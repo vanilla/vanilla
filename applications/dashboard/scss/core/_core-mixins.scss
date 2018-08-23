@@ -11,3 +11,24 @@
 @mixin sassToCss($varName, $varVal) {
     --#{stripDollarSign($varName)}: $varVal;
 }
+
+
+
+
+
+// Icon Buttons
+
+@mixin iconButtonHoverState() {
+    opacity: 1;
+    cursor: pointer;
+}
+
+@mixin iconButtonFocusState($includeBgStyles: true) {
+    opacity: 1;
+    outline: $state-focus_outline;
+}
+
+@mixin iconButtonActiveState($includeBgStyles: false, $includeFgStyles: true) {
+    opacity: 1;
+    @content; // Optional extra styles
+}

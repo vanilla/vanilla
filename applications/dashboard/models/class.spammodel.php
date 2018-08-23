@@ -103,6 +103,9 @@ class SpamModel extends Gdn_Pluggable {
 
         // Log the spam entry.
         if ($spam && val('Log', $options, true)) {
+            // Make sure all IP addresses are packed before insertion
+            $data = ipEncodeRecursive($data);
+
             $logOptions = [];
             switch ($recordType) {
                 case 'Registration':

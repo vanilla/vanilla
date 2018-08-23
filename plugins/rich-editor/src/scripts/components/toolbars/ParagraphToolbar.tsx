@@ -128,7 +128,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
             return icons.codeBlock();
         }
         if (activeFormats[SpoilerLineBlot.blotName] === true) {
-            return icons.spoiler();
+            return icons.spoiler("richEditorButton-icon");
         }
 
         // Fallback to paragraph formatting.

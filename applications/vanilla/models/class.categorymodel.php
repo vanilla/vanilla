@@ -191,12 +191,12 @@ class CategoryModel extends Gdn_Model {
      * @param array &$category The category to calculate.
      * @param bool|null $addUserCategory
      */
-    private function calculateUser(&$category, $addUserCategory = null) {
+    private function calculateUser(array &$category, $addUserCategory = null) {
         // Kludge to make sure that the url is absolute when reaching the user's screen (or API).
         $category['Url'] = self::categoryUrl($category, '', true);
 
         if (!isset($category['PhotoUrl'])) {
-            if ($photo = val('Photo', $category)) {
+            if ($photo = ($category['Photo'] ?? false)) {
                 $category['PhotoUrl'] = Gdn_Upload::url($photo);
             }
         }
@@ -217,8 +217,8 @@ class CategoryModel extends Gdn_Model {
         if ($addUserCategory || ($addUserCategory === null && $this->joinUserCategory())) {
             $userCategories = $this->getUserCategories();
 
-            $dateMarkedRead = val('DateMarkedRead', $category);
-            $userData = val($category['CategoryID'], $userCategories);
+            $dateMarkedRead = ($category['DateMarkedRead'] ?? false );
+            $userData = ($userCategories[$category['CategoryID']] ?? false);
             if ($userData) {
                 $userDateMarkedRead = $userData['DateMarkedRead'];
 
@@ -235,7 +235,7 @@ class CategoryModel extends Gdn_Model {
             }
 
             // Calculate the following field.
-            $following = !((bool)val('Archived', $category) || (bool)val('Unfollow', $userData, false));
+            $following = !((bool)($category['Archived'] ?? false) || (bool)($userData['Unfollow'] ?? false));
             $category['Following'] = $following;
 
             $category['Followed'] = boolval($userData['Followed']);
@@ -244,8 +244,8 @@ class CategoryModel extends Gdn_Model {
             if (strcasecmp($category['DisplayAs'], 'heading') === 0) {
                 $category['Read'] = false;
             } elseif ($dateMarkedRead) {
-                if (val('LastDateInserted', $category)) {
-                    $category['Read'] = Gdn_Format::toTimestamp($dateMarkedRead) >= Gdn_Format::toTimestamp($category['LastDateInserted']);
+                if ($lastDateInserted = ($category['LastDateInserted'] ?? false)) {
+                    $category['Read'] = Gdn_Format::toTimestamp($dateMarkedRead) >= Gdn_Format::toTimestamp($lastDateInserted);
                 } else {
                     $category['Read'] = true;
                 }
@@ -597,18 +597,18 @@ class CategoryModel extends Gdn_Model {
      *
      * @param array &$category The category to calculate.
      */
-    private static function calculate(&$category) {
+    private static function calculate(array &$category) {
         $category['Url'] = self::categoryUrl($category, false, '/');
 
-        if (val('Photo', $category)) {
-            $category['PhotoUrl'] = Gdn_Upload::url($category['Photo']);
+        if ($photo = ($category['Photo'] ?? false)) {
+            $category['PhotoUrl'] = Gdn_Upload::url($photo);
         } else {
             $category['PhotoUrl'] = '';
         }
 
         self::calculateDisplayAs($category);
 
-        if (!val('CssClass', $category)) {
+        if (!($category['CssClass'] ?? false)) {
             $category['CssClass'] = 'Category-'.$category['UrlCode'];
         }
 
@@ -892,11 +892,16 @@ class CategoryModel extends Gdn_Model {
         if (is_numeric($category)) {
             $category = static::categories($category);
         }
-
-        $permissionCategoryID = val('PermissionCategoryID', $category, -1);
+        if (is_array($category)) {
+            $permissionCategoryID = ($category['PermissionCategoryID'] ?? -1);
+            $categoryID = ($category['CategoryID'] ?? false);
+        } else {
+            $permissionCategoryID = ($category->PermissionCategoryID ?? -1);
+            $categoryID = ($category->CategoryID ?? false);
+        }
 
         $result = Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $permissionCategoryID)
-            || Gdn::session()->checkPermission($permission, $fullMatch, 'Category', val('CategoryID', $category));
+            || Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $categoryID);
 
         return $result;
     }
@@ -1739,8 +1744,8 @@ class CategoryModel extends Gdn_Model {
             foreach ($iDs as $iD) {
                 $category = $categories[$iD];
 
-                $dateMarkedRead = val('DateMarkedRead', $category);
-                $row = val($iD, $userData);
+                $dateMarkedRead = ($category['DateMarkedRead'] ?? false);
+                $row = ($userData[$iD] ?? false);
                 if ($row) {
                     $userDateMarkedRead = $row['DateMarkedRead'];
 
@@ -1755,7 +1760,7 @@ class CategoryModel extends Gdn_Model {
                 }
 
                 // Calculate the following field.
-                $following = !((bool)val('Archived', $category) || (bool)val('Unfollow', $row, false));
+                $following = !((bool)($category['Archived'] ?? false) || (bool)($row['Unfollow'] ?? false));
                 $categories[$iD]['Following'] = $following;
 
                 $categories[$iD]['Followed'] = boolval($row['Followed']);
@@ -1764,8 +1769,8 @@ class CategoryModel extends Gdn_Model {
                 if ($category['DisplayAs'] == 'Heading') {
                     $categories[$iD]['Read'] = false;
                 } elseif ($dateMarkedRead) {
-                    if (val('LastDateInserted', $category)) {
-                        $categories[$iD]['Read'] = Gdn_Format::toTimestamp($dateMarkedRead) >= Gdn_Format::toTimestamp($category['LastDateInserted']);
+                    if ($lastDateInserted = ($category['LastDateInserted'] ?? false)) {
+                        $categories[$iD]['Read'] = Gdn_Format::toTimestamp($dateMarkedRead) >= Gdn_Format::toTimestamp($lastDateInserted);
                     } else {
                         $categories[$iD]['Read'] = true;
                     }

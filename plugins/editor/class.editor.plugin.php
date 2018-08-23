@@ -563,6 +563,9 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addJsFile('jquery.iframe-transport.js', 'plugins/editor');
         $c->addJsFile('jquery.fileupload.js', 'plugins/editor');
 
+        // Mentions
+        $c->addJsFile('jquery.atwho.js');
+
         // Set definitions for JavaScript to read
         $c->addDefinition('editorVersion', $this->pluginInfo['Version']);
         $c->addDefinition('editorInputFormat', $this->Format);

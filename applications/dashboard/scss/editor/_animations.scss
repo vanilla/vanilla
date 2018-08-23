@@ -9,4 +9,8 @@
 
 .collapsableContent {
     transition: max-height 0.2s ease;
+
+    *:last-child {
+        margin-bottom: 0;
+    }
 }

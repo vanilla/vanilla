@@ -69,7 +69,7 @@ export default class ParagraphToolbarMenuItems extends React.PureComponent<IProp
                 isDisabled: activeFormats.codeBlock === true,
             },
             {
-                icon: icons.spoiler(),
+                icon: icons.spoiler("richEditorButton-icon"),
                 label: t("Format as spoiler"),
                 onClick: this.formatSpoiler,
                 isActive: activeFormats["spoiler-line"] === true,

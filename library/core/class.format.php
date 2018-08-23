@@ -1434,7 +1434,10 @@ class Gdn_Format {
                 'regex' => ['/https?:\/\/embed.gettyimages\.com\/([\w=?&;+-_]*)\/([\d]*)\/([\d]*)/i']
             ],
             'Twitch' => [
-                'regex' => ['/https?:\/\/(?:www\.)?twitch\.tv\/([\w]+)/i']
+                'regex' => ['/https?:\/\/(?:www\.)?twitch\.tv\/([\w]+)$/i']
+            ],
+            'TwitchRecorded' => [
+                'regex' => ['/https?:\/\/(?:www\.)?twitch\.tv\/videos\/(\w+)$/i']
             ],
             'Soundcloud' => [
                 'regex' => ['/https?:(?:www\.)?\/\/soundcloud\.com\/([\w=?&;+-_]*)\/([\w=?&;+-_]*)/i']
@@ -1594,6 +1597,12 @@ EOT;
             case 'Twitch':
                 return <<<EOT
 <iframe src="https://player.twitch.tv/?channel={$matches[1]}&autoplay=false" height="360" width="640" frameborder="0" scrolling="no" autoplay="false" allowfullscreen="true"></iframe>
+EOT;
+                break;
+
+            case 'TwitchRecorded':
+                return <<<EOT
+<iframe src="https://player.twitch.tv/?video={$matches[1]}&autoplay=false" height="360" width="640" frameborder="0" scrolling="no" autoplay="false" allowfullscreen="true"></iframe>
 EOT;
                 break;
 

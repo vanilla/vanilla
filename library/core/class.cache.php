@@ -410,15 +410,14 @@ abstract class Gdn_Cache {
      */
     abstract public function add($key, $value, $options = []);
 
-    public function stripKey($key, $options) {
-        $usePrefix = !val(Gdn_Cache::FEATURE_NOPREFIX, $options, false);
-        $forcePrefix = val(Gdn_Cache::FEATURE_FORCEPREFIX, $options, null);
+    public function stripKey($key, array $options) {
+        $usePrefix = !($options[Gdn_Cache::FEATURE_NOPREFIX] ?? false);
 
         if ($usePrefix) {
+            $forcePrefix = ($options[Gdn_Cache::FEATURE_FORCEPREFIX] ?? null);
             $key = substr($key, strlen($this->getPrefix($forcePrefix)) + 1);
         }
         return $key;
-
     }
 
     /**
@@ -642,12 +641,12 @@ abstract class Gdn_Cache {
         return true;
     }
 
-    public function makeKey($key, $options) {
-        $usePrefix = !val(Gdn_Cache::FEATURE_NOPREFIX, $options, false);
-        $forcePrefix = val(Gdn_Cache::FEATURE_FORCEPREFIX, $options, null);
+    public function makeKey($key, array $options) {
+        $usePrefix = !($options[Gdn_Cache::FEATURE_NOPREFIX] ?? false);
 
         $prefix = '';
         if ($usePrefix) {
+            $forcePrefix = ($options[Gdn_Cache::FEATURE_FORCEPREFIX] ?? null);
             $prefix = $this->getPrefix($forcePrefix).'!';
         }
 

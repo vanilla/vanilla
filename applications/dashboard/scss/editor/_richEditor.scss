@@ -592,7 +592,7 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
         line-height: $global-condensed_lineHeight;
     }
 
-    > * {
+    > *:not(.emoji) {
         &:not(:last-child) {
             margin-bottom: $global-block_margin;
         }
@@ -634,12 +634,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
             margin-bottom: 0;
         }
     }
-}
-
-.emoji { // old emoji support
-    width: 20px;
-    height: 20px;
-    vertical-align: -.232em;
 }
 
 .richEditor-button {

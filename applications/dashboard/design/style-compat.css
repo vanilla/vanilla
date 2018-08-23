@@ -1378,7 +1378,7 @@ label.checkbox input.checkbox-input {
   line-height: 1.25;
 }
 
-.userContent > *:not(:last-child) {
+.userContent > *:not(:last-child):not(.emoji) {
   margin-bottom: 14px;
 }
 
@@ -1415,12 +1415,6 @@ label.checkbox input.checkbox-input {
 .userContent li,
 .userContent li *:last-child {
   margin-bottom: 0;
-}
-
-.emoji {
-  width: 20px;
-  height: 20px;
-  vertical-align: -.232em;
 }
 
 .richEditor-button {

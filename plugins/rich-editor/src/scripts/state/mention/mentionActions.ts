@@ -47,7 +47,7 @@ export function filterSuggestions(users: IMentionSuggestionData[], searchName: s
 /**
  * Make an API request for mention suggestions. These results are cached by the lookup username.
  */
-function loadUsers(username: string, editorID: string) {
+function loadUsers(username: string) {
     return (dispatch: Dispatch<any>, getState: () => IStoreState) => {
         const { usersTrie } = getState().editor.mentions;
 

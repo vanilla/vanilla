@@ -353,8 +353,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
 }
 
 function mapDispatchToProps(dispatch) {
-    const mentionLookupFn = (username: string, editorID: string) =>
-        dispatch(mentionThunks.loadUsers(username, editorID));
+    const mentionLookupFn = (username: string) => dispatch(mentionThunks.loadUsers(username));
 
     return {
         lookupMentions: debounce(mentionLookupFn, 50) as any,
@@ -373,11 +372,10 @@ function mapStateToProps(state: IStoreState) {
     } = state.editor.mentions;
 
     const currentNode = currentUsername && usersTrie.getValue(currentUsername);
-    const showLoader = currentNode && currentNode.status === "PENDING";
-    const suggestions = lastSuccessfulUsername ? usersTrie.getValue(lastSuccessfulUsername) : null;
+    const showLoader = currentNode && currentNode.status === LoadStatus.LOADING;
 
     return {
-        suggestions,
+        suggestions: lastSuccessfulUsername ? usersTrie.getValue(lastSuccessfulUsername) : null,
         lastSuccessfulUsername,
         activeSuggestionID,
         activeSuggestionIndex,
@@ -390,4 +388,4 @@ const withRedux = connect(
     mapDispatchToProps,
 );
 
-export default withRedux(withEditor<any>(MentionToolbar as any));
+export default withRedux(withEditor(MentionToolbar as any));

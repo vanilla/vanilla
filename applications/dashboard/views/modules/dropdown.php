@@ -5,7 +5,7 @@ $trigger = $dropdown->getTrigger();
 ?><span class="ToggleFlyout <?php echo $dropdown->getCssClass(); ?>"><?php
     if (($trigger['type'] ?? '') === 'button') :
     ?><span class="Button-Options">
-        <span class="OptionsTitle" title="<?php echo t('Options'); ?>">
+        <span class="OptionsTitle" title="<?php echo DiscussionModel::t('Options'); ?>">
             <?php echo $trigger['text']; ?>
         </span>
         <?php echo sprite('SpFlyoutHandle', 'Arrow'); ?>

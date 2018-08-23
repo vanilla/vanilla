@@ -80,6 +80,8 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             this.props.lookupMentions(text, this.props.editorID);
         }
 
+        // If we have loading or valid suggestions and a valid mention selection
+        // Create an autocompleteblot if it doesn't exist, and inject accessibility attributes into it.
         const suggestions = this.props.suggestions;
         if (suggestions) {
             const isLoading = suggestions && suggestions.status === LoadStatus.LOADING;

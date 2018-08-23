@@ -3247,7 +3247,31 @@ class DiscussionModel extends Gdn_Model {
             '%s view' => Gdn::translate('%s view'),
             '%s views' => Gdn::translate('%s views'),
             '%s comment' => Gdn::translate('%s comment'),
-            '%s comments' => Gdn::translate('%s comments')
+            '%s comments' => Gdn::translate('%s comments'),
+            '%s point' => Gdn::translate('%s point'),
+            '%s points' => Gdn::translate('%s points'),
+            'Most recent by %1$s' => Gdn::translate('Most recent by %1$s'),
+            'Started by %1$s' => Gdn::translate('Started by %1$s'),
+            'via %s' => Gdn::translate('via %s'),
+            'Options' => Gdn::translate('Options')
         ];
+    }
+
+    /**
+     * bigPlural global function replacement
+     *
+     * @param int $number
+     * @param string $format
+     *
+     * @return string
+     */
+    public static function bigPluralHtmlSpan(int $number, string $format) {
+        if ($number === 1) {
+            $format = self::t($format);
+        } else {
+            $format = self::t($format.'s');
+        }
+        $title = sprintf($format, number_format($number));
+        return '<span title="'.$title.'" class="Number">'.Gdn_Format::bigNumber($number).'</span>';
     }
 }

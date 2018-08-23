@@ -1249,9 +1249,9 @@ if (!function_exists('pluralTranslate')) {
      */
     function pluralTranslate($number, $singular, $plural, $singularDefault = false, $pluralDefault = false) {
         if ($number == 1) {
-            return t($singular, $singularDefault);
+            return Gdn::translate($singular, $singularDefault);
         } else {
-            return t($plural, $pluralDefault);
+            return Gdn::translate($plural, $pluralDefault);
         }
     }
 }
@@ -1383,15 +1383,17 @@ if (!function_exists('userAnchor')) {
             $cssClass = null;
         } elseif (is_string($options)) {
             $options = ['Px' => $options];
+        } else {
+            $options = (array)$options;
         }
 
-        $px = val('Px', $options, '');
+        $px = ($options['Px'] ?? '');
         $name = val($px.'Name', $user, t('Unknown'));
-        $text = val('Text', $options, htmlspecialchars($name)); // Allow anchor text to be overridden.
+        $text = ($options['Text'] ?? htmlspecialchars($name)); // Allow anchor text to be overridden.
 
         $attributes = [
             'class' => $cssClass,
-            'rel' => val('Rel', $options)
+            'rel' => ($options['Rel'] ?? false)
         ];
         if (isset($options['title'])) {
             $attributes['title'] = $options['title'];

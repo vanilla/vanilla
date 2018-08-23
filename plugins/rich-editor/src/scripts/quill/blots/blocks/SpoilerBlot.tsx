@@ -50,8 +50,9 @@ export class SpoilerWrapperBlot extends WrapperBlot {
 
     constructor(domNode) {
         super(domNode);
-        // this.attachToggleButton();
-        const button = ReactDOM.render(<SpoilerButton />, this.domNode);
+        const button = document.createElement("div");
+        this.domNode.appendChild(button);
+        ReactDOM.render(<SpoilerButton />, button);
     }
 
     public attach() {

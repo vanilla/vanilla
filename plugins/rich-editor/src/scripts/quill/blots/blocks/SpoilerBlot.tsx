@@ -50,8 +50,13 @@ export class SpoilerWrapperBlot extends WrapperBlot {
 
     constructor(domNode) {
         super(domNode);
-        // this.attachToggleButton();
-        const button = ReactDOM.render(<SpoilerButton />, this.domNode);
+
+        // We need to synchronously create a spot for this button to be rendered. Otherwise react's async rendering
+        // could cause the button to be rendered after quill inserts the first editable line.
+        // The button ALWAYS needs to be first.
+        const button = document.createElement("div");
+        this.domNode.appendChild(button);
+        ReactDOM.render(<SpoilerButton />, button);
     }
 
     public attach() {

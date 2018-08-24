@@ -33,6 +33,7 @@ export async function makeProdConfig(section: string) {
         chunkFilename: "[name].min.js?[chunkhash]",
         publicPath: "/",
         path: VANILLA_ROOT,
+        library: `vanilla${section}`,
     };
     baseConfig.devtool = "source-map";
     baseConfig.optimization = {

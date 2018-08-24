@@ -525,8 +525,8 @@ if (!class_exists('HeadModule', false)) {
                 $tag = $attributes[self::TAG_KEY];
 
                 // Inline the content of the tag, if necessary.
-                if (val('_hint', $attributes) == 'inline') {
-                    $path = val('_path', $attributes);
+                if (($attributes['_hint'] ?? false) == 'inline') {
+                    $path = ($attributes['_path'] ?? false);
                     if ($path && !stringBeginsWith($path, 'http')) {
                         $attributes[self::CONTENT_KEY] = file_get_contents($path);
 

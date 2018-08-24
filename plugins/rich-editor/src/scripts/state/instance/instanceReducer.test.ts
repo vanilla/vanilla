@@ -7,6 +7,7 @@
 import { expect } from "chai";
 import instanceReducer, { initialState, defaultInstance } from "@rich-editor/state/instance/instanceReducer";
 import { actions as instanceActions } from "./instanceActions";
+import Quill from "quill/core";
 
 describe("instanceReducer", () => {
     it("should return the initial state", () => {
@@ -27,12 +28,16 @@ describe("instanceReducer", () => {
     });
 
     describe("SET_SELECTION", () => {
+        let quill: Quill;
+        before(() => {
+            quill = new Quill(document.body);
+        });
         it("always sets the passed selection as the currentSelection", () => {
             const init = { 123: defaultInstance };
             const selections = [null, { index: 0, length: 0 }];
 
             selections.forEach(selection => {
-                const action = instanceActions.setSelection(123, selection);
+                const action = instanceActions.setSelection(123, selection, quill);
                 expect(instanceReducer(init, action)[123].currentSelection).deep.equals(selection);
             });
         });
@@ -41,7 +46,7 @@ describe("instanceReducer", () => {
             const goodSelections = [{ index: 5, length: 93 }, { index: 0, length: 0 }];
 
             goodSelections.forEach(selection => {
-                const action = instanceActions.setSelection(123, selection);
+                const action = instanceActions.setSelection(123, selection, quill);
                 expect(instanceReducer(init, action)[123].lastGoodSelection).deep.equals(selection);
             });
         });
@@ -54,7 +59,7 @@ describe("instanceReducer", () => {
                 },
             };
 
-            const action = instanceActions.setSelection(123, null);
+            const action = instanceActions.setSelection(123, null, quill);
             expect(instanceReducer(init, action)[123].lastGoodSelection).deep.equals(lastGoodSelection);
         });
     });

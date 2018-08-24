@@ -25,6 +25,9 @@ if (!$hasUserID) {
     $firstTimeHere = !($this->Form->isPostBack() && $this->Form->getFormValue('Connect', null) !== null);
     $connectNameProvided = (bool)$this->Form->getFormValue('ConnectName');
 
+    $validationResults = $this->Form->validationResults();
+    $usernameNotValid = array_key_exists('Name', $validationResults) || array_key_exists('ConnectName', $validationResults);
+
     // Buckle up, deciding whether to show this field is intense.
     // Any of these 3 scenarios will do it:
     $displayConnectName =
@@ -34,7 +37,9 @@ if (!$hasUserID) {
         // 2) If you clicked submit and we found matches (but validation failed and you need to try again).
         || (!$firstTimeHere && count($ExistingUsers))
         // 3) We're forcing a manual username selection.
-        || !$allowConnect;
+        || !$allowConnect
+        // 4) There was an error with the submitted name.
+        || $usernameNotValid;
 }
 ?>
 <div class="Connect">

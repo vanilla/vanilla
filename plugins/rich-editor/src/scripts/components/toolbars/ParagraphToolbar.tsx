@@ -10,7 +10,7 @@ import { t } from "@dashboard/application";
 import * as icons from "@rich-editor/components/icons";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { watchFocusInDomTree } from "@dashboard/dom";
-import { createEditorFlyoutEscapeListener, isEmbedSelected } from "@rich-editor/quill/utility";
+import { createEditorFlyoutEscapeListener, isEmbedSelected, forceSelectionUpdate } from "@rich-editor/quill/utility";
 import Formatter from "@rich-editor/quill/Formatter";
 import ParagraphToolbarMenuItems from "@rich-editor/components/toolbars/pieces/ParagraphToolbarMenuItems";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
@@ -226,6 +226,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
         this.setState({ hasFocus: !this.state.hasFocus }, () => {
             if (this.state.hasFocus) {
                 this.menuRef.current!.focusFirstItem();
+                forceSelectionUpdate();
             }
         });
     };

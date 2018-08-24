@@ -93,7 +93,7 @@ describe("Formatter", () => {
         const formattingFunction = (range = getFullRange()) => formatter.codeBlock(range);
         testNoLineFormatInlinePreservation("codeBlock", formattingFunction, OpUtils.codeBlock());
         testLineFormatExclusivity("codeBlock", formattingFunction, OpUtils.codeBlock());
-        // testMultiLineFormatting("codeBlock", formattingFunction, OpUtils.codeBlock());
+        testCodeBlockFormatStripping(formattingFunction);
     });
 
     function assertQuillInputOutput(input: any[], expectedOutput: any[], formattingFunction: () => void) {
@@ -210,6 +210,35 @@ describe("Formatter", () => {
                     assertQuillInputOutput(initial, expected, formatterFunction);
                 });
             });
+        });
+    }
+
+    function testCodeBlockFormatStripping(formatterFunction: () => void) {
+        it("can strip all other formats before applying the codeBlock format", () => {
+            const initial = [
+                { insert: "asd" },
+                { attributes: { link: "http://vanillafactory.spawn/en/post/discussion/asdfasdf" }, insert: "f asd" },
+                { insert: "f " },
+                {
+                    attributes: { strike: true, italic: true, bold: true },
+                    insert: { mention: { name: "member", userID: 8 } },
+                },
+                { attributes: { strike: true }, insert: "  " },
+                { attributes: { strike: true, bold: true }, insert: "asd" },
+                { attributes: { bold: true }, insert: "fasdf " },
+                { attributes: { italic: true, bold: true }, insert: "asl;dfjad" },
+                { attributes: { italic: true, bold: true, codeInline: true }, insert: "asdf" },
+                { attributes: { italic: true, bold: true }, insert: " " },
+                { insert: "\n" },
+            ];
+
+            const expected = [
+                {
+                    insert: "asdf asdf @member  asdfasdf asl;dfjadasdf ",
+                },
+                { attributes: { codeBlock: true }, insert: "\n" },
+            ];
+            assertQuillInputOutput(initial, expected, formatterFunction);
         });
     }
 

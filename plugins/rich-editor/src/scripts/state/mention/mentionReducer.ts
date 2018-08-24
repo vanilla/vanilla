@@ -8,6 +8,7 @@ import * as mentionActions from "./mentionActions";
 import MentionTrie from "@rich-editor/state/mention/MentionTrie";
 import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 import { IMentionState } from "@rich-editor/@types/store";
+import { LoadStatus } from "@dashboard/@types/api";
 
 export const initialState: IMentionState = {
     lastSuccessfulUsername: null,
@@ -45,7 +46,7 @@ export default function mentionReducer(state = initialState, action: mentionActi
         case mentionActions.LOAD_USERS_REQUEST: {
             const { username } = action.payload;
             state.usersTrie.insert(username, {
-                status: "PENDING",
+                status: LoadStatus.LOADING,
             });
 
             // We want to invalidate the previous results unless:
@@ -53,7 +54,7 @@ export default function mentionReducer(state = initialState, action: mentionActi
             // - The new string is a superset of the old one.
             let shouldKeepPreviousResults = false;
             const previousSuccessfulName = state.lastSuccessfulUsername;
-            if (previousSuccessfulName != null && username.length > previousSuccessfulName.length) {
+            if (previousSuccessfulName != null && username.length >= previousSuccessfulName.length) {
                 const newNameSubstring = username.substring(0, previousSuccessfulName.length);
                 if (newNameSubstring === previousSuccessfulName) {
                     shouldKeepPreviousResults = true;
@@ -69,8 +70,8 @@ export default function mentionReducer(state = initialState, action: mentionActi
         case mentionActions.LOAD_USERS_FAILURE: {
             const { username, error } = action.payload;
             state.usersTrie.insert(username, {
-                status: "FAILED",
-                users: null,
+                status: LoadStatus.ERROR,
+                data: undefined,
                 error,
             });
             return state;
@@ -78,8 +79,8 @@ export default function mentionReducer(state = initialState, action: mentionActi
         case mentionActions.LOAD_USERS_SUCCESS: {
             const { username, users } = action.payload;
             state.usersTrie.insert(username, {
-                status: "SUCCESSFUL",
-                users: sortSuggestions(users, username),
+                status: LoadStatus.SUCCESS,
+                data: sortSuggestions(users, username),
             });
 
             const firstUserID = users.length > 0 ? users[0].domID : "";

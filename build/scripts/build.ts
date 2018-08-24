@@ -7,7 +7,7 @@
 import webpack, { Stats } from "webpack";
 import { makeProdConfig } from "./configs/makeProdConfig";
 import { makeDevConfig } from "./configs/makeDevConfig";
-import serve, { Result, InitializedKoa, Options } from "webpack-serve";
+import serve, { InitializedKoa, Options } from "webpack-serve";
 import { getOptions, BuildMode } from "./options";
 import chalk from "chalk";
 import { installNodeModules } from "./utility/moduleUtils";

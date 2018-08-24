@@ -74,6 +74,11 @@ class DropdownModule extends Gdn_Module {
     use \Garden\Translation;
 
     /**
+     * @var array
+     */
+    protected static $views = [];
+
+    /**
      * @var string The id value of the trigger.
      */
     private $triggerId;
@@ -250,7 +255,27 @@ class DropdownModule extends Gdn_Module {
             'Refetch Page' => Gdn::translate('Refetch Page'),
             'Move' => Gdn::translate('Move'),
             'Tag' => Gdn::translate('Tag'),
-            'Delete Discussion' => Gdn::translate('Delete Discussion')
+            'Delete Discussion' => Gdn::translate('Delete Discussion'),
+            'Options' => Gdn::translate('Options')
         ];
+    }
+
+    /**
+     * Method overwrites parent method to cache response statically
+     *
+     * @param string $view
+     * @param string $applicationFolder
+     *
+     * @return array|mixed
+     *
+     * @throws Exception
+     */
+    public function fetchViewLocation($view = '', $applicationFolder = '') {
+        $key = $applicationFolder . ':' . $view;
+        if (!array_key_exists($key, self::$views)) {
+            $viewPath = parent::fetchViewLocation($view, $applicationFolder);
+            self::$views[$key] = $viewPath;
+        }
+        return self::$views[$key];
     }
 }

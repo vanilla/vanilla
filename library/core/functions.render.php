@@ -1388,7 +1388,8 @@ if (!function_exists('userAnchor')) {
         }
 
         $px = ($options['Px'] ?? '');
-        $name = val($px.'Name', $user, t('Unknown'));
+
+        $name = val($px.'Name', $user, UserModel::t('Unknown'));
         $text = ($options['Text'] ?? htmlspecialchars($name)); // Allow anchor text to be overridden.
 
         $attributes = [

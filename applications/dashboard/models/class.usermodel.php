@@ -14,6 +14,7 @@ use Garden\EventManager;
  * Handles user data.
  */
 class UserModel extends Gdn_Model {
+    use \Garden\Translation;
 
     /** Deprecated. */
     const DEFAULT_CONFIRM_EMAIL = 'You need to confirm your email address before you can continue. Please confirm your email address by clicking on the following link: {/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';

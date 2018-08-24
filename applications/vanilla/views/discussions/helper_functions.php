@@ -177,12 +177,12 @@ if (!function_exists('WriteDiscussion')) :
                     writeTags($discussion);
                     ?>
                     <span class="MItem MCount ViewCount"><?php
-                        printf(pluralTranslate($discussion->CountViews,
+                        printf(DiscussionModel::pluralTranslate($discussion->CountViews,
                             '%s view html', '%s views html', DiscussionModel::t('%s view'), DiscussionModel::t('%s views')),
                             DiscussionModel::bigPluralHtmlSpan($discussion->CountViews, '%s view'));
                         ?></span>
          <span class="MItem MCount CommentCount"><?php
-             printf(pluralTranslate($discussion->CountComments,
+             printf(DiscussionModel::pluralTranslate($discussion->CountComments,
                  '%s comment html', '%s comments html', DiscussionModel::t('%s comment'), DiscussionModel::t('%s comments')),
                  DiscussionModel::bigPluralHtmlSpan($discussion->CountComments, '%s comment'));
              ?></span>

@@ -3274,4 +3274,12 @@ class DiscussionModel extends Gdn_Model {
         $title = sprintf($format, number_format($number));
         return '<span title="'.$title.'" class="Number">'.Gdn_Format::bigNumber($number).'</span>';
     }
+
+    public static function pluralTranslate(int $number, string $singular, string $plural, $singularDefault = false, $pluralDefault = false) {
+        if ($number == 1) {
+            return self::t($singular, $singularDefault);
+        } else {
+            return self::t($plural, $pluralDefault);
+        }
+    }
 }

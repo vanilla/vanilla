@@ -98,6 +98,7 @@ export default function registerQuill() {
     // The inline blot needs its order changed
     const blotsAllowingMentionComboBox = [
         "blots/block",
+        "formats/list/item",
         "formats/header",
         "formats/bold",
         "formats/italic",

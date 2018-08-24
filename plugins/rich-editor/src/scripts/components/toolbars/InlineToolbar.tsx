@@ -26,7 +26,6 @@ interface IState {
     inputValue: string;
     isLinkMenuOpen: boolean;
     menuHasFocus: boolean;
-    quillHasFocus: boolean;
 }
 
 /**
@@ -58,7 +57,6 @@ export class InlineToolbar extends React.Component<IProps, IState> {
             inputValue: "",
             isLinkMenuOpen: false,
             menuHasFocus: false,
-            quillHasFocus: false,
         };
     }
 

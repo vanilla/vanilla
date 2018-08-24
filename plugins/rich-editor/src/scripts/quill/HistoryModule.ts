@@ -18,6 +18,7 @@ const SHORTKEY = /Mac/i.test(navigator.platform) ? "metaKey" : "ctrlKey";
 export default class HistoryModule extends BaseHistoryModule {
     private readonly EMBED_KEY = "insert.embed-external";
     private readonly EMBED_CONFIRM_KEY = "insert.embed-external.loaderData.loaded";
+    private readonly CODE_KEY = "attributes.codeBlock";
     private readonly Z_KEYCODE = 90;
 
     /**
@@ -46,6 +47,10 @@ export default class HistoryModule extends BaseHistoryModule {
 
     public record(changeDelta: DeltaStatic, oldDelta: DeltaStatic) {
         if (this.operationsContainKey(changeDelta.ops, this.EMBED_KEY)) {
+            this.cutoff();
+        }
+
+        if (this.operationsContainKey(changeDelta.ops, this.CODE_KEY)) {
             this.cutoff();
         }
 

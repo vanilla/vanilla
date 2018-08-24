@@ -6,6 +6,9 @@
 
 import * as instanceActions from "./instanceActions";
 import { IEditorInstanceState, IEditorInstance } from "@rich-editor/@types/store";
+import Quill, { RangeStatic } from "quill/core";
+import { getMentionRange, rangeContainsBlot } from "@rich-editor/quill/utility";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 
 const defaultSelection = {
     index: 0,
@@ -16,6 +19,7 @@ export const initialState: IEditorInstanceState = {};
 export const defaultInstance: IEditorInstance = {
     currentSelection: defaultSelection,
     lastGoodSelection: defaultSelection,
+    mentionSelection: null,
 };
 
 /**
@@ -50,15 +54,17 @@ export default function instanceReducer(
         }
         case instanceActions.SET_SELECTION: {
             validateIDExistance(state, action);
-            const { selection, editorID } = action.payload;
+            const { selection, editorID, quill } = action.payload;
             const instanceState = state[editorID];
             const { lastGoodSelection } = instanceState;
+
             return {
                 ...state,
                 [editorID]: {
                     ...instanceState,
                     currentSelection: selection,
                     lastGoodSelection: selection !== null ? selection : lastGoodSelection,
+                    mentionSelection: getMentionRange(quill, selection),
                 },
             };
         }

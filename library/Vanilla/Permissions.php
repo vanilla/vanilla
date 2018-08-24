@@ -6,6 +6,7 @@
 
 namespace Vanilla;
 
+use Garden\StaticConfig;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\DelimitedScheme;
 
@@ -14,6 +15,7 @@ use Vanilla\Utility\DelimitedScheme;
  */
 class Permissions implements \JsonSerializable {
     use PermissionsTranslationTrait;
+    use StaticConfig;
 
     const BAN_BANNED = '!banned';
     const BAN_DELETED = '!deleted';
@@ -37,6 +39,11 @@ class Permissions implements \JsonSerializable {
      * @var array An array of bans that override all permissions a user may have.
      */
     private $bans = [];
+
+    /**
+     * @var array
+     */
+    protected static $staticCache = [];
 
     /**
      * Permissions constructor.
@@ -176,8 +183,15 @@ class Permissions implements \JsonSerializable {
      * @see Permissions::addBan(), Permissions::getBan()
      */
     public function isBanned(array $permissions = []) {
-        $ban = $this->getBan($permissions);
-        return $ban !== null;
+        if (count($permissions) === 1) {
+            if (!key_exists($permissions[0], self::$staticCache)) {
+                self::$staticCache[$permissions[0]] = ($this->getBan($permissions) !== null) ;
+            }
+            return self::$staticCache[$permissions[0]];
+        } else {
+            $ban = $this->getBan($permissions);
+            return $ban !== null;
+        }
     }
 
     /**

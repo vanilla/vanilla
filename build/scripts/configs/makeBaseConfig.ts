@@ -105,16 +105,27 @@ ${chalk.green(aliases)}`;
                     test: /\.s?css$/,
                     use: [
                         options.mode === BuildMode.DEVELOPMENT ? "style-loader" : MiniCssExtractPlugin.loader,
-                        "css-loader",
+                        {
+                            loader: "css-loader",
+                            options: {
+                                sourceMap: true,
+                            },
+                        },
                         {
                             loader: "postcss-loader",
                             options: {
+                                sourceMap: true,
                                 config: {
                                     path: path.resolve(__dirname),
                                 },
                             },
                         },
-                        "sass-loader",
+                        {
+                            loader: "sass-loader",
+                            options: {
+                                sourceMap: true,
+                            },
+                        },
                     ],
                 },
             ],

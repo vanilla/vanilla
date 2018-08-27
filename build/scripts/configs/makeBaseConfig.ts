@@ -141,11 +141,6 @@ ${chalk.green(aliases)}`;
                 checkSyntacticErrors: true,
                 async: true,
             }),
-            // new MiniCssExtractPlugin({
-            //     // Options similar to the same options in webpackOptions.output
-            //     // both options are optional
-            //     filename: "[name].min.css",
-            // }),
         ],
         resolve: {
             modules: modulePaths,
@@ -170,6 +165,14 @@ ${chalk.green(aliases)}`;
             modules: [path.join(VANILLA_ROOT, "node_modules")],
         },
     };
+
+    if (options.mode === BuildMode.PRODUCTION) {
+        config.plugins.push(
+            new MiniCssExtractPlugin({
+                filename: "[name].min.css",
+            }),
+        );
+    }
 
     if (options.fix) {
         config.plugins.unshift(getPrettierPlugin());

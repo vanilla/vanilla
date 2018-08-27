@@ -48,7 +48,7 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
         const { mentionSelection } = this.props;
 
         const hasResults = mentionProps.length > 0 || showLoader;
-        const classes = classNames("atMentionList-items", "MenuItems");
+        const classes = classNames("richEditor-menu", "atMentionList-items");
         const isVisible = hasResults && (!!mentionSelection || this.hasFocusedElement);
 
         return (

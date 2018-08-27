@@ -73,8 +73,8 @@ export default function MentionSuggestion(props: IMentionProps) {
         >
             <button type="button" className="atMentionList-suggestion">
                 <span className="atMentionList-user">
-                    <span className="PhotoWrap atMentionList-photoWrap">
-                        <img src={photoUrl} alt={name} className="atMentionList-photo ProfilePhoto" />
+                    <span className="atMentionList-photoWrap">
+                        <img src={photoUrl} alt={name} className="atMentionList-photo" />
                     </span>
                     <span className="atMentionList-userName">{formattedName}</span>
                 </span>

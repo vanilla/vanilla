@@ -41,7 +41,7 @@ const statOptions = {
 };
 
 async function runProd() {
-    const config = [await makeProdConfig("knowledge")];
+    const config = [await makeProdConfig("forum"), await makeProdConfig("admin"), await makeProdConfig("knowledge")];
     const compiler = webpack(config);
     compiler.run((err: Error, stats: Stats) => {
         if (err) {

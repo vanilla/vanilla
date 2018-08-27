@@ -14,56 +14,19 @@ use Gdn;
  *
  */
 trait Translation {
-    /**
-     * @var array
-     */
-    protected static $t = [];
-
-    /**
-     * @var boolean
-     */
-    protected static $tInit = false;
-
-    /**
-     * Returns of translation of a string or all translations as an associative array
-     *
-     * @param string $key String to translate
-     *
-     * @return string
-     */
-    public static function t(string $key) {
-        if (!self::$tInit) {
-            self::$t = self::tInit();
-            self::$tInit = true;
-        }
-        if (empty($key)) {
-            return '';
-        } else {
-            if (!key_exists($key, self::$t)) {
-                self::$t[$key] = Gdn::translate($key);
-            }
-            return self::$t[$key];
-        }
+    use StaticCache {
+        sc as t;
     }
 
     /**
-     * Returns all translations as an associative array
+     * Calculates value for particular key (overwrite f() of StaticCache trait)
+     *
+     * @param string $key Key to store
+     * @param mixed $default Default value for the key if not defined
      *
      * @return array
      */
-    public static function tAll() {
-        if (!self::$tInit) {
-            self::$t = self::tInit();
-            self::$tInit = true;
-        }
-        return self::$t;
-    }
-    /**
-     * Returns array of translations for current class
-     *
-     * @return array
-     */
-    protected static function tInit() {
-        return [];
+    protected static function f(string $key, $default) {
+        return Gdn::translate($key);
     }
 }

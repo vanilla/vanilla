@@ -14,57 +14,19 @@ use Gdn;
  *
  */
 trait StaticConfig {
-    /**
-     * @var array
-     */
-    protected static $c = [];
-
-    /**
-     * @var boolean
-     */
-    protected static $cInit = false;
-
-    /**
-     * Returns of cached value of config key or calls Gdn::config() function if key not found yet
-     *
-     * @param string $key Config key to get
-     * @param mixed $default Default value for config key to set if not set up
-     *
-     * @return mixed
-     */
-    public static function c(string $key, $default = false) {
-        if (!self::$cInit) {
-            self::$c = self::cInit();
-            self::$cInit = true;
-        }
-        if (empty($key)) {
-            return '';
-        } else {
-            if (!key_exists($key, self::$c)) {
-                self::$c[$key] = Gdn::config($key, $default);
-            }
-            return self::$c[$key];
-        }
+    use StaticCache {
+        sc as c;
     }
 
     /**
-     * Returns all configuration cached properties
+     * Calculates value for particular key (overwrite f() of StaticCache trait)
+     *
+     * @param string $key Key to store
+     * @param mixed $default Default value for the key if not defined
      *
      * @return array
      */
-    public static function cAll() {
-        if (!self::$cInit) {
-            self::$c = self::cInit();
-            self::$cInit = true;
-        }
-        return self::$c;
-    }
-    /**
-     * Returns array of config for current class
-     *
-     * @return array
-     */
-    protected static function cInit() {
-        return [];
+    protected static function f(string $key, $default) {
+        return Gdn::config($key, $default);
     }
 }

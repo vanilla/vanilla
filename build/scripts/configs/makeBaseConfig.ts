@@ -13,6 +13,7 @@ import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import { getOptions, BuildMode } from "../options";
 import chalk from "chalk";
 import { printVerbose } from "../utility/utils";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
 /**
  * Create the core webpack config.
@@ -100,6 +101,22 @@ ${chalk.green(aliases)}`;
                         },
                     ],
                 },
+                {
+                    test: /\.s?css$/,
+                    use: [
+                        options.mode === BuildMode.DEVELOPMENT ? "style-loader" : MiniCssExtractPlugin.loader,
+                        "css-loader",
+                        {
+                            loader: "postcss-loader",
+                            options: {
+                                config: {
+                                    path: path.resolve(__dirname),
+                                },
+                            },
+                        },
+                        "sass-loader",
+                    ],
+                },
             ],
         },
         plugins: [
@@ -124,10 +141,18 @@ ${chalk.green(aliases)}`;
                 checkSyntacticErrors: true,
                 async: true,
             }),
+            // new MiniCssExtractPlugin({
+            //     // Options similar to the same options in webpackOptions.output
+            //     // both options are optional
+            //     filename: "[name].min.css",
+            // }),
         ],
         resolve: {
             modules: modulePaths,
-            alias: moduleAliases,
+            alias: {
+                ...moduleAliases,
+                "dashboard-scss": path.resolve(VANILLA_ROOT, "applications/dashboard/scss"),
+            },
             extensions: [".ts", ".tsx", ".js", ".jsx"],
             // This needs to be true so that the same copy of a node_module gets shared.
             // Ex. If quill has parchment as a dep and imports and we use parchment too, there will be two paths

@@ -1,0 +1,5 @@
+# Browsers that we transpile/prefix for
+
+last 4 versions
+last 6 iOS versions
+ie > 9

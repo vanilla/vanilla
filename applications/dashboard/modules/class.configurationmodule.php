@@ -19,6 +19,7 @@
  *   b) Call this object's renderAll() method within the view if you don't want to customize the view any further.
  */
 class ConfigurationModule extends Gdn_Module {
+    use \Garden\StaticConfig;
 
     /** @var bool Whether or not the view is rendering the entire page. */
     public $RenderAll = false;

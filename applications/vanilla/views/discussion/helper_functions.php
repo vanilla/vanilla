@@ -67,14 +67,14 @@ if (!function_exists('writeComment')) :
         static $userPhotoFirst = null;
 
         if ($userPhotoFirst === null) {
-            $userPhotoFirst = c('Vanilla.Comment.UserPhotoFirst', true);
+            $userPhotoFirst = ConfigurationModule::c('Vanilla.Comment.UserPhotoFirst', true);
         }
         $author = Gdn::userModel()->getID($comment->InsertUserID); //UserBuilder($Comment, 'Insert');
-        $permalink = val('Url', $comment, '/discussion/comment/'.$comment->CommentID.'/#Comment_'.$comment->CommentID);
+        $permalink = ($comment->Url ?? '/discussion/comment/'.$comment->CommentID.'/#Comment_'.$comment->CommentID);
 
         // Set CanEditComments (whether to show checkboxes)
         if (!property_exists($sender, 'CanEditComments')) {
-            $sender->CanEditComments = $session->checkPermission('Vanilla.Comments.Edit', true, 'Category', 'any') && c('Vanilla.AdminCheckboxes.Use');
+            $sender->CanEditComments = $session->checkPermission('Vanilla.Comments.Edit', true, 'Category', 'any') && ConfigurationModule::c('Vanilla.AdminCheckboxes.Use');
         }
         // Prep event args
         $cssClass = cssClass($comment, false);
@@ -127,8 +127,8 @@ if (!function_exists('writeComment')) :
             </span>
             <span class="AuthorInfo">
                <?php
-               echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
-               echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
+               echo ' '.wrapIf(htmlspecialchars(($author->Title ?? false)), 'span', ['class' => 'MItem AuthorTitle']);
+               echo ' '.wrapIf(htmlspecialchars(($author->Location ?? false)), 'span', ['class' => 'MItem AuthorLocation']);
                $sender->fireEvent('AuthorInfo');
                ?>
             </span>
@@ -142,7 +142,7 @@ if (!function_exists('writeComment')) :
                         ?>
                         <?php
                         // Include source if one was set
-                        if ($source = val('Source', $comment)) {
+                        if ($source = ($comment->Source ?? false)) {
                             echo wrap(sprintf(t('via %s'), t($source.' Source', $source)), 'span', ['class' => 'MItem Source']);
                         }
 
@@ -167,7 +167,7 @@ if (!function_exists('writeComment')) :
                         <?php
                         $sender->fireEvent('AfterCommentBody');
                         writeReactions($comment);
-                        if (val('Attachments', $comment)) {
+                        if (($comment->Attachments ?? false)) {
                             writeAttachments($comment->Attachments);
                         }
                         ?>
@@ -319,7 +319,7 @@ if (!function_exists('getDiscussionOptionsDropdown')):
             $discussion = $sender->data('Discussion');
         }
 
-        $categoryID = val('CategoryID', $discussion);
+        $categoryID = ($discussion->CategoryID ?? false);
 
         if (!$categoryID && property_exists($sender, 'Discussion')) {
             trace('Getting category ID from controller Discussion property.');
@@ -337,26 +337,26 @@ if (!function_exists('getDiscussionOptionsDropdown')):
         $canDelete = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Delete');
         $canMove = $canEdit && $session->checkPermission('Garden.Moderation.Manage');
         $canRefetch = $canEdit && valr('Attributes.ForeignUrl', $discussion);
-        $canDismiss = c('Vanilla.Discussions.Dismiss', 1)
+        $canDismiss = ConfigurationModule::c('Vanilla.Discussions.Dismiss', 1)
             && $discussion->Announce
             && !$discussion->Dismissed
             && $session->isValid();
-        $canTag = c('Tagging.Discussions.Enabled') && checkPermission('Vanilla.Tagging.Add') && in_array(strtolower($sender->ControllerName), ['discussionscontroller', 'categoriescontroller']) ;
+        $canTag = ConfigurationModule::c('Tagging.Discussions.Enabled') && checkPermission('Vanilla.Tagging.Add') && in_array(strtolower($sender->ControllerName), ['discussionscontroller', 'categoriescontroller']) ;
 
         if ($canEdit && $timeLeft) {
             $timeLeft = ' ('.Gdn_Format::seconds($timeLeft).')';
         }
 
-        $t = DropdownModule::tAll();
-        $dropdown->addLinkIf($canDismiss, $t['Dismiss'], "vanilla/discussion/dismissannouncement?discussionid={$discussionID}", 'dismiss', 'DismissAnnouncement Hijack')
-            ->addLinkIf($canEdit, $t['Edit'].$timeLeft, '/post/editdiscussion/'.$discussionID, 'edit')
-            ->addLinkIf($canAnnounce, $t['Announce'], '/discussion/announce?discussionid='.$discussionID, 'announce', 'AnnounceDiscussion Popup')
-            ->addLinkIf($canSink, $t[($discussion->Sink ? 'Unsink' : 'Sink')], '/discussion/sink?discussionid='.$discussionID.'&sink='.(int)!$discussion->Sink, 'sink', 'SinkDiscussion Hijack')
-            ->addLinkIf($canClose, $t[($discussion->Closed ? 'Reopen' : 'Close')], '/discussion/close?discussionid='.$discussionID.'&close='.(int)!$discussion->Closed, 'close', 'CloseDiscussion Hijack')
-            ->addLinkIf($canRefetch, $t['Refetch Page'], '/discussion/refetchpageinfo.json?discussionid='.$discussionID, 'refetch', 'RefetchPage Hijack')
-            ->addLinkIf($canMove, $t['Move'], '/moderation/confirmdiscussionmoves?discussionid='.$discussionID, 'move', 'MoveDiscussion Popup')
-            ->addLinkIf($canTag, $t['Tag'], '/discussion/tag?discussionid='.$discussionID, 'tag', 'TagDiscussion Popup')
-            ->addLinkIf($canDelete, $t['Delete Discussion'], '/discussion/delete?discussionid='.$discussionID.'&target='.$categoryUrl, 'delete', 'DeleteDiscussion Popup');
+        //$t = DropdownModule::tAll();
+        $dropdown->addLinkIf($canDismiss, DropdownModule::t('Dismiss'), "vanilla/discussion/dismissannouncement?discussionid={$discussionID}", 'dismiss', 'DismissAnnouncement Hijack')
+            ->addLinkIf($canEdit, DropdownModule::t('Edit').$timeLeft, '/post/editdiscussion/'.$discussionID, 'edit')
+            ->addLinkIf($canAnnounce, DropdownModule::t('Announce'), '/discussion/announce?discussionid='.$discussionID, 'announce', 'AnnounceDiscussion Popup')
+            ->addLinkIf($canSink, DropdownModule::t(($discussion->Sink ? 'Unsink' : 'Sink')), '/discussion/sink?discussionid='.$discussionID.'&sink='.(int)!$discussion->Sink, 'sink', 'SinkDiscussion Hijack')
+            ->addLinkIf($canClose, DropdownModule::t(($discussion->Closed ? 'Reopen' : 'Close')), '/discussion/close?discussionid='.$discussionID.'&close='.(int)!$discussion->Closed, 'close', 'CloseDiscussion Hijack')
+            ->addLinkIf($canRefetch, DropdownModule::t('Refetch Page'), '/discussion/refetchpageinfo.json?discussionid='.$discussionID, 'refetch', 'RefetchPage Hijack')
+            ->addLinkIf($canMove, DropdownModule::t('Move'), '/moderation/confirmdiscussionmoves?discussionid='.$discussionID, 'move', 'MoveDiscussion Popup')
+            ->addLinkIf($canTag, DropdownModule::t('Tag'), '/discussion/tag?discussionid='.$discussionID, 'tag', 'TagDiscussion Popup')
+            ->addLinkIf($canDelete, DropdownModule::t('Delete Discussion'), '/discussion/delete?discussionid='.$discussionID.'&target='.$categoryUrl, 'delete', 'DeleteDiscussion Popup');
 
         // DEPRECATED
         $options = [];

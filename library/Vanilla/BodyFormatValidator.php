@@ -59,6 +59,7 @@ class BodyFormatValidator {
         } else {
             // Re-encode the value to escape unicode values.
             $this->stripUselessEmbedData($value);
+            $this->stripTrailingWhitespace($value);
             $value = json_encode($value);
         }
 
@@ -95,6 +96,22 @@ class BodyFormatValidator {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Strip trailing whitespace off of the end of rich-editor contents.
+     *
+     * The last line is always a line terminator so we know that we can strip strip any whitespace and replace it with
+     * a single line-terminator.
+     *
+     * @param array[] $operations The quill operations to loop through.
+     */
+    private function stripTrailingWhitespace(array &$operations) {
+        $lastIndex = key(end($operations));
+        $lastInsert = $operations[$lastIndex]["insert"] ?? null;
+        if ($lastInsert) {
+            $operations[$lastIndex]["insert"] = preg_replace('/\s+$/', "\n", $lastInsert);
         }
     }
 

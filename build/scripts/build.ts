@@ -14,7 +14,7 @@ import { installNodeModules } from "./utility/moduleUtils";
 import { makePolyfillConfig } from "./configs/makePolyfillConfig";
 import { printError, print, fail } from "./utility/utils";
 
-void Promise.all([installNodeModules("forum"), installNodeModules("admin")]).then(run);
+void Promise.all([installNodeModules("forum"), installNodeModules("admin"), installNodeModules("knowledge")]).then(run);
 
 /**
  * Run the requested build type.
@@ -41,7 +41,7 @@ const statOptions = {
 };
 
 async function runProd() {
-    const config = [await makeProdConfig("forum"), await makeProdConfig("admin")];
+    const config = [await makeProdConfig("forum"), await makeProdConfig("admin"), await makeProdConfig("knowledge")];
     const compiler = webpack(config);
     compiler.run((err: Error, stats: Stats) => {
         if (err) {
@@ -74,7 +74,7 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = false;")}`);
         fail(message);
     }
 
-    const config = [await makeDevConfig("forum"), await makeDevConfig("admin")];
+    const config = [await makeDevConfig("forum"), await makeDevConfig("admin"), await makeDevConfig("knowledge")];
     const compiler = webpack(config) as any;
     const argv = {};
     const enhancer = (app: InitializedKoa) => {

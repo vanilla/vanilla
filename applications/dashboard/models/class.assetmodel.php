@@ -175,7 +175,7 @@ class AssetModel extends Gdn_Model {
             ];
         }
 
-        if (!in_array($section, ['forum', 'admin'], true)) {
+        if (!in_array($section, ['forum', 'admin', 'knowledge'], true)) {
             trigger_error("Unknown core js basename: $section");
             return [];
         }

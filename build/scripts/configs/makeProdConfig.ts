@@ -11,6 +11,7 @@ import { getOptions, BuildMode } from "../options";
 import { makeBaseConfig } from "./makeBaseConfig";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import UglifyJsPlugin from "uglifyjs-webpack-plugin";
+import OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
 
 let analyzePort = 8888;
 
@@ -69,6 +70,7 @@ export async function makeProdConfig(section: string) {
                 parallel: true,
                 sourceMap: true, // set to true if you want JS source maps
             }),
+            new OptimizeCSSAssetsPlugin({}),
         ],
     };
 

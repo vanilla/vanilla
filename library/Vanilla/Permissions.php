@@ -41,11 +41,6 @@ class Permissions implements \JsonSerializable {
     private $bans = [];
 
     /**
-     * @var array
-     */
-    protected static $staticCache = [];
-
-    /**
      * Permissions constructor.
      *
      * @param array $permissions The internal permissions array, usually from a cache.
@@ -183,15 +178,8 @@ class Permissions implements \JsonSerializable {
      * @see Permissions::addBan(), Permissions::getBan()
      */
     public function isBanned(array $permissions = []) {
-        if (count($permissions) === 1) {
-            if (!key_exists($permissions[0], self::$staticCache)) {
-                self::$staticCache[$permissions[0]] = ($this->getBan($permissions) !== null) ;
-            }
-            return self::$staticCache[$permissions[0]];
-        } else {
-            $ban = $this->getBan($permissions);
-            return $ban !== null;
-        }
+        $ban = $this->getBan($permissions);
+        return $ban !== null;
     }
 
     /**

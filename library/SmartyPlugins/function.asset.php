@@ -17,19 +17,19 @@
  * @param object $smarty Smarty The smarty object rendering the template.
  * @return string The rendered asset.
  */
-function smarty_function_asset($params, &$smarty) {
-    $name = val('name', $params);
-	$tag = val('tag', $params, '');
-	$id = val('id', $params, $name);
+function smarty_function_asset(array $params, &$smarty) {
+    $name = ($params['name'] ?? false);
+    $tag = ($params['tag'] ?? '');
+    $id = ($params['id'] ?? $name);
 
-	$class = val('class', $params, '');
-	if ($class != '') {
-		$class = ' class="'.$class.'"';
+    $class = ($params['class'] ?? '');
+    if ($class != '') {
+        $class = ' class="'.$class.'"';
     }
-	
-	$controller = Gdn::controller();
+
+    $controller = Gdn::controller();
     $controller->EventArguments['AssetName'] = $name;
-   
+
     $result = '';
 
     ob_start();
@@ -37,11 +37,11 @@ function smarty_function_asset($params, &$smarty) {
     $result .= ob_get_clean();
 
     $asset = $controller->getAsset($name);
-   
+
     if (is_object($asset)) {
         $asset->AssetName = $name;
-      
-        if (val('Visible', $asset, true)) {
+
+        if (($asset->Visible ?? true)) {
             $asset = $asset->toString();
         } else {
             $asset = '';
@@ -53,7 +53,7 @@ function smarty_function_asset($params, &$smarty) {
     } else {
         $result .= $asset;
     }
-   
+
     ob_start();
     $controller->fireEvent('AfterRenderAsset');
     $result .= ob_get_clean();

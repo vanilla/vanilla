@@ -3258,7 +3258,7 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
-     * bigPlural global function replacement
+     * Replacement for bigPlural global function
      *
      * @param int $number
      * @param string $format
@@ -3275,6 +3275,17 @@ class DiscussionModel extends Gdn_Model {
         return '<span title="'.$title.'" class="Number">'.Gdn_Format::bigNumber($number).'</span>';
     }
 
+    /**
+     * Replacement for pluralTranslate global function
+     *
+     * @param int $number
+     * @param string $singular
+     * @param string $plural
+     * @param bool $singularDefault
+     * @param bool $pluralDefault
+     *
+     * @return mixed
+     */
     public static function pluralTranslate(int $number, string $singular, string $plural, $singularDefault = false, $pluralDefault = false) {
         if ($number == 1) {
             return self::t($singular, $singularDefault);

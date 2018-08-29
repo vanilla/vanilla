@@ -13,7 +13,7 @@ use Garden\Schema\ValidationField;
 /**
  * Basic model class.
  */
-class Model {
+class Model implements InjectableInterface {
 
     /** @var \Gdn_Database */
     private $database;
@@ -30,60 +30,10 @@ class Model {
     /**
      * Basic model constructor.
      *
-     * @param string $table
-     * @param \Gdn_Database $database
+     * @param string $table Database table associated with this resource.
      */
-    public function __construct(string $table, \Gdn_Database $database) {
+    public function __construct(string $table) {
         $this->table = $table;
-        $this->database = $database;
-
-        $schema = $this->database->simpleSchema($table);
-        $this->setReadSchema(clone $schema)
-            ->setWriteSchema(clone $schema);
-    }
-
-    /**
-     * Attempt to decode a encoded string value into a more complex type.
-     *
-     * @param mixed $value Raw database value.
-     * @param ValidationField $field An object representing the Garden Schema field.
-     * @return mixed Unpacked attributes field value.
-     */
-    private function filterValueDecode($value, ValidationField $field) {
-        if ($value === null || $value === '') {
-            $value = null;
-        } elseif (is_string($value)) {
-            $value = json_decode($value, true);
-            if ($value === null) {
-                $value = unserialize($value);
-                if ($value === false) {
-                    $value = null;
-                }
-            }
-        }
-
-        return $value;
-    }
-
-    /**
-     * Attempt to decode a encoded string value into a more complex type.
-     *
-     * @param mixed $value Raw database value.
-     * @param ValidationField $field An object representing the Garden Schema field.
-     * @return mixed Unpacked attributes field value.
-     * @throws \Exception If there was an error encoding the value.
-     */
-    private function filterValueEncode($value, ValidationField $field) {
-        if ($value === null || $value === '') {
-            $value = null;
-        } else {
-            $value = json_encode($value, JSON_UNESCAPED_SLASHES);
-            $jsonError = json_last_error();
-            if ($jsonError !== JSON_ERROR_NONE) {
-                throw new \Exception("An error was encountered while encoding the JSON value ({$jsonError}).");
-            }
-        }
-        return $value;
     }
 
     /**
@@ -127,46 +77,36 @@ class Model {
     }
 
     /**
-     * Set the read/output schema for the model.
-     *
-     * @param Schema $schema Schema representing the resource's database table.
-     * @return Model Current instance for fluent calls.
+     * @param \Gdn_Database $database
      */
-    private function setReadSchema(Schema $schema): Model {
-        // Transform Attributes field values, if available.
-        $attributes = $schema->getField('properties.Attributes');
-        if ($attributes) {
-            $attributeTypes = $schema->getField('properties.Attributes.type', []);
-            if (!empty($attributeTypes)) {
-                $attributeTypes = array_unique(array_merge($attributeTypes, ['array', 'object']));
-                $schema->setField('properties.Attributes.type', $attributeTypes);
-            }
-            $schema->addFilter('Attributes', function ($value, ValidationField $field) {
-                return $this->filterValueDecode($value, $field);
-            });
-        }
+    public function setDependencies(\Gdn_Database $database) {
+        $this->database = $database;
 
-        $this->readSchema = $schema;
-        return $this;
+        $schema = $this->database->simpleSchema($this->table);
+        $this->readSchema = $this->configureReadSchema(clone $schema);
+        $this->writeSchema = $this->configureWriteSchema(clone $schema);
     }
 
     /**
-     * Set the write/input schema for the model.
+     * Configure a Garden Schema instance for read operations by the model.
      *
      * @param Schema $schema Schema representing the resource's database table.
-     * @return Model Current instance for fluent calls.
+     * @return Schema Currently configured read schema.
      */
-    private function setWriteSchema(Schema $schema): Model {
-        // Transform Attributes field values, if available.
-        $attributes = $schema->getField('properties.Attributes');
-        if ($attributes) {
-            $schema->addFilter('Attributes', function ($value, ValidationField $field) {
-                return $this->filterValueEncode($value, $field);
-            });
-        }
+    protected function configureReadSchema(Schema $schema): Schema {
+        // Child classes can make adjustments as necessary.
+        return $schema;
+    }
 
-        $this->writeSchema = $schema;
-        return $this;
+    /**
+     * Configure a Garden Schema instance for write operations by the model.
+     *
+     * @param Schema $schema Schema representing the resource's database table.
+     * @return Schema Currently configured write schema.
+     */
+    protected function configureWriteSchema(Schema $schema): Schema {
+        // Child classes can make adjustments as necessary.
+        return $schema;
     }
 
     /**

@@ -503,7 +503,7 @@ trait NestedCollection {
      * @param array $item The item to generate CSS class for.
      * @return string The generated CSS class.
      */
-    private function buildCssClass($prefix, $item) {
+    private function buildCssClass($prefix, array $item = []) {
         $result = '';
         if ($prefix) {
             $prefix .= '-';
@@ -511,12 +511,12 @@ trait NestedCollection {
         if (!$this->useCssPrefix) {
             $prefix = '';
         }
-        if (val('key', $item)) {
-            if (is_array(val('key', $item))) {
-                $result .= $prefix.implode('-', val('key', $item));
+        if ($cssClass = ($item['key'] ?? false)) {
+            if (is_array($cssClass)) {
+                $result .= $prefix.implode('-', $cssClass);
             }
             else {
-                $result .= $prefix.str_replace('.', '-', val('key', $item));
+                $result .= $prefix.str_replace('.', '-', $cssClass);
             }
         }
         return trim($result);

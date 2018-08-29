@@ -1034,7 +1034,7 @@ class UserModel extends Gdn_Model {
         $userIDs = [];
         foreach ($data as $row) {
             foreach ($columns as $columnName) {
-                $iD = val($columnName, $row);
+                $iD = (is_object($row))? ($row->$columnName ?? false) : ($row[$columnName] ?? false);
                 if (is_numeric($iD)) {
                     $userIDs[$iD] = 1;
                 }
@@ -1051,13 +1051,15 @@ class UserModel extends Gdn_Model {
         }
 
         // Join the user data using prefixes (ex: 'Name' for 'InsertUserID' becomes 'InsertName')
-        $join = val('Join', $options, ['Name', 'Email', 'Photo']);
+        $join = ($options['Join'] ?? ['Name', 'Email', 'Photo']);
 
         foreach ($data2 as &$row) {
+            $isObj = is_object($row);
             foreach ($prefixes as $px) {
-                $iD = val($px.'UserID', $row);
+                $pxUserId = $px.'UserID';
+                $iD = $isObj ? ($row->$pxUserId ?? false) : ($row[$pxUserId] ?? false);
                 if (is_numeric($iD)) {
-                    $user = val($iD, $users, false);
+                    $user = ($users[$iD] ?? false);
                     foreach ($join as $column) {
                         $value = $user[$column];
                         if ($column == 'Photo') {

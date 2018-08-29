@@ -263,12 +263,13 @@ class DropdownModule extends Gdn_Module {
     /**
      * Method overwrites parent method to cache response statically
      *
-     * @param string $view
-     * @param string $applicationFolder
+     * @param string $view Template name
+     * @param string $applicationFolder App folder to check for template
      *
      * @return array|mixed
      *
-     * @throws Exception
+     * @throws Exception Exception could be thrown by parent::fetchViewLocation() when template is not found.
+     *
      */
     public function fetchViewLocation($view = '', $applicationFolder = '') {
         $key = $applicationFolder . ':' . $view;

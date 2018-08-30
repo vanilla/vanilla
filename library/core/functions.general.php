@@ -1359,9 +1359,9 @@ if (!function_exists('_formatStringCallback')) {
         // Parse out the field and format.
         $parts = explode(',', $match);
         $field = trim($parts[0]);
-        $format = trim(val(1, $parts, ''));
-        $subFormat = strtolower(trim(val(2, $parts, '')));
-        $formatArgs = val(3, $parts, '');
+        $format = trim(($parts[1] ?? ''));
+        $subFormat = isset($parts[2]) ? strtolower(trim($parts[2])) : '';
+        $formatArgs = $parts[3] ?? '';
 
         if (in_array($format, ['currency', 'integer', 'percent'])) {
             $formatArgs = $subFormat;
@@ -1489,11 +1489,11 @@ if (!function_exists('_formatStringCallback')) {
                             $result = $formatArgs;
                             break;
                         case 'p':
-                            $result = val(5, $parts, val(4, $parts));
+                            $result = ($parts[5] ?? ($parts[4] ?? false));
                             break;
                         case 'u':
                         default:
-                            $result = val(4, $parts);
+                            $result = ($parts[4] ?? false);
                     }
 
                     break;

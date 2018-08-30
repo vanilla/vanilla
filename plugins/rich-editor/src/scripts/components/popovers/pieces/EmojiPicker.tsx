@@ -77,12 +77,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
     }
 
     public render() {
-        const description = [
-            t("Insert an emoji in your message."),
-            t(
-                'Use keyboard shortcuts "page up" and "page down" to cycle through available categories when menu is open.',
-            ),
-        ].join(" ");
+        const description = [t("Insert an emoji in your message."), t("richEditor.emoji.pagingInstructions")].join(" ");
 
         const extraHeadingContent = (
             <button type="button" className="accessibility-jumpTo" onClick={this.focusOnCategories}>

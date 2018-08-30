@@ -12,14 +12,14 @@ namespace Garden;
  *
  */
 trait TwigTrait {
-    protected static $defaultFolder = PATH_ROOT.'/plugins/knowledge/views';
+    protected static $twigDefaultFolder = PATH_ROOT;
     /**
      * Twig templating environment initialize
      *
      * @return \Twig_Environment
      */
     protected static function twigInit() {
-        $loader = new \Twig_Loader_Filesystem(self ::$defaultFolder);
+        $loader = new \Twig_Loader_Filesystem(self ::$twigDefaultFolder);
         return new \Twig_Environment($loader);
     }
 }

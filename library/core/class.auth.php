@@ -262,7 +262,7 @@ class Gdn_Auth extends Gdn_Pluggable {
      * @return object
      * @throws Exception
      */
-    public function Authenticator($default = 'default') {
+    public function getAuthenticator($default = 'default') {
         if (!$this->_Authenticator) {
             $this->authenticateWith($default);
         }

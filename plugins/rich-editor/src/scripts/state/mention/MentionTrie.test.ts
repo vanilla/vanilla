@@ -6,14 +6,15 @@
 
 import MentionTrie, { IMentionNode, IMentionValue } from "./MentionTrie";
 import { expect } from "chai";
+import { LoadStatus } from "@dashboard/@types/api";
 
-const PENDING_VALUE: IMentionValue = {
-    status: "PENDING",
+const LOADING_VALUE: IMentionValue = {
+    status: LoadStatus.LOADING,
 };
 
 const SUCCESSFUL_VALUE: IMentionValue = {
-    status: "SUCCESSFUL",
-    users: [],
+    status: LoadStatus.SUCCESS,
+    data: [],
 };
 
 describe("MentionTrie", () => {
@@ -31,7 +32,7 @@ describe("MentionTrie", () => {
                                             t: {
                                                 children: {},
                                                 value: {
-                                                    status: "PENDING",
+                                                    status: LoadStatus.LOADING,
                                                 },
                                             },
                                         },
@@ -41,8 +42,8 @@ describe("MentionTrie", () => {
                                             t: {
                                                 children: {},
                                                 value: {
-                                                    status: "SUCCESSFUL",
-                                                    users: [],
+                                                    status: LoadStatus.SUCCESS,
+                                                    data: [],
                                                 },
                                             },
                                         },
@@ -54,7 +55,7 @@ describe("MentionTrie", () => {
                 },
             };
 
-            trie.insert("test", PENDING_VALUE);
+            trie.insert("test", LOADING_VALUE);
 
             trie.insert("teft", SUCCESSFUL_VALUE);
 
@@ -63,10 +64,10 @@ describe("MentionTrie", () => {
 
         it("Does not invalidate a parent value with a child insertion", () => {
             const trie = new MentionTrie();
-            trie.insert("t", PENDING_VALUE);
+            trie.insert("t", LOADING_VALUE);
             trie.insert("t", SUCCESSFUL_VALUE);
             expect(trie.getValue("t")).deep.equals(SUCCESSFUL_VALUE);
-            trie.insert("te", PENDING_VALUE);
+            trie.insert("te", LOADING_VALUE);
             trie.insert("te", SUCCESSFUL_VALUE);
             expect(trie.getValue("t")).deep.equals(SUCCESSFUL_VALUE);
             expect(trie.getValue("te")).deep.equals(SUCCESSFUL_VALUE);
@@ -76,16 +77,16 @@ describe("MentionTrie", () => {
     describe("getValue", () => {
         it("can retrieve a value", () => {
             const trie = new MentionTrie();
-            trie.insert("test", PENDING_VALUE);
+            trie.insert("test", LOADING_VALUE);
             trie.insert("teft", SUCCESSFUL_VALUE);
 
-            expect(trie.getValue("test")).to.deep.equal(PENDING_VALUE);
+            expect(trie.getValue("test")).to.deep.equal(LOADING_VALUE);
             expect(trie.getValue("teft")).to.deep.equal(SUCCESSFUL_VALUE);
         });
 
         it("returns null if its value cannot be found", () => {
             const trie = new MentionTrie();
-            trie.insert("test", PENDING_VALUE);
+            trie.insert("test", LOADING_VALUE);
             trie.insert("teft", SUCCESSFUL_VALUE);
 
             expect(trie.getValue("t")).to.eq(null);
@@ -95,7 +96,7 @@ describe("MentionTrie", () => {
 
         it("will overwrite an existing value", () => {
             const trie = new MentionTrie();
-            trie.insert("test", PENDING_VALUE);
+            trie.insert("test", LOADING_VALUE);
             trie.insert("test", SUCCESSFUL_VALUE);
 
             expect(trie.getValue("test")).to.deep.eq(SUCCESSFUL_VALUE);

@@ -48,5 +48,10 @@ echo "Comparing results of PHP_CodeSniffer scan with changed lines from branch d
 echo ""
 ./vendor/bin/diffFilter --phpcs $GIT_DIFF_FILENAME $PHPCS_DIFF_FILENAME
 
+CODESNIFFER_RESULT=$?
+
 # End folding in Travis.
 [ $TRAVIS ] && echo "travis_fold:end:coding_standards"
+
+# Make sure this script exits with the same status as the PHP_CodeSniffer command.
+exit $CODESNIFFER_RESULT

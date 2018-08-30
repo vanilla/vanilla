@@ -46,7 +46,8 @@
         "vanilla/legacy-oauth": "~1.0",
         "vanilla/legacy-passwords": "~1.0",
         "vanilla/nbbc": "~2.1",
-        "vanilla/vanilla-connect": "~0.0"
+        "vanilla/vanilla-connect": "~0.0",
+        "twig/twig": "^2.5"
     },
     "require-dev": {
         "exussum12/coverage-checker": "~0.10",

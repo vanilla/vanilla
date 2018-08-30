@@ -12,6 +12,7 @@ import { matchAtMention } from "@dashboard/utility";
 import uniqueId from "lodash/uniqueId";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import BlockBlot from "@rich-editor/quill/blots/blocks/BlockBlot";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 
 interface IBoundary {
     start: number;
@@ -279,24 +280,32 @@ const MIN_MENTION_LENGTH = 1;
  * Get the range of text to convert to a mention.
  *
  * @param quill - A quill instance.
- * @param currentIndex - The current position in the document..
+ * @param currentSelection - The current quill selection.
  *
  * @returns A range if a mention was matched, or null if one was not.
  */
-export function getMentionRange(
-    quill: Quill,
-    currentIndex?: number,
-    ignoreTrailingNewline = false,
-): RangeStatic | null {
-    if (!currentIndex) {
-        currentIndex = quill.getSelection().index;
+export function getMentionRange(quill: Quill, currentSelection: RangeStatic | null): RangeStatic | null {
+    if (!quill.hasFocus()) {
+        return null;
+    }
+
+    if (!currentSelection) {
+        return null;
+    }
+
+    if (currentSelection.length > 0) {
+        return null;
+    }
+
+    if (rangeContainsBlot(quill, CodeBlockBlot, currentSelection)) {
+        return null;
     }
 
     // Get details about our current leaf (likely a TextBlot).
     // This breaks the text to search every time there is a different DOM Node. Eg. A format, link, line break.
-    const [leaf] = quill.getLeaf(currentIndex);
+    const [leaf] = quill.getLeaf(currentSelection.index);
     const leafOffset = leaf.offset(quill.scroll);
-    const length = currentIndex - leafOffset;
+    const length = currentSelection.index - leafOffset;
     const leafContentBeforeCursor = quill.getText(leafOffset, length);
 
     // See if the leaf's content contains an `@`.
@@ -305,10 +314,7 @@ export function getMentionRange(
         return null;
     }
     const mentionIndex = leafOffset + leafAtSignIndex;
-    let potentialMention = leafContentBeforeCursor.substring(leafAtSignIndex);
-    if (ignoreTrailingNewline) {
-        potentialMention = potentialMention.replace("\n", "");
-    }
+    const potentialMention = leafContentBeforeCursor.substring(leafAtSignIndex);
 
     const usernameLength = potentialMention.length - 1;
     const meetsLengthRequirements = usernameLength >= MIN_MENTION_LENGTH;

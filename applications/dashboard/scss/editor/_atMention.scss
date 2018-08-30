@@ -32,7 +32,7 @@ $atMention_maxHeight                 : ($atMention-avatar_width + $atMention-use
 }
 
 .atMentionList-items {
-    &.MenuItems { // For overwriting old themes
+    &.atMentionList-items { // For overwriting old themes
         display: block;
         padding: $atMention-user_paddingVertical 0;
         overflow: auto;
@@ -45,6 +45,10 @@ $atMention_maxHeight                 : ($atMention-avatar_width + $atMention-use
 }
 
 .atMentionList-item {
+    &.atMentionList-item { // For overwriting old themes
+        margin-bottom: 0;
+    }
+
     &.isActive {
         .atMentionList-suggestion {
             background-color: $state-focus_color;

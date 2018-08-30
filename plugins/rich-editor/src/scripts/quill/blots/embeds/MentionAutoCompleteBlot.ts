@@ -85,7 +85,7 @@ export default class MentionAutoCompleteBlot extends Inline {
      */
     public cancel() {
         this.replaceWith("inline", this.domNode.innerHTML);
-        this.quill && this.quill.update(Quill.sources.API);
+        this.quill && this.quill.update(Quill.sources.SILENT);
     }
 
     /**

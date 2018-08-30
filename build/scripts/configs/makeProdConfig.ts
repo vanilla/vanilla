@@ -11,6 +11,7 @@ import { getOptions, BuildMode } from "../options";
 import { makeBaseConfig } from "./makeBaseConfig";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import UglifyJsPlugin from "uglifyjs-webpack-plugin";
+import OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
 
 let analyzePort = 8888;
 
@@ -30,9 +31,10 @@ export async function makeProdConfig(section: string) {
     // Webpack does not along a function for name here.
     baseConfig.output = {
         filename: "[name].min.js",
-        chunkFilename: "[name].min.js",
+        chunkFilename: "[name].min.js?[chunkhash]",
         publicPath: "/",
         path: VANILLA_ROOT,
+        library: `vanilla${section}`,
     };
     baseConfig.devtool = "source-map";
     baseConfig.optimization = {
@@ -45,15 +47,19 @@ export async function makeProdConfig(section: string) {
         // We want to split
         splitChunks: {
             chunks: "initial",
+            minSize: 1000000, // This should prevent webpack from creating extra chunks for
             cacheGroups: {
                 commons: {
                     test: /[\\/]node_modules[\\/]/,
+                    minSize: 30000,
+                    reuseExistingChunk: true,
                     name: `js/webpack/vendors-${section}`,
                     chunks: "initial",
                 },
                 library: {
                     // Our library files currently only come from the dashboard.
                     test: /[\\/]applications[\\/]dashboard[\\/]src[\\/]scripts[\\/]/,
+                    minSize: 30000,
                     name: `applications/dashboard/js/webpack/library-${section}`,
                     // We currently NEED every library file to be shared among everything.
                     // Many of these files have common global state that is not exposed on the window object.
@@ -68,6 +74,7 @@ export async function makeProdConfig(section: string) {
                 parallel: true,
                 sourceMap: true, // set to true if you want JS source maps
             }),
+            new OptimizeCSSAssetsPlugin({}),
         ],
     };
 

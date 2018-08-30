@@ -67,7 +67,9 @@ export class Editor extends React.Component<IProps> {
 
         // Add a listener for a force selection update.
         document.addEventListener(SELECTION_UPDATE, () =>
-            this.onQuillUpdate(Quill.events.SELECTION_CHANGE, null, null, Quill.sources.USER),
+            window.requestAnimationFrame(() => {
+                this.onQuillUpdate(Quill.events.SELECTION_CHANGE, null, null, Quill.sources.USER);
+            }),
         );
 
         this.addQuoteHandler();
@@ -150,7 +152,7 @@ export class Editor extends React.Component<IProps> {
         }
 
         if (shouldDispatch) {
-            this.store.dispatch(actions.setSelection(this.editorID, this.quill.getSelection()));
+            this.store.dispatch(actions.setSelection(this.editorID, this.quill.getSelection(), this.quill));
         }
     };
 

@@ -13,6 +13,7 @@ import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import { getOptions, BuildMode } from "../options";
 import chalk from "chalk";
 import { printVerbose } from "../utility/utils";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
 /**
  * Create the core webpack config.
@@ -100,6 +101,33 @@ ${chalk.green(aliases)}`;
                         },
                     ],
                 },
+                {
+                    test: /\.s?css$/,
+                    use: [
+                        options.mode === BuildMode.DEVELOPMENT ? "style-loader" : MiniCssExtractPlugin.loader,
+                        {
+                            loader: "css-loader",
+                            options: {
+                                sourceMap: true,
+                            },
+                        },
+                        {
+                            loader: "postcss-loader",
+                            options: {
+                                sourceMap: true,
+                                config: {
+                                    path: path.resolve(__dirname),
+                                },
+                            },
+                        },
+                        {
+                            loader: "sass-loader",
+                            options: {
+                                sourceMap: true,
+                            },
+                        },
+                    ],
+                },
             ],
         },
         plugins: [
@@ -127,7 +155,10 @@ ${chalk.green(aliases)}`;
         ],
         resolve: {
             modules: modulePaths,
-            alias: moduleAliases,
+            alias: {
+                ...moduleAliases,
+                "dashboard-scss": path.resolve(VANILLA_ROOT, "applications/dashboard/scss"),
+            },
             extensions: [".ts", ".tsx", ".js", ".jsx"],
             // This needs to be true so that the same copy of a node_module gets shared.
             // Ex. If quill has parchment as a dep and imports and we use parchment too, there will be two paths
@@ -145,6 +176,14 @@ ${chalk.green(aliases)}`;
             modules: [path.join(VANILLA_ROOT, "node_modules")],
         },
     };
+
+    if (options.mode === BuildMode.PRODUCTION) {
+        config.plugins.push(
+            new MiniCssExtractPlugin({
+                filename: "[name].min.css",
+            }),
+        );
+    }
 
     if (options.fix) {
         config.plugins.unshift(getPrettierPlugin());

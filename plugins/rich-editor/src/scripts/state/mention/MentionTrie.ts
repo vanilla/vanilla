@@ -5,23 +5,9 @@
  */
 
 import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
+import { ILoadable } from "@dashboard/@types/api";
 
-interface ISuccessValue {
-    status: "SUCCESSFUL";
-    users: IMentionSuggestionData[];
-}
-
-interface IFailureValue {
-    status: "FAILED";
-    users?: null;
-    error: Error;
-}
-
-interface IPendingValue {
-    status: "PENDING";
-}
-
-export type IMentionValue = ISuccessValue | IFailureValue | IPendingValue;
+export type IMentionValue = ILoadable<IMentionSuggestionData[]>;
 
 export interface IMentionNode {
     children?: {

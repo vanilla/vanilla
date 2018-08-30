@@ -8,7 +8,7 @@ import React from "react";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { getRequiredID } from "@dashboard/componentIDs";
 import { watchFocusInDomTree } from "@dashboard/dom";
-import { createEditorFlyoutEscapeListener } from "@rich-editor/quill/utility";
+import { createEditorFlyoutEscapeListener, forceSelectionUpdate } from "@rich-editor/quill/utility";
 import classNames from "classnames";
 
 export interface IPopoverControllerChildParameters {
@@ -85,8 +85,10 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
         if (!prevState.isVisible && this.state.isVisible) {
             if (this.initalFocusRef.current) {
                 this.initalFocusRef.current.focus();
+                forceSelectionUpdate();
             } else if (this.buttonRef.current) {
                 this.buttonRef.current.focus();
+                forceSelectionUpdate();
             }
         }
     }

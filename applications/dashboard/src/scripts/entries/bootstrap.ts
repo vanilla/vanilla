@@ -10,11 +10,6 @@ import { log, logError, debug } from "@dashboard/utility";
 import gdn from "@dashboard/gdn";
 import apiv2 from "@dashboard/apiv2";
 
-// Right now this is imported here instead of being its own bundle.
-// Once we have some part of vanilla that can function without the legacy js,
-// this should be pulled out into its own javascript bundle.
-import "../legacy";
-
 // Inject the debug flag into the utility.
 debug(getMeta("debug", false));
 

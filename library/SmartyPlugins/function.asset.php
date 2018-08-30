@@ -18,9 +18,9 @@
  * @return string The rendered asset.
  */
 function smarty_function_asset(array $params, &$smarty) {
-    $name = ($params['name'] ?? false);
-    $tag = ($params['tag'] ?? '');
-    $id = ($params['id'] ?? $name);
+    $name = $params['name'] ?? false;
+    $tag = $params['tag'] ?? '';
+    $id = $params['id'] ?? $name;
 
     $class = ($params['class'] ?? '');
     if ($class != '') {

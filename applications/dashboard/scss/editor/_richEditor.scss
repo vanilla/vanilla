@@ -592,12 +592,12 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
         line-height: $global-condensed_lineHeight;
     }
 
-    > * {
-        &:not(:last-child) {
+    > *:not(.emoji) {
+        &:not(:last-child):not(br) {
             margin-bottom: $global-block_margin;
         }
 
-        &:first-child {
+        &:first-child:not(br) {
             margin-top: #{(1 - $global-base_lineHeight) * .5em} !important;
         }
     }
@@ -634,12 +634,6 @@ $richEditor-mobileEmbedBreakPoint                 : 550px !default;
             margin-bottom: 0;
         }
     }
-}
-
-.emoji { // old emoji support
-    width: 20px;
-    height: 20px;
-    vertical-align: -.232em;
 }
 
 .richEditor-button {

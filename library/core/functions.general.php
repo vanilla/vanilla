@@ -1361,7 +1361,7 @@ if (!function_exists('_formatStringCallback')) {
         $field = trim($parts[0]);
         $format = trim(($parts[1] ?? ''));
         $subFormat = isset($parts[2]) ? strtolower(trim($parts[2])) : '';
-        $formatArgs = ($parts[3] ?? '');
+        $formatArgs = $parts[3] ?? '';
 
         if (in_array($format, ['currency', 'integer', 'percent'])) {
             $formatArgs = $subFormat;

@@ -1059,7 +1059,7 @@ class UserModel extends Gdn_Model {
                 $pxUserId = $px.'UserID';
                 $iD = $isObj ? ($row->$pxUserId ?? false) : ($row[$pxUserId] ?? false);
                 if (is_numeric($iD)) {
-                    $user = ($users[$iD] ?? false);
+                    $user = $users[$iD] ?? false;
                     foreach ($join as $column) {
                         $value = $user[$column];
                         if ($column == 'Photo') {

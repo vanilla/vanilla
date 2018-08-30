@@ -705,7 +705,7 @@ class CategoryCollection {
      * @param array &$result The working result.
      */
     private function flattenTreeInternal(array $category, array &$result) {
-        $children = ($category['Children'] ?? []);
+        $children = $category['Children'] ?? [];
         $category['Children'] = [];
         $result[] = $category;
 

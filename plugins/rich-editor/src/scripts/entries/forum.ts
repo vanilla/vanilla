@@ -7,7 +7,6 @@
 import { registerReducer } from "@dashboard/state/reducerRegistry";
 import editorReducer from "@rich-editor/state/editorReducer";
 import { onReady } from "@dashboard/application";
-import mountEditor from "@rich-editor/mountEditor";
 
 onReady(() => {
     registerReducer("editor", editorReducer);
@@ -21,7 +20,8 @@ onReady(() => {
 async function setupEditor() {
     const discussionFormContainer = document.querySelectorAll(".richEditor");
     if (discussionFormContainer.length > 0) {
-        discussionFormContainer.forEach(mountEditor);
+        const mountEditor = await import(/* webpackChunkName: "plugins/rich-editor/js/webpack/chunks/mountEditor" */ "@rich-editor/mountEditor");
+        discussionFormContainer.forEach(mountEditor.default);
     }
 }
 
@@ -37,7 +37,8 @@ async function setupCommentEditForm() {
 
         const richEditor = container.querySelector(".richEditor");
         if (richEditor) {
-            mountEditor(richEditor);
+            const mountEditor = await import(/* webpackChunkName: "plugins/rich-editor/js/webpack/chunks/mountEditor" */ "@rich-editor/mountEditor");
+            mountEditor.default(richEditor);
         }
     });
 }

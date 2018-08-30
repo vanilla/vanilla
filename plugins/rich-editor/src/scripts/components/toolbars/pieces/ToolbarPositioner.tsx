@@ -215,7 +215,7 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
      */
     private getYCoordinates(): IYCoordinates | null {
         const bounds = this.getBounds();
-        if (!bounds || !this.props.flyoutHeight) {
+        if (bounds == null || this.props.flyoutHeight == null) {
             return null;
         }
 

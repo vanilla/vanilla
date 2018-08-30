@@ -30,9 +30,10 @@ export async function makeProdConfig(section: string) {
     // Webpack does not along a function for name here.
     baseConfig.output = {
         filename: "[name].min.js",
-        chunkFilename: "[name].min.js",
+        chunkFilename: "[name].min.js?[chunkhash]",
         publicPath: "/",
         path: VANILLA_ROOT,
+        library: `vanilla${section}`,
     };
     baseConfig.devtool = "source-map";
     baseConfig.optimization = {

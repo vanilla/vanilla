@@ -55,8 +55,6 @@ $state-focus_outline                                 : none !default;
 $state-active_color                                  : mix($global-color_primary, $global-color_bg, 95%) !default; // #0075f5
 $state-active_opacity                                : 1 !default;
 
-
-
 /* -------------------------------------------------------------- *\
     Password Strength Colors
 \* -------------------------------------------------------------- */
@@ -89,32 +87,33 @@ $global-color_linkedIn                               : #007bb6;
     Typography
 \* -------------------------------------------------------------- */
 
-$global-title_fontSize                                 : 30px !default;
-$global-subTitle_fontSize                              : 18px !default;
+$global-title_fontSize                               : 30px !default;
+$global-subTitle_fontSize                            : 18px !default;
 
-$global-large_fontSize                                 : 16px !default;
-$global-medium_fontSize                                : 14px !default;
-$global-small_fontSize                                 : 12px !default;
+$global-large_fontSize                               : 16px !default;
+$global-medium_fontSize                              : 14px !default;
+$global-small_fontSize                               : 12px !default;
 
-$global-heading_topMargin                              : 1.5 * $global-medium_fontSize;
 
-$global-normal_fontWeight                              : 400 !default;
-$global-bold_fontWeight                                : 600 !default;
+$global-heading_topMargin                            : 1.5 * $global-medium_fontSize;
 
-$global-block_margin                                   : $global-medium_fontSize !default;
+$global-normal_fontWeight                            : 400 !default;
+$global-bold_fontWeight                              : 600 !default;
 
-$global-base_lineHeight                                : 1.5 !default;
-$global-condensed_lineHeight                           : 1.25 !default;
+$global-block_margin                                 : $global-medium_fontSize !default;
 
-$global-heading_fontFamily                             : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
-$global-heading_fontWeight                             : $global-bold_fontWeight !default; // Derived
+$global-base_lineHeight                              : 1.5 !default;
+$global-condensed_lineHeight                         : 1.25 !default;
 
-$global-body_fontFamily                                : "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
-$global-body_fontWeight                                : $global-normal_fontWeight !default; // Derived
+$global-heading_fontFamily                           : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
+$global-heading_fontWeight                           : $global-bold_fontWeight !default; // Derived
 
-$link_default-color                                    : $global-color_primary !default;
-$link_default_hover-color                              : $global-color_secondary !default;
-$link_default_focus-color                              : $global-color_secondary !default;
+$global-body_fontFamily                              : "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
+$global-body_fontWeight                              : $global-normal_fontWeight !default; // Derived
+
+$link_default-color                                  : $global-color_primary !default;
+$link_default_hover-color                            : $global-color_secondary !default;
+$link_default_focus-color                            : $global-color_secondary !default;
 
 
 /* -------------------------------------------------------------- *\
@@ -130,7 +129,6 @@ $global-default_easing                               : ease-out !default;
 
 $icon-default_size                                   : 24px !default;
 $icon-large_size                                     : 32px !default;
-
 
 /* -------------------------------------------------------------- *\
     Layout
@@ -172,7 +170,6 @@ $component-titleBar_verticalPadding                  : $component-spacing_half !
 $component-titleBar_minHeight                        : 60px;
 $component-titleBar_countBg                          : mix($global-color_bg, $global-color_fg, 88%) !default;
 $component-titleBar_viewMoreColor                    : mix($global-color_bg, $global-color_fg, 60%) !default;
-
 
 /* -------------------------------------------------------------- *\
     Widgets
@@ -254,7 +251,7 @@ $formElement_borderRadius                            : $global_borderRadius !def
 $formElement_giantInput_height                       : 51px !default;
 $formElement_giantInput_fontSize                     : $utility-baseUnit * 4 !default; // Derived
 $formElement_halfHeight                              : $formElement_height / 2 !default; // Derived
-$formElement-borderWidthFull                        : $formElement_borderWidth * 2 !default; // Derived
+$formElement-borderWidthFull                         : $formElement_borderWidth * 2 !default; // Derived
 $formElement_horizontalPadding                       : $utility-baseUnit * 2 !default; // Derived
 $formElement_paddingVertical                         : $utility-baseUnit !default; // Derived
 $formElement_placeholderColor                        : mix($global-color_fg, $global-color_bg, 50%) !default; // Derived
@@ -276,6 +273,12 @@ $global-fileUpload_hover_bg                          : mix($global-color_primary
 
 $formElement-panel_shadowColor                       : rgba($global-color_fg, .2) !default;
 $formElement-panel_boxShadow                         : 0 1px 3px 0 $formElement-panel_shadowColor !default;
+
+$formElement-disabled_opacity                        : .5 !default;
+
+/* -------------------------------------------------------------- *\
+    menu
+\* -------------------------------------------------------------- */
 
 $menu-dropShadow_color                               : rgba($global-color_fg, .2);
 $menu-dropShadow                                     : 0 5px 10px $menu-dropShadow_color;
@@ -371,7 +374,6 @@ $metaText_fontSize                                   : $global-small_fontSize;
 $metaText_color                                      : mix($global-color_fg, $global-color_bg, 80%) !default;
 $metaText_margin                                     : $utility-baseUnit !default;
 
-
 /* -------------------------------------------------------------- *\
       Thumbnails
 \* -------------------------------------------------------------- */
@@ -391,18 +393,22 @@ $global-separator_width                             : 1px;
     Header
 \* -------------------------------------------------------------- */
 
-$global-header_height: 50px !default;
+$global-header_height                               : 50px !default;
 
 /* -------------------------------------------------------------- *\
     Footer
 \* -------------------------------------------------------------- */
 
-$global-footer_height: 50px !default;
+$global-footer_height                               : 50px !default;
 
-///* -------------------------------------------------------------- *\
-//    Embedded content
-//\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *\
+    Embedded content
+\* -------------------------------------------------------------- */
 
-$embeddedText_padding: $global-medium_fontSize;
+$embeddedText_padding                               : $global-medium_fontSize;
 
+/* -------------------------------------------------------------- *\
+    Etc
+\* -------------------------------------------------------------- */
 
+$mark_bg                                            : mix($global-color-primary, $global-color-bg, 22%);

@@ -55,7 +55,7 @@ $embedLink-excerpt_lineHeight: $global-base_lineHeight !default;
     margin: 0;
 
     @include mediaQuery-richEditor_embed {
-        @include breakWord;
+        word-break: break-word;
         white-space: normal;
     }
 }

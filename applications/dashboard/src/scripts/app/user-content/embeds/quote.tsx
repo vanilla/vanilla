@@ -30,7 +30,7 @@ export function mountQuoteEmbeds() {
             const quoteData = JSON.parse(data) as IEmbedData;
             const onRenderComplete = () => {
                 embed.removeAttribute("data-json");
-                embed.classList.remove('embedResponsive-initialLink');
+                embed.classList.remove("embedResponsive-initialLink");
             };
             ReactDOM.render(
                 <QuoteEmbed data={quoteData} inEditor={false} onRenderComplete={onRenderComplete} />,

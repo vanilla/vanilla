@@ -19,7 +19,7 @@ trait TwigTrait {
      * @return \Twig_Environment
      */
     protected static function twigInit() {
-        $loader = new \Twig_Loader_Filesystem(self ::$twigDefaultFolder);
+        $loader = new \Twig_Loader_Filesystem(self::$twigDefaultFolder);
         return new \Twig_Environment($loader);
     }
 }

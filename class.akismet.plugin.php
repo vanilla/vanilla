@@ -130,8 +130,9 @@ class AkismetPlugin extends Gdn_Plugin {
      * @param $args
      */
     public function base_checkSpam_handler($sender, $args) {
-        if ($args['IsSpam']) {
-            return; // don't double check
+        // Don't check for spam if another plugin has already determined it is.
+        if ($sender->EventArguments['IsSpam']) {
+            return;
         }
 
         $recordType = $args['RecordType'];

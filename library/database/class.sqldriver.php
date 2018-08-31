@@ -1922,7 +1922,7 @@ abstract class Gdn_SQLDriver {
             }
 
             $escapedName = $this->escapeFieldReference($f, true);
-            if (in_array(substr($f, -1),  ['+', '-'], true)) {
+            if (in_array(substr($f, -1), ['+', '-'], true)) {
                 // This is an increment/decrement.
                 $op = substr($f, -1);
                 $f = substr($f, 0, -1);

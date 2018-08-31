@@ -36,6 +36,10 @@ export function initAllUserContent() {
     initQuoteEmbeds();
 }
 
+/**
+ * Runs method for all embeds that need to be rendered everytime content changes.
+ * This is ideal for something like react's `componentDidMount`.
+ */
 export function convertAllUserContent() {
     void convertGettyEmbeds();
     void convertImgurEmbeds();

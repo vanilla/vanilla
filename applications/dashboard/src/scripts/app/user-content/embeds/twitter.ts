@@ -58,7 +58,7 @@ export async function renderTweet(elements: IEmbedElements, data: IScrapeData) {
  *
  * @see library/Vanilla/Embeds/EmbedManager.php
  */
-async function convertTwitterEmbeds() {
+export async function convertTwitterEmbeds() {
     const tweets = Array.from(document.querySelectorAll(".js-twitterCard"));
     if (tweets.length > 0) {
         await ensureScript("//platform.twitter.com/widgets.js");

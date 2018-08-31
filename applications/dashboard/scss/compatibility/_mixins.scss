@@ -77,6 +77,19 @@
     margin: auto 0;
 }
 
+@mixin noSelect() {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+@mixin resetButton() {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 0;
+}
+
 @mixin disabledInput {
     pointer-events: none;
     user-select: none;

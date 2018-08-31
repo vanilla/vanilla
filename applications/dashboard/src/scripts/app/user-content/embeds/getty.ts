@@ -34,7 +34,7 @@ export async function renderGetty(elements: IEmbedElements, data: IScrapeData) {
 /**
  * Renders posted getty embeds.
  */
-async function convertGettyEmbeds() {
+export async function convertGettyEmbeds() {
     const gettyPosts = document.querySelectorAll(".js-gettyEmbed");
     if (gettyPosts.length > 0) {
         for (const post of gettyPosts) {

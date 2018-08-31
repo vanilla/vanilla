@@ -196,7 +196,7 @@ $authenticateMethod-button_horizontalMargin: 12px !default;
 }
 
 .authenticateUser-paragraph {
-    @include breakWord;
+    word-break: break-word;
 
     &.isError {
         color: #ff3933;

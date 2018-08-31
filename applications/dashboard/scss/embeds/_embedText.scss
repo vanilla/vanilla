@@ -53,7 +53,7 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
     text-overflow: ellipsis;
 
     @include mediaQuery-richEditor_embed {
-        @include breakWord;
+        word-break: break-word;
         white-space: normal;
     }
 }

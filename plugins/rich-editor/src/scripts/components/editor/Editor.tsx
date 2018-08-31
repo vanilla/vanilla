@@ -30,7 +30,7 @@ import registerQuill from "@rich-editor/quill/registerQuill";
 interface IProps {
     editorID: string;
     editorDescriptionID: string;
-    bodybox: HTMLInputElement;
+    legacyTextArea?: HTMLInputElement;
     isPrimaryEditor: boolean;
 }
 
@@ -51,16 +51,14 @@ export class Editor extends React.Component<IProps> {
 
     public componentDidMount() {
         // Setup quill
-        const { bodybox } = this.props;
         registerQuill();
         const options = { theme: "vanilla" };
         this.quill = new Quill(this.quillMountRef!.current!, options);
-        bodybox.style.display = "none";
 
         this.editorID = getIDForQuill(this.quill);
 
         // Setup syncing
-        this.setupBodyBoxSync();
+        this.setupLegacyTextAreaSync();
         this.setupDebugPasteListener();
         this.store.dispatch(actions.createInstance(this.editorID));
         this.quill.on(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
@@ -161,9 +159,13 @@ export class Editor extends React.Component<IProps> {
      *
      * Once we rewrite the post page, this should no longer be necessary.
      */
-    private setupBodyBoxSync() {
-        const { bodybox } = this.props;
-        const initialValue = bodybox.value;
+    private setupLegacyTextAreaSync() {
+        const { legacyTextArea } = this.props;
+        if (!legacyTextArea) {
+            return;
+        }
+
+        const initialValue = legacyTextArea.value;
 
         if (initialValue) {
             log("Setting existing content as contents of editor");
@@ -171,7 +173,7 @@ export class Editor extends React.Component<IProps> {
         }
 
         this.quill.on("text-change", () => {
-            bodybox.value = JSON.stringify(this.quill.getContents().ops);
+            legacyTextArea.value = JSON.stringify(this.quill.getContents().ops);
         });
 
         // Listen for the legacy form event if applicable and clear the form.
@@ -204,9 +206,10 @@ export class Editor extends React.Component<IProps> {
      * This only works for PASTE. Not editing the contents.
      */
     private setupDebugPasteListener() {
-        if (debug()) {
-            const { bodybox } = this.props;
-            bodybox.addEventListener("paste", event => {
+        const { legacyTextArea } = this.props;
+
+        if (debug() && legacyTextArea) {
+            legacyTextArea.addEventListener("paste", event => {
                 if (this.allowPasteListener) {
                     event.stopPropagation();
                     event.preventDefault();

@@ -84,7 +84,7 @@ function getBan(permissions: string[] = []): object | null {
     permissions = permissions.map(str => str.toLowerCase());
     const bans = gdn.permissions.bans || {};
 
-    for (const name of bans) {
+    for (const name of Object.keys(bans)) {
         const ban = bans[name];
 
         if (name in permissions) {

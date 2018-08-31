@@ -367,7 +367,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                 ],
 '<div class="embedExternal embedImgur">
     <div class="embedExternal-content">
-        <blockquote class="imgur-embed-pub" lang="en" data-id="10HROiq"><a href="https://imgur.com/10HROiq"></a></blockquote>
+        <blockquote class="imgur-embed-pub" lang="en" data-id="10HROiq"><a href="https://imgur.com/10HROiq">https://imgur.com/10HROiq</a></blockquote>
     </div>
 </div>'
             ],
@@ -387,7 +387,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                 ],
 '<div class="embedExternal embedImgur">
     <div class="embedExternal-content">
-        <blockquote class="imgur-embed-pub" lang="en" data-id="a/OsirufX"><a href="https://imgur.com/OsirufX"></a></blockquote>
+        <blockquote class="imgur-embed-pub" lang="en" data-id="a/OsirufX"><a href="https://imgur.com/OsirufX">https://imgur.com/OsirufX</a></blockquote>
     </div>
 </div>'
             ],

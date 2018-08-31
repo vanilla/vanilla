@@ -27,9 +27,16 @@ else
     ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore
 fi
 
+PHPUNIT_RESULT=$?
+
 # Run standards check on pull requests.
 if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
     ./tests/travis/diff-standards.sh $TRAVIS_BRANCH $TRAVIS_BUILD_DIR
+    PHPCODESNIFFER_RESULT=$?
 else
+    PHPCODESNIFFER_RESULT=0
     echo "Skipping coding standards check..."
 fi
+
+# Make sure all commands had a zero result.
+exit $(($PHPUNIT_RESULT | $PHPCODESNIFFER_RESULT))

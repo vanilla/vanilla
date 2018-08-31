@@ -61,7 +61,7 @@ export class LinkEmbed extends BaseEmbed {
  *
  * @param container - Element containing embeds to truncate
  */
-function truncateEmbedLinks(container = document.body) {
+export function truncateEmbedLinks(container = document.body) {
     const embeds = container.querySelectorAll(".embedLink-excerpt");
     embeds.forEach(el => {
         let untruncatedText = getData(el, "untruncatedText");

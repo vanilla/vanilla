@@ -38,7 +38,7 @@ export class ImgurEmbed extends BaseEmbed {
 /**
  * Renders posted imgur embeds.
  */
-async function convertImgurEmbeds() {
+export async function convertImgurEmbeds() {
     const images = Array.from(document.querySelectorAll(".imgur-embed-pub"));
     if (images.length > 0) {
         await ensureScript("//s.imgur.com/min/embed.js");

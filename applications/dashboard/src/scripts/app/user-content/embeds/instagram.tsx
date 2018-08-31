@@ -47,7 +47,7 @@ export class InstagramEmbed extends BaseEmbed {
 /**
  * Renders posted instagram embeds.
  */
-async function convertInstagramEmbeds() {
+export async function convertInstagramEmbeds() {
     const instagramEmbeds = document.querySelectorAll(".instagram-media");
     if (instagramEmbeds.length > 0) {
         await ensureScript("//platform.instagram.com/en_US/embeds.js");

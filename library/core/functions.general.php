@@ -2329,7 +2329,8 @@ if (!function_exists('jsonEncodeChecked')) {
      * @param mixed $value
      * @param int|null $options
      * @return string
-     * @throws Exception
+     * @throws Exception If an error occurred while encoding.
+     * @deprecated 2.8 Use \Vanilla\Utility\StringUtils::jsonEncodeChecked instead.
      */
     function jsonEncodeChecked($value, $options = null) {
         return \Vanilla\Utility\StringUtils::jsonEncodeChecked($value, $options);

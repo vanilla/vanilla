@@ -4,11 +4,11 @@
  * @license GPLv2
  */
 
-namespace Vanilla;
+namespace Vanilla\Models;
 
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
-use Garden\Schema\ValidationField;
+use Vanilla\InjectableInterface;
 
 /**
  * Basic model class.

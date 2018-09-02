@@ -2139,6 +2139,10 @@ abstract class Gdn_SQLDriver {
         if (count($in) > 0) {
             $inExpr = '('.implode(', ', $in).')';
         } else {
+            // WHERE NOT IN (NULL) would yield an empty result set.
+            if ($op == 'not in') {
+                return $this;
+            }
             $inExpr = '(null)';
         }
 

@@ -31,13 +31,13 @@ trait StaticCache {
      * @return mixed
      */
     public static function sc(string $key, $default = false) {
-        if (!self::$scInit) {
-            self::$sCache = self::scInit();
-            self::$scInit = true;
-        }
         if (empty($key)) {
-            return '';
+            throw new \Exception('Static cache key can not be empty!');
         } else {
+            if (!self::$scInit) {
+                self::$sCache = self::scInit();
+                self::$scInit = true;
+            }
             if (!key_exists($key, self::$sCache)) {
                 self::$sCache[$key] = self::f($key, $default);
             }

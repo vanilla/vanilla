@@ -488,6 +488,88 @@ class Gdn_Database {
     }
 
     /**
+     * Translate a database data type into a type compatible with Garden Schema.
+     *
+     * @param string $fieldType
+     * @return string
+     */
+    private function simpleDataType(string $fieldType): string {
+        $fieldType = strtolower($fieldType);
+
+        switch ($fieldType) {
+            case 'bool':
+            case 'boolean':
+                $result = 'boolean';
+                break;
+            case 'bit':
+            case 'tinyint':
+            case 'smallint':
+            case 'mediumint':
+            case 'int':
+            case 'integer':
+            case 'bigint':
+                $result = 'integer';
+                break;
+            case 'decimal':
+            case 'dec':
+            case 'float':
+            case 'double':
+                $result = 'number';
+                break;
+            case 'timestamp':
+                $result = 'timestamp';
+                break;
+            case 'date':
+            case 'datetime':
+                $result = 'datetime';
+                break;
+            default:
+                $result = 'string';
+        }
+
+        return $result;
+    }
+
+    /**
+     * Generate a Garden Schema instance, based on the database table schema.
+     *
+     * @param string $table Target table for building the Schema.
+     * @return \Garden\Schema\Schema
+     */
+    public function simpleSchema(string $table): \Garden\Schema\Schema {
+        $schema = [];
+        $databaseSchema = $this->sql()->fetchTableSchema($table);
+
+        /** @var object $databaseField */
+        foreach ($databaseSchema as $databaseField) {
+            $type = $this->simpleDataType($databaseField->Type);
+            $allowNull = (bool)$databaseField->AllowNull;
+            $isAutoIncrement = (bool)$databaseField->AutoIncrement;
+            $hasDefault = !($databaseField->Default === null);
+            $isRequired = !$allowNull && !$isAutoIncrement && !$hasDefault;
+
+            $field = [
+                'allowNull' => $allowNull,
+                'required' => $isRequired,
+                'type' => $type,
+            ];
+            if ($type === 'string' && $databaseField->Length) {
+                $field['maximumLength'] = $databaseField->Length;
+            }
+            if (is_array($databaseField->Enum) && !empty($databaseField->Enum)) {
+                $field['enum'] = $databaseField->Enum;
+            }
+
+            // Garden Schema requires appending a question mark to the field name if it's not required.
+            $key = $databaseField->Name.(!$isRequired ? '?' : '');
+            $schema[$key] = $field;
+        }
+
+        $result = \Garden\Schema\Schema::parse($schema);
+        return $result;
+    }
+
+    /**
      * The slave connection to the database.
      *
      * @return PDO

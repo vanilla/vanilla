@@ -16,6 +16,7 @@ use Gdn;
 trait Translation {
     use StaticCache {
         sc as t;
+        scInit as tInit;
     }
 
     /**
@@ -27,6 +28,6 @@ trait Translation {
      * @return array
      */
     protected static function f(string $key, $default) {
-        return Gdn::translate($key);
+        return Gdn::translate($key, $default);
     }
 }

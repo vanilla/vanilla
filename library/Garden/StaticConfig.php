@@ -16,6 +16,7 @@ use Gdn;
 trait StaticConfig {
     use StaticCache {
         sc as c;
+        scInit as cInit;
     }
 
     /**

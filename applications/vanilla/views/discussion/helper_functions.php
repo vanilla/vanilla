@@ -319,7 +319,7 @@ if (!function_exists('getDiscussionOptionsDropdown')):
             $discussion = $sender->data('Discussion');
         }
 
-        $categoryID = ($discussion->CategoryID ?? false);
+        $categoryID = $discussion->CategoryID ?? false;
 
         if (!$categoryID && property_exists($sender, 'Discussion')) {
             trace('Getting category ID from controller Discussion property.');

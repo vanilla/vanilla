@@ -347,7 +347,6 @@ if (!function_exists('getDiscussionOptionsDropdown')):
             $timeLeft = ' ('.Gdn_Format::seconds($timeLeft).')';
         }
 
-        //$t = DropdownModule::tAll();
         $dropdown->addLinkIf($canDismiss, DropdownModule::t('Dismiss'), "vanilla/discussion/dismissannouncement?discussionid={$discussionID}", 'dismiss', 'DismissAnnouncement Hijack')
             ->addLinkIf($canEdit, DropdownModule::t('Edit').$timeLeft, '/post/editdiscussion/'.$discussionID, 'edit')
             ->addLinkIf($canAnnounce, DropdownModule::t('Announce'), '/discussion/announce?discussionid='.$discussionID, 'announce', 'AnnounceDiscussion Popup')

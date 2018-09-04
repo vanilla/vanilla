@@ -22,11 +22,10 @@ class SchemaFilters {
      */
     public static function encodeValue($value, ValidationField $field) {
         if ($value === null || $value === '') {
-            $value = null;
-        } else {
-            $value = StringUtils::jsonEncodeChecked($value, JSON_UNESCAPED_SLASHES);
+            return null;
         }
-        return $value;
+        $result = StringUtils::jsonEncodeChecked($value, JSON_UNESCAPED_SLASHES);
+        return $result;
     }
 
     /**

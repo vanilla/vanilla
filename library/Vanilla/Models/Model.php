@@ -126,14 +126,12 @@ class Model implements InjectableInterface {
      * @param array $set Field values to set.
      * @param array $where Conditions to restrict the update.
      * @throws \Exception If an error is encountered while performing the query.
-     * @return bool True if no errors were encountered when performing the query.
+     * @return bool True.
      */
     public function update(array $set, array $where): bool {
         $set = $this->writeSchema->validate($set, true);
-        $result = $this->sql()->put($this->table, $set, $where);
-        if (!($result instanceof \Gdn_DataSet)) {
-            throw new \Exception('An unknown error was encountered while performing the update.');
-        }
+        $this->sql()->put($this->table, $set, $where);
+        // If fully executed without an exception bubbling up, consider this a success.
         return true;
     }
 }

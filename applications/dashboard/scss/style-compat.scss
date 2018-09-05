@@ -11,8 +11,6 @@
 @import "compatibility/buttons";
 @import "compatibility/categories";
 @import "compatibility/groups";
-@import "compatibility/codeBlocks";
-
 
 // This should always be added after style.css and not be overridden.
 @import "new-components/authenticateUser";
@@ -27,6 +25,7 @@
 // Editor
 @import "editor/variables";
 @import "editor/mixins";
+@import "editor/mixinsLegacy";
 @import "editor/animations";
 @import "editor/richEditor";
 @import "editor/atMention";
@@ -35,6 +34,7 @@
 @import "editor/accessibility";
 @import "editor/spoiler";
 @import "editor/emoji";
+@import "editor/codeBlocks";
 
 // Embeds
 @import "embeds/embeds";

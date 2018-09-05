@@ -140,6 +140,7 @@ if (!function_exists('WriteDiscussion')) :
         if (!preg_match('/\w/u', $discussionName)) {
             $discussionName = t('Blank Discussion Topic');
         }
+        $discussionName = htmlspecialchars($discussionName);
         $sender->EventArguments['DiscussionName'] = &$discussionName;
 
         static $firstDiscussion = true;

@@ -107,13 +107,16 @@ $global-condensed_lineHeight                         : 1.25 !default;
 
 $global-heading_fontFamily                           : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 $global-heading_fontWeight                           : $global-bold_fontWeight !default; // Derived
+$global-heading_lineHeightRatio                      : .74;
 
 $global-body_fontFamily                              : "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
 $global-body_fontWeight                              : $global-normal_fontWeight !default; // Derived
+$global-body_lineHeightRatio                         : $global-heading_lineHeightRatio;
 
 $link_default-color                                  : $global-color_primary !default;
 $link_default_hover-color                            : $global-color_secondary !default;
 $link_default_focus-color                            : $global-color_secondary !default;
+$link_default_visited-color                          : mix($global-color_secondary, $global-color_fg, 90%) !default;
 
 
 /* -------------------------------------------------------------- *\

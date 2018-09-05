@@ -50,13 +50,12 @@ $buttonSpoiler: (
     width: $icon-default_size;
     height: $icon-default_size;
     display: inline-block;
-    margin-left: 6px;
     vertical-align: .2em;
 }
 
 .button-spoiler {
     @include generateButtonClass($buttonSpoiler, false);
-    @include noSelect;
+    user-select: none;
     width: 100%;
     max-width: 100%;
     font-size: $spoiler-fontSize;
@@ -103,12 +102,9 @@ $buttonSpoiler: (
 }
 
 .spoiler-chevron {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: $icon_default_size * 1.5;
-    height: $icon_default_size * 2;
+    @include absolute-middleRight($embeddedText_padding);
+    width: $icon-default_size;
+    height: $icon_default_size;
     display: flex;
     align-items: center;
     opacity: $state-icon_opacity;

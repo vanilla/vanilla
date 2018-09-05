@@ -125,37 +125,6 @@ button.Close {
   opacity: 0.4;
 }
 
-.userContent .code {
-  display: inline;
-  vertical-align: middle;
-  line-height: inherit;
-  font-size: 0.85em;
-  box-sizing: border-box;
-  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-  max-width: 100%;
-  margin: 0;
-  color: #26282b;
-  background-color: #f7f7f7;
-  border: 0;
-}
-
-.userContent .codeInline {
-  display: inline;
-  white-space: normal;
-  padding: 0.2em 0.4em;
-  border-radius: 0;
-}
-
-.userContent .codeBlock {
-  display: block;
-  overflow-x: auto;
-  word-wrap: normal;
-  line-height: 1.45;
-  white-space: pre;
-  padding: 14px;
-  border-radius: 0;
-}
-
 .authenticateUserCol {
   padding: 0 26px;
   margin: auto;
@@ -724,6 +693,11 @@ label.checkbox input.checkbox-input {
   position: absolute;
 }
 
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 @-webkit-keyframes spinnerLoader {
   0% {
     -webkit-transform: rotate(73deg);
@@ -734,7 +708,6 @@ label.checkbox input.checkbox-input {
             transform: rotate(433deg);
   }
 }
-
 @keyframes spinnerLoader {
   0% {
     -webkit-transform: rotate(73deg);
@@ -746,6 +719,11 @@ label.checkbox input.checkbox-input {
   }
 }
 
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 @-webkit-keyframes fadein {
   0% {
     opacity: 0;
@@ -754,7 +732,6 @@ label.checkbox input.checkbox-input {
     opacity: 1;
   }
 }
-
 @keyframes fadein {
   0% {
     opacity: 0;
@@ -1825,15 +1802,14 @@ body.isMobile .Popup.hasRichEditor .Border {
   width: 24px;
   height: 24px;
   display: inline-block;
-  margin-left: 6px;
   vertical-align: .2em;
 }
 
 .button-spoiler {
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   width: 100%;
   max-width: 100%;
   font-size: 16px;
@@ -1891,11 +1867,15 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .spoiler-chevron {
   position: absolute;
+  display: block;
   top: 0;
-  right: 0;
+  right: 14px;
   bottom: 0;
-  width: 36px;
-  height: 48px;
+  max-height: 100%;
+  max-width: 100%;
+  margin: auto 0;
+  width: 24px;
+  height: 24px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1966,6 +1946,37 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .emojiGroup {
   opacity: 0.6;
+}
+
+.userContent .code {
+  display: inline;
+  vertical-align: middle;
+  line-height: inherit;
+  font-size: 0.85em;
+  box-sizing: border-box;
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  max-width: 100%;
+  margin: 0;
+  color: #26282b;
+  background-color: #f7f7f7;
+  border: 0;
+}
+
+.userContent .codeInline {
+  display: inline;
+  white-space: normal;
+  padding: 0.2em 0.4em;
+  border-radius: 0;
+}
+
+.userContent .codeBlock {
+  display: block;
+  overflow-x: auto;
+  word-wrap: normal;
+  line-height: 1.45;
+  white-space: pre;
+  padding: 14px;
+  border-radius: 0;
 }
 
 .embedResponsive {
@@ -2299,14 +2310,6 @@ body.isMobile .Popup.hasRichEditor .Border {
   text-overflow: ellipsis;
 }
 
-@media (max-width: 550px) {
-  .embedText-titleLink,
-  .embedText-title {
-    word-break: break-word;
-    white-space: normal;
-  }
-}
-
 .embedText-titleLink {
   margin: 0;
   color: inherit;
@@ -2370,13 +2373,6 @@ body.isMobile .Popup.hasRichEditor .Border {
   overflow: hidden;
   text-overflow: ellipsis;
   margin: 0;
-}
-
-@media (max-width: 550px) {
-  .embedLink-source {
-    word-break: break-word;
-    white-space: normal;
-  }
 }
 
 .embedLink-excerpt {

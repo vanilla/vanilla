@@ -51,11 +51,6 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-
-    @include mediaQuery-richEditor_embed {
-        word-break: break-word;
-        white-space: normal;
-    }
 }
 
 .embedText-titleLink {

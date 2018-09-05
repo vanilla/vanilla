@@ -53,11 +53,6 @@ $embedLink-excerpt_lineHeight: $global-base_lineHeight !default;
     overflow: hidden;
     text-overflow: ellipsis;
     margin: 0;
-
-    @include mediaQuery-richEditor_embed {
-        word-break: break-word;
-        white-space: normal;
-    }
 }
 
 .embedLink-excerpt {

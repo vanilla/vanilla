@@ -217,14 +217,17 @@ class PostController extends VanillaController {
             // Prep form with current data for editing
             if (isset($this->Discussion)) {
                 $this->Form->setData($this->Discussion);
-            } elseif (isset($this->Draft))
+            } elseif (isset($this->Draft)) {
                 $this->Form->setData($this->Draft);
-            else {
+            } else {
                 if ($this->Category !== null) {
                     $this->Form->setData(['CategoryID' => $this->Category->CategoryID]);
                 }
                 $this->populateForm($this->Form);
             }
+            
+            // Decode HTML entities escaped by DiscussionModel::calculate() here.
+            $this->Form->setValue('Name', htmlspecialchars_decode($this->Form->getValue('Name')));
 
         } elseif ($this->Form->authenticatedPostBack()) { // Form was submitted
             // Save as a draft?

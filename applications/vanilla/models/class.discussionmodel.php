@@ -1004,7 +1004,7 @@ class DiscussionModel extends Gdn_Model {
         $archiveTimestamp = Gdn_Format::toTimestamp(Gdn::config('Vanilla.Archive.Date', 0));
 
         // Fix up output
-        $discussion->Name = Gdn_Format::text($discussion->Name);
+        $discussion->Name = htmlspecialchars($discussion->Name);
         $discussion->Attributes = dbdecode($discussion->Attributes);
         $discussion->Url = discussionUrl($discussion);
         $discussion->Tags = $this->formatTags($discussion->Tags);

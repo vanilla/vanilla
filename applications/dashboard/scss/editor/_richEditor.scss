@@ -1,8 +1,6 @@
 .richEditor {
     position: relative;
     display: block;
-    padding-left: $richEditor_horizontalPadding;
-
     &.isDisabled { // Before React has replaced initial HTML
         &,
         .richEditor-button {
@@ -10,21 +8,14 @@
         }
     }
 
-    color: $global-color_fg;
-
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    p {
-        color: $global-color_fg;
-    }
-
-    blockquote {
-        display: block;
-        margin: 0;
+    &.inheritHeight {
+        .richEditor-text,
+        .richEditor-textWrap,
+        .richEditor-frame {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
     }
 }
 
@@ -530,70 +521,7 @@
     }
 }
 
-.userContent {
-    line-height: $global-base_lineHeight;
 
-    &.Message {
-        margin-top: $global-medium_fontSize;
-    }
-
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-        line-height: $global-condensed_lineHeight;
-    }
-
-    > *:not(.emoji) {
-        &:not(:last-child):not(br) {
-            margin-bottom: $global-block_margin;
-        }
-
-        &:first-child:not(br) {
-            margin-top: #{(1 - $global-base_lineHeight) * .5em} !important;
-        }
-    }
-
-    &,
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    span,
-    div,
-    td,
-    th,
-    a,
-    p
-    {
-        word-break: break-word;
-        text-overflow: ellipsis;
-    }
-
-    .CommentHeader {
-        margin-bottom: $global-medium_fontSize;
-    }
-
-    li {
-        &,
-        *:first-child {
-            margin-top: 0;
-        }
-        &,
-        *:last-child {
-            margin-bottom: 0;
-        }
-    }
-}
-
-.richEditor-button {
-    user-select: none;
-    cursor: pointer;
-}
 
 // Emoji Groups
 
@@ -611,156 +539,3 @@
     width: $icon-default_size;
     size: $icon-default_size;
 }
-
-body.hasRichEditor {
-    // Hide Preview
-    #Form_Preview {
-        display: none;
-    }
-}
-
-// Handle gutter for paragraph menu
-@include mediaQuery-richEditor_notMobile {
-    body.hasRichEditor {
-        // New Discussions
-        &.Section-PostDiscussion {
-            #DiscussionForm {
-                select {
-                    max-width: 100%;
-                }
-
-                .FormWrapper {
-                    padding: {
-                        left: $richEditor_horizontalPadding;
-                        right: $richEditor_horizontalPadding;
-                    }
-
-                    .richEditor {
-                        padding-left: 0;
-                        padding-right: 0;
-                    }
-                }
-            }
-        }
-
-        // Comment
-        .CommentForm {
-            .CommentFormWrap {
-                .Form-HeaderWrap {
-                    display: none;
-                }
-
-                .FormWrapper {
-                    padding-right: 0;
-                    padding-left: 0;
-                }
-            }
-
-            .richEditor {
-                padding: {
-                    left: $richEditor_horizontalPadding;
-                    right: $richEditor_horizontalPadding;
-
-                }
-
-                .richEditor {
-                    padding-left: 0;
-                    padding-right: 0;
-                }
-            }
-
-            .Buttons {
-                padding-right: $richEditor_horizontalPadding;
-            }
-        }
-
-        .DataListWrap {
-            .FormWrapper.FormWrapper-Condensed {
-
-            }
-        }
-
-        // New Message
-        #EventAddEditForm,
-        #GroupForm,
-        #MessageForm,
-        #ConversationForm {
-            .Form-HeaderWrap {
-                display: none;
-            }
-
-            .FormWrapper {
-                padding: {
-                    left: $richEditor_horizontalPadding;
-                    right: $richEditor_horizontalPadding;
-                }
-
-                .richEditor {
-                    padding-right: 0;
-                    padding-left: 0;
-                }
-            }
-        }
-
-        &.Profile {
-            .FormWrapper.FormWrapper-Condensed {
-                padding-right: $richEditor_horizontalPadding;
-                padding-left: 0;
-
-                .Activity {
-                    .Buttons {
-                        padding-left: $richEditor_horizontalPadding
-                    }
-                }
-            }
-        }
-
-        &.Section-Conversation {
-            .CommentForm {
-                .Buttons {
-                    padding-right: 0;
-                }
-            }
-        }
-
-        .Popup.hasRichEditor {
-            .Border {
-                width: 100%;
-                box-sizing: border-box;
-            }
-
-            .Content {
-                margin-top: 10px;
-                > h1 {
-                    padding-left: $richEditor_horizontalPadding;
-                }
-            }
-
-            .FormWrapper {
-                background: none;
-                padding: {
-                    top: 3px;
-                    left: $richEditor_horizontalPadding;
-                    right: $richEditor_horizontalPadding;
-                }
-            }
-
-            .richEditor {
-                padding-left: 0;
-            }
-        }
-    }
-}
-
-
-// Mobile
-body.isMobile {
-    @include richEditorMobileStyles();
-}
-
-@include mediaQuery-richEditor_mobile {
-    @include richEditorMobileStyles();
-}
-
-
-

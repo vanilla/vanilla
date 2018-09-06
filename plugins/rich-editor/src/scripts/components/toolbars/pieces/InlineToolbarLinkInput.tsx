@@ -31,6 +31,7 @@ export class InlineToolbarLinkInput extends React.Component<IProps, {}> {
     }
 
     public render() {
+        const close = `x`;
         return (
             <div className="richEditor-menu insertLink" role="dialog" aria-label={t("Insert Url")}>
                 <input
@@ -43,7 +44,7 @@ export class InlineToolbarLinkInput extends React.Component<IProps, {}> {
                 />
                 <button type="button" onClick={this.props.onCloseClick} className="Close richEditor-close">
                     <span className="Close-x" aria-hidden="true">
-                        {t("Close")}
+                        {close}
                     </span>
                     <span className="sr-only">{t("Close")}</span>
                 </button>

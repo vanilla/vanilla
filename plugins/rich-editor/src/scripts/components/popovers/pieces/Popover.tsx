@@ -75,6 +75,8 @@ export default class Popover extends React.Component<IProps, IState> {
             </div>
         ) : null;
 
+        const close = `x`;
+
         return (
             <div
                 id={this.state.id}
@@ -97,7 +99,7 @@ export default class Popover extends React.Component<IProps, IState> {
                     {screenReaderDescription}
                     <button type="button" onClick={this.props.onCloseClick} className="Close richEditor-close">
                         <span className="Close-x" aria-hidden="true">
-                            {t("Close")}
+                            {close}
                         </span>
                         <span className="sr-only">{t("Close")}</span>
                     </button>

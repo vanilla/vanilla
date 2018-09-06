@@ -43,7 +43,7 @@ export class InlineToolbarLinkInput extends React.Component<IProps, {}> {
                 />
                 <button type="button" onClick={this.props.onCloseClick} className="Close richEditor-close">
                     <span className="Close-x" aria-hidden="true">
-                        {t("×")}
+                        {t("Close")}
                     </span>
                     <span className="sr-only">{t("Close")}</span>
                 </button>

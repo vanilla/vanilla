@@ -44,60 +44,6 @@
     }
 }
 
-// Rich Editor
-@mixin mediaQuery-richEditor_mobile {
-    @media (max-width: $richEditor-mobileBreakPoint) {
-        @content;
-    }
-}
-
-@mixin mediaQuery-richEditor_notMobile {
-    @media (min-width: #{$richEditor-mobileBreakPoint}) {
-        @content;
-    }
-}
-
-
-
-@mixin richEditorMobileStyles {
-    .embedDialogue {
-        position: static;
-    }
-
-    .u-richEditorHiddenOnMobile {
-        display: none !important;
-    }
-
-    .richEditor {
-        padding-left: 0;
-    }
-
-    .richEditor-menu.richEditorFlyout {
-        left: 0;
-        width: calc(100% + #{$global-border-width * 4});
-    }
-
-    .richEditor-embedBarMobileBorder {
-        display: block;
-    }
-
-    .FormWrapper {
-        padding-left: $richEditor-mobile_spacing;
-        padding-right: $richEditor-mobile_spacing;
-    }
-
-    .richEditorParagraphMenu {
-        display: none !important;
-    }
-
-    .Popup.hasRichEditor {
-        .Border {
-            width: 100%;
-            box-sizing: border-box;
-        }
-    }
-}
-
 @mixin ieHack {
     // IE 10 and 11 only
     @media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {

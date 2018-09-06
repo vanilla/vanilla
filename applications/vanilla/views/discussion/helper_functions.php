@@ -85,10 +85,16 @@ if (!function_exists('writeComment')) :
         $sender->EventArguments['Permalink'] = $permalink;
 
         // Needed in writeCommentOptions()
-        if ($sender->data('Discussion', null) === null) {
+        $discussion = $sender->data('Discussion', null);
+        
+        if ($discussion === null) {
             $discussionModel = new DiscussionModel();
             $discussion = $discussionModel->getID($comment->DiscussionID);
             $sender->setData('Discussion', $discussion);
+        }
+        
+        if (($discussion->InsertUserID ?? false) == $comment->InsertUserID) {
+            $cssClass .= ' original-poster';
         }
 
         // DEPRECATED ARGUMENTS (as of 2.1)

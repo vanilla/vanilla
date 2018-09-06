@@ -4,6 +4,8 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
+import path from "path";
+import del from "del";
 import webpack, { Stats } from "webpack";
 import { makeProdConfig } from "./configs/makeProdConfig";
 import { makeDevConfig } from "./configs/makeDevConfig";
@@ -13,6 +15,7 @@ import chalk from "chalk";
 import { installNodeModules } from "./utility/moduleUtils";
 import { makePolyfillConfig } from "./configs/makePolyfillConfig";
 import { printError, print, fail } from "./utility/utils";
+import { DIST_DIRECTORY } from "./env";
 
 void Promise.all([installNodeModules("forum"), installNodeModules("admin"), installNodeModules("knowledge")]).then(run);
 
@@ -41,6 +44,8 @@ const statOptions = {
 };
 
 async function runProd() {
+    // Cleanup
+    del.sync(path.join(DIST_DIRECTORY, "**"));
     const config = [await makeProdConfig("forum"), await makeProdConfig("admin"), await makeProdConfig("knowledge")];
     const compiler = webpack(config);
     compiler.run((err: Error, stats: Stats) => {

@@ -154,7 +154,7 @@ function makeEntryPaths(entries: string[]): string[] {
  */
 function getCommonEntries(section: string) {
     return {
-        [`/js/webpack/bootstrap-${section}`]: makeEntryPaths([BOOTSTRAP_SOURCE_FILE]),
+        [`bootstrap`]: makeEntryPaths([BOOTSTRAP_SOURCE_FILE]),
     };
 }
 
@@ -169,12 +169,11 @@ export async function getEntries(section: string): Promise<any> {
 
     for (const addonPath of addonPaths) {
         const entryType = await addonHasEntry(addonPath, section);
+        const addonName = path.basename(addonPath);
 
-        // Strip out the vanilla root to create an "absolute" looking path, from the root of the project.
-        const relativePath = addonPath.replace(VANILLA_ROOT, "") + `/js/webpack/${section}`;
         if (entryType !== null) {
             const entryPath = path.resolve(addonPath, `src/scripts/entries/${section}.${entryType}`);
-            appEntries[relativePath] = makeEntryPaths([entryPath]);
+            appEntries[`addons/${addonName}`] = makeEntryPaths([entryPath]);
         }
     }
 

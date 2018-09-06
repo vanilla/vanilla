@@ -21,6 +21,12 @@ class AssetModel extends Gdn_Model {
      */
     const CACHE_GRACE_PERIOD = 90;
 
+    /** @var string Directory for webpack-built files. */
+    const WEBPACK_DIST_DIRECTORY_NAME = "dist";
+
+    /** @var string Webpack built script extension. */
+    const WEBPACK_SCRIPT_EXTENSION = ".min.js";
+
     /** @var array List of CSS files to serve. */
     protected $_CssFiles = [];
 
@@ -87,12 +93,12 @@ class AssetModel extends Gdn_Model {
         switch ($basename) {
             case 'style':
                 $this->_CssFiles = [
-                    ['style.css', 'dashboard', ['Sort' => -10]]
+                    ['style.css', 'dashboard', ['Sort' => -10]],
                 ];
                 break;
             case 'admin':
                 $this->_CssFiles = [
-                    ['admin.css', 'dashboard', ['Sort' => -10]]
+                    ['admin.css', 'dashboard', ['Sort' => -10]],
                 ];
                 break;
             default:
@@ -159,57 +165,52 @@ class AssetModel extends Gdn_Model {
      * These follow a pretty strict pattern of:
      *
      * - webpack runtime
-     * - vendor chunks
-     * - library chunks
-     * - entry chunks
+     * - vendor chunk
+     * - library chunk
+     * - addon chunks
      * - bootstrap
      *
-     * @param string $basename - The section of the theme to lookup.
+     * @param string $sectionName - The section of the site to lookup.
      * @return array
+     * @throws Exception If the requested section does not exist.
      */
-    public function getWebpackJsFiles(string $section) {
-        if (c("HotReload.Enabled", false)) {
-            $ip = c("HotReload.IP", "127.0.0.1");
+    public function getWebpackJsFiles(string $sectionName) {
+        if (Gdn::config("HotReload.Enabled", false)) {
+            $ip = Gdn::config("HotReload.IP", "127.0.0.1");
             return [
-                "http://$ip:3030/$section-hot-bundle.js"
+                "http://$ip:3030/$sectionName-hot-bundle.js"
             ];
         }
 
-        if (!in_array($section, ['forum', 'admin', 'knowledge'], true)) {
-            trigger_error("Unknown core js basename: $section");
-            return [];
+        $enabledAddonKeys = [];
+        $enabledAddons = $this->addonManager->getEnabled();
+        /** @var Addon $addon */
+        foreach($enabledAddons as $addon) {
+            $enabledAddonKeys[] = $addon->getKey();
         }
 
-        // Add the lib.
-        $result = [
-            "/js/webpack/runtime-$section.min.js",
-            "/js/webpack/vendors-$section.min.js",
+        $sectionDir = PATH_ROOT . DS . self::WEBPACK_DIST_DIRECTORY_NAME . DS . $sectionName;
+
+        if (!file_exists($sectionDir)) {
+            throw new \Exception("That requested section $sectionName does not exist");
+        }
+
+        $sectionRoot = '/' . self::WEBPACK_DIST_DIRECTORY_NAME . '/' . $sectionName;
+        $scripts = [
+            $sectionRoot . '/runtime' . self::WEBPACK_SCRIPT_EXTENSION,
+            $sectionRoot . '/vendors' . self::WEBPACK_SCRIPT_EXTENSION,
         ];
 
-        // Loop through the enabled addons and get their javascript.
-        foreach ($this->addonManager->getEnabled() as $addon) {
-            /* @var Addon $addon */
-            if ($addon->getType() !== Addon::TYPE_ADDON) {
-                continue;
-            }
-
-            $subLibraryPath = "/js/webpack/library-$section.min.js";
-
-            $localPath = $addon->path($subLibraryPath, Addon::PATH_REAL);
-            if (file_exists($localPath)) {
-                $result[] = $localPath = $addon->path($subLibraryPath, Addon::PATH_ADDON);
-            }
-
-            $subPath = "/js/webpack/$section.min.js";
-            $localPath = $addon->path($subPath, Addon::PATH_REAL);
-            if (file_exists($localPath)) {
-                $result[] = $localPath = $addon->path($subPath, Addon::PATH_ADDON);
+        foreach ($enabledAddonKeys as $addonKey) {
+            $filePath = $sectionDir . DS . 'addons' . DS . $addonKey . self::WEBPACK_SCRIPT_EXTENSION;
+            if (file_exists($filePath)) {
+                $resourcePath = $sectionRoot . '/addons/' . $addonKey . self::WEBPACK_SCRIPT_EXTENSION;
+                $scripts[] = $resourcePath;
             }
         }
 
-        // Add the bootstrap after everything else.
-        $result[] = "/js/webpack/bootstrap-$section.min.js";
-        return $result;
+        $scripts[] = $sectionRoot . '/bootstrap' . self::WEBPACK_SCRIPT_EXTENSION;
+        return $scripts;
     }
 
     /**
@@ -470,7 +471,7 @@ class AssetModel extends Gdn_Model {
         // Add the desktop theme version.
         $themes = [
             '' => Gdn::addonManager()->lookupTheme(Gdn::themeManager()->desktopTheme()),
-            'Mobile' => Gdn::addonManager()->lookupTheme(Gdn::themeManager()->mobileTheme())
+            'Mobile' => Gdn::addonManager()->lookupTheme(Gdn::themeManager()->mobileTheme()),
         ];
         foreach ($themes as $optionsPx => $theme) {
             if (!$theme instanceof Addon) {
@@ -669,7 +670,7 @@ class AssetModel extends Gdn_Model {
         trace([
             'view' => $view,
             'controller' => $controller,
-            'folder' => $folder
+            'folder' => $folder,
         ], 'View');
         trace($paths, __METHOD__);
 

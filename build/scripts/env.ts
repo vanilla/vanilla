@@ -14,6 +14,8 @@ export const VANILLA_PLUGINS = resolve(VANILLA_ROOT, "plugins");
 export const VANILLA_APPS = resolve(VANILLA_ROOT, "applications");
 export const VANILLA_THEMES = resolve(VANILLA_ROOT, "themes");
 
+export const DIST_DIRECTORY = resolve(VANILLA_ROOT, "dist");
+
 // Config files
 export const PRETTIER_FILE = resolve(VANILLA_ROOT, "prettier.config.js");
 export const TS_CONFIG_FILE = resolve(VANILLA_ROOT, "tsconfig.json");

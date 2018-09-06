@@ -17,6 +17,7 @@
 !/conf/config-defaults.php
 !/conf/constants.php
 !/conf/readme.txt
+/dist/*
 /locales/*
 !/locales/.gitkeep
 /plugins/*

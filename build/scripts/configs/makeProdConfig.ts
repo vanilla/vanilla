@@ -4,8 +4,9 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import { Configuration } from "webpack";
-import { VANILLA_ROOT } from "../env";
+import path from "path";
+import webpack, { Configuration } from "webpack";
+import { DIST_DIRECTORY } from "../env";
 import { getEntries } from "../utility/addonUtils";
 import { getOptions, BuildMode } from "../options";
 import { makeBaseConfig } from "./makeBaseConfig";
@@ -32,8 +33,8 @@ export async function makeProdConfig(section: string) {
     baseConfig.output = {
         filename: "[name].min.js",
         chunkFilename: "[name].min.js?[chunkhash]",
-        publicPath: "/",
-        path: VANILLA_ROOT,
+        publicPath: `/dist/${section}`,
+        path: path.join(DIST_DIRECTORY, section),
         library: `vanilla${section}`,
     };
     baseConfig.devtool = "source-map";
@@ -42,25 +43,25 @@ export async function makeProdConfig(section: string) {
         namedChunks: false,
         // Create a single runtime chunk per section.
         runtimeChunk: {
-            name: `js/webpack/runtime-${section}`,
+            name: `runtime`,
         },
         // We want to split
         splitChunks: {
-            chunks: "initial",
-            minSize: 1000000, // This should prevent webpack from creating extra chunks for
+            chunks: "all",
+            minSize: 1000000, // This should prevent webpack from creating extra chunks.
             cacheGroups: {
                 commons: {
                     test: /[\\/]node_modules[\\/]/,
                     minSize: 30000,
                     reuseExistingChunk: true,
-                    name: `js/webpack/vendors-${section}`,
-                    chunks: "initial",
+                    name: `vendors`,
+                    chunks: "all",
                 },
                 library: {
                     // Our library files currently only come from the dashboard.
                     test: /[\\/]applications[\\/]dashboard[\\/]src[\\/]scripts[\\/]/,
                     minSize: 30000,
-                    name: `applications/dashboard/js/webpack/library-${section}`,
+                    name: `library`,
                     // We currently NEED every library file to be shared among everything.
                     // Many of these files have common global state that is not exposed on the window object.
                     chunks: "all",
@@ -77,6 +78,12 @@ export async function makeProdConfig(section: string) {
             new OptimizeCSSAssetsPlugin({}),
         ],
     };
+
+    baseConfig.plugins!.push(
+        new webpack.DefinePlugin({
+            __BUILD__SECTION__: JSON.stringify(section),
+        }),
+    );
 
     // Spawn a bundle size analyzer. This is super usefull if you find a bundle has jumped up in size.
     if (options.mode === BuildMode.ANALYZE) {

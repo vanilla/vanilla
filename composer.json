@@ -79,6 +79,7 @@
     "scripts": {
         "pre-install-cmd": "Vanilla\\Setup\\ComposerHelper::preUpdate",
         "pre-update-cmd": "Vanilla\\Setup\\ComposerHelper::preUpdate",
+        "post-install-cmd": "./build/build-frontend.sh",
         "lint-diff": "./tests/travis/diff-standards.sh"
     },
     "autoload-dev": {

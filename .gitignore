@@ -7,6 +7,7 @@
 !/build/scripts
 !/build/tsconfig.json
 !/build/.htaccess
+!/build/build-frontend.sh
 !/build/build.xml
 !/build/package-include.txt
 !/build/package-exclude.txt

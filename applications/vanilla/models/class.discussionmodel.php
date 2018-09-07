@@ -2904,7 +2904,12 @@ class DiscussionModel extends Gdn_Model {
         }
         $userModel = Gdn::userModel();
         // Get category permission.
-        $hasPermission = $userID && $userModel->getCategoryViewPermission($userID, val('CategoryID', $discussion), $permission);
+        $categoryID = val('CategoryID', $discussion);
+        if ($userID && Gdn::session()->UserID === $userID) {
+            $hasPermission = CategoryModel::checkPermission($categoryID, $permission);
+        } else {
+            $hasPermission = $userID && $userModel->getCategoryViewPermission($userID, $categoryID, $permission);
+        }
         // Check if we've timed out.
         if (strpos(strtolower($permission), 'edit' !== false)) {
             $hasPermission &= self::editContentTimeout($discussion);

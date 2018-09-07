@@ -584,7 +584,6 @@ class VanillaHooks implements Gdn_IPlugin {
 
             $options = ['ForeignID' => $permissionCategoryID];
             $result = Gdn::userModel()->checkPermission($userID, $permission, $options);
-
             return $result;
         }
         return false;

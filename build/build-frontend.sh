@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
-echo ""
-echo "Installing node_modules"
-yarn install
+printf "\nInstalling node_modules\n"
+yarn install --pure-lockfile
 INSTALL_RESULT=$?
+if [[ $INSTALL_RESULT -ne 0 ]]
+then
+    echo "Installing node_modules failed."
+    exit $INSTALL_RESULT
+fi
 
-echo ""
-echo "Building frontend assets"
+printf "\nBuilding frontend assets\n"
 yarn build
 BUILD_RESULT=$?
-
-# Make sure all commands had a zero result.
-exit $(($INSTALL_RESULT | $BUILD_RESULT))
+if [[ $BUILD_RESULT -ne 0 ]]
+then
+    echo "Building frontend assets failed."
+    exit $BUILD_RESULT
+fi

@@ -15,7 +15,7 @@ import chalk from "chalk";
 import { printVerbose } from "../utility/utils";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
-const happyThreadPool = HappyPack.ThreadPool({ size: 4 });
+const happyThreadPool = HappyPack.ThreadPool({ size: 3 });
 
 /**
  * Create the core webpack config.
@@ -151,7 +151,6 @@ ${chalk.green(aliases)}`;
                 tsconfig: TS_CONFIG_FILE,
                 tslint: TS_LINT_FILE,
                 checkSyntacticErrors: true,
-                async: true,
             }),
         ],
         resolve: {

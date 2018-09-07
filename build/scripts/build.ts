@@ -49,8 +49,9 @@ async function runProd() {
     const config = [await makeProdConfig("forum"), await makeProdConfig("admin"), await makeProdConfig("knowledge")];
     const compiler = webpack(config);
     compiler.run((err: Error, stats: Stats) => {
-        if (err) {
-            printError("The build encountered an error:" + err);
+        if (err || stats.hasErrors()) {
+            print(stats.toString(statOptions));
+            fail(`\nThe build encountered an error: ${err}`);
         }
 
         print(stats.toString(statOptions));

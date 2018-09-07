@@ -39,6 +39,7 @@ export async function makeProdConfig(section: string) {
     };
     baseConfig.devtool = "source-map";
     baseConfig.optimization = {
+        noEmitOnErrors: true,
         namedModules: false,
         namedChunks: false,
         // Create a single runtime chunk per section.

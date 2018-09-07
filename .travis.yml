@@ -15,11 +15,6 @@ before_script:
   - composer self-update
   - composer install --optimize-autoloader
   - tests/travis/setup.sh
-  # Node
-  - yarn install --pure-lockfile
-  - cd plugins/rich-editor
-  - yarn install
-  - cd ../..
 
 # Cache Composer package files.
 cache:
@@ -58,8 +53,8 @@ php:
 # Steps of the build script.
 script:
   - tests/travis/main.sh
+  - build/build-frontend.sh
   - yarn run test
-  - yarn run lint:ts
   - ls -lah ./conf
   - cat /tmp/error.log
   - cat /tmp/access.log

@@ -36,7 +36,7 @@ export async function installNodeModules(section: string) {
                 print(`Installing node modules for directory: ${chalk.yellow(dir)}`);
                 process.chdir(dir);
                 const spawnOptions = options.verbose ? { stdio: "inherit" } : {};
-                await spawnChildProcess("yarn", ["install"], spawnOptions);
+                await spawnChildProcess("yarn", ["install", "--pure-lockfile"], spawnOptions);
             }
         }
     } catch (err) {

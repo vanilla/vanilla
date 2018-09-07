@@ -202,9 +202,9 @@ class AssetModel extends Gdn_Model {
         ];
 
         // The library chunk is not always created if there is nothing shared between entry-points.
-        $libraryFilePath = $sectionDir . DS . 'library' . self::WEBPACK_SCRIPT_EXTENSION;
-        if (file_exists($libraryFilePath)) {
-            $scripts[] = $sectionRoot . '/library' . self::WEBPACK_SCRIPT_EXTENSION;
+        $sharedFilePath = $sectionDir . DS . 'shared' . self::WEBPACK_SCRIPT_EXTENSION;
+        if (file_exists($sharedFilePath)) {
+            $scripts[] = $sectionRoot . '/shared' . self::WEBPACK_SCRIPT_EXTENSION;
         }
 
         foreach ($enabledAddonKeys as $addonKey) {

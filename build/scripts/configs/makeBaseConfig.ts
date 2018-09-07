@@ -15,13 +15,14 @@ import chalk from "chalk";
 import { printVerbose } from "../utility/utils";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
+const happyThreadPool = HappyPack.ThreadPool({ size: 4 });
+
 /**
  * Create the core webpack config.
  *
  * @param section - The section of the app to build. Eg. forum | admin | knowledge.
  */
 export async function makeBaseConfig(section: string) {
-    const happyThreadPool = HappyPack.ThreadPool({ size: 4, id: "ts" });
     const addonPaths = await lookupAddonPaths(section);
     const options = await getOptions();
 

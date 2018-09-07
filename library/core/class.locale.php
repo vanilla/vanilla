@@ -357,7 +357,7 @@ class Gdn_Locale extends Gdn_Pluggable {
 
         $this->EventArguments['Code'] = $code;
         $this->EventArguments['Default'] = $default;
-        if (Gdn::config('EnabledPlugins.localligator', false)) {
+        if (Gdn::config('Debug', false)) {
             $this->fireEvent('BeforeTranslate');
         }
 

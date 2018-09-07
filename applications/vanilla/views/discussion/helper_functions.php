@@ -93,8 +93,8 @@ if (!function_exists('writeComment')) :
             $sender->setData('Discussion', $discussion);
         }
         
-        if (($discussion->InsertUserID ?? false) == $comment->InsertUserID) {
-            $cssClass .= ' original-poster';
+        if (val('InsertUserID', $discussion) === $comment->InsertUserID) {
+            $cssClass .= ' isOriginalPoster';
         }
 
         // DEPRECATED ARGUMENTS (as of 2.1)

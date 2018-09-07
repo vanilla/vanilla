@@ -7,12 +7,12 @@
 import path from "path";
 import webpack, { Configuration } from "webpack";
 import { DIST_DIRECTORY } from "../env";
-import { getEntries } from "../utility/addonUtils";
 import { getOptions, BuildMode } from "../options";
 import { makeBaseConfig } from "./makeBaseConfig";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import UglifyJsPlugin from "uglifyjs-webpack-plugin";
 import OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
+import EntryModel from "../utility/EntryModel";
 
 let analyzePort = 8888;
 
@@ -21,9 +21,9 @@ let analyzePort = 8888;
  *
  * @param section - The section of the app to build. Eg. forum | admin | knowledge.
  */
-export async function makeProdConfig(section: string) {
-    const baseConfig: Configuration = (await makeBaseConfig(section)) as any;
-    const forumEntries = await getEntries(section);
+export async function makeProdConfig(entryModel: EntryModel, section: string) {
+    const baseConfig: Configuration = await makeBaseConfig(entryModel, section);
+    const forumEntries = await entryModel.getProdEntries(section);
     const options = await getOptions();
 
     baseConfig.mode = "production";

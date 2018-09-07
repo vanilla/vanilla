@@ -28,7 +28,7 @@ export const enum BuildMode {
     POLYFILLS = "polyfills",
 }
 
-interface IBuildOptions {
+export interface IBuildOptions {
     mode: BuildMode;
     verbose: boolean;
     fix: boolean;

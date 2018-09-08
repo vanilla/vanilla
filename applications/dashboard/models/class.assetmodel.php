@@ -185,7 +185,7 @@ class AssetModel extends Gdn_Model {
         $enabledAddonKeys = [];
         $enabledAddons = $this->addonManager->getEnabled();
         /** @var Addon $addon */
-        foreach($enabledAddons as $addon) {
+        foreach ($enabledAddons as $addon) {
             $enabledAddonKeys[] = $addon->getKey();
         }
 

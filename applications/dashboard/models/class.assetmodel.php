@@ -171,7 +171,7 @@ class AssetModel extends Gdn_Model {
      * - bootstrap
      *
      * @param string $sectionName - The section of the site to lookup.
-     * @return array
+     * @return string[] Javascript file paths.
      * @throws Exception If the requested section does not exist.
      */
     public function getWebpackJsFiles(string $sectionName) {
@@ -189,12 +189,14 @@ class AssetModel extends Gdn_Model {
             $enabledAddonKeys[] = $addon->getKey();
         }
 
+        // Make sure that we actually have some entry-points that were built for this section.
         $sectionDir = PATH_ROOT . DS . self::WEBPACK_DIST_DIRECTORY_NAME . DS . $sectionName;
-
         if (!file_exists($sectionDir)) {
-            throw new \Exception("That requested section $sectionName does not exist");
+            trace("That requested webpack asset section $sectionName does not exist\"");
+            return [];
         }
 
+        // We always have a runtime and vendor section first.
         $sectionRoot = '/' . self::WEBPACK_DIST_DIRECTORY_NAME . '/' . $sectionName;
         $scripts = [
             $sectionRoot . '/runtime' . self::WEBPACK_SCRIPT_EXTENSION,
@@ -207,6 +209,7 @@ class AssetModel extends Gdn_Model {
             $scripts[] = $sectionRoot . '/shared' . self::WEBPACK_SCRIPT_EXTENSION;
         }
 
+        // Load addon bundles next.
         foreach ($enabledAddonKeys as $addonKey) {
             $filePath = $sectionDir . DS . 'addons' . DS . $addonKey . self::WEBPACK_SCRIPT_EXTENSION;
             if (file_exists($filePath)) {
@@ -215,6 +218,7 @@ class AssetModel extends Gdn_Model {
             }
         }
 
+        // The bootstrap file goes last.
         $scripts[] = $sectionRoot . '/bootstrap' . self::WEBPACK_SCRIPT_EXTENSION;
         return $scripts;
     }

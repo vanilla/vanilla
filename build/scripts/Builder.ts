@@ -18,6 +18,15 @@ import { printError, print, fail } from "./utility/utils";
 import { DIST_DIRECTORY } from "./env";
 import EntryModel from "./utility/EntryModel";
 
+/**
+ * A class to build frontend assets.
+ *
+ * This supports
+ * - A production build. (BuildMode.PRODUCTION)
+ * - A development build. (BuildMode.DEVELOPMENT)
+ * - A production build that spawns a bundle size analyzer (BuildMode.ANALYZE)
+ * - A production build that only builds polyfills. (BuildMode.POLYFILLS)
+ */
 export default class Builder {
     private statOptions = {
         chunks: false, // Makes the build much quieter
@@ -29,10 +38,16 @@ export default class Builder {
 
     private entryModel: EntryModel;
 
+    /**
+     * @param options The options to build with.
+     */
     constructor(private options: IBuildOptions) {
         this.entryModel = new EntryModel(options);
     }
 
+    /**
+     * Run the build based on the provided options.
+     */
     public async build() {
         await this.entryModel.init();
         await this.installNodeModules();
@@ -47,10 +62,17 @@ export default class Builder {
         }
     }
 
+    /**
+     * Install node modules for all addons providing source files.
+     */
     private async installNodeModules() {
         return await Promise.all(this.entryModel.addonDirs.map(installNodeModulesInDir));
     }
 
+    /**
+     * Run the production build. This fails agressively if there are any errors.
+     * It is also much slower than the development build.
+     */
     private async runProd() {
         // Cleanup
         del.sync(path.join(DIST_DIRECTORY, "**"));
@@ -66,6 +88,11 @@ export default class Builder {
             print(stats.toString(this.statOptions));
         });
     }
+
+    /**
+     * Build the polyfill files. This is entirely independant of any other files.
+     * This should only need to be run if we change browser support.
+     */
     private async runPolyfill() {
         const config = await makePolyfillConfig(this.entryModel);
         const compiler = webpack(config);
@@ -78,6 +105,15 @@ export default class Builder {
         });
     }
 
+    /**
+     * Run the development builds.
+     *
+     * Builds all enabled addons at once and serves them through an in memory development server.
+     * Does not output any files to the disk and has VERY fast incremental builds.
+     *
+     * Requires a vanilla config to lookup configuration options.
+     * Requires the HotReload config option to be enabled.
+     */
     private async runDev() {
         const buildOptions = await getOptions();
         const hotReloadConfigSet = buildOptions.phpConfig.HotReload && buildOptions.phpConfig.HotReload.Enabled;

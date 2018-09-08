@@ -8,8 +8,7 @@ import { promisify } from "util";
 import * as fs from "fs";
 import * as path from "path";
 import { VANILLA_APPS, VANILLA_ROOT, VANILLA_PLUGINS, PUBLIC_PATH_SOURCE_FILE, BOOTSTRAP_SOURCE_FILE } from "../env";
-import { getOptions, BuildMode, IBuildOptions } from "../options";
-const realPath = promisify(fs.realpath);
+import { BuildMode, IBuildOptions } from "../options";
 const readDir = promisify(fs.readdir);
 const fileExists = promisify(fs.exists);
 
@@ -28,30 +27,51 @@ interface IAddon {
     addonDir: string;
 }
 
+/**
+ * A model to provide data about entry points to the build.
+ */
 export default class EntryModel {
+    /** Regex to match typescript files. */
     private static TS_REGEX = /\.tsx?$/;
 
     /** This should be changed to a location that is not in dashboard. */
     private static BOOTSTRAP_PATH = path.resolve(VANILLA_APPS, "dashboard/src/scripts/entries/bootstrap.ts");
+
+    /** This public path file needs to be added first for any static entrypoint that has dynamic entries. */
     private static PUBLIC_PATH_PATH = path.resolve(VANILLA_ROOT, "build/entries/public-path.ts");
 
+    /** The addons that are being built. */
     private buildAddons: {
         [addonKey: string]: IAddon;
     } = {};
+
+    /** Directories containing entrypoints. */
     private entryDirs: string[] = [];
 
+    /**
+     * Construct the EntryModel. Be sure to run the async init() method after constructing.
+     */
     constructor(private options: IBuildOptions) {}
 
+    /**
+     * Trigger directory lookups to parse all of the files in the project.
+     * This is where ALL files lookups should be started from.
+     */
     public async init() {
         await Promise.all([this.initAddons(VANILLA_APPS), this.initAddons(VANILLA_PLUGINS)]);
         await this.initEntries();
     }
 
+    /**
+     *
+     * @param section The section to get entries for. These sections are dynamically generated.
+     * @see getSections()
+     */
     public async getProdEntries(section: string): Promise<IWebpackEntries> {
         const entries: IWebpackEntries = {};
 
         for (const entryDir of this.entryDirs) {
-            const entry = await this.getAddonEntry(entryDir, section);
+            const entry = await this.lookupEntry(entryDir, section);
             if (entry !== null) {
                 const addonName = path.basename(entry.addonPath);
                 entries[`addons/${addonName}`] = [EntryModel.PUBLIC_PATH_PATH, entry.entryPath];
@@ -62,6 +82,10 @@ export default class EntryModel {
         return entries;
     }
 
+    /**
+     * Gather all the sections across every addon. Sections are determined by having
+     * an entrypoint in /src/scripts/entries. The filename is the section name without its extension.
+     */
     public async getSections(): Promise<string[]> {
         let names: string[] = [];
         for (const dir of this.entryDirs) {
@@ -79,14 +103,26 @@ export default class EntryModel {
         return names;
     }
 
+    /**
+     * Get the directories of all addons being built.
+     */
     public get addonDirs(): string[] {
         return Object.values(this.buildAddons!).map(addon => addon.addonDir);
     }
 
+    /**
+     * Get all of the src directories in the project.
+     */
     public get srcDirs(): string[] {
         return Object.values(this.buildAddons!).map(addon => addon.srcDir);
     }
 
+    /**
+     * Get all of the aliases in the project.
+     *
+     * An alias is a mapping of addonKey -> `@addonKey`.
+     * One is generated for every addon being built.
+     */
     public get aliases() {
         const result: IWebpackEntries = {};
         for (const addonPath of this.addonDirs) {
@@ -96,10 +132,17 @@ export default class EntryModel {
         return result;
     }
 
+    /**
+     * Initialize buildAddons.
+     *
+     * This has a lot of FS lookups don't run it more than once.
+     *
+     * @param rootDir The directory to find addons in.
+     */
     private async initAddons(rootDir: string) {
         let addonKeyList = await readDir(path.resolve(rootDir));
 
-        // Filter only the enabled addons for a Hot Build.
+        // Filter only the enabled addons for a development build.
         if (this.options.mode === BuildMode.DEVELOPMENT) {
             addonKeyList = addonKeyList.filter(addonPath => {
                 const addonKey = path.basename(addonPath);
@@ -114,12 +157,13 @@ export default class EntryModel {
             });
         }
 
+        // Go through all of the addons with a `src/scripts` directory and gather data on them.
         for (const addonKey of addonKeyList) {
             const addonPath = path.resolve(rootDir, addonKey);
             const srcPath = path.join(addonPath, "src/scripts");
             const entriesPath = path.join(srcPath, "entries");
-            const hasEntries = await fileExists(srcPath);
-            if (hasEntries) {
+            const hasSrcFiles = await fileExists(srcPath);
+            if (hasSrcFiles) {
                 this.buildAddons[addonKey] = {
                     srcDir: srcPath,
                     addonDir: addonPath,
@@ -129,6 +173,9 @@ export default class EntryModel {
         }
     }
 
+    /**
+     * Look up all of the entry directories. This is quite expensive in terms of IO so don't run it more than once.
+     */
     private async initEntries() {
         for (const addon of Object.values(this.buildAddons)) {
             const entriesExists = await fileExists(addon.entriesDir);
@@ -139,15 +186,19 @@ export default class EntryModel {
     }
 
     /**
-     * Determine if an addon has an entry of a particular type. Return that type if applicable.
+     * Determine if an addon has an entry for a particular section.
      *
-     * @param addonPath - The path of the addon to look in.
-     * @param section - The section of the product being built. Eg. forum / admin / knowledge.
+     * @param entryDir - The entry directory to look in.
+     * @param section - The sectionn to look for an entry for.
+     *
+     * @returns An entry if one was found.
      */
-    private async getAddonEntry(entryDir: string, section: string): Promise<IEntry | null> {
+    private async lookupEntry(entryDir: string, section: string): Promise<IEntry | null> {
         const addonPath = entryDir.replace("/src/scripts/entries", "");
         const tsPath = path.resolve(entryDir, `${section}.ts`);
         const tsPathExists = await fileExists(tsPath);
+
+        // Entries can be of .ts or .tsx extensions.
         if (tsPathExists) {
             return {
                 addonPath,

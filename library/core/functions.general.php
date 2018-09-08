@@ -775,7 +775,7 @@ if (!function_exists('dbdecode')) {
         // Backward compatibility.
         if ($decodedValue === null) {
             // Suppress errors https://github.com/vanilla/vanilla/pull/3734#issuecomment-210664113
-            $decodedValue = @unserialize($value);
+            $decodedValue = @unserialize($value, ['allowed_classes' => false]);
         }
 
         if (is_array($value) || is_object($value)) {

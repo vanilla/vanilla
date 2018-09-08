@@ -59,11 +59,19 @@ function parseEnabledAddons(config: any) {
 }
 
 export async function getOptions(): Promise<IBuildOptions> {
-    const config = await getVanillaConfig(yargs.argv.config);
+    // We only want/need to parse the config for development builds to see which addons are enabled.
+    // CI does not have a config file so don't look one up if we are
+    let config = {};
+    let enabledAddonKeys: string[] = [];
+    if (yargs.argv.mode === BuildMode.DEVELOPMENT) {
+        config = await getVanillaConfig(yargs.argv.config);
+        enabledAddonKeys = parseEnabledAddons(config);
+    }
+
     return {
         mode: yargs.argv.mode,
         verbose: yargs.argv.verbose,
-        enabledAddonKeys: parseEnabledAddons(config),
+        enabledAddonKeys,
         configFile: yargs.argv.config,
         fix: yargs.argv.fix,
         phpConfig: config,

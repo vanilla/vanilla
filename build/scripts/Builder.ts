@@ -15,7 +15,7 @@ import chalk from "chalk";
 import { installNodeModulesInDir } from "./utility/moduleUtils";
 import { makePolyfillConfig } from "./configs/makePolyfillConfig";
 import { printError, print, fail } from "./utility/utils";
-import { DIST_DIRECTORY } from "./env";
+import { DIST_DIRECTORY, VANILLA_APPS } from "./env";
 import EntryModel from "./utility/EntryModel";
 
 /**
@@ -66,7 +66,14 @@ export default class Builder {
      * Install node modules for all addons providing source files.
      */
     private async installNodeModules() {
-        return await Promise.all(this.entryModel.addonDirs.map(installNodeModulesInDir));
+        // Make an exception for the old dashboard node_modules. We don't want to install these.
+        // Eventually they will be untangled but for now they trigger bower component installation.
+        // That does not work in CI.
+        const dashboardPath = path.resolve(VANILLA_APPS, "dashboard");
+        const installableAddons = this.entryModel.addonDirs.filter(addonDir => addonDir !== dashboardPath);
+
+        // Install the node modules.
+        return await Promise.all(installableAddons.map(installNodeModulesInDir));
     }
 
     /**

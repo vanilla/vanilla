@@ -34,12 +34,6 @@ export default class EntryModel {
     /** Regex to match typescript files. */
     private static TS_REGEX = /\.tsx?$/;
 
-    /** This should be changed to a location that is not in dashboard. */
-    private static BOOTSTRAP_PATH = path.resolve(VANILLA_APPS, "dashboard/src/scripts/entries/bootstrap.ts");
-
-    /** This public path file needs to be added first for any static entrypoint that has dynamic entries. */
-    private static PUBLIC_PATH_PATH = path.resolve(VANILLA_ROOT, "build/entries/public-path.ts");
-
     /** The addons that are being built. */
     private buildAddons: {
         [addonKey: string]: IAddon;
@@ -74,11 +68,11 @@ export default class EntryModel {
             const entry = await this.lookupEntry(entryDir, section);
             if (entry !== null) {
                 const addonName = path.basename(entry.addonPath);
-                entries[`addons/${addonName}`] = [EntryModel.PUBLIC_PATH_PATH, entry.entryPath];
+                entries[`addons/${addonName}`] = [PUBLIC_PATH_SOURCE_FILE, entry.entryPath];
             }
         }
 
-        entries.bootstrap = [EntryModel.PUBLIC_PATH_PATH, EntryModel.BOOTSTRAP_PATH];
+        entries.bootstrap = [PUBLIC_PATH_SOURCE_FILE, BOOTSTRAP_SOURCE_FILE];
         return entries;
     }
 

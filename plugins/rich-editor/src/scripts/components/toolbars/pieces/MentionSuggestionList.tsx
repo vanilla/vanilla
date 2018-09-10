@@ -7,14 +7,14 @@
 import React from "react";
 import classNames from "classnames";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
+import { t } from "@library/application";
+import { RangeStatic } from "quill/core";
 import MentionSuggestion, {
     IMentionProps,
     MentionSuggestionLoading,
     MentionSuggestionSpacer,
-} from "./MentionSuggestion";
-import { t } from "@library/application";
-import ToolbarPositioner from "./ToolbarPositioner";
-import { RangeStatic } from "quill/core";
+} from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
+import ToolbarPositioner from "@rich-editor/components/toolbars/pieces/ToolbarPositioner";
 
 interface IProps extends IWithEditorProps {
     mentionProps: Array<Partial<IMentionProps>>;

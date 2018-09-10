@@ -15,6 +15,7 @@ use Vanilla\AddonManager;
  * for different locales. It is a singleton class.
  */
 class Gdn_Locale extends Gdn_Pluggable {
+    use \Garden\StaticCacheConfigTrait;
 
     /**  @var string The name of the currently loaded Locale. */
     public $Locale = '';
@@ -355,7 +356,7 @@ class Gdn_Locale extends Gdn_Pluggable {
             }
         }
 
-        if (Gdn::config('Debug', false)) {
+        if (self::c('Debug', false)) {
             $this->EventArguments['Code'] = $code;
             $this->EventArguments['Default'] = $default;
             $this->fireEvent('BeforeTranslate');

@@ -17,8 +17,8 @@ import {
     getBlotAtIndex,
     rangeContainsBlot,
     forceSelectionUpdate,
-} from "./utility";
-import MentionAutoCompleteBlot from "./blots/embeds/MentionAutoCompleteBlot";
+} from "@rich-editor/quill/utility";
+import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
 
 /**
  * A module for managing focus of Embeds. For this to work for a new Embed,

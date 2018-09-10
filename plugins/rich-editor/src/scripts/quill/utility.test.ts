@@ -13,7 +13,7 @@ import {
     convertBoundaryToRange,
     getMentionRange,
     expandRange,
-} from "./utility";
+} from "@rich-editor/quill/utility";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import OpUtils from "@rich-editor/__tests__/OpUtils";
 

@@ -5,8 +5,8 @@
 
 import React from "react";
 import classNames from "classnames";
-import Button from "./Button";
 import { IOptionalComponentID } from "@library/componentIDs";
+import Button from "@dashboard/components/forms/Button";
 
 interface IProps extends IOptionalComponentID {
     content: string | Node;

@@ -15,29 +15,32 @@ import Header from "quill/formats/header";
 import { IndentClass as Indent } from "quill/formats/indent";
 
 // Custom Inline Blots
-import CodeInlineBlot from "./blots/inline/CodeBlot";
+import CodeInlineBlot from "@rich-editor/quill/blots/inline/CodeBlot";
 
 // Custom Embed Blots
-import EmojiBlot from "./blots/embeds/EmojiBlot";
-import ExternalEmbedBlot from "./blots/embeds/ExternalEmbedBlot";
-import EmbedErrorBlot from "./blots/embeds/ErrorBlot";
-import MentionBlot from "./blots/embeds/MentionBlot";
-import MentionComboBoxBlot from "./blots/embeds/MentionComboBoxBlot";
-import MentionAutoCompleteBlot from "./blots/embeds/MentionAutoCompleteBlot";
+import EmojiBlot from "@rich-editor/quill/blots/embeds/EmojiBlot";
+import ExternalEmbedBlot from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
+import EmbedErrorBlot from "@rich-editor/quill/blots/embeds/ErrorBlot";
+import MentionBlot from "@rich-editor/quill/blots/embeds/MentionBlot";
+import MentionComboBoxBlot from "@rich-editor/quill/blots/embeds/MentionComboBoxBlot";
+import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
 
 // Custom Block Blots
-import BlockBlot from "./blots/blocks/BlockBlot";
-import SpoilerLineBlot, { SpoilerWrapperBlot, SpoilerContentBlot } from "./blots/blocks/SpoilerBlot";
-import BlockquoteLineBlot, { BlockquoteWrapperBlot, BlockquoteContentBlot } from "./blots/blocks/BlockquoteBlot";
-import CodeBlockBlot from "./blots/blocks/CodeBlockBlot";
+import BlockBlot from "@rich-editor/quill/blots/blocks/BlockBlot";
+import SpoilerLineBlot, { SpoilerWrapperBlot, SpoilerContentBlot } from "@rich-editor/quill/blots/blocks/SpoilerBlot";
+import BlockquoteLineBlot, {
+    BlockquoteWrapperBlot,
+    BlockquoteContentBlot,
+} from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 
 // Custom Modules/Themes
-import VanillaTheme from "./VanillaTheme";
-import FocusModule from "./FocusModule";
-import EmbedInsertionModule from "./EmbedInsertionModule";
-import HistoryModule from "./HistoryModule";
-import ClipboardModule from "./ClipboardModule";
-import LoadingBlot from "./blots/embeds/LoadingBlot";
+import VanillaTheme from "@rich-editor/quill/VanillaTheme";
+import FocusModule from "@rich-editor/quill/FocusModule";
+import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
+import HistoryModule from "@rich-editor/quill/HistoryModule";
+import ClipboardModule from "@rich-editor/quill/ClipboardModule";
+import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 
 export default function registerQuill() {
     Quill.register(

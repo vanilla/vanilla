@@ -9,11 +9,11 @@ import { Grid, AutoSizer } from "react-virtualized";
 import classNames from "classnames";
 import { t } from "@library/application";
 import * as Icons from "@rich-editor/components/icons";
-import Popover from "./Popover";
-import { IPopoverControllerChildParameters } from "./PopoverController";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
-import { EMOJI_GROUPS, EMOJIS } from "./emojiData";
-import EmojiButton from "./EmojiButton";
+import { EMOJIS, EMOJI_GROUPS } from "@rich-editor/components/popovers/pieces/emojiData";
+import { IPopoverControllerChildParameters } from "@rich-editor/components/popovers/pieces/PopoverController";
+import Popover from "@rich-editor/components/popovers/pieces/Popover";
+import EmojiButton from "@rich-editor/components/popovers/pieces/EmojiButton";
 
 const BUTTON_SIZE = 36;
 const COL_SIZE = 7;

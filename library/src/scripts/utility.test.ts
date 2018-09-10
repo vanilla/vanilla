@@ -10,7 +10,7 @@ import {
     hashString,
     isInstanceOfOneOf,
     splitStringLoosely,
-} from "@dashboard/utility";
+} from "@library/utility";
 import chai, { expect } from "chai";
 import asPromised from "chai-as-promised";
 chai.use(asPromised);

@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { getMeta } from "@dashboard/application";
+import { getMeta } from "@library/application";
 
 /**
  * A component for displaying and setting the document title.

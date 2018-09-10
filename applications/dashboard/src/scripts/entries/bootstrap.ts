@@ -5,10 +5,10 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { onContent, getMeta, _executeReady, _mountComponents } from "@dashboard/application";
-import { log, logError, debug } from "@dashboard/utility";
-import gdn from "@dashboard/gdn";
-import apiv2 from "@dashboard/apiv2";
+import { onContent, getMeta, _executeReady, _mountComponents } from "@library/application";
+import { log, logError, debug } from "@library/utility";
+import gdn from "@library/gdn";
+import apiv2 from "@library/apiv2";
 
 // Inject the debug flag into the utility.
 debug(getMeta("debug", false));

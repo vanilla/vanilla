@@ -8,7 +8,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import gdn from "@dashboard/gdn";
+import gdn from "@library/gdn";
 
 /**
  * Determine if all of the provided permissions are present.

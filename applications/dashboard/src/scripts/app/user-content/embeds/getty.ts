@@ -3,9 +3,9 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { IEmbedData, IEmbedElements, registerEmbedRenderer } from "@dashboard/embeds";
-import { ensureScript } from "@dashboard/dom";
-import { onContent, onReady } from "@dashboard/application";
+import { IEmbedData, IEmbedElements, registerEmbedRenderer } from "@library/embeds";
+import { ensureScript } from "@library/dom";
+import { onContent, onReady } from "@library/application";
 import { IScrapeData } from "@dashboard/@types/api";
 
 export function initGettyEmbeds() {

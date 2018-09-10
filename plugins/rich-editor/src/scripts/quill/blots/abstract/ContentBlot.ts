@@ -3,9 +3,9 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import WrapperBlot from "./WrapperBlot";
-import withWrapper from "./withWrapper";
-import LineBlot from "./LineBlot";
+import WrapperBlot from "@rich-editor/quill/blots/abstract/WrapperBlot";
+import withWrapper from "@rich-editor/quill/blots/abstract/withWrapper";
+import LineBlot from "@rich-editor/quill/blots/abstract/LineBlot";
 
 /**
  * A Content blot is both a WrappedBlot and a WrapperBlot.

@@ -5,8 +5,8 @@
  */
 
 import Quill from "quill/core";
-import MentionAutoCompleteBlot from "./MentionAutoCompleteBlot";
 import { expect } from "chai";
+import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
 import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 
 describe("[MentionAutoCompleteBlot]", () => {

@@ -5,12 +5,12 @@
 
 import React from "react";
 import classNames from "classnames";
-import { getOptionalID, IOptionalComponentID } from "@dashboard/componentIDs";
+import { getOptionalID, IOptionalComponentID } from "@library/componentIDs";
 
 interface IProps extends IOptionalComponentID {
     className?: string;
     isError?: boolean;
-    content?: string | Node | null;
+    content?: React.ReactNode;
 }
 
 export default class Paragraph extends React.Component<IProps> {

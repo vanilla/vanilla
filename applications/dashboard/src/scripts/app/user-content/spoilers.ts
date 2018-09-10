@@ -3,7 +3,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { delegateEvent } from "@dashboard/dom";
+import { delegateEvent } from "@library/dom";
 
 export function initSpoilers() {
     // Setup

@@ -3,10 +3,10 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import React, { ReactNode } from "react";
+import React from "react";
 import classNames from "classnames";
-import { uniqueIDFromPrefix, getRequiredID, IRequiredComponentID } from "@dashboard/componentIDs";
-import { IFieldError } from "@dashboard/@types/api";
+import { getRequiredID, IRequiredComponentID } from "@library/componentIDs";
+import { IFieldError } from "@library/@types/api";
 
 interface IProps extends IRequiredComponentID {
     className?: string;

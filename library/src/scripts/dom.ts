@@ -5,10 +5,9 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import * as utility from "@dashboard/utility";
+import { logError, log, hashString } from "@library/utility";
 import twemoji from "twemoji";
 import tabbable from "tabbable";
-import { logError, log } from "@dashboard/utility";
 import debounce from "lodash/debounce";
 
 /**
@@ -128,7 +127,7 @@ export function delegateEvent(
         scope = document;
     }
 
-    const eventHash = utility.hashString(functionKey).toString();
+    const eventHash = hashString(functionKey).toString();
 
     if (!Object.keys(delegatedEventListeners).includes(eventHash)) {
         const wrappedCallback = event => {
@@ -567,7 +566,7 @@ export function stickyHeader() {
             )();
         });
     } else {
-        utility.log("No sticky header found");
+        log("No sticky header found");
     }
 }
 

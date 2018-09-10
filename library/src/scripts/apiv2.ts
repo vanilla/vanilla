@@ -5,12 +5,12 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { formatUrl, t } from "@dashboard/application";
-import { isFileImage, indexArrayByKey } from "@dashboard/utility";
+import { formatUrl, t } from "@library/application";
+import { isFileImage, indexArrayByKey } from "@library/utility";
 import axios from "axios";
 import qs from "qs";
-import { IEmbedData } from "@dashboard/embeds";
-import { IFieldError, LoadStatus, ILoadable } from "@dashboard/@types/api";
+import { IEmbedData } from "@library/embeds";
+import { IFieldError, LoadStatus, ILoadable } from "@library/@types/api";
 
 function fieldErrorTransformer(responseData) {
     if (responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {

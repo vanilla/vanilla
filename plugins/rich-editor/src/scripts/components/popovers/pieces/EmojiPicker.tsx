@@ -7,7 +7,7 @@
 import React from "react";
 import { Grid, AutoSizer } from "react-virtualized";
 import classNames from "classnames";
-import { t } from "@dashboard/application";
+import { t } from "@library/application";
 import * as Icons from "@rich-editor/components/icons";
 import Popover from "./Popover";
 import { IPopoverControllerChildParameters } from "./PopoverController";

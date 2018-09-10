@@ -5,11 +5,11 @@
 
 import React from "react";
 import BaseEmbed from "@dashboard/app/user-content/embeds/BaseEmbed";
-import { sanitizeUrl } from "@dashboard/utility";
-import { getData, setData } from "@dashboard/dom";
+import { sanitizeUrl } from "@library/utility";
+import { getData, setData } from "@library/dom";
 import debounce from "lodash/debounce";
 import shave from "shave";
-import { registerEmbedComponent } from "@dashboard/embeds";
+import { registerEmbedComponent } from "@library/embeds";
 
 export function initLinkEmbeds() {
     registerEmbedComponent("link", LinkEmbed);

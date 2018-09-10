@@ -4,9 +4,8 @@
  */
 
 import { createStore, compose, applyMiddleware, combineReducers, Store } from "redux";
-import { getReducers } from "@dashboard/state/reducerRegistry";
+import { getReducers } from "@library/state/reducerRegistry";
 import thunk from "redux-thunk";
-import { IStoreState } from "@dashboard/@types/state";
 
 // There may be an initial state to import.
 const initialState = {};
@@ -21,7 +20,7 @@ const enhancer = composeEnhancers(applyMiddleware(...middleware));
 // Build the store, add devtools extension support if it's available.
 let store;
 
-export default function getStore<S extends IStoreState = IStoreState>(): Store<S> {
+export default function getStore<S>(): Store<S> {
     if (store === undefined) {
         // Get our reducers.
         const reducer = combineReducers(getReducers());

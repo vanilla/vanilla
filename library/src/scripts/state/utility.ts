@@ -5,8 +5,8 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { IApiResponse, IApiError } from "@dashboard/@types/api";
-import apiv2 from "@dashboard/apiv2";
+import { IApiResponse, IApiError } from "@library/@types/api";
+import apiv2 from "@library/apiv2";
 import { AxiosResponse, AxiosError } from "axios";
 
 // Utility to pull a group of action types out of an actions object

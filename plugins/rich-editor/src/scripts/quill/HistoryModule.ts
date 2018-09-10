@@ -7,7 +7,7 @@
 import get from "lodash/get";
 import BaseHistoryModule from "quill/modules/history";
 import { DeltaOperation, DeltaStatic } from "quill/core";
-import { FOCUS_CLASS } from "@dashboard/embeds";
+import { FOCUS_CLASS } from "@library/embeds";
 
 const SHORTKEY = /Mac/i.test(navigator.platform) ? "metaKey" : "ctrlKey";
 

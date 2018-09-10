@@ -5,15 +5,15 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { addRoutes, addComponent, onReady } from "@dashboard/application";
+import { addRoutes, addComponent, onReady } from "@library/application";
 import React from "react";
 import { Route } from "react-router-dom";
 import SignInPage from "@dashboard/app/authenticate/SignInPage";
 import PasswordPage from "@dashboard/app/authenticate/PasswordPage";
 import RecoverPasswordPage from "@dashboard/app/authenticate/RecoverPasswordPage";
 import Router from "@dashboard/components/Router";
-import { stickyHeader } from "@dashboard/dom";
-import { registerReducer } from "@dashboard/state/reducerRegistry";
+import { stickyHeader } from "@library/dom";
+import { registerReducer } from "@library/state/reducerRegistry";
 import authenticateReducer from "@dashboard/state/authenticate/authenticateReducer";
 import usersReducer from "@dashboard/state/users/usersReducer";
 import { initAllUserContent } from "@dashboard/app/user-content";

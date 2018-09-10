@@ -15,15 +15,15 @@ import {
     insertNewLineAtEndOfScroll,
     insertNewLineAtStartOfScroll,
     rangeContainsBlot,
-} from "./utility";
-import { isAllowedUrl } from "@dashboard/application";
-import LineBlot from "./blots/abstract/LineBlot";
-import CodeBlockBlot from "./blots/blocks/CodeBlockBlot";
-import FocusableEmbedBlot from "./blots/abstract/FocusableEmbedBlot";
-import EmbedInsertionModule from "./EmbedInsertionModule";
+} from "@rich-editor/quill/utility";
+import { isAllowedUrl } from "@library/application";
+import LineBlot from "@rich-editor/quill/blots/abstract/LineBlot";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
+import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import LinkBlot from "quill/formats/link";
 import BlockBlot from "quill/blots/block";
-import CodeBlot from "./blots/inline/CodeBlot";
+import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
 
 export default class KeyboardBindings {
     private static MULTI_LINE_BLOTS = ["spoiler-line", "blockquote-line", "codeBlock"];

@@ -3,8 +3,8 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { onReady, onContent } from "@dashboard/application";
-import { convertToSafeEmojiCharacters } from "@dashboard/dom";
+import { onReady, onContent } from "@library/application";
+import { convertToSafeEmojiCharacters } from "@library/dom";
 
 export function initEmojiSupport() {
     // Emoji

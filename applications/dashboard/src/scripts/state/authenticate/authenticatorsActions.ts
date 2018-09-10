@@ -3,7 +3,7 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import { generateApiActionCreators, ActionsUnion, apiThunk } from "@dashboard/state/utility";
+import { generateApiActionCreators, ActionsUnion, apiThunk } from "@library/state/utility";
 import { IUserAuthenticator } from "@dashboard/@types/api";
 
 export const GET_USER_AUTHENTICATORS_REQUEST = "GET_USER_AUTHENTICATORS_REQUEST";

@@ -12,7 +12,7 @@ import MentionSuggestion, {
     MentionSuggestionLoading,
     MentionSuggestionSpacer,
 } from "./MentionSuggestion";
-import { t } from "@dashboard/application";
+import { t } from "@library/application";
 import ToolbarPositioner from "./ToolbarPositioner";
 import { RangeStatic } from "quill/core";
 

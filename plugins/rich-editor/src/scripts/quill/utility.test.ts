@@ -4,12 +4,17 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import * as utility from "./utility";
 import Quill from "quill/core";
 import { expect } from "chai";
-import { getIDForQuill, insertBlockBlotAt } from "./utility";
+import {
+    getIDForQuill,
+    insertBlockBlotAt,
+    convertRangeToBoundary,
+    convertBoundaryToRange,
+    getMentionRange,
+    expandRange,
+} from "./utility";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
-import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import OpUtils from "@rich-editor/__tests__/OpUtils";
 
 const prettyNewline = (contents: string) => contents.replace(/\n/g, "↵ ");
@@ -25,7 +30,7 @@ describe("Range/Boundary conversions", () => {
             end: 13,
         };
 
-        expect(utility.convertRangeToBoundary(input)).deep.equals(output);
+        expect(convertRangeToBoundary(input)).deep.equals(output);
     });
 
     it("converts boundary to range", () => {
@@ -38,7 +43,7 @@ describe("Range/Boundary conversions", () => {
             length: 10,
         };
 
-        expect(utility.convertBoundaryToRange(input)).deep.equals(output);
+        expect(convertBoundaryToRange(input)).deep.equals(output);
     });
 });
 
@@ -59,7 +64,7 @@ describe("expandRange", () => {
             length: 11,
         };
 
-        expect(utility.expandRange(initialRange, startRange)).deep.equals(expectedRange);
+        expect(expandRange(initialRange, startRange)).deep.equals(expectedRange);
     });
 });
 
@@ -100,7 +105,7 @@ describe("getMentionRange", () => {
 
         validIndexes.forEach(index => {
             it(prettyNewline(description) + index, () => {
-                expect(utility.getMentionRange(quill, { index, length: 0 })).deep.equals({ index: 0, length: index });
+                expect(getMentionRange(quill, { index, length: 0 })).deep.equals({ index: 0, length: index });
             });
         });
     });
@@ -120,7 +125,7 @@ describe("getMentionRange", () => {
 
         validIndexes.forEach(index => {
             it(prettyNewline(description) + index, () => {
-                expect(utility.getMentionRange(quill, { index, length: 0 })).deep.equals({
+                expect(getMentionRange(quill, { index, length: 0 })).deep.equals({
                     index: 2,
                     length: index - 2,
                 });
@@ -146,7 +151,7 @@ describe("getMentionRange", () => {
 
         validIndexes.forEach(index => {
             it(prettyNewline(description) + index, () => {
-                expect(utility.getMentionRange(quill, { index, length: 0 })).deep.equals({
+                expect(getMentionRange(quill, { index, length: 0 })).deep.equals({
                     index: 6,
                     length: index - 6,
                 });
@@ -159,11 +164,11 @@ describe("getMentionRange", () => {
         quill.setContents([{ insert: "@Somebody" }]);
         const selection = { index: 3, length: 0 };
         quill.setSelection(selection);
-        expect(utility.getMentionRange(quill, selection)).not.to.eq(null);
+        expect(getMentionRange(quill, selection)).not.to.eq(null);
 
         // Actual check.
         button.focus();
-        expect(utility.getMentionRange(quill, selection)).to.eq(null);
+        expect(getMentionRange(quill, selection)).to.eq(null);
     });
 
     it("Returns null when the selection length is greater than 0", () => {
@@ -171,20 +176,20 @@ describe("getMentionRange", () => {
         quill.setContents([{ insert: "@Somebody" }]);
         let selection = { index: 3, length: 0 };
         quill.setSelection(selection);
-        expect(utility.getMentionRange(quill, selection)).not.to.eq(null);
+        expect(getMentionRange(quill, selection)).not.to.eq(null);
 
         // Actual check.
         button.focus();
         selection = { index: 3, length: 1 };
         quill.setSelection(selection);
-        expect(utility.getMentionRange(quill, selection)).to.eq(null);
+        expect(getMentionRange(quill, selection)).to.eq(null);
     });
 
     it("Returns null if we are inside of a codeblock", () => {
         quill.setContents([{ insert: "@Somebody" }, OpUtils.codeBlock()]);
         const selection = { index: 3, length: 0 };
         quill.setSelection(selection);
-        expect(utility.getMentionRange(quill, selection)).to.eq(null);
+        expect(getMentionRange(quill, selection)).to.eq(null);
     });
 });
 

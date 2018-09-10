@@ -4,13 +4,13 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import FocusModule from "./FocusModule";
+import FocusModule from "@rich-editor/quill/FocusModule";
 import Quill, { Blot } from "quill/core";
 import Parchment from "parchment";
 import { expect } from "chai";
 import KeyboardModule from "quill/modules/keyboard";
-import FocusableEmbedBlot from "./blots/abstract/FocusableEmbedBlot";
-import LoadingBlot from "./blots/embeds/LoadingBlot";
+import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
+import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 
 const stubEmbedData: IEmbedValue = {

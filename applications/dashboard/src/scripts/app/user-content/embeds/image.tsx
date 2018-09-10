@@ -5,8 +5,8 @@
 
 import React from "react";
 import BaseEmbed from "@dashboard/app/user-content/embeds/BaseEmbed";
-import { registerEmbedComponent } from "@dashboard/embeds";
-import { sanitizeUrl } from "@dashboard/utility";
+import { registerEmbedComponent } from "@library/embeds";
+import { sanitizeUrl } from "@library/utility";
 
 export function initImageEmbeds() {
     registerEmbedComponent("image", ImageEmbed);

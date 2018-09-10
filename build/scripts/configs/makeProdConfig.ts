@@ -49,11 +49,11 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
         // We want to split
         splitChunks: {
             chunks: "all",
-            minSize: 1000000, // This should prevent webpack from creating extra chunks.
+            minSize: 10000000, // This should prevent webpack from creating extra chunks.
             cacheGroups: {
                 vendors: {
                     test: /[\\/]node_modules[\\/]/,
-                    minSize: 30000,
+                    minSize: 10000000,
                     reuseExistingChunk: true,
                     name: `vendors`,
                     chunks: "all",
@@ -61,7 +61,7 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
                 shared: {
                     // Our library files currently only come from the dashboard.
                     test: /[\\/]applications[\\/]dashboard[\\/]src[\\/]scripts[\\/]/,
-                    minSize: 30000,
+                    minSize: 1000000,
                     // We currently NEED every library file to be shared among everything.
                     // Many of these files have common global state that is not exposed on the window object.
                     chunks: "all",

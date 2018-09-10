@@ -53,15 +53,21 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
             cacheGroups: {
                 vendors: {
                     test: /[\\/]node_modules[\\/]/,
-                    minSize: 10000000,
+                    minSize: 30000,
                     reuseExistingChunk: true,
-                    name: `vendors`,
+                    // If name is explicitly specified many different vendors~someOtherChunk combined
+                    // chunk bundles will get outputted.
+                    name: "vendors",
                     chunks: "all",
+                    minChunks: 2,
                 },
                 shared: {
                     // Our library files currently only come from the dashboard.
                     test: /[\\/]applications[\\/]dashboard[\\/]src[\\/]scripts[\\/]/,
-                    minSize: 1000000,
+                    minSize: 30000,
+                    // If name is explicitly specified many different shared~someOtherChunk combined
+                    // chunk bundles will get outputted.
+                    name: "shared",
                     // We currently NEED every library file to be shared among everything.
                     // Many of these files have common global state that is not exposed on the window object.
                     chunks: "all",

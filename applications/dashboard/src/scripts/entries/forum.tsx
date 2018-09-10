@@ -1,6 +1,4 @@
 /**
- * Wire together the different parts of the application.
- *
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
@@ -8,15 +6,9 @@
 import { addRoutes, addComponent, onReady } from "@library/application";
 import React from "react";
 import { Route } from "react-router-dom";
-import SignInPage from "@dashboard/app/authenticate/SignInPage";
-import PasswordPage from "@dashboard/app/authenticate/PasswordPage";
-import RecoverPasswordPage from "@dashboard/app/authenticate/RecoverPasswordPage";
 import Router from "@dashboard/components/Router";
 import { stickyHeader } from "@library/dom";
 import { registerReducer } from "@library/state/reducerRegistry";
-import authenticateReducer from "@dashboard/state/authenticate/authenticateReducer";
-import usersReducer from "@dashboard/state/users/usersReducer";
-import { initAllUserContent } from "@dashboard/app/user-content";
 
 initAllUserContent();
 
@@ -36,3 +28,13 @@ addRoutes([
 onReady(() => {
     stickyHeader();
 });
+
+// The forum section needs these legacy scripts that have been moved into the bundled JS so it could be refactored.
+// Other sections should not need this yet.
+import "@dashboard/legacy";
+import { initAllUserContent } from "@library/user-content";
+import authenticateReducer from "@dashboard/pages/authenticate/authenticateReducer";
+import usersReducer from "@dashboard/usersReducer";
+import SignInPage from "@dashboard/pages/authenticate/SignInPage";
+import PasswordPage from "@dashboard/pages/authenticate/PasswordPage";
+import RecoverPasswordPage from "@dashboard/pages/recoverPassword/RecoverPasswordPage";

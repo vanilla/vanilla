@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import BaseEmbed from "@dashboard/app/user-content/embeds/BaseEmbed";
+import BaseEmbed from "@library/user-content/embeds/BaseEmbed";
 import { sanitizeUrl } from "@library/utility";
 import { getData, setData } from "@library/dom";
 import debounce from "lodash/debounce";

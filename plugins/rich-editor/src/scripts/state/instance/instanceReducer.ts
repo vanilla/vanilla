@@ -4,11 +4,9 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import * as instanceActions from "./instanceActions";
+import * as instanceActions from "@rich-editor/state/instance/instanceActions";
 import { IEditorInstanceState, IEditorInstance } from "@rich-editor/@types/store";
-import Quill, { RangeStatic } from "quill/core";
-import { getMentionRange, rangeContainsBlot } from "@rich-editor/quill/utility";
-import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import { getMentionRange } from "@rich-editor/quill/utility";
 
 const defaultSelection = {
     index: 0,

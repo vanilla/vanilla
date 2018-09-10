@@ -4,11 +4,11 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import * as mentionActions from "./mentionActions";
+import * as mentionActions from "@rich-editor/state/mention/mentionActions";
 import MentionTrie from "@rich-editor/state/mention/MentionTrie";
 import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 import { IMentionState } from "@rich-editor/@types/store";
-import { LoadStatus } from "@dashboard/@types/api";
+import { LoadStatus } from "@library/@types/api";
 
 export const initialState: IMentionState = {
     lastSuccessfulUsername: null,

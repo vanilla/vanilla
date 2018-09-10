@@ -7,9 +7,9 @@ import * as React from "react";
 import { t } from "@library/application";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DocumentTitle from "@dashboard/components/DocumentTitle";
-import PasswordForm from "@dashboard/app/authenticate/components/PasswordForm";
+import PasswordForm from "@dashboard/pages/authenticate/components/PasswordForm";
 
-export default class SignInPage extends React.Component {
+export default class PasswordPage extends React.Component {
     private id = uniqueIDFromPrefix("PasswordPage");
 
     get titleID(): string {

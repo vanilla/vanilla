@@ -11,9 +11,9 @@ import { getRequiredID, IRequiredComponentID } from "@library/componentIDs";
 import DocumentTitle from "@dashboard/components/DocumentTitle";
 import Or from "@dashboard/components/forms/Or";
 import { IStoreState, IAuthenticatorState } from "@dashboard/@types/state";
-import { getUserAuthenticators } from "@dashboard/state/authenticate/authenticatorsActions";
-import SSOMethods from "@dashboard/app/authenticate/components/SSOMethods";
-import PasswordForm from "@dashboard/app/authenticate/components/PasswordForm";
+import { getUserAuthenticators } from "@dashboard/pages/authenticate/authenticatorsActions";
+import SSOMethods from "@dashboard/pages/authenticate/components/SSOMethods";
+import PasswordForm from "@dashboard/pages/authenticate/components/PasswordForm";
 
 interface IProps {
     authenticatorState: IAuthenticatorState;

@@ -7,7 +7,7 @@
 import { promisify } from "util";
 import * as fs from "fs";
 import * as path from "path";
-import { VANILLA_APPS, VANILLA_ROOT, VANILLA_PLUGINS, PUBLIC_PATH_SOURCE_FILE, BOOTSTRAP_SOURCE_FILE } from "../env";
+import { VANILLA_APPS, VANILLA_PLUGINS, PUBLIC_PATH_SOURCE_FILE, BOOTSTRAP_SOURCE_FILE } from "../env";
 import { BuildMode, IBuildOptions } from "../options";
 const readDir = promisify(fs.readdir);
 const fileExists = promisify(fs.exists);

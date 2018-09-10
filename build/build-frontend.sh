@@ -8,8 +8,24 @@ then
     exit $INSTALL_RESULT
 fi
 
+VANILLA_BUILD_NODE_ARGS=${VANILLA_BUILD_NODE_ARGS:-""}
+VANILLA_BUILD_MEMORY_RESTRICTIONS=${VANILLA_BUILD_MEMORY_RESTRICTIONS:-false}
+
+BUILD_FLAGS="";
+if [[ "$VANILLA_BUILD_MEMORY_RESTRICTIONS" = true ]]
+then
+    BUILD_FLAGS="--low-memory"
+fi
+
 printf "\nBuilding frontend assets\n"
-yarn build:infra
+
+set -x;
+# Run the build
+TS_NODE_PROJECT=build/tsconfig.json \
+node $VANILLA_BUILD_NODE_ARGS \
+-r ../node_modules/ts-node/register \
+build/scripts/build.ts $BUILD_FLAGS
+
 BUILD_RESULT=$?
 if [[ $BUILD_RESULT -ne 0 ]]
 then

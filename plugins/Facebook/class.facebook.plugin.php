@@ -92,7 +92,8 @@ class FacebookPlugin extends Gdn_Plugin {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
         curl_setopt($ch, CURLOPT_URL, $url);
 
         if ($post !== false) {
@@ -487,7 +488,8 @@ class FacebookPlugin extends Gdn_Plugin {
         // Get the redirect URI.
         $c = curl_init();
         curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($c, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($c, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
         curl_setopt($c, CURLOPT_URL, $url);
         $contents = curl_exec($c);
 
@@ -516,7 +518,12 @@ class FacebookPlugin extends Gdn_Plugin {
      */
     public function getProfile($accessToken) {
         $url = "https://graph.facebook.com/me?access_token=$accessToken&fields=name,id,email";
-        $contents = file_get_contents($url);
+        $c = curl_init();
+        curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($c, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($c, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
+        curl_setopt($c, CURLOPT_URL, $url);
+        $contents = curl_exec($c);
         $profile = json_decode($contents, true);
         return $profile;
     }

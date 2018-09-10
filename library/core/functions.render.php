@@ -941,7 +941,7 @@ if (!function_exists('formatPossessive')) {
     }
 }
 
-if (!function_exists('formatRssCustom')) {
+if (!function_exists('formatRssHtmlCustom')) {
     /**
      * @param string $html
      * @return string Returns the filtered RSS.

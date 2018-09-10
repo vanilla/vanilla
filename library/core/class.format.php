@@ -1150,7 +1150,7 @@ class Gdn_Format {
      * @return string
      */
     public static function rssHtml($text, $format = 'Html') {
-        if (!in_array($text, ['Html', 'Raw'])) {
+        if (!in_array($format, ['Html', 'Raw'])) {
             $text = Gdn_Format::to($text, $format);
         }
 

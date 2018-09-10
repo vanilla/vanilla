@@ -6,7 +6,7 @@
 foreach ($this->DiscussionData->result() as $Discussion) {
     ?>
     <item>
-        <title><?php echo Gdn_Format::text($Discussion->Name); ?></title>
+        <title><?php echo Gdn_Format::rssHtml($Discussion->Name); ?></title>
         <link><?php echo $Discussion->Url; ?></link>
         <pubDate><?php echo date('r', Gdn_Format::toTimeStamp($Discussion->DateInserted)); ?></pubDate>
         <category><?php echo Gdn_Format::text($Discussion->Category); ?></category>

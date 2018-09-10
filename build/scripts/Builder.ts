@@ -72,8 +72,11 @@ export default class Builder {
         const dashboardPath = path.resolve(VANILLA_APPS, "dashboard");
         const installableAddons = this.entryModel.addonDirs.filter(addonDir => addonDir !== dashboardPath);
 
+        const originalDir = process.cwd();
         // Install the node modules.
-        return await Promise.all(installableAddons.map(installNodeModulesInDir));
+        return await Promise.all(installableAddons.map(installNodeModulesInDir)).then(() => {
+            process.chdir(originalDir);
+        });
     }
 
     /**

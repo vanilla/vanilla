@@ -16,7 +16,6 @@ import { spawn } from "child_process";
  */
 export async function installNodeModulesInDir(dir: string) {
     const options = await getOptions();
-    const originalDir = process.cwd();
 
     try {
         print(`Installing node modules for directory: ${chalk.yellow(dir)}`);
@@ -26,8 +25,6 @@ export async function installNodeModulesInDir(dir: string) {
     } catch (err) {
         fail(`\nNode module installation failed.\n    ${err}\n`);
     }
-
-    process.chdir(originalDir);
 }
 
 /**

@@ -9,7 +9,7 @@ then
 fi
 
 printf "\nBuilding frontend assets\n"
-yarn build
+yarn build:infra
 BUILD_RESULT=$?
 if [[ $BUILD_RESULT -ne 0 ]]
 then

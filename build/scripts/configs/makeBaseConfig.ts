@@ -143,11 +143,6 @@ ${chalk.green(aliases)}`;
                     },
                 ],
             }),
-            new ForkTsCheckerWebpackPlugin({
-                tsconfig: TS_CONFIG_FILE,
-                tslint: TS_LINT_FILE,
-                checkSyntacticErrors: true,
-            }),
         ],
         resolve: {
             modules: modulePaths,
@@ -172,6 +167,16 @@ ${chalk.green(aliases)}`;
             modules: [path.join(VANILLA_ROOT, "node_modules")],
         },
     };
+
+    if (!options.lowMemory) {
+        config.plugins.push(
+            new ForkTsCheckerWebpackPlugin({
+                tsconfig: TS_CONFIG_FILE,
+                tslint: TS_LINT_FILE,
+                checkSyntacticErrors: true,
+            }),
+        );
+    }
 
     if (options.mode === BuildMode.PRODUCTION) {
         config.plugins.push(

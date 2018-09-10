@@ -16,6 +16,9 @@ yargs
         alias: "f",
         default: false,
     })
+    .options("low-memory", {
+        default: false,
+    })
     .options("install", {
         alias: "i",
         default: false,
@@ -33,6 +36,7 @@ export interface IBuildOptions {
     verbose: boolean;
     fix: boolean;
     install: boolean;
+    lowMemory: boolean;
     enabledAddonKeys: string[];
     configFile: string;
     phpConfig: any;
@@ -72,6 +76,7 @@ export async function getOptions(): Promise<IBuildOptions> {
         mode: yargs.argv.mode,
         verbose: yargs.argv.verbose,
         enabledAddonKeys,
+        lowMemory: yargs.argv["low-memory"],
         configFile: yargs.argv.config,
         fix: yargs.argv.fix,
         phpConfig: config,

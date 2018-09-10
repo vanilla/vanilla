@@ -111,6 +111,7 @@
         "test:debug": "karma start ./tests/javascript/karma.conf.js --browsers ChromeDebug",
         "lint:ts": "tslint -c ./tslint.json -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish",
         "build": "ts-node -P build/tsconfig.json build/scripts/build.ts",
+        "build:infra": "TS_NODE_PROJECT=build/tsconfig.json node --max-old-space-size=512 -r ts-node/register build/scripts/build.ts --low-memory",
         "build:polyfills": "yarn run build --mode=polyfills",
         "build:dev": "yarn run build --mode=development",
         "build:analyze": "yarn run build --mode=analyze"

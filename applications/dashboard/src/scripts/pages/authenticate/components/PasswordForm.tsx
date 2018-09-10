@@ -13,10 +13,10 @@ import ButtonSubmit from "@dashboard/components/forms/ButtonSubmit";
 import Paragraph from "@dashboard/components/forms/Paragraph";
 import { IRequiredComponentID, getRequiredID } from "@library/componentIDs";
 import { IStoreState, IPasswordState } from "@dashboard/@types/state";
-import { postAuthenticatePassword } from "@dashboard/state/authenticate/passwordActions";
 import { IAuthenticatePasswordParams } from "@dashboard/@types/api";
 import { connect } from "react-redux";
 import { LoadStatus } from "@library/@types/api";
+import { postAuthenticatePassword } from "@dashboard/pages/authenticate/passwordActions";
 
 interface IProps {
     passwordState: IPasswordState;

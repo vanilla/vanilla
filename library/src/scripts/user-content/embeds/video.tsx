@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import BaseEmbed from "@dashboard/app/user-content/embeds/BaseEmbed";
+import BaseEmbed from "@library/user-content/embeds/BaseEmbed";
 import { IEmbedProps, registerEmbedComponent } from "@library/embeds";
 import { simplifyFraction } from "@library/utility";
 import { t } from "@library/application";

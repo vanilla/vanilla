@@ -5,8 +5,8 @@
  */
 
 import { combineReducers } from "redux";
-import authenticatorsReducer from "@dashboard/state/authenticate/authenticatorsReducer";
-import passwordReducer from "@dashboard/state/authenticate/passwordReducer";
+import authenticatorsReducer from "@dashboard/pages/authenticate/authenticatorsReducer";
+import passwordReducer from "@dashboard/pages/recoverPassword/recoverPasswordReducer";
 
 const authenticateReducer = combineReducers({
     authenticators: authenticatorsReducer,

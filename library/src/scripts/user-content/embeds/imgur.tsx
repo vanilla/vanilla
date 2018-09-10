@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import BaseEmbed from "@dashboard/app/user-content/embeds/BaseEmbed";
+import BaseEmbed from "@library/user-content/embeds/BaseEmbed";
 import { ensureScript } from "@library/dom";
 import { onContent } from "@library/application";
 import { registerEmbedComponent } from "@library/embeds";

@@ -5,7 +5,7 @@
  */
 
 import { combineReducers } from "redux";
-import requestPasswordReducer from "@dashboard/state/users/requestPasswordReducer";
+import requestPasswordReducer from "@dashboard/pages/recoverPassword/recoverPasswordReducer";
 
 const usersReducer = combineReducers({
     requestPassword: requestPasswordReducer,

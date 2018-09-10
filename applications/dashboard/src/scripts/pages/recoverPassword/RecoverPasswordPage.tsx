@@ -11,15 +11,15 @@ import React from "react";
 import ButtonSubmit from "@dashboard/components/forms/ButtonSubmit";
 import Paragraph from "@dashboard/components/forms/Paragraph";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
-import RememberPasswordLink from "./components/RememberPasswordLink";
 import uniqueId from "lodash/uniqueId";
 import { IStoreState, IRequestPasswordState } from "@dashboard/@types/state";
 import { IRequestPasswordOptions } from "@dashboard/@types/api";
+import { connect } from "react-redux";
 import {
     postRequestPassword,
     afterRequestPasswordSuccessNavigate,
-} from "@dashboard/state/users/requestPasswordActions";
-import { connect } from "react-redux";
+} from "@dashboard/pages/recoverPassword/recoverPasswordActions";
+import RememberPasswordLink from "@dashboard/pages/authenticate/components/RememberPasswordLink";
 
 interface IState {
     email: string;

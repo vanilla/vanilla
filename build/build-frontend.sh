@@ -25,6 +25,7 @@ TS_NODE_PROJECT=build/tsconfig.json \
 node $VANILLA_BUILD_NODE_ARGS \
 -r ../node_modules/ts-node/register \
 build/scripts/build.ts $BUILD_FLAGS
+set +x;
 
 BUILD_RESULT=$?
 if [[ $BUILD_RESULT -ne 0 ]]

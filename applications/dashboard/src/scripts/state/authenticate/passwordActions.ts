@@ -3,11 +3,11 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import { generateApiActionCreators, ActionsUnion, apiThunk } from "@dashboard/state/utility";
+import { generateApiActionCreators, ActionsUnion, apiThunk } from "@library/state/utility";
 import { IAuthenticatePasswordResponseData, IAuthenticatePasswordParams } from "@dashboard/@types/api";
-import apiv2 from "@dashboard/apiv2";
+import apiv2 from "@library/apiv2";
 import { AxiosResponse, AxiosError } from "axios";
-import { formatUrl } from "@dashboard/application";
+import { formatUrl } from "@library/application";
 
 // Authenticating user /authenticate/password
 export const POST_AUTHENTICATE_PASSWORD_REQUEST = "POST_AUTHENTICATE_PASSWORD_REQUEST";

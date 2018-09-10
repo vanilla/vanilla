@@ -5,10 +5,10 @@
 
 import React from "react";
 import BaseEmbed from "@dashboard/app/user-content/embeds/BaseEmbed";
-import { IEmbedProps, registerEmbedComponent } from "@dashboard/embeds";
-import { simplifyFraction } from "@dashboard/utility";
-import { t } from "@dashboard/application";
-import { delegateEvent } from "@dashboard/dom";
+import { IEmbedProps, registerEmbedComponent } from "@library/embeds";
+import { simplifyFraction } from "@library/utility";
+import { t } from "@library/application";
+import { delegateEvent } from "@library/dom";
 import ReactDOM from "react-dom";
 
 export function initVideoEmbeds() {

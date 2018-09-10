@@ -8,8 +8,8 @@
 import React, { ComponentClass } from "react";
 import ReactDOM from "react-dom";
 import { RouteProps } from "react-router-dom";
-import gdn from "@dashboard/gdn";
-import { PromiseOrNormalCallback, logError } from "@dashboard/utility";
+import gdn from "@library/gdn";
+import { PromiseOrNormalCallback, logError } from "@library/utility";
 import isUrl from "validator/lib/isURL";
 
 /**

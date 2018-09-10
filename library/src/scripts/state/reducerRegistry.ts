@@ -7,9 +7,9 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import { logError } from "@dashboard/utility";
+import { onReady } from "@library/application";
+import { logError } from "@library/utility";
 import { Reducer, ReducersMapObject } from "redux";
-import { onReady } from "@dashboard/application";
 
 let haveGot = false;
 let wasReadyCalled = false;

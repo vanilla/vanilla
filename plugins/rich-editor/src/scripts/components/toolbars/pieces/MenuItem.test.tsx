@@ -7,7 +7,7 @@
 import React from "react";
 import { shallow } from "enzyme";
 import sinon from "sinon";
-import MenuItem from "./MenuItem";
+import MenuItem from "@rich-editor/components/toolbars/pieces/MenuItem";
 import { bold } from "@rich-editor/components/icons";
 
 const noop = () => {

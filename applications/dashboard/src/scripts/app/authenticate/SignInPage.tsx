@@ -5,16 +5,15 @@
 
 import * as React from "react";
 import { connect } from "react-redux";
-import { t } from "@dashboard/application";
+import { t } from "@library/application";
+import { LoadStatus } from "@library/@types/api";
+import { getRequiredID, IRequiredComponentID } from "@library/componentIDs";
 import DocumentTitle from "@dashboard/components/DocumentTitle";
-import PasswordForm from "./components/PasswordForm";
-import SSOMethods from "./components/SSOMethods";
-import { getRequiredID, IRequiredComponentID } from "@dashboard/componentIDs";
 import Or from "@dashboard/components/forms/Or";
-import PageLoading from "@dashboard/components/PageLoading";
-import { LoadStatus } from "@dashboard/@types/api";
 import { IStoreState, IAuthenticatorState } from "@dashboard/@types/state";
 import { getUserAuthenticators } from "@dashboard/state/authenticate/authenticatorsActions";
+import SSOMethods from "@dashboard/app/authenticate/components/SSOMethods";
+import PasswordForm from "@dashboard/app/authenticate/components/PasswordForm";
 
 interface IProps {
     authenticatorState: IAuthenticatorState;

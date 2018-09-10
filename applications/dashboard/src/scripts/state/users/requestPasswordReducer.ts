@@ -5,7 +5,7 @@
 
 import * as actions from "@dashboard/state/users/requestPasswordActions";
 import { IRequestPasswordState } from "@dashboard/@types/state";
-import { LoadStatus } from "@dashboard/@types/api";
+import { LoadStatus } from "@library/@types/api";
 
 const initialState: IRequestPasswordState = {
     status: LoadStatus.PENDING,

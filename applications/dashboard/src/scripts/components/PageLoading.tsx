@@ -1,6 +1,6 @@
 import * as React from "react";
-import { t } from "@dashboard/application";
-import { ILoadable, LoadStatus } from "@dashboard/@types/api";
+import { t } from "@library/application";
+import { ILoadable, LoadStatus } from "@library/@types/api";
 
 export default class PageLoading extends React.PureComponent<ILoadable<any>, {}> {
     public static defaultProps: Partial<ILoadable<any>> = {

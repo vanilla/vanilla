@@ -5,12 +5,12 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
-import { registerEmbedComponent, IEmbedProps, IEmbedData, IQuoteEmbedData } from "@dashboard/embeds";
-import { onContent, t, formatUrl, makeProfileUrl } from "@dashboard/application";
+import { registerEmbedComponent, IEmbedProps, IEmbedData, IQuoteEmbedData } from "@library/embeds";
+import { onContent, t, formatUrl, makeProfileUrl } from "@library/application";
 import CollapsableUserContent from "@dashboard/app/user-content/CollapsableContent";
 import uniqueId from "lodash/uniqueId";
 import classnames from "classnames";
-import api from "@dashboard/apiv2";
+import api from "@library/apiv2";
 
 export function initQuoteEmbeds() {
     registerEmbedComponent("quote", QuoteEmbed as any);

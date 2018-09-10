@@ -6,7 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { t } from "@dashboard/application";
+import { t } from "@library/application";
 
 interface IState {
     id: string;

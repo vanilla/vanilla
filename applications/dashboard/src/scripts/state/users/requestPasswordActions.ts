@@ -3,7 +3,7 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import { generateApiActionCreators, ActionsUnion, apiThunk, createAction } from "@dashboard/state/utility";
+import { generateApiActionCreators, ActionsUnion, apiThunk, createAction } from "@library/state/utility";
 import { IRequestPasswordOptions } from "@dashboard/@types/api";
 
 // Authenticating user /authenticate/password

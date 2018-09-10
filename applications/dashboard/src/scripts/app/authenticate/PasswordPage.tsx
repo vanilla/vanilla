@@ -4,10 +4,10 @@
  */
 
 import * as React from "react";
-import { t } from "@dashboard/application";
+import { t } from "@library/application";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DocumentTitle from "@dashboard/components/DocumentTitle";
-import PasswordForm from "./components/PasswordForm";
-import { uniqueIDFromPrefix } from "@dashboard/componentIDs";
+import PasswordForm from "@dashboard/app/authenticate/components/PasswordForm";
 
 export default class SignInPage extends React.Component {
     private id = uniqueIDFromPrefix("PasswordPage");

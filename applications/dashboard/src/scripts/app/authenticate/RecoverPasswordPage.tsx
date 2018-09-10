@@ -3,8 +3,9 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { getFieldErrors, getGlobalErrorMessage } from "@dashboard/apiv2";
-import { t } from "@dashboard/application";
+import { getFieldErrors, getGlobalErrorMessage } from "@library/apiv2";
+import { LoadStatus } from "@library/@types/api";
+import { t } from "@library/application";
 import DocumentTitle from "@dashboard/components/DocumentTitle";
 import React from "react";
 import ButtonSubmit from "@dashboard/components/forms/ButtonSubmit";
@@ -13,7 +14,7 @@ import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 import RememberPasswordLink from "./components/RememberPasswordLink";
 import uniqueId from "lodash/uniqueId";
 import { IStoreState, IRequestPasswordState } from "@dashboard/@types/state";
-import { IRequestPasswordOptions, LoadStatus } from "@dashboard/@types/api";
+import { IRequestPasswordOptions } from "@dashboard/@types/api";
 import {
     postRequestPassword,
     afterRequestPasswordSuccessNavigate,

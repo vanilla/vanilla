@@ -5,7 +5,7 @@
 
 import * as actions from "@dashboard/state/authenticate/passwordActions";
 import { IPasswordState } from "@dashboard/@types/state";
-import { LoadStatus } from "@dashboard/@types/api";
+import { LoadStatus } from "@library/@types/api";
 
 const initialState: IPasswordState = {
     status: LoadStatus.PENDING,

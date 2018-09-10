@@ -15,6 +15,7 @@
         "baseUrl": ".",
         "downlevelIteration": true,
         "paths": {
+            "@library/*": ["./library/src/scripts/*"],
             "@vanilla/*": ["./applications/vanilla/src/scripts/*"],
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"],
             "@rich-editor/*": ["./plugins/rich-editor/src/scripts/*"],

@@ -5,8 +5,8 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { formatUrl, getMeta } from "@dashboard/application";
-import { log, matchAtMention as _matchAtMention } from "@dashboard/utility";
+import { formatUrl, getMeta } from "@library/application";
+import { log, matchAtMention as _matchAtMention } from "@library/utility";
 
 // Store cache results in an outer scoped variable., so all instances share the same data
 // and can build the cache together.

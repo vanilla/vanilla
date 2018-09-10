@@ -5,7 +5,7 @@
 
 import React from "react";
 import BaseEmbed from "@dashboard/app/user-content/embeds/BaseEmbed";
-import { registerEmbedComponent } from "@dashboard/embeds";
+import { registerEmbedComponent } from "@library/embeds";
 
 export function initCodePenEmbeds() {
     registerEmbedComponent("codepen", CodePenEmbed);

@@ -5,10 +5,12 @@
  */
 
 import React from "react";
-import EmojiPicker from "./pieces/EmojiPicker";
-import PopoverController, { IPopoverControllerChildParameters } from "./pieces/PopoverController";
 import * as Icons from "@rich-editor/components/icons";
-import { getRequiredID, IRequiredComponentID, IOptionalComponentID } from "@dashboard/componentIDs";
+import { getRequiredID, IRequiredComponentID, IOptionalComponentID } from "@library/componentIDs";
+import PopoverController, {
+    IPopoverControllerChildParameters,
+} from "@rich-editor/components/popovers/pieces/PopoverController";
+import EmojiPicker from "@rich-editor/components/popovers/pieces/EmojiPicker";
 
 export default class EmojiPopover extends React.Component<IOptionalComponentID, IRequiredComponentID> {
     public constructor(props) {

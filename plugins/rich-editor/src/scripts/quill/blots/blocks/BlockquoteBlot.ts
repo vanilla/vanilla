@@ -6,9 +6,9 @@
 
 /* tslint:disable:max-classes-per-file */
 
-import WrapperBlot from "../abstract/WrapperBlot";
-import ContentBlot from "../abstract/ContentBlot";
-import LineBlot from "../abstract/LineBlot";
+import WrapperBlot from "@rich-editor/quill/blots/abstract/WrapperBlot";
+import ContentBlot from "@rich-editor/quill/blots/abstract/ContentBlot";
+import LineBlot from "@rich-editor/quill/blots/abstract/LineBlot";
 
 export default class BlockquoteLineBlot extends LineBlot {
     public static blotName = "blockquote-line";

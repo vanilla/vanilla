@@ -3,7 +3,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { t } from "@dashboard/application";
+import { t } from "@library/application";
 import React from "react";
 import { Link } from "react-router-dom";
 

@@ -3,19 +3,20 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { getFieldErrors, getGlobalErrorMessage } from "@dashboard/apiv2";
-import { t } from "@dashboard/application";
+import { getFieldErrors, getGlobalErrorMessage } from "@library/apiv2";
+import { t } from "@library/application";
 import React from "react";
 import { withRouter, Link } from "react-router-dom";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 import Checkbox from "@dashboard/components/forms/Checkbox";
 import ButtonSubmit from "@dashboard/components/forms/ButtonSubmit";
 import Paragraph from "@dashboard/components/forms/Paragraph";
-import { IRequiredComponentID, getRequiredID } from "@dashboard/componentIDs";
+import { IRequiredComponentID, getRequiredID } from "@library/componentIDs";
 import { IStoreState, IPasswordState } from "@dashboard/@types/state";
 import { postAuthenticatePassword } from "@dashboard/state/authenticate/passwordActions";
-import { IAuthenticatePasswordParams, LoadStatus } from "@dashboard/@types/api";
+import { IAuthenticatePasswordParams } from "@dashboard/@types/api";
 import { connect } from "react-redux";
+import { LoadStatus } from "@library/@types/api";
 
 interface IProps {
     passwordState: IPasswordState;

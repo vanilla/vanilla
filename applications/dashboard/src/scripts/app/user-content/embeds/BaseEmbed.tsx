@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { IEmbedProps } from "@dashboard/embeds";
+import { IEmbedProps } from "@library/embeds";
 
 /**
  * A base embed react component class.

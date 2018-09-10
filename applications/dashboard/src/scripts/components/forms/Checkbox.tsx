@@ -3,10 +3,10 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { t } from "@dashboard/application";
+import { t } from "@library/application";
 import React from "react";
 import classNames from "classnames";
-import { uniqueIDFromPrefix, getOptionalID, IOptionalComponentID } from "@dashboard/componentIDs";
+import { getOptionalID, IOptionalComponentID } from "@library/componentIDs";
 
 interface IProps extends IOptionalComponentID {
     id?: string;

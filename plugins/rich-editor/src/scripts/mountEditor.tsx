@@ -7,7 +7,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import uniqueId from "lodash/uniqueId";
-import { ensureHtmlElement } from "@dashboard/dom";
+import { ensureHtmlElement } from "@library/dom";
 import Editor from "@rich-editor/components/editor/Editor";
 
 /**

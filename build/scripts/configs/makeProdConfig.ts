@@ -63,7 +63,7 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
                 },
                 shared: {
                     // Our library files currently only come from the dashboard.
-                    test: /[\\/]applications[\\/]dashboard[\\/]src[\\/]scripts[\\/]/,
+                    test: /[\\/]library[\\/]src[\\/]scripts[\\/]/,
                     minSize: 30000,
                     // If name is explicitly specified many different shared~someOtherChunk combined
                     // chunk bundles will get outputted.

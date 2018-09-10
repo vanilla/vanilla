@@ -7,7 +7,7 @@
 import Enzyme from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
 import { importAll } from "@testroot/utility";
-import reducerRegistry from "@dashboard/state/reducerRegistry";
+import reducerRegistry from "@library/state/reducerRegistry";
 import editorReducer from "@rich-editor/state/editorReducer";
 import registerQuill from "@rich-editor/quill/registerQuill";
 

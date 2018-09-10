@@ -4,7 +4,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { ActionsUnion, createAction } from "@dashboard/state/utility";
+import { ActionsUnion, createAction } from "@library/state/utility";
 import Quill, { RangeStatic } from "quill/core";
 
 export const CREATE_INSTANCE = "[instance] create";

@@ -3,7 +3,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import WrapperBlot from "./WrapperBlot";
+import WrapperBlot from "@rich-editor/quill/blots/abstract/WrapperBlot";
 import { Blot, Container } from "quill/core";
 import Parchment from "parchment";
 

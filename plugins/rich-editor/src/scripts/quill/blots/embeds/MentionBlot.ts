@@ -5,7 +5,7 @@
  */
 
 import EmbedBlot from "quill/blots/embed";
-import { formatUrl, makeProfileUrl } from "@dashboard/application";
+import { makeProfileUrl } from "@library/application";
 import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 
 /**

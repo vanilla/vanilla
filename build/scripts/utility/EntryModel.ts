@@ -7,7 +7,13 @@
 import { promisify } from "util";
 import * as fs from "fs";
 import * as path from "path";
-import { VANILLA_APPS, VANILLA_ROOT, VANILLA_PLUGINS, PUBLIC_PATH_SOURCE_FILE, BOOTSTRAP_SOURCE_FILE } from "../env";
+import {
+    VANILLA_APPS,
+    VANILLA_PLUGINS,
+    PUBLIC_PATH_SOURCE_FILE,
+    BOOTSTRAP_SOURCE_FILE,
+    LIBRARY_SRC_DIRECTORY,
+} from "../env";
 import { BuildMode, IBuildOptions } from "../options";
 const readDir = promisify(fs.readdir);
 const fileExists = promisify(fs.exists);
@@ -108,7 +114,10 @@ export default class EntryModel {
      * Get all of the src directories in the project.
      */
     public get srcDirs(): string[] {
-        return Object.values(this.buildAddons!).map(addon => addon.srcDir);
+        return [
+            LIBRARY_SRC_DIRECTORY, // The library srces are always allowed.
+            ...Object.values(this.buildAddons!).map(addon => addon.srcDir),
+        ];
     }
 
     /**
@@ -123,6 +132,8 @@ export default class EntryModel {
             const key = "@" + path.basename(addonPath);
             result[key] = path.resolve(addonPath, "src/scripts");
         }
+
+        result["@library"] = LIBRARY_SRC_DIRECTORY;
         return result;
     }
 

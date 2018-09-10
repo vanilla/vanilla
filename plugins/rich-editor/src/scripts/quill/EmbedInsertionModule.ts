@@ -7,10 +7,10 @@
 import Module from "quill/core/module";
 import Parchment from "parchment";
 import Quill from "quill/core";
-import api, { uploadImage } from "@dashboard/apiv2";
-import { getPastedImage, getDraggedImage } from "@dashboard/dom";
-import ExternalEmbedBlot, { IEmbedValue } from "./blots/embeds/ExternalEmbedBlot";
-import getStore from "@dashboard/state/getStore";
+import api, { uploadImage } from "@library/apiv2";
+import { getPastedImage, getDraggedImage } from "@library/dom";
+import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
+import getStore from "@library/state/getStore";
 import { getIDForQuill, insertBlockBlotAt } from "@rich-editor/quill/utility";
 import { IStoreState } from "@rich-editor/@types/store";
 

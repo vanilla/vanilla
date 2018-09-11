@@ -876,7 +876,7 @@ class UserModel extends Gdn_Model {
                 if ($user) {
                     $user = (array)$user;
                     // Save the user.
-                    $this->syncUser($user, $userData,false /*force*/, $isTrustedProvider);
+                    $this->syncUser($user, $userData, false /*force*/, $isTrustedProvider);
                     $userID = $user['UserID'];
                 }
             }

@@ -2,7 +2,7 @@
 /**
  * @author Alexander Kim <alexander.k@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license GPL v2
  */
 
 namespace Garden;
@@ -11,7 +11,7 @@ namespace Garden;
  * For classes that need to cache some static values and configs.
  *
  */
-trait StaticCache {
+trait StaticCacheTrait {
     /**
      * @var array
      */

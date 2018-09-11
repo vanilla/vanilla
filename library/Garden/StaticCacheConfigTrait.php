@@ -2,7 +2,7 @@
 /**
  * @author Alexander Kim <alexander.k@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license GPL v2
  */
 
 namespace Garden;
@@ -13,8 +13,8 @@ use Gdn;
  * For classes that need to cache some static values and configs.
  *
  */
-trait StaticConfig {
-    use StaticCache {
+trait StaticCacheConfigTrait {
+    use StaticCacheTrait {
         sc as c;
         scInit as cInit;
     }

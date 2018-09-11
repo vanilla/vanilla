@@ -402,7 +402,7 @@ class DiscussionController extends VanillaController {
             redirectTo('discussions');
         }
 
-        $this->jsonTarget("#Discussion_$discussionID", null, 'SlideUp');
+        $this->jsonTarget("#Discussion_$discussionID", null, 'Highlight');
 
         $this->render('Blank', 'Utility', 'Dashboard');
     }

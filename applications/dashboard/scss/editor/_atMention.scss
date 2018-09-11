@@ -17,7 +17,7 @@ $atMention_maxHeight                 : ($atMention-avatar_width + $atMention-use
 .atMentionList {
     position: absolute;
     width: $atMention_width;
-    transform: translateY($baseUnit); // offset
+    transform: translateY($utility-baseUnit); // offset
 }
 
 .atMentionList-suggestion {

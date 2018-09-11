@@ -4,8 +4,8 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import mentionReducer from "./mention/mentionReducer";
-import instanceReducer from "./instance/instanceReducer";
+import mentionReducer from "@rich-editor/state/mention/mentionReducer";
+import instanceReducer from "@rich-editor/state/instance/instanceReducer";
 import { combineReducers } from "redux";
 
 const editorReducer = combineReducers({

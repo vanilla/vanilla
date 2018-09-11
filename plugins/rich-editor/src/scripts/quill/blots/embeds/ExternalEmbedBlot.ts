@@ -4,13 +4,13 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { setData, getData, escapeHTML } from "@dashboard/dom";
+import { setData, getData, escapeHTML } from "@library/dom";
 import uniqueId from "lodash/uniqueId";
-import { IEmbedData, renderEmbed, FOCUS_CLASS, IQuoteEmbedData } from "@dashboard/embeds";
-import FocusableEmbedBlot from "../abstract/FocusableEmbedBlot";
-import ErrorBlot from "./ErrorBlot";
-import { t } from "@dashboard/application";
-import { logError, capitalizeFirstLetter } from "@dashboard/utility";
+import { IEmbedData, renderEmbed, FOCUS_CLASS } from "@library/embeds";
+import { t } from "@library/application";
+import { logError, capitalizeFirstLetter } from "@library/utility";
+import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
+import ErrorBlot from "@rich-editor/quill/blots/embeds/ErrorBlot";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 

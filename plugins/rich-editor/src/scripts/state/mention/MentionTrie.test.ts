@@ -4,9 +4,9 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import MentionTrie, { IMentionNode, IMentionValue } from "./MentionTrie";
+import MentionTrie, { IMentionNode, IMentionValue } from "@rich-editor/state/mention/MentionTrie";
 import { expect } from "chai";
-import { LoadStatus } from "@dashboard/@types/api";
+import { LoadStatus } from "@library/@types/api";
 
 const LOADING_VALUE: IMentionValue = {
     status: LoadStatus.LOADING,

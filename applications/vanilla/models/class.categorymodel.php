@@ -2889,7 +2889,7 @@ class CategoryModel extends Gdn_Model {
         $CategoryID = val('CategoryID', $FormPostValues);
         $NewName = val('Name', $FormPostValues, '');
         $UrlCode = val('UrlCode', $FormPostValues, '');
-        $AllowDiscussions = val('AllowDiscussions', $FormPostValues, '');
+        $AllowDiscussions = val('AllowDiscussions', $FormPostValues, 1);
         $CustomPermissions = (bool)val('CustomPermissions', $FormPostValues) || is_array(val('Permissions', $FormPostValues));
         $CustomPoints = val('CustomPoints', $FormPostValues, null);
 
@@ -2949,11 +2949,11 @@ class CategoryModel extends Gdn_Model {
             $Fields = $this->Validation->schemaValidationFields();
             $Fields = $this->coerceData($Fields);
             unset($Fields['CategoryID']);
-            $Fields['AllowDiscussions'] = (bool)val('AllowDiscussions', $Fields);
+            $Fields['AllowDiscussions'] = isset($Fields['AllowDiscussions']) ? (bool)$Fields['AllowDiscussions'] : (bool)$AllowDiscussions;
 
             if ($Insert === false) {
                 $OldCategory = $this->getID($CategoryID, DATASET_TYPE_ARRAY);
-                if (null === val('AllowDiscussions', $FormPostValues, null)) {
+                if (null === $AllowDiscussions) {
                     $AllowDiscussions = $OldCategory['AllowDiscussions']; // Force the allowdiscussions property
                 }
                 $Fields['AllowDiscussions'] = (bool)$AllowDiscussions;

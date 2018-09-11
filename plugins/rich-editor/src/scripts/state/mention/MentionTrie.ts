@@ -5,7 +5,7 @@
  */
 
 import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
-import { ILoadable } from "@dashboard/@types/api";
+import { ILoadable } from "@library/@types/api";
 
 export type IMentionValue = ILoadable<IMentionSuggestionData[]>;
 

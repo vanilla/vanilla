@@ -4,11 +4,11 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import FocusableEmbedBlot from "./FocusableEmbedBlot";
 import Quill, { RangeStatic } from "quill/core";
 import { expect } from "chai";
 import sinon from "sinon";
-import { getBlotAtIndex } from "../../utility";
+import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
+import { getBlotAtIndex } from "@rich-editor/quill/utility";
 
 describe("FocusableEmbedBlot", () => {
     let quill: Quill;

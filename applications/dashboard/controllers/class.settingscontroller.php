@@ -598,6 +598,7 @@ class SettingsController extends DashboardController {
                     try {
                         // Save the ban.
                         $newID = $this->Form->save();
+                        $this->jsonTarget('', '', 'Refresh');
                     } catch (Exception $ex) {
                         $this->Form->addError($ex);
                     }
@@ -613,6 +614,7 @@ class SettingsController extends DashboardController {
                 if ($this->Form->authenticatedPostBack()) {
                     $banModel->delete(['BanID' => $iD]);
                     $this->View = 'BanDelete';
+                    $this->jsonTarget('', '', 'Refresh');
                 }
                 break;
             case 'find':

@@ -49,6 +49,8 @@ class MessageController extends DashboardController {
         $this->MessageModel->setMessageCache();
 
         $this->informMessage(sprintf(t('%s deleted'), t('Message')));
+        $this->jsonTarget('', '', 'Refresh');
+
         $this->render('blank', 'utility', 'dashboard');
     }
 
@@ -103,6 +105,9 @@ class MessageController extends DashboardController {
         // Make sure the form knows which item we are editing.
         if (is_numeric($messageID) && $messageID > 0) {
             $this->Form->addHidden('MessageID', $messageID);
+        } else {
+            // Enable newly created messages by default.
+            $this->Form->setValue('Enabled', true);
         }
 
         $categoriesData = CategoryModel::categories();
@@ -126,6 +131,7 @@ class MessageController extends DashboardController {
 
                 // Redirect
                 $this->informMessage(t('Your changes have been saved.'));
+                $this->jsonTarget('', '', 'Refresh');
             }
         }
         $this->render();

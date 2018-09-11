@@ -6,13 +6,12 @@
 
 /* tslint:disable:max-classes-per-file */
 
-import WrapperBlot from "../abstract/WrapperBlot";
-import ContentBlot from "../abstract/ContentBlot";
-import LineBlot from "../abstract/LineBlot";
-import SpoilerButton from "../../components/SpoilerButton";
 import ReactDOM from "react-dom";
-import Editor from "@rich-editor/components/editor/Editor";
 import React from "react";
+import WrapperBlot from "@rich-editor/quill/blots/abstract/WrapperBlot";
+import ContentBlot from "@rich-editor/quill/blots/abstract/ContentBlot";
+import LineBlot from "@rich-editor/quill/blots/abstract/LineBlot";
+import SpoilerButton from "@rich-editor/quill/components/SpoilerButton";
 
 /**
  * Represent a single line of a Spoiler.

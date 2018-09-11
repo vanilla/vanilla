@@ -66,6 +66,7 @@ module.exports = {
             path.join(VANILLA_ROOT, "tests/node_modules"),
         ],
         alias: {
+            "@library": path.resolve(VANILLA_ROOT, "library/src/scripts/"),
             "@dashboard": path.resolve(VANILLA_ROOT, "applications/dashboard/src/scripts/"),
             "@vanilla": path.resolve(VANILLA_ROOT, "applications/vanilla/src/scripts/"),
             "@rich-editor": path.resolve(VANILLA_ROOT, "plugins/rich-editor/src/scripts/"),

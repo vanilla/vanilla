@@ -6,7 +6,7 @@
 
 import { expect } from "chai";
 import instanceReducer, { initialState, defaultInstance } from "@rich-editor/state/instance/instanceReducer";
-import { actions as instanceActions } from "./instanceActions";
+import { actions as instanceActions } from "@rich-editor/state/instance/instanceActions";
 import Quill from "quill/core";
 
 describe("instanceReducer", () => {

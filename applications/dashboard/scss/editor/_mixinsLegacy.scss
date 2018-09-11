@@ -1,0 +1,123 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+@mixin defaultTransition($timing-default: .15s, $easing-default: ease-out, $properties...) {
+    transition-property: $properties;
+    transition-duration: $timing-default;
+    transition-timing-function: $easing-default;
+}
+
+@mixin customCubicBezier($startA, $endA, $startB, $endB){
+    transition-timing-function: cubic-bezier($startA, $endA, $startB, $endB);
+}
+
+@mixin generateStylesFromMap($map) {
+    @each $property, $value in $map {
+        #{$property} : $value;
+    }
+}
+
+@mixin generateButtonClass($buttonMap, $useZIndex: false) {
+    & {
+        @include generateStylesFromMap(map-get($buttonMap, "default"));
+    }
+
+    &:not([disabled]) {
+        &:hover {
+            @include generateStylesFromMap(map-get($buttonMap, "hover"));
+
+            @if $useZIndex {
+                z-index: 2;
+            }
+        }
+
+        &:active {
+            @include generateStylesFromMap(map-get($buttonMap, "focus"));
+
+            @if $useZIndex {
+                z-index: 1;
+            }
+        }
+    }
+}
+
+// Rich Editor
+@mixin mediaQuery-richEditor_mobile {
+    @media (max-width: $richEditor-mobileBreakPoint) {
+        @content;
+    }
+}
+
+@mixin mediaQuery-richEditor_notMobile {
+    @media (min-width: #{$richEditor-mobileBreakPoint}) {
+        @content;
+    }
+}
+
+
+
+@mixin richEditorMobileStyles {
+    .embedDialogue {
+        position: static;
+    }
+
+    .u-richEditorHiddenOnMobile {
+        display: none !important;
+    }
+
+    .richEditor {
+        padding-left: 0;
+    }
+
+    .richEditor-menu.richEditorFlyout {
+        left: 0;
+        width: calc(100% + #{$global-border-width * 4});
+    }
+
+    .richEditor-embedBarMobileBorder {
+        display: block;
+    }
+
+    .FormWrapper {
+        padding-left: $richEditor-mobile_spacing;
+        padding-right: $richEditor-mobile_spacing;
+    }
+
+    .richEditorParagraphMenu {
+        display: none !important;
+    }
+
+    .Popup.hasRichEditor {
+        .Border {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    }
+}
+
+@mixin ieHack {
+    // IE 10 and 11 only
+    @media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+        @content;
+    }
+}
+
+
+@mixin objectFitWithFallback() {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    height: auto;
+    width: 100%;
+    @supports (object-fit: cover) {
+        object-fit: cover;
+        object-position: center;
+        height: 100%;
+    }
+}

@@ -6,7 +6,7 @@
 import { getFieldErrors, getGlobalErrorMessage } from "@library/apiv2";
 import { LoadStatus } from "@library/@types/api";
 import { t } from "@library/application";
-import DocumentTitle from "@dashboard/components/DocumentTitle";
+import DocumentTitle from "@library/components/DocumentTitle";
 import React from "react";
 import ButtonSubmit from "@dashboard/components/forms/ButtonSubmit";
 import Paragraph from "@dashboard/components/forms/Paragraph";

@@ -6,7 +6,7 @@
 import React from "react";
 import { sprintf } from "sprintf-js";
 import { t } from "@library/application";
-import DocumentTitle from "@dashboard/components/DocumentTitle";
+import DocumentTitle from "@library/components/DocumentTitle";
 
 export default class NotFoundPage extends React.PureComponent<IProps> {
     public static defaultProps = {

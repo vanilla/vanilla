@@ -8,7 +8,7 @@ import { connect } from "react-redux";
 import { t } from "@library/application";
 import { LoadStatus } from "@library/@types/api";
 import { getRequiredID, IRequiredComponentID } from "@library/componentIDs";
-import DocumentTitle from "@dashboard/components/DocumentTitle";
+import DocumentTitle from "@library/components/DocumentTitle";
 import Or from "@dashboard/components/forms/Or";
 import { IStoreState, IAuthenticatorState } from "@dashboard/@types/state";
 import { getUserAuthenticators } from "@dashboard/pages/authenticate/authenticatorsActions";

@@ -1,4 +1,14 @@
 @charset "UTF-8";
+/*!
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 /* -------------------------------------------------------------- *    Utility Variables
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Globals
@@ -724,6 +734,13 @@ label.checkbox input.checkbox-input {
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+.accessibility-jumpTo {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 0;
+}
+
 @-webkit-keyframes fadein {
   0% {
     opacity: 0;
@@ -732,6 +749,7 @@ label.checkbox input.checkbox-input {
     opacity: 1;
   }
 }
+
 @keyframes fadein {
   0% {
     opacity: 0;
@@ -750,11 +768,14 @@ label.checkbox input.checkbox-input {
   margin-bottom: 0;
 }
 
+/*!
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 .richEditor {
   position: relative;
   display: block;
-  padding-left: 36px;
-  color: #555a62;
 }
 
 .richEditor.isDisabled,
@@ -762,19 +783,22 @@ label.checkbox input.checkbox-input {
   cursor: progress !important;
 }
 
-.richEditor h1,
-.richEditor h2,
-.richEditor h3,
-.richEditor h4,
-.richEditor h5,
-.richEditor h6,
-.richEditor p {
-  color: #555a62;
-}
-
-.richEditor blockquote {
-  display: block;
-  margin: 0;
+.richEditor.inheritHeight .richEditor-text,
+.richEditor.inheritHeight .richEditor-textWrap,
+.richEditor.inheritHeight .richEditor-frame {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
 }
 
 .richEditor-frame.InputBox {
@@ -1343,6 +1367,39 @@ label.checkbox input.checkbox-input {
   top: calc(50% + 17px);
 }
 
+.emojiGroups {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: nowrap;
+      -ms-flex-wrap: nowrap;
+          flex-wrap: nowrap;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.emojiGroup-icon {
+  display: block;
+  position: relative;
+  margin: auto;
+  padding: 0;
+  width: 24px;
+  size: 24px;
+}
+
+.richEditor {
+  color: #555a62;
+  padding-left: 36px;
+}
+
+.richEditor blockquote {
+  display: block;
+  margin: 0;
+}
+
 .userContent {
   line-height: 1.5;
 }
@@ -1358,6 +1415,7 @@ label.checkbox input.checkbox-input {
 .userContent h5,
 .userContent h6 {
   line-height: 1.25;
+  color: #555a62;
 }
 
 .userContent > *:not(.emoji):not(:last-child):not(br) {
@@ -1405,29 +1463,6 @@ label.checkbox input.checkbox-input {
       -ms-user-select: none;
           user-select: none;
   cursor: pointer;
-}
-
-.emojiGroups {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-wrap: nowrap;
-      -ms-flex-wrap: nowrap;
-          flex-wrap: nowrap;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-}
-
-.emojiGroup-icon {
-  display: block;
-  position: relative;
-  margin: auto;
-  padding: 0;
-  width: 24px;
-  size: 24px;
 }
 
 body.hasRichEditor #Form_Preview {
@@ -1732,10 +1767,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .accessibility-jumpTo {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border: 0;
   border: 0;
   clip: rect(0 0 0 0);
   height: 1px;

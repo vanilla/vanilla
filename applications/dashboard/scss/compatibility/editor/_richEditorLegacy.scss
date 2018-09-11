@@ -1,11 +1,11 @@
 /*!
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @author Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 
-@import "richEditor";
+@import "../../../../../library/src/scss/editor/richEditor";
 
 .richEditor {
     color: $global-color_fg;

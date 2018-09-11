@@ -1,7 +1,7 @@
 // This CSS file should always be added after style.css and not be overridden.
 // Variables
-@import "core-variables";
-@import "social/socialMedia";
+@import "../../../library/src/scss/core-variables";
+@import "../../../library/src/scss/social/socialMediaVariables";
 
 // Compatibility
 @import "compatibility/mixins";
@@ -23,18 +23,18 @@
 @import "new-components/pageHeading";
 
 // Editor
-@import "editor/variables";
-@import "editor/mixins";
-@import "editor/mixinsLegacy";
-@import "editor/animations";
-@import "editor/richEditorLegacy";
-@import "editor/atMention";
-@import "editor/blockquote";
-@import "editor/lists";
-@import "editor/accessibility";
-@import "editor/spoiler";
-@import "editor/emoji";
-@import "editor/codeBlocks";
+@import "../../../library/src/scss/editor/variables";
+@import "../../../library/src/scss/editor/mixins";
+@import "compatibility/editor/mixinsLegacy";
+@import "../../../library/src/scss/editor/animations";
+@import "compatibility/editor/richEditorLegacy";
+@import "../../../library/src/scss/editor/atMention";
+@import "../../../library/src/scss/editor/blockquote";
+@import "../../../library/src/scss/editor/lists";
+@import "../../../library/src/scss/editor/accessibility";
+@import "../../../library/src/scss/editor/spoiler";
+@import "../../../library/src/scss/editor/emoji";
+@import "../../../library/src/scss/editor/codeBlocks";
 
 // Embeds
-@import "embeds/embeds";
+@import "../../../library/src/scss/embeds/embeds";

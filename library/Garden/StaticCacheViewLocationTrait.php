@@ -7,8 +7,6 @@
 
 namespace Garden;
 
-use Gdn;
-
 /**
  * For classes which extend Gdn_Module to cache fetchViewLocation response.
  */

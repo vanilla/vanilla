@@ -776,7 +776,7 @@ class UserModel extends Gdn_Model {
      * @param bool $force
      * @since 2.1
      */
-    public function syncUser($currentUser, $newUser, $force = false) {
+    public function syncUser($currentUser, $newUser, $force = false, $isTrustedProvider = false) {
         // Don't synchronize the user if we are configured not to.
         if (!$force && !c('Garden.Registration.ConnectSynchronize', true)) {
             return;
@@ -817,7 +817,12 @@ class UserModel extends Gdn_Model {
         $newUser['UserID'] = $currentUser['UserID'];
         trace($newUser);
 
-        $result = $this->save($newUser, ['NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => isset($newUser['RoleID'])]);
+        $result = $this->save($newUser, [
+            'NoConfirmEmail' => true,
+            'FixUnique' => true,
+            'SaveRoles' => isset($newUser['RoleID']),
+            'ValidateName' => !$isTrustedProvider,
+        ]);
         if (!$result) {
             trace($this->Validation->resultsText());
         }
@@ -836,9 +841,14 @@ class UserModel extends Gdn_Model {
         trace('UserModel->Connect()');
         $provider = Gdn_AuthenticationProviderModel::getProviderByKey($providerKey);
 
+        $isTrustedProvider = isset($provider['Trusted']) ? $provider['Trusted'] : false;
+
+        $saveRoles = $saveRolesRegister = false;
+
         // Trusted providers can sync roles.
-        if (val('Trusted', $provider) && (!empty($userData['Roles']) || !empty($userData['Roles']))) {
+        if ($isTrustedProvider && !empty($userData['Roles'])) {
             saveToConfig('Garden.SSO.SyncRoles', true, false);
+            $saveRoles = $saveRolesRegister = true;
         }
 
         $userID = false;
@@ -854,7 +864,7 @@ class UserModel extends Gdn_Model {
 
         if ($userID) {
             // Save the user.
-            $this->syncUser($userID, $userData);
+            $this->syncUser($userID, $userData, false /*force*/, $isTrustedProvider);
             return $userID;
         } else {
             // The user hasn't already been connected. We want to see if we can't find the user based on some critera.
@@ -866,7 +876,7 @@ class UserModel extends Gdn_Model {
                 if ($user) {
                     $user = (array)$user;
                     // Save the user.
-                    $this->syncUser($user, $userData);
+                    $this->syncUser($user, $userData,false /*force*/, $isTrustedProvider);
                     $userID = $user['UserID'];
                 }
             }
@@ -876,15 +886,16 @@ class UserModel extends Gdn_Model {
                 $userData['Password'] = md5(microtime());
                 $userData['HashMethod'] = 'Random';
 
-                touchValue('CheckCaptcha', $options, false);
-                touchValue('NoConfirmEmail', $options, true);
-                touchValue('NoActivity', $options, true);
-
                 // Translate SSO style roles to an array of role IDs suitable for registration.
                 if (!empty($userData['Roles']) && !isset($userData['RoleID'])) {
                     $userData['RoleID'] = $this->lookupRoleIDs($userData['Roles']);
                 }
-                touchValue('SaveRoles', $options, !empty($userData['RoleID']) && c('Garden.SSO.SyncRoles', false));
+
+                $options['CheckCaptcha'] = isset($options['CheckCaptcha']) ? $options['CheckCaptcha'] : false;
+                $options['NoConfirmEmail'] = isset($userData['Email']) || !UserModel::requireConfirmEmail();
+                $options['NoActivity'] = isset($options['NoActivity']) ? $options['NoActivity'] : true;
+                $options['SaveRoles'] = $saveRolesRegister;
+                $options['ValidateName'] = $isTrustedProvider;
 
                 trace($userData, 'Registering User');
                 $userID = $this->register($userData, $options);

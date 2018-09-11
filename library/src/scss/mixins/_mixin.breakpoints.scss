@@ -1,0 +1,28 @@
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+// Break Points
+$richEditor-mobile_spacing                        : 18px !default;
+$richEditor-mobileBreakPoint                      : 700px !default;
+$richEditor-mobileEmbedBreakPoint                 : 550px !default;
+
+@mixin mediaQuery-richEditor_embed {
+    @media (max-width: $richEditor-mobileEmbedBreakPoint) {
+        @content;
+    }
+}
+
+// Rich Editor
+@mixin mediaQuery-richEditor_mobile {
+    @media (max-width: $richEditor-mobileBreakPoint) {
+        @content;
+    }
+}
+
+@mixin mediaQuery-richEditor_notMobile {
+    @media (min-width: #{$richEditor-mobileBreakPoint}) {
+        @content;
+    }
+}

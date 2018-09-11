@@ -58,7 +58,7 @@ export async function makeProdConfig(section: string) {
                 },
                 library: {
                     // Our library files currently only come from the dashboard.
-                    test: /[\\/]applications[\\/]dashboard[\\/]src[\\/]scripts[\\/]/,
+                    test: /[\\/]library[\\/]src[\\/]scripts[\\/]/,
                     minSize: 30000,
                     name: `applications/dashboard/js/webpack/library-${section}`,
                     // We currently NEED every library file to be shared among everything.

@@ -6,13 +6,15 @@
 
 import React from "react";
 import KeyboardModule from "quill/modules/keyboard";
-import { t, isAllowedUrl } from "@dashboard/application";
+import { t, isAllowedUrl } from "@library/application";
+import { getRequiredID, IRequiredComponentID } from "@library/componentIDs";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
-import Popover from "./pieces/Popover";
-import PopoverController, { IPopoverControllerChildParameters } from "./pieces/PopoverController";
 import * as Icons from "@rich-editor/components/icons";
-import { getRequiredID, IRequiredComponentID } from "@dashboard/componentIDs";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
+import PopoverController, {
+    IPopoverControllerChildParameters,
+} from "@rich-editor/components/popovers/pieces/PopoverController";
+import Popover from "@rich-editor/components/popovers/pieces/Popover";
 
 interface IProps extends IWithEditorProps {}
 

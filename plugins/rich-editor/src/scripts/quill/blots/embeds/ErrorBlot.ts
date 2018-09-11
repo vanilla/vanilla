@@ -5,9 +5,9 @@
  */
 
 import FocusableEmbedBlot from "../abstract/FocusableEmbedBlot";
-import { t } from "@dashboard/application";
+import { t } from "@library/application";
 import uniqueId from "lodash/uniqueId";
-import { FOCUS_CLASS } from "@dashboard/embeds";
+import { FOCUS_CLASS } from "@library/embeds";
 
 /**
  * A full error. Non-recoverable. A form should not be submitted while one of these is present.

@@ -3,8 +3,8 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import ClassFormatBlot from "./ClassFormatBlot";
-import withWrapper from "./withWrapper";
+import ClassFormatBlot from "@rich-editor/quill/blots/abstract/ClassFormatBlot";
+import withWrapper from "@rich-editor/quill/blots/abstract/withWrapper";
 
 /**
  * A Line blot is responsible for recreating it's wrapping Blots.

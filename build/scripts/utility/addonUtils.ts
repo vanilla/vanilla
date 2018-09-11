@@ -7,7 +7,14 @@
 import { promisify } from "util";
 import * as fs from "fs";
 import * as path from "path";
-import { VANILLA_APPS, VANILLA_ROOT, VANILLA_PLUGINS, PUBLIC_PATH_SOURCE_FILE, BOOTSTRAP_SOURCE_FILE } from "../env";
+import {
+    VANILLA_APPS,
+    VANILLA_ROOT,
+    VANILLA_PLUGINS,
+    PUBLIC_PATH_SOURCE_FILE,
+    BOOTSTRAP_SOURCE_FILE,
+    LIBRARY_SRC_DIRECTORY,
+} from "../env";
 import { getOptions, BuildMode } from "../options";
 const realPath = promisify(fs.realpath);
 const readDir = promisify(fs.readdir);
@@ -94,6 +101,8 @@ export async function getAddonAliasMapping(section: string): Promise<IStringMap>
         const key = "@" + path.basename(addonPath);
         result[key] = path.resolve(addonPath, "src/scripts");
     }
+    result["@library"] = LIBRARY_SRC_DIRECTORY;
+
     return result;
 }
 

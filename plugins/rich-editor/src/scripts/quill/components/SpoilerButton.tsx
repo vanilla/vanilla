@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { t } from "@dashboard/application";
+import { t } from "@library/application";
 import { spoiler } from "@rich-editor/components/icons";
 
 export default class SpoilerButton extends React.Component<{}> {

@@ -26,6 +26,7 @@ import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import Quill, { Sources } from "quill/core";
 import { hot } from "react-hot-loader";
 import registerQuill from "@rich-editor/quill/registerQuill";
+import "../../../scss/editor.scss";
 
 interface IProps {
     editorID: string;

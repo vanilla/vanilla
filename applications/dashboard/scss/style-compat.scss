@@ -1,6 +1,11 @@
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 // This CSS file should always be added after style.css and not be overridden.
 // Variables
-@import "../../../library/src/scss/core-variables";
+@import "../../../library/src/scss/variables";
 @import "../../../library/src/scss/social/socialMediaVariables";
 
 // Compatibility
@@ -23,18 +28,20 @@
 @import "new-components/pageHeading";
 
 // Editor
-@import "../../../library/src/scss/editor/variables";
-@import "../../../library/src/scss/editor/mixins";
+@import "../../../plugins/rich-editor/src/scss/variables";
+@import "../../../plugins/rich-editor/src/scss/mixins";
 @import "compatibility/editor/mixinsLegacy";
-@import "../../../library/src/scss/editor/animations";
 @import "compatibility/editor/richEditorLegacy";
-@import "../../../library/src/scss/editor/atMention";
-@import "../../../library/src/scss/editor/blockquote";
-@import "../../../library/src/scss/editor/lists";
-@import "../../../library/src/scss/editor/accessibility";
-@import "../../../library/src/scss/editor/spoiler";
-@import "../../../library/src/scss/editor/emoji";
-@import "../../../library/src/scss/editor/codeBlocks";
+
+// User content
+@import "../../../library/src/scss/user-content/animations";
+@import "../../../library/src/scss/user-content/atMention";
+@import "../../../library/src/scss/user-content/blockquote";
+@import "../../../library/src/scss/user-content/lists";
+@import "../../../library/src/scss/user-content/accessibility";
+@import "../../../library/src/scss/user-content/spoiler";
+@import "../../../library/src/scss/user-content/emoji";
+@import "../../../library/src/scss/user-content/codeBlocks";
 
 // Embeds
 @import "../../../library/src/scss/embeds/embeds";

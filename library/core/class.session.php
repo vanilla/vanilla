@@ -16,7 +16,7 @@ use Vanilla\Permissions;
  * Handles user information throughout a session. This class is a singleton.
  */
 class Gdn_Session {
-    use \Garden\StaticConfig;
+    use \Garden\StaticCacheConfigTrait;
 
     /**
      * Parameter name for incoming CSRF tokens.

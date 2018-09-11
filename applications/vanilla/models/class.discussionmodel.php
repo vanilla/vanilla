@@ -17,7 +17,7 @@ class DiscussionModel extends Gdn_Model {
 
     use StaticInitializer;
     use \Vanilla\FloodControlTrait;
-    use \Garden\Translation;
+    use \Garden\StaticCacheTranslationTrait;
 
     /** Cache key. */
     const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';

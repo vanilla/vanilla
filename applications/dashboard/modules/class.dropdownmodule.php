@@ -71,7 +71,7 @@
 class DropdownModule extends Gdn_Module {
 
     use NestedCollection;
-    use \Garden\Translation;
+    use \Garden\StaticCacheTranslationTrait;
 
     /**
      * @var array

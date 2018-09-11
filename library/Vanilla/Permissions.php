@@ -6,7 +6,7 @@
 
 namespace Vanilla;
 
-use Garden\StaticConfig;
+use Garden\StaticCacheConfigTrait;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\DelimitedScheme;
 
@@ -15,7 +15,7 @@ use Vanilla\Utility\DelimitedScheme;
  */
 class Permissions implements \JsonSerializable {
     use PermissionsTranslationTrait;
-    use StaticConfig;
+    use StaticCacheConfigTrait;
 
     const BAN_BANNED = '!banned';
     const BAN_DELETED = '!deleted';

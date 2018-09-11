@@ -20,7 +20,7 @@ use Vanilla\Renderer;
  * Utility class that helps to format strings, objects, and arrays.
  */
 class Gdn_Format {
-    use \Garden\Translation;
+    use \Garden\StaticCacheTranslationTrait;
 
     /**
      * @var bool Flag which allows plugins to decide if the output should include rel="nofollow" on any <a> links.

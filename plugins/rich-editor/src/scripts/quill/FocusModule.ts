@@ -9,16 +9,16 @@ import Parchment from "parchment";
 import KeyboardModule from "quill/modules/keyboard";
 import Module from "quill/core/module";
 import { RangeStatic } from "quill/core";
-import { delegateEvent, getNextTabbableElement } from "@dashboard/dom";
-import FocusableEmbedBlot from "./blots/abstract/FocusableEmbedBlot";
+import { delegateEvent, getNextTabbableElement } from "@library/dom";
+import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import {
     insertNewLineAtEndOfScroll,
     insertNewLineAtStartOfScroll,
     getBlotAtIndex,
     rangeContainsBlot,
     forceSelectionUpdate,
-} from "./utility";
-import MentionAutoCompleteBlot from "./blots/embeds/MentionAutoCompleteBlot";
+} from "@rich-editor/quill/utility";
+import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
 
 /**
  * A module for managing focus of Embeds. For this to work for a new Embed,

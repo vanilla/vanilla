@@ -5,10 +5,11 @@
  */
 
 import React from "react";
-import { t } from "@dashboard/application";
-import getStore from "@dashboard/state/getStore";
-import { hasPermission } from "@dashboard/permissions";
-import { log, debug, sanitizeUrl } from "@dashboard/utility";
+import { t } from "@library/application";
+import getStore from "@library/state/getStore";
+import { hasPermission } from "@library/permissions";
+import { log, debug } from "@library/utility";
+import { delegateEvent, removeDelegatedEvent } from "@library/dom";
 import EmbedPopover from "@rich-editor/components/popovers/EmbedPopover";
 import EmojiPopover from "@rich-editor/components/popovers/EmojiPopover";
 import MentionToolbar from "@rich-editor/components/toolbars/MentionToolbar";
@@ -21,7 +22,6 @@ import { Provider as ReduxProvider } from "react-redux";
 import { actions } from "@rich-editor/state/instance/instanceActions";
 import { getIDForQuill, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import { IStoreState } from "@rich-editor/@types/store";
-import { delegateEvent, removeDelegatedEvent } from "@dashboard/dom";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import Quill, { Sources } from "quill/core";
 import { hot } from "react-hot-loader";

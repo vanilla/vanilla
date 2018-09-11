@@ -3,7 +3,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import BlockBlot from "../blocks/BlockBlot";
+import BlockBlot from "@rich-editor/quill/blots/blocks/BlockBlot";
 
 /**
  * A Block Blot implementing class matching functionality and representation in the outputted delta.

@@ -5,11 +5,11 @@
  */
 
 import { expect } from "chai";
-import mentionReducer, { initialState, sortSuggestions } from "./mentionReducer";
-import { actions as mentionActions } from "./mentionActions";
+import mentionReducer, { initialState, sortSuggestions } from "@rich-editor/state/mention/mentionReducer";
+import { actions as mentionActions } from "@rich-editor/state/mention/mentionActions";
 // import sinon, { SinonSandbox } from "sinon";
 import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
-import { LoadStatus } from "@dashboard/@types/api";
+import { LoadStatus } from "@library/@types/api";
 
 type SortProviderTuple = [string[], string, string[]];
 interface ISortTestData {

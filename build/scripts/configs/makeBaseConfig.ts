@@ -79,7 +79,6 @@ ${chalk.green(aliases)}`;
                 {
                     test: /\.tsx?$/,
                     exclude: ["node_modules"],
-                    include: tsSourceIncludes,
                     use: [
                         {
                             loader: "happypack/loader?id=ts",

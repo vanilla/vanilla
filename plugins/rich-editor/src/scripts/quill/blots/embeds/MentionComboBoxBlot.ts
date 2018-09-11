@@ -9,7 +9,7 @@ import Inline from "quill/blots/inline";
 import Embed from "quill/blots/embed";
 import TextBlot from "quill/blots/text";
 import Parchment from "parchment";
-import MentionAutoCompleteBlot from "./MentionAutoCompleteBlot";
+import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
 
 /**
  * A Blot to wrap the MentionAutoCompleteBlot.

@@ -5,11 +5,11 @@
  */
 
 import { Dispatch } from "redux";
-import { ActionsUnion, createAction } from "@dashboard/state/utility";
-import api from "@dashboard/apiv2";
+import { ActionsUnion, createAction } from "@library/state/utility";
+import api from "@library/apiv2";
 import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 import { IStoreState } from "@rich-editor/@types/store";
-import { IApiError, LoadStatus } from "@dashboard/@types/api";
+import { IApiError, LoadStatus } from "@library/@types/api";
 
 export const SET_ACTIVE_SUGGESTION = "[mentions] set active suggestion";
 export const LOAD_USERS_REQUEST = "[mentions] load users request";

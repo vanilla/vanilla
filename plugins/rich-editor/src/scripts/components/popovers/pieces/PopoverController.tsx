@@ -5,9 +5,8 @@
  */
 
 import React from "react";
-import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
-import { getRequiredID } from "@dashboard/componentIDs";
-import { watchFocusInDomTree } from "@dashboard/dom";
+import { getRequiredID } from "@library/componentIDs";
+import { watchFocusInDomTree } from "@library/dom";
 import { createEditorFlyoutEscapeListener, forceSelectionUpdate } from "@rich-editor/quill/utility";
 import classNames from "classnames";
 

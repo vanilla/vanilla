@@ -16,7 +16,7 @@ yargs
         alias: "f",
         default: false,
     })
-    .options("low-memory", {
+    .options("disable-validation", {
         default: false,
     })
     .options("install", {
@@ -36,7 +36,7 @@ export interface IBuildOptions {
     verbose: boolean;
     fix: boolean;
     install: boolean;
-    lowMemory: boolean;
+    disableValidation: boolean;
     enabledAddonKeys: string[];
     configFile: string;
     phpConfig: any;
@@ -76,7 +76,7 @@ export async function getOptions(): Promise<IBuildOptions> {
         mode: yargs.argv.mode,
         verbose: yargs.argv.verbose,
         enabledAddonKeys,
-        lowMemory: yargs.argv["low-memory"],
+        disableValidation: yargs.argv["disable-validation"],
         configFile: yargs.argv.config,
         fix: yargs.argv.fix,
         phpConfig: config,

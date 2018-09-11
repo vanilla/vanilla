@@ -153,7 +153,7 @@ ${chalk.green(aliases)}`;
         },
     };
 
-    if (!options.lowMemory) {
+    if (!options.disableValidation) {
         config.plugins.push(
             new ForkTsCheckerWebpackPlugin({
                 tsconfig: TS_CONFIG_FILE,

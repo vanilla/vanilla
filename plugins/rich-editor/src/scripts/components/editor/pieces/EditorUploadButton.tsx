@@ -8,8 +8,8 @@ import React, { MouseEvent, ChangeEvent } from "react";
 import * as Icons from "@rich-editor/components/icons";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
-import { uploadImage } from "@dashboard/apiv2";
-import { isFileImage } from "@dashboard/utility";
+import { uploadImage } from "@library/apiv2";
+import { isFileImage } from "@library/utility";
 
 interface IProps extends IWithEditorProps {}
 

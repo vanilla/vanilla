@@ -6,7 +6,7 @@
 
 import Quill from "quill/core";
 import Inline from "quill/blots/inline";
-import { t } from "@dashboard/application";
+import { t } from "@library/application";
 import { IUserFragment } from "@dashboard/@types/api/user";
 
 /**

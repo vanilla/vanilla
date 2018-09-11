@@ -3,12 +3,12 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { BlockEmbed } from "quill/blots/block";
-import { FOCUS_CLASS } from "@dashboard/embeds";
 import Quill from "quill/core";
-import { logWarning } from "@dashboard/utility";
-import { getBlotAtIndex } from "../../utility";
+import { BlockEmbed } from "quill/blots/block";
+import { FOCUS_CLASS } from "@library/embeds";
+import { logWarning } from "@library/utility";
 import Parchment from "parchment";
+import { getBlotAtIndex } from "@rich-editor/quill/utility";
 
 /**
  * A blot that can take focus and still behave as part of the Quill editor.

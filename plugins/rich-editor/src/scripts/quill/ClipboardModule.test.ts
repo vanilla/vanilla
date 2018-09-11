@@ -4,7 +4,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import ClipboardModule from "./ClipboardModule";
+import ClipboardModule from "@rich-editor/quill/ClipboardModule";
 import { expect } from "chai";
 
 describe("ClipboardModule.splitLinkOperationsOutOfText()", () => {

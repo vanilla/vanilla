@@ -4,7 +4,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { onReady, onContent } from "@dashboard/application";
+import { onReady, onContent } from "@library/application";
 
 onReady(handleRichEditorInputFormatterOptions);
 onContent(handleRichEditorInputFormatterOptions);

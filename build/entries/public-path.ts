@@ -8,7 +8,7 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import { assetUrl } from "@dashboard/application";
+import { assetUrl } from "@library/application";
 
 /**
  * This needs to be a free variable.

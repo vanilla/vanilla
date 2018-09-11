@@ -6,17 +6,17 @@
 
 import React from "react";
 import Quill from "quill/core";
-import { t } from "@dashboard/application";
+import HeadingBlot from "quill/formats/header";
+import { t } from "@library/application";
+import { watchFocusInDomTree } from "@library/dom";
 import * as icons from "@rich-editor/components/icons";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
-import { watchFocusInDomTree } from "@dashboard/dom";
-import { createEditorFlyoutEscapeListener, isEmbedSelected, forceSelectionUpdate } from "@rich-editor/quill/utility";
+import { isEmbedSelected, forceSelectionUpdate } from "@rich-editor/quill/utility";
 import Formatter from "@rich-editor/quill/Formatter";
 import ParagraphToolbarMenuItems from "@rich-editor/components/toolbars/pieces/ParagraphToolbarMenuItems";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
-import HeadingBlot from "quill/formats/header";
 import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
 import classNames from "classnames";
 

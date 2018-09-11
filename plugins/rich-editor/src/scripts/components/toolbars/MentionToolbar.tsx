@@ -11,7 +11,7 @@ import debounce from "lodash/debounce";
 import isEqual from "lodash/isEqual";
 import Keyboard from "quill/modules/keyboard";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
-import MentionSuggestionList from "./pieces/MentionSuggestionList";
+import MentionSuggestionList from "@rich-editor/components/toolbars/pieces/MentionSuggestionList";
 import { thunks as mentionThunks, actions as mentionActions } from "@rich-editor/state/mention/mentionActions";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
 import { getBlotAtIndex } from "@rich-editor/quill/utility";
@@ -19,7 +19,7 @@ import { IMentionValue } from "@rich-editor/state/mention/MentionTrie";
 import { connect } from "react-redux";
 import { IMentionSuggestionData, IMentionProps } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 import { IStoreState } from "@rich-editor/@types/store";
-import { LoadStatus } from "@dashboard/@types/api";
+import { LoadStatus } from "@library/@types/api";
 
 interface IProps extends IWithEditorProps {
     lookupMentions: (username: string, editorID: string) => void;

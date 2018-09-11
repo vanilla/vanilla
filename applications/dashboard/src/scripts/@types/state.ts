@@ -5,7 +5,8 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-import { ILoadable, IUserFragment, IApiError } from "@dashboard/@types/api";
+import { ILoadable } from "@library/@types/api";
+import { IUserFragment } from "@dashboard/@types/api";
 import { IUserAuthenticator } from "@dashboard/@types/api/authenticate";
 
 export type IAuthenticatorState = ILoadable<IUserAuthenticator[]>;

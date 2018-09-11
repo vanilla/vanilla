@@ -8,7 +8,7 @@ const path = require("path");
 const webpackConfig = require("./webpack.test.config");
 const VANILLA_ROOT = path.resolve(path.join(__dirname, "../../"));
 
-const TEST_FILE_ROOTS = process.env.TEST_FILE_ROOTS || ["applications/*", "plugins/*"];
+const TEST_FILE_ROOTS = process.env.TEST_FILE_ROOTS || ["library", "applications/*", "plugins/*"];
 
 const files = [];
 const preprocessors = {};

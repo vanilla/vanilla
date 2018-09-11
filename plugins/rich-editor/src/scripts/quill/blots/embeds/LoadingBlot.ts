@@ -3,10 +3,10 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { t } from "@dashboard/application";
-import FocusableEmbedBlot from "../abstract/FocusableEmbedBlot";
-import { FOCUS_CLASS } from "@dashboard/embeds";
-import { escapeHTML, setData, getData } from "@dashboard/dom";
+import { t } from "@library/application";
+import { FOCUS_CLASS } from "@library/embeds";
+import { escapeHTML, setData, getData } from "@library/dom";
+import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 
 const LOADER_DATA_KEY = "loadingDataKey";

@@ -1,12 +1,14 @@
 /*!
+ * @author Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 // This CSS file should always be added after style.css and not be overridden.
 // Variables
-@import "../../../library/src/scss/variables";
-@import "../../../library/src/scss/social/socialMediaVariables";
+@import "~library-scss/_variables";
+@import "~library-scss/social/_socialMediaVariables";
+@import "~library-scss/mixins/_mixins";
 
 // Compatibility
 @import "compatibility/mixins";
@@ -28,20 +30,20 @@
 @import "new-components/pageHeading";
 
 // Editor
-@import "../../../plugins/rich-editor/src/scss/variables";
-@import "../../../plugins/rich-editor/src/scss/mixins";
+@import "../../../../plugins/rich-editor/src/scss/variables";
+@import "../../../../plugins/rich-editor/src/scss/mixins/mixin.mobileStyles";
 @import "compatibility/editor/mixinsLegacy";
 @import "compatibility/editor/richEditorLegacy";
 
 // User content
-@import "../../../library/src/scss/user-content/animations";
-@import "../../../library/src/scss/user-content/atMention";
-@import "../../../library/src/scss/user-content/blockquote";
-@import "../../../library/src/scss/user-content/lists";
-@import "../../../library/src/scss/user-content/accessibility";
-@import "../../../library/src/scss/user-content/spoiler";
-@import "../../../library/src/scss/user-content/emoji";
-@import "../../../library/src/scss/user-content/codeBlocks";
+@import "~library-scss/user-content/_animations";
+@import "~library-scss/user-content/_atMention";
+@import "~library-scss/user-content/_blockquote";
+@import "~library-scss/user-content/_lists";
+@import "~library-scss/user-content/_accessibility";
+@import "~library-scss/user-content/_spoiler";
+@import "~library-scss/user-content/_emoji";
+@import "~library-scss/user-content/_codeBlocks";
 
 // Embeds
-@import "../../../library/src/scss/embeds/embeds";
+@import "~library-scss/embeds/_embeds";

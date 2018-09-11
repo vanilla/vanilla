@@ -5,6 +5,9 @@
 
 import "@dashboard/app/index";
 
+// Styles for the forum section.
+import "../../scss/style-compat.scss";
+
 // The forum section needs these legacy scripts that have been moved into the bundled JS so it could be refactored.
 // Other sections should not need this yet.
 import "@dashboard/legacy";

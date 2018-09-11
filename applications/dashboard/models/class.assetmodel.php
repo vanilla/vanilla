@@ -16,10 +16,15 @@ use Vanilla\Addon;
  * Manages Assets.
  */
 class AssetModel extends Gdn_Model {
+
+    use \Garden\StaticCacheConfigTrait;
     /**
      * The number of seconds to wait after a deploy before switching the cache buster.
      */
     const CACHE_GRACE_PERIOD = 90;
+
+    /** @var string Path to the build style compat file. */
+    const STYLE_COMPAT_PATH = "/applications/dashboard/js/webpack/forum.min.css";
 
     /** @var array List of CSS files to serve. */
     protected $_CssFiles = [];
@@ -107,7 +112,10 @@ class AssetModel extends Gdn_Model {
         // Include theme customizations last so that they override everything else.
         switch ($basename) {
             case 'style':
-                $this->addCssFile(asset('/applications/dashboard/design/style-compat.css', true), false, ['Sort' => -9.999]);
+                if (!self::c("HotReload.Enabled")) {
+                    $styleCompatAsset = asset(self::STYLE_COMPAT_PATH, true);
+                    $this->addCssFile($styleCompatAsset, false, ['Sort' => -9.999]);
+                }
                 $this->addCssFile('custom.css', false, ['Sort' => 1000]);
 
                 if (Gdn::controller()->Theme && Gdn::controller()->ThemeOptions) {
@@ -168,8 +176,8 @@ class AssetModel extends Gdn_Model {
      * @return array
      */
     public function getWebpackJsFiles(string $section) {
-        if (c("HotReload.Enabled", false)) {
-            $ip = c("HotReload.IP", "127.0.0.1");
+        if (self::c("HotReload.Enabled")) {
+            $ip = self::c("HotReload.IP", "127.0.0.1");
             return [
                 "http://$ip:3030/$section-hot-bundle.js"
             ];

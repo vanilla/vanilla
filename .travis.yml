@@ -45,7 +45,7 @@ jobs:
         - cat /tmp/access.log
     - language: php
       php: 7.1
-      type: cron
+      if: type = cron
       # The versions of PHP to test the project under.
       addons:
         apt:
@@ -71,7 +71,7 @@ jobs:
         - cat /tmp/access.log
     - language: php
       php: 7.0
-      type: cron
+      if: type = cron
       # The versions of PHP to test the project under.
       addons:
         apt:

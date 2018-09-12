@@ -8,16 +8,18 @@ addons:
   hosts:
     - vanilla.test
 
+
+php:
+  - 7.0
+  - 7.1
+  - 7.2
+
 # Configure the build.
 matrix:
   fast_finish: true
   include:
     - language: php
       # The versions of PHP to test the project under.
-      php:
-        - 7.0
-        - 7.1
-        - 7.2
       addons:
         apt:
           packages:

@@ -1,7 +1,7 @@
 /**
  * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license GPL-2.0-only
  */
 
 import FocusableEmbedBlot from "../abstract/FocusableEmbedBlot";

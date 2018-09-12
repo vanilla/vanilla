@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "36a671c68244d1f4f8e849f06a24aed7",
+    "content-hash": "8e9361c1ecfa937e41d95638f5f92308",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -559,16 +559,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.4.14",
+            "version": "v3.4.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "810af2d35fc72b6cf5c01116806d2b65ccaaf2e2"
+                "reference": "c2f4812ead9f847cb69e90917ca7502e6892d6b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/810af2d35fc72b6cf5c01116806d2b65ccaaf2e2",
-                "reference": "810af2d35fc72b6cf5c01116806d2b65ccaaf2e2",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/c2f4812ead9f847cb69e90917ca7502e6892d6b8",
+                "reference": "c2f4812ead9f847cb69e90917ca7502e6892d6b8",
                 "shasum": ""
             },
             "require": {
@@ -614,7 +614,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:19:56+00:00"
+            "time": "2018-08-10T07:34:36+00:00"
         },
         {
             "name": "tburry/pquery",
@@ -1177,16 +1177,16 @@
         },
         {
             "name": "exussum12/coverage-checker",
-            "version": "0.10.3",
+            "version": "0.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/exussum12/coverageChecker.git",
-                "reference": "bc4f9c3a1ea23f1b3f8c03d6d99964ccc19e75bd"
+                "reference": "de7f6731220b0b321bff755c44a131d5d7c39583"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/exussum12/coverageChecker/zipball/bc4f9c3a1ea23f1b3f8c03d6d99964ccc19e75bd",
-                "reference": "bc4f9c3a1ea23f1b3f8c03d6d99964ccc19e75bd",
+                "url": "https://api.github.com/repos/exussum12/coverageChecker/zipball/de7f6731220b0b321bff755c44a131d5d7c39583",
+                "reference": "de7f6731220b0b321bff755c44a131d5d7c39583",
                 "shasum": ""
             },
             "require": {
@@ -1220,7 +1220,7 @@
                 }
             ],
             "description": "Allows checking the code coverage of a single pull request",
-            "time": "2018-07-11T19:12:17+00:00"
+            "time": "2018-08-30T18:15:26+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -1886,16 +1886,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "6.5.12",
+            "version": "6.5.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "24da433d7384824d65ea93fbb462e2f31bbb494e"
+                "reference": "0973426fb012359b2f18d3bd1e90ef1172839693"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/24da433d7384824d65ea93fbb462e2f31bbb494e",
-                "reference": "24da433d7384824d65ea93fbb462e2f31bbb494e",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/0973426fb012359b2f18d3bd1e90ef1172839693",
+                "reference": "0973426fb012359b2f18d3bd1e90ef1172839693",
                 "shasum": ""
             },
             "require": {
@@ -1966,7 +1966,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2018-08-22T06:32:48+00:00"
+            "time": "2018-09-08T15:10:43+00:00"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -2639,7 +2639,7 @@
         },
         {
             "name": "symfony/css-selector",
-            "version": "v3.4.14",
+            "version": "v3.4.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/css-selector.git",
@@ -2732,16 +2732,16 @@
         },
         {
             "name": "vanilla/standards",
-            "version": "1.02",
+            "version": "1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/standards.git",
-                "reference": "3be8a283dbd5c4361e77ff2da12b9a85925c1795"
+                "reference": "222cbad7a713ee9a93d64721b14c34cde7751bb1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/standards/zipball/3be8a283dbd5c4361e77ff2da12b9a85925c1795",
-                "reference": "3be8a283dbd5c4361e77ff2da12b9a85925c1795",
+                "url": "https://api.github.com/repos/vanilla/standards/zipball/222cbad7a713ee9a93d64721b14c34cde7751bb1",
+                "reference": "222cbad7a713ee9a93d64721b14c34cde7751bb1",
                 "shasum": ""
             },
             "require": {
@@ -2754,7 +2754,7 @@
                 "GPL-2.0"
             ],
             "description": "Rules for Vanilla forums' coding standards.",
-            "time": "2018-08-27T14:34:07+00:00"
+            "time": "2018-09-12T18:04:39+00:00"
         },
         {
             "name": "voku/html-min",
@@ -2917,7 +2917,8 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.0.0"
+        "php": ">=7.0.0",
+        "ext-json": "*"
     },
     "platform-dev": [],
     "platform-overrides": {

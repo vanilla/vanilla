@@ -85,7 +85,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
     /**
      * Format a string as a PHP comment.
      *
-     * @param string $str The string ro format.
+     * @param string $str The string to format.
      * @param string[] $lines The output buffer.
      */
     private static function formatComment(string $str, array &$lines) {

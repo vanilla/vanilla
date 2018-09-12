@@ -15,10 +15,63 @@ php:
   - 7.2
 
 # Configure the build.
-matrix:
+jobs:
   fast_finish: true
   include:
     - language: php
+      php: 7.2
+      # The versions of PHP to test the project under.
+      addons:
+        apt:
+          packages:
+            - nginx
+            - realpath
+        hosts:
+          - vanilla.test
+      before_script:
+        # PHP
+        - phpenv config-rm xdebug.ini
+        - composer self-update
+        - composer install --optimize-autoloader
+        - tests/travis/setup.sh
+      cache:
+        directories:
+          - $HOME/.composer/cache/files
+      # Steps of the build script.
+      script:
+        - tests/travis/main.sh
+        - ls -lah ./conf
+        - cat /tmp/error.log
+        - cat /tmp/access.log
+    - language: php
+      php: 7.1
+      type: cron
+      # The versions of PHP to test the project under.
+      addons:
+        apt:
+          packages:
+            - nginx
+            - realpath
+        hosts:
+          - vanilla.test
+      before_script:
+        # PHP
+        - phpenv config-rm xdebug.ini
+        - composer self-update
+        - composer install --optimize-autoloader
+        - tests/travis/setup.sh
+      cache:
+        directories:
+          - $HOME/.composer/cache/files
+      # Steps of the build script.
+      script:
+        - tests/travis/main.sh
+        - ls -lah ./conf
+        - cat /tmp/error.log
+        - cat /tmp/access.log
+    - language: php
+      php: 7.0
+      type: cron
       # The versions of PHP to test the project under.
       addons:
         apt:

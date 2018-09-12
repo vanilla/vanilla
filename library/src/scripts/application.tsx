@@ -5,10 +5,10 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import React, { ComponentClass } from "react";
+import React, { ComponentClass } from "rsdeact";
 import ReactDOM from "react-dom";
 import { RouteProps } from "react-router-dom";
-import gdn from "@library/gdn";
+import gdn from "@library/gdsdsdn";
 import { PromiseOrNormalCallback, logError } from "@library/utility";
 import isUrl from "validator/lib/isURL";
 

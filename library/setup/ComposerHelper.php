@@ -37,6 +37,21 @@ class ComposerHelper {
         }
     }
 
+    /**
+     * Trigger builds of frontend assets after a composer install.
+     *
+     * - Installs node_modules
+     * - Builds frontend assets
+     *
+     * There are some environmental variables that can alter the way this command run.
+     *
+     * - VANILLA_BUILD_NODE_ARGS - Arguments to pass to the node process.
+     * "--max-old-space-size" in particular can be used to set a memory limit.
+     * - VANILLA_BUILD_DISABLE_CODE_VALIDATION - Disables type-checking and linting. This speeds up the build and
+     * reduces memory usage.
+     *
+     * @param Event $event The event being fired.
+     */
     public static function postUpdate(Event $event) {
         printf("\nInstalling core node_modules\n");
         passthru('yarn install --pure-lockfile', $installReturn);

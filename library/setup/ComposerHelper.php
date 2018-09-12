@@ -17,6 +17,7 @@ class ComposerHelper {
 
     const NODE_ARGS_ENV = "VANILLA_BUILD_NODE_ARGS";
     const DISABLE_VALIDATION_ENV = "VANILLA_BUILD_DISABLE_CODE_VALIDATION";
+    const DISABLE_AUTO_BUILD = "VANILLA_BUILD_DISABLE_AUTO_BUILD";
 
     /**
      * Clear the addon manager cache.
@@ -49,10 +50,15 @@ class ComposerHelper {
      * "--max-old-space-size" in particular can be used to set a memory limit.
      * - VANILLA_BUILD_DISABLE_CODE_VALIDATION - Disables type-checking and linting. This speeds up the build and
      * reduces memory usage.
-     *
-     * @param Event $event The event being fired.
+     * - VANILLA_BUILD_DISABLE_AUTO_BUILD - Prevent the build from running on composer install.
      */
-    public static function postUpdate(Event $event) {
+    public static function postUpdate() {
+        $skipBuild = getenv(self::DISABLE_AUTO_BUILD) ? true : false;
+        if ($skipBuild) {
+            printf("\nSkipping automatic JS build because " . self::DISABLE_AUTO_BUILD . " env variable is set.");
+            return;
+        }
+
         printf("\nInstalling core node_modules\n");
         passthru('yarn install --pure-lockfile', $installReturn);
 

@@ -61,13 +61,20 @@ class ComposerHelper {
             exit($installReturn);
         }
 
-        $nodeArgs = getenv(self::NODE_ARGS_ENV) ?: "";
-        $disableValidationFlag = getenv(self::DISABLE_VALIDATION_ENV) ? "--low-memory" : "";
-
         $vanillaRoot = realpath(__DIR__ . "/../../");
         $buildScript = realpath($vanillaRoot . "/build/scripts/build.ts");
         $tsNodeRegister = realpath($vanillaRoot . "/node_modules/ts-node/register");
         $tsConfig = realpath($vanillaRoot . "/build/tsconfig.json");
+
+
+        // Build bootstrap can be used to configure this build if env variables are not available.
+        $buildBootstrap = realpath($vanillaRoot . "/conf/build-bootstrap.php");
+        if (file_exists($buildBootstrap)) {
+            include $buildBootstrap;
+        }
+
+        $nodeArgs = getenv(self::NODE_ARGS_ENV) ?: "";
+        $disableValidationFlag = getenv(self::DISABLE_VALIDATION_ENV) ? "--low-memory" : "";
         $buildCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildScript $disableValidationFlag";
 
         printf("\nBuilding frontend assets\n");

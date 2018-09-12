@@ -53,7 +53,6 @@ php:
 # Steps of the build script.
 script:
   - tests/travis/main.sh
-  - build/build-frontend.sh
   - yarn run test
   - ls -lah ./conf
   - cat /tmp/error.log

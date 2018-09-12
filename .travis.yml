@@ -8,36 +8,59 @@ addons:
   hosts:
     - vanilla.test
 
-# Steps to prepare for build script execution.
-before_script:
-  # PHP
-  - phpenv config-rm xdebug.ini
-  - composer self-update
-  - composer install --optimize-autoloader
-  - tests/travis/setup.sh
-  # Node
-  - yarn install --pure-lockfile
-  - cd plugins/rich-editor
-  - yarn install
-  - cd ../..
-
-# Cache Composer package files.
-cache:
-  directories:
-    - $HOME/.composer/cache/files
-    - $TRAVIS_BUILD_DIR/node_modules
-    - $TRAVIS_BUILD_DIR/plugins/rich-editor/node_modules
-  yarn: true
-
-# No additional system dependencies to install. Skip the install step.
-install: true
-
-# The project's primary programming language. This will affect default dependency availability.
-language: php
-
 # Configure the build.
 matrix:
   fast_finish: true
+  include:
+    - language: php
+      # The versions of PHP to test the project under.
+      php:
+        - 7.0
+        - 7.1
+        - 7.2
+      addons:
+        apt:
+          packages:
+            - nginx
+            - realpath
+        hosts:
+          - vanilla.test
+      before_script:
+        # PHP
+        - phpenv config-rm xdebug.ini
+        - composer self-update
+        - composer install --optimize-autoloader
+        - tests/travis/setup.sh
+      cache:
+        directories:
+          - $HOME/.composer/cache/files
+      # Steps of the build script.
+      script:
+        - tests/travis/main.sh
+        - ls -lah ./conf
+        - cat /tmp/error.log
+        - cat /tmp/access.log
+    - language: node_js
+      node_js:
+        - lts/*
+      before_script:
+        # Node
+        - yarn install --pure-lockfile
+        - cd plugins/rich-editor
+        - yarn install
+        - cd ../..
+      cache:
+        directories:
+          - $TRAVIS_BUILD_DIR/node_modules
+          - $TRAVIS_BUILD_DIR/plugins/rich-editor/node_modules
+        yarn: true
+      # Steps of the build script.
+      script:
+        - yarn run test
+        - yarn run lint:ts
+
+# No additional system dependencies to install. Skip the install step.
+install: true
 
 # Send status update notifications to a HipChat room.
 notifications:
@@ -48,21 +71,6 @@ notifications:
       - secure: "SsKmSAZFynBz4ZKm5NPyuXvNjIMyxpNMXsgfXVImG8xjQHdXjEpZAiyckK8E2lXBBypv59Oex6wsS0RvyxpI/mwQ9dTQ9ayurQxwH3V5Q/+pRbtXJOkP+DSIsHhRb9D4xa5nPbh4N48+QZvUFiH2ety9/gev4mtMkLv3lC0vgpc="
     template:
       - '%{repository_slug} build <a href="%{build_url}">#%{build_number}</a> (%{branch} - <a href="%{compare_url}">%{commit}</a> by %{author}): %{message}'
-
-# The versions of PHP to test the project under.
-php:
-  - 7.0
-  - 7.1
-  - 7.2
-
-# Steps of the build script.
-script:
-  - tests/travis/main.sh
-  - yarn run test
-  - yarn run lint:ts
-  - ls -lah ./conf
-  - cat /tmp/error.log
-  - cat /tmp/access.log
 
 # Run build in a Docker container. Reduces time between commit and start of build.
 sudo: false

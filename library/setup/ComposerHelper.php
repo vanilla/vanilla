@@ -53,7 +53,6 @@ class ComposerHelper {
      * - VANILLA_BUILD_DISABLE_AUTO_BUILD - Prevent the build from running on composer install.
      */
     public static function postUpdate() {
-        throw new \Exception("Test");
         $skipBuild = getenv(self::DISABLE_AUTO_BUILD) ? true : false;
         if ($skipBuild) {
             printf("\nSkipping automatic JS build because " . self::DISABLE_AUTO_BUILD . " env variable is set.");

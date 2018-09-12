@@ -2,9 +2,10 @@
 jobs:
   fast_finish: true
   include:
-    - language: php
+    # PHP 7.2 Job. This should always run.
+    - name: "PHP 7.2"
+      language: php
       php: 7.2
-      # The versions of PHP to test the project under.
       addons:
         apt:
           packages:
@@ -13,24 +14,23 @@ jobs:
         hosts:
           - vanilla.test
       before_script:
-        # PHP
-        - phpenv config-rm xdebug.ini
+        - phpenv config-rm xdebug.ini # Remove xdebug for better performance.
         - composer self-update
         - composer install --optimize-autoloader
         - tests/travis/setup.sh
       cache:
         directories:
           - $HOME/.composer/cache/files
-      # Steps of the build script.
       script:
         - tests/travis/main.sh
         - ls -lah ./conf
         - cat /tmp/error.log
         - cat /tmp/access.log
-    - language: php
+    # PHP 7.1 Job. This only runs in the daily cron jobs.
+    - name: "PHP 7.1"
+      language: php
       php: 7.1
       if: type = cron
-      # The versions of PHP to test the project under.
       addons:
         apt:
           packages:
@@ -39,24 +39,23 @@ jobs:
         hosts:
           - vanilla.test
       before_script:
-        # PHP
-        - phpenv config-rm xdebug.ini
+        - phpenv config-rm xdebug.ini # Remove xdebug for better performance.
         - composer self-update
         - composer install --optimize-autoloader
         - tests/travis/setup.sh
       cache:
         directories:
           - $HOME/.composer/cache/files
-      # Steps of the build script.
       script:
         - tests/travis/main.sh
         - ls -lah ./conf
         - cat /tmp/error.log
         - cat /tmp/access.log
-    - language: php
+    # PHP 7.1 Job. This only runs in the daily cron jobs.
+    - name: "PHP 7.0"
+      language: php
       php: 7.0
       if: type = cron
-      # The versions of PHP to test the project under.
       addons:
         apt:
           packages:
@@ -65,25 +64,26 @@ jobs:
         hosts:
           - vanilla.test
       before_script:
-        # PHP
-        - phpenv config-rm xdebug.ini
+        - phpenv config-rm xdebug.ini # Remove xdebug for better performance.
         - composer self-update
         - composer install --optimize-autoloader
         - tests/travis/setup.sh
       cache:
         directories:
           - $HOME/.composer/cache/files
-      # Steps of the build script.
       script:
         - tests/travis/main.sh
         - ls -lah ./conf
         - cat /tmp/error.log
         - cat /tmp/access.log
-    - language: node_js
+    # Frontend JS Job
+    - name: "JS Build / Test"
+      language: node_js
       node_js:
         - lts/*
       before_script:
-        # Node
+        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4 # Ensure a consistent yarn version
+        - export PATH=$HOME/.yarn/bin:$PATH
         - yarn install --pure-lockfile
         - cd plugins/rich-editor
         - yarn install
@@ -93,7 +93,6 @@ jobs:
           - $TRAVIS_BUILD_DIR/node_modules
           - $TRAVIS_BUILD_DIR/plugins/rich-editor/node_modules
         yarn: true
-      # Steps of the build script.
       script:
         - yarn run test
         - yarn run lint:ts

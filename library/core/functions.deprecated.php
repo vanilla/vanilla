@@ -265,12 +265,14 @@ if (!function_exists('formatArrayAssignment')) {
             $isAssociativeArray = array_key_exists(0, $value) === false || is_array($value[0]) === true ? true : false;
             if ($isAssociativeArray === true) {
                 foreach ($value as $k => $v) {
-                    formatArrayAssignment($array, $prefix."['$k']", $v);
+                    formatArrayAssignment($array, $prefix.'['.var_export($k, true).']', $v);
                 }
             } else {
                 // If $Value is not an associative array, just write it like a simple array definition.
                 $formattedValue = array_map(['Gdn_Format', 'ArrayValueForPhp'], $value);
-                $array[] = $prefix .= " = array('".implode("', '", $formattedValue)."');";
+                $f2 = var_export($value, true);
+
+                $array[] = $prefix .= ' = '.var_export($value, true).';';
             }
         } elseif (is_int($value)) {
             $array[] = $prefix .= ' = '.$value.';';

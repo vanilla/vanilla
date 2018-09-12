@@ -53,7 +53,6 @@ class ComposerHelper {
      * @param Event $event The event being fired.
      */
     public static function postUpdate(Event $event) {
-        throw new \Exception("Test");
         printf("\nInstalling core node_modules\n");
         passthru('yarn install --pure-lockfile', $installReturn);
 

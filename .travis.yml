@@ -3,7 +3,7 @@ jobs:
   fast_finish: true
   include:
     # PHP 7.2 Job. This should always run.
-    - name: "PHP 7.2"
+    - name: PHP 7.2
       language: php
       php: 7.2
       addons:
@@ -27,7 +27,7 @@ jobs:
         - cat /tmp/error.log
         - cat /tmp/access.log
     # PHP 7.1 Job. This only runs in the daily cron jobs.
-    - name: "PHP 7.1"
+    - name: PHP 7.1
       language: php
       php: 7.1
       if: type = cron
@@ -52,7 +52,7 @@ jobs:
         - cat /tmp/error.log
         - cat /tmp/access.log
     # PHP 7.1 Job. This only runs in the daily cron jobs.
-    - name: "PHP 7.0"
+    - name: PHP 7.0
       language: php
       php: 7.0
       if: type = cron
@@ -77,10 +77,11 @@ jobs:
         - cat /tmp/error.log
         - cat /tmp/access.log
     # Frontend JS Job
-    - name: "JS Build / Test"
+    - name: JS Build / Test
       language: node_js
-      node_js:
-        - lts/*
+      node_js: lts/*
+      addons:
+        chrome: stable
       before_script:
         - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4 # Ensure a consistent yarn version
         - export PATH=$HOME/.yarn/bin:$PATH

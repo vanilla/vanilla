@@ -3571,7 +3571,7 @@ if (!function_exists('translateContent')) {
      * @see Gdn::translate()
      */
     function translateContent($code, $default = false) {
-        \Garden\Deprecation::log();
+        \Vanilla\Utility\Deprecation::log();
         return t($code, $default);
     }
 }

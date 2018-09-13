@@ -5,7 +5,7 @@
  * @license GPL v2
  */
 
-namespace Garden;
+namespace Vanilla\Utility;
 
 /**
  * Class Deprecation.

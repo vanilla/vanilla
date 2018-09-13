@@ -40,6 +40,7 @@ class Deprecation {
         if (!key_exists($info['function'], self::$calls)) {
             $fileName = str_replace(PATH_ROOT, '', $info['file']);
             $message = 'Deprecated function '.$info['function'].' called from '.$fileName.' at line : '.$info['line'];
+            trigger_error($message, E_USER_DEPRECATED);
             error_log($message, E_USER_ERROR);
             self::$calls[$info['function']] = true;
         }

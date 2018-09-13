@@ -6,8 +6,10 @@
 
 const path = require("path");
 const webpack = require("webpack");
-
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const VANILLA_ROOT = path.resolve(path.join(__dirname, "../../"));
+
+const TS_CONFIG_FILE = path.resolve(VANILLA_ROOT, "tsconfig.json");
 
 module.exports = {
     context: VANILLA_ROOT,
@@ -39,16 +41,10 @@ module.exports = {
                 include: [/\/src\/scripts/, /tests\/javascript/],
                 use: [
                     {
-                        loader: "babel-loader",
-                        options: {
-                            presets: ["@vanillaforums/babel-preset"],
-                            cacheDirectory: true,
-                        },
-                    },
-                    {
                         loader: "ts-loader",
                         options: {
-                            configFile: path.resolve(VANILLA_ROOT, "tsconfig.json"),
+                            configFile: TS_CONFIG_FILE,
+                            transpileOnly: true,
                         },
                     },
                 ],
@@ -70,6 +66,7 @@ module.exports = {
             "@dashboard": path.resolve(VANILLA_ROOT, "applications/dashboard/src/scripts/"),
             "@vanilla": path.resolve(VANILLA_ROOT, "applications/vanilla/src/scripts/"),
             "@rich-editor": path.resolve(VANILLA_ROOT, "plugins/rich-editor/src/scripts/"),
+            "@knowledge": path.resolve(VANILLA_ROOT, "plugins/knowledge/src/scripts/"),
             "@testroot": path.resolve(VANILLA_ROOT, "tests/javascript/"),
         },
         extensions: [".ts", ".tsx", ".js", ".jsx"],
@@ -82,6 +79,11 @@ module.exports = {
             test: /\.(ts|tsx|js|jsx)($|\?)/i, // process .js and .ts files only
         }),
         new webpack.DefinePlugin({ VANILLA_ROOT }),
+        new ForkTsCheckerWebpackPlugin({
+            tsconfig: TS_CONFIG_FILE,
+            checkSyntacticErrors: true,
+            async: false,
+        }),
     ],
 
     /**

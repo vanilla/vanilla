@@ -24,6 +24,11 @@ class Deprecation {
      * Note 2: We need to extend this method or create another one for any non global function to deprecate
      *       That one should include class name and method name detection
      *
+     * IMPORTANT: any new call/reference to this log() method should be pushed/merged to master branch
+     *            only when it does not output any errors on your localhost and/or staging
+     *            General idea is to apply this method only to strong function-candidates
+     *            which have no visible calls in the project developer can detect.
+     *
      * Outputs that data to error log (should be visible on production)
      *
      * This function outputs 1 message per function per request

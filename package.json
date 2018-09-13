@@ -79,7 +79,7 @@
         "karma-mocha-reporter": "2.2.5",
         "karma-sourcemap-loader": "0.3.7",
         "karma-spec-reporter": "0.0.32",
-        "karma-webpack": "4.0.0-rc.2",
+        "karma-webpack": "3.0.4",
         "mini-css-extract-plugin": "0.4.2",
         "mocha": "5.2.0",
         "node-sass": "4.9.3",

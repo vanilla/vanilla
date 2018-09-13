@@ -7,8 +7,9 @@
 const path = require("path");
 const webpack = require("webpack");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
-const VANILLA_ROOT = path.resolve(path.join(__dirname, "../../"));
+const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
+const VANILLA_ROOT = path.resolve(path.join(__dirname, "../../"));
 const TS_CONFIG_FILE = path.resolve(VANILLA_ROOT, "tsconfig.json");
 
 module.exports = {
@@ -61,14 +62,9 @@ module.exports = {
             path.join(VANILLA_ROOT, "plugins/rich-editor/node_modules"),
             path.join(VANILLA_ROOT, "tests/node_modules"),
         ],
-        alias: {
-            "@library": path.resolve(VANILLA_ROOT, "library/src/scripts/"),
-            "@dashboard": path.resolve(VANILLA_ROOT, "applications/dashboard/src/scripts/"),
-            "@vanilla": path.resolve(VANILLA_ROOT, "applications/vanilla/src/scripts/"),
-            "@rich-editor": path.resolve(VANILLA_ROOT, "plugins/rich-editor/src/scripts/"),
-            "@knowledge": path.resolve(VANILLA_ROOT, "plugins/knowledge/src/scripts/"),
-            "@testroot": path.resolve(VANILLA_ROOT, "tests/javascript/"),
-        },
+        plugins: [
+            new TsConfigPathsPlugin({configFile: TS_CONFIG_FILE}),
+        ],
         extensions: [".ts", ".tsx", ".js", ".jsx"],
     },
     plugins: [

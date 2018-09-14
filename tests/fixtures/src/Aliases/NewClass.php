@@ -7,8 +7,6 @@
 
 namespace VanillaTests\Fixtures\Aliases;
 
-class_alias(NewClass::class, NewClass::CLASS_ALIAS);
+class NewClass {}
 
-class NewClass {
-    const CLASS_ALIAS = "\OldClass";
-}
+TestAliasLoader::createAliases(NewClass::class);

@@ -34,10 +34,6 @@ class AliasProviderTraitTest extends IsolatedTestCase {
         self::assertFreshAutoload(ExtendsNewClass::class);
     }
 
-    public function setUp() {
-        parent::setUp();
-    }
-
     /**
      * Verify that loading the old class loads the new class through the autoloader.
      */

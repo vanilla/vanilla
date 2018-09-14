@@ -1,8 +1,13 @@
 <?php
 /**
- * @author Adam Charron <adam.c@vanillaforums.com>
+ * Gdn_Factory.
+ *
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
+ * @package Core
+ * @since 2.0
  */
 
 namespace Vanilla\Legacy;
@@ -24,7 +29,7 @@ class Factory {
     /** @var array The object definitions for the factory. */
     protected $_Objects = [];
 
-    /** @var array The property dependancies for the factory. */
+    /** @var array The property dependencies for the factory. */
     protected $_Dependencies = [];
 
     /**

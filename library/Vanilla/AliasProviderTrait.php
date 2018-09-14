@@ -96,7 +96,7 @@ trait AliasProviderTrait {
      *
      * @param string $aliasName the class name to try and load.
      */
-    public static function autoload($aliasName) {
+    public static function autoload(string $aliasName) {
         $aliases = static::getAliasesToClasses();
         if (isset($aliases[$aliasName])) {
             $newName = $aliases[$aliasName];

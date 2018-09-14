@@ -12,6 +12,9 @@ use VanillaTests\Fixtures\Aliases\ExtendsNewClass;
 use VanillaTests\Fixtures\Aliases\NewClass;
 use VanillaTests\Fixtures\Aliases\TestAliasLoader;
 
+/**
+ * @group Pure
+ */
 class AliasProviderTraitTest extends TestCase {
 
     /** @var bool Set this to have each test run separately without the same autoload. */
@@ -25,8 +28,8 @@ class AliasProviderTraitTest extends TestCase {
      * - Verify that the we are starting with a fresh set of classes. Eg. The classes we're testing have not been
      * autoloaded yet. $runTestInSeparateProcess should handle this.
      */
-    public function setUp() {
-        parent::setUp();
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
 
         // Our alias autoloader throws deprecated notices. Disable the error reporting for these tests.
         // Since this test runs in a separate process it shouldn't affect the rest of the tests.

@@ -20,6 +20,8 @@ class TestAliasLoader {
      * @inheritdoc
      */
     protected static function provideAliases(): array {
+
+        new Someaasdfadsfasdf;
         return [
             NewClass::class => ["VanillaTests\OldClass"],
             ExtendsNewClass::class => ["VanillaTests\ExtendsOldClass"],

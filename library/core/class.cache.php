@@ -130,6 +130,12 @@ abstract class Gdn_Cache {
 
     /** @var int  */
     public static $trackTime = 0;
+    /**
+     * All possible prefixes to cache as static array and avoid recalculations
+     *
+     * @var array
+     */
+    protected static $cConfig = [];
 
     /**
      *
@@ -564,9 +570,14 @@ abstract class Gdn_Cache {
 
     public function getPrefix($forcePrefix = null, $withRevision = true) {
         static $configPrefix = false;
+        $cKey = ($forcePrefix ?? 'null:').($withRevision ? 'true' : 'false');
+        if (key_exists($cKey, self::$cConfig)) {
+            return self::$cConfig[$cKey];
+        }
 
         // Allow overriding the prefix
         if (!is_null($forcePrefix)) {
+            self::$cConfig[$cKey] = $forcePrefix;
             return $forcePrefix;
         }
 
@@ -578,7 +589,7 @@ abstract class Gdn_Cache {
             }
 
             if ($configPrefix === false) {
-                $configPrefix = c('Cache.Prefix', false);
+                $configPrefix = Gdn::config('Cache.Prefix', false);
             }
         }
 
@@ -596,7 +607,8 @@ abstract class Gdn_Cache {
             $response .= ".rev{$revisionNumber}";
         }
 
-        return ($configPrefix === false) ? null : $response;
+        self::$cConfig[$cKey] = ($configPrefix === false) ? null : $response;
+        return self::$cConfig[$cKey];
     }
 
     public function getRevision($forcePrefix = null, $force = false) {

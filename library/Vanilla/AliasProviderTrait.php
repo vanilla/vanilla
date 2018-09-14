@@ -38,6 +38,11 @@ trait AliasProviderTrait {
      */
     protected abstract static function provideAliases(): array;
 
+    /**
+     * Get the map of class => alias[]
+     *
+     * @return array
+     */
     private static function getClassToAliases(): array {
         if (self::$classToAliases === null) {
             self::$classToAliases = self::provideAliases();
@@ -46,6 +51,11 @@ trait AliasProviderTrait {
         return self::$classToAliases;
     }
 
+    /**
+     * Get the map of alias => class.
+     *
+     * @return array
+     */
     private static function getAliasesToClasses(): array {
         if (self::$aliasesToClasses === null) {
             self::$aliasesToClasses = [];
@@ -76,7 +86,7 @@ trait AliasProviderTrait {
      *
      * @param string $className
      * @return array
-     * @throws \Exception
+     * @throws \Exception If you try and fetch aliases for a class that is not listed.
      */
     public static function getAliases(string $className): array {
         $classes = static::getClassToAliases();

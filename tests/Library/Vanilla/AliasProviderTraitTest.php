@@ -12,9 +12,10 @@ use VanillaTests\Fixtures\Aliases\NewClass;
 use VanillaTests\Fixtures\Aliases\TestAliasLoader;
 use VanillaTests\IsolatedTestCase;
 
+/**
+ * Tests for the alias provider trait.
+ */
 class AliasProviderTraitTest extends IsolatedTestCase {
-
-
     /**
      * Prepare each instance of the test.
      *

@@ -26,6 +26,4 @@ class IsolatedTestCase extends TestCase {
      * This prevents issues with container pollution.
      */
     protected $preserveGlobalState = false;
-
-    protected $backupGlobals;
 }

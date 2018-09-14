@@ -3569,6 +3569,7 @@ if (!function_exists('translateContent')) {
      * @param string $default The default value to be displayed if the translation code is not found.
      * @return string The translated string or $code if there is no value in $default.
      * @see Gdn::translate()
+     * @deprecated
      */
     function translateContent($code, $default = false) {
         \Vanilla\Utility\Deprecation::log();

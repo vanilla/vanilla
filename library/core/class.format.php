@@ -2353,13 +2353,14 @@ EOT;
      *
      * @param string $serializedString A json or php serialized string to be unserialized.
      * @return mixed
+     * @deprecated
      */
     public static function unserialize($serializedString) {
         $result = $serializedString;
 
         if (is_string($serializedString)) {
             if (substr_compare('a:', $serializedString, 0, 2) === 0 || substr_compare('O:', $serializedString, 0, 2) === 0) {
-                $result = unserialize($serializedString);
+                $result = unserialize($serializedString, ['allowed_classes' => false]);
             } elseif (substr_compare('obj:', $serializedString, 0, 4) === 0) {
                 $result = json_decode(substr($serializedString, 4), false);
             } elseif (substr_compare('arr:', $serializedString, 0, 4) === 0) {

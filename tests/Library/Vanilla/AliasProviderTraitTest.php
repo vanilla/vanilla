@@ -7,18 +7,13 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use PHPUnit\Framework\TestCase;
 use VanillaTests\Fixtures\Aliases\ExtendsNewClass;
 use VanillaTests\Fixtures\Aliases\NewClass;
 use VanillaTests\Fixtures\Aliases\TestAliasLoader;
+use VanillaTests\IsolatedTestCase;
 
-/**
- * @group Pure
- */
-class AliasProviderTraitTest extends TestCase {
+class AliasProviderTraitTest extends IsolatedTestCase {
 
-    /** @var bool Set this to have each test run separately without the same autoload. */
-    protected $runTestInSeparateProcess = true;
 
     /**
      * Prepare each instance of the test.
@@ -29,7 +24,6 @@ class AliasProviderTraitTest extends TestCase {
      * autoloaded yet. $runTestInSeparateProcess should handle this.
      */
     public static function setUpBeforeClass() {
-        parent::setUpBeforeClass();
 
         // Our alias autoloader throws deprecated notices. Disable the error reporting for these tests.
         // Since this test runs in a separate process it shouldn't affect the rest of the tests.
@@ -37,6 +31,10 @@ class AliasProviderTraitTest extends TestCase {
         spl_autoload_register([TestAliasLoader::class, 'autoload']);
         self::assertFreshAutoload(NewClass::class);
         self::assertFreshAutoload(ExtendsNewClass::class);
+    }
+
+    public function setUp() {
+        parent::setUp();
     }
 
     /**

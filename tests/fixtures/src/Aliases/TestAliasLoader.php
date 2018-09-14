@@ -21,8 +21,8 @@ class TestAliasLoader {
      */
     protected static function provideAliases(): array {
         return [
-            NewClass::class => ["OldClass"],
-            ExtendsNewClass::class => ["ExtendsOldClass"],
+            NewClass::class => ["VanillaTests\OldClass"],
+            ExtendsNewClass::class => ["VanillaTests\ExtendsOldClass"],
         ];
     }
 }

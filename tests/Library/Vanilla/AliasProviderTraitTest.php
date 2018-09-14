@@ -7,12 +7,12 @@
 
 namespace VanillaTests\Library\Vanilla;
 
+use PHPUnit\Framework\TestCase;
 use VanillaTests\Fixtures\Aliases\ExtendsNewClass;
 use VanillaTests\Fixtures\Aliases\NewClass;
 use VanillaTests\Fixtures\Aliases\TestAliasLoader;
-use VanillaTests\SharedBootstrapTestCase;
 
-class AliasProviderTraitTest extends SharedBootstrapTestCase {
+class AliasProviderTraitTest extends TestCase {
 
     /** @var bool Set this to have each test run separately without the same autoload. */
     protected $runTestInSeparateProcess = true;
@@ -40,7 +40,7 @@ class AliasProviderTraitTest extends SharedBootstrapTestCase {
      * Verify that loading the old class loads the new class through the autoloader.
      */
     public function testSimpleAliasAutoload() {
-        new \OldClass();
+        new \VanillaTests\OldClass();
         $this->assertCompleteAutoload(NewClass::class);
     }
 
@@ -57,7 +57,7 @@ class AliasProviderTraitTest extends SharedBootstrapTestCase {
      * Tests for various permutations of old classname + new classnames with inheritance.
      */
     public function testOldExtendsNew() {
-        $this->assertClassExtendsClass(\ExtendsOldClass::class, NewClass::class);
+        $this->assertClassExtendsClass(\VanillaTests\ExtendsOldClass::class, NewClass::class);
         $this->assertCompleteAutoload(NewClass::class);
         $this->assertCompleteAutoload(ExtendsNewClass::class);
     }
@@ -66,7 +66,7 @@ class AliasProviderTraitTest extends SharedBootstrapTestCase {
      * Tests for various permutations of old classname + new classnames with inheritance.
      */
     public function testNewExtendsOld() {
-        $this->assertClassExtendsClass(ExtendsNewClass::class, \OldClass::class);
+        $this->assertClassExtendsClass(ExtendsNewClass::class, \VanillaTests\OldClass::class);
         $this->assertCompleteAutoload(NewClass::class);
         $this->assertCompleteAutoload(ExtendsNewClass::class);
     }
@@ -75,7 +75,7 @@ class AliasProviderTraitTest extends SharedBootstrapTestCase {
      * Tests for various permutations of old classname + new classnames with inheritance.
      */
     public function testOldExtendsOld() {
-        $this->assertClassExtendsClass(\ExtendsOldClass::class, \OldClass::class);
+        $this->assertClassExtendsClass(\VanillaTests\ExtendsOldClass::class, \VanillaTests\OldClass::class);
         $this->assertCompleteAutoload(NewClass::class);
         $this->assertCompleteAutoload(ExtendsNewClass::class);
     }

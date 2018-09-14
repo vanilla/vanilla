@@ -571,7 +571,7 @@ abstract class Gdn_Cache {
     public function getPrefix($forcePrefix = null, $withRevision = true) {
         static $configPrefix = false;
         $cKey = ($forcePrefix ?? 'null:').($withRevision ? 'true' : 'false');
-        if (key_exists($cKey, self::$cConfig)) {
+        if (array_key_exists($cKey, self::$cConfig)) {
             return self::$cConfig[$cKey];
         }
 

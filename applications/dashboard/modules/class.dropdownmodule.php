@@ -71,12 +71,7 @@
 class DropdownModule extends Gdn_Module {
 
     use NestedCollection;
-    use \Garden\StaticCacheTranslationTrait;
-
-    /**
-     * @var array
-     */
-    protected static $views = [];
+    use \Garden\StaticCacheViewLocationTrait;
 
     /**
      * @var string The id value of the trigger.
@@ -237,25 +232,5 @@ class DropdownModule extends Gdn_Module {
         $this->trigger['attributes'] = $attributes;
         $this->trigger['url'] = $url;
         return $this;
-    }
-
-    /**
-     * Method overwrites parent method to cache response statically
-     *
-     * @param string $view Template name
-     * @param string $applicationFolder App folder to check for template
-     *
-     * @return array|mixed
-     *
-     * @throws Exception Exception could be thrown by parent::fetchViewLocation() when template is not found.
-     *
-     */
-    public function fetchViewLocation($view = '', $applicationFolder = '') {
-        $key = $applicationFolder . ':' . $view;
-        if (!array_key_exists($key, self::$views)) {
-            $viewPath = parent::fetchViewLocation($view, $applicationFolder);
-            self::$views[$key] = $viewPath;
-        }
-        return self::$views[$key];
     }
 }

@@ -203,7 +203,7 @@ class Gdn_Database {
      *   - <b>Engine</b>: Required. The name of the database engine (MySQL, pgsql, sqlite, odbc, etc.
      *   - <b>Dsn</b>: Optional. The dsn for the connection. If the dsn is not supplied then the connectio information below must be supplied.
      *   - <b>Host, Dbname</b>: Optional. The individual database connection options that will be build into a dsn.
-     *   - <b>User</b>: The username to connect to the datbase.
+     *   - <b>User</b>: The username to connect to the database.
      *   - <b>Password</b>: The password to connect to the database.
      *   - <b>ConnectionOptions</b>: Other PDO connection attributes.
      */

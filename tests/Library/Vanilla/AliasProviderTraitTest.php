@@ -7,12 +7,12 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use PHPUnit\Framework\TestCase;
 use VanillaTests\Fixtures\Aliases\ExtendsNewClass;
 use VanillaTests\Fixtures\Aliases\NewClass;
 use VanillaTests\Fixtures\Aliases\TestAliasLoader;
+use VanillaTests\SharedBootstrapTestCase;
 
-class AliasProviderTraitTest extends TestCase {
+class AliasProviderTraitTest extends SharedBootstrapTestCase {
 
     /** @var bool Set this to have each test run separately without the same autoload. */
     protected $runTestInSeparateProcess = true;

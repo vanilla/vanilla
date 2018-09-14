@@ -7,6 +7,8 @@
 
 namespace Vanilla;
 
+use Vanilla\Legacy\Factory;
+
 /**
  * An autoloader for vanilla class aliases.
  *
@@ -23,6 +25,8 @@ class AliasLoader {
      * @inheritdoc
      */
     protected static function provideAliases(): array {
-        return [];
+        return [
+            Factory::class => [\Gdn_Factory::class]
+        ];
     }
 }

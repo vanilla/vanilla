@@ -12,7 +12,7 @@ use Gdn;
 use VanillaTests\Fixtures\Tuple;
 
 /**
- * Tests for the {@link Gdn_Factory}.
+ * Tests for the {@link Factory}.
  */
 class FactoryTest extends SharedBootstrapTestCase {
     const TUPLE = 'VanillaTests\Fixtures\Tuple';

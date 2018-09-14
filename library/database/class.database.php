@@ -124,7 +124,7 @@ class Gdn_Database {
     }
 
     /**
-     * Hook for cleanup via Gdn_Factory.
+     * Hook for cleanup via \Vanilla\Legacy\Factory.
      */
     public function cleanup() {
         $this->closeConnection();

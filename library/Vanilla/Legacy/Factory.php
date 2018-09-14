@@ -10,6 +10,7 @@ namespace Vanilla\Legacy;
 use Gdn;
 use Garden\Container\Container;
 use Garden\Container\NotFoundException;
+use Vanilla\AliasLoader;
 
 /**
  * Object factory
@@ -242,3 +243,6 @@ class Factory {
         return $arr;
     }
 }
+
+// Create the aliases for the Factory.
+AliasLoader::createAliases(Factory::class);

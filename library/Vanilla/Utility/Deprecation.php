@@ -7,10 +7,13 @@
 
 namespace Vanilla\Utility;
 
+use Garden\StaticCacheConfigTrait;
+
 /**
  * Class Deprecation.
  */
 class Deprecation {
+    use StaticCacheConfigTrait;
     protected static $calls = [];
 
     /**
@@ -36,13 +39,15 @@ class Deprecation {
      * @return void
      */
     public static function log() {
-        $info = debug_backtrace()[1];
-        if (!key_exists($info['function'], self::$calls)) {
-            $fileName = str_replace(PATH_ROOT, '', $info['file']);
-            $message = 'Deprecated function '.$info['function'].' called from '.$fileName.' at line : '.$info['line'];
-            trigger_error($message, E_USER_DEPRECATED);
-            error_log($message, E_USER_ERROR);
-            self::$calls[$info['function']] = true;
+        if (self::c('Vanilla.Deprecation.Enabled', true)) {
+            $info = debug_backtrace()[1];
+            if (!key_exists($info['function'], self::$calls)) {
+                $fileName = str_replace(PATH_ROOT, '', $info['file']);
+                $message = 'Deprecated function '.$info['function'].' called from '.$fileName.' at line : '.$info['line'];
+                trigger_error($message, E_USER_DEPRECATED);
+                error_log($message, E_USER_ERROR);
+                self::$calls[$info['function']] = true;
+            }
         }
     }
 }

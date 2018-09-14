@@ -39,6 +39,7 @@ class Deprecation {
      * @return void
      */
     public static function log() {
+        // Set Vanilla.Deprecation.Enabled to false to disable log output
         if (self::c('Vanilla.Deprecation.Enabled', true)) {
             $info = debug_backtrace()[1];
             if (!key_exists($info['function'], self::$calls)) {

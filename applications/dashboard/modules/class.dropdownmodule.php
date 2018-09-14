@@ -72,6 +72,7 @@ class DropdownModule extends Gdn_Module {
 
     use NestedCollection;
     use \Garden\StaticCacheViewLocationTrait;
+    use \Garden\StaticCacheTranslationTrait;
 
     /**
      * @var string The id value of the trigger.

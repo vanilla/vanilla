@@ -211,8 +211,8 @@ class CategoryModel extends Gdn_Model {
         $category['PermsCommentsAdd'] = self::checkPermission($category, 'Vanilla.Comments.Add');
 
         $code = $category['UrlCode'];
-        $category['Name'] = translateContent("Categories.".$code.".Name", $category['Name']);
-        $category['Description'] = translateContent("Categories.".$code.".Description", $category['Description']);
+        $category['Name'] = Gdn::translate("Categories.".$code.".Name", $category['Name']);
+        $category['Description'] = Gdn::translate("Categories.".$code.".Description", $category['Description']);
 
         if ($addUserCategory || ($addUserCategory === null && $this->joinUserCategory())) {
             $userCategories = $this->getUserCategories();

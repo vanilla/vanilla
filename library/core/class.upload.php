@@ -164,7 +164,7 @@ class Gdn_Upload extends Gdn_Pluggable {
      * - /path/from/uploads.ext: This is a locally uploaded file.
      * - /path/to/uploads/path.ext: A full path starting from the uploads directory (deprecated).
      * - ~type/path.ext: A specific type of upload provided by a plugin (deprecated).
-     * - type://domain/path.ext: A specific type of upload provied by a plugin with additional domain information.
+     * - type://domain/path.ext: A specific type of upload provided by a plugin with additional domain information.
      *
      * @param string $name The virtual name of the file.
      * @return array|bool Returns an array of parsed information or false if the parse failed.

@@ -1,3 +1,9 @@
+/*!
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 $richEditor_bg                                    : $global-color_bg !default;
 $richEditor_horizontalPadding                     : 36px !default;
 $richEditor_minHeight                             : 200px !default;
@@ -38,8 +44,3 @@ $richEditor-paragraphMenuButton_offset            : -$formElement_borderWidth + 
 $richEditor-text_offset                           : 0 !default;
 
 $embedImage_width                                 : 640px !default;
-
-// Break Points
-$richEditor-mobile_spacing                        : 18px !default;
-$richEditor-mobileBreakPoint                      : 700px !default;
-$richEditor-mobileEmbedBreakPoint                 : 550px !default;

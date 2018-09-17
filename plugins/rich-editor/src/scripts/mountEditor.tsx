@@ -32,7 +32,7 @@ export default function mountEditor(containerSelector: string | Element) {
             <Editor
                 editorID={editorID}
                 editorDescriptionID={descriptionID}
-                bodybox={bodybox as HTMLInputElement}
+                legacyTextArea={bodybox as HTMLInputElement}
                 isPrimaryEditor={true}
             />,
             container,

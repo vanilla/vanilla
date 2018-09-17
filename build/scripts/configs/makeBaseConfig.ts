@@ -156,7 +156,7 @@ ${chalk.green(aliases)}`;
             modules: modulePaths,
             alias: {
                 ...moduleAliases,
-                "dashboard-scss": path.resolve(VANILLA_ROOT, "applications/dashboard/scss"),
+                "library-scss": path.resolve(VANILLA_ROOT, "library/src/scss"),
             },
             extensions: [".ts", ".tsx", ".js", ".jsx"],
             // This needs to be true so that the same copy of a node_module gets shared.

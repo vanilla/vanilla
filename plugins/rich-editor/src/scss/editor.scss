@@ -4,8 +4,8 @@
  * @license GPL-2.0-only
  */
 
-@import "~library-scss/_variables";
-@import "variables";
+@import "~library-scss/_coreVariables";
+@import "richEditorVariables";
 @import "~library-scss/mixins/_mixins";
 @import "mixins/mixin.mobileStyles";
 @import "richEditor";

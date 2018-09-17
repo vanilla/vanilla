@@ -6,7 +6,7 @@
 
 // This CSS file should always be added after style.css and not be overridden.
 // Variables
-@import "~library-scss/_variables";
+@import "~library-scss/_coreVariables";
 @import "~library-scss/social/_socialMediaVariables";
 @import "~library-scss/mixins/_mixins";
 
@@ -30,20 +30,20 @@
 @import "new-components/pageHeading";
 
 // Editor
-@import "../../../../plugins/rich-editor/src/scss/variables";
+@import "../../../../plugins/rich-editor/src/scss/richEditorVariables";
 @import "../../../../plugins/rich-editor/src/scss/mixins/mixin.mobileStyles";
 @import "compatibility/editor/mixinsLegacy";
 @import "compatibility/editor/richEditorLegacy";
 
 // User content
-@import "~library-scss/user-content/_animations";
-@import "~library-scss/user-content/_atMention";
-@import "~library-scss/user-content/_blockquote";
-@import "~library-scss/user-content/_lists";
-@import "~library-scss/user-content/_accessibility";
-@import "~library-scss/user-content/_spoiler";
-@import "~library-scss/user-content/_emoji";
-@import "~library-scss/user-content/_codeBlocks";
+@import "~library-scss/userContent/_animations";
+@import "~library-scss/userContent/_atMention";
+@import "~library-scss/userContent/_blockquote";
+@import "~library-scss/userContent/_lists";
+@import "~library-scss/userContent/_accessibility";
+@import "~library-scss/userContent/_spoiler";
+@import "~library-scss/userContent/_emoji";
+@import "~library-scss/userContent/_codeBlocks";
 
 // Embeds
 @import "~library-scss/embeds/_embeds";

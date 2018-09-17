@@ -1,7 +1,7 @@
 {
     "name": "vanilla",
     "description": "Vanilla is a powerfully simple discussion forum you can easily customize to make as unique as your community.",
-    "license": "GPL-2.0",
+    "license": "GPL-2.0-only",
     "private": true,
     "dependencies": {
         "axios": "0.18.0",

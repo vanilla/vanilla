@@ -2,8 +2,8 @@
 /**
  * Discussions Sort/Filter module
  *
- * @copyright 2016 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
  * @package Vanilla
  * @author Becky Van Bussel
  * @since 2.2

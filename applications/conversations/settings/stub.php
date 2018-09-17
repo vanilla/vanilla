@@ -5,7 +5,7 @@
  * Called by ConversationsHooks::setup() to insert stub content upon enabling app.
  *
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license GPL-2.0-only
  * @package Conversations
  * @since 2.2
  */

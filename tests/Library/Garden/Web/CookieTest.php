@@ -2,7 +2,7 @@
 /**
  * @author Vanilla Forums Inc.
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license GPL-2.0-only
  */
 
 namespace VanillaTests\Library\Garden\Web;

@@ -2,7 +2,7 @@
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license GPL-2.0-only
  */
 
 namespace Vanilla\Models;

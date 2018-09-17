@@ -2,7 +2,7 @@
  * Entrypoint for the APIv2 calls. Prepulates an axios instance with some config settings.
  *
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license GPL-2.0-only
  */
 
 import { formatUrl, t } from "@library/application";

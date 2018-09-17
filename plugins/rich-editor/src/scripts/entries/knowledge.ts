@@ -4,8 +4,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-import { registerReducer } from "@dashboard/state/reducerRegistry";
+import { registerReducer } from "@library/state/reducerRegistry";
 import editorReducer from "@rich-editor/state/editorReducer";
-import { onReady } from "@dashboard/application";
 
 registerReducer("editor", editorReducer);

@@ -10,9 +10,6 @@ import Router from "@dashboard/components/Router";
 import { stickyHeader } from "@library/dom";
 import { registerReducer } from "@library/state/reducerRegistry";
 
-// Styles for the forum section.
-import "../../../scss/style-compat.scss";
-
 initAllUserContent();
 
 // Redux

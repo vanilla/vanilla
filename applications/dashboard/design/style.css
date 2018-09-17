@@ -64,7 +64,8 @@ textarea, input[type=text] {
 }
 
 .textarea-autosize {
-  transition: height 0.1s ease;
+  -webkit-transition: height 0.1s ease;
+          transition: height 0.1s ease;
   resize: none !important;
 }
 
@@ -580,7 +581,9 @@ div.FileUpload .CurrentImage {
   border-width: 0 0 100px 200px;
   opacity: 0;
   filter: alpha(opacity=0);
-  transform: translate(-300px, 0) scale(4);
+  -webkit-transform: translate(-300px, 0) scale(4);
+      -ms-transform: translate(-300px, 0) scale(4);
+          transform: translate(-300px, 0) scale(4);
   direction: ltr;
   cursor: pointer;
 }
@@ -1076,7 +1079,10 @@ body > #Frame > .Head {
 }
 
 .OptionsTitle {
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   background: url("images/ui_sprites.png") no-repeat 0 -101px;
   padding: 0;
   width: 21px;
@@ -5491,7 +5497,8 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .SocialIcon {
-  transition: background-color 100ms;
+  -webkit-transition: background-color 100ms;
+          transition: background-color 100ms;
 }
 
 .SocialIcon .Icon,
@@ -5952,11 +5959,20 @@ Styleguide Attachments
 }
 
 .twitter-card-loaded {
-  transition: all 0.2s ease;
+  -webkit-transition: all 0.2s ease;
+          transition: all 0.2s ease;
   opacity: 1;
 }
 
 /* Effects */
+@-webkit-keyframes highlight {
+  0% {
+    background-color: #ff9;
+  }
+  10% {
+    background-color: #ff9;
+  }
+}
 @keyframes highlight {
   0% {
     background-color: #ff9;
@@ -5967,7 +5983,8 @@ Styleguide Attachments
 }
 
 .highlight-effect {
-  animation: highlight .8s;
+  -webkit-animation: highlight .8s;
+          animation: highlight .8s;
 }
 
 /* Groups section tweaks */
@@ -6027,7 +6044,9 @@ Styleguide Attachments
   width: 100%;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
-  user-select: none;
+  -moz-user-select: none;
+   -ms-user-select: none;
+       user-select: none;
   -webkit-user-select: none;
 }
 
@@ -6187,9 +6206,18 @@ img.jcrop-preview {
 }
 
 .flex {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 
 .flex > * {
@@ -6201,23 +6229,35 @@ img.jcrop-preview {
 }
 
 .flex-wrap {
-  flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
 }
 
 .shrink {
-  flex-shrink: 1;
+  -webkit-flex-shrink: 1;
+      -ms-flex-negative: 1;
+          flex-shrink: 1;
 }
 
 .grow {
-  flex-grow: 1;
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
 }
 
 .no-shrink {
-  flex-shrink: 0;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
 }
 
 .no-grow {
-  flex-grow: 0;
+  -webkit-box-flex: 0;
+  -webkit-flex-grow: 0;
+      -ms-flex-positive: 0;
+          flex-grow: 0;
 }
 
 .pull-left {
@@ -6243,7 +6283,10 @@ img.jcrop-preview {
 }
 
 .foggy input {
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 .foggy::before {
@@ -6256,5 +6299,4 @@ img.jcrop-preview {
   z-index: 1;
   content: '';
 }
-
 /*# sourceMappingURL=style.css.map */

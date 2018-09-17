@@ -243,7 +243,7 @@ module.exports = function (grunt) {
         files: {
           'scss/maps/_vanillicon.scss': 'scss/vanillicon/*.scss',
           'scss/maps/_extensions.scss': 'scss/extensions/*.scss',
-          'scss/maps/_bootstrapVariables.scss': 'scss/vendors/bootstrap/scss/_richEditorVariables.scss',
+          'scss/maps/_bootstrapVariables.scss': 'scss/vendors/bootstrap/scss/_variables.scss',
           'scss/maps/_bootstrapMixins.scss': 'scss/vendors/bootstrap/scss/mixins/*.scss',
           'scss/maps/_bootstrapAnimation.scss': 'scss/vendors/bootstrap/scss/_animation.scss',
           'scss/maps/_vendorSubset.scss': [
@@ -259,7 +259,7 @@ module.exports = function (grunt) {
           ],
           'scss/maps/_dashboard.scss': [
             'scss/src/*.scss',
-            '!scss/src/_richEditorVariables.scss',
+            '!scss/src/_variables.scss',
             '!scss/src/_icons.scss',
             '!scss/src/_svgs.scss',
             '!scss/src/_helpers.scss'

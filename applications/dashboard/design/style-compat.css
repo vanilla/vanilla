@@ -114,12 +114,24 @@
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-@keyframes spinnerLoader {
+@-webkit-keyframes spinnerLoader {
   0% {
-    transform: rotate(73deg);
+    -webkit-transform: rotate(73deg);
+            transform: rotate(73deg);
   }
   100% {
-    transform: rotate(433deg);
+    -webkit-transform: rotate(433deg);
+            transform: rotate(433deg);
+  }
+}
+@keyframes spinnerLoader {
+  0% {
+    -webkit-transform: rotate(73deg);
+            transform: rotate(73deg);
+  }
+  100% {
+    -webkit-transform: rotate(433deg);
+            transform: rotate(433deg);
   }
 }
 
@@ -308,9 +320,17 @@ button.Close {
 }
 
 .rememberMeAndForgot {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  -webkit-flex-wrap: wrap;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
   font-size: 12px;
 }
 
@@ -320,7 +340,10 @@ button.Close {
 }
 
 .rememberMeAndForgot-rememberMe {
-  flex-grow: 1;
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
   padding-right: 6px;
 }
 
@@ -338,10 +361,22 @@ button.Close {
 }
 
 .button.Button.Primary.buttonCTA, .button.Button.button-sso {
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
   background-image: none;
   box-sizing: border-box;
   text-decoration: none !important;
@@ -371,10 +406,21 @@ button.Close {
 }
 
 .button-ssoContents {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-flex-wrap: wrap;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
   width: 100%;
   max-width: 100%;
 }
@@ -422,25 +468,49 @@ button.Close {
 .PageControls .selectBox {
   margin-right: 15px;
   float: left;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
 }
 
 .selectBox-label {
   position: relative;
   cursor: pointer;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   margin-right: 5px;
 }
 
 .selectBox-main {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
   position: relative;
   cursor: pointer;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 .selectBox-content {
@@ -455,7 +525,10 @@ button.Close {
   display: inline-block;
   vertical-align: inherit;
   cursor: pointer;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   outline: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -529,8 +602,14 @@ body.Categories.isMobile .PageControls.Top {
 }
 
 .ButtonGroup.discussion-sort-filter-module {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  align-items: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 
 .inputBlock {
@@ -539,8 +618,14 @@ body.Categories.isMobile .PageControls.Top {
 }
 
 .inputBlock .checkbox {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  align-items: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 
 .inputBlock.inputBlock-tighter {
@@ -619,7 +704,10 @@ label.checkbox input.checkbox-input {
 }
 
 .checkbox-label {
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   margin-left: 6px;
   line-height: inherit;
 }
@@ -647,10 +735,18 @@ label.checkbox input.checkbox-input {
 }
 
 .pageHeading {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
   width: 100%;
-  align-items: center;
-  flex-wrap: wrap;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-flex-wrap: wrap;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
 }
 
 .pageHeading .pageHeading-title {
@@ -663,12 +759,20 @@ label.checkbox input.checkbox-input {
   position: relative;
   display: block;
   max-width: 100%;
-  flex-grow: 1;
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
 }
 
 .pageHeading-actions {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  align-self: center;
+  -webkit-align-self: center;
+      -ms-flex-item-align: center;
+          align-self: center;
   max-width: 100%;
 }
 
@@ -788,7 +892,10 @@ label.checkbox input.checkbox-input {
 }
 
 .richEditor-button {
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   cursor: pointer;
 }
 
@@ -891,6 +998,7 @@ body.isMobile .richEditor {
 
 body.isMobile .richEditor-menu.richEditorFlyout {
   left: 0;
+  width: -webkit-calc(100% + 4px);
   width: calc(100% + 4px);
 }
 
@@ -924,6 +1032,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   }
   .richEditor-menu.richEditorFlyout {
     left: 0;
+    width: -webkit-calc(100% + 4px);
     width: calc(100% + 4px);
   }
   .richEditor-embedBarMobileBorder {
@@ -942,6 +1051,15 @@ body.isMobile .Popup.hasRichEditor .Border {
   }
 }
 
+@-webkit-keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 @keyframes fadein {
   0% {
     opacity: 0;
@@ -952,7 +1070,8 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .collapsableContent {
-  transition: max-height 0.2s ease;
+  -webkit-transition: max-height 0.2s ease;
+          transition: max-height 0.2s ease;
 }
 
 .collapsableContent *:last-child {
@@ -962,7 +1081,9 @@ body.isMobile .Popup.hasRichEditor .Border {
 .atMentionList {
   position: absolute;
   width: 200px;
-  transform: translateY(6px);
+  -webkit-transform: translateY(6px);
+      -ms-transform: translateY(6px);
+          transform: translateY(6px);
 }
 
 .atMentionList-suggestion {
@@ -971,7 +1092,9 @@ body.isMobile .Popup.hasRichEditor .Border {
   overflow-x: hidden;
   max-width: 100%;
   position: relative;
-  appearance: none;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
   border: 0;
   padding: 0;
   background: none;
@@ -1005,8 +1128,14 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .atMentionList-user,
 .atMentionList-noResults {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  align-items: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
   width: 100%;
   box-sizing: border-box;
   overflow: hidden;
@@ -1028,10 +1157,14 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .atMentionList-userName {
   display: block;
-  flex-grow: 1;
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  max-width: -webkit-calc(100% - 40px);
   max-width: calc(100% - 40px);
 }
 
@@ -1047,7 +1180,10 @@ body.isMobile .Popup.hasRichEditor .Border {
 .atMention {
   color: inherit;
   font-weight: 600;
-  user-select: all;
+  -webkit-user-select: all;
+     -moz-user-select: all;
+      -ms-user-select: all;
+          user-select: all;
 }
 
 .blockquote {
@@ -1119,7 +1255,9 @@ body.isMobile .Popup.hasRichEditor .Border {
   padding: 0 12px;
   width: 100%;
   z-index: 2;
-  transform: translateY(-100%);
+  -webkit-transform: translateY(-100%);
+      -ms-transform: translateY(-100%);
+          transform: translateY(-100%);
 }
 
 .accessibility-jumpTo:hover {
@@ -1160,7 +1298,10 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .button-spoiler {
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   width: 100%;
   max-width: 100%;
   font-size: 16px;
@@ -1195,9 +1336,15 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .spoiler-warningMain {
   position: relative;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
   box-sizing: border-box;
-  justify-content: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
   padding: 0 24px;
   width: 100%;
   line-height: 1;
@@ -1221,8 +1368,14 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin: auto 0;
   width: 24px;
   height: 24px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  align-items: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
   opacity: 0.6;
 }
 
@@ -1251,7 +1404,10 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .spoiler-buttonContainer {
   white-space: normal;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 .safeEmoji {
@@ -1274,7 +1430,10 @@ body.isMobile .Popup.hasRichEditor .Border {
   width: 1em;
   margin: 0 .05em 0 .1em;
   vertical-align: -0.1em;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 .emojiGroup {
@@ -1327,8 +1486,14 @@ body.isMobile .Popup.hasRichEditor .Border {
   max-width: 100%;
   width: 640px;
   position: relative;
-  justify-content: center;
-  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
   box-sizing: border-box;
 }
 
@@ -1372,12 +1537,17 @@ body.isMobile .Popup.hasRichEditor .Border {
   width: 1em;
   margin: 0;
   vertical-align: -0.14em;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 .embedLinkLoader-loader {
-  transition-duration: opacity;
-  transition-timing-function: ease-out;
+  -webkit-transition-duration: opacity;
+          transition-duration: opacity;
+  -webkit-transition-timing-function: ease-out;
+          transition-timing-function: ease-out;
   display: block;
   width: 1em;
   height: 1em;
@@ -1386,8 +1556,10 @@ body.isMobile .Popup.hasRichEditor .Border {
   border-right: 3px solid rgba(2, 145, 219, 0.2);
   border-bottom: 3px solid rgba(2, 145, 219, 0.2);
   border-left: 3px solid rgba(2, 145, 219, 0.2);
-  transform: translateZ(0);
-  animation: spinnerLoader 0.7s infinite ease-in-out;
+  -webkit-transform: translateZ(0);
+          transform: translateZ(0);
+  -webkit-animation: spinnerLoader 0.7s infinite ease-in-out;
+          animation: spinnerLoader 0.7s infinite ease-in-out;
   display: inline-block;
   vertical-align: -0.14em;
 }
@@ -1404,12 +1576,16 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .richEditor .embedExternal {
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 .richEditor .embedExternal-content,
 .richEditor .embedLinkLoader-link {
-  transition: 0.2s ease box-shadow;
+  -webkit-transition: 0.2s ease box-shadow;
+          transition: 0.2s ease box-shadow;
   cursor: pointer;
 }
 
@@ -1441,11 +1617,15 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedVideo .embedExternal-content:focus .embedVideo-playIcon, .embedVideo .embedExternal-content:hover .embedVideo-playIcon {
-  transform: scale(1.1);
+  -webkit-transform: scale(1.1);
+      -ms-transform: scale(1.1);
+          transform: scale(1.1);
 }
 
 .richEditor .embedVideo .embedExternal-content:focus .embedVideo-playIcon, .richEditor .embedVideo .embedExternal-content:hover .embedVideo-playIcon {
-  transform: scale(1);
+  -webkit-transform: scale(1);
+      -ms-transform: scale(1);
+          transform: scale(1);
 }
 
 .embedVideo-iframe,
@@ -1487,6 +1667,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   left: 0;
   height: 100%;
   width: 100%;
+  background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
 }
 
@@ -1589,10 +1770,21 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedText-header {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-start;
+  -webkit-flex-wrap: wrap;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
   font-size: 14px;
   line-height: 1.25;
 }
@@ -1647,6 +1839,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .embedLink-image + .embedText-main {
   margin-left: auto;
+  width: -webkit-calc(100% - 225px);
   width: calc(100% - 225px);
   border-left-style: solid;
   border-left-width: 1px;
@@ -1701,8 +1894,14 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedQuote-userLink {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
   display: inline-flex;
-  align-items: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 
 .embedQuote-userName {
@@ -1728,10 +1927,21 @@ body.isMobile .Popup.hasRichEditor .Border {
   position: absolute;
   top: 0;
   right: 8px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  appearance: none;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
   background: none;
   border: none;
   cursor: pointer;
@@ -1757,6 +1967,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedQuote-title {
+  max-width: -webkit-calc(100% - 36px);
   max-width: calc(100% - 36px);
 }
 
@@ -1775,9 +1986,18 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedQuote-header {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
   padding-top: 14px;
   padding-left: 14px;
   padding-right: 14px;
@@ -1790,6 +2010,9 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedQuote-metaLink {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
   display: inline-flex;
 }
 
@@ -1797,7 +2020,9 @@ body.isMobile .Popup.hasRichEditor .Border {
   display: inline-block;
   width: 24px;
   height: 24px;
-  flex-basis: 24px;
+  -webkit-flex-basis: 24px;
+      -ms-flex-preferred-size: 24px;
+          flex-basis: 24px;
 }
 
 .embedLoader {
@@ -1806,9 +2031,18 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLoader-box {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
   background: #FFFFFF;
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.3);
   width: 135px;
@@ -1818,8 +2052,10 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLoader-loader {
-  transition-duration: opacity;
-  transition-timing-function: ease-out;
+  -webkit-transition-duration: opacity;
+          transition-duration: opacity;
+  -webkit-transition-timing-function: ease-out;
+          transition-timing-function: ease-out;
   display: block;
   width: 42px;
   height: 42px;
@@ -1828,8 +2064,10 @@ body.isMobile .Popup.hasRichEditor .Border {
   border-right: 3px solid rgba(2, 145, 219, 0.2);
   border-bottom: 3px solid rgba(2, 145, 219, 0.2);
   border-left: 3px solid rgba(2, 145, 219, 0.2);
-  transform: translateZ(0);
-  animation: spinnerLoader 0.7s infinite ease-in-out;
+  -webkit-transform: translateZ(0);
+          transform: translateZ(0);
+  -webkit-animation: spinnerLoader 0.7s infinite ease-in-out;
+          animation: spinnerLoader 0.7s infinite ease-in-out;
 }
 
 .embedLoader-loader::after {
@@ -1839,15 +2077,22 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLoader-error {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
   overflow: hidden;
-  align-items: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
   list-style: none;
   margin: 0;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
   padding: 15px;
   background: #ffebeb;
-  transition: 0.2s ease box-shadow;
+  -webkit-transition: 0.2s ease box-shadow;
+          transition: 0.2s ease box-shadow;
   cursor: pointer;
 }
 
@@ -1864,15 +2109,21 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLoader-error .embedLoader-warningIcon {
-  align-self: flex-start;
+  -webkit-align-self: flex-start;
+      -ms-flex-item-align: start;
+          align-self: flex-start;
 }
 
 .embedLoader-error .closeButton {
   opacity: 0.7;
   width: 24px;
   height: 24px;
-  flex-basis: 24px;
-  align-self: flex-start;
+  -webkit-flex-basis: 24px;
+      -ms-flex-preferred-size: 24px;
+          flex-basis: 24px;
+  -webkit-align-self: flex-start;
+      -ms-flex-item-align: start;
+          align-self: flex-start;
   margin: 0 0 0 auto;
   cursor: pointer;
   position: relative;
@@ -1904,6 +2155,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .userContent .embedLoader-errorMessage {
+  max-width: -webkit-calc(100% - 72px);
   max-width: calc(100% - 72px);
   padding-left: 24px;
 }
@@ -1956,6 +2208,9 @@ body.isMobile .Popup.hasRichEditor .Border {
 .embedTwitter .embedExternal-content {
   border-radius: 4px;
   width: auto;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
   display: inline-flex;
 }
 
@@ -1977,5 +2232,4 @@ body.isMobile .Popup.hasRichEditor .Border {
   margin-bottom: 0 !important;
   width: 100% !important;
 }
-
 /*# sourceMappingURL=style-compat.css.map */

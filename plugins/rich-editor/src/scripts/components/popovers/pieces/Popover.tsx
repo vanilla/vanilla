@@ -75,7 +75,7 @@ export default class Popover extends React.Component<IProps, IState> {
             </div>
         ) : null;
 
-        const close = `x`;
+        const close = `×`;
 
         return (
             <div

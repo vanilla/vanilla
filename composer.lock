@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "8e9361c1ecfa937e41d95638f5f92308",
+    "content-hash": "d01750c9e401959d8c74c018ef29edc2",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -2732,16 +2732,16 @@
         },
         {
             "name": "vanilla/standards",
-            "version": "1.3",
+            "version": "1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/standards.git",
-                "reference": "222cbad7a713ee9a93d64721b14c34cde7751bb1"
+                "reference": "f9fe9cb8dd15e09414ee27cab652085183c47d7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/standards/zipball/222cbad7a713ee9a93d64721b14c34cde7751bb1",
-                "reference": "222cbad7a713ee9a93d64721b14c34cde7751bb1",
+                "url": "https://api.github.com/repos/vanilla/standards/zipball/f9fe9cb8dd15e09414ee27cab652085183c47d7e",
+                "reference": "f9fe9cb8dd15e09414ee27cab652085183c47d7e",
                 "shasum": ""
             },
             "require": {
@@ -2754,7 +2754,7 @@
                 "GPL-2.0"
             ],
             "description": "Rules for Vanilla forums' coding standards.",
-            "time": "2018-09-12T18:04:39+00:00"
+            "time": "2018-09-17T19:45:10+00:00"
         },
         {
             "name": "voku/html-min",

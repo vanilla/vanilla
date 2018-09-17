@@ -742,7 +742,7 @@ if (!function_exists('trueStripSlashes')) {
          * @deprecated
          */
         function trueStripSlashes($string) {
-            deprecated('trueStripSlashes()');
+            \Vanilla\Utility\Deprecation::log();
             return stripslashes($string);
         }
     } else {
@@ -750,7 +750,7 @@ if (!function_exists('trueStripSlashes')) {
          * @deprecated
          */
         function trueStripSlashes($string) {
-            deprecated('trueStripSlashes()');
+            \Vanilla\Utility\Deprecation::log();
             return $string;
         }
     }

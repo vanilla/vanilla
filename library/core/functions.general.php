@@ -3,7 +3,7 @@
  * General functions
  *
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license GPL-2.0-only
  * @package Core
  * @since 2.0
  */
@@ -775,7 +775,7 @@ if (!function_exists('dbdecode')) {
         // Backward compatibility.
         if ($decodedValue === null) {
             // Suppress errors https://github.com/vanilla/vanilla/pull/3734#issuecomment-210664113
-            $decodedValue = @unserialize($value);
+            $decodedValue = @unserialize($value, ['allowed_classes' => false]);
         }
 
         if (is_array($value) || is_object($value)) {
@@ -3569,8 +3569,10 @@ if (!function_exists('translateContent')) {
      * @param string $default The default value to be displayed if the translation code is not found.
      * @return string The translated string or $code if there is no value in $default.
      * @see Gdn::translate()
+     * @deprecated
      */
     function translateContent($code, $default = false) {
+        \Vanilla\Utility\Deprecation::log();
         return t($code, $default);
     }
 }

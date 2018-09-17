@@ -4,7 +4,7 @@
  *
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license GPL-2.0-only
  * @package Core
  * @since 2.0
  */
@@ -168,7 +168,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      * Defines a column to be added to $this->table().
      *
      * @param string $name The name of the column to create.
-     * @param mixed $type The data type of the column to be created. Types with a length speecifty the length in barackets.
+     * @param mixed $type The data type of the column to be created. Types with a length specify the length in brackets.
      * * If an array of values is provided, the type will be set as "enum" and the array will be assigned as the column's Enum property.
      * * If an array of two values is specified then a "set" or "enum" can be specified (ex. array('set', array('Short', 'Tall', 'Fat', 'Skinny')))
      * @param boolean $nullDefault Whether or not nulls are allowed, if not a default can be specified.

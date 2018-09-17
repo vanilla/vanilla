@@ -1,13 +1,16 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license GPL-2.0-only
  */
 
 const path = require("path");
 const webpack = require("webpack");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const VANILLA_ROOT = path.resolve(path.join(__dirname, "../../"));
+const TS_CONFIG_FILE = path.resolve(VANILLA_ROOT, "tsconfig.json");
 
 module.exports = {
     context: VANILLA_ROOT,
@@ -39,16 +42,10 @@ module.exports = {
                 include: [/\/src\/scripts/, /tests\/javascript/],
                 use: [
                     {
-                        loader: "babel-loader",
-                        options: {
-                            presets: ["@vanillaforums/babel-preset"],
-                            cacheDirectory: true,
-                        },
-                    },
-                    {
                         loader: "ts-loader",
                         options: {
-                            configFile: path.resolve(VANILLA_ROOT, "tsconfig.json"),
+                            configFile: TS_CONFIG_FILE,
+                            transpileOnly: true,
                         },
                     },
                 ],
@@ -65,13 +62,9 @@ module.exports = {
             path.join(VANILLA_ROOT, "plugins/rich-editor/node_modules"),
             path.join(VANILLA_ROOT, "tests/node_modules"),
         ],
-        alias: {
-            "@library": path.resolve(VANILLA_ROOT, "library/src/scripts/"),
-            "@dashboard": path.resolve(VANILLA_ROOT, "applications/dashboard/src/scripts/"),
-            "@vanilla": path.resolve(VANILLA_ROOT, "applications/vanilla/src/scripts/"),
-            "@rich-editor": path.resolve(VANILLA_ROOT, "plugins/rich-editor/src/scripts/"),
-            "@testroot": path.resolve(VANILLA_ROOT, "tests/javascript/"),
-        },
+        plugins: [
+            new TsConfigPathsPlugin({configFile: TS_CONFIG_FILE}),
+        ],
         extensions: [".ts", ".tsx", ".js", ".jsx"],
     },
     plugins: [
@@ -82,6 +75,11 @@ module.exports = {
             test: /\.(ts|tsx|js|jsx)($|\?)/i, // process .js and .ts files only
         }),
         new webpack.DefinePlugin({ VANILLA_ROOT }),
+        new ForkTsCheckerWebpackPlugin({
+            tsconfig: TS_CONFIG_FILE,
+            checkSyntacticErrors: true,
+            async: false,
+        }),
     ],
 
     /**

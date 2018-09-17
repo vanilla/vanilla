@@ -2,7 +2,7 @@
  * Utilities and types for handling unique and/or required HTML ids in react components.
  *
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license GPL-2.0-only
  */
 
 import uniqueId from "lodash/uniqueId";

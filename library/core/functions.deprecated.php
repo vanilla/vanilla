@@ -767,7 +767,7 @@ if (!function_exists('viewLocation')) {
      * @deprecated
      */
     function viewLocation($view, $controller, $folder) {
-        deprecated('viewLocation()');
+        \Vanilla\Utility\Deprecation::log();
         $paths = [];
 
         if (strpos($view, '/') !== false) {

@@ -227,11 +227,11 @@ body.hasRichEditor {
 
 // Mobile
 body.isMobile {
-    @include richEditorMobileStyles();
+    @include legacyMobileStyles();
 }
 
 @include mediaQuery-richEditor_mobile {
-    @include richEditorMobileStyles();
+    @include legacyMobileStyles();
 }
 
 

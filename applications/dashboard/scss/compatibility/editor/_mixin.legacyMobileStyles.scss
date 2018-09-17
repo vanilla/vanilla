@@ -4,7 +4,9 @@
  * @license GPL-2.0-only
  */
 
-@mixin richEditorMobileStyles {
+$richEditor-mobile_spacing                        : 18px !default;
+
+@mixin legacyMobileStyles {
     .embedDialogue {
         position: static;
     }

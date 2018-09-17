@@ -31,8 +31,8 @@
 
 // Editor
 @import "../../../plugins/rich-editor/src/scss/richEditorVariables";
-@import "../../../plugins/rich-editor/src/scss/mixins/mixin.mobileStyles";
-@import "compatibility/editor/mixinsLegacy";
+@import "compatibility/editor/mixin.legacyMobileStyles";
+@import "compatibility/editor/mixin.legacyEditor";
 @import "compatibility/editor/richEditorLegacy";
 
 // User content

@@ -4,6 +4,10 @@
  * @license GPL-2.0-only
  */
 
+// Break Points
+$richEditor-mobile_spacing                        : 18px !default;
+$richEditor-mobileBreakPoint                      : 700px !default;
+
 @mixin defaultTransition($timing-default: .15s, $easing-default: ease-out, $properties...) {
     transition-property: $properties;
     transition-duration: $timing-default;
@@ -71,4 +75,17 @@
 
 .accessibility-jumpTo {
     @include resetButton;
+}
+
+// Rich Editor
+@mixin mediaQuery-richEditor_mobile {
+    @media (max-width: $richEditor-mobileBreakPoint) {
+        @content;
+    }
+}
+
+@mixin mediaQuery-richEditor_notMobile {
+    @media (min-width: #{$richEditor-mobileBreakPoint}) {
+        @content;
+    }
 }

@@ -24,6 +24,9 @@ class UsersApiController extends AbstractApiController {
     /** @var Gdn_Configuration */
     private $configuration;
 
+    /** @var array */
+    private $guestFragment;
+
     /** @var Schema */
     private $idParamSchema;
 
@@ -195,6 +198,23 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
+     * Get a user fragment representing a guest.
+     *
+     * @return array
+     */
+    public function getGuestFragment() {
+        if ($this->guestFragment === null) {
+            $this->guestFragment = [
+                "userID" => 0,
+                "name" => t("Guest"),
+                "photoUrl" => UserModel::getDefaultAvatarUrl(),
+                "dateLastActive" => null
+            ];
+        }
+        return $this->guestFragment;
+    }
+
+    /**
      * Get a list of users, filtered by username.
      *
      * @param array $query
@@ -256,6 +276,31 @@ class UsersApiController extends AbstractApiController {
         $paging = ApiUtils::morePagerInfo($result, '/api/v2/users/names', $query, $in);
 
         return new Data($result, ['paging' => $paging]);
+    }
+
+    /**
+     * Get a fragment representing the current user.
+     *
+     * @return array
+     * @throws ValidationException If output validation fails.
+     * @throws \Garden\Web\Exception\HttpException If a ban has been applied on the permission(s) for this session.
+     * @throws \Vanilla\Exception\PermissionException If the user does not have valid permission to access this action.
+     */
+    public function index_me() {
+        $this->permission();
+
+        $this->schema([], "in")->setDescription("Get information about the current user.");
+        $out = $this->schema($this->getUserFragmentSchema(), "out");
+
+        if (is_object($this->getSession()->User)) {
+            $user = (array)$this->getSession()->User;
+            $user = $this->normalizeOutput($user);
+        } else {
+            $user = $this->getGuestFragment();
+        }
+
+        $result = $out->validate($user);
+        return $result;
     }
 
     /**

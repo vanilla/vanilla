@@ -1,0 +1,22 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$fullPageLoader-size            : 100px;
+$fullPageLoader-thickness       : 6px;
+
+.fullPageLoader {
+    @include absolute-fullSizeOfParent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+
+    &::after {
+        @include spinnerLoader($fullPageLoader-size, $fullPageLoader-thickness);
+        content: '';
+    }
+}

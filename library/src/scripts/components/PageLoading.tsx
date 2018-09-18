@@ -6,21 +6,25 @@
 import * as React from "react";
 import { t } from "@library/application";
 import { ILoadable, LoadStatus } from "@library/@types/api";
+import FullPageLoader from "@library/components/FullPageLoader";
 
 export default class PageLoading extends React.PureComponent<ILoadable<any>, {}> {
     public static defaultProps: Partial<ILoadable<any>> = {
         status: LoadStatus.PENDING,
     };
 
-    public render(): JSX.Element | null {
+    public render(): React.ReactNode {
         switch (this.props.status) {
             case LoadStatus.PENDING:
-            case LoadStatus.SUCCESS:
                 return null;
+            case LoadStatus.SUCCESS:
+                document.body.classList.remove("isLoading");
+                return this.props.children;
             case LoadStatus.LOADING:
-                return <div>{t("Loading...")}</div>;
+                document.body.classList.add("isLoading");
+                return <FullPageLoader />;
             case LoadStatus.ERROR:
-                return this.props.error ? <div>{this.props.error}</div> : null;
+                return this.props.error ? <div className="error">{this.props.error}</div> : null;
         }
     }
 }

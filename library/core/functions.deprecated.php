@@ -444,6 +444,7 @@ if (!function_exists('parseUrl')) {
      * @deprecated
      */
     function parseUrl($url, $component = -1) {
+        \Vanilla\Utility\Deprecation::log();
         $defaults = [
             'scheme' => 'http',
             'host' => '',

@@ -120,4 +120,38 @@ class GeneralFunctionsTest extends SharedBootstrapTestCase {
 
         return $r;
     }
+
+    /**
+     * Test the **absoluteSource()** function.
+     *
+     * @param string $srcPath The source path.
+     * @param string $url The full URL that the source path is on.
+     * @param string $expected The expected absolute source result.
+     * @dataProvider provideAbsoluteSourceTests
+     */
+    public function testAbsoluteSource(string $srcPath, string $url, string $expected) {
+        $actual = absoluteSource($srcPath, $url);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Provide tests for **testAbsoluteSource()**.
+     *
+     * @return array Returns a data provider array.
+     */
+    public function provideAbsoluteSourceTests() {
+        $r = [
+            'root' => ['/foo', 'http://ex.com/bar', 'http://ex.com/foo'],
+            'relative' => ['bar', 'http://ex.com/foo', 'http://ex.com/foo/bar'],
+            'relative slash' => ['bar', 'http://ex.com/foo/', 'http://ex.com/foo/bar'],
+            'scheme' => ['https://ex.com', 'http://ex.com', 'https://ex.com'],
+            'schema-less' => ['//ex.com', 'https://baz.com', 'https://ex.com'],
+            'bad scheme' => ['bad://ex.com', 'http://ex.com', ''],
+            'bad scheme 2' => ['foo', 'bad://ex.com', ''],
+            '..' => ['../foo', 'http://ex.com/bar/baz', 'http://ex.com/bar/foo'],
+            '.. 2' => ['../foo', 'http://ex.com/bar/baz/', 'http://ex.com/bar/foo']
+        ];
+
+        return $r;
+    }
 }

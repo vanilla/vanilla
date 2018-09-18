@@ -21,39 +21,47 @@ if (!function_exists('absoluteSource')) {
      * @return string Absolute source path.
      */
     function absoluteSource($srcPath, $url) {
-        // If there is a scheme in the srcpath already, just return it.
-        if (!is_null(parse_url($srcPath, PHP_URL_SCHEME))) {
-            return $srcPath;
+        $srcParts = parse_url($srcPath);
+        $urlParts = parse_url($url);
+
+        if ($srcParts === false || $urlParts === false) {
+            return '';
         }
 
-        // Does SrcPath assume root?
-        if (in_array(substr($srcPath, 0, 1), ['/', '\\'])) {
-            return parse_url($url, PHP_URL_SCHEME)
-            .'://'
-            .parse_url($url, PHP_URL_HOST)
-            .$srcPath;
-        }
-
-        // Work with the path in the url & the provided src path to backtrace if necessary
-        $urlPathParts = explode('/', str_replace('\\', '/', parse_url($url, PHP_URL_PATH)));
-        $srcParts = explode('/', str_replace('\\', '/', $srcPath));
-        $result = [];
-        foreach ($srcParts as $part) {
-            if (!$part || $part == '.') {
-                continue;
-            }
-
-            if ($part == '..') {
-                array_pop($urlPathParts);
+        // If there is a scheme in the src path already, just return it.
+        if (!empty($srcParts['scheme'])) {
+            if (in_array($srcParts['scheme'], ['http', 'https'], true)) {
+                return $srcPath;
             } else {
-                $result[] = $part;
+                return '';
             }
+        } elseif (empty($urlParts['scheme']) || !in_array($urlParts['scheme'], ['http', 'https'])) {
+            return '';
         }
-        // Put it all together & return
-        return parse_url($url, PHP_URL_SCHEME)
-        .'://'
-        .parse_url($url, PHP_URL_HOST)
-        .'/'.implode('/', array_filter(array_merge($urlPathParts, $result)));
+
+        $parts = $srcParts + $urlParts + ['path' => ''];
+
+        if (!empty($srcParts['path']) && $srcParts['path'][0] !== '/') {
+            // Work with the path in the url & the provided src path to backtrace if necessary
+            $urlPathParts = explode('/', trim(str_replace('\\', '/', $urlParts['path'] ?? ''), '/'));
+            $srcPathParts = explode('/', str_replace('\\', '/', $srcParts['path']));
+            foreach ($srcPathParts as $part) {
+                if (!$part || $part == '.') {
+                    continue;
+                }
+
+                if ($part == '..') {
+                    array_pop($urlPathParts);
+                } else {
+                    $urlPathParts[] = $part;
+                }
+            }
+
+            $parts['path'] = '/'.implode('/', $urlPathParts);
+        }
+
+        $result = "{$parts['scheme']}://{$parts['host']}{$parts['path']}";
+        return $result;
     }
 }
 
@@ -1195,8 +1203,6 @@ if (!function_exists('domGetImages')) {
             ];
         }
 
-//      Gdn::controller()->Data['AllImages'] = $Images;
-
         // Sort by size, biggest one first
         $imageSort = [];
         // Only look at first 4 images (speed!)
@@ -1204,7 +1210,7 @@ if (!function_exists('domGetImages')) {
         foreach ($images as $imageInfo) {
             $image = $imageInfo['Src'];
 
-            if (strpos($image, 'doubleclick.') != false) {
+            if (empty($image) || strpos($image, 'doubleclick.') !== false) {
                 continue;
             }
 
@@ -1217,8 +1223,6 @@ if (!function_exists('domGetImages')) {
                 }
 
                 $diag = (int)floor(sqrt(($width * $width) + ($height * $height)));
-
-//            Gdn::controller()->Data['Foo'][] = array($Image, $Width, $Height, $Diag);
 
                 if (!$width || !$height) {
                     continue;
@@ -1235,8 +1239,6 @@ if (!function_exists('domGetImages')) {
                 }
 
                 // Prefer images that are less than 800px wide (banners?)
-//            if ($Diag > 141 && $Width < 800) { }
-
                 if (!array_key_exists($diag, $imageSort)) {
                     $imageSort[$diag] = [$image];
                 } else {

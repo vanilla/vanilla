@@ -389,16 +389,16 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "v3.1.32",
+            "version": "v3.1.33",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smarty-php/smarty.git",
-                "reference": "ac9d4b587e5bf53381e21881820a9830765cb459"
+                "reference": "dd55b23121e55a3b4f1af90a707a6c4e5969530f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/ac9d4b587e5bf53381e21881820a9830765cb459",
-                "reference": "ac9d4b587e5bf53381e21881820a9830765cb459",
+                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/dd55b23121e55a3b4f1af90a707a6c4e5969530f",
+                "reference": "dd55b23121e55a3b4f1af90a707a6c4e5969530f",
                 "shasum": ""
             },
             "require": {
@@ -438,7 +438,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2018-04-24T14:53:33+00:00"
+            "time": "2018-09-12T20:54:16+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -814,20 +814,23 @@
         },
         {
             "name": "vanilla/garden-password",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-password.git",
-                "reference": "62c1182687e82ed3e941af635deb2b1a1d96c980"
+                "reference": "4f8b07907fcd3bcb90e5b0875e205dc65984c8b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-password/zipball/62c1182687e82ed3e941af635deb2b1a1d96c980",
-                "reference": "62c1182687e82ed3e941af635deb2b1a1d96c980",
+                "url": "https://api.github.com/repos/vanilla/garden-password/zipball/4f8b07907fcd3bcb90e5b0875e205dc65984c8b9",
+                "reference": "4f8b07907fcd3bcb90e5b0875e205dc65984c8b9",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~6.0"
             },
             "suggest": {
                 "ircmaxell/password-compat": "~1.0",
@@ -863,7 +866,7 @@
                 "vanilla",
                 "vanilla forums"
             ],
-            "time": "2016-10-21T20:47:48+00:00"
+            "time": "2018-09-17T18:11:55+00:00"
         },
         {
             "name": "vanilla/garden-schema",

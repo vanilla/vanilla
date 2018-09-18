@@ -327,7 +327,14 @@ class DashboardHooks extends Gdn_Plugin {
             ->addLinkIf('Garden.Settings.Manage', t('Statistics'), '/dashboard/statistics', 'site-settings.statistics', '', $sort)
 
             ->addGroupIf('Garden.Settings.Manage', t('Forum Data'), 'forum-data', '', ['after' => 'site-settings'])
-            ->addLinkIf('Garden.Settings.Manage', t('Import'), '/dashboard/import', 'forum-data.import', '', $sort);
+            ->addLinkIf(
+                \Vanilla\FeatureFlagHelper::featureEnabled('Import') && $session->checkPermission('Garden.Import'),
+                t('Import'),
+                '/dashboard/import',
+                'forum-data.import',
+                '',
+                $sort
+            );
     }
 
     /**

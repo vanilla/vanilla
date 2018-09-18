@@ -8,11 +8,11 @@ import Quill, { IFormats } from "quill/core";
 import React from "react";
 import { connect } from "react-redux";
 import { IStoreState, IEditorInstance } from "@rich-editor/@types/store";
-import { ILegacyMode } from "@rich-editor/components/editor/Editor";
 
-interface IContextProps extends ILegacyMode {
+interface IContextProps {
     quill: Quill;
     editorID: string;
+    legacyMode: boolean;
 }
 
 interface IGeneratedContextProps {

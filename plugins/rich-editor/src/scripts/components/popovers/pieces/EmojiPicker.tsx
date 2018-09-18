@@ -14,7 +14,6 @@ import { EMOJIS, EMOJI_GROUPS } from "@rich-editor/components/popovers/pieces/em
 import { IPopoverControllerChildParameters } from "@rich-editor/components/popovers/pieces/PopoverController";
 import Popover from "@rich-editor/components/popovers/pieces/Popover";
 import EmojiButton from "@rich-editor/components/popovers/pieces/EmojiButton";
-import { ILegacyMode } from "@rich-editor/components/editor/Editor";
 
 const BUTTON_SIZE = 36;
 const COL_SIZE = 7;
@@ -35,7 +34,7 @@ EMOJIS.forEach((data, key) => {
 
 const lastEmojiIndex = EMOJIS.length - 1;
 
-interface IProps extends IWithEditorProps, IPopoverControllerChildParameters, ILegacyMode {
+interface IProps extends IWithEditorProps, IPopoverControllerChildParameters {
     contentID: string;
 }
 
@@ -51,10 +50,6 @@ interface IState {
 }
 
 export class EmojiPicker extends React.PureComponent<IProps, IState> {
-    public static defaultProps = {
-        legacyMode: false,
-    };
-
     private categoryPickerID: string;
     private gridEl: Grid;
     private lastRowIndex = this.getRowFromIndex(EMOJIS.length);
@@ -162,7 +157,6 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 additionalClassRoot="insertEmoji"
                 onCloseClick={this.props.closeMenuHandler}
                 isVisible={this.props.isVisible}
-                legacyMode={this.props.legacyMode}
             />
         );
     }

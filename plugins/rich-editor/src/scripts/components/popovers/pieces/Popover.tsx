@@ -7,7 +7,6 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
-import { ILegacyMode } from "@rich-editor/components/editor/editor";
 import CloseButton from "@library/components/CloseButton";
 
 interface IState {
@@ -16,7 +15,7 @@ interface IState {
     titleID: string;
 }
 
-interface IProps extends ILegacyMode {
+interface IProps {
     id: string;
     titleID: string;
     descriptionID?: string;
@@ -34,10 +33,6 @@ interface IProps extends ILegacyMode {
 }
 
 export default class Popover extends React.Component<IProps, IState> {
-    public static defaultProps = {
-        legacyMode: false,
-    };
-
     constructor(props) {
         super(props);
         this.state = {
@@ -102,11 +97,7 @@ export default class Popover extends React.Component<IProps, IState> {
                     </h2>
                     {screenReaderDescription}
 
-                    <CloseButton
-                        onClick={this.props.onCloseClick}
-                        className="richEditor-close"
-                        legacyMode={this.props.legacyMode}
-                    />
+                    <CloseButton onClick={this.props.onCloseClick} className="richEditor-close" />
 
                     {this.props.additionalHeaderContent && this.props.additionalHeaderContent}
                 </div>

@@ -8,21 +8,18 @@ import React from "react";
 import classNames from "classnames";
 import { close } from "@library/components/Icons";
 import { t } from "../application";
-import { ILegacyMode } from "@rich-editor/components/editor/Editor";
+import { IWithEditorProps, withEditor } from "@rich-editor/components/context";
 
-interface IProps extends ILegacyMode {
+interface IProps extends IWithEditorProps {
     className?: string;
     disabled?: boolean;
     onClick: any;
 }
 
-export default class CloseButton extends React.Component<IProps> {
-    public static defaultProps = {
-        disabled: false,
-    };
-
+export class CloseButton extends React.Component<IProps> {
     public render() {
         const closeLabel = t("Close");
+
         if (this.props.legacyMode) {
             const componentClasses = classNames("Close", this.props.className);
             const closeChar = `×`;
@@ -50,3 +47,5 @@ export default class CloseButton extends React.Component<IProps> {
         }
     }
 }
+
+export default withEditor<IProps>(CloseButton);

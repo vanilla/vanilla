@@ -31,10 +31,6 @@ interface IState {
  * This __cannot__ be a pure component because it needs to re-render when quill emits, even if the selection is the same.
  */
 export class InlineToolbar extends React.Component<IProps, IState> {
-    public static defaultProps = {
-        legacyMode: false,
-    };
-
     private quill: Quill;
     private formatter: Formatter;
     private linkInput: React.RefObject<HTMLInputElement> = React.createRef();
@@ -75,7 +71,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const { activeFormats, instanceState, legacyMode } = this.props;
+        const { activeFormats, instanceState } = this.props;
         const alertMessage = this.isFormatMenuVisible ? (
             <span aria-live="assertive" role="alert" className="sr-only">
                 {t("Inline Menu Available")}
@@ -100,7 +96,6 @@ export class InlineToolbar extends React.Component<IProps, IState> {
                         onInputChange={this.onInputChange}
                         onInputKeyDown={this.onInputKeyDown}
                         onCloseClick={this.onCloseClick}
-                        legacyMode={this.props.legacyMode}
                     />
                 </ToolbarContainer>
             </div>

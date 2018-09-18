@@ -28,22 +28,15 @@ import { hot } from "react-hot-loader";
 import registerQuill from "@rich-editor/quill/registerQuill";
 import "../../../scss/editor.scss";
 
-export interface ILegacyMode {
-    legacyMode?: boolean;
-}
-
-interface IProps extends ILegacyMode {
+interface IProps {
     editorID: string;
     editorDescriptionID: string;
     legacyTextArea?: HTMLInputElement;
     isPrimaryEditor: boolean;
+    legacyMode: boolean;
 }
 
 export class Editor extends React.Component<IProps> {
-    public static defaultProps = {
-        legacyMode: false,
-    };
-
     private hasUploadPermission: boolean;
     private quillMountRef: React.RefObject<HTMLDivElement> = React.createRef();
     private store = getStore<IStoreState>();
@@ -59,6 +52,7 @@ export class Editor extends React.Component<IProps> {
     }
 
     public componentDidMount() {
+        window.document.body.classList.add("hasFullHeight");
         // Setup quill
         registerQuill();
         const options = { theme: "vanilla" };
@@ -86,6 +80,10 @@ export class Editor extends React.Component<IProps> {
         this.forceUpdate();
     }
 
+    public componentDidUpdate() {
+        window.document.body.classList.add("hasFullHeight");
+    }
+
     public componentWillUnmount() {
         removeDelegatedEvent(this.delegatedHandlerHash);
     }
@@ -97,7 +95,7 @@ export class Editor extends React.Component<IProps> {
         // These should all re-render after componentDidMount calls forceUpdate().
         const quillDependantItems = this.quill && (
             <React.Fragment>
-                <InlineToolbar legacyMode={this.props.legacyMode} />
+                <InlineToolbar />
                 <ParagraphToolbar />
                 <MentionToolbar />
                 <div className="richEditor-embedBar">
@@ -107,7 +105,7 @@ export class Editor extends React.Component<IProps> {
                         aria-label={t("Inline Level Formatting Menu")}
                     >
                         <li className="richEditor-menuItem u-richEditorHiddenOnMobile" role="menuitem">
-                            <EmojiPopover legacyMode={this.props.legacyMode} />
+                            <EmojiPopover />
                         </li>
                         {this.hasUploadPermission && (
                             <li className="richEditor-menuItem" role="menuitem">
@@ -115,7 +113,7 @@ export class Editor extends React.Component<IProps> {
                             </li>
                         )}
                         <li className="richEditor-menuItem" role="menuitem">
-                            <EmbedPopover legacyMode={this.props.legacyMode} />
+                            <EmbedPopover />
                         </li>
                     </ul>
                 </div>
@@ -124,7 +122,9 @@ export class Editor extends React.Component<IProps> {
 
         return (
             <ReduxProvider store={this.store}>
-                <EditorProvider value={{ quill: this.quill, editorID: this.editorID }}>
+                <EditorProvider
+                    value={{ quill: this.quill, editorID: this.editorID, legacyMode: this.props.legacyMode }}
+                >
                     <EditorDescriptions id={editorDescriptionID} />
                     <div className="richEditor-frame InputBox">
                         <div className="richEditor-textWrap" ref={this.quillMountRef}>

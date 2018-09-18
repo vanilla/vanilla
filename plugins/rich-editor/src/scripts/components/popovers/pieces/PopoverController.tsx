@@ -31,10 +31,6 @@ interface IState {
 }
 
 export default class PopoverController extends React.PureComponent<IProps, IState> {
-    public static defaultProps = {
-        legacyMode: false,
-    };
-
     private initalFocusRef: React.RefObject<any>;
     private buttonRef: React.RefObject<HTMLButtonElement>;
     private controllerRef: React.RefObject<HTMLDivElement>;

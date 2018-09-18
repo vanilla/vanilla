@@ -426,6 +426,7 @@ class ProxyRequest {
         curl_setopt($handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/'.c('Vanilla.Version')));
         curl_setopt($handler, CURLOPT_CONNECTTIMEOUT, $connectTimeout);
         curl_setopt($handler, CURLOPT_HEADERFUNCTION, [$this, 'CurlHeader']);
+        curl_setopt($handler, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
 
         if ($transferMode == 'binary') {
             curl_setopt($handler, CURLOPT_BINARYTRANSFER, true);

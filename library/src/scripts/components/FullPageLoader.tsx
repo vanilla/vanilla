@@ -5,9 +5,22 @@
  */
 
 import * as React from "react";
+import { LoadingComponentProps } from "react-loadable";
 
-export default class FullPageLoader extends React.Component {
+interface IProps extends Partial<LoadingComponentProps> {}
+
+export default class FullPageLoader extends React.Component<IProps> {
+    public static defaultProps: IProps = {
+        pastDelay: true,
+    };
+
     public render() {
-        return <div className="fullPageLoader" />;
+        const { pastDelay } = this.props;
+
+        if (pastDelay) {
+            return <div className="fullPageLoader" />;
+        } else {
+            return null;
+        }
     }
 }

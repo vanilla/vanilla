@@ -5,11 +5,12 @@
  */
 
 body {
-    .isLoading,
-    .fullHeightOfViewPort {
+    &.isLoading,
+    &.fullHeightOfViewPort {
         &,
         .page {
             height: 100vh;
+            max-height: 100vh;
             overflow: hidden;
         }
     }

@@ -5,25 +5,13 @@
  */
 
 import * as React from "react";
-import { LoadingComponentProps } from "react-loadable";
-
-interface IProps extends Partial<LoadingComponentProps> {}
+import { t } from "@library/application";
 
 /**
  * A smart loading component. Takes up the full page and only displays in certain scenarias.
  */
-export default class FullPageLoader extends React.Component<IProps> {
-    public static defaultProps: IProps = {
-        pastDelay: true,
-    };
-
+export default class FullPageLoader extends React.Component {
     public render() {
-        const { pastDelay } = this.props;
-
-        if (pastDelay) {
-            return <div className="fullPageLoader" />;
-        } else {
-            return null;
-        }
+        return <div className="fullPageLoader" tabIndex={0} aria-label={t("Your requested page is loading")} />;
     }
 }

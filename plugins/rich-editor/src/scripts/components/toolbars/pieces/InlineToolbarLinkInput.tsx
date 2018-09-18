@@ -7,7 +7,7 @@
 import React from "react";
 import { t } from "@library/application";
 import { ILegacyMode } from "@rich-editor/components/editor/editor";
-import CloseButton from "@dashboard/components/CloseButton";
+import CloseButton from "@library/components/CloseButton";
 
 interface IProps extends ILegacyMode {
     inputRef: React.RefObject<HTMLInputElement>;

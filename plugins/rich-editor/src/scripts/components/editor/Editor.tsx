@@ -36,7 +36,6 @@ interface IProps extends ILegacyMode {
     editorID: string;
     editorDescriptionID: string;
     legacyTextArea?: HTMLInputElement;
-    legacyMode?: boolean;
     isPrimaryEditor: boolean;
 }
 

@@ -6,9 +6,9 @@
 
 import React from "react";
 import classNames from "classnames";
-import { ILegacyMode } from "@rich-editor/components/editor/editor";
 import { close } from "@library/components/Icons";
-import { t } from "@library/application";
+import { t } from "../application";
+import { ILegacyMode } from "@rich-editor/components/editor/Editor";
 
 interface IProps extends ILegacyMode {
     className?: string;
@@ -35,7 +35,7 @@ export default class CloseButton extends React.Component<IProps> {
                 </button>
             );
         } else {
-            const componentClasses = classNames("button", "button-close", this.props.className);
+            const componentClasses = classNames("button", "button-icon", "button-close", this.props.className);
             return (
                 <button
                     disabled={this.props.disabled}

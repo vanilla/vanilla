@@ -8,11 +8,11 @@ import Quill, { IFormats } from "quill/core";
 import React from "react";
 import { connect } from "react-redux";
 import { IStoreState, IEditorInstance } from "@rich-editor/@types/store";
+import { ILegacyMode } from "@rich-editor/components/editor/Editor";
 
-interface IContextProps {
+interface IContextProps extends ILegacyMode {
     quill: Quill;
     editorID: string;
-    legacyMode?: boolean;
 }
 
 interface IGeneratedContextProps {
@@ -32,7 +32,7 @@ export { Consumer as EditorConsumer, Provider as EditorProvider };
  * Map in the instance state of the current editor.
  */
 function mapStateToProps(state: IStoreState, ownProps: IContextProps) {
-    const { editorID, quill } = ownProps;
+    const { editorID, quill, legacyMode } = ownProps;
     const instanceState = state.editor.instances[editorID];
     const { lastGoodSelection } = instanceState;
     const activeFormats = lastGoodSelection ? quill.getFormat(lastGoodSelection) : {};

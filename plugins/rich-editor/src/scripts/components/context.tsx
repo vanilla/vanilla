@@ -12,6 +12,7 @@ import { IStoreState, IEditorInstance } from "@rich-editor/@types/store";
 interface IContextProps {
     quill: Quill;
     editorID: string;
+    legacyMode?: boolean;
 }
 
 interface IGeneratedContextProps {

@@ -6,8 +6,10 @@
 
 import React from "react";
 import { t } from "@library/application";
+import { ILegacyMode } from "@rich-editor/components/editor/editor";
+import CloseButton from "@dashboard/components/CloseButton";
 
-interface IProps {
+interface IProps extends ILegacyMode {
     inputRef: React.RefObject<HTMLInputElement>;
     inputValue: string;
     onInputKeyDown: React.KeyboardEventHandler<any>;
@@ -16,6 +18,10 @@ interface IProps {
 }
 
 export class InlineToolbarLinkInput extends React.Component<IProps, {}> {
+    public static defaultProps = {
+        legacyMode: false,
+    };
+
     constructor(props) {
         super(props);
 
@@ -42,12 +48,11 @@ export class InlineToolbarLinkInput extends React.Component<IProps, {}> {
                     className="InputBox insertLink-input"
                     placeholder={t("Paste or type a link…")}
                 />
-                <button type="button" onClick={this.props.onCloseClick} className="Close richEditor-close">
-                    <span className="Close-x" aria-hidden="true">
-                        {close}
-                    </span>
-                    <span className="sr-only">{t("Close")}</span>
-                </button>
+                <CloseButton
+                    legacyMode={this.props.legacyMode}
+                    className="richEditor-close"
+                    onClick={this.props.onCloseClick}
+                />
             </div>
         );
     }

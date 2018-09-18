@@ -11,8 +11,15 @@ import PopoverController, {
     IPopoverControllerChildParameters,
 } from "@rich-editor/components/popovers/pieces/PopoverController";
 import EmojiPicker from "@rich-editor/components/popovers/pieces/EmojiPicker";
+import { ILegacyMode } from "@rich-editor/components/editor/editor";
 
-export default class EmojiPopover extends React.Component<IOptionalComponentID, IRequiredComponentID> {
+interface IProps extends IOptionalComponentID, ILegacyMode {}
+
+export default class EmojiPopover extends React.Component<IProps, IRequiredComponentID> {
+    public static defaultProps = {
+        legacyMode: false,
+    };
+
     public constructor(props) {
         super(props);
         this.state = {
@@ -29,7 +36,7 @@ export default class EmojiPopover extends React.Component<IOptionalComponentID, 
         return (
             <PopoverController id={this.state.id} classNameRoot="emojiPicker" icon={icon}>
                 {(options: IPopoverControllerChildParameters) => {
-                    return <EmojiPicker {...options} contentID={options.id} />;
+                    return <EmojiPicker {...options} contentID={options.id} legacyMode={this.props.legacyMode} />;
                 }}
             </PopoverController>
         );

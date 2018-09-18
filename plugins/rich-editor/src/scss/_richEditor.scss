@@ -9,6 +9,8 @@
     }
 
     &.inheritHeight {
+        display: flex;
+
         .richEditor-text,
         .richEditor-textWrap,
         .richEditor-frame {

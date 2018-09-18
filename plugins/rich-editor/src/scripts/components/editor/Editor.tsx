@@ -28,14 +28,23 @@ import { hot } from "react-hot-loader";
 import registerQuill from "@rich-editor/quill/registerQuill";
 import "../../../scss/editor.scss";
 
-interface IProps {
+export interface ILegacyMode {
+    legacyMode?: boolean;
+}
+
+interface IProps extends ILegacyMode {
     editorID: string;
     editorDescriptionID: string;
     legacyTextArea?: HTMLInputElement;
+    legacyMode?: boolean;
     isPrimaryEditor: boolean;
 }
 
 export class Editor extends React.Component<IProps> {
+    public static defaultProps = {
+        legacyMode: false,
+    };
+
     private hasUploadPermission: boolean;
     private quillMountRef: React.RefObject<HTMLDivElement> = React.createRef();
     private store = getStore<IStoreState>();
@@ -89,7 +98,7 @@ export class Editor extends React.Component<IProps> {
         // These should all re-render after componentDidMount calls forceUpdate().
         const quillDependantItems = this.quill && (
             <React.Fragment>
-                <InlineToolbar />
+                <InlineToolbar legacyMode={this.props.legacyMode} />
                 <ParagraphToolbar />
                 <MentionToolbar />
                 <div className="richEditor-embedBar">
@@ -99,7 +108,7 @@ export class Editor extends React.Component<IProps> {
                         aria-label={t("Inline Level Formatting Menu")}
                     >
                         <li className="richEditor-menuItem u-richEditorHiddenOnMobile" role="menuitem">
-                            <EmojiPopover />
+                            <EmojiPopover legacyMode={this.props.legacyMode} />
                         </li>
                         {this.hasUploadPermission && (
                             <li className="richEditor-menuItem" role="menuitem">
@@ -107,7 +116,7 @@ export class Editor extends React.Component<IProps> {
                             </li>
                         )}
                         <li className="richEditor-menuItem" role="menuitem">
-                            <EmbedPopover />
+                            <EmbedPopover legacyMode={this.props.legacyMode} />
                         </li>
                     </ul>
                 </div>

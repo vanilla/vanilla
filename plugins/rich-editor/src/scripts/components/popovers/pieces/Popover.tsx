@@ -7,6 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
+import { ILegacyMode } from "@rich-editor/components/editor/editor";
 
 interface IState {
     id: string;
@@ -14,7 +15,7 @@ interface IState {
     titleID: string;
 }
 
-interface IProps {
+interface IProps extends ILegacyMode {
     id: string;
     titleID: string;
     descriptionID?: string;
@@ -32,6 +33,10 @@ interface IProps {
 }
 
 export default class Popover extends React.Component<IProps, IState> {
+    public static defaultProps = {
+        legacyMode: false,
+    };
+
     constructor(props) {
         super(props);
         this.state = {

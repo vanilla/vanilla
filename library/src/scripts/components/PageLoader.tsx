@@ -8,6 +8,9 @@ import { ILoadable, LoadStatus } from "@library/@types/api";
 import FullPageLoader from "@library/components/FullPageLoader";
 import FullPageError from "@library/components/FullPageError";
 
+/**
+ * A class for handling an ILoadable and display error, loading, or children.
+ */
 export default class PageLoader extends React.PureComponent<ILoadable<any>, {}> {
     public static defaultProps: Partial<ILoadable<any>> = {
         status: LoadStatus.PENDING,

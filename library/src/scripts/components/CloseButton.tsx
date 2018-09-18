@@ -1,5 +1,4 @@
-/*
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+/**
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
@@ -7,16 +6,26 @@
 import React from "react";
 import classNames from "classnames";
 import { close } from "@library/components/Icons";
-import { t } from "../application";
-import { IWithEditorProps, withEditor } from "@rich-editor/components/context";
+import { t } from "@library/application";
+import { ILegacyProps } from "@library/@types/legacy";
 
-interface IProps extends IWithEditorProps {
+interface IProps extends Partial<ILegacyProps> {
     className?: string;
     disabled?: boolean;
     onClick: any;
 }
 
-export class CloseButton extends React.Component<IProps> {
+/**
+ * A standardized close button.
+ */
+export default class CloseButton extends React.Component<IProps> {
+    public static defaultProps: ILegacyProps = {
+        legacyMode: false,
+    };
+
+    /**
+     * There are 2 rendering modes. 1 with w real icon, and one using text in place of an icon.
+     */
     public render() {
         const closeLabel = t("Close");
 
@@ -47,5 +56,3 @@ export class CloseButton extends React.Component<IProps> {
         }
     }
 }
-
-export default withEditor<IProps>(CloseButton);

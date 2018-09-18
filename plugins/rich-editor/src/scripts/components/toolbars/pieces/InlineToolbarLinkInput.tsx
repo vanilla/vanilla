@@ -7,8 +7,9 @@
 import React from "react";
 import { t } from "@library/application";
 import CloseButton from "@library/components/CloseButton";
+import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 
-interface IProps {
+interface IProps extends IWithEditorProps {
     inputRef: React.RefObject<HTMLInputElement>;
     inputValue: string;
     onInputKeyDown: React.KeyboardEventHandler<any>;
@@ -42,10 +43,14 @@ export class InlineToolbarLinkInput extends React.Component<IProps, {}> {
                     className="InputBox insertLink-input"
                     placeholder={t("Paste or type a link…")}
                 />
-                <CloseButton className="richEditor-close" onClick={this.props.onCloseClick} />
+                <CloseButton
+                    className="richEditor-close"
+                    onClick={this.props.onCloseClick}
+                    legacyMode={this.props.legacyMode}
+                />
             </div>
         );
     }
 }
 
-export default InlineToolbarLinkInput;
+export default withEditor<IProps>(InlineToolbarLinkInput);

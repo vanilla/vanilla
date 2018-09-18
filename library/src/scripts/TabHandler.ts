@@ -8,10 +8,21 @@
 import tabbable from "tabbable";
 import { logError } from "@library/utility";
 
+/**
+ * A class for handling tabbing inside of a container with various exclusions.
+ *
+ * The goal is here is to be able to programatically implement various tabbing behaviours
+ * required for accessibility.
+ */
 export default class TabHandler {
     private tabbableElements: HTMLElement[];
 
     /**
+     * Construct the handler. Don't be afraid to construct multiple of these.
+     *
+     * The elements in a particular TabHandler are very moment specific.
+     * If the DOM changes underneath it it will likely no longer be valid.
+     *
      * @param root - The root element to look in.
      * @param excludedElements - Elements to ignore.
      * @param excludedRoots - These element's children will be ignored.
@@ -43,7 +54,7 @@ export default class TabHandler {
             logError("Unable to tab to next element, `fromElement` given is not valid: ", from);
             return null;
         }
-        const tabbables = this.tabbableElements.filter(this.filterExcludedWithExcemption.bind(this, from));
+        const tabbables = this.tabbableElements.filter(this.createExcludeFilterWithExemption.bind(this, from));
         const currentTabIndex = this.tabbableElements.indexOf(from);
 
         if (currentTabIndex < 0) {
@@ -64,6 +75,9 @@ export default class TabHandler {
         return tabbables[targetIndex] || null;
     }
 
+    /**
+     * Get the first focusable element.
+     */
     public getInitial(): HTMLElement | null {
         const tabbables = this.tabbableElements.filter(this.filterAllExcluded);
         if (tabbables.length > 0) {
@@ -73,25 +87,38 @@ export default class TabHandler {
         }
     }
 
-    private filterExcludedWithExcemption = (excemption: Element, elementToFilter: Element): boolean => {
-        // We want to excempt items that are the active item or a parent of the active item
-        // because otherwise we would not be able to tab away from them.
-        const elementIsActiveOrChildOfActive = excemption === elementToFilter || elementToFilter.contains(excemption);
+    /**
+     * Filter out all excluded elements. Allows 1 element and its parents to be exempted.
+     *
+     * The exemption is necessary so we can find our place
+     * if the focus is already in an item that we are trying to exclude.
+     *
+     * @returns A filter for use with [].filter()
+     */
+    private createExcludeFilterWithExemption = (exemption: Element) => {
+        return (elementToFilter: Element): boolean => {
+            const elementIsActiveOrChildOfActive = exemption === elementToFilter || elementToFilter.contains(exemption);
 
-        if (!elementIsActiveOrChildOfActive) {
-            if (this.excludedElements.includes(elementToFilter)) {
-                return false;
-            }
-            for (const excludedRoot of this.excludedRoots) {
-                if (excludedRoot !== elementToFilter && excludedRoot.contains(elementToFilter)) {
+            if (!elementIsActiveOrChildOfActive) {
+                if (this.excludedElements.includes(elementToFilter)) {
                     return false;
                 }
+                for (const excludedRoot of this.excludedRoots) {
+                    if (excludedRoot !== elementToFilter && excludedRoot.contains(elementToFilter)) {
+                        return false;
+                    }
+                }
             }
-        }
 
-        return true;
+            return true;
+        };
     };
 
+    /**
+     * A filter for use with [].filter().
+     *
+     * Filters out all excluded elements and roots.
+     */
     private filterAllExcluded = (elementToFilter: Element): boolean => {
         if (this.excludedElements.includes(elementToFilter)) {
             return false;

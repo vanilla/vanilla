@@ -2,13 +2,15 @@
 
 namespace Vanilla;
 
-use Gdn;
 use Vanilla\Exception\FeatureNotEnabledException;
+use Garden\StaticCacheConfigTrait;
 
 /**
  * A helper class for gatekeeping code behind feature flags.
  */
 class FeatureFlagHelper {
+
+    use StaticCacheConfigTrait;
 
     /**
      * Is a feature enabled?
@@ -18,7 +20,7 @@ class FeatureFlagHelper {
      */
     public static function featureEnabled(string $feature): bool {
         // We're going to enforce the root "Feature" namespace.
-        $configValue = Gdn::config("Feature.{$feature}.Enabled");
+        $configValue = self::c("Feature.{$feature}.Enabled");
         // Force a true boolean.
         $result = filter_var($configValue, FILTER_VALIDATE_BOOLEAN);
         return $result;
@@ -50,6 +52,7 @@ class FeatureFlagHelper {
      * @deprecated 2.7 Use FeatureFlagHelper::ensureFeature instead.
      */
     public static function throwIfNotEnabled(string $feature, string $exceptionClass = \Exception::class, array $exceptionArguments = []) {
+        Utility\Deprecation::log();
         if (self::featureEnabled($feature) === false) {
             if ($exceptionClass === \Exception::class && empty($exceptionArguments)) {
                 $exceptionArguments = [t('This feature is not enabled.')];

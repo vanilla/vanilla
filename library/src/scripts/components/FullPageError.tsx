@@ -15,7 +15,7 @@ interface IProps {
 export default class FullPageError extends React.Component<IProps> {
     public render() {
         return (
-            <div className="fullPageError" aria-role="alert">
+            <div className="fullPageError" role="alert">
                 {this.props.children}
             </div>
         );

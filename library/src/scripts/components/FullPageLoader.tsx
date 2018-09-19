@@ -12,6 +12,6 @@ import { t } from "@library/application";
  */
 export default class FullPageLoader extends React.Component {
     public render() {
-        return <div className="fullPageLoader" tabIndex={0} aria-label={t("Your requested page is loading")} />;
+        return <div className="fullPageLoader" />;
     }
 }

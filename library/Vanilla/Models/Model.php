@@ -7,9 +7,9 @@
 namespace Vanilla\Models;
 
 use Exception;
-use Garden\Pipeline;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
+use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\InjectableInterface;
 
 /**
@@ -17,26 +17,14 @@ use Vanilla\InjectableInterface;
  */
 class Model implements InjectableInterface {
 
-    /** @var string Destination for processors looking to alter read operation results. */
-    const PIPELINE_READ = "read";
-
-    /** @var string Destination for processors looking to alter write operations. */
-    const PIPELINE_WRITE = "write";
-
     /** @var \Gdn_Database */
     private $database;
-
-    /** @var Pipeline */
-    private $readPipeline;
 
     /** @var Schema */
     private $readSchema;
 
     /** @var string */
     private $table;
-
-    /** @var Pipeline */
-    private $writePipeline;
 
     /** @var Schema */
     private $writeSchema;
@@ -48,23 +36,6 @@ class Model implements InjectableInterface {
      */
     public function __construct(string $table) {
         $this->table = $table;
-        $this->readPipeline = new Pipeline();
-        $this->writePipeline = new Pipeline();
-    }
-
-    /**
-     * Add a new processor to a pipeline.
-     *
-     * @param callable $processor
-     * @param string $target
-     * @return Model
-     * @throws Exception If an invalid pipeline is specified.
-     */
-    public function addToPipeline(callable $processor, string $target): Model {
-        $pipeline = $this->getPipeline($target);
-
-        $pipeline->addProcessor($processor);
-        return $this;
     }
 
     /**
@@ -137,28 +108,7 @@ class Model implements InjectableInterface {
     }
 
     /**
-     * Get a pipeline by its name.
-     *
-     * @param string $name
-     * @return Pipeline
-     * @throws Exception If the pipeline name specified is invalid.
-     */
-    private function getPipeline(string $name): Pipeline {
-        switch ($name) {
-            case self::PIPELINE_READ:
-                $pipeline = $this->readPipeline;
-                break;
-            case self::PIPELINE_WRITE:
-                $pipeline = $this->writePipeline;
-                break;
-            default:
-                throw new Exception("Invalid pipeline specified.");
-        }
-        return $pipeline;
-    }
-
-    /**
-     * Get a single row.
+     * Select a single row.
      *
      * @param array $where Conditions for the select query.
      * @param array $options Options for the select query.
@@ -170,14 +120,13 @@ class Model implements InjectableInterface {
      * @throws ValidationException If a row fails to validate against the schema.
      * @throws Exception If no rows could be found.
      */
-    public function getSingle(array $where = [], array $options = []): array {
+    public function selectSingle(array $where = [], array $options = []): array {
         $options["limit"] = 1;
         $rows = $this->get($where, $options);
         if (empty($rows)) {
-            throw new Exception("No rows matched the provided criteria.");
+            throw new NoResultsException("No rows matched the provided criteria.");
         }
-        $row = reset($rows);
-        $result = $this->invokePipeline($row, self::PIPELINE_READ);
+        $result = reset($rows);
         return $result;
     }
 
@@ -197,19 +146,6 @@ class Model implements InjectableInterface {
         if ($result === false) {
             throw new Exception("An unknown error was encountered while inserting the row.");
         }
-        return $result;
-    }
-
-    /**
-     * Invoke a pipeline on a value.
-     *
-     * @param mixed $value
-     * @param string $name
-     * @return mixed
-     * @throws Exception If the pipeline name specified is invalid.
-     */
-    private function invokePipeline($value, string $name) {
-        $result = $this->getPipeline($name)->process($value);
         return $result;
     }
 

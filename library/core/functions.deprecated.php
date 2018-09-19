@@ -64,7 +64,7 @@ if (!function_exists('arrayInArray')) {
 }
 
 /**
- * array_merge_recursive does indeed merge arrays, but it converts values with duplicate
+ * The array_merge_recursive function does indeed merge arrays, but it converts values with duplicate
  * keys to arrays rather than overwriting the value in the first array with the duplicate
  * value in the second array, as array_merge does. I.e., with array_merge_recursive,
  * this happens (documented behavior):

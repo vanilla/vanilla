@@ -88,7 +88,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
      * @param string $str The string to format.
      * @param string[] $lines The output buffer.
      */
-    private static function formatComment(string $str, array &$lines) {
+    private static function formatComment($str, &$lines) {
         $commentLines = explode("\n", str_replace("\r", '', $str));
 
         foreach ($commentLines as $line) {

@@ -54,8 +54,8 @@ export default class TabHandler {
             logError("Unable to tab to next element, `fromElement` given is not valid: ", from);
             return null;
         }
-        const tabbables = this.tabbableElements.filter(this.createExcludeFilterWithExemption.bind(this, from));
-        const currentTabIndex = this.tabbableElements.indexOf(from);
+        const tabbables = this.tabbableElements.filter(this.createExcludeFilterWithExemption(from));
+        const currentTabIndex = tabbables.indexOf(from);
 
         if (currentTabIndex < 0) {
             return null;

@@ -43,13 +43,13 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     protected $CallbackOptions;
 
     /**
+     * Gdn_ConfigurationSource constructor.
      *
-     *
-     * @param $configuration
-     * @param $type
-     * @param $source
-     * @param $group
-     * @param $settings
+     * @param Gdn_Configuration $configuration Top level configuration object to reference.
+     * @param string $type Type of source (e.g. file or string).
+     * @param string $source Name of source (e.g. filename, or string source tag).
+     * @param string $group Group name for this config source (e.g. Configuration).
+     * @param array $settings Current array of live config settings for this source.
      */
     public function __construct($configuration, $type, $source, $group, $settings) {
         parent::__construct();
@@ -85,27 +85,28 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     }
 
     /**
+     * Allow key splitting on dots.
      *
-     *
-     * @param bool $splitting
+     * @param bool $splitting The new value.
      */
     public function splitting($splitting = true) {
         $this->Splitting = (boolean)$splitting;
     }
 
     /**
+     * Identify this object for debugging.
      *
-     *
-     * @return string
+     * @return string Returns an identity as a string.
+     * @deprecated
      */
     public function identify() {
         return __METHOD__.":{$this->Type}:{$this->Source}:".(int)$this->Dirty;
     }
 
     /**
+     * Group name for this config source (e.g. Configuration).
      *
-     *
-     * @return string
+     * @return string Returns the group name.
      */
     public function group() {
         return $this->Group;
@@ -199,11 +200,12 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     }
 
     /**
+     * Parse a config string.
      *
-     *
-     * @param $String
-     * @param $Name
-     * @return bool
+     * @param string $String The string to parse.
+     * @param string $Name The name of the configuration variable within the string.
+     * @return array|false Returns the parsed string or **false** if the string was malformed.
+     * @deprecated
      */
     public static function parseString($String, $Name) {
         // Define the variable properly.
@@ -254,9 +256,9 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     }
 
     /**
+     * Specify this configuration source should be a file.
      *
-     *
-     * @param $file
+     * @param string $file The path to the config file.
      */
     public function toFile($file) {
         $this->Type = 'file';
@@ -265,18 +267,18 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     }
 
     /**
+     * Export settings.
      *
-     *
-     * @return array
+     * @return array Returns the settings.
      */
     public function export() {
         return $this->Settings;
     }
 
     /**
+     * Import settings.
      *
-     *
-     * @param $settings
+     * @param array $settings The settings to import.
      */
     public function import($settings) {
         $this->Settings = $settings;
@@ -334,11 +336,11 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     }
 
     /**
+     * Set a config value.
      *
-     *
-     * @param $name
-     * @param null $value
-     * @param bool $overwrite
+     * @param array|string $name The name of the config setting or an array of config settings.
+     * @param mixed $value The new value.
+     * @param bool $overwrite Whether or not to overwrite an existing config value.
      */
     public function set($name, $value = null, $overwrite = true) {
         // Make sure this source' config settings are in the right format
@@ -433,10 +435,10 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     }
 
     /**
+     * Save the config.
      *
-     *
-     * @return bool|null
-     * @throws Exception
+     * @return bool|null Returns **null** of the config doesn't need to be saved or a bool indicating success.
+     * @throws Exception Throws an exception if something goes wrong while saving.
      */
     public function save() {
         if (!$this->Dirty) {
@@ -584,9 +586,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
     }
 
     /**
-     *
-     *
-     * @throws Exception
+     * Handle flushing the config to its source during app shutdown.
      */
     public function shutdown() {
         if ($this->Dirty) {

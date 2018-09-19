@@ -674,6 +674,7 @@ if (!function_exists('safeParseStr')) {
      * @see parse_str()
      */
     function safeParseStr($str, &$output, $original = null) {
+        \Vanilla\Utility\Deprecation::log();
         $exploded = explode('&', $str);
         $output = [];
         if (is_array($original)) {
@@ -742,7 +743,7 @@ if (!function_exists('trueStripSlashes')) {
          * @deprecated
          */
         function trueStripSlashes($string) {
-            deprecated('trueStripSlashes()');
+            \Vanilla\Utility\Deprecation::log();
             return stripslashes($string);
         }
     } else {
@@ -750,7 +751,7 @@ if (!function_exists('trueStripSlashes')) {
          * @deprecated
          */
         function trueStripSlashes($string) {
-            deprecated('trueStripSlashes()');
+            \Vanilla\Utility\Deprecation::log();
             return $string;
         }
     }
@@ -767,7 +768,7 @@ if (!function_exists('viewLocation')) {
      * @deprecated
      */
     function viewLocation($view, $controller, $folder) {
-        deprecated('viewLocation()');
+        \Vanilla\Utility\Deprecation::log();
         $paths = [];
 
         if (strpos($view, '/') !== false) {

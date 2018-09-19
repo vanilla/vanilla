@@ -65,7 +65,7 @@ class AuthenticateApiController extends AbstractApiController {
         SSOModel $ssoModel,
         UserModel $userModel
     ) {
-        \Vanilla\FeatureFlagHelper::throwIfNotEnabled(self::FEATURE_FLAG);
+        \Vanilla\FeatureFlagHelper::ensureFeature(self::FEATURE_FLAG);
         $this->authenticatorApiController = $authenticatorApiController;
         $this->config = $config;
         $this->request = $request;

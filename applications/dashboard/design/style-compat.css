@@ -1,4 +1,13 @@
 @charset "UTF-8";
+/*!
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 /* -------------------------------------------------------------- *    Utility Variables
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Globals
@@ -45,6 +54,102 @@
 \* -------------------------------------------------------------- */
 /* ------------------------------- *    Third Party Colors
 \* ------------------------------- */
+/*!
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+@-webkit-keyframes spinnerLoader {
+  0% {
+    -webkit-transform: rotate(73deg);
+            transform: rotate(73deg);
+  }
+  100% {
+    -webkit-transform: rotate(433deg);
+            transform: rotate(433deg);
+  }
+}
+@keyframes spinnerLoader {
+  0% {
+    -webkit-transform: rotate(73deg);
+            transform: rotate(73deg);
+  }
+  100% {
+    -webkit-transform: rotate(433deg);
+            transform: rotate(433deg);
+  }
+}
+
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 em {
   font-style: italic;
 }
@@ -694,653 +799,39 @@ label.checkbox input.checkbox-input {
 }
 
 /*!
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @author Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-@-webkit-keyframes spinnerLoader {
-  0% {
-    -webkit-transform: rotate(73deg);
-            transform: rotate(73deg);
-  }
-  100% {
-    -webkit-transform: rotate(433deg);
-            transform: rotate(433deg);
-  }
-}
-@keyframes spinnerLoader {
-  0% {
-    -webkit-transform: rotate(73deg);
-            transform: rotate(73deg);
-  }
-  100% {
-    -webkit-transform: rotate(433deg);
-            transform: rotate(433deg);
-  }
-}
-
 /*!
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-@-webkit-keyframes fadein {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-@keyframes fadein {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.accessibility-jumpTo {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 0;
 }
 
-.collapsableContent {
-  -webkit-transition: max-height 0.2s ease;
-          transition: max-height 0.2s ease;
-}
-
-.collapsableContent *:last-child {
-  margin-bottom: 0;
-}
-
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 .richEditor {
-  position: relative;
-  display: block;
+  color: #555a62;
   padding-left: 36px;
-  color: #555a62;
-}
-
-.richEditor.isDisabled,
-.richEditor.isDisabled .richEditor-button {
-  cursor: progress !important;
-}
-
-.richEditor h1,
-.richEditor h2,
-.richEditor h3,
-.richEditor h4,
-.richEditor h5,
-.richEditor h6,
-.richEditor p {
-  color: #555a62;
 }
 
 .richEditor blockquote {
   display: block;
   margin: 0;
-}
-
-.richEditor-frame.InputBox {
-  position: relative;
-  background: #fff;
-  height: auto;
-  padding: 0;
-}
-
-.richEditor-menu {
-  display: inline-block;
-  position: relative;
-  background-color: #fff;
-  border-radius: 2px;
-  border-color: #d6d7d9;
-  border-style: solid;
-  border-width: 1px;
-  box-shadow: 0 5px 10px rgba(85, 90, 98, 0.2);
-}
-
-.richEditorParagraphMenu {
-  position: absolute;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  top: 9px;
-  left: 0;
-  -webkit-transform: translateX(-100%);
-      -ms-transform: translateX(-100%);
-          transform: translateX(-100%);
-  height: 28px;
-  width: 36px;
-  z-index: 1;
-  -webkit-animation: fadein 0.3s ease;
-          animation: fadein 0.3s ease;
-  -webkit-animation-iteration-count: 1;
-          animation-iteration-count: 1;
-}
-
-.richEditorParagraphMenu .richEditor-button.isActive:hover {
-  cursor: default;
-}
-
-.richEditorParagraphMenu-handle {
-  width: 28px;
-  max-width: 28px;
-  min-width: 28px;
-  height: 28px;
-}
-
-.richEditor-text {
-  position: relative;
-  min-height: 200px;
-  padding-top: 12px;
-  padding-right: 12px;
-  padding-bottom: 12px;
-  padding-left: 12px;
-  outline-color: transparent;
-  white-space: pre-wrap !important;
-}
-
-.richEditor-text:focus {
-  outline-offset: 0;
-  outline-style: solid;
-  outline-width: 1px;
-  outline-color: rgba(2, 145, 219, 0.6);
-}
-
-.ql-clipboard {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
-}
-
-.richEditor-menuItems {
-  position: relative;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: start;
-  -webkit-align-items: flex-start;
-      -ms-flex-align: start;
-          align-items: flex-start;
-  -webkit-box-pack: start;
-  -webkit-justify-content: flex-start;
-      -ms-flex-pack: start;
-          justify-content: flex-start;
-  -webkit-flex-wrap: nowrap;
-      -ms-flex-wrap: nowrap;
-          flex-wrap: nowrap;
-  list-style: none;
-  padding: 0;
-  -ms-overflow-style: -ms-autohiding-scrollbar;
-  margin: 0;
-}
-
-.richEditor-menuItems .richEditor-menuItem {
-  display: block;
-  padding: 0;
-  margin: 0;
-}
-
-.richEditor-menuItems .richEditor-menuItem .richEditor-button, .richEditor-menuItems .richEditor-menuItem.richEditor-button {
-  width: 36px;
-  font-size: 22.1538461538px;
-  line-height: 36px;
-}
-
-.richEditor-menuItems .richEditor-menuItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuItems .richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
-  font-size: 10px;
-}
-
-.richEditor-menuItems .richEditor-menuItem:first-child .richEditor-embedButton {
-  border-bottom-left-radius: 2px;
-}
-
-.richEditor-menuItems .richEditor-menuItem.isRightAligned {
-  margin-left: auto;
-}
-
-.richEditor-nextInput,
-.iconButton,
-.richEditor-button {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow-x: hidden;
-  max-width: 100%;
-  position: relative;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-  border: 0;
-  padding: 0;
-  background: none;
-  text-align: left;
-}
-
-.richEditor-button {
-  display: block;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  cursor: pointer;
-}
-
-.richEditor-button.richEditor-formatButton, .richEditor-button.richEditor-embedButton {
-  height: 36px;
-  color: inherit;
-}
-
-.richEditor-button.emojiGroup {
-  display: block;
-  width: 36px;
-  height: 36px;
-  text-align: center;
-}
-
-.richEditor-button.emojiGroup.isSelected {
-  opacity: 1;
-}
-
-.richEditor-button:not(:disabled) {
-  cursor: pointer;
-}
-
-.richEditor-button:hover {
-  opacity: 1;
-  cursor: pointer;
-}
-
-.richEditor-button:hover .Close-x,
-.richEditor-button:hover .richEditorButton-icon {
-  opacity: 1;
-}
-
-.richEditor-button:focus {
-  opacity: 1;
-  outline: none;
-  z-index: 2;
-}
-
-.richEditor-button:focus .Close-x,
-.richEditor-button:focus .richEditorButton-icon {
-  opacity: 1;
-}
-
-.richEditor-button.isActive {
-  opacity: 1;
-}
-
-.richEditor-button.isActive .Close-x,
-.richEditor-button.isActive .richEditorButton-icon {
-  opacity: 1;
-}
-
-.richEditor-button.isOpen {
-  opacity: 1;
-}
-
-.richEditor-button.richEditor-formatButton:focus {
-  opacity: 1;
-  outline: none;
-}
-
-.richEditor-menuItem {
-  display: block;
-  padding: 0;
-  margin: 0;
-}
-
-.richEditor-menuItem .richEditor-button, .richEditor-menuItem.richEditor-button {
-  width: 36px;
-  height: 36px;
-  max-width: 36px;
-  font-size: 22.1538461538px;
-  line-height: 36px;
-}
-
-.richEditor-menuItem .richEditor-button.emojiChar-🇺🇳, .richEditor-menuItem.richEditor-button.emojiChar-🇺🇳 {
-  font-size: 14px;
-}
-
-.richEditor-menuItem.isRightAligned {
-  margin-left: auto;
-}
-
-.richEditor-upload {
-  display: none !important;
-}
-
-.richEditor-embedBar {
-  display: block;
-  width: 100%;
-  padding: 0;
-  margin-top: 1px;
-}
-
-.richEditorButton-icon {
-  display: block;
-  margin: auto;
-  height: 24px;
-  width: 24px;
-  opacity: 0.6;
-}
-
-.Close-x {
-  display: block;
-  opacity: 0.6;
-  cursor: pointer;
-}
-
-.insertLink {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-wrap: nowrap;
-      -ms-flex-wrap: nowrap;
-          flex-wrap: nowrap;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  max-width: 387px;
-  width: 100%;
-  padding-left: 5px;
-}
-
-.richEditor-close.Close {
-  position: relative;
-  display: block;
-  width: 36px;
-  height: 36px;
-  line-height: 36px;
-  vertical-align: bottom;
-  top: auto;
-  right: auto;
-  text-align: center;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  background: transparent;
-  cursor: pointer;
-  opacity: 0.6;
-}
-
-.richEditor-close.Close:hover {
-  opacity: 1;
-  cursor: pointer;
-}
-
-.richEditor-close.Close:focus {
-  opacity: 1;
-  outline: none;
-}
-
-.richEditor-close.Close:active {
-  opacity: 1;
-}
-
-.insertLink-input.InputBox {
-  border: 0 !important;
-  margin-bottom: 0 !important;
-  -webkit-box-flex: 1;
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
-  max-width: -webkit-calc(100% - 36px);
-  max-width: calc(100% - 36px);
-}
-
-.richEditorFlyout {
-  position: relative;
-  overflow: hidden;
-  background-color: #fff;
-  border-radius: 2px;
-  border-color: #d6d7d9;
-  border-style: solid;
-  border-width: 1px;
-  box-shadow: 0 5px 10px rgba(85, 90, 98, 0.2);
-  z-index: 6;
-}
-
-.richEditorFlyout .InputBox {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.richEditorFlyout .richEditor-close {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-
-.richEditorFlyout .Footer {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.richEditorFlyout-header {
-  padding-top: 6px;
-  padding-right: 12px;
-  padding-bottom: 6px;
-  padding-left: 12px;
-}
-
-.richEditorFlyout-footer {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  padding-left: 12px;
-  padding-right: 12px;
-}
-
-.richEditorFlyout-footer.insertEmoji-footer {
-  padding: 0;
-}
-
-.richEditorFlyout-title {
-  word-break: break-word;
-  text-overflow: ellipsis;
-  overflow-x: hidden;
-  max-width: 100%;
-  margin: 0;
-  max-width: -webkit-calc(100% - 36px);
-  max-width: calc(100% - 36px);
-  min-height: 24px;
-  font-size: 100%;
-  line-height: inherit;
-  color: #555a62;
-}
-
-.richEditorFlyout-title:focus {
-  outline: 0;
-}
-
-.insertMedia-footer {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: end;
-  -webkit-justify-content: flex-end;
-      -ms-flex-pack: end;
-          justify-content: flex-end;
-  padding-left: 12px;
-  padding-right: 12px;
-  padding-bottom: 12px;
-}
-
-.insertMedia-help {
-  margin-right: auto;
-  font-size: 12px;
-}
-
-.insertMedia-insert {
-  margin-bottom: 3px;
-}
-
-.richEditorFlyout {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  width: 276px;
-  border: 1px solid #d6d7d9;
-  box-shadow: 0 5px 10px rgba(85, 90, 98, 0.2);
-  background: #fff;
-  border-radius: 2px;
-}
-
-.richEditorFlyout-body {
-  padding-left: 12px;
-  padding-right: 12px;
-}
-
-.insertEmoji-body {
-  max-height: 100vh;
-  height: 252px;
-}
-
-.content-wrapper {
-  height: 100%;
-}
-
-.embedDialogue {
-  position: relative;
-}
-
-.richEditor-insertEmoji {
-  font-size: 24px;
-  text-align: center;
-  overflow: hidden;
-  opacity: 0.75;
-}
-
-.richEditor-insertEmoji .fallBackEmoji {
-  display: block;
-  margin: auto;
-}
-
-.richEditor-insertEmoji:hover, .richEditor-insertEmoji:focus {
-  opacity: 1;
-}
-
-.richEditor ~ .TextBoxWrapper {
-  display: none;
-}
-
-.richEditor-nubPosition {
-  position: absolute;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: start;
-  -webkit-align-items: flex-start;
-      -ms-flex-align: start;
-          align-items: flex-start;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  overflow: hidden;
-  width: 24px;
-  height: 24px;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  -webkit-transform: translateX(-50%);
-      -ms-transform: translateX(-50%);
-          transform: translateX(-50%);
-  margin-top: -1px;
-  pointer-events: none;
-}
-
-.richEditor-nub {
-  position: relative;
-  display: block;
-  width: 12px;
-  height: 12px;
-  border-top: 1px solid #d6d7d9;
-  border-right: 1px solid #d6d7d9;
-  box-shadow: 0 0 5px 1px rgba(85, 90, 98, 0.2);
-  background: #fff;
-}
-
-.richEditor-inlineToolbarContainer.isUp {
-  -webkit-transform: translateY(-12px);
-      -ms-transform: translateY(-12px);
-          transform: translateY(-12px);
-}
-
-.richEditor-inlineToolbarContainer.isUp .richEditor-nubPosition {
-  top: 100%;
-}
-
-.richEditor-inlineToolbarContainer.isUp .richEditor-nub {
-  -webkit-transform: translateY(-50%) rotate(135deg);
-      -ms-transform: translateY(-50%) rotate(135deg);
-          transform: translateY(-50%) rotate(135deg);
-}
-
-.richEditor-inlineToolbarContainer.isDown {
-  -webkit-transform: translateY(12px);
-      -ms-transform: translateY(12px);
-          transform: translateY(12px);
-}
-
-.richEditor-inlineToolbarContainer.isDown .richEditor-nubPosition {
-  bottom: 100%;
-}
-
-.richEditor-inlineToolbarContainer.isDown .richEditor-nubPosition {
-  -webkit-box-align: end;
-  -webkit-align-items: flex-end;
-      -ms-flex-align: end;
-          align-items: flex-end;
-  -webkit-transform: translateY(-50%) translateX(-50%);
-      -ms-transform: translateY(-50%) translateX(-50%);
-          transform: translateY(-50%) translateX(-50%);
-  margin-top: 1px;
-}
-
-.richEditor-inlineToolbarContainer.isDown .richEditor-nub {
-  -webkit-transform: translateY(50%) rotate(-45deg);
-      -ms-transform: translateY(50%) rotate(-45deg);
-          transform: translateY(50%) rotate(-45deg);
-}
-
-.richEditor-paragraphToolbarContainer {
-  position: absolute;
-  left: -webkit-calc(50% - 18px);
-  left: calc(50% - 18px);
-}
-
-.richEditor-paragraphToolbarContainer.isUp {
-  bottom: -webkit-calc(50% + 17px);
-  bottom: calc(50% + 17px);
-}
-
-.richEditor-paragraphToolbarContainer.isDown {
-  top: -webkit-calc(50% + 17px);
-  top: calc(50% + 17px);
 }
 
 .userContent {
@@ -1358,6 +849,7 @@ label.checkbox input.checkbox-input {
 .userContent h5,
 .userContent h6 {
   line-height: 1.25;
+  color: #555a62;
 }
 
 .userContent > *:not(.emoji):not(:last-child):not(br) {
@@ -1405,29 +897,6 @@ label.checkbox input.checkbox-input {
       -ms-user-select: none;
           user-select: none;
   cursor: pointer;
-}
-
-.emojiGroups {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-wrap: nowrap;
-      -ms-flex-wrap: nowrap;
-          flex-wrap: nowrap;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-}
-
-.emojiGroup-icon {
-  display: block;
-  position: relative;
-  margin: auto;
-  padding: 0;
-  width: 24px;
-  size: 24px;
 }
 
 body.hasRichEditor #Form_Preview {
@@ -1582,6 +1051,33 @@ body.isMobile .Popup.hasRichEditor .Border {
   }
 }
 
+@-webkit-keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.collapsableContent {
+  -webkit-transition: max-height 0.2s ease;
+          transition: max-height 0.2s ease;
+}
+
+.collapsableContent *:last-child {
+  margin-bottom: 0;
+}
+
 .atMentionList {
   position: absolute;
   width: 200px;
@@ -1732,10 +1228,6 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .accessibility-jumpTo {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border: 0;
   border: 0;
   clip: rect(0 0 0 0);
   height: 1px;

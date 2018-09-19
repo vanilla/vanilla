@@ -9,7 +9,8 @@ import Parchment from "parchment";
 import KeyboardModule from "quill/modules/keyboard";
 import Module from "quill/core/module";
 import { RangeStatic } from "quill/core";
-import { delegateEvent, getNextTabbableElement } from "@library/dom";
+import { delegateEvent } from "@library/dom";
+import TabHandler from "@library/TabHandler";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import {
     insertNewLineAtEndOfScroll,
@@ -91,12 +92,12 @@ export default class EmbedFocusModule extends Module {
         const editorIsFullscreen = this.editorRoot.classList.contains("isFocused") && position === "fixed";
         if (editorIsFullscreen && KeyboardModule.match(event, { key: KeyboardModule.keys.ESCAPE, shiftKey: false })) {
             this.quill.root.focus();
-            const nextEl: any = getNextTabbableElement({
-                root: this.formWrapper,
-                fromElement: this.quill.root,
-            });
-            nextEl.focus();
-            this.editorRoot.classList.toggle("isFocused", false);
+            const tabHandler = new TabHandler(this.formWrapper);
+            const nextEl = tabHandler.getNext();
+            if (nextEl) {
+                nextEl.focus();
+                this.editorRoot.classList.toggle("isFocused", false);
+            }
         }
     };
 
@@ -119,13 +120,10 @@ export default class EmbedFocusModule extends Module {
         }
         const blotForActiveElement = this.getEmbedBlotForFocusedElement();
         const focusItemIsEmbedBlot = blotForActiveElement instanceof FocusableEmbedBlot;
+
         // Focus the next available editor ui component.
-        const nextElement = getNextTabbableElement({
-            root: this.formWrapper,
-            excludedRoots: [this.quill.root],
-            allowLooping: false,
-            fromElement,
-        });
+        const tabHandler = new TabHandler(this.formWrapper, undefined, [this.quill.root]);
+        const nextElement = tabHandler.getNext(fromElement, false, false);
 
         if (!nextElement) {
             return false;
@@ -157,13 +155,8 @@ export default class EmbedFocusModule extends Module {
             fromElement = this.quill.root;
         }
 
-        const prevElement = getNextTabbableElement({
-            root: this.formWrapper,
-            excludedRoots: [this.quill.root],
-            fromElement,
-            reverse: true,
-            allowLooping: false,
-        });
+        const tabHandler = new TabHandler(this.formWrapper, undefined, [this.quill.root]);
+        const prevElement = tabHandler.getNext(fromElement, true, false);
 
         if (!prevElement) {
             return false;
@@ -403,12 +396,13 @@ export default class EmbedFocusModule extends Module {
             "click",
             ".js-richEditor-next",
             (event, clickedElement) => {
-                const nextEl: any = getNextTabbableElement({
-                    root: this.formWrapper,
-                    fromElement: clickedElement,
-                });
-                nextEl.focus();
-                this.editorRoot.classList.toggle("isFocused", false);
+                const tabHandler = new TabHandler(this.formWrapper);
+                const nextEl = tabHandler.getNext(clickedElement);
+
+                if (nextEl) {
+                    nextEl.focus();
+                    this.editorRoot.classList.toggle("isFocused", false);
+                }
             },
             this.editorRoot,
         );

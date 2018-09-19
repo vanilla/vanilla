@@ -30,7 +30,7 @@ class ImportController extends DashboardController {
      * @access public
      */
     public function go($transientKey = '') {
-        $this->permission('Garden.Settings.Manage');
+        $this->checkAccess();
         if (!Gdn::session()->validateTransientKey($transientKey) && !Gdn::request()->isAuthenticatedPostBack()) {
             throw new Gdn_UserException('The CSRF token is invalid.', 403);
         }
@@ -92,13 +92,24 @@ class ImportController extends DashboardController {
     }
 
     /**
+     * Ensure that imports are enabled and that the user has permission.
+     */
+    private function checkAccess() {
+        $this->permission('Garden.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
+        \Vanilla\FeatureFlagHelper::ensureFeature(
+            'Import',
+            t('Imports are not enabled.', 'Imports are not enabled. Set the config Feature.Import.Enabled = true to enable imports.')
+        );
+    }
+
+    /**
      * Main import page.
      *
      * @since 2.0.0
      * @access public
      */
     public function index() {
-        $this->permission('Garden.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
+        $this->checkAccess();
         $timer = new Gdn_Timer();
 
         // Determine the current step.
@@ -112,7 +123,7 @@ class ImportController extends DashboardController {
         $existingPaths2 = safeGlob(PATH_UPLOADS.'/porter/export*', ['gz']);
         $existingPaths = array_merge($existingPaths, $existingPaths2);
         foreach ($existingPaths as $path) {
-            $importPaths[$path] = basename($path);
+            $importPaths[substr($path, strlen(PATH_UPLOADS))] = basename($path);
         }
         // Add the database as a path.
         $importPaths = array_merge(['db:' => t('This Database')], $importPaths);
@@ -152,9 +163,12 @@ class ImportController extends DashboardController {
                     $uploadedFiles[$importPath] = basename($filename);
                     $imp->Data['UploadedFiles'] = $uploadedFiles;
                 } elseif (($pathSelect = $this->Form->getFormValue('PathSelect'))) {
-                    if ($pathSelect == 'NEW') {
+                    if ($pathSelect === 'NEW') {
                         $validation->addValidationResult('ImportFile', 'ValidateRequired');
                     } else {
+                        if ($pathSelect !== 'db:') {
+                            $pathSelect = PATH_UPLOADS.$pathSelect;
+                        }
                         $imp->ImportPath = $pathSelect;
                     }
                 } elseif (!$imp->ImportPath && count($importPaths) == 0) {
@@ -216,7 +230,7 @@ class ImportController extends DashboardController {
      * @access public
      */
     public function restart($transientKey = '') {
-        $this->permission('Garden.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
+        $this->checkAccess();
         if (!Gdn::session()->validateTransientKey($transientKey) && !Gdn::request()->isAuthenticatedPostBack()) {
             throw new Gdn_UserException('The CSRF token is invalid.', 403);
         }

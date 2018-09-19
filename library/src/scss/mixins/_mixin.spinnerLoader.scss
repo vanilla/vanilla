@@ -1,5 +1,4 @@
 /*!
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
@@ -34,29 +33,5 @@ $spinnerOffset: 73deg;
     }
     100% {
         transform: rotate(#{360 + $spinnerOffset});
-    }
-}
-
-
-@mixin objectFitWithFallback() {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    margin: auto;
-    height: auto;
-    width: 100%;
-    @supports (object-fit: cover) {
-        object-fit: cover;
-        object-position: center;
-        height: 100%;
-    }
-}
-
-
-@mixin mediaQuery-richEditor_embed {
-    @media (max-width: $richEditor-mobileEmbedBreakPoint) {
-        @content;
     }
 }

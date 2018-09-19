@@ -23,15 +23,17 @@ import { actions } from "@rich-editor/state/instance/instanceActions";
 import { getIDForQuill, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import { IStoreState } from "@rich-editor/@types/store";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
-import Quill, { Sources } from "quill/core";
+import Quill, { Sources, DeltaOperation } from "quill/core";
 import { hot } from "react-hot-loader";
 import registerQuill from "@rich-editor/quill/registerQuill";
+import "../../../scss/editor.scss";
 
 interface IProps {
     editorID: string;
     editorDescriptionID: string;
-    bodybox: HTMLInputElement;
+    legacyTextArea?: HTMLInputElement;
     isPrimaryEditor: boolean;
+    legacyMode: boolean;
 }
 
 export class Editor extends React.Component<IProps> {
@@ -50,17 +52,16 @@ export class Editor extends React.Component<IProps> {
     }
 
     public componentDidMount() {
+        window.document.body.classList.add("hasFullHeight");
         // Setup quill
-        const { bodybox } = this.props;
         registerQuill();
         const options = { theme: "vanilla" };
         this.quill = new Quill(this.quillMountRef!.current!, options);
-        bodybox.style.display = "none";
 
         this.editorID = getIDForQuill(this.quill);
 
         // Setup syncing
-        this.setupBodyBoxSync();
+        this.setupLegacyTextAreaSync();
         this.setupDebugPasteListener();
         this.store.dispatch(actions.createInstance(this.editorID));
         this.quill.on(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
@@ -79,8 +80,28 @@ export class Editor extends React.Component<IProps> {
         this.forceUpdate();
     }
 
+    public componentDidUpdate() {
+        window.document.body.classList.add("hasFullHeight");
+    }
+
     public componentWillUnmount() {
         removeDelegatedEvent(this.delegatedHandlerHash);
+    }
+
+    /**
+     * Get the content out of the quill editor.
+     */
+    public getEditorContent(): DeltaOperation[] | undefined {
+        return this.quill.getContents().ops;
+    }
+
+    /**
+     * Set the quill editor contents.
+     *
+     * @param content The delta to set.
+     */
+    public setEditorContent(content: DeltaOperation[]) {
+        this.quill.setContents(content);
     }
 
     public render() {
@@ -117,7 +138,9 @@ export class Editor extends React.Component<IProps> {
 
         return (
             <ReduxProvider store={this.store}>
-                <EditorProvider value={{ quill: this.quill, editorID: this.editorID }}>
+                <EditorProvider
+                    value={{ quill: this.quill, editorID: this.editorID, legacyMode: this.props.legacyMode }}
+                >
                     <EditorDescriptions id={editorDescriptionID} />
                     <div className="richEditor-frame InputBox">
                         <div className="richEditor-textWrap" ref={this.quillMountRef}>
@@ -161,9 +184,13 @@ export class Editor extends React.Component<IProps> {
      *
      * Once we rewrite the post page, this should no longer be necessary.
      */
-    private setupBodyBoxSync() {
-        const { bodybox } = this.props;
-        const initialValue = bodybox.value;
+    private setupLegacyTextAreaSync() {
+        const { legacyTextArea } = this.props;
+        if (!legacyTextArea) {
+            return;
+        }
+
+        const initialValue = legacyTextArea.value;
 
         if (initialValue) {
             log("Setting existing content as contents of editor");
@@ -171,7 +198,7 @@ export class Editor extends React.Component<IProps> {
         }
 
         this.quill.on("text-change", () => {
-            bodybox.value = JSON.stringify(this.quill.getContents().ops);
+            legacyTextArea.value = JSON.stringify(this.quill.getContents().ops);
         });
 
         // Listen for the legacy form event if applicable and clear the form.
@@ -204,9 +231,10 @@ export class Editor extends React.Component<IProps> {
      * This only works for PASTE. Not editing the contents.
      */
     private setupDebugPasteListener() {
-        if (debug()) {
-            const { bodybox } = this.props;
-            bodybox.addEventListener("paste", event => {
+        const { legacyTextArea } = this.props;
+
+        if (debug() && legacyTextArea) {
+            legacyTextArea.addEventListener("paste", event => {
                 if (this.allowPasteListener) {
                     event.stopPropagation();
                     event.preventDefault();

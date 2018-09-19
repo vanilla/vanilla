@@ -27,6 +27,7 @@ if (!defined('PATH_ROOT')) {
 
 // Disable Phar stream
 stream_wrapper_unregister('phar');
+
 /**
  * Bootstrap Before
  *

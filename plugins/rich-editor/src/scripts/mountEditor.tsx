@@ -34,6 +34,7 @@ export default function mountEditor(containerSelector: string | Element) {
                 editorDescriptionID={descriptionID}
                 legacyTextArea={bodybox as HTMLInputElement}
                 isPrimaryEditor={true}
+                legacyMode={true}
             />,
             container,
         );

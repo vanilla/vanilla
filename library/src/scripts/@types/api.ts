@@ -12,6 +12,8 @@ export const enum LoadStatus {
 
 interface IPendingValue {
     status: LoadStatus.PENDING;
+    data?: undefined;
+    error?: undefined;
 }
 
 interface ILoadingValue<T> {

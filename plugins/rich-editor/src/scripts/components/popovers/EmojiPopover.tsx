@@ -12,7 +12,9 @@ import PopoverController, {
 } from "@rich-editor/components/popovers/pieces/PopoverController";
 import EmojiPicker from "@rich-editor/components/popovers/pieces/EmojiPicker";
 
-export default class EmojiPopover extends React.Component<IOptionalComponentID, IRequiredComponentID> {
+interface IProps extends IOptionalComponentID {}
+
+export default class EmojiPopover extends React.Component<IProps, IRequiredComponentID> {
     public constructor(props) {
         super(props);
         this.state = {

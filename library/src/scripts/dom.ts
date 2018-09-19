@@ -9,6 +9,7 @@ import { logError, log, hashString } from "@library/utility";
 import twemoji from "twemoji";
 import tabbable from "tabbable";
 import debounce from "lodash/debounce";
+import TabHandler from "@library/TabHandler";
 
 /**
  * Use the browser's built-in functionality to quickly and safely escape a string.
@@ -345,81 +346,6 @@ interface ITabbableOptions {
     reverse: boolean;
     fromElement: Element;
     allowLooping: boolean;
-}
-
-/**
- * Get the next tabbable item within a given tabindex.
- *
- * WARNING: Performance can be poor if you pass many excluded roots and do not
- * sufficiently narrow the tree your are looking in.
- *
- * @param options
- * @property root - The root element to look in.
- * @property excludedElements - Elements to ignore.
- * @property excludedRoots - These element's children will be ignored.
- * @property reverse - True to get the previous element instead.
- * @property fromElement - The currently focused element.
- * @property allowLooping - Whether or not the focus should loop around from beginning <-> end.
- */
-export function getNextTabbableElement(options?: Partial<ITabbableOptions>): HTMLElement | null {
-    const defaultTabbableOptions: ITabbableOptions = {
-        root: document.documentElement,
-        excludedElements: [],
-        excludedRoots: [],
-        reverse: false,
-        fromElement: document.activeElement,
-        allowLooping: true,
-    };
-
-    // Merge the passed options and the defaults.
-    const finalOptions = {
-        ...defaultTabbableOptions,
-        ...options,
-    } as ITabbableOptions;
-
-    if (!(finalOptions.fromElement instanceof HTMLElement)) {
-        logError("Unable to tab to next element, `fromElement` given is not valid: ", finalOptions.fromElement);
-        return null;
-    }
-
-    const tabbables = tabbable(finalOptions.root).filter((tabbableElement: Element) => {
-        // We want to excempt items that are the active item or a parent of the active item
-        // because otherwise we would not be able to tab away from them.
-        const elementIsActiveOrChildOfActive =
-            finalOptions.fromElement === tabbableElement || tabbableElement.contains(finalOptions.fromElement);
-
-        if (!elementIsActiveOrChildOfActive) {
-            if (finalOptions.excludedElements.includes(tabbableElement)) {
-                return false;
-            }
-            for (const excludedRoot of finalOptions.excludedRoots) {
-                if (excludedRoot !== tabbableElement && excludedRoot.contains(tabbableElement)) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    });
-
-    const currentTabIndex = tabbables.indexOf(finalOptions.fromElement);
-
-    if (currentTabIndex < 0) {
-        return null;
-    }
-
-    let targetIndex = finalOptions.reverse ? currentTabIndex - 1 : currentTabIndex + 1;
-
-    if (finalOptions.allowLooping) {
-        // Loop over the beginning and ends
-        if (targetIndex < 0) {
-            targetIndex = tabbables.length - 1;
-        } else if (targetIndex >= tabbables.length) {
-            targetIndex = 0;
-        }
-    }
-
-    return tabbables[targetIndex] || null;
 }
 
 function checkDomTreeWasClicked(rootNode: Element | null, clickedElement: Element) {

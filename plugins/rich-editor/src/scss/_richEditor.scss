@@ -9,6 +9,8 @@
     }
 
     &.inheritHeight {
+        display: flex;
+
         .richEditor-text,
         .richEditor-textWrap,
         .richEditor-frame {
@@ -82,6 +84,7 @@
     }
     outline-color: transparent;
     white-space: pre-wrap !important; // Needed for spaces around embed blots to work properly!
+    overflow: auto;
 
     &:focus {
         outline: {

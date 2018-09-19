@@ -6,7 +6,8 @@
 
 import React from "react";
 import classNames from "classnames";
-import { t } from "@library/application";
+import CloseButton from "@library/components/CloseButton";
+import { IWithEditorProps, withEditor } from "@rich-editor/components/context";
 
 interface IState {
     id: string;
@@ -14,7 +15,7 @@ interface IState {
     titleID: string;
 }
 
-interface IProps {
+interface IProps extends IWithEditorProps {
     id: string;
     titleID: string;
     descriptionID?: string;
@@ -31,7 +32,7 @@ interface IProps {
     onCloseClick(event?: React.MouseEvent<any>);
 }
 
-export default class Popover extends React.Component<IProps, IState> {
+export class Popover extends React.Component<IProps, IState> {
     constructor(props) {
         super(props);
         this.state = {
@@ -75,8 +76,6 @@ export default class Popover extends React.Component<IProps, IState> {
             </div>
         ) : null;
 
-        const close = `×`;
-
         return (
             <div
                 id={this.state.id}
@@ -97,12 +96,12 @@ export default class Popover extends React.Component<IProps, IState> {
                         {this.props.title}
                     </h2>
                     {screenReaderDescription}
-                    <button type="button" onClick={this.props.onCloseClick} className="Close richEditor-close">
-                        <span className="Close-x" aria-hidden="true">
-                            {close}
-                        </span>
-                        <span className="sr-only">{t("Close")}</span>
-                    </button>
+
+                    <CloseButton
+                        onClick={this.props.onCloseClick}
+                        className="richEditor-close"
+                        legacyMode={this.props.legacyMode}
+                    />
 
                     {this.props.additionalHeaderContent && this.props.additionalHeaderContent}
                 </div>
@@ -114,3 +113,5 @@ export default class Popover extends React.Component<IProps, IState> {
         );
     }
 }
+
+export default withEditor<IProps>(Popover);

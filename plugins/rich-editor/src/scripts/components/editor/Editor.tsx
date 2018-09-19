@@ -33,6 +33,7 @@ interface IProps {
     editorDescriptionID: string;
     legacyTextArea?: HTMLInputElement;
     isPrimaryEditor: boolean;
+    legacyMode: boolean;
 }
 
 export class Editor extends React.Component<IProps> {
@@ -51,6 +52,7 @@ export class Editor extends React.Component<IProps> {
     }
 
     public componentDidMount() {
+        window.document.body.classList.add("hasFullHeight");
         // Setup quill
         registerQuill();
         const options = { theme: "vanilla" };
@@ -76,6 +78,10 @@ export class Editor extends React.Component<IProps> {
         // Once we've created our quill instance we need to force an update to allow all of the quill dependent
         // Modules to render.
         this.forceUpdate();
+    }
+
+    public componentDidUpdate() {
+        window.document.body.classList.add("hasFullHeight");
     }
 
     public componentWillUnmount() {
@@ -116,7 +122,9 @@ export class Editor extends React.Component<IProps> {
 
         return (
             <ReduxProvider store={this.store}>
-                <EditorProvider value={{ quill: this.quill, editorID: this.editorID }}>
+                <EditorProvider
+                    value={{ quill: this.quill, editorID: this.editorID, legacyMode: this.props.legacyMode }}
+                >
                     <EditorDescriptions id={editorDescriptionID} />
                     <div className="richEditor-frame InputBox">
                         <div className="richEditor-textWrap" ref={this.quillMountRef}>

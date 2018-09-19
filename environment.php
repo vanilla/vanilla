@@ -25,7 +25,7 @@ if (!defined('PATH_ROOT')) {
     define('PATH_ROOT', getcwd());
 }
 
-//
+// Disable Phar stream
 stream_wrapper_unregister('phar');
 /**
  * Bootstrap Before

@@ -35,7 +35,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @param AuthenticatorModel $authenticatorModel
      */
     public function __construct(AuthenticatorModel $authenticatorModel) {
-        \Vanilla\FeatureFlagHelper::throwIfNotEnabled(AuthenticateApiController::FEATURE_FLAG);
+        \Vanilla\FeatureFlagHelper::ensureFeature(AuthenticateApiController::FEATURE_FLAG);
         $this->authenticatorModel = $authenticatorModel;
     }
 

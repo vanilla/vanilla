@@ -350,7 +350,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         }
 
         if (is_string($value)) {
-            $result = Gdn_Format::unserialize($value);
+            $result = self::unserialize($value);
         } else {
             $result = $value;
         }
@@ -857,6 +857,28 @@ class Gdn_Configuration extends Gdn_Pluggable {
     }
 
     /**
+     * Takes a serialized variable and unserializes it back into its original state.
+     *
+     * @param string $serializedString A json or php serialized string to be unserialized.
+     * @return mixed
+     * @deprecated
+     */
+    private static function unserialize($serializedString) {
+        $result = $serializedString;
+
+        if (is_string($serializedString)) {
+            if (substr_compare('a:', $serializedString, 0, 2) === 0 || substr_compare('O:', $serializedString, 0, 2) === 0) {
+                $result = unserialize($serializedString, ['allowed_classes' => false]);
+            } elseif (substr_compare('obj:', $serializedString, 0, 4) === 0) {
+                $result = json_decode(substr($serializedString, 4), false);
+            } elseif (substr_compare('arr:', $serializedString, 0, 4) === 0) {
+                $result = json_decode(substr($serializedString, 4), true);
+            }
+        }
+        return $result;
+    }
+
+    /**
      *
      */
     public function shutdown() {
@@ -1338,7 +1360,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
         }
 
         if (is_string($value)) {
-            $result = Gdn_Format::unserialize($value);
+            $result = self::unserialize($value);
         } else {
             $result = $value;
         }
@@ -1495,6 +1517,28 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                 return false;
                 break;
         }
+    }
+
+    /**
+     * Takes a serialized variable and unserializes it back into its original state.
+     *
+     * @param string $serializedString A json or php serialized string to be unserialized.
+     * @return mixed
+     * @deprecated
+     */
+    private static function unserialize($serializedString) {
+        $result = $serializedString;
+
+        if (is_string($serializedString)) {
+            if (substr_compare('a:', $serializedString, 0, 2) === 0 || substr_compare('O:', $serializedString, 0, 2) === 0) {
+                $result = unserialize($serializedString, ['allowed_classes' => false]);
+            } elseif (substr_compare('obj:', $serializedString, 0, 4) === 0) {
+                $result = json_decode(substr($serializedString, 4), false);
+            } elseif (substr_compare('arr:', $serializedString, 0, 4) === 0) {
+                $result = json_decode(substr($serializedString, 4), true);
+            }
+        }
+        return $result;
     }
 
     /**

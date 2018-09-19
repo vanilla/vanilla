@@ -674,6 +674,7 @@ if (!function_exists('safeParseStr')) {
      * @see parse_str()
      */
     function safeParseStr($str, &$output, $original = null) {
+        \Vanilla\Utility\Deprecation::log();
         $exploded = explode('&', $str);
         $output = [];
         if (is_array($original)) {

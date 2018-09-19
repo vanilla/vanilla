@@ -23,7 +23,7 @@ import { actions } from "@rich-editor/state/instance/instanceActions";
 import { getIDForQuill, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import { IStoreState } from "@rich-editor/@types/store";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
-import Quill, { Sources } from "quill/core";
+import Quill, { Sources, DeltaOperation } from "quill/core";
 import { hot } from "react-hot-loader";
 import registerQuill from "@rich-editor/quill/registerQuill";
 import "../../../scss/editor.scss";
@@ -86,6 +86,22 @@ export class Editor extends React.Component<IProps> {
 
     public componentWillUnmount() {
         removeDelegatedEvent(this.delegatedHandlerHash);
+    }
+
+    /**
+     * Get the content out of the quill editor.
+     */
+    public getEditorContent(): DeltaOperation[] | undefined {
+        return this.quill.getContents().ops;
+    }
+
+    /**
+     * Set the quill editor contents.
+     *
+     * @param content The delta to set.
+     */
+    public setEditorContent(content: DeltaOperation[]) {
+        this.quill.setContents(content);
     }
 
     public render() {

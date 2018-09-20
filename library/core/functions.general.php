@@ -1797,10 +1797,11 @@ if (!function_exists('getRecord')) {
                 /** @var ActivityModel $activityModel */
                 $activityModel = $container->get(ActivityModel::class);
                 $row = $activityModel->getID($id, DATASET_TYPE_ARRAY);
-                if (!$activityModel->canView($row)) {
-                    throw permissionException();
-                }
                 if ($row) {
+                    if (!$activityModel->canView($row)) {
+                        throw permissionException();
+                    }
+
                     $row['Name'] = formatString($row['HeadlineFormat'], $row);
                     $row['Body'] = $row['Story'];
                 }

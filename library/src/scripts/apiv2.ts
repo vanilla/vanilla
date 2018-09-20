@@ -27,7 +27,7 @@ const api = axios.create({
             "X-Requested-With": "vanilla",
         },
     },
-    transformResponse: [...axios.defaults.transformResponse, fieldErrorTransformer],
+    transformResponse: [...(axios.defaults.transformResponse as any), fieldErrorTransformer],
     paramsSerializer: params => qs.stringify(params, { indices: false }),
 });
 

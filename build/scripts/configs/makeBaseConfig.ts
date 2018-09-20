@@ -33,31 +33,21 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
 ${chalk.green(aliases)}`;
     printVerbose(message);
 
-    const extraTsLoaders =
-        options.mode === BuildMode.DEVELOPMENT
-            ? [
-                  {
-                      loader: "babel-loader",
-                      options: {
-                          babelrc: false,
-                          plugins: [
-                              require.resolve("react-hot-loader/babel"),
-                              require.resolve("babel-plugin-syntax-dynamic-import"),
-                          ],
-                      },
-                  },
-              ]
-            : [];
+    const babelPlugins: string[] = [];
+    if (options.mode === BuildMode.DEVELOPMENT) {
+        babelPlugins.push(require.resolve("react-hot-loader/babel"));
+    }
 
     const config = {
         context: VANILLA_ROOT,
         module: {
             rules: [
                 {
-                    test: /\.jsx?$/,
+                    test: /\.(jsx?|tsx?)$/,
                     exclude: ["node_modules"],
                     include: [
                         // We need to transpile quill's ES6 because we are building from source.
+                        /\/src\/scripts/,
                         /\/node_modules\/quill/,
                     ],
                     use: [
@@ -65,21 +55,8 @@ ${chalk.green(aliases)}`;
                             loader: "babel-loader",
                             options: {
                                 presets: [require.resolve("@vanillaforums/babel-preset")],
+                                // plugins: babelPlugins,
                                 cacheDirectory: true,
-                            },
-                        },
-                    ],
-                },
-                {
-                    test: /\.tsx?$/,
-                    exclude: ["node_modules"],
-                    use: [
-                        ...extraTsLoaders,
-                        {
-                            loader: "ts-loader",
-                            options: {
-                                happyPackMode: true,
-                                configFile: TS_CONFIG_FILE,
                             },
                         },
                     ],

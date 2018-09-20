@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-export const enum LoadStatus {
+export enum LoadStatus {
     PENDING = "PENDING",
     LOADING = "LOADING",
     SUCCESS = "SUCCESS",

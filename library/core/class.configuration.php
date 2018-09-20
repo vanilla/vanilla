@@ -83,6 +83,20 @@ class Gdn_Configuration extends Gdn_Pluggable {
     }
 
     /**
+     * Format a string as a PHP comment.
+     *
+     * @param string $str The string to format.
+     * @param string[] $lines The output buffer.
+     */
+    private static function formatComment(string $str, array &$lines) {
+        $commentLines = explode("\n", str_replace("\r", '', $str));
+
+        foreach ($commentLines as $line) {
+            $lines[] = '// '.$line;
+        }
+    }
+
+    /**
      * Set a format option to be used by the Gdn_Configuration::format function.
      *
      * @param string $formatOption The option in $allowedOptions that you want to update.
@@ -287,7 +301,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         foreach ($data as $key => $value) {
             if ($headings && $lastKey != $key && is_array($value)) {
                 $lines[] = '';
-                $lines[] = '// '.$key;
+                self::formatComment($key, $lines);
                 $lastKey = $key;
             }
 
@@ -305,7 +319,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
             $session = Gdn::session();
             $user = $session->UserID > 0 && is_object($session->User) ? $session->User->Name : 'Unknown';
             $lines[] = '';
-            $lines[] = '// Last edited by '.$user.' ('.remoteIp().')'.Gdn_Format::toDateTime();
+            self::formatComment('Last edited by '.$user.' ('.remoteIp().') '.Gdn_Format::toDateTime(), $lines);
         }
 
         $result = implode(PHP_EOL, $lines);

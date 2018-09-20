@@ -27,9 +27,9 @@ echo heading(t('Manage Routes'), t('Add Route'), 'dashboard/routes/add', 'js-mod
             $Reserved = $RouteData['Reserved'];
             ?>
             <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
-                <td class="strong"><?php echo $Route; ?></td>
-                <td class="Alt"><?php echo $Target; ?></td>
-                <td class="Alt"><?php echo $RouteType; ?></td>
+                <td class="strong"><?php echo htmlspecialchars($Route); ?></td>
+                <td class="Alt"><?php echo htmlspecialchars($Target); ?></td>
+                <td class="Alt"><?php echo htmlspecialchars($RouteType); ?></td>
                 <td class="options">
                     <div class="btn-group">
                     <?php

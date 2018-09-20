@@ -123,7 +123,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
                             //$this->_Result[$Index] = (array)$this->_Result[$Index];
                             break;
                         case DATASET_TYPE_OBJECT:
-                            $row = new ArrayObject($row, ArrayObject::ARRAY_AS_PROPS);
+                            $row = (object)$row;
                             //$this->_Result[$Index] = (object)$this->_Result[$Index];
                             break;
                     }
@@ -193,12 +193,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
 
         // Calling fetchAll on insert/update/delete queries will raise an error!
         if (preg_match('/^(insert|update|delete)/', trim(strtolower($this->_PDOStatement->queryString))) !== 1) {
-            $result = $this->_PDOStatement->fetchAll(PDO::FETCH_ASSOC);
-            if ($this->_DatasetType != DATASET_TYPE_ARRAY) {
-                foreach ($result as &$row) {
-                    $row = new ArrayObject($row, ArrayObject::ARRAY_AS_PROPS);
-                }
-            }
+            $result = $this->_PDOStatement->fetchAll($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
         } else {
             $this->_Result = $result;
         }

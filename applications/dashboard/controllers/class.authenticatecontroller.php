@@ -2,7 +2,7 @@
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license GPL-2.0-only
  */
 
 use Garden\Web\Data;
@@ -54,7 +54,7 @@ class AuthenticateController extends Gdn_Controller {
         SSOModel $ssoModel,
         UserModel $userModel
     ) {
-        \Vanilla\FeatureFlagHelper::throwIfNotEnabled(AuthenticateApiController::FEATURE_FLAG);
+        \Vanilla\FeatureFlagHelper::ensureFeature(AuthenticateApiController::FEATURE_FLAG);
         parent::__construct();
 
         $this->authenticateApiController = $authenticateApiController;

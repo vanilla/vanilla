@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license GPL-2.0-only
  */
 
 namespace VanillaTests\APIv2;
@@ -175,6 +175,50 @@ class UsersTest extends AbstractResourceTest {
         $row = $this->testPost();
         $result = parent::testGetEdit($row);
         return $result;
+    }
+
+    /**
+     * Test getting current user info when the user is a guest.
+     */
+    public function testMeGuest() {
+        $this->api()->setUserID(0);
+
+        $response = $this->api()->get("{$this->baseUrl}/me");
+        $this->assertSame(200, $response->getStatusCode());
+
+        $expected = [
+            "userID" => 0,
+            "name" => "Guest",
+            "photoUrl" => \UserModel::getDefaultAvatarUrl(),
+            "dateLastActive" => null
+        ];
+        $actual = $response->getBody();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Test getting current user info when the user is a valid member.
+     */
+    public function testMeMember() {
+        /** @var \UserModel $userModel */
+        $userModel = self::container()->get('UserModel');
+        $userID = $this->api()->getUserID();
+        $user = $userModel->getID($userID, DATASET_TYPE_ARRAY);
+        $dateLastActive = $user["DateLastActive"] ? date("c", strtotime($user["DateLastActive"])) : null;
+
+        $response = $this->api()->get("{$this->baseUrl}/me");
+        $this->assertSame(200, $response->getStatusCode());
+
+        $expected = [
+            "userID" => $userID,
+            "name" => $user["Name"],
+            "photoUrl" => userPhotoUrl($user),
+            "dateLastActive" => $dateLastActive
+        ];
+        $actual = $response->getBody();
+
+        $this->assertEquals($expected, $actual);
     }
 
     /**

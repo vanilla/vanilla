@@ -4,7 +4,7 @@
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license GPL-2.0-only
  * @package Core
  * @since 2.0.18
  */
@@ -426,6 +426,7 @@ class ProxyRequest {
         curl_setopt($handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/'.c('Vanilla.Version')));
         curl_setopt($handler, CURLOPT_CONNECTTIMEOUT, $connectTimeout);
         curl_setopt($handler, CURLOPT_HEADERFUNCTION, [$this, 'CurlHeader']);
+        curl_setopt($handler, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
 
         if ($transferMode == 'binary') {
             curl_setopt($handler, CURLOPT_BINARYTRANSFER, true);

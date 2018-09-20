@@ -1,3 +1,9 @@
+/*!
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 $embedLink-linkImage_width: 225px !default;
 $embedLink-linkImage_mobileWidth: 100px !default;
 $embedLink-image_separatorColor: rgba($global-color_fg, .1) !default;
@@ -34,7 +40,7 @@ $embedLink-excerpt_lineHeight: $global-base_lineHeight !default;
         }
     }
 
-    @include mediaQuery-richEditor_embed {
+    @include mediaQuery-embedMobile {
         position: relative;
         width: 100%;
         padding-top: 0;

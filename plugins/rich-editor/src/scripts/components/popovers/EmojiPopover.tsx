@@ -1,7 +1,7 @@
 /**
  * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license GPL-2.0-only
  */
 
 import React from "react";
@@ -12,7 +12,9 @@ import PopoverController, {
 } from "@rich-editor/components/popovers/pieces/PopoverController";
 import EmojiPicker from "@rich-editor/components/popovers/pieces/EmojiPicker";
 
-export default class EmojiPopover extends React.Component<IOptionalComponentID, IRequiredComponentID> {
+interface IProps extends IOptionalComponentID {}
+
+export default class EmojiPopover extends React.Component<IProps, IRequiredComponentID> {
     public constructor(props) {
         super(props);
         this.state = {

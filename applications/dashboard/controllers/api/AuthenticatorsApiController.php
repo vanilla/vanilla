@@ -2,7 +2,7 @@
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license GPL-2.0-only
  */
 
 use Garden\Schema\Schema;
@@ -35,7 +35,7 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @param AuthenticatorModel $authenticatorModel
      */
     public function __construct(AuthenticatorModel $authenticatorModel) {
-        \Vanilla\FeatureFlagHelper::throwIfNotEnabled(AuthenticateApiController::FEATURE_FLAG);
+        \Vanilla\FeatureFlagHelper::ensureFeature(AuthenticateApiController::FEATURE_FLAG);
         $this->authenticatorModel = $authenticatorModel;
     }
 

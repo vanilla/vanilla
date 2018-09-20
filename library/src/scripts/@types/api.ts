@@ -1,6 +1,6 @@
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license GPL-2.0-only
  */
 
 export const enum LoadStatus {
@@ -12,6 +12,8 @@ export const enum LoadStatus {
 
 interface IPendingValue {
     status: LoadStatus.PENDING;
+    data?: undefined;
+    error?: undefined;
 }
 
 interface ILoadingValue<T> {

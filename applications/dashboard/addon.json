@@ -3,7 +3,7 @@
     "version": "2.4.201",
     "allowDisable": false,
     "url": "https://open.vanillaforums.com",
-    "license": "GNU GPL v2",
+    "license": "GPL-2.0-only",
     "priority": 5,
     "hidden": true,
     "icon": "dashboard.png",

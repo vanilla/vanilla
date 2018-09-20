@@ -3,7 +3,7 @@
     "version": "2.4.201",
     "setupController": "setup",
     "url": "https://open.vanillaforums.com",
-    "license": "GNU GPL v2",
+    "license": "GPL-2.0-only",
     "icon": "conversations.png",
     "key": "conversations",
     "type": "addon",

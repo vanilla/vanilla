@@ -1,7 +1,7 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license GPL-2.0-only
  */
 
 import * as path from "path";
@@ -156,7 +156,7 @@ ${chalk.green(aliases)}`;
             modules: modulePaths,
             alias: {
                 ...moduleAliases,
-                "dashboard-scss": path.resolve(VANILLA_ROOT, "applications/dashboard/scss"),
+                "library-scss": path.resolve(VANILLA_ROOT, "library/src/scss"),
             },
             extensions: [".ts", ".tsx", ".js", ".jsx"],
             // This needs to be true so that the same copy of a node_module gets shared.

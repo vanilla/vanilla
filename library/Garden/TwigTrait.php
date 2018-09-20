@@ -2,7 +2,7 @@
 /**
  * @author Alexander Kim <alexander.k@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license GPL-2.0-only
  */
 
 namespace Garden;

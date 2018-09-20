@@ -1,7 +1,7 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license GPL-2.0-only
  */
 
 import React from "react";
@@ -32,8 +32,9 @@ export default function mountEditor(containerSelector: string | Element) {
             <Editor
                 editorID={editorID}
                 editorDescriptionID={descriptionID}
-                bodybox={bodybox as HTMLInputElement}
+                legacyTextArea={bodybox as HTMLInputElement}
                 isPrimaryEditor={true}
+                legacyMode={true}
             />,
             container,
         );

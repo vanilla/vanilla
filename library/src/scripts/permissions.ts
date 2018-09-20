@@ -5,7 +5,7 @@
  * @see {Gdn_Controller->renderMaster()} for the injection of permissions into the client.
  *
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license GPL-2.0-only
  */
 
 import gdn from "@library/gdn";
@@ -84,7 +84,7 @@ function getBan(permissions: string[] = []): object | null {
     permissions = permissions.map(str => str.toLowerCase());
     const bans = gdn.permissions.bans || {};
 
-    for (const name of bans) {
+    for (const name of Object.keys(bans)) {
         const ban = bans[name];
 
         if (name in permissions) {

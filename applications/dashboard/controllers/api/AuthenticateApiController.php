@@ -2,7 +2,7 @@
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license GPL-2.0-only
  */
 
 use Garden\Schema\Schema;
@@ -65,7 +65,7 @@ class AuthenticateApiController extends AbstractApiController {
         SSOModel $ssoModel,
         UserModel $userModel
     ) {
-        \Vanilla\FeatureFlagHelper::throwIfNotEnabled(self::FEATURE_FLAG);
+        \Vanilla\FeatureFlagHelper::ensureFeature(self::FEATURE_FLAG);
         $this->authenticatorApiController = $authenticatorApiController;
         $this->config = $config;
         $this->request = $request;

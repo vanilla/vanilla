@@ -1,13 +1,15 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license GPL-2.0-only
  */
 
 import React from "react";
 import { t } from "@library/application";
+import CloseButton from "@library/components/CloseButton";
+import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 
-interface IProps {
+interface IProps extends IWithEditorProps {
     inputRef: React.RefObject<HTMLInputElement>;
     inputValue: string;
     onInputKeyDown: React.KeyboardEventHandler<any>;
@@ -41,15 +43,14 @@ export class InlineToolbarLinkInput extends React.Component<IProps, {}> {
                     className="InputBox insertLink-input"
                     placeholder={t("Paste or type a link…")}
                 />
-                <button type="button" onClick={this.props.onCloseClick} className="Close richEditor-close">
-                    <span className="Close-x" aria-hidden="true">
-                        {t("×")}
-                    </span>
-                    <span className="sr-only">{t("Close")}</span>
-                </button>
+                <CloseButton
+                    className="richEditor-close"
+                    onClick={this.props.onCloseClick}
+                    legacyMode={this.props.legacyMode}
+                />
             </div>
         );
     }
 }
 
-export default InlineToolbarLinkInput;
+export default withEditor<IProps>(InlineToolbarLinkInput);

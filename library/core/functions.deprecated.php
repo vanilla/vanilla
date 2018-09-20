@@ -2,7 +2,7 @@
 /**
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPLv2
+ * @license GPL-2.0-only
  */
 
 if (!function_exists('addActivity')) {
@@ -265,12 +265,14 @@ if (!function_exists('formatArrayAssignment')) {
             $isAssociativeArray = array_key_exists(0, $value) === false || is_array($value[0]) === true ? true : false;
             if ($isAssociativeArray === true) {
                 foreach ($value as $k => $v) {
-                    formatArrayAssignment($array, $prefix."['$k']", $v);
+                    formatArrayAssignment($array, $prefix.'['.var_export($k, true).']', $v);
                 }
             } else {
                 // If $Value is not an associative array, just write it like a simple array definition.
                 $formattedValue = array_map(['Gdn_Format', 'ArrayValueForPhp'], $value);
-                $array[] = $prefix .= " = array('".implode("', '", $formattedValue)."');";
+                $f2 = var_export($value, true);
+
+                $array[] = $prefix .= ' = '.var_export($value, true).';';
             }
         } elseif (is_int($value)) {
             $array[] = $prefix .= ' = '.$value.';';
@@ -674,6 +676,7 @@ if (!function_exists('safeParseStr')) {
      * @see parse_str()
      */
     function safeParseStr($str, &$output, $original = null) {
+        \Vanilla\Utility\Deprecation::log();
         $exploded = explode('&', $str);
         $output = [];
         if (is_array($original)) {
@@ -742,7 +745,7 @@ if (!function_exists('trueStripSlashes')) {
          * @deprecated
          */
         function trueStripSlashes($string) {
-            deprecated('trueStripSlashes()');
+            \Vanilla\Utility\Deprecation::log();
             return stripslashes($string);
         }
     } else {
@@ -750,7 +753,7 @@ if (!function_exists('trueStripSlashes')) {
          * @deprecated
          */
         function trueStripSlashes($string) {
-            deprecated('trueStripSlashes()');
+            \Vanilla\Utility\Deprecation::log();
             return $string;
         }
     }
@@ -767,7 +770,7 @@ if (!function_exists('viewLocation')) {
      * @deprecated
      */
     function viewLocation($view, $controller, $folder) {
-        deprecated('viewLocation()');
+        \Vanilla\Utility\Deprecation::log();
         $paths = [];
 
         if (strpos($view, '/') !== false) {

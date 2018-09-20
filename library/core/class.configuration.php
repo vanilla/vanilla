@@ -4,7 +4,7 @@
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license GPL-2.0-only
  * @package Core
  * @since 2.0
  */
@@ -79,6 +79,20 @@ class Gdn_Configuration extends Gdn_Pluggable {
             $this->defaultPath = PATH_CONF_DEFAULT;
         } else {
             $this->defaultPath = PATH_CONF.'/config.php';
+        }
+    }
+
+    /**
+     * Format a string as a PHP comment.
+     *
+     * @param string $str The string to format.
+     * @param string[] $lines The output buffer.
+     */
+    private static function formatComment(string $str, array &$lines) {
+        $commentLines = explode("\n", str_replace("\r", '', $str));
+
+        foreach ($commentLines as $line) {
+            $lines[] = '// '.$line;
         }
     }
 
@@ -287,7 +301,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         foreach ($data as $key => $value) {
             if ($headings && $lastKey != $key && is_array($value)) {
                 $lines[] = '';
-                $lines[] = '// '.$key;
+                self::formatComment($key, $lines);
                 $lastKey = $key;
             }
 
@@ -305,7 +319,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
             $session = Gdn::session();
             $user = $session->UserID > 0 && is_object($session->User) ? $session->User->Name : 'Unknown';
             $lines[] = '';
-            $lines[] = '// Last edited by '.$user.' ('.remoteIp().')'.Gdn_Format::toDateTime();
+            self::formatComment('Last edited by '.$user.' ('.remoteIp().') '.Gdn_Format::toDateTime(), $lines);
         }
 
         $result = implode(PHP_EOL, $lines);
@@ -350,7 +364,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         }
 
         if (is_string($value)) {
-            $result = Gdn_Format::unserialize($value);
+            $result = self::unserialize($value);
         } else {
             $result = $value;
         }
@@ -857,6 +871,28 @@ class Gdn_Configuration extends Gdn_Pluggable {
     }
 
     /**
+     * Takes a serialized variable and unserializes it back into its original state.
+     *
+     * @param string $serializedString A json or php serialized string to be unserialized.
+     * @return mixed
+     * @deprecated
+     */
+    private static function unserialize($serializedString) {
+        $result = $serializedString;
+
+        if (is_string($serializedString)) {
+            if (substr_compare('a:', $serializedString, 0, 2) === 0 || substr_compare('O:', $serializedString, 0, 2) === 0) {
+                $result = unserialize($serializedString, ['allowed_classes' => false]);
+            } elseif (substr_compare('obj:', $serializedString, 0, 4) === 0) {
+                $result = json_decode(substr($serializedString, 4), false);
+            } elseif (substr_compare('arr:', $serializedString, 0, 4) === 0) {
+                $result = json_decode(substr($serializedString, 4), true);
+            }
+        }
+        return $result;
+    }
+
+    /**
      *
      */
     public function shutdown() {
@@ -1338,7 +1374,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
         }
 
         if (is_string($value)) {
-            $result = Gdn_Format::unserialize($value);
+            $result = self::unserialize($value);
         } else {
             $result = $value;
         }
@@ -1495,6 +1531,28 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                 return false;
                 break;
         }
+    }
+
+    /**
+     * Takes a serialized variable and unserializes it back into its original state.
+     *
+     * @param string $serializedString A json or php serialized string to be unserialized.
+     * @return mixed
+     * @deprecated
+     */
+    private static function unserialize($serializedString) {
+        $result = $serializedString;
+
+        if (is_string($serializedString)) {
+            if (substr_compare('a:', $serializedString, 0, 2) === 0 || substr_compare('O:', $serializedString, 0, 2) === 0) {
+                $result = unserialize($serializedString, ['allowed_classes' => false]);
+            } elseif (substr_compare('obj:', $serializedString, 0, 4) === 0) {
+                $result = json_decode(substr($serializedString, 4), false);
+            } elseif (substr_compare('arr:', $serializedString, 0, 4) === 0) {
+                $result = json_decode(substr($serializedString, 4), true);
+            }
+        }
+        return $result;
     }
 
     /**

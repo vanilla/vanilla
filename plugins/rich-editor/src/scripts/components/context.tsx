@@ -1,7 +1,7 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ * @license GPL-2.0-only
  */
 
 import Quill, { IFormats } from "quill/core";
@@ -12,6 +12,7 @@ import { IStoreState, IEditorInstance } from "@rich-editor/@types/store";
 interface IContextProps {
     quill: Quill;
     editorID: string;
+    legacyMode: boolean;
 }
 
 interface IGeneratedContextProps {
@@ -31,7 +32,7 @@ export { Consumer as EditorConsumer, Provider as EditorProvider };
  * Map in the instance state of the current editor.
  */
 function mapStateToProps(state: IStoreState, ownProps: IContextProps) {
-    const { editorID, quill } = ownProps;
+    const { editorID, quill, legacyMode } = ownProps;
     const instanceState = state.editor.instances[editorID];
     const { lastGoodSelection } = instanceState;
     const activeFormats = lastGoodSelection ? quill.getFormat(lastGoodSelection) : {};

@@ -101,8 +101,13 @@ class Factory {
     public function install($alias, $className, $path = '', $factoryType = Gdn::FactorySingleton, $data = null) {
         $factoryType = ucfirst($factoryType);
         if (!in_array($factoryType, [Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton, Gdn::FactoryRealSingleton])) {
-            throw new \Exception(sprintf('$FactoryType must be one of %s, %s, %s, %s.', Gdn::FactoryInstance,
-                Gdn::FactoryPrototype, Gdn::FactorySingleton, Gdn::FactoryRealSingleton));
+            throw new \Exception(sprintf(
+                '$FactoryType must be one of %s, %s, %s, %s.',
+                Gdn::FactoryInstance,
+                Gdn::FactoryPrototype,
+                Gdn::FactorySingleton,
+                Gdn::FactoryRealSingleton
+            ));
         }
         $this->container
             ->rule($alias);

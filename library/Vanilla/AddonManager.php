@@ -221,11 +221,9 @@ class AddonManager {
 
         $result = [];
         if ($searchAll === false) {
-
             // If the className does not contain a wildcard we can check the autloadClass index directly.
             $fqPattern = Addon::parseFullyQualifiedClass($pattern);
             if (strpos($fqPattern['className'], '*') === false) {
-
                 // Convert the pattern's class name to a class key.
                 $classKey = strtolower($fqPattern['className']);
                 if (array_key_exists($classKey, $this->autoloadClasses)) {
@@ -238,7 +236,7 @@ class AddonManager {
             }
 
             foreach ($loadedClasses as $classKey => $classesEntry) {
-                foreach($classesEntry as $namespaceKey => $classData) {
+                foreach ($classesEntry as $namespaceKey => $classData) {
                     if ($fn($namespaceKey.$classKey)) {
                         $result[] = $classData['namespace'].$classData['className'];
                     }
@@ -286,6 +284,8 @@ class AddonManager {
      * @return array Return an array of addon indexed by their keys.
      */
     public function lookupAllByType($type) {
+        static::validateType($type);
+
         if ($this->typeUsesMultiCaching($type)) {
             $this->ensureMultiCache();
             return $this->multiCache;
@@ -297,7 +297,7 @@ class AddonManager {
                     $addon = $this->lookupSingleCachedAddon($addonDirName, $type);
                     $addons[$addon->getKey()] = $addon;
                 } catch (\Exception $ex) {
-                    trigger_error("The $type in $subdir is invalid and will be skipped.", E_USER_WARNING);
+                    trigger_error("The $type in $addonDirPath is invalid and will be skipped.", E_USER_WARNING);
                     // Clear the addon out of the index.
                     $this->deleteSingleIndexKey($type, $addonDirName);
                 }
@@ -331,6 +331,8 @@ class AddonManager {
      * @return array Returns an array of {@link Addon} objects.
      */
     public function scan($type, $saveCache = false) {
+        static::validateType($type);
+
         if ($saveCache && !$this->isCacheEnabled()) {
             throw new \InvalidArgumentException("Cannot save the addon cache when the cache directory is empty.", 500);
         }
@@ -741,6 +743,8 @@ class AddonManager {
      * @return Addon|null
      */
     public function lookupAddon($key) {
+        static::validateKey($key);
+
         $this->ensureMultiCache();
 
         $realKey = strtolower($key);
@@ -759,6 +763,9 @@ class AddonManager {
      * @return bool Returns
      */
     public function isEnabled($key, $type) {
+        static::validateKey($key);
+        static::validateType($type);
+
         if ($type === Addon::TYPE_ADDON) {
             $key = strtolower($key);
         }
@@ -866,6 +873,8 @@ class AddonManager {
      * @return null|Addon Returns an {@link Addon} object for the locale pack or **null** if it can't be found.
      */
     public function lookupLocale($localeDirName) {
+        static::validateKey($localeDirName);
+
         $result = $this->lookupSingleCachedAddon($localeDirName, Addon::TYPE_LOCALE);
         return $result;
     }
@@ -983,6 +992,8 @@ class AddonManager {
      * @return null|Addon Returns an {@link Addon} object for the theme or **null** if it can't be found.
      */
     public function lookupTheme($themeDirName) {
+        static::validateKey($themeDirName);
+
         $result = $this->lookupSingleCachedAddon($themeDirName, Addon::TYPE_THEME);
         return $result;
     }
@@ -1017,7 +1028,7 @@ class AddonManager {
                 if (isset($this->autoloadClasses[$classKey])) {
                     $orderedByPriority = [];
                     $addonAdded = false;
-                    foreach($this->autoloadClasses[$classKey] as $loadedClassNamespaceKey => $loadedClassData) {
+                    foreach ($this->autoloadClasses[$classKey] as $loadedClassNamespaceKey => $loadedClassData) {
                         $loadedClassAddon = $loadedClassData['addon'];
                         if (!$addonAdded && $addon->getPriority() < $loadedClassAddon->getPriority()) {
                             $orderedByPriority[$namespaceKey] = [
@@ -1068,7 +1079,7 @@ class AddonManager {
         // Remove all of the addon's classes from the autoloader.
         foreach ($addon->getClasses() as $classKey => $classInfo) {
             if (isset($this->autoloadClasses[$classKey])) {
-                foreach($this->autoloadClasses[$classKey] as $namespaceKey => $classData) {
+                foreach ($this->autoloadClasses[$classKey] as $namespaceKey => $classData) {
                     if (strtolower($classData['namespace']) === $namespaceKey) {
                         unset($this->autoloadClasses[$classKey][$namespaceKey]);
                     }
@@ -1327,5 +1338,27 @@ class AddonManager {
         }
 
         return $this;
+    }
+
+    /**
+     * Validate an addon type against the whitelist of known types.
+     *
+     * @param string $type The type to check.
+     */
+    private static function validateType(string $type) {
+        if (!in_array($type, [Addon::TYPE_ADDON, Addon::TYPE_LOCALE, Addon::TYPE_THEME])) {
+            throw new \InvalidArgumentException("Addons cannot have a type of: $type", 400);
+        }
+    }
+
+    /**
+     * Validate an addon key.
+     *
+     * @param string $key The key to validate.
+     */
+    private static function validateKey(string $key) {
+        if (!preg_match('`^[a-z0-9_-]+$`i', $key)) {
+            throw new \InvalidArgumentException("Invalid addon key: $key", 400);
+        }
     }
 }

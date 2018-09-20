@@ -21,20 +21,6 @@ export async function makePolyfillConfig(entryModel: EntryModel) {
         filename: `js/webpack/polyfills.min.js`,
         path: DIST_DIRECTORY,
     };
-    baseConfig.module!.rules = [
-        {
-            test: /\.tsx?$/,
-            exclude: ["node_modules"],
-            use: [
-                {
-                    loader: "ts-loader",
-                    options: {
-                        configFile: TS_CONFIG_FILE,
-                    },
-                },
-            ],
-        },
-    ];
     baseConfig.optimization = {
         splitChunks: false,
     };

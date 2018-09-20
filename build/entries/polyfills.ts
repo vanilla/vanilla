@@ -8,7 +8,7 @@
  * @license GPL-2.0-only
  */
 
-import "babel-polyfill";
+import "@babel/polyfill";
 
 /**
  * Polyfill forEach on NodeList.

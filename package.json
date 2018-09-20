@@ -54,6 +54,7 @@
         "@types/webpack": "4.4.9",
         "@types/webpack-bundle-analyzer": "2.9.2",
         "@types/webpack-serve": "2.0.0",
+        "@types/webpackbar": "2.6.0",
         "@types/yargs": "11.1.1",
         "@vanillaforums/babel-preset": "1.0.5",
         "@vanillaforums/prettier-config": "1.0.0",
@@ -104,6 +105,7 @@
         "webpack": "4.19.1",
         "webpack-bundle-analyzer": "2.13.1",
         "webpack-serve": "2.0.2",
+        "webpackbar": "2.6.3",
         "yargs": "12.0.2"
     },
     "scripts": {

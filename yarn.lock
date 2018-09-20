@@ -477,6 +477,13 @@
     "@types/uglify-js" "*"
     source-map "^0.6.0"
 
+"@types/webpackbar@2.6.0":
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/@types/webpackbar/-/webpackbar-2.6.0.tgz#0fa1b88e2c7ab68919d94fb8a5b3c882e4d7c94c"
+  dependencies:
+    "@types/node" "*"
+    "@types/webpack" "*"
+
 "@types/yargs@11.1.1":
   version "11.1.1"
   resolved "https://registry.yarnpkg.com/@types/yargs/-/yargs-11.1.1.tgz#2e724257167fd6b615dbe4e54301e65fe597433f"
@@ -2004,6 +2011,10 @@ ci-info@^1.0.0:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-1.1.3.tgz#710193264bb05c77b8c90d02f5aaf22216a667b2"
 
+ci-info@^1.5.0:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-1.5.1.tgz#17e8eb5de6f8b2b6038f0cbb714d410bfa9f3030"
+
 cipher-base@^1.0.0, cipher-base@^1.0.1, cipher-base@^1.0.3:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/cipher-base/-/cipher-base-1.0.4.tgz#8760e4ecc272f4c363532f926d874aae2c1397de"
@@ -2046,7 +2057,7 @@ cli-boxes@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/cli-boxes/-/cli-boxes-1.0.0.tgz#4fa917c3e59c94a004cd61f8ee509da651687143"
 
-cli-cursor@^2.1.0:
+cli-cursor@^2.0.0, cli-cursor@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/cli-cursor/-/cli-cursor-2.1.0.tgz#b35dac376479facc3e94747d41d0d0f5238ffcb5"
   dependencies:
@@ -2231,6 +2242,15 @@ connect@^3.6.0:
     finalhandler "1.1.0"
     parseurl "~1.3.2"
     utils-merge "1.0.1"
+
+consola@^1.4.3:
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/consola/-/consola-1.4.3.tgz#945e967e05430ddabd3608b37f5fa37fcfacd9dd"
+  dependencies:
+    chalk "^2.3.2"
+    figures "^2.0.0"
+    lodash "^4.17.5"
+    std-env "^1.1.0"
 
 console-browserify@^1.1.0:
   version "1.1.0"
@@ -4250,6 +4270,12 @@ is-ci@^1.0.10:
   dependencies:
     ci-info "^1.0.0"
 
+is-ci@^1.1.0:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/is-ci/-/is-ci-1.2.1.tgz#e3779c8ee17fccf428488f6e281187f2e632841c"
+  dependencies:
+    ci-info "^1.5.0"
+
 is-color-stop@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/is-color-stop/-/is-color-stop-1.1.0.tgz#cfff471aee4dd5c9e158598fbe12967b5cdad345"
@@ -4931,6 +4957,14 @@ log-symbols@^2.1.0:
   resolved "https://registry.yarnpkg.com/log-symbols/-/log-symbols-2.2.0.tgz#5740e1c5d6f0dfda4ad9323b5332107ef6b4c40a"
   dependencies:
     chalk "^2.0.1"
+
+log-update@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/log-update/-/log-update-2.3.0.tgz#88328fd7d1ce7938b29283746f0b1bc126b24708"
+  dependencies:
+    ansi-escapes "^3.0.0"
+    cli-cursor "^2.0.0"
+    wrap-ansi "^3.0.1"
 
 log4js@^3.0.0:
   version "3.0.5"
@@ -6356,6 +6390,10 @@ prettier@1.14.3:
   version "1.14.3"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.14.3.tgz#90238dd4c0684b7edce5f83b0fb7328e48bd0895"
 
+pretty-time@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/pretty-time/-/pretty-time-1.1.0.tgz#ffb7429afabb8535c346a34e41873adf3d74dd0e"
+
 private@^0.1.6, private@~0.1.5:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/private/-/private-0.1.8.tgz#2381edb3689f7a53d653190060fcf822d2f368ff"
@@ -7434,6 +7472,12 @@ statuses@~1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-1.4.0.tgz#bb73d446da2796106efcc1b601a253d6c46bd087"
 
+std-env@^1.1.0, std-env@^1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/std-env/-/std-env-1.3.1.tgz#4e1758412439e9ece1d437b1b098551911aa44ee"
+  dependencies:
+    is-ci "^1.1.0"
+
 stdout-stream@^1.4.0:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/stdout-stream/-/stdout-stream-1.4.1.tgz#5ac174cdd5cd726104aa0c0b2bd83815d8d535de"
@@ -7604,7 +7648,7 @@ tabbable@3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/tabbable/-/tabbable-3.1.1.tgz#db7512f28a9a1ed16e4275bd190131be9d5ad8e9"
 
-table@^4.0.1:
+table@^4.0.1, table@^4.0.3:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/table/-/table-4.0.3.tgz#00b5e2b602f1794b9acaf9ca908a76386a7813bc"
   dependencies:
@@ -8345,6 +8389,21 @@ webpack@4.19.1:
     watchpack "^1.5.0"
     webpack-sources "^1.2.0"
 
+webpackbar@2.6.3:
+  version "2.6.3"
+  resolved "https://registry.yarnpkg.com/webpackbar/-/webpackbar-2.6.3.tgz#4f2d0078375acfe95c0e55227771a2ed98ecc5c9"
+  dependencies:
+    chalk "^2.4.1"
+    consola "^1.4.3"
+    figures "^2.0.0"
+    loader-utils "^1.1.0"
+    lodash "^4.17.10"
+    log-update "^2.3.0"
+    pretty-time "^1.1.0"
+    schema-utils "^1.0.0"
+    std-env "^1.3.1"
+    table "^4.0.3"
+
 whatwg-fetch@>=0.10.0:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/whatwg-fetch/-/whatwg-fetch-2.0.4.tgz#dde6a5df315f9d39991aa17621853d720b85566f"
@@ -8395,6 +8454,13 @@ wrap-ansi@^2.0.0:
   dependencies:
     string-width "^1.0.1"
     strip-ansi "^3.0.1"
+
+wrap-ansi@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-3.0.1.tgz#288a04d87eda5c286e060dfe8f135ce8d007f8ba"
+  dependencies:
+    string-width "^2.1.1"
+    strip-ansi "^4.0.0"
 
 wrappy@1:
   version "1.0.2"

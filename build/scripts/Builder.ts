@@ -28,13 +28,7 @@ import EntryModel from "./utility/EntryModel";
  * - A production build that only builds polyfills. (BuildMode.POLYFILLS)
  */
 export default class Builder {
-    private statOptions = {
-        chunks: false, // Makes the build much quieter
-        modules: false,
-        entrypoints: false,
-        warnings: false,
-        colors: true, // Shows colors in the console
-    };
+    private statOptions: any = this.options.verbose ? "verbose" : "minimal";
 
     private entryModel: EntryModel;
 

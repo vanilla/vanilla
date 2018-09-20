@@ -13,6 +13,7 @@ import chalk from "chalk";
 import { printVerbose } from "../utility/utils";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import EntryModel from "../utility/EntryModel";
+import WebpackBar from "webpackbar";
 
 /**
  * Create the core webpack config.
@@ -38,7 +39,7 @@ ${chalk.green(aliases)}`;
         babelPlugins.push(require.resolve("react-hot-loader/babel"));
     }
 
-    const config = {
+    const config: any = {
         context: VANILLA_ROOT,
         module: {
             rules: [
@@ -48,6 +49,7 @@ ${chalk.green(aliases)}`;
                     include: [
                         // We need to transpile quill's ES6 because we are building from source.
                         /\/src\/scripts/,
+                        /\/build\/entries/,
                         /\/node_modules\/quill/,
                     ],
                     use: [
@@ -105,7 +107,12 @@ ${chalk.green(aliases)}`;
                 },
             ],
         },
-        plugins: [] as any[],
+        performance: { hints: false },
+        plugins: [
+            new WebpackBar({
+                name: section,
+            }),
+        ] as any[],
         resolve: {
             modules: modulePaths,
             alias: {

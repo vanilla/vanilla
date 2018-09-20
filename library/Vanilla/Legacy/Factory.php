@@ -1,6 +1,6 @@
 <?php
 /**
- * Gdn_Factory.
+ * Old Factory class for DI.
  *
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
@@ -23,6 +23,8 @@ use Vanilla\AliasLoader;
  * A factory used to create most objects in the core library.
  * If you have your own object that implements some base portion of the library you can install it in the factory
  * make sure your own object has the same properties/methods as the core object and then install it into this factory.
+ *
+ * @deprecated 2.8
  */
 class Factory {
 

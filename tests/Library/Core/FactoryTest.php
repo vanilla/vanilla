@@ -12,7 +12,8 @@ use Gdn;
 use VanillaTests\Fixtures\Tuple;
 
 /**
- * Tests for the {@link Factory}.
+ * Tests for the legacy factory class.
+ * @see \Vanilla\Legacy\Factory;
  */
 class FactoryTest extends SharedBootstrapTestCase {
     const TUPLE = 'VanillaTests\Fixtures\Tuple';

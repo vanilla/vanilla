@@ -83,6 +83,28 @@ export default class EntryModel {
     }
 
     /**
+     * Get entries for the development build.
+     *
+     * Compared to the prod build there is 1 multi-entry instead of multiple.
+     * Eg. 1 output bundle per section.
+     *
+     * @param section - The section to get entries for.
+     */
+    public async getDevEntries(section: string): Promise<string[]> {
+        const entries = [PUBLIC_PATH_SOURCE_FILE];
+
+        for (const entryDir of this.entryDirs) {
+            const entry = await this.lookupEntry(entryDir, section);
+            if (entry !== null) {
+                entries.push(entry.entryPath);
+            }
+        }
+
+        entries.push(BOOTSTRAP_SOURCE_FILE);
+        return entries;
+    }
+
+    /**
      * Gather all the sections across every addon. Sections are determined by having
      * an entrypoint in /src/scripts/entries. The filename is the section name without its extension.
      */

@@ -10,7 +10,7 @@ import { DIST_DIRECTORY } from "../env";
 import { getOptions, BuildMode } from "../options";
 import { makeBaseConfig } from "./makeBaseConfig";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
-import UglifyJsPlugin from "uglifyjs-webpack-plugin";
+import TerserWebpackPlugin from "terser-webpack-plugin";
 import OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
 import EntryModel from "../utility/EntryModel";
 
@@ -81,7 +81,7 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
             },
         },
         minimizer: [
-            new UglifyJsPlugin({
+            new TerserWebpackPlugin({
                 cache: true,
                 parallel: true,
                 sourceMap: true, // set to true if you want JS source maps
@@ -89,12 +89,6 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
             new OptimizeCSSAssetsPlugin({}),
         ],
     };
-
-    baseConfig.plugins!.push(
-        new webpack.DefinePlugin({
-            __BUILD__SECTION__: JSON.stringify(section),
-        }),
-    );
 
     // Spawn a bundle size analyzer. This is super usefull if you find a bundle has jumped up in size.
     if (options.mode === BuildMode.ANALYZE) {

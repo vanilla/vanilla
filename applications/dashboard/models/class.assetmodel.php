@@ -229,7 +229,7 @@ class AssetModel extends Gdn_Model {
      * @return string
      */
     public function getInlinePolyfillJSContent(): string {
-        $polyfillFileUrl = asset("/js/webpack/polyfills.min.js?h=".$this->cacheBuster());
+        $polyfillFileUrl = asset("/dist/polyfills.min.js?h=".$this->cacheBuster());
 
         $debug = c("Debug", false);
         $logAdding = $debug ? "console.log('Older browser detected. Initiating polyfills.');" : "";

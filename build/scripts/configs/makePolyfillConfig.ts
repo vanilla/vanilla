@@ -18,7 +18,7 @@ export async function makePolyfillConfig(entryModel: EntryModel) {
     baseConfig.devtool = "source-map";
     baseConfig.entry = POLYFILL_SOURCE_FILE;
     baseConfig.output = {
-        filename: `js/webpack/polyfills.min.js`,
+        filename: `polyfills.min.js`,
         path: DIST_DIRECTORY,
     };
     baseConfig.optimization = {

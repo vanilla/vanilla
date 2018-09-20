@@ -5,6 +5,7 @@
  */
 
 import * as path from "path";
+import webpack from "webpack";
 import { VANILLA_ROOT, TS_CONFIG_FILE, TS_LINT_FILE, PRETTIER_FILE } from "../env";
 import PrettierPlugin from "prettier-webpack-plugin";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
@@ -45,7 +46,7 @@ ${chalk.green(aliases)}`;
             rules: [
                 {
                     test: /\.(jsx?|tsx?)$/,
-                    exclude: ["node_modules"],
+                    exclude: ["node_modules", /node_modules\/quill-delta/],
                     include: [
                         // We need to transpile quill's ES6 because we are building from source.
                         /\/src\/scripts/,
@@ -57,7 +58,7 @@ ${chalk.green(aliases)}`;
                             loader: "babel-loader",
                             options: {
                                 presets: [require.resolve("@vanillaforums/babel-preset")],
-                                // plugins: babelPlugins,
+                                plugins: babelPlugins,
                                 cacheDirectory: true,
                             },
                         },
@@ -109,6 +110,9 @@ ${chalk.green(aliases)}`;
         },
         performance: { hints: false },
         plugins: [
+            new webpack.DefinePlugin({
+                __BUILD__SECTION__: JSON.stringify(section),
+            }),
             new WebpackBar({
                 name: section,
             }),

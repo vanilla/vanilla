@@ -91,7 +91,7 @@ export default class EntryModel {
      * @param section - The section to get entries for.
      */
     public async getDevEntries(section: string): Promise<string[]> {
-        const entries = [PUBLIC_PATH_SOURCE_FILE];
+        const entries: string[] = [];
 
         for (const entryDir of this.entryDirs) {
             const entry = await this.lookupEntry(entryDir, section);

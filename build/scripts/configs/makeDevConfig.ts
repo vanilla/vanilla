@@ -16,8 +16,6 @@ import { getOptions } from "../options";
  */
 export async function makeDevConfig(entryModel: EntryModel, section: string) {
     const options = await getOptions();
-    const { phpConfig } = options;
-    const ip = phpConfig.HotReload && phpConfig.HotReload.IP ? phpConfig.HotReload.IP : "localhost";
 
     const baseConfig: Configuration = await makeBaseConfig(entryModel, section);
     const sectionEntries = await entryModel.getDevEntries(section);
@@ -27,7 +25,7 @@ export async function makeDevConfig(entryModel: EntryModel, section: string) {
     baseConfig.output = {
         filename: `${section}-hot-bundle.js`,
         chunkFilename: "[name].chunk.js",
-        publicPath: `http://${ip}:3030/`,
+        publicPath: `http://${options.devIp}:3030/`,
     };
     baseConfig.optimization = {
         splitChunks: false,

@@ -345,7 +345,6 @@ class ModerationController extends VanillaController {
         $Session = Gdn::session();
         $this->Form = new Gdn_Form();
         $DiscussionModel = new DiscussionModel();
-        $CategoryModel = new CategoryModel();
 
         $this->title(t('Confirm'));
 
@@ -394,8 +393,7 @@ class ModerationController extends VanillaController {
 
             // Iterate and move.
             foreach ($AllowedDiscussions as $DiscussionID) {
-                $Discussion = val($DiscussionID, $DiscussionData);
-
+                $Discussion = ($DiscussionData[$DiscussionID] ?? false);
                 // Create the shadow redirect.
                 if ($RedirectLink) {
                     $DiscussionModel->defineSchema();
@@ -448,26 +446,10 @@ class ModerationController extends VanillaController {
 
             // Update recent posts and counts on all affected categories.
             foreach ($AffectedCategories as $categoryID => $counts) {
-                $CategoryModel->refreshAggregateRecentPost($categoryID, true);
-
-                // Prepare to adjust post counts for this category and its ancestors.
-                list($discussionOffset, $commentOffset) = $counts;
-
-                // Offset the discussion count for this category and its parents.
-                if ($discussionOffset < 0) {
-                    CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset);
-                } else {
-                    CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset);
-                }
-
-                // Offset the comment count for this category and its parents.
-                if ($commentOffset < 0) {
-                    CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset);
-                } else {
-                    CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset);
-                }
+                $DiscussionModel->updateDiscussionCount($categoryID);
             }
-
+            CategoryModel::recalculateAggregateCounts();
+            CategoryModel::clearCache();
             // Clear selections.
             if ($ClearSelection) {
                 Gdn::userModel()->saveAttribute($Session->UserID, 'CheckedDiscussions', false);

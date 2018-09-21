@@ -515,7 +515,7 @@ class AddonManager {
      * @return Addon|null Returns an addon object or null if one isn't found.
      */
     private function lookupSingleCachedAddon($addonDirName, $type) {
-        if (empty($addonDirName)) {
+        if (empty($addonDirName) || !static::validateKey($addonDirName)) {
             return null;
         }
 
@@ -743,7 +743,9 @@ class AddonManager {
      * @return Addon|null
      */
     public function lookupAddon($key) {
-        static::validateKey($key);
+        if (!static::validateKey($key)) {
+            return false;
+        }
 
         $this->ensureMultiCache();
 
@@ -763,7 +765,6 @@ class AddonManager {
      * @return bool Returns
      */
     public function isEnabled($key, $type) {
-        static::validateKey($key);
         static::validateType($type);
 
         if ($type === Addon::TYPE_ADDON) {
@@ -873,8 +874,6 @@ class AddonManager {
      * @return null|Addon Returns an {@link Addon} object for the locale pack or **null** if it can't be found.
      */
     public function lookupLocale($localeDirName) {
-        static::validateKey($localeDirName);
-
         $result = $this->lookupSingleCachedAddon($localeDirName, Addon::TYPE_LOCALE);
         return $result;
     }
@@ -992,8 +991,6 @@ class AddonManager {
      * @return null|Addon Returns an {@link Addon} object for the theme or **null** if it can't be found.
      */
     public function lookupTheme($themeDirName) {
-        static::validateKey($themeDirName);
-
         $result = $this->lookupSingleCachedAddon($themeDirName, Addon::TYPE_THEME);
         return $result;
     }
@@ -1357,8 +1354,10 @@ class AddonManager {
      * @param string $key The key to validate.
      */
     private static function validateKey(string $key) {
-        if (!preg_match('`^[a-z0-9_-]+$`i', $key)) {
-            throw new \InvalidArgumentException("Invalid addon key: $key", 400);
+        if (!preg_match('`^[a-z0-9_-]*$`i', $key)) {
+            trigger_error("Invalid addon key: $key.", E_USER_NOTICE);
+            return false;
         }
+        return true;
     }
 }

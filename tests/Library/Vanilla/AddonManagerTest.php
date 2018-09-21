@@ -794,7 +794,7 @@ class AddonManagerTest extends TestCase {
     /**
      * Test a bad theme key.
      *
-     * @expectedException \InvalidArgumentException
+     * @expectedException PHPUnit\Framework\Error\Notice
      */
     public function testBadThemeKey() {
         $am = $this->createTestManager();

@@ -21,4 +21,4 @@ import { assetUrl } from "@library/application";
  * @see https://github.com/webpack/webpack/issues/2776#issuecomment-233208623
  */
 // @ts-ignore: Cannot find variable warning. See comment aboe.
-__webpack_public_path__ = assetUrl("/");
+__webpack_public_path__ = assetUrl("/dist/" + __BUILD__SECTION__ + "/");

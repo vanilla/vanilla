@@ -9,7 +9,7 @@ class RichEditorPlugin extends Gdn_Plugin {
 
     const FORMAT_NAME = "Rich";
     const QUOTE_CONFIG_ENABLE = "RichEditor.Quote.Enable";
-    const EDITOR_STYLE_ASSET_PATH = "/plugins/rich-editor/js/webpack/chunks/mountEditor.min.css";
+    const EDITOR_STYLE_ASSET_PATH = "/dist/forum/async~mountEditor.min.css";
 
     /** @var integer */
     private static $editorID = 0;

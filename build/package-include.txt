@@ -3,6 +3,7 @@ applications/**
 bootstrap.php
 cache/**
 conf/**
+dist/**
 container.html
 environment.php
 index.php

@@ -345,6 +345,10 @@ class AttachmentModel extends Gdn_Model {
      * @return string Function name.
      */
     public static function getWriteAttachmentMethodName($type) {
+        if (empty($type)) {
+            return '';
+        }
+
         $method = str_replace('-', ' ', $type);
         $method = ucwords($method);
         $method = str_replace(' ', '', $method);

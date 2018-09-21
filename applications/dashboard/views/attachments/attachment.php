@@ -14,7 +14,7 @@ if (!function_exists('WriteAttachment')) {
     function writeAttachment($attachment) {
 
         $customMethod = AttachmentModel::getWriteAttachmentMethodName($attachment['Type']);
-        if (function_exists($customMethod)) {
+        if (function_exists($customMethod) && strcasecmp($customMethod, 'writeAttachment') !== 0) {
             if (val('Error', $attachment)) {
                 writeErrorAttachment($attachment);
                 return;

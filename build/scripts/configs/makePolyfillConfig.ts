@@ -6,19 +6,20 @@
 
 import { Configuration } from "webpack";
 import { makeBaseConfig } from "./makeBaseConfig";
-import { POLYFILL_SOURCE_FILE, TS_CONFIG_FILE, VANILLA_ROOT } from "../env";
+import { POLYFILL_SOURCE_FILE, TS_CONFIG_FILE, DIST_DIRECTORY } from "../env";
+import EntryModel from "../utility/EntryModel";
 
 /**
  * Create a config for building the polyfills file. This should be built entirely on its own.
  */
-export async function makePolyfillConfig() {
-    const baseConfig: Configuration = (await makeBaseConfig("")) as any;
+export async function makePolyfillConfig(entryModel: EntryModel) {
+    const baseConfig: Configuration = await makeBaseConfig(entryModel, "");
     baseConfig.mode = "production";
     baseConfig.devtool = "source-map";
     baseConfig.entry = POLYFILL_SOURCE_FILE;
     baseConfig.output = {
         filename: `js/webpack/polyfills.min.js`,
-        path: VANILLA_ROOT,
+        path: DIST_DIRECTORY,
     };
     baseConfig.module!.rules = [
         {

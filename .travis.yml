@@ -86,20 +86,20 @@ jobs:
         - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4 # Ensure a consistent yarn version
         - export PATH=$HOME/.yarn/bin:$PATH
         - yarn install --pure-lockfile
-        - cd plugins/rich-editor
-        - yarn install
-        - cd ../..
       cache:
         directories:
           - $TRAVIS_BUILD_DIR/node_modules
           - $TRAVIS_BUILD_DIR/plugins/rich-editor/node_modules
         yarn: true
       script:
-        - yarn run test
-        - yarn run lint:ts
+        - yarn build
+        - yarn test
 
 # No additional system dependencies to install. Skip the install step.
 install: true
+
+env:
+  - VANILLA_BUILD_DISABLE_AUTO_BUILD=true
 
 # Send status update notifications to a HipChat room.
 notifications:

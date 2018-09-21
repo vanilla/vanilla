@@ -149,7 +149,8 @@ class GeneralFunctionsTest extends SharedBootstrapTestCase {
             'bad scheme' => ['bad://ex.com', 'http://ex.com', ''],
             'bad scheme 2' => ['foo', 'bad://ex.com', ''],
             '..' => ['../foo', 'http://ex.com/bar/baz', 'http://ex.com/bar/foo'],
-            '.. 2' => ['../foo', 'http://ex.com/bar/baz/', 'http://ex.com/bar/foo']
+            '.. 2' => ['../foo', 'http://ex.com/bar/baz/', 'http://ex.com/bar/foo'],
+            '../..' => ['../../foo', 'http://ex.com/bar/baz', 'http://ex.com/foo'],
         ];
 
         return $r;

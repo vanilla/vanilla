@@ -3563,7 +3563,7 @@ SQL;
      *
      * @return void
      */
-    public static function recalculateAggregateCounts() {
+    private static function recalculateAggregateCounts() {
         // First grab the max depth so you know where to loop.
         $depth = Gdn::sql()
             ->select('Depth', 'max')

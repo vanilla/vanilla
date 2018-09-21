@@ -448,7 +448,7 @@ class ModerationController extends VanillaController {
             foreach ($AffectedCategories as $categoryID => $counts) {
                 $DiscussionModel->updateDiscussionCount($categoryID);
             }
-            CategoryModel::recalculateAggregateCounts();
+            (new CategoryModel())->counts('CountAllDiscussions');
             CategoryModel::clearCache();
             // Clear selections.
             if ($ClearSelection) {

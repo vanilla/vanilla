@@ -168,7 +168,7 @@ class VanillaHtmlFormatter {
             'direct_list_nest' => 1,
             'elements' => '*-applet-button-embed-fieldset-form-iframe-input-legend-link-object-optgroup-option-script-select-style-textarea',
             'keep_bad' => 0,
-            'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
+            'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, rapidminer, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
             'unique_ids' => 1,
             'valid_xhtml' => 0
         ];

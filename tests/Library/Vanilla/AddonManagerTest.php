@@ -803,6 +803,20 @@ class AddonManagerTest extends SharedBootstrapTestCase {
     }
 
     /**
+     * Looking up an empty addon key should return null, no error.
+     */
+    public function testEmptyKeyLookup() {
+        $am = $this->createTestManager();
+
+        $addon = $am->lookupAddon('');
+        $this->assertNull($addon);
+        $addon = $am->lookupTheme('');
+        $this->assertNull($addon);
+        $addon = $am->lookupLocale('');
+        $this->assertNull($addon);
+    }
+
+    /**
      * Make an addon manager that has conflicting addons..
      *
      * @return AddonManager

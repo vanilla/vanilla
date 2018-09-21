@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import DropDownItem from "@library/components/dropdown/DropDownItem";
+import DropDownItem from "@library/components/dropdown/items/DropDownItem";
 
-export default class DropDownSeparator extends React.Component {
+export default class DropDownItemSeparator extends React.Component {
     public render() {
         return (
             <DropDownItem className="dropDown-separator">

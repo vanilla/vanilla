@@ -6,14 +6,14 @@
 
 import * as React from "react";
 import { NavLink } from "react-router-dom";
-import DropDownItem from "@library/components/dropdown/DropDownItem";
+import DropDownItem from "@library/components/dropdown/items/DropDownItem";
 
-export interface IReactLink {
+export interface IDropDownItemLink {
     url: string;
     name: string;
 }
 
-export default class DropDownLink extends React.Component<(IReactLink)> {
+export default class DropDownItemLink extends React.Component<IDropDownItemLink> {
     public render() {
         return (
             <DropDownItem>

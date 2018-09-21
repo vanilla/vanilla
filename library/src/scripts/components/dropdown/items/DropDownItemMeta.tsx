@@ -6,14 +6,14 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import DropDownItem from "@library/components/dropdown/DropDownItem";
+import DropDownItem from "@library/components/dropdown/items/DropDownItem";
 
 export interface IProps {
     className?: string;
     metas: React.ReactNode;
 }
 
-export default class DropDownItems extends React.Component<IProps> {
+export default class DropDownItemMeta extends React.Component<IProps> {
     private hasChildren: boolean;
 
     public constructor(props) {
@@ -22,10 +22,11 @@ export default class DropDownItems extends React.Component<IProps> {
     }
 
     public render() {
+        const temp = `temp`;
         if (this.hasChildren) {
             return (
-                <DropDownItem>
-                    <Meta />
+                <DropDownItem className={this.props.className}>
+                    {temp}
                 </DropDownItem>
             );
         } else {

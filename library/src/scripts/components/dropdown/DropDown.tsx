@@ -5,20 +5,46 @@
  */
 
 import * as React from "react";
-import classNames from "classnames";
+import PopoverController, {
+    IDropDownControllerChildParameters,
+} from "@rich-editor/components/popovers/pieces/PopoverController";
+import { dropDownMenu } from "@library/components/Icons";
+import { getRequiredID } from "@library/componentIDs";
 
-
-
-interface IProps {
-    toggle?: React.ReactNode | string;
-    children: React.ReactNode | Array<React.ReactNode>; // Either custom content, or array of content
+export interface IProps {
+    name: string;
+    children: React.ReactNode;
+    className?: string;
+    isList?: boolean;
 }
 
-/**
- * Generic dropdown component. Takes either a standard link or a react component.
- */
-export default class DropDown extends React.Component {
-    public render() {
+export interface IState {
+    id: string;
+}
 
+export default class DropDownToggleButton extends React.PureComponent<IProps, IState> {
+    public defaultProps = {
+        isList: true,
+    };
+
+    public constructor(props) {
+        super(props);
+        this.state = {
+            id: getRequiredID(props, "dropDown"),
+        };
+    }
+
+    public render() {
+        return (
+            <PopoverController id={this.state.id} classNameRoot="dropDown" icon={dropDownMenu()}>
+                {(params: IDropDownControllerChildParameters) => {
+                    if (this.props.isList) {
+                        return <ul className="dropDownItems">{this.props.children}</ul>;
+                    } else {
+                        return <React.Fragment>{this.props.children}</React.Fragment>;
+                    }
+                }}
+            </PopoverController>
+        );
     }
 }

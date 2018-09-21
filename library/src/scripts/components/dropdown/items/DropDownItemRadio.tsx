@@ -5,9 +5,8 @@
  */
 
 import * as React from "react";
-import { NavLink } from "react-router-dom";
-import DropDownItem from "@library/components/dropdown/DropDownItem";
-import { check } from "@library/components/Icons";
+import { check } from "../../Icons";
+import DropDownItem from "@library/components/dropdown/items/DropDownItem";
 
 interface IOption {
     name: string;
@@ -23,12 +22,11 @@ interface IProps {
 }
 
 export interface IState {
-    selectedOption: string;
+    selectedValue: string;
 }
 
-export default class DropDownRadio extends React.Component<IProps> {
+export default class DropDownItemRadio extends React.Component<IProps, IState> {
     private hasOptions: boolean;
-    private selectedValue: string;
 
     public constructor(props) {
         super(props);
@@ -38,16 +36,32 @@ export default class DropDownRadio extends React.Component<IProps> {
             props.selectedOption = props.options[0].value;
         }
 
+        let selectedIndex = 0;
+
+        props.selectedOption.some( (option, index) => {
+            if (option.selected) {
+                selectedIndex = index;
+                return true;
+            }
+        });
+
         this.state = {
-            selectedIndex: 0,
+            selectedValue: this.props.options[selectedIndex].value,
         };
     }
 
     public render() {
-        const radioOptions = this.props.options.map((option) => {
+        const radioOptions = this.props.options.map((option, index) => {
             return (
                 <label className="dropDownRadio-option">
-                    <input type="radio" className="dropDownRadio-input" name={this.props.groupID} value={option.value} />
+                    <input
+                        type="radio"
+                        className="dropDownRadio-input"
+                        name={this.props.groupID}
+                        value={option.value}
+                        checked={this.state.selectedValue === option.value}
+                        onChange={this.props.onChange}
+                    />
                     <span className="dropDownRadio-check" aria-hidden={true}>
                         {option.selected && check()}
                     </span>
@@ -58,7 +72,7 @@ export default class DropDownRadio extends React.Component<IProps> {
             );
         });
 
-        if (this.props.options.length === 0) {
+        if (!this.hasOptions) {
             return null;
         } else {
             return (
@@ -73,4 +87,10 @@ export default class DropDownRadio extends React.Component<IProps> {
             );
         }
     }
+
+    private onChange = (e) => {
+        this.setState({
+            selectedValue: e.currentTarget.value,
+        });
+    };
 }

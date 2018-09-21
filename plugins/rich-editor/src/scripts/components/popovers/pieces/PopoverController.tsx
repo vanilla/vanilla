@@ -17,12 +17,19 @@ export interface IPopoverControllerChildParameters {
     closeMenuHandler(event?: React.SyntheticEvent<any>);
 }
 
+export interface IDropDownControllerChildParameters {
+    id: string;
+    isVisible: boolean;
+    closeMenuHandler(event?: React.SyntheticEvent<any>);
+}
+
 interface IProps {
     id: string;
     classNameRoot: string;
     icon: JSX.Element;
-    children: (props: IPopoverControllerChildParameters) => JSX.Element;
+    children: (props: IPopoverControllerChildParameters | IDropDownControllerChildParameters) => JSX.Element;
     onClose?: () => void;
+    buttonClasses: string;
 }
 
 interface IState {
@@ -52,7 +59,7 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
     }
 
     public render() {
-        const buttonClasses = classNames("richEditor-button", "richEditor-embedButton", {
+        const buttonClasses = classNames(this.props.buttonClasses, {
             isOpen: this.state.isVisible,
         });
 

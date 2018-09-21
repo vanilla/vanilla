@@ -62,3 +62,20 @@ export function check(className?: string) {
         </svg>
     );
 }
+
+export function dropDownMenu(className?: string) {
+    const title = `…`;
+    return (
+        <svg
+            className={classNames("icon", "icon-dropDownMenu", className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+            <circle cx="5.7" cy="12" r="2" fill="currentColor" />
+            <circle cx="18.3" cy="12" r="2" fill="currentColor" />
+            <circle cx="12" cy="12" r="2" fill="currentColor" />
+        </svg>
+    );
+}

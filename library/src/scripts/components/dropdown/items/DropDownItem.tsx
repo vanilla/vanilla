@@ -15,9 +15,9 @@ export interface IProps {
 export default class DropDownItem extends React.Component<IProps> {
     public render() {
         return (
-            <li className={classNames("dropDownItem", this.props.className)}>
+            <DropDownItem className={this.props.className}>
                 {this.props.children}
-            </li>
+            </DropDownItem>
         );
     }
 }

@@ -50,7 +50,13 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
         const Icon = <Icons.embed />;
 
         return (
-            <PopoverController id={this.state.id} classNameRoot="embedDialogue" icon={Icon} onClose={this.clearInput}>
+            <PopoverController
+                id={this.state.id}
+                classNameRoot="embedDialogue"
+                icon={Icon}
+                onClose={this.clearInput}
+                buttonClasses="richEditor-button richEditor-embedButton"
+            >
                 {(params: IPopoverControllerChildParameters) => {
                     const { initialFocusRef, closeMenuHandler, isVisible } = params;
 

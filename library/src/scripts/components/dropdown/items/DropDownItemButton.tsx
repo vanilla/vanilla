@@ -6,19 +6,20 @@
 
 import * as React from "react";
 import { NavLink } from "react-router-dom";
-import DropDownItem from "@library/components/dropdown/DropDownItem";
+import DropDownItem from "@library/components/dropdown/items/DropDownItem";
 
-export interface IProps {
+
+export interface IDropDownItemButton {
     name: string;
     children: React.ReactNode | string;
     onClick: any;
     className?: string;
 }
 
-export default class DropDownButton extends React.Component<(IProps)> {
+export default class DropDownItemButton extends React.Component<IDropDownItemButton> {
     public render() {
         return (
-            <DropDownItem>
+            <DropDownItem className={this.props.className}>
                 <button type="button" title={this.props.name} onClick={this.props.onClick} className={this.props.className}>
                     {this.props.children}
                 </button>

@@ -6,44 +6,25 @@
 
 import { getOptions } from "../options";
 import { print, fail } from "./utils";
-import { lookupAddonPaths } from "./addonUtils";
 import chalk from "chalk";
 import { spawn } from "child_process";
-
-const alreadyInstalledDirectories = new Set();
 
 /**
  * Install dependancies for all requirements.
  *
  * @param options
  */
-export async function installNodeModules(section: string) {
+export async function installNodeModulesInDir(dir: string) {
     const options = await getOptions();
 
-    if (!options.install) {
-        return;
-    }
-
-    print(`Verifying node_module installation for section ${chalk.yellow(section)}.`);
-    const originalDir = process.cwd();
-
     try {
-        const directories = await lookupAddonPaths(section);
-
-        for (const dir of directories) {
-            if (!alreadyInstalledDirectories.has(dir)) {
-                alreadyInstalledDirectories.add(dir);
-                print(`Installing node modules for directory: ${chalk.yellow(dir)}`);
-                process.chdir(dir);
-                const spawnOptions = options.verbose ? { stdio: "inherit" } : {};
-                await spawnChildProcess("yarn", ["install"], spawnOptions);
-            }
-        }
+        print(`Installing node modules for directory: ${chalk.yellow(dir)}`);
+        process.chdir(dir);
+        const spawnOptions = options.verbose ? { stdio: "inherit" } : {};
+        await spawnChildProcess("yarn", ["install", "--pure-lockfile"], spawnOptions);
     } catch (err) {
         fail(`\nNode module installation failed.\n    ${err}\n`);
     }
-
-    process.chdir(originalDir);
 }
 
 /**

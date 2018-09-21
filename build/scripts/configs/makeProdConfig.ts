@@ -4,14 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import { Configuration } from "webpack";
-import { VANILLA_ROOT } from "../env";
-import { getEntries } from "../utility/addonUtils";
+import path from "path";
+import webpack, { Configuration } from "webpack";
+import { DIST_DIRECTORY } from "../env";
 import { getOptions, BuildMode } from "../options";
 import { makeBaseConfig } from "./makeBaseConfig";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import UglifyJsPlugin from "uglifyjs-webpack-plugin";
 import OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
+import EntryModel from "../utility/EntryModel";
 
 let analyzePort = 8888;
 
@@ -20,9 +21,9 @@ let analyzePort = 8888;
  *
  * @param section - The section of the app to build. Eg. forum | admin | knowledge.
  */
-export async function makeProdConfig(section: string) {
-    const baseConfig: Configuration = (await makeBaseConfig(section)) as any;
-    const forumEntries = await getEntries(section);
+export async function makeProdConfig(entryModel: EntryModel, section: string) {
+    const baseConfig: Configuration = await makeBaseConfig(entryModel, section);
+    const forumEntries = await entryModel.getProdEntries(section);
     const options = await getOptions();
 
     baseConfig.mode = "production";
@@ -32,39 +33,50 @@ export async function makeProdConfig(section: string) {
     baseConfig.output = {
         filename: "[name].min.js",
         chunkFilename: "[name].min.js?[chunkhash]",
-        publicPath: "/",
-        path: VANILLA_ROOT,
+        publicPath: `/dist/${section}`,
+        path: path.join(DIST_DIRECTORY, section),
         library: `vanilla${section}`,
     };
     baseConfig.devtool = "source-map";
     baseConfig.optimization = {
+        noEmitOnErrors: true,
         namedModules: false,
         namedChunks: false,
         // Create a single runtime chunk per section.
         runtimeChunk: {
-            name: `js/webpack/runtime-${section}`,
+            name: `runtime`,
         },
         // We want to split
         splitChunks: {
-            chunks: "initial",
-            minSize: 1000000, // This should prevent webpack from creating extra chunks for
+            chunks: "all",
+            minSize: 10000000, // This should prevent webpack from creating extra chunks.
             cacheGroups: {
-                commons: {
+                vendors: {
                     test: /[\\/]node_modules[\\/]/,
                     minSize: 30000,
                     reuseExistingChunk: true,
-                    name: `js/webpack/vendors-${section}`,
-                    chunks: "initial",
+                    // If name is explicitly specified many different vendors~someOtherChunk combined
+                    // chunk bundles will get outputted.
+                    name: "vendors",
+                    chunks: "all",
+                    minChunks: 2,
                 },
-                library: {
+                shared: {
                     // Our library files currently only come from the dashboard.
                     test: /[\\/]library[\\/]src[\\/]scripts[\\/]/,
                     minSize: 30000,
-                    name: `applications/dashboard/js/webpack/library-${section}`,
+                    // If name is explicitly specified many different shared~someOtherChunk combined
+                    // chunk bundles will get outputted.
+                    name: "shared",
                     // We currently NEED every library file to be shared among everything.
                     // Many of these files have common global state that is not exposed on the window object.
                     chunks: "all",
                     minChunks: 2,
+                },
+                // Allow async chunks to be split however webpack wants to split them.
+                async: {
+                    minSize: 50000,
+                    chunks: "async",
                 },
             },
         },
@@ -77,6 +89,12 @@ export async function makeProdConfig(section: string) {
             new OptimizeCSSAssetsPlugin({}),
         ],
     };
+
+    baseConfig.plugins!.push(
+        new webpack.DefinePlugin({
+            __BUILD__SECTION__: JSON.stringify(section),
+        }),
+    );
 
     // Spawn a bundle size analyzer. This is super usefull if you find a bundle has jumped up in size.
     if (options.mode === BuildMode.ANALYZE) {

@@ -6,38 +6,32 @@
 
 import * as path from "path";
 import { VANILLA_ROOT, TS_CONFIG_FILE, TS_LINT_FILE, PRETTIER_FILE } from "../env";
-import { getAddonAliasMapping, getScriptSourceDirectories, lookupAddonPaths } from "../utility/addonUtils";
 import PrettierPlugin from "prettier-webpack-plugin";
-import HappyPack from "happypack";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import { getOptions, BuildMode } from "../options";
 import chalk from "chalk";
 import { printVerbose } from "../utility/utils";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import EntryModel from "../utility/EntryModel";
 
 /**
  * Create the core webpack config.
  *
  * @param section - The section of the app to build. Eg. forum | admin | knowledge.
  */
-export async function makeBaseConfig(section: string) {
-    const happyThreadPool = HappyPack.ThreadPool({ size: 4, id: "ts" });
-    const addonPaths = await lookupAddonPaths(section);
+export async function makeBaseConfig(entryModel: EntryModel, section: string) {
     const options = await getOptions();
 
     const modulePaths = [
         "node_modules",
         path.join(VANILLA_ROOT, "node_modules"),
-        ...addonPaths.map(dir => path.resolve(dir, "node_modules")),
+        ...entryModel.addonDirs.map(dir => path.resolve(dir, "node_modules")),
     ];
-    const moduleAliases = await getAddonAliasMapping(section);
 
-    const aliases = Object.keys(moduleAliases).join(", ");
+    const aliases = Object.keys(entryModel.aliases).join(", ");
     const message = `Building section ${chalk.yellowBright(section)} with the following aliases
 ${chalk.green(aliases)}`;
     printVerbose(message);
-
-    const tsSourceIncludes = await getScriptSourceDirectories(section);
 
     const extraTsLoaders =
         options.mode === BuildMode.DEVELOPMENT
@@ -80,8 +74,13 @@ ${chalk.green(aliases)}`;
                     test: /\.tsx?$/,
                     exclude: ["node_modules"],
                     use: [
+                        ...extraTsLoaders,
                         {
-                            loader: "happypack/loader?id=ts",
+                            loader: "ts-loader",
+                            options: {
+                                happyPackMode: true,
+                                configFile: TS_CONFIG_FILE,
+                            },
                         },
                     ],
                 },
@@ -129,33 +128,11 @@ ${chalk.green(aliases)}`;
                 },
             ],
         },
-        plugins: [
-            new HappyPack({
-                id: "ts",
-                verbose: options.verbose,
-                threadPool: happyThreadPool,
-                loaders: [
-                    ...extraTsLoaders,
-                    {
-                        loader: "ts-loader",
-                        options: {
-                            happyPackMode: true,
-                            configFile: TS_CONFIG_FILE,
-                        },
-                    },
-                ],
-            }),
-            new ForkTsCheckerWebpackPlugin({
-                tsconfig: TS_CONFIG_FILE,
-                tslint: TS_LINT_FILE,
-                checkSyntacticErrors: true,
-                async: true,
-            }),
-        ],
+        plugins: [] as any[],
         resolve: {
             modules: modulePaths,
             alias: {
-                ...moduleAliases,
+                ...entryModel.aliases,
                 "library-scss": path.resolve(VANILLA_ROOT, "library/src/scss"),
             },
             extensions: [".ts", ".tsx", ".js", ".jsx"],
@@ -175,6 +152,16 @@ ${chalk.green(aliases)}`;
             modules: [path.join(VANILLA_ROOT, "node_modules")],
         },
     };
+
+    if (!options.disableValidation) {
+        config.plugins.push(
+            new ForkTsCheckerWebpackPlugin({
+                tsconfig: TS_CONFIG_FILE,
+                tslint: TS_LINT_FILE,
+                checkSyntacticErrors: true,
+            }),
+        );
+    }
 
     if (options.mode === BuildMode.PRODUCTION) {
         config.plugins.push(

@@ -16,6 +16,9 @@ yargs
         alias: "f",
         default: false,
     })
+    .options("disable-validation", {
+        default: false,
+    })
     .options("install", {
         alias: "i",
         default: false,
@@ -28,14 +31,16 @@ export const enum BuildMode {
     POLYFILLS = "polyfills",
 }
 
-interface IBuildOptions {
+export interface IBuildOptions {
     mode: BuildMode;
     verbose: boolean;
     fix: boolean;
     install: boolean;
+    disableValidation: boolean;
     enabledAddonKeys: string[];
     configFile: string;
     phpConfig: any;
+    devIp: string;
 }
 
 /**
@@ -59,14 +64,26 @@ function parseEnabledAddons(config: any) {
 }
 
 export async function getOptions(): Promise<IBuildOptions> {
-    const config = await getVanillaConfig(yargs.argv.config);
+    // We only want/need to parse the config for development builds to see which addons are enabled.
+    // CI does not have a config file so don't look one up if we are
+    let config: any = {};
+    let enabledAddonKeys: string[] = [];
+    let devIp = "localhost";
+    if (yargs.argv.mode === BuildMode.DEVELOPMENT) {
+        config = await getVanillaConfig(yargs.argv.config);
+        devIp = config.HotReload && config.HotReload.IP ? config.HotReload.IP : "localhost";
+        enabledAddonKeys = parseEnabledAddons(config);
+    }
+
     return {
         mode: yargs.argv.mode,
         verbose: yargs.argv.verbose,
-        enabledAddonKeys: parseEnabledAddons(config),
+        enabledAddonKeys,
+        disableValidation: yargs.argv["disable-validation"],
         configFile: yargs.argv.config,
         fix: yargs.argv.fix,
         phpConfig: config,
         install: yargs.argv.install,
+        devIp,
     };
 }

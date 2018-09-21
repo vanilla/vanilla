@@ -93,15 +93,6 @@ class Gdn_Request implements RequestInterface {
      * @var string ex: vanilla.local:8080
      */
     protected static $hostEndPoint;
-
-    /**
-    /*  Holds url() results to avoid recalls vs same path
-     * https://github.com/vanilla/vanilla/issues/7617
-     *
-     * @var array
-     */
-    protected static $urls = [];
-
     /**
      * Instantiate a new instance of the {@link Gdn_Request} class.
      */
@@ -1569,10 +1560,6 @@ class Gdn_Request implements RequestInterface {
      */
     public function url($path = '', $withDomain = false, $ssl = null) {
         static $allowSSL = null;
-        $staticKey = ($withDomain ? '1-' : '0-').($ssl ? '1-' : '0-').$path;
-        if ($r = (self::$urls[$staticKey] ?? false)) {
-            return $r;
-        }
         if ($allowSSL === null) {
             $allowSSL = c('Garden.AllowSSL', false);
         }
@@ -1610,7 +1597,6 @@ class Gdn_Request implements RequestInterface {
         }
 
         if (substr($path, 0, 2) == '//' || in_array(strpos($path, '://'), [4, 5])) { // Accounts for http:// and https:// - some querystring params may have "://", and this would cause things to break.
-            self::$urls[$staticKey] = $path;
             return $path;
         }
 
@@ -1680,7 +1666,6 @@ class Gdn_Request implements RequestInterface {
             $result .= $hash;
         }
 
-        self::$urls[$staticKey] = $result;
         return $result;
     }
 

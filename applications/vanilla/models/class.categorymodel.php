@@ -3668,6 +3668,8 @@ SQL;
     /**
      * Recalculate all aggregate CountAllDiscussions and CountAllComments columns for category and all parents.
      *
+     * @param int $categoryId Category ID to update
+     *
      * @return void
      */
     public static function recalculateCounts(int $categoryId) {

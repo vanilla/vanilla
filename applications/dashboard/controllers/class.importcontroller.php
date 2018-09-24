@@ -96,14 +96,6 @@ class ImportController extends DashboardController {
      */
     private function checkAccess() {
         $this->permission('Garden.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
-        \Vanilla\FeatureFlagHelper::throwIfNotEnabled(
-            'Import',
-            Gdn_UserException::class,
-            [
-                t('Imports are not enabled.', 'Imports are not enabled. Set the config Feature.Import.Enabled = true to enable imports.'),
-                403
-            ]
-        );
     }
 
     /**

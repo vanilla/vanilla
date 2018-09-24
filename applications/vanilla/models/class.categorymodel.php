@@ -3608,6 +3608,101 @@ SQL;
     }
 
     /**
+     * Recalculate  CountDiscussions and CountComments columns for category.
+     *
+     * @param int $categoryId Category ID to update
+     * @return void
+     */
+    public static function recalculateCategoryCounts(int $categoryId) {
+        $sql = Gdn::sql()
+            ->select('DiscussionID', 'count', 'DiscussionCount')
+            ->select('CountComments', 'sum', 'CountComments')
+            ->from('Discussion')
+            ->where('CategoryID', $categoryId);
+
+        $exclude = Gdn::config('Vanilla.Archive.Exclude');
+        if ($exclude) {
+            $archiveDate = Gdn::config('Vanilla.Archive.Date');
+            if ($archiveDate) {
+                $sql->where('d.DateLastComment >', $archiveDate);
+            }
+        }
+        $row = $sql->get()->firstRow(DATASET_TYPE_ARRAY);
+
+        $discussionCount = $row['DiscussionCount'] ?? 0;
+        $commentCount = $row['CountComments'] ?? 0;
+
+        Gdn::sql()
+            ->update('Category')
+            ->set('CountDiscussions', $discussionCount)
+            ->set('CountComments', $commentCount)
+            ->where('CategoryID', $categoryId)
+            ->put();
+    }
+
+    /**
+     * Recalculate  CountAllDiscussions count column for category.
+     *
+     * @param int $categoryId Category ID to update
+     * @return void
+     */
+    public static function recalculateCategoryCountsAll(int $categoryId) {
+        $row = Gdn::sql()
+            ->select('CountAllDiscussions', 'sum', 'CountAllDiscussions')
+            ->select('CountAllComments', 'sum', 'CountAllComments')
+            ->from('Category')
+            ->where('ParentCategoryID', $categoryId)
+            ->get()
+            ->firstRow(DATASET_TYPE_ARRAY);
+
+        $CountAllDiscussions = $row['CountAllDiscussions'] ?? 0;
+        $CountAllComments = $row['CountAllComments'] ?? 0;
+        Gdn::sql()
+            ->update('Category')
+            ->set('CountAllDiscussions', "CountDiscussions + {$CountAllDiscussions}", false)
+            ->set('CountAllComments', "CountComments + {$CountAllComments}", false)
+            ->where('CategoryID', $categoryId)
+            ->put();
+    }
+
+    /**
+     * Recalculate all aggregate CountAllDiscussions and CountAllComments columns for category and all parents.
+     *
+     * @return void
+     */
+    public static function recalculateCounts(int $categoryId) {
+        self::recalculateCategoryCounts($categoryId);
+        self::recalculateCategoryCountsAll($categoryId);
+
+        $categoryRow = Gdn::sql()
+            ->select('Depth')
+            ->select('ParentCategoryID')
+            ->from('Category')
+            ->where('CategoryID', $categoryId)
+            ->get()
+            ->firstRow(DATASET_TYPE_ARRAY);
+        $depth = (int)($categoryRow['Depth'] ?? 0);
+        $categoryId = $categoryRow['ParentCategoryID'] ?? 0;
+
+        if ($depth === 0) {
+            return;
+        }
+
+        while ($depth > 0) {
+            self::recalculateCategoryCountsAll($categoryId);
+            $depth--;
+
+            $parent = Gdn::sql()
+                ->select('ParentCategoryID')
+                ->from('Category')
+                ->where('CategoryID', $categoryId)
+                ->get()
+                ->firstRow(DATASET_TYPE_ARRAY);
+            $categoryId = $parent['ParentCategoryID'] ?? 0;
+        }
+    }
+
+    /**
      * Search for categories by name.
      *
      * @param string $name The whole or partial category name to search for.

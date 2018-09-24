@@ -81,7 +81,7 @@ class ComposerHelper {
 
         $nodeArgs = getenv(self::NODE_ARGS_ENV) ?: "";
         $disableValidationFlag = getenv(self::DISABLE_VALIDATION_ENV) ? "--low-memory" : "";
-        $buildCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildScript $disableValidationFlag";
+        $buildCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildScript -i $disableValidationFlag";
 
         printf("\nBuilding frontend assets\n");
         printf("\n$buildCommand\n");

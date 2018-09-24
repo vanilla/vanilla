@@ -153,9 +153,8 @@ window.vanilla.embed = function(host) {
                 if (currentPath != message[1]) {
                     currentPath = message[1];
                     // Strip off the values that this script added
-                    currentPath = currentPath.replace('/index.php?p=', ''); // 1
-                    currentPath = stripParam(currentPath, 'remote='); // 2
-                    currentPath = stripParam(currentPath, 'locale='); // 3
+                    currentPath = stripParam(currentPath, 'remote='); // 1
+                    currentPath = stripParam(currentPath, 'locale='); // 2
                     window.location.hash = currentPath;
                 }
             }

@@ -274,7 +274,7 @@ class TwitterPlugin extends Gdn_Plugin {
             $redirectUri .= (strpos($redirectUri, '?') === false ? '?' : '&').$query;
         }
 
-        $params = ['oauth_callback' => $redirectUri];
+        $params = ['callback_url' => $redirectUri];
 
         $url = 'https://api.twitter.com/oauth/request_token';
         $request = OAuthRequest::from_consumer_and_token($consumer, null, 'POST', $url, $params);

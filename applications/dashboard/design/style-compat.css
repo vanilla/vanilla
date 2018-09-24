@@ -74,10 +74,6 @@
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
@@ -899,8 +895,10 @@ label.checkbox input.checkbox-input {
   cursor: pointer;
 }
 
+body.hasRichEditor .richEditor ~ .TextBoxWrapper,
+body.hasRichEditor .CommentForm .PreviewButton,
 body.hasRichEditor #Form_Preview {
-  display: none;
+  display: none !important;
 }
 
 @media (min-width: 700px) {
@@ -982,6 +980,10 @@ body.hasRichEditor #Form_Preview {
   body.hasRichEditor .Popup.hasRichEditor .richEditor {
     padding-left: 0;
   }
+}
+
+.richEditor-text {
+  overflow: visible;
 }
 
 body.isMobile .embedDialogue {
@@ -1608,6 +1610,11 @@ body.isMobile .Popup.hasRichEditor .Border {
   cursor: pointer;
 }
 
+/*!
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 .embedVideo .embedExternal-content {
   position: relative;
   display: block;
@@ -1818,6 +1825,11 @@ body.isMobile .Popup.hasRichEditor .Border {
   pointer-events: none;
 }
 
+/*!
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 .embedLink-image {
   position: absolute;
   display: block;

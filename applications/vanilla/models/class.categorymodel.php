@@ -579,12 +579,6 @@ class CategoryModel extends Gdn_Model {
      *
      */
     protected static function buildCache($categoryID = null) {
-        if (!(
-            Gdn::cache()->activeEnabled()
-            && Gdn::cache()->type() != Gdn_Cache::CACHE_TYPE_NULL)
-        ) {
-            return;
-        };
         self::calculateData(self::$Categories);
         self::joinRecentPosts(self::$Categories, $categoryID);
 
@@ -3520,11 +3514,11 @@ SQL;
         }
 
         // Update the cache.
-        $categoriesToUpdate = self::instance()->getWhere(['CategoryID' => $updatedCategories])->resultArray();
+        $categoriesToUpdate = self::instance()->getWhere(['CategoryID' => $updatedCategories]);
         foreach ($categoriesToUpdate as $current) {
-            $currentID = $current['CategoryID'];
-            $countAllDiscussions = $current['CountAllDiscussions'];
-            $countAllComments = $current['CountAllComments'];
+            $currentID = val('CategoryID', $current);
+            $countAllDiscussions = val('CountAllDiscussions', $current);
+            $countAllComments = val('CountAllComments', $current);
             self::setCache(
                 $currentID,
                 ['CountAllDiscussions' => $countAllDiscussions, 'CountAllComments' => $countAllComments]

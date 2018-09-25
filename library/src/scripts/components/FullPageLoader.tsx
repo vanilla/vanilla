@@ -14,9 +14,12 @@ import DocumentTitle from "@library/components/DocumentTitle";
 export default class FullPageLoader extends React.Component {
     public render() {
         return (
-            <div className="fullPageLoader">
-                <DocumentTitle title={t("Loading")} />
-            </div>
+            <React.Fragment>
+                <div className="fullPageLoader" aria-hidden="true" />
+                <div className="sr-only">
+                    <DocumentTitle title={t("Loading")} />
+                </div>
+            </React.Fragment>
         );
     }
 }

@@ -6,12 +6,16 @@
 import { createStore, compose, applyMiddleware, combineReducers, Store } from "redux";
 import { getReducers } from "@library/state/reducerRegistry";
 import thunk from "redux-thunk";
+import { createBrowserHistory } from "history";
+import { connectRouter, routerMiddleware } from "connected-react-router";
+
+const history = createBrowserHistory();
 
 // There may be an initial state to import.
 const initialState = {};
 const initialActions = window.__ACTIONS__ || [];
 
-const middleware = [thunk];
+const middleware = [thunk, routerMiddleware(history)];
 
 // Browser may have redux dev tools installed, if so integrate with it.
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -23,7 +27,7 @@ let store;
 export default function getStore<S>(): Store<S> {
     if (store === undefined) {
         // Get our reducers.
-        const reducer = combineReducers(getReducers());
+        const reducer = connectRouter(history)(combineReducers(getReducers()));
         store = createStore(reducer, initialState, enhancer);
 
         // Dispatch initial actions returned from the server.
@@ -31,4 +35,8 @@ export default function getStore<S>(): Store<S> {
     }
 
     return store;
+}
+
+export function getHistory() {
+    return history;
 }

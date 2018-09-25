@@ -97,7 +97,7 @@ export function apiThunk(
 ) {
     return dispatch => {
         dispatch(actionCreators.request(params));
-        apiv2[requestType as any](endpoint, params)
+        return apiv2[requestType as any](endpoint, params)
             .then((response: AxiosResponse) => {
                 dispatch(actionCreators.success(response, params));
             })

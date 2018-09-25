@@ -657,13 +657,12 @@ class AddonManagerTest extends SharedBootstrapTestCase {
         $addon = $am->lookupAddon('bad-require');
         $r = $am->lookupRequirements($addon, AddonManager::REQ_MISSING | AddonManager::REQ_VERSION);
 
-        $this->assertArrayHasKey('asd!', $r);
+        $this->assertArrayHasKey('asd', $r);
         $this->assertArrayHasKey('namespaced-plugin', $r);
 
-        $this->assertSame(AddonManager::REQ_MISSING, $r['asd!']['status']);
+        $this->assertSame(AddonManager::REQ_MISSING, $r['asd']['status']);
         $this->assertSame(AddonManager::REQ_VERSION, $r['namespaced-plugin']['status']);
     }
-
 
     /**
      * Test an addon with an invalid require key.
@@ -779,6 +778,42 @@ class AddonManagerTest extends SharedBootstrapTestCase {
         $locale = $am->lookup('test-locale');
         $this->assertEquals('test', $locale->getKey());
         $this->assertEquals(Addon::TYPE_LOCALE, $locale->getType());
+    }
+
+    /**
+     * Test addon type checking.
+     *
+     * @expectedException \InvalidArgumentException
+     */
+    public function testBadType() {
+        $am = $this->createTestManager();
+
+        $addons = $am->lookupAllByType('../../../fixtures/error');
+    }
+
+    /**
+     * Test a bad theme key.
+     *
+     * @expectedException PHPUnit\Framework\Error\Notice
+     */
+    public function testBadThemeKey() {
+        $am = $this->createTestManager();
+
+        $theme = $am->lookupTheme('../../../../fixtures/error-index');
+    }
+
+    /**
+     * Looking up an empty addon key should return null, no error.
+     */
+    public function testEmptyKeyLookup() {
+        $am = $this->createTestManager();
+
+        $addon = $am->lookupAddon('');
+        $this->assertNull($addon);
+        $addon = $am->lookupTheme('');
+        $this->assertNull($addon);
+        $addon = $am->lookupLocale('');
+        $this->assertNull($addon);
     }
 
     /**

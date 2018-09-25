@@ -1203,8 +1203,10 @@ class Gdn_Controller extends Gdn_Pluggable {
 
     /**
      * Stop the current action and re-authenticate, if necessary.
+     *
+     * @param $options array Setting key 'ForceTimeout' to `true` will ignore the cooldown window between prompts.
      */
-    public function reauth() {
+    public function reauth($options = []) {
         // Make sure we're logged in...
         if (Gdn::session()->UserID == 0) {
             return;
@@ -1223,7 +1225,8 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         // If the user has logged in recently enough, don't make them login again.
         $lastAuthenticated = Gdn::authenticator()->identity()->getAuthTime();
-        if ($lastAuthenticated > 0) {
+        $forceTimeout = $options['ForceTimeout'] ?? false;
+        if ($lastAuthenticated > 0 && !$forceTimeout) {
             $sinceAuth = time() - $lastAuthenticated;
             if ($sinceAuth < self::REAUTH_TIMEOUT) {
                 return;

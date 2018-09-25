@@ -3607,7 +3607,7 @@ SQL;
      * @param int $categoryId Category ID to update
      * @return void
      */
-    public static function recalculateCategoryCounts(int $categoryId) {
+    public static function recalculatePostCounts(int $categoryId) {
         $sql = Gdn::sql()
             ->select('DiscussionID', 'count', 'DiscussionCount')
             ->select('CountComments', 'sum', 'CountComments')
@@ -3640,7 +3640,7 @@ SQL;
      * @param int $categoryId Category ID to update
      * @return void
      */
-    public static function recalculateCategoryCountsAll(int $categoryId) {
+    public static function recalculateAggregatePostCounts(int $categoryId) {
         $row = Gdn::sql()
             ->select('CountAllDiscussions', 'sum', 'CountAllDiscussions')
             ->select('CountAllComments', 'sum', 'CountAllComments')
@@ -3667,9 +3667,9 @@ SQL;
      * @return void
      */
     public static function recalculateCounts(int $categoryId) {
-        self::recalculateCategoryCounts($categoryId);
+        self::recalculatePostCounts($categoryId);
         do {
-            self::recalculateCategoryCountsAll($categoryId);
+            self::recalculateAggregatePostCounts($categoryId);
             $categoryRow = Gdn::sql()
                 ->select('ParentCategoryID')
                 ->from('Category')

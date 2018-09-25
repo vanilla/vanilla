@@ -33,7 +33,7 @@ export default class EmojiPopover extends React.Component<IProps, IRequiredCompo
                 classNameRoot="emojiPicker"
                 icon={icon}
                 buttonClasses="richEditor-button richEditor-embedButton"
-                forceUpdate={forceSelectionUpdate}
+                onVisibilityChange={forceSelectionUpdate}
             >
                 {(options: IPopoverControllerChildParameters) => {
                     return <EmojiPicker {...options} contentID={options.id} />;

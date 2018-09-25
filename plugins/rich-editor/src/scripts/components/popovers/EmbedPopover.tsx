@@ -12,8 +12,8 @@ import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import * as Icons from "@rich-editor/components/icons";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import Popover from "@rich-editor/components/popovers/pieces/Popover";
-import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import PopoverController, { IPopoverControllerChildParameters } from "@library/components/PopoverController";
+import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 
 interface IProps extends IWithEditorProps {}
 
@@ -55,7 +55,7 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                 icon={Icon}
                 onClose={this.clearInput}
                 buttonClasses="richEditor-button richEditor-embedButton"
-                forceUpdate={forceSelectionUpdate}
+                onVisibilityChange={forceSelectionUpdate}
             >
                 {(params: IPopoverControllerChildParameters) => {
                     const { initialFocusRef, closeMenuHandler, isVisible } = params;

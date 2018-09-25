@@ -8,7 +8,7 @@ import React from "react";
 import { getRequiredID } from "@library/componentIDs";
 import { watchFocusInDomTree } from "@library/dom";
 import classNames from "classnames";
-import createEditorFlyoutEscapeListener from "@library/utils/escapeListenner";
+import escapeListenner from "@library/utils/escapeListenner";
 
 export interface IPopoverControllerChildParameters {
     id: string;
@@ -24,12 +24,7 @@ interface IProps {
     children: (props: IPopoverControllerChildParameters) => JSX.Element;
     onClose?: () => void;
     buttonClasses: string;
-    createEscapeListener?: (
-        controllerRef: HTMLDivElement,
-        buttonRef: HTMLButtonElement,
-        closeMenuHandler: (event: any) => void,
-    ) => void;
-    forceUpdate?: () => void;
+    onVisibilityChange?: () => void;
 }
 
 interface IState {
@@ -38,9 +33,6 @@ interface IState {
 }
 
 export default class PopoverController extends React.PureComponent<IProps, IState> {
-    public static defaultProps = {
-        createEscapeListener: createEditorFlyoutEscapeListener,
-    };
     private initalFocusRef: React.RefObject<any>;
     private buttonRef: React.RefObject<HTMLButtonElement>;
     private controllerRef: React.RefObject<HTMLDivElement>;
@@ -94,13 +86,13 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
         if (!prevState.isVisible && this.state.isVisible) {
             if (this.initalFocusRef.current) {
                 this.initalFocusRef.current.focus();
-                if (this.props.forceUpdate) {
-                    this.props.forceUpdate();
+                if (this.props.onVisibilityChange) {
+                    this.props.onVisibilityChange();
                 }
             } else if (this.buttonRef.current) {
                 this.buttonRef.current.focus();
-                if (this.props.forceUpdate) {
-                    this.props.forceUpdate();
+                if (this.props.onVisibilityChange) {
+                    this.props.onVisibilityChange();
                 }
             }
         }
@@ -108,13 +100,7 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
 
     public componentDidMount() {
         watchFocusInDomTree(this.controllerRef.current!, this.handleFocusChange);
-        if (this.props.createEscapeListener) {
-            this.props.createEscapeListener(
-                this.controllerRef.current!,
-                this.buttonRef.current!,
-                this.closeMenuHandler,
-            );
-        }
+        escapeListenner(this.controllerRef.current!, this.buttonRef.current!, this.closeMenuHandler);
     }
 
     private handleFocusChange = hasFocus => {

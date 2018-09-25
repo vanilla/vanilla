@@ -1,5 +1,5 @@
-/**
- * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
+/*
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
@@ -7,18 +7,12 @@
 import React from "react";
 import { getRequiredID } from "@library/componentIDs";
 import { watchFocusInDomTree } from "@library/dom";
-import { createEditorFlyoutEscapeListener, forceSelectionUpdate } from "@rich-editor/quill/utility";
 import classNames from "classnames";
+import createEditorFlyoutEscapeListener from "@library/utils/escapeListenner";
 
 export interface IPopoverControllerChildParameters {
     id: string;
-    initialFocusRef: React.RefObject<any>;
-    isVisible: boolean;
-    closeMenuHandler(event?: React.SyntheticEvent<any>);
-}
-
-export interface IDropDownControllerChildParameters {
-    id: string;
+    initialFocusRef?: React.RefObject<any>;
     isVisible: boolean;
     closeMenuHandler(event?: React.SyntheticEvent<any>);
 }
@@ -27,9 +21,15 @@ interface IProps {
     id: string;
     classNameRoot: string;
     icon: JSX.Element;
-    children: (props: IPopoverControllerChildParameters | IDropDownControllerChildParameters) => JSX.Element;
+    children: (props: IPopoverControllerChildParameters) => JSX.Element;
     onClose?: () => void;
     buttonClasses: string;
+    createEscapeListener?: (
+        controllerRef: HTMLDivElement,
+        buttonRef: HTMLButtonElement,
+        closeMenuHandler: (event: any) => void,
+    ) => void;
+    forceUpdate?: () => void;
 }
 
 interface IState {
@@ -38,6 +38,9 @@ interface IState {
 }
 
 export default class PopoverController extends React.PureComponent<IProps, IState> {
+    public static defaultProps = {
+        createEscapeListener: createEditorFlyoutEscapeListener,
+    };
     private initalFocusRef: React.RefObject<any>;
     private buttonRef: React.RefObject<HTMLButtonElement>;
     private controllerRef: React.RefObject<HTMLDivElement>;
@@ -91,17 +94,27 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
         if (!prevState.isVisible && this.state.isVisible) {
             if (this.initalFocusRef.current) {
                 this.initalFocusRef.current.focus();
-                forceSelectionUpdate();
+                if (this.props.forceUpdate) {
+                    this.props.forceUpdate();
+                }
             } else if (this.buttonRef.current) {
                 this.buttonRef.current.focus();
-                forceSelectionUpdate();
+                if (this.props.forceUpdate) {
+                    this.props.forceUpdate();
+                }
             }
         }
     }
 
     public componentDidMount() {
         watchFocusInDomTree(this.controllerRef.current!, this.handleFocusChange);
-        createEditorFlyoutEscapeListener(this.controllerRef.current!, this.buttonRef.current!, this.closeMenuHandler);
+        if (this.props.createEscapeListener) {
+            this.props.createEscapeListener(
+                this.controllerRef.current!,
+                this.buttonRef.current!,
+                this.closeMenuHandler,
+            );
+        }
     }
 
     private handleFocusChange = hasFocus => {

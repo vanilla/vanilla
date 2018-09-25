@@ -5,17 +5,15 @@
  */
 
 import * as React from "react";
-import PopoverController, {
-    IDropDownControllerChildParameters,
-} from "@rich-editor/components/popovers/pieces/PopoverController";
 import { dropDownMenu } from "@library/components/Icons";
 import { getRequiredID } from "@library/componentIDs";
+import DropDownItem from "@library/components/dropdown/items/DropDownItem";
+import PopoverController from "@library/components/PopoverController";
 
 export interface IProps {
     name: string;
     children: React.ReactNode;
     className?: string;
-    isList?: boolean;
 }
 
 export interface IState {
@@ -23,10 +21,6 @@ export interface IState {
 }
 
 export default class DropDownToggleButton extends React.PureComponent<IProps, IState> {
-    public defaultProps = {
-        isList: true,
-    };
-
     public constructor(props) {
         super(props);
         this.state = {
@@ -35,14 +29,19 @@ export default class DropDownToggleButton extends React.PureComponent<IProps, IS
     }
 
     public render() {
+        const children = React.Children.map(this.props.children, child => {
+            return <DropDownItem>{child}</DropDownItem>;
+        });
+
         return (
-            <PopoverController id={this.state.id} classNameRoot="dropDown" icon={dropDownMenu()}>
-                {(params: IDropDownControllerChildParameters) => {
-                    if (this.props.isList) {
-                        return <ul className="dropDownItems">{this.props.children}</ul>;
-                    } else {
-                        return <React.Fragment>{this.props.children}</React.Fragment>;
-                    }
+            <PopoverController
+                id={this.state.id}
+                classNameRoot="dropDown"
+                icon={dropDownMenu()}
+                buttonClasses="button-icon"
+            >
+                {params => {
+                    return <ul className="dropDownItems">{children}</ul>;
                 }}
             </PopoverController>
         );

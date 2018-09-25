@@ -287,7 +287,8 @@ $formElement-disabled_opacity                        : .5 !default;
 \* -------------------------------------------------------------- */
 
 $menu-dropShadow_color                               : rgba($global-color_fg, .2);
-$menu-dropShadow                                     : 0 5px 10px $menu-dropShadow_color;
+$menu_dropShadow                                     : 0 5px 10px $menu-dropShadow_color;
+$menu_borderRadius                                   : $global_borderRadius;
 
 /* -------------------------------------------------------------- *\
     Buttons

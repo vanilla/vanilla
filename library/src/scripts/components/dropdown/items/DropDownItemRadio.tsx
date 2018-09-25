@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { check } from "../../Icons";
-import DropDownItem, { IDropDownItem } from "@library/components/dropdown/items/DropDownItem";
+import DropDownItem from "@library/components/dropdown/items/DropDownItem";
 import classNames from "classnames";
 
 export interface IMenuRadioOption {
@@ -19,7 +19,7 @@ interface IProps {
     name: string;
     groupID: string; // the "name" of the radio button group
     className?: string;
-    options: IOption[];
+    options: IMenuRadioOption[];
     onChange: () => void;
 }
 

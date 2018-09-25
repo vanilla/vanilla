@@ -11,6 +11,7 @@ import PopoverController from "@library/components/PopoverController";
 import DropDownContents from "@library/components/dropdown/items/DropDownContents";
 
 export interface IProps {
+    id: string;
     name: string;
     children: React.ReactNode;
     className?: string;
@@ -44,10 +45,13 @@ export default class DropDown extends React.PureComponent<IProps, IState> {
                 classNameRoot="dropDown"
                 icon={this.props.icon!}
                 buttonClasses="button button-icon"
+                name={this.props.name}
             >
                 {params => {
                     return (
                         <DropDownContents
+                            id={this.state.id + "-handle"}
+                            parentID={this.state.id}
                             isPositionedFromRight={this.props.stickRight!}
                             isPositionedFromTop={this.props.stickTop!}
                             {...params}

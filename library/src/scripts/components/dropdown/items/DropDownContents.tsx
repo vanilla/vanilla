@@ -8,6 +8,8 @@ import * as React from "react";
 import classNames from "classnames";
 
 export interface IProps {
+    id: string;
+    parentID: string;
     className?: string;
     children: React.ReactNode;
     isVisible?: boolean;
@@ -20,22 +22,21 @@ export default class DropDownContents extends React.Component<IProps> {
         if (this.props.isVisible) {
             return (
                 <div
-                    className={classNames(
-                        "dropDown-contents",
-                        {
-                            hasPositionFromTop: this.props.isPositionedFromTop,
-                            hasPositionFromBottom: !this.props.isPositionedFromTop,
-                            hasPositionFromRight: this.props.isPositionedFromRight,
-                            hasPositionFromLeft: !this.props.isPositionedFromRight,
-                        },
-                        this.props.className,
-                    )}
+                    id={this.props.id}
+                    aria-controlledBy={this.props.parentID}
+                    className={classNames("dropDown-contents", this.props.className)}
+                    style={{
+                        top: this.props.isPositionedFromTop ? "100%" : undefined,
+                        right: this.props.isPositionedFromRight ? "0" : undefined,
+                        bottom: !this.props.isPositionedFromTop ? "100%" : undefined,
+                        left: !this.props.isPositionedFromRight ? "0" : undefined,
+                    }}
                 >
                     {this.props.children}
                 </div>
             );
         } else {
-            return null;
+            return <div id={this.props.id} aria-controlledBy={this.props.parentID} className="sr-only" />;
         }
     }
 }

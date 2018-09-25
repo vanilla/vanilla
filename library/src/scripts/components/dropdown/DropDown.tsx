@@ -9,6 +9,7 @@ import { dropDownMenu } from "@library/components/Icons";
 import { getRequiredID } from "@library/componentIDs";
 import DropDownItem from "@library/components/dropdown/items/DropDownItem";
 import PopoverController from "@library/components/PopoverController";
+import DropDownContents from "@library/components/dropdown/items/DropDownContents";
 
 export interface IProps {
     name: string;
@@ -18,13 +19,15 @@ export interface IProps {
 
 export interface IState {
     id: string;
+    open: boolean;
 }
 
-export default class DropDownToggleButton extends React.PureComponent<IProps, IState> {
+export default class DropDown extends React.PureComponent<IProps, IState> {
     public constructor(props) {
         super(props);
         this.state = {
             id: getRequiredID(props, "dropDown"),
+            open: false,
         };
     }
 
@@ -41,7 +44,11 @@ export default class DropDownToggleButton extends React.PureComponent<IProps, IS
                 buttonClasses="button-icon"
             >
                 {params => {
-                    return <ul className="dropDownItems">{children}</ul>;
+                    return (
+                        <DropDownContents {...params}>
+                            <ul className="dropDownItems">{children}</ul>
+                        </DropDownContents>
+                    );
                 }}
             </PopoverController>
         );

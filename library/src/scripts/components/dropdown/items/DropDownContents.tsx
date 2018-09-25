@@ -10,10 +10,15 @@ import classNames from "classnames";
 export interface IProps {
     className?: string;
     children: React.ReactNode;
+    isVisible: boolean;
 }
 
-export default class DropDownItem extends React.Component<IProps> {
+export default class DropDownContents extends React.Component<IProps> {
     public render() {
-        return <li className={classNames("dropDown-item", this.props.className)}>{this.props.children}</li>;
+        if (this.props.isVisible) {
+            return <div className={classNames("dropDown-contents", this.props.className)}>{this.props.children}</div>;
+        } else {
+            return null;
+        }
     }
 }

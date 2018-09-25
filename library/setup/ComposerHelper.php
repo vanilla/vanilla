@@ -55,7 +55,7 @@ class ComposerHelper {
     public static function postUpdate() {
         $skipBuild = getenv(self::DISABLE_AUTO_BUILD) ? true : false;
         if ($skipBuild) {
-            printf("\nSkipping automatic JS build because " . self::DISABLE_AUTO_BUILD . " env variable is set.");
+            printf("\nSkipping automatic JS build because " . self::DISABLE_AUTO_BUILD . " env variable is set.\n");
             return;
         }
 

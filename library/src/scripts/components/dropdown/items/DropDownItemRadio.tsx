@@ -9,7 +9,7 @@ import { check } from "../../Icons";
 import DropDownItem, { IDropDownItem } from "@library/components/dropdown/items/DropDownItem";
 import classNames from "classnames";
 
-interface IOption {
+export interface IMenuRadioOption {
     name: string;
     value: string;
     selected?: boolean;

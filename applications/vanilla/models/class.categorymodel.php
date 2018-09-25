@@ -3668,34 +3668,16 @@ SQL;
      */
     public static function recalculateCounts(int $categoryId) {
         self::recalculateCategoryCounts($categoryId);
-        self::recalculateCategoryCountsAll($categoryId);
-
-        $categoryRow = Gdn::sql()
-            ->select('Depth')
-            ->select('ParentCategoryID')
-            ->from('Category')
-            ->where('CategoryID', $categoryId)
-            ->get()
-            ->firstRow(DATASET_TYPE_ARRAY);
-        $depth = (int)($categoryRow['Depth'] ?? 0);
-        $categoryId = $categoryRow['ParentCategoryID'] ?? 0;
-
-        if ($depth === 0) {
-            return;
-        }
-
-        while ($depth > 0) {
+        do {
             self::recalculateCategoryCountsAll($categoryId);
-            $depth--;
-
-            $parent = Gdn::sql()
+            $categoryRow = Gdn::sql()
                 ->select('ParentCategoryID')
                 ->from('Category')
                 ->where('CategoryID', $categoryId)
                 ->get()
                 ->firstRow(DATASET_TYPE_ARRAY);
-            $categoryId = $parent['ParentCategoryID'] ?? 0;
-        }
+            $categoryId = $categoryRow['ParentCategoryID'] ?? 0;
+        } while ($categoryId > 0);
     }
 
     /**

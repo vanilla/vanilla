@@ -8,8 +8,8 @@ import * as React from "react";
 import classNames from "classnames";
 
 export interface IProps {
-    className?: string;
     children: React.ReactNode;
+    className?: string;
 }
 
 export default class DropDownItem extends React.Component<IProps> {

@@ -9,8 +9,8 @@ import classNames from "classnames";
 import DropDownItem from "@library/components/dropdown/items/DropDownItem";
 
 export interface IProps {
+    children: React.ReactNode;
     className?: string;
-    metas: React.ReactNode;
 }
 
 export default class DropDownItemMeta extends React.Component<IProps> {
@@ -18,15 +18,14 @@ export default class DropDownItemMeta extends React.Component<IProps> {
 
     public constructor(props) {
         super(props);
-        this.hasChildren = props.metas.length > 0;
+        this.hasChildren = props.metas && props.metas.length > 0;
     }
 
     public render() {
-        const temp = `temp`;
         if (this.hasChildren) {
             return (
-                <DropDownItem className={this.props.className}>
-                    {temp}
+                <DropDownItem className={classNames("dropDown-metaItem", this.props.className)}>
+                    <div className="dropDownItem-metas">{this.props.children}</div>
                 </DropDownItem>
             );
         } else {

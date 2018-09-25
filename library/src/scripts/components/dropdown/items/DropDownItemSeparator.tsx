@@ -5,13 +5,14 @@
  */
 
 import * as React from "react";
-import DropDownItem from "@library/components/dropdown/items/DropDownItem";
+import DropDownItem, { IDropDownItem } from "@library/components/dropdown/items/DropDownItem";
+import classNames from "classnames";
 
-export default class DropDownItemSeparator extends React.Component {
+export default class DropDownItemSeparator extends React.Component<IDropDownItem> {
     public render() {
         return (
-            <DropDownItem className="dropDown-separator">
-                <hr className="sr-only"/>
+            <DropDownItem className={classNames("dropDown-separator", this.props.className)}>
+                <hr className="sr-only" />
             </DropDownItem>
         );
     }

@@ -7,21 +7,27 @@
 import * as React from "react";
 import { NavLink } from "react-router-dom";
 import DropDownItem from "@library/components/dropdown/items/DropDownItem";
-
+import classNames from "classnames";
 
 export interface IDropDownItemButton {
     name: string;
-    children: React.ReactNode | string;
-    onClick: any;
     className?: string;
+    children?: React.ReactNode;
+    onClick: any;
 }
 
 export default class DropDownItemButton extends React.Component<IDropDownItemButton> {
     public render() {
+        const buttonContent = this.props.children ? this.props.children : this.props.name;
         return (
-            <DropDownItem className={this.props.className}>
-                <button type="button" title={this.props.name} onClick={this.props.onClick} className={this.props.className}>
-                    {this.props.children}
+            <DropDownItem className={classNames("dropDown-buttonItem", this.props.className)}>
+                <button
+                    type="button"
+                    title={this.props.name}
+                    onClick={this.props.onClick}
+                    className={this.props.className}
+                >
+                    {buttonContent}
                 </button>
             </DropDownItem>
         );

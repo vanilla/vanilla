@@ -19,7 +19,7 @@ export default (
     },
 ) => {
     root.addEventListener("keydown", (event: KeyboardEvent) => {
-        if (event.key === "Escape" || event.key === "Esc") {
+        if (event.key === "Escape") {
             if (root.contains(document.activeElement)) {
                 event.preventDefault();
                 returnElement.focus();

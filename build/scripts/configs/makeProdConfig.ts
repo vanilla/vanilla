@@ -75,8 +75,8 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
                 },
                 // Allow async chunks to be split however webpack wants to split them.
                 async: {
-                    minSize: 50000,
                     chunks: "async",
+                    automaticNameDelimiter: "/",
                 },
             },
         },

@@ -1524,7 +1524,7 @@ class CategoryModel extends Gdn_Model {
 
         if (count($discussion)>0) {
             $result['LastCommentID'] = $discussion['LastCommentID'] ?? null;
-            $result['LastCategoryID'] = $discussion['CategoryID'] ?? null;
+            $result['LastCategoryID'] = $discussion['CategoryID'];
             $result['LastDateInserted'] = !empty($discussion['DateLastComment']) ? $discussion['DateLastComment'] :
                 (!empty($discussion['DateUpdated']) ? $discussion['DateUpdated'] : $discussion['DateInserted']);
             $result['LastDiscussionID'] = $discussion['DiscussionID'];
@@ -3719,18 +3719,22 @@ SQL;
             ->select('DiscussionID')
             ->select('DateLastComment')
             ->select('DateInserted')
-            ->select('CategoryID', '', 'LastCategoryID')
+            ->select('DateUpdated')
+            ->select('CategoryID')
             ->select('LastCommentID')
             ->from('Discussion')
             ->where('CategoryID', $categoryId)
-            ->orderBy('DateLastComment, DateUpdated, DateInserted', 'desc')
+            ->orderBy('DateLastComment', 'desc')
+            ->orderBy('DateUpdated', 'desc')
+            ->orderBy('DateInserted', 'desc')
             ->limit(1)
             ->get()
             ->firstRow(DATASET_TYPE_ARRAY);
 
         $fieldsToUpdate = static::postRecentPostFieldSet($discussion);
         //Let's update category fields only if latest discussion found has fresher timestamp
-        while (empty($category['LastDateInserted'] ?? null) || $category['LastDateInserted'] < $fieldsToUpdate['LastDateInserted']) {
+        while (empty($category['LastDateInserted'] ?? null)
+            || $category['LastDateInserted'] != $fieldsToUpdate['LastDateInserted']) {
             Gdn::sql()
                 ->update('Category')
                 ->set('LastCategoryID', $fieldsToUpdate['LastCategoryID'])

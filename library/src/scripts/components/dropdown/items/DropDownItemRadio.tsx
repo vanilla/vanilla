@@ -53,7 +53,7 @@ export default class DropDownItemRadio extends React.Component<IProps, IState> {
         if (!this.hasOptions) {
             return null;
         } else {
-            const radioOptions = this.props.options.map((option, index) => {
+            const radioOptions = this.props.options.forEach((option, index) => {
                 return (
                     <label className="dropDownRadio-option">
                         <input

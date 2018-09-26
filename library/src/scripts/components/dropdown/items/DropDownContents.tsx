@@ -17,7 +17,10 @@ export interface IProps {
     isPositionedFromTop: boolean;
     isPositionedFromRight: boolean;
 }
-
+/**
+ * The contents of the dropdown (not the wrapper and not the button to toggle it).
+ * Note that it renders an empty, hidden div when closed so that the aria-labelledby points to an element in the DOM.
+ */
 export default class DropDownContents extends React.Component<IProps> {
     public render() {
         if (this.props.isVisible) {

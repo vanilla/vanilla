@@ -6,9 +6,8 @@
 
 import React from "react";
 import { getRequiredID } from "@library/componentIDs";
-import { watchFocusInDomTree } from "@library/dom";
+import { addEscapeListener, watchFocusInDomTree } from "@library/dom";
 import classNames from "classnames";
-import { addEscapeListener } from "@library/utility";
 
 export interface IPopoverControllerChildParameters {
     id: string;

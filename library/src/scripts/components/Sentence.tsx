@@ -6,7 +6,6 @@
 import classNames from "classnames";
 import { Link } from "react-router-dom";
 import * as React from "react";
-import { log } from "@library/utility";
 
 export const enum InlineTypes {
     TEXT = "TEXT",
@@ -49,10 +48,8 @@ export interface ISentence {
 
 /**
  * Combines multiple inline elements together. Usually for translated text with links, datetimes and text.
- *
- * @param contents
+ * No need to set "counter". It will be set automatically. Kept optional to not need to call it on the top level. Used for React's "key" values
  */
-
 export default class Sentence extends React.Component<ISentence> {
     public static defaultProps = {
         counter: 0,

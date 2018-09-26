@@ -6,6 +6,7 @@
 
 import * as React from "react";
 import classNames from "classnames";
+import { t } from "@library/application";
 
 export interface IProps {
     id: string;
@@ -23,7 +24,7 @@ export default class DropDownContents extends React.Component<IProps> {
             return (
                 <div
                     id={this.props.id}
-                    aria-controlledBy={this.props.parentID}
+                    aria-labelledby={this.props.parentID}
                     className={classNames("dropDown-contents", this.props.className)}
                     style={{
                         top: this.props.isPositionedFromTop ? "100%" : undefined,
@@ -36,7 +37,9 @@ export default class DropDownContents extends React.Component<IProps> {
                 </div>
             );
         } else {
-            return <div id={this.props.id} aria-controlledBy={this.props.parentID} className="sr-only" />;
+            return (
+                <div id={this.props.id} aria-hidden={true} aria-labelledby={this.props.parentID} className="sr-only" />
+            ); // for accessibility
         }
     }
 }

@@ -194,7 +194,7 @@ class Gdn_Theme {
      * @param array $options
      * @return mixed|null|string
      */
-    public static function link($path, $text = false, $format = null, $options = []) {
+    public static function   link($path, $text = false, $format = null, $options = []) {
         $session = Gdn::session();
         $class = val('class', $options, '');
         $withDomain = val('WithDomain', $options);

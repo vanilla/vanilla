@@ -8,7 +8,7 @@ import React from "react";
 import { getRequiredID } from "@library/componentIDs";
 import { watchFocusInDomTree } from "@library/dom";
 import classNames from "classnames";
-import escapeListenner from "@library/utils/escapeListenner";
+import { addEscapeListener } from "@library/utility";
 
 export interface IPopoverControllerChildParameters {
     id: string;
@@ -107,7 +107,7 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
 
     public componentDidMount() {
         watchFocusInDomTree(this.controllerRef.current!, this.handleFocusChange);
-        escapeListenner(this.controllerRef.current!, this.buttonRef.current!, this.closeMenuHandler);
+        addEscapeListener(this.controllerRef.current!, this.buttonRef.current!, this.closeMenuHandler);
     }
 
     private handleFocusChange = hasFocus => {

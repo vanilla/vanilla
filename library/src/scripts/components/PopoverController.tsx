@@ -63,7 +63,7 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
         });
 
         return (
-            <div className={this.props.classNameRoot} ref={this.controllerRef}>
+            <div id={this.state.id} className={this.props.classNameRoot} ref={this.controllerRef}>
                 <button
                     id={this.buttonID}
                     onClick={this.togglePopover}

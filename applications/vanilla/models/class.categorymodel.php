@@ -3723,7 +3723,7 @@ SQL;
             ->select('LastCommentID')
             ->from('Discussion')
             ->where('CategoryID', $categoryId)
-            ->orderBy('DateLastComment, DateUpdated, DateInserted','desc')
+            ->orderBy('DateLastComment, DateUpdated, DateInserted', 'desc')
             ->limit(1)
             ->get()
             ->firstRow(DATASET_TYPE_ARRAY);

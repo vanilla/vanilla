@@ -1522,7 +1522,7 @@ class CategoryModel extends Gdn_Model {
             'LastDiscussionID' => null
         ];
 
-        if (count($discussion)>0) {
+        if (count($discussion) > 0) {
             $result['LastCommentID'] = $discussion['LastCommentID'] ?? null;
             $result['LastCategoryID'] = $discussion['CategoryID'];
             $result['LastDateInserted'] = !empty($discussion['DateLastComment']) ? $discussion['DateLastComment'] :
@@ -3743,7 +3743,7 @@ SQL;
                 ->set('LastDateInserted', $fieldsToUpdate['LastDateInserted'])
                 ->where('CategoryID', $category['CategoryID'])
                 ->put();
-            if (($category['ParentCategoryID'] ?? -1) >0) {
+            if (($category['ParentCategoryID'] ?? -1) > 0) {
                 $category = self::instance()->getID($category['ParentCategoryID'], DATASET_TYPE_ARRAY);
             } else {
                 break;

@@ -774,6 +774,7 @@ class UserModel extends Gdn_Model {
      * @param array|int $currentUser
      * @param array $newUser Data to overwrite user with.
      * @param bool $force
+     * @param bool $isTrustedProvider
      * @since 2.1
      */
     public function syncUser($currentUser, $newUser, $force = false, $isTrustedProvider = false) {
@@ -841,7 +842,7 @@ class UserModel extends Gdn_Model {
         trace('UserModel->Connect()');
         $provider = Gdn_AuthenticationProviderModel::getProviderByKey($providerKey);
 
-        $isTrustedProvider = isset($provider['Trusted']) ? $provider['Trusted'] : false;
+        $isTrustedProvider = $provider['Trusted'] ?? false;
 
         $saveRoles = $saveRolesRegister = false;
 
@@ -864,7 +865,7 @@ class UserModel extends Gdn_Model {
 
         if ($userID) {
             // Save the user.
-            $this->syncUser($userID, $userData, false /*force*/, $isTrustedProvider);
+            $this->syncUser($userID, $userData, false, $isTrustedProvider);
             return $userID;
         } else {
             // The user hasn't already been connected. We want to see if we can't find the user based on some critera.
@@ -876,7 +877,7 @@ class UserModel extends Gdn_Model {
                 if ($user) {
                     $user = (array)$user;
                     // Save the user.
-                    $this->syncUser($user, $userData, false /*force*/, $isTrustedProvider);
+                    $this->syncUser($user, $userData, false, $isTrustedProvider);
                     $userID = $user['UserID'];
                 }
             }
@@ -895,7 +896,7 @@ class UserModel extends Gdn_Model {
                 $options['NoConfirmEmail'] = isset($userData['Email']) || !UserModel::requireConfirmEmail();
                 $options['NoActivity'] = isset($options['NoActivity']) ? $options['NoActivity'] : true;
                 $options['SaveRoles'] = $saveRolesRegister;
-                $options['ValidateName'] = $isTrustedProvider;
+                $options['ValidateName'] = !$isTrustedProvider;
 
                 trace($userData, 'Registering User');
                 $userID = $this->register($userData, $options);

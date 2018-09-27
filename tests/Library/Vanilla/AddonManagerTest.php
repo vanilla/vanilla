@@ -823,7 +823,7 @@ class AddonManagerTest extends SharedBootstrapTestCase {
      * @dataProvider provideBadAddonKeyTypes
      */
     public function testBadAddonKeyScan($type) {
-        $err = error_reporting(E_ALL & ~E_USER_NOTICE & ~E_USER_WARNING);
+        $err = error_reporting(E_ALL & ~E_USER_NOTICE);
 
         try {
             $am = new AddonManager(

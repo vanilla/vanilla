@@ -1,5 +1,5 @@
-_Vanilla uses Composer!
-You cannot clone this repo right into a web directory - it requires a build step. [Learn more](https://open.vanillaforums.com/discussion/31083/vanilla-now-uses-compose) or just [download the latest stable build](https://open.vanillaforums.com/addon/vanilla-core) instead_.
+_Vanilla uses Composer and NPM!
+You cannot clone this repo right into a web directory - it requires a build step. [Learn more](https://open.vanillaforums.com/discussion/36708/the-git-version-of-vanilla-no-longer-ships-pre-built-fronted-assets/p1?new=1) or just [download the latest stable build](https://open.vanillaforums.com/addon/vanilla-core) instead_.
 
 ![Vanilla](http://images.v-cdn.net/vanilla-black-logo-400.svg)
 
@@ -159,6 +159,8 @@ To end maintenance mode, delete it and save.
 ## Building with Phing
 
 Vanilla includes a buildfile for [Phing](https://www.phing.info/), a build system for PHP, in the build directory. Running the `phing` command from the build directory will create a deploy-ready copy of Vanilla. This process automatically fetches dependencies with Composer, filters out any unnecessary developer files (Git files/directories, .editorconfig, unit tests, etc.) and compresses the result into an archive.
+
+The phing build requires `NodeJS` and `yarn` to build frontend assets for packaging. See [build tool documentation](https://docs.vanillaforums.com/developer/tools/building-frontend/) for installation instructions.
 
 ## Version Control Strategy
 

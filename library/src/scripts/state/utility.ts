@@ -97,9 +97,10 @@ export function apiThunk(
 ) {
     return dispatch => {
         dispatch(actionCreators.request(params));
-        apiv2[requestType as any](endpoint, params)
+        return apiv2[requestType as any](endpoint, params)
             .then((response: AxiosResponse) => {
                 dispatch(actionCreators.success(response, params));
+                return response;
             })
             .catch((axiosError: AxiosError) => {
                 const error = axiosError.response ? axiosError.response.data : (axiosError as any);

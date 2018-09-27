@@ -346,7 +346,9 @@ class AddonManager {
             try {
                 $addon = new Addon($subdir);
                 $key = $addon->getKey();
-                if (!array_key_exists($key, $addons)) {
+                if (!static::validateKey($key)) {
+                    trigger_error("The $type in $subdir has an invalid key: $key.", E_USER_WARNING);
+                } elseif (!array_key_exists($key, $addons)) {
                     $addons[$key] = $addon;
                 } else {
                     \Logger::error('Duplicate addon: {key}', [
@@ -394,7 +396,9 @@ class AddonManager {
             $paths = glob(PATH_ROOT."$subdir/*", GLOB_ONLYDIR | GLOB_NOSORT);
             foreach ($paths as $path) {
                 $basename = basename($path);
-                if (!array_key_exists($basename, $result)) {
+                if (!AddonManager::validateKey($basename)) {
+                    trigger_error("The $type in $subdir/$basename has an invalid key: $basename.", E_USER_WARNING);
+                } elseif (!array_key_exists($basename, $result)) {
                     $result[$basename] = substr($path, $strlen);
                 } else {
                     \Logger::error('Duplicate addon: {basename}', [

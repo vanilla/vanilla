@@ -892,9 +892,9 @@ class UserModel extends Gdn_Model {
                     $userData['RoleID'] = $this->lookupRoleIDs($userData['Roles']);
                 }
 
-                $options['CheckCaptcha'] = isset($options['CheckCaptcha']) ? $options['CheckCaptcha'] : false;
+                $options['CheckCaptcha'] = $options['CheckCaptcha'] ?? false;
                 $options['NoConfirmEmail'] = isset($userData['Email']) || !UserModel::requireConfirmEmail();
-                $options['NoActivity'] = isset($options['NoActivity']) ? $options['NoActivity'] : true;
+                $options['NoActivity'] = $options['NoActivity'] ?? true;
                 $options['SaveRoles'] = $saveRolesRegister;
                 $options['ValidateName'] = !$isTrustedProvider;
 

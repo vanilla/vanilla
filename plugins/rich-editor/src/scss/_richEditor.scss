@@ -40,7 +40,7 @@
         style: $global-border_style;
         width: $global-border_width;
     }
-    box-shadow: $menu-dropShadow;
+    box-shadow: $menu_dropShadow;
 }
 
 .richEditorParagraphMenu {
@@ -322,7 +322,7 @@
         style: $global-border_style;
         width: $global-border_width;
     }
-    box-shadow: $menu-dropShadow;
+    box-shadow: $menu_dropShadow;
     z-index: 6;
 
     .InputBox {
@@ -403,7 +403,7 @@
     left: 0;
     width: #{$richEditor-flyout_paddingHorizontal * 2 + 7 * $richEditor-menuButton_size};
     border: $formElement-borderWidth $formElement-borderStyle $formElement_borderColor;
-    box-shadow: $menu-dropShadow;
+    box-shadow: $menu_dropShadow;
     background: $global-color_bg;
     border-radius: $global-borderRadius;
 }
@@ -469,7 +469,7 @@
         top: $richEditor-menu_borderWidth solid $global-border_color;
         right: $richEditor-menu_borderWidth solid $global-border_color;
     }
-    box-shadow: 0 0 5px 1px $menu-dropShadow_color;
+    box-shadow: 0 0 5px 1px $menu_dropShadow_color;
     background: $richEditor_bg;
 }
 

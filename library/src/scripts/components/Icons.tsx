@@ -47,3 +47,35 @@ export function close(className?: string) {
         </svg>
     );
 }
+
+export function check(className?: string) {
+    const title = `✓`;
+    return (
+        <svg
+            className={classNames("icon", "icon-check", className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+            <polygon fill="currentColor" points="5,12.7 3.6,14.1 9,19.5 20.4,7.9 19,6.5 9,16.8" />
+        </svg>
+    );
+}
+
+export function dropDownMenu(className?: string) {
+    const title = `…`;
+    return (
+        <svg
+            className={classNames("icon", "icon-dropDownMenu", className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+            <circle cx="5.7" cy="12" r="2" fill="currentColor" />
+            <circle cx="18.3" cy="12" r="2" fill="currentColor" />
+            <circle cx="12" cy="12" r="2" fill="currentColor" />
+        </svg>
+    );
+}

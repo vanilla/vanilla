@@ -1,18 +1,17 @@
-/**
- * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
+/*
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
 import { getRequiredID } from "@library/componentIDs";
-import { watchFocusInDomTree } from "@library/dom";
-import { createEditorFlyoutEscapeListener, forceSelectionUpdate } from "@rich-editor/quill/utility";
+import { addEscapeListener, watchFocusInDomTree } from "@library/dom";
 import classNames from "classnames";
 
 export interface IPopoverControllerChildParameters {
     id: string;
-    initialFocusRef: React.RefObject<any>;
+    initialFocusRef?: React.RefObject<any>;
     isVisible: boolean;
     closeMenuHandler(event?: React.SyntheticEvent<any>);
 }
@@ -23,6 +22,9 @@ interface IProps {
     icon: JSX.Element;
     children: (props: IPopoverControllerChildParameters) => JSX.Element;
     onClose?: () => void;
+    buttonClasses: string;
+    onVisibilityChange?: () => void;
+    name?: string;
 }
 
 interface IState {
@@ -47,31 +49,37 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
         };
     }
 
-    get componentID(): string {
+    get buttonID(): string {
+        return this.state.id + "-handle";
+    }
+
+    get contentID(): string {
         return this.state.id + "-contents";
     }
 
     public render() {
-        const buttonClasses = classNames("richEditor-button", "richEditor-embedButton", {
+        const buttonClasses = classNames(this.props.buttonClasses, {
             isOpen: this.state.isVisible,
         });
 
         return (
-            <div className={this.props.classNameRoot} ref={this.controllerRef}>
+            <div id={this.state.id} className={this.props.classNameRoot} ref={this.controllerRef}>
                 <button
-                    id={this.state.id}
+                    id={this.buttonID}
                     onClick={this.togglePopover}
                     className={buttonClasses}
                     type="button"
-                    aria-controls={this.componentID}
+                    title={this.props.name}
+                    aria-label={this.props.name}
+                    aria-controls={this.contentID}
                     aria-expanded={this.state.isVisible}
                     aria-haspopup="true"
                     ref={this.buttonRef}
                 >
-                    {this.props.icon}
+                    <span className="u-noInteraction">{this.props.icon}</span>
                 </button>
                 {this.props.children({
-                    id: this.componentID,
+                    id: this.contentID,
                     initialFocusRef: this.initalFocusRef,
                     isVisible: this.state.isVisible,
                     closeMenuHandler: this.closeMenuHandler,
@@ -84,17 +92,21 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
         if (!prevState.isVisible && this.state.isVisible) {
             if (this.initalFocusRef.current) {
                 this.initalFocusRef.current.focus();
-                forceSelectionUpdate();
+                if (this.props.onVisibilityChange) {
+                    this.props.onVisibilityChange();
+                }
             } else if (this.buttonRef.current) {
                 this.buttonRef.current.focus();
-                forceSelectionUpdate();
+                if (this.props.onVisibilityChange) {
+                    this.props.onVisibilityChange();
+                }
             }
         }
     }
 
     public componentDidMount() {
         watchFocusInDomTree(this.controllerRef.current!, this.handleFocusChange);
-        createEditorFlyoutEscapeListener(this.controllerRef.current!, this.buttonRef.current!, this.closeMenuHandler);
+        addEscapeListener(this.controllerRef.current!, this.buttonRef.current!, this.closeMenuHandler);
     }
 
     private handleFocusChange = hasFocus => {

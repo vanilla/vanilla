@@ -7,10 +7,9 @@
 import React from "react";
 import * as Icons from "@rich-editor/components/icons";
 import { getRequiredID, IRequiredComponentID, IOptionalComponentID } from "@library/componentIDs";
-import PopoverController, {
-    IPopoverControllerChildParameters,
-} from "@rich-editor/components/popovers/pieces/PopoverController";
+import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import EmojiPicker from "@rich-editor/components/popovers/pieces/EmojiPicker";
+import PopoverController, { IPopoverControllerChildParameters } from "@library/components/PopoverController";
 
 interface IProps extends IOptionalComponentID {}
 
@@ -29,7 +28,13 @@ export default class EmojiPopover extends React.Component<IProps, IRequiredCompo
         const icon = Icons.emoji();
 
         return (
-            <PopoverController id={this.state.id} classNameRoot="emojiPicker" icon={icon}>
+            <PopoverController
+                id={this.state.id}
+                classNameRoot="emojiPicker"
+                icon={icon}
+                buttonClasses="richEditor-button richEditor-embedButton"
+                onVisibilityChange={forceSelectionUpdate}
+            >
                 {(options: IPopoverControllerChildParameters) => {
                     return <EmojiPicker {...options} contentID={options.id} />;
                 }}

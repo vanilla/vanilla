@@ -110,7 +110,7 @@ $global-condensed_lineHeight                         : 1.25 !default;
 
 $global-heading_fontFamily                           : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 $global-heading_fontWeight                           : $global-bold_fontWeight !default; // Derived
-$global-heading_lineHeightRatio                      : .74;
+$global-heading_lineHeightRatio                      : .8;
 
 $global-body_fontFamily                              : "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
 $global-body_fontWeight                              : $global-normal_fontWeight !default; // Derived
@@ -286,8 +286,10 @@ $formElement-disabled_opacity                        : .5 !default;
     menu
 \* -------------------------------------------------------------- */
 
-$menu-dropShadow_color                               : rgba($global-color_fg, .2);
-$menu-dropShadow                                     : 0 5px 10px $menu-dropShadow_color;
+$menu-dropShadow_color                               : mix($global-color_fg, $global-color_bg, 20%) !default;
+$menu-border_color                                   : mix($global-color_fg, $global-color_bg, 5%) !default;
+$menu_dropShadow                                     : 0 5px 10px $menu-dropShadow_color !default;
+$menu_borderRadius                                   : $global_borderRadius !default;
 
 /* -------------------------------------------------------------- *\
     Buttons

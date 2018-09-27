@@ -14,6 +14,9 @@ interface IProps {
     contents: IWord[] | string;
 }
 
+/**
+ * Implements meta type of item for DropDownMenu
+ */
 export default class DropDownItemMetas extends React.Component<IProps> {
     public render() {
         return (

@@ -27,6 +27,10 @@ export interface IState {
     selectedValue: string;
 }
 
+/**
+ * Implements radio button type of item for DropDownMenu. Note that visually this component doesn't look like radio buttons,
+ * despite being radio buttons semantically and functionally.
+ */
 export default class DropDownItemRadio extends React.Component<IProps, IState> {
     private hasOptions: boolean;
 

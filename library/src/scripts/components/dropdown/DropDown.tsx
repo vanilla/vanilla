@@ -24,6 +24,9 @@ export interface IState {
     id: string;
 }
 
+/**
+ * Creates a drop down menu
+ */
 export default class DropDown extends React.PureComponent<IProps, IState> {
     public static defaultProps = {
         stickRight: true,

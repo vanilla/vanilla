@@ -12,6 +12,9 @@ export interface IProps {
     className?: string;
 }
 
+/**
+ * Generic wrap for items in DropDownMenu
+ */
 export default class DropDownItem extends React.Component<IProps> {
     public render() {
         return <li className={classNames("dropDown-item", this.props.className)}>{this.props.children}</li>;

@@ -84,10 +84,7 @@ export default class Sentence extends React.Component<ISentence> {
                     default:
                         const text = word as IInlineText;
                         return (
-                            <span
-                                className={classNames("word", "word-text", (word.contents as IInlineText).className)}
-                                key={key}
-                            >
+                            <span className={classNames("word", "word-text", word.className)} key={key}>
                                 <Sentence className={word.className} contents={text.contents} counter={childCounter} />
                             </span>
                         );

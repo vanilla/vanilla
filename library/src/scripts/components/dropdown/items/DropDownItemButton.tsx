@@ -16,6 +16,9 @@ export interface IDropDownItemButton {
     onClick: any;
 }
 
+/**
+ * Implements button type of item for DropDownMenu
+ */
 export default class DropDownItemButton extends React.Component<IDropDownItemButton> {
     public render() {
         const buttonContent = this.props.children ? this.props.children : this.props.name;

@@ -16,6 +16,9 @@ export interface IDropDownItemLink {
     className?: string;
 }
 
+/**
+ * Implements link type of item for DropDownMenu
+ */
 export default class DropDownItemLink extends React.Component<IDropDownItemLink> {
     public render() {
         const linkContents = this.props.children ? this.props.children : this.props.name;

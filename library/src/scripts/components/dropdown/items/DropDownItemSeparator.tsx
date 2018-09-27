@@ -12,6 +12,9 @@ interface IProps {
     className?: string;
 }
 
+/**
+ * Implements line separator type of item for DropDownMenu
+ */
 export default class DropDownItemSeparator extends React.Component<IProps> {
     public render() {
         return (

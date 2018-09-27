@@ -2597,7 +2597,7 @@ class UserModel extends Gdn_Model {
         $this->fireEvent('AfterUserQuery');
 
         if (isset($where)) {
-            $this->SQL->where($where);
+            $this->SQL->where($where, null, false);
         }
 
         if (!empty($roleID)) {
@@ -2715,7 +2715,7 @@ class UserModel extends Gdn_Model {
         }
 
         if (isset($where)) {
-            $this->SQL->where($where);
+            $this->SQL->where($where, null, false);
         }
 
         $this->SQL

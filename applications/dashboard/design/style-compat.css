@@ -895,8 +895,10 @@ label.checkbox input.checkbox-input {
   cursor: pointer;
 }
 
+body.hasRichEditor .richEditor ~ .TextBoxWrapper,
+body.hasRichEditor .CommentForm .PreviewButton,
 body.hasRichEditor #Form_Preview {
-  display: none;
+  display: none !important;
 }
 
 @media (min-width: 700px) {

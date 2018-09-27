@@ -80,11 +80,13 @@
     cursor: pointer;
 }
 
-
+// Styles that only take affect when the rich editor is enabled.
 body.hasRichEditor {
-    // Hide Preview
+    .richEditor ~ .TextBoxWrapper,
+    .CommentForm .PreviewButton,
     #Form_Preview {
-        display: none;
+        // The text box wrapper can have $.show() called on it which adds an inline `display: block`.
+        display: none !important;
     }
 }
 

@@ -5,8 +5,8 @@
  */
 
 import * as React from "react";
-import DropDownItem from "@library/components/dropdown/items/DropDownItem";
 import classNames from "classnames";
+import DropDownItem from "./DropDownItem";
 
 interface IProps {
     className?: string;

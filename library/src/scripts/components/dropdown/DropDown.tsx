@@ -8,7 +8,7 @@ import * as React from "react";
 import { dropDownMenu } from "@library/components/Icons";
 import { getRequiredID } from "@library/componentIDs";
 import PopoverController from "@library/components/PopoverController";
-import DropDownContents from "@library/components/dropdown/items/DropDownContents";
+import DropDownContents from "./DropDownContents";
 
 export interface IProps {
     id: string;

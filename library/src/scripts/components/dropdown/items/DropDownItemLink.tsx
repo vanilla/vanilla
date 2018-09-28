@@ -6,9 +6,9 @@
 
 import * as React from "react";
 import { NavLink } from "react-router-dom";
-import DropDownItem from "@library/components/dropdown/items/DropDownItem";
 import classNames from "classnames";
 import { LocationDescriptor } from "history";
+import DropDownItem from "./DropDownItem";
 
 export interface IDropDownItemLink {
     to: LocationDescriptor;

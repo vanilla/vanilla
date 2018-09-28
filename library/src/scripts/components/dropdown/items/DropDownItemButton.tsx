@@ -5,9 +5,8 @@
  */
 
 import * as React from "react";
-import { NavLink } from "react-router-dom";
-import DropDownItem from "@library/components/dropdown/items/DropDownItem";
 import classNames from "classnames";
+import DropDownItem from "./DropDownItem";
 
 export interface IDropDownItemButton {
     name: string;

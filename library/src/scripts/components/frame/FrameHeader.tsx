@@ -36,7 +36,7 @@ export default class FrameHeader extends React.PureComponent<IProps> {
 
         const backTitle = t("Back");
 
-        const heading = <Heading depth={this.props.heading}>{this.props.title}</Heading>;
+        const heading = <Heading title={this.props.title} depth={this.props.heading} />;
 
         let contents;
         if (this.props.parentID) {

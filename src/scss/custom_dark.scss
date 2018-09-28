@@ -6,8 +6,13 @@
 
 /* ------------------ Theme ------------------ */
 
-@import "base/_variables.scss";
+@import "base/variables_dark";
+@import "base/variables";
 
 /* --------------- Boilerplate --------------- */
 
 @import "../../node_modules/@vanillaforums/theme-boilerplate/src/scss/custom";
+
+/* --------------- Components --------------- */
+
+@import "components/searchbox_dark";

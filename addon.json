@@ -2,11 +2,12 @@
     "key": "keystone",
     "name": "Keystone",
     "description": "A SCSS boilerplate for vanilla responsive themes.",
-    "version": "1.0.0",
+    "version": "0.0.1",
      "authors": [
         {
             "name": "Isis Graziatto",
-            "email": "isis.g@vanillaforums.com"
+            "email": "isis.g@vanillaforums.com",
+            "homepage": "//vanillaforums.com"
         }
     ],
     "license": "GPL-2.0-only",
@@ -15,5 +16,12 @@
     "type": "theme",
     "build": {
         "process": "v1"
+    },
+    "options": {
+        "Styles": {
+            "Default": "%s_default",
+            "Classic": "%s_classic",
+            "Dark": "%s_dark"
+        }
     }
 }

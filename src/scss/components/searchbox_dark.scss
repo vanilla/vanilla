@@ -1,0 +1,22 @@
+.AdvancedSearch .bwrap .Button,
+#Form_Go {
+    border-width: 0;
+}
+
+.SearchBox {
+    #Form_search,
+    #Form_Search {
+        background-color: $global-color_bg;
+        color: $global-color_white;
+    }
+}
+
+.AdvancedSearch {
+
+    .Handle.Handle {
+
+        .Arrow {
+            color: $global-color_primary;
+        }
+    }
+}

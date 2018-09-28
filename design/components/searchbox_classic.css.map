@@ -1,0 +1,1 @@
+{"version":3,"sources":["components/searchbox_classic.scss"],"names":[],"mappings":"AAAA,wCAEI,cAAe,CAClB","file":"searchbox_classic.css","sourcesContent":[".AdvancedSearch .bwrap .Button,\n#Form_Go {\n    border-width: 0;\n}\n"]}

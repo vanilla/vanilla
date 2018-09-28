@@ -1,0 +1,58 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Global Overwrites
+\* -------------------------------------------------------------- */
+
+$global-color_black:                    #000;
+$global-color_white:                    #fff;
+$global-color_transparent:              transparent;
+
+$global-color_primary:                  #dd9909;
+$global-color_primaryAlt:               lighten($global-color_primary, 8%);
+$global-color_secondary:                #A94456 !default;
+
+$global-color_bg:                       #191C1F !default;
+$global-color_fg:                       $global-color_white !default; // text color | should have high contrast between $global-color_bg
+
+$global-body_bg:                        $global-color_bg !default;
+
+/* -------------------------------------------------------------- *\
+    Header
+\* -------------------------------------------------------------- */
+
+$header_bg:                              mix($global-color_bg, $global-color_fg, 90%) !default;
+$header_color:                           $global-color_white !default;
+$header-hover_color:                     $global-color_white !default;
+
+/* -------------------------------------------------------------- *\
+    Footer
+\* -------------------------------------------------------------- */
+
+$footer_bg:                              mix($global-color_bg, $global-color_fg, 90%) !default;
+$footer_color:                           $global-color_fg !default;
+$footer-link_color:                      $global-color_primary !default;
+$footer-link-hover_color:                $global-color_primaryAlt !default;
+
+/* -------------------------------------------------------------- *\
+    Navigation
+\* -------------------------------------------------------------- */
+
+$navigation_backgroundColor:              mix($global-color_black, $header-bg, 12%) !default;
+
+/* -------------------------------------------------------------- *\
+    Components
+\* -------------------------------------------------------------- */
+
+$component-title_color:                  $global-color_primary !default;
+$component-title-hover_color:            $global-color_primaryAlt !default;
+
+/* -------------------------------------------------------------- *\
+    Mebox
+\* -------------------------------------------------------------- */
+
+$mebox_hover_bg:  mix($global-color_black, $header-bg, 12%) !default;

@@ -1,0 +1,71 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Global Overwrites
+\* -------------------------------------------------------------- */
+
+$global_borderRadius:                   2px !default;
+
+$global-color_black:                    #000;
+$global-color_white:                    #FFF;
+$global-color_transparent:              transparent;
+
+$global-color_primary:                  #465775 !default;
+$global-color_primaryAlt:               lighten($global-color_primary, 8%) !default;
+$global-color_secondary:                #1eb9cc !default;
+
+$global-color_bg:                       $global-color_white !default;
+$global-color_fg:                       lighten(desaturate($global-color_primary, 70%), 8%) !default; // text color | should have high contrast between $global-color_bg
+
+$global-body_bg:                        $global-color_bg !default;
+
+/* -------------------------------------------------------------- *\
+    Theme
+\* -------------------------------------------------------------- */
+
+$theme-photo_round:                      false !default;
+$theme-photo_borderRadius:               $global_borderRadius !default;
+
+$theme-link-hover_textDecoration:        underline !default;
+
+/* -------------------------------------------------------------- *\
+    Header
+\* -------------------------------------------------------------- */
+
+$header_minHeight:                       50px !default;
+$header_bg:                              #f8f8f8 !default;
+$header_color:                           $global-color_primary !default;
+$header-hover_color:                     $global-color_primaryAlt !default;
+$header_border:                          1px solid rgba($header_bg, .3) !default;
+
+/* -------------------------------------------------------------- *\
+    Footer
+\* -------------------------------------------------------------- */
+
+$footer_bg:                              #454955 !default;
+$footer_color:                           $global-color_white !default;
+$footer-link_color:                      $global-color_primary !default;
+$footer-link-hover_color:                $global-color_primaryAlt !default;
+
+/* -------------------------------------------------------------- *\
+    Navigation
+\* -------------------------------------------------------------- */
+
+$navigation_backgroundColor:              $global-color_primary !default;
+$navigation_color:                        $global-color_white !default;
+
+/* -------------------------------------------------------------- *\
+    Components
+\* -------------------------------------------------------------- */
+
+$component-item_spacing:                 0 !default;
+
+/* -------------------------------------------------------------- *\
+    Mebox
+\* -------------------------------------------------------------- */
+
+$mebox_hover_bg:  mix($global-color_black, $header-bg, 12%) !default;

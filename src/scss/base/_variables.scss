@@ -123,11 +123,11 @@ $frame_borderRadius:                     0 !default;
     Header
 \* -------------------------------------------------------------- */
 
-$header_minHeight:                       80px !default;
-$header_bg:                              $global-color_bg !default;
-$header_color:                           $global-color_primary !default;
-$header-hover_color:                     $global-color_primaryAlt !default;
-$header_border:                          1px solid $global-color_primary !default;
+$header_minHeight:                       48px !default;
+$header_bg:                              $global-color_primary !default;
+$header_color:                           $global-color_white !default;
+$header-hover_color:                     $global-color_white !default;
+$header_border:                          none !default;
 $header_boxShadow:                       none !default;
 
 /* -------------------------------------------------------------- *\

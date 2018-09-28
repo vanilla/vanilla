@@ -28,6 +28,8 @@ class KeystoneThemeHooks extends Gdn_Plugin {
             'Vanilla.Categories.Layout' => 'modern',
             'Vanilla.Discussions.Layout' => 'modern',
             'Badges.BadgesModule.Target' => 'AfterUserInfo',
+            'Garden.ThemeOptions.Styles.Key' => 'Default',
+            'Garden.ThemeOptions.Styles.Value' => '%s_default',
         ]);
     }
 

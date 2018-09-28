@@ -9,10 +9,12 @@ import { NavLink } from "react-router-dom";
 import classNames from "classnames";
 import { LocationDescriptor } from "history";
 import DropDownItem from "./DropDownItem";
+import { ModalLink } from "@library/components/modal";
 
 export interface IDropDownItemLink {
     to: LocationDescriptor;
     name: string;
+    isModalLink?: boolean;
     children?: React.ReactNode;
     className?: string;
 }
@@ -22,17 +24,14 @@ export interface IDropDownItemLink {
  */
 export default class DropDownItemLink extends React.Component<IDropDownItemLink> {
     public render() {
-        const linkContents = this.props.children ? this.props.children : this.props.name;
+        const { children, name, isModalLink, className, to } = this.props;
+        const linkContents = children ? children : name;
+        const LinkComponent = isModalLink ? ModalLink : NavLink;
         return (
-            <DropDownItem className={classNames("dropDown-linkItem", this.props.className)}>
-                <NavLink
-                    to={this.props.to}
-                    title={this.props.name}
-                    className="dropDownItem-link"
-                    activeClassName="isCurrent"
-                >
+            <DropDownItem className={classNames("dropDown-linkItem", className)}>
+                <LinkComponent to={to} title={name} className="dropDownItem-link" activeClassName="isCurrent">
                     {linkContents}
-                </NavLink>
+                </LinkComponent>
             </DropDownItem>
         );
     }

@@ -9,27 +9,20 @@ import classNames from "classnames";
 import { t } from "@library/application";
 import { newFolder } from "@library/components/Icons";
 
-interface IProps {
+export interface IFrameFooterProps {
     className?: string;
-    children: JSX.Element;
+    children: JSX.Element | JSX.Element[];
 }
 
 /**
  * Generic footer for frame component
  */
-export default class FrameFooter extends React.PureComponent<IProps> {
-
-    public defaultProps = {
+export default class FrameFooter extends React.PureComponent<IFrameFooterProps> {
+    public static defaultProps = {
         validSelection: false,
     };
 
     public render() {
-        return (
-            <footer className={classNames('flyoutFooter', this.props.className)}>
-                {this.props.children}
-            </footer>
-        );
+        return <footer className={classNames("frameFooter", this.props.className)}>{this.props.children}</footer>;
     }
 }
-
-

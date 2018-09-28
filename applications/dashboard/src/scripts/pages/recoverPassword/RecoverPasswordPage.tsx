@@ -91,6 +91,7 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
                         <ButtonSubmit
                             disabled={!this.allowEdit || this.state.email.length === 0}
                             content={t("Request a new password")}
+                            legacyMode={true}
                         />
                     </form>
                     <RememberPasswordLink />

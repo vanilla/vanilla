@@ -6,22 +6,22 @@
 
 import React from "react";
 import classNames from "classnames";
+import FramePanel from "@library/components/frame/FramePanel";
 
-interface IProps {
+export interface IFrameBodyProps {
     className?: string;
-    children: JSX.Element;
+    children: JSX.Element[];
 }
 
 /**
  * This section goes between the header/footer. The scrolling should be done on the Panel in case they stack.
  */
-export default class FrameBody extends React.PureComponent<IProps> {
-
+export default class FrameBody extends React.PureComponent<IFrameBodyProps> {
     public render() {
-        return (
-            <div className={classNames('flyout-body', 'inheritHeight', this.props.className)}>
-                {this.props.children}
-            </div>
-        );
+        const panels = this.props.children.map(panel => {
+            return <FramePanel>{panel}</FramePanel>;
+        });
+
+        return <div className={classNames("flyout-body", "inheritHeight", this.props.className)}>{panels}</div>;
     }
 }

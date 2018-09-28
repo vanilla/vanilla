@@ -17,12 +17,9 @@ interface IProps {
  * might go up and down the tree, and stack each level on top of each other.
  */
 export default class FramePanel extends React.PureComponent<IProps> {
-
     public render() {
         return (
-            <div className={classNames('popoverLayer', 'inheritHeight', this.props.className)}>
-                {this.props.children}
-            </div>
+            <div className={classNames("framePanel", "inheritHeight", this.props.className)}>{this.props.children}</div>
         );
     }
 }

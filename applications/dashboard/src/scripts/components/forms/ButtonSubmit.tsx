@@ -12,11 +12,13 @@ interface IProps extends IOptionalComponentID {
     content: string | Node;
     className?: string;
     disabled?: boolean;
+    legacyMode?: boolean;
 }
 
 export default class ButtonSubmit extends React.Component<IProps, IOptionalComponentID> {
     public static defaultProps = {
         disabled: false,
+        legacyMode: false,
     };
 
     constructor(props) {
@@ -40,6 +42,7 @@ export default class ButtonSubmit extends React.Component<IProps, IOptionalCompo
                 content={this.props.content}
                 className={componentClasses}
                 prefix="submitButton"
+                legacyMode={this.props.legacyMode}
             >
                 {this.props.content}
             </Button>

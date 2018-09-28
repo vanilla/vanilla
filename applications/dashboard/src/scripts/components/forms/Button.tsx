@@ -13,6 +13,7 @@ interface IProps extends IOptionalComponentID {
     content: string | Node;
     disabled?: boolean;
     prefix: string;
+    legacyMode?: boolean;
 }
 
 interface IState {
@@ -25,6 +26,7 @@ export default class Button extends React.Component<IProps, IState> {
         disabled: false,
         type: "button",
         prefix: "button",
+        legacyMode: false,
     };
 
     constructor(props) {
@@ -35,7 +37,7 @@ export default class Button extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const componentClasses = classNames("button", "Button", this.props.className);
+        const componentClasses = classNames("button", { Button: this.props.legacyMode }, this.props.className);
 
         return (
             <button

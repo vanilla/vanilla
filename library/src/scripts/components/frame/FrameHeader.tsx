@@ -6,42 +6,55 @@
 
 import React from "react";
 import classNames from "classnames";
-import Heading from "@knowledge/components/Heading";
-import BackLink from "@knowledge/components/BackLink";
+import Heading, { ICommonHeadingProps } from "@knowledge/components/Heading";
 import { t } from "@library/application";
 import { leftChevron } from "@library/components/Icons";
 import CloseButton from "@library/components/CloseButton";
 
-interface IProps {
-    className?: string;
-    heading?: 2 | 3 | 4 | 5 | 6;
-    parentID?: number;
-    title: JSX.Element | string;
+interface ICommonFrameHeaderProps extends ICommonHeadingProps {
+    closeFrame: () => void;
+    onBackClick: () => void;
 }
+
+export interface IStringTitle extends ICommonFrameHeaderProps {
+    title: string;
+}
+
+export interface IComponentTitle extends ICommonFrameHeaderProps {
+    children: JSX.Element | string;
+}
+
+export type IFrameHeaderProps = IStringTitle | IComponentTitle;
 
 /**
  * Generic header for frame
  */
-export default class FrameHeader extends React.PureComponent<IProps> {
-
+export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> {
     public static defaultProps = {
         heading: 2,
     };
 
     public render() {
-
-        const tempClick = () => {
-            alert("click");
-        };
-
         const backTitle = t("Back");
+        const stringTitle = "title" in this.props ? this.props.title : null;
+        const componentTitle = "children" in this.props ? this.props.children : null;
 
-        const heading = <Heading title={this.props.title} depth={this.props.heading} />;
+        const heading = (
+            <Heading title={stringTitle!} depth={this.props.depth}>
+                {componentTitle!}
+            </Heading>
+        );
 
         let contents;
-        if (this.props.parentID) {
+        if (this.props.onBackClick) {
             contents = (
-                <button className="flyoutHeader-backButton" type="button">
+                <button
+                    title={backTitle}
+                    aria-label={backTitle}
+                    onClick={this.props.onBackClick}
+                    className="flyoutHeader-backButton"
+                    type="button"
+                >
                     {leftChevron("flyoutHeader-backIcon")}
                     {heading}
                 </button>
@@ -51,9 +64,9 @@ export default class FrameHeader extends React.PureComponent<IProps> {
         }
 
         return (
-            <header className={classNames('frameHeader', this.props.className)}>
+            <header className={classNames("frameHeader", this.props.className)}>
                 {contents}
-                <CloseButton className="flyoutHeader-close" onClick={tempClick}/>
+                <CloseButton className="flyoutHeader-close" onClick={this.props.closeFrame} />
             </header>
         );
     }

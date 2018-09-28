@@ -21,7 +21,7 @@ export default class DropDownItemMetas extends React.Component<IProps> {
     public render() {
         return (
             <DropDownItem className="dropDown-metasItem">
-                <Sentence contents={this.props.contents} />
+                <Sentence children={this.props.contents} />
             </DropDownItem>
         );
     }

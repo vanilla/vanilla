@@ -79,3 +79,61 @@ export function dropDownMenu(className?: string) {
         </svg>
     );
 }
+
+export function newFolder(className?: string, title: string = t("New Folder")) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className={classNames("icon", "icon-dropDownMenu", className)}
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+            <path
+                d="M12.25,11.438a.5.5,0,0,0-1,0v2.75H8.5a.5.5,0,0,0,0,1h2.75v2.75a.5.5,0,0,0,1,0v-2.75H15a.5.5,0,0,0,0-1H12.25Z"
+                fill="currentColor"
+            />
+            <path
+                d="M21,7.823H13.825L12.457,4.735a.5.5,0,0,0-.457-.3H3a.5.5,0,0,0-.5.5v16a.5.5,0,0,0,.5.5H21a.5.5,0,0,0,.5-.5V8.323A.5.5,0,0,0,21,7.823Zm-.5,12.615H3.5v-15h8.175l1.368,3.087a.5.5,0,0,0,.457.3h7Z"
+                fill="currentColor"
+            />
+        </svg>
+    );
+}
+
+export function categoryIcon(className?: string) {
+    const title = t("Folder");
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className={classNames("icon", "icon-categoryIcon", className)}
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+            <path
+                d="M9.369,3.164H14.75a.375.375,0,0,1,.375.375V13a.375.375,0,0,1-.375.375H1.25A.375.375,0,0,1,.875,13V1A.375.375,0,0,1,1.25.625H8a.375.375,0,0,1,.343.223ZM1.625,1.375v11.25h12.75V3.914H9.125a.375.375,0,0,1-.343-.223L7.756,1.375Z"
+                transform="translate(-0.875 -0.625)"
+                fill="currentColor"
+            />
+        </svg>
+    );
+}
+
+export function selectedCategory(className?: string) {
+    const title = `✓`;
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className={classNames("icon", "icon-selectedCategory", className)}
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+            <polygon
+                points="12.136 3.139 13.25 4.253 6.211 11.292 2.75 7.83 3.863 6.717 6.211 9.064 12.136 3.139"
+                fill="currentColor"
+            />
+        </svg>
+    );
+}

@@ -1,6 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
     <description><?php echo Gdn_Format::text($this->Head->title()); ?></description>
-    <language><?php echo Gdn::config('Garden.Locale', 'en-US'); ?></language>
     <atom:link href="<?php echo htmlspecialchars(url($this->SelfUrl, true)); ?>" rel="self" type="application/rss+xml"/>
 <?php
 $Activities = $this->data('Activities', []);

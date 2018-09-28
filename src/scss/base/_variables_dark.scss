@@ -55,4 +55,4 @@ $component-title-hover_color:            $global-color_primaryAlt !default;
     Mebox
 \* -------------------------------------------------------------- */
 
-$mebox_hover_bg:  mix($global-color_black, $header-bg, 12%) !default;
+$mebox_hover_bg:                         mix($global-color_white, $header-bg, 12%) !default;

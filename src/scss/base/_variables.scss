@@ -198,6 +198,12 @@ $component-meta_fontWeight:              $global-normal_fontWeight !default;
 $component-meta_lineHeight:              $global-base_lineHeight !default;
 
 /* -------------------------------------------------------------- *\
+    Mebox
+\* -------------------------------------------------------------- */
+
+$mebox_hover_bg:                         mix($global-color_black, $header-bg, 12%) !default;
+
+/* -------------------------------------------------------------- *\
     Form Elements
 \* -------------------------------------------------------------- */
 

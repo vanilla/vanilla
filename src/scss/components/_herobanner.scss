@@ -1,0 +1,84 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://vanillaforums.com Proprietary
+ */
+
+.Herobanner {
+    background-color: #3F3E46;
+    position: relative;
+    width: 100%;
+    height: 370px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    color: $global-color_white;
+
+    .HomepageTitle {
+        font-size: 48px;
+
+        @include maxWidth($theme-breakpoint_tablet) {
+            font-size: $global-subTitle_fontSize;
+        }
+    }
+
+    > .Container {
+        width: 100%;
+    }
+
+    @include maxWidth {
+        height: auto;
+        background-image: none !important;
+        background: transparent;
+
+        .HomepageTitle,
+        .PageDescription {
+            display: none;
+        }
+    }
+
+    //unset .ThemeOptions-panelToLeft margin
+    .SearchBox.SearchBox {
+        margin-left: auto;
+    }
+
+    .SearchBox {
+        $SearchboxFeatured_size: #{$global-subTitle_fontSize * 2};
+
+        max-width: 700px;
+        margin: 0 auto;
+
+        .Handle {
+            display: none;
+        }
+
+        @include minWidth {
+
+            .AdvancedSearch .BigInput,
+            #Form_Search {
+                height: $SearchboxFeatured_size;
+                padding-left: $global-subTitle_fontSize;
+                font-size: $global-subTitle_fontSize;
+            }
+
+            .bwrap > .Button,
+            #Form_Go {
+                border-width: 0;
+                height: $SearchboxFeatured_size;
+                width: $SearchboxFeatured_size;
+            }
+
+            form > div::after {
+                font-size: $global-subTitle_fontSize;
+                height: $SearchboxFeatured_size;
+                width: $SearchboxFeatured_size;
+                line-height: $SearchboxFeatured_size;
+            }
+        }
+
+        @include maxWidth {
+            margin-top: $utility-large_padding;
+        }
+    }
+}

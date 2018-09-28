@@ -14,6 +14,18 @@
 <body id="{$BodyID}" class="
     {$BodyClass}
 
+    {if $ThemeOptions.Options.hasHeroBanner}
+        ThemeOptions-hasHeroBanner
+    {/if}
+
+    {if $ThemeOptions.Options.hasFetureSearchbox}
+        ThemeOptions-hasFetureSearchbox
+    {/if}
+
+    {if $ThemeOptions.Options.panelToLeft}
+        ThemeOptions-panelToLeft
+    {/if}
+
     {if $User.SignedIn}
         UserLoggedIn
     {else}
@@ -41,22 +53,60 @@
                 {include file="partials/header.tpl"}
             </div>
             <div class="Frame-body">
+                {if $ThemeOptions.Options.hasHeroBanner && inSection(["CategoryList", "DiscussionList"])}
+                    <div class="Herobanner" {if $heroImageUrl} style="background-image:url('{$heroImageUrl}')"{/if}>
+                        <div class="Container">
+                            {if $ThemeOptions.Options.hasFetureSearchbox}
+                                <div class="SearchBox js-sphinxAutoComplete" role="search">
+                                    {if $hasAdvancedSearch === true}
+                                        {searchbox_advanced}
+                                    {else}
+                                        {searchbox}
+                                    {/if}
+                                </div>
+                            {else}
+                                {if $Category}
+                                    <h2 class="H HomepageTitle">{$Category.Name}</h2>
+                                    <p class="P PageDescription">{$Category.Description}</p>
+                                {else}
+                                    {if {homepage_title} !== ""}
+                                        <h2 class="H HomepageTitle">{homepage_title}</h2>
+                                    {/if}
+                                    {if $_Description}
+                                        <p class="P PageDescription">{$_Description}</p>
+                                    {/if}
+                                {/if}
+                            {/if}
+                        </div>
+                    </div>
+                {/if}
                 <div class="Frame-content">
                     <div class="Container">
                         <div class="Frame-contentWrap">
                             <div class="Frame-details">
-                                <div class="Frame-row">
-                                    <nav class="BreadcrumbsBox">
-                                        {breadcrumbs}
-                                    </nav>
-                                    {if !$SectionGroups}
-                                        <div class="SearchBox js-sphinxAutoComplete" role="search">
-                                            {searchbox}
-                                        </div>
-                                    {/if}
-                                </div>
+                                {if !$ThemeOptions.Options.hasFetureSearchbox || !inSection(["CategoryList", "DiscussionList"])}
+                                    <div class="Frame-row">
+                                        <nav class="BreadcrumbsBox">
+                                            {breadcrumbs}
+                                        </nav>
+                                        {if !$SectionGroups}
+                                            <div class="SearchBox js-sphinxAutoComplete" role="search">
+                                                {if $hasAdvancedSearch === true}
+                                                    {searchbox_advanced}
+                                                {else}
+                                                    {searchbox}
+                                                {/if}
+                                            </div>
+                                        {/if}
+                                    </div>
+                                {/if}
                                 <div class="Frame-row">
                                     <main class="Content MainContent">
+                                        {if $ThemeOptions.Options.hasFetureSearchbox && inSection(["CategoryList", "DiscussionList"])}
+                                            <nav class="BreadcrumbsBox">
+                                                {breadcrumbs}
+                                            </nav>
+                                        {/if}
                                         {if inSection("Profile")}
                                             <div class="Profile-header">
                                                 <div class="Profile-photo">

@@ -15,94 +15,12 @@ class ModerationControllerTest extends BaseTest {
 
     protected $user;
 
+    /**
+     * @var array Array of categories holding initial/valid values for tests
+     */
     protected static $categories = [];
 
     protected static $discussions = [];
-
-    protected static $validResponses = [
-        'CountAllDiscussions' => [
-            'cat1' => 2,
-            'cat1_1' => 2,
-            'cat1_1_1' => 2,
-            'cat1_2' => 0,
-            'cat1_2_1' => 0,
-            'cat2' => 2,
-            'cat2_1' => 0,
-            'cat2_1_1' => 0,
-            'cat2_2' => 2,
-            'cat2_2_1' => 2,
-            'cat2_2_1_1' => 2,
-            'cat2_2_1_1_1' => 2,
-            'cat2_2_1_1_1_1' => 2,
-        ],
-        'CountAllComments' => [
-            'cat1' => 1,
-            'cat1_1' => 1,
-            'cat1_1_1' => 1,
-            'cat1_2' => 0,
-            'cat1_2_1' => 0,
-            'cat2' => 1,
-            'cat2_1' => 0,
-            'cat2_1_1' => 0,
-            'cat2_2' => 1,
-            'cat2_2_1' => 1,
-            'cat2_2_1_1' => 1,
-            'cat2_2_1_1_1' => 1,
-            'cat2_2_1_1_1_1' => 1,
-
-        ],
-        'CountCategories' => [
-            'cat1' => 0,
-            'cat1_1' => 0,
-            'cat1_1_1' => 0,
-            'cat1_2' => 0,
-            'cat1_2_1' => 0,
-            'cat2' => 0,
-            'cat2_1' => 0,
-            'cat2_1_1' => 0,
-            'cat2_2' => 0,
-            'cat2_2_1' => 0,
-            'cat2_2_1_1' => 0,
-            'cat2_2_1_1_1' => 0,
-            'cat2_2_1_1_1_1' => 0,
-
-        ],
-        'CountDiscussions' => [
-            'cat1' => 0,
-            'cat1_1' => 0,
-            'cat1_1_1' => 2,
-            'cat1_2' => 0,
-            'cat1_2_1' => 0,
-            'cat2' => 0,
-            'cat2_1' => 0,
-            'cat2_1_1' => 0,
-            'cat2_2' => 0,
-            'cat2_2_1' => 0,
-            'cat2_2_1_1' => 0,
-            'cat2_2_1_1_1' => 0,
-            'cat2_2_1_1_1_1' => 2,
-
-        ],
-        'CountComments' => [
-            'cat1' => 0,
-            'cat1_1' => 0,
-            'cat1_1_1' => 1,
-            'cat1_2' => 0,
-            'cat1_2_1' => 0,
-            'cat2' => 0,
-            'cat2_1' => 0,
-            'cat2_1_1' => 0,
-            'cat2_2' => 0,
-            'cat2_2_1' => 0,
-            'cat2_2_1_1' => 0,
-            'cat2_2_1_1_1' => 0,
-            'cat2_2_1_1_1_1' => 1,
-
-        ],
-        'DateInserted' => [],
-        'DateUpdated' => [],
-
-    ];
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
@@ -185,20 +103,26 @@ class ModerationControllerTest extends BaseTest {
 
         self::$discussions['d1_c1-1-1'] = $discussion = $this->addDiscussion([
             'CategoryID' => $cat1_1_1['CategoryID'],
-            'Name' => 'Discussion 1 of cat-1-1-1',
+            'Name' => 'Discussion 1 of cat1-1-1',
             'Body' => 'Test '.rand(1,9999999999)
         ]);
+        $this->updateValidValues('cat1_1_1' , 'CountDiscussions', '++', false);
+        $this->updateValidValues('cat1_1_1' , 'CountAllDiscussions', '++');
 
         $comment = $this->addComment([
             'DiscussionID' => $discussion['DiscussionID'],
             'Body' => 'Moderation controller test. LINE: '.__LINE__.' DATE: '.date('r')
         ]);
+        $this->updateValidValues('cat1_1_1' , 'CountComments', '++', false);
+        $this->updateValidValues('cat1_1_1' , 'CountAllComments', '++');
 
         self::$discussions['d2_c1-1-1'] = $discussion = $this->addDiscussion([
             'CategoryID' => $cat1_1_1['CategoryID'],
-            'Name' => 'Discussion 2 of cat-1-1-1',
+            'Name' => 'Discussion 2 of cat1-1-1',
             'Body' => 'Test '.rand(1,9999999999)
         ]);
+        $this->updateValidValues('cat1_1_1' , 'CountDiscussions', '++', false);
+        $this->updateValidValues('cat1_1_1' , 'CountAllDiscussions', '++');
 
         $this->updateValidValues('cat1_1_1' , 'LastDateInserted', $discussion['DateInserted']);
 
@@ -207,18 +131,24 @@ class ModerationControllerTest extends BaseTest {
             'Name' => 'Discussion 1 of cat2_2_1_1_1_1',
             'Body' => 'Test '.rand(1,9999999999)
         ]);
+        $this->updateValidValues('cat2_2_1_1_1_1' , 'CountDiscussions', '++', false);
+        $this->updateValidValues('cat2_2_1_1_1_1' , 'CountAllDiscussions', '++');
 
         self::$discussions['d2_c2_2_1_1_1_1'] = $discussion = $this->addDiscussion([
             'CategoryID' => $cat2_2_1_1_1_1['CategoryID'],
             'Name' => 'Discussion 2 of cat2_2_1_1_1_1',
             'Body' => 'Test '.rand(1,9999999999)
         ]);
+        $this->updateValidValues('cat2_2_1_1_1_1' , 'CountDiscussions', '++', false);
+        $this->updateValidValues('cat2_2_1_1_1_1' , 'CountAllDiscussions', '++');
 
         $comment = $this->addComment([
             'DiscussionID' => $discussion['DiscussionID'],
             'Body' => 'Moderation controller test. LINE: '.__LINE__.' DATE: '.date('r')
         ]);
 
+        $this->updateValidValues('cat2_2_1_1_1_1' , 'CountComments', '++', false);
+        $this->updateValidValues('cat2_2_1_1_1_1' , 'CountAllComments', '++');
         $this->updateValidValues('cat2_2_1_1_1_1' , 'LastDateInserted', $comment['DateInserted']);
 
         $this->assertTrue( true);
@@ -229,10 +159,12 @@ class ModerationControllerTest extends BaseTest {
             $continue = false;
             switch ($newValue) {
                 case '++':
-                    self::$validResponses[$fieldToUpdate][$catKey]++;
+                    //self::$validResponses[$fieldToUpdate][$catKey]++;
+                    self::$categories[$catKey][$fieldToUpdate]++;
                     break;
                 case '--':
-                    self::$validResponses[$fieldToUpdate][$catKey]--;
+                    //self::$validResponses[$fieldToUpdate][$catKey]--;
+                    self::$categories[$catKey][$fieldToUpdate]--;
                     break;
                 default:
                     self::$categories[$catKey][$fieldToUpdate] = $newValue;
@@ -304,11 +236,11 @@ class ModerationControllerTest extends BaseTest {
     public function testCategories() {
         foreach (self::$categories as $catKey => $category) {
             $cat = $this->getCategory($category['CategoryID']);
-            $this->assertEquals(self::$validResponses['CountAllDiscussions'][$catKey], $cat['CountAllDiscussions'], 'CountAllDiscussions failed on  '.$catKey);
-            $this->assertEquals(self::$validResponses['CountAllComments'][$catKey], $cat['CountAllComments'], 'CountAllComments failed on  '.$catKey);
-            $this->assertEquals(self::$validResponses['CountCategories'][$catKey], $cat['CountCategories'], 'CountCategories failed on  '.$catKey);
-            $this->assertEquals(self::$validResponses['CountDiscussions'][$catKey], $cat['CountDiscussions'], 'CountDiscussions failed on  '.$catKey.' '.json_encode($cat));
-            $this->assertEquals(self::$validResponses['CountComments'][$catKey], $cat['CountComments'], 'CountComments failed on  '.$catKey);
+            $this->assertEquals($category['CountAllDiscussions'], $cat['CountAllDiscussions'], 'CountAllDiscussions failed on  '.$catKey);
+            $this->assertEquals($category['CountAllComments'], $cat['CountAllComments'], 'CountAllComments failed on  '.$catKey);
+            $this->assertEquals($category['CountCategories'], $cat['CountCategories'], 'CountCategories failed on  '.$catKey);
+            $this->assertEquals($category['CountDiscussions'], $cat['CountDiscussions'], 'CountDiscussions failed on  '.$catKey.' '.json_encode($cat));
+            $this->assertEquals($category['CountComments'], $cat['CountComments'], 'CountComments failed on  '.$catKey);
             $this->assertEquals($category['DateInserted'], $cat['DateInserted'], 'DateInserted failed on  '.$catKey);
             $this->assertEquals($category['DateUpdated'], $cat['DateUpdated'], 'DateUpdated failed on  '.$catKey);
             $this->assertEquals($category['LastDateInserted'], $cat['LastDateInserted'], 'LastDateInserted failed on  '.$catKey);

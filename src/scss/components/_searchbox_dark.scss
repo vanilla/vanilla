@@ -4,12 +4,7 @@
  * @license GPL-2.0-only
  */
 
-.AdvancedSearch .bwrap .Button,
-#Form_Go {
-    border-width: 0;
-}
-
-.SearchBox {
+.Frame-content .SearchBox {
     #Form_search,
     #Form_Search {
         background-color: $global-color_bg;
@@ -17,12 +12,13 @@
     }
 }
 
-.AdvancedSearch {
+.Herobanner .SearchBox {
+    #Form_search,
+    #Form_Search {
 
-    .Handle.Handle {
-
-        .Arrow {
-            color: $global-color_primary;
+        @include maxWidth {
+            background-color: $global-color_bg;
+            color: $global-color_white;
         }
     }
 }

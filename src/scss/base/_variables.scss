@@ -210,6 +210,12 @@ $component-meta_lineHeight:              $global-base_lineHeight !default;
 $mebox_hover_bg:                         mix($global-color_black, $header-bg, 12%) !default;
 
 /* -------------------------------------------------------------- *\
+    SearchBox
+\* -------------------------------------------------------------- */
+
+$searchbox-button_borderWidth:           0 !default;
+
+/* -------------------------------------------------------------- *\
     Form Elements
 \* -------------------------------------------------------------- */
 

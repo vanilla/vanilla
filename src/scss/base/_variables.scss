@@ -167,6 +167,12 @@ $footer-base_fontSize:                   $global-medium_fontSize !default;
 $footer-base_lineHeight:                 $global-base_lineHeight !default;
 
 /* -------------------------------------------------------------- *\
+    Navigation
+\* -------------------------------------------------------------- */
+
+$navigation_backgroundColor:             darken($header_bg, 6%) !default;
+
+/* -------------------------------------------------------------- *\
     Components
 \* -------------------------------------------------------------- */
 

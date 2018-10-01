@@ -31,8 +31,6 @@ class ModerationControllerTest extends BaseTest {
             'Garden.Registration.Method' => 'Basic',
             'Garden.Registration.ConfirmEmail' => false,
             'Garden.Registration.SkipCaptcha' => true,
-            'Vanilla.Discussions.Add'=>true,
-            'Vanilla.Discussions.Edit'=>true,
         ]);
 
         self::$testUser = $this->addAdminUser();
@@ -105,65 +103,52 @@ class ModerationControllerTest extends BaseTest {
             'CategoryID' => $cat1_1_1['CategoryID'],
             'Name' => 'Discussion 1 of cat1-1-1',
             'Body' => 'Test '.rand(1,9999999999)
-        ]);
-        $this->updateValidValues('cat1_1_1' , 'CountDiscussions', '++', false);
-        $this->updateValidValues('cat1_1_1' , 'CountAllDiscussions', '++');
+        ], 'cat1_1_1');
+
 
         $comment = $this->addComment([
             'DiscussionID' => $discussion['DiscussionID'],
             'Body' => 'Moderation controller test. LINE: '.__LINE__.' DATE: '.date('r')
-        ]);
-        $this->updateValidValues('cat1_1_1' , 'CountComments', '++', false);
-        $this->updateValidValues('cat1_1_1' , 'CountAllComments', '++');
+        ], 'cat1_1_1');
 
         self::$discussions['d2_c1-1-1'] = $discussion = $this->addDiscussion([
             'CategoryID' => $cat1_1_1['CategoryID'],
             'Name' => 'Discussion 2 of cat1-1-1',
             'Body' => 'Test '.rand(1,9999999999)
-        ]);
-        $this->updateValidValues('cat1_1_1' , 'CountDiscussions', '++', false);
-        $this->updateValidValues('cat1_1_1' , 'CountAllDiscussions', '++');
+        ], 'cat1_1_1');
 
-        $this->updateValidValues('cat1_1_1' , 'LastDateInserted', $discussion['DateInserted']);
+
 
         self::$discussions['d1_c2_2_1_1_1_1'] = $discussion = $this->addDiscussion([
             'CategoryID' => $cat2_2_1_1_1_1['CategoryID'],
             'Name' => 'Discussion 1 of cat2_2_1_1_1_1',
             'Body' => 'Test '.rand(1,9999999999)
-        ]);
-        $this->updateValidValues('cat2_2_1_1_1_1' , 'CountDiscussions', '++', false);
-        $this->updateValidValues('cat2_2_1_1_1_1' , 'CountAllDiscussions', '++');
+        ], 'cat2_2_1_1_1_1');
+
 
         self::$discussions['d2_c2_2_1_1_1_1'] = $discussion = $this->addDiscussion([
             'CategoryID' => $cat2_2_1_1_1_1['CategoryID'],
             'Name' => 'Discussion 2 of cat2_2_1_1_1_1',
             'Body' => 'Test '.rand(1,9999999999)
-        ]);
-        $this->updateValidValues('cat2_2_1_1_1_1' , 'CountDiscussions', '++', false);
-        $this->updateValidValues('cat2_2_1_1_1_1' , 'CountAllDiscussions', '++');
+        ], 'cat2_2_1_1_1_1');
 
         $comment = $this->addComment([
             'DiscussionID' => $discussion['DiscussionID'],
             'Body' => 'Moderation controller test. LINE: '.__LINE__.' DATE: '.date('r')
-        ]);
+        ], 'cat2_2_1_1_1_1');
 
-        $this->updateValidValues('cat2_2_1_1_1_1' , 'CountComments', '++', false);
-        $this->updateValidValues('cat2_2_1_1_1_1' , 'CountAllComments', '++');
-        $this->updateValidValues('cat2_2_1_1_1_1' , 'LastDateInserted', $comment['DateInserted']);
 
         $this->assertTrue( true);
     }
 
-    protected function updateValidValues(string $catKey, string $fieldToUpdate, $newValue, bool $recursively = true) {
+    protected static function updateValidValues(string $catKey, string $fieldToUpdate, $newValue, bool $recursively = true) {
         do {
             $continue = false;
             switch ($newValue) {
                 case '++':
-                    //self::$validResponses[$fieldToUpdate][$catKey]++;
                     self::$categories[$catKey][$fieldToUpdate]++;
                     break;
                 case '--':
-                    //self::$validResponses[$fieldToUpdate][$catKey]--;
                     self::$categories[$catKey][$fieldToUpdate]--;
                     break;
                 default:
@@ -180,7 +165,24 @@ class ModerationControllerTest extends BaseTest {
         } while ($continue);
     }
 
-    protected static function addDiscussion(array $discussion) {
+    protected static function updateValidValuesOnMoveDiscussion(array $discussion, string $srcCategoryKey, string $destCategoryKey, bool $updateRecent = true, array $srcDiscussionToUpdate = []) {
+
+        // Right now CountDiscussions field is not updated at all  - which is wrong
+        // @todo We need to uncomment next 2 lines when bug is fixed
+        // self::updateValidValues($destCategoryKey,'CountDiscussions','++');
+        // self::updateValidValues($srcCategoryKey,'CountDiscussions','--');
+        self::updateValidValues($destCategoryKey , 'CountAllDiscussions', '++');
+        self::updateValidValues($srcCategoryKey , 'CountAllDiscussions', '--');
+        if ($updateRecent) {
+            self::updateValidValues($destCategoryKey , 'LastDateInserted', $discussion['DateInserted']);
+            self::updateValidValues($destCategoryKey , 'LastDiscussionID', $discussion['DiscussionID']);
+            //self::updateValidValues($srcCategoryKey , 'LastDateInserted', ($srcDiscussion['DateInserted'] ?? null));
+            //self::updateValidValues($srcCategoryKey , 'LastDiscussionID', ($srcDiscussion['DiscussionID'] ?? null));
+        }
+
+    }
+
+    protected static function addDiscussion(array $discussion, string $catKey) {
         $r = self::$api->post(
             '/post/discussion.json',
             $discussion
@@ -189,6 +191,14 @@ class ModerationControllerTest extends BaseTest {
             throwException('Failed to create new discussion: ' . json_encode($discussion));
         }
         $body = $r->getBody();
+        if (!empty($catKey)) {
+            self::updateValidValues($catKey , 'CountDiscussions', '++', false);
+            self::updateValidValues($catKey , 'CountAllDiscussions', '++');
+            self::updateValidValues($catKey , 'LastDateInserted', $body['Discussion']['DateInserted']);
+            self::updateValidValues($catKey , 'LastDiscussionID', $body['Discussion']['DiscussionID']);
+            self::updateValidValues($catKey , 'LastCommentID', null);
+        }
+
         return $body['Discussion'];
     }
 
@@ -204,7 +214,7 @@ class ModerationControllerTest extends BaseTest {
         return $body['Category'];
     }
 
-    protected static function addComment(array $comment) {
+    protected static function addComment(array $comment, string $catKey) {
         $r = self::$api->post(
             '/post/comment.json',
             $comment
@@ -213,10 +223,15 @@ class ModerationControllerTest extends BaseTest {
             throwException('Failed to add new comment: ' . json_encode($comment));
         }
         $body = $r->getBody();
+        if (!empty($catKey)) {
+            self::updateValidValues($catKey, 'CountComments', '++', false);
+            self::updateValidValues($catKey, 'CountAllComments', '++');
+            self::updateValidValues($catKey, 'LastDateInserted', $body['Comment']['DateInserted']);
+            self::updateValidValues($catKey , 'LastDiscussionID', $body['Comment']['DiscussionID']);
+            self::updateValidValues($catKey , 'LastCommentID', $body['Comment']['CommentID']);
+        }
         return $body['Comment'];
     }
-
-
 
     protected static function getCategory(int $categoryId) {
         $r = self::$api->get(
@@ -244,12 +259,17 @@ class ModerationControllerTest extends BaseTest {
             $this->assertEquals($category['DateInserted'], $cat['DateInserted'], 'DateInserted failed on  '.$catKey);
             $this->assertEquals($category['DateUpdated'], $cat['DateUpdated'], 'DateUpdated failed on  '.$catKey);
             $this->assertEquals($category['LastDateInserted'], $cat['LastDateInserted'], 'LastDateInserted failed on  '.$catKey);
-
+            $this->assertEquals($category['LastDiscussionID'], $cat['LastDiscussionID'], 'LastDiscussionID failed on  '.$catKey);
+            $this->assertEquals($category['LastCommentID'], $cat['LastCommentID'], 'LastCommentID failed on  '.$catKey);
         }
 
     }
 
     /**
+     * Use case #1:
+     * Src cat Lvl6 (cat2_2_1_1_1_1) has 1 discussion with 1 comment
+     * Dest cat Lvl3 (cat1_2_1) has 0 discussions
+     *
      * @depends testCategories
      */
     public function testConfirmDiscussionMoves() {
@@ -265,17 +285,7 @@ class ModerationControllerTest extends BaseTest {
 
         $this->assertEquals('200' , $status);
         $this->assertArrayHasKey('isHomepage' , $body);
-
-
-        $this->updateValidValues('cat1_2_1' , 'CountAllDiscussions', '++');
-        // Right now CountDiscussions field is not updated at all  - which is wrong
-        // @todo We need to uncomment next 2 lines when bug is fixed
-        // self::$validResponses['CountDiscussions']['cat1_2_1']++;
-        // self::$validResponses['CountDiscussions']['cat2_2_1_1_1_1']--;
-        $this->updateValidValues('cat2_2_1_1_1_1' , 'CountAllDiscussions', '--');
-
-        $this->updateValidValues('cat1_2_1' , 'LastDateInserted', $discussion['DateInserted']);
-
+        $this->updateValidValuesOnMoveDiscussion($discussion, 'cat2_2_1_1_1_1', 'cat1_2_1');
         $this->testCategories();
     }
 

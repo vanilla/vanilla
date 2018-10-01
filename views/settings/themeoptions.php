@@ -11,7 +11,7 @@
  *
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license https://vanillaforums.com Proprietary
+ * @license GPL-2.0-only
  */
 
 $hasCustomStyles = is_array($this->data('ThemeInfo.Options.Styles'));

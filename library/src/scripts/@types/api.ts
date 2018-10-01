@@ -1,3 +1,5 @@
+import { Omit } from "@library/@types/utils";
+
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -56,3 +58,11 @@ export interface IApiError {
         [key: string]: IFieldError[];
     };
 }
+
+interface IMultiType<T> {
+    recordType: T;
+    recordID: number;
+}
+
+export type MultiTypeRecord<T, Subtract extends keyof T, TypeName extends string> = Omit<T, Subtract> &
+    IMultiType<TypeName>;

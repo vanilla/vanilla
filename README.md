@@ -3,7 +3,7 @@
 
 ## Description
 
-A clean Vanilla theme focused on responsiveness.
+A responsive Vanilla theme with customization options.
 
 
 ## Customizations

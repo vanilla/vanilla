@@ -18,8 +18,6 @@ interface IProps {
  */
 export default class FramePanel extends React.PureComponent<IProps> {
     public render() {
-        return (
-            <div className={classNames("framePanel", "inheritHeight", this.props.className)}>{this.props.children}</div>
-        );
+        return <div className={classNames("framePanel", this.props.className)}>{this.props.children}</div>;
     }
 }

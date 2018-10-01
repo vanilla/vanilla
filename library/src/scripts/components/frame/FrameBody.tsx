@@ -18,8 +18,6 @@ export interface IFrameBodyProps {
  */
 export default class FrameBody extends React.PureComponent<IFrameBodyProps> {
     public render() {
-        return (
-            <div className={classNames("frame-body", "inheritHeight", this.props.className)}>{this.props.children}</div>
-        );
+        return <div className={classNames("frame-body", this.props.className)}>{this.props.children}</div>;
     }
 }

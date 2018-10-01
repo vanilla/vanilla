@@ -8,7 +8,7 @@ import classNames from "classnames";
 import { getOptionalID, IOptionalComponentID } from "@library/componentIDs";
 
 interface IProps extends IOptionalComponentID {
-    children: string | JSX.Element;
+    children: string | JSX.Element | JSX.Element[];
     className?: string;
     type?: string;
     disabled?: boolean;

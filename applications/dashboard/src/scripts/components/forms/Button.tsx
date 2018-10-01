@@ -8,12 +8,15 @@ import classNames from "classnames";
 import { getOptionalID, IOptionalComponentID } from "@library/componentIDs";
 
 interface IProps extends IOptionalComponentID {
+    children: string | JSX.Element;
     className?: string;
-    type: string;
-    content: string | Node;
+    type?: string;
     disabled?: boolean;
-    prefix: string;
+    prefix?: string;
     legacyMode?: boolean;
+    onClick?: () => void;
+    title?: string;
+    ariaLabel?: string;
 }
 
 interface IState {
@@ -45,8 +48,11 @@ export default class Button extends React.Component<IProps, IState> {
                 disabled={this.props.disabled}
                 type={this.props.type}
                 className={componentClasses}
+                onClick={this.props.onClick}
+                title={this.props.title}
+                aria-label={this.props.ariaLabel || this.props.title}
             >
-                {this.props.content}
+                {this.props.children}
             </button>
         );
     }

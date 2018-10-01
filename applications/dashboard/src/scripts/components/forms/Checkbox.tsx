@@ -21,7 +21,7 @@ interface IState {
     id: string;
 }
 
-export default class Button extends React.Component<IProps, IState> {
+export default class Checkbox extends React.Component<IProps, IState> {
     public static defaultProps = {
         disabled: false,
         id: false,

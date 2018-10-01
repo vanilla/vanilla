@@ -6,11 +6,10 @@
 
 import React, { ReactNode } from "react";
 import classNames from "classnames";
-import FramePanel from "@library/components/frame/FramePanel";
 
 interface IProps {
     className?: string;
-    children: JSX.Element;
+    children: JSX.Element | JSX.Element[];
 }
 
 /**

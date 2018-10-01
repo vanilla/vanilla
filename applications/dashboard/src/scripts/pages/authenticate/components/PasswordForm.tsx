@@ -105,7 +105,9 @@ export class PasswordForm extends React.Component<IProps, IState> {
                         </span>
                     </div>
                 </div>
-                <ButtonSubmit disabled={!this.allowSubmit} content={t("Sign In")} legacyMode={true} />
+                <ButtonSubmit disabled={!this.allowSubmit} legacyMode={true}>
+                    {t("Sign In")}
+                </ButtonSubmit>
             </form>
         );
     }

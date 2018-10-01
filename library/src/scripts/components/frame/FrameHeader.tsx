@@ -10,6 +10,7 @@ import Heading, { ICommonHeadingProps } from "@knowledge/components/Heading";
 import { t } from "@library/application";
 import { leftChevron } from "@library/components/Icons";
 import CloseButton from "@library/components/CloseButton";
+import Button from "@dashboard/components/forms/Button";
 
 interface ICommonFrameHeaderProps extends ICommonHeadingProps {
     closeFrame: () => void;
@@ -41,26 +42,20 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
 
         const heading = (
             <Heading title={stringTitle!} depth={this.props.depth}>
-                {componentTitle!}
+                {componentTitle}
             </Heading>
         );
 
-        let contents;
+        let contents = heading;
         if (this.props.onBackClick) {
             contents = (
-                <button
-                    title={backTitle}
-                    aria-label={backTitle}
-                    onClick={this.props.onBackClick}
-                    className="flyoutHeader-backButton"
-                    type="button"
-                >
-                    {leftChevron("flyoutHeader-backIcon")}
-                    {heading}
-                </button>
+                <Button title={backTitle} onClick={this.props.onBackClick} className="flyoutHeader-backButton">
+                    <React.Fragment>
+                        {leftChevron("flyoutHeader-backIcon")}
+                        {heading}
+                    </React.Fragment>
+                </Button>
             );
-        } else {
-            contents = heading;
         }
 
         return (

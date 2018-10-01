@@ -9,7 +9,7 @@ import { IOptionalComponentID } from "@library/componentIDs";
 import Button from "@dashboard/components/forms/Button";
 
 interface IProps extends IOptionalComponentID {
-    content: string | Node;
+    children: string | JSX.Element;
     className?: string;
     disabled?: boolean;
     legacyMode?: boolean;
@@ -39,12 +39,11 @@ export default class ButtonSubmit extends React.Component<IProps, IOptionalCompo
                 id={this.props.id}
                 disabled={this.props.disabled}
                 type="submit"
-                content={this.props.content}
                 className={componentClasses}
                 prefix="submitButton"
                 legacyMode={this.props.legacyMode}
             >
-                {this.props.content}
+                {this.props.children}
             </Button>
         );
     }

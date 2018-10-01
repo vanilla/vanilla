@@ -40,7 +40,10 @@ export default class Button extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const componentClasses = classNames("button", { Button: this.props.legacyMode }, this.props.className);
+        const componentClasses = classNames(
+            { button: this.props.legacyMode, Button: this.props.legacyMode },
+            this.props.className,
+        );
 
         return (
             <button

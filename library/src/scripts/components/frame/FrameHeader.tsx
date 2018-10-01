@@ -41,7 +41,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
         const componentTitle = "children" in this.props ? this.props.children : null;
 
         const heading = (
-            <Heading title={stringTitle!} depth={this.props.depth}>
+            <Heading title={stringTitle!} depth={this.props.depth} className="frameHeader-heading">
                 {componentTitle}
             </Heading>
         );
@@ -49,9 +49,9 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
         let contents = heading;
         if (this.props.onBackClick) {
             contents = (
-                <Button title={backTitle} onClick={this.props.onBackClick} className="flyoutHeader-backButton">
+                <Button title={backTitle} onClick={this.props.onBackClick} className="frameHeader-backButton">
                     <React.Fragment>
-                        {leftChevron("flyoutHeader-backIcon")}
+                        {leftChevron("frameHeader-backIcon")}
                         {heading}
                     </React.Fragment>
                 </Button>
@@ -61,7 +61,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
         return (
             <header className={classNames("frameHeader", this.props.className)}>
                 {contents}
-                <CloseButton className="flyoutHeader-close" onClick={this.props.closeFrame} />
+                <CloseButton className="frameHeader-close" onClick={this.props.closeFrame} />
             </header>
         );
     }

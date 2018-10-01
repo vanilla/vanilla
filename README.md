@@ -3,18 +3,17 @@
 
 ## Description
 
-A responsive, theme boilerplate for Vanilla in SCSS.
+A clean Vanilla theme focused on responsiveness.
 
 
-## Notes
+## Customizations
 
-- This theme contains javascript to animate the open and close of the mobile navigation menu.
-- This theme sets its own flyout open/close listeners.
-
-## Instalation
-
-Refer to the [installation guide](https://github.com/vanilla/themes/blob/master/vanilla-theme-boilerplate/guide.md). 
-
+- Javascript to animate the open and close of the mobile navigation menu.
+- Sets its own flyout open/close listeners.
+- Dependency on the [theme-boilerplate](https://www.npmjs.com/package/@vanillaforums/theme-boilerplate).
+- Overwrites the `themeOptions_create` to support `hasHeroBanner`, `hasFetureSearchbox` and `panelToLeft` customized options.
+- Custom options `hasHeroBanner`, `hasFetureSearchbox` are dependent on the Hero Image Plugin.
+- If Advanced Search Plugin is enabled, the theme will render advanced search module, otherwise, it will render the search module.
 
 ## Building Styles / Javascript / Images
 

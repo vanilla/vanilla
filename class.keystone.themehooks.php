@@ -39,6 +39,7 @@ class KeystoneThemeHooks extends Gdn_Plugin {
     /**
      * Runs every page load
      *
+     *
      * @param Gdn_Controller $sender This could be any controller
      *
      * @return void
@@ -72,7 +73,7 @@ class KeystoneThemeHooks extends Gdn_Plugin {
     }
 
     /**
-     * Overwrite themeOptions() method to support custom fields
+     * Overwrites method to support `hasHeroBanner`, `hasFetureSearchbox` and `panelToLeft` custom fields
      *
      * @param SettingsController $sender
      */
@@ -86,9 +87,10 @@ class KeystoneThemeHooks extends Gdn_Plugin {
         $themeManager = Gdn::themeManager();
         $sender->setData('ThemeInfo', $themeManager->enabledThemeInfo());
 
+        // set hasHeroImagePlugin to view
         $sender->setData('hasHeroImagePlugin', class_exists('HeroImagePlugin'));
 
-        //get toggle values
+        //get toggle values from config
         $checkboxes = c("Garden.ThemeOptions.Options");
 
         foreach ($checkboxes  as $key => $value) {

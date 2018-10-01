@@ -7,6 +7,8 @@
     '</div>';
 }
 /**
+ * This view is overwriten to render custom `hasHeroBanner`, `hasFetureSearchbox` and `panelToLeft` toggle fields
+ *
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license https://vanillaforums.com Proprietary
@@ -89,7 +91,9 @@ echo $this->Form->errors();
 <section>
     <?php echo subheading(t('Options')); ?>
     <ul>
-        <?php if( $this->Data['hasHeroImagePlugin']){ ?>
+        <?php
+            //Only render these fields if hasHeroImagePlugin == true
+            if( $this->Data['hasHeroImagePlugin']){ ?>
             <li class="form-group"><?php
                 echo $this->Form->toggle("ThemeOptions.Options.hasHeroBanner", t("Integrate Hero Image plugin"), [], "Displays \"Hero Image\" plugin below the header. \"Hero Image\" plugin needs to be enabled for this option to work properly."); ?>
             </li>

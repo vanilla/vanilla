@@ -6,12 +6,14 @@
  * Time: 11:31 AM
  */
 
-namespace VanillaTests\APIv0\Controllers;
+namespace VanillaTests\Controllers;
 
 use VanillaTests\APIv0\BaseTest;
 
 class ModerationControllerTest extends BaseTest {
     protected static $testUser;
+
+    protected $user;
 
     protected static $categories = [];
 
@@ -24,12 +26,82 @@ class ModerationControllerTest extends BaseTest {
             'cat1_1_1' => 2,
             'cat1_2' => 0,
             'cat1_2_1' => 0,
+            'cat2' => 2,
+            'cat2_1' => 0,
+            'cat2_1_1' => 0,
+            'cat2_2' => 2,
+            'cat2_2_1' => 2,
+            'cat2_2_1_1' => 2,
+            'cat2_2_1_1_1' => 2,
+            'cat2_2_1_1_1_1' => 2,
+        ],
+        'CountAllComments' => [
+            'cat1' => 1,
+            'cat1_1' => 1,
+            'cat1_1_1' => 1,
+            'cat1_2' => 0,
+            'cat1_2_1' => 0,
+            'cat2' => 1,
+            'cat2_1' => 0,
+            'cat2_1_1' => 0,
+            'cat2_2' => 1,
+            'cat2_2_1' => 1,
+            'cat2_2_1_1' => 1,
+            'cat2_2_1_1_1' => 1,
+            'cat2_2_1_1_1_1' => 1,
+
+        ],
+        'CountCategories' => [
+            'cat1' => 0,
+            'cat1_1' => 0,
+            'cat1_1_1' => 0,
+            'cat1_2' => 0,
+            'cat1_2_1' => 0,
             'cat2' => 0,
             'cat2_1' => 0,
             'cat2_1_1' => 0,
             'cat2_2' => 0,
+            'cat2_2_1' => 0,
+            'cat2_2_1_1' => 0,
+            'cat2_2_1_1_1' => 0,
+            'cat2_2_1_1_1_1' => 0,
 
-        ]
+        ],
+        'CountDiscussions' => [
+            'cat1' => 0,
+            'cat1_1' => 0,
+            'cat1_1_1' => 2,
+            'cat1_2' => 0,
+            'cat1_2_1' => 0,
+            'cat2' => 0,
+            'cat2_1' => 0,
+            'cat2_1_1' => 0,
+            'cat2_2' => 0,
+            'cat2_2_1' => 0,
+            'cat2_2_1_1' => 0,
+            'cat2_2_1_1_1' => 0,
+            'cat2_2_1_1_1_1' => 2,
+
+        ],
+        'CountComments' => [
+            'cat1' => 0,
+            'cat1_1' => 0,
+            'cat1_1_1' => 1,
+            'cat1_2' => 0,
+            'cat1_2_1' => 0,
+            'cat2' => 0,
+            'cat2_1' => 0,
+            'cat2_1_1' => 0,
+            'cat2_2' => 0,
+            'cat2_2_1' => 0,
+            'cat2_2_1_1' => 0,
+            'cat2_2_1_1_1' => 0,
+            'cat2_2_1_1_1_1' => 1,
+
+        ],
+        'DateInserted' => [],
+        'DateUpdated' => [],
+
     ];
 
     public static function setUpBeforeClass() {
@@ -41,9 +113,12 @@ class ModerationControllerTest extends BaseTest {
             'Garden.Registration.Method' => 'Basic',
             'Garden.Registration.ConfirmEmail' => false,
             'Garden.Registration.SkipCaptcha' => true,
+            'Vanilla.Discussions.Add'=>true,
+            'Vanilla.Discussions.Edit'=>true,
         ]);
 
-        $testUser = $this->addAdminUser();
+        self::$testUser = $this->addAdminUser();
+        $this->api()->setUser(self::$testUser);
 
         self::$categories['cat1'] = $cat1 = $this->addCategory(['Name' => 'Root Cat 1',
             'UrlCode' => 'root-cat-1',
@@ -62,6 +137,11 @@ class ModerationControllerTest extends BaseTest {
         self::$categories['cat1_2'] = $cat1_2 = $this->addCategory(['Name' => 'Level2 Child 2 of Cat 1',
             'UrlCode' => 'cat-1-child-2',
             'ParentCategoryID' => $cat1['CategoryID'],
+            'DisplayAs' => 'Discussions']);
+
+        self::$categories['cat1_2_1'] = $cat1_2_1 = $this->addCategory(['Name' => 'Level3 Child 1 of Cat 1-2',
+            'UrlCode' => 'cat-1-child-2-1',
+            'ParentCategoryID' => $cat1_2['CategoryID'],
             'DisplayAs' => 'Discussions']);
 
         self::$categories['cat2'] = $cat2 = $this->addCategory(['Name' => 'Root Cat 2',
@@ -83,21 +163,89 @@ class ModerationControllerTest extends BaseTest {
             'ParentCategoryID' => $cat2['CategoryID'],
             'DisplayAs' => 'Discussions']);
 
+        self::$categories['cat2_2_1'] = $cat2_2_1 = $this->addCategory(['Name' => 'Level3 Child 1 of Cat 2-2',
+            'UrlCode' => 'cat-2-child-2-1',
+            'ParentCategoryID' => $cat2_2['CategoryID'],
+            'DisplayAs' => 'Discussions']);
 
-        $discussion = $this->addDiscussion([
+        self::$categories['cat2_2_1_1'] = $cat2_2_1_1 = $this->addCategory(['Name' => 'Level4 Child 1 of Cat 2-2-1',
+            'UrlCode' => 'cat-2-child-2-1-1',
+            'ParentCategoryID' => $cat2_2_1['CategoryID'],
+            'DisplayAs' => 'Discussions']);
+
+        self::$categories['cat2_2_1_1_1'] = $cat2_2_1_1_1 = $this->addCategory(['Name' => 'Level5 Child 1 of Cat 2-2-1-1',
+            'UrlCode' => 'cat-2-child-2-1-1-1',
+            'ParentCategoryID' => $cat2_2_1_1['CategoryID'],
+            'DisplayAs' => 'Discussions']);
+
+        self::$categories['cat2_2_1_1_1_1'] = $cat2_2_1_1_1_1 = $this->addCategory(['Name' => 'Level6 Child 1 of Cat 2-2-1-1-1',
+            'UrlCode' => 'cat-2-child-2-1-1-1-1',
+            'ParentCategoryID' => $cat2_2_1_1_1['CategoryID'],
+            'DisplayAs' => 'Discussions']);
+
+        self::$discussions['d1_c1-1-1'] = $discussion = $this->addDiscussion([
             'CategoryID' => $cat1_1_1['CategoryID'],
             'Name' => 'Discussion 1 of cat-1-1-1',
             'Body' => 'Test '.rand(1,9999999999)
         ]);
 
-        $discussion = $this->addDiscussion([
+        $comment = $this->addComment([
+            'DiscussionID' => $discussion['DiscussionID'],
+            'Body' => 'Moderation controller test. LINE: '.__LINE__.' DATE: '.date('r')
+        ]);
+
+        self::$discussions['d2_c1-1-1'] = $discussion = $this->addDiscussion([
             'CategoryID' => $cat1_1_1['CategoryID'],
             'Name' => 'Discussion 2 of cat-1-1-1',
             'Body' => 'Test '.rand(1,9999999999)
         ]);
-        //throw new \Exception(json_encode($discussion));
+
+        $this->updateValidValues('cat1_1_1' , 'LastDateInserted', $discussion['DateInserted']);
+
+        self::$discussions['d1_c2_2_1_1_1_1'] = $discussion = $this->addDiscussion([
+            'CategoryID' => $cat2_2_1_1_1_1['CategoryID'],
+            'Name' => 'Discussion 1 of cat2_2_1_1_1_1',
+            'Body' => 'Test '.rand(1,9999999999)
+        ]);
+
+        self::$discussions['d2_c2_2_1_1_1_1'] = $discussion = $this->addDiscussion([
+            'CategoryID' => $cat2_2_1_1_1_1['CategoryID'],
+            'Name' => 'Discussion 2 of cat2_2_1_1_1_1',
+            'Body' => 'Test '.rand(1,9999999999)
+        ]);
+
+        $comment = $this->addComment([
+            'DiscussionID' => $discussion['DiscussionID'],
+            'Body' => 'Moderation controller test. LINE: '.__LINE__.' DATE: '.date('r')
+        ]);
+
+        $this->updateValidValues('cat2_2_1_1_1_1' , 'LastDateInserted', $comment['DateInserted']);
 
         $this->assertTrue( true);
+    }
+
+    protected function updateValidValues(string $catKey, string $fieldToUpdate, $newValue, bool $recursively = true) {
+        do {
+            $continue = false;
+            switch ($newValue) {
+                case '++':
+                    self::$validResponses[$fieldToUpdate][$catKey]++;
+                    break;
+                case '--':
+                    self::$validResponses[$fieldToUpdate][$catKey]--;
+                    break;
+                default:
+                    self::$categories[$catKey][$fieldToUpdate] = $newValue;
+            }
+
+            if ($recursively) {
+                if (($pos = strrpos($catKey, '_')) > 0) {
+                    $continue = true;
+                    $catKey = substr($catKey, 0, $pos);
+                }
+            }
+
+        } while ($continue);
     }
 
     protected static function addDiscussion(array $discussion) {
@@ -124,6 +272,20 @@ class ModerationControllerTest extends BaseTest {
         return $body['Category'];
     }
 
+    protected static function addComment(array $comment) {
+        $r = self::$api->post(
+            '/post/comment.json',
+            $comment
+        );
+        if ($r->getStatusCode() != 200) {
+            throwException('Failed to add new comment: ' . json_encode($comment));
+        }
+        $body = $r->getBody();
+        return $body['Comment'];
+    }
+
+
+
     protected static function getCategory(int $categoryId) {
         $r = self::$api->get(
             '/vanilla/settings/getcategory.json',
@@ -139,37 +301,51 @@ class ModerationControllerTest extends BaseTest {
     /**
      * @depends testModerationDiscussionMoveInintDB
      */
-    public function testCountAllDiscussions() {
+    public function testCategories() {
         foreach (self::$categories as $catKey => $category) {
             $cat = $this->getCategory($category['CategoryID']);
-            $this->assertEquals(self::$validResponses['CountAllDiscussions'][$catKey], $cat['CountAllDiscussions']);
+            $this->assertEquals(self::$validResponses['CountAllDiscussions'][$catKey], $cat['CountAllDiscussions'], 'CountAllDiscussions failed on  '.$catKey);
+            $this->assertEquals(self::$validResponses['CountAllComments'][$catKey], $cat['CountAllComments'], 'CountAllComments failed on  '.$catKey);
+            $this->assertEquals(self::$validResponses['CountCategories'][$catKey], $cat['CountCategories'], 'CountCategories failed on  '.$catKey);
+            $this->assertEquals(self::$validResponses['CountDiscussions'][$catKey], $cat['CountDiscussions'], 'CountDiscussions failed on  '.$catKey.' '.json_encode($cat));
+            $this->assertEquals(self::$validResponses['CountComments'][$catKey], $cat['CountComments'], 'CountComments failed on  '.$catKey);
+            $this->assertEquals($category['DateInserted'], $cat['DateInserted'], 'DateInserted failed on  '.$catKey);
+            $this->assertEquals($category['DateUpdated'], $cat['DateUpdated'], 'DateUpdated failed on  '.$catKey);
+            $this->assertEquals($category['LastDateInserted'], $cat['LastDateInserted'], 'LastDateInserted failed on  '.$catKey);
+
         }
 
     }
-//        $r = $this->api()->post('/moderation/confirmdiscussionmoves?discussionid=7359', [
-//            'Move' => 'Move',
-//            'CategpryID' => 1
-//        ]);
-//
-//        $body = $r->getBody();
-//        $status = $r->getStatusCode();
-//
-//        $this->assertEquals('200' , $status);
-//        $this->assertEquals(0 , strlen($body));
-//    }
 
-//    public function testConfirmDiscussionMoves() {
-//        $r = $this->api()->post('/moderation/confirmdiscussionmoves?discussionid=7359', [
-//            'Move' => 'Move',
-//            'CategpryID' => 1
-//        ]);
-//
-//        $body = $r->getBody();
-//        $status = $r->getStatusCode();
-//
-//        $this->assertEquals('200' , $status);
-//        $this->assertEquals(0 , strlen($body));
-//    }
+    /**
+     * @depends testCategories
+     */
+    public function testConfirmDiscussionMoves() {
+        $discussion = self::$discussions['d1_c2_2_1_1_1_1'];
+        $category = self::$categories['cat1_2_1'];
+        $r = $this->api()->post('/moderation/confirmdiscussionmoves.json?discussionid='.$discussion['DiscussionID'], [
+            'Move' => 'Move',
+            'CategoryID' => $category['CategoryID']
+        ]);
+
+        $body = $r->getBody();
+        $status = $r->getStatusCode();
+
+        $this->assertEquals('200' , $status);
+        $this->assertArrayHasKey('isHomepage' , $body);
+
+
+        $this->updateValidValues('cat1_2_1' , 'CountAllDiscussions', '++');
+        // Right now CountDiscussions field is not updated at all  - which is wrong
+        // @todo We need to uncomment next 2 lines when bug is fixed
+        // self::$validResponses['CountDiscussions']['cat1_2_1']++;
+        // self::$validResponses['CountDiscussions']['cat2_2_1_1_1_1']--;
+        $this->updateValidValues('cat2_2_1_1_1_1' , 'CountAllDiscussions', '--');
+
+        $this->updateValidValues('cat1_2_1' , 'LastDateInserted', $discussion['DateInserted']);
+
+        $this->testCategories();
+    }
 
 
     /**

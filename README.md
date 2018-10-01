@@ -1,4 +1,4 @@
-# Vanilla Theme Boilerplate
+# Keystone
 
 
 ## Description

@@ -9,7 +9,7 @@ import { IOptionalComponentID } from "@library/componentIDs";
 import Button from "@dashboard/components/forms/Button";
 
 interface IProps extends IOptionalComponentID {
-    children: string | JSX.Element;
+    children: React.ReactNode;
     className?: string;
     disabled?: boolean;
     legacyMode?: boolean;

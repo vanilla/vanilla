@@ -151,8 +151,15 @@ export class Editor extends React.Component<IProps> {
     /**
      * Get the content out of the quill editor.
      */
-    public getEditorContent(): DeltaOperation[] | undefined {
+    public getEditorOperations(): DeltaOperation[] | undefined {
         return this.quill.getContents().ops;
+    }
+
+    /**
+     * Get the content out of the quill editor.
+     */
+    public getEditorText(): string {
+        return this.quill.getText();
     }
 
     /**
@@ -162,6 +169,7 @@ export class Editor extends React.Component<IProps> {
      */
     public setEditorContent(content: DeltaOperation[]) {
         this.quill.setContents(content);
+        this.quill.getModule("history").clear();
     }
 
     /**
@@ -173,7 +181,7 @@ export class Editor extends React.Component<IProps> {
      */
     private onQuillUpdate = (type: string, newValue, oldValue, source: Sources) => {
         if (this.props.onChange && type === Quill.events.TEXT_CHANGE && source !== Quill.sources.SILENT) {
-            this.props.onChange(this.getEditorContent()!);
+            this.props.onChange(this.getEditorOperations()!);
         }
 
         let shouldDispatch = false;

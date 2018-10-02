@@ -5,9 +5,9 @@
  */
 
 export { default as DropDown } from "./DropDown";
-export { default as DropdownItem } from "./items/DropdownItem";
-export { default as DropdownItemButton } from "./items/DropdownItemButton";
-export { default as DropdownItemLink } from "./items/DropdownItemLink";
-export { default as DropdownItemMetas } from "./items/DropdownItemMetas";
-export { default as DropdownItemRadio } from "./items/DropdownItemRadio";
-export { default as DropdownItemSeparator } from "./items/DropdownItemSeparator";
+export { default as DropDownItem } from "./items/DropDownItem";
+export { default as DropDownItemButton } from "./items/DropDownItemButton";
+export { default as DropDownItemLink } from "./items/DropDownItemLink";
+export { default as DropDownItemMetas } from "./items/DropDownItemMetas";
+export { default as DropDownItemRadio } from "./items/DropDownItemRadio";
+export { default as DropDownItemSeparator } from "./items/DropDownItemSeparator";

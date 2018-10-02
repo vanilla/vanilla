@@ -126,7 +126,7 @@ export function categoryIcon(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             className={classNames("icon", "icon-categoryIcon", className)}
-            viewBox="0 0 24 24"
+            viewBox="0 0 14.25 12.75"
             aria-hidden="true"
         >
             <title>{title}</title>
@@ -145,7 +145,7 @@ export function selectedCategory(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             className={classNames("icon", "icon-selectedCategory", className)}
-            viewBox="0 0 24 24"
+            viewBox="0 0 16.8 13"
             aria-hidden="true"
         >
             <title>{title}</title>

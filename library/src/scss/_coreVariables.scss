@@ -133,8 +133,9 @@ $global-default_easing                               : ease-out !default;
     Icons
 \* -------------------------------------------------------------- */
 
-$icon-default_size                                   : 24px !default;
 $icon-large_size                                     : 32px !default;
+$icon-default_size                                   : 24px !default;
+$icon-small_size                                     : 18px !default;
 
 /* -------------------------------------------------------------- *\
     Layout
@@ -286,19 +287,18 @@ $formElement-disabled_opacity                        : .5 !default;
     Overlays (Menus, flyouts and Modals)
 \* -------------------------------------------------------------- */
 
-@function modifyColorBasedOnLightness($color, $percentage) {
+@function getBlackOrWhiteBasedOnColor($color) {
     @if (lightness($color) > 50) {
-        @return lighten($color, $percentage); // Lighter backgorund
+        @return white; // Lighter backgorund
     } @else {
-        @return darken($color, $percentage); // Darker backgorund
+        @return black; // Darker backgorund
     }
 }
 
-
-$overlay_bgColor                                        : rgba(modifyColorBasedOnLightness($global-color_fg, 100%), .2)!default;
-$overlay-dropShadow_color                               : mix($overlay_bgColor, $global-color_bg, 20%) !default;
+$overlay_bgColor                                        : rgba(getBlackOrWhiteBasedOnColor($global-color_fg), .2)!default;
+$overlay-dropShadow_color                               : $overlay_bgColor !default;
 $overlay-border_color                                   : mix($overlay_bgColor, $global-color_bg, 5%) !default;
-$overlay-dropShadow                                     : 0 5px 10px $overlay-dropShadow_color !default;
+$overlay-dropShadow                                     : 0 5px 10px $overlay_bgColor !default;
 $overlay-borderRadius                                   : $global_borderRadius !default;
 
 /* -------------------------------------------------------------- *\

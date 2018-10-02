@@ -84,7 +84,9 @@ export class Editor extends React.Component<IProps> {
     }
 
     public componentWillUnmount() {
-        removeDelegatedEvent(this.delegatedHandlerHash);
+        if (this.delegatedHandlerHash) {
+            removeDelegatedEvent(this.delegatedHandlerHash);
+        }
     }
 
     /**

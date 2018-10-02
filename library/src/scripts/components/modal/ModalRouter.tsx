@@ -19,11 +19,9 @@ class ModalRouter extends React.Component<IProps> {
     public render() {
         const { location, modalRoutes, pageRoutes } = this.props;
 
-        const mergedPageRoutes = [...React.Children.toArray(pageRoutes), ...React.Children.toArray(modalRoutes)];
-
         return (
             <React.Fragment>
-                <Switch location={this.isModal ? this.lastLocation : location}>{mergedPageRoutes}</Switch>
+                <Switch location={this.isModal ? this.lastLocation : location}>{pageRoutes}</Switch>
                 <Switch>{this.isModal ? modalRoutes : null}</Switch>
             </React.Fragment>
         );

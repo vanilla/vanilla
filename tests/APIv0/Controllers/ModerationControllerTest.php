@@ -90,6 +90,17 @@ class ModerationControllerTest extends BaseTest {
         // self::updateValidValues($srcCategoryKey,'CountDiscussions','--');
         self::updateValidValues($destCategoryKey, 'CountAllDiscussions', '++');
         self::updateValidValues($srcCategoryKey, 'CountAllDiscussions', '--');
+        if (!empty(self::$discussions[$discussion['discussionKey']]['LastCommentID'] ?? null)){
+            self::updateValidValues($destCategoryKey, 'CountAllComments', '++');
+            self::updateValidValues($srcCategoryKey, 'CountAllComments', '--');
+            if ($discussion['LastCommentID'] > self::$categories[$destCategoryKey]['LastCommentID']) {
+                self::updateValidValues($destCategoryKey, 'LastCommentID', $discussion['LastCommentID']);
+                self::updateValidValues($srcCategoryKey, 'LastCommentID', ($srcDiscussionToUpdate['LastCommentID'] ?? null));
+                //self::$discussions[$discussionKey]['LastCommentID'] = $comment['CommentID'];
+                //self::$discussions[$discussionKey]['DateLastComment'] = $comment['DateInserted'];
+            }
+        }
+
         if ($updateRecent) {
             if ($discussion['DateInserted'] > self::$categories[$destCategoryKey]['LastDateInserted']) {
                 self::updateValidValues($destCategoryKey, 'LastDateInserted', $discussion['DateInserted']);
@@ -192,7 +203,7 @@ class ModerationControllerTest extends BaseTest {
      * @param string $catKey
      * @return mixed
      */
-    protected static function addComment(array $comment, string $catKey) {
+    protected static function addComment(array $comment, string $discussionKey, string $catKey) {
         $r = self::$api->post(
             '/post/comment.json',
             $comment
@@ -201,14 +212,17 @@ class ModerationControllerTest extends BaseTest {
             throwException('Failed to add new comment: ' . json_encode($comment));
         }
         $body = $r->getBody();
+        $comment = $body['Comment'];
         if (!empty($catKey)) {
+            self::$discussions[$discussionKey]['LastCommentID'] = $comment['CommentID'];
+            self::$discussions[$discussionKey]['DateLastComment'] = $comment['DateInserted'];
             self::updateValidValues($catKey, 'CountComments', '++', false);
             self::updateValidValues($catKey, 'CountAllComments', '++');
-            self::updateValidValues($catKey, 'LastDateInserted', $body['Comment']['DateInserted']);
-            self::updateValidValues($catKey, 'LastDiscussionID', $body['Comment']['DiscussionID']);
-            self::updateValidValues($catKey, 'LastCommentID', $body['Comment']['CommentID']);
+            self::updateValidValues($catKey, 'LastDateInserted', $comment['DateInserted']);
+            self::updateValidValues($catKey, 'LastDiscussionID', $comment['DiscussionID']);
+            self::updateValidValues($catKey, 'LastCommentID', $comment['CommentID']);
         }
-        return $body['Comment'];
+        return $comment;
     }
 
     /**
@@ -314,6 +328,28 @@ class ModerationControllerTest extends BaseTest {
         $this->moveDiscussion(self::$discussions['d1_case6'], 'cat2_1_1_1_1_1_1', 'cat2_1_1');
         $this->moveDiscussion(self::$discussions['d1_case5'], 'cat2_1_1_1_1_1', 'cat3_1_1');
         $this->moveDiscussion(self::$discussions['d1_case5'], 'cat3_1_1', 'cat2_1', self::$discussions['d1_case4']);
+        $this->recheckCategories();
+    }
+    /**
+     * Use case #5:
+     * New comment add to existing discussion and move that discussion after
+     *
+     * @depends testModerationDiscussionMoveInintDB
+     * @depends testMoveNewDiscussionsEmptyCategories
+     * @depends testMoveExistingDiscussionToEmptyCategory
+     * @depends testMoveExistingDiscussionToNotEmptyCategory
+     * @depends testMoveMostRecentDiscussionToNotEmptyCategory
+     */
+    public function testAddCommentMoveDiscussion() {
+        $comment = $this->addComment([
+            'DiscussionID' => self::$discussions['d1_case1']['DiscussionID'],
+            'Body' => 'Moderation controller test.'
+        ], 'd1_case1','cat2_1');
+
+        $this->recheckCategories();
+
+        $this->moveDiscussion(self::$discussions['d1_case1'], 'cat2_1', 'cat3_1_1', self::$discussions['d1_case6']);
+
         $this->recheckCategories();
     }
 

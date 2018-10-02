@@ -15,7 +15,7 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 
 interface ICommonFrameHeaderProps extends ICommonHeadingProps {
     closeFrame: () => void;
-    onBackClick: () => void;
+    onBackClick?: () => void;
 }
 
 export interface IStringTitle extends ICommonFrameHeaderProps {
@@ -49,9 +49,9 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                     aria-label={backTitle}
                     baseClass={ButtonBaseClass.ICON}
                     onClick={this.props.onBackClick}
-                    className="frameHeader-backButton isCompact"
+                    className="frameHeader-backButton"
                 >
-                    {leftChevron("frameHeader-backIcon isLarge")}
+                    {leftChevron("frameHeader-backIcon")}
                 </Button>
             );
         }

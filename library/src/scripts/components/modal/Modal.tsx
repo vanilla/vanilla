@@ -6,6 +6,7 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
+import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 import TabHandler from "@library/TabHandler";
 import { logError } from "@library/utility";
 import { getRequiredID } from "@library/componentIDs";
@@ -116,7 +117,7 @@ export default class Modal extends React.Component<IProps, IState> {
         this.focusInitialElement();
         document.addEventListener("keydown", this.handleEscapeKeyPress);
         this.props.appContainer!.setAttribute("aria-hidden", true);
-        document.body.style.position = "fixed";
+        disableBodyScroll(this.selfRef.current!);
     }
 
     /**
@@ -125,7 +126,7 @@ export default class Modal extends React.Component<IProps, IState> {
     public componentWillUnmount() {
         this.props.appContainer!.removeAttribute("aria-hidden");
         document.removeEventListener("keydown", this.handleEscapeKeyPress);
-        document.body.style.position = "initial";
+        enableBodyScroll(this.selfRef.current!);
         const prevFocussedElement = Modal.focusHistory.pop() || document.body;
         prevFocussedElement.focus();
     }

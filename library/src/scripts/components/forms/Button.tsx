@@ -1,4 +1,4 @@
-/*
+/**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -31,6 +31,9 @@ export enum ButtonBaseClass {
     CUSTOM = "",
 }
 
+/**
+ * A stylable, configurable button component.
+ */
 export default class Button extends React.Component<IProps, IState> {
     public static defaultProps = {
         id: false,

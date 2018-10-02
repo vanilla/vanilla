@@ -1,21 +1,24 @@
 /**
- * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPL-2.0-only
  */
 
 import * as React from "react";
 import className from "classnames";
 import { Link } from "react-router-dom";
 
-export interface IBreadcrumbProps {
+interface IProps {
     className?: string;
     lastElement: boolean;
     url: string;
     name: string;
 }
 
-export default class Breadcrumb extends React.Component<IBreadcrumbProps> {
+/**
+ * A component representing a single crumb in a breadcrumb component.
+ */
+export default class Breadcrumb extends React.Component<IProps> {
     public render() {
         let ariaCurrent;
         if (this.props.lastElement) {

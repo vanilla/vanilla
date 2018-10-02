@@ -1,4 +1,4 @@
-/*
+/**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import className from "classnames";
-import { t } from "../application";
+import { t } from "@library/application";
 import Breadcrumb from "@library/components/Breadcrumb";
 
 export interface ICrumb {
@@ -14,12 +14,15 @@ export interface ICrumb {
     url: string;
 }
 
-export interface IBreadcrumbsProps {
+export interface IProps {
     children: ICrumb[];
     className?: string;
 }
 
-export default class Breadcrumbs extends React.Component<IBreadcrumbsProps> {
+/**
+ * A component representing a string of breadcrumbs. Passa n arrow crumb props as children.
+ */
+export default class Breadcrumbs extends React.Component<IProps> {
     public render() {
         if (this.props.children.length > 1) {
             const crumbCount = this.props.children.length - 1;

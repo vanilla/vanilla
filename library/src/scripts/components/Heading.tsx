@@ -1,7 +1,7 @@
 /**
- * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPL-2.0-only
  */
 
 import * as React from "react";
@@ -22,6 +22,9 @@ export interface IComponentTitle extends ICommonHeadingProps {
 
 export type IHeadingProps = IStringTitle | IComponentTitle;
 
+/**
+ * A component representing a element.
+ */
 export default class Heading extends React.Component<IHeadingProps> {
     public static defaultProps = {
         depth: 2,

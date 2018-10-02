@@ -1,9 +1,9 @@
-import { Omit } from "@library/@types/utils";
-
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+
+import { Omit } from "@library/@types/utils";
 
 export const enum LoadStatus {
     PENDING = "PENDING",

@@ -1,4 +1,4 @@
-/*
+/**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -22,6 +22,9 @@ interface IState {
     id: string;
 }
 
+/**
+ * A styled, accessible checkbox component.
+ */
 export default class Checkbox extends React.Component<IProps, IState> {
     public static defaultProps = {
         disabled: false,

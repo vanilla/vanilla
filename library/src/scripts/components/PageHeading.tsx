@@ -1,4 +1,4 @@
-/*
+/**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -16,6 +16,10 @@ interface IPageHeading {
     menu?: JSX.Element;
 }
 
+/**
+ * A component representing a top level page heading.
+ * Can be configured with an options menu and a backlink.
+ */
 export default class PageHeading extends React.Component<IPageHeading> {
     public render() {
         return (

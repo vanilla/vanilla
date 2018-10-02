@@ -1,4 +1,4 @@
-/*
+/**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -13,6 +13,11 @@ interface IUserContent {
     content: string;
 }
 
+/**
+ * A component for placing rendered user content.
+ *
+ * This will ensure that all embeds/etc are initialized.
+ */
 export default class UserContent extends React.Component<IUserContent> {
     public render() {
         return (

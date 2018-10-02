@@ -1,4 +1,4 @@
-/*
+/**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -10,13 +10,16 @@ import { t } from "../application";
 import { Link } from "react-router-dom";
 import { leftChevron } from "@library/components/Icons";
 
-interface IBackLink {
+interface IProps {
     url?: string;
     title?: string;
     className?: string;
 }
 
-export default class BackLink extends React.Component<IBackLink> {
+/**
+ * A link button for navigating backwards. Uses a back arrow icon.
+ */
+export default class BackLink extends React.Component<IProps> {
     public static defaultProps = {
         title: t("Back"),
     };

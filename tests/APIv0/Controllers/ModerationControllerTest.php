@@ -1,15 +1,17 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: alexander
- * Date: 2018-09-27
- * Time: 11:31 AM
+ * @author Alexander Kim <alexander.k@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
  */
 
 namespace VanillaTests\Controllers;
 
 use VanillaTests\APIv0\BaseTest;
 
+/**
+ * Class ModerationControllerTest: tests confirmdiscussionmoves action
+ */
 class ModerationControllerTest extends BaseTest {
     /**
      * @var array Array of categories holding initial and continually updated valid values for tests
@@ -20,7 +22,9 @@ class ModerationControllerTest extends BaseTest {
      */
     protected static $discussions = [];
 
-
+    /**
+     * Initial config set up for test
+     */
     public function testModerationDiscussionMoveInintDB() {
         $this->api()->saveToConfig([
             'Garden.Registration.Method' => 'Basic',
@@ -32,6 +36,14 @@ class ModerationControllerTest extends BaseTest {
         $this->api()->setUser($this->addAdminUser());
     }
 
+    /**
+     * Helper function updates valid data array for tests
+     *
+     * @param string $catKey
+     * @param string $fieldToUpdate
+     * @param mixed $newValue
+     * @param bool $recursively
+     */
     protected static function updateValidValues(string $catKey, string $fieldToUpdate, $newValue, bool $recursively = true) {
         do {
             $continue = false;
@@ -52,28 +64,40 @@ class ModerationControllerTest extends BaseTest {
                     $catKey = substr($catKey, 0, $pos);
                 }
             }
-
         } while ($continue);
     }
 
-    protected static function updateValidValuesOnMoveDiscussion(array $discussion, string $srcCategoryKey, string $destCategoryKey, bool $updateRecent = true, array $srcDiscussionToUpdate = []) {
+    /**
+     * Update valid data after discussion being moved from one category to another
+     *
+     * @param array $discussion
+     * @param string $srcCategoryKey
+     * @param string $destCategoryKey
+     * @param bool $updateRecent
+     * @param array $srcDiscussionToUpdate
+     */
+    protected static function updateValidValuesOnMoveDiscussion(
+        array $discussion,
+        string $srcCategoryKey,
+        string $destCategoryKey,
+        bool $updateRecent = true,
+        array $srcDiscussionToUpdate = []
+    ) {
         self::$discussions[$discussion['discussionKey']]['CategoryID'] = self::$categories[$destCategoryKey]['CategoryID'];
         // Right now CountDiscussions field is not updated at all  - which is wrong
         // @todo We need to uncomment next 2 lines when bug is fixed
         // self::updateValidValues($destCategoryKey,'CountDiscussions','++');
         // self::updateValidValues($srcCategoryKey,'CountDiscussions','--');
-
-
-        self::updateValidValues($destCategoryKey , 'CountAllDiscussions', '++');
-        self::updateValidValues($srcCategoryKey , 'CountAllDiscussions', '--');
+        self::updateValidValues($destCategoryKey, 'CountAllDiscussions', '++');
+        self::updateValidValues($srcCategoryKey, 'CountAllDiscussions', '--');
         if ($updateRecent) {
             if ($discussion['DateInserted'] > self::$categories[$destCategoryKey]['LastDateInserted']) {
-                self::updateValidValues($destCategoryKey , 'LastDateInserted', $discussion['DateInserted']);
-                self::updateValidValues($destCategoryKey , 'LastDiscussionID', $discussion['DiscussionID']);
+                self::updateValidValues($destCategoryKey, 'LastDateInserted', $discussion['DateInserted']);
+                self::updateValidValues($destCategoryKey, 'LastDiscussionID', $discussion['DiscussionID']);
             } else {
                 //echo $destCategoryKey.':'.$discussion['DateInserted'].':'.self::$categories[$destCategoryKey]['LastDateInserted']."\n";
-                self::updateValidValues($destCategoryKey , 'LastDateInserted', self::$categories[$destCategoryKey]['LastDateInserted']);
-                self::updateValidValues($destCategoryKey , 'LastDiscussionID', self::$categories[$destCategoryKey]['LastDiscussionID']);
+                self::updateValidValues($destCategoryKey, 'LastDateInserted', self::$categories[$destCategoryKey]['LastDateInserted']);
+                self::updateValidValues($destCategoryKey, 'LastDiscussionID', self::$categories[$destCategoryKey]['LastDiscussionID']);
             }
 
             // Right now LastDateInserted and LastDiscussionID fields are not updated against source Category - which is wrong
@@ -81,12 +105,18 @@ class ModerationControllerTest extends BaseTest {
             //self::updateValidValues($srcCategoryKey , 'LastDateInserted', ($srcDiscussion['DateInserted'] ?? null));
             //self::updateValidValues($srcCategoryKey , 'LastDiscussionID', ($srcDiscussion['DiscussionID'] ?? null));
             // @todo until then lets update in non-recursive mode to reproduce current data flow
-            self::updateValidValues($srcCategoryKey , 'LastDateInserted', ($srcDiscussionToUpdate['DateInserted'] ?? null), false);
-            self::updateValidValues($srcCategoryKey , 'LastDiscussionID', ($srcDiscussionToUpdate['DiscussionID'] ?? null), false);
+            self::updateValidValues($srcCategoryKey, 'LastDateInserted', ($srcDiscussionToUpdate['DateInserted'] ?? null), false);
+            self::updateValidValues($srcCategoryKey, 'LastDiscussionID', ($srcDiscussionToUpdate['DiscussionID'] ?? null), false);
         }
-
     }
 
+    /**
+     * Add new discussion to test database.
+     *
+     * @param array $discussion
+     * @param string $catKey
+     * @return mixed
+     */
     protected static function addDiscussion(array $discussion, string $catKey) {
         $r = self::$api->post(
             '/post/discussion.json',
@@ -97,24 +127,40 @@ class ModerationControllerTest extends BaseTest {
         }
         $body = $r->getBody();
         if (!empty($catKey)) {
-            self::updateValidValues($catKey , 'CountDiscussions', '++', false);
-            self::updateValidValues($catKey , 'CountAllDiscussions', '++');
-            self::updateValidValues($catKey , 'LastDateInserted', $body['Discussion']['DateInserted']);
-            self::updateValidValues($catKey , 'LastDiscussionID', $body['Discussion']['DiscussionID']);
-            self::updateValidValues($catKey , 'LastCommentID', null);
+            self::updateValidValues($catKey, 'CountDiscussions', '++', false);
+            self::updateValidValues($catKey, 'CountAllDiscussions', '++');
+            self::updateValidValues($catKey, 'LastDateInserted', $body['Discussion']['DateInserted']);
+            self::updateValidValues($catKey, 'LastDiscussionID', $body['Discussion']['DiscussionID']);
+            self::updateValidValues($catKey, 'LastCommentID', null);
         }
 
         return $body['Discussion'];
     }
+
+    /**
+     * Execute move discussion api call
+     *
+     * @param array $discussion
+     * @param string $srcCatKey
+     * @param string $destCatKey
+     * @param array $srcDiscussion
+     */
     protected function moveDiscussion(array $discussion, string $srcCatKey, string $destCatKey, array $srcDiscussion = []) {
         $r = self::$api->post('/moderation/confirmdiscussionmoves.json?discussionid='.$discussion['DiscussionID'], [
         'Move' => 'Move',
         'CategoryID' => self::$categories[$destCatKey]['CategoryID']
         ]);
 
-        $this->updateValidValuesOnMoveDiscussion($discussion, $srcCatKey, $destCatKey, true , $srcDiscussion);
+        $this->updateValidValuesOnMoveDiscussion($discussion, $srcCatKey, $destCatKey, true, $srcDiscussion);
     }
 
+    /**
+     * Add new category to test database.
+     *
+     * @param array $category
+     * @param string $catKey
+     * @return mixed
+     */
     protected static function addCategory(array $category, string $catKey = '') {
         if (!empty($catKey)) {
             if (($pos = strrpos($catKey, '_')) > 0) {
@@ -139,6 +185,13 @@ class ModerationControllerTest extends BaseTest {
         return $body['Category'];
     }
 
+    /**
+     * Add new comment to test database.
+     *
+     * @param array $comment
+     * @param string $catKey
+     * @return mixed
+     */
     protected static function addComment(array $comment, string $catKey) {
         $r = self::$api->post(
             '/post/comment.json',
@@ -152,15 +205,21 @@ class ModerationControllerTest extends BaseTest {
             self::updateValidValues($catKey, 'CountComments', '++', false);
             self::updateValidValues($catKey, 'CountAllComments', '++');
             self::updateValidValues($catKey, 'LastDateInserted', $body['Comment']['DateInserted']);
-            self::updateValidValues($catKey , 'LastDiscussionID', $body['Comment']['DiscussionID']);
-            self::updateValidValues($catKey , 'LastCommentID', $body['Comment']['CommentID']);
+            self::updateValidValues($catKey, 'LastDiscussionID', $body['Comment']['DiscussionID']);
+            self::updateValidValues($catKey, 'LastCommentID', $body['Comment']['CommentID']);
         }
         return $body['Comment'];
     }
 
+    /**
+     * Returns actual category from app (from test database).
+     *
+     * @param int $categoryId
+     * @return mixed
+     */
     protected static function getCategory(int $categoryId) {
         $r = self::$api->get(
-            '/vanilla/settings/getcategory.json?'.rand(0,1000),
+            '/vanilla/settings/getcategory.json?'.rand(0, 1000),
             ['CategoryID'=>$categoryId]
         );
         if ($r->getStatusCode() != 200) {
@@ -171,7 +230,8 @@ class ModerationControllerTest extends BaseTest {
     }
 
     /**
-     * @depends testModerationDiscussionMoveInintDB
+     * Execute asserts to compare prepared valid data
+     * vs actual data getting from app/test database through APIv0
      */
     public function recheckCategories() {
         foreach (self::$categories as $catKey => $category) {
@@ -179,7 +239,7 @@ class ModerationControllerTest extends BaseTest {
             $this->assertEquals($category['CountAllDiscussions'], $cat['CountAllDiscussions'], 'CountAllDiscussions failed on  '.$catKey);
             $this->assertEquals($category['CountAllComments'], $cat['CountAllComments'], 'CountAllComments failed on  '.$catKey);
             $this->assertEquals($category['CountCategories'], $cat['CountCategories'], 'CountCategories failed on  '.$catKey);
-            $this->assertEquals($category['CountDiscussions'], $cat['CountDiscussions'], 'CountDiscussions failed on  '.$catKey.' '.json_encode($cat));
+            $this->assertEquals($category['CountDiscussions'], $cat['CountDiscussions'], 'CountDiscussions failed on  '.$catKey);
             $this->assertEquals($category['CountComments'], $cat['CountComments'], 'CountComments failed on  '.$catKey);
             $this->assertEquals($category['DateInserted'], $cat['DateInserted'], 'DateInserted failed on  '.$catKey);
             $this->assertEquals($category['DateUpdated'], $cat['DateUpdated'], 'DateUpdated failed on  '.$catKey);
@@ -187,7 +247,6 @@ class ModerationControllerTest extends BaseTest {
             $this->assertEquals($category['LastDiscussionID'], $cat['LastDiscussionID'], 'LastDiscussionID failed on  '.$catKey);
             $this->assertEquals($category['LastCommentID'], $cat['LastCommentID'], 'LastCommentID failed on  '.$catKey);
         }
-
     }
 
     /**
@@ -229,10 +288,11 @@ class ModerationControllerTest extends BaseTest {
 
     /**
      * Use case #3:
-     * Src cat Lvl1-6
-     * Dest cat cat2_1 has 0-1-2-3 discussions
-     * but has LastDiscussionID fresher than we move in.
+     * Move existing discussion to non empty category
+     * where destination category already has LastDiscussionID fresher than we move in.
      *
+     * @depends testModerationDiscussionMoveInintDB
+     * @depends testMoveNewDiscussionsEmptyCategories
      * @depends testMoveExistingDiscussionToEmptyCategory
      */
     public function testMoveExistingDiscussionToNotEmptyCategory() {
@@ -241,9 +301,33 @@ class ModerationControllerTest extends BaseTest {
         $this->moveDiscussion(self::$discussions['d1_case2'], 'cat3_1_1', $destCatKey, self::$discussions['d1_case4']);
         $this->recheckCategories();
     }
+    /**
+     * Use case #4:
+     * Move most recent discussion from one category to another
+     *
+     * @depends testModerationDiscussionMoveInintDB
+     * @depends testMoveNewDiscussionsEmptyCategories
+     * @depends testMoveExistingDiscussionToEmptyCategory
+     * @depends testMoveExistingDiscussionToNotEmptyCategory
+     */
+    public function testMoveMostRecentDiscussionToNotEmptyCategory() {
+        $this->moveDiscussion(self::$discussions['d1_case6'], 'cat2_1_1_1_1_1_1', 'cat2_1_1');
+        $this->moveDiscussion(self::$discussions['d1_case5'], 'cat2_1_1_1_1_1', 'cat3_1_1');
+        $this->moveDiscussion(self::$discussions['d1_case5'], 'cat3_1_1', 'cat2_1', self::$discussions['d1_case4']);
+        $this->recheckCategories();
+    }
 
-    public function createAndMove(string $srcCatKey, string $destCatKey, string $discussionKey ) {
-        if ( !($srcCategory = (self::$categories[$srcCatKey] ?? false))) {
+    /**
+     * Helper function:
+     * automatically creates source and destination categories with its parents recursively
+     * create discussion under source category and move it to destination
+     *
+     * @param string $srcCatKey
+     * @param string $destCatKey
+     * @param string $discussionKey
+     */
+    public function createAndMove(string $srcCatKey, string $destCatKey, string $discussionKey) {
+        if (!($srcCategory = (self::$categories[$srcCatKey] ?? false))) {
             self::$categories[$srcCatKey] = $srcCategory = self::addCategory([
                 'Name' => 'Test cat '.$srcCatKey,
                 'UrlCode' => 'test-cat-'.$srcCatKey,
@@ -253,9 +337,9 @@ class ModerationControllerTest extends BaseTest {
             'Name' => 'Discussion 1 of '.$srcCatKey,
             'Body' => 'Test '.$srcCatKey.' '.$destCatKey,
             'CategoryID' => $srcCategory['CategoryID']
-        ],$srcCatKey);
+        ], $srcCatKey);
         $discussion['discussionKey'] = self::$discussions[$discussionKey]['discussionKey'] = $discussionKey;
-        if ( !($destCategory = (self::$categories[$destCatKey] ?? false))) {
+        if (!($destCategory = (self::$categories[$destCatKey] ?? false))) {
             self::$categories[$destCatKey] = $destCategory = self::addCategory([
                 'Name' => ' Test cat ' . $destCatKey,
                 'UrlCode' => 'test-cat-' . $destCatKey,
@@ -293,7 +377,6 @@ class ModerationControllerTest extends BaseTest {
             '/user/add.json',
             http_build_query($adminUser)
         );
-        $b = $r->getBody();
         $this->assertResponseSuccess($r);
 
         // Query the user in the database.

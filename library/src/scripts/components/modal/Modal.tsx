@@ -1,19 +1,30 @@
 /**
- * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPL-2.0-only
  */
 
 import React from "react";
 import ReactDOM from "react-dom";
 import TabHandler from "@library/TabHandler";
 import { logError } from "@library/utility";
+import { getRequiredID } from "@library/componentIDs";
+import classNames from "classnames";
+import { ModalSizes } from "./ModalSizes";
 
 interface IProps {
-    exitHandler: () => void;
-    appContainer: Element;
-    container: Element;
+    className?: string;
+    exitHandler?: () => void;
+    appContainer?: Element;
+    container?: Element;
     children: React.ReactNode;
+    initialFocus?: HTMLElement;
+    description?: string; //For Accessibility
+    size: ModalSizes;
+}
+
+interface IState {
+    id: string;
 }
 
 /**
@@ -26,18 +37,62 @@ interface IProps {
  * - Prevents scrolling of the body.
  * - Focuses the first focusable element in the Modal.
  */
-export default class Modal extends React.Component<IProps> {
+export default class Modal extends React.Component<IProps, IState> {
+    public static defaultProps = {
+        appContainer: document.getElementById("app"),
+        container: document.getElementById("modals"),
+    };
+
+    public static focusHistory: HTMLElement[] = [];
+
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
+
+    private get modalID() {
+        return this.state.id + "-modal";
+    }
+
+    private get descriptionID() {
+        return this.state.id + "-description";
+    }
+
+    public constructor(props) {
+        super(props);
+        this.state = {
+            id: getRequiredID(props, "modal"),
+        };
+    }
 
     /**
      * Render the contents into a portal.
      */
     public render() {
         return ReactDOM.createPortal(
-            <div className="modal inheritHeight" ref={this.selfRef} onKeyDown={this.handleTabbing}>
-                {this.props.children}
+            <div className="overlay">
+                <div
+                    id={this.modalID}
+                    role="dialog"
+                    aria-modal={true}
+                    className={classNames(
+                        "modal",
+                        {
+                            isFullScreen: this.props.size === ModalSizes.FULL_SCREEN,
+                            isLarge: this.props.size === ModalSizes.LARGE,
+                            isMedium: this.props.size === ModalSizes.MEDIUM,
+                            isSmall: this.props.size === ModalSizes.SMALL,
+                        },
+                        this.props.className,
+                    )}
+                    ref={this.selfRef}
+                    onKeyDown={this.handleTabbing}
+                    aria-describedby={this.descriptionID}
+                >
+                    <div id={this.descriptionID} className="sr-only">
+                        {this.props.description}
+                    </div>
+                    {this.props.children}
+                </div>
             </div>,
-            this.props.container,
+            this.props.container!,
         );
     }
 
@@ -57,9 +112,10 @@ export default class Modal extends React.Component<IProps> {
      * Everything here should be torn down in componentWillUnmount
      */
     public componentDidMount() {
+        Modal.focusHistory.push(document.activeElement as HTMLElement);
         this.focusInitialElement();
         document.addEventListener("keydown", this.handleEscapeKeyPress);
-        this.props.appContainer.setAttribute("aria-hidden", true);
+        this.props.appContainer!.setAttribute("aria-hidden", true);
         document.body.style.position = "fixed";
     }
 
@@ -67,9 +123,11 @@ export default class Modal extends React.Component<IProps> {
      * Tear down setup from componentDidMount
      */
     public componentWillUnmount() {
-        this.props.appContainer.removeAttribute("aria-hidden");
+        this.props.appContainer!.removeAttribute("aria-hidden");
         document.removeEventListener("keydown", this.handleEscapeKeyPress);
         document.body.style.position = "initial";
+        const prevFocussedElement = Modal.focusHistory.pop() || document.body;
+        prevFocussedElement.focus();
     }
 
     /**
@@ -108,7 +166,9 @@ export default class Modal extends React.Component<IProps> {
         if (event.keyCode === escKey) {
             event.preventDefault();
             event.stopImmediatePropagation();
-            this.props.exitHandler();
+            if (this.props.exitHandler) {
+                this.props.exitHandler();
+            }
         }
     };
 

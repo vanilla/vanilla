@@ -6,8 +6,9 @@
 
 import React from "react";
 import { withRouter, RouteComponentProps } from "react-router-dom";
-import Modal from "./Modal";
 import FullPageLoader from "@library/components/FullPageLoader";
+import { ModalSizes } from "./ModalSizes";
+import Modal from "./Modal";
 
 interface IProps extends RouteComponentProps<{}> {}
 
@@ -17,11 +18,7 @@ interface IProps extends RouteComponentProps<{}> {}
 class ModalLoader extends React.Component<IProps> {
     public render() {
         return (
-            <Modal
-                exitHandler={this.navigateToBacklink}
-                appContainer={document.getElementById("app")!}
-                container={document.getElementById("modals")!}
-            >
+            <Modal size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>
                 <FullPageLoader />
             </Modal>
         );

@@ -5,6 +5,7 @@
  */
 
 import * as React from "react";
+import classNames from "classnames";
 import Sentence, { IWord } from "@library/components/Sentence";
 import DropDownItem from "./DropDownItem";
 

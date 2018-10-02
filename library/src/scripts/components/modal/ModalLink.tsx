@@ -32,4 +32,4 @@ export class ModalLink extends React.Component<IProps> {
     }
 }
 
-export default withRouter(ModalLink as any);
+export default withRouter(ModalLink as any) as any;

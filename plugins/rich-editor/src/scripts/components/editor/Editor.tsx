@@ -33,6 +33,7 @@ interface IProps {
     legacyTextArea?: HTMLInputElement;
     isPrimaryEditor: boolean;
     legacyMode: boolean;
+    onChange?: (newContent: DeltaOperation[]) => void;
 }
 
 export class Editor extends React.Component<IProps> {
@@ -48,61 +49,6 @@ export class Editor extends React.Component<IProps> {
         super(props);
         log("Initializing Rich Editor");
         this.hasUploadPermission = hasPermission("uploads.add");
-    }
-
-    public componentDidMount() {
-        window.document.body.classList.add("hasFullHeight");
-        // Setup quill
-        registerQuill();
-        const options = { theme: "vanilla" };
-        this.quill = new Quill(this.quillMountRef!.current!, options);
-
-        this.editorID = getIDForQuill(this.quill);
-
-        // Setup syncing
-        this.setupLegacyTextAreaSync();
-        this.setupDebugPasteListener();
-        this.store.dispatch(actions.createInstance(this.editorID));
-        this.quill.on(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
-
-        // Add a listener for a force selection update.
-        document.addEventListener(SELECTION_UPDATE, () =>
-            window.requestAnimationFrame(() => {
-                this.onQuillUpdate(Quill.events.SELECTION_CHANGE, null, null, Quill.sources.USER);
-            }),
-        );
-
-        this.addQuoteHandler();
-
-        // Once we've created our quill instance we need to force an update to allow all of the quill dependent
-        // Modules to render.
-        this.forceUpdate();
-    }
-
-    public componentDidUpdate() {
-        window.document.body.classList.add("hasFullHeight");
-    }
-
-    public componentWillUnmount() {
-        if (this.delegatedHandlerHash) {
-            removeDelegatedEvent(this.delegatedHandlerHash);
-        }
-    }
-
-    /**
-     * Get the content out of the quill editor.
-     */
-    public getEditorContent(): DeltaOperation[] | undefined {
-        return this.quill.getContents().ops;
-    }
-
-    /**
-     * Set the quill editor contents.
-     *
-     * @param content The delta to set.
-     */
-    public setEditorContent(content: DeltaOperation[]) {
-        this.quill.setContents(content);
     }
 
     public render() {
@@ -161,6 +107,64 @@ export class Editor extends React.Component<IProps> {
     }
 
     /**
+     * Initial editor setup.
+     */
+    public componentDidMount() {
+        document.body.classList.add("hasFullHeight");
+
+        // Setup quill
+        registerQuill();
+        const options = { theme: "vanilla" };
+        this.quill = new Quill(this.quillMountRef!.current!, options);
+        this.editorID = getIDForQuill(this.quill);
+
+        // Setup syncing
+        this.setupLegacyTextAreaSync();
+        this.setupDebugPasteListener();
+        this.store.dispatch(actions.createInstance(this.editorID));
+        this.quill.on(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
+
+        // Add a listener for a force selection update.
+        document.addEventListener(SELECTION_UPDATE, () =>
+            window.requestAnimationFrame(() => {
+                this.onQuillUpdate(Quill.events.SELECTION_CHANGE, null, null, Quill.sources.USER);
+            }),
+        );
+
+        this.addQuoteHandler();
+
+        // Once we've created our quill instance we need to force an update to allow all of the quill dependent
+        // Modules to render.
+        this.forceUpdate();
+    }
+
+    public componentDidUpdate() {
+        window.document.body.classList.add("hasFullHeight");
+    }
+
+    public componentWillUnmount() {
+        if (this.delegatedHandlerHash) {
+            removeDelegatedEvent(this.delegatedHandlerHash);
+        }
+    }
+
+    /**
+     * Get the content out of the quill editor.
+     */
+    public getEditorContent(): DeltaOperation[] | undefined {
+        return this.quill.getContents().ops;
+    }
+
+    /**
+     * Set the quill editor contents.
+     *
+     * @param content The delta to set.
+     */
+    public setEditorContent(content: DeltaOperation[]) {
+        this.quill.setContents(content);
+    }
+
+    /**
      * Quill dispatches a lot of unnecessary updates. We need to filter out only the ones we want.
      *
      * We need
@@ -168,6 +172,10 @@ export class Editor extends React.Component<IProps> {
      * - Every selection change event (even the "silent" ones).
      */
     private onQuillUpdate = (type: string, newValue, oldValue, source: Sources) => {
+        if (this.props.onChange && type === Quill.events.TEXT_CHANGE && source !== Quill.sources.SILENT) {
+            this.props.onChange(this.getEditorContent()!);
+        }
+
         let shouldDispatch = false;
         if (type === Quill.events.SELECTION_CHANGE) {
             shouldDispatch = true;

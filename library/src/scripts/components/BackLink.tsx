@@ -16,6 +16,9 @@ interface IProps extends RouteComponentProps<{}> {
     className?: string;
 }
 
+/**
+ * A link button for navigating backwards. Uses a back arrow icon.
+ */
 export class BackLink extends React.Component<IProps> {
     public static defaultProps = {
         title: t("Back"),

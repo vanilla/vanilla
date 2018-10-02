@@ -47,7 +47,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                 <Button
                     title={backTitle}
                     aria-label={backTitle}
-                    baseClass={ButtonBaseClass.CUSTOM}
+                    baseClass={ButtonBaseClass.ICON}
                     onClick={this.props.onBackClick}
                     className="frameHeader-backButton"
                 >

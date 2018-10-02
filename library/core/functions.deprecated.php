@@ -296,6 +296,7 @@ if (!function_exists('formatDottedAssignment')) {
      * @deprecated
      */
     function formatDottedAssignment(&$array, $prefix, $value) {
+        \Vanilla\Utility\Deprecation::log();
         if (is_array($value)) {
             // If $Value doesn't contain a key of "0" OR it does and it's value IS
             // an array, this should be treated as an associative array.

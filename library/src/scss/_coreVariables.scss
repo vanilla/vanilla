@@ -283,13 +283,23 @@ $formElement-panel_boxShadow                         : 0 1px 3px 0 $formElement-
 $formElement-disabled_opacity                        : .5 !default;
 
 /* -------------------------------------------------------------- *\
-    menu
+    Overlays (Menus, flyouts and Modals)
 \* -------------------------------------------------------------- */
 
-$menu-dropShadow_color                               : mix($global-color_fg, $global-color_bg, 20%) !default;
-$menu-border_color                                   : mix($global-color_fg, $global-color_bg, 5%) !default;
-$menu_dropShadow                                     : 0 5px 10px $menu-dropShadow_color !default;
-$menu_borderRadius                                   : $global_borderRadius !default;
+@function modifyColorBasedOnLightness($color, $percentage) {
+    @if (lightness($color) > 50) {
+        @return lighten($color, $percentage); // Lighter backgorund
+    } @else {
+        @return darken($color, $percentage); // Darker backgorund
+    }
+}
+
+
+$overlay_bgColor                                        : rgba(modifyColorBasedOnLightness($global-color_fg, 100%), .2)!default;
+$overlay-dropShadow_color                               : mix($overlay_bgColor, $global-color_bg, 20%) !default;
+$overlay-border_color                                   : mix($overlay_bgColor, $global-color_bg, 5%) !default;
+$overlay-dropShadow                                     : 0 5px 10px $overlay-dropShadow_color !default;
+$overlay-borderRadius                                   : $global_borderRadius !default;
 
 /* -------------------------------------------------------------- *\
     Buttons

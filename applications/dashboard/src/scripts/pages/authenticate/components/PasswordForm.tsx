@@ -8,8 +8,8 @@ import { t } from "@library/application";
 import React from "react";
 import { withRouter, Link } from "react-router-dom";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
-import Checkbox from "@dashboard/components/forms/Checkbox";
-import ButtonSubmit from "@dashboard/components/forms/ButtonSubmit";
+import Checkbox from "@library/components/forms/Checkbox";
+import ButtonSubmit from "@library/components/forms/ButtonSubmit";
 import Paragraph from "@dashboard/components/forms/Paragraph";
 import { IRequiredComponentID, getRequiredID } from "@library/componentIDs";
 import { IStoreState, IPasswordState } from "@dashboard/@types/state";
@@ -105,7 +105,9 @@ export class PasswordForm extends React.Component<IProps, IState> {
                         </span>
                     </div>
                 </div>
-                <ButtonSubmit disabled={!this.allowSubmit} content={t("Sign In")} />
+                <ButtonSubmit disabled={!this.allowSubmit} legacyMode={true}>
+                    {t("Sign In")}
+                </ButtonSubmit>
             </form>
         );
     }

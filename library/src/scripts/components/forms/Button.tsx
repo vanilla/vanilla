@@ -1,11 +1,12 @@
-/**
+/*
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
 import classNames from "classnames";
-import { getOptionalID, IOptionalComponentID } from "@library/componentIDs";
+import { getOptionalID, IOptionalComponentID } from "../../componentIDs";
 
 interface IProps extends IOptionalComponentID {
     children: React.ReactNode;
@@ -17,10 +18,17 @@ interface IProps extends IOptionalComponentID {
     onClick?: () => void;
     title?: string;
     ariaLabel?: string;
+    baseClass?: ButtonBaseClass;
 }
 
 interface IState {
     id?: string;
+}
+
+export enum ButtonBaseClass {
+    STANDARD = "button",
+    ICON = "button-icon",
+    CUSTOM = "",
 }
 
 export default class Button extends React.Component<IProps, IState> {
@@ -30,6 +38,7 @@ export default class Button extends React.Component<IProps, IState> {
         type: "button",
         prefix: "button",
         legacyMode: false,
+        baseClass: ButtonBaseClass.STANDARD,
     };
 
     constructor(props) {
@@ -41,7 +50,8 @@ export default class Button extends React.Component<IProps, IState> {
 
     public render() {
         const componentClasses = classNames(
-            { button: this.props.legacyMode, Button: this.props.legacyMode },
+            this.props.baseClass,
+            { Button: this.props.legacyMode },
             this.props.className,
         );
 

@@ -1,12 +1,14 @@
-/**
+/*
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
 import classNames from "classnames";
-import { IOptionalComponentID } from "@library/componentIDs";
-import Button from "@dashboard/components/forms/Button";
+import { IOptionalComponentID } from "../../componentIDs";
+import Button from "@library/components/forms/Button";
+
 
 interface IProps extends IOptionalComponentID {
     children: React.ReactNode;

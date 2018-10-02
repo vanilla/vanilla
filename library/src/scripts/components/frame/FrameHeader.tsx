@@ -6,11 +6,11 @@
 
 import React from "react";
 import classNames from "classnames";
-import Heading, { ICommonHeadingProps } from "@knowledge/components/Heading";
+import Heading, { ICommonHeadingProps } from "@knowledge/../Heading";
 import { t } from "@library/application";
 import { leftChevron } from "@library/components/Icons";
 import CloseButton from "@library/components/CloseButton";
-import Button from "@dashboard/components/forms/Button";
+import Button, { ButtonBaseClass } from "@dashboard/../forms/Button";
 
 interface ICommonFrameHeaderProps extends ICommonHeadingProps {
     closeFrame: () => void;
@@ -40,27 +40,27 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
         const stringTitle = "title" in this.props ? this.props.title : null;
         const componentTitle = "children" in this.props ? this.props.children : null;
 
-        const heading = (
-            <Heading title={stringTitle!} depth={this.props.depth} className="frameHeader-heading">
-                {componentTitle}
-            </Heading>
-        );
-
-        let contents = heading;
+        let backLink;
         if (this.props.onBackClick) {
-            contents = (
-                <Button title={backTitle} onClick={this.props.onBackClick} className="frameHeader-backButton">
-                    <React.Fragment>
-                        {leftChevron("frameHeader-backIcon")}
-                        {heading}
-                    </React.Fragment>
+            backLink = (
+                <Button
+                    title={backTitle}
+                    aria-label={backTitle}
+                    baseClass={ButtonBaseClass.CUSTOM}
+                    onClick={this.props.onBackClick}
+                    className="frameHeader-backButton"
+                >
+                    {leftChevron("frameHeader-backIcon")}
                 </Button>
             );
         }
 
         return (
             <header className={classNames("frameHeader", this.props.className)}>
-                {contents}
+                {backLink}
+                <Heading title={stringTitle!} depth={this.props.depth} className="frameHeader-heading">
+                    {componentTitle}
+                </Heading>
                 <CloseButton className="frameHeader-close" onClick={this.props.closeFrame} />
             </header>
         );

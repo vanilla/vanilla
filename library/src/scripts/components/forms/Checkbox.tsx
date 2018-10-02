@@ -1,4 +1,5 @@
-/**
+/*
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
@@ -6,7 +7,8 @@
 import { t } from "@library/application";
 import React from "react";
 import classNames from "classnames";
-import { getOptionalID, IOptionalComponentID } from "@library/componentIDs";
+import { IOptionalComponentID, getOptionalID } from "@library/componentIDs";
+
 
 interface IProps extends IOptionalComponentID {
     id?: string;

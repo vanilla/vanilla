@@ -22,120 +22,17 @@ class ModerationControllerTest extends BaseTest {
 
     protected static $discussions = [];
 
-    public static function setUpBeforeClass() {
-        parent::setUpBeforeClass();
-    }
 
     public function testModerationDiscussionMoveInintDB() {
         $this->api()->saveToConfig([
             'Garden.Registration.Method' => 'Basic',
             'Garden.Registration.ConfirmEmail' => false,
             'Garden.Registration.SkipCaptcha' => true,
+            //'Cache.Enabled' => false,
         ]);
 
         self::$testUser = $this->addAdminUser();
         $this->api()->setUser(self::$testUser);
-
-        self::$categories['cat1'] = $cat1 = $this->addCategory(['Name' => 'Root Cat 1',
-            'UrlCode' => 'root-cat-1',
-            'DisplayAs' => 'Discussions']);
-
-        self::$categories['cat1_1'] = $cat1_1 = $this->addCategory(['Name' => 'Level2 Child 1 of Cat 1',
-            'UrlCode' => 'cat-1-child-1',
-            'ParentCategoryID' => $cat1['CategoryID'],
-            'DisplayAs' => 'Discussions']);
-
-        self::$categories['cat1_1_1'] = $cat1_1_1 = $this->addCategory(['Name' => 'Level3 Child 1-1-1',
-            'UrlCode' => 'cat-1-child-1-1',
-            'ParentCategoryID' => $cat1_1['CategoryID'],
-            'DisplayAs' => 'Discussions']);
-
-        self::$categories['cat1_2'] = $cat1_2 = $this->addCategory(['Name' => 'Level2 Child 2 of Cat 1',
-            'UrlCode' => 'cat-1-child-2',
-            'ParentCategoryID' => $cat1['CategoryID'],
-            'DisplayAs' => 'Discussions']);
-
-        self::$categories['cat1_2_1'] = $cat1_2_1 = $this->addCategory(['Name' => 'Level3 Child 1 of Cat 1-2',
-            'UrlCode' => 'cat-1-child-2-1',
-            'ParentCategoryID' => $cat1_2['CategoryID'],
-            'DisplayAs' => 'Discussions']);
-
-        self::$categories['cat2'] = $cat2 = $this->addCategory(['Name' => 'Root Cat 2',
-            'UrlCode' => 'root-cat-2',
-            'DisplayAs' => 'Discussions']);
-
-        self::$categories['cat2_1'] = $cat2_1 = $this->addCategory(['Name' => 'Level2 Child 1 of Cat 2',
-            'UrlCode' => 'cat-2-child-1',
-            'ParentCategoryID' => $cat2['CategoryID'],
-            'DisplayAs' => 'Discussions']);
-
-        self::$categories['cat2_1_1'] = $cat2_1_1 = $this->addCategory(['Name' => 'Level3 Child 2-1-1',
-            'UrlCode' => 'cat-2-child-1-1',
-            'ParentCategoryID' => $cat2_1['CategoryID'],
-            'DisplayAs' => 'Discussions']);
-
-        self::$categories['cat2_2'] = $cat2_2 = $this->addCategory(['Name' => 'Level2 Child 2 of Cat 2',
-            'UrlCode' => 'cat-2-child-2',
-            'ParentCategoryID' => $cat2['CategoryID'],
-            'DisplayAs' => 'Discussions']);
-
-        self::$categories['cat2_2_1'] = $cat2_2_1 = $this->addCategory(['Name' => 'Level3 Child 1 of Cat 2-2',
-            'UrlCode' => 'cat-2-child-2-1',
-            'ParentCategoryID' => $cat2_2['CategoryID'],
-            'DisplayAs' => 'Discussions']);
-
-        self::$categories['cat2_2_1_1'] = $cat2_2_1_1 = $this->addCategory(['Name' => 'Level4 Child 1 of Cat 2-2-1',
-            'UrlCode' => 'cat-2-child-2-1-1',
-            'ParentCategoryID' => $cat2_2_1['CategoryID'],
-            'DisplayAs' => 'Discussions']);
-
-        self::$categories['cat2_2_1_1_1'] = $cat2_2_1_1_1 = $this->addCategory(['Name' => 'Level5 Child 1 of Cat 2-2-1-1',
-            'UrlCode' => 'cat-2-child-2-1-1-1',
-            'ParentCategoryID' => $cat2_2_1_1['CategoryID'],
-            'DisplayAs' => 'Discussions']);
-
-        self::$categories['cat2_2_1_1_1_1'] = $cat2_2_1_1_1_1 = $this->addCategory(['Name' => 'Level6 Child 1 of Cat 2-2-1-1-1',
-            'UrlCode' => 'cat-2-child-2-1-1-1-1',
-            'ParentCategoryID' => $cat2_2_1_1_1['CategoryID'],
-            'DisplayAs' => 'Discussions']);
-
-        self::$discussions['d1_c1-1-1'] = $discussion = $this->addDiscussion([
-            'CategoryID' => $cat1_1_1['CategoryID'],
-            'Name' => 'Discussion 1 of cat1-1-1',
-            'Body' => 'Test '.rand(1,9999999999)
-        ], 'cat1_1_1');
-
-
-        $comment = $this->addComment([
-            'DiscussionID' => $discussion['DiscussionID'],
-            'Body' => 'Moderation controller test. LINE: '.__LINE__.' DATE: '.date('r')
-        ], 'cat1_1_1');
-
-        self::$discussions['d2_c1-1-1'] = $discussion = $this->addDiscussion([
-            'CategoryID' => $cat1_1_1['CategoryID'],
-            'Name' => 'Discussion 2 of cat1-1-1',
-            'Body' => 'Test '.rand(1,9999999999)
-        ], 'cat1_1_1');
-
-
-
-        self::$discussions['d1_c2_2_1_1_1_1'] = $discussion = $this->addDiscussion([
-            'CategoryID' => $cat2_2_1_1_1_1['CategoryID'],
-            'Name' => 'Discussion 1 of cat2_2_1_1_1_1',
-            'Body' => 'Test '.rand(1,9999999999)
-        ], 'cat2_2_1_1_1_1');
-
-
-        self::$discussions['d2_c2_2_1_1_1_1'] = $discussion = $this->addDiscussion([
-            'CategoryID' => $cat2_2_1_1_1_1['CategoryID'],
-            'Name' => 'Discussion 2 of cat2_2_1_1_1_1',
-            'Body' => 'Test '.rand(1,9999999999)
-        ], 'cat2_2_1_1_1_1');
-
-        $comment = $this->addComment([
-            'DiscussionID' => $discussion['DiscussionID'],
-            'Body' => 'Moderation controller test. LINE: '.__LINE__.' DATE: '.date('r')
-        ], 'cat2_2_1_1_1_1');
 
 
         $this->assertTrue( true);
@@ -166,18 +63,32 @@ class ModerationControllerTest extends BaseTest {
     }
 
     protected static function updateValidValuesOnMoveDiscussion(array $discussion, string $srcCategoryKey, string $destCategoryKey, bool $updateRecent = true, array $srcDiscussionToUpdate = []) {
-
+        self::$discussions[$discussion['discussionKey']]['CategoryID'] = self::$categories[$destCategoryKey]['CategoryID'];
         // Right now CountDiscussions field is not updated at all  - which is wrong
         // @todo We need to uncomment next 2 lines when bug is fixed
         // self::updateValidValues($destCategoryKey,'CountDiscussions','++');
         // self::updateValidValues($srcCategoryKey,'CountDiscussions','--');
+
+
         self::updateValidValues($destCategoryKey , 'CountAllDiscussions', '++');
         self::updateValidValues($srcCategoryKey , 'CountAllDiscussions', '--');
         if ($updateRecent) {
-            self::updateValidValues($destCategoryKey , 'LastDateInserted', $discussion['DateInserted']);
-            self::updateValidValues($destCategoryKey , 'LastDiscussionID', $discussion['DiscussionID']);
+            if ($discussion['DateInserted'] > self::$categories[$destCategoryKey]['LastDateInserted']) {
+                self::updateValidValues($destCategoryKey , 'LastDateInserted', $discussion['DateInserted']);
+                self::updateValidValues($destCategoryKey , 'LastDiscussionID', $discussion['DiscussionID']);
+            } else {
+                //echo $destCategoryKey.':'.$discussion['DateInserted'].':'.self::$categories[$destCategoryKey]['LastDateInserted']."\n";
+                self::updateValidValues($destCategoryKey , 'LastDateInserted', self::$categories[$destCategoryKey]['LastDateInserted']);
+                self::updateValidValues($destCategoryKey , 'LastDiscussionID', self::$categories[$destCategoryKey]['LastDiscussionID']);
+            }
+
+            // Right now LastDateInserted and LastDiscussionID fields are not updated against source Category - which is wrong
+            // @todo We need to uncomment next 2 lines when bug is fixed
             //self::updateValidValues($srcCategoryKey , 'LastDateInserted', ($srcDiscussion['DateInserted'] ?? null));
             //self::updateValidValues($srcCategoryKey , 'LastDiscussionID', ($srcDiscussion['DiscussionID'] ?? null));
+            // @todo until then lets update in non-recursive mode to reproduce current data flow
+            self::updateValidValues($srcCategoryKey , 'LastDateInserted', ($srcDiscussionToUpdate['DateInserted'] ?? null), false);
+            self::updateValidValues($srcCategoryKey , 'LastDiscussionID', ($srcDiscussionToUpdate['DiscussionID'] ?? null), false);
         }
 
     }
@@ -201,8 +112,28 @@ class ModerationControllerTest extends BaseTest {
 
         return $body['Discussion'];
     }
+    protected function moveDiscussion(array $discussion, string $srcCatKey, string $destCatKey, array $srcDiscussion = []) {
+        $r = self::$api->post('/moderation/confirmdiscussionmoves.json?discussionid='.$discussion['DiscussionID'], [
+        'Move' => 'Move',
+        'CategoryID' => self::$categories[$destCatKey]['CategoryID']
+        ]);
 
-    protected static function addCategory(array $category) {
+        $this->updateValidValuesOnMoveDiscussion($discussion, $srcCatKey, $destCatKey, true , $srcDiscussion);
+    }
+
+    protected static function addCategory(array $category, string $catKey = '') {
+        if (!empty($catKey)) {
+            if (($pos = strrpos($catKey, '_')) > 0) {
+                $catKey = substr($catKey, 0, $pos);
+                if (!($parentCat = (self::$categories[$catKey] ?? false))) {
+                    self::$categories[$catKey] = $parentCat = self::addCategory(['Name' => ' Test cat '.$catKey,
+                        'UrlCode' => 'test-cat-'.$catKey,
+                        'DisplayAs' => 'Discussions'], $catKey);
+                }
+                $category['ParentCategoryID'] = $parentCat['CategoryID'];
+            }
+        }
+
         $r = self::$api->post(
             '/vanilla/settings/addcategory.json',
             $category
@@ -235,7 +166,7 @@ class ModerationControllerTest extends BaseTest {
 
     protected static function getCategory(int $categoryId) {
         $r = self::$api->get(
-            '/vanilla/settings/getcategory.json',
+            '/vanilla/settings/getcategory.json?'.rand(0,1000),
             ['CategoryID'=>$categoryId]
         );
         if ($r->getStatusCode() != 200) {
@@ -248,7 +179,7 @@ class ModerationControllerTest extends BaseTest {
     /**
      * @depends testModerationDiscussionMoveInintDB
      */
-    public function testCategories() {
+    public function recheckCategories() {
         foreach (self::$categories as $catKey => $category) {
             $cat = $this->getCategory($category['CategoryID']);
             $this->assertEquals($category['CountAllDiscussions'], $cat['CountAllDiscussions'], 'CountAllDiscussions failed on  '.$catKey);
@@ -267,26 +198,77 @@ class ModerationControllerTest extends BaseTest {
 
     /**
      * Use case #1:
-     * Src cat Lvl6 (cat2_2_1_1_1_1) has 1 discussion with 1 comment
-     * Dest cat Lvl3 (cat1_2_1) has 0 discussions
+     * Src cat Lvl1-6 has 1 discussion
+     * Dest cat Lvl1-6 has 0 discussions
      *
-     * @depends testCategories
+     * @depends testModerationDiscussionMoveInintDB
      */
-    public function testConfirmDiscussionMoves() {
-        $discussion = self::$discussions['d1_c2_2_1_1_1_1'];
-        $category = self::$categories['cat1_2_1'];
-        $r = $this->api()->post('/moderation/confirmdiscussionmoves.json?discussionid='.$discussion['DiscussionID'], [
-            'Move' => 'Move',
-            'CategoryID' => $category['CategoryID']
-        ]);
+    public function testCase1() {
+        $this->createAndMove('cat1', 'cat2', 'd1_case1');
+        $this->createAndMove('cat1_1_1', 'cat2_1_1', 'd1_case2');
+        $this->createAndMove('cat1_1_1_1', 'cat2_1_1_1', 'd1_case3');
+        $this->createAndMove('cat1_1_1_1_1', 'cat2_1_1_1_1', 'd1_case4');
+        $this->createAndMove('cat1_1_1_1_1_1', 'cat2_1_1_1_1_1', 'd1_case5');
+        $this->createAndMove('cat1_1_1_1_1_1_1', 'cat2_1_1_1_1_1_1', 'd1_case6');
+        $this->recheckCategories();
+    }
 
-        $body = $r->getBody();
-        $status = $r->getStatusCode();
+    /**
+     * Use case #2:
+     * Src cat Lvl1-6 has 1 discussion
+     * Dest cat cat3_1_1 has 0-1-2-3 discussions
+     *
+     * @depends testCase1
+     */
+    public function testCase2() {
+        $destCatKey = 'cat3_1_1';
+        self::$categories[$destCatKey] = $destCategory = self::addCategory([
+            'Name' => 'Test cat '.$destCatKey,
+            'UrlCode' => 'test-cat-'.$destCatKey,
+            'DisplayAs' => 'Discussions'], $destCatKey);
+        $this->moveDiscussion(self::$discussions['d1_case1'], 'cat2', $destCatKey, self::$discussions['d1_case6']);
+        $this->moveDiscussion(self::$discussions['d1_case2'], 'cat2_1_1', $destCatKey, self::$discussions['d1_case6']);
+        $this->moveDiscussion(self::$discussions['d1_case3'], 'cat2_1_1_1', $destCatKey, self::$discussions['d1_case6']);
+        $this->moveDiscussion(self::$discussions['d1_case4'], 'cat2_1_1_1_1', $destCatKey, self::$discussions['d1_case6']);
+        $this->recheckCategories();
+    }
 
-        $this->assertEquals('200' , $status);
-        $this->assertArrayHasKey('isHomepage' , $body);
-        $this->updateValidValuesOnMoveDiscussion($discussion, 'cat2_2_1_1_1_1', 'cat1_2_1');
-        $this->testCategories();
+    /**
+     * Use case #3:
+     * Src cat Lvl1-6
+     * Dest cat cat2_1 has 0-1-2-3 discussions
+     * but has LastDiscussionID fresher than we move in.
+     *
+     * @depends testCase2
+     */
+    public function testCase3() {
+        $destCatKey = 'cat2_1';
+        $this->moveDiscussion(self::$discussions['d1_case1'], 'cat3_1_1', $destCatKey, self::$discussions['d1_case4']);
+        $this->moveDiscussion(self::$discussions['d1_case2'], 'cat3_1_1', $destCatKey, self::$discussions['d1_case4']);
+        $this->recheckCategories();
+    }
+
+    public function createAndMove(string $srcCatKey, string $destCatKey, string $discussionKey ) {
+        if ( !($srcCategory = (self::$categories[$srcCatKey] ?? false))) {
+            self::$categories[$srcCatKey] = $srcCategory = self::addCategory([
+                'Name' => 'Test cat '.$srcCatKey,
+                'UrlCode' => 'test-cat-'.$srcCatKey,
+                'DisplayAs' => 'Discussions'], $srcCatKey);
+        }
+        $discussion = self::$discussions[$discussionKey] = self::addDiscussion([
+            'Name' => 'Discussion 1 of '.$srcCatKey,
+            'Body' => 'Test '.$srcCatKey.' '.$destCatKey,
+            'CategoryID' => $srcCategory['CategoryID']
+        ],$srcCatKey);
+        $discussion['discussionKey'] = self::$discussions[$discussionKey]['discussionKey'] = $discussionKey;
+        if ( !($destCategory = (self::$categories[$destCatKey] ?? false))) {
+            self::$categories[$destCatKey] = $destCategory = self::addCategory([
+                'Name' => ' Test cat ' . $destCatKey,
+                'UrlCode' => 'test-cat-' . $destCatKey,
+                'DisplayAs' => 'Discussions'
+            ], $destCatKey);
+        }
+        $this->moveDiscussion($discussion, $srcCatKey, $destCatKey);
     }
 
 

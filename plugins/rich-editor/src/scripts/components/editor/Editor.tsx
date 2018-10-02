@@ -168,7 +168,9 @@ export class Editor extends React.Component<IProps> {
      * @param content The delta to set.
      */
     public setEditorContent(content: DeltaOperation[]) {
+        log("Setting existing content as contents of editor");
         this.quill.setContents(content);
+        // Clear the history so that you can't "undo" your initial content.
         this.quill.getModule("history").clear();
     }
 
@@ -210,8 +212,7 @@ export class Editor extends React.Component<IProps> {
         const initialValue = legacyTextArea.value;
 
         if (initialValue) {
-            log("Setting existing content as contents of editor");
-            this.quill.setContents(JSON.parse(initialValue));
+            this.setEditorContent(JSON.parse(initialValue));
         }
 
         this.quill.on("text-change", () => {

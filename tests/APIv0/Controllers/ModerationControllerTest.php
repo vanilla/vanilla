@@ -11,15 +11,13 @@ namespace VanillaTests\Controllers;
 use VanillaTests\APIv0\BaseTest;
 
 class ModerationControllerTest extends BaseTest {
-    protected static $testUser;
-
-    protected $user;
-
     /**
-     * @var array Array of categories holding initial/valid values for tests
+     * @var array Array of categories holding initial and continually updated valid values for tests
      */
     protected static $categories = [];
-
+    /**
+     * @var array Array of discussions holding initial and continually updated valid values for tests
+     */
     protected static $discussions = [];
 
 
@@ -31,11 +29,7 @@ class ModerationControllerTest extends BaseTest {
             //'Cache.Enabled' => false,
         ]);
 
-        self::$testUser = $this->addAdminUser();
-        $this->api()->setUser(self::$testUser);
-
-
-        $this->assertTrue( true);
+        $this->api()->setUser($this->addAdminUser());
     }
 
     protected static function updateValidValues(string $catKey, string $fieldToUpdate, $newValue, bool $recursively = true) {
@@ -203,7 +197,7 @@ class ModerationControllerTest extends BaseTest {
      *
      * @depends testModerationDiscussionMoveInintDB
      */
-    public function testCase1() {
+    public function testMoveNewDiscussionsEmptyCategories() {
         $this->createAndMove('cat1', 'cat2', 'd1_case1');
         $this->createAndMove('cat1_1_1', 'cat2_1_1', 'd1_case2');
         $this->createAndMove('cat1_1_1_1', 'cat2_1_1_1', 'd1_case3');
@@ -218,9 +212,9 @@ class ModerationControllerTest extends BaseTest {
      * Src cat Lvl1-6 has 1 discussion
      * Dest cat cat3_1_1 has 0-1-2-3 discussions
      *
-     * @depends testCase1
+     * @depends testMoveNewDiscussionsEmptyCategories
      */
-    public function testCase2() {
+    public function testMoveExistingDiscussionToEmptyCategory() {
         $destCatKey = 'cat3_1_1';
         self::$categories[$destCatKey] = $destCategory = self::addCategory([
             'Name' => 'Test cat '.$destCatKey,
@@ -239,9 +233,9 @@ class ModerationControllerTest extends BaseTest {
      * Dest cat cat2_1 has 0-1-2-3 discussions
      * but has LastDiscussionID fresher than we move in.
      *
-     * @depends testCase2
+     * @depends testMoveExistingDiscussionToEmptyCategory
      */
-    public function testCase3() {
+    public function testMoveExistingDiscussionToNotEmptyCategory() {
         $destCatKey = 'cat2_1';
         $this->moveDiscussion(self::$discussions['d1_case1'], 'cat3_1_1', $destCatKey, self::$discussions['d1_case4']);
         $this->moveDiscussion(self::$discussions['d1_case2'], 'cat3_1_1', $destCatKey, self::$discussions['d1_case4']);

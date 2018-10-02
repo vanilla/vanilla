@@ -8,7 +8,7 @@ import { LoadStatus } from "@library/@types/api";
 import { t } from "@library/application";
 import DocumentTitle from "@library/components/DocumentTitle";
 import React from "react";
-import ButtonSubmit from "@dashboard/components/forms/ButtonSubmit";
+import ButtonSubmit from "@library/components/forms/ButtonSubmit";
 import Paragraph from "@dashboard/components/forms/Paragraph";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 import uniqueId from "lodash/uniqueId";
@@ -88,10 +88,9 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
                             onChange={this.handleEmailChange}
                             ref={this.emainInput}
                         />
-                        <ButtonSubmit
-                            disabled={!this.allowEdit || this.state.email.length === 0}
-                            content={t("Request a new password")}
-                        />
+                        <ButtonSubmit disabled={!this.allowEdit || this.state.email.length === 0} legacyMode={true}>
+                            {t("Request a new password")}
+                        </ButtonSubmit>
                     </form>
                     <RememberPasswordLink />
                 </div>

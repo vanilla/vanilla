@@ -11,7 +11,7 @@ import Sentence, { IWord } from "@library/components/Sentence";
 
 interface IProps {
     className?: string;
-    contents: IWord[] | string;
+    children: IWord[] | string;
 }
 
 /**
@@ -20,8 +20,8 @@ interface IProps {
 export default class DropDownItemMetas extends React.Component<IProps> {
     public render() {
         return (
-            <DropDownItem className="dropDown-metasItem">
-                <Sentence contents={this.props.contents} />
+            <DropDownItem className={classNames("dropDown-metasItem", this.props.className)}>
+                <Sentence>{this.props.children}</Sentence>
             </DropDownItem>
         );
     }

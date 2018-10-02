@@ -27,7 +27,7 @@ interface IState {
 
 export enum ButtonBaseClass {
     STANDARD = "button",
-    ICON = "button-icon",
+    ICON = "buttonIcon",
     CUSTOM = "",
 }
 

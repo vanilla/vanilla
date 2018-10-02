@@ -15,7 +15,7 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 
 interface ICommonFrameHeaderProps extends ICommonHeadingProps {
     closeFrame: () => void;
-    onBackClick: () => void;
+    onBackClick?: () => void;
 }
 
 export interface IStringTitle extends ICommonFrameHeaderProps {
@@ -47,7 +47,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                 <Button
                     title={backTitle}
                     aria-label={backTitle}
-                    baseClass={ButtonBaseClass.CUSTOM}
+                    baseClass={ButtonBaseClass.ICON}
                     onClick={this.props.onBackClick}
                     className="frameHeader-backButton"
                 >
@@ -62,7 +62,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                 <Heading title={stringTitle!} depth={this.props.depth} className="frameHeader-heading">
                     {componentTitle}
                 </Heading>
-                <CloseButton className="frameHeader-close" onClick={this.props.closeFrame} />
+                <CloseButton className="frameHeader-close isCompact" onClick={this.props.closeFrame} />
             </header>
         );
     }

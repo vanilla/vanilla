@@ -108,6 +108,15 @@ class Model implements InjectableInterface {
     }
 
     /**
+     * Get the database table name.
+     *
+     * @return string
+     */
+    protected function getTable(): string {
+        return $this->table;
+    }
+
+    /**
      * Select a single row.
      *
      * @param array $where Conditions for the select query.
@@ -161,7 +170,7 @@ class Model implements InjectableInterface {
      *
      * @return \Gdn_SQLDriver
      */
-    private function sql(): \Gdn_SQLDriver {
+    protected function sql(): \Gdn_SQLDriver {
         $sql = clone $this->database->sql();
         $sql->reset();
         return $sql;

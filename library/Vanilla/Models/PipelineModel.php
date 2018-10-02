@@ -96,7 +96,7 @@ class PipelineModel extends Model implements InjectableInterface {
         $databaseOperation->setType(Operation::TYPE_UPDATE);
         $databaseOperation->setCaller($this);
         $databaseOperation->setSet($set);
-        $databaseOperation->setSet($where);
+        $databaseOperation->setWhere($where);
         $result = $this->pipeline->process($databaseOperation, function (Operation $databaseOperation) {
             return parent::update(
                 $databaseOperation->getSet(),

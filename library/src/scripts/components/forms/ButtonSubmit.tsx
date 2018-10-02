@@ -9,7 +9,6 @@ import classNames from "classnames";
 import { IOptionalComponentID } from "../../componentIDs";
 import Button from "@library/components/forms/Button";
 
-
 interface IProps extends IOptionalComponentID {
     children: React.ReactNode;
     className?: string;

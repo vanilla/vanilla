@@ -6,11 +6,12 @@
 
 import React from "react";
 import classNames from "classnames";
-import Heading, { ICommonHeadingProps } from "@knowledge/../Heading";
+
 import { t } from "@library/application";
 import { leftChevron } from "@library/components/Icons";
 import CloseButton from "@library/components/CloseButton";
-import Button, { ButtonBaseClass } from "@dashboard/../forms/Button";
+import Heading, { ICommonHeadingProps } from "@library/components/Heading";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 
 interface ICommonFrameHeaderProps extends ICommonHeadingProps {
     closeFrame: () => void;

@@ -6,10 +6,9 @@
 
 import React from "react";
 import { withRouter, RouteComponentProps } from "react-router-dom";
-import Modal from "Modal";
-import FullPageLoader from "FullPageLoader";
 import { t } from "../application";
-import { ModalSizes } from "Modal";
+import Modal, { ModalSizes } from "@library/components/Modal";
+import FullPageLoader from "@library/components/FullPageLoader";
 
 interface IProps extends RouteComponentProps<{}> {}
 

@@ -7,6 +7,7 @@
 namespace Vanilla\Models;
 
 use Exception;
+use Garden\Schema\Schema;
 use Vanilla\Database\Operation;
 use Vanilla\Database\Operation\Pipeline;
 use Vanilla\Database\Operation\Processor;
@@ -18,7 +19,7 @@ use Vanilla\InjectableInterface;
 class PipelineModel extends Model implements InjectableInterface {
 
     /** @var Pipeline */
-    private $pipeline;
+    protected $pipeline;
 
     /**
      * Model constructor.
@@ -63,6 +64,26 @@ class PipelineModel extends Model implements InjectableInterface {
             );
         });
         return $result;
+    }
+
+    /**
+     * Get the model's read schema.
+     *
+     * @return Schema
+     */
+    public function getReadSchema(): Schema {
+        $this->ensureSchemas();
+        return $this->readSchema;
+    }
+
+    /**
+     * Get the model's write schema.
+     *
+     * @return Schema
+     */
+    public function getWriteSchema(): Schema {
+        $this->ensureSchemas();
+        return $this->writeSchema;
     }
 
     /**

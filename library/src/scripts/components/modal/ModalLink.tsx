@@ -5,10 +5,10 @@
  */
 
 import React from "react";
-import { NavLinkProps, NavLink, withRouter } from "react-router-dom";
+import { NavLinkProps, NavLink, withRouter, RouteComponentProps } from "react-router-dom";
 import { LocationDescriptor } from "history";
 
-interface IProps extends NavLinkProps {
+interface IProps extends NavLinkProps, Partial<RouteComponentProps<{}>> {
     to: string;
 }
 
@@ -17,7 +17,7 @@ interface IProps extends NavLinkProps {
  */
 export class ModalLink extends React.Component<IProps> {
     public render() {
-        const { to, ...rest } = this.props;
+        const { to, staticContext, ...rest } = this.props;
         const location: LocationDescriptor = {
             pathname: to,
             state: {
@@ -32,4 +32,4 @@ export class ModalLink extends React.Component<IProps> {
     }
 }
 
-export default withRouter(ModalLink as any) as any;
+export default withRouter(ModalLink as any);

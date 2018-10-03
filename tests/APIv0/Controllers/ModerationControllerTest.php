@@ -25,7 +25,7 @@ class ModerationControllerTest extends BaseTest {
     /**
      * Initial config set up for test
      */
-    public function testModerationDiscussionMoveInintDB() {
+    public function testInitDB() {
         $this->api()->saveToConfig([
             'Garden.Registration.Method' => 'Basic',
             'Garden.Registration.ConfirmEmail' => false,
@@ -279,7 +279,7 @@ class ModerationControllerTest extends BaseTest {
      *
      * @large
      *
-     * @depends testModerationDiscussionMoveInintDB
+     * @depends testInitDB
      */
     public function testMoveNewDiscussionsEmptyCategories() {
         $this->createAndMove('cat1', 'cat2', 'd1_case1');
@@ -298,7 +298,7 @@ class ModerationControllerTest extends BaseTest {
      *
      * @large
      *
-     * @depends testModerationDiscussionMoveInintDB
+     * @depends testInitDB
      * @depends testMoveNewDiscussionsEmptyCategories
      */
     public function testMoveExistingDiscussionToEmptyCategory() {
@@ -321,7 +321,7 @@ class ModerationControllerTest extends BaseTest {
      *
      * @large
      *
-     * @depends testModerationDiscussionMoveInintDB
+     * @depends testInitDB
      * @depends testMoveNewDiscussionsEmptyCategories
      * @depends testMoveExistingDiscussionToEmptyCategory
      */
@@ -337,7 +337,7 @@ class ModerationControllerTest extends BaseTest {
      *
      * @large
      *
-     * @depends testModerationDiscussionMoveInintDB
+     * @depends testInitDB
      * @depends testMoveNewDiscussionsEmptyCategories
      * @depends testMoveExistingDiscussionToEmptyCategory
      * @depends testMoveExistingDiscussionToNotEmptyCategory
@@ -354,7 +354,7 @@ class ModerationControllerTest extends BaseTest {
      *
      * @large
      *
-     * @depends testModerationDiscussionMoveInintDB
+     * @depends testInitDB
      * @depends testMoveNewDiscussionsEmptyCategories
      * @depends testMoveExistingDiscussionToEmptyCategory
      * @depends testMoveExistingDiscussionToNotEmptyCategory
@@ -378,7 +378,7 @@ class ModerationControllerTest extends BaseTest {
      *
      * @large
      *
-     * @depends testModerationDiscussionMoveInintDB
+     * @depends testInitDB
      * @depends testMoveNewDiscussionsEmptyCategories
      * @depends testMoveExistingDiscussionToEmptyCategory
      * @depends testMoveExistingDiscussionToNotEmptyCategory

@@ -469,7 +469,7 @@
         top: $richEditor-menu_borderWidth solid $global-border_color;
         right: $richEditor-menu_borderWidth solid $global-border_color;
     }
-    box-shadow: 0 0 5px 1px $overlay-dropShadow_color;
+    box-shadow: #{$richEditor-menu_borderWidth} #{-$richEditor-menu_borderWidth} 5px 0 rgba($overlay-dropShadow_color, .1);
     background: $richEditor_bg;
 }
 

@@ -45,6 +45,7 @@ export interface ISentence {
     className?: string;
     children: IWord[] | string;
     counter?: number;
+    recursiveChildClass?: string;
 }
 
 /**
@@ -56,41 +57,71 @@ export default class Sentence extends React.Component<ISentence> {
         counter: 0,
     };
 
+    public processChild(word, i = 1) {
+        const key = "sentence-" + this.props.counter + "-" + i;
+        const childCounter = this.props.counter! + 1;
+
+        switch (word.type) {
+            case InlineTypes.DATETIME:
+                const time = word as IInlineDateTime;
+                return (
+                    <time
+                        className={classNames("word", "word-time", time.className, this.props.recursiveChildClass)}
+                        dateTime={time.timeStamp}
+                        key={key}
+                    >
+                        <Sentence
+                            className={time.className}
+                            children={time.children}
+                            counter={childCounter}
+                            recursiveChildClass={this.props.recursiveChildClass}
+                        />
+                    </time>
+                );
+            case InlineTypes.LINK:
+                const link = word as IInlineLink;
+                return (
+                    <Link
+                        to={link.to}
+                        className={classNames("word", "word-link", link.className, this.props.recursiveChildClass)}
+                        key={key}
+                    >
+                        <Sentence
+                            className={word.className}
+                            children={link.children}
+                            counter={childCounter}
+                            recursiveChildClass={this.props.recursiveChildClass}
+                        />
+                    </Link>
+                );
+            default:
+                const text = word as IInlineText;
+                return (
+                    <span
+                        className={classNames("word", "word-text", word.className, this.props.recursiveChildClass)}
+                        key={key}
+                    >
+                        <Sentence
+                            className={word.className}
+                            children={text.children}
+                            counter={childCounter}
+                            recursiveChildClass={this.props.recursiveChildClass}
+                        />
+                    </span>
+                );
+        }
+    }
+
     public render() {
         const spacer = ` `;
         if (typeof this.props.children !== "string") {
-            return (this.props.children as IWord[]).map((word: IWord, i: number) => {
-                const key = "sentence-" + this.props.counter + "-" + i;
-                const childCounter = this.props.counter! + 1;
-
-                switch (word.type) {
-                    case InlineTypes.DATETIME:
-                        const time = word as IInlineDateTime;
-                        return (
-                            <time
-                                className={classNames("word", "word-time", time.className)}
-                                dateTime={time.timeStamp}
-                                key={key}
-                            >
-                                <Sentence className={time.className} children={time.children} counter={childCounter} />
-                            </time>
-                        );
-                    case InlineTypes.LINK:
-                        const link = word as IInlineLink;
-                        return (
-                            <Link to={link.to} className={classNames("word", "word-link", link.className)} key={key}>
-                                <Sentence className={word.className} children={link.children} counter={childCounter} />
-                            </Link>
-                        );
-                    default:
-                        const text = word as IInlineText;
-                        return (
-                            <span className={classNames("word", "word-text", word.className)} key={key}>
-                                <Sentence className={word.className} children={text.children} counter={childCounter} />
-                            </span>
-                        );
-                }
-            });
+            if (this.props.children.length > 0) {
+                return (this.props.children as IWord[]).map((word: IWord, i: number) => {
+                    return this.processChild(word, i);
+                });
+            } else {
+                return this.processChild(this.props.children);
+            }
         } else {
             return this.props.children; // plain text
         }

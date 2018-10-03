@@ -47,7 +47,7 @@ export default class DropDown extends React.PureComponent<IProps, IState> {
                 id={this.state.id}
                 classNameRoot="dropDown"
                 icon={this.props.icon!}
-                buttonClasses="button buttonIcon"
+                buttonClasses="buttonIcon"
                 name={this.props.name}
             >
                 {params => {

@@ -11,8 +11,8 @@ A responsive Vanilla theme with customization options.
 - Javascript to animate the open and close of the mobile navigation menu.
 - Sets its own flyout open/close listeners.
 - Dependency on the [theme-boilerplate](https://www.npmjs.com/package/@vanillaforums/theme-boilerplate).
-- Overwrites the `themeOptions_create` to support `hasHeroBanner`, `hasFetureSearchbox` and `panelToLeft` customized options.
-- Custom options `hasHeroBanner`, `hasFetureSearchbox` are dependent on the Hero Image Plugin.
+- Overwrites the `themeOptions_create` to support `hasHeroBanner`, `hasFeatureSearchbox` and `panelToLeft` customized options.
+- Custom options `hasHeroBanner`, `hasFeatureSearchbox` are dependent on the Hero Image Plugin.
 - If Advanced Search Plugin is enabled, the theme will render advanced search module, otherwise, it will render the search module.
 
 ## Building Styles / Javascript / Images

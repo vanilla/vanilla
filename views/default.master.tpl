@@ -26,8 +26,8 @@
         ThemeOptions-hasHeroBanner
     {/if}
 
-    {if $ThemeOptions.Options.hasFetureSearchbox}
-        ThemeOptions-hasFetureSearchbox
+    {if $ThemeOptions.Options.hasFeatureSearchbox}
+        ThemeOptions-hasFeatureSearchbox
     {/if}
 
     {if $ThemeOptions.Options.panelToLeft}
@@ -116,7 +116,7 @@
                 {if $ThemeOptions.Options.hasHeroBanner && inSection(["CategoryList", "DiscussionList"])}
                     <div class="Herobanner" {if $heroImageUrl} style="background-image:url('{$heroImageUrl}')"{/if}>
                         <div class="Container">
-                            {if $ThemeOptions.Options.hasFetureSearchbox}
+                            {if $ThemeOptions.Options.hasFeatureSearchbox}
                                 <div class="SearchBox js-sphinxAutoComplete" role="search">
                                     {if $hasAdvancedSearch === true}
                                         {searchbox_advanced}
@@ -146,7 +146,7 @@
                     <div class="Container">
                         <div class="Frame-contentWrap">
                             <div class="Frame-details">
-                                {if !$ThemeOptions.Options.hasFetureSearchbox || !inSection(["CategoryList", "DiscussionList"])}
+                                {if !$ThemeOptions.Options.hasFeatureSearchbox || !inSection(["CategoryList", "DiscussionList"])}
                                     <div class="Frame-row">
                                         <nav class="BreadcrumbsBox">
                                             {breadcrumbs}
@@ -166,7 +166,7 @@
 
                                     <!---------- Main Content ---------->
                                     <main class="Content MainContent">
-                                        {if $ThemeOptions.Options.hasFetureSearchbox && inSection(["CategoryList", "DiscussionList"])}
+                                        {if $ThemeOptions.Options.hasFeatureSearchbox && inSection(["CategoryList", "DiscussionList"])}
                                             <nav class="BreadcrumbsBox">
                                                 {breadcrumbs}
                                             </nav>

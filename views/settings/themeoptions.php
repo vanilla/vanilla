@@ -7,7 +7,7 @@
     '</div>';
 }
 /**
- * This view is overwriten to render custom `hasHeroBanner`, `hasFetureSearchbox` and `panelToLeft` toggle fields
+ * This view is overwriten to render custom `hasHeroBanner`, `hasFeatureSearchbox` and `panelToLeft` toggle fields
  *
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
@@ -97,9 +97,13 @@ echo $this->Form->errors();
             <li class="form-group"><?php
                 echo $this->Form->toggle("ThemeOptions.Options.hasHeroBanner", t("Integrate Hero Image plugin"), [], "Displays \"Hero Image\" plugin below the header. \"Hero Image\" plugin needs to be enabled for this option to work properly."); ?>
             </li>
-            <li class="form-group"><?php
-                echo $this->Form->toggle("ThemeOptions.Options.hasFetureSearchbox", t("Integrate searchbox with Hero Image plugin"), [], "Change searchbox's position to display over Hero Banner. . \"Hero Image\" plugin needs to be enabled for this option to work properly."); ?>
-            </li>
+            <?php
+            //Only render this field if AdvancedSearchPlugin == true
+            if( $this->Data['hasAdvancedSearch']){ ?>
+                <li class="form-group"><?php
+                    echo $this->Form->toggle("ThemeOptions.Options.hasFeatureSearchbox", t("Integrate searchbox with Hero Image plugin"), [], "Change searchbox's position to display over Hero Banner. . \"Hero Image\" plugin needs to be enabled for this option to work properly."); ?>
+                </li>
+            <?php } ?>
         <?php } ?>
         <li class="form-group"><?php
             echo $this->Form->toggle("ThemeOptions.Options.panelToLeft", t("Panel to the left"), [], "Change the main panel's position to the left side."); ?>

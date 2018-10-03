@@ -24,14 +24,11 @@ class KeystoneThemeHooks extends Gdn_Plugin {
     public function structure() {
         saveToConfig([
             'Garden.MobileTheme' => 'keystone',
-            'Routes.DefaultController' => ['categories', 'Internal'],
-            'Vanilla.Categories.Layout' => 'modern',
-            'Vanilla.Discussions.Layout' => 'modern',
             'Badges.BadgesModule.Target' => 'AfterUserInfo',
             'Garden.ThemeOptions.Styles.Key' => 'Default',
             'Garden.ThemeOptions.Styles.Value' => '%s_default',
             'Garden.ThemeOptions.Options.hasHeroBanner' => false,
-            'Garden.ThemeOptions.Options.hasFetureSearchbox' => false,
+            'Garden.ThemeOptions.Options.hasFeatureSearchbox' => false,
             'Garden.ThemeOptions.Options.panelToLeft' => false,
         ]);
     }
@@ -57,12 +54,21 @@ class KeystoneThemeHooks extends Gdn_Plugin {
             //unset config ThemeOptions.Options referent the HeroImagePlugin
             saveToConfig([
                 'Garden.ThemeOptions.Options.hasHeroBanner' => false,
-                'Garden.ThemeOptions.Options.hasFetureSearchbox' => false,
+                'Garden.ThemeOptions.Options.hasFeatureSearchbox' => false,
             ]);
         }
 
+        $hasAdvancedSearch = class_exists('AdvancedSearchPlugin');
+
         //set "hasAdvancedSearch" to smarty
-        $sender->setData('hasAdvancedSearch', class_exists('AdvancedSearchPlugin'));
+        $sender->setData('hasAdvancedSearch', $hasAdvancedSearch);
+
+        //unset config ThemeOptions.Options.hasFeatureSearchbox if AdvancedSearchPlugin is disabled
+        if(!$hasAdvancedSearch) {
+            saveToConfig([
+                'Garden.ThemeOptions.Options.hasFeatureSearchbox' => false,
+            ]);
+        }
 
         //set ThemeOptions to smarty
         $themeOptions = c("Garden.ThemeOptions");
@@ -73,7 +79,18 @@ class KeystoneThemeHooks extends Gdn_Plugin {
     }
 
     /**
-     * Overwrites method to support `hasHeroBanner`, `hasFetureSearchbox` and `panelToLeft` custom fields
+     * Register {searchbox_advanced} even if AdvancedSearchPlugin is disabled so theme doens't break
+     * @param Smarty $sender
+     * @param type $args
+     */
+    public function gdn_smarty_init_handler($sender, $args) {
+        if(!class_exists('AdvancedSearchPlugin')) {
+            $sender->register_function('searchbox_advanced', 'searchBoxAdvancedMock');
+        }
+    }
+
+    /**
+     * Overwrites method to support `hasHeroBanner`, `hasFeatureSearchbox` and `panelToLeft` custom fields
      *
      * @param SettingsController $sender
      */
@@ -85,10 +102,12 @@ class KeystoneThemeHooks extends Gdn_Plugin {
         $sender->setHighlightRoute('dashboard/settings/themeoptions');
 
         $themeManager = Gdn::themeManager();
+        //$themeManager = Gdn::addonManager()->getTheme();
         $sender->setData('ThemeInfo', $themeManager->enabledThemeInfo());
 
         // set hasHeroImagePlugin to view
         $sender->setData('hasHeroImagePlugin', class_exists('HeroImagePlugin'));
+        $sender->setData('hasAdvancedSearch', class_exists('AdvancedSearchPlugin'));
 
         //get toggle values from config
         $checkboxes = c("Garden.ThemeOptions.Options");
@@ -144,3 +163,11 @@ class KeystoneThemeHooks extends Gdn_Plugin {
         $sender->render();
     }
 }
+
+if (!function_exists('searchBoxAdvancedMock')):
+
+    function searchBoxAdvancedMock($params) {
+        return "";
+    }
+
+endif;

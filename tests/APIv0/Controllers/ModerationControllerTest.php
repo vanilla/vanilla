@@ -277,6 +277,8 @@ class ModerationControllerTest extends BaseTest {
      * Src cat Lvl1-6 has 1 discussion
      * Dest cat Lvl1-6 has 0 discussions
      *
+     * @large
+     *
      * @depends testModerationDiscussionMoveInintDB
      */
     public function testMoveNewDiscussionsEmptyCategories() {
@@ -293,6 +295,8 @@ class ModerationControllerTest extends BaseTest {
      * Use case #2:
      * Src cat Lvl1-6 has 1 discussion
      * Dest cat cat3_1_1 has 0-1-2-3 discussions
+     *
+     * @large
      *
      * @depends testModerationDiscussionMoveInintDB
      * @depends testMoveNewDiscussionsEmptyCategories
@@ -315,6 +319,8 @@ class ModerationControllerTest extends BaseTest {
      * Move existing discussion to non empty category
      * where destination category already has LastDiscussionID fresher than we move in.
      *
+     * @large
+     *
      * @depends testModerationDiscussionMoveInintDB
      * @depends testMoveNewDiscussionsEmptyCategories
      * @depends testMoveExistingDiscussionToEmptyCategory
@@ -328,6 +334,8 @@ class ModerationControllerTest extends BaseTest {
     /**
      * Use case #4:
      * Move most recent discussion from one category to another
+     *
+     * @large
      *
      * @depends testModerationDiscussionMoveInintDB
      * @depends testMoveNewDiscussionsEmptyCategories
@@ -343,6 +351,8 @@ class ModerationControllerTest extends BaseTest {
     /**
      * Use case #5:
      * New comment add to existing discussion and move that discussion after
+     *
+     * @large
      *
      * @depends testModerationDiscussionMoveInintDB
      * @depends testMoveNewDiscussionsEmptyCategories
@@ -365,6 +375,8 @@ class ModerationControllerTest extends BaseTest {
      * After that move we expect it to have most recent fields updated
      * Then move some previous discussion into the same destCategory
      * We expect detCategory recent field to not be updated
+     *
+     * @large
      *
      * @depends testModerationDiscussionMoveInintDB
      * @depends testMoveNewDiscussionsEmptyCategories
@@ -392,6 +404,8 @@ class ModerationControllerTest extends BaseTest {
      * Helper function:
      * automatically creates source and destination categories with its parents recursively
      * create discussion under source category and move it to destination
+     *
+     * @large
      *
      * @param string $srcCatKey
      * @param string $destCatKey

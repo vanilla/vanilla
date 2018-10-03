@@ -93,13 +93,14 @@ class ModerationControllerTest extends BaseTest {
         if (!empty(self::$discussions[$discussion['discussionKey']]['LastCommentID'] ?? null)) {
             self::updateValidValues($destCategoryKey, 'CountAllComments', '++');
             self::updateValidValues($srcCategoryKey, 'CountAllComments', '--');
+            //self::updateValidValues($srcCategoryKey, 'CountComments', '--', false);
             if ($discussion['LastCommentID'] > self::$categories[$destCategoryKey]['LastCommentID']) {
                 self::updateValidValues($destCategoryKey, 'LastCommentID', $discussion['LastCommentID']);
-                // Right now LastCommentIDis not updated against source Parent categories - which is wrong
-                // @todo We need to switch to recursive mode when bug is fixed
-                // @todo until then lets update in non-recursive mode to reproduce current data flow
-                self::updateValidValues($srcCategoryKey, 'LastCommentID', ($srcDiscussionToUpdate['LastCommentID'] ?? null), false);
             }
+            // Right now LastCommentIDis not updated against source Parent categories - which is wrong
+            // @todo We need to switch to recursive mode when bug is fixed
+            // @todo until then lets update in non-recursive mode to reproduce current data flow
+            self::updateValidValues($srcCategoryKey, 'LastCommentID', ($srcDiscussionToUpdate['LastCommentID'] ?? null), false);
         }
 
         if ($updateRecent) {
@@ -220,7 +221,11 @@ class ModerationControllerTest extends BaseTest {
         if (!empty($catKey)) {
             self::$discussions[$discussionKey]['LastCommentID'] = $comment['CommentID'];
             self::$discussions[$discussionKey]['DateLastComment'] = $comment['DateInserted'];
-            self::updateValidValues($catKey, 'CountComments', '++', false);
+            if (empty(self::$categories[$catKey]['LastCommentID'] ?? '')) {
+                self::updateValidValues($catKey, 'CountComments', 1, false);
+            } else {
+                self::updateValidValues($catKey, 'CountComments', '++', false);
+            }
             self::updateValidValues($catKey, 'CountAllComments', '++');
             self::updateValidValues($catKey, 'LastDateInserted', $comment['DateInserted']);
             self::updateValidValues($catKey, 'LastDiscussionID', $comment['DiscussionID']);
@@ -289,6 +294,7 @@ class ModerationControllerTest extends BaseTest {
      * Src cat Lvl1-6 has 1 discussion
      * Dest cat cat3_1_1 has 0-1-2-3 discussions
      *
+     * @depends testModerationDiscussionMoveInintDB
      * @depends testMoveNewDiscussionsEmptyCategories
      */
     public function testMoveExistingDiscussionToEmptyCategory() {
@@ -351,6 +357,34 @@ class ModerationControllerTest extends BaseTest {
         ], 'd1_case1', 'cat2_1');
         $this->recheckCategories();
         $this->moveDiscussion(self::$discussions['d1_case1'], 'cat2_1', 'cat3_1_1', self::$discussions['d1_case6']);
+        $this->recheckCategories();
+    }
+    /**
+     * Use case #6:
+     * Create new comment to existing discussion and move it to some destCategory
+     * After that move we expect it to have most recent fields updated
+     * Then move some previous discussion into the same destCategory
+     * We expect detCategory recent field to not be updated
+     *
+     * @depends testModerationDiscussionMoveInintDB
+     * @depends testMoveNewDiscussionsEmptyCategories
+     * @depends testMoveExistingDiscussionToEmptyCategory
+     * @depends testMoveExistingDiscussionToNotEmptyCategory
+     * @depends testMoveMostRecentDiscussionToNotEmptyCategory
+     * @depends testAddCommentMoveDiscussion
+     */
+    public function testCommentDestinationLastCommentFresher() {
+        //Create new comment to Discussion d1_case5
+        $comment = $this->addComment([
+            'DiscussionID' => self::$discussions['d1_case5']['DiscussionID'],
+            'Body' => 'Moderation controller test.'
+        ], 'd1_case5', 'cat2_1');
+        // Move discussion d1_case5 to cat1_1_1
+        $this->moveDiscussion(self::$discussions['d1_case5'], 'cat2_1', 'cat1_1_1', self::$discussions['d1_case6']);
+        // Now cat1_1_1 has most recent comment in DB
+        //Lets move something older in
+        $this->moveDiscussion(self::$discussions['d1_case1'], 'cat3_1_1', 'cat1_1_1', self::$discussions['d1_case4']);
+        // Check if everything is updated correctly
         $this->recheckCategories();
     }
 

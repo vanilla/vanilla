@@ -13,6 +13,18 @@ use VanillaTests\APIv0\BaseTest;
  * Class ModerationControllerTest: tests confirmdiscussionmoves action
  */
 class ModerationControllerTest extends BaseTest {
+    const FIELDS_CHECK_LIST = [
+        'CountAllDiscussions',
+        'CountAllComments',
+        'CountCategories',
+        'CountDiscussions',
+        'CountComments',
+        'DateInserted',
+        'DateUpdated',
+        'LastDateInserted',
+        'LastDiscussionID',
+        'LastCommentID'
+    ];
     /**
      * @var array Array of categories holding initial and continually updated valid values for tests
      */
@@ -30,7 +42,7 @@ class ModerationControllerTest extends BaseTest {
             'Garden.Registration.Method' => 'Basic',
             'Garden.Registration.ConfirmEmail' => false,
             'Garden.Registration.SkipCaptcha' => true,
-            //'Cache.Enabled' => false,
+            'Cache.Enabled' => false,
         ]);
 
         $this->api()->setUser($this->addAdminUser());
@@ -257,18 +269,12 @@ class ModerationControllerTest extends BaseTest {
      * vs actual data getting from app/test database through APIv0
      */
     public function recheckCategories() {
+        self::FIELDS_CHECK_LIST;
         foreach (self::$categories as $catKey => $category) {
             $cat = $this->getCategory($category['CategoryID']);
-            $this->assertEquals($category['CountAllDiscussions'], $cat['CountAllDiscussions'], 'CountAllDiscussions failed on  '.$catKey);
-            $this->assertEquals($category['CountAllComments'], $cat['CountAllComments'], 'CountAllComments failed on  '.$catKey);
-            $this->assertEquals($category['CountCategories'], $cat['CountCategories'], 'CountCategories failed on  '.$catKey);
-            $this->assertEquals($category['CountDiscussions'], $cat['CountDiscussions'], 'CountDiscussions failed on  '.$catKey);
-            $this->assertEquals($category['CountComments'], $cat['CountComments'], 'CountComments failed on  '.$catKey);
-            $this->assertEquals($category['DateInserted'], $cat['DateInserted'], 'DateInserted failed on  '.$catKey);
-            $this->assertEquals($category['DateUpdated'], $cat['DateUpdated'], 'DateUpdated failed on  '.$catKey);
-            $this->assertEquals($category['LastDateInserted'], $cat['LastDateInserted'], 'LastDateInserted failed on  '.$catKey);
-            $this->assertEquals($category['LastDiscussionID'], $cat['LastDiscussionID'], 'LastDiscussionID failed on  '.$catKey);
-            $this->assertEquals($category['LastCommentID'], $cat['LastCommentID'], 'LastCommentID failed on  '.$catKey);
+            foreach (self::FIELDS_CHECK_LIST as $field) {
+                $this->assertEquals($category[$field], $cat[$field], $field.' failed on  '.$catKey);
+            }
         }
     }
 

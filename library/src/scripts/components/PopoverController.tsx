@@ -20,6 +20,7 @@ interface IProps {
     id: string;
     classNameRoot: string;
     icon: JSX.Element;
+    disabled?: boolean;
     children: (props: IPopoverControllerChildParameters) => JSX.Element;
     onClose?: () => void;
     buttonClasses: string;
@@ -74,16 +75,18 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
                     aria-controls={this.contentID}
                     aria-expanded={this.state.isVisible}
                     aria-haspopup="true"
+                    disabled={this.props.disabled}
                     ref={this.buttonRef}
                 >
                     <span className="u-noInteraction">{this.props.icon}</span>
                 </button>
-                {this.props.children({
-                    id: this.contentID,
-                    initialFocusRef: this.initalFocusRef,
-                    isVisible: this.state.isVisible,
-                    closeMenuHandler: this.closeMenuHandler,
-                })}
+                {!this.props.disabled &&
+                    this.props.children({
+                        id: this.contentID,
+                        initialFocusRef: this.initalFocusRef,
+                        isVisible: this.state.isVisible,
+                        closeMenuHandler: this.closeMenuHandler,
+                    })}
             </div>
         );
     }

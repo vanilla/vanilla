@@ -9,7 +9,7 @@ import classNames from "classnames";
 
 interface IProps {
     className?: string;
-    children: JSX.Element | JSX.Element[] | string;
+    children: React.ReactNode;
 }
 
 /**

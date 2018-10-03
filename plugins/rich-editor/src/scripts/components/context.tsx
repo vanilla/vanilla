@@ -8,19 +8,19 @@ import Quill, { IFormats } from "quill/core";
 import React from "react";
 import { connect } from "react-redux";
 import { IStoreState, IEditorInstance } from "@rich-editor/@types/store";
+import { Omit } from "@library/@types/utils";
 
 interface IContextProps {
     quill: Quill;
     editorID: string;
     legacyMode: boolean;
+    isLoading: boolean;
 }
 
 interface IGeneratedContextProps {
     instanceState: IEditorInstance;
     activeFormats: IFormats;
 }
-
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 export type IWithEditorProps = IContextProps & IGeneratedContextProps;
 

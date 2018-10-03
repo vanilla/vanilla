@@ -6,7 +6,6 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { t } from "@library/application";
 
 export interface IProps {
     id: string;

@@ -1,14 +1,14 @@
 /**
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
 import { withRouter, RouteComponentProps } from "react-router-dom";
-import { t } from "../application";
-import Modal, { ModalSizes } from "@library/components/Modal";
 import FullPageLoader from "@library/components/FullPageLoader";
+import { ModalSizes } from "./ModalSizes";
+import Modal from "./Modal";
 
 interface IProps extends RouteComponentProps<{}> {}
 
@@ -32,4 +32,4 @@ class ModalLoader extends React.Component<IProps> {
     };
 }
 
-export default withRouter(ModalLoader);
+export default withRouter<IProps>(ModalLoader);

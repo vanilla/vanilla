@@ -6,17 +6,12 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
-import TabHandler from "../TabHandler";
-import { logError } from "../utility";
-import { getRequiredID } from "../componentIDs";
+import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
+import TabHandler from "@library/TabHandler";
+import { logError } from "@library/utility";
+import { getRequiredID } from "@library/componentIDs";
 import classNames from "classnames";
-
-export enum ModalSizes {
-    FULL_SCREEN = "full screen",
-    LARGE = "large",
-    MEDIUM = "medium",
-    SMALL = "small",
-}
+import { ModalSizes } from "./ModalSizes";
 
 interface IProps {
     className?: string;
@@ -73,7 +68,7 @@ export default class Modal extends React.Component<IProps, IState> {
      */
     public render() {
         return ReactDOM.createPortal(
-            <div className="overlay">
+            <div className="overlay" onKeyDown={this.handleEscapeKeyPress} onClick={this.handleScrimClick}>
                 <div
                     id={this.modalID}
                     role="dialog"
@@ -91,6 +86,7 @@ export default class Modal extends React.Component<IProps, IState> {
                     )}
                     ref={this.selfRef}
                     onKeyDown={this.handleTabbing}
+                    onClick={this.handleModalClick}
                     aria-describedby={this.descriptionID}
                 >
                     <div id={this.descriptionID} className="sr-only">
@@ -121,9 +117,8 @@ export default class Modal extends React.Component<IProps, IState> {
     public componentDidMount() {
         Modal.focusHistory.push(document.activeElement as HTMLElement);
         this.focusInitialElement();
-        document.addEventListener("keydown", this.handleEscapeKeyPress);
         this.props.appContainer!.setAttribute("aria-hidden", true);
-        document.body.style.position = "fixed";
+        disableBodyScroll(this.selfRef.current!);
     }
 
     /**
@@ -131,8 +126,7 @@ export default class Modal extends React.Component<IProps, IState> {
      */
     public componentWillUnmount() {
         this.props.appContainer!.removeAttribute("aria-hidden");
-        document.removeEventListener("keydown", this.handleEscapeKeyPress);
-        document.body.style.position = "initial";
+        enableBodyScroll(this.selfRef.current!);
         const prevFocussedElement = Modal.focusHistory.pop() || document.body;
         prevFocussedElement.focus();
     }
@@ -167,15 +161,33 @@ export default class Modal extends React.Component<IProps, IState> {
      *
      * This needs to be a global listener or it will not work if something in the component isn't focused.
      */
-    private handleEscapeKeyPress = (event: KeyboardEvent) => {
+    private handleEscapeKeyPress = (event: React.KeyboardEvent) => {
         const escKey = 27;
 
         if (event.keyCode === escKey) {
             event.preventDefault();
-            event.stopImmediatePropagation();
+            event.stopPropagation();
             if (this.props.exitHandler) {
                 this.props.exitHandler();
             }
+        }
+    };
+
+    /**
+     * Stop propagation of events at the top of the modal so they don't make it
+     * to the scrim click handler.
+     */
+    private handleModalClick = (event: React.MouseEvent) => {
+        event.stopPropagation();
+    };
+
+    /**
+     * Call the exit handler when the scrim is clicked directly.
+     */
+    private handleScrimClick = (event: React.MouseEvent) => {
+        event.preventDefault();
+        if (this.props.exitHandler) {
+            this.props.exitHandler();
         }
     };
 

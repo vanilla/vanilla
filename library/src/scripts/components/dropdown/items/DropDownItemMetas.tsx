@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import DropDownItem from "@library/components/dropdown/items/DropDownItem";
 import classNames from "classnames";
 import Sentence, { IWord } from "@library/components/Sentence";
+import DropDownItem from "./DropDownItem";
 
 interface IProps {
     className?: string;

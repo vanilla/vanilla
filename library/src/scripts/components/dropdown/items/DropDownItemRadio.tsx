@@ -5,9 +5,9 @@
  */
 
 import * as React from "react";
-import { check } from "../../Icons";
-import DropDownItem from "@library/components/dropdown/items/DropDownItem";
+import { check } from "@library/components/Icons";
 import classNames from "classnames";
+import DropDownItem from "./DropDownItem";
 
 export interface IMenuRadioOption {
     name: string;

@@ -10,11 +10,11 @@ import { t } from "@library/application";
 /**
  * A smart loading component. Takes up the full page and only displays in certain scenarios.
  */
-export default class FullPageLoader extends React.Component {
+export default class MediumLoader extends React.Component {
     public render() {
         return (
             <React.Fragment>
-                <div className="fullPageLoader" aria-hidden="true" />
+                <div className="mediumLoader" aria-hidden="true" />
                 <h1 className="sr-only">{t("Loading")}</h1>
             </React.Fragment>
         );

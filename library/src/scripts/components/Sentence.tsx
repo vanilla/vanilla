@@ -105,7 +105,7 @@ export default class Sentence extends React.Component<ISentence> {
                             className={word.className}
                             children={text.children}
                             counter={childCounter}
-                            recursiveChildClass={this.props.childClass}
+                            recursiveChildClass={this.props.recursiveChildClass}
                         />
                     </span>
                 );

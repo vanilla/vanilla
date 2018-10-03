@@ -7,7 +7,6 @@
 import React from "react";
 import { t } from "@library/application";
 import getStore from "@library/state/getStore";
-import { hasPermission } from "@library/permissions";
 import { log, debug } from "@library/utility";
 import { delegateEvent, removeDelegatedEvent } from "@library/dom";
 import EmbedPopover from "@rich-editor/components/popovers/EmbedPopover";
@@ -33,6 +32,7 @@ interface ICommonProps {
     isPrimaryEditor: boolean;
     isLoading?: boolean;
     onChange?: (newContent: DeltaOperation[]) => void;
+    allowUpload: boolean;
 }
 
 interface ILegacyProps extends ICommonProps {
@@ -47,33 +47,44 @@ interface INewProps extends ICommonProps {
 
 type IProps = ILegacyProps | INewProps;
 
+/**
+ * React component for instantiating a rich editor.
+ */
 export class Editor extends React.Component<IProps> {
-    private hasUploadPermission: boolean;
+    /** Ref for a dom node for quill to mount into. */
     private quillMountRef: React.RefObject<HTMLDivElement> = React.createRef();
-    private store = getStore<IStoreState>();
-    private allowPasteListener = true;
-    private domID: string;
-    private editorID: string;
-    private descriptionID: string;
-    private quill: Quill;
-    private delegatedHandlerHash: string;
 
-    constructor(props) {
-        super(props);
-        log("Initializing Rich Editor");
-        this.hasUploadPermission = hasPermission("uploads.add");
-        this.domID = uniqueId("editor-");
-        this.descriptionID = this.domID + "-description";
-    }
+    /** The ID of the root rich editor node. */
+    private domID: string = uniqueId("editor-");
+
+    /** The redux store. */
+    private store = getStore<IStoreState>();
+
+    /**
+     * The ID of our quill instance.
+     * This is needed to work our quill instance's chunk of the redux store
+     */
+    private quillID: string;
+
+    /** The quill instance. */
+    private quill: Quill;
+
+    /** The hash of our delegated quote event handler. Used to unset the handler on unmount. */
+    private quoteHandler: string;
 
     public render() {
         // These items CANNOT be rendered before quill is ready, but the main text area is required for quill to render.
         // These should all re-render after componentDidMount calls forceUpdate().
         const quillDependantItems = this.quill && (
             <React.Fragment>
-                <InlineToolbar />
-                <ParagraphToolbar />
-                <MentionToolbar />
+                {!this.props.isLoading && (
+                    <React.Fragment>
+                        <InlineToolbar />
+                        <ParagraphToolbar />
+                        <MentionToolbar />
+                    </React.Fragment>
+                )}
+
                 <div className="richEditor-embedBar">
                     <ul
                         className="richEditor-menuItems richEditor-inlineMenuItems"
@@ -81,15 +92,15 @@ export class Editor extends React.Component<IProps> {
                         aria-label={t("Inline Level Formatting Menu")}
                     >
                         <li className="richEditor-menuItem u-richEditorHiddenOnMobile" role="menuitem">
-                            <EmojiPopover />
+                            <EmojiPopover disabled={this.props.isLoading} />
                         </li>
-                        {this.hasUploadPermission && (
+                        {this.props.allowUpload && (
                             <li className="richEditor-menuItem" role="menuitem">
-                                <UploadButton />
+                                <UploadButton disabled={this.props.isLoading} />
                             </li>
                         )}
                         <li className="richEditor-menuItem" role="menuitem">
-                            <EmbedPopover />
+                            <EmbedPopover disabled={this.props.isLoading} />
                         </li>
                     </ul>
                 </div>
@@ -101,7 +112,7 @@ export class Editor extends React.Component<IProps> {
                 <EditorProvider
                     value={{
                         quill: this.quill,
-                        editorID: this.editorID,
+                        editorID: this.quillID,
                         legacyMode: !!this.props.legacyMode,
                         isLoading: !!this.props.isLoading,
                     }}
@@ -126,11 +137,12 @@ export class Editor extends React.Component<IProps> {
         if (!this.props.legacyMode) {
             mainContent = (
                 <div
-                    className={classNames("richEditor", this.props.className)}
+                    className={classNames("richEditor", this.props.className, { isDisabled: this.props.isLoading })}
                     aria-label={t("Type your message.")}
                     aria-describedby={this.descriptionID}
                     role="textbox"
                     aria-multiline={true}
+                    id={this.domID}
                 >
                     {mainContent}
                 </div>
@@ -150,12 +162,15 @@ export class Editor extends React.Component<IProps> {
         registerQuill();
         const options = { theme: "vanilla" };
         this.quill = new Quill(this.quillMountRef!.current!, options);
-        this.editorID = getIDForQuill(this.quill);
+        if (this.props.isLoading) {
+            this.quill.disable();
+        }
+        this.quillID = getIDForQuill(this.quill);
 
         // Setup syncing
         this.setupLegacyTextAreaSync();
         this.setupDebugPasteListener();
-        this.store.dispatch(actions.createInstance(this.editorID));
+        this.store.dispatch(actions.createInstance(this.quillID));
         this.quill.on(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
 
         // Add a listener for a force selection update.
@@ -172,13 +187,18 @@ export class Editor extends React.Component<IProps> {
         this.forceUpdate();
     }
 
-    public componentDidUpdate() {
-        window.document.body.classList.add("hasFullHeight");
+    /**
+     * Cleanup from componentDidMount.
+     */
+    public componentWillUnmount() {
+        this.removeQuoteHandler();
     }
 
-    public componentWillUnmount() {
-        if (this.delegatedHandlerHash) {
-            removeDelegatedEvent(this.delegatedHandlerHash);
+    public componentDidUpdate(oldProps: IProps) {
+        if (oldProps.isLoading && !this.props.isLoading) {
+            this.quill.enable();
+        } else if (!oldProps.isLoading && this.props.isLoading) {
+            this.quill.disable();
         }
     }
 
@@ -228,7 +248,7 @@ export class Editor extends React.Component<IProps> {
         }
 
         if (shouldDispatch) {
-            this.store.dispatch(actions.setSelection(this.editorID, this.quill.getSelection(), this.quill));
+            this.store.dispatch(actions.setSelection(this.quillID, this.quill.getSelection(), this.quill));
         }
     };
 
@@ -261,14 +281,17 @@ export class Editor extends React.Component<IProps> {
         const form = this.quill.container.closest("form");
         if (form) {
             form.addEventListener("X-ClearCommentForm", () => {
-                this.allowPasteListener = false;
                 this.quill.setContents([]);
                 this.quill.setSelection(null as any, Quill.sources.USER);
-                this.allowPasteListener = true;
             });
         }
     }
 
+    /**
+     * Handler for clicking on quote button.
+     *
+     * Triggers a media scraping.
+     */
     private quoteButtonClickHandler = (event: MouseEvent, triggeringElement: Element) => {
         event.preventDefault();
         const embedInserter: EmbedInsertionModule = this.quill.getModule("embed/insertion");
@@ -276,8 +299,23 @@ export class Editor extends React.Component<IProps> {
         void embedInserter.scrapeMedia(url);
     };
 
+    /**
+     * Add the handler for when a quote button is clicked.
+     */
     private addQuoteHandler() {
-        this.delegatedHandlerHash = delegateEvent("click", ".js-quoteButton", this.quoteButtonClickHandler)!;
+        this.quoteHandler = delegateEvent("click", ".js-quoteButton", this.quoteButtonClickHandler)!;
+    }
+
+    /**
+     * Removes the event listener from addQuoteHandler.
+     *
+     * In some rare instances the component will unmount before quoteHandler exists.
+     * Because of this we need to check that it has been set.
+     */
+    private removeQuoteHandler() {
+        if (this.quoteHandler) {
+            removeDelegatedEvent(this.quoteHandler);
+        }
     }
 
     /**
@@ -294,18 +332,20 @@ export class Editor extends React.Component<IProps> {
 
         if (debug() && legacyTextArea) {
             legacyTextArea.addEventListener("paste", event => {
-                if (this.allowPasteListener) {
-                    event.stopPropagation();
-                    event.preventDefault();
+                event.stopPropagation();
+                event.preventDefault();
 
-                    // Get pasted data via clipboard API
-                    const clipboardData = event.clipboardData || window.clipboardData;
-                    const pastedData = clipboardData.getData("Text");
-                    const delta = JSON.parse(pastedData);
-                    this.quill.setContents(delta);
-                }
+                // Get pasted data via clipboard API
+                const clipboardData = event.clipboardData || window.clipboardData;
+                const pastedData = clipboardData.getData("Text");
+                const delta = JSON.parse(pastedData);
+                this.quill.setContents(delta);
             });
         }
+    }
+
+    private get descriptionID(): string {
+        return this.domID + "-description";
     }
 }
 

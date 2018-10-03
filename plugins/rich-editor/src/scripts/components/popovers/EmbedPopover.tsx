@@ -15,7 +15,9 @@ import Popover from "@rich-editor/components/popovers/pieces/Popover";
 import PopoverController, { IPopoverControllerChildParameters } from "@library/components/PopoverController";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 
-interface IProps extends IWithEditorProps {}
+interface IProps extends IWithEditorProps {
+    disabled?: boolean;
+}
 
 interface IState extends IRequiredComponentID {
     id: string;
@@ -56,6 +58,7 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                 onClose={this.clearInput}
                 buttonClasses="richEditor-button richEditor-embedButton"
                 onVisibilityChange={forceSelectionUpdate}
+                disabled={this.props.disabled}
             >
                 {(params: IPopoverControllerChildParameters) => {
                     const { initialFocusRef, closeMenuHandler, isVisible } = params;

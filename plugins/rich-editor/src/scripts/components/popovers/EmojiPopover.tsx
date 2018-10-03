@@ -11,7 +11,9 @@ import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import EmojiPicker from "@rich-editor/components/popovers/pieces/EmojiPicker";
 import PopoverController, { IPopoverControllerChildParameters } from "@library/components/PopoverController";
 
-interface IProps extends IOptionalComponentID {}
+interface IProps extends IOptionalComponentID {
+    disabled?: boolean;
+}
 
 export default class EmojiPopover extends React.Component<IProps, IRequiredComponentID> {
     public constructor(props) {
@@ -34,6 +36,7 @@ export default class EmojiPopover extends React.Component<IProps, IRequiredCompo
                 icon={icon}
                 buttonClasses="richEditor-button richEditor-embedButton"
                 onVisibilityChange={forceSelectionUpdate}
+                disabled={this.props.disabled}
             >
                 {(options: IPopoverControllerChildParameters) => {
                     return <EmojiPicker {...options} contentID={options.id} />;

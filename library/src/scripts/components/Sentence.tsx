@@ -74,7 +74,7 @@ export default class Sentence extends React.Component<ISentence> {
                             className={time.className}
                             children={time.children}
                             counter={childCounter}
-                            recursiveChildClass={this.props.childClass}
+                            recursiveChildClass={this.props.recursiveChildClass}
                         />
                     </time>
                 );
@@ -90,7 +90,7 @@ export default class Sentence extends React.Component<ISentence> {
                             className={word.className}
                             children={link.children}
                             counter={childCounter}
-                            recursiveChildClass={this.props.childClass}
+                            recursiveChildClass={this.props.recursiveChildClass}
                         />
                     </Link>
                 );

@@ -26,22 +26,35 @@ import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import Quill, { Sources, DeltaOperation } from "quill/core";
 import { hot } from "react-hot-loader";
 import registerQuill from "@rich-editor/quill/registerQuill";
+import { uniqueId } from "lodash";
+import classNames from "classnames";
 
-interface IProps {
-    editorID: string;
-    editorDescriptionID: string;
-    legacyTextArea?: HTMLInputElement;
+interface ICommonProps {
     isPrimaryEditor: boolean;
-    legacyMode: boolean;
+    isLoading?: boolean;
     onChange?: (newContent: DeltaOperation[]) => void;
 }
+
+interface ILegacyProps extends ICommonProps {
+    legacyMode: true;
+    legacyTextArea?: HTMLInputElement;
+}
+
+interface INewProps extends ICommonProps {
+    legacyMode?: false;
+    className?: string;
+}
+
+type IProps = ILegacyProps | INewProps;
 
 export class Editor extends React.Component<IProps> {
     private hasUploadPermission: boolean;
     private quillMountRef: React.RefObject<HTMLDivElement> = React.createRef();
     private store = getStore<IStoreState>();
     private allowPasteListener = true;
+    private domID: string;
     private editorID: string;
+    private descriptionID: string;
     private quill: Quill;
     private delegatedHandlerHash: string;
 
@@ -49,11 +62,11 @@ export class Editor extends React.Component<IProps> {
         super(props);
         log("Initializing Rich Editor");
         this.hasUploadPermission = hasPermission("uploads.add");
+        this.domID = uniqueId("editor-");
+        this.descriptionID = this.domID + "-description";
     }
 
     public render() {
-        const { editorDescriptionID } = this.props;
-
         // These items CANNOT be rendered before quill is ready, but the main text area is required for quill to render.
         // These should all re-render after componentDidMount calls forceUpdate().
         const quillDependantItems = this.quill && (
@@ -83,12 +96,17 @@ export class Editor extends React.Component<IProps> {
             </React.Fragment>
         );
 
-        return (
+        let mainContent = (
             <ReduxProvider store={this.store}>
                 <EditorProvider
-                    value={{ quill: this.quill, editorID: this.editorID, legacyMode: this.props.legacyMode }}
+                    value={{
+                        quill: this.quill,
+                        editorID: this.editorID,
+                        legacyMode: !!this.props.legacyMode,
+                        isLoading: !!this.props.isLoading,
+                    }}
                 >
-                    <EditorDescriptions id={editorDescriptionID} />
+                    <EditorDescriptions id={this.descriptionID} />
                     <div className="richEditor-frame InputBox">
                         <div className="richEditor-textWrap" ref={this.quillMountRef}>
                             <div
@@ -104,6 +122,22 @@ export class Editor extends React.Component<IProps> {
                 </EditorProvider>
             </ReduxProvider>
         );
+
+        if (!this.props.legacyMode) {
+            mainContent = (
+                <div
+                    className={classNames("richEditor", this.props.className)}
+                    aria-label={t("Type your message.")}
+                    aria-describedby={this.descriptionID}
+                    role="textbox"
+                    aria-multiline={true}
+                >
+                    {mainContent}
+                </div>
+            );
+        }
+
+        return mainContent;
     }
 
     /**
@@ -204,6 +238,10 @@ export class Editor extends React.Component<IProps> {
      * Once we rewrite the post page, this should no longer be necessary.
      */
     private setupLegacyTextAreaSync() {
+        if (!this.props.legacyMode) {
+            return;
+        }
+
         const { legacyTextArea } = this.props;
         if (!legacyTextArea) {
             return;
@@ -249,6 +287,9 @@ export class Editor extends React.Component<IProps> {
      * This only works for PASTE. Not editing the contents.
      */
     private setupDebugPasteListener() {
+        if (!this.props.legacyMode) {
+            return;
+        }
         const { legacyTextArea } = this.props;
 
         if (debug() && legacyTextArea) {

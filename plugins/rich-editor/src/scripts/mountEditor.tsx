@@ -24,18 +24,10 @@ export default function mountEditor(containerSelector: string | Element) {
     }
 
     const initialFormat = bodybox.getAttribute("format") || "Rich";
-    const editorID = uniqueId("editor-");
-    const descriptionID = editorID + "-description";
 
     if (initialFormat === "Rich") {
         ReactDOM.render(
-            <Editor
-                editorID={editorID}
-                editorDescriptionID={descriptionID}
-                legacyTextArea={bodybox as HTMLInputElement}
-                isPrimaryEditor={true}
-                legacyMode={true}
-            />,
+            <Editor legacyTextArea={bodybox as HTMLInputElement} isPrimaryEditor={true} legacyMode={true} />,
             container,
         );
         container.classList.remove("isDisabled");

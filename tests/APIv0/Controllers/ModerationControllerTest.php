@@ -269,7 +269,6 @@ class ModerationControllerTest extends BaseTest {
      * vs actual data getting from app/test database through APIv0
      */
     public function recheckCategories() {
-        self::FIELDS_CHECK_LIST;
         foreach (self::$categories as $catKey => $category) {
             $cat = $this->getCategory($category['CategoryID']);
             foreach (self::FIELDS_CHECK_LIST as $field) {
@@ -313,10 +312,12 @@ class ModerationControllerTest extends BaseTest {
             'Name' => 'Test cat '.$destCatKey,
             'UrlCode' => 'test-cat-'.$destCatKey,
             'DisplayAs' => 'Discussions'], $destCatKey);
-        $this->moveDiscussion(self::$discussions['d1_case1'], 'cat2', $destCatKey, self::$discussions['d1_case6']);
-        $this->moveDiscussion(self::$discussions['d1_case2'], 'cat2_1_1', $destCatKey, self::$discussions['d1_case6']);
-        $this->moveDiscussion(self::$discussions['d1_case3'], 'cat2_1_1_1', $destCatKey, self::$discussions['d1_case6']);
+        //We need to test both order from latest to older and backward from older to most recent
+        //reverse order brings more changes on data on each call
         $this->moveDiscussion(self::$discussions['d1_case4'], 'cat2_1_1_1_1', $destCatKey, self::$discussions['d1_case6']);
+        $this->moveDiscussion(self::$discussions['d1_case3'], 'cat2_1_1_1', $destCatKey, self::$discussions['d1_case6']);
+        $this->moveDiscussion(self::$discussions['d1_case2'], 'cat2_1_1', $destCatKey, self::$discussions['d1_case6']);
+        $this->moveDiscussion(self::$discussions['d1_case1'], 'cat2', $destCatKey, self::$discussions['d1_case6']);
         $this->recheckCategories();
     }
 

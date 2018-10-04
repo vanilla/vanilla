@@ -538,7 +538,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 'u.InviteUserID',
                 'u2.Name as InvitedByName',
                 'u.Location',
-                'group_concat(r.Name)',
+                'group_concat(r.Name) as Roles',
             ])
             ->from('User u')
             ->leftJoin('User u2', 'u.InviteUserID = u2.UserID and u.InviteUserID is not null')

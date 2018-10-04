@@ -1736,7 +1736,7 @@ class CategoryModel extends Gdn_Model {
      * @param bool $addUserCategory
      */
     public static function joinUserData(&$categories, $addUserCategory = true) {
-        $iDs = array_column($categories,'CategoryID', 'CategoryID');
+        $iDs = array_column($categories, 'CategoryID', 'CategoryID');
         $categoriesKeys = array_column($categories, 'CategoryID');
         $categories = array_combine($categoriesKeys, $categories);
 

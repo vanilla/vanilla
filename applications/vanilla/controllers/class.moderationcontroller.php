@@ -447,6 +447,7 @@ class ModerationController extends VanillaController {
             }
 
             // Update recent posts and counts on all affected categories.
+            CategoryModel::clearCache();
             foreach ($AffectedCategories as $categoryID => $counts) {
                 $CategoryModel->refreshAggregateRecentPost($categoryID, true);
 
@@ -467,6 +468,7 @@ class ModerationController extends VanillaController {
                     CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset);
                 }
             }
+            CategoryModel::clearCache();
 
             // Clear selections.
             if ($ClearSelection) {

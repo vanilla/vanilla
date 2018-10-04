@@ -3514,6 +3514,7 @@ SQL;
         }
 
         // Update the cache.
+/*
         $categoriesToUpdate = self::instance()->getWhere(['CategoryID' => $updatedCategories]);
         foreach ($categoriesToUpdate as $current) {
             $currentID = val('CategoryID', $current);
@@ -3524,6 +3525,7 @@ SQL;
                 ['CountAllDiscussions' => $countAllDiscussions, 'CountAllComments' => $countAllComments]
             );
         }
+*/
     }
 
     /**

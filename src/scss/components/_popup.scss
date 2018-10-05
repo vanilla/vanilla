@@ -65,6 +65,15 @@ div.Popup {
             border-color: $global-color_warning;
             color: $popup_color;
         }
+
+        .Buttons .Close,
+        .Button.Danger {
+
+            &:focus,
+            &:hover {
+                color: $global-color_white;
+            }
+        }
     }
 
     .Content,

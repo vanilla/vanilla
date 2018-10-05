@@ -172,6 +172,7 @@ select::-ms-expand {
 }
 
 #Form_OK,
+.Button:not(.GroupOptionsTitle),
 .Buttons .btn-primary {
     @include Button($global-color_primary, $global-color_white);
 }
@@ -276,10 +277,6 @@ div.token-input-dropdown {
         color: $global-color_primary;
         pointer-events: none;
     }
-}
-
-.Button:not(.GroupOptionsTitle) {
-    @include Button;
 }
 
 .ButtonGroup.Multi {

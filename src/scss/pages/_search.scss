@@ -9,9 +9,24 @@
 \* -------------------------------------------------------------- */
 
 body.Section-SearchResults {
+    @include noPanel;
 
     .SearchBox {
         display: none;
+    }
+
+    .SearchForm {
+        position: relative;
+        margin-top: 0;
+    }
+
+    .SearchForm .SiteSearch {
+        max-width: 100%;
+
+        .Button {
+            top: 0;
+            right: 0;
+        }
     }
 
     .AdvancedSearch {

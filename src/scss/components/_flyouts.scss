@@ -339,6 +339,7 @@ $flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.
 
     .ToggleFlyout,
     .ButtonGroup {
+        cursor: pointer;
 
         &::before {
             content: "";
@@ -352,9 +353,8 @@ $flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.
             width: 100vw;
             padding: 0;
             border: none;
-            background: rgba($global-color_black, 0.43);
+            background: rgba($color-black, 0.43);
             z-index: 1;
-            transition: transition(opacity);
             cursor: pointer;
             pointer-events: none;
         }

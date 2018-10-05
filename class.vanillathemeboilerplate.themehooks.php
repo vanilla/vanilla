@@ -23,7 +23,7 @@ class VanillaThemeBoilerplateThemeHooks extends Gdn_Plugin {
      */
     public function structure() {
         saveToConfig([
-            'Garden.MobileTheme' => 'vanilla-theme-boilerplate',
+            'Garden.MobileTheme' => 'theme-boilerplate',
             'Routes.DefaultController' => ['categories', 'Internal'],
             'Vanilla.Categories.Layout' => 'modern',
             'Vanilla.Discussions.Layout' => 'modern',

@@ -1,6 +1,6 @@
 {
-    "key": "vanilla-theme-boilerplate",
-    "name": "Vanilla Theme Boilerplate",
+    "key": "theme-boilerplate",
+    "name": "Theme Boilerplate",
     "description": "A SCSS boilerplate for vanilla responsive themes.",
     "version": "1.0.0",
     "authors": [],

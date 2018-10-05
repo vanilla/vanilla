@@ -28,8 +28,8 @@ try {
     fse.copyFileSync(path.resolve(TOOL_ROOT, "addon.json"), path.resolve(DEST, "addon.json"));
     fse.readFile(path.resolve(DEST, "addon.json"), 'utf8', function (err,data) {
 
-        data = data.replace(/vanilla-theme-boilerplate/g, themeKey);
-        data = data.replace(/Vanilla Theme Boilerplate/g, themeName);
+        data = data.replace(/theme-boilerplate/g, themeKey);
+        data = data.replace(/Theme Boilerplate/g, themeName);
 
         fse.writeFileSync(path.resolve(DEST, "addon.json"), data);
     });

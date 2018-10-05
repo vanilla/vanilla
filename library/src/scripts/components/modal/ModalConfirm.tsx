@@ -9,7 +9,7 @@ import { t } from "@library/application";
 import Button from "@library/components/forms/Button";
 import { Frame, FrameBody, FrameFooter, FrameHeader, FramePanel } from "@library/components/frame";
 import SmartAlign from "@library/components/SmartAlign";
-import { ModalSizes } from "@library/components/modal/ModalSizes";
+import ModalSizes from "@library/components/modal/ModalSizes";
 import { getRequiredID } from "@library/componentIDs";
 import Modal from "@library/components/modal/Modal";
 

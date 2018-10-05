@@ -7,8 +7,8 @@
 import React from "react";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import FullPageLoader from "@library/components/FullPageLoader";
-import { ModalSizes } from "./ModalSizes";
-import Modal from "./Modal";
+import ModalSizes from "@library/components/modal/ModalSizes";
+import Modal from "@library/components/modal/Modal";
 
 interface IProps extends RouteComponentProps<{}> {}
 

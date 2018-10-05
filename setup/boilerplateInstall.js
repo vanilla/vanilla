@@ -44,14 +44,20 @@ try {
         fse.writeFileSync(path.resolve(DEST, "class."+themeHooksFileName+".themehooks.php"), data);
     });
 
+    //copy README.md and swap theme name
+    fse.copyFileSync(path.resolve(TOOL_ROOT, "setup/README.md"), path.resolve(DEST, "README.md"));
+    fse.readFile(path.resolve(DEST, "README.md"), 'utf8', function (err,data) {
+
+        data = data.replace(/Vanilla Theme Boilerplate/g, themeName);
+
+        fse.writeFileSync(path.resolve(DEST, "README.md"), data);
+    });
+
     //copy design/ dir
     fse.copySync(path.resolve(TOOL_ROOT, "design"), path.resolve(DEST, "design"));
 
     //create js/ dir
     fse.mkdirSync(path.resolve(DEST, "js"));
-
-    //copy README.md
-    fse.copyFileSync(path.resolve(TOOL_ROOT, "README.md"), path.resolve(DEST, "README.md"));
 
     //copy screenshot.png
     fse.copyFileSync(path.resolve(TOOL_ROOT, "screenshot.png"), path.resolve(DEST, "screenshot.png"));

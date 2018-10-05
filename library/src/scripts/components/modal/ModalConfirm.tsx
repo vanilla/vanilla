@@ -11,7 +11,7 @@ import { Frame, FrameBody, FrameFooter, FrameHeader, FramePanel } from "@library
 import SmartAlign from "@library/components/SmartAlign";
 import { ModalSizes } from "@library/components/modal/ModalSizes";
 import { getRequiredID } from "@library/componentIDs";
-import Modal from "@library/components/Modal/Modal";
+import Modal from "@library/components/modal/Modal";
 
 interface IProps {
     title: string; // required for accessibility

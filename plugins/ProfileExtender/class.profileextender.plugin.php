@@ -531,7 +531,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 'u.Email',
                 'u.DateInserted',
                 'u.DateLastActive',
-                'inet6_ntoa(u.LastIpAddress) as LastIpAddress',
+                'inet6_ntoa(u.LastIPAddress)',
                 'u.CountDiscussions',
                 'u.CountComments',
                 'u.Points',

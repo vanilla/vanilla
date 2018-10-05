@@ -1,0 +1,62 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Variables
+\* -------------------------------------------------------------- */
+
+$count_fontWeight:                  inherit !default;
+$count_fontSize:                    $global-small_fontSize !default;
+$count_borderRadius:                $formButton_borderRadius !default;
+$count_height:                      $formButton_height !default;
+$count_bg:                          $theme-hover_color !default;
+$count_border:                      0 !default;
+$count_color:                       inherit !default;
+
+$count-hover_bg:                    $global-color_primary !default;
+$count-hover_borderColor:           $global-color_primary !default;
+$count-hover_color:                 $global-color_white !default;
+
+@mixin Count {
+    background-color: $count_bg;
+    color: $count_color;
+    border-color: darken($count_bg, 8%);
+    border: $count_border;
+    border-radius: $count_borderRadius;
+    padding: 0 $utility-xSmall_padding;
+    font-size: $count_fontSize;
+    line-height: $global-base_lineHeight;
+    white-space: nowrap;
+    display: inline-block;
+    text-align: center;
+    @if ($formButton_borderRadius == $formButton_height) {
+        min-width: 22px;
+    }
+}
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+// Reset margins
+.Aside {
+    margin: 0;
+}
+
+.Count,
+.Reactions .Count {
+    @include Count;
+}
+
+a:focus,
+a:hover {
+    .Count,
+    .Reactions .Count {
+        background-color: $count-hover_bg;
+        color: $count-hover_color;
+        border-color: $count-hover_borderColor;
+    }
+}

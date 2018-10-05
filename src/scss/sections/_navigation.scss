@@ -1,0 +1,240 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Variables
+\* -------------------------------------------------------------- */
+
+$navigation_backgroundColor:              $global-color_primary !default;
+$navigation_color:                        $global-color_white !default;
+$navigation_button-bg:                    $global-color_secondary !default;
+$navigation_button-color:                 $global-color_white !default;
+$navigation_fontSize:                     $global-medium_fontSize !default;
+$navigation_paddingSide:                  $utility-medium_padding !default;
+$navigation_vertical_paddingSide:         0 !default;
+$navigation-item_height:                  36px !default;
+$navigation-item_fontWeight:              $global-normal_fontWeight !default;
+$navigation-easing-transition:            cubic-bezier(0, 1, 0, 1) !default;
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.Navigation {
+    display: none;
+    overflow: hidden;
+    position: relative;
+    background: $navigation_backgroundColor;
+    color: $navigation_color;
+    width: 100%;
+    height: auto;
+    max-height: 0;
+    transition: max-height .3s ease;
+
+    @include maxWidth {
+        display: block;
+    }
+
+    &.isOpen {
+        max-height: 450px;
+    }
+
+    .Container {
+        @include maxWidth {
+            padding: 0;
+        }
+    }
+
+    .Button.NewDiscussion {
+        margin: 0 auto;
+        display: block;
+        max-width: 280px;
+        line-height: $formButton_height;
+    }
+
+    .ButtonGroup.NewDiscussion {
+        .Primary:first-child {
+            width: 100%;
+        }
+    }
+
+    &.isReadyToTransition {
+        will-change: max-height;
+        transition: max-height $global-default_easing $global-default_timing * 2;
+
+        &[data-state= 'CLOSED'] {
+            transition-timing-function: $navigation-easing-transition;
+        }
+    }
+
+    a {
+        color: $global-color_white;
+        line-height: 24px;
+    }
+
+    .NewDiscussion.mobile {
+        width: 100%;
+
+        .ButtonGroup.Action,
+        .Button.Action {
+            background: $navigation_button-bg;
+            border-color: darken($navigation_button-bg, 5%);
+            color: $navigation_button-color;
+            width: 100%;
+
+            .Button {
+                color: inherit;
+            }
+        }
+    }
+
+    .MeBox-SignIn {
+        flex-wrap: wrap;
+    }
+
+    .SignInIcons.SignInIcons {
+        margin-left: 0;
+        margin-top: $utility-large_padding;
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+
+    .SocialIcon {
+        margin: 0 $utility-xSmall_padding;
+    }
+
+    .MeBox.mobile {
+        width: 100%;
+    }
+
+    .MeBox.mobile .MeBox {
+        width: 100%;
+
+        .SignInLinks {
+            width: 100%;
+            text-align: center;
+            padding-top: $utility-medium_padding;
+
+            a {
+                @include Button($navigation_button-bg, $navigation_button-color);
+            }
+
+            .Bullet {
+                font-size: 0;
+                width: 20px;
+            }
+        }
+
+        & > .PhotoWrap.PhotoWrap {
+            display: inline-flex;
+            float: left;
+            height: 32px;
+            margin: $utility-small_padding 0 0 0;
+            padding-left: 10px;
+            justify-content: flex-start;
+            width: calc((100% / 5) + 10px);
+            box-shadow: none;
+            border-radius: 0;
+
+            img {
+                border-radius: $theme-photo_borderRadius;
+                overflow: hidden;
+
+                @if ($theme-photo_round) {
+                    border-radius: 50%;
+                }
+                width: 32px;
+            }
+        }
+
+        & > .PhotoWrap,
+        .WhoIs > .Username {
+            display: none;
+        }
+
+        .WhoIs {
+            width: 100%;
+        }
+
+        .MeMenu {
+            display: flex;
+            justify-content: space-between;
+            padding: 0;
+        }
+
+        .MeButton:hover {
+            background-color: transparent;
+        }
+
+        .MeButton .Sprite::before {
+            line-height: 32px;
+            font-size: $global-medium_fontSize;
+
+            @include maxWidth($theme-breakpoint_base){
+                line-height: $global-base_lineHeight;
+                font-size: $global-subTitle_fontSize;
+            }
+        }
+
+        .MeMenu > * {
+            margin: 0;
+            height: 42px;
+            width: 42px;
+            display: flex;
+            justify-content: center;
+        }
+    }
+}
+
+.Navigation-row {
+    padding: 0 $utility-large_padding $utility-large_padding;
+    display: flex;
+    align-items: center;
+}
+
+.Navigation-link {
+    font-size: $navigation_fontSize;
+    font-weight: $navigation-item_fontWeight;
+    line-height: $navigation-item_height;
+    display: block;
+    width: 100%;
+    padding: 0 $utility-large_padding;
+}
+
+.Navigation-linkContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    height: $panel-item_height;
+
+    a {
+        margin: 0;
+        line-height: $panel-item_height;
+
+        &:hover {
+            background: none;
+        }
+    }
+
+    &::after {
+        content: "";
+        width: 100%;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: rgba($global-color_black, 0.2);
+    }
+}
+.UserLoggedOut {
+
+    .Navigation-row.NewDiscussion {
+        display: none;
+    }
+}

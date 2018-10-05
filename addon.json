@@ -1,0 +1,14 @@
+{
+    "key": "vanilla-theme-boilerplate",
+    "name": "Vanilla Theme Boilerplate",
+    "description": "A SCSS boilerplate for vanilla responsive themes.",
+    "version": "1.0.0",
+    "authors": [],
+    "license": "GPL-2.0-only",
+    "sites": [],
+    "priority": 1000,
+    "type": "theme",
+    "build": {
+        "process": "v1"
+    }
+}

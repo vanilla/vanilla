@@ -1,0 +1,93 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Variables
+\* -------------------------------------------------------------- */
+
+$tag_borderRadius:                $formButton_borderRadius !default;
+$tag_height:                      $formButton_height !default;
+$tag_bg:                          $theme-hover_color !default;
+$tag_border:                      0 !default;
+$tag_color:                       inherit !default;
+
+$tag-hover_bg:                    $global-color_primary !default;
+$tag-hover_borderColor:           $global-color_primary !default;
+$tag-hover_color:                 $global-color_white !default;
+
+@mixin Tag() {
+    background-color: $theme-hover_color;
+    border-color: $global-color_primary;
+    border: 0;
+    color: inherit;
+    line-height: $global-base_lineHeight;
+    height: auto;
+    border-radius: $formButton_borderRadius;
+    padding: 0 $utility-small_padding;
+    display: inline-block;
+    font-weight: inherit;
+    font-size: inherit;
+    white-space: nowrap;
+}
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.Panel .TagCloud a {
+    @include Tag;
+    font-size: $global-small_fontSize;
+    @include ellipsis;
+    max-width: $panel_width;
+
+    .Count {
+        background-color: transparent;
+    }
+
+    &:focus,
+    &:hover {
+        background-color: $global-color_primary;
+        border-color: $global-color_primary;
+        color: $global-color_white;
+        text-decoration: none;
+    }
+}
+
+.DataList,
+.MessageList,
+.DataTableWrap {
+    .Tag,
+    .NewCommentCount,
+    .HasNew,
+    .Tag-Poll,
+    .RoleTracker,
+    .IdeationTag {
+       @include Tag;
+    }
+
+    .IdeationTag {
+        &:focus,
+        &:hover {
+            background-color: $global-color_primary;
+            border-color: $global-color_primary;
+            color: $global-color_white;
+            text-decoration: none;
+        }
+    }
+}
+
+.Form-Tags .AvailableTag {
+    @include Tag;
+
+    &:focus,
+    &:hover {
+        background-color: $global-color_primary;
+        border-color: $global-color_primary;
+        color: $global-color_white;
+        text-decoration: none;
+    }
+}
+

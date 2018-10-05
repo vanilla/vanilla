@@ -1,0 +1,284 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.Panel-main {
+
+    @include maxWidth($theme-breakpoint_tablet) {
+
+        .BoxNewDiscussion,
+        .BoxCategories {
+            display: none;
+        }
+
+        .Box h4 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: $global-subTitle_fontSize;
+            font-weight: $global-heading_fontWeight;
+            color: $global-color_fg;
+        }
+    }
+
+    .SocialIcon,
+    .ApplyButton,
+    .Button.Primary {
+        display: inline-flex;
+        justify-content: center;
+    }
+
+    .TagCloud {
+        background: transparent;
+
+        li {
+            padding: 0;
+            background: transparent;
+        }
+    }
+}
+
+.Panel-header {
+    display: none;
+}
+
+.Panel {
+    width: $panel_width;
+    background: $panel_bg;
+    padding: $panel_padding;
+    border: $panel_border;
+    border-radius: $panel_borderRadius;
+
+    @if($panel_toLeft != true) {
+        margin-left: auto;
+    }
+
+    @include maxWidth($theme-breakpoint_tablet) {
+        width: 100%;
+        //margin-top: $utility-large_padding;
+    }
+
+    h4 {
+        font-weight: bold;
+        margin-bottom: $utility-small_padding;
+        padding-bottom: 3px;
+        border-bottom: $component_border;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .Count {
+            margin-right: 6px;
+            margin-bottom: 4px;
+        }
+    }
+
+    .PanelInfo li {
+        padding: 0;
+    }
+
+    .vanilla-connect {
+        a {
+            display: inline-flex;
+        }
+
+        .Button + .Button {
+            margin-top: 3px;
+        }
+    }
+
+    .ButtonGroup.Multi,
+    .Button.BigButton {
+        width: 100%;
+        padding: 0;
+        margin: 0 0 $utility-large_padding;
+    }
+
+    .NewDiscussion.Big {
+        padding-right: 0;
+        position: relative;
+
+        > .Primary:first-child {
+            width: 100%;
+        }
+
+        .Button.Handle {
+            margin-left: 32px - $utility-medium_padding;
+            position: absolute;
+            right: 0;
+        }
+    }
+
+    .PhotoWrap {
+        height: 24px;
+        width: 24px;
+    }
+
+    .PhotoWrapLarge {
+        width: 100%;
+        height: auto;
+        border-radius: 0;
+        position: relative;
+
+        &:hover {
+            a.ChangePicture {
+                display: block;
+            }
+        }
+    }
+
+
+    .Leaderboard,
+    .InThisConversation {
+
+        a {
+            min-height: $panel-item_height;
+            padding: 0 $utility-small_padding;
+            border-radius: $formElement_borderRadius;
+            width: 100%;
+            color: $panel_color;
+            transition: transition(color), transition(background-color);
+
+            &:hover {
+                background: rgba($global-color_black, 0.08);
+            }
+        }
+
+        .ProfilePhoto.ProfilePhoto {
+            @include photoWrap;
+
+            width: $theme-photo-small_size;
+            height: $theme-photo-small_size;
+        }
+
+        .Username {
+            @include ellipsis;
+            max-width: 75%;
+            display: inline-block;
+            margin-left: $utility-small_padding;
+        }
+
+        .Conversation-User {
+            display: flex;
+        }
+    }
+}
+
+.Box {
+    li,
+    li:first-child {
+        border: none;
+    }
+}
+
+body.Section-EditProfile .Box,
+.BoxFilter,
+.BoxCategories {
+
+    .PanelCategories li {
+        padding: 0;
+
+        &.Depth2,
+        &.Depth3,
+        &.Depth4,
+        &.Depth5 {
+            position: relative;
+
+            a {
+                padding-left: 24px;
+            }
+
+            &::before {
+                content: "";
+                display: block;
+                position: absolute;
+                left: 7px;
+                top: 50%;
+                width: 6px;
+                height: 6px;
+                border-bottom: 2px solid mix($global-color_fg, $global-color_white, 20%);
+                border-left: 2px solid mix($global-color_fg, $global-color_white, 20%);
+                transform: translateY(-50%);
+                z-index: 1;
+            }
+        }
+    }
+
+    li {
+        border-radius: $formElement_borderRadius;
+    }
+
+    li.Heading {
+        min-height: $panel-item_height;
+        padding: 0 $utility-small_padding;
+        display: flex;
+        align-items: center;
+
+        .Aside {
+            order: 2;
+            margin-left: auto;
+        }
+    }
+
+    a {
+        min-height: $panel-item_height;
+        padding: 0 $utility-small_padding;
+        border-radius: $formElement_borderRadius;
+        width: 100%;
+        color: $panel_color;
+        transition: transition(color), transition(background-color);
+
+        &:hover {
+            background: $panel-hover_bg;
+        }
+    }
+
+    &.BadgeGrid a {
+        width: auto;
+        border-radius: 0;
+        padding: 0;
+    }
+
+    .Active {
+
+        a {
+            background-color: lighten($panel-hover_bg, 3%);
+            color: $panel-link_color;
+
+            &:focus,
+            &:hover {
+                color: $panel-link-hover_color;
+                background-color: $panel-hover_bg;
+
+                .Count {
+                    background-color: $panel-link-hover_color;
+                }
+            }
+        }
+    }
+
+}
+
+.WhosOnline.Box {
+
+    .PhotoWrap.PhotoWrap {
+        display: inline-block;
+        margin-left: 2px;
+        margin-right: 2px;
+        @include photoWrap;
+        min-height: 0;
+        width: $theme-photo-small_size;
+        height: $theme-photo-small_size;
+    }
+}
+
+    .PhotoGrid {
+        margin: 0 -2px;
+        width: calc(100% + 4px);
+    }

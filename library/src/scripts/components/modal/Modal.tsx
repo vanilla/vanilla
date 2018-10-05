@@ -8,7 +8,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 import TabHandler from "@library/TabHandler";
-import { logError } from "@library/utility";
 import { getRequiredID } from "@library/componentIDs";
 import classNames from "classnames";
 import { ModalSizes } from "./ModalSizes";
@@ -19,7 +18,7 @@ interface IProps {
     appContainer?: Element;
     container?: Element;
     children: React.ReactNode;
-    initialFocus?: HTMLElement;
+    elementToFocus?: string;
     description?: string; //For Accessibility
     size: ModalSizes;
 }
@@ -115,7 +114,6 @@ export default class Modal extends React.Component<IProps, IState> {
      * Everything here should be torn down in componentWillUnmount
      */
     public componentDidMount() {
-        Modal.focusHistory.push(document.activeElement as HTMLElement);
         this.focusInitialElement();
         this.props.appContainer!.setAttribute("aria-hidden", true);
         disableBodyScroll(this.selfRef.current!);
@@ -135,12 +133,15 @@ export default class Modal extends React.Component<IProps, IState> {
      * Focus the initial element in the Modal.
      */
     private focusInitialElement() {
-        const initialElement = this.tabHandler.getInitial();
-        if (initialElement) {
-            initialElement.focus();
+        let targetElement;
+        if (this.props.elementToFocus) {
+            targetElement = document.getElementById(this.props.elementToFocus);
         } else {
-            logError("A modal was created without any focusable element");
+            targetElement = this.tabHandler.getInitial();
         }
+        const elementToFocus = !!targetElement ? targetElement : document.body;
+        elementToFocus.focus();
+        Modal.focusHistory.push(elementToFocus);
     }
 
     /**

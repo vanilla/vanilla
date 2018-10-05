@@ -45,6 +45,7 @@ export default class CloseButton extends React.Component<IProps> {
             );
         } else {
             const componentClasses = classNames("buttonClose", this.props.className);
+            const iconPadding = !this.props.legacyMode;
             return (
                 <Button
                     disabled={this.props.disabled}
@@ -54,7 +55,7 @@ export default class CloseButton extends React.Component<IProps> {
                     onClick={this.props.onClick}
                     baseClass={this.props.baseClass}
                 >
-                    {close()}
+                    {close("isSmall", iconPadding)}
                 </Button>
             );
         }

@@ -16,6 +16,7 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 interface ICommonFrameHeaderProps extends ICommonHeadingProps {
     closeFrame: () => void;
     onBackClick?: () => void;
+    srOnlyTitle?: boolean;
 }
 
 export interface IStringTitle extends ICommonFrameHeaderProps {
@@ -34,6 +35,7 @@ export type IFrameHeaderProps = IStringTitle | IComponentTitle;
 export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> {
     public static defaultProps = {
         heading: 2,
+        srOnlyTitle: false,
     };
 
     public render() {
@@ -59,10 +61,16 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
         return (
             <header className={classNames("frameHeader", this.props.className)}>
                 {backLink}
-                <Heading title={stringTitle!} depth={this.props.depth} className="frameHeader-heading">
+                <Heading
+                    title={stringTitle!}
+                    depth={this.props.depth}
+                    className={classNames("frameHeader-heading", { "sr-only": this.props.srOnlyTitle })}
+                >
                     {componentTitle}
                 </Heading>
-                <CloseButton className="frameHeader-close isCompact" onClick={this.props.closeFrame} />
+                <div className="frameHeader-closePosition">
+                    <CloseButton className="frameHeader-close" onClick={this.props.closeFrame} />
+                </div>
             </header>
         );
     }

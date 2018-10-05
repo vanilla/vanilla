@@ -8,10 +8,10 @@ import * as React from "react";
 import { t } from "@library/application";
 import Button from "@library/components/forms/Button";
 import { Frame, FrameBody, FrameFooter, FrameHeader, FramePanel } from "@library/components/frame";
-import { Modal } from "@library/components/Modal";
 import SmartAlign from "@library/components/SmartAlign";
 import { ModalSizes } from "@library/components/modal/ModalSizes";
 import { getRequiredID } from "@library/componentIDs";
+import Modal from "@library/components/Modal/Modal";
 
 interface IProps {
     title: string; // required for accessibility

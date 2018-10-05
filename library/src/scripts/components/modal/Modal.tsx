@@ -8,7 +8,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 import TabHandler from "@library/TabHandler";
-import { logError } from "@library/utility";
 import { getRequiredID } from "@library/componentIDs";
 import classNames from "classnames";
 import { ModalSizes } from "./ModalSizes";

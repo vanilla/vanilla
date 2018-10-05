@@ -57,6 +57,7 @@ $searchbox-button_borderWidth: 1px !default;
     }
 }
 
+.SearchForm .SiteSearch .Button,
 .AdvancedSearch .bwrap .Button,
 #Form_Go {
     background: transparent;
@@ -142,4 +143,18 @@ $searchbox-button_borderWidth: 1px !default;
         line-height: $formElement_height;
         pointer-events: none;
     }
+}
+
+.SearchForm form > div::after,
+.SearchBox form > div::after {
+    @include icon;
+    content: $icon-search;
+    color: $searchbox-button_color;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: $formElement_height;
+    line-height: $formElement_height;
+    pointer-events: none;
 }

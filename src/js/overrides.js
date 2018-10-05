@@ -16,7 +16,9 @@ import {disableScroll, enableScroll, toggleScroll} from './utility';
 export function fixToggleFlyoutBehaviour() {
     $(document).undelegate(".ToggleFlyout", "click");
     var lastOpen = null;
+
     $(document).delegate(".ToggleFlyout", "click", function(e) {
+        var $toggleFlyout = $(this);
         var $flyout = $(".Flyout", this);
         var isHandle = false;
 
@@ -50,38 +52,42 @@ export function fixToggleFlyoutBehaviour() {
             });
         }
 
-        if ($flyout.css("visibility") == "hidden") {
+        if ($flyout.css("visibility") === "hidden") {
             if (lastOpen !== null) {
                 $(".Flyout", lastOpen).hide();
                 $(lastOpen)
                     .removeClass("Open")
                     .closest(".Item")
                     .removeClass("Open");
+                $toggleFlyout.setFlyoutAttributes();
             }
 
             $(this).addClass("Open").closest(".Item").addClass("Open");
             $flyout.show();
             disableScroll();
             lastOpen = this;
+            $toggleFlyout.setFlyoutAttributes();
         } else {
             $flyout.hide();
             $(this).removeClass("Open").closest(".Item").removeClass("Open");
             enableScroll();
+            $toggleFlyout.setFlyoutAttributes();
         }
 
         if (isHandle) return false;
     });
 
     // Close ToggleFlyout menu even if their links are hijacked
-    $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
-        if ($(this).hasClass('FlyoutButton'))
+    $(document).delegate(".ToggleFlyout a", "mouseup", function() {
+        if ($(this).hasClass("FlyoutButton"))
             return;
 
-        $('.ToggleFlyout').removeClass('Open').closest('.Item').removeClass('Open');
-        $('.Flyout').hide();
+        $(".ToggleFlyout").removeClass("Open").closest(".Item").removeClass("Open");
+        $(".Flyout").hide();
+        $(this).closest(".ToggleFlyout").setFlyoutAttributes();
     });
 
-    $(document).on( "click touchstart", function() {
+    $(document).delegate(document, "click", function(e) {
         if (lastOpen) {
             $(".Flyout", lastOpen).hide();
             $(lastOpen)

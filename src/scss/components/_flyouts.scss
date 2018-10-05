@@ -333,6 +333,18 @@ $flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.
     }
 }
 
+@include maxWidth($theme-breakpoint_tablet) {
+
+    .ToggleFlyout,
+    .ButtonGroup {
+        cursor: pointer;
+
+        &::before {
+            cursor: pointer;
+        }
+    }
+}
+
 // ---------- Mobile ---------- //
 
 @include maxWidth($theme-breakpoint_smallTable) {
@@ -354,8 +366,6 @@ $flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.
             border: none;
             background: rgba($global-color_black, 0.43);
             z-index: 1;
-            transition: transition(opacity);
-            cursor: pointer;
             pointer-events: none;
         }
 
@@ -440,7 +450,6 @@ $flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.
     .ButtonGroup.Open .Dropdown,
     .editor-dropdown-open .Flyout.Flyout.Flyout {
         visibility: visible;
-        //transform: translateY(0);
         transition-delay: 0s;
         opacity: 1;
 

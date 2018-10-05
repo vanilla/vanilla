@@ -38,7 +38,7 @@ try {
     fse.copyFileSync(path.resolve(TOOL_ROOT, "class.vanillathemeboilerplate.themehooks.php"), path.resolve(DEST, "class."+themeHooksFileName+".themehooks.php"));
     fse.readFile(path.resolve(DEST, "class."+themeHooksFileName+".themehooks.php"), 'utf8', function (err,data) {
 
-        data = data.replace(/vanilla-theme-boilerplate/g, themeKey);
+        data = data.replace(/theme-boilerplate/g, themeKey);
         data = data.replace(/VanillaThemeBoilerplate/g, themeHooksClassName);
 
         fse.writeFileSync(path.resolve(DEST, "class."+themeHooksFileName+".themehooks.php"), data);

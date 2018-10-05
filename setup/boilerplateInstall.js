@@ -45,7 +45,7 @@ try {
     });
 
     //copy README.md and swap theme name
-    fse.copyFileSync(path.resolve(TOOL_ROOT, "setup/README.md"), path.resolve(DEST, "README.md"));
+    fse.copyFileSync(path.resolve(TOOL_ROOT, "setup/src/README.md"), path.resolve(DEST, "README.md"));
     fse.readFile(path.resolve(DEST, "README.md"), 'utf8', function (err,data) {
 
         data = data.replace(/Vanilla Theme Boilerplate/g, themeName);

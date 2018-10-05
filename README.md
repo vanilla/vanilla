@@ -37,4 +37,19 @@ Node and Yarn are prerequisites to use this tool. Please download and install th
 
 4. Your theme is ready to be enabled. On your localhost navigate to **Dashboard > Appearance > Themes** and enable your theme.
 
-For more information about using this tool please refer to [our docs](https://docs.vanillaforums.com/developer/theme-boilerplate/).
+### Usage
+
+You might want to start taking a look at `src/scss/_variables.scss`. There you can find most of the variables you need to customize your theme.
+
+A good starting point is to create variables containing your brand values on the top of the `_variables.scss`, like colors, font family, sizes, etc. Make sure to use the  `$theme-` namespace to keep things organized.
+
+Once your variables are set, you may start customizing!
+
+To know more about the boilerplate SCSS structure please visit the [variables description](https://docs.vanillaforums.com/developer/theme-boilerplate/sctructure-variables/) page.
+There you can find information about what each variable represents, naming conventions and folder structure.
+
+Essentially you can overwrite whatever you like but be careful! Some variables are heavily inherited and not meant to be overwritten. Doing so may break your layout.
+
+### Building Styles / Javascript / Images
+
+The boilerplate frontend assets are built with the [Vanilla CLI](https://docs.vanillaforums.com/developer/vanilla-cli/).

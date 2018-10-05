@@ -522,7 +522,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
         // Determine profile fields we need to add.
         $fields = $this->getProfileFields();
-        $columnNames = ['Name', 'Email', 'Joined', 'Last Seen', 'LastIpAddress', 'Discussions', 'Comments', 'Points', 'InviteUserID', 'InvitedByName', 'Location', 'Roles'];
+        $columnNames = ['Name', 'Email', 'Joined', 'Last Seen', 'LastIPAddress', 'Discussions', 'Comments', 'Points', 'InviteUserID', 'InvitedByName', 'Location', 'Roles'];
 
         // Set up our basic query.
         Gdn::sql()

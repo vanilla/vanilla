@@ -325,3 +325,13 @@ export function sanitizeUrl(url: string) {
         return "unsafe:" + url;
     }
 }
+
+/**
+ * Check if valid array
+ *
+ * @param items The array to validate
+ * @param minItems Minimum expected items, defaults to 1;
+ */
+export function loopableArray(items?: any[], minItems: number = 0) {
+    return !!items && items.length && items.length > minItems;
+}

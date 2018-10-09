@@ -159,3 +159,75 @@ export function selectedCategory(className?: string) {
         </svg>
     );
 }
+
+export function fileGeneric(className?: string) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 18 18"
+            className={classNames("icon", "icon-fileGeneric", className)}
+            aria-hidden="true"
+        >
+            <title>{t("Document")}</title>
+            <rect width="18" height="18" rx="1" ry="1" fill="2b5599" />
+            <polygon
+                points="6.133 13.543 4 5 5.365 5 6.707 11.07 6.73 11.07 8.389 5 9.326 5 10.979 11.07 11.002 11.07 12.35 5 13.715 5 11.582 13.543 10.498 13.543 8.869 7.385 8.846 7.385 7.211 13.543 6.133 13.543"
+                fill="fff"
+            />
+        </svg>
+    );
+}
+
+export function fileWord(className?: string) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 18 18"
+            className={classNames("icon", "icon-fileWord", className)}
+            aria-hidden="true"
+        >
+            <title>{t("Word Document")}</title>
+            <rect width="18" height="18" rx="1" ry="1" fill="#2b5599" />
+            <polygon
+                points="6.133 13.543 4 5 5.365 5 6.707 11.07 6.73 11.07 8.389 5 9.326 5 10.979 11.07 11.002 11.07 12.35 5 13.715 5 11.582 13.543 10.498 13.543 8.869 7.385 8.846 7.385 7.211 13.543 6.133 13.543"
+                fill="fff"
+            />
+        </svg>
+    );
+}
+
+export function fileExcel(className?: string) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 18 18"
+            className={classNames("icon", "icon-fileExcel", className)}
+            aria-hidden="true"
+        >
+            <title>{t("Excel Document")}</title>
+            <rect width="18" height="18" rx="1" ry="1" fill="#2b5599" />
+            <polygon
+                points="6.133 13.543 4 5 5.365 5 6.707 11.07 6.73 11.07 8.389 5 9.326 5 10.979 11.07 11.002 11.07 12.35 5 13.715 5 11.582 13.543 10.498 13.543 8.869 7.385 8.846 7.385 7.211 13.543 6.133 13.543"
+                fill="#fff"
+            />
+        </svg>
+    );
+}
+
+export function filePDF(className?: string) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 18 18"
+            className={classNames("icon", "icon-filePDF", className)}
+            aria-hidden="true"
+        >
+            <title>{t("PDF Document")}</title>
+            <rect width="18" height="18" rx="1" ry="1" fill="2b5599" />
+            <polygon
+                points="6.133 13.543 4 5 5.365 5 6.707 11.07 6.73 11.07 8.389 5 9.326 5 10.979 11.07 11.002 11.07 12.35 5 13.715 5 11.582 13.543 10.498 13.543 8.869 7.385 8.846 7.385 7.211 13.543 6.133 13.543"
+                fill="fff"
+            />
+        </svg>
+    );
+}

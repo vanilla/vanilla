@@ -456,16 +456,16 @@ class ModerationController extends VanillaController {
 
                 // Offset the discussion count for this category and its parents.
                 if ($discussionOffset < 0) {
-                    CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset, true);
+                    CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset, false);
                 } else {
-                    CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset, true);
+                    CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset, false);
                 }
 
                 // Offset the comment count for this category and its parents.
                 if ($commentOffset < 0) {
-                    CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset, true);
+                    CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset, false);
                 } else {
-                    CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset, true);
+                    CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset, false);
                 }
             }
             CategoryModel::clearCache();

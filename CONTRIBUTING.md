@@ -10,6 +10,6 @@ Here are some quick and easy ways to get involved in the Vanilla Forums project.
 * Keep our to-do list fresh by reviewing our open issues for resolved or duplicated items.
 * Got an idea or suggestion? Use the [community forum](https://open.vanillaforums.com/discussions) to discuss it.
 * Identify broken addons in the [community directory](https://open.vanillaforums.com/addons).
-* Imporove our custom features on the community forum by helping in the [community repo](https://github.com/vanilla/community).
+* Improve our custom features on the community forum by helping in the [community repo](https://github.com/vanilla/community).
 
 And add to and improve this list!

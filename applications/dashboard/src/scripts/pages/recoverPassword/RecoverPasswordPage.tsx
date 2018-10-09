@@ -9,7 +9,7 @@ import { t } from "@library/application";
 import DocumentTitle from "@library/components/DocumentTitle";
 import React from "react";
 import ButtonSubmit from "@library/components/forms/ButtonSubmit";
-import Paragraph from "@dashboard/components/forms/Paragraph";
+import Paragraph from "@library/components/Paragraph";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 import uniqueId from "lodash/uniqueId";
 import { IStoreState, IRequestPasswordState } from "@dashboard/@types/state";

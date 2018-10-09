@@ -5,7 +5,7 @@
 
 import { t } from "@library/application";
 import React from "react";
-import Paragraph from "@dashboard/components/forms/Paragraph";
+import Paragraph from "@library/components/Paragraph";
 import { IUserAuthenticator } from "@dashboard/@types/api";
 
 interface IProps {

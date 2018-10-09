@@ -7,7 +7,7 @@ import React from "react";
 import classNames from "classnames";
 import { getRequiredID, IOptionalComponentID } from "@library/componentIDs";
 import { IFieldError } from "@library/@types/api";
-import Paragraph from "@dashboard/components/forms/Paragraph";
+import Paragraph from "@library/components/Paragraph";
 import ErrorMessages from "@dashboard/components/forms/ErrorMessages";
 
 export interface IInputTextProps extends IOptionalComponentID {

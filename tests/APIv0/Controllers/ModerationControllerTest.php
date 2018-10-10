@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Controllers;
+namespace VanillaTests\APIv0\Controllers;
 
 use VanillaTests\APIv0\BaseTest;
 
@@ -34,18 +34,17 @@ class ModerationControllerTest extends BaseTest {
      */
     protected static $discussions = [];
 
-    /**
-     * Initial config set up for test
-     */
-    public function testInitDB() {
-        $this->api()->saveToConfig([
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+        self::$api->saveToConfig([
             'Garden.Registration.Method' => 'Basic',
             'Garden.Registration.ConfirmEmail' => false,
             'Garden.Registration.SkipCaptcha' => true,
             'Cache.Enabled' => false,
         ]);
 
-        $this->api()->setUser($this->addAdminUser());
+        $system = self::$api->querySystemUser(true);
+        self::$api->setUser($system);
     }
 
     /**
@@ -173,10 +172,13 @@ class ModerationControllerTest extends BaseTest {
      * @param array $srcDiscussion
      */
     protected function moveDiscussion(array $discussion, string $srcCatKey, string $destCatKey, array $srcDiscussion = []) {
-        $r = self::$api->post('/moderation/confirmdiscussionmoves.json?discussionid='.$discussion['DiscussionID'], [
-        'Move' => 'Move',
-        'CategoryID' => self::$categories[$destCatKey]['CategoryID']
-        ]);
+        $r = self::$api->post(
+            '/moderation/confirmdiscussionmoves.json?discussionid='.$discussion['DiscussionID'],
+            [
+                'Move' => 'Move',
+                'CategoryID' => self::$categories[$destCatKey]['CategoryID']
+            ]
+        );
 
         $this->updateValidValuesOnMoveDiscussion($discussion, $srcCatKey, $destCatKey, true, $srcDiscussion);
     }
@@ -254,7 +256,7 @@ class ModerationControllerTest extends BaseTest {
      */
     protected static function getCategory(int $categoryId) {
         $r = self::$api->get(
-            '/vanilla/settings/getcategory.json?'.rand(0, 1000),
+            '/vanilla/settings/getcategory.json',
             ['CategoryID'=>$categoryId]
         );
         if ($r->getStatusCode() != 200) {
@@ -268,7 +270,7 @@ class ModerationControllerTest extends BaseTest {
      * Execute asserts to compare prepared valid data
      * vs actual data getting from app/test database through APIv0
      */
-    public function recheckCategories() {
+    protected function recheckCategories() {
         foreach (self::$categories as $catKey => $category) {
             $cat = $this->getCategory($category['CategoryID']);
             foreach (self::FIELDS_CHECK_LIST as $field) {
@@ -284,7 +286,6 @@ class ModerationControllerTest extends BaseTest {
      *
      * @large
      *
-     * @depends testInitDB
      */
     public function testMoveNewDiscussionsEmptyCategories() {
         $this->createAndMove('cat1', 'cat2', 'd1_case1');
@@ -303,7 +304,6 @@ class ModerationControllerTest extends BaseTest {
      *
      * @large
      *
-     * @depends testInitDB
      * @depends testMoveNewDiscussionsEmptyCategories
      */
     public function testMoveExistingDiscussionToEmptyCategory() {
@@ -328,7 +328,6 @@ class ModerationControllerTest extends BaseTest {
      *
      * @large
      *
-     * @depends testInitDB
      * @depends testMoveNewDiscussionsEmptyCategories
      * @depends testMoveExistingDiscussionToEmptyCategory
      */
@@ -338,13 +337,13 @@ class ModerationControllerTest extends BaseTest {
         $this->moveDiscussion(self::$discussions['d1_case2'], 'cat3_1_1', $destCatKey, self::$discussions['d1_case4']);
         $this->recheckCategories();
     }
+
     /**
      * Use case #4:
      * Move most recent discussion from one category to another
      *
      * @large
      *
-     * @depends testInitDB
      * @depends testMoveNewDiscussionsEmptyCategories
      * @depends testMoveExistingDiscussionToEmptyCategory
      * @depends testMoveExistingDiscussionToNotEmptyCategory
@@ -355,13 +354,13 @@ class ModerationControllerTest extends BaseTest {
         $this->moveDiscussion(self::$discussions['d1_case5'], 'cat3_1_1', 'cat2_1', self::$discussions['d1_case4']);
         $this->recheckCategories();
     }
+
     /**
      * Use case #5:
      * New comment add to existing discussion and move that discussion after
      *
      * @large
      *
-     * @depends testInitDB
      * @depends testMoveNewDiscussionsEmptyCategories
      * @depends testMoveExistingDiscussionToEmptyCategory
      * @depends testMoveExistingDiscussionToNotEmptyCategory
@@ -376,6 +375,7 @@ class ModerationControllerTest extends BaseTest {
         $this->moveDiscussion(self::$discussions['d1_case1'], 'cat2_1', 'cat3_1_1', self::$discussions['d1_case6']);
         $this->recheckCategories();
     }
+
     /**
      * Use case #6:
      * Create new comment to existing discussion and move it to some destCategory
@@ -385,7 +385,6 @@ class ModerationControllerTest extends BaseTest {
      *
      * @large
      *
-     * @depends testInitDB
      * @depends testMoveNewDiscussionsEmptyCategories
      * @depends testMoveExistingDiscussionToEmptyCategory
      * @depends testMoveExistingDiscussionToNotEmptyCategory
@@ -412,13 +411,11 @@ class ModerationControllerTest extends BaseTest {
      * automatically creates source and destination categories with its parents recursively
      * create discussion under source category and move it to destination
      *
-     * @large
-     *
      * @param string $srcCatKey
      * @param string $destCatKey
      * @param string $discussionKey
      */
-    public function createAndMove(string $srcCatKey, string $destCatKey, string $discussionKey) {
+    protected function createAndMove(string $srcCatKey, string $destCatKey, string $discussionKey) {
         if (!($srcCategory = (self::$categories[$srcCatKey] ?? false))) {
             self::$categories[$srcCatKey] = $srcCategory = self::addCategory([
                 'Name' => 'Test cat '.$srcCatKey,
@@ -439,46 +436,5 @@ class ModerationControllerTest extends BaseTest {
             ], $destCatKey);
         }
         $this->moveDiscussion($discussion, $srcCatKey, $destCatKey);
-    }
-
-
-    /**
-     * Test adding an admin user.
-     *
-     * @large
-     */
-    public function addAdminUser() {
-        $system = $this->api()->querySystemUser(true);
-        $this->api()->setUser($system);
-
-        $adminUser = [
-            'Name' => 'Admin',
-            'Email' => 'admin@example.com',
-            'Password' => 'adminsecure',
-        ];
-
-        // Get the admin roles.
-        $adminRole = $this->api()->queryOne("select * from GDN_Role where Name = :name", [':name' => 'Administrator']);
-        $this->assertNotEmpty($adminRole);
-        $adminUser['RoleID'] = [$adminRole['RoleID']];
-
-        $this->api()->saveToConfig([
-            'Garden.Email.Disabled' => true,
-        ]);
-        $r = $this->api()->post(
-            '/user/add.json',
-            http_build_query($adminUser)
-        );
-        $this->assertResponseSuccess($r);
-
-        // Query the user in the database.
-        $dbUser = $this->api()->queryUserKey('Admin', true);
-
-        // Query the admin role.
-        $userRoles = $this->api()->query("select * from GDN_UserRole where UserID = :userID", [':userID' => $dbUser['UserID']]);
-        $userRoleIDs = array_column($userRoles, 'RoleID');
-        $this->assertEquals($adminUser['RoleID'], $userRoleIDs);
-
-        return $dbUser;
     }
 }

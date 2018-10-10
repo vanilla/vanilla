@@ -10,7 +10,7 @@ import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 import TabHandler from "@library/TabHandler";
 import { getRequiredID } from "@library/componentIDs";
 import classNames from "classnames";
-import { ModalSizes } from "./ModalSizes";
+import ModalSizes from "@library/components/modal/ModalSizes";
 
 interface IProps {
     className?: string;

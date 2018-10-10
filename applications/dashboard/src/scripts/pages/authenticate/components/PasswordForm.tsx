@@ -10,7 +10,7 @@ import { withRouter, Link } from "react-router-dom";
 import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
 import Checkbox from "@library/components/forms/Checkbox";
 import ButtonSubmit from "@library/components/forms/ButtonSubmit";
-import Paragraph from "@dashboard/components/forms/Paragraph";
+import Paragraph from "@library/components/Paragraph";
 import { IRequiredComponentID, getRequiredID } from "@library/componentIDs";
 import { IStoreState, IPasswordState } from "@dashboard/@types/state";
 import { IAuthenticatePasswordParams } from "@dashboard/@types/api";
@@ -68,7 +68,7 @@ export class PasswordForm extends React.Component<IProps, IState> {
                 <Paragraph
                     id={this.formDescriptionID}
                     className="authenticateUser-paragraph"
-                    content={globalErrorMessage}
+                    children={globalErrorMessage}
                     isError={true}
                 />
                 <InputTextBlock

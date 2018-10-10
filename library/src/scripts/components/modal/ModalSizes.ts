@@ -4,9 +4,11 @@
  * @license GPL-2.0-only
  */
 
-export enum ModalSizes {
+enum ModalSizes {
     FULL_SCREEN = "full screen",
     LARGE = "large",
     MEDIUM = "medium",
     SMALL = "small",
 }
+
+export default ModalSizes;

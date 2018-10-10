@@ -37,7 +37,7 @@ export default class ReduxActions {
      * @see https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
      *
      * @param requestType The string for the request type. This should be a unique constant.
-     * @param successType The string for the success type. This should be a unique constant.
+     * @param responseType The string for the response type. This should be a unique constant.
      * @param errorType The string for the error type. This should be a unique constant.
      * @param dummyResponseType A placeholder to infer the type of the response. This isn't used for anything other than inferring a type.
      * @param dummyMetaType A placeholder to infer the type of the meta. This isn't used for anything other than inferringa  type.
@@ -46,38 +46,38 @@ export default class ReduxActions {
      *
      * ```
      * const GET_THING_REQUEST = "GET_THING_REQUEST";
-     * const GET_THING_SUCCESS = "GET_THING_SUCCESS";
+     * const GET_THING_RESPONSE = "GET_THING_RESPONSE";
      * const GET_THING_ERROR = "GET_THING_ERROR";
      * interface IThing { thing: string }
      * interface IThingOptions { page?: number }
      *
-     * generateApiActionCreators(GET_THING_REQUEST, GET_THING_SUCCESS, GET_THING_ERROR, {} as IThing, {} as IThingOptions);
+     * generateApiActionCreators(GET_THING_REQUEST, GET_THING_RESPONSE, GET_THING_ERROR, {} as IThing, {} as IThingOptions);
      * ```
      */
     public static generateApiActionCreators<
         RequestActionType extends string,
-        SuccessActionType extends string,
+        ResponseActionType extends string,
         ErrorActionType extends string,
         ResponseDataType,
         Meta = any
     >(
         requestType: RequestActionType,
-        successType: SuccessActionType,
+        responseType: ResponseActionType,
         errorType: ErrorActionType,
         dummyResponseType?: ResponseDataType,
         dummyMetaType?: Meta,
     ): {
         request: (meta?: Meta) => IApiAction<RequestActionType, Meta>;
-        success: (
+        response: (
             payload: IApiResponse<ResponseDataType>,
             meta?: Meta,
-        ) => IApiSuccessAction<SuccessActionType, Meta, ResponseDataType>;
+        ) => IApiResponseAction<ResponseActionType, Meta, ResponseDataType>;
         error: (error: IApiError, meta?: Meta) => IApiErrorAction<ErrorActionType, Meta>;
     } {
         return {
             request: (meta: Meta) => ReduxActions.createApiRequestAction(requestType, meta),
-            success: (response: IApiResponse<ResponseDataType>, meta: Meta) =>
-                ReduxActions.createApiSuccessAction(successType, meta, response),
+            response: (response: IApiResponse<ResponseDataType>, meta: Meta) =>
+                ReduxActions.createApiResponseAction(responseType, meta, response),
             error: (error: IApiError, meta: Meta) => ReduxActions.createApiErrorAction(errorType, meta, error),
         };
     }
@@ -118,17 +118,17 @@ export default class ReduxActions {
     }
 
     /**
-     * Create an API success action. For use in createApiActions().
+     * Create an API response action. For use in createApiActions().
      *
      * @param type The action's type.
      * @param meta The type of the meta for the action.
      * @param payload The shape of the IApiResponse data.
      */
-    private static createApiSuccessAction<ActionType extends string, Meta, ResponseDataType>(
+    private static createApiResponseAction<ActionType extends string, Meta, ResponseDataType>(
         type: ActionType,
         meta: Meta,
         payload: IApiResponse<ResponseDataType>,
-    ): IApiSuccessAction<ActionType, Meta, ResponseDataType> {
+    ): IApiResponseAction<ActionType, Meta, ResponseDataType> {
         return {
             type,
             meta,
@@ -170,7 +170,7 @@ export default class ReduxActions {
         this.dispatch(actionCreators.request(params));
         try {
             const response: AxiosResponse<T> = await this.api[requestType as any](endpoint, params);
-            this.dispatch(actionCreators.success(response, params));
+            this.dispatch(actionCreators.response(response, params));
             return response;
         } catch (axiosError) {
             const error = axiosError.response ? axiosError.response.data : (axiosError as any);
@@ -207,7 +207,7 @@ interface IApiErrorAction<ActionType, Meta> extends IApiAction<ActionType, Meta>
     payload: IApiError;
 }
 
-interface IApiSuccessAction<ActionType, Meta, ResponseDataType> extends IApiAction<ActionType, Meta> {
+interface IApiResponseAction<ActionType, Meta, ResponseDataType> extends IApiAction<ActionType, Meta> {
     payload: IApiResponse<ResponseDataType>;
 }
 

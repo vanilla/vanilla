@@ -11,7 +11,7 @@ import { getOptionalID, IOptionalComponentID } from "../componentIDs";
 interface IProps extends IOptionalComponentID {
     className?: string;
     isError?: boolean;
-    content?: React.ReactNode;
+    children?: React.ReactNode;
 }
 
 export default class Paragraph extends React.Component<IProps> {
@@ -27,7 +27,7 @@ export default class Paragraph extends React.Component<IProps> {
     }
 
     public render() {
-        if (this.props.content) {
+        if (this.props.children) {
             const componentClasses = classNames({ isError: this.props.isError }, this.props.className);
 
             let accessibilityProps = {};
@@ -41,7 +41,7 @@ export default class Paragraph extends React.Component<IProps> {
 
             return (
                 <p id={this.id} className={componentClasses} {...accessibilityProps}>
-                    {this.props.content}
+                    {this.props.children}
                 </p>
             );
         } else {

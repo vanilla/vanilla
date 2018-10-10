@@ -59,7 +59,7 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
                 <div id={this.id} className="authenticateUserCol">
                     {pageTitle}
                     <Paragraph
-                        content={t("A message has been sent to your email address with password reset instructions.")}
+                        children={t("A message has been sent to your email address with password reset instructions.")}
                         className="authenticateUser-paragraph"
                     />
                     <RememberPasswordLink onClick={this.props.onNavigateAway} />
@@ -70,13 +70,13 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
                 <div className="authenticateUserCol">
                     {pageTitle}
                     <Paragraph
-                        content={t("RecoverPasswordLabelCode", "Enter your email to continue.")}
+                        children={t("RecoverPasswordLabelCode", "Enter your email to continue.")}
                         className="authenticateUser-paragraph"
                     />
                     <form id={this.id} onSubmit={this.handleSubmit} aria-labelledby={this.pageTitleID} noValidate>
                         <Paragraph
                             className="authenticateUser-paragraph"
-                            content={getGlobalErrorMessage(this.props.requestPasswordState, ["email"])}
+                            children={getGlobalErrorMessage(this.props.requestPasswordState, ["email"])}
                             isError={true}
                         />
                         <InputTextBlock

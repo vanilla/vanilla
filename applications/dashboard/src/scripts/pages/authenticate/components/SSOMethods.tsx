@@ -41,7 +41,7 @@ export default class SSOMethods extends React.Component<IProps> {
 
         return (
             <div className="ssoMethods">
-                <Paragraph content={t("Sign in with one of the following:")} />
+                <Paragraph children={t("Sign in with one of the following:")} />
                 {ssoMethods}
             </div>
         );

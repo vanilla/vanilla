@@ -68,7 +68,7 @@ export class PasswordForm extends React.Component<IProps, IState> {
                 <Paragraph
                     id={this.formDescriptionID}
                     className="authenticateUser-paragraph"
-                    content={globalErrorMessage}
+                    children={globalErrorMessage}
                     isError={true}
                 />
                 <InputTextBlock

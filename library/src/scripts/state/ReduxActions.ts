@@ -148,9 +148,9 @@ export default class ReduxActions {
      * Bind dispatch to an action creator.
      */
     protected bindDispatch = <T extends (...args) => void>(actionCreator: T): T => {
-        return function() {
-            return this.dispatch(actionCreator.apply(this, arguments));
-        } as any;
+        return ((...args) => {
+            return this.dispatch(actionCreator.apply(this, args));
+        }) as any;
     };
 
     /**

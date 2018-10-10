@@ -18,6 +18,7 @@ export type ActionsUnion<A extends IActionCreatorsMapObject> = ReturnType<A[keyo
  * Utility to create an action with our a without a payload of a given type.
  * The action generated can have its type narrowed in a reducer switch statement if the type T matches.
  *
+ * @deprecated
  * @see ActionsUnion
  *
  * @param type The action type.
@@ -36,6 +37,8 @@ export function createAction<ActionType extends string, Payload>(type: ActionTyp
  * Create request, response, and error action creators.
  *
  * The dummy types are needed because typescript currently requires all generic types to be specified or all to be inferred. They cannot currently be mixed.
+ *
+ * @deprecated
  *
  * @see https://github.com/Microsoft/TypeScript/issues/10571#issuecomment-345402872
  *
@@ -89,6 +92,13 @@ type GeneratedActionCreators = ReturnType<typeof generateApiActionCreators>;
 
 // Thunk types
 type RequestType = "get" | "post" | "put" | "delete" | "patch";
+/**
+ * @deprecated
+ * @param requestType
+ * @param endpoint
+ * @param actionCreators
+ * @param params
+ */
 export function apiThunk(
     requestType: RequestType,
     endpoint: string,
@@ -144,6 +154,7 @@ interface IApiSuccessAction<ActionType, Meta, ResponseDataType> extends IApiActi
 /**
  * Create an API request action. For use in createApiActions().
  *
+ * @deprecated
  * @param type The action's type.
  * @param meta The type of the meta for the action.
  */
@@ -160,6 +171,7 @@ function createApiRequestAction<ActionType extends string, Meta>(
 /**
  * Create an API error action. For use in createApiActions().
  *
+ * @deprecated
  * @param type The action's type.
  * @param meta The type of the meta for the action.
  * @param error An API error.
@@ -179,6 +191,7 @@ function createApiErrorAction<ActionType extends string, Meta>(
 /**
  * Create an API success action. For use in createApiActions().
  *
+ * @deprecated
  * @param type The action's type.
  * @param meta The type of the meta for the action.
  * @param payload The shape of the IApiResponse data.

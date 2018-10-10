@@ -50,12 +50,6 @@ class KeystoneThemeHooks extends Gdn_Plugin {
         if (class_exists('HeroImagePlugin')) {
             $imageUrl = HeroImagePlugin::getCurrentHeroImageLink();
             $sender->setData('heroImageUrl', $imageUrl);
-        }else{
-            //unset config ThemeOptions.Options referent the HeroImagePlugin
-            saveToConfig([
-                'Garden.ThemeOptions.Options.hasHeroBanner' => false,
-                'Garden.ThemeOptions.Options.hasFeatureSearchbox' => false,
-            ]);
         }
 
         $hasAdvancedSearch = class_exists('AdvancedSearchPlugin');
@@ -79,9 +73,26 @@ class KeystoneThemeHooks extends Gdn_Plugin {
     }
 
     /**
+     * Unset ThemeOptions.Options config related to HeroImagePlugin
+     *
+     *
+     * @param gdn_pluginManager $sender
+     *
+     * @return void
+     */
+    public function gdn_pluginManager_addonDisabled_handler($sender, $args) {
+        if($args["AddonName"] === "heroimage") {
+            saveToConfig([
+                'Garden.ThemeOptions.Options.hasHeroBanner' => false,
+                'Garden.ThemeOptions.Options.hasFeatureSearchbox' => false,
+            ]);
+        }
+    }
+
+    /**
      * Register {searchbox_advanced} even if AdvancedSearchPlugin is disabled so theme doens't break
      * @param Smarty $sender
-     * @param type $args
+     * @param $args
      */
     public function gdn_smarty_init_handler($sender, $args) {
         if(!class_exists('AdvancedSearchPlugin')) {

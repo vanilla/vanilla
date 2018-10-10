@@ -3,8 +3,8 @@
 
 
 "@vanillaforums/theme-boilerplate@^1.0.1":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@vanillaforums/theme-boilerplate/-/theme-boilerplate-1.0.4.tgz#21f271c3e83cdf1e0a556af38f672c6c7ccf5a77"
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/@vanillaforums/theme-boilerplate/-/theme-boilerplate-1.0.8.tgz#3088a9fb11c4a8bb61b2914433d4b44f157d641b"
   dependencies:
     fs-extra "^7.0.0"
 

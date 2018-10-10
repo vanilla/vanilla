@@ -8,6 +8,9 @@ import * as React from "react";
 import classNames from "classnames";
 import { NavLink } from "react-router-dom";
 import { rightTriangle } from "@library/components/Icons";
+import Button from "@library/components/forms/Button";
+import Paragraph from "@dashboard/components/forms/Paragraph";
+import { t } from "@library/application";
 
 interface IProps {
     name: string;
@@ -34,9 +37,14 @@ export default class NavNode extends React.Component<IProps> {
 
         return (
             <li className={classNames("navNode", this.props.className)}>
+                {hasChildren && (
+                    <Button>
+                        <Paragraph>{t("Toggle Category")}</Paragraph>
+                        {rightTriangle()}
+                    </Button>
+                )}
                 <NavLink to={this.props.url} activeClassName="isCurrent">
                     <span className="navNode-label">{this.props.name}</span>
-                    {hasChildren && rightTriangle()}
                 </NavLink>
                 {hasChildren && <ul className="navNode-children">{childrenContents}</ul>}
             </li>

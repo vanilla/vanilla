@@ -160,10 +160,10 @@ export function selectedCategory(className?: string) {
     );
 }
 
-export function rightTriangle(className?: string, deg?: string, title: string = "▾") {
+export function downTriangle(className?: string, deg?: number, title: string = "▾") {
     let transform;
     if (deg) {
-        transform = { rotate: deg };
+        transform = { transform: `rotate(${deg}deg` };
     }
     return (
         <svg
@@ -171,7 +171,7 @@ export function rightTriangle(className?: string, deg?: string, title: string = 
             className={classNames("icon", "icon-triangleRight", className)}
             viewBox="0 0 8 8"
             aria-hidden="true"
-            transform={transform}
+            style={transform}
         >
             <title>{title}</title>
             <polygon points="0 2.594 8 2.594 4 6.594 0 2.594" fill="currentColor" />
@@ -179,6 +179,6 @@ export function rightTriangle(className?: string, deg?: string, title: string = 
     );
 }
 
-export function downTriangle(className?: string) {
-    return rightTriangle(className, "90deg", `▶`);
+export function rightTriangle(className?: string) {
+    return downTriangle(className, -90, `▶`);
 }

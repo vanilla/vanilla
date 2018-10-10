@@ -72,6 +72,7 @@ export default class Sentence extends React.Component<ISentence> {
                             "word",
                             "word-time",
                             time.className,
+                            this.props.className,
                             this.props.recursiveChildClass,
                             this.props.directChildClass,
                         )}
@@ -98,6 +99,7 @@ export default class Sentence extends React.Component<ISentence> {
                             "word",
                             "word-link",
                             link.className,
+                            this.props.className,
                             this.props.recursiveChildClass,
                             this.props.directChildClass,
                         )}
@@ -124,6 +126,7 @@ export default class Sentence extends React.Component<ISentence> {
                             word.className,
                             this.props.recursiveChildClass,
                             this.props.directChildClass,
+                            this.props.className,
                         )}
                         key={key}
                     >

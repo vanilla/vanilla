@@ -159,3 +159,26 @@ export function selectedCategory(className?: string) {
         </svg>
     );
 }
+
+export function rightTriangle(className?: string, deg?: string, title: string = "▾") {
+    let transform;
+    if (deg) {
+        transform = { rotate: deg };
+    }
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className={classNames("icon", "icon-triangleRight", className)}
+            viewBox="0 0 8 8"
+            aria-hidden="true"
+            transform={transform}
+        >
+            <title>{title}</title>
+            <polygon points="0 2.594 8 2.594 4 6.594 0 2.594" fill="currentColor" />
+        </svg>
+    );
+}
+
+export function downTriangle(className?: string) {
+    return rightTriangle(className, "90deg", `▶`);
+}

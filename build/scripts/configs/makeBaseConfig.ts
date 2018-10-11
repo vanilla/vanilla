@@ -46,13 +46,10 @@ ${chalk.green(aliases)}`;
             rules: [
                 {
                     test: /\.(jsx?|tsx?)$/,
-                    exclude: [/node_modules/, /node_modules\/quill-delta/],
-                    include: [
+                    exclude: (modulePath: string) => {
                         // We need to transpile quill's ES6 because we are building from source.
-                        /\/src\/scripts/,
-                        /\/build\/entries/,
-                        /\/node_modules\/quill/,
-                    ],
+                        return /node_modules/.test(modulePath) && !/node_modules\/quill\//.test(modulePath);
+                    },
                     use: [
                         {
                             loader: "babel-loader",

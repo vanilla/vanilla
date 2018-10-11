@@ -97,7 +97,7 @@ function polyfillRemove() {
  * @see https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
  */
 function polyfillCustomEvent() {
-    if (typeof CustomEvent === "function") {
+    if (typeof window.CustomEvent === "function") {
         return;
     }
 
@@ -108,9 +108,9 @@ function polyfillCustomEvent() {
         return evt;
     }
 
-    CustomEvent.prototype = (window as any).Event.prototype;
+    CustomEvent.prototype = window.Event.prototype;
 
-    (window as any).CustomEvent = CustomEvent;
+    window.CustomEvent = CustomEvent as any;
 }
 
 polyfillNodeListForEach();

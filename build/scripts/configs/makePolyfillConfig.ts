@@ -23,6 +23,7 @@ export async function makePolyfillConfig(entryModel: EntryModel) {
     };
     baseConfig.optimization = {
         splitChunks: false,
+        minimize: false,
     };
 
     return baseConfig;

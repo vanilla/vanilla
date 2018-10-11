@@ -81,11 +81,11 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
             },
         },
         minimizer: [
-            new TerserWebpackPlugin({
-                cache: true,
-                parallel: true,
-                sourceMap: true, // set to true if you want JS source maps
-            }),
+            // new TerserWebpackPlugin({
+            //     cache: true,
+            //     parallel: true,
+            //     sourceMap: true, // set to true if you want JS source maps
+            // }),
             new OptimizeCSSAssetsPlugin({}),
         ],
     };

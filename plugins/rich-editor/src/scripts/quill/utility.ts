@@ -6,7 +6,6 @@
 
 import Emitter from "quill/core/emitter";
 import Quill, { RangeStatic, Blot } from "quill/core";
-import KeyboardModule from "quill/modules/keyboard";
 import Delta from "quill-delta";
 import { matchAtMention } from "@library/utility";
 import uniqueId from "lodash/uniqueId";
@@ -331,30 +330,6 @@ export function getMentionRange(quill: Quill, currentSelection: RangeStatic | nu
         index: mentionIndex,
         length: potentialMention.length,
     };
-}
-
-/**
- * Register an keyboard listener for the escape key.
- *
- * @param root - The element to watch for the escape listener in.
- * @param returnElement - The element to return to when escape is pressed.
- */
-export function createEditorFlyoutEscapeListener(
-    root: HTMLElement,
-    returnElement: HTMLElement,
-    callback: (event: KeyboardEvent) => void = () => {
-        return;
-    },
-) {
-    root.addEventListener("keydown", (event: KeyboardEvent) => {
-        if (KeyboardModule.match(event, { key: KeyboardModule.keys.ESCAPE, shiftKey: false })) {
-            if (root.contains(document.activeElement)) {
-                event.preventDefault();
-                returnElement.focus();
-                callback(event);
-            }
-        }
-    });
 }
 
 const quillIDMap: Map<Quill, string> = new Map();

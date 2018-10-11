@@ -221,11 +221,9 @@ class AddonManager {
 
         $result = [];
         if ($searchAll === false) {
-
             // If the className does not contain a wildcard we can check the autloadClass index directly.
             $fqPattern = Addon::parseFullyQualifiedClass($pattern);
             if (strpos($fqPattern['className'], '*') === false) {
-
                 // Convert the pattern's class name to a class key.
                 $classKey = strtolower($fqPattern['className']);
                 if (array_key_exists($classKey, $this->autoloadClasses)) {
@@ -238,7 +236,7 @@ class AddonManager {
             }
 
             foreach ($loadedClasses as $classKey => $classesEntry) {
-                foreach($classesEntry as $namespaceKey => $classData) {
+                foreach ($classesEntry as $namespaceKey => $classData) {
                     if ($fn($namespaceKey.$classKey)) {
                         $result[] = $classData['namespace'].$classData['className'];
                     }
@@ -286,6 +284,8 @@ class AddonManager {
      * @return array Return an array of addon indexed by their keys.
      */
     public function lookupAllByType($type) {
+        static::validateType($type);
+
         if ($this->typeUsesMultiCaching($type)) {
             $this->ensureMultiCache();
             return $this->multiCache;
@@ -297,7 +297,7 @@ class AddonManager {
                     $addon = $this->lookupSingleCachedAddon($addonDirName, $type);
                     $addons[$addon->getKey()] = $addon;
                 } catch (\Exception $ex) {
-                    trigger_error("The $type in $subdir is invalid and will be skipped.", E_USER_WARNING);
+                    trigger_error("The $type in $addonDirPath is invalid and will be skipped.", E_USER_WARNING);
                     // Clear the addon out of the index.
                     $this->deleteSingleIndexKey($type, $addonDirName);
                 }
@@ -331,6 +331,8 @@ class AddonManager {
      * @return array Returns an array of {@link Addon} objects.
      */
     public function scan($type, $saveCache = false) {
+        static::validateType($type);
+
         if ($saveCache && !$this->isCacheEnabled()) {
             throw new \InvalidArgumentException("Cannot save the addon cache when the cache directory is empty.", 500);
         }
@@ -344,7 +346,9 @@ class AddonManager {
             try {
                 $addon = new Addon($subdir);
                 $key = $addon->getKey();
-                if (!array_key_exists($key, $addons)) {
+                if (!static::validateKey($key)) {
+                    trigger_error("The $type in $subdir has an invalid key: $key.", E_USER_WARNING);
+                } elseif (!array_key_exists($key, $addons)) {
                     $addons[$key] = $addon;
                 } else {
                     \Logger::error('Duplicate addon: {key}', [
@@ -392,7 +396,9 @@ class AddonManager {
             $paths = glob(PATH_ROOT."$subdir/*", GLOB_ONLYDIR | GLOB_NOSORT);
             foreach ($paths as $path) {
                 $basename = basename($path);
-                if (!array_key_exists($basename, $result)) {
+                if (!AddonManager::validateKey($basename)) {
+                    trigger_error("The $type in $subdir/$basename has an invalid key: $basename.", E_USER_WARNING);
+                } elseif (!array_key_exists($basename, $result)) {
                     $result[$basename] = substr($path, $strlen);
                 } else {
                     \Logger::error('Duplicate addon: {basename}', [
@@ -513,7 +519,7 @@ class AddonManager {
      * @return Addon|null Returns an addon object or null if one isn't found.
      */
     private function lookupSingleCachedAddon($addonDirName, $type) {
-        if (empty($addonDirName)) {
+        if (empty($addonDirName) || !static::validateKey($addonDirName)) {
             return null;
         }
 
@@ -741,6 +747,10 @@ class AddonManager {
      * @return Addon|null
      */
     public function lookupAddon($key) {
+        if (!static::validateKey($key)) {
+            return false;
+        }
+
         $this->ensureMultiCache();
 
         $realKey = strtolower($key);
@@ -759,6 +769,8 @@ class AddonManager {
      * @return bool Returns
      */
     public function isEnabled($key, $type) {
+        static::validateType($type);
+
         if ($type === Addon::TYPE_ADDON) {
             $key = strtolower($key);
         }
@@ -1017,7 +1029,7 @@ class AddonManager {
                 if (isset($this->autoloadClasses[$classKey])) {
                     $orderedByPriority = [];
                     $addonAdded = false;
-                    foreach($this->autoloadClasses[$classKey] as $loadedClassNamespaceKey => $loadedClassData) {
+                    foreach ($this->autoloadClasses[$classKey] as $loadedClassNamespaceKey => $loadedClassData) {
                         $loadedClassAddon = $loadedClassData['addon'];
                         if (!$addonAdded && $addon->getPriority() < $loadedClassAddon->getPriority()) {
                             $orderedByPriority[$namespaceKey] = [
@@ -1068,7 +1080,7 @@ class AddonManager {
         // Remove all of the addon's classes from the autoloader.
         foreach ($addon->getClasses() as $classKey => $classInfo) {
             if (isset($this->autoloadClasses[$classKey])) {
-                foreach($this->autoloadClasses[$classKey] as $namespaceKey => $classData) {
+                foreach ($this->autoloadClasses[$classKey] as $namespaceKey => $classData) {
                     if (strtolower($classData['namespace']) === $namespaceKey) {
                         unset($this->autoloadClasses[$classKey][$namespaceKey]);
                     }
@@ -1327,5 +1339,29 @@ class AddonManager {
         }
 
         return $this;
+    }
+
+    /**
+     * Validate an addon type against the whitelist of known types.
+     *
+     * @param string $type The type to check.
+     */
+    private static function validateType(string $type) {
+        if (!in_array($type, [Addon::TYPE_ADDON, Addon::TYPE_LOCALE, Addon::TYPE_THEME])) {
+            throw new \InvalidArgumentException("Addons cannot have a type of: $type", 400);
+        }
+    }
+
+    /**
+     * Validate an addon key.
+     *
+     * @param string $key The key to validate.
+     */
+    private static function validateKey(string $key) {
+        if (!preg_match('`^[a-z0-9_-]*$`i', $key)) {
+            trigger_error("Invalid addon key: $key.", E_USER_NOTICE);
+            return false;
+        }
+        return true;
     }
 }

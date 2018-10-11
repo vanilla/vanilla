@@ -3,7 +3,7 @@
     "name": "Requirements can't be met",
     "type": "addon",
     "require": {
-        "asd!": ">1.0",
+        "asd": ">1.0",
         "namespaced-plugin": ">= 4320"
     }
 }

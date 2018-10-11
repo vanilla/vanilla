@@ -25,6 +25,9 @@ if (!defined('PATH_ROOT')) {
     define('PATH_ROOT', getcwd());
 }
 
+// Disable Phar stream
+stream_wrapper_unregister('phar');
+
 /**
  * Bootstrap Before
  *
@@ -66,3 +69,4 @@ if (function_exists('mb_internal_encoding')) {
 if (!include_once PATH_ROOT.'/vendor/autoload.php') {
     die("Could not find the autoloader. Did you forget to run 'composer install' in '".PATH_ROOT."' ?\n");
 }
+spl_autoload_register([Vanilla\AliasLoader::class, 'autoload']);

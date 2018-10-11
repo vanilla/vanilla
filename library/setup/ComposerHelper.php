@@ -55,7 +55,7 @@ class ComposerHelper {
     public static function postUpdate() {
         $skipBuild = getenv(self::DISABLE_AUTO_BUILD) ? true : false;
         if ($skipBuild) {
-            printf("\nSkipping automatic JS build because " . self::DISABLE_AUTO_BUILD . " env variable is set.");
+            printf("\nSkipping automatic JS build because " . self::DISABLE_AUTO_BUILD . " env variable is set.\n");
             return;
         }
 
@@ -80,8 +80,8 @@ class ComposerHelper {
         }
 
         $nodeArgs = getenv(self::NODE_ARGS_ENV) ?: "";
-        $disableValidationFlag = getenv(self::DISABLE_VALIDATION_ENV) ? "--low-memory" : "";
-        $buildCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildScript $disableValidationFlag";
+        $disableValidationFlag = getenv(self::DISABLE_VALIDATION_ENV) ? "--disable-validation" : "";
+        $buildCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildScript -i $disableValidationFlag";
 
         printf("\nBuilding frontend assets\n");
         printf("\n$buildCommand\n");

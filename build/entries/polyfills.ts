@@ -20,7 +20,7 @@ import "@babel/polyfill";
  * https://developer.mozilla.org/en-US/docs/Web/API/NodeList/forEach#Polyfill
  */
 function polyfillNodeListForEach() {
-    if (window.NodeList && !NodeList.prototype.forEach) {
+    if (NodeList && !NodeList.prototype.forEach) {
         NodeList.prototype.forEach = function forEach(callback, thisArg) {
             thisArg = thisArg || window;
             for (let i = 0; i < this.length; i++) {
@@ -41,7 +41,8 @@ function polyfillNodeListForEach() {
  */
 export function polyfillClosest() {
     if (!Element.prototype.matches) {
-        Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+        Element.prototype.matches =
+            (Element as any).prototype.msMatchesSelector || (Element as any).prototype.webkitMatchesSelector;
     }
 
     if (!Element.prototype.closest) {
@@ -96,7 +97,7 @@ function polyfillRemove() {
  * @see https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
  */
 function polyfillCustomEvent() {
-    if (typeof window.CustomEvent === "function") {
+    if (typeof CustomEvent === "function") {
         return;
     }
 
@@ -107,9 +108,9 @@ function polyfillCustomEvent() {
         return evt;
     }
 
-    CustomEvent.prototype = window.Event.prototype;
+    CustomEvent.prototype = (window as any).Event.prototype;
 
-    window.CustomEvent = CustomEvent as any;
+    (window as any).CustomEvent = CustomEvent;
 }
 
 polyfillNodeListForEach();

@@ -6,9 +6,9 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
-import uniqueId from "lodash/uniqueId";
 import { ensureHtmlElement } from "@library/dom";
 import Editor from "@rich-editor/components/editor/Editor";
+import { hasPermission } from "@library/permissions";
 
 /**
  * Mount the editor into a DOM Node.
@@ -24,17 +24,14 @@ export default function mountEditor(containerSelector: string | Element) {
     }
 
     const initialFormat = bodybox.getAttribute("format") || "Rich";
-    const editorID = uniqueId("editor-");
-    const descriptionID = editorID + "-description";
 
     if (initialFormat === "Rich") {
         ReactDOM.render(
             <Editor
-                editorID={editorID}
-                editorDescriptionID={descriptionID}
                 legacyTextArea={bodybox as HTMLInputElement}
                 isPrimaryEditor={true}
                 legacyMode={true}
+                allowUpload={hasPermission("uploads.add")}
             />,
             container,
         );

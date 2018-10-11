@@ -7,6 +7,7 @@
 namespace Vanilla\Models;
 
 use Exception;
+use Garden\Schema\Schema;
 use Vanilla\Database\Operation;
 use Vanilla\Database\Operation\Pipeline;
 use Vanilla\Database\Operation\Processor;
@@ -18,7 +19,7 @@ use Vanilla\InjectableInterface;
 class PipelineModel extends Model implements InjectableInterface {
 
     /** @var Pipeline */
-    private $pipeline;
+    protected $pipeline;
 
     /**
      * Model constructor.
@@ -66,6 +67,26 @@ class PipelineModel extends Model implements InjectableInterface {
     }
 
     /**
+     * Get the model's read schema.
+     *
+     * @return Schema
+     */
+    public function getReadSchema(): Schema {
+        $this->ensureSchemas();
+        return $this->readSchema;
+    }
+
+    /**
+     * Get the model's write schema.
+     *
+     * @return Schema
+     */
+    public function getWriteSchema(): Schema {
+        $this->ensureSchemas();
+        return $this->writeSchema;
+    }
+
+    /**
      * Add a resource row.
      *
      * @param array $set Field values to set.
@@ -96,7 +117,7 @@ class PipelineModel extends Model implements InjectableInterface {
         $databaseOperation->setType(Operation::TYPE_UPDATE);
         $databaseOperation->setCaller($this);
         $databaseOperation->setSet($set);
-        $databaseOperation->setSet($where);
+        $databaseOperation->setWhere($where);
         $result = $this->pipeline->process($databaseOperation, function (Operation $databaseOperation) {
             return parent::update(
                 $databaseOperation->getSet(),

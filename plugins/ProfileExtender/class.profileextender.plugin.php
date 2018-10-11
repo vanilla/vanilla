@@ -522,28 +522,43 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
         // Determine profile fields we need to add.
         $fields = $this->getProfileFields();
-        $columnNames = ['Name', 'Email', 'Joined', 'Last Seen', 'Discussions', 'Comments', 'Points', 'InviteUserID', 'InvitedByName'];
+        $columnNames = ['Name', 'Email', 'Joined', 'Last Seen', 'LastIPAddress', 'Discussions', 'Comments', 'Points', 'InviteUserID', 'InvitedByName', 'Location', 'Roles'];
 
         // Set up our basic query.
         Gdn::sql()
-            ->select('u.Name')
-            ->select('u.Email')
-            ->select('u.DateInserted')
-            ->select('u.DateLastActive')
-            ->select('u.CountDiscussions')
-            ->select('u.CountComments')
-            ->select('u.Points')
-            ->select('u.InviteUserID')
-            ->select('u2.Name', '', 'InvitedByName')
+            ->select([
+                'u.Name',
+                'u.Email',
+                'u.DateInserted',
+                'u.DateLastActive',
+                'inet6_ntoa(u.LastIPAddress)',
+                'u.CountDiscussions',
+                'u.CountComments',
+                'u.Points',
+                'u.InviteUserID',
+                'u2.Name as InvitedByName',
+                'u.Location',
+                'group_concat(r.Name) as Roles',
+            ])
             ->from('User u')
             ->leftJoin('User u2', 'u.InviteUserID = u2.UserID and u.InviteUserID is not null')
+            ->join('UserRole ur', 'u.UserID = ur.UserID')
+            ->join('Role r', 'r.RoleID = ur.RoleID')
             ->where('u.Deleted', 0)
-            ->where('u.Admin <', 2);
+            ->where('u.Admin <', 2)
+            ->groupBy('u.UserID');
 
         if (val('DateOfBirth', $fields)) {
             $columnNames[] = 'Birthday';
             Gdn::sql()->select('u.DateOfBirth');
             unset($fields['DateOfBirth']);
+        }
+
+        if (Gdn::addonManager()->isEnabled('Ranks', \Vanilla\Addon::TYPE_ADDON)) {
+            $columnNames[] = 'Rank';
+            Gdn::sql()
+                ->select('ra.Name as Rank')
+                ->leftJoin('Rank ra', 'ra.RankID = u.RankID');
         }
 
         $i = 0;
@@ -566,7 +581,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         die();
 
         // Useful for query debug.
-        //$sender->render('blank');
+        // $sender->render('blank');
     }
 
     /**

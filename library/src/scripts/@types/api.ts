@@ -3,6 +3,8 @@
  * @license GPL-2.0-only
  */
 
+import { Omit } from "@library/@types/utils";
+
 export enum LoadStatus {
     PENDING = "PENDING",
     LOADING = "LOADING",
@@ -56,3 +58,11 @@ export interface IApiError {
         [key: string]: IFieldError[];
     };
 }
+
+interface IMultiType<T> {
+    recordType: T;
+    recordID: number;
+}
+
+export type MultiTypeRecord<T, Subtract extends keyof T, TypeName extends string> = Omit<T, Subtract> &
+    IMultiType<TypeName>;

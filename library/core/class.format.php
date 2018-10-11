@@ -20,6 +20,7 @@ use Vanilla\Renderer;
  * Utility class that helps to format strings, objects, and arrays.
  */
 class Gdn_Format {
+    use \Garden\StaticCacheTranslationTrait;
 
     /**
      * @var bool Flag which allows plugins to decide if the output should include rel="nofollow" on any <a> links.
@@ -555,20 +556,20 @@ class Gdn_Format {
             // If the timestamp was during the current day
             if (date('Y m d', $timestamp) == date('Y m d', $now)) {
                 // Use the time format
-                $format = t('Date.DefaultTimeFormat', '%l:%M%p');
+                $format = self::t('Date.DefaultTimeFormat', '%l:%M%p');
             } elseif (date('Y', $timestamp) == date('Y', $now)) {
                 // If the timestamp is the same year, show the month and date
-                $format = t('Date.DefaultDayFormat', '%B %e');
+                $format = self::t('Date.DefaultDayFormat', '%B %e');
             } elseif (date('Y', $timestamp) != date('Y', $now)) {
                 // If the timestamp is not the same year, just show the year
-                $format = t('Date.DefaultYearFormat', '%B %Y');
+                $format = self::t('Date.DefaultYearFormat', '%B %Y');
             } else {
                 // Otherwise, use the date format
-                $format = t('Date.DefaultFormat', '%B %e, %Y');
+                $format = self::t('Date.DefaultFormat', '%B %e, %Y');
             }
         }
 
-        $fullFormat = t('Date.DefaultDateTimeFormat', '%c');
+        $fullFormat = self::t('Date.DefaultDateTimeFormat', '%c');
 
         // Emulate %l and %e for Windows.
         if (strpos($format, '%l') !== false) {

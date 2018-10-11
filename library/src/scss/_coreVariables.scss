@@ -110,7 +110,7 @@ $global-condensed_lineHeight                         : 1.25 !default;
 
 $global-heading_fontFamily                           : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 $global-heading_fontWeight                           : $global-bold_fontWeight !default; // Derived
-$global-heading_lineHeightRatio                      : .74;
+$global-heading_lineHeightRatio                      : .8;
 
 $global-body_fontFamily                              : "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
 $global-body_fontWeight                              : $global-normal_fontWeight !default; // Derived
@@ -133,8 +133,9 @@ $global-default_easing                               : ease-out !default;
     Icons
 \* -------------------------------------------------------------- */
 
-$icon-default_size                                   : 24px !default;
 $icon-large_size                                     : 32px !default;
+$icon-default_size                                   : 24px !default;
+$icon-small_size                                     : 16px !default;
 
 /* -------------------------------------------------------------- *\
     Layout
@@ -283,11 +284,22 @@ $formElement-panel_boxShadow                         : 0 1px 3px 0 $formElement-
 $formElement-disabled_opacity                        : .5 !default;
 
 /* -------------------------------------------------------------- *\
-    menu
+    Overlays (Menus, flyouts and Modals)
 \* -------------------------------------------------------------- */
 
-$menu-dropShadow_color                               : rgba($global-color_fg, .2);
-$menu-dropShadow                                     : 0 5px 10px $menu-dropShadow_color;
+@function getBlackOrWhiteBasedOnColor($color) {
+    @if (lightness($color) > 50) {
+        @return white; // Lighter backgorund
+    } @else {
+        @return black; // Darker backgorund
+    }
+}
+
+$overlay_bgColor                                        : rgba(getBlackOrWhiteBasedOnColor($global-color_fg), .2)!default;
+$overlay-dropShadow_color                               : $overlay_bgColor !default;
+$overlay-border_color                                   : mix($global-color_fg, $global-color_bg, 5%) !default;
+$overlay-dropShadow                                     : 0 5px 10px $overlay_bgColor !default;
+$overlay-borderRadius                                   : $global_borderRadius !default;
 
 /* -------------------------------------------------------------- *\
     Buttons

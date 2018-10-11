@@ -657,13 +657,12 @@ class AddonManagerTest extends SharedBootstrapTestCase {
         $addon = $am->lookupAddon('bad-require');
         $r = $am->lookupRequirements($addon, AddonManager::REQ_MISSING | AddonManager::REQ_VERSION);
 
-        $this->assertArrayHasKey('asd!', $r);
+        $this->assertArrayHasKey('asd', $r);
         $this->assertArrayHasKey('namespaced-plugin', $r);
 
-        $this->assertSame(AddonManager::REQ_MISSING, $r['asd!']['status']);
+        $this->assertSame(AddonManager::REQ_MISSING, $r['asd']['status']);
         $this->assertSame(AddonManager::REQ_VERSION, $r['namespaced-plugin']['status']);
     }
-
 
     /**
      * Test an addon with an invalid require key.
@@ -779,6 +778,79 @@ class AddonManagerTest extends SharedBootstrapTestCase {
         $locale = $am->lookup('test-locale');
         $this->assertEquals('test', $locale->getKey());
         $this->assertEquals(Addon::TYPE_LOCALE, $locale->getType());
+    }
+
+    /**
+     * Test addon type checking.
+     *
+     * @expectedException \InvalidArgumentException
+     */
+    public function testBadType() {
+        $am = $this->createTestManager();
+
+        $addons = $am->lookupAllByType('../../../fixtures/error');
+    }
+
+    /**
+     * Test a bad theme key.
+     *
+     * @expectedException PHPUnit\Framework\Error\Notice
+     */
+    public function testBadThemeKey() {
+        $am = $this->createTestManager();
+
+        $theme = $am->lookupTheme('../../../../fixtures/error-index');
+    }
+
+    /**
+     * Looking up an empty addon key should return null, no error.
+     */
+    public function testEmptyKeyLookup() {
+        $am = $this->createTestManager();
+
+        $addon = $am->lookupAddon('');
+        $this->assertNull($addon);
+        $addon = $am->lookupTheme('');
+        $this->assertNull($addon);
+        $addon = $am->lookupLocale('');
+        $this->assertNull($addon);
+    }
+
+    /**
+     * Add-ons with bad keys should not be indexed.
+     *
+     * @param string $type
+     * @dataProvider provideBadAddonKeyTypes
+     */
+    public function testBadAddonKeyScan($type) {
+        $err = error_reporting(E_ALL & ~E_USER_NOTICE & ~E_USER_WARNING);
+
+        try {
+            $am = new AddonManager(
+                [
+                    Addon::TYPE_ADDON => "/tests/fixtures/bad-addons",
+                    Addon::TYPE_THEME => "/tests/fixtures/bad-themes",
+                ],
+                PATH_ROOT.'/tests/cache/am/bad-manager'
+            );
+
+            $addons = $am->lookupAllByType($type);
+            $this->assertEmpty($addons);
+        } finally {
+            error_reporting($err);
+        }
+    }
+
+    /**
+     * Provide data for `testBadAddonKeyScan`.
+     *
+     * @return array Returns a data provider.
+     */
+    public function provideBadAddonKeyTypes() {
+        return [
+            Addon::TYPE_ADDON => [Addon::TYPE_ADDON],
+            Addon::TYPE_THEME => [Addon::TYPE_THEME],
+        ];
     }
 
     /**

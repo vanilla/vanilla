@@ -11,7 +11,9 @@ import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { uploadImage } from "@library/apiv2";
 import { isFileImage } from "@library/utility";
 
-interface IProps extends IWithEditorProps {}
+interface IProps extends IWithEditorProps {
+    disabled?: boolean;
+}
 
 export class EditorUploadButton extends React.Component<IProps, {}> {
     private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
@@ -22,6 +24,7 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
                 className="richEditor-button richEditor-embedButton richEditor-buttonUpload"
                 type="button"
                 aria-pressed="false"
+                disabled={this.props.disabled}
                 onClick={this.onFakeButtonClick}
             >
                 <Icons.image />

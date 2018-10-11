@@ -6,6 +6,8 @@
 
 $fullPageLoader-size            : 100px;
 $fullPageLoader-thickness       : 6px;
+$mediumLoader-size            : 50px;
+$mediumLoader-thickness       : 6px;
 
 .fullPageLoader {
     @include absolute-fullSizeOfParent;
@@ -17,6 +19,20 @@ $fullPageLoader-thickness       : 6px;
 
     &::after {
         @include spinnerLoader($fullPageLoader-size, $fullPageLoader-thickness);
+        content: '';
+    }
+}
+
+.mediumLoader {
+    @include absolute-fullSizeOfParent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+
+    &::after {
+        @include spinnerLoader($mediumLoader-size, $mediumLoader-thickness);
         content: '';
     }
 }

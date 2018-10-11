@@ -63,6 +63,48 @@ if (!function_exists('arrayInArray')) {
     }
 }
 
+/**
+ * The array_merge_recursive function does indeed merge arrays, but it converts values with duplicate
+ * keys to arrays rather than overwriting the value in the first array with the duplicate
+ * value in the second array, as array_merge does. I.e., with array_merge_recursive,
+ * this happens (documented behavior):
+ *
+ * array_merge_recursive(array('key' => 'org value'), array('key' => 'new value'));
+ *     => array('key' => array('org value', 'new value'));
+ *
+ * array_merge_recursive_distinct does not change the datatypes of the values in the arrays.
+ * Matching keys' values in the second array overwrite those in the first array, as is the
+ * case with array_merge, i.e.:
+ *
+ * array_merge_recursive_distinct(array('key' => 'org value'), array('key' => 'new value'));
+ *     => array('key' => array('new value'));
+ *
+ * Parameters are passed by reference, though only for performance reasons. They're not
+ * altered by this function.
+ *
+ * @param array $array1
+ * @param mixed $array2
+ * @return array
+ * @author daniel@danielsmedegaardbuus.dk
+ * @deprecated
+ */
+function &arrayMergeRecursiveDistinct(array &$array1, &$array2 = null) {
+    deprecated('arrayMergeRecursiveDistinct');
+    $merged = $array1;
+
+    if (is_array($array2)) {
+        foreach ($array2 as $key => $val) {
+            if (is_array($array2[$key])) {
+                $merged[$key] = is_array($merged[$key]) ? arrayMergeRecursiveDistinct($merged[$key], $array2[$key]) : $array2[$key];
+            } else {
+                $merged[$key] = $val;
+            }
+        }
+    }
+
+    return $merged;
+}
+
 if (!function_exists('arrayValue')) {
     /**
      * Get the value associated with a {@link $Needle} key in a {@link $Haystack} array.
@@ -265,12 +307,14 @@ if (!function_exists('formatArrayAssignment')) {
             $isAssociativeArray = array_key_exists(0, $value) === false || is_array($value[0]) === true ? true : false;
             if ($isAssociativeArray === true) {
                 foreach ($value as $k => $v) {
-                    formatArrayAssignment($array, $prefix."['$k']", $v);
+                    formatArrayAssignment($array, $prefix.'['.var_export($k, true).']', $v);
                 }
             } else {
                 // If $Value is not an associative array, just write it like a simple array definition.
                 $formattedValue = array_map(['Gdn_Format', 'ArrayValueForPhp'], $value);
-                $array[] = $prefix .= " = array('".implode("', '", $formattedValue)."');";
+                $f2 = var_export($value, true);
+
+                $array[] = $prefix .= ' = '.var_export($value, true).';';
             }
         } elseif (is_int($value)) {
             $array[] = $prefix .= ' = '.$value.';';
@@ -294,6 +338,7 @@ if (!function_exists('formatDottedAssignment')) {
      * @deprecated
      */
     function formatDottedAssignment(&$array, $prefix, $value) {
+        \Vanilla\Utility\Deprecation::log();
         if (is_array($value)) {
             // If $Value doesn't contain a key of "0" OR it does and it's value IS
             // an array, this should be treated as an associative array.
@@ -444,6 +489,7 @@ if (!function_exists('parseUrl')) {
      * @deprecated
      */
     function parseUrl($url, $component = -1) {
+        \Vanilla\Utility\Deprecation::log();
         $defaults = [
             'scheme' => 'http',
             'host' => '',

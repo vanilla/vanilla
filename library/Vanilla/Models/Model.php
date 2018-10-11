@@ -21,13 +21,13 @@ class Model implements InjectableInterface {
     private $database;
 
     /** @var Schema */
-    private $readSchema;
+    protected $readSchema;
 
     /** @var string */
     private $table;
 
     /** @var Schema */
-    private $writeSchema;
+    protected $writeSchema;
 
     /**
      * Basic model constructor.
@@ -63,7 +63,7 @@ class Model implements InjectableInterface {
     /**
      * Make sure we have configured schemas available to the instance.
      */
-    private function ensureSchemas() {
+    protected function ensureSchemas() {
         if ($this->readSchema === null || $this->writeSchema === null) {
             $schema = $this->database->simpleSchema($this->table);
 
@@ -105,6 +105,15 @@ class Model implements InjectableInterface {
         $result = $schema->validate($result);
 
         return $result;
+    }
+
+    /**
+     * Get the database table name.
+     *
+     * @return string
+     */
+    protected function getTable(): string {
+        return $this->table;
     }
 
     /**
@@ -161,7 +170,7 @@ class Model implements InjectableInterface {
      *
      * @return \Gdn_SQLDriver
      */
-    private function sql(): \Gdn_SQLDriver {
+    protected function sql(): \Gdn_SQLDriver {
         $sql = clone $this->database->sql();
         $sql->reset();
         return $sql;

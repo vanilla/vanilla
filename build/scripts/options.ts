@@ -40,6 +40,7 @@ export interface IBuildOptions {
     enabledAddonKeys: string[];
     configFile: string;
     phpConfig: any;
+    devIp: string;
 }
 
 /**
@@ -65,10 +66,12 @@ function parseEnabledAddons(config: any) {
 export async function getOptions(): Promise<IBuildOptions> {
     // We only want/need to parse the config for development builds to see which addons are enabled.
     // CI does not have a config file so don't look one up if we are
-    let config = {};
+    let config: any = {};
     let enabledAddonKeys: string[] = [];
+    let devIp = "localhost";
     if (yargs.argv.mode === BuildMode.DEVELOPMENT) {
         config = await getVanillaConfig(yargs.argv.config);
+        devIp = config.HotReload && config.HotReload.IP ? config.HotReload.IP : "localhost";
         enabledAddonKeys = parseEnabledAddons(config);
     }
 
@@ -81,5 +84,6 @@ export async function getOptions(): Promise<IBuildOptions> {
         fix: yargs.argv.fix,
         phpConfig: config,
         install: yargs.argv.install,
+        devIp,
     };
 }

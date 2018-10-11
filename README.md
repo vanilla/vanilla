@@ -1,5 +1,5 @@
-_Vanilla uses Composer!
-You cannot clone this repo right into a web directory - it requires a build step. [Learn more](https://open.vanillaforums.com/discussion/31083/vanilla-now-uses-compose) or just [download the latest stable build](https://open.vanillaforums.com/addon/vanilla-core) instead_.
+_Vanilla uses Composer and NPM!
+You cannot clone this repo right into a web directory - it requires a build step. [Learn more](https://open.vanillaforums.com/discussion/36708/the-git-version-of-vanilla-no-longer-ships-pre-built-fronted-assets/p1?new=1) or just [download the latest stable build](https://open.vanillaforums.com/addon/vanilla-core) instead_.
 
 ![Vanilla](http://images.v-cdn.net/vanilla-black-logo-400.svg)
 
@@ -147,18 +147,11 @@ To end maintenance mode, delete it and save.
 * [Vanilla community forums](https://open.vanillaforums.com/discussions)
 * [Official cloud hosting with professional support & migration services](https://vanillaforums.com/plans)
 
-## Contributing
-
-* Troubleshoot issues you run into on the community forum so everyone can help & reference it later.
-* Got an idea or suggestion? Use the [forum](https://open.vanillaforums.com/discussions) to discuss it.
-* File detailed [issues](https://github.com/vanilla/vanilla/issues) on GitHub (version number, what you did, and actual vs expected outcomes).
-* Sign the [Contributors' Agreement](https://open.vanillaforums.com/contributors) to send us code.
-* Use pull requests against the `master` branch.
-* Keep our to-do list fresh by reviewing our open issues for resolved or duplicated items.
-
 ## Building with Phing
 
 Vanilla includes a buildfile for [Phing](https://www.phing.info/), a build system for PHP, in the build directory. Running the `phing` command from the build directory will create a deploy-ready copy of Vanilla. This process automatically fetches dependencies with Composer, filters out any unnecessary developer files (Git files/directories, .editorconfig, unit tests, etc.) and compresses the result into an archive.
+
+The phing build requires `NodeJS` and `yarn` to build frontend assets for packaging. See [build tool documentation](https://docs.vanillaforums.com/developer/tools/building-frontend/) for installation instructions.
 
 ## Version Control Strategy
 

@@ -143,11 +143,12 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = false;")}`);
 
         const options: Options = {
             compiler,
+            host: this.options.devIp,
             port: 3030,
             add: enhancer,
             clipboard: false,
             devMiddleware: {
-                publicPath: "http://localhost:3030/",
+                publicPath: `http://${this.options.devIp}:3030/`,
                 stats: this.statOptions,
             },
         };

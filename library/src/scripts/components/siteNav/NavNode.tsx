@@ -9,8 +9,8 @@ import classNames from "classnames";
 import { NavLink } from "react-router-dom";
 import { rightTriangle } from "@library/components/Icons";
 import Button from "@library/components/forms/Button";
-import Paragraph from "@dashboard/components/forms/Paragraph";
 import { t } from "@library/application";
+import Paragraph from "@library/components/Paragraph";
 
 interface IProps {
     name: string;

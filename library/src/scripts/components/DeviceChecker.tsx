@@ -10,6 +10,7 @@ import debounce from "lodash/debounce";
 export enum Devices {
     MOBILE = "mobile",
     TABLET = "tablet",
+    NO_BLEED = "no_bleed", // Not enough space for back link which goes outside the margin.
     DESKTOP = "desktop",
 }
 
@@ -45,6 +46,9 @@ export default class DeviceChecker extends React.Component<IDeviceCheckerProps> 
                     break;
                 case "2":
                     device = Devices.TABLET;
+                    break;
+                case "3":
+                    device = Devices.NO_BLEED;
                     break;
             }
             return device;

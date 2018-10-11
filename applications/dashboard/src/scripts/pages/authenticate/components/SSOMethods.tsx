@@ -5,7 +5,7 @@
 
 import { t } from "@library/application";
 import React from "react";
-import Paragraph from "@dashboard/components/forms/Paragraph";
+import Paragraph from "@library/components/Paragraph";
 import { IUserAuthenticator } from "@dashboard/@types/api";
 
 interface IProps {
@@ -41,7 +41,7 @@ export default class SSOMethods extends React.Component<IProps> {
 
         return (
             <div className="ssoMethods">
-                <Paragraph content={t("Sign in with one of the following:")} />
+                <Paragraph children={t("Sign in with one of the following:")} />
                 {ssoMethods}
             </div>
         );

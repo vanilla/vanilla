@@ -45,7 +45,9 @@ export interface ISentence {
     className?: string;
     children: IWord[] | string;
     counter?: number;
-    recursiveChildClass?: string;
+    recursiveChildClass?: string; // Applied to all children, including self
+    descendantChildClasses?: string; // applied recursively to children (Excluding self)
+    directChildClass?: string; // Applied to children only
 }
 
 /**
@@ -66,7 +68,14 @@ export default class Sentence extends React.Component<ISentence> {
                 const time = word as IInlineDateTime;
                 return (
                     <time
-                        className={classNames("word", "word-time", time.className, this.props.recursiveChildClass)}
+                        className={classNames(
+                            "word",
+                            "word-time",
+                            time.className,
+                            this.props.className,
+                            this.props.recursiveChildClass,
+                            this.props.directChildClass,
+                        )}
                         dateTime={time.timeStamp}
                         key={key}
                     >
@@ -74,7 +83,10 @@ export default class Sentence extends React.Component<ISentence> {
                             className={time.className}
                             children={time.children}
                             counter={childCounter}
-                            recursiveChildClass={this.props.recursiveChildClass}
+                            recursiveChildClass={classNames(
+                                this.props.recursiveChildClass,
+                                this.props.descendantChildClasses,
+                            )}
                         />
                     </time>
                 );
@@ -83,14 +95,24 @@ export default class Sentence extends React.Component<ISentence> {
                 return (
                     <Link
                         to={link.to}
-                        className={classNames("word", "word-link", link.className, this.props.recursiveChildClass)}
+                        className={classNames(
+                            "word",
+                            "word-link",
+                            link.className,
+                            this.props.className,
+                            this.props.recursiveChildClass,
+                            this.props.directChildClass,
+                        )}
                         key={key}
                     >
                         <Sentence
                             className={word.className}
                             children={link.children}
                             counter={childCounter}
-                            recursiveChildClass={this.props.recursiveChildClass}
+                            recursiveChildClass={classNames(
+                                this.props.recursiveChildClass,
+                                this.props.descendantChildClasses,
+                            )}
                         />
                     </Link>
                 );
@@ -98,14 +120,24 @@ export default class Sentence extends React.Component<ISentence> {
                 const text = word as IInlineText;
                 return (
                     <span
-                        className={classNames("word", "word-text", word.className, this.props.recursiveChildClass)}
+                        className={classNames(
+                            "word",
+                            "word-text",
+                            word.className,
+                            this.props.recursiveChildClass,
+                            this.props.directChildClass,
+                            this.props.className,
+                        )}
                         key={key}
                     >
                         <Sentence
                             className={word.className}
                             children={text.children}
                             counter={childCounter}
-                            recursiveChildClass={this.props.recursiveChildClass}
+                            recursiveChildClass={classNames(
+                                this.props.recursiveChildClass,
+                                this.props.descendantChildClasses,
+                            )}
                         />
                     </span>
                 );

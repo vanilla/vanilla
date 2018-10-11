@@ -7,7 +7,7 @@
 import * as React from "react";
 import classNames from "classnames";
 import DropDownItem from "./DropDownItem";
-import Button from "@library/components/forms/Button";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 
 export interface IDropDownItemButton {
     name: string;
@@ -34,6 +34,7 @@ export default class DropDownItemButton extends React.Component<IDropDownItemBut
                     title={this.props.name}
                     onClick={this.props.onClick}
                     className={classNames("dropDownItem-button", this.props.className)}
+                    baseClass={ButtonBaseClass.CUSTOM}
                     disabled={this.props.disabled}
                 >
                     {buttonContent}

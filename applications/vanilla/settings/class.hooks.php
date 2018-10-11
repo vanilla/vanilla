@@ -697,8 +697,11 @@ class VanillaHooks implements Gdn_IPlugin {
             $discussionsLabel = sprite('SpDiscussions').' '.t('Discussions');
             $commentsLabel = sprite('SpComments').' '.t('Comments');
             if (c('Vanilla.Profile.ShowCounts', true)) {
-                $discussionsLabel .= '<span class="Aside">'.countString(getValueR('User.CountDiscussions', $sender, null), "/profile/count/discussions?userid=$userID").'</span>';
-                $commentsLabel .= '<span class="Aside">'.countString(getValueR('User.CountComments', $sender, null), "/profile/count/comments?userid=$userID").'</span>';
+                $discussionsCount = getValueR('User.CountDiscussions', $sender, null);
+                $commentsCount = getValueR('User.CountComments', $sender, null);
+
+                $discussionsLabel .= '<span class="Aside">'.countString(bigPlural($discussionsCount, '%s discussions'), "/profile/count/discussions?userid=$userID").'</span>';
+                $commentsLabel .= '<span class="Aside">'.countString(bigPlural($commentsCount, '%s comment'), "/profile/count/comments?userid=$userID").'</span>';
             }
             $sender->addProfileTab(t('Discussions'), userUrl($sender->User, '', 'discussions'), 'Discussions', $discussionsLabel);
             $sender->addProfileTab(t('Comments'), userUrl($sender->User, '', 'comments'), 'Comments', $commentsLabel);

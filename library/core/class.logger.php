@@ -287,7 +287,7 @@ class Logger {
         $defaults = [
             'userid' => Gdn::session()->UserID,
             'username' => val("Name", Gdn::session()->User, 'anonymous'),
-            'ip' => Gdn::request()->ipAddress(),
+            'ipaddress' => Gdn::request()->ipAddress(),
             'timestamp' => time(),
             'method' => Gdn::request()->requestMethod(),
             'domain' => rtrim(url('/', true), '/'),

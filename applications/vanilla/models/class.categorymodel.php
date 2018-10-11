@@ -1509,6 +1509,31 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Build the database category fields related to recent post.
+     *
+     * @param array $discussion
+     * @return array
+     */
+    private static function postRecentPostFieldSet(array $discussion) : array {
+        $result = [
+            'LastCategoryID' => null,
+            'LastCommentID' => null,
+            'LastDateInserted' => null,
+            'LastDiscussionID' => null
+        ];
+
+        if (count($discussion) > 0) {
+            $result['LastCommentID'] = $discussion['LastCommentID'] ?? null;
+            $result['LastCategoryID'] = $discussion['CategoryID'];
+            $result['LastDateInserted'] = !empty($discussion['DateLastComment']) ? $discussion['DateLastComment'] :
+                (!empty($discussion['DateUpdated']) ? $discussion['DateUpdated'] : $discussion['DateInserted']);
+            $result['LastDiscussionID'] = $discussion['DiscussionID'];
+        }
+
+        return $result;
+    }
+
+    /**
      * Join recent posts and users to a category tree.
      *
      * @param array &$categoryTree A category tree obtained with {@link CategoryModel::getChildTree()}.
@@ -3600,6 +3625,173 @@ SQL;
         }
 
         self::instance()->clearCache();
+    }
+
+    /**
+     * Recalculate  CountDiscussions and CountComments columns for category.
+     *
+     * @param int $categoryId Category ID to update
+     * @return void
+     */
+    public static function recalculatePostCounts(int $categoryId) {
+        $sql = Gdn::sql()
+            ->select('DiscussionID', 'count', 'DiscussionCount')
+            ->select('CountComments', 'sum', 'CountComments')
+            ->from('Discussion')
+            ->where('CategoryID', $categoryId);
+
+        $exclude = Gdn::config('Vanilla.Archive.Exclude');
+        if ($exclude) {
+            $archiveDate = Gdn::config('Vanilla.Archive.Date');
+            if ($archiveDate) {
+                $sql->where('d.DateLastComment >', $archiveDate);
+            }
+        }
+        $row = $sql->get()->firstRow(DATASET_TYPE_ARRAY);
+
+        $discussionCount = $row['DiscussionCount'] ?? 0;
+        $commentCount = $row['CountComments'] ?? 0;
+
+        Gdn::sql()
+            ->update('Category')
+            ->set('CountDiscussions', $discussionCount)
+            ->set('CountComments', $commentCount)
+            ->where('CategoryID', $categoryId)
+            ->put();
+    }
+
+    /**
+     * Recalculate  CountAllDiscussions count column for category.
+     *
+     * @param int $categoryId Category ID to update
+     * @return void
+     */
+    public static function recalculateAggregatePostCounts(int $categoryId) {
+        $row = Gdn::sql()
+            ->select('CountAllDiscussions', 'sum', 'CountAllDiscussions')
+            ->select('CountAllComments', 'sum', 'CountAllComments')
+            ->from('Category')
+            ->where('ParentCategoryID', $categoryId)
+            ->get()
+            ->firstRow(DATASET_TYPE_ARRAY);
+
+        $CountAllDiscussions = $row['CountAllDiscussions'] ?? 0;
+        $CountAllComments = $row['CountAllComments'] ?? 0;
+        Gdn::sql()
+            ->update('Category')
+            ->set('CountAllDiscussions', "CountDiscussions + {$CountAllDiscussions}", false)
+            ->set('CountAllComments', "CountComments + {$CountAllComments}", false)
+            ->where('CategoryID', $categoryId)
+            ->put();
+    }
+
+    /**
+     * Recalculate all aggregate CountAllDiscussions and CountAllComments columns for category and all parents.
+     *
+     * @param int $categoryId Category ID to update
+     *
+     * @return void
+     */
+    public static function recalculateCountFields(int $categoryId) {
+        self::recalculatePostCounts($categoryId);
+        do {
+            self::recalculateAggregatePostCounts($categoryId);
+            $categoryRow = Gdn::sql()
+                ->select('ParentCategoryID')
+                ->from('Category')
+                ->where('CategoryID', $categoryId)
+                ->get()
+                ->firstRow(DATASET_TYPE_ARRAY);
+            $categoryId = $categoryRow['ParentCategoryID'] ?? 0;
+        } while ($categoryId > 0);
+    }
+
+    /**
+     * Get latest discussion data which directly belongs to category from database.
+     *
+     * @param int $categoryId
+     */
+    private static function recentPostFieldsInCategory(int $categoryId) : array {
+        $res = Gdn::sql()
+            ->select('DiscussionID')
+            ->select('DateLastComment')
+            ->select('DateInserted')
+            ->select('DateUpdated')
+            ->select('CategoryID')
+            ->select('LastCommentID')
+            ->from('Discussion')
+            ->where('CategoryID', $categoryId)
+            ->orderBy('DateLastComment', 'desc')
+            ->orderBy('DateUpdated', 'desc')
+            ->orderBy('DateInserted', 'desc')
+            ->limit(1)
+            ->get()
+            ->firstRow(DATASET_TYPE_ARRAY);
+        return $res;
+    }
+
+    /**
+     * Get latest child categories data which belongs to category from database.
+     *
+     * @param int $categoryId Parent category id to collect childrens data
+     */
+    private static function recentPostFieldsCategoryChildren(int $categoryId) : array {
+        $res = Gdn::sql()
+            ->select('C.CategoryID')
+            ->select('C.LastCategoryID')
+            ->select('C.LastDiscussionID')
+            ->select('C.LastCommentID')
+            ->select('C.LastDateInserted')
+            ->from('Category')
+            ->join('Category C',
+                'Category.TreeLeft<C.TreeLeft
+                     AND Category.TreeRight>C.TreeRight')
+            ->where('Category.CategoryID', $categoryId)
+            ->orderBy('C.LastDateInserted', 'desc')
+            ->limit(1)
+            ->get()
+            ->firstRow(DATASET_TYPE_ARRAY);
+        return $res;
+    }
+    /**
+     * Recalculate recent[s]fields  for category and all parents.
+     *
+     * @param int $categoryId Category ID to update
+     *
+     * @return void
+     */
+    public static function recalculateRecentFields(int $categoryId) {
+        $category = self::instance()->getID($categoryId, DATASET_TYPE_ARRAY);
+
+        $discussion = self::recentPostFieldsInCategory($categoryId);
+        $fieldsToUpdate = static::postRecentPostFieldSet($discussion);
+        //Let's update category fields only if latest discussion found has fresher timestamp
+        $needUpdate = (empty($category['LastDateInserted'] ?? null)
+            || $category['LastDateInserted'] != $fieldsToUpdate['LastDateInserted']);
+        while ($needUpdate) {
+            Gdn::sql()
+                ->update('Category')
+                ->set('LastCategoryID', $fieldsToUpdate['LastCategoryID'])
+                ->set('LastDiscussionID', $fieldsToUpdate['LastDiscussionID'])
+                ->set('LastCommentID', $fieldsToUpdate['LastCommentID'])
+                ->set('LastDateInserted', $fieldsToUpdate['LastDateInserted'])
+                ->where('CategoryID', $category['CategoryID'])
+                ->put();
+            $parentId = ($category['ParentCategoryID'] ?? -1);
+            if ( $parentId > 0) {
+                $category = self::instance()->getID($parentId, DATASET_TYPE_ARRAY);
+                $direct = self::recentPostFieldsInCategory($parentId);
+                $fieldsToUpdate = static::postRecentPostFieldSet($direct);
+                $indirect = self::recentPostFieldsCategoryChildren($parentId);
+                if ($fieldsToUpdate['LastDateInserted'] < $indirect['LastDateInserted']) {
+                    $fieldsToUpdate = $indirect;
+                }
+                $needUpdate = (empty($category['LastDateInserted'] ?? null)
+                    || $category['LastDateInserted'] != $fieldsToUpdate['LastCategoryID']);
+            } else {
+                break;
+            }
+        }
     }
 
     /**

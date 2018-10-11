@@ -253,7 +253,6 @@ export function downTriangle(className?: string, deg?: number, title: string = "
     );
 }
 
-NavNode.tsx;
 export function rightTriangle(className?: string) {
     return downTriangle(className, -90, `▶`);
 }

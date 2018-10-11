@@ -7,7 +7,7 @@
 import * as React from "react";
 import { t } from "../../application";
 import classNames from "classnames";
-import NavNode from "@library/components/siteNav/NavNode";
+import SiteNavNode from "@library/components/siteNav/SiteNavNode";
 import { getRequiredID } from "@library/componentIDs";
 
 interface IProps {
@@ -40,19 +40,23 @@ export default class SiteNav extends React.Component<IProps, IState> {
         const content =
             this.props.children && this.props.children.length > 0
                 ? this.props.children.map((child, i) => {
-                      return <NavNode {...child} key={`navNode-${i}`} counter={i} titleID={this.titleID} />;
+                      return <SiteNavNode {...child} key={`navNode-${i}`} counter={i} titleID={this.titleID} />;
                   })
                 : null;
         return (
-            <nav onKeyDownCapture={this.handleKeyDown} className={classNames("siteNavigation", this.props.className)}>
+            <nav onKeyDownCapture={this.handleKeyDown} className={classNames("siteNav", this.props.className)}>
                 <h2 id={this.titleID} className="sr-only">{`${t("Category navigation from folder: ")}\"${
                     this.props.name
                 }\"`}</h2>
-                {content}
+
+                <ul className="siteNav-children" role="tree" aria-labelledby={this.titleID}>
+                    {content}
+                </ul>
             </nav>
         );
     }
 
+    // https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
     private handleKeyDown = event => {
         const currentFocussedElement = document.activeElement;
         switch (`${event.controlKey ? "Control+" : ""}${event.shiftKey ? "Shift+" : ""}event.code`) {

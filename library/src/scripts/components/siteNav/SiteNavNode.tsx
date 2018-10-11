@@ -7,10 +7,9 @@
 import * as React from "react";
 import classNames from "classnames";
 import { NavLink } from "react-router-dom";
-import { rightTriangle, downTriangle } from "@library/components/Icons";
-import Button from "@library/components/forms/Button";
+import { downTriangle, rightTriangle } from "@library/components/Icons";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
-import Paragraph from "@library/components/Paragraph";
 
 interface IProps {
     name: string;
@@ -19,14 +18,13 @@ interface IProps {
     children: any[];
     counter: number;
     url: string;
-    openRecursive?: boolean;
 }
 
 interface IState {
     open: boolean;
 }
 
-export default class NavNode extends React.Component<IProps, IState> {
+export default class SiteNavNode extends React.Component<IProps, IState> {
     public constructor(props) {
         super(props);
         this.state = {
@@ -37,7 +35,7 @@ export default class NavNode extends React.Component<IProps, IState> {
         this.toggle = this.toggle.bind(this);
     }
 
-    public open(recursive?) {
+    public open() {
         this.setState({
             open: true,
         });
@@ -62,20 +60,17 @@ export default class NavNode extends React.Component<IProps, IState> {
             hasChildren &&
             this.props.children.map((child, i) => {
                 return (
-                    <NavNode
+                    <SiteNavNode
                         {...child}
-                        key={"navNode-" + this.props.counter + "-" + i}
+                        key={"siteNavNode-" + this.props.counter + "-" + i}
                         counter={this.props.counter! + 1}
-                        openRecursive={this.props.openRecursive}
                     />
                 );
             });
-
         return (
             <li
-                role={topLevel ? "tree" : "group"}
-                className={classNames("navNode", this.props.className)}
-                aria-labelledby={this.props.titleID}
+                role="treeitem"
+                className={classNames("siteNavNode", this.props.className)}
                 aria-expanded={this.state.open}
             >
                 {hasChildren && (
@@ -85,16 +80,24 @@ export default class NavNode extends React.Component<IProps, IState> {
                         title={t("Toggle Category")}
                         ariaLabel={t("Toggle Category")}
                         onClick={this.toggle}
+                        baseClass={ButtonBaseClass.CUSTOM}
+                        className="siteNavNode-toggle"
                     >
-                        {this.state.open ? downTriangle() : rightTriangle()}
+                        {this.state.open ? downTriangle(t("Expand")) : rightTriangle(t("Collapse"))}
                     </Button>
                 )}
-                <NavLink tabIndex={0} to={this.props.url} activeClassName="isCurrent">
-                    <span className="navNode-label">{this.props.name}</span>
+                <NavLink
+                    className={classNames("siteNavNode-link", { hasChildren })}
+                    tabIndex={0}
+                    to={this.props.url}
+                    activeClassName="isCurrent"
+                >
+                    {!hasChildren && <span className="siteNavNode-spacer" aria-hidden={true} />}
+                    <span className="siteNavNode-label">{this.props.name}</span>
                 </NavLink>
                 {hasChildren &&
                     this.state.open && (
-                        <ul className="navNode-children" role="group">
+                        <ul className="siteNavNode-children" role="group">
                             {childrenContents}
                         </ul>
                     )}

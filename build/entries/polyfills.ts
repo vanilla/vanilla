@@ -48,7 +48,7 @@ export function polyfillClosest() {
     if (!Element.prototype.closest) {
         Element.prototype.closest = function closest(s) {
             let el = this;
-            if (!document.documentElement.contains(el)) {
+            if (document.documentElement && !document.documentElement.contains(el)) {
                 return null;
             }
             do {

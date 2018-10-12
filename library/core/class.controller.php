@@ -1880,7 +1880,8 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                 // Add the client-side translations.
                 // This is done in the controller rather than the asset model because the translations are not linked to compiled code.
-                $this->Head->addScript($AssetModel->getJSLocalePath(Gdn::locale()->current()), 'text/javascript', false, ['defer' => 'true']);
+                $localePath = $AssetModel->getJSLocalePath(Gdn::locale()->current());
+                $this->Head->addScript($localePath."?h=$busta", 'text/javascript', false, ['defer' => 'true']);
 
                 $polyfillContent = $AssetModel->getInlinePolyfillJSContent();
                 $this->Head->addScript(null, null, false, ["content" => $polyfillContent]);

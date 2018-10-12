@@ -259,7 +259,8 @@ class AssetModel extends Gdn_Model {
      * @return string The path the locale javascript file.
      */
     public function getJSLocalePath(string $localeKey): string {
-        return '/api/v2/locales/' . rawurlencode($localeKey) . "/translations.js";
+        // We need a web-root url, not an asset URL because this is an API endpoint resource that is dynamically generated.
+        return Gdn::request()->url('/api/v2/locales/' . rawurlencode($localeKey) . "/translations.js");
     }
 
     /**

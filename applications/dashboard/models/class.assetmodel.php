@@ -259,8 +259,8 @@ class AssetModel extends Gdn_Model {
      * @return string The path the locale javascript file.
      */
     public function getJSLocalePath(string $localeKey): string {
-        $busta = $this->cacheBuster();
-        return '/api/v2/locales/' . rawurlencode($localeKey) . "/translations.js?etag=$busta";
+        $cacheBuster = $this->cacheBuster();
+        return '/api/v2/locales/' . rawurlencode($localeKey) . "/translations.js?etag=$cacheBuster";
     }
 
     /**

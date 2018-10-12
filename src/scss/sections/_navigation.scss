@@ -11,6 +11,7 @@
 $navigation_backgroundColor:              $global-color_primary !default;
 $navigation_color:                        $global-color_white !default;
 $navigation_button-bg:                    $global-color_secondary !default;
+$navigation_button-hover-bg:              darken($global-color_secondary, 8%) !default;
 $navigation_button-color:                 $global-color_white !default;
 $navigation_fontSize:                     $global-medium_fontSize !default;
 $navigation_paddingSide:                  $utility-medium_padding !default;
@@ -120,7 +121,7 @@ $navigation-easing-transition:            cubic-bezier(0, 1, 0, 1) !default;
             padding-top: $utility-medium_padding;
 
             a {
-                @include Button($navigation_button-bg, $navigation_button-color);
+                @include Button($navigation_button-bg, $navigation_button-color, $navigation_button-hover-bg);
             }
 
             .Bullet {

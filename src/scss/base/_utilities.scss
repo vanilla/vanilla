@@ -608,7 +608,7 @@
     background: $background;
     color: $color;
     border: $formButton_border;
-    border-color: $formButton-hover_bg;
+    border-color: $background-hover;
     line-height: $formButton_height;
     min-height: $formButton_height;
     padding: 0 $formButton_padding;

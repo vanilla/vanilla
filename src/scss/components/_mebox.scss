@@ -95,14 +95,20 @@ $mebox_hover_bg:                        rgba(mix($mebox_color, $global-color_fg,
     }
 
     .SignInLinks {
-        a {
+        .SignInPopup,
+        .ApplyButton {
             display: inline-block;
-            @include Button(transparent, $global-color_primary);
-            border-color: $global-color_primary;
+        }
+
+        .SignInPopup {
+            @include Button;
+        }
+
+        .ApplyButton {
+            @include Button(transparent, $global-color_primary, $global-color_primary);
 
             &:focus,
             &:hover {
-                background-color: $global-color_primary;
                 color: $global-color_white;
             }
         }

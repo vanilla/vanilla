@@ -7,10 +7,11 @@
 import * as React from "react";
 import { t } from "../../application";
 import classNames from "classnames";
-import SiteNavNode from "@library/components/siteNav/SiteNavNode";
 import { getRequiredID } from "@library/componentIDs";
+import { withRouter, RouteComponentProps } from "react-router-dom";
+import SiteNavNode from "@library/components/siteNav/SiteNavNode";
 
-interface IProps {
+interface IProps extends RouteComponentProps<{}> {
     name: string;
     className?: string;
     children: any[];
@@ -24,7 +25,7 @@ export interface IState {
  * Recursive component to generate site nav
  * No need to set "counter". It will be set automatically. Kept optional to not need to call it on the top level. Used for React's "key" values
  */
-export default class SiteNav extends React.Component<IProps, IState> {
+export class SiteNav extends React.Component<IProps, IState> {
     public constructor(props) {
         super(props);
         this.state = {
@@ -40,7 +41,16 @@ export default class SiteNav extends React.Component<IProps, IState> {
         const content =
             this.props.children && this.props.children.length > 0
                 ? this.props.children.map((child, i) => {
-                      return <SiteNavNode {...child} key={`navNode-${i}`} counter={i} titleID={this.titleID} />;
+                      return (
+                          <SiteNavNode
+                              {...child}
+                              key={`navNode-${i}`}
+                              counter={i}
+                              titleID={this.titleID}
+                              visible={true}
+                              location={this.props.location}
+                          />
+                      );
                   })
                 : null;
         return (
@@ -147,3 +157,5 @@ export default class SiteNav extends React.Component<IProps, IState> {
         }
     };
 }
+
+export default withRouter<IProps>(SiteNav);

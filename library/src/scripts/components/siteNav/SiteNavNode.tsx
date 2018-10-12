@@ -18,39 +18,83 @@ interface IProps {
     children: any[];
     counter: number;
     url: string;
+    openParent?: () => void;
+    location: any;
 }
 
 interface IState {
     open: boolean;
+    current: boolean;
 }
 
 export default class SiteNavNode extends React.Component<IProps, IState> {
     public constructor(props) {
         super(props);
         this.state = {
-            open: props.openRecursive,
+            open: false,
+            current: false,
         };
-        this.open = this.open.bind(this);
-        this.close = this.close.bind(this);
-        this.toggle = this.toggle.bind(this);
     }
 
-    public open() {
+    public open = () => {
         this.setState({
             open: true,
         });
-    }
+    };
 
-    public close() {
+    public close = () => {
+        this.setState({
+            open: false,
+        });
+    };
+
+    public openRecursive = () => {
+        if (!this.state.current && this.currentPage()) {
+            this.setState({
+                current: true,
+            });
+            if (this.props.openParent) {
+                this.props.openParent();
+            }
+        }
+    };
+
+    public openSelfAndOpenParent = () => {
         this.setState({
             open: true,
         });
-    }
+        if (this.props.openParent) {
+            this.open();
+            this.props.openParent();
+        }
+    };
 
-    public toggle() {
+    public toggle = () => {
         this.setState({
             open: !this.state.open,
         });
+    };
+
+    public handleClick = e => {
+        e.currentTarget.nextElementSibling.focus();
+        this.toggle();
+    };
+
+    public currentPage(): boolean {
+        if (this.props.location && this.props.location.pathname) {
+            return this.props.location.pathname === this.props.url;
+        } else {
+            return false;
+        }
+    }
+
+    public componentDidUpdate() {
+        this.openRecursive();
+    }
+
+    public componentDidMount() {
+        // window.console.log("Component did mount: SiteNav Node", this.props);
+        this.openRecursive();
     }
 
     public render() {
@@ -64,6 +108,8 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                         {...child}
                         key={"siteNavNode-" + this.props.counter + "-" + i}
                         counter={this.props.counter! + 1}
+                        openParent={this.openSelfAndOpenParent}
+                        location={this.props.location}
                     />
                 );
             });
@@ -79,28 +125,22 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                         ariaHidden={true}
                         title={t("Toggle Category")}
                         ariaLabel={t("Toggle Category")}
-                        onClick={this.toggle}
+                        onClick={this.handleClick as any}
                         baseClass={ButtonBaseClass.CUSTOM}
                         className="siteNavNode-toggle"
                     >
                         {this.state.open ? downTriangle(t("Expand")) : rightTriangle(t("Collapse"))}
                     </Button>
                 )}
-                <NavLink
-                    className={classNames("siteNavNode-link", { hasChildren })}
-                    tabIndex={0}
-                    to={this.props.url}
-                    activeClassName="isCurrent"
-                >
-                    {!hasChildren && <span className="siteNavNode-spacer" aria-hidden={true} />}
+                {!hasChildren && <span className="siteNavNode-spacer" aria-hidden={true} />}
+                <NavLink className={classNames("siteNavNode-link")} tabIndex={0} to={this.props.url}>
                     <span className="siteNavNode-label">{this.props.name}</span>
                 </NavLink>
-                {hasChildren &&
-                    this.state.open && (
-                        <ul className="siteNavNode-children" role="group">
-                            {childrenContents}
-                        </ul>
-                    )}
+                {hasChildren && (
+                    <ul className={classNames("siteNavNode-children", { isHidden: !this.state.open })} role="group">
+                        {childrenContents}
+                    </ul>
+                )}
             </li>
         );
     }

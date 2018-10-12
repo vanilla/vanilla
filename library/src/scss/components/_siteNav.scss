@@ -8,6 +8,7 @@ $siteNav-node_fontSize              : $global-medium_fontSize;
 $siteNav-node_color                 : $global-color_fg;
 $siteNav-nodeToggle_size            : 24px;
 $siteNav-node_active_bg             : mix($global-color_fg, $global-color_bg, 10%);
+$siteNav-node_marginLeft            : 24px;
 
 .siteNav {
     position: relative;
@@ -24,10 +25,14 @@ $siteNav-node_active_bg             : mix($global-color_fg, $global-color_bg, 10
     position: relative;
     display: block;
     font-size: $siteNav-node_fontSize;
+
+    &.isCurrent {
+        background-color: $siteNav-node_active_bg;
+    }
 }
 
 .siteNavNode-link {
-    display: block;
+    display: inline;
     color: $siteNav-node_color;
     padding: {
         top: $utility-baseUnit;
@@ -35,33 +40,26 @@ $siteNav-node_active_bg             : mix($global-color_fg, $global-color_bg, 10
         right: $utility-baseUnit;
         left: 0;
     }
-
-    &.hasChildren {
-        padding-left: $siteNav-nodeToggle_size;
-    }
-
-    &.isCurrent {
-        background-color: $siteNav-node_active_bg;
-    }
 }
 
 .siteNavNode-spacer {
-    display: inline-flex;
+    display: inline-block;
+    height: 1em;
+}
+.siteNavNode-toggle {
     align-items: center;
     justify-content: center;
     padding: 0;
     width: $siteNav-nodeToggle_size;
-    height: 1em;
 }
 
 .siteNavNode-toggle {
-    @include absolute-topLeft;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0;
+    outline: 0; // We have proper accessibility on the tree, the button toggle is hidden from screen readers
+    height: $siteNav-nodeToggle_size;
     width: $siteNav-nodeToggle_size;
-    height: $siteNav-nodeToggle_size + 2 * $utility-baseUnit;
 }
 
 .siteNavNode-label {
@@ -69,5 +67,5 @@ $siteNav-node_active_bg             : mix($global-color_fg, $global-color_bg, 10
 }
 
 .siteNavNode-children {
-
+    margin-left: $siteNav-node_marginLeft;
 }

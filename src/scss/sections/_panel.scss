@@ -34,6 +34,16 @@
         justify-content: center;
     }
 
+    .ApplyButton {
+        background-color: transparent;
+        color: $global-color_primary;
+
+        &:focus,
+        &:hover {
+            color: $global-color_white;
+        }
+    }
+
     .TagCloud {
         background: transparent;
 

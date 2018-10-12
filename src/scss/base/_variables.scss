@@ -49,8 +49,8 @@ $global-color_primary:                  #007cbb !default;
 $global-color_primaryAlt:               darken($global-color_primary, 8%) !default;
 $global-color_secondary:                #d71950 !default;
 
-$global-color_bg:                       grey !default;//$global-color_white !default;
-$global-color_fg:                       white !default;//lighten(desaturate($global-color_primary, 90%), 8%) !default; // text color | should have high contrast between $global-color_bg
+$global-color_bg:                       $global-color_white !default;
+$global-color_fg:                       lighten(desaturate($global-color_primary, 90%), 8%) !default; // text color | should have high contrast between $global-color_bg
 
 $global-body_bg:                        $global-color_bg !default;
 

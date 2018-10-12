@@ -158,12 +158,16 @@
         }
     }
 
+    .NewCommentCount.NewCommentCount,
     .MItem {
         font-size: $component-meta_fontSize;
         margin-left: 0;
         margin-right: $utility-small_padding;
-        margin-bottom: $utility-small_padding;
+    }
+
+    .MItem {
         color: $component-meta-link_color;
+        margin-bottom: $utility-small_padding;
 
         &:last-child {
             margin-right: 0;

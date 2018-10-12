@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { downTriangle, rightTriangle } from "@library/components/Icons";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
@@ -20,6 +20,7 @@ interface IProps {
     url: string;
     openParent?: () => void;
     location: any;
+    depth: number;
 }
 
 interface IState {
@@ -76,7 +77,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
     };
 
     public handleClick = e => {
-        e.currentTarget.nextElementSibling.focus();
+        e.preventDefault();
         this.toggle();
     };
 
@@ -118,14 +119,17 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                         counter={this.props.counter! + 1}
                         openParent={this.openSelfAndOpenParent}
                         location={this.props.location}
+                        depth={this.props.depth + 1}
                     />
                 );
             });
+        const space = `&nbsp;`;
         return (
             <li
                 role="treeitem"
                 className={classNames("siteNavNode", this.props.className, { isCurrent: this.state.current })}
                 aria-expanded={this.state.open}
+                style={{ marginLeft: `${(this.props.depth - 1) * 18}px` }}
             >
                 {hasChildren && (
                     <Button
@@ -140,15 +144,23 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                         {this.state.open ? downTriangle(t("Expand")) : rightTriangle(t("Collapse"))}
                     </Button>
                 )}
-                {!hasChildren && <span className="siteNavNode-spacer" aria-hidden={true} />}
-                <NavLink className={classNames("siteNavNode-link")} tabIndex={0} to={this.props.url}>
-                    <span className="siteNavNode-label">{this.props.name}</span>
-                </NavLink>
-                {hasChildren && (
-                    <ul className={classNames("siteNavNode-children", { isHidden: !this.state.open })} role="group">
-                        {childrenContents}
-                    </ul>
+                {!hasChildren && (
+                    <span
+                        className="siteNavNode-spacer"
+                        aria-hidden={true}
+                        dangerouslySetInnerHTML={{ __html: space }}
+                    />
                 )}
+                <div className={classNames("siteNavNode-contents")}>
+                    <Link className={classNames("siteNavNode-link")} tabIndex={0} to={this.props.url}>
+                        <span className="siteNavNode-label">{this.props.name}</span>
+                    </Link>
+                    {hasChildren && (
+                        <ul className={classNames("siteNavNode-children", { isHidden: !this.state.open })} role="group">
+                            {childrenContents}
+                        </ul>
+                    )}
+                </div>
             </li>
         );
     }

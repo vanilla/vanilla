@@ -6,9 +6,9 @@
 
 $siteNav-node_fontSize              : $global-medium_fontSize;
 $siteNav-node_color                 : $global-color_fg;
-$siteNav-nodeToggle_size            : 24px;
+$siteNav-nodeToggle_height          : $siteNav-node_fontSize * $global-condensed_lineHeight;
+$siteNav-nodeToggle_width           : 24px;
 $siteNav-node_active_bg             : mix($global-color_fg, $global-color_bg, 10%);
-$siteNav-node_marginLeft            : 24px;
 
 .siteNav {
     position: relative;
@@ -23,49 +23,61 @@ $siteNav-node_marginLeft            : 24px;
 
 .siteNavNode {
     position: relative;
-    display: block;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
     font-size: $siteNav-node_fontSize;
+    width: 100%;
 
     &.isCurrent {
         background-color: $siteNav-node_active_bg;
     }
 }
 
+.siteNavNode-contents {
+    display: block;
+    width: 100%;
+    max-width: calc(100% - #{$siteNav-nodeToggle_width});
+
+
+}
+
 .siteNavNode-link {
-    display: inline;
+    display: block;
+    flex-grow: 1;
     color: $siteNav-node_color;
-    padding: {
-        top: $utility-baseUnit;
-        bottom: $utility-baseUnit;
-        right: $utility-baseUnit;
-        left: 0;
-    }
+    line-height: $global-condensed_lineHeight;
+    overflow: hidden;
+    padding: $utility-baseUnit 0;
 }
 
 .siteNavNode-spacer {
-    display: inline-block;
-    height: 1em;
+    display: block;
+    height: $siteNav-nodeToggle_height;
+    width: $siteNav-nodeToggle_width;
+    margin: $utility-baseUnit 0;
 }
 .siteNavNode-toggle {
+    display: flex;
     align-items: center;
     justify-content: center;
+    margin: $utility-baseUnit 0;
     padding: 0;
-    width: $siteNav-nodeToggle_size;
+    height: $siteNav-nodeToggle_height;
+    width: $siteNav-nodeToggle_width;
 }
 
 .siteNavNode-toggle {
-    display: inline-flex;
+    display: block;
     align-items: center;
     justify-content: center;
     outline: 0; // We have proper accessibility on the tree, the button toggle is hidden from screen readers
-    height: $siteNav-nodeToggle_size;
-    width: $siteNav-nodeToggle_size;
+    height: $siteNav-nodeToggle_height;
+    width: $siteNav-nodeToggle_width;
 }
 
 .siteNavNode-label {
 
 }
 
-.siteNavNode-children {
-    margin-left: $siteNav-node_marginLeft;
-}

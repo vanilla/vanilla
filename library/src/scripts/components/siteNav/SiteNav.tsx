@@ -49,6 +49,7 @@ export class SiteNav extends React.Component<IProps, IState> {
                               titleID={this.titleID}
                               visible={true}
                               location={this.props.location}
+                              depth={0}
                           />
                       );
                   })

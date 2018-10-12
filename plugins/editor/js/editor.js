@@ -1074,20 +1074,20 @@
                                     // File dropped is not allowed!
                                     var message;
 
-                                    if (!validSize && !validFile) {
-                                        message = gdn.definition('fileErrorSizeFormat', 'editor') + ' (max ' + maxUploadSize + ' bytes)';
-                                    } else {
-
-                                        if (!validSize) {
-                                            message = gdn.definition('fileErrorSize', 'editor') + ' (max ' + maxUploadSize + ' bytes)';
-                                        }
-
-                                        if (!validFile) {
-                                            message = gdn.definition('fileErrorFormat', 'editor');
-                                        }
+                                    if (!validSize) {
+                                        message = gdn.definition('fileErrorSize', 'editor') + ' (max ' + maxUploadSize + ' bytes)';
+                                        gdn.informMessage(message);
                                     }
 
-                                    gdn.informMessage(message);
+                                    if (!validFile) {
+                                        message = gdn.definition('fileErrorFormat', 'editor');
+                                        gdn.informMessage(message);
+                                    }
+
+                                    if (fileAlreadyExists) {
+                                        message = gdn.definition('fileErrorAlreadyExists', 'editor');
+                                        gdn.informMessage(message);
+                                    }
                                 }
                             });
                         }

@@ -107,7 +107,7 @@ notifications:
     format: html
     on_success: change
     rooms:
-      - secure: "SsKmSAZFynBz4ZKm5NPyuXvNjIMyxpNMXsgfXVImG8xjQHdXjEpZAiyckK8E2lXBBypv59Oex6wsS0RvyxpI/mwQ9dTQ9ayurQxwH3V5Q/+pRbtXJOkP+DSIsHhRb9D4xa5nPbh4N48+QZvUFiH2ety9/gev4mtMkLv3lC0vgpc="
+      secure: "RG/MW3X18uxgSOCFJU77Oxd1JaECF6vrsk1hmnH9+Li9k1bk9PDavV/k7YZvhqujoIUjlkHhOz32EvzT0HDq2qfWRLgAzdXZL/bdBzxAG5N5e/fPt7DPatqu9f6/0V+jQTcORjdGyWpvIDupFJmrClQFN8EfiKx644aXg1p8kS8="
     template:
       - '%{repository_slug} build <a href="%{build_url}">#%{build_number}</a> (%{branch} - <a href="%{compare_url}">%{commit}</a> by %{author}): %{message}'
 

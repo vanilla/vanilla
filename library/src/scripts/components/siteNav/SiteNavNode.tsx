@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { downTriangle, rightTriangle } from "@library/components/Icons";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
+import TabHandler from "@library/TabHandler";
 
 interface IProps {
     name: string;
@@ -37,16 +38,28 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
         };
     }
 
-    public open = () => {
-        this.setState({
-            open: true,
-        });
+    public open = (callbackIfAlreadyOpen?: any) => {
+        if (!this.state.open) {
+            this.setState({
+                open: true,
+            });
+        } else {
+            if (callbackIfAlreadyOpen) {
+                callbackIfAlreadyOpen();
+            }
+        }
     };
 
-    public close = () => {
-        this.setState({
-            open: false,
-        });
+    public close = (callbackIfAlreadyClosed?: any) => {
+        if (this.state.open) {
+            this.setState({
+                open: false,
+            });
+        } else {
+            if (callbackIfAlreadyClosed) {
+                callbackIfAlreadyClosed();
+            }
+        }
     };
 
     public openRecursive = () => {
@@ -126,8 +139,8 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
         const space = `&nbsp;`;
         return (
             <li
-                role="treeitem"
                 className={classNames("siteNavNode", this.props.className, { isCurrent: this.state.current })}
+                role="treeitem"
                 aria-expanded={this.state.open}
                 style={{ marginLeft: `${(this.props.depth - 1) * 18}px` }}
             >
@@ -152,7 +165,12 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                     />
                 )}
                 <div className={classNames("siteNavNode-contents")}>
-                    <Link className={classNames("siteNavNode-link")} tabIndex={0} to={this.props.url}>
+                    <Link
+                        onKeyDownCapture={this.handleKeyDown}
+                        className={classNames("siteNavNode-link")}
+                        tabIndex={0}
+                        to={this.props.url}
+                    >
                         <span className="siteNavNode-label">{this.props.name}</span>
                     </Link>
                     {hasChildren && (
@@ -164,4 +182,62 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
             </li>
         );
     }
+
+    private next = (tabHandler, currentLink) => {
+        const nextElement = tabHandler.getNext(currentLink, false, false);
+        if (nextElement) {
+            nextElement.focus();
+        }
+    };
+
+    private prev = (tabHandler, currentLink) => {
+        const prevElement = tabHandler.getNext(currentLink, true, false);
+        if (prevElement) {
+            prevElement.focus();
+        }
+    };
+
+    // https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
+    private handleKeyDown = event => {
+        const currentLink = document.activeElement;
+        const selectedNode = currentLink.closest(".siteNavNode");
+        const siteNavRoot = currentLink.closest(".siteNav");
+        const tabHandler = new TabHandler(siteNavRoot!);
+
+        window.console.log("from site node: ", event.key);
+
+        switch (event.key) {
+            case "ArrowRight":
+                /*
+                    When focus is on a closed node, opens the node; focus does not move.
+                    When focus is on a open node, moves focus to the first child node.
+                    When focus is on an end node, does nothing.
+                 */
+                if (this.props.children && this.props.children.length > 0) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.open(() => {
+                        this.next(tabHandler, currentLink);
+                    });
+                }
+                break;
+            case "ArrowLeft":
+                /*
+                    When focus is on an open node, closes the node.
+                    When focus is on a child node that is also either an end node or a closed node, moves focus to its parent node.
+                    When focus is on a root node that is also either an end node or a closed node, does nothing.
+                */
+
+                if (this.props.children && this.props.children.length > 0) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.close(() => {
+                        this.prev(tabHandler, currentLink);
+                    });
+                } else {
+                    this.prev(tabHandler, currentLink);
+                }
+                break;
+        }
+    };
 }

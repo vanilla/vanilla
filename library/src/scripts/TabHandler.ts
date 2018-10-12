@@ -86,6 +86,17 @@ export default class TabHandler {
             return null;
         }
     }
+    /**
+     * Get the last focusable element.
+     */
+    public getLast(): HTMLElement | null {
+        const tabbables = this.tabbableElements.filter(this.filterAllExcluded);
+        if (tabbables.length > 0) {
+            return tabbables[tabbables.length - 1];
+        } else {
+            return null;
+        }
+    }
 
     /**
      * Filter out all excluded elements. Allows 1 element and its parents to be exempted.

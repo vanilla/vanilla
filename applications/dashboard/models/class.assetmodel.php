@@ -252,6 +252,18 @@ class AssetModel extends Gdn_Model {
     }
 
     /**
+     * Get the resource path for a javascript bundle of a particular locale bundle.
+     *
+     * @param string $localeKey The key of the locale to lookup
+     *
+     * @return string The path the locale javascript file.
+     */
+    public function getJSLocalePath(string $localeKey): string {
+        $busta = $this->cacheBuster();
+        return '/api/v2/locales/' . rawurlencode($localeKey) . "/translations.js?etag=$busta";
+    }
+
+    /**
      * Sorting callback
      *
      * @param $a

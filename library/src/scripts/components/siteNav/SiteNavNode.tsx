@@ -88,12 +88,20 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
         }
     }
 
-    public componentDidUpdate() {
+    public updateCurrentState() {
+        this.setState({
+            current: this.currentPage(),
+        });
+    }
+
+    public componentDidUpdate(prevProps) {
         this.openRecursive();
+        if (prevProps.location.pathname !== this.props.location.pathname) {
+            this.updateCurrentState();
+        }
     }
 
     public componentDidMount() {
-        // window.console.log("Component did mount: SiteNav Node", this.props);
         this.openRecursive();
     }
 
@@ -116,7 +124,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
         return (
             <li
                 role="treeitem"
-                className={classNames("siteNavNode", this.props.className)}
+                className={classNames("siteNavNode", this.props.className, { isCurrent: this.state.current })}
                 aria-expanded={this.state.open}
             >
                 {hasChildren && (

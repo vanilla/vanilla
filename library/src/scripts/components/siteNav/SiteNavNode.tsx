@@ -200,11 +200,8 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
     // https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
     private handleKeyDown = event => {
         const currentLink = document.activeElement;
-        const selectedNode = currentLink.closest(".siteNavNode");
         const siteNavRoot = currentLink.closest(".siteNav");
         const tabHandler = new TabHandler(siteNavRoot!);
-
-        window.console.log("from site node: ", event.key);
 
         switch (event.key) {
             case "ArrowRight":

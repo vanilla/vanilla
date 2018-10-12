@@ -79,13 +79,8 @@ export class SiteNav extends React.Component<IProps, IState> {
     private handleKeyDown = (event: KeyboardEvent) => {
         const currentLink = document.activeElement;
         const selectedNode = currentLink.closest(".siteNavNode");
-        const currentChildrenContainer =
-            currentLink && selectedNode ? this.firstVisibleOfType(selectedNode, ".siteNavNode-children") : null;
         const siteNavRoot = currentLink.closest(".siteNav");
-        const lastNodeChild = siteNavRoot ? this.lastVisibleOfType(siteNavRoot) : null;
         const tabHandler = new TabHandler(siteNavRoot!);
-
-        window.console.log("from site nav: ", event.key);
 
         switch (
             event.key // See SiteNavNode for the rest of the keyboard handler
@@ -95,11 +90,9 @@ export class SiteNav extends React.Component<IProps, IState> {
                     Moves focus one row or one cell down, depending on whether a row or cell is currently focused.
                     If focus is on the bottom row, focus does not move.
                  */
-                event.preventDefault();
-                event.stopPropagation();
-                window.console.log("Arrow Up: ", lastNodeChild === selectedNode);
-                // very first
                 if (siteNavRoot) {
+                    event.preventDefault();
+                    event.stopPropagation();
                     if (selectedNode && currentLink) {
                         const nextElement = tabHandler.getNext(currentLink, false, false);
                         if (nextElement) {
@@ -113,9 +106,9 @@ export class SiteNav extends React.Component<IProps, IState> {
                     Moves focus one row or one cell up, depending on whether a row or cell is currently focused.
                     If focus is on the top row, focus does not move.
                  */
-                event.preventDefault();
-                event.stopPropagation();
                 if (selectedNode && currentLink) {
+                    event.preventDefault();
+                    event.stopPropagation();
                     const prevElement = tabHandler.getNext(currentLink, true, false);
                     if (prevElement) {
                         prevElement.focus();

@@ -9,6 +9,8 @@ $siteNav-node_color                 : $global-color_fg;
 $siteNav-nodeToggle_height          : $siteNav-node_fontSize * $global-condensed_lineHeight;
 $siteNav-nodeToggle_width           : 24px;
 $siteNav-node_active_bg             : mix($global-color_fg, $global-color_bg, 10%);
+$siteNav-node_borderWidth           : 1px;
+$siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWidth;
 
 .siteNav {
     position: relative;
@@ -28,7 +30,6 @@ $siteNav-node_active_bg             : mix($global-color_fg, $global-color_bg, 10
     justify-content: flex-start;
     flex-wrap: nowrap;
     font-size: $siteNav-node_fontSize;
-    width: 100%;
 
     &.isCurrent {
         background-color: $siteNav-node_active_bg;
@@ -39,8 +40,6 @@ $siteNav-node_active_bg             : mix($global-color_fg, $global-color_bg, 10
     display: block;
     width: 100%;
     max-width: calc(100% - #{$siteNav-nodeToggle_width});
-
-
 }
 
 .siteNavNode-link {
@@ -48,8 +47,36 @@ $siteNav-node_active_bg             : mix($global-color_fg, $global-color_bg, 10
     flex-grow: 1;
     color: $siteNav-node_color;
     line-height: $global-condensed_lineHeight;
-    overflow: hidden;
-    padding: $utility-baseUnit 0;
+    outline: 0;
+
+
+    &:active,
+    &:focus {
+        outline: 0;
+        .siteNavNode-label {
+            border: {
+                color: $global-color_primary;
+            }
+        }
+    }
+}
+
+.siteNavNode-label {
+    position: relative;
+    display: block;
+    width: calc(100% + #{$siteNav-nodeToggle_width});
+    margin-left: -$siteNav-nodeToggle_width;
+    border: {
+        style: solid;
+        width: $siteNav-node_borderWidth;
+        color: transparent;
+    }
+    padding: {
+        top: $siteNav-node_padding;
+        bottom: $siteNav-node_padding;
+        right: $siteNav-node_padding;
+        left: $siteNav-nodeToggle_width - $siteNav-node_borderWidth;
+    }
 }
 
 .siteNavNode-spacer {
@@ -58,6 +85,7 @@ $siteNav-node_active_bg             : mix($global-color_fg, $global-color_bg, 10
     width: $siteNav-nodeToggle_width;
     margin: $utility-baseUnit 0;
 }
+
 .siteNavNode-toggle {
     display: flex;
     align-items: center;
@@ -75,9 +103,5 @@ $siteNav-node_active_bg             : mix($global-color_fg, $global-color_bg, 10
     outline: 0; // We have proper accessibility on the tree, the button toggle is hidden from screen readers
     height: $siteNav-nodeToggle_height;
     width: $siteNav-nodeToggle_width;
-}
-
-.siteNavNode-label {
-
 }
 

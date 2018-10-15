@@ -8,7 +8,7 @@ import * as React from "react";
 import classNames from "classnames";
 import DropDownItem from "./DropDownItem";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import { ISelectBoxItem } from "@knowledge/modules/common/SelectBox";
+import { ISelectBoxItem } from "@library/components/SelectBox";
 
 export interface IDropDownItemButton {
     name: string;

@@ -11,6 +11,8 @@
  * @since 2.0
  */
 
+use Vanilla\Legacy;
+
 /**
  * Framework superobject.
  *
@@ -71,7 +73,7 @@ class Gdn {
     /** @var object  */
     protected static $_Config = null;
 
-    /** @var Gdn_Factory The factory used to create core objects in the application. */
+    /** @var Legacy\Factory The factory used to create core objects in the application. */
     protected static $_Factory = null;
 
     /** @var boolean Whether or not Gdn::FactoryInstall should overwrite existing objects. */
@@ -195,7 +197,7 @@ class Gdn {
         array_shift($args);
 
         // Get the item from the container.
-        // This code has been brought in from {@link Gdn_Factory::factory()}.
+        // This code has been brought in from {@link Legacy\Factory::factory()}.
         $dic = static::getContainer();
         try {
             if (!$dic->has($alias) && $dic->has("Gdn_$alias")) {
@@ -212,12 +214,12 @@ class Gdn {
     /**
      * Get or lazy-create the factory.
      *
-     * @return Gdn_Factory
+     * @return Legacy\Factory
      */
     private static function getFactory() {
         deprecated('Gdn::getFactory()');
         if (is_null(self::$_Factory)) {
-            static::setFactory(new Gdn_Factory(static::getContainer()));
+            static::setFactory(new Legacy\Factory(static::getContainer()));
             static::factoryOverwrite(false);
         }
         return self::$_Factory;
@@ -228,7 +230,7 @@ class Gdn {
      *
      * @param string $alias The alias of the factory to check for.
      * @return boolean Whether or not a factory definintion exists.
-     * @see Gdn_Factory::exists()
+     * @see Legacy\Factory::exists()
      */
     public static function factoryExists($alias) {
         return static::getContainer()->hasRule($alias);
@@ -242,7 +244,7 @@ class Gdn {
      * @param string $path The path to the class' file. You can prefix the path with ~ to start at the application root.
      * @param string $factoryType The way objects will be instantiated for the class. One of the Gdn::Factory* constants.
      * @param mixed $data Additional data for the installation.
-     * @see Gdn_Factory::install()
+     * @see Legacy\Factory::install()
      */
     public static function factoryInstall($alias, $className, $path = '', $factoryType = self::FactorySingleton, $data = null) {
         // Don't overwrite an existing definition.
@@ -296,7 +298,7 @@ class Gdn {
      * @param string $alias The alias of the class that will have the dependency.
      * @param string $propertyName The name of the property on the class that will have the dependency.
      * @param string $sourceAlias The alias of the class that will provide the value of the property when objects are instantiated.
-     * @see Gdn_Factory::instalDependency()
+     * @see Legacy\Factory::instalDependency()
      */
     public static function factoryInstallDependency($alias, $propertyName, $sourceAlias) {
         deprecated('Gdn::factoryInstallDependency()');
@@ -584,7 +586,7 @@ class Gdn {
     /**
      * Set the object used as the factory for the api.
      *
-     * @param Gdn_Factory $factory The object used as the factory.
+     * @param Legacy\Factory $factory The object used as the factory.
      * @param boolean $override whether to override the property if it is already set.
      */
     public static function setFactory($factory, $override = true) {

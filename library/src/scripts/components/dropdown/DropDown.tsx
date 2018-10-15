@@ -76,6 +76,7 @@ export default class DropDown extends React.Component<IProps, IState> {
                             className={this.props.className + "Contents"}
                             isPositionedFromRight={this.props.stickRight!}
                             isPositionedFromTop={this.props.stickTop!}
+                            onClick={params.closeMenuHandler}
                             {...params}
                         >
                             <ul className="dropDownItems">{this.props.children}</ul>

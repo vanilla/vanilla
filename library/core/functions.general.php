@@ -4216,7 +4216,7 @@ if (!function_exists('ipDecodeRecursive')) {
     function ipDecodeRecursive($input) {
         walkAllRecursive($input, function(&$val, $key = null, $parent = null) {
             if (is_string($val)) {
-                if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true)) {
+                if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true) || ($key == 'IP')) {
                     $val = ipDecode($val);
                 }
             }

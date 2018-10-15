@@ -8,6 +8,7 @@ import * as React from "react";
 import classNames from "classnames";
 
 export interface ICommonHeadingProps {
+    id?: string;
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
     className?: string;
 }
@@ -37,6 +38,7 @@ export default class Heading extends React.Component<IHeadingProps> {
 
         return (
             <Tag
+                id={this.props.id}
                 className={classNames(
                     "heading",
                     `heading-${this.props.depth}`,

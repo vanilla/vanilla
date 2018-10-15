@@ -18,6 +18,7 @@ export interface IProps {
     stickTop?: boolean; // Adjusts the flyout position vertically
     stickRight?: boolean; // Adjusts the flyout position horizontally
     icon?: JSX.Element;
+    describedBy?: string;
 }
 
 export interface IState {

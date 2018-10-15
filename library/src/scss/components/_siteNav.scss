@@ -94,6 +94,7 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     padding: 0;
     height: $siteNav-nodeToggle_height;
     width: $siteNav-nodeToggle_width;
+    z-index: 1;
 }
 
 .siteNavNode-toggle {

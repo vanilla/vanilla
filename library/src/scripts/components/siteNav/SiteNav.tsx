@@ -13,7 +13,6 @@ import SiteNavNode from "@library/components/siteNav/SiteNavNode";
 import TabHandler from "@library/TabHandler";
 
 interface IProps extends RouteComponentProps<{}> {
-    name: string;
     className?: string;
     children: any[];
 }
@@ -57,9 +56,9 @@ export class SiteNav extends React.Component<IProps, IState> {
                 : null;
         return (
             <nav onKeyDownCapture={this.handleKeyDown as any} className={classNames("siteNav", this.props.className)}>
-                <h2 id={this.titleID} className="sr-only">{`${t("Category navigation from folder: ")}\"${
-                    this.props.name
-                }\"`}</h2>
+                <h2 id={this.titleID} className="sr-only">
+                    {t("Site Navigation")}
+                </h2>
                 <ul className="siteNav-children" role="tree" aria-labelledby={this.titleID}>
                     {content}
                 </ul>

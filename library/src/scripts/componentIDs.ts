@@ -17,10 +17,12 @@ export interface IRequiredComponentID {
     id: string;
 }
 
+// Generates unique ID from suffix
 export function uniqueIDFromPrefix(suffix: string) {
     return (suffix + uniqueId()) as string;
 }
 
+// Get required ID, will either return ID given through props or generate unique ID from suffix
 export function getRequiredID(props: IRequiredComponentID, suffix: string): string {
     if (props.id) {
         return props.id;
@@ -29,6 +31,7 @@ export function getRequiredID(props: IRequiredComponentID, suffix: string): stri
     }
 }
 
+// Get optional ID, will either return given ID through props if given, if true, will get generated ID from prefix, if false, ignored
 export function getOptionalID(props: IOptionalComponentID, suffix?: string): string | null {
     if (props.id) {
         // we want an ID

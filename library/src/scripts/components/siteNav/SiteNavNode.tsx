@@ -29,6 +29,9 @@ interface IState {
     current: boolean;
 }
 
+/**
+ * Recursive component to generate site nav item
+ */
 export default class SiteNavNode extends React.Component<IProps, IState> {
     public constructor(props) {
         super(props);
@@ -38,6 +41,10 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
         };
     }
 
+    /**
+     * Opens node. Optional callback if it's already open.
+     * @param callbackIfAlreadyOpen
+     */
     public open = (callbackIfAlreadyOpen?: any) => {
         if (!this.state.open) {
             this.setState({
@@ -50,6 +57,10 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
         }
     };
 
+    /**
+     * Closes node. Optional callback if already closed.
+     * @param callbackIfAlreadyClosed
+     */
     public close = (callbackIfAlreadyClosed?: any) => {
         if (this.state.open) {
             this.setState({
@@ -62,6 +73,9 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
         }
     };
 
+    /**
+     * Triggers opening up each node up the tree if this node is the current page
+     */
     public openRecursive = () => {
         if (!this.state.current && this.currentPage()) {
             this.setState({
@@ -73,6 +87,9 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
         }
     };
 
+    /**
+     * Opens self and calls same function on parent. Opens all the way to the root.
+     */
     public openSelfAndOpenParent = () => {
         this.setState({
             open: true,
@@ -83,17 +100,28 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
         }
     };
 
+    /**
+     * Toggle node
+     */
     public toggle = () => {
         this.setState({
             open: !this.state.open,
         });
     };
 
+    /**
+     * Handles clicking on the chevron to toggle node
+     * @param e
+     */
     public handleClick = e => {
         e.preventDefault();
         this.toggle();
     };
 
+    /**
+     * Checks if we're on the current page
+     * Note that this won't work with non-canonical URLs
+     */
     public currentPage(): boolean {
         if (this.props.location && this.props.location.pathname) {
             return this.props.location.pathname === this.props.url;
@@ -102,26 +130,36 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
         }
     }
 
+    /**
+     * Updates state with current status
+     */
     public updateCurrentState() {
         this.setState({
             current: this.currentPage(),
         });
     }
 
+    /**
+     * When component updates, check if we're the current node, if so open recursively up the tree.
+     * Also check if we're the current page
+     * @param prevProps
+     */
     public componentDidUpdate(prevProps) {
         this.openRecursive();
         if (prevProps.location.pathname !== this.props.location.pathname) {
             this.updateCurrentState();
         }
     }
-
+    /**
+     * When component gets added to DOM, check if we're the current node, if so open recursively up the tree
+     * @param prevProps
+     */
     public componentDidMount() {
         this.openRecursive();
     }
 
     public render() {
         const hasChildren = this.props.children && this.props.children.length > 0;
-        const topLevel = this.props.counter === 1;
         const childrenContents =
             hasChildren &&
             this.props.children.map((child, i) => {
@@ -132,7 +170,6 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                         counter={this.props.counter! + 1}
                         openParent={this.openSelfAndOpenParent}
                         location={this.props.location}
-                        depth={this.props.depth + 1}
                     />
                 );
             });
@@ -142,7 +179,6 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                 className={classNames("siteNavNode", this.props.className, { isCurrent: this.state.current })}
                 role="treeitem"
                 aria-expanded={this.state.open}
-                style={{ marginLeft: `${(this.props.depth - 1) * 18}px` }}
             >
                 {hasChildren && (
                     <Button
@@ -183,21 +219,43 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
         );
     }
 
-    private next = (tabHandler, currentLink) => {
+    /**
+     * Select next visible elemnt in tree
+     * @param tabHandler The tab handler handler
+     * @param currentLink The starting point
+     */
+    private next = (tabHandler: TabHandler, currentLink: Element) => {
         const nextElement = tabHandler.getNext(currentLink, false, false);
         if (nextElement) {
             nextElement.focus();
         }
     };
 
-    private prev = (tabHandler, currentLink) => {
+    /**
+     * Select prev visible elemnt in tree
+     * @param tabHandler The tab handler handler
+     * @param currentLink The starting point
+     */
+    private prev = (tabHandler: TabHandler, currentLink: Element) => {
         const prevElement = tabHandler.getNext(currentLink, true, false);
         if (prevElement) {
             prevElement.focus();
         }
     };
 
-    // https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
+    /**
+     * Keyboard handler for arrow up, arrow down, home and end.
+     * For full accessibility docs, see https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
+     * Note that some of the events are on the SiteNavNode
+     * @param event
+     */
+
+    /**
+     * Keyboard handler for arrow right and arrow left.
+     * For full accessibility docs, see https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
+     * Note that some of the events are on SiteNav.tsx
+     * @param event
+     */
     private handleKeyDown = event => {
         const currentLink = document.activeElement;
         const siteNavRoot = currentLink.closest(".siteNav");

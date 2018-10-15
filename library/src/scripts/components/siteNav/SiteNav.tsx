@@ -13,6 +13,7 @@ import SiteNavNode from "@library/components/siteNav/SiteNavNode";
 import TabHandler from "@library/TabHandler";
 
 interface IProps extends RouteComponentProps<{}> {
+    id?: string;
     className?: string;
     children: any[];
 }
@@ -22,19 +23,18 @@ export interface IState {
 }
 
 /**
- * Recursive component to generate site nav
- * No need to set "counter". It will be set automatically. Kept optional to not need to call it on the top level. Used for React's "key" values
+ * Implementation of SiteNav component
  */
 export class SiteNav extends React.Component<IProps, IState> {
+    private id;
+
     public constructor(props) {
         super(props);
-        this.state = {
-            id: getRequiredID(props, "siteNav"),
-        };
+        this.id = getRequiredID(props, "siteNav");
     }
 
     public get titleID() {
-        return this.state.id + "-title";
+        return this.id + "-title";
     }
 
     public render() {
@@ -55,7 +55,7 @@ export class SiteNav extends React.Component<IProps, IState> {
                   })
                 : null;
         return (
-            <nav onKeyDownCapture={this.handleKeyDown as any} className={classNames("siteNav", this.props.className)}>
+            <nav onKeyDownCapture={this.handleKeyDown} className={classNames("siteNav", this.props.className)}>
                 <h2 id={this.titleID} className="sr-only">
                     {t("Site Navigation")}
                 </h2>
@@ -66,16 +66,31 @@ export class SiteNav extends React.Component<IProps, IState> {
         );
     }
 
-    public firstVisibleOfType = (container, selector: string = ".siteNavNode") => {
+    /**
+     * Get first element of type in container, excluding hidden elements
+     * @param container The container we're looking in
+     * @param selector The selector to find element
+     */
+    public firstVisibleOfType = (container: Element, selector: string = ".siteNavNode") => {
         return container.querySelector(selector + ":not(.isHidden):first-child") || null;
     };
 
-    public lastVisibleOfType = (container, selector: string = ".siteNavNode") => {
+    /**
+     * Get last element of type in container, excluding hidden elements
+     * @param container The container we're looking in
+     * @param selector The selector to find element
+     */
+    public lastVisibleOfType = (container: Element, selector: string = ".siteNavNode") => {
         return container.querySelector(selector + ":not(.isHidden):last-child") || null;
     };
 
-    // https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
-    private handleKeyDown = (event: KeyboardEvent) => {
+    /**
+     * Keyboard handler for arrow up, arrow down, home and end.
+     * For full accessibility docs, see https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
+     * Note that some of the events are on SiteNavNode.tsx
+     * @param event
+     */
+    private handleKeyDown = (event: React.KeyboardEvent) => {
         const currentLink = document.activeElement;
         const selectedNode = currentLink.closest(".siteNavNode");
         const siteNavRoot = currentLink.closest(".siteNav");

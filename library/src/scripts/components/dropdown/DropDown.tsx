@@ -9,20 +9,24 @@ import { dropDownMenu } from "@library/components/Icons";
 import { getRequiredID } from "@library/componentIDs";
 import PopoverController from "@library/components/PopoverController";
 import DropDownContents from "./DropDownContents";
+import { ButtonBaseClass } from "@library/components/forms/Button";
 
 export interface IProps {
     id: string;
-    name: string;
+    name?: string;
     children: React.ReactNode;
     className?: string;
     stickTop?: boolean; // Adjusts the flyout position vertically
     stickRight?: boolean; // Adjusts the flyout position horizontally
-    icon?: JSX.Element;
     describedBy?: string;
+    buttonContents?: React.ReactNode;
+    buttonClassName?: string;
+    buttonBaseClass?: ButtonBaseClass;
 }
 
 export interface IState {
     id: string;
+    selectedText: string;
 }
 
 /**
@@ -32,14 +36,24 @@ export default class DropDown extends React.PureComponent<IProps, IState> {
     public static defaultProps = {
         stickRight: true,
         stickTop: true,
-        icon: dropDownMenu(),
     };
 
     public constructor(props) {
         super(props);
         this.state = {
             id: getRequiredID(props, "dropDown"),
+            selectedText: "",
         };
+    }
+
+    public setSelectedText(selectedText) {
+        this.setState({
+            selectedText,
+        });
+    }
+
+    public get selectedText(): string {
+        return this.state.selectedText;
     }
 
     public render() {
@@ -47,9 +61,11 @@ export default class DropDown extends React.PureComponent<IProps, IState> {
             <PopoverController
                 id={this.state.id}
                 classNameRoot="dropDown"
-                icon={this.props.icon!}
-                buttonClasses="buttonIcon"
+                buttonBaseClass={this.props.buttonBaseClass || ButtonBaseClass.CUSTOM}
                 name={this.props.name}
+                buttonContents={this.props.buttonContents || dropDownMenu()}
+                buttonClassName={this.props.buttonClassName}
+                selectedItemLabel={this.selectedText}
             >
                 {params => {
                     return (

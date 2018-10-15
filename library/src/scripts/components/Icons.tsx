@@ -142,7 +142,7 @@ export function categoryIcon(className?: string) {
     );
 }
 
-export function selectedCategory(className?: string) {
+export function checkCompact(className?: string) {
     const title = `✓`;
     return (
         <svg

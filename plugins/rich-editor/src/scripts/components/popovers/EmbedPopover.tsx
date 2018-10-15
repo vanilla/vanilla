@@ -6,14 +6,15 @@
 
 import React from "react";
 import KeyboardModule from "quill/modules/keyboard";
-import { t, isAllowedUrl } from "@library/application";
+import { isAllowedUrl, t } from "@library/application";
 import { getRequiredID, IRequiredComponentID } from "@library/componentIDs";
-import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
+import { IWithEditorProps, withEditor } from "@rich-editor/components/context";
 import * as Icons from "@rich-editor/components/icons";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import Popover from "@rich-editor/components/popovers/pieces/Popover";
 import PopoverController, { IPopoverControllerChildParameters } from "@library/components/PopoverController";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
+import { ButtonBaseClass } from "@library/components/forms/Button";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -54,11 +55,13 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
             <PopoverController
                 id={this.state.id}
                 classNameRoot="embedDialogue"
-                icon={Icon}
                 onClose={this.clearInput}
-                buttonClasses="richEditor-button richEditor-embedButton"
+                buttonClassName="richEditor-button richEditor-embedButton"
                 onVisibilityChange={forceSelectionUpdate}
                 disabled={this.props.disabled}
+                name={t("Embed")}
+                buttonContents={Icon}
+                buttonBaseClass={ButtonBaseClass.CUSTOM}
             >
                 {(params: IPopoverControllerChildParameters) => {
                     const { initialFocusRef, closeMenuHandler, isVisible } = params;

@@ -447,6 +447,7 @@ class ModerationController extends VanillaController {
             }
 
             // Update recent posts and counts on all affected categories.
+            CategoryModel::clearCache();
             foreach ($AffectedCategories as $categoryID => $counts) {
                 $CategoryModel->refreshAggregateRecentPost($categoryID, true);
 
@@ -455,18 +456,19 @@ class ModerationController extends VanillaController {
 
                 // Offset the discussion count for this category and its parents.
                 if ($discussionOffset < 0) {
-                    CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset);
+                    CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset, false);
                 } else {
-                    CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset);
+                    CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset, false);
                 }
 
                 // Offset the comment count for this category and its parents.
                 if ($commentOffset < 0) {
-                    CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset);
+                    CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset, false);
                 } else {
-                    CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset);
+                    CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset, false);
                 }
             }
+            CategoryModel::clearCache();
 
             // Clear selections.
             if ($ClearSelection) {

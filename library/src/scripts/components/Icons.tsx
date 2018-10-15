@@ -234,7 +234,7 @@ export function filePDF(className?: string) {
     );
 }
 
-export function downTriangle(title: string = "▾", className?: string, deg?: number) {
+export function downTriangle(className?: string, title: string = "▾", deg?: number) {
     let transform;
     if (deg) {
         transform = { transform: `rotate(${deg}deg` };

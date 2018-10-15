@@ -92,7 +92,7 @@ export default class PopoverController extends React.PureComponent<
                     disabled={this.props.disabled}
                     baseClass={this.props.buttonBaseClass}
                 >
-                    <span className="u-noInteraction">{this.props.buttonContents}</span>
+                    {this.props.buttonContents}
                 </Button>
                 {!this.props.disabled &&
                     this.props.children({

@@ -10,6 +10,7 @@ import { getRequiredID } from "@library/componentIDs";
 import PopoverController from "@library/components/PopoverController";
 import DropDownContents from "./DropDownContents";
 import { ButtonBaseClass } from "@library/components/forms/Button";
+import classNames from "classnames";
 
 export interface IProps {
     id: string;
@@ -32,7 +33,7 @@ export interface IState {
 /**
  * Creates a drop down menu
  */
-export default class DropDown extends React.PureComponent<IProps, IState> {
+export default class DropDown extends React.Component<IProps, IState> {
     public static defaultProps = {
         stickRight: true,
         stickTop: true,
@@ -72,6 +73,7 @@ export default class DropDown extends React.PureComponent<IProps, IState> {
                         <DropDownContents
                             id={this.state.id + "-handle"}
                             parentID={this.state.id}
+                            className={this.props.className + "Contents"}
                             isPositionedFromRight={this.props.stickRight!}
                             isPositionedFromTop={this.props.stickTop!}
                             {...params}

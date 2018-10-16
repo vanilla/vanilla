@@ -34,6 +34,9 @@ class ModerationControllerTest extends BaseTest {
      */
     protected static $discussions = [];
 
+    /**
+     * This method is called before the first test of this test class is run.
+     */
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
         self::$api->saveToConfig([

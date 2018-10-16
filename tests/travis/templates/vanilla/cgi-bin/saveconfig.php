@@ -54,8 +54,8 @@ class SimpleConfig {
      * @return bool Returns **true** on success or **false** on failure.
      */
     private function unlink($path) {
-        $r = unlink($path);
         $this->flushPathCache($path);
+        $r = unlink($path);
         return $r;
     }
 
@@ -69,7 +69,7 @@ class SimpleConfig {
             // This fixes a bug with some configurations of apc.
             @apc_delete_file($path);
         } elseif (function_exists('opcache_invalidate')) {
-            @opcache_invalidate($path);
+            @opcache_invalidate($path, true);
         }
     }
 

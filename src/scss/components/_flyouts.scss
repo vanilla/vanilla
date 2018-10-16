@@ -292,14 +292,28 @@ $flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.
 }
 
 .MenuItems.ui-autocomplete {
+    padding: 0;
+
+    mark {
+        background-color: rgba($global-color_warning, .5);
+    }
 
     @include maxWidth {
-        width: 100% !important;
+        width: calc(100% - (#{$utility-large_padding} * 2)) !important;
     }
 
     a {
         margin: 0;
         font-weight: inherit;
+
+        .Title {
+            @include ellipsis;
+        }
+
+        &:focus,
+        &:hover {
+            color: inherit !important;
+        }
     }
 
     mark {

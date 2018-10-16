@@ -99,12 +99,12 @@ $global-subTitle_fontSize                            : 18px !default;
 
 $userContent_fontSize                                : $global-medium_fontSize !default; // 14 for forums, but 16 for KB
 
-$userContent-fontSizeH1                              : (32em/14) !default;
-$userContent-fontSizeH2                              : (24em/14) !default;
-$userContent-fontSizeH3                              : (20em/14) !default;
-$userContent-fontSizeH4                              : (16em/14) !default;
-$userContent-fontSizeH5                              : 1em !default;
-$userContent-fontSizeH6                              : (12em/14) !default;
+$userContent-fontSizeH1                              : 2em !default;
+$userContent-fontSizeH2                              : 1.5em !default;
+$userContent-fontSizeH3                              : 1.25em !default;
+$userContent-fontSizeH4                              : 1em !default;
+$userContent-fontSizeH5                              : .875em !default;
+$userContent-fontSizeH6                              : .85em !default;
 
 $global-heading_topMargin                            : 1.5 * $global-medium_fontSize;
 
@@ -156,14 +156,11 @@ $global-gutter_size                                  : $global-relativeSpacer;
 $global-gutter_halfSize                              : $global-gutter_size / 2;
 $global-gutter_quarterSize                           : $global-gutter_size / 4;
 
-$global-panel_spacerOuter                            : 60px !default;
-$global-panel_width                                  : 226px + $global-panel_spacerOuter !default;
+$global-panel_spacerOuter                            : 36px !default;
+$global-panel_width                                  : 226px !default;
+$global-panel_paddedWidth                            : $global-panel_width + $global-panel_spacerOuter !default;
 
-//$global-panel_spacerInner                            : 18px !default;
-
-
-
-$global-main_width                                   : $global-panel_width * 2 + 558px !default;
+$global-main_width                                   : $global-panel_paddedWidth * 2 + 660px !default;
 $global-main_paddedWidth                             : $global-main_width + 2 * $global-gutter_size !default;  // Derived
 
 $global-twoColumn_breakpoint                         : 900px !default; // Generic breakpoint for 2 columns

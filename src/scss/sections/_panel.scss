@@ -71,17 +71,19 @@
 
     @include maxWidth($theme-breakpoint_tablet) {
         width: 100%;
-        //margin-top: $utility-large_padding;
     }
 
     h4 {
         font-weight: bold;
         margin-bottom: $utility-small_padding;
-        padding-bottom: 3px;
-        border-bottom: $component_border;
         display: flex;
         align-items: center;
         justify-content: space-between;
+
+        @if($panel_item-border == 0) {
+            padding-bottom: $utility-small_padding;
+            border-bottom: $component_border;
+        }
 
         .Count {
             margin-right: 6px;
@@ -148,6 +150,7 @@
         }
 
         &:hover {
+
             a.ChangePicture {
                 z-index: 1;
                 display: block;
@@ -251,13 +254,24 @@ body.Section-EditProfile .Box,
     a {
         min-height: $panel-item_height;
         padding: 0 $utility-small_padding;
-        border-radius: $formElement_borderRadius;
+        border-radius: $panel_item-borderRadius;
         width: 100%;
         color: $panel_color;
+        border: $panel_item-border;
         transition: transition(color), transition(background-color);
 
         &:hover {
             background: $panel-hover_bg;
+        }
+    }
+
+    li:not(.Heading) + li:not(.Heading) {
+        margin-top: $panel_item-spacing;
+
+        @if($panel_item-spacing == 0) {
+            a {
+                border-top-width: 0;
+            }
         }
     }
 

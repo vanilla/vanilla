@@ -155,6 +155,10 @@ $panel_padding:                          0 !default;
 $panel-border:                           $content_border !default;
 $panel_borderRadius:                     $content_borderRadius !default;
 
+$panel_item-border:                      0 !default;
+$panel_item-spacing:                     0 !default;
+$panel_item-borderRadius:                $global_borderRadius !default;
+
 /* -------------------------------------------------------------- *\
     Footer
 \* -------------------------------------------------------------- */

@@ -12,6 +12,8 @@ import SmartAlign from "@library/components/SmartAlign";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import { getRequiredID } from "@library/componentIDs";
 import Modal from "@library/components/modal/Modal";
+import MediumLoader from "@library/components/MediumLoader";
+import ButtonLoader from "@library/components/ButtonLoader";
 
 interface IProps {
     title: string; // required for accessibility
@@ -20,6 +22,7 @@ interface IProps {
     onCancel: () => void;
     onConfirm: () => void;
     children: React.ReactNode;
+    isConfirmLoading?: boolean;
 }
 
 interface IState {
@@ -46,23 +49,24 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
     }
 
     public render() {
+        const { onCancel, onConfirm, srOnlyTitle, isConfirmLoading, title, children } = this.props;
         return (
-            <Modal size={ModalSizes.SMALL} elementToFocus={this.cancelID} exitHandler={this.props.onCancel}>
+            <Modal size={ModalSizes.SMALL} elementToFocus={this.cancelID} exitHandler={onCancel}>
                 <Frame>
-                    <FrameHeader closeFrame={this.props.onCancel} srOnlyTitle={this.props.srOnlyTitle!}>
-                        {this.props.title}
+                    <FrameHeader closeFrame={onCancel} srOnlyTitle={srOnlyTitle!}>
+                        {title}
                     </FrameHeader>
                     <FrameBody>
                         <FramePanel>
-                            <SmartAlign className="frameBody-contents">{this.props.children}</SmartAlign>
+                            <SmartAlign className="frameBody-contents">{children}</SmartAlign>
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter>
-                        <Button id={this.cancelID} onClick={this.props.onCancel}>
+                        <Button id={this.cancelID} onClick={onCancel}>
                             {t("Cancel")}
                         </Button>
-                        <Button onClick={this.props.onConfirm} className="buttonPrimary">
-                            {t("Ok")}
+                        <Button onClick={onConfirm} className="buttonPrimary" disabled={isConfirmLoading}>
+                            {isConfirmLoading ? <ButtonLoader /> : t("Ok")}
                         </Button>
                     </FrameFooter>
                 </Frame>

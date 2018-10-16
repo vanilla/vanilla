@@ -131,13 +131,25 @@
     }
 
     .PhotoWrapLarge {
-        width: 100%;
-        height: auto;
+        width: $panel_width;
+        height: $panel_width;
         border-radius: 0;
         position: relative;
+        overflow: hidden;
+
+        img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+            min-width: 50%;
+            min-height: 50%;
+        }
 
         &:hover {
             a.ChangePicture {
+                z-index: 1;
                 display: block;
             }
         }

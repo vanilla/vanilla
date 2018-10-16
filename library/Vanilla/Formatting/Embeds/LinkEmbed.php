@@ -79,7 +79,7 @@ class LinkEmbed extends Embed {
         }
 
         $urlEncoded = htmlspecialchars(\Gdn_Format::sanitizeUrl($url));
-        $urlAsMeta = "<span class=\"embedLink-source meta\">$urlEncoded</span>";
+        $urlAsMeta = "<span class=\"embedLink-source metaStyle\">$urlEncoded</span>";
         $nameEncoded = htmlspecialchars($name);
         $bodyEncoded = htmlspecialchars($body);
 

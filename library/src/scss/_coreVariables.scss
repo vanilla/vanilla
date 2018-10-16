@@ -90,23 +90,34 @@ $global-color_linkedIn                               : #007bb6;
     Typography
 \* -------------------------------------------------------------- */
 
-$global-title_fontSize                               : 30px !default;
-$global-subTitle_fontSize                            : 18px !default;
-
 $global-large_fontSize                               : 16px !default;
 $global-medium_fontSize                              : 14px !default;
 $global-small_fontSize                               : 12px !default;
 
+$global-title_fontSize                               : 30px !default;
+$global-subTitle_fontSize                            : 18px !default;
+
+$userContent_fontSize                                : $global-medium_fontSize !default; // 14 for forums, but 16 for KB
+
+$userContent-fontSizeH1                              : (32em/14) !default;
+$userContent-fontSizeH2                              : (24em/14) !default;
+$userContent-fontSizeH3                              : (20em/14) !default;
+$userContent-fontSizeH4                              : (16em/14) !default;
+$userContent-fontSizeH5                              : 1em !default;
+$userContent-fontSizeH6                              : (12em/14) !default;
 
 $global-heading_topMargin                            : 1.5 * $global-medium_fontSize;
 
 $global-normal_fontWeight                            : 400 !default;
-$global-bold_fontWeight                              : 600 !default;
+$global-semiBold_fontWeight                          : 600 !default;
+$global-bold_fontWeight                              : 700 !default;
 
 $global-block_margin                                 : $global-medium_fontSize !default;
 
 $global-base_lineHeight                              : 1.5 !default;
 $global-condensed_lineHeight                         : 1.25 !default;
+
+$global-relativeSpacer                               : $userContent_fontSize * $global-base_lineHeight;
 
 $global-heading_fontFamily                           : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 $global-heading_fontWeight                           : $global-bold_fontWeight !default; // Derived
@@ -141,7 +152,7 @@ $icon-small_size                                     : 16px !default;
     Layout
 \* -------------------------------------------------------------- */
 
-$global-gutter_size                                  : 24px;
+$global-gutter_size                                  : $global-relativeSpacer;
 $global-gutter_halfSize                              : $global-gutter_size / 2;
 $global-gutter_quarterSize                           : $global-gutter_size / 4;
 

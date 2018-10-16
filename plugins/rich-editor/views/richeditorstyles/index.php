@@ -644,7 +644,7 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
                     <h3 class="embedLink-title">
                         Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years   Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years
                     </h3>
-                    <span class="embedLink-source meta">
+                    <span class="embedLink-source metaStyle">
                         nytimes.com
                     </span>
                 </div>
@@ -664,7 +664,7 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
                     <h3 class="embedLink-title">
                         Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years   Hulk attacks New York, kills 17, injures 23 in deadliest attack in 5 years
                     </h3>
-                    <span class="embedLink-source meta">
+                    <span class="embedLink-source metaStyle">
                         nytimes.com
                     </span>
                 </div>

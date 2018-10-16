@@ -624,7 +624,7 @@ class MyThemeNameThemeHooks extends Gdn_Plugin {
                         <img src="https://secure.gravatar.com/avatar/b0420af06d6fecc16fc88a88cbea8218/?default=https%3A%2F%2Fvanillicon.com%2Fb0420af06d6fecc16fc88a88cbea8218_200.png&amp;rating=g&amp;size=120" alt="Linc" class="ProfilePhoto ProfilePhotoMedium">
                     </span>
                     <span class="embedLink-userName">steve_captain_rogers</span>
-                    <time class="embedLink-dateTime meta" datetime="2017-02-17 11:13">Feb 17, 2017 11:13 AM</time>
+                    <time class="embedLink-dateTime metaStyle" datetime="2017-02-17 11:13">Feb 17, 2017 11:13 AM</time>
                 </div>
                 <div class="embedLink-excerpt">
                     The Battle of New York, locally known as "The Incident", was a major battle between the Avengers and Loki with his borrowed Chitauri army in Manhattan, New York City. It was, according to Loki's plan, the first battle in Loki's war to subjugate Earth, but the nd Loki with his borrowed…

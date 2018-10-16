@@ -73,7 +73,7 @@ class LinkEmbed extends Embed {
         }
 
         if ($timestamp && $humanTime) {
-            $timestampAsMeta = "<time class=\"embedLink-dateTime meta\" dateTime=\"$timestamp\">$humanTime</time>";
+            $timestampAsMeta = "<time class=\"embedLink-dateTime metaStyle\" dateTime=\"$timestamp\">$humanTime</time>";
         } else {
             $timestampAsMeta = "";
         }

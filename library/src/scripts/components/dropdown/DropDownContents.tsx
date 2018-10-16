@@ -15,6 +15,7 @@ export interface IProps {
     isVisible?: boolean;
     isPositionedFromTop: boolean;
     isPositionedFromRight: boolean;
+    onClick: (event: React.MouseEvent) => void;
 }
 /**
  * The contents of the dropdown (not the wrapper and not the button to toggle it).
@@ -34,6 +35,7 @@ export default class DropDownContents extends React.Component<IProps> {
                         bottom: !this.props.isPositionedFromTop ? "100%" : undefined,
                         left: !this.props.isPositionedFromRight ? "0" : undefined,
                     }}
+                    onClick={this.props.onClick}
                 >
                     {this.props.children}
                 </div>

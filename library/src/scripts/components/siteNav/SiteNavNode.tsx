@@ -173,7 +173,6 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                     />
                 );
             });
-        const space = `&nbsp;`;
         return (
             <li
                 className={classNames("siteNavNode", this.props.className, { isCurrent: this.state.current })}
@@ -194,11 +193,9 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                     </Button>
                 )}
                 {!hasChildren && (
-                    <span
-                        className="siteNavNode-spacer"
-                        aria-hidden={true}
-                        dangerouslySetInnerHTML={{ __html: space }}
-                    />
+                    <span className="siteNavNode-spacer" aria-hidden={true}>
+                        {` `}
+                    </span>
                 )}
                 <div className={classNames("siteNavNode-contents")}>
                     <Link

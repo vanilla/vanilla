@@ -8,6 +8,7 @@ import React from "react";
 import { getRequiredID } from "@library/componentIDs";
 import { addEscapeListener, watchFocusInDomTree } from "@library/dom";
 import classNames from "classnames";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 
 export interface IPopoverControllerChildParameters {
     id: string;
@@ -16,16 +17,24 @@ export interface IPopoverControllerChildParameters {
     closeMenuHandler(event?: React.SyntheticEvent<any>);
 }
 
-interface IProps {
+export interface IPopoverControllerProps {
     id: string;
     classNameRoot: string;
-    icon: JSX.Element;
+    buttonContents: React.ReactNode;
     disabled?: boolean;
     children: (props: IPopoverControllerChildParameters) => JSX.Element;
     onClose?: () => void;
-    buttonClasses: string;
+    buttonBaseClass: ButtonBaseClass;
+    buttonClassName?: string;
     onVisibilityChange?: () => void;
-    name?: string;
+}
+
+export interface IPopoverControllerPropsWithIcon extends IPopoverControllerProps {
+    name: string;
+}
+
+export interface IPopoverControllerPropsWithTextLabel extends IPopoverControllerProps {
+    selectedItemLabel: string;
 }
 
 interface IState {
@@ -33,7 +42,10 @@ interface IState {
     isVisible: boolean;
 }
 
-export default class PopoverController extends React.PureComponent<IProps, IState> {
+export default class PopoverController extends React.PureComponent<
+    IPopoverControllerPropsWithIcon | IPopoverControllerPropsWithTextLabel,
+    IState
+> {
     private initalFocusRef: React.RefObject<any>;
     private buttonRef: React.RefObject<HTMLButtonElement>;
     private controllerRef: React.RefObject<HTMLDivElement>;
@@ -59,27 +71,29 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
     }
 
     public render() {
-        const buttonClasses = classNames(this.props.buttonClasses, {
+        const buttonClasses = classNames(this.props.buttonClassName, {
             isOpen: this.state.isVisible,
         });
 
+        const title = "name" in this.props ? this.props.name : this.props.selectedItemLabel;
+
         return (
             <div id={this.state.id} className={this.props.classNameRoot} ref={this.controllerRef}>
-                <button
+                <Button
                     id={this.buttonID}
                     onClick={this.togglePopover}
                     className={buttonClasses}
                     type="button"
-                    title={this.props.name}
-                    aria-label={this.props.name}
+                    title={title}
+                    aria-label={"name" in this.props ? this.props.name : undefined}
                     aria-controls={this.contentID}
                     aria-expanded={this.state.isVisible}
                     aria-haspopup="true"
                     disabled={this.props.disabled}
-                    ref={this.buttonRef}
+                    baseClass={this.props.buttonBaseClass}
                 >
-                    <span className="u-noInteraction">{this.props.icon}</span>
-                </button>
+                    {this.props.buttonContents}
+                </Button>
                 {!this.props.disabled &&
                     this.props.children({
                         id: this.contentID,
@@ -91,7 +105,10 @@ export default class PopoverController extends React.PureComponent<IProps, IStat
         );
     }
 
-    public componentDidUpdate(prevProps: IProps, prevState: IState) {
+    public componentDidUpdate(
+        prevProps: IPopoverControllerPropsWithIcon | IPopoverControllerPropsWithTextLabel,
+        prevState: IState,
+    ) {
         if (!prevState.isVisible && this.state.isVisible) {
             if (this.initalFocusRef.current) {
                 this.initalFocusRef.current.focus();

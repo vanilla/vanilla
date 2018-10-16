@@ -160,7 +160,9 @@ $global-panel_spacerOuter                            : 36px !default;
 $global-panel_width                                  : 226px !default;
 $global-panel_paddedWidth                            : $global-panel_width + $global-panel_spacerOuter !default;
 
-$global-main_width                                   : $global-panel_paddedWidth * 2 + 660px !default;
+$global-middleColumn_width                           : 660px;
+
+$global-main_width                                   : $global-panel_paddedWidth * 2 + $global-middleColumn_width !default;
 $global-main_paddedWidth                             : $global-main_width + 2 * $global-gutter_size !default;  // Derived
 
 $global-twoColumn_breakpoint                         : 900px !default; // Generic breakpoint for 2 columns
@@ -270,8 +272,8 @@ $formElement_heightWithBorder                        : $formElement_height + 2 *
 $formElement_borderColor                             : $global-border_color !default; // Derived
 $formElement_borderStyle                             : solid;
 $formElement_borderRadius                            : $global_borderRadius !default;
-$formElement_giantInput_height                       : 51px !default;
-$formElement_giantInput_fontSize                     : $utility-baseUnit * 4 !default; // Derived
+$formElement_giantInput_height                       : 82px !default;
+$formElement_giantInput_fontSize                     : 24px !default;
 $formElement_halfHeight                              : $formElement_height / 2 !default; // Derived
 $formElement-borderWidthFull                         : $formElement_borderWidth * 2 !default; // Derived
 $formElement_horizontalPadding                       : $utility-baseUnit * 2 !default; // Derived

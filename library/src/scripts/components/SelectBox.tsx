@@ -75,38 +75,33 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
     };
 
     public render() {
-        const space = `&nbsp;`;
-
-        const selectItems =
-            this.props.children && this.props.children.length > 0
-                ? this.props.children.map((child, i) => {
-                      const selected = this.state.selectedIndex === i;
-                      return (
-                          <DropDownItemButton
-                              key={this.props.id + "-item" + i}
-                              className={classNames({ isSelected: child.selected })}
-                              name={child.name}
-                              onClick={this.handleClick.bind(this, child, i)}
-                              disabled={i === this.state.selectedIndex}
-                              clickData={child}
-                              index={i}
-                              current={selected}
-                              buttonClassName="dropDownItem-button selectBox-buttonItem"
-                          >
-                              <span className="selectBox-checkContainer sc-only">
-                                  {selected && checkCompact("selectBox-selectedIcon")}
-                                  {!selected && (
-                                      <span className="selectBox-spacer" dangerouslySetInnerHTML={{ __html: space }} />
-                                  )}
-                              </span>
-                              <span className="selectBox-itemLabel">{child.name}</span>
-                              {child.outdated && (
-                                  <span className="selectBox-outdated metaStyle">{t("(Outdated)")}</span>
-                              )}
-                          </DropDownItemButton>
-                      );
-                  })
-                : null;
+        const selectItems = this.props.children.map((child, i) => {
+            const selected = this.state.selectedIndex === i;
+            return (
+                <DropDownItemButton
+                    key={this.props.id + "-item" + i}
+                    className={classNames({ isSelected: child.selected })}
+                    name={child.name}
+                    onClick={this.handleClick.bind(this, child, i)}
+                    disabled={i === this.state.selectedIndex}
+                    clickData={child}
+                    index={i}
+                    current={selected}
+                    buttonClassName="dropDownItem-button selectBox-buttonItem"
+                >
+                    <span className="selectBox-checkContainer sc-only">
+                        {selected && checkCompact("selectBox-selectedIcon")}
+                        {!selected && (
+                            <span className="selectBox-spacer" aria-hidden={true}>
+                                {` `}
+                            </span>
+                        )}
+                    </span>
+                    <span className="selectBox-itemLabel">{child.name}</span>
+                    {child.outdated && <span className="selectBox-outdated metaStyle">{t("(Outdated)")}</span>}
+                </DropDownItemButton>
+            );
+        });
         const buttonContents =
             this.state.selectedItem && this.state.selectedItem.name ? (
                 <React.Fragment>

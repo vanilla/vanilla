@@ -1,9 +1,6 @@
-$menu-separator_height: 1px;
-$menu-separator_margin: 6px !default;
-$menu-separator_style: solid;
-$menu-separator_color: #dddee0 !default;
 $selectBox-toggle_lineHeight: 13px !default;
 $selectBox-toggle_fontSize: 13px !default;
+$selectBox-separator_color: #dddee0 !default;
 
 .selectBox {
     display: inline-block;
@@ -110,8 +107,8 @@ $selectBox-toggle_fontSize: 13px !default;
 
 .menu-separator {
     background: none; // TODO: get rid of when we get the new editor
-    border-bottom: $menu-separator_height $menu-separator_style $menu-separator_color;
-    margin: $menu-separator_margin 0;
+    border-bottom: $selectBox-separator_height solid $selectBox-separator_color;
+    margin: $selectBox-separator_margin 0;
 
     hr { // We keep the <hr/> for accessibility
         @include sr-only();

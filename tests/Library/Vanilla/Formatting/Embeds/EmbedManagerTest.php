@@ -170,7 +170,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     <div class="embedText-header">
                         <h3 class="embedText-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 1</h3>
                         
-                        <span class="embedLink-source meta">https://vanillaforums.com</span>
+                        <span class="embedLink-source metaStyle">https://vanillaforums.com</span>
                     </div>
                     <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
                 </div>
@@ -198,7 +198,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     <div class="embedText-header">
                         <h3 class="embedText-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 2</h3>
                         
-                        <span class="embedLink-source meta">https://vanillaforums.com</span>
+                        <span class="embedLink-source metaStyle">https://vanillaforums.com</span>
                     </div>
                     <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
                 </div>
@@ -229,7 +229,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     <div class="embedText-header">
                         <h3 class="embedText-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 3</h3>
                         
-                        <span class="embedLink-source meta">https://vanillaforums.com</span>
+                        <span class="embedLink-source metaStyle">https://vanillaforums.com</span>
                     </div>
                     <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
                 </div>
@@ -259,8 +259,8 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                 <div class="embedText-main">
                     <div class="embedText-header">
                         <h3 class="embedText-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 4</h3>
-                        <time class="embedLink-dateTime meta" dateTime="2018-07-30">July 30th 2018</time>
-                        <span class="embedLink-source meta">https://vanillaforums.com</span>
+                        <time class="embedLink-dateTime metaStyle" dateTime="2018-07-30">July 30th 2018</time>
+                        <span class="embedLink-source metaStyle">https://vanillaforums.com</span>
                     </div>
                     <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
                 </div>
@@ -290,8 +290,8 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                 <div class="embedText-main">
                     <div class="embedText-header">
                         <h3 class="embedText-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 5</h3>
-                        <time class="embedLink-dateTime meta" dateTime="2018-07-30">July 30th 2018</time>
-                        <span class="embedLink-source meta">https://vanillaforums.com</span>
+                        <time class="embedLink-dateTime metaStyle" dateTime="2018-07-30">July 30th 2018</time>
+                        <span class="embedLink-source metaStyle">https://vanillaforums.com</span>
                     </div>
                     <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
                 </div>
@@ -319,7 +319,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
                     <div class="embedText-header">
                         <h3 class="embedText-title">Online Community Software and Customer Forum Software by Vanilla Forums - Embed Link 6</h3>
                         
-                        <span class="embedLink-source meta">https://vanillaforums.com</span>
+                        <span class="embedLink-source metaStyle">https://vanillaforums.com</span>
                     </div>
                     <div class="embedLink-excerpt">Engage your customers with a vibrant and modern online customer community forum. A customer community helps to increases loyalty, reduce support costs and deliver feedback.</div>
                 </div>

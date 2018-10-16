@@ -161,6 +161,7 @@
     .NewCommentCount.NewCommentCount,
     .MItem {
         font-size: $component-meta_fontSize;
+        line-height: inherit;
         margin-left: 0;
         margin-right: $utility-small_padding;
     }
@@ -421,6 +422,18 @@
 
             @include maxWidth {
                 display: none;
+            }
+
+            a {
+                background-color: $theme-hover_color;
+                border-color: $global-color_primary;
+                line-height: $global-base_lineHeight;
+                border-radius: $formButton_borderRadius;
+                padding: 0 $utility-small_padding;
+                display: inline-block;
+                font-weight: inherit;
+                font-size: inherit;
+                white-space: nowrap;
             }
         }
 

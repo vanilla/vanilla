@@ -41,7 +41,7 @@ echo $this->Form->errors();
             <li id="<?php echo "Job_$i"; ?>" class="form-group DBA-Job" rel="<?php echo htmlspecialchars($Job); ?>">
                 <?php
                 if (!$this->Form->isPostBack()) {
-                    $this->Form->setValue("Job_$i", true);
+                    $this->Form->setValue("Job_$i", false);
                 }
                 ?>
 

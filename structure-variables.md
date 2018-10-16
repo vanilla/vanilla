@@ -101,6 +101,9 @@ $vanillaBox-icon_hover_paddingTop
 - **$panel_toLeft**: Set `true` on this variable if you want the panel to be on the left.
 - **$panel_width**: Width for the panel section.
 - **$panel_bg**: Background color for the panel section.
+- **$panel_item-border**: Border for each item on the panel.
+- **$panel_item-spacing**: Spacing between items on the panel. If the value of this field is `0`, item's borders will colapse.
+- **$panel_item-borderRadius**: Border radius for each item on the panel.
 
 ### Footer
 

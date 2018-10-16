@@ -583,6 +583,7 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('canUpload', $this->canUpload());
         $c->addDefinition('fileErrorSize', t('editor.fileErrorSize', 'File size is too large.'));
         $c->addDefinition('fileErrorFormat', t('editor.fileErrorFormat', 'File format is not allowed.'));
+        $c->addDefinition('fileErrorAlreadyExists', t('editor.fileErrorAlreadyExists', 'File already uploaded.'));
         $c->addDefinition('fileErrorSizeFormat', t('editor.fileErrorSizeFormat', 'File size is too large and format is not allowed.'));
 
         $additionalDefinitions = [];

@@ -117,7 +117,7 @@ $global-block_margin                                 : $userContent_fontSize !de
 $global-base_lineHeight                              : 1.5 !default;
 $global-condensed_lineHeight                         : 1.25 !default;
 
-$global-relativeSpacer                               : $userContent_fontSize * $global-base_lineHeight;
+$global_spacer                                       : $userContent_fontSize * $global-base_lineHeight;
 
 $global-heading_fontFamily                           : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 $global-heading_fontWeight                           : $global-bold_fontWeight !default; // Derived
@@ -152,7 +152,7 @@ $icon-small_size                                     : 16px !default;
     Layout
 \* -------------------------------------------------------------- */
 
-$global-gutter_size                                  : $global-relativeSpacer;
+$global-gutter_size                                  : $global_spacer;
 $global-gutter_halfSize                              : $global-gutter_size / 2;
 $global-gutter_quarterSize                           : $global-gutter_size / 4;
 

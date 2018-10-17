@@ -24,7 +24,7 @@ class AliasLoader {
      */
     protected static function provideAliases(): array {
         return [
-            \Vanilla\Web\Assets\LegacyAssetModel::class => 'AssetModel',
+            \Vanilla\Web\Assets\LegacyAssetModel::class => ['AssetModel'],
         ];
     }
 }

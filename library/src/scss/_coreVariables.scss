@@ -273,7 +273,7 @@ $formElement_borderColor                             : $global-border_color !def
 $formElement_borderStyle                             : solid;
 $formElement_borderRadius                            : $global_borderRadius !default;
 $formElement_giantInput_height                       : 82px !default;
-$formElement_giantInput_fontSize                     : 24px !default;
+$formElement_giantInput_fontSize                     : $global-title_fontSize !default;
 $formElement_halfHeight                              : $formElement_height / 2 !default; // Derived
 $formElement-borderWidthFull                         : $formElement_borderWidth * 2 !default; // Derived
 $formElement_horizontalPadding                       : $utility-baseUnit * 2 !default; // Derived

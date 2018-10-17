@@ -555,8 +555,8 @@ class LegacyAssetModel extends Gdn_Model {
         $keys = [];
 
         foreach ($resources as $key => $options) {
-           $version = $options['version'] ?? '';
-           $keys[] = "{$key} -> {$version}";
+            $version = $options['version'] ?? '';
+            $keys[] = "{$key} -> {$version}";
         }
 
         return md5(implode("\n", $keys));

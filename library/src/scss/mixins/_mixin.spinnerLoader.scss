@@ -11,9 +11,9 @@
     border-radius: 50%;
     border: {
         top: $thickness solid $color;
-        right: $thickness solid rgba($color, 0.2);
-        bottom: $thickness solid rgba($color, 0.2);
-        left: $thickness solid rgba($color, 0.2);
+        right: $thickness solid rgba($color, 0.3);
+        bottom: $thickness solid rgba($color, 0.3);
+        left: $thickness solid rgba($color, 0.3);
     }
     transform: translateZ(0);
     animation: spinnerLoader $speed infinite ease-in-out;

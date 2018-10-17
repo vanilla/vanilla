@@ -23,6 +23,8 @@ class AliasLoader {
      * @inheritdoc
      */
     protected static function provideAliases(): array {
-        return [];
+        return [
+            \Vanilla\Web\Assets\LegacyAssetModel::class => 'AssetModel',
+        ];
     }
 }

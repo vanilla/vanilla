@@ -6,16 +6,21 @@
  *
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
- * @package Dashboard
  * @since 2.1
  */
 
+namespace Vanilla\Web\Assets;
+
+use Gdn_Controller;
 use Vanilla\Addon;
+use Gdn_Model;
+use Gdn;
+use Vanilla\AliasLoader;
 
 /**
  * Manages Assets.
  */
-class AssetModel extends Gdn_Model {
+class LegacyAssetModel extends Gdn_Model {
     /**
      * The number of seconds to wait after a deploy before switching the cache buster.
      */
@@ -40,6 +45,8 @@ class AssetModel extends Gdn_Model {
 
     public function __construct(\Vanilla\AddonManager $addonManager) {
         parent::__construct();
+        // Set the old class name for Gdn_Pluggable.
+        $this->ClassName = "AssetModel";
         $this->addonManager = $addonManager;
     }
 
@@ -77,13 +84,12 @@ class AssetModel extends Gdn_Model {
 
     /**
      *
-     *
      * @param $themeType
      * @param $basename
      * @param $eTag
      * @param null $notFound
+     * @param string|null $currentTheme
      * @return array
-     * @throws Exception
      */
     public function getCssFiles($themeType, $basename, $eTag, &$notFound = null, $currentTheme = null) {
         $notFound = [];
@@ -134,10 +140,8 @@ class AssetModel extends Gdn_Model {
         // Hunt the css files down.
         $paths = [];
         foreach ($this->_CssFiles as $info) {
-            $filename = $info[0];
-            $folder = val(1, $info);
-            $options = val(2, $info);
-            $css = val('Css', $options);
+            list($filename, $folder, $options) = $info;
+            $css = $options['Css'] ?? false;
 
             if ($css) {
                 // Add some literal Css.
@@ -172,7 +176,6 @@ class AssetModel extends Gdn_Model {
      *
      * @param string $sectionName - The section of the site to lookup.
      * @return string[] Javascript file paths.
-     * @throws Exception If the requested section does not exist.
      */
     public function getWebpackJsFiles(string $sectionName) {
         if (Gdn::config("HotReload.Enabled", false)) {
@@ -265,15 +268,15 @@ class AssetModel extends Gdn_Model {
     }
 
     /**
-     * Sorting callback
+     * Sorting callback for a CSS tuple.
      *
-     * @param $a
-     * @param $b
+     * @param array $a A file tuple.
+     * @param array $b A file tuple.
      * @return int
      */
-    protected function _comparePath($a, $b) {
-        $sortA = val('Sort', $a[2], 0);
-        $sortB = val('Sort', $b[2], 0);
+    protected function _comparePath(array $a, array $b) {
+        $sortA = $a[2]['Sort'] ?? 0;
+        $sortB = $b[2]['Sort'] ?? 0;
 
         if ($sortA == $sortB) {
             return 0;
@@ -290,6 +293,7 @@ class AssetModel extends Gdn_Model {
      * @param string $filename name/relative path to css file
      * @param string $folder optional. app or plugin folder to search
      * @param string $themeType mobile or desktop
+     * @param string|null $currentTheme The key of the current theme.
      * @return array|bool
      */
     public static function cssPath($filename, $folder = '', $themeType = '', $currentTheme = null) {
@@ -513,7 +517,7 @@ class AssetModel extends Gdn_Model {
 
         $info = Gdn::themeManager()->getThemeInfo(Gdn::themeManager()->desktopTheme());
         if (!empty($info)) {
-            $version = val('Version', $info, 'v0');
+            $version = $info['Version'] ?? 'v0';
             $data[strtolower("{$info['Index']}-theme-{$version}")] = true;
 
             if (Gdn::controller()->Theme && Gdn::controller()->ThemeOptions) {
@@ -525,7 +529,7 @@ class AssetModel extends Gdn_Model {
         // Add the mobile theme version.
         $info = Gdn::themeManager()->getThemeInfo(Gdn::themeManager()->mobileTheme());
         if (!empty($info)) {
-            $version = val('Version', $info, 'v0');
+            $version = $version = $info['Version'] ?? 'v0';
             $data[strtolower("{$info['Index']}-theme-{$version}")] = true;
         }
 
@@ -551,7 +555,7 @@ class AssetModel extends Gdn_Model {
         $keys = [];
 
         foreach ($resources as $key => $options) {
-           $version = val('version', $options, '');
+           $version = $options['version'] ?? '';
            $keys[] = "{$key} -> {$version}";
         }
 
@@ -645,7 +649,7 @@ class AssetModel extends Gdn_Model {
 
             // Get list of permitted view extensions
             if (is_null($extensions)) {
-                $extensions = AssetModel::viewExtensions();
+                $extensions = self::viewExtensions();
             }
 
             // 1. Gather paths from the theme, if enabled
@@ -700,3 +704,6 @@ class AssetModel extends Gdn_Model {
         return false;
     }
 }
+
+// Create aliases for backwards compatibility.
+AliasLoader::createAliases(LegacyAssetModel::class);

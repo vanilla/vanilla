@@ -94,7 +94,7 @@ $global-large_fontSize                               : 16px !default;
 $global-medium_fontSize                              : 14px !default;
 $global-small_fontSize                               : 12px !default;
 
-$global-title_fontSize                               : 30px !default;
+$global-title_fontSize                               : 32px !default;
 $global-subTitle_fontSize                            : 18px !default;
 
 $userContent_fontSize                                : $global-medium_fontSize !default; // 14 for forums, but 16 for KB
@@ -112,7 +112,7 @@ $global-normal_fontWeight                            : 400 !default;
 $global-semiBold_fontWeight                          : 600 !default;
 $global-bold_fontWeight                              : 700 !default;
 
-$global-block_margin                                 : $global-medium_fontSize !default;
+$global-block_margin                                 : $userContent_fontSize !default;
 
 $global-base_lineHeight                              : 1.5 !default;
 $global-condensed_lineHeight                         : 1.25 !default;

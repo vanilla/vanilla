@@ -113,8 +113,11 @@ class KeystoneThemeHooks extends Gdn_Plugin {
         $sender->setHighlightRoute('dashboard/settings/themeoptions');
 
         $themeManager = Gdn::themeManager();
-        //$themeManager = Gdn::addonManager()->getTheme();
         $sender->setData('ThemeInfo', $themeManager->enabledThemeInfo());
+        //$themeInfo = Gdn::addonManager()->getTheme()->getInfo();
+        //$themeKey = $themeInfo["key"];
+        //$sender->setData('ThemeInfo', $themeManager->enabledThemeInfo());
+        //$sender->setData('ThemeInfo', $themeInfo);
 
         // set hasHeroImagePlugin to view
         $sender->setData('hasHeroImagePlugin', class_exists('HeroImagePlugin'));
@@ -168,6 +171,7 @@ class KeystoneThemeHooks extends Gdn_Plugin {
         }
 
         $sender->setData('ThemeFolder', $themeManager->getEnabledDesktopThemeKey());
+        //$sender->setData('ThemeFolder', $themeKey);
         $sender->title(t('Theme Options'));
         $form->addHidden('StyleKey', $styleKey);
 

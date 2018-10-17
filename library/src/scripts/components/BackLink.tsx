@@ -14,6 +14,8 @@ interface IProps extends RouteComponentProps<{}> {
     url?: string | null;
     title?: string;
     className?: string;
+    visibleLabel?: boolean;
+    clickHandler?: () => void;
 }
 
 /**
@@ -22,6 +24,7 @@ interface IProps extends RouteComponentProps<{}> {
 export class BackLink extends React.Component<IProps> {
     public static defaultProps = {
         title: t("Back"),
+        visibleLabel: false,
     };
     public render() {
         if (this.props.url) {
@@ -32,9 +35,10 @@ export class BackLink extends React.Component<IProps> {
                         aria-label={this.props.title}
                         title={this.props.title}
                         onClick={this.clickHandler}
-                        className="backLink-link"
+                        className={classNames("backLink-link", { hasVisibleLabel: this.props.visibleLabel })}
                     >
                         {leftChevron("backLink-icon")}
+                        {this.props.visibleLabel && <span className="backLink-label">{this.props.title}</span>}
                     </Link>
                 </div>
             );

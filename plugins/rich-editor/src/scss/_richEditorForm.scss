@@ -1,0 +1,26 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+.richEditorForm {
+    position: relative;
+}
+
+.richEditorForm-title {
+    position: relative;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+
+    &:focus {
+        z-index: 1;
+    }
+}
+
+
+.richEditorForm-editor {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    margin-top: -$formElement-borderWidth;
+}

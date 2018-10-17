@@ -200,7 +200,10 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                 <div className={classNames("siteNavNode-contents")}>
                     <Link
                         onKeyDownCapture={this.handleKeyDown}
-                        className={classNames("siteNavNode-link")}
+                        className={classNames("siteNavNode-link", {
+                            hasChildren,
+                            isFirstLevel: this.props.depth === 0,
+                        })}
                         tabIndex={0}
                         to={this.props.url}
                     >

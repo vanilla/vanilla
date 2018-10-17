@@ -17,7 +17,7 @@ import { ButtonBaseClass } from "@library/components/forms/Button";
 export interface ISelectBoxItem {
     name: string;
     className?: string;
-    onClick: () => {};
+    onClick?: () => {};
     selected?: boolean;
     outdated?: boolean;
 }
@@ -28,6 +28,9 @@ interface IProps {
     children: ISelectBoxItem[];
     stickTop?: boolean; // Adjusts the flyout position vertically
     stickRight?: boolean; // Adjusts the flyout position horizontally
+    buttonClassName?: string;
+    buttonBaseClass?: ButtonBaseClass;
+    widthOfParent?: boolean;
 }
 
 export interface ISelfLabelledProps extends IProps {
@@ -50,6 +53,7 @@ interface IState {
 export default class SelectBox extends React.Component<ISelfLabelledProps | IExternalLabelledProps, IState> {
     public static defaultProps = {
         selectedIndex: 0,
+        buttonBaseClass: ButtonBaseClass.TEXT,
     };
 
     public constructor(props) {
@@ -121,8 +125,9 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         className="selectBox-dropDown"
                         name={"label" in this.props ? this.props.label : this.state.selectedItem.name}
                         buttonContents={buttonContents}
-                        buttonClassName="selectBox-toggle"
-                        buttonBaseClass={ButtonBaseClass.TEXT}
+                        buttonClassName={classNames(this.props.buttonClassName, "selectBox-toggle")}
+                        contentsClassName={classNames({ isParentWidth: this.props.widthOfParent })}
+                        buttonBaseClass={this.props.buttonBaseClass}
                         stickTop={this.props.stickTop}
                         stickRight={this.props.stickRight}
                     >

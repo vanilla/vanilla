@@ -40,7 +40,7 @@ $embedQuote-toggleButton_padding  : 12px !default;
 }
 
 .embedQuote-collapseButton {
-    @include absolute-topRight(0, #{$global-medium_fontSize - ($buttonIcon_size - $icon-default_size)/2});
+    @include absolute-topRight(0, #{$userContent_fontSize - ($buttonIcon_size - $icon-default_size)/2});
     display: flex;
     align-items: center;
     justify-content: center;

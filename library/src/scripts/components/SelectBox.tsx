@@ -17,7 +17,7 @@ import { ButtonBaseClass } from "@library/components/forms/Button";
 export interface ISelectBoxItem {
     name: string;
     className?: string;
-    onClick: () => {};
+    onClick?: () => {};
     selected?: boolean;
     outdated?: boolean;
 }

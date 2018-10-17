@@ -20,6 +20,12 @@ trait TwigTrait {
      */
     protected static function twigInit() {
         $loader = new \Twig_Loader_Filesystem(self::$twigDefaultFolder);
-        return new \Twig_Environment($loader);
+        if (\Gdn::config('Debug') === true) {
+            $twigEnv = new \Twig_Environment($loader, ['debug' => true]);
+            $twigEnv->addExtension(new \Twig_Extension_Debug());
+        } else {
+            $twigEnv = new \Twig_Environment($loader);
+        }
+        return $twigEnv;
     }
 }

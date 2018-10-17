@@ -6,6 +6,8 @@
 
 .richEditorForm {
     position: relative;
+    height: 100vh;
+    padding-top: $global-gutter_halfSize;
 }
 
 .richEditorForm-title {
@@ -23,4 +25,8 @@
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     margin-top: -$formElement-borderWidth;
+}
+
+.richEditorForm-body {
+    height: calc(100% - #{$formElement-height + $global-gutter_size + $global-gutter_size});
 }

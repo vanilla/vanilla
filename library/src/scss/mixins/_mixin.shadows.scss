@@ -1,0 +1,19 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+@mixin shadow-embed($baseColor: $global-color_fg) {
+  box-shadow: 0 1px 3px 0 rgba($baseColor, .3);
+}
+
+@mixin shadow-dropDown($baseColor: #000) {
+  box-shadow: 0 5px 10px 0 rgba($baseColor, .3);
+}
+
+@mixin shadow-modal($baseColor: #000) {
+  box-shadow: 0 5px 20px rgba($baseColor, .5);
+}
+
+

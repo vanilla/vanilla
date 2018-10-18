@@ -38,16 +38,18 @@ class LegacyAssetModel extends Gdn_Model {
      /** @var string */
     public $UrlPrefix = '';
 
-    /**
-     * @var \Vanilla\AddonManager
-     */
+    /** @var \Vanilla\AddonManager */
     private $addonManager;
 
-    public function __construct(\Vanilla\AddonManager $addonManager) {
+    /** @var CacheBusterInterface */
+    private $cacheBuster;
+
+    public function __construct(\Vanilla\AddonManager $addonManager, CacheBusterInterface $cacheBuster) {
         parent::__construct();
         // Set the old class name for Gdn_Pluggable.
         $this->ClassName = "AssetModel";
         $this->addonManager = $addonManager;
+        $this->cacheBuster = $cacheBuster;
     }
 
     /**
@@ -158,7 +160,7 @@ class LegacyAssetModel extends Gdn_Model {
         }
 
         // Sort the paths.
-        usort($paths, ['AssetModel', '_comparePath']);
+        usort($paths, ['LegacyAssetModel', '_comparePath']);
 
         return $paths;
     }
@@ -232,7 +234,7 @@ class LegacyAssetModel extends Gdn_Model {
      * @return string
      */
     public function getInlinePolyfillJSContent(): string {
-        $polyfillFileUrl = asset("/js/webpack/polyfills.min.js?h=".$this->cacheBuster());
+        $polyfillFileUrl = asset("/js/webpack/polyfills.min.js?h=".$this->cacheBuster->value());
 
         $debug = c("Debug", false);
         $logAdding = $debug ? "console.log('Older browser detected. Initiating polyfills.');" : "";
@@ -563,12 +565,13 @@ class LegacyAssetModel extends Gdn_Model {
     }
 
     /**
-     * Return a cache buster string.
+     * Return a cache buster string
+     *
+     * @deprecated 2.8 CacheBusterInterface::class
      */
     public function cacheBuster(): string {
-        /** @type $cacheBuster CacheBusterInterface */
-        $cacheBuster = Gdn::getContainer()->get(CacheBusterInterface::class);
-        return $cacheBuster->value();
+        deprecated(CacheBusterInterface::class);
+        return $this->cacheBuster->value();
     }
 
     /**

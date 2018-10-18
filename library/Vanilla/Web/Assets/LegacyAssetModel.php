@@ -44,7 +44,7 @@ class LegacyAssetModel extends Gdn_Model {
     /** @var CacheBusterInterface */
     private $cacheBuster;
 
-    public function __construct(\Vanilla\AddonManager $addonManager, CacheBusterInterface $cacheBuster) {
+    public function __construct(\Vanilla\AddonManager $addonManager, CacheBusterInterface $cacheBuster, WebpackAssetProvider $assetProvider) {
         parent::__construct();
         // Set the old class name for Gdn_Pluggable.
         $this->ClassName = "AssetModel";
@@ -163,110 +163,6 @@ class LegacyAssetModel extends Gdn_Model {
         usort($paths, ['LegacyAssetModel', '_comparePath']);
 
         return $paths;
-    }
-
-    /**
-     * Get files built from webpack using the in-repo build process.
-     *
-     * These follow a pretty strict pattern of:
-     *
-     * - webpack runtime
-     * - vendor chunk
-     * - library chunk
-     * - addon chunks
-     * - bootstrap
-     *
-     * @param string $sectionName - The section of the site to lookup.
-     * @return string[] Javascript file paths.
-     */
-    public function getWebpackJsFiles(string $sectionName) {
-        if (Gdn::config("HotReload.Enabled", false)) {
-            $ip = Gdn::config("HotReload.IP", "127.0.0.1");
-            return [
-                "http://$ip:3030/$sectionName-hot-bundle.js"
-            ];
-        }
-
-        $enabledAddonKeys = [];
-        $enabledAddons = $this->addonManager->getEnabled();
-        /** @var Addon $addon */
-        foreach ($enabledAddons as $addon) {
-            $enabledAddonKeys[] = $addon->getKey();
-        }
-
-        // Make sure that we actually have some entry-points that were built for this section.
-        $sectionDir = PATH_ROOT . DS . self::WEBPACK_DIST_DIRECTORY_NAME . DS . $sectionName;
-        if (!file_exists($sectionDir)) {
-            trace("That requested webpack asset section $sectionName does not exist\"");
-            return [];
-        }
-
-        // We always have a runtime and vendor section first.
-        $sectionRoot = '/' . self::WEBPACK_DIST_DIRECTORY_NAME . '/' . $sectionName;
-        $scripts = [
-            $sectionRoot . '/runtime' . self::WEBPACK_SCRIPT_EXTENSION,
-            $sectionRoot . '/vendors' . self::WEBPACK_SCRIPT_EXTENSION,
-        ];
-
-        // The library chunk is not always created if there is nothing shared between entry-points.
-        $sharedFilePath = $sectionDir . DS . 'shared' . self::WEBPACK_SCRIPT_EXTENSION;
-        if (file_exists($sharedFilePath)) {
-            $scripts[] = $sectionRoot . '/shared' . self::WEBPACK_SCRIPT_EXTENSION;
-        }
-
-        // Load addon bundles next.
-        foreach ($enabledAddonKeys as $addonKey) {
-            $filePath = $sectionDir . DS . 'addons' . DS . $addonKey . self::WEBPACK_SCRIPT_EXTENSION;
-            if (file_exists($filePath)) {
-                $resourcePath = $sectionRoot . '/addons/' . $addonKey . self::WEBPACK_SCRIPT_EXTENSION;
-                $scripts[] = $resourcePath;
-            }
-        }
-
-        // The bootstrap file goes last.
-        $scripts[] = $sectionRoot . '/bootstrap' . self::WEBPACK_SCRIPT_EXTENSION;
-        return $scripts;
-    }
-
-    /**
-     * Get the content for an inline polyfill script.
-     *
-     * @return string
-     */
-    public function getInlinePolyfillJSContent(): string {
-        $polyfillFileUrl = asset("/js/webpack/polyfills.min.js?h=".$this->cacheBuster->value());
-
-        $debug = c("Debug", false);
-        $logAdding = $debug ? "console.log('Older browser detected. Initiating polyfills.');" : "";
-        $logNotAdding = $debug ? "console.log('Modern browser detected. No polyfills necessary');" : "";
-
-        // Add the polyfill loader.
-        $scriptContent =
-            "var supportsAllFeatures = window.Promise && window.fetch && window.Symbol"
-            ."&& window.CustomEvent && Element.prototype.remove && Element.prototype.closest"
-            ."&& window.NodeList && NodeList.prototype.forEach;"
-            ."if (!supportsAllFeatures) {"
-            .$logAdding
-            ."var head = document.getElementsByTagName('head')[0];"
-            ."var script = document.createElement('script');"
-            ."script.src = '$polyfillFileUrl';"
-            ."head.appendChild(script);"
-            ."} else { $logNotAdding }";
-
-        return $scriptContent;
-    }
-
-    /**
-     * Get the resource path for a javascript bundle of a particular locale bundle.
-     *
-     * @param string $localeKey The key of the locale to lookup.
-     *
-     * @return string The path the locale javascript file.
-     */
-    public function getJSLocalePath(string $localeKey): string {
-        // We need a web-root url, not an asset URL because this is an API endpoint resource that is dynamically generated.
-        // It cannot have the assetPath joined onto the beginning.
-        return Gdn::request()->url("/api/v2/locales/$localeKey/translations.js", true);
     }
 
     /**

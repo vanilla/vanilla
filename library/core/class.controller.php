@@ -1878,20 +1878,21 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                 $this->Head->addScript('', 'text/javascript', false, ['content' => $this->definitionList(false)]);
 
-                $busta = $AssetModel->cacheBuster();
+                // Webpack based scripts
+                /** @var \Vanilla\Web\Assets\WebpackAssetProvider $webpackAssetProvider */
+                $webpackAssetProvider = Gdn::getContainer()->get(\Vanilla\Web\Assets\WebpackAssetProvider::class);
 
                 // Add the client-side translations.
-                // This is done in the controller rather than the asset model because the translations are not linked to compiled code.
-                $localePath = $AssetModel->getJSLocalePath(Gdn::locale()->current());
-                $this->Head->addScript($localePath."?h=$busta", 'text/javascript', false, ['defer' => 'true']);
+                $localeScriptPath = $webpackAssetProvider->getLocaleAsset()->getWebPath();
+                $this->Head->addScript($localeScriptPath, 'text/javascript', false, ['defer' => 'true']);
 
-                $polyfillContent = $AssetModel->getInlinePolyfillJSContent();
+                $polyfillContent = $webpackAssetProvider->getInlinePolyfillContents();
                 $this->Head->addScript(null, null, false, ["content" => $polyfillContent]);
 
                 // Add the built webpack javascript files.
-                $webpackJs = $AssetModel->getWebpackJsFiles($this->MasterView === 'admin' ? 'admin' : 'forum');
-                foreach ($webpackJs as $path) {
-                    $this->Head->addScript($path."?h=$busta", 'text/javascript', false, ['defer' => 'true']);
+                $jsAssets = $webpackAssetProvider->getScripts($this->MasterView === 'admin' ? 'admin' : 'forum');
+                foreach ($jsAssets as $asset) {
+                    $this->Head->addScript($asset->getWebPath(), 'text/javascript', false, ['defer' => 'true']);
                 }
 
                 foreach ($this->_JsFiles as $Index => $JsInfo) {

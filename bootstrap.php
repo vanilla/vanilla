@@ -35,6 +35,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
     ->rule(DateTimeInterface::class)
     ->setAliasOf(DateTimeImmutable::class)
+    ->setConstructorArgs([null, null])
 
     ->rule(\Vanilla\Web\Assets\CacheBusterInterface::class)
     ->setShared(true)

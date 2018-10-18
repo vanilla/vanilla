@@ -33,6 +33,13 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule(InjectableInterface::class)
     ->addCall('setDependencies')
 
+    ->rule(DateTimeInterface::class)
+    ->setAliasOf(DateTimeImmutable::class)
+
+    ->rule(\Vanilla\Web\Assets\CacheBusterInterface::class)
+    ->setShared(true)
+    ->setAliasOf(\Vanilla\Web\Assets\DeploymentCacheBuster::class)
+
     // Cache
     ->rule('Gdn_Cache')
     ->setShared(true)
@@ -43,6 +50,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Gdn_Configuration')
     ->setShared(true)
     ->addAlias('Config')
+    ->addAlias(\Vanilla\Config\ConfigInterface::class)
 
     // AddonManager
     ->rule(Vanilla\AddonManager::class)

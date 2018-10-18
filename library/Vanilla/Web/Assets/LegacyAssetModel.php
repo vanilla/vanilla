@@ -564,21 +564,11 @@ class LegacyAssetModel extends Gdn_Model {
 
     /**
      * Return a cache buster string.
-     *
-     * @return string Returns a string.
      */
-    public function cacheBuster() {
-        if ($timestamp = c('Garden.Deployed')) {
-            $graced = $timestamp + static::CACHE_GRACE_PERIOD;
-            if (time() >= $graced) {
-                $timestamp = $graced;
-            }
-            $result = dechex($timestamp);
-        } else {
-            $result = APPLICATION_VERSION;
-        }
-
-        return $result;
+    public function cacheBuster(): string {
+        /** @type $cacheBuster CacheBusterInterface */
+        $cacheBuster = Gdn::getContainer()->get(CacheBusterInterface::class);
+        return $cacheBuster->value();
     }
 
     /**

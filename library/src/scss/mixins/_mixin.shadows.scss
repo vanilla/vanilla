@@ -17,3 +17,11 @@
 }
 
 
+@mixin shadow-contrast($baseColor: $global-color_fg, $border: false, $borderRadius: 0) {
+    $shadowColor : rgba($baseColor, .2);
+    box-shadow: 0 0 3px 0 $shadowColor;
+    @if ($border) {
+        outline: solid $shadowColor 1px;
+        border-radius: $borderRadius;
+    }
+}

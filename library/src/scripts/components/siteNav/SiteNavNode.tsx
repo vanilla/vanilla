@@ -11,6 +11,7 @@ import { downTriangle, rightTriangle } from "@library/components/Icons";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
 import TabHandler from "@library/TabHandler";
+import { ReactNodeArray } from "react";
 
 interface IProps {
     name: string;
@@ -173,31 +174,35 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                     />
                 );
             });
+
+        const spacer = <span className="siteNavNode-spacer" aria-hidden={true}>{` `}</span>;
+        const spacers: JSX.Element[] = [];
+        for (let i = 0; i < this.props.depth; i++) {
+            spacers.push(spacer);
+        }
+
         return (
             <li
                 className={classNames("siteNavNode", this.props.className, { isCurrent: this.state.current })}
                 role="treeitem"
                 aria-expanded={this.state.open}
             >
-                {hasChildren && (
-                    <Button
-                        tabIndex={-1}
-                        ariaHidden={true}
-                        title={t("Toggle Category")}
-                        ariaLabel={t("Toggle Category")}
-                        onClick={this.handleClick as any}
-                        baseClass={ButtonBaseClass.CUSTOM}
-                        className="siteNavNode-toggle"
-                    >
-                        {this.state.open ? downTriangle(t("Expand")) : rightTriangle(t("Collapse"))}
-                    </Button>
-                )}
-                {!hasChildren && (
-                    <span className="siteNavNode-spacer" aria-hidden={true}>
-                        {` `}
-                    </span>
-                )}
                 <div className={classNames("siteNavNode-contents")}>
+                    {spacer}
+                    {!hasChildren && spacer}
+                    {hasChildren && (
+                        <Button
+                            tabIndex={-1}
+                            ariaHidden={true}
+                            title={t("Toggle Category")}
+                            ariaLabel={t("Toggle Category")}
+                            onClick={this.handleClick as any}
+                            baseClass={ButtonBaseClass.CUSTOM}
+                            className="siteNavNode-toggle"
+                        >
+                            {this.state.open ? downTriangle(t("Expand")) : rightTriangle(t("Collapse"))}
+                        </Button>
+                    )}
                     <Link
                         onKeyDownCapture={this.handleKeyDown}
                         className={classNames("siteNavNode-link", {
@@ -209,12 +214,14 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                     >
                         <span className="siteNavNode-label">{this.props.name}</span>
                     </Link>
-                    {hasChildren && (
+                </div>
+                {hasChildren && (
+                    <React.Fragment>
                         <ul className={classNames("siteNavNode-children", { isHidden: !this.state.open })} role="group">
                             {childrenContents}
                         </ul>
-                    )}
-                </div>
+                    </React.Fragment>
+                )}
             </li>
         );
     }
@@ -242,13 +249,6 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
             prevElement.focus();
         }
     };
-
-    /**
-     * Keyboard handler for arrow up, arrow down, home and end.
-     * For full accessibility docs, see https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
-     * Note that some of the events are on the SiteNavNode
-     * @param event
-     */
 
     /**
      * Keyboard handler for arrow right and arrow left.

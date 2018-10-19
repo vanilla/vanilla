@@ -25,21 +25,28 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
 
 .siteNavNode {
     position: relative;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    flex-wrap: nowrap;
+    //display: flex;
+    //align-items: flex-start;
+    //justify-content: flex-end;
+    //flex-wrap: nowrap;
     font-size: $siteNav-node_fontSize;
 
+    background: rgba(0, 0, 0, 0.11);
+
     &.isCurrent {
-        background-color: $siteNav-node_active_bg;
+        .siteNavNode-contents {
+            background-color: $siteNav-node_active_bg;
+        }
     }
 }
 
 .siteNavNode-contents {
-    display: block;
     width: 100%;
-    max-width: calc(100% - #{$siteNav-nodeToggle_width});
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    //max-width: calc(100% - #{$siteNav-nodeToggle_width});
 }
 
 .siteNavNode-link {
@@ -71,8 +78,8 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
 .siteNavNode-label {
     position: relative;
     display: block;
-    width: calc(100% + #{$siteNav-nodeToggle_width});
-    margin-left: -$siteNav-nodeToggle_width;
+    //width: calc(100% + #{$siteNav-nodeToggle_width});
+    //margin-left: -$siteNav-nodeToggle_width;
     border: {
         style: solid;
         width: $siteNav-node_borderWidth;
@@ -82,7 +89,8 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
         top: $siteNav-node_padding;
         bottom: $siteNav-node_padding;
         right: $siteNav-node_padding;
-        left: $siteNav-nodeToggle_width - $siteNav-node_borderWidth;
+        left: $siteNav-node_padding;
+        //left: $siteNav-nodeToggle_width - $siteNav-node_borderWidth;
     }
 }
 

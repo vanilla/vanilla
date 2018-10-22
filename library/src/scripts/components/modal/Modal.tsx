@@ -27,7 +27,7 @@ interface IModalCommonProps {
     container?: Element;
     description?: string;
     children: React.ReactNode;
-    elementToFocus?: React.RefObject<HTMLElement>;
+    elementToFocus?: HTMLElement;
     size: ModalSizes;
 }
 
@@ -95,8 +95,9 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
                     ref={this.selfRef}
                     onKeyDown={this.handleTabbing}
                     onClick={this.handleModalClick}
-                    aria-describedby={this.descriptionID}
                     aria-label={"label" in this.props ? this.props.label : undefined}
+                    aria-labelledby={"titleID" in this.props ? this.props.titleID : undefined}
+                    aria-describedby={this.props.description ? this.descriptionID : undefined}
                 >
                     {this.props.description && (
                         <div id={this.descriptionID} className="sr-only">
@@ -152,14 +153,14 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
      */
     private focusInitialElement() {
         let targetElement;
-        if (this.props.elementToFocus && this.props.elementToFocus.current) {
-            targetElement = this.props.elementToFocus.current;
+        if (this.props.elementToFocus) {
+            targetElement = this.props.elementToFocus;
         } else {
             targetElement = this.tabHandler.getInitial();
         }
-        const elementToFocus = !!targetElement ? targetElement : document.body;
-        elementToFocus.focus();
-        Modal.focusHistory.push(elementToFocus);
+        targetElement = !!targetElement ? targetElement : document.body;
+        targetElement.focus();
+        Modal.focusHistory.push(targetElement);
     }
 
     /**

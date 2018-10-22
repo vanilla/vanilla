@@ -21,16 +21,16 @@ export default class EscapeListener {
     /**
      * Start the listeners.
      */
-    public start() {
+    public start = () => {
         this.root.addEventListener("keydown", this.keydownListener);
-    }
+    };
 
     /**
      * Stop the listeners.
      */
-    public stop() {
+    public stop = () => {
         this.root.removeEventListener("keydown", this.keydownListener);
-    }
+    };
 
     /**
      * Handler that checks for the key of an keyboard event and:

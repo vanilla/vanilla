@@ -61,7 +61,6 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                 this.setState({ hasFocus: false });
             }
         });
-        this.selfRef.current!.addEventListener("keydown", this.handleDocumentKeyDown);
     }
 
     public render() {
@@ -80,6 +79,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                 id={this.componentID}
                 style={this.pilcrowStyles}
                 className="richEditorParagraphMenu"
+                onKeyDown={this.handleKeyDown}
                 ref={this.selfRef}
             >
                 <button
@@ -249,7 +249,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      * but the selection is set to a 0 length selection at the end of the current selection before the
      * focus is moved.
      */
-    private handleDocumentKeyDown = (event: KeyboardEvent) => {
+    private handleKeyDown = (event: React.KeyboardEvent) => {
         if (event.keyCode === 27 && this.state.hasFocus) {
             event.preventDefault();
             this.close();

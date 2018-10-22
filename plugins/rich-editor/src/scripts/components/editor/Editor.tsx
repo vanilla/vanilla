@@ -173,13 +173,7 @@ export class Editor extends React.Component<IProps> {
         this.store.dispatch(actions.createInstance(this.quillID));
         this.quill.on(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
 
-        // Add a listener for a force selection update.
-        document.addEventListener(SELECTION_UPDATE, () =>
-            window.requestAnimationFrame(() => {
-                this.onQuillUpdate(Quill.events.SELECTION_CHANGE, null, null, Quill.sources.USER);
-            }),
-        );
-
+        this.addGlobalSelectionHandler();
         this.addQuoteHandler();
 
         // Once we've created our quill instance we need to force an update to allow all of the quill dependent
@@ -191,6 +185,7 @@ export class Editor extends React.Component<IProps> {
      * Cleanup from componentDidMount.
      */
     public componentWillUnmount() {
+        this.removeGlobalSelectionHandler();
         this.removeQuoteHandler();
     }
 
@@ -316,6 +311,29 @@ export class Editor extends React.Component<IProps> {
         if (this.quoteHandler) {
             removeDelegatedEvent(this.quoteHandler);
         }
+    }
+
+    /**
+     * Handle forced selection updates.
+     */
+    private handleGlobalSelectionUpdate = () => {
+        window.requestAnimationFrame(() => {
+            this.onQuillUpdate(Quill.events.SELECTION_CHANGE, null, null, Quill.sources.USER);
+        });
+    };
+
+    /**
+     * Add a handler for forced selection updates.
+     */
+    private addGlobalSelectionHandler() {
+        document.addEventListener(SELECTION_UPDATE, this.handleGlobalSelectionUpdate);
+    }
+
+    /**
+     * Remove the handler for forced selection updates.
+     */
+    private removeGlobalSelectionHandler() {
+        document.removeEventListener(SELECTION_UPDATE, this.handleGlobalSelectionUpdate);
     }
 
     /**

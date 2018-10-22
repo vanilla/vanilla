@@ -23,7 +23,6 @@ interface ITextDescription {
 interface IModalCommonProps {
     className?: string;
     exitHandler?: () => void;
-    appContainer?: Element;
     pageContainer?: Element;
     container?: Element;
     description?: string;
@@ -48,7 +47,6 @@ interface IModalHeadingDescription extends IModalCommonProps, IHeadingDescriptio
  */
 export default class Modal extends React.Component<IModalTextDescription | IModalHeadingDescription> {
     public static defaultProps = {
-        appContainer: document.getElementById("app"),
         pageContainer: document.getElementById("page"),
         container: document.getElementById("modals"),
     };

@@ -8,7 +8,6 @@ import React from "react";
 import Quill from "quill/core";
 import HeadingBlot from "quill/formats/header";
 import { t } from "@library/application";
-import { watchFocusInDomTree } from "@library/dom";
 import * as icons from "@rich-editor/components/icons";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { isEmbedSelected, forceSelectionUpdate } from "@rich-editor/quill/utility";
@@ -36,6 +35,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
     private menuRef: React.RefObject<MenuItems> = React.createRef();
     private formatter: Formatter;
+    private focusWatcher: FocusWatcher;
 
     constructor(props: IProps) {
         super(props);
@@ -53,14 +53,22 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     }
 
     /**
-     * Mount quill listeners.
+     * @inheritDoc
      */
     public componentDidMount() {
-        watchFocusInDomTree(this.selfRef.current!, newHasFocusState => {
+        this.focusWatcher = new FocusWatcher(this.selfRef.current!, newHasFocusState => {
             if (!newHasFocusState) {
                 this.setState({ hasFocus: false });
             }
         });
+        this.focusWatcher.start();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public componentWillUnmount() {
+        this.focusWatcher.stop();
     }
 
     public render() {

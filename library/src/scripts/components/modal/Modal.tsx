@@ -12,20 +12,29 @@ import { getRequiredID } from "@library/componentIDs";
 import classNames from "classnames";
 import ModalSizes from "@library/components/modal/ModalSizes";
 
-interface IProps {
+interface IHeadingDescription {
+    titleID: string;
+}
+
+interface ITextDescription {
+    label: string; // Necessary if there's no proper title
+}
+
+interface IModalCommonProps {
     className?: string;
     exitHandler?: () => void;
     appContainer?: Element;
+    pageContainer?: Element;
     container?: Element;
+    description?: string;
     children: React.ReactNode;
-    elementToFocus?: string;
-    description?: string; //For Accessibility
+    elementToFocus?: React.RefObject<HTMLElement>;
     size: ModalSizes;
 }
 
-interface IState {
-    id: string;
-}
+interface IModalTextDescription extends IModalCommonProps, ITextDescription {}
+
+interface IModalHeadingDescription extends IModalCommonProps, IHeadingDescription {}
 
 /**
  * An accessible Modal component.
@@ -37,29 +46,31 @@ interface IState {
  * - Prevents scrolling of the body.
  * - Focuses the first focusable element in the Modal.
  */
-export default class Modal extends React.Component<IProps, IState> {
+export default class Modal extends React.Component<IModalTextDescription | IModalHeadingDescription> {
     public static defaultProps = {
         appContainer: document.getElementById("app"),
+        pageContainer: document.getElementById("page"),
         container: document.getElementById("modals"),
     };
 
     public static focusHistory: HTMLElement[] = [];
+    public static stack: Modal[] = [];
 
+    private id;
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
 
     private get modalID() {
-        return this.state.id + "-modal";
+        return this.id + "-modal";
     }
 
     private get descriptionID() {
-        return this.state.id + "-description";
+        return this.id + "-description";
     }
 
     public constructor(props) {
         super(props);
-        this.state = {
-            id: getRequiredID(props, "modal"),
-        };
+        this.id = getRequiredID(props, "modal");
+        Modal.stack.push(this);
     }
 
     /**
@@ -87,10 +98,13 @@ export default class Modal extends React.Component<IProps, IState> {
                     onKeyDown={this.handleTabbing}
                     onClick={this.handleModalClick}
                     aria-describedby={this.descriptionID}
+                    aria-label={"label" in this.props ? this.props.label : undefined}
                 >
-                    <div id={this.descriptionID} className="sr-only">
-                        {this.props.description}
-                    </div>
+                    {this.props.description && (
+                        <div id={this.descriptionID} className="sr-only">
+                            {this.props.description}
+                        </div>
+                    )}
                     {this.props.children}
                 </div>
             </div>,
@@ -115,7 +129,7 @@ export default class Modal extends React.Component<IProps, IState> {
      */
     public componentDidMount() {
         this.focusInitialElement();
-        this.props.appContainer!.setAttribute("aria-hidden", true);
+        this.props.pageContainer!.setAttribute("aria-hidden", true);
         disableBodyScroll(this.selfRef.current!);
     }
 
@@ -123,8 +137,14 @@ export default class Modal extends React.Component<IProps, IState> {
      * Tear down setup from componentDidMount
      */
     public componentWillUnmount() {
-        this.props.appContainer!.removeAttribute("aria-hidden");
-        enableBodyScroll(this.selfRef.current!);
+        // Set aria-hidden on page and reenable scrolling if we're removing the last modal
+        Modal.stack.pop();
+        if (Modal.stack.length === 0) {
+            this.props.pageContainer!.removeAttribute("aria-hidden");
+            enableBodyScroll(this.selfRef.current!);
+        } else {
+            this.props.pageContainer!.setAttribute("aria-hidden", true);
+        }
         const prevFocussedElement = Modal.focusHistory.pop() || document.body;
         prevFocussedElement.focus();
     }
@@ -134,8 +154,8 @@ export default class Modal extends React.Component<IProps, IState> {
      */
     private focusInitialElement() {
         let targetElement;
-        if (this.props.elementToFocus) {
-            targetElement = document.getElementById(this.props.elementToFocus);
+        if (this.props.elementToFocus && this.props.elementToFocus.current) {
+            targetElement = this.props.elementToFocus.current;
         } else {
             targetElement = this.tabHandler.getInitial();
         }

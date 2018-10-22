@@ -1,0 +1,46 @@
+.Discussion {
+    .DataList,
+    .MessageList {
+        $arrow-size: 12px;
+        $left-spacing: #{$theme-photo_size + $component-base_padding + $arrow-size};
+
+        .Item {
+            margin-left: $left-spacing;
+
+            &::before,
+            &::after {
+                border-top: $arrow-size solid transparent;
+                border-bottom: $arrow-size solid transparent;
+                border-left: $arrow-size solid transparent;
+                border-right: $arrow-size solid $component_borderColor;
+                content: "";
+                left: -#{$arrow-size + $component-base_padding};
+                position: absolute;
+                top: $component-base_padding;
+            }
+
+            &::after {
+              border-right: $arrow-size solid $global-color_white;
+              left: -#{$arrow-size + $component-base_padding - 2px};
+            }
+
+            .Item-Header {
+                background: transparent;
+
+                .PhotoWrap {
+                    left: -$left-spacing;
+                    top: 0;
+                }
+
+                .Meta,
+                .AuthorWrap {
+                    padding-left: 0;
+                }
+            }
+        }
+
+        .ItemDiscussion {
+            position: relative;
+        }
+    }
+}

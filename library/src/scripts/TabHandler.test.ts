@@ -6,7 +6,6 @@
 
 import TabHandler from "@library/TabHandler";
 import { expect } from "chai";
-import sinon from "sinon";
 
 describe("TabHandler", () => {
     it("can find a tabbable element", () => {

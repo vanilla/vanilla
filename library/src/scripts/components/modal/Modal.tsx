@@ -8,7 +8,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 import TabHandler from "@library/TabHandler";
-import { getRequiredID } from "@library/componentIDs";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
 import classNames from "classnames";
 import ModalSizes from "@library/components/modal/ModalSizes";
 
@@ -54,7 +54,7 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
     public static focusHistory: HTMLElement[] = [];
     public static stack: Modal[] = [];
 
-    private id;
+    private id = uniqueIDFromPrefix("modal");
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
 
     private get modalID() {
@@ -65,18 +65,12 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
         return this.id + "-description";
     }
 
-    public constructor(props) {
-        super(props);
-        this.id = getRequiredID(props, "modal");
-        Modal.stack.push(this);
-    }
-
     /**
      * Render the contents into a portal.
      */
     public render() {
         return ReactDOM.createPortal(
-            <div className="overlay" onKeyDown={this.handleEscapeKeyPress} onClick={this.handleScrimClick}>
+            <div className="overlay" onClick={this.handleScrimClick}>
                 <div
                     id={this.modalID}
                     role="dialog"
@@ -130,6 +124,12 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
         this.focusInitialElement();
         this.props.pageContainer!.setAttribute("aria-hidden", true);
         disableBodyScroll(this.selfRef.current!);
+
+        // Add the escape keyboard listener only on the first modal in the stack.
+        if (Modal.stack.length === 0) {
+            document.addEventListener("keydown", this.handleDocumentEscapePress);
+        }
+        Modal.stack.push(this);
     }
 
     /**
@@ -141,6 +141,10 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
         if (Modal.stack.length === 0) {
             this.props.pageContainer!.removeAttribute("aria-hidden");
             enableBodyScroll(this.selfRef.current!);
+
+            // This event listener is only added once (on the top modal).
+            // So we only remove when clearing the last one.
+            document.removeEventListener("keydown", this.handleDocumentEscapePress);
         } else {
             this.props.pageContainer!.setAttribute("aria-hidden", true);
         }
@@ -177,18 +181,22 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
     };
 
     /**
-     * Handle the escape key.
+     * Handle escape press and close the top modal.
      *
-     * This needs to be a global listener or it will not work if something in the component isn't focused.
+     * This listener is added to the document in the event a non-focusable element inside the modal is clicked.
+     * In that case focus will be on the document.
+     *
+     * Because of this we have to be smarter and call only the top modal's escape handler.
      */
-    private handleEscapeKeyPress = (event: React.KeyboardEvent) => {
+    private handleDocumentEscapePress = (event: KeyboardEvent) => {
+        const topModal = Modal.stack[Modal.stack.length - 1];
         const escKey = 27;
 
         if (event.keyCode === escKey) {
             event.preventDefault();
             event.stopPropagation();
-            if (this.props.exitHandler) {
-                this.props.exitHandler();
+            if (topModal.props.exitHandler) {
+                topModal.props.exitHandler();
             }
         }
     };

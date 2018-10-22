@@ -12,7 +12,6 @@ import SmartAlign from "@library/components/SmartAlign";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import { getRequiredID } from "@library/componentIDs";
 import Modal from "@library/components/modal/Modal";
-import MediumLoader from "@library/components/MediumLoader";
 import ButtonLoader from "@library/components/ButtonLoader";
 
 interface IProps {
@@ -37,23 +36,30 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
         srOnlyTitle: false,
     };
 
+    private cancelRef;
+    private id;
+
     constructor(props) {
         super(props);
-        this.state = {
-            id: getRequiredID(props, "modalConfirm-"),
-        };
+        this.cancelRef = React.createRef();
+        this.id = getRequiredID(props, "confirmModal");
     }
 
-    public get cancelID() {
-        return this.state.id + "-cancelButton";
+    public get titleID() {
+        return this.id + "-title";
     }
 
     public render() {
         const { onCancel, onConfirm, srOnlyTitle, isConfirmLoading, title, children } = this.props;
         return (
-            <Modal size={ModalSizes.SMALL} elementToFocus={this.cancelID} exitHandler={onCancel}>
+            <Modal
+                size={ModalSizes.SMALL}
+                elementToFocus={this.cancelRef.current}
+                exitHandler={onCancel}
+                titleID={this.titleID}
+            >
                 <Frame>
-                    <FrameHeader closeFrame={onCancel} srOnlyTitle={srOnlyTitle!}>
+                    <FrameHeader titleID={this.titleID} closeFrame={onCancel} srOnlyTitle={srOnlyTitle!}>
                         {title}
                     </FrameHeader>
                     <FrameBody>
@@ -62,7 +68,7 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter>
-                        <Button id={this.cancelID} onClick={onCancel}>
+                        <Button ref={this.cancelRef} onClick={onCancel}>
                             {t("Cancel")}
                         </Button>
                         <Button onClick={onConfirm} className="buttonPrimary" disabled={isConfirmLoading}>

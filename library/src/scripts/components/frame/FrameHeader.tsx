@@ -17,6 +17,7 @@ interface ICommonFrameHeaderProps extends ICommonHeadingProps {
     closeFrame: () => void;
     onBackClick?: () => void;
     srOnlyTitle?: boolean;
+    titleID?: string;
 }
 
 export interface IStringTitle extends ICommonFrameHeaderProps {
@@ -62,6 +63,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
             <header className={classNames("frameHeader", this.props.className)}>
                 {backLink}
                 <Heading
+                    id={this.props.titleID}
                     title={stringTitle!}
                     depth={this.props.depth}
                     className={classNames("frameHeader-heading", { "sr-only": this.props.srOnlyTitle })}

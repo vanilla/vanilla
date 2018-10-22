@@ -17,6 +17,7 @@ import { rangeContainsBlot } from "@rich-editor/quill/utility";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import Formatter from "@rich-editor/quill/Formatter";
 import InlineToolbarMenuItems from "@rich-editor/components/toolbars/pieces/InlineToolbarMenuItems";
+import FocusWatcher from "@library/FocusWatcher";
 
 interface IProps extends IWithEditorProps {}
 

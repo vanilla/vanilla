@@ -18,6 +18,7 @@ import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
 import classNames from "classnames";
+import FocusWatcher from "@library/FocusWatcher";
 
 interface IProps extends IWithEditorProps {}
 

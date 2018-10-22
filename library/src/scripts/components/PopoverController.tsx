@@ -6,9 +6,10 @@
 
 import React from "react";
 import { getRequiredID } from "@library/componentIDs";
-import { addEscapeListener, watchFocusInDomTree } from "@library/dom";
 import classNames from "classnames";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import FocusWatcher from "@library/FocusWatcher";
+import EscapeListener from "@library/EscapeListener";
 
 export interface IPopoverControllerChildParameters {
     id: string;
@@ -49,6 +50,8 @@ export default class PopoverController extends React.PureComponent<
     private initalFocusRef: React.RefObject<any>;
     private buttonRef: React.RefObject<HTMLButtonElement>;
     private controllerRef: React.RefObject<HTMLDivElement>;
+    private focusWatcher: FocusWatcher;
+    private escapeListener: EscapeListener;
 
     constructor(props) {
         super(props);
@@ -124,9 +127,27 @@ export default class PopoverController extends React.PureComponent<
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public componentDidMount() {
-        watchFocusInDomTree(this.controllerRef.current!, this.handleFocusChange);
-        addEscapeListener(this.controllerRef.current!, this.buttonRef.current!, this.closeMenuHandler);
+        this.focusWatcher = new FocusWatcher(this.controllerRef.current!, this.handleFocusChange);
+        this.focusWatcher.start();
+
+        this.escapeListener = new EscapeListener(
+            this.controllerRef.current!,
+            this.buttonRef.current!,
+            this.closeMenuHandler,
+        );
+        this.escapeListener.start();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public componentWillUnmount() {
+        this.focusWatcher.stop();
+        this.escapeListener.stop();
     }
 
     private handleFocusChange = hasFocus => {

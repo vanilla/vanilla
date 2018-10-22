@@ -11,7 +11,7 @@
  * This is particularly useful when you want to track focus leaving or enterring a component
  * without caring about the individual contents inside.
  */
-class FocusWatcher {
+export default class FocusWatcher {
     /**
      * @param rootNode - The root dom node to watch on.
      * @param callback - A callback for when the tree focuses and blurs.

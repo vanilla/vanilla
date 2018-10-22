@@ -11,6 +11,8 @@ import { expect } from "chai";
 import gdn from "@library/gdn";
 import { escapeHTML } from "@library/dom";
 
+// tslint:disable:jsx-use-translation-function
+
 describe("<Translate />", () => {
     it("renders nothing when given an empty string source", () => {
         const rendered = render(<Translate source="" />);
@@ -59,10 +61,11 @@ describe("<Translate />", () => {
         const interpolatedContent = "Interpolated $$ < ?Content";
         const testString = `Before<0>${interpolatedContent}</0>After`;
         const expected = `Before<div>${escapeHTML(interpolatedContent)}</div>After`;
+        const c0 = content => <TestComponent content={content} />;
 
         const rendered = render(
             <div>
-                <Translate source={testString} c0={content => <TestComponent content={content} />} />
+                <Translate source={testString} c0={c0} />
             </div>,
         );
         expect(rendered.html()).equals(expected);

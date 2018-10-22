@@ -4,14 +4,19 @@
  */
 
 import * as React from "react";
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { ILoadable, LoadStatus, IApiError } from "@library/@types/api";
 import FullPageLoader from "@library/components/FullPageLoader";
 import FullPageError from "@library/components/FullPageError";
+
+interface IProps {
+    status: LoadStatus;
+    error?: Error | IApiError;
+}
 
 /**
  * A class for handling an ILoadable and display error, loading, or children.
  */
-export default class PageLoader extends React.PureComponent<ILoadable<any>, {}> {
+export default class PageLoader extends React.PureComponent<IProps, {}> {
     public static defaultProps: Partial<ILoadable<any>> = {
         status: LoadStatus.PENDING,
     };

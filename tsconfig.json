@@ -27,8 +27,7 @@
             "./node_modules/@types"
         ],
         "skipLibCheck": true,
-        "sourceMap": true,
-        "inlineSourceMap": false,
+        "sourceMap": true
     },
     "include": [
         "**/*.ts",

@@ -6,7 +6,6 @@
 
 const path = require("path");
 const webpack = require("webpack");
-const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const VANILLA_ROOT = path.resolve(path.join(__dirname, "../../"));
@@ -68,18 +67,7 @@ module.exports = {
         extensions: [".ts", ".tsx", ".js", ".jsx"],
     },
     plugins: [
-        // For some reason karma-webpack doesn't pass along the sourcemaps properly for files with .ts extensions
-        // https://stackoverflow.com/a/39175635
-        new webpack.SourceMapDevToolPlugin({
-            filename: null, // if no value is provided the sourcemap is inlined
-            test: /\.(ts|tsx|js|jsx)($|\?)/i, // process .js and .ts files only
-        }),
         new webpack.DefinePlugin({ VANILLA_ROOT }),
-        new ForkTsCheckerWebpackPlugin({
-            tsconfig: TS_CONFIG_FILE,
-            checkSyntacticErrors: true,
-            async: false,
-        }),
     ],
 
     /**

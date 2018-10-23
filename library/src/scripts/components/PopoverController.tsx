@@ -6,9 +6,10 @@
 
 import React from "react";
 import { getRequiredID } from "@library/componentIDs";
-import { addEscapeListener, watchFocusInDomTree } from "@library/dom";
 import classNames from "classnames";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import FocusWatcher from "@library/FocusWatcher";
+import EscapeListener from "@library/EscapeListener";
 
 export interface IPopoverControllerChildParameters {
     id: string;
@@ -46,29 +47,15 @@ export default class PopoverController extends React.PureComponent<
     IPopoverControllerPropsWithIcon | IPopoverControllerPropsWithTextLabel,
     IState
 > {
-    private initalFocusRef: React.RefObject<any>;
-    private buttonRef: React.RefObject<HTMLButtonElement>;
-    private controllerRef: React.RefObject<HTMLDivElement>;
-
-    constructor(props) {
-        super(props);
-        this.controllerRef = React.createRef();
-        this.initalFocusRef = React.createRef();
-        this.buttonRef = React.createRef();
-
-        this.state = {
-            id: getRequiredID(props, "popover"),
-            isVisible: false,
-        };
-    }
-
-    get buttonID(): string {
-        return this.state.id + "-handle";
-    }
-
-    get contentID(): string {
-        return this.state.id + "-contents";
-    }
+    public state = {
+        id: getRequiredID(this.props, "popover"),
+        isVisible: false,
+    };
+    private initalFocusRef: React.RefObject<any> = React.createRef();
+    private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
+    private controllerRef: React.RefObject<HTMLDivElement> = React.createRef();
+    private focusWatcher: FocusWatcher;
+    private escapeListener: EscapeListener;
 
     public render() {
         const buttonClasses = classNames(this.props.buttonClassName, {
@@ -91,6 +78,7 @@ export default class PopoverController extends React.PureComponent<
                     aria-haspopup="true"
                     disabled={this.props.disabled}
                     baseClass={this.props.buttonBaseClass}
+                    buttonRef={this.buttonRef}
                 >
                     {this.props.buttonContents}
                 </Button>
@@ -124,9 +112,27 @@ export default class PopoverController extends React.PureComponent<
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public componentDidMount() {
-        watchFocusInDomTree(this.controllerRef.current!, this.handleFocusChange);
-        addEscapeListener(this.controllerRef.current!, this.buttonRef.current!, this.closeMenuHandler);
+        this.focusWatcher = new FocusWatcher(this.controllerRef.current!, this.handleFocusChange);
+        this.focusWatcher.start();
+
+        this.escapeListener = new EscapeListener(
+            this.controllerRef.current!,
+            this.buttonRef.current!,
+            this.closeMenuHandler,
+        );
+        this.escapeListener.start();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public componentWillUnmount() {
+        this.focusWatcher.stop();
+        this.escapeListener.stop();
     }
 
     private handleFocusChange = hasFocus => {
@@ -134,6 +140,14 @@ export default class PopoverController extends React.PureComponent<
             this.setState({ isVisible: false });
         }
     };
+
+    private get buttonID(): string {
+        return this.state.id + "-handle";
+    }
+
+    private get contentID(): string {
+        return this.state.id + "-contents";
+    }
 
     /**
      * Toggle Menu menu

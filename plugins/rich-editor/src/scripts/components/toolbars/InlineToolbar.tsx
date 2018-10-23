@@ -10,7 +10,6 @@ import Emitter from "quill/core/emitter";
 import Keyboard from "quill/modules/keyboard";
 import LinkBlot from "quill/formats/link";
 import { t, isAllowedUrl } from "@library/application";
-import { watchFocusInDomTree } from "@library/dom";
 import ToolbarContainer from "@rich-editor/components/toolbars/pieces/ToolbarContainer";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import InlineToolbarLinkInput from "@rich-editor/components/toolbars/pieces/InlineToolbarLinkInput";
@@ -18,6 +17,7 @@ import { rangeContainsBlot } from "@rich-editor/quill/utility";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import Formatter from "@rich-editor/quill/Formatter";
 import InlineToolbarMenuItems from "@rich-editor/components/toolbars/pieces/InlineToolbarMenuItems";
+import FocusWatcher from "@library/FocusWatcher";
 
 interface IProps extends IWithEditorProps {}
 
@@ -35,6 +35,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     private formatter: Formatter;
     private linkInput: React.RefObject<HTMLInputElement> = React.createRef();
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
+    private focusWatcher: FocusWatcher;
 
     /**
      * Temporaly remove the focus requirement on the toolbar so we can focus it.
@@ -159,7 +160,8 @@ export class InlineToolbar extends React.Component<IProps, IState> {
      */
     public componentDidMount() {
         document.addEventListener("keydown", this.escFunction, false);
-        watchFocusInDomTree(this.selfRef.current!, this.handleFocusChange);
+        this.focusWatcher = new FocusWatcher(this.selfRef.current!, this.handleFocusChange);
+        this.focusWatcher.start();
 
         // Add a key binding for the link popup.
         const keyboard: Keyboard = this.quill.getModule("keyboard");
@@ -178,6 +180,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
      */
     public componentWillUnmount() {
         document.removeEventListener("keydown", this.escFunction, false);
+        this.focusWatcher.stop();
     }
 
     /**

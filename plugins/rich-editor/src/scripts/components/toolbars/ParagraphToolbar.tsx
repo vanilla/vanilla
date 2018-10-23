@@ -8,7 +8,6 @@ import React from "react";
 import Quill from "quill/core";
 import HeadingBlot from "quill/formats/header";
 import { t } from "@library/application";
-import { watchFocusInDomTree } from "@library/dom";
 import * as icons from "@rich-editor/components/icons";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { isEmbedSelected, forceSelectionUpdate } from "@rich-editor/quill/utility";
@@ -19,6 +18,7 @@ import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
 import classNames from "classnames";
+import FocusWatcher from "@library/FocusWatcher";
 
 interface IProps extends IWithEditorProps {}
 
@@ -36,6 +36,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
     private menuRef: React.RefObject<MenuItems> = React.createRef();
     private formatter: Formatter;
+    private focusWatcher: FocusWatcher;
 
     constructor(props: IProps) {
         super(props);
@@ -53,15 +54,22 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     }
 
     /**
-     * Mount quill listeners.
+     * @inheritDoc
      */
     public componentDidMount() {
-        watchFocusInDomTree(this.selfRef.current!, newHasFocusState => {
+        this.focusWatcher = new FocusWatcher(this.selfRef.current!, newHasFocusState => {
             if (!newHasFocusState) {
                 this.setState({ hasFocus: false });
             }
         });
-        this.selfRef.current!.addEventListener("keydown", this.handleDocumentKeyDown);
+        this.focusWatcher.start();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public componentWillUnmount() {
+        this.focusWatcher.stop();
     }
 
     public render() {
@@ -80,6 +88,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                 id={this.componentID}
                 style={this.pilcrowStyles}
                 className="richEditorParagraphMenu"
+                onKeyDown={this.handleKeyDown}
                 ref={this.selfRef}
             >
                 <button
@@ -249,7 +258,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      * but the selection is set to a 0 length selection at the end of the current selection before the
      * focus is moved.
      */
-    private handleDocumentKeyDown = (event: KeyboardEvent) => {
+    private handleKeyDown = (event: React.KeyboardEvent) => {
         if (event.keyCode === 27 && this.state.hasFocus) {
             event.preventDefault();
             this.close();

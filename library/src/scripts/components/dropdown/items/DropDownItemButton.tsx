@@ -7,14 +7,19 @@
 import * as React from "react";
 import classNames from "classnames";
 import DropDownItem from "./DropDownItem";
-import Button from "@library/components/forms/Button";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import { ISelectBoxItem } from "@library/components/SelectBox";
 
 export interface IDropDownItemButton {
     name: string;
     className?: string;
+    buttonClassName?: string;
     children?: React.ReactNode;
-    onClick: any;
     disabled?: boolean;
+    onClick: any;
+    clickData?: ISelectBoxItem;
+    index?: number;
+    current?: boolean;
 }
 
 /**
@@ -23,18 +28,21 @@ export interface IDropDownItemButton {
 export default class DropDownItemButton extends React.Component<IDropDownItemButton> {
     public static defaultProps = {
         disabled: false,
+        buttonClassName: "dropDownItem-button",
     };
 
     public render() {
         const buttonContent = this.props.children ? this.props.children : this.props.name;
         return (
-            <DropDownItem className={classNames("dropDown-buttonItem", this.props.className)}>
+            <DropDownItem className={this.props.className}>
                 <Button
                     type="button"
                     title={this.props.name}
-                    onClick={this.props.onClick}
-                    className={classNames("dropDownItem-button", this.props.className)}
+                    onClick={this.props.onClick.bind(this, this.props.clickData, this.props.index)}
+                    className={this.props.buttonClassName}
+                    baseClass={ButtonBaseClass.CUSTOM}
                     disabled={this.props.disabled}
+                    aria-current={this.props.current ? "true" : "false"}
                 >
                     {buttonContent}
                 </Button>

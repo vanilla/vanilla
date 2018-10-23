@@ -19,6 +19,9 @@ interface IProps extends IOptionalComponentID {
     title?: string;
     ariaLabel?: string;
     baseClass?: ButtonBaseClass;
+    ariaHidden?: boolean;
+    tabIndex?: number;
+    buttonRef?: React.RefObject<HTMLButtonElement>;
 }
 
 interface IState {
@@ -28,6 +31,7 @@ interface IState {
 export enum ButtonBaseClass {
     STANDARD = "button",
     ICON = "buttonIcon",
+    TEXT = "buttonAsText",
     CUSTOM = "",
 }
 
@@ -67,6 +71,9 @@ export default class Button extends React.Component<IProps, IState> {
                 onClick={this.props.onClick}
                 title={this.props.title}
                 aria-label={this.props.ariaLabel || this.props.title}
+                aria-hidden={this.props.ariaHidden}
+                tabIndex={this.props.tabIndex}
+                ref={this.props.buttonRef}
             >
                 {this.props.children}
             </button>

@@ -1,0 +1,115 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$siteNav-node_fontSize              : $global-medium_fontSize;
+$siteNav-node_color                 : $global-color_fg;
+$siteNav-nodeToggle_height          : $siteNav-node_fontSize * $global-condensed_lineHeight;
+$siteNav-nodeToggle_width           : $global-gutter_size;
+$siteNav-node_active_bg             : mix($global-color_fg, $global-color_bg, 10%);
+$siteNav-node_borderWidth           : 1px;
+$siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWidth;
+
+.siteNav {
+    position: relative;
+    display: block;
+}
+
+.siteNav-children {
+    position: relative;
+    display: block;
+}
+
+
+.siteNavNode {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    font-size: $siteNav-node_fontSize;
+
+    &.isCurrent {
+        background-color: $siteNav-node_active_bg;
+    }
+}
+
+.siteNavNode-contents {
+    display: block;
+    width: 100%;
+    max-width: calc(100% - #{$siteNav-nodeToggle_width});
+}
+
+.siteNavNode-link {
+    display: block;
+    flex-grow: 1;
+    color: $siteNav-node_color;
+    line-height: $global-condensed_lineHeight;
+    outline: 0;
+
+    &:active,
+    &:focus {
+        outline: 0;
+        .siteNavNode-label {
+            border: {
+                color: $global-color_primary;
+            }
+        }
+    }
+
+    &.hasChildren {
+        font-weight: $global-semiBold_fontWeight;
+
+        &.isFirstLevel {
+            font-weight: $global-bold_fontWeight;
+        }
+    }
+}
+
+.siteNavNode-label {
+    position: relative;
+    display: block;
+    width: calc(100% + #{$siteNav-nodeToggle_width});
+    margin-left: -$siteNav-nodeToggle_width;
+    border: {
+        style: solid;
+        width: $siteNav-node_borderWidth;
+        color: transparent;
+    }
+    padding: {
+        top: $siteNav-node_padding;
+        bottom: $siteNav-node_padding;
+        right: $siteNav-node_padding;
+        left: $siteNav-nodeToggle_width - $siteNav-node_borderWidth;
+    }
+}
+
+.siteNavNode-spacer {
+    display: block;
+    height: $siteNav-nodeToggle_height;
+    width: $siteNav-nodeToggle_width;
+    margin: $utility-baseUnit 0;
+}
+
+.siteNavNode-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: $utility-baseUnit 0;
+    padding: 0;
+    height: $siteNav-nodeToggle_height;
+    width: $siteNav-nodeToggle_width;
+    z-index: 1;
+}
+
+.siteNavNode-toggle {
+    display: block;
+    align-items: center;
+    justify-content: center;
+    outline: 0; // We have proper accessibility on the tree, the button toggle is hidden from screen readers
+    height: $siteNav-nodeToggle_height;
+    width: $siteNav-nodeToggle_width;
+}
+

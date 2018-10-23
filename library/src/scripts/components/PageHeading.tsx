@@ -13,7 +13,7 @@ interface IPageHeading {
     title: string;
     backUrl?: string | null; // back link
     className?: string;
-    menu?: JSX.Element;
+    menu?: React.ReactNode;
 }
 
 /**

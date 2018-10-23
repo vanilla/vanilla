@@ -142,7 +142,7 @@ export function categoryIcon(className?: string) {
     );
 }
 
-export function selectedCategory(className?: string) {
+export function checkCompact(className?: string) {
     const title = `✓`;
     return (
         <svg
@@ -165,7 +165,7 @@ export function fileGeneric(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 18 18"
-            className={classNames("icon", "icon-fileGeneric", className)}
+            className={classNames("icon", "icon-fileGeneric", "attachmentIcon", className)}
             aria-hidden="true"
         >
             <title>{t("Document")}</title>
@@ -184,7 +184,7 @@ export function fileWord(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 18 18"
-            className={classNames("icon", "icon-fileWord", className)}
+            className={classNames("icon", "icon-fileWord", "attachmentIcon", className)}
             aria-hidden="true"
         >
             <title>{t("Word Document")}</title>
@@ -202,7 +202,7 @@ export function fileExcel(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 18 18"
-            className={classNames("icon", "icon-fileExcel", className)}
+            className={classNames("icon", "icon-fileExcel", "attachmentIcon", className)}
             aria-hidden="true"
         >
             <title>{t("Excel Document")}</title>
@@ -221,7 +221,7 @@ export function filePDF(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 18 18"
-            className={classNames("icon", "icon-filePDF", className)}
+            className={classNames("icon", "icon-filePDF", "attachmentIcon", className)}
             aria-hidden="true"
         >
             <title>{t("PDF Document")}</title>
@@ -232,4 +232,27 @@ export function filePDF(className?: string) {
             />
         </svg>
     );
+}
+
+export function downTriangle(className?: string, title: string = "▾", deg?: number) {
+    let transform;
+    if (deg) {
+        transform = { transform: `rotate(${deg}deg` };
+    }
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 8 8"
+            className={classNames("icon", "icon-triangleRight", className)}
+            aria-hidden="true"
+            style={transform}
+        >
+            <title>{title}</title>
+            <polygon points="0 2.594 8 2.594 4 6.594 0 2.594" fill="currentColor" />
+        </svg>
+    );
+}
+
+export function rightTriangle(title: string = `▶`, className?: string) {
+    return downTriangle(className, title, -90);
 }

@@ -73,13 +73,13 @@ class LinkEmbed extends Embed {
         }
 
         if ($timestamp && $humanTime) {
-            $timestampAsMeta = "<time class=\"embedLink-dateTime meta\" dateTime=\"$timestamp\">$humanTime</time>";
+            $timestampAsMeta = "<time class=\"embedLink-dateTime metaStyle\" dateTime=\"$timestamp\">$humanTime</time>";
         } else {
             $timestampAsMeta = "";
         }
 
         $urlEncoded = htmlspecialchars(\Gdn_Format::sanitizeUrl($url));
-        $urlAsMeta = "<span class=\"embedLink-source meta\">$urlEncoded</span>";
+        $urlAsMeta = "<span class=\"embedLink-source metaStyle\">$urlEncoded</span>";
         $nameEncoded = htmlspecialchars($name);
         $bodyEncoded = htmlspecialchars($body);
 

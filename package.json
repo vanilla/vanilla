@@ -61,7 +61,7 @@
         "@types/yargs": "12.0.1",
         "@vanillaforums/babel-preset": "1.0.5",
         "@vanillaforums/prettier-config": "1.0.0",
-        "@vanillaforums/tslint-config": "1.1.8",
+        "@vanillaforums/tslint-config": "1.1.9",
         "autoprefixer": "9.1.5",
         "axios-mock-adapter": "1.15.0",
         "babel-core": "6.26.3",

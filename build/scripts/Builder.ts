@@ -51,8 +51,6 @@ export default class Builder {
                 return await this.runProd();
             case BuildMode.DEVELOPMENT:
                 return await this.runDev();
-            case BuildMode.POLYFILLS:
-                return await this.runPolyfill();
         }
     }
 
@@ -81,28 +79,15 @@ export default class Builder {
         // Cleanup
         del.sync(path.join(DIST_DIRECTORY, "**"));
         const sections = await this.entryModel.getSections();
-        const config = await Promise.all(sections.map(section => makeProdConfig(this.entryModel, section)));
+        const config = await Promise.all([
+            ...sections.map(section => makeProdConfig(this.entryModel, section)),
+            makePolyfillConfig(this.entryModel),
+        ]);
         const compiler = webpack(config);
         compiler.run((err: Error, stats: Stats) => {
             if (err || stats.hasErrors()) {
                 print(stats.toString(this.statOptions));
                 fail(`\nThe build encountered an error: ${err}`);
-            }
-
-            print(stats.toString(this.statOptions));
-        });
-    }
-
-    /**
-     * Build the polyfill files. This is entirely independant of any other files.
-     * This should only need to be run if we change browser support.
-     */
-    private async runPolyfill() {
-        const config = await makePolyfillConfig(this.entryModel);
-        const compiler = webpack(config);
-        compiler.run((err: Error, stats: Stats) => {
-            if (err) {
-                printError("The build encountered an error:" + err);
             }
 
             print(stats.toString(this.statOptions));

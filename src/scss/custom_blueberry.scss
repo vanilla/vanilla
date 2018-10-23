@@ -6,7 +6,7 @@
 
 /* ------------------ Theme ------------------ */
 
-@import "base/variables_whisper";
+@import "base/variables_blueberry";
 @import "base/variables";
 
 /* --------------- Boilerplate --------------- */
@@ -16,12 +16,12 @@
 /* --------------- Components --------------- */
 
 @import "components/herobanner";
-@import "components/form_whisper";
-@import "components/lists_whisper";
+@import "components/form_blueberry";
+@import "components/lists_blueberry";
 @import "components/searchbox";
 
 /* ------------------ Sections ------------------ */
 
-@import "sections/footer_whisper";
-@import "sections/panel_whisper";
+@import "sections/footer_blueberry";
+@import "sections/panel_blueberry";
 @import "sections/themeoptions";

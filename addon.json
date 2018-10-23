@@ -21,8 +21,8 @@
         "Styles": {
             "Default": "%s_default",
             "Classic": "%s_classic",
-            "Dark": "%s_dark",
-            "Whisper": "%s_whisper"
+            "Void": "%s_void",
+            "Blueberry": "%s_blueberry"
         }
     }
 }

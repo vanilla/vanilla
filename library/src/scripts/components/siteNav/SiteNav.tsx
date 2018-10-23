@@ -28,7 +28,7 @@ export interface IState {
 export class SiteNav extends React.Component<IProps, IState> {
     private id;
 
-    public constructor(props) {
+    public constructor(props: IProps) {
         super(props);
         this.id = getRequiredID(props, "siteNav");
     }
@@ -91,6 +91,9 @@ export class SiteNav extends React.Component<IProps, IState> {
      * @param event
      */
     private handleKeyDown = (event: React.KeyboardEvent) => {
+        if (document.activeElement === null) {
+            return;
+        }
         const currentLink = document.activeElement;
         const selectedNode = currentLink.closest(".siteNavNode");
         const siteNavRoot = currentLink.closest(".siteNav");

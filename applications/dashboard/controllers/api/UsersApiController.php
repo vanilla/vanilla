@@ -15,11 +15,16 @@ use Vanilla\DateFilterSchema;
 use Vanilla\ImageResizer;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
+use Vanilla\PermissionsTranslationTrait;
+use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\DelimitedScheme;
 
 /**
  * API Controller for the `/users` resource.
  */
 class UsersApiController extends AbstractApiController {
+
+    use PermissionsTranslationTrait;
 
     /** @var Gdn_Configuration */
     private $configuration;
@@ -54,6 +59,7 @@ class UsersApiController extends AbstractApiController {
         $this->configuration = $configuration;
         $this->userModel = $userModel;
         $this->imageResizer = $imageResizer;
+        $this->nameScheme =  new DelimitedScheme('.', new CamelCaseScheme());
     }
 
     /**
@@ -218,7 +224,7 @@ class UsersApiController extends AbstractApiController {
      * Get a list of users, filtered by username.
      *
      * @param array $query
-     * @return array
+     * @return Data
      */
     public function index_byNames(array $query) {
         $this->permission('Garden.SignIn.Allow');
@@ -286,17 +292,29 @@ class UsersApiController extends AbstractApiController {
      * @throws \Garden\Web\Exception\HttpException If a ban has been applied on the permission(s) for this session.
      * @throws \Vanilla\Exception\PermissionException If the user does not have valid permission to access this action.
      */
-    public function index_me() {
+    public function get_me(array $query) {
         $this->permission();
 
-        $this->schema([], "in")->setDescription("Get information about the current user.");
+        $in = $this->schema([
+            "expand?" => ApiUtils::getExpandDefinition(["permissions"]),
+        ], "in")->setDescription("Get information about the current user.");
         $out = $this->schema($this->getUserFragmentSchema(), "out");
+
+        $query = $in->validate($query);
 
         if (is_object($this->getSession()->User)) {
             $user = (array)$this->getSession()->User;
             $user = $this->normalizeOutput($user);
         } else {
             $user = $this->getGuestFragment();
+        }
+
+        // Expand permissions for the current user.
+        if ($this->isExpandField("permissions", $query["expand"])) {
+            $user["permissions"] = $this->formatPermissions($this->getSession()->getPermissions());
+        } else {
+            // The user record will have a "permissions" key on it by default. Nuke it.
+            unset($user["permissions"]);
         }
 
         $result = $out->validate($user);

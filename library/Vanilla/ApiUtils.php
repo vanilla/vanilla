@@ -71,7 +71,7 @@ class ApiUtils {
                 'type' => 'string'
             ],
             'style' => 'form',
-            'type' => "array",
+            'type' => ['boolean', 'array'],
         ];
         return $result;
     }

@@ -16,7 +16,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
     private $userFragmentSchema;
 
     /** @var Schema */
-    private $permissionFragment;
+    private $permissionsFragment;
 
     /** @var Schema */
     private $postFragmentSchema;

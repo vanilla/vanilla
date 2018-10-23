@@ -16,9 +16,6 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
     private $userFragmentSchema;
 
     /** @var Schema */
-    private $permissionsFragment;
-
-    /** @var Schema */
     private $postFragmentSchema;
 
     /**
@@ -79,26 +76,9 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
                 'name:s' => 'The username of the user.',
                 'photoUrl:s' => 'The URL of the user\'s avatar picture.',
                 'dateLastActive:dt|n' => 'Time the user was last active.',
-                "permissions:a?" => $this->getPermissionFragment(),
             ], 'UserFragment');
         }
         return $this->userFragmentSchema;
-    }
-
-    /**
-     * Get a fragment representing a single permission row.
-     *
-     * @return Schema
-     */
-    protected function getPermissionFragment() {
-        if ($this->permissionsFragment === null) {
-            $this->permissionsFragment = $this->schema([
-                "id:i?",
-                "type:s",
-                "permissions:o",
-            ], "PermissionFragment");
-        }
-        return $this->permissionsFragment;
     }
 
     /**

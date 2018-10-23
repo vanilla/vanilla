@@ -109,8 +109,7 @@ $userContent-fontSizeH6                              : .85em !default;
 $global-heading_topMargin                            : 1.5 * $global-medium_fontSize;
 
 $global-normal_fontWeight                            : 400 !default;
-$global-semiBold_fontWeight                          : 600 !default;
-$global-bold_fontWeight                              : 700 !default;
+$global-bold_fontWeight                              : 600 !default;
 
 $global-block_margin                                 : $userContent_fontSize !default;
 
@@ -127,11 +126,10 @@ $global-body_fontFamily                              : "Open Sans", "Segoe UI", 
 $global-body_fontWeight                              : $global-normal_fontWeight !default; // Derived
 $global-body_lineHeightRatio                         : $global-heading_lineHeightRatio;
 
-$link_default-color                                  : $global-color_primary !default;
-$link_default_hover-color                            : $global-color_secondary !default;
-$link_default_focus-color                            : $global-color_secondary !default;
-$link_default_visited-color                          : mix($global-color_secondary, $global-color_fg, 90%) !default;
-
+$link-default_color                                  : $global-color_primary !default;
+$link-default_hover_color                            : $global-color_secondary !default;
+$link-default_focus_color                            : $global-color_secondary !default;
+$link-default_visited_color                          : mix($global-color_secondary, $global-color_fg, 90%) !default;
 
 /* -------------------------------------------------------------- *\
     Animation
@@ -156,7 +154,7 @@ $global-gutter_size                                  : $global_spacer;
 $global-gutter_halfSize                              : $global-gutter_size / 2;
 $global-gutter_quarterSize                           : $global-gutter_size / 4;
 
-$global-panel_spacerOuter                            : 36px !default;
+$global-panel_spacerOuter                            : 18px !default;
 $global-panel_width                                  : 226px !default;
 $global-panel_paddedWidth                            : $global-panel_width + $global-panel_spacerOuter !default;
 

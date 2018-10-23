@@ -204,6 +204,24 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
+     * Get global permissions available to the current user.
+     *
+     * @return array
+     */
+    private function globalPermissions(): array {
+        $result = [];
+
+        foreach ($this->getSession()->getPermissionsArray() as $permission) {
+            if (!is_string($permission)) {
+                continue;
+            }
+            $result[] = $this->renamePermission($permission);
+        }
+
+        return $result;
+    }
+
+    /**
      * Get a user fragment representing a guest.
      *
      * @return array
@@ -287,6 +305,7 @@ class UsersApiController extends AbstractApiController {
     /**
      * Get a fragment representing the current user.
      *
+     * @param array $query
      * @return array
      * @throws ValidationException If output validation fails.
      * @throws \Garden\Web\Exception\HttpException If a ban has been applied on the permission(s) for this session.
@@ -295,10 +314,20 @@ class UsersApiController extends AbstractApiController {
     public function get_me(array $query) {
         $this->permission();
 
-        $in = $this->schema([
-            "expand?" => ApiUtils::getExpandDefinition(["permissions"]),
-        ], "in")->setDescription("Get information about the current user.");
-        $out = $this->schema($this->getUserFragmentSchema(), "out");
+        $in = $this->schema([], "in")->setDescription("Get information about the current user.");
+        $out = $this->schema(Schema::parse([
+            "userID",
+            "name",
+            "photoUrl",
+            "dateLastActive",
+            "permissions?" => [
+                "description" => "Global permissions available to the current user.",
+                "items" => [
+                    "type" => "string",
+                ],
+                "type" => "array",
+            ],
+        ])->add($this->getUserFragmentSchema()), "out");
 
         $query = $in->validate($query);
 
@@ -310,12 +339,7 @@ class UsersApiController extends AbstractApiController {
         }
 
         // Expand permissions for the current user.
-        if ($this->isExpandField("permissions", $query["expand"])) {
-            $user["permissions"] = $this->formatPermissions($this->getSession()->getPermissions());
-        } else {
-            // The user record will have a "permissions" key on it by default. Nuke it.
-            unset($user["permissions"]);
-        }
+        $user["permissions"] = $this->globalPermissions();
 
         $result = $out->validate($user);
         return $result;

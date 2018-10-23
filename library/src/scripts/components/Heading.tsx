@@ -32,7 +32,9 @@ export default class Heading extends React.Component<IHeadingProps> {
         depth: 2,
     };
 
-    private renderAsDepth = this.props.renderAsDepth ? this.props.renderAsDepth : this.props.depth;
+    private get renderAsDepth(): number {
+        return this.props.renderAsDepth ? this.props.renderAsDepth : this.props.depth!;
+    }
 
     public render() {
         const Tag = `h${this.props.depth}`;

@@ -5,11 +5,9 @@
  * @license GPL-2.0-only
  */
 
-import { logError, log, hashString } from "@library/utility";
+import { log, hashString } from "@library/utility";
 import twemoji from "twemoji";
-import tabbable from "tabbable";
 import debounce from "lodash/debounce";
-import TabHandler from "@library/TabHandler";
 
 /**
  * Use the browser's built-in functionality to quickly and safely escape a string.
@@ -339,93 +337,6 @@ export function ensureScript(scriptUrl: string) {
     });
 }
 
-interface ITabbableOptions {
-    root: Element;
-    excludedElements: Element[];
-    excludedRoots: Element[];
-    reverse: boolean;
-    fromElement: Element;
-    allowLooping: boolean;
-}
-
-function checkDomTreeWasClicked(rootNode: Element | null, clickedElement: Element) {
-    return rootNode && clickedElement && (rootNode.contains(clickedElement as Element) || rootNode === clickedElement);
-}
-
-/**
- * Determine if the currently focused element is somewhere inside of (or the same as)
- * a given Element.
- *
- * @param rootNode - The root node to look in.
- */
-function checkDomTreeHasFocus(rootNode: Element | null, event: FocusEvent, callback: (hasFocus: boolean) => void) {
-    setTimeout(() => {
-        const possibleTargets = [
-            // NEEDS TO COME FIRST, because safari will populate relatedTarget on focusin, and its not what we're looking for.
-            document.activeElement, // IE11, Safari.
-            event.relatedTarget as Element, // Chrome (The actual standard)
-            (event as any).explicitOriginalTarget, // Firefox
-        ];
-
-        let activeElement = null;
-        for (const target of possibleTargets) {
-            if (target && target !== document.body) {
-                activeElement = target;
-                break;
-            }
-        }
-
-        if (activeElement !== null) {
-            const hasFocus =
-                rootNode && activeElement && (activeElement === rootNode || rootNode.contains(activeElement));
-
-            // We will only invalidate based on something actually getting focus.
-            callback(!!hasFocus);
-        }
-    }, 0);
-}
-
-/**
- * Register a callback for focusin and focusin out events. The main improvement here over registering
- * the listeners yourself is that the events fire for the whole tree as 1 item instead of as
- * individual notes.
- *
- * This is particularly useful when you want to track focus leaving or enterring a component
- * without caring about the individual contents inside.
- *
- * @param rootNode - The root dom node to watch on.
- * @param callback - A callback for when the tree focuses and blurs.
- */
-export function watchFocusInDomTree(rootNode: Element, callback: (hasFocus: boolean) => void) {
-    rootNode.addEventListener(
-        "focusout",
-        (event: FocusEvent) => {
-            checkDomTreeHasFocus(rootNode, event, hasFocus => {
-                !hasFocus && callback(false);
-            });
-        },
-        true,
-    );
-
-    rootNode.addEventListener(
-        "focusin",
-        (event: FocusEvent) => {
-            checkDomTreeHasFocus(rootNode, event, hasFocus => {
-                hasFocus && callback(true);
-            });
-        },
-        true,
-    );
-
-    document.addEventListener("click", event => {
-        const triggeringElement = event.target as Element;
-        const wasClicked = checkDomTreeWasClicked(rootNode, triggeringElement);
-        if (!wasClicked) {
-            callback(false);
-        }
-    });
-}
-
 /**
  * Sticky header handling
  */
@@ -568,29 +479,4 @@ export function getElementHeight(
         height: finalHeight,
         bottomMargin: bottomHeight,
     };
-}
-
-/**
- * Register an keyboard listener for the escape key.
- *
- * @param root - The element to watch for the escape listener in.
- * @param returnElement - The element to return to when escape is pressed.
- * @param callback
- */
-export function addEscapeListener(
-    root: HTMLElement,
-    returnElement: HTMLElement,
-    callback: (event: KeyboardEvent) => void = () => {
-        return;
-    },
-) {
-    root.addEventListener("keydown", (event: KeyboardEvent) => {
-        if (event.key === "Escape") {
-            if (root.contains(document.activeElement)) {
-                event.preventDefault();
-                returnElement.focus();
-                callback(event);
-            }
-        }
-    });
 }

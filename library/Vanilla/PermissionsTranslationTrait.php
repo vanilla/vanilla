@@ -8,6 +8,7 @@
 namespace Vanilla;
 
 use Vanilla\Utility\NameScheme;
+use Vanilla\Permissions;
 
 /**
  * Translates permission names between the old and new formats.
@@ -97,6 +98,85 @@ trait PermissionsTranslationTrait {
             unset($currentPerm, $pass);
         }
 
+        return $result;
+    }
+
+    /**
+     * Given a permissions object, return its data array in the explicit-scope format.
+     *
+     * @param \Vanilla\Permissions $permissions
+     * @return array
+     */
+    private function formatPermissions(Permissions $permissions) {
+        $raw = $permissions->getPermissions();
+        $global = [];
+        $categories = [];
+
+        /**
+         * Format an array of permission names.
+         *
+         * @param array $perms
+         * @return array
+         */
+        $format = function (array $perms) {
+            $result = [];
+
+            foreach ($perms as $name => $val) {
+                // Discard deprecated permissions.
+                if ($this->isPermissionDeprecated($name)) {
+                    continue;
+                }
+                // Rename using mapping or standard renaming (i.e. Addon.Resource.Config to Resource.Config).
+                $name = $this->renamePermission($name);
+                $result[$name] = $val;
+            }
+            // Collapse multiple permissions into single value, where relevant.
+            $result = $this->consolidatePermissions($result);
+
+            ksort($result);
+            return $result;
+        };
+
+        // Step one: separate global and per-resource (e.g. category) permissions.
+        foreach ($raw as $key => $val) {
+            if (is_string($val)) {
+                // Permissions objects only contain what permissions we have, so the value will always be true.
+                $global[$val] = true;
+            } elseif (is_array($val)) {
+                foreach ($val as $resourceID) {
+                    $rowPermissions = $categories[$resourceID] ?? [];
+                    $rowPermissions[$key] = true;
+                    $categories[$resourceID] = $rowPermissions;
+                }
+            }
+        }
+
+        // Step two: add in global permissions, formatted using relevant translations.
+        $result = [
+            [
+                'type' => 'global',
+                'permissions' => $format($global)
+            ]
+        ];
+
+        // Step three: add in per-resource permissions, also formatted.
+        foreach ($categories as $categoryID => $permissionSlugs) {
+            // Default category (-1) permissions now fall under an ID of zero (0).
+            $categoryPermissions = [
+                'id' => $categoryID == -1 ? 0 : $categoryID,
+                'type' => 'category'
+            ];
+
+            $categoryPermissions['permissions'] = $format($permissionSlugs);
+            $result[] = $categoryPermissions;
+        }
+
+        /**
+         * Step four: return the result. We should have an array of permission rows. Each row containing a
+         * type (either "global" or a specific resource), a permissions key containing an associative array of
+         * permission slugs keys with boolean values indicating whether or not they are granted and, optionally, an id
+         * key to represent a specific resource, if this is a per-resource set of permissions.
+         */
         return $result;
     }
 

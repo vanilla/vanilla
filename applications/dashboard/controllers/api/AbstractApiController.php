@@ -112,7 +112,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
      */
     public function isExpandField($field, $expand) {
         $result = false;
-        if ($expand === true) {
+        if ($expand === "all" || $expand === true) {
             // A boolean true allows everything.
             $result = true;
         } elseif (is_array($expand)) {

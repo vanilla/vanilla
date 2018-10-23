@@ -1,4 +1,4 @@
-/*!
+/*
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -45,9 +45,13 @@ $global-color_black:                    #000;
 $global-color_white:                    #fff;
 $global-color_transparent:              transparent;
 
-$global-color_primary:                  #007cbb !default;
+$global-color_sky:                      #286DA8;
+$global-color_watermelon:               #CD5360;
+$global-color_breeze:                   #438496;
+
+$global-color_primary:                  $global-color_sky !default;
 $global-color_primaryAlt:               darken($global-color_primary, 8%) !default;
-$global-color_secondary:                #d71950 !default;
+$global-color_secondary:                $global-color_watermelon !default;
 
 $global-color_bg:                       $global-color_white !default;
 $global-color_fg:                       lighten(desaturate($global-color_primary, 90%), 8%) !default; // text color | should have high contrast between $global-color_bg

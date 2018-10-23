@@ -2,7 +2,7 @@
     .DataList,
     .MessageList {
         $arrow-size: 12px;
-        $left-spacing: #{$theme-photo_size + $component-base_padding + $arrow-size};
+        $left-spacing: #{$theme-photo_size + $utility-baseUnit + $arrow-size};
 
         .Item {
             margin-left: $left-spacing;
@@ -35,6 +35,37 @@
                 .Meta,
                 .AuthorWrap {
                     padding-left: 0;
+                }
+            }
+
+            .Username {
+                color: $global-color_primary;
+
+                &:focus,
+                &:hover {
+                    color: $global-color_primaryAlt;
+                }
+            }
+
+            @include maxWidth {
+                margin-left: 0;
+
+                &::before,
+                &::after {
+                    content: none;
+                }
+
+                .Item-Header {
+
+                    .PhotoWrap {
+                        top: $utility-medium_padding;
+                        left: $utility-medium_padding;
+                    }
+
+                    .Meta,
+                    .AuthorWrap {
+                        padding-left: calc(#{$theme-photo_size} + #{$utility-medium_padding});
+                    }
                 }
             }
         }

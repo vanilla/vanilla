@@ -1,0 +1,24 @@
+body.Section-EditProfile .Box,
+.BoxFilter,
+.BoxCategories {
+
+    .Active {
+
+        a {
+            background-color: transparent;
+            color: $panel-link_color;
+            border: $component_border;
+            box-shadow: $component_boxShadow;
+
+            &:focus,
+            &:hover {
+                color: $panel-link-hover_color;
+                background-color: transparent;
+
+                .Count {
+                    background-color: $panel-link-hover_color;
+                }
+            }
+        }
+    }
+}

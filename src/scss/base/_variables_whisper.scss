@@ -14,12 +14,16 @@ $global-color_black:                    #000;
 $global-color_white:                    #FFF;
 $global-color_transparent:              transparent;
 
-$global-color_primary:                  #63b7c3 !default;
+$global-color_blueberry:                #6B7A8F;
+$global-color_apricot:                  #F7882F;
+$global-color_powderblue:               #3d8ac1;
+
+$global-color_primary:                  $global-color_powderblue !default;
 $global-color_primaryAlt:               darken($global-color_primary, 8%) !default;
-$global-color_secondary:                #F7882F !default;
+$global-color_secondary:                $global-color_apricot !default;
 
 $global-color_bg:                       $global-color_white !default;
-$global-color_fg:                       darken(desaturate($global-color_primary, 50%), 10%) !default; // text color | should have high contrast between $global-color_bg
+$global-color_fg:                       darken(desaturate($global-color_blueberry, 1%), 10%) !default; // text color | should have high contrast between $global-color_bg
 
 $global-body_bg:                        $global-color_bg !default;
 
@@ -35,7 +39,7 @@ $theme-photo_size:                       52px !default;
 \* -------------------------------------------------------------- */
 
 $header_minHeight:                       50px !default;
-$header_bg:                              #717F8C !default;
+$header_bg:                              $global-color_blueberry !default;
 $header_color:                           $global-color_white !default;
 $header-hover_color:                     $global-color_white !default;
 $header_border:                          1px solid rgba($header_bg, .3) !default;
@@ -44,7 +48,7 @@ $header_border:                          1px solid rgba($header_bg, .3) !default
     Panel
 \* -------------------------------------------------------------- */
 
-$panel_item-spacing:                     3px !default;
+$panel_item-spacing:                     6px !default;
 $panel_item-borderRadius:                $global_borderRadius !default;
 
 /* -------------------------------------------------------------- *\
@@ -60,7 +64,7 @@ $footer-link-hover_color:                darken($global-color_secondary, 8%) !de
     Navigation
 \* -------------------------------------------------------------- */
 
-$navigation_backgroundColor:              #4a535a !default;
+$navigation_backgroundColor:              darken($global-color_blueberry, 8%) !default;
 $navigation_color:                        $global-color_white !default;
 $navigation_button-bg:                    $global-color_primary !default;
 $navigation_button-hover-bg:              $global-color_primaryAlt !default;
@@ -75,6 +79,7 @@ $hamburger_color:                         $global-color_white !default;
     Components
 \* -------------------------------------------------------------- */
 
-$component_boxShadow:                    0 1px 2px 0 rgba(0,0,0, .2) !default;
-$component-meta-link_color:              #717F8C !default;
-$component-meta-link-hover_color:        darken(#717F8C, 8%) !default;
+$component_borderWidth:                  0 !default;
+$component_boxShadow:                    0 1px 4px 0 rgba(0,0,0, .3) !default;
+$component-meta-link_color:              $global-color_primary !default;
+$component-meta-link-hover_color:        $global-color_primaryAlt !default;

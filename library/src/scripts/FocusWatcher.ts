@@ -31,9 +31,9 @@ export default class FocusWatcher {
      * Remove the event listeners from this class.
      */
     public stop() {
-        this.rootNode.addEventListener("focusout", this.handleFocusOut, true);
-        this.rootNode.addEventListener("focusin", this.handleFocusIn, true);
-        document.addEventListener("click", this.handleClick);
+        this.rootNode.removeEventListener("focusout", this.handleFocusOut, true);
+        this.rootNode.removeEventListener("focusin", this.handleFocusIn, true);
+        document.removeEventListener("click", this.handleClick);
     }
 
     /**

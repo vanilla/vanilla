@@ -445,14 +445,14 @@ class ReflectionAction {
                 // Remove the boolean type from expand.
                 if ($key === 'expand' && count($sch['type']) === 2 && in_array('boolean', $sch['type'])) {
                     $sch['type'] = 'array';
-                    if (isset($sch['items']['enum'])) {
-                        $sch['items']['enum'][] = 'all';
+                    if (isset($sch['items']['enum']) && !in_array(\Vanilla\ApiUtils::EXPAND_ALL, $sch['items']['enum'])) {
+                        $sch['items']['enum'][] = \Vanilla\ApiUtils::EXPAND_ALL;
                     }
                     if (isset($sch['default'])) {
                         if ($sch['default'] === false) {
                             unset($sch['default']);
                         } elseif ($sch['default'] === 'true') {
-                            $sch['default'] = ['all'];
+                            $sch['default'] = [\Vanilla\ApiUtils::EXPAND_ALL];
                         }
                     }
                 }

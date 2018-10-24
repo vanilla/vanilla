@@ -237,7 +237,7 @@ window.vanilla.embed = function(host) {
 
         if (embed_type == 'comments') {
             result = '//' + host + '/discussion/embed/'
-            // Break the cache.
+            // Break the cache. /embed/ gets cached, looks like you are not logged in.
             + '&c=' + new Date().getTime()
             + '&vanilla_identifier=' + encodeURIComponent(foreign_id)
             + '&vanilla_url=' + encodeURIComponent(foreign_url);

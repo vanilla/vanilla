@@ -47,8 +47,6 @@ export default class ClipboardModule extends ClipboardBase {
         }
     }
 
-    public container: HTMLElement;
-
     constructor(quill, options) {
         super(quill, options);
         this.addMatcher(Node.TEXT_NODE, this.linkMatcher);

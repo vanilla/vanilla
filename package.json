@@ -59,7 +59,7 @@
         "@types/webpack-serve": "2.0.0",
         "@types/webpackbar": "2.6.0",
         "@types/yargs": "12.0.1",
-        "@vanillaforums/babel-preset": "2.0.0-beta1",
+        "@vanillaforums/babel-preset": "2.0.0",
         "@vanillaforums/prettier-config": "1.0.0",
         "@vanillaforums/tslint-config": "1.1.9",
         "autoprefixer": "9.3.0",

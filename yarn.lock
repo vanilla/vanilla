@@ -1207,10 +1207,10 @@
   resolved "https://registry.yarnpkg.com/@types/yargs/-/yargs-12.0.1.tgz#c5ce4ad64499010ae4dc2acd9b14d49749a44233"
   integrity sha512-UVjo2oH79aRNcsDlFlnQ/iJ67Jd7j6uSg7jUJP/RZ/nUjAh5ElmnwlD5K/6eGgETJUgCHkiWn91B8JjXQ6ubAw==
 
-"@vanillaforums/babel-preset@2.0.0-beta1":
-  version "2.0.0-beta1"
-  resolved "https://registry.yarnpkg.com/@vanillaforums/babel-preset/-/babel-preset-2.0.0-beta1.tgz#a41491635944fae15c2d280efa3c60113def0c83"
-  integrity sha512-QUlQGdPu7EBhoJ1qJBhsKAv25FzOLS7sHMKRT+0MBtEpiL3YmDIw+7l894wtk1X+kzTpMsSEM4ERalHqXZ/YSg==
+"@vanillaforums/babel-preset@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@vanillaforums/babel-preset/-/babel-preset-2.0.0.tgz#c19db5377c1a57aebe120e896502116d53eab476"
+  integrity sha512-DmhhHHAlx/Y3JmNxnQpiRjeqwRsMihq39dMAd0m8/RCYHdD+4Z8B54PG1KI9UQSAmSEcth+Mp28J6zgmn5mYTQ==
   dependencies:
     "@babel/core" "^7.1.2"
     "@babel/plugin-proposal-class-properties" "^7.1.0"

@@ -1233,7 +1233,7 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      * Stop the current action and re-authenticate, if necessary.
      *
-     * @param $options array Setting key 'ForceTimeout' to `true` will ignore the cooldown window between prompts.
+     * @param array $options Setting key 'ForceTimeout' to `true` will ignore the cooldown window between prompts.
      */
     public function reauth($options = []) {
         // Make sure we're logged in...

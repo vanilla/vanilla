@@ -321,7 +321,7 @@ class UsersApiController extends AbstractApiController {
             "name",
             "photoUrl",
             "dateLastActive",
-            "permissions?" => [
+            "permissions" => [
                 "description" => "Global permissions available to the current user.",
                 "items" => [
                     "type" => "string",

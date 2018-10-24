@@ -218,6 +218,7 @@ class UsersApiController extends AbstractApiController {
             $result[] = $this->renamePermission($permission);
         }
 
+        sort($result);
         return $result;
     }
 

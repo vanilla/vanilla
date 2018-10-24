@@ -116,7 +116,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
             // A boolean true allows everything.
             $result = true;
         } elseif (is_array($expand)) {
-            $result = !empty(array_intersect(['all', 'true', '1', $field], $expand));
+            $result = !empty(array_intersect([\Vanilla\ApiUtils::EXPAND_ALL, 'true', '1', $field], $expand));
         }
         return $result;
     }

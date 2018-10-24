@@ -397,7 +397,7 @@ class ProfileController extends Gdn_Controller {
             // If we're changing the email address, militarize our reauth with no cooldown allowed.
             $authOptions = [];
             $submittedEmail = $this->Form->getFormValue('Email', null);
-            if ($submittedEmail && $canEditEmail && $user['Email'] !== $submittedEmail) {
+            if ($submittedEmail !== null && $canEditEmail && $user['Email'] !== $submittedEmail) {
                 $authOptions['ForceTimeout'] = true;
             }
 

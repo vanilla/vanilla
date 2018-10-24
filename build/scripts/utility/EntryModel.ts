@@ -51,7 +51,7 @@ export default class EntryModel {
     /**
      * Construct the EntryModel. Be sure to run the async init() method after constructing.
      */
-    constructor(private options: IBuildOptions) {}
+    constructor(private options: IBuildOptions, private includeUnitTests: boolean = false) {}
 
     /**
      * Trigger directory lookups to parse all of the files in the project.
@@ -187,6 +187,7 @@ export default class EntryModel {
             const srcPath = path.join(addonPath, "src/scripts");
             const entriesPath = path.join(srcPath, "entries");
             const hasSrcFiles = await fileExists(srcPath);
+
             if (hasSrcFiles) {
                 this.buildAddons[addonKey] = {
                     srcDir: srcPath,

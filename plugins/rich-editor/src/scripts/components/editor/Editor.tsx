@@ -161,7 +161,6 @@ export class Editor extends React.Component<IProps> {
         // Setup quill
         registerQuill();
         const options = { theme: "vanilla" };
-        console.log(this.quillMountRef.current!);
         this.quill = new Quill(this.quillMountRef.current!, options);
         if (this.props.isLoading) {
             this.quill.disable();

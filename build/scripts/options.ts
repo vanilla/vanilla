@@ -5,7 +5,9 @@ export enum BuildMode {
     DEVELOPMENT = "development",
     PRODUCTION = "production",
     ANALYZE = "analyze",
-    POLYFILLS = "polyfills",
+    TEST = "test",
+    TEST_WATCH = "testwatch",
+    TEST_DEBUG = "testwatch",
 }
 
 yargs

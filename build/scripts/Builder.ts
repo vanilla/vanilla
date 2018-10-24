@@ -14,7 +14,7 @@ import { getOptions, BuildMode, IBuildOptions } from "./options";
 import chalk from "chalk";
 import { installNodeModulesInDir } from "./utility/moduleUtils";
 import { makePolyfillConfig } from "./configs/makePolyfillConfig";
-import { printError, print, fail } from "./utility/utils";
+import { print, fail } from "./utility/utils";
 import { DIST_DIRECTORY, VANILLA_APPS } from "./env";
 import EntryModel from "./utility/EntryModel";
 

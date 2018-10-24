@@ -38,6 +38,7 @@
         "@types/del": "3.0.1",
         "@types/enzyme": "3.1.14",
         "@types/jquery": "3.3.22",
+        "@types/karma": "3.0.0",
         "@types/lodash": "4.14.117",
         "@types/mini-css-extract-plugin": "0.2.0",
         "@types/mocha": "5.2.5",
@@ -91,6 +92,7 @@
         "mini-css-extract-plugin": "0.4.4",
         "mocha": "5.2.0",
         "node-sass": "4.9.4",
+        "nodemon": "1.18.4",
         "optimize-css-assets-webpack-plugin": "5.0.1",
         "postcss-loader": "3.0.0",
         "prettier": "1.14.3",
@@ -105,6 +107,7 @@
         "ts-lint": "4.5.1",
         "ts-loader": "5.2.2",
         "ts-node": "7.0.1",
+        "tsc-watch": "1.0.30",
         "tsconfig-paths-webpack-plugin": "3.2.0",
         "tslint": "5.11.0",
         "typescript": "3.1.3",
@@ -116,16 +119,15 @@
         "yargs": "12.0.2"
     },
     "scripts": {
-        "test": "karma start ./tests/javascript/karma.conf.js --single-run && yarn check-types",
-        "test:watch": "karma start ./tests/javascript/karma.conf.js && yarn check-types:watch",
-        "test:debug": "karma start ./tests/javascript/karma.conf.js --browsers ChromeDebug",
-        "lint:ts": "tslint -c ./tslint.json -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish",
+        "pre-push": "yarn build && yarn test && yarn check-types",
         "build": "ts-node -P build/tsconfig.json build/scripts/build.ts",
-        "build:infra": "TS_NODE_PROJECT=build/tsconfig.json node --max-old-space-size=512 -r ts-node/register build/scripts/build.ts --low-memory",
-        "build:polyfills": "yarn run build --mode=polyfills",
         "build:dev": "yarn run build --mode=development",
         "build:analyze": "yarn run build --mode=analyze",
-        "check-types": "tsc -p tsconfig.json --noemit",
-        "check-types:watch": "yarn check-types --watch"
+        "test": "ts-node -P build/tsconfig.json build/scripts/test.ts --mode=test",
+        "test:watch": "ts-node -P build/tsconfig.json build/scripts/test.ts --mode=testwatch",
+        "test:debug": "ts-node -P build/tsconfig.json build/scripts/test.ts --mode=testdebug",
+        "check-types": "tsc -p tsconfig.json --noemit && yarn lint",
+        "check-types:watch": "tsc-watch -p tsconfig.json --noemit --onSuccess \"yarn lint\"",
+        "lint": "tslint -c ./tslint.json -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish"
     }
 }

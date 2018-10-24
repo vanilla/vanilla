@@ -6,9 +6,8 @@
 
 import * as path from "path";
 import webpack from "webpack";
-import { VANILLA_ROOT, TS_CONFIG_FILE, TS_LINT_FILE, PRETTIER_FILE } from "../env";
+import { VANILLA_ROOT, PRETTIER_FILE } from "../env";
 import PrettierPlugin from "prettier-webpack-plugin";
-import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import { getOptions, BuildMode } from "../options";
 import chalk from "chalk";
 import { printVerbose } from "../utility/utils";

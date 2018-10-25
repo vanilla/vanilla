@@ -7,7 +7,7 @@ export enum BuildMode {
     ANALYZE = "analyze",
     TEST = "test",
     TEST_WATCH = "testwatch",
-    TEST_DEBUG = "testwatch",
+    TEST_DEBUG = "testdebug",
 }
 
 yargs

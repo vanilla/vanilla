@@ -1,0 +1,16 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+
+// Classes from react-select
+
+.suggestedTextInput__placeholder {
+    color: $formElement-placeholderColor;
+}
+
+.suggestedTextInput-noOptions {
+    padding: $global_spacer;
+}

@@ -6,12 +6,16 @@
 
 import * as React from "react";
 import Select, { components } from "react-select";
-import { getOptionalID, uniqueIDFromPrefix } from "@library/componentIDs";
+import CreatableSelect from "react-select/lib/Creatable";
+import { getOptionalID, uniqueIDFromPrefix, getRequiredID } from "@library/componentIDs";
 import classNames from "classnames";
 import { t } from "@library/application";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { close, downTriangle } from "@library/components/Icons";
 import Heading from "@library/components/Heading";
+import { ClearIndicator } from "@library/components/forms/select/overwrites/ClearIndicator";
+import SelectContainer from "@library/components/forms/select/overwrites/SelectContainer";
+import DoNotRender from "@library/components/forms/select/overwrites/DoNotRender";
 
 export interface IComboBoxOption {
     value: string;
@@ -45,17 +49,22 @@ export default class BigSearch extends React.Component<IProps> {
     private prefix = "bigSearch";
     private searchButtonID;
     private searchInputID;
-    private ref = React.createRef();
 
     constructor(props) {
         super(props);
-        this.id = getOptionalID(props, this.prefix);
+        this.id = getRequiredID(props, this.prefix);
         this.searchButtonID = this.id + "-searchButton";
         this.searchInputID = this.id + "-searchInput";
     }
 
-    private handleOnChange = chosenValue => {
-        this.props.setQuery(chosenValue);
+    private handleOnChange = (newValue: any, actionMeta: any) => {
+        window.console.log("chosenValue: ", newValue);
+        this.props.setQuery(newValue);
+    };
+
+    private handleInputChange = (newValue: any, actionMeta: any) => {
+        window.console.log("handleInputChange: ", newValue);
+        this.props.setQuery({ data: newValue });
     };
 
     public render() {
@@ -63,51 +72,45 @@ export default class BigSearch extends React.Component<IProps> {
 
         /** The children to be rendered inside the indicator. */
         const componentOverwrites = {
-            Control: this.SearchLabel,
-            IndicatorSeparator: this.DoNotRender,
-            DropdownIndicator: this.DoNotRender,
-            ClearIndicator: this.ClearIndicator,
-            SelectContainer: this.SelectContainer,
-            ValueContainer: this.ValueContainer,
-        };
-
-        const getStyles = (key, props) => {
-            return {
-                borderRadius: {},
-                colors: {},
-                spacing: {},
-            };
+            Control: this.BigSearchControl,
+            IndicatorSeparator: DoNotRender,
+            DropdownIndicator: DoNotRender,
+            ClearIndicator,
+            SelectContainer,
+            // ValueContainer,
         };
 
         const getTheme = theme => {
             return {
                 ...theme,
                 borderRadius: {},
-                colors: {},
+                color: {},
                 spacing: {},
             };
         };
+        console.log(this.props.query);
 
         return (
-            <Select
+            <CreatableSelect
                 id={this.id}
                 components={componentOverwrites}
                 isClearable={true}
                 isDisabled={disabled}
-                loadOptions={loadOptions}
+                // loadOptions={loadOptions}
                 options={options}
                 classNamePrefix={this.prefix}
                 className={classNames(this.prefix, className)}
                 styles={{}}
                 placeholder={this.props.placeholder}
-                value={this.props.query}
-                onChange={this.handleOnChange}
+                value={this.props.query.data}
                 aria-label={t("Search")}
                 escapeClearsValue={true}
                 inputId={this.searchInputID}
                 pageSize={20}
-                NoOptionsMessage={t("No Results Found")}
+                // NoOptionsMessage={t("No Results Found")}
                 theme={getTheme}
+                onChange={this.handleOnChange}
+                onInputChange={this.handleInputChange}
             />
         );
     }
@@ -133,8 +136,6 @@ export default class BigSearch extends React.Component<IProps> {
             }
         };
 
-        window.console.log("restInnerProps:", restInnerProps);
-
         return (
             <button
                 {...restInnerProps}
@@ -155,7 +156,7 @@ export default class BigSearch extends React.Component<IProps> {
         );
     }
 
-    public SearchLabel = props => {
+    private BigSearchControl = props => {
         const id = uniqueIDFromPrefix("searchInputBlock");
         const labelID = id + "-label";
 
@@ -166,66 +167,22 @@ export default class BigSearch extends React.Component<IProps> {
 
         return (
             <form className="bigSearch-form" onSubmit={preventFormSubmission}>
-                <Heading depth={1} className="inputBlock-labelAndDescription searchInputBlock-labelAndDescription">
+                <Heading depth={1} className="bigSearch-heading">
                     <label className="searchInputBlock-label" htmlFor={this.searchInputID}>
                         {t("Search")}
                     </label>
                 </Heading>
                 <div className="bigSearch-content">
-                    <div className="bigSearch-inputWrap">
+                    <div className={`${props.prefix}-valueContainer inputBlock-inputText InputBox inputText isLarge`}>
                         <components.Control {...props} />
                     </div>
-                    <Button type="submit" id={this.searchButtonID} className={"buttonPrimary"}>
+                    <Button type="submit" id={this.searchButtonID} className="buttonPrimary bigSearch-submitButton">
                         {t("Search")}
                     </Button>
                 </div>
             </form>
         );
     };
-
-    public DoNotRender = props => {
-        return null;
-    };
-
-    // public ValueContainer = props => {
-    //     return <components.IndicatorsContainer {...props} styles={{}} className="bigSearch-indicatorsContainer" />;
-    // };
-
-    // public ControlComponent = props => {
-    //     return (
-    //         <div style={{}} className="bigSearch-here">
-    //             <components.Control {...props} />
-    //         </div>
-    //     );
-    // };
-
-    public SelectContainer = ({ children, ...props }) => {
-        return (
-            <components.SelectContainer {...props} styles={{}} className="bigInput-selectContainer">
-                {children}
-            </components.SelectContainer>
-        );
-    };
-
-    public ValueContainer = ({ children, ...props }) => (
-        <components.ValueContainer
-            styles={{}}
-            className="bigInput-valueContainer inputBlock-inputText InputBox inputText"
-        >
-            {children}
-        </components.ValueContainer>
-    );
-
-    public Input = props => {
-        if (props.isHidden) {
-            return <components.Input {...props} />;
-        }
-        return <components.Input styles={{}} className="bigInput-realInput" />;
-    };
-
-    //MenuList
-
-    //NoOptionsMessage
 
     //option
 }

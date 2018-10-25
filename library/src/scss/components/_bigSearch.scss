@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-.bigSearch {}
+
 
 .bigSearch-clear {
     position: relative;
@@ -27,8 +27,8 @@
     flex-grow: 1;
 }
 
-.bigInput-valueContainer {
-
+.heading.bigSearch-heading {
+    margin-bottom: $global_spacer;
 }
 
 
@@ -36,4 +36,40 @@
 
 .bigSearch__placeholder {
     color: $formElement-placeholderColor;
+}
+
+
+.bigSearch-content { // For specificity
+    .bigSearch-submitButton {
+        position: relative;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        margin-left: -1px;
+
+        &:hover,
+        &:focus {
+            z-index: 1;
+        }
+    }
+
+    .bigSearch__control {
+        border: 0;
+        background-color: transparent;
+
+
+        &.bigSearch__control--is-focused {
+            box-shadow: none;
+
+
+            .inputText {
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+                border-color: $button-basic_focus_border;
+            }
+        }
+    }
+
+    .bigSearch__value-container {
+        overflow: auto;
+    }
 }

@@ -13,6 +13,8 @@ import UsersActions from "./UsersActions";
 import { IMe } from "@library/@types/api";
 import { LoadStatus, ILoadable } from "@library/@types/api";
 
+// tslint:disable:jsx-use-translation-function
+
 describe("<Permission />", () => {
     let user: ILoadable<IMe>;
     let actions: UsersActions;

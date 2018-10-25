@@ -8,7 +8,6 @@
 import { ILoadable } from "@library/@types/api";
 import { IUserFragment } from "@library/@types/api";
 import { IUserAuthenticator } from "@dashboard/@types/api/authenticate";
-import { IUsersStoreState } from "@library/users/UsersModel";
 
 export type IAuthenticatorState = ILoadable<IUserAuthenticator[]>;
 export type IPasswordState = ILoadable<IUserFragment>;
@@ -24,6 +23,7 @@ export interface IUsersState {
     requestPassword: IRequestPasswordState;
 }
 
-export interface IStoreState extends IUsersStoreState {
+export interface IStoreState {
     authenticate: IAuthenticateState;
+    users: IUsersState;
 }

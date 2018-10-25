@@ -14,3 +14,26 @@
     height: $formElement-height;
     width: $formElement-height;
 }
+
+.bigSearch-form {
+    display: block;
+}
+
+.bigSearch-content {
+    display: flex;
+}
+
+.bigSearch-inputWrap {
+    flex-grow: 1;
+}
+
+.bigInput-valueContainer {
+
+}
+
+
+// Classes from react-select
+
+.bigSearch__placeholder {
+    color: $formElement-placeholderColor;
+}

@@ -5,14 +5,13 @@
  */
 
 import * as React from "react";
-import Select from "react-select";
-import { getOptionalID } from "@library/componentIDs";
+import Select, { components } from "react-select";
+import { getOptionalID, uniqueIDFromPrefix } from "@library/componentIDs";
 import classNames from "classnames";
 import { t } from "@library/application";
-import { close } from "@library/components/Icons";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-
-// import ClearIndicator from "@library/components/forms/select/overwrites/ClearIndicator";
+import { close, downTriangle } from "@library/components/Icons";
+import Heading from "@library/components/Heading";
 
 export interface IComboBoxOption {
     value: string;
@@ -44,31 +43,80 @@ export default class BigSearch extends React.Component<IProps> {
 
     private id;
     private prefix = "bigSearch";
+    private searchButtonID;
+    private searchInputID;
     private ref = React.createRef();
 
     constructor(props) {
         super(props);
         this.id = getOptionalID(props, this.prefix);
+        this.searchButtonID = this.id + "-searchButton";
+        this.searchInputID = this.id + "-searchInput";
     }
 
-    // private Placeholder = props => <div className={props.className}>{t("Placeholder")}</div>;
+    private handleOnChange = chosenValue => {
+        this.props.setQuery(chosenValue);
+    };
 
-    // public ClearIndicator = props => {
-    //     return (
-    //         <div {...props.restInnerProps} ref={props.ref} className="bigSearch-close">
-    //             {/*<CloseButton disabled={props.isDisabled} onClick={props.onMouseDown} />*/}
-    //             <span className="bigSearch-clear">
-    //                 <span className={classNames(ButtonBaseClass.ICON)} role="button" onClick={this.preventDefault}>
-    //                     {close("isSmall")}
-    //                 </span>
-    //                 <span className="sr-only">{t("Clear")}</span>
-    //             </span>
-    //         </div>
-    //     );
-    // };
+    public render() {
+        const { className, disabled, options, loadOptions } = this.props;
 
-    // We need to manually trigger the clear function
-    private ClearIndicator = props => {
+        /** The children to be rendered inside the indicator. */
+        const componentOverwrites = {
+            Control: this.SearchLabel,
+            IndicatorSeparator: this.DoNotRender,
+            DropdownIndicator: this.DoNotRender,
+            ClearIndicator: this.ClearIndicator,
+            SelectContainer: this.SelectContainer,
+            ValueContainer: this.ValueContainer,
+        };
+
+        const getStyles = (key, props) => {
+            return {
+                borderRadius: {},
+                colors: {},
+                spacing: {},
+            };
+        };
+
+        const getTheme = theme => {
+            return {
+                ...theme,
+                borderRadius: {},
+                colors: {},
+                spacing: {},
+            };
+        };
+
+        return (
+            <Select
+                id={this.id}
+                components={componentOverwrites}
+                isClearable={true}
+                isDisabled={disabled}
+                loadOptions={loadOptions}
+                options={options}
+                classNamePrefix={this.prefix}
+                className={classNames(this.prefix, className)}
+                styles={{}}
+                placeholder={this.props.placeholder}
+                value={this.props.query}
+                onChange={this.handleOnChange}
+                aria-label={t("Search")}
+                escapeClearsValue={true}
+                inputId={this.searchInputID}
+                pageSize={20}
+                NoOptionsMessage={t("No Results Found")}
+                theme={getTheme}
+            />
+        );
+    }
+
+    public getValue = value => {
+        return value;
+    };
+
+    public ClearIndicator(props) {
         const {
             innerProps: { ref, ...restInnerProps },
             isDisabled,
@@ -85,6 +133,8 @@ export default class BigSearch extends React.Component<IProps> {
             }
         };
 
+        window.console.log("restInnerProps:", restInnerProps);
+
         return (
             <button
                 {...restInnerProps}
@@ -94,6 +144,8 @@ export default class BigSearch extends React.Component<IProps> {
                 style={{}}
                 aria-hidden={null} // Unset the prop in restInnerProps
                 onKeyDown={handleKeyDown}
+                onClick={restInnerProps.onMouseDown}
+                onTouchEnd={restInnerProps.onTouchEnd}
                 disabled={isDisabled}
                 title={t("Clear")}
                 aria-label={t("Clear")}
@@ -101,67 +153,82 @@ export default class BigSearch extends React.Component<IProps> {
                 {close("isSmall")}
             </button>
         );
-    };
+    }
 
-    private handleOnChange = chosenValue => {
-        this.props.setQuery(chosenValue);
-    };
+    public SearchLabel = props => {
+        const id = uniqueIDFromPrefix("searchInputBlock");
+        const labelID = id + "-label";
 
-    public render() {
-        const { className, disabled, options, loadOptions } = this.props;
-
-        /** The children to be rendered inside the indicator. */
-        const components = {
-            ClearIndicator: this.ClearIndicator,
+        const preventFormSubmission = e => {
+            e.preventDefault();
+            this.props.setQuery(props.getValue());
         };
 
         return (
-            <Select
-                id={this.id}
-                components={components}
-                isClearable={true}
-                isDisabled={disabled}
-                loadOptions={loadOptions}
-                options={options}
-                classNamePrefix={this.prefix}
-                className={classNames(this.prefix, className)}
-                styles={{}}
-                placeholder={this.props.placeholder}
-                value={this.props.query}
-                onChange={this.handleOnChange}
-                aria-label={t("Search")}
-            />
+            <form className="bigSearch-form" onSubmit={preventFormSubmission}>
+                <Heading depth={1} className="inputBlock-labelAndDescription searchInputBlock-labelAndDescription">
+                    <label className="searchInputBlock-label" htmlFor={this.searchInputID}>
+                        {t("Search")}
+                    </label>
+                </Heading>
+                <div className="bigSearch-content">
+                    <div className="bigSearch-inputWrap">
+                        <components.Control {...props} />
+                    </div>
+                    <Button type="submit" id={this.searchButtonID} className={"buttonPrimary"}>
+                        {t("Search")}
+                    </Button>
+                </div>
+            </form>
         );
-    }
-
-    public getValue = value => {
-        return value;
     };
+
+    public DoNotRender = props => {
+        return null;
+    };
+
+    // public ValueContainer = props => {
+    //     return <components.IndicatorsContainer {...props} styles={{}} className="bigSearch-indicatorsContainer" />;
+    // };
+
+    // public ControlComponent = props => {
+    //     return (
+    //         <div style={{}} className="bigSearch-here">
+    //             <components.Control {...props} />
+    //         </div>
+    //     );
+    // };
+
+    public SelectContainer = ({ children, ...props }) => {
+        return (
+            <components.SelectContainer {...props} styles={{}} className="bigInput-selectContainer">
+                {children}
+            </components.SelectContainer>
+        );
+    };
+
+    public ValueContainer = ({ children, ...props }) => (
+        <components.ValueContainer
+            styles={{}}
+            className="bigInput-valueContainer inputBlock-inputText InputBox inputText"
+        >
+            {children}
+        </components.ValueContainer>
+    );
+
+    public Input = props => {
+        if (props.isHidden) {
+            return <components.Input {...props} />;
+        }
+        return <components.Input styles={{}} className="bigInput-realInput" />;
+    };
+
+    //MenuList
+
+    //NoOptionsMessage
+
+    //option
 }
 
-/**
- const componentsList = {
-ClearIndicator: <this.Placeholder />,
-Control: <this.Placeholder />,
-DropdownIndicator: <this.Placeholder />,
-Group: <this.Placeholder />,
-groupHeading: <this.Placeholder />,
-IndicatorsContainer: <this.Placeholder />,
-IndicatorSeparator: <this.Placeholder />,
-Input: <this.Placeholder />,
-LoadingIndicator: <this.Placeholder />,
-Menu: <this.Placeholder />,
-MenuList: <this.Placeholder />,
-LoadingMessage: <this.Placeholder />,
-NoOptionsMessage: <this.Placeholder />,
-MultiValue: <this.Placeholder />,
-MultiValueLabel: <this.Placeholder />,
-MultiValueRemove: <this.Placeholder />,
-Option: <this.Placeholder />,
-Placeholder: <this.Placeholder />,
-SelectContainer: <this.Placeholder />,
-SingleValue: <this.Placeholder />,
-ValueContainer: <this.Placeholder />,
-};
- *
- */
+// Wrap in form if not already
+// Role search on input

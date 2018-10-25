@@ -5,13 +5,13 @@
  */
 
 import { getOptions } from "./options";
-import Builder from "./Builder";
+import { KarmaRunner } from "./KarmaRunner";
 
 /**
  * Run the build. Options are passed as arguments from the command line.
  * @see https://docs.vanillaforums.com/developer/tools/building-frontend/
  */
 void getOptions().then(options => {
-    const builder = new Builder(options);
-    return builder.build();
+    const runner = new KarmaRunner(options);
+    return runner.run();
 });

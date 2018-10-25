@@ -43,14 +43,15 @@ export class Permission extends React.Component<IProps> {
      * - Only 1 one of the provided permissions needs to match.
      */
     private hasPermission(): boolean {
-        let { currentUser, permission } = this.props;
-        if (!Array.isArray(permission)) {
-            permission = [permission];
+        const { currentUser, permission } = this.props;
+        let lookupPermissions = permission;
+        if (!Array.isArray(lookupPermissions)) {
+            lookupPermissions = [lookupPermissions];
         }
 
         return (
             currentUser.status === LoadStatus.SUCCESS &&
-            (currentUser.data.isAdmin || this.arrayContainsOneOf(permission, currentUser.data.permissions))
+            (currentUser.data.isAdmin || this.arrayContainsOneOf(lookupPermissions, currentUser.data.permissions))
         );
     }
 

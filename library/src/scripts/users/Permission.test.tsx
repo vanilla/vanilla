@@ -135,7 +135,7 @@ describe("<Permission />", () => {
                 status: LoadStatus.SUCCESS,
                 data: makeMockUser([], true),
             };
-            let result = shallow(
+            const result = shallow(
                 <Permission permission="asd" currentUser={user} usersActions={actions}>
                     {successComponent}
                 </Permission>,

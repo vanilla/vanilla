@@ -5,7 +5,7 @@
  */
 
 import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
-import { IMe } from "@dashboard/@types/api";
+import { IMe } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
 
 export interface IInjectableUsersActions {

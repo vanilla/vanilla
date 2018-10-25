@@ -6,7 +6,7 @@
 
 import ReduxReducer from "@library/state/ReduxReducer";
 import produce from "immer";
-import { IMe } from "@dashboard/@types/api";
+import { IMe } from "@library/@types/api";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import UsersActions from "@library/users/UsersActions";
 

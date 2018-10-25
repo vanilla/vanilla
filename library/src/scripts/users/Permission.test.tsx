@@ -10,7 +10,7 @@ import { shallow, mount } from "enzyme";
 import sinon from "sinon";
 import { Permission } from "@library/users/Permission";
 import UsersActions from "./UsersActions";
-import { IMe } from "@dashboard/@types/api";
+import { IMe } from "@library/@types/api";
 import { LoadStatus, ILoadable } from "@library/@types/api";
 
 describe("<Permission />", () => {

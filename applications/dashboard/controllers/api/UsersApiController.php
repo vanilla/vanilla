@@ -26,6 +26,8 @@ class UsersApiController extends AbstractApiController {
 
     use PermissionsTranslationTrait;
 
+    const ME_ACTION_CONSTANT = "@@users/GET_ME_RESPONSE";
+
     /** @var Gdn_Configuration */
     private $configuration;
 
@@ -321,6 +323,7 @@ class UsersApiController extends AbstractApiController {
             "name",
             "photoUrl",
             "dateLastActive",
+            "isAdmin:b",
             "permissions" => [
                 "description" => "Global permissions available to the current user.",
                 "items" => [
@@ -470,6 +473,10 @@ class UsersApiController extends AbstractApiController {
         if (array_key_exists('Confirmed', $dbRecord)) {
             $dbRecord['emailConfirmed'] = $dbRecord['Confirmed'];
             unset($dbRecord['Confirmed']);
+        }
+        if (array_key_exists('Admin', $dbRecord)) {
+            $dbRecord['isAdmin'] = $dbRecord['Admin'];
+            unset($dbRecord['Admin']);
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);

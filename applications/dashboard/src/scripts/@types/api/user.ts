@@ -10,6 +10,11 @@ export interface IUserFragment {
     dateLastActive: string | null;
 }
 
+export interface IMe extends IUserFragment {
+    permissions: string[];
+    isAdmin: boolean;
+}
+
 export interface IUser extends IUserFragment {
     email: string;
     emailConfirmed: boolean;

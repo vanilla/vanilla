@@ -11,7 +11,7 @@ import { LoadStatus } from "@library/@types/api";
 import UsersActions, { IInjectableUsersActions } from "@library/users/UsersActions";
 
 interface IProps extends IInjectableUserState, IInjectableUsersActions {
-    permission: string;
+    permission: string | string[];
     children: React.ReactNode;
     fallback?: React.ReactNode;
 }
@@ -28,11 +28,19 @@ export class Permission extends React.Component<IProps> {
     }
 
     private hasPermission(): boolean {
-        const { currentUser, permission } = this.props;
+        let { currentUser, permission } = this.props;
+        if (!Array.isArray(permission)) {
+            permission = [permission];
+        }
+
         return (
             currentUser.status === LoadStatus.SUCCESS &&
-            (currentUser.data.isAdmin || currentUser.data.permissions.includes(permission))
+            (currentUser.data.isAdmin || this.arrayContainsOneOf(permission, currentUser.data.permissions))
         );
+    }
+
+    private arrayContainsOneOf(needles: string[], haystack: string[]) {
+        return needles.some(val => haystack.indexOf(val) >= 0);
     }
 }
 

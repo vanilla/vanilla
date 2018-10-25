@@ -5,7 +5,7 @@
  */
 
 import path from "path";
-import webpack, { Configuration } from "webpack";
+import { Configuration } from "webpack";
 import { DIST_DIRECTORY } from "../env";
 import { getOptions, BuildMode } from "../options";
 import { makeBaseConfig } from "./makeBaseConfig";

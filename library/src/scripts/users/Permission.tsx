@@ -16,17 +16,32 @@ interface IProps extends IInjectableUserState, IInjectableUsersActions {
     fallback?: React.ReactNode;
 }
 
+/**
+ * Component for checking one or many permissions.
+ *
+ * Conditionally renders either it's children or a fallback based on if the user has a permission.
+ */
 export class Permission extends React.Component<IProps> {
     public render(): React.ReactNode {
         return this.hasPermission() ? this.props.children : this.props.fallback || null;
     }
 
+    /**
+     * Trigger fetching of data if it hasn't already occurred.
+     */
     public componentDidMount() {
         if (this.props.currentUser.status === LoadStatus.PENDING) {
             void this.props.usersActions.getMe();
         }
     }
 
+    /**
+     * Determine if the user has one of the given permissions.
+     *
+     * - Always false if the data isn't loaded yet.
+     * - Always true if the user has the admin flag set.
+     * - Only 1 one of the provided permissions needs to match.
+     */
     private hasPermission(): boolean {
         let { currentUser, permission } = this.props;
         if (!Array.isArray(permission)) {
@@ -39,6 +54,12 @@ export class Permission extends React.Component<IProps> {
         );
     }
 
+    /**
+     * Check if an a haystack contains 1 of the passed needles.
+     *
+     * @param needles The strings to check for.
+     * @param haystack The place to look for them.
+     */
     private arrayContainsOneOf(needles: string[], haystack: string[]) {
         return needles.some(val => haystack.indexOf(val) >= 0);
     }

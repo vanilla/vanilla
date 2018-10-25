@@ -22,7 +22,14 @@ export interface IUsersStoreState {
     users: IUsersState;
 }
 
+/**
+ * Reducer and state mapping for users data.
+ */
 export default class UsersModel implements ReduxReducer<IUsersState> {
+    /**
+     * Map the current user data out into react props.
+     * @param state
+     */
     public static mapStateToProps(state: IUsersStoreState): IInjectableUserState {
         if (!("users" in state)) {
             throw new Error(
@@ -35,11 +42,18 @@ export default class UsersModel implements ReduxReducer<IUsersState> {
         };
     }
 
+    /**
+     * @inheritdoc
+     */
     public readonly initialState: IUsersState = {
         current: {
             status: LoadStatus.PENDING,
         },
     };
+
+    /**
+     * @inheritdoc
+     */
     public reducer = (
         state: IUsersState = this.initialState,
         action: typeof UsersActions.ACTION_TYPES,

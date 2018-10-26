@@ -264,9 +264,11 @@ $flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.
 }
 
 .PopList.Conversations .HasNew {
-    background-color: $flyout-hover_bg;
-    color: $global-color_primary;
-    padding: 2px 4px;
+    border-radius: $formButton_borderRadius;
+    background-color: $bullet_bg;
+    border: 1px solid $bullet_borderColor;
+    color: $bullet_fg;
+    padding: 0px 4px;
 }
 
 .PopList .Item.Empty {

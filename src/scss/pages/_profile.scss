@@ -128,7 +128,7 @@ body.Section-Profile {
         }
 
         .MemberButtons {
-            @include Button();
+            @include Button($button-primary_bg, $button-primary_fg, $button-primary_border);
             margin-right: $utility-small_padding;
 
             @include maxWidth {
@@ -137,7 +137,7 @@ body.Section-Profile {
         }
 
         .Button-EditProfile {
-            @include Button();
+            @include Button($button-primary_bg, $button-primary_fg, $button-primary_border);
         }
 
         .ButtonGroup.Open .NavButton.Handle {
@@ -147,13 +147,13 @@ body.Section-Profile {
         }
 
         .ProfileButtons-BackToProfile {
-            @include Button(transparent, $global-color_primary);
-            border-color: $global-color_primary;
+            @include Button($button-basic_bg, $button-basic_fg, $button-basic_border);
 
             &:focus,
             &:hover {
-                background-color: $global-color_primary;
-                color: $global-color_white;
+                border-color: $button-basic-hover_border;
+                background-color: $button-basic-hover_bg;
+                color: $button-basic-hover_fg;
             }
         }
 

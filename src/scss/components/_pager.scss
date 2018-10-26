@@ -68,12 +68,13 @@ $quickSearch_color:                      $global-color_white !default;
 
 .PrevNextPager .Previous,
 .PrevNextPager .Next {
-    @include Button(transparent, $global-color_primary);
+    @include Button($button-basic_bg, $button-basic_fg, $button-basic_border);
 
     &:focus,
     &:hover {
-        background-color: $global-color_primary;
-        color: $global-color_white;
+        border-color: $button-basic-hover_border;
+        background-color: $button-basic-hover_bg;
+        color: $button-basic-hover_fg;
     }
 }
 

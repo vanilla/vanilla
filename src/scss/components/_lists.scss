@@ -271,7 +271,7 @@
         visibility: visible;
 
         .OptionsLink {
-            @include Button;
+            @include Button($button-primary_bg, $button-primary_fg, $button-primary_border);
             margin-left: $utility-small_padding;
         }
 

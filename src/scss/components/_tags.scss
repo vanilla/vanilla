@@ -77,6 +77,13 @@ $tag-hover_color:                 $global-color_white !default;
             text-decoration: none;
         }
     }
+
+    .NewCommentCount,
+    .HasNew {
+        border: 1px solid $bullet_borderColor;
+        background: $bullet_bg;
+        color: $bullet_fg;
+    }
 }
 
 .Form-Tags .AvailableTag {

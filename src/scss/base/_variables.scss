@@ -8,7 +8,7 @@
     Utility Variables
 \* -------------------------------------------------------------- */
 
-$utility-baseUnit:                                   6px !default;
+$utility-baseUnit:                      6px !default;
 
 /* -------------------------------------------------------------- *\
     Global Overwrites
@@ -30,10 +30,10 @@ $global-small_fontSize:                 14px !default;
 $global-title_fontSize:                 32px !default;
 $global-subTitle_fontSize:              24px !default;
 
-$global-base_lineHeight:                1.618em !default;
-$global-lineHeight_offset:              .32em !default; // Offset font to make top of capital letters flush with top of container
+$global-base_lineHeight:                1.618 !default;
+$global-lineHeight_offset:              .32 !default; // Offset font to make top of capital letters flush with top of container
 $global-headinglineHeight_offset:       $global-lineHeight_offset !default; // Different if heading has different font than body
-$global-bodylineHeight_offset:          .4em !default; // Different if body has different font than headding
+$global-bodylineHeight_offset:          .4 !default; // Different if body has different font than headding
 
 $global-main_width:                     1224px !default;
 
@@ -56,8 +56,8 @@ $global-body_bg:                        $global-color_bg !default;
 
 $icon-default_size:                     20px !default;
 
-$link_default-color:                    $global-color_fg !default;
-$link_default_hover-color:              $global-color_primary !default;
+$link-default_color:                    $global-color_fg !default;
+$link-default_hover_color:              $global-color_primary !default;
 
 
 /* -------------------------------------------------------------- *\
@@ -194,9 +194,9 @@ $component-title_fontSize:               $global-large_fontSize !default;
 $component-title_fontWeight:             $global-bold_fontWeight !default;
 $component-title_lineHeight:             $global-base_lineHeight !default;
 
-$component-meta_color:                   $link_default-color !default;
-$component-meta-link_color:              $global-color_primary !default;
-$component-meta-link-hover_color:        $global-color_primaryAlt !default;
+$component-meta_color:                   $component-base_color !default;
+$component-meta-link_color:              $link-default_color !default;
+$component-meta-link-hover_color:        $theme-heading-hover_color !default;
 $component-meta_fontSize:                $global-small_fontSize !default;
 $component-meta_fontWeight:              $global-normal_fontWeight !default;
 $component-meta_lineHeight:              $global-base_lineHeight !default;
@@ -220,9 +220,29 @@ $formElement_borderRadius:               $global_borderRadius !default;
     Buttons
 \* -------------------------------------------------------------- */
 
-$formButton_bg:                          $global-color_primary !default;
-$formButton-hover_bg:                    $global-color_primaryAlt !default;
-$formButton_color:                       $global-color_white !default;
+$button-basic_fg:                        $global-color_primary !default;
+$button-basic_bg:                        transparent !default;
+$button-basic_border:                    $global-color_primary !default;
+
+$button-basic_hover_fg:                  $global-color_white !default;
+$button-basic_hover_bg:                  $global-color_primary !default;
+$button-basic_hover_border:              $global-color_primary !default;
+
+$button-primary_fg:                      $global-color_white !default;
+$button-primary_bg:                      $global-color_primary !default;
+$button-primary_border:                  $global-color_primaryAlt !default;
+
+$button-primary_hover_fg:                $global-color_white !default;
+$button-primary_hover_bg:                $global-color_primaryAlt !default;
+$button-primary_hover_border:            $global-color_primaryAlt !default;
+
+/* -------------------------------------------------------------- *\
+    Form Buttons
+\* -------------------------------------------------------------- */
+
+$formButton_bg:                          $button-primary_bg !default;
+$formButton-hover_bg:                    $button-primary_hover_fg !default;
+$formButton_color:                       $button-primary_fg !default;
 $formButton_fontFamily:                  $global-body_fontFamily !default;
 $formButton_fontWeight:                  $global-normal_fontWeight !default;
 $formButton_fontSize:                    $global-medium_fontSize !default;
@@ -231,6 +251,14 @@ $formButton_padding:                     $utility-medium_padding !default;
 $formButton_height:                      $formElement_height !default;
 $formButton_borderRadius:                $formElement_borderRadius !default;
 $formButton_border:                      1px solid !default;
+
+/* -------------------------------------------------------------- *\
+    Bullets
+\* -------------------------------------------------------------- */
+
+$bullet_borderColor:                     $global-color_secondary !default;
+$bullet_bg:                              $global-color_secondary !default;
+$bullet_fg:                              $global-color_white !default;
 
 /* -------------------------------------------------------------- *\
     Breakpoints

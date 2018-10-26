@@ -1,4 +1,4 @@
-/*!
+/*
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -597,9 +597,9 @@
 }
 
 @mixin Button(
-    $background: $formButton_bg,
-    $color: $formButton_color,
-    $background-hover: $formButton-hover_bg
+    $background: $button-primary_bg,
+    $color: $button-primary_fg,
+    $background-hover: $button-primary_border
 ) {
     font-family: $formButton_fontFamily;
     font-weight: $formButton_fontWeight;

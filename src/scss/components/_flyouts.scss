@@ -10,7 +10,7 @@
 
 $flyout_bg:                             $global-color_white !default;
 $flyout-hover_bg:                       darken($global-color_white, 7%) !default;
-$flyout_color:                          $global-color_black !default;
+$flyout_fg:                             mix($global-color_black, $flyout_bg, 70%) !default;
 
 $flyout-link_color:                     $global-color_primary !default;
 $flyout-link-hover_color:               $global-color_primaryAlt !default;
@@ -31,7 +31,7 @@ $flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.
     border: $flyout_border;
     box-shadow: $flyout_boxShadow;
     border-radius: $flyout_borderRadius;
-    color: $flyout_color;
+    color: $flyout_fg;
     line-height: $global-base_lineHeight;
 
     &::before {
@@ -179,7 +179,7 @@ $flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.
     &.Title {
         display: block;
         text-align: center;
-        color: $flyout_color;
+        color: $flyout_fg;
         font-size: $global-medium_fontSize;
         text-transform: uppercase;
         line-height: $global-base_lineHeight;
@@ -238,6 +238,10 @@ $flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.
         }
     }
 
+    .Excerpt {
+        color: $flyout_fg;
+    }
+
     .Author .PhotoWrap {
         width: $theme-photo-small_size;
         height: $theme-photo-small_size;
@@ -264,9 +268,11 @@ $flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.
 }
 
 .PopList.Conversations .HasNew {
-    background-color: $flyout-hover_bg;
-    color: $global-color_primary;
-    padding: 2px 4px;
+    border-radius: $formButton_borderRadius;
+    background-color: $bullet_bg;
+    border: 1px solid $bullet_borderColor;
+    color: $bullet_fg;
+    padding: 0px 4px;
 }
 
 .PopList .Item.Empty {

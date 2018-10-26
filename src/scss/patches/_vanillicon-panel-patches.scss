@@ -16,7 +16,12 @@
         align-items:  center;
 
         &::before {
-            margin-right: 5px;
+
+            @if($panel_item-showIcons == false) {
+                content: none !important;
+            } @else {
+                margin-right: 5px;
+            }
         }
 
         .Aside {

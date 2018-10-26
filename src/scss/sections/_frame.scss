@@ -37,11 +37,11 @@
 .Frame-contentWrap {
     background-color: $content_bg;
     border: $frame_border;
-    padding: $content_padding;
     box-shadow: $frame_boxShadow;
     border-radius: $frame_borderRadius;
-    width: calc(100% + (#{$content_padding} * 2));
-    margin: 0 -#{$content_padding};
+    padding-top: $content_padding;
+    padding-bottom: $content_padding;
+    @include framePaddingReverse();
 }
 
 .Frame-details {

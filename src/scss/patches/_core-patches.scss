@@ -219,7 +219,7 @@ a.ChangePicture {
 }
 
 #Form_Ban {
-    @include Button($global-color_primary, $global-color_white);
+    @include Button($button-primary_bg, $button-primary_fg, $button-primary_border);
 }
 
 .Dropdown.MenuItems {
@@ -278,7 +278,7 @@ table.PreferenceGroup th {
     }
 
     button {
-        @include Button;
+        @include Button($button-primary_bg, $button-primary_fg, $button-primary_border);
         float: right;
         margin-top: -16px;
     }

@@ -271,7 +271,7 @@
         visibility: visible;
 
         .OptionsLink {
-            @include Button;
+            @include Button($button-primary_bg, $button-primary_fg, $button-primary_border);
             margin-left: $utility-small_padding;
         }
 
@@ -407,7 +407,7 @@
         }
 
         .Item-Header {
-            background: $theme-hover_color;
+            background: $component-header_bg;
             margin: 0;
             padding: $utility-medium_padding;
             width: 100%;
@@ -461,6 +461,15 @@
             .Meta,
             .Author {
                 margin: 0;
+            }
+
+            .Username {
+                color: $component-title_color;
+
+                &:hover,
+                &:focus {
+                    color: $component-title-hover_color;
+                }
             }
         }
 

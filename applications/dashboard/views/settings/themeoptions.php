@@ -68,6 +68,8 @@ echo $this->Form->errors();
 </section>
 <?php endif; ?>
 
+<?php $this->fireEvent('AfterCustomStyles'); ?>
+
 <?php if ($hasCustomText): ?>
 <section>
     <?php echo subheading(t('Text')); ?>

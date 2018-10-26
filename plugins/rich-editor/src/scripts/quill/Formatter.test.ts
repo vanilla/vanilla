@@ -8,10 +8,15 @@ import Formatter from "@rich-editor/quill/Formatter";
 import Quill, { RangeStatic } from "quill/core";
 import { expect } from "chai";
 import OpUtils, { inlineFormatOps, blockFormatOps } from "@rich-editor/__tests__/OpUtils";
+import registerQuill from "./registerQuill";
 
 describe("Formatter", () => {
     let quill: Quill;
     let formatter: Formatter;
+
+    before(() => {
+        registerQuill();
+    });
 
     beforeEach(() => {
         document.body.innerHTML = `

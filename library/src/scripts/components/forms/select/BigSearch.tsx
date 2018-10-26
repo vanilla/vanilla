@@ -5,20 +5,14 @@
  */
 
 import * as React from "react";
-import Select, { components } from "react-select";
+import { components } from "react-select";
 import CreatableSelect from "react-select/lib/Creatable";
-import { getOptionalID, uniqueIDFromPrefix, getRequiredID, IOptionalComponentID } from "@library/componentIDs";
+import { uniqueIDFromPrefix, getRequiredID, IOptionalComponentID } from "@library/componentIDs";
 import classNames from "classnames";
 import { t } from "@library/application";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import { clear } from "@library/components/Icons";
+import Button from "@library/components/forms/Button";
 import Heading from "@library/components/Heading";
-import { ClearIndicator, clearIndicator } from "@library/components/forms/select/overwrites/ClearIndicator";
-import SelectContainer from "@library/components/forms/select/overwrites/SelectContainer";
-import DoNotRender from "@library/components/forms/select/overwrites/DoNotRender";
-import Menu from "@library/components/forms/select/overwrites/Menu";
-import MenuList from "@library/components/forms/select/overwrites/MenuList";
-import { BigSearchControl } from "@library/components/forms/select/overwrites/BigSearchControl";
+import { clearIndicator } from "@library/components/forms/select/overwrites/ClearIndicator";
 import MenuOption from "@library/components/forms/select/overwrites/MenuOption";
 import menuList from "@library/components/forms/select/overwrites/MenuList";
 import menu from "@library/components/forms/select/overwrites/Menu";
@@ -78,7 +72,7 @@ export default class BigSearch extends React.Component<IProps> {
 
         /** The children to be rendered inside the indicator. */
         const componentOverwrites = {
-            Control: this.BigSearchControl,
+            Control: this.bigSearchControl,
             IndicatorSeparator: doNotRender,
             DropdownIndicator: doNotRender,
             ClearIndicator: clearIndicator,
@@ -133,7 +127,7 @@ export default class BigSearch extends React.Component<IProps> {
         e.preventDefault();
     };
 
-    private BigSearchControl = props => {
+    private bigSearchControl = props => {
         const id = uniqueIDFromPrefix("searchInputBlock");
         const labelID = id + "-label";
 

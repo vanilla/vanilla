@@ -8,6 +8,7 @@
 import { log, hashString } from "@library/utility";
 import twemoji from "twemoji";
 import debounce from "lodash/debounce";
+import "focus-visible";
 
 /**
  * Use the browser's built-in functionality to quickly and safely escape a string.

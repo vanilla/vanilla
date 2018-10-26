@@ -43,6 +43,9 @@
             <div class="Frame-body">
                 <div class="Frame-content">
                     <div class="Container">
+
+                        {debug}
+
                         <div class="Frame-contentWrap">
                             <div class="Frame-details">
                                 <div class="Frame-row">

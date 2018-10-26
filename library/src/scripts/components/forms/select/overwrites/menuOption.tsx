@@ -14,7 +14,6 @@ import BreadCrumbString from "@library/components/BreadCrumbString";
  * Note that this is NOT a true react component and gets called within the react select plugin
  * @param props
  */
-
 export default function menuOption(props: any) {
     const { data, innerProps, isFocused } = props;
     const { dateUpdated, locationData } = data;

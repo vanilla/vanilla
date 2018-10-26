@@ -12,12 +12,12 @@ import classNames from "classnames";
 import { t } from "@library/application";
 import Button from "@library/components/forms/Button";
 import Heading from "@library/components/Heading";
-import { clearIndicator } from "@library/components/forms/select/overwrites/ClearIndicator";
-import MenuOption from "@library/components/forms/select/overwrites/MenuOption";
-import menuList from "@library/components/forms/select/overwrites/MenuList";
-import menu from "@library/components/forms/select/overwrites/Menu";
-import selectContainer from "@library/components/forms/select/overwrites/SelectContainer";
-import doNotRender from "@library/components/forms/select/overwrites/DoNotRender";
+import { clearIndicator } from "@library/components/forms/select/overwrites/clearIndicator";
+import MenuOption from "@library/components/forms/select/overwrites/menuOption";
+import menuList from "@library/components/forms/select/overwrites/menuList";
+import menu from "@library/components/forms/select/overwrites/menu";
+import selectContainer from "@library/components/forms/select/overwrites/selectContainer";
+import doNotRender from "@library/components/forms/select/overwrites/doNotRender";
 
 export interface IComboBoxOption {
     value: string;
@@ -127,6 +127,11 @@ export default class BigSearch extends React.Component<IProps> {
         e.preventDefault();
     };
 
+    /**
+     * Overwrite for the Control component in react select
+     * Note that this is NOT a real react component and it needs to be defined here because we need to access the props from the plugin
+     * @param props
+     */
     private bigSearchControl = props => {
         const id = uniqueIDFromPrefix("searchInputBlock");
         const labelID = id + "-label";

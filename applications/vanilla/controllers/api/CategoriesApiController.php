@@ -601,7 +601,7 @@ class CategoriesApiController extends AbstractApiController {
      * @param bool $expand
      * @return Schema
      */
-    public function    schemaWithParent($expand = false, $type = '') {
+    public function schemaWithParent($expand = false, $type = '') {
         $attributes = ['parentCategoryID:i|n' => 'Parent category ID.'];
         if ($expand) {
             $attributes['parent:o?'] = Schema::parse(['categoryID', 'name', 'urlcode', 'url'])

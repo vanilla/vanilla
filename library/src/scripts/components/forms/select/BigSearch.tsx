@@ -11,7 +11,7 @@ import { getOptionalID, uniqueIDFromPrefix, getRequiredID } from "@library/compo
 import classNames from "classnames";
 import { t } from "@library/application";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import { close, downTriangle } from "@library/components/Icons";
+import { clear } from "@library/components/Icons";
 import Heading from "@library/components/Heading";
 import { ClearIndicator } from "@library/components/forms/select/overwrites/ClearIndicator";
 import SelectContainer from "@library/components/forms/select/overwrites/SelectContainer";
@@ -58,12 +58,10 @@ export default class BigSearch extends React.Component<IProps> {
     }
 
     private handleOnChange = (newValue: any, actionMeta: any) => {
-        window.console.log("chosenValue: ", newValue);
         this.props.setQuery(newValue);
     };
 
     private handleInputChange = (newValue: any, actionMeta: any) => {
-        window.console.log("handleInputChange: ", newValue);
         this.props.setQuery({ data: newValue });
     };
 
@@ -88,7 +86,6 @@ export default class BigSearch extends React.Component<IProps> {
                 spacing: {},
             };
         };
-        console.log(this.props.query);
 
         return (
             <CreatableSelect
@@ -96,18 +93,16 @@ export default class BigSearch extends React.Component<IProps> {
                 components={componentOverwrites}
                 isClearable={true}
                 isDisabled={disabled}
-                // loadOptions={loadOptions}
                 options={options}
                 classNamePrefix={this.prefix}
                 className={classNames(this.prefix, className)}
                 styles={{}}
                 placeholder={this.props.placeholder}
-                value={this.props.query.data}
+                value={this.props.query}
                 aria-label={t("Search")}
                 escapeClearsValue={true}
                 inputId={this.searchInputID}
                 pageSize={20}
-                // NoOptionsMessage={t("No Results Found")}
                 theme={getTheme}
                 onChange={this.handleOnChange}
                 onInputChange={this.handleInputChange}
@@ -118,43 +113,6 @@ export default class BigSearch extends React.Component<IProps> {
     public getValue = value => {
         return value;
     };
-
-    public ClearIndicator(props) {
-        const {
-            innerProps: { ref, ...restInnerProps },
-            isDisabled,
-        } = props;
-
-        // We need to bind the function to the props for that component
-        const handleKeyDown = event => {
-            switch (event.key) {
-                case "Enter":
-                case "Spacebar":
-                case " ":
-                    restInnerProps.onMouseDown(event);
-                    break;
-            }
-        };
-
-        return (
-            <button
-                {...restInnerProps}
-                className={classNames(ButtonBaseClass.ICON, "bigSearch-clear")}
-                type="button"
-                ref={ref}
-                style={{}}
-                aria-hidden={null} // Unset the prop in restInnerProps
-                onKeyDown={handleKeyDown}
-                onClick={restInnerProps.onMouseDown}
-                onTouchEnd={restInnerProps.onTouchEnd}
-                disabled={isDisabled}
-                title={t("Clear")}
-                aria-label={t("Clear")}
-            >
-                {close("isSmall")}
-            </button>
-        );
-    }
 
     private BigSearchControl = props => {
         const id = uniqueIDFromPrefix("searchInputBlock");

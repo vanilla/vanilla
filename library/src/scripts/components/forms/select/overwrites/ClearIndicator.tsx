@@ -5,12 +5,11 @@
  */
 
 import * as React from "react";
-import Select, { components } from "react-select";
 
 import classNames from "classnames";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
-import { close } from "@library/components/Icons";
+import { clear } from "@library/components/Icons";
 
 export function ClearIndicator({ children, ...props }) {
     const {
@@ -44,7 +43,7 @@ export function ClearIndicator({ children, ...props }) {
             title={t("Clear")}
             aria-label={t("Clear")}
         >
-            {close("isSmall")}
+            {clear()}
         </button>
     );
 }

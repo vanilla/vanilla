@@ -26,6 +26,8 @@ export interface IUsersStoreState {
  * Reducer and state mapping for users data.
  */
 export default class UsersModel implements ReduxReducer<IUsersState> {
+    public static readonly GUEST_ID = 0;
+
     /**
      * Map the current user data out into react props.
      * @param state

@@ -78,6 +78,10 @@ $tag-hover_color:                 $global-color_white !default;
         }
     }
 
+    .RoleTracker {
+        background-color: transparent;
+    }
+
     .NewCommentCount,
     .HasNew {
         border: 1px solid $bullet_borderColor;

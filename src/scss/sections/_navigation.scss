@@ -1,24 +1,8 @@
-/*!
+/*
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-
-/* -------------------------------------------------------------- *\
-    Variables
-\* -------------------------------------------------------------- */
-
-$navigation_backgroundColor:              $global-color_primary !default;
-$navigation_color:                        $global-color_white !default;
-$navigation_button-bg:                    $global-color_secondary !default;
-$navigation_button-hover-bg:              darken($global-color_secondary, 8%) !default;
-$navigation_button-color:                 $global-color_white !default;
-$navigation_fontSize:                     $global-medium_fontSize !default;
-$navigation_paddingSide:                  $utility-medium_padding !default;
-$navigation_vertical_paddingSide:         0 !default;
-$navigation-item_height:                  36px !default;
-$navigation-item_fontWeight:              $global-normal_fontWeight !default;
-$navigation-easing-transition:            cubic-bezier(0, 1, 0, 1) !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -28,8 +12,8 @@ $navigation-easing-transition:            cubic-bezier(0, 1, 0, 1) !default;
     display: none;
     overflow: hidden;
     position: relative;
-    background: $navigation_backgroundColor;
-    color: $navigation_color;
+    background: $navigation_bg;
+    color: $navigation_fg;
     width: 100%;
     height: auto;
     max-height: 0;
@@ -81,9 +65,9 @@ $navigation-easing-transition:            cubic-bezier(0, 1, 0, 1) !default;
 
         .ButtonGroup.Action,
         .Button.Action {
-            background: $navigation_button-bg;
-            border-color: darken($navigation_button-bg, 5%);
-            color: $navigation_button-color;
+            background: $navigation-button_bg;
+            border-color: $navigation-button_border;
+            color: $navigation-button_fg;
             width: 100%;
 
             .Button {
@@ -121,7 +105,7 @@ $navigation-easing-transition:            cubic-bezier(0, 1, 0, 1) !default;
             padding-top: $utility-medium_padding;
 
             a {
-                @include Button($navigation_button-bg, $navigation_button-color, $navigation_button-hover-bg);
+                @include Button($navigation-button_bg, $navigation-button_fg, $navigation-button_border);
             }
 
             .Bullet {
@@ -230,9 +214,14 @@ $navigation-easing-transition:            cubic-bezier(0, 1, 0, 1) !default;
         left: 0;
         right: 0;
         height: 1px;
-        background: rgba($global-color_black, 0.2);
+        background: $navigation_border;
     }
 }
+
+.Navigation-linkContainer:last-child::after {
+    content: none;
+}
+
 .UserLoggedOut {
 
     .Navigation-row.NewDiscussion {

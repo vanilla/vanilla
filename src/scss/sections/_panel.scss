@@ -203,7 +203,7 @@
 }
 
 body.Section-EditProfile .Box,
-.BoxFilter,
+.BoxFilter:not(.BoxBestOfFilter),
 .BoxCategories {
 
     .PanelCategories li {

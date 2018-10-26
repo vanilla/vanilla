@@ -115,6 +115,7 @@ export default class BigSearch extends React.Component<IProps> {
                 pageSize={20}
                 theme={getTheme}
                 styles={customStyles}
+                backspaceRemovesValue={true}
             />
         );
     }

@@ -17,7 +17,6 @@ export default function Option(props: any) {
     const handleClick = e => {
         e.preventDefault();
         props.innerProps.onClick();
-        console.log("props: ", props);
     };
 
     return (

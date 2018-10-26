@@ -6,7 +6,7 @@
 
 /* ------------------ Theme ------------------ */
 
-@import "base/variables_void";
+@import "base/variables_breeze";
 @import "base/variables";
 
 /* --------------- Boilerplate --------------- */
@@ -16,11 +16,8 @@
 /* --------------- Components --------------- */
 
 @import "components/herobanner";
-@import "components/lists_void";
-@import "components/searchbox_void";
+@import "components/lists_breeze";
 
 /* ------------------ Sections ------------------ */
 
-@import "sections/frame_void";
-@import "sections/header_void";
 @import "sections/themeoptions";

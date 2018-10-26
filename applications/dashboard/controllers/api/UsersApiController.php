@@ -235,7 +235,8 @@ class UsersApiController extends AbstractApiController {
                 "userID" => 0,
                 "name" => t("Guest"),
                 "photoUrl" => UserModel::getDefaultAvatarUrl(),
-                "dateLastActive" => null
+                "dateLastActive" => null,
+                "isAdmin" => false,
             ];
         }
         return $this->guestFragment;

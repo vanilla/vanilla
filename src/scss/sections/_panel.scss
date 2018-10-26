@@ -162,10 +162,21 @@
     .Leaderboard,
     .InThisConversation {
 
+        li:not(.Heading) + li:not(.Heading) {
+            margin-top: $panel_item-spacing;
+
+            @if($panel_item-spacing == 0) {
+                a {
+                    border-top-width: 0;
+                }
+            }
+        }
+
         a {
             min-height: $panel-item_height;
+            border: $panel_item-border;
             padding: 0 $utility-small_padding;
-            border-radius: $formElement_borderRadius;
+            border-radius: $panel_item-borderRadius;
             width: 100%;
             color: $panel_color;
             transition: transition(color), transition(background-color);

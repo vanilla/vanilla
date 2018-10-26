@@ -152,7 +152,7 @@ $navigation-button_border:                darken($navigation-button_bg, 8%) !def
     Content
 \* -------------------------------------------------------------- */
 
-$content_bg:                             hotpink !default;
+$content_bg:                             transparent !default;
 $content_border:                         0 !default;
 $content_padding:                        $utility-large_padding !default;
 $content-mobile_padding:                 $utility-medium_padding !default;
@@ -174,9 +174,10 @@ $panel_padding:                          0 !default;
 $panel-border:                           $content_border !default;
 $panel_borderRadius:                     $content_borderRadius !default;
 
-$panel_item-border:                      0 !default;
+$panel_item-border:                      none !default;
 $panel_item-spacing:                     0 !default;
 $panel_item-borderRadius:                $global_borderRadius !default;
+$panel_item-showIcons:                   true !default;
 
 /* -------------------------------------------------------------- *\
     Footer

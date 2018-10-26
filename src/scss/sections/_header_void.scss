@@ -1,0 +1,19 @@
+.Header {
+    background-color: $header_bg;
+
+    @include maxWidth {
+        background-color: $global-color_black;
+
+        .row {
+            height: 48px;
+        }
+
+        .Header-logo {
+
+            img {
+                max-height: 48px - 12px;
+            }
+        }
+    }
+
+}

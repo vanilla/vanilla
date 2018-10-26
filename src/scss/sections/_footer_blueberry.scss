@@ -2,6 +2,6 @@
 
     .row:first-child {
         padding-top: $utility-large_padding;
-        border-top: $component_border;
+        border-top: 1px solid #{$theme-border_color};
     }
 }

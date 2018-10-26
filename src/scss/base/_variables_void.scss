@@ -12,14 +12,15 @@ $global-color_black:                    #000;
 $global-color_white:                    #fff;
 $global-color_transparent:              transparent;
 
-$global-color_void:                     #121212;
-$global-color_orange:                   #f17f1a;
-$global-color_pitchblack:               #1a1a1a;
-$global-color_darkgrey:                 #585858;
+$global-color_void:                     #1f201f;
+$global-color_darkgrey:                 #202020;
+$global-color_grey:                     #a3a3a3;
+$global-color_dijon:                    #f2ae09;
+$global-color_rust:                     #984B43;
 
-$global-color_primary:                  $global-color_orange;
+$global-color_primary:                  $global-color_dijon;
 $global-color_primaryAlt:               lighten($global-color_primary, 8%);
-$global-color_secondary:                $global-color_darkgrey !default;
+$global-color_secondary:                $global-color_rust !default;
 
 $global-color_bg:                       $global-color_void !default;
 $global-color_fg:                       $global-color_white !default; // text color | should have high contrast between $global-color_bg
@@ -30,7 +31,7 @@ $global-body_bg:                        $global-color_bg !default;
     Theme Colors
 \* -------------------------------------------------------------- */
 
-$theme-border_color:                    mix($global-color_fg, $global-color_bg, 24%) !default;
+$theme-border_color:                    mix($global-color_fg, $global-color_bg, 14%) !default;
 
 $theme-link-hover_textDecoration:       underline !default;
 
@@ -38,18 +39,32 @@ $theme-heading_color:                   $global-color_secondary !default;
 $theme-heading-hover_color:             $global-color_primaryAlt !default;
 
 /* -------------------------------------------------------------- *\
+    Frame
+\* -------------------------------------------------------------- */
+
+$frame_backgroundColor:                  $global-color_black !default;
+
+/* -------------------------------------------------------------- *\
     Content
 \* -------------------------------------------------------------- */
 
-$content_bg:                             transparent !default;
+$content_bg:                             $global-color_void !default;
 
 /* -------------------------------------------------------------- *\
     Header
 \* -------------------------------------------------------------- */
 
-$header_bg:                              mix($global-color_bg, $global-color_fg, 90%) !default;
+$header_bg:                              transparent !default;
+$header_minHeight:                       96px !default;
 $header_color:                           $global-color_white !default;
 $header-hover_color:                     $global-color_white !default;
+
+/* -------------------------------------------------------------- *\
+    Panel
+\* -------------------------------------------------------------- */
+
+$panel-item_height:                      2.5em !default;
+$panel_item-borderRadius:                $panel-item_height !default;
 
 /* -------------------------------------------------------------- *\
     Footer
@@ -70,16 +85,44 @@ $navigation_backgroundColor:              mix($global-color_black, $header-bg, 1
     Components
 \* -------------------------------------------------------------- */
 
-$component_bg:                           $global-color_pitchblack !default;
-$component-title_color:                  $global-color_secondary !default;
-$component-title-hover_color:            darken($global-color_secondary, 8%) !default;
-$component-meta-link_color:              mix($global-color_fg, $component_bg, 54%) !default;
-$component-meta-link-hover_color:        mix($global-color_fg, $component_bg, 54%) !default;
+$component-item_spacing:                 0 !default;
+$component_bg:                           transparent !default;
+$component-title_color:                  $global-color_white !default;
+$component-title-hover_color:            $global-color_primary !default;
+$component-base_color:                   $global-color_white !default;
+$component-meta-link_color:              $global-color_grey !default;
+$component-meta-link-hover_color:        $global-color_primary !default;
+$component_borderRadius:                 0 !default;
+
+/* -------------------------------------------------------------- *\
+    Form Elements
+\* -------------------------------------------------------------- */
+
+$formElement_height:                     36px !default;
+
+/* -------------------------------------------------------------- *\
+    Buttons
+\* -------------------------------------------------------------- */
+
+$formButton_height:                      $formElement_height !default;
+$formButton_borderRadius:                $formButton_height !default;
+
+/* -------------------------------------------------------------- *\
+    Navigation
+\* -------------------------------------------------------------- */
+
+$navigation_backgroundColor:             $global-color_black !default;
 
 /* -------------------------------------------------------------- *\
     Mebox
 \* -------------------------------------------------------------- */
 
-$mebox_hover_bg:                         mix($global-color_white, $header-bg, 12%) !default;
+$mebox_hover_bg:                         $frame_backgroundColor !default;
+
+/* -------------------------------------------------------------- *\
+    Searchbox
+\* -------------------------------------------------------------- */
+
+$searchbox-button_color:                 $global-color_primary !default;
 
 

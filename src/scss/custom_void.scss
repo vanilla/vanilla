@@ -16,8 +16,11 @@
 /* --------------- Components --------------- */
 
 @import "components/herobanner";
+@import "components/lists_void";
 @import "components/searchbox_void";
 
 /* ------------------ Sections ------------------ */
 
+@import "sections/frame_void";
+@import "sections/header_void";
 @import "sections/themeoptions";

@@ -45,9 +45,8 @@ $global-color_black:                    #000;
 $global-color_white:                    #fff;
 $global-color_transparent:              transparent;
 
-$global-color_sky:                      #286DA8;
-$global-color_watermelon:               #CD5360;
-$global-color_breeze:                   #438496;
+$global-color_sky:                      #007cbb;
+$global-color_watermelon:               #d71950;
 
 $global-color_primary:                  $global-color_sky !default;
 $global-color_primaryAlt:               darken($global-color_primary, 8%) !default;

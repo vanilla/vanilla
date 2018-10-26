@@ -100,12 +100,25 @@
 }
 
 @mixin framePadding($includeVertical: false) {
-    padding-left: $utility-large_padding;
-    padding-right: $utility-large_padding;
+    padding-left: $content_padding;
+    padding-right: $content_padding;
 
     @if ($includeVertical) {
-        padding-top: $utility-medium_padding;
-        padding-bottom: $utility-medium_padding;
+        padding-top: $content_padding;
+        padding-bottom: $content_padding;
+    }
+}
+
+@mixin framePaddingReverse($includeVertical: false) {
+    margin-left: -#{$content_padding};
+    margin-right: -#{$content_padding};
+    padding-left: $content_padding;
+    padding-right: $content_padding;
+    width: calc(100% + (#{$content_padding} * 2));
+
+    @if ($includeVertical) {
+        margin-top: -#{$content_padding};
+        margin-bottom: -#{$content_padding};
     }
 }
 

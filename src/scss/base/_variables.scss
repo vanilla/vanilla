@@ -152,9 +152,10 @@ $navigation-button_border:                darken($navigation-button_bg, 8%) !def
     Content
 \* -------------------------------------------------------------- */
 
-$content_bg:                             transparent !default;
+$content_bg:                             hotpink !default;
 $content_border:                         0 !default;
-$content_padding:                        $utility-medium_padding !default;
+$content_padding:                        $utility-large_padding !default;
+$content-mobile_padding:                 $utility-medium_padding !default;
 $content_borderRadius:                   0 !default;
 
 /* -------------------------------------------------------------- *\

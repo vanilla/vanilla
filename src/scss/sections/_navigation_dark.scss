@@ -3,13 +3,6 @@
     &::after {
         width: calc(100% - (#{$utility-large_padding} * 2));
         margin: 0 auto;
-        background: $theme-border_color;
-    }
-}
-
-.Navigation-linkContainer:last-child {
-    &::after {
-        content: none;
     }
 }
 

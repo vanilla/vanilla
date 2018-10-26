@@ -30,10 +30,10 @@ $global-small_fontSize:                 14px !default;
 $global-title_fontSize:                 32px !default;
 $global-subTitle_fontSize:              24px !default;
 
-$global-base_lineHeight:                1.618em !default;
-$global-lineHeight_offset:              .32em !default; // Offset font to make top of capital letters flush with top of container
+$global-base_lineHeight:                1.618 !default;
+$global-lineHeight_offset:              .32 !default; // Offset font to make top of capital letters flush with top of container
 $global-headinglineHeight_offset:       $global-lineHeight_offset !default; // Different if heading has different font than body
-$global-bodylineHeight_offset:          .4em !default; // Different if body has different font than headding
+$global-bodylineHeight_offset:          .4 !default; // Different if body has different font than headding
 
 $global-main_width:                     1224px !default;
 
@@ -59,8 +59,8 @@ $global-body_bg:                        $global-color_bg !default;
 
 $icon-default_size:                     20px !default;
 
-$link_default-color:                    $global-color_fg !default;
-$link_default_hover-color:              $global-color_primary !default;
+$link-default_color:                    $global-color_fg !default;
+$link-default_hover_color:              $global-color_primary !default;
 
 
 /* -------------------------------------------------------------- *\
@@ -134,12 +134,31 @@ $header_border:                          none !default;
 $header_boxShadow:                       none !default;
 
 /* -------------------------------------------------------------- *\
+    Navigation
+\* -------------------------------------------------------------- */
+
+$navigation_bg:                           darken($header_bg, 6%) !default;
+$navigation_fg:                           $global-color_white !default;
+$navigation_border:                       darken($navigation_bg, 8%)!default;
+$navigation_fontSize:                     $global-medium_fontSize !default;
+$navigation_paddingSide:                  $utility-medium_padding !default;
+$navigation_vertical_paddingSide:         0 !default;
+$navigation-item_height:                  36px !default;
+$navigation-item_fontWeight:              $global-normal_fontWeight !default;
+$navigation-easing-transition:            cubic-bezier(0, 1, 0, 1) !default;
+
+$navigation-button_bg:                    $global-color_secondary !default;
+$navigation-button_fg:                    $global-color_white !default;
+$navigation-button_border:                darken($navigation-button_bg, 8%) !default;
+
+/* -------------------------------------------------------------- *\
     Content
 \* -------------------------------------------------------------- */
 
 $content_bg:                             transparent !default;
 $content_border:                         0 !default;
-$content_padding:                        $utility-medium_padding !default;
+$content_padding:                        $utility-large_padding !default;
+$content-mobile_padding:                 $utility-medium_padding !default;
 $content_borderRadius:                   0 !default;
 
 /* -------------------------------------------------------------- *\
@@ -158,6 +177,11 @@ $panel_padding:                          0 !default;
 $panel-border:                           $content_border !default;
 $panel_borderRadius:                     $content_borderRadius !default;
 
+$panel_item-border:                      none !default;
+$panel_item-spacing:                     0 !default;
+$panel_item-borderRadius:                $global_borderRadius !default;
+$panel_item-showIcons:                   true !default;
+
 /* -------------------------------------------------------------- *\
     Footer
 \* -------------------------------------------------------------- */
@@ -168,12 +192,6 @@ $footer-link_color:                      $global-color_primary !default;
 $footer-link-hover_color:                $global-color_primaryAlt !default;
 $footer-base_fontSize:                   $global-medium_fontSize !default;
 $footer-base_lineHeight:                 $global-base_lineHeight !default;
-
-/* -------------------------------------------------------------- *\
-    Navigation
-\* -------------------------------------------------------------- */
-
-$navigation_backgroundColor:             darken($header_bg, 6%) !default;
 
 /* -------------------------------------------------------------- *\
     Components
@@ -187,6 +205,8 @@ $component_borderColor:                  $theme-border_color !default;
 $component_border:                       #{$theme-border_color} #{$component_borderWidth} solid !default;
 $component_boxShadow:                    none !default;
 $component_borderRadius:                 $global_borderRadius !default;
+
+$component-header_bg:                    transparent !default;
 
 $component-base_color:                   $global-color_fg !default;
 $component-base_fontSize:                $global-medium_fontSize !default;
@@ -207,18 +227,6 @@ $component-meta_fontWeight:              $global-normal_fontWeight !default;
 $component-meta_lineHeight:              $global-base_lineHeight !default;
 
 /* -------------------------------------------------------------- *\
-    Mebox
-\* -------------------------------------------------------------- */
-
-$mebox_hover_bg:                         mix($global-color_black, $header-bg, 12%) !default;
-
-/* -------------------------------------------------------------- *\
-    SearchBox
-\* -------------------------------------------------------------- */
-
-$searchbox-button_borderWidth:           0 !default;
-
-/* -------------------------------------------------------------- *\
     Form Elements
 \* -------------------------------------------------------------- */
 
@@ -237,6 +245,26 @@ $formElement_borderRadius:               $global_borderRadius !default;
     Buttons
 \* -------------------------------------------------------------- */
 
+$button-basic_fg:                        $global-color_primary !default;
+$button-basic_bg:                        transparent !default;
+$button-basic_border:                    $global-color_primary !default;
+
+$button-basic_hover_fg:                  $global-color_white !default;
+$button-basic_hover_bg:                  $global-color_primary !default;
+$button-basic_hover_border:              $global-color_primary !default;
+
+$button-primary_fg:                      $global-color_white !default;
+$button-primary_bg:                      $global-color_primary !default;
+$button-primary_border:                  $global-color_primaryAlt !default;
+
+$button-primary_hover_fg:                $global-color_white !default;
+$button-primary_hover_bg:                $global-color_primaryAlt !default;
+$button-primary_hover_border:            $global-color_primaryAlt !default;
+
+/* -------------------------------------------------------------- *\
+    Form Buttons
+\* -------------------------------------------------------------- */
+
 $formButton_bg:                          $global-color_primary !default;
 $formButton_color:                       $global-color_white !default;
 $formButton_fontFamily:                  $global-body_fontFamily !default;
@@ -247,6 +275,26 @@ $formButton_padding:                     $utility-medium_padding !default;
 $formButton_height:                      $formElement_height !default;
 $formButton_borderRadius:                $formElement_borderRadius !default;
 $formButton_border:                      1px solid !default;
+
+/* -------------------------------------------------------------- *\
+    Bullets
+\* -------------------------------------------------------------- */
+
+$bullet_borderColor:                     orange !default;
+$bullet_bg:                              orange !default;
+$bullet_fg:                              $global-color_white !default;
+
+/* -------------------------------------------------------------- *\
+    Mebox
+\* -------------------------------------------------------------- */
+
+$mebox_hover_bg:                         mix($global-color_black, $header-bg, 12%) !default;
+
+/* -------------------------------------------------------------- *\
+    SearchBox
+\* -------------------------------------------------------------- */
+
+$searchbox-button_borderWidth:           0 !default;
 
 /* -------------------------------------------------------------- *\
     Breakpoints

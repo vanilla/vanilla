@@ -113,7 +113,8 @@ $formButton_borderRadius:                $formButton_height !default;
     Navigation
 \* -------------------------------------------------------------- */
 
-$navigation_backgroundColor:             $global-color_black !default;
+$navigation_bg:                          $global-color_black !default;
+$navigation_border:                      $theme-border_color !default;
 
 /* -------------------------------------------------------------- *\
     Mebox

@@ -2,6 +2,12 @@
 # yarn lockfile v1
 
 
+"@vanillaforums/theme-boilerplate@../theme-boilerplate/vanillaforums-theme-boilerplate-1.0.10.tgz":
+  version "1.0.10"
+  resolved "../theme-boilerplate/vanillaforums-theme-boilerplate-1.0.10.tgz#a9dca751cfcaae14a59911c70e24afb4e2db438d"
+  dependencies:
+    fs-extra "^7.0.0"
+
 "@vanillaforums/theme-boilerplate@^1.0.1":
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/@vanillaforums/theme-boilerplate/-/theme-boilerplate-1.0.9.tgz#cc591ab3b11bf3b20b221c911a1b40e4f980dd08"

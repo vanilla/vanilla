@@ -72,7 +72,7 @@ $footer_bg:                              rgba($global-color_secondary, .2) !defa
     Navigation
 \* -------------------------------------------------------------- */
 
-$navigation_backgroundColor:             darken($header_bg, 6%) !default;
+$navigation_bg:                          darken($header_bg, 6%) !default;
 
 /* -------------------------------------------------------------- *\
     Components

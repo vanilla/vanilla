@@ -22,6 +22,7 @@ export default function menuOption(props: any) {
 
     const handleClick = e => {
         e.preventDefault();
+        props.innerProps.onClick();
     };
 
     return (

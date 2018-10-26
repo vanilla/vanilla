@@ -16,6 +16,7 @@ interface IProps extends IOptionalComponentID {
     prefix?: string;
     legacyMode?: boolean;
     onClick?: () => void;
+    onKeyDown?: () => void;
     title?: string;
     ariaLabel?: string;
     baseClass?: ButtonBaseClass;
@@ -74,6 +75,7 @@ export default class Button extends React.Component<IProps, IState> {
                 aria-hidden={this.props.ariaHidden}
                 tabIndex={this.props.tabIndex}
                 ref={this.props.buttonRef}
+                onKeyDown={this.props.onKeyDown}
             >
                 {this.props.children}
             </button>

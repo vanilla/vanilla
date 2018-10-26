@@ -7,7 +7,7 @@
 import * as React from "react";
 import classNames from "classnames";
 import DateTime from "@library/components/DateTime";
-import LocationBreadcrumbs from "@knowledge/modules/locationPicker/components/LocationBreadcrumbs";
+import BreadCrumbString from "@library/components/BreadCrumbString";
 
 export default function Option(props: any) {
     const { data, innerProps, isFocused } = props;
@@ -34,14 +34,14 @@ export default function Option(props: any) {
                 {dateUpdated &&
                     hasLocationData && (
                         <span className="suggestedTextInput-main">
-                            <span className="metas">
+                            <span className="metas isFlexed">
                                 {dateUpdated && (
                                     <span className="meta">
                                         <DateTime className="meta" timestamp={dateUpdated} />
                                     </span>
                                 )}
                                 {hasLocationData && (
-                                    <span className="meta">{LocationBreadcrumbs.renderString(locationData)}</span>
+                                    <BreadCrumbString className="meta">{locationData}</BreadCrumbString>
                                 )}
                             </span>
                         </span>

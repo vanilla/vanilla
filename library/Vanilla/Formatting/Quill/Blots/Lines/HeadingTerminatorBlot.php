@@ -30,7 +30,7 @@ class HeadingTerminatorBlot extends AbstractLineTerminatorBlot {
      * @throws \Exception
      */
     public function getGroupOpeningTag(): string {
-        return "<h" . $this->getHeadingLevel() . ' id="' . $this->getReferenceId() . '">';
+        return "<h" . $this->getHeadingLevel() . 'id="' . $this->getReference() . '">';
     }
 
     /**
@@ -88,22 +88,11 @@ class HeadingTerminatorBlot extends AbstractLineTerminatorBlot {
     }
 
     /**
-     * Get the internal reference  for the blot.
-     *
-     * @return string Interdoc reference. Ex: #my-title, #hello-heading
-     */
-    public function getReference(): string {
-        $ref = '#' . urlencode(str_replace(' ', '-', $this->getText()));
-        return $ref;
-    }
-
-    /**
-     * Get heading text with html tags stripped out.
+     * Get the unique interdoc ref id for the blot.
      *
      * @return string
      */
-    public function getText(): string {
-        $text = strip_tags($this->render());
-        return $text;
+    public function getReference(): string {
+        return $this->currentOperation["attributes"]["ref"] ?? '';
     }
 }

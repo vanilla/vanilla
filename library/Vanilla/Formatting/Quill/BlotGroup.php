@@ -274,4 +274,31 @@ class BlotGroup {
 
         return $blots;
     }
+
+    /**
+     * Get heading text with html tags stripped out.
+     *
+     * @return string
+     */
+    public function getText(): string {
+        $text = strip_tags($this->render());
+        return $text;
+    }
+
+    /**
+     * Get the internal reference  for the blot.
+     *
+     * @return string Interdoc reference. Ex: #my-title, #hello-heading
+     */
+    public function getReference(): string {
+        $blot = $this->getPrimaryBlot();
+        $ref = '#';
+        if ($blot instanceof HeadingTerminatorBlot) {
+            $ref .= $blot->getReference();
+        }
+        if ($ref ===  '#') {
+            $ref .= urlencode(str_replace(' ', '-', $this->getText()));
+        }
+        return $ref;
+    }
 }

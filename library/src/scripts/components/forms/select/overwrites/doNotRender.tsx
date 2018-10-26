@@ -4,7 +4,10 @@
  * @license GPL-2.0-only
  */
 
-// Do not render a component
-export default function DoNotRender() {
+/**
+ * Overwrite for the React Select plugin
+ * Use this function if you don't want to render a component
+ */
+export default function doNotRender() {
     return null;
 }

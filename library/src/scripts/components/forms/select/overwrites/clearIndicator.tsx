@@ -11,7 +11,13 @@ import { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
 import { clear } from "@library/components/Icons";
 
-export function ClearIndicator({ children, ...props }) {
+/**
+ * Overwrite for the clearIndicator component in React Select
+ * Note that this is NOT a true react component and gets called within the react select plugin
+ * @param children - children of component
+ * @param props - props of component
+ */
+export function clearIndicator({ children, ...props }) {
     const {
         innerProps: { ref, ...restInnerProps },
         isDisabled,

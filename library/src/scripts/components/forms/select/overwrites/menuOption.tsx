@@ -9,7 +9,13 @@ import classNames from "classnames";
 import DateTime from "@library/components/DateTime";
 import BreadCrumbString from "@library/components/BreadCrumbString";
 
-export default function MenuOption(props: any) {
+/**
+ * Overwrite for the menuOption component in React Select
+ * Note that this is NOT a true react component and gets called within the react select plugin
+ * @param props
+ */
+
+export default function menuOption(props: any) {
     const { data, innerProps, isFocused } = props;
     const { dateUpdated, locationData } = data;
     const hasLocationData = locationData && locationData.length > 0;

@@ -7,7 +7,12 @@
 import * as React from "react";
 import { components } from "react-select";
 
-export default function MenuList(props: any) {
+/**
+ * Overwrite for the input menuList component in React Select
+ * Note that this is NOT a true react component and gets called within the react select plugin
+ * @param props - props for menuList
+ */
+export default function menuList(props: any) {
     return (
         <components.MenuList {...props}>
             <ul className="suggestedTextInput-menuItems">{props.children}</ul>

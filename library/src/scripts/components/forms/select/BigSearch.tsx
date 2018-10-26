@@ -13,13 +13,17 @@ import { t } from "@library/application";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { clear } from "@library/components/Icons";
 import Heading from "@library/components/Heading";
-import { ClearIndicator } from "@library/components/forms/select/overwrites/ClearIndicator";
+import { ClearIndicator, clearIndicator } from "@library/components/forms/select/overwrites/ClearIndicator";
 import SelectContainer from "@library/components/forms/select/overwrites/SelectContainer";
 import DoNotRender from "@library/components/forms/select/overwrites/DoNotRender";
 import Menu from "@library/components/forms/select/overwrites/Menu";
 import MenuList from "@library/components/forms/select/overwrites/MenuList";
 import { BigSearchControl } from "@library/components/forms/select/overwrites/BigSearchControl";
 import MenuOption from "@library/components/forms/select/overwrites/MenuOption";
+import menuList from "@library/components/forms/select/overwrites/MenuList";
+import menu from "@library/components/forms/select/overwrites/Menu";
+import selectContainer from "@library/components/forms/select/overwrites/SelectContainer";
+import doNotRender from "@library/components/forms/select/overwrites/DoNotRender";
 
 export interface IComboBoxOption {
     value: string;
@@ -75,12 +79,12 @@ export default class BigSearch extends React.Component<IProps> {
         /** The children to be rendered inside the indicator. */
         const componentOverwrites = {
             Control: this.BigSearchControl,
-            IndicatorSeparator: DoNotRender,
-            DropdownIndicator: DoNotRender,
-            ClearIndicator,
-            SelectContainer,
-            Menu,
-            MenuList,
+            IndicatorSeparator: doNotRender,
+            DropdownIndicator: doNotRender,
+            ClearIndicator: clearIndicator,
+            SelectContainer: selectContainer,
+            Menu: menu,
+            MenuList: menuList,
             Option: MenuOption,
         };
 
@@ -125,17 +129,16 @@ export default class BigSearch extends React.Component<IProps> {
         return value;
     };
 
+    public preventFormSubmission = e => {
+        e.preventDefault();
+    };
+
     private BigSearchControl = props => {
         const id = uniqueIDFromPrefix("searchInputBlock");
         const labelID = id + "-label";
 
-        const preventFormSubmission = e => {
-            e.preventDefault();
-            this.props.setQuery(props.getValue());
-        };
-
         return (
-            <form className="bigSearch-form" onSubmit={preventFormSubmission}>
+            <form className="bigSearch-form" onSubmit={this.preventFormSubmission}>
                 <Heading depth={1} className="bigSearch-heading">
                     <label className="searchInputBlock-label" htmlFor={this.searchInputID}>
                         {t("Search")}

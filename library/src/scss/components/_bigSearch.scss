@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-
+$bigSearch-search_minWidth: 109px;
 
 .bigSearch-clear {
     position: relative;
@@ -45,6 +45,8 @@
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
         margin-left: -1px;
+        min-width: $bigSearch-search_minWidth;
+        flex-basis: $bigSearch-search_minWidth;
 
         &:hover,
         &:focus {

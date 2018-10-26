@@ -7,10 +7,10 @@
 import * as React from "react";
 import { components } from "react-select";
 
-export default function MenuList ({ children, ...props}: any) {
+export default function MenuList(props: any) {
     return (
-        <components.MenuList {...props} styles={{}} className={`${props.prefix}-menuList`}>
-            {props.children}
+        <components.MenuList {...props}>
+            <ul className="suggestedTextInput-menuItems">{props.children}</ul>
         </components.MenuList>
     );
 }

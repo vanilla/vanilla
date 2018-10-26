@@ -4,6 +4,8 @@
  * @license GPL-2.0-only
  */
 
+$suggestedTextInput-option_padding: 12px;
+
 
 // Classes from react-select
 
@@ -13,4 +15,9 @@
 
 .suggestedTextInput-noOptions {
     padding: $global_spacer;
+}
+
+.suggestedTextInput-option {
+    width: 100%;
+    padding: $suggestedTextInput-option_padding;
 }

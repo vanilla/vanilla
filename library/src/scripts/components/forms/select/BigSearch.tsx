@@ -16,6 +16,8 @@ import Heading from "@library/components/Heading";
 import { ClearIndicator } from "@library/components/forms/select/overwrites/ClearIndicator";
 import SelectContainer from "@library/components/forms/select/overwrites/SelectContainer";
 import DoNotRender from "@library/components/forms/select/overwrites/DoNotRender";
+import MenuList from "@library/components/forms/select/overwrites/MenuList";
+import Option from "@library/components/forms/select/overwrites/Option";
 
 export interface IComboBoxOption {
     value: string;
@@ -58,11 +60,11 @@ export default class BigSearch extends React.Component<IProps> {
     }
 
     private handleOnChange = (newValue: any, actionMeta: any) => {
-        this.props.setQuery(newValue);
+        this.props.setQuery(newValue.label || "");
     };
 
     private handleInputChange = (newValue: any, actionMeta: any) => {
-        this.props.setQuery({ data: newValue });
+        this.props.setQuery(newValue.label || "");
     };
 
     public render() {
@@ -75,7 +77,8 @@ export default class BigSearch extends React.Component<IProps> {
             DropdownIndicator: DoNotRender,
             ClearIndicator,
             SelectContainer,
-            // ValueContainer,
+            MenuList,
+            Option,
         };
 
         const getTheme = theme => {
@@ -98,7 +101,6 @@ export default class BigSearch extends React.Component<IProps> {
                 className={classNames(this.prefix, className)}
                 styles={{}}
                 placeholder={this.props.placeholder}
-                value={this.props.query}
                 aria-label={t("Search")}
                 escapeClearsValue={true}
                 inputId={this.searchInputID}
@@ -131,7 +133,7 @@ export default class BigSearch extends React.Component<IProps> {
                     </label>
                 </Heading>
                 <div className="bigSearch-content">
-                    <div className={`${props.prefix}-valueContainer inputBlock-inputText InputBox inputText isLarge`}>
+                    <div className={`${this.prefix}-valueContainer inputText isLarge isClearable`}>
                         <components.Control {...props} />
                     </div>
                     <Button type="submit" id={this.searchButtonID} className="buttonPrimary bigSearch-submitButton">
@@ -141,9 +143,6 @@ export default class BigSearch extends React.Component<IProps> {
             </form>
         );
     };
-
-    //option
 }
 
-// Wrap in form if not already
 // Role search on input

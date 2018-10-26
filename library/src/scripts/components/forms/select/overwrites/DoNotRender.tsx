@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
-export default function ClearIndicator() {
+// Do not render a component
+export default function DoNotRender() {
     return null;
 }

@@ -7,7 +7,7 @@
 import * as React from "react";
 import Select, { components } from "react-select";
 import CreatableSelect from "react-select/lib/Creatable";
-import { getOptionalID, uniqueIDFromPrefix, getRequiredID } from "@library/componentIDs";
+import { getOptionalID, uniqueIDFromPrefix, getRequiredID, IOptionalComponentID } from "@library/componentIDs";
 import classNames from "classnames";
 import { t } from "@library/application";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
@@ -18,7 +18,8 @@ import SelectContainer from "@library/components/forms/select/overwrites/SelectC
 import DoNotRender from "@library/components/forms/select/overwrites/DoNotRender";
 import Menu from "@library/components/forms/select/overwrites/Menu";
 import MenuList from "@library/components/forms/select/overwrites/MenuList";
-import Option from "@library/components/forms/select/overwrites/Option";
+import { BigSearchControl } from "@library/components/forms/select/overwrites/BigSearchControl";
+import MenuOption from "@library/components/forms/select/overwrites/MenuOption";
 
 export interface IComboBoxOption {
     value: string;
@@ -26,7 +27,7 @@ export interface IComboBoxOption {
     data: any;
 }
 
-interface IProps {
+interface IProps extends IOptionalComponentID {
     query: string;
     disabled?: boolean;
     className?: string;
@@ -48,12 +49,12 @@ export default class BigSearch extends React.Component<IProps> {
         disabled: false,
     };
 
-    private id;
+    private id: string;
     private prefix = "bigSearch";
-    private searchButtonID;
-    private searchInputID;
+    private searchButtonID: string;
+    private searchInputID: string;
 
-    constructor(props) {
+    constructor(props: IProps) {
         super(props);
         this.id = getRequiredID(props, this.prefix);
         this.searchButtonID = this.id + "-searchButton";
@@ -80,7 +81,7 @@ export default class BigSearch extends React.Component<IProps> {
             SelectContainer,
             Menu,
             MenuList,
-            Option,
+            Option: MenuOption,
         };
 
         const getTheme = theme => {

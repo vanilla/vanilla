@@ -12,5 +12,5 @@ export default function Input(props: any) {
     if (props.isHidden) {
         return <components.Input {...props} />;
     }
-    return <components.Input className={classNames(`${props.prefix}-textInput`, "suggestedTextInput-textInput")} />;
+    return <components.Input {...props} className={classNames(`${props.prefix}-textInput`, "suggestedTextInput-textInput")} />;
 }

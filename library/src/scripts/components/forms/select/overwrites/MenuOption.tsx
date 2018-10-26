@@ -9,14 +9,13 @@ import classNames from "classnames";
 import DateTime from "@library/components/DateTime";
 import BreadCrumbString from "@library/components/BreadCrumbString";
 
-export default function Option(props: any) {
+export default function MenuOption(props: any) {
     const { data, innerProps, isFocused } = props;
     const { dateUpdated, locationData } = data;
     const hasLocationData = locationData && locationData.length > 0;
 
     const handleClick = e => {
         e.preventDefault();
-        props.innerProps.onClick();
     };
 
     return (

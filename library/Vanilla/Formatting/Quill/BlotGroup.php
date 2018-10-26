@@ -297,7 +297,11 @@ class BlotGroup {
             $ref .= $blot->getReference();
         }
         if ($ref ===  '#') {
-            $ref .= urlencode(str_replace(' ', '-', $this->getText()));
+            $text = str_replace(' ', '-', $this->getText());
+            if (strlen($text) > 100) {
+                $text = substr($text, 0, 50) . '-' . md5($text);
+            }
+            $ref .= urlencode($text);
         }
         return $ref;
     }

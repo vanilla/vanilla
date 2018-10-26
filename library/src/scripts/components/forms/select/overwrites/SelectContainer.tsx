@@ -9,7 +9,7 @@ import { components } from "react-select";
 
 export default function SelectContainer({ children, ...props }: any) {
     return (
-        <components.SelectContainer {...props} className="bigInput-selectContainer">
+        <components.SelectContainer {...props} className="suggestedTextInput-selectContainer">
             {children}
         </components.SelectContainer>
     );

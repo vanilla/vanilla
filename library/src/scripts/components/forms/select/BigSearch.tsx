@@ -16,6 +16,7 @@ import Heading from "@library/components/Heading";
 import { ClearIndicator } from "@library/components/forms/select/overwrites/ClearIndicator";
 import SelectContainer from "@library/components/forms/select/overwrites/SelectContainer";
 import DoNotRender from "@library/components/forms/select/overwrites/DoNotRender";
+import Menu from "@library/components/forms/select/overwrites/Menu";
 import MenuList from "@library/components/forms/select/overwrites/MenuList";
 import Option from "@library/components/forms/select/overwrites/Option";
 
@@ -77,6 +78,7 @@ export default class BigSearch extends React.Component<IProps> {
             DropdownIndicator: DoNotRender,
             ClearIndicator,
             SelectContainer,
+            Menu,
             MenuList,
             Option,
         };
@@ -90,24 +92,29 @@ export default class BigSearch extends React.Component<IProps> {
             };
         };
 
+        const customStyles = {
+            option: () => ({}),
+            menu: base => {
+                return { ...base, backgroundColor: null, boxShadow: null };
+            },
+        };
+
         return (
             <CreatableSelect
                 id={this.id}
+                inputId={this.searchInputID}
                 components={componentOverwrites}
                 isClearable={true}
                 isDisabled={disabled}
                 options={options}
                 classNamePrefix={this.prefix}
                 className={classNames(this.prefix, className)}
-                styles={{}}
                 placeholder={this.props.placeholder}
                 aria-label={t("Search")}
                 escapeClearsValue={true}
-                inputId={this.searchInputID}
                 pageSize={20}
                 theme={getTheme}
-                onChange={this.handleOnChange}
-                onInputChange={this.handleInputChange}
+                styles={customStyles}
             />
         );
     }

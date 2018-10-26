@@ -20,4 +20,39 @@ $suggestedTextInput-option_padding: 12px;
 .suggestedTextInput-option {
     width: 100%;
     padding: $suggestedTextInput-option_padding;
+    text-align: left;
+
+    &:hover,
+    &:focus {
+        background-color: $state-hover_color;
+    }
 }
+
+.suggestedTextInput-menu {
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+    border-bottom-right-radius: $global_borderRadius;
+    border-bottom-left-radius: $global_borderRadius;
+
+    margin: {
+        top: -$formElement_borderWidth;
+        bottom: -$formElement_borderWidth;
+    }
+}
+
+.suggestedTextInput-item {
+    + .suggestedTextInput-item {
+        border-top: {
+            style: solid;
+            width: 1px;
+            color: $global-border_color;
+        }
+    }
+}
+
+//.suggestedTextInput-selectContainer {
+//    .suggestedTextInput-menu {
+//
+//    }
+//}
+//dropDown-contents

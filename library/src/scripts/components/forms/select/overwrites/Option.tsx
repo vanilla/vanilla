@@ -7,14 +7,18 @@
 import * as React from "react";
 import classNames from "classnames";
 import DateTime from "@library/components/DateTime";
-import { t } from "@library/application";
 import LocationBreadcrumbs from "@knowledge/modules/locationPicker/components/LocationBreadcrumbs";
-import { IKbCategoryFragment } from "@knowledge/@types/api";
 
 export default function Option(props: any) {
-    console.log("option props; ", props);
-    const { data } = props;
+    const { data, innerProps, isFocused } = props;
     const { dateUpdated, locationData } = data;
+    const hasLocationData = locationData && locationData.length > 0;
+
+    const handleClick = e => {
+        e.preventDefault();
+        props.innerProps.onClick();
+        console.log("props: ", props);
+    };
 
     return (
         <li className={classNames(`${props.prefix}-item`, "suggestedTextInput-item")}>
@@ -23,22 +27,26 @@ export default function Option(props: any) {
                 title={props.children}
                 aria-label={props.children}
                 className="suggestedTextInput-option"
+                onClick={handleClick}
             >
                 <span className="suggestedTextInput-head">
                     <span className="suggestedTextInput-title">{props.children}</span>
                 </span>
-                <span className="suggestedTextInput-main">
-                    <span className="metas">
-                        <span className="meta">
-                            <DateTime className="meta" timestamp={dateUpdated} />
+                {dateUpdated &&
+                    hasLocationData && (
+                        <span className="suggestedTextInput-main">
+                            <span className="metas">
+                                {dateUpdated && (
+                                    <span className="meta">
+                                        <DateTime className="meta" timestamp={dateUpdated} />
+                                    </span>
+                                )}
+                                {hasLocationData && (
+                                    <span className="meta">{LocationBreadcrumbs.renderString(locationData)}</span>
+                                )}
+                            </span>
                         </span>
-                        <span className="meta">{t("location")}</span>
-                        {locationData &&
-                            locationData.length > 0 && (
-                                <span className="meta">{LocationBreadcrumbs.renderString(locationData)}</span>
-                            )}
-                    </span>
-                </span>
+                    )}
             </button>
         </li>
     );

@@ -20,20 +20,6 @@ interface IProps extends ITabProps {
  */
 // export default class RadioButtonTab extends React.Component<IRadioButtonTab> {
 class RadioButtonTab extends React.Component<IProps> {
-    private onClick = event => {
-        this.props.setData(this.props.data);
-    };
-
-    private onKeyDown = event => {
-        switch (event.key) {
-            case "Enter":
-            case "Spacebar":
-            case " ":
-                this.props.setData(this.props.data);
-                break;
-        }
-    };
-
     public render() {
         return (
             <label className={classNames("radioButtonsAsTabs-tab", this.props.childClass, this.props.className)}>
@@ -51,8 +37,18 @@ class RadioButtonTab extends React.Component<IProps> {
         );
     }
 
-    private onClick = e => {
+    private onClick = event => {
         this.props.setData(this.props.data);
+    };
+
+    private onKeyDown = event => {
+        switch (event.key) {
+            case "Enter":
+            case "Spacebar":
+            case " ":
+                this.props.setData(this.props.data);
+                break;
+        }
     };
 }
 

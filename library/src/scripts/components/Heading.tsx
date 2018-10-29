@@ -19,7 +19,7 @@ export interface IStringTitle extends ICommonHeadingProps {
 }
 
 export interface IComponentTitle extends ICommonHeadingProps {
-    children: JSX.Element | string;
+    children: React.ReactNode;
 }
 
 export type IHeadingProps = IStringTitle | IComponentTitle;

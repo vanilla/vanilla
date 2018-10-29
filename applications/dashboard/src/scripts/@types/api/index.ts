@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 
-export * from "@dashboard/@types/api/user";
 export * from "@dashboard/@types/api/authenticate";
 export * from "@dashboard/@types/api/comment";
 export * from "@dashboard/@types/api/discussion";

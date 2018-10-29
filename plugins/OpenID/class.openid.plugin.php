@@ -213,7 +213,6 @@ class OpenIDPlugin extends Gdn_Plugin {
             case 'id_res':
                 if ($OpenID->validate()) {
                     $Attributes = $OpenID->getAttributes();
-                    print_r($_GET);
                 }
 
                 break;

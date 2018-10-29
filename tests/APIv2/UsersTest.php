@@ -191,6 +191,7 @@ class UsersTest extends AbstractResourceTest {
             "name" => "Guest",
             "photoUrl" => \UserModel::getDefaultAvatarUrl(),
             "dateLastActive" => null,
+            "isAdmin" => false,
             "permissions" => [
                 "activity.view",
                 "discussions.view",
@@ -220,6 +221,7 @@ class UsersTest extends AbstractResourceTest {
             "name" => $user["Name"],
             "photoUrl" => userPhotoUrl($user),
             "dateLastActive" => $dateLastActive,
+            "isAdmin" => true,
             "permissions" => [
                 "activity.delete",
                 "activity.view",

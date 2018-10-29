@@ -56,13 +56,13 @@ function loadUsers(username: string) {
         if (exactLookup != null) {
             switch (exactLookup.status) {
                 case LoadStatus.SUCCESS:
-                    return dispatch(actions.loadUsersSuccess(username, exactLookup.data));
+                    return dispatch(actions.loadUsersSuccess(username, exactLookup.data!));
                 case LoadStatus.LOADING:
                     // Already handled
                     return;
                 case LoadStatus.ERROR:
                     // Previously failed.
-                    dispatch(actions.loadUsersFailure(username, exactLookup.error));
+                    dispatch(actions.loadUsersFailure(username, exactLookup.error!));
                     return;
             }
         }
@@ -72,11 +72,11 @@ function loadUsers(username: string) {
         if (partialLookup != null) {
             switch (partialLookup.status) {
                 case LoadStatus.SUCCESS: {
-                    if (partialLookup.data.length < USER_LIMIT) {
+                    if (partialLookup.data!.length < USER_LIMIT) {
                         // The previous match already found the maximum amount of users that the server had
                         // Return the previous results.
                         return dispatch(
-                            actions.loadUsersSuccess(username, filterSuggestions(partialLookup.data, username)),
+                            actions.loadUsersSuccess(username, filterSuggestions(partialLookup.data!, username)),
                         );
                     }
                 }

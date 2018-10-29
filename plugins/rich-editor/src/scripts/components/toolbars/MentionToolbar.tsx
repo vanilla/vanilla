@@ -85,7 +85,11 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         const suggestions = this.props.suggestions;
         if (suggestions) {
             const isLoading = suggestions && suggestions.status === LoadStatus.LOADING;
-            const isSuccess = suggestions && suggestions.status === LoadStatus.SUCCESS && suggestions.data.length > 0;
+            const isSuccess =
+                suggestions &&
+                suggestions.status === LoadStatus.SUCCESS &&
+                suggestions.data &&
+                suggestions.data.length > 0;
 
             if (mentionSelection && (isLoading || isSuccess)) {
                 if (!this.state.autoCompleteBlot) {
@@ -111,7 +115,8 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
 
     public render() {
         const { suggestions, lastSuccessfulUsername, showLoader, activeSuggestionID } = this.props;
-        const data = suggestions && suggestions.status === LoadStatus.SUCCESS ? suggestions.data : [];
+        const data =
+            suggestions && suggestions.status === LoadStatus.SUCCESS && suggestions.data ? suggestions.data : [];
 
         return (
             <MentionSuggestionList
@@ -175,7 +180,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         const { mentionSelection } = this.props.instanceState;
         const inActiveMention = mentionSelection !== null;
 
-        if (!suggestions || suggestions.status !== LoadStatus.SUCCESS) {
+        if (!suggestions || suggestions.status !== LoadStatus.SUCCESS || !suggestions.data) {
             return;
         }
 
@@ -195,7 +200,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             const currentItemIsLoader = activeSuggestionID === this.loaderID;
 
             const getIDFromIndex = (newIndex: number) => {
-                return showLoader && newIndex === lastIndex ? this.loaderID : suggestions.data[newIndex].domID;
+                return showLoader && newIndex === lastIndex ? this.loaderID : suggestions.data![newIndex].domID;
             };
 
             switch (true) {
@@ -298,7 +303,8 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             !(autoCompleteBlot instanceof MentionAutoCompleteBlot) ||
             this.isConvertingMention ||
             !suggestions ||
-            suggestions.status !== LoadStatus.SUCCESS
+            suggestions.status !== LoadStatus.SUCCESS ||
+            !suggestions.data
         ) {
             return;
         }
@@ -339,7 +345,8 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             this.MENTION_COMPLETION_CHARACTERS.includes(lastOperation.insert)
         ) {
             const { suggestions } = this.props;
-            const users = suggestions && suggestions.status === LoadStatus.SUCCESS ? suggestions.data : [];
+            const users =
+                suggestions && suggestions.status === LoadStatus.SUCCESS && suggestions.data ? suggestions.data : [];
 
             const isASingleExactMatch = users.length === 1 && this.props.lastSuccessfulUsername === users[0].name;
             // Autocomplete the mention if certain conditions occur.

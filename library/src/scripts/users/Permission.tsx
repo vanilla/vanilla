@@ -51,6 +51,7 @@ export class Permission extends React.Component<IProps> {
 
         return (
             currentUser.status === LoadStatus.SUCCESS &&
+            !!currentUser.data &&
             (currentUser.data.isAdmin || this.arrayContainsOneOf(lookupPermissions, currentUser.data.permissions))
         );
     }

@@ -13,7 +13,7 @@ import { t } from "@library/application";
 import Button from "@library/components/forms/Button";
 import Heading from "@library/components/Heading";
 import { clearIndicator } from "@library/components/forms/select/overwrites/clearIndicator";
-import MenuOption from "@library/components/forms/select/overwrites/menuOption";
+import SearchResultOption from "@library/components/forms/select/overwrites/SearchResultOption";
 import menuList from "@library/components/forms/select/overwrites/menuList";
 import menu from "@library/components/forms/select/overwrites/menu";
 import selectContainer from "@library/components/forms/select/overwrites/selectContainer";
@@ -26,7 +26,7 @@ export interface IComboBoxOption {
 }
 
 interface IProps extends IOptionalComponentID {
-    query: string;
+    query?: string;
     disabled?: boolean;
     className?: string;
     placeholder: string;
@@ -79,7 +79,7 @@ export default class BigSearch extends React.Component<IProps> {
             SelectContainer: selectContainer,
             Menu: menu,
             MenuList: menuList,
-            Option: MenuOption,
+            Option: SearchResultOption,
         };
 
         const getTheme = theme => {

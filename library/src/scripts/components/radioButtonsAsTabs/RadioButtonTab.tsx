@@ -16,33 +16,13 @@ interface IRadioButtonTab {
     data: any;
 }
 
-interface IState {
-    checked: boolean;
-}
-
 /**
  * Implement what looks like a tab, but what is semantically radio button. To be used in the RadioButtonsAsTabs component
  */
 // export default class RadioButtonTab extends React.Component<IRadioButtonTab> {
 export default class RadioButtonTab extends React.Component<IRadioButtonTab> {
-    // public render() {
-
-    public static defaultProps = {
-        checked: false,
-    };
-
-    public constructor(props) {
-        super(props);
-        this.state = {
-            checked: this.props.checked,
-        };
-    }
-
     private onClick = e => {
         this.props.setData(this.props.data);
-        this.setState({
-            checked: true,
-        });
     };
 
     //{groupID: string, setData: (data: any) => void, selectedTab: ISearchDomain}

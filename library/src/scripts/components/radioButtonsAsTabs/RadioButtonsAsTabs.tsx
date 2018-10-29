@@ -14,7 +14,7 @@ import { t } from "@library/application";
 interface IProps {
     prefix: string;
     accessibleTitle: string; // Describe what these buttons represent. Hidden from view, for screen readers
-    children: ReactNode;
+    // children: ReactNode; // Remove
     selectedTab: ISearchDomain;
     className?: string;
     setData: (data: any) => void;

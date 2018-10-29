@@ -26,3 +26,8 @@ export const TS_LINT_FILE = resolve(VANILLA_ROOT, "tslint.json");
 export const BOOTSTRAP_SOURCE_FILE = resolve(VANILLA_ROOT, "library/src/scripts/bootstrap.ts");
 export const POLYFILL_SOURCE_FILE = resolve(VANILLA_ROOT, "build/entries/polyfills.ts");
 export const PUBLIC_PATH_SOURCE_FILE = resolve(VANILLA_ROOT, "build/entries/public-path.ts");
+
+// Tests
+export const TEST_FILE_ROOTS = process.env.TEST_FILE_ROOTS
+    ? process.env.TEST_FILE_ROOTS.split(",")
+    : ["library", "applications/*", "plugins/*"];

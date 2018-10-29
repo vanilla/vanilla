@@ -41,9 +41,6 @@ export default class WrapperBlot extends Container {
         return domNode;
     }
 
-    /** @type {Node} */
-    public domNode;
-
     /**
      * Join the children elements together where possible.
      *

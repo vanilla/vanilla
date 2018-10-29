@@ -21,7 +21,7 @@ export interface IUserAuthenticator {
     sso?: any;
 }
 
-export const enum AuthenticationStep {
+export enum AuthenticationStep {
     AUTHENTICATED = "authenticated",
     LINK_USER = "linkUser",
 }

@@ -62,7 +62,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
             <label className={componentClasses}>
                 <span id={this.labelID} className="inputBlock-labelAndDescription">
                     <span className="inputBlock-labelText">{this.props.label}</span>
-                    <Paragraph id={false} className="inputBlock-labelNote" children={this.props.labelNote} />
+                    <Paragraph className="inputBlock-labelNote" children={this.props.labelNote} />
                 </span>
 
                 <span className="inputBlock-inputWrap">

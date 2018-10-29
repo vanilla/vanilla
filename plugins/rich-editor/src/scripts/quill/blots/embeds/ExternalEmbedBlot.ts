@@ -182,7 +182,7 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
                     loaderData: value.loaderData,
                 };
 
-                const loader = this.domNode.querySelector(".embedLinkLoader");
+                const loader = (this.domNode as Element).querySelector(".embedLinkLoader");
                 const embedElement = ExternalEmbedBlot.createEmbedFromData(data, loader);
                 setData(embedElement, DATA_KEY, newValue);
                 finalBlot = new ExternalEmbedBlot(embedElement, newValue, false);

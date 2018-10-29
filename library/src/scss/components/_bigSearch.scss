@@ -1,0 +1,77 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$bigSearch-search_minWidth: 109px;
+
+.bigSearch-clear {
+    position: relative;
+    color: inherit;
+    display: flex;
+    box-sizing: border-box;
+    height: $formElement-height;
+    width: $formElement-height;
+}
+
+.bigSearch-form {
+    display: block;
+}
+
+.bigSearch-content {
+    display: flex;
+}
+
+.bigSearch-inputWrap {
+    flex-grow: 1;
+}
+
+.heading.bigSearch-heading {
+    margin-bottom: $global_spacer;
+}
+
+
+// Classes from react-select
+
+.bigSearch__placeholder {
+    color: $formElement-placeholderColor;
+}
+
+
+.bigSearch-content { // For specificity
+    .bigSearch-submitButton {
+        position: relative;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        margin-left: -1px;
+        min-width: $bigSearch-search_minWidth;
+        flex-basis: $bigSearch-search_minWidth;
+
+        &:hover,
+        &:focus {
+            z-index: 1;
+        }
+    }
+
+    .bigSearch__control {
+        border: 0;
+        background-color: transparent;
+
+
+        &.bigSearch__control--is-focused {
+            box-shadow: none;
+
+
+            .inputText {
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+                border-color: $button-basic_focus_border;
+            }
+        }
+    }
+
+    .bigSearch__value-container {
+        overflow: auto;
+    }
+}

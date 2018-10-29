@@ -12,6 +12,8 @@
  * @abstract
  */
 
+use \Vanilla\Web\Assets\LegacyAssetModel;
+
 /**
  * Controller base class.
  *
@@ -1807,15 +1809,15 @@ class Gdn_Controller extends Gdn_Pluggable {
             // Only get css & ui Components if this is NOT a syndication request
             if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
 
-                $CssAnchors = AssetModel::getAnchors();
+                $CssAnchors = LegacyAssetModel::getAnchors();
 
                 $this->EventArguments['CssFiles'] = &$this->_CssFiles;
                 $this->fireEvent('BeforeAddCss');
 
-                $ETag = AssetModel::eTag();
+                $ETag = LegacyAssetModel::eTag();
                 $ThemeType = isMobile() ? 'mobile' : 'desktop';
-                /* @var \AssetModel $AssetModel */
-                $AssetModel = Gdn::getContainer()->get(\AssetModel::class);
+                /* @var LegacyAssetModel $AssetModel */
+                $AssetModel = Gdn::getContainer()->get(LegacyAssetModel::class);
 
                 // And now search for/add all css files.
                 foreach ($this->_CssFiles as $CssInfo) {
@@ -1837,7 +1839,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                     $AppFolder = $CssInfo['AppFolder'];
                     $LookupFolder = !empty($AppFolder) ? $AppFolder : $this->ApplicationFolder;
-                    $Search = AssetModel::cssPath($CssFile, $LookupFolder, $ThemeType);
+                    $Search = LegacyAssetModel::cssPath($CssFile, $LookupFolder, $ThemeType);
                     if (!$Search) {
                         continue;
                     }
@@ -1905,7 +1907,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                     $AppFolder = $JsInfo['AppFolder'];
                     $LookupFolder = !empty($AppFolder) ? $AppFolder : $this->ApplicationFolder;
-                    $Search = AssetModel::jsPath($JsFile, $LookupFolder, $ThemeType);
+                    $Search = LegacyAssetModel::jsPath($JsFile, $LookupFolder, $ThemeType);
                     if (!$Search) {
                         continue;
                     }

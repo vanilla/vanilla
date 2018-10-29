@@ -232,7 +232,7 @@ class LegacyAssetModel extends Gdn_Model {
      * @return string
      */
     public function getInlinePolyfillJSContent(): string {
-        $polyfillFileUrl = asset("/js/webpack/polyfills.min.js?h=".$this->cacheBuster());
+        $polyfillFileUrl = asset("/dist/polyfills.min.js?h=".$this->cacheBuster());
 
         $debug = c("Debug", false);
         $logAdding = $debug ? "console.log('Older browser detected. Initiating polyfills.');" : "";
@@ -316,7 +316,7 @@ class LegacyAssetModel extends Gdn_Model {
             $filename = "/{$filename}";
             $path = PATH_ROOT.$filename;
             if (file_exists($path)) {
-                deprecated(htmlspecialchars($path).": AssetModel::CssPath() with direct paths");
+                deprecated(htmlspecialchars($path).": LegacyAssetModel::CssPath() with direct paths");
                 return [$path, $filename];
             }
             return false;
@@ -408,7 +408,7 @@ class LegacyAssetModel extends Gdn_Model {
             $filename = "/{$filename}";
             $path = PATH_ROOT.$filename;
             if (file_exists($path)) {
-                deprecated(htmlspecialchars($path).": AssetModel::JsPath() with direct paths");
+                deprecated(htmlspecialchars($path).": LegacyAssetModel::JsPath() with direct paths");
                 return [$path, $filename];
             }
             return false;
@@ -590,7 +590,7 @@ class LegacyAssetModel extends Gdn_Model {
      * @deprecated
      */
     public static function viewHandlers() {
-        deprecated('AssetModel::viewHandlers()');
+        deprecated('LegacyAssetModel::viewHandlers()');
 
         $exts = static::viewExtensions();
         $result = [];

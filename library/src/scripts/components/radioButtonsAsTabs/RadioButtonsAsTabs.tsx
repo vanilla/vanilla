@@ -6,7 +6,7 @@
 
 import React from "react";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
-import { classNames as className } from "react-select/lib/utils";
+import classNames from "classnames";
 import { ISearchDomain } from "@knowledge/modules/search/components/AdvancedSearch";
 import TabContext from "@library/contexts/TabContext";
 
@@ -17,6 +17,7 @@ interface IProps {
     setData: (data: any) => void;
     children: React.ReactNode;
     defaultTab: ISearchDomain;
+    childClass?: string;
 }
 
 /**
@@ -37,10 +38,11 @@ export default class RadioButtonsAsTabs extends React.Component<IProps> {
                     groupID: this.groupID,
                     setData: this.props.setData,
                     defaultTab: this.props.defaultTab,
+                    childClass: this.props.childClass || "",
                 }}
             >
                 <fieldset
-                    className={className(
+                    className={classNames(
                         "inputBlock radioButtonsAsTabs _searchBarAdvanced-searchIn",
                         this.props.className,
                     )}

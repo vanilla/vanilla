@@ -86,7 +86,7 @@ export default class BigSearch extends React.Component<IProps> {
             return {
                 ...theme,
                 borderRadius: {},
-                color: {},
+                colors: {},
                 spacing: {},
             };
         };

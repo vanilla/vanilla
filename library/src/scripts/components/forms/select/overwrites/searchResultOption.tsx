@@ -14,7 +14,7 @@ import BreadCrumbString from "@library/components/BreadCrumbString";
  * Note that this is NOT a true react component and gets called within the react select plugin
  * @param props
  */
-export default function SelectOption(props: any) {
+export default function searchResultOption(props: any) {
     const { data, innerProps, isFocused } = props;
     const { dateUpdated, locationData } = data;
     const hasLocationData = locationData && locationData.length > 0;
@@ -36,6 +36,21 @@ export default function SelectOption(props: any) {
                 <span className="suggestedTextInput-head">
                     <span className="suggestedTextInput-title">{props.children}</span>
                 </span>
+                {dateUpdated &&
+                    hasLocationData && (
+                        <span className="suggestedTextInput-main">
+                            <span className="metas isFlexed">
+                                {dateUpdated && (
+                                    <span className="meta">
+                                        <DateTime className="meta" timestamp={dateUpdated} />
+                                    </span>
+                                )}
+                                {hasLocationData && (
+                                    <BreadCrumbString className="meta">{locationData}</BreadCrumbString>
+                                )}
+                            </span>
+                        </span>
+                    )}
             </button>
         </li>
     );

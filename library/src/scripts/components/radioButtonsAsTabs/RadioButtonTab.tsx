@@ -22,7 +22,7 @@ interface IProps extends ITabProps {
 class RadioButtonTab extends React.Component<IProps> {
     public render() {
         return (
-            <label className={classNames("radioButtonsAsTabs-tab", this.props.className)}>
+            <label className={classNames("radioButtonsAsTabs-tab", this.props.childClass, this.props.className)}>
                 <input
                     className="radioButtonsAsTabs-input sr-only"
                     type="radio"

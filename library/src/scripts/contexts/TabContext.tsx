@@ -11,6 +11,7 @@ export interface ITabProps {
     setData: (data: any) => void;
     groupID: string;
     defaultTab: any;
+    childClass: string;
 }
 
 const TabContext = React.createContext<ITabProps>({} as any);

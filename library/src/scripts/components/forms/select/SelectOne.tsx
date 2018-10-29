@@ -18,6 +18,8 @@ import { IComboBoxOption } from "./BigSearch";
 import SelectOption from "@library/components/forms/select/overwrites/SelectOption";
 import { IFieldError } from "@library/@types/api";
 import ErrorMessages from "@dashboard/components/forms/ErrorMessages";
+import valueContainer from "@library/components/forms/select/overwrites/valueContainer";
+import controlContainer from "@library/components/forms/select/overwrites/controlContainer";
 
 interface IProps extends IOptionalComponentID {
     label: string;
@@ -62,13 +64,16 @@ export default class SelectOne extends React.Component<IProps> {
             Menu: menu,
             MenuList: menuList,
             Option: SelectOption,
+            ValueContainer: valueContainer,
+            Control: controlContainer,
         };
 
         const getTheme = theme => {
             return {
                 ...theme,
                 borderRadius: {},
-                color: {},
+                borderWidth: 0,
+                colors: {},
                 spacing: {},
             };
         };
@@ -78,6 +83,9 @@ export default class SelectOne extends React.Component<IProps> {
             menu: base => {
                 return { ...base, backgroundColor: null, boxShadow: null };
             },
+            control: () => ({
+                borderWidth: 0,
+            }),
         };
 
         let describedBy;

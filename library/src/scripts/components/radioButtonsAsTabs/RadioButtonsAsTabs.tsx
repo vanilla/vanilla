@@ -7,7 +7,6 @@
 import React from "react";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import classNames from "classnames";
-import { ISearchDomain } from "@knowledge/modules/search/components/AdvancedSearch";
 import TabContext from "@library/contexts/TabContext";
 
 interface IProps {
@@ -16,7 +15,7 @@ interface IProps {
     className?: string;
     setData: (data: any) => void;
     children: React.ReactNode;
-    defaultTab: ISearchDomain;
+    defaultTab: any;
     childClass?: string;
 }
 

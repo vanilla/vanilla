@@ -10,6 +10,11 @@ import { IFieldError } from "@library/@types/api";
 import Paragraph from "@library/components/Paragraph";
 import ErrorMessages from "@dashboard/components/forms/ErrorMessages";
 
+export enum InputTextBlockBaseClass {
+    STANDARD = "inputBlock",
+    CUSTOM = "",
+}
+
 export interface IInputTextProps extends IOptionalComponentID {
     className?: string;
     label: ReactNode;
@@ -28,6 +33,7 @@ export interface IInputTextProps extends IOptionalComponentID {
     required?: boolean;
     errors?: IFieldError[];
     disabled?: boolean;
+    baseClass?: InputTextBlockBaseClass;
 }
 
 interface IState {
@@ -39,6 +45,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
         disabled: false,
         type: "text",
         errors: [],
+        baseClass: InputTextBlockBaseClass.STANDARD,
     };
 
     private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
@@ -51,7 +58,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
     }
 
     public render() {
-        const componentClasses = classNames("inputBlock", this.props.className);
+        const componentClasses = classNames(this.props.baseClass, this.props.className);
         const inputClasses = classNames("inputBlock-inputText", "InputBox", "inputText", this.props.inputClassNames);
         const hasErrors = !!this.props.errors && this.props.errors.length > 0;
 

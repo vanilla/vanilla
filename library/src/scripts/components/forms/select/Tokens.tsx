@@ -16,8 +16,10 @@ import doNotRender from "@library/components/forms/select/overwrites/doNotRender
 import Paragraph from "@library/components/Paragraph";
 import { IComboBoxOption } from "./BigSearch";
 import selectOption from "@library/components/forms/select/overwrites/SelectOption";
-import valueContainer from "@library/components/forms/select/overwrites/valueContainer";
-import controlContainer from "@library/components/forms/select/overwrites/controlContainer";
+import valueContainerTokens from "@library/components/forms/select/overwrites/valueContainerTokens";
+import multiValueContainer from "./overwrites/multiValueContainer";
+import multiValueLabel from "./overwrites/multiValueLabel";
+import multiValueRemove from "./overwrites/multiValueRemove";
 
 interface IProps extends IOptionalComponentID {
     label: string;
@@ -59,8 +61,11 @@ export default class Tokens extends React.Component<IProps> {
             Menu: menu,
             MenuList: menuList,
             Option: selectOption,
-            ValueContainer: valueContainer,
-            Control: controlContainer,
+            ValueContainer: valueContainerTokens,
+            Control: multiValueContainer,
+            MultiValueContainer: multiValueContainer,
+            MultiValueLabel: multiValueLabel,
+            MultiValueRemove: multiValueRemove,
         };
 
         const getTheme = theme => {
@@ -80,10 +85,16 @@ export default class Tokens extends React.Component<IProps> {
             control: () => ({
                 borderWidth: 0,
             }),
+            multiValue: base => {
+                return { ...base, borderRadius: null };
+            },
+            multiValueLabel: base => {
+                return { ...base, borderRadius: null };
+            },
         };
 
         return (
-            <div className={this.props.className}>
+            <div className={classNames("tokens", "inputBlock", this.props.className)}>
                 <label htmlFor={this.inputID} className="inputBlock-labelAndDescription">
                     <span className="inputBlock-labelText">{this.props.label}</span>
                     <Paragraph className="inputBlock-labelNote" children={this.props.labelNote} />

@@ -4,3 +4,29 @@
  * @license GPL-2.0-only
  */
 
+
+$tokens-token_fontSize: $metaText_fontSize;
+$tokens-token_bg: mix($global-color_fg, $global-color_bg, 20%);
+
+.tokensContainer {
+    min-height: $formElement_height;
+    padding: 0 $utility-baseUnit;
+
+    &.tokens__value-container--has-value {
+        padding: $utility-baseUnit / 2;
+    }
+}
+
+.tokens__multi-value {
+    font-size: $tokens-token_fontSize;
+    padding: {
+        left: $utility-baseUnit;
+        right: 2px;
+    };
+    margin: $utility-baseUnit / 2;
+    background-color: $tokens-token_bg;
+}
+
+.tokens__multi-value {
+    user-select: none;
+}

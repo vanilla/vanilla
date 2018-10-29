@@ -113,8 +113,8 @@ class IpEncodeDecodeTest extends SharedBootstrapTestCase {
      *
      * @return array
      */
-   public function provideObjects() {
-     return [
+    public function provideObjects() {
+        return [
            'junk' => [
                (object) ['a', 'b', 'c'],
                (object) ['a', 'b', 'c'],
@@ -135,8 +135,8 @@ class IpEncodeDecodeTest extends SharedBootstrapTestCase {
                (object) ['SomeIPAddress' => ['SomeIPAddress' => '12.13.14.15'], 'SomethingElse' => ['SomethingElse' => '255.255.255.255']],
                (object) ['SomeIPAddress' => ['SomeIPAddress' => ipencode('12.13.14.15')], 'SomethingElse' => ['SomethingElse' => '255.255.255.255']]
            ]
-       ];
-   }
+        ];
+    }
     /**
      * Test decoding IPs in an object.
      *

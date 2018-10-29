@@ -13,7 +13,7 @@ import { t } from "@library/application";
 import Button from "@library/components/forms/Button";
 import Heading from "@library/components/Heading";
 import { clearIndicator } from "@library/components/forms/select/overwrites/clearIndicator";
-import SearchResultOption from "@library/components/forms/select/overwrites/SearchResultOption";
+import SearchResultOption from "@library/components/forms/select/overwrites/searchResultOption";
 import menuList from "@library/components/forms/select/overwrites/menuList";
 import menu from "@library/components/forms/select/overwrites/menu";
 import selectContainer from "@library/components/forms/select/overwrites/selectContainer";

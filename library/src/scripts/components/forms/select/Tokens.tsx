@@ -15,7 +15,7 @@ import selectContainer from "@library/components/forms/select/overwrites/selectC
 import doNotRender from "@library/components/forms/select/overwrites/doNotRender";
 import Paragraph from "@library/components/Paragraph";
 import { IComboBoxOption } from "./BigSearch";
-import selectOption from "@library/components/forms/select/overwrites/SelectOption";
+import selectOption from "@library/components/forms/select/overwrites/selectOption";
 import valueContainerTokens from "@library/components/forms/select/overwrites/valueContainerTokens";
 import multiValueContainer from "./overwrites/multiValueContainer";
 import multiValueLabel from "./overwrites/multiValueLabel";
@@ -47,8 +47,7 @@ export default class Tokens extends React.Component<IProps> {
     }
 
     private handleOnChange = (newValue: any, actionMeta: any) => {
-        console.log("New value: ", newValue);
-        // this.props.setAuthor(newValue);
+        this.props.setAuthor(newValue);
     };
 
     public render() {

@@ -15,7 +15,7 @@ import selectContainer from "@library/components/forms/select/overwrites/selectC
 import doNotRender from "@library/components/forms/select/overwrites/doNotRender";
 import Paragraph from "@library/components/Paragraph";
 import { IComboBoxOption } from "./BigSearch";
-import SelectOption from "@library/components/forms/select/overwrites/SelectOption";
+import SelectOption from "@library/components/forms/select/overwrites/selectOption";
 import { IFieldError } from "@library/@types/api";
 import ErrorMessages from "@dashboard/components/forms/ErrorMessages";
 import valueContainer from "@library/components/forms/select/overwrites/valueContainer";

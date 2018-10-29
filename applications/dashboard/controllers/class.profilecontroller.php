@@ -393,9 +393,15 @@ class ProfileController extends Gdn_Controller {
 
         $this->fireEvent('BeforeEdit');
 
-        // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack(true)) {
-            $this->reauth();
+            // If we're changing the email address, militarize our reauth with no cooldown allowed.
+            $authOptions = [];
+            $submittedEmail = $this->Form->getFormValue('Email', null);
+            if ($submittedEmail !== null && $canEditEmail && $user['Email'] !== $submittedEmail) {
+                $authOptions['ForceTimeout'] = true;
+            }
+
+            $this->reauth($authOptions);
 
             $this->Form->setFormValue('UserID', $userID);
 

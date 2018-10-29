@@ -6,7 +6,7 @@
 
 
 $tokens-token_fontSize: $metaText_fontSize;
-$tokens-token_bg: mix($global-color_fg, $global-color_bg, 20%);
+$tokens-token_bg: mix($global-color_fg, $global-color_bg, 15%);
 
 .tokensContainer {
     min-height: $formElement_height;
@@ -19,6 +19,8 @@ $tokens-token_bg: mix($global-color_fg, $global-color_bg, 20%);
 
 .tokens__multi-value {
     font-size: $tokens-token_fontSize;
+    font-weight: $global-bold_fontWeight;
+    text-shadow: $global-color_bg 0 0 1px;
     padding: {
         left: $utility-baseUnit;
         right: 2px;

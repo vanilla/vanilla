@@ -55,8 +55,14 @@ class Gdn_Auth extends Gdn_Pluggable {
         if (!c('Garden.Installed', false)) {
             return;
         }
+
+        $this->authHandled = false;
+        $this->fireEvent('startAuthenticator');
+
         // Start the 'session'
-        Gdn::session()->start(false, false);
+        if ($this->authHandled === false) {
+            Gdn::session()->start(false, false);
+        }
 
         // Get list of enabled authenticators
         $authenticationSchemes = Gdn::config('Garden.Authenticator.EnabledSchemes', []);
@@ -72,6 +78,7 @@ class Gdn_Auth extends Gdn_Pluggable {
         if (Gdn::session()->isValid() && !Gdn::session()->checkPermission('Garden.SignIn.Allow')) {
             return Gdn::authenticator()->authenticateWith('user')->deauthenticate();
         }
+
     }
 
     public function registerAuthenticator($AuthenticationSchemeAlias) {

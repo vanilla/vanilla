@@ -624,7 +624,7 @@ class DashboardHooks extends Gdn_Plugin {
     public function gdn_dispatcher_appStartup_handler($sender) {
         safeHeader('P3P: CP="CAO PSA OUR"', true);
 
-        if ($sSO = Gdn::request()->get('sso')) {
+        if ($sso = Gdn::request()->get('sso')) {
             saveToConfig('Garden.Registration.SendConnectEmail', false, false);
 
             $deliveryMethod = $sender->getDeliveryMethod(Gdn::request());
@@ -633,7 +633,7 @@ class DashboardHooks extends Gdn_Plugin {
             $userID = false;
             try {
                 $currentUserID = Gdn::session()->UserID;
-                $userID = Gdn::userModel()->sso($sSO);
+                $userID = Gdn::userModel()->sso($sso);
             } catch (Exception $ex) {
                 trace($ex, TRACE_ERROR);
             }
@@ -663,7 +663,13 @@ class DashboardHooks extends Gdn_Plugin {
                 redirectTo($url);
             }
         }
+    }
+
+    public function gdn_auth_startAuthenticator_handler($sender) {
         $this->checkAccessToken();
+        if (Gdn::session()->isValid()) {
+            $sender->authHandled = true;
+        }
     }
 
     /**

@@ -12,8 +12,12 @@ import { components } from "react-select";
  * Note that this is NOT a true react component and gets called within the react select plugin
  * @param props
  */
-export default function noOptionsMessage (props) {
+export default function noOptionsMessage(props) {
     return (
-        <components.NoOptionsMessage {...props} style={{}} className={`${props.prefix}-noOptions suggestedTextInput-noOptions`} />
+        <components.NoOptionsMessage
+            {...props}
+            style={{}}
+            className={`${props.prefix}-noOptions suggestedTextInput-noOptions`}
+        />
     );
 }

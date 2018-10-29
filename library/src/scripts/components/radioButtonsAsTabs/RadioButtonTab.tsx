@@ -6,34 +6,28 @@
 
 import * as React from "react";
 import classNames from "classnames";
+import { ITabProps, withTabs } from "@library/contexts/TabContext";
 
-interface IRadioButtonTab {
-    groupID: string;
+interface IProps extends ITabProps {
     label: string;
-    checked?: boolean;
     className?: string;
-    setData: (data: any) => void;
     data: any;
+    defaultTab: any;
 }
 
 /**
  * Implement what looks like a tab, but what is semantically radio button. To be used in the RadioButtonsAsTabs component
  */
 // export default class RadioButtonTab extends React.Component<IRadioButtonTab> {
-export default class RadioButtonTab extends React.Component<IRadioButtonTab> {
-    private onClick = e => {
-        this.props.setData(this.props.data);
-    };
-
-    //{groupID: string, setData: (data: any) => void, selectedTab: ISearchDomain}
+class RadioButtonTab extends React.Component<IProps> {
     public render() {
         return (
             <label className={classNames("radioButtonsAsTabs-tab", this.props.className)}>
                 <input
                     className="radioButtonsAsTabs-input sr-only"
                     type="radio"
-                    onClick={this.onClick}
-                    checked={this.props.checked}
+                    onClick={this.props.setData}
+                    defaultChecked={this.props.defaultTab === this.props.data}
                     name={this.props.groupID}
                     value={this.props.label}
                 />
@@ -41,4 +35,10 @@ export default class RadioButtonTab extends React.Component<IRadioButtonTab> {
             </label>
         );
     }
+
+    private onClick = e => {
+        this.props.setData(this.props.data);
+    };
 }
+
+export default withTabs<IProps>(RadioButtonTab);

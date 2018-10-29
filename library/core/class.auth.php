@@ -78,7 +78,6 @@ class Gdn_Auth extends Gdn_Pluggable {
         if (Gdn::session()->isValid() && !Gdn::session()->checkPermission('Garden.SignIn.Allow')) {
             return Gdn::authenticator()->authenticateWith('user')->deauthenticate();
         }
-
     }
 
     public function registerAuthenticator($AuthenticationSchemeAlias) {

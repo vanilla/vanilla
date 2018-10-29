@@ -27,6 +27,7 @@ import { hot } from "react-hot-loader";
 import registerQuill from "@rich-editor/quill/registerQuill";
 import { uniqueId } from "lodash";
 import classNames from "classnames";
+import Permission from "@library/users/Permission";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -94,11 +95,12 @@ export class Editor extends React.Component<IProps> {
                         <li className="richEditor-menuItem u-richEditorHiddenOnMobile" role="menuitem">
                             <EmojiPopover disabled={this.props.isLoading} />
                         </li>
-                        {this.props.allowUpload && (
+                        <Permission permission="uploads.add">
                             <li className="richEditor-menuItem" role="menuitem">
                                 <UploadButton disabled={this.props.isLoading} />
                             </li>
-                        )}
+                        </Permission>
+
                         <li className="richEditor-menuItem" role="menuitem">
                             <EmbedPopover disabled={this.props.isLoading} />
                         </li>

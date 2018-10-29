@@ -14,7 +14,7 @@ export interface IInputTextProps extends IOptionalComponentID {
     className?: string;
     label: ReactNode;
     labelClassName?: string;
-    inputHelp?: string;
+    noteAfterInput?: string;
     value: string;
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     labelNote?: string;
@@ -86,7 +86,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
                         ref={this.inputRef}
                     />
                 </span>
-                <Paragraph className="inputBlock-labelNote" children={this.props.inputHelp} />
+                <Paragraph className="inputBlock-labelNote" children={this.props.noteAfterInput} />
                 <ErrorMessages id={this.errorID} errors={this.props.errors} />
             </label>
         );

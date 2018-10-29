@@ -6,27 +6,30 @@
 
 import * as React from "react";
 import Select from "react-select";
-import CreatableSelect from "react-select/lib/Creatable";
-import { uniqueIDFromPrefix, getRequiredID, IOptionalComponentID } from "@library/componentIDs";
+import { getRequiredID, IOptionalComponentID } from "@library/componentIDs";
 import classNames from "classnames";
 import { t } from "@library/application";
-import Button from "@library/components/forms/Button";
-import Heading from "@library/components/Heading";
-import { clearIndicator } from "@library/components/forms/select/overwrites/clearIndicator";
 import menuList from "@library/components/forms/select/overwrites/menuList";
 import menu from "@library/components/forms/select/overwrites/menu";
 import selectContainer from "@library/components/forms/select/overwrites/selectContainer";
 import doNotRender from "@library/components/forms/select/overwrites/doNotRender";
 import Paragraph from "@library/components/Paragraph";
 import { IComboBoxOption } from "./BigSearch";
-import SelectOption from "./overwrites/SelectOption";
+import SelectOption from "@library/components/forms/select/overwrites/SelectOption";
+import { IFieldError } from "@library/@types/api";
+import ErrorMessages from "@dashboard/components/forms/ErrorMessages";
 
 interface IProps extends IOptionalComponentID {
     label: string;
     disabled?: boolean;
     className?: string;
+    placeholder?: string;
     options: IComboBoxOption[];
-    setOption: (option: IComboBoxOption[]) => void;
+    setData: (data: any) => void;
+    labelNote?: string;
+    noteAfterInput?: string;
+    errors?: IFieldError[];
+    searchable?: boolean;
 }
 
 /**
@@ -34,25 +37,23 @@ interface IProps extends IOptionalComponentID {
  */
 export default class SelectOne extends React.Component<IProps> {
     private id: string;
-    private prefix = "selectOne";
+    private prefix = "SelectOne";
     private inputID: string;
+    private errorID: string;
 
     constructor(props: IProps) {
         super(props);
         this.id = getRequiredID(props, this.prefix);
-        // this.searchButtonID = this.id + "-searchButton";
-        this.inputID = this.id + "-selectOneInput";
+        this.inputID = this.id + "-input";
+        this.errorID = this.id + "-errors";
     }
 
-    /**
-     * Change handler for date within
-     */
     private handleOnChange = (newValue: any, actionMeta: any) => {
-        this.props.setOption(newValue);
+        this.props.setData(newValue);
     };
 
     public render() {
-        const { className, disabled, options } = this.props;
+        const { className, disabled, options, searchable } = this.props;
 
         /** The children to be rendered inside the indicator. */
         const componentOverwrites = {
@@ -79,29 +80,38 @@ export default class SelectOne extends React.Component<IProps> {
             },
         };
 
+        let describedBy;
+        const hasErrors = this.props.errors && this.props.errors!.length > 0;
+        if (hasErrors) {
+            describedBy = this.errorID;
+        }
+
         return (
             <div className={this.props.className}>
                 <label htmlFor={this.inputID} className="inputBlock-labelAndDescription">
-                    <span className="inputBlock-labelText">{this.props.label}</span>
+                    <span className={classNames("inputBlock-labelText", this.props.label)}>{this.props.label}</span>
+                    <Paragraph className="inputBlock-labelNote" children={this.props.labelNote} />
                 </label>
 
                 <div className="inputBlock-inputWrap">
                     <Select
                         id={this.id}
+                        options={options}
                         inputId={this.inputID}
                         components={componentOverwrites}
                         isClearable={true}
                         isDisabled={disabled}
-                        options={options}
                         classNamePrefix={this.prefix}
                         className={classNames(this.prefix, className)}
                         aria-label={this.props.label}
-                        escapeClearsValue={true}
-                        pageSize={20}
                         theme={getTheme}
                         styles={customStyles}
-                        backspaceRemovesValue={true}
+                        aria-invalid={hasErrors}
+                        aria-describedby={describedBy}
+                        isSearchable={searchable}
                     />
+                    <Paragraph className="inputBlock-labelNote" children={this.props.noteAfterInput} />
+                    <ErrorMessages id={this.errorID} errors={this.props.errors} />
                 </div>
             </div>
         );

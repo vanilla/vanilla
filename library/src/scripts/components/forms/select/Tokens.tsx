@@ -6,13 +6,9 @@
 
 import * as React from "react";
 import Select from "react-select";
-import CreatableSelect from "react-select/lib/Creatable";
-import { uniqueIDFromPrefix, getRequiredID, IOptionalComponentID } from "@library/componentIDs";
+import { getRequiredID, IOptionalComponentID } from "@library/componentIDs";
 import classNames from "classnames";
 import { t } from "@library/application";
-import Button from "@library/components/forms/Button";
-import Heading from "@library/components/Heading";
-import { clearIndicator } from "@library/components/forms/select/overwrites/clearIndicator";
 import menuList from "@library/components/forms/select/overwrites/menuList";
 import menu from "@library/components/forms/select/overwrites/menu";
 import selectContainer from "@library/components/forms/select/overwrites/selectContainer";

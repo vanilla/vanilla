@@ -18,7 +18,7 @@ $checkRadio-checkBox_barHeight              : 2px;
 $checkRadio-radioButton_iconWidth           : 6px;
 $checkRadio-checked_bg                      : $global-color_primary !default;
 
-$checkRadio-hover_borderColor               : $formElement_borderColor !default;
+$checkRadio-hover_borderColor               : $global-color_primary !default;
 $checkRadio-hover_bg                        : $state-hover_color !default;
 $checkRadio-hover_opacity                   : .8 !default;
 

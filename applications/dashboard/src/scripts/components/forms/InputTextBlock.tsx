@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { ReactNode } from "react";
 import classNames from "classnames";
 import { getRequiredID, IOptionalComponentID } from "@library/componentIDs";
 import { IFieldError } from "@library/@types/api";
@@ -12,7 +12,9 @@ import ErrorMessages from "@dashboard/components/forms/ErrorMessages";
 
 export interface IInputTextProps extends IOptionalComponentID {
     className?: string;
-    label: string;
+    label: ReactNode;
+    labelClassName?: string;
+    inputHelp?: string;
     value: string;
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     labelNote?: string;
@@ -61,7 +63,9 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
         return (
             <label className={componentClasses}>
                 <span id={this.labelID} className="inputBlock-labelAndDescription">
-                    <span className="inputBlock-labelText">{this.props.label}</span>
+                    <span className={classNames("inputBlock-labelText", this.props.labelClassName)}>
+                        {this.props.label}
+                    </span>
                     <Paragraph className="inputBlock-labelNote" children={this.props.labelNote} />
                 </span>
 
@@ -82,6 +86,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
                         ref={this.inputRef}
                     />
                 </span>
+                <Paragraph className="inputBlock-labelNote" children={this.props.inputHelp} />
                 <ErrorMessages id={this.errorID} errors={this.props.errors} />
             </label>
         );

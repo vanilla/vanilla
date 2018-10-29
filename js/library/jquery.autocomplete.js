@@ -548,7 +548,7 @@ $.Autocompleter.Cache = function(options) {
    };
 };
 
-$.Autocompleter.SelectOne = function (options, input, select, config) {
+$.Autocompleter.Select = function (options, input, select, config) {
    var CLASSES = {
       ACTIVE: "ac_over"
    };

@@ -30,6 +30,9 @@ class BlotGroupTest extends SharedBootstrapTestCase {
         $this->assertTrue($block->getIndexForBlotOfType(HeadingTerminatorBlot::class) === 2);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function setUp() {
         parent::setUp();
         BlotGroup::resetIDs();
@@ -60,6 +63,9 @@ class BlotGroupTest extends SharedBootstrapTestCase {
         }
     }
 
+    /**
+     * Test that resetting the blot group ID's works properly.
+     */
     public function testReset() {
         $this->assertIncrementing();
         BlotGroup::resetIDs();

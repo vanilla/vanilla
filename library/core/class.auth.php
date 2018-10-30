@@ -56,7 +56,6 @@ class Gdn_Auth extends Gdn_Pluggable {
             return;
         }
 
-        $this->authHandled = false;
         $this->fireEvent('startAuthenticator');
 
         // Start the 'session'

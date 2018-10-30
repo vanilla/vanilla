@@ -666,9 +666,7 @@ class DashboardHooks extends Gdn_Plugin {
     }
 
     /**
-     * Check is we have a valid token associated with the request.
-     *
-     * @param Gdn_Auth $sender
+     * Check if we have a valid token associated with the request.
      */
     public function gdn_auth_startAuthenticator_handler() {
         $this->checkAccessToken();

@@ -29,8 +29,8 @@ class HeadingTerminatorBlot extends AbstractLineTerminatorBlot {
      * @inheritdoc
      * @throws \Exception
      */
-    public function getGroupOpeningTag(): string {
-        return "<h" . $this->getHeadingLevel() . ' id="' . $this->getReference() . '" >';
+    public function getGroupOpeningTag(string $context = ""): string {
+        return "<h" . $this->getHeadingLevel() . ' data-id="' . $context . '" >';
     }
 
     /**
@@ -85,14 +85,5 @@ class HeadingTerminatorBlot extends AbstractLineTerminatorBlot {
         // Heading attributes generally live in the next operation.
         // For empty headings there is only one operation, so it could be in the current op.
         return $this->currentOperation["attributes"]["header"] ?? $defaultLevel;
-    }
-
-    /**
-     * Get the unique interdoc ref id for the blot.
-     *
-     * @return string
-     */
-    public function getReference(): string {
-        return $this->currentOperation["attributes"]["ref"] ?? '';
     }
 }

@@ -9,9 +9,7 @@ namespace Vanilla\Formatting\Quill;
 
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineTerminatorBlot;
-use Vanilla\Formatting\Quill\Blots\CodeLineBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\CodeLineTerminatorBlot;
-use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\ParagraphLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
@@ -322,10 +320,10 @@ class BlotGroup {
 
         // Keep track of the values that have been generated so far.
         if (array_key_exists($text, self::$ids)) {
-            $text .= '-' . self::$ids[$text];
             self::$ids[$text]++;
+            $text .= '-' . self::$ids[$text];
         } else {
-            self::$ids[$text] = 1;
+            self::$ids[$text] = 0;
         }
 
         return $text;

@@ -19,6 +19,7 @@ import menu from "@library/components/forms/select/overwrites/menu";
 import selectContainer from "@library/components/forms/select/overwrites/selectContainer";
 import doNotRender from "@library/components/forms/select/overwrites/doNotRender";
 import { ReactNode } from "react";
+import noOptionsMessage from "./overwrites/noOptionsMessage";
 
 export interface IComboBoxOption {
     value: string;
@@ -75,19 +76,7 @@ export default class BigSearch extends React.Component<IProps> {
     };
 
     public render() {
-        const { className, disabled, options, loadOptions } = this.props;
-
-        /** The children to be rendered inside the indicator. */
-        const componentOverwrites = {
-            Control: this.searchControl,
-            IndicatorSeparator: doNotRender,
-            DropdownIndicator: doNotRender,
-            ClearIndicator: clearIndicator,
-            SelectContainer: selectContainer,
-            Menu: menu,
-            MenuList: menuList,
-            Option: SearchResultOption,
-        };
+        const { className, disabled, options } = this.props;
 
         const getTheme = theme => {
             return {
@@ -109,7 +98,7 @@ export default class BigSearch extends React.Component<IProps> {
             <CreatableSelect
                 id={this.id}
                 inputId={this.searchInputID}
-                components={componentOverwrites}
+                components={this.componentOverwrites}
                 isClearable={true}
                 isDisabled={disabled}
                 options={options}
@@ -172,6 +161,21 @@ export default class BigSearch extends React.Component<IProps> {
                 </div>
             </form>
         );
+    };
+
+    /*
+    * Overwrite components in Select component
+    */
+    private componentOverwrites = {
+        Control: this.searchControl,
+        IndicatorSeparator: doNotRender,
+        DropdownIndicator: doNotRender,
+        ClearIndicator: clearIndicator,
+        SelectContainer: selectContainer,
+        Menu: menu,
+        MenuList: menuList,
+        Option: SearchResultOption,
+        NoOptionsMessage: noOptionsMessage,
     };
 }
 

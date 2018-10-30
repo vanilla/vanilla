@@ -7,7 +7,7 @@ import { getFieldErrors, getGlobalErrorMessage } from "@library/apiv2";
 import { t } from "@library/application";
 import React from "react";
 import { withRouter, Link } from "react-router-dom";
-import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
+import InputTextBlock from "@library/components/forms/InputTextBlock";
 import Checkbox from "@library/components/forms/Checkbox";
 import ButtonSubmit from "@library/components/forms/ButtonSubmit";
 import Paragraph from "@library/components/Paragraph";

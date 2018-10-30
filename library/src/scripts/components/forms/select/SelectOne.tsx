@@ -17,9 +17,10 @@ import Paragraph from "@library/components/Paragraph";
 import { IComboBoxOption } from "./BigSearch";
 import SelectOption from "@library/components/forms/select/overwrites/selectOption";
 import { IFieldError } from "@library/@types/api";
-import ErrorMessages from "@dashboard/components/forms/ErrorMessages";
+import ErrorMessages from "@library/components/forms/ErrorMessages";
 import valueContainer from "@library/components/forms/select/overwrites/valueContainer";
 import controlContainer from "@library/components/forms/select/overwrites/controlContainer";
+import noOptionsMessage from "./overwrites/noOptionsMessage";
 
 interface IProps extends IOptionalComponentID {
     label: string;
@@ -56,38 +57,6 @@ export default class SelectOne extends React.Component<IProps> {
 
     public render() {
         const { className, disabled, options, searchable } = this.props;
-
-        /** The children to be rendered inside the indicator. */
-        const componentOverwrites = {
-            IndicatorsContainer: doNotRender,
-            SelectContainer: selectContainer,
-            Menu: menu,
-            MenuList: menuList,
-            Option: SelectOption,
-            ValueContainer: valueContainer,
-            Control: controlContainer,
-        };
-
-        const getTheme = theme => {
-            return {
-                ...theme,
-                borderRadius: {},
-                borderWidth: 0,
-                colors: {},
-                spacing: {},
-            };
-        };
-
-        const customStyles = {
-            option: () => ({}),
-            menu: base => {
-                return { ...base, backgroundColor: null, boxShadow: null };
-            },
-            control: () => ({
-                borderWidth: 0,
-            }),
-        };
-
         let describedBy;
         const hasErrors = this.props.errors && this.props.errors!.length > 0;
         if (hasErrors) {
@@ -106,14 +75,14 @@ export default class SelectOne extends React.Component<IProps> {
                         id={this.id}
                         options={options}
                         inputId={this.inputID}
-                        components={componentOverwrites}
+                        components={this.componentOverwrites}
                         isClearable={true}
                         isDisabled={disabled}
                         classNamePrefix={this.prefix}
                         className={classNames(this.prefix, className)}
                         aria-label={this.props.label}
-                        theme={getTheme}
-                        styles={customStyles}
+                        theme={this.getTheme}
+                        styles={this.getStyles()}
                         aria-invalid={hasErrors}
                         aria-describedby={describedBy}
                         isSearchable={searchable}
@@ -124,4 +93,45 @@ export default class SelectOne extends React.Component<IProps> {
             </div>
         );
     }
+
+    /*
+    * Overwrite components in Select component
+    */
+    private componentOverwrites = {
+        IndicatorsContainer: doNotRender,
+        SelectContainer: selectContainer,
+        Menu: menu,
+        MenuList: menuList,
+        Option: SelectOption,
+        ValueContainer: valueContainer,
+        Control: controlContainer,
+        NoOptionsMessage: noOptionsMessage,
+    };
+
+    /**
+     * Overwrite theme in Select component
+     */
+    private getTheme = theme => {
+        return {
+            ...theme,
+            borderRadius: {},
+            borderWidth: 0,
+            colors: {},
+            spacing: {},
+        };
+    };
+    /**
+     * Overwrite styles in Select component
+     */
+    private getStyles = () => {
+        return {
+            option: () => ({}),
+            menu: base => {
+                return { ...base, backgroundColor: null, boxShadow: null };
+            },
+            control: () => ({
+                borderWidth: 0,
+            }),
+        };
+    };
 }

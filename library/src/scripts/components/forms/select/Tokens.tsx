@@ -20,6 +20,7 @@ import valueContainerTokens from "@library/components/forms/select/overwrites/va
 import multiValueContainer from "./overwrites/multiValueContainer";
 import multiValueLabel from "./overwrites/multiValueLabel";
 import multiValueRemove from "./overwrites/multiValueRemove";
+import noOptionsMessage from "./overwrites/noOptionsMessage";
 
 interface IProps extends IOptionalComponentID {
     label: string;
@@ -53,30 +54,70 @@ export default class Tokens extends React.Component<IProps> {
     public render() {
         const { className, disabled, options } = this.props;
 
-        /** The children to be rendered inside the indicator. */
-        const componentOverwrites = {
-            IndicatorsContainer: doNotRender,
-            SelectContainer: selectContainer,
-            Menu: menu,
-            MenuList: menuList,
-            Option: selectOption,
-            ValueContainer: valueContainerTokens,
-            Control: multiValueContainer,
-            MultiValueContainer: multiValueContainer,
-            MultiValueLabel: multiValueLabel,
-            MultiValueRemove: multiValueRemove,
-        };
+        return (
+            <div className={classNames("tokens", "inputBlock", this.props.className)}>
+                <label htmlFor={this.inputID} className="inputBlock-labelAndDescription">
+                    <span className="inputBlock-labelText">{this.props.label}</span>
+                    <Paragraph className="inputBlock-labelNote" children={this.props.labelNote} />
+                </label>
 
-        const getTheme = theme => {
-            return {
-                ...theme,
-                border: {},
-                colors: {},
-                spacing: {},
-            };
-        };
+                <div className="inputBlock-inputWrap">
+                    <Select
+                        id={this.id}
+                        inputId={this.inputID}
+                        components={this.componentOverwrites}
+                        isClearable={true}
+                        isDisabled={disabled}
+                        options={options}
+                        classNamePrefix={this.prefix}
+                        className={classNames(this.prefix, className)}
+                        placeholder={this.props.placeholder}
+                        aria-label={t("Search")}
+                        escapeClearsValue={true}
+                        pageSize={20}
+                        theme={this.getTheme}
+                        styles={this.getStyles()}
+                        backspaceRemovesValue={true}
+                        isMulti={true}
+                    />
+                </div>
+            </div>
+        );
+    }
 
-        const customStyles = {
+    /*
+    * Overwrite components in Select component
+    */
+    private componentOverwrites = {
+        IndicatorsContainer: doNotRender,
+        SelectContainer: selectContainer,
+        Menu: menu,
+        MenuList: menuList,
+        Option: selectOption,
+        ValueContainer: valueContainerTokens,
+        Control: multiValueContainer,
+        MultiValueContainer: multiValueContainer,
+        MultiValueLabel: multiValueLabel,
+        MultiValueRemove: multiValueRemove,
+        NoOptionsMessage: noOptionsMessage,
+    };
+
+    /**
+     * Overwrite theme in Select component
+     */
+    private getTheme = theme => {
+        return {
+            ...theme,
+            border: {},
+            colors: {},
+            spacing: {},
+        };
+    };
+    /**
+     * Overwrite styles in Select component
+     */
+    private getStyles = () => {
+        return {
             option: () => ({}),
             menu: base => {
                 return { ...base, backgroundColor: null, boxShadow: null };
@@ -91,35 +132,5 @@ export default class Tokens extends React.Component<IProps> {
                 return { ...base, borderRadius: null };
             },
         };
-
-        return (
-            <div className={classNames("tokens", "inputBlock", this.props.className)}>
-                <label htmlFor={this.inputID} className="inputBlock-labelAndDescription">
-                    <span className="inputBlock-labelText">{this.props.label}</span>
-                    <Paragraph className="inputBlock-labelNote" children={this.props.labelNote} />
-                </label>
-
-                <div className="inputBlock-inputWrap">
-                    <Select
-                        id={this.id}
-                        inputId={this.inputID}
-                        components={componentOverwrites}
-                        isClearable={true}
-                        isDisabled={disabled}
-                        options={options}
-                        classNamePrefix={this.prefix}
-                        className={classNames(this.prefix, className)}
-                        placeholder={this.props.placeholder}
-                        aria-label={t("Search")}
-                        escapeClearsValue={true}
-                        pageSize={20}
-                        theme={getTheme}
-                        styles={customStyles}
-                        backspaceRemovesValue={true}
-                        isMulti={true}
-                    />
-                </div>
-            </div>
-        );
-    }
+    };
 }

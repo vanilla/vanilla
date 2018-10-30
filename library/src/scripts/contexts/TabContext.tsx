@@ -18,7 +18,7 @@ const TabContext = React.createContext<ITabProps>({} as any);
 export default TabContext;
 
 /**
- * HOC to inject DeviceContext as props.
+ * Inject RadioButtonAsTabs data to RadioButtonTab through props.
  *
  * @param WrappedComponent - The component to wrap
  */

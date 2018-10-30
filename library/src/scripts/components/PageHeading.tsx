@@ -13,7 +13,7 @@ interface IPageHeading {
     children: React.ReactNode;
     backUrl?: string | null; // back link
     className?: string;
-    menu?: React.ReactNode;
+    actions?: React.ReactNode;
 }
 
 /**
@@ -31,7 +31,7 @@ export default class PageHeading extends React.Component<IPageHeading> {
                     {/* Will not render if no url is passed */}
                     <Heading depth={1}>{this.props.children}</Heading>
                 </div>
-                {this.props.menu && <div className="pageHeading-actions">{this.props.menu}</div>}
+                {this.props.actions && <div className="pageHeading-actions">{this.props.actions}</div>}
             </div>
         );
     }

@@ -34,11 +34,7 @@ export default function multiValueRemove(props) {
         <components.MultiValueRemove {...props} className="suggestedTextInput-tokenRemove">
             <button
                 {...innerProps}
-                className={classNames(
-                    ButtonBaseClass.CUSTOM,
-                    `${selectProps.classNamePrefix}-clear`,
-                    "suggestedTextInput-clear",
-                )}
+                className={classNames(ButtonBaseClass.CUSTOM, `${selectProps.classNamePrefix}-clear`)}
                 type="button"
                 style={{}}
                 aria-hidden={null} // Unset the prop in restInnerProps

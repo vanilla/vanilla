@@ -4,9 +4,9 @@
  * @license GPL-2.0-only
  */
 
-$bigSearch-search_minWidth: 109px;
+$searchBar-search_minWidth: 109px;
 
-.bigSearch-clear {
+.searchBar-clear {
     position: relative;
     color: inherit;
     display: flex;
@@ -15,38 +15,39 @@ $bigSearch-search_minWidth: 109px;
     width: $formElement-height;
 }
 
-.bigSearch-form {
+.searchBar-form {
     display: block;
 }
 
-.bigSearch-content {
+.searchBar-content {
     display: flex;
 }
 
-.bigSearch-inputWrap {
+.searchBar-inputWrap {
     flex-grow: 1;
 }
 
-.heading.bigSearch-heading {
+.heading.searchBar-heading {
     margin-bottom: $global_spacer;
 }
 
 
 // Classes from react-select
 
-.bigSearch__placeholder {
+.searchBar__placeholder {
     color: $formElement-placeholderColor;
+    margin: auto;
 }
 
 
-.bigSearch-content { // For specificity
-    .bigSearch-submitButton {
+.searchBar-content { // For specificity
+    .searchBar-submitButton {
         position: relative;
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
         margin-left: -1px;
-        min-width: $bigSearch-search_minWidth;
-        flex-basis: $bigSearch-search_minWidth;
+        min-width: $searchBar-search_minWidth;
+        flex-basis: $searchBar-search_minWidth;
 
         &:hover,
         &:focus {
@@ -54,12 +55,14 @@ $bigSearch-search_minWidth: 109px;
         }
     }
 
-    .bigSearch__control {
+    .searchBar__control {
+        display: flex;
         border: 0;
         background-color: transparent;
+        height: 100%;
 
 
-        &.bigSearch__control--is-focused {
+        &.searchBar__control--is-focused {
             box-shadow: none;
 
 
@@ -71,7 +74,25 @@ $bigSearch-search_minWidth: 109px;
         }
     }
 
-    .bigSearch__value-container {
+    .searchBar__value-container {
         overflow: auto;
     }
+}
+
+.searchBar-actionButton {
+    margin: {
+        left: auto;
+        right: -($buttonIcon-iconPadding_offset + 3); // the "3" is to offset the pencil
+    }
+    opacity: .8;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.searchBar-label {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
 }

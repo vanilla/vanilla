@@ -6,7 +6,6 @@
 
 $suggestedTextInput-option_padding: 12px;
 $suggestedTextInput-clearButton_width: 16px;
-$suggestedTextInput-clearIcon_width: 8px;
 
 
 // Classes from react-select
@@ -67,15 +66,15 @@ $suggestedTextInput-clearIcon_width: 8px;
 
     &:hover,
     &:focus {
-        background-color: $global-color_primary;
-        color: $global-color_bg;
+        color: $global-color_primary;
     }
 }
 
-.suggestedTextInput-tokenRemoveIcon {
-    &.icon {
-        width: $suggestedTextInput-clearIcon_width;
-        height: $suggestedTextInput-clearIcon_width;
+.suggestedTextInput-inputText {
+    &.inputText {
+        padding: {
+            top: 0;
+            bottom: 0;
+        }
     }
 }
-

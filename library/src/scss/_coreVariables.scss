@@ -331,6 +331,8 @@ $overlay-borderRadius                                   : $global_borderRadius !
 
 $buttonIcon_size                                     : 36px !default;
 
+$buttonIcon-iconPadding_offset                       : ($buttonIcon_size - $icon-default_size) / 2;
+
 // Global Button options
 
 $global-button_paddingTop                            : 2px !default;

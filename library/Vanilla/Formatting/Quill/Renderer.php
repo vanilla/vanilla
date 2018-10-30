@@ -20,7 +20,6 @@ class Renderer {
      * @return string
      */
     public function render(BlotGroupCollection $blotGroups): string {
-        BlotGroup::resetIDs();
         $result = "";
         foreach ($blotGroups as $index => $group) {
             $result .= $group->render();

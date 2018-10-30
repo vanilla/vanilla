@@ -9,7 +9,9 @@ namespace Vanilla\Formatting\Quill;
 
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineTerminatorBlot;
+use Vanilla\Formatting\Quill\Blots\CodeLineBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\CodeLineTerminatorBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\ParagraphLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
@@ -20,7 +22,6 @@ use Vanilla\Formatting\Quill\Blots\TextBlot;
  * - Multiple line blots if it is a line type grouping
  */
 class BlotGroup {
-
     /** @var AbstractBlot[] */
     private $blots = [];
 
@@ -101,7 +102,7 @@ class BlotGroup {
 
         // Don't render empty groups.
         $surroundTagBlot = $this->getBlotForSurroundingTags();
-        $result = $surroundTagBlot->getGroupOpeningTag($this->getReference());
+        $result = $surroundTagBlot->getGroupOpeningTag();
 
         // Line blots have special rendering.
         if ($surroundTagBlot instanceof AbstractLineTerminatorBlot) {
@@ -156,19 +157,6 @@ class BlotGroup {
         }
 
         return $result;
-    }
-
-    /**
-     * Get the text contents of the blot group. No HTML tags allowed!
-     *
-     * @return string
-     */
-    public function getText(): string {
-        $result = "";
-        foreach ($this->blots as $index => $blot) {
-            $result .= $blot->render();
-        }
-        return strip_tags($result);
     }
 
     /**
@@ -288,54 +276,13 @@ class BlotGroup {
         return $blots;
     }
 
-    /** @var array An mapping of an ID to the number of times it has been used. */
-    private static $ids = [];
-
-    /**
-     * Reset the incrementing ID counters.
-     */
-    public static function resetIDs() {
-        self::$ids = [];
-    }
-
-    /**
-     * Generate a uniqueID from a text string. Github markdown style.
-     *
-     * - Strips all non-letter, non-number characters.
-     * - Trim whitespace from ends.
-     * - Replace whitespace with -.
-     * - Convert to lowercase.
-     * - Append an incrementing ID starting from 1 if the ID has been used.
-     *
-     * @see BlotGroup::resetIDs() for restarting the ID counter.
-     *
-     * @param string $text The text to transform
-     * @return string A uniqueID
-     */
-    public static function makeUniqueIDFromText(string $text): string {
-        $text = preg_replace("/[^a-zA-Z0-9]+/m", " ", $text);
-        $text = trim($text, " ");
-        $text = preg_replace("/\s+/", '-', $text);
-        $text = mb_strtolower($text);
-
-        // Keep track of the values that have been generated so far.
-        if (array_key_exists($text, self::$ids)) {
-            self::$ids[$text]++;
-            $text .= '-' . self::$ids[$text];
-        } else {
-            self::$ids[$text] = 0;
-        }
-
-        return $text;
-    }
-
     /**
      * Get heading text with html tags stripped out.
      *
      * @return string
      */
-    public function getReference(): string {
-        $text = $this->getText();
-        return self::makeUniqueIDFromText($text);
+    public function getText(): string {
+        $text = strip_tags($this->render());
+        return $text;
     }
 }

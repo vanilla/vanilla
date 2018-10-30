@@ -11,7 +11,6 @@ import Italic from "quill/formats/italic";
 import Link from "quill/formats/link";
 import Strike from "quill/formats/strike";
 import List, { ListItem } from "quill/formats/list";
-import Header from "quill/formats/header";
 import { IndentClass as Indent } from "quill/formats/indent";
 
 // Custom Inline Blots
@@ -41,6 +40,7 @@ import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import HistoryModule from "@rich-editor/quill/HistoryModule";
 import ClipboardModule from "@rich-editor/quill/ClipboardModule";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
+import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 
 export default function registerQuill() {
     Quill.register(
@@ -54,7 +54,7 @@ export default function registerQuill() {
             "formats/spoiler/content": SpoilerContentBlot,
             "formats/spoiler/wrapper": SpoilerWrapperBlot,
             "formats/codeBlock": CodeBlockBlot,
-            "formats/header": Header,
+            "formats/header": HeaderBlot,
             "formats/list": List,
             "formats/list/item": ListItem,
             "formats/embed-error": EmbedErrorBlot,

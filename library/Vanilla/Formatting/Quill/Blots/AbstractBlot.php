@@ -100,11 +100,9 @@ abstract class AbstractBlot {
     /**
      * Get the HTML to represent the opening tag of the Group this is contained in.
      *
-     * @param string $context Some context to render the tag with.
-     *
      * @return string
      */
-    public function getGroupOpeningTag(string $context = ""): string {
+    public function getGroupOpeningTag(): string {
         return "<p>";
     }
 

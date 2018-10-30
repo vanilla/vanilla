@@ -167,6 +167,7 @@ export class Editor extends React.Component<IProps> {
         if (this.props.isLoading) {
             this.quill.disable();
         }
+        window.quill = this.quill;
         this.quillID = getIDForQuill(this.quill);
 
         // Setup syncing

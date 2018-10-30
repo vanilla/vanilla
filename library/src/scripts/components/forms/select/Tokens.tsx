@@ -20,6 +20,7 @@ import valueContainerTokens from "@library/components/forms/select/overwrites/va
 import multiValueContainer from "./overwrites/multiValueContainer";
 import multiValueLabel from "./overwrites/multiValueLabel";
 import multiValueRemove from "./overwrites/multiValueRemove";
+import noOptionsMessage from "./overwrites/noOptionsMessage";
 
 interface IProps extends IOptionalComponentID {
     label: string;
@@ -83,6 +84,7 @@ export default class Tokens extends React.Component<IProps> {
             </div>
         );
     }
+
     /*
     * Overwrite components in Select component
     */
@@ -97,6 +99,7 @@ export default class Tokens extends React.Component<IProps> {
         MultiValueContainer: multiValueContainer,
         MultiValueLabel: multiValueLabel,
         MultiValueRemove: multiValueRemove,
+        NoOptionsMessage: noOptionsMessage,
     };
 
     /**

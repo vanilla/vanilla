@@ -16,7 +16,7 @@ $suggestedTextInput-clearIcon_width: 8px;
 }
 
 .suggestedTextInput-noOptions {
-    padding: $global_spacer;
+    padding: $suggestedTextInput-option_padding;
 }
 
 .suggestedTextInput-option {

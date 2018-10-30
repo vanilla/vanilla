@@ -20,6 +20,7 @@ import { IFieldError } from "@library/@types/api";
 import ErrorMessages from "@library/components/forms/ErrorMessages";
 import valueContainer from "@library/components/forms/select/overwrites/valueContainer";
 import controlContainer from "@library/components/forms/select/overwrites/controlContainer";
+import noOptionsMessage from "./overwrites/noOptionsMessage";
 
 interface IProps extends IOptionalComponentID {
     label: string;
@@ -104,6 +105,7 @@ export default class SelectOne extends React.Component<IProps> {
         Option: SelectOption,
         ValueContainer: valueContainer,
         Control: controlContainer,
+        NoOptionsMessage: noOptionsMessage,
     };
 
     /**

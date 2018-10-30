@@ -6,8 +6,8 @@
 
 import React from "react";
 import classNames from "classnames";
-import { getOptionalID, IOptionalComponentID } from "../../componentIDs";
-import { ButtonBaseClass } from "./Button";
+import { getOptionalID, IOptionalComponentID } from "../componentIDs";
+import { ButtonBaseClass } from "./forms/Button";
 import { Link } from "react-router-dom";
 
 interface IProps extends IOptionalComponentID {
@@ -24,10 +24,6 @@ interface IProps extends IOptionalComponentID {
  */
 export default class LinkAsButton extends React.Component<IProps> {
     public static defaultProps = {
-        disabled: false,
-        type: "button",
-        prefix: "button",
-        legacyMode: false,
         baseClass: ButtonBaseClass.STANDARD,
     };
 

@@ -20,7 +20,7 @@ interface IProps extends IOptionalComponentID {
 }
 
 /**
- * A stylable, configurable button component.
+ * A Link component that looks like a Button component.
  */
 export default class LinkAsButton extends React.Component<IProps> {
     public static defaultProps = {

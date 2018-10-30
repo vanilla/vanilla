@@ -5,6 +5,8 @@
  */
 
 $suggestedTextInput-option_padding: 12px;
+$suggestedTextInput-clearButton_width: 16px;
+$suggestedTextInput-clearIcon_width: 8px;
 
 
 // Classes from react-select
@@ -14,7 +16,7 @@ $suggestedTextInput-option_padding: 12px;
 }
 
 .suggestedTextInput-noOptions {
-    padding: $global_spacer;
+    padding: $suggestedTextInput-option_padding;
 }
 
 .suggestedTextInput-option {
@@ -50,9 +52,30 @@ $suggestedTextInput-option_padding: 12px;
     }
 }
 
-//.suggestedTextInput-selectContainer {
-//    .suggestedTextInput-menu {
-//
-//    }
-//}
-//dropDown-contents
+.suggestedTextInput-valueContainer {
+    &.inputBlock-inputText {
+        height: auto;
+    }
+}
+
+.suggestedTextInput-clear {
+    padding: 0;
+    height: $suggestedTextInput-clearButton_width;
+    width: $suggestedTextInput-clearButton_width;
+    border-radius: 50%;
+    margin-left: 3px;
+
+    &:hover,
+    &:focus {
+        background-color: $global-color_primary;
+        color: $global-color_bg;
+    }
+}
+
+.suggestedTextInput-tokenRemoveIcon {
+    &.icon {
+        width: $suggestedTextInput-clearIcon_width;
+        height: $suggestedTextInput-clearIcon_width;
+    }
+}
+

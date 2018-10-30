@@ -102,7 +102,7 @@
 }
 
 @function mixContentBgAndFg($percent) {
-  @return mix($content-bg, $content-fg, $percent);
+  @return mix($global-color-bg, $global-color-fg, $percent);
 }
 
 @mixin sr-only {

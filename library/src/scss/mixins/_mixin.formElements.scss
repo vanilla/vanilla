@@ -21,7 +21,7 @@
 }
 
 @function inputLineHeight($height, $paddingTop, $fullBorderWidth) {
-  @return $height - (2 * $paddingTop);
+  @return $height - (2 * $paddingTop + $fullBorderWidth);
 }
 
 @mixin selectBoxSizing($height, $fontSize, $paddingSide) {

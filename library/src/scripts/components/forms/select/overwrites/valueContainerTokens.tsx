@@ -17,7 +17,7 @@ export default function valueContainer({ children, ...props }: any) {
     return (
         <components.ValueContainer
             {...props}
-            className="suggestedTextInput-valueContainer inputBlock-inputText inputText"
+            className="suggestedTextInput-valueContainer inputBlock-inputText inputText tokensContainer"
         >
             {children}
         </components.ValueContainer>

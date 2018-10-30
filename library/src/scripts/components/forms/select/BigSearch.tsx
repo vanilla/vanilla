@@ -13,11 +13,12 @@ import { t } from "@library/application";
 import Button from "@library/components/forms/Button";
 import Heading from "@library/components/Heading";
 import { clearIndicator } from "@library/components/forms/select/overwrites/clearIndicator";
-import MenuOption from "@library/components/forms/select/overwrites/menuOption";
+import SearchResultOption from "@library/components/forms/select/overwrites/searchResultOption";
 import menuList from "@library/components/forms/select/overwrites/menuList";
 import menu from "@library/components/forms/select/overwrites/menu";
 import selectContainer from "@library/components/forms/select/overwrites/selectContainer";
 import doNotRender from "@library/components/forms/select/overwrites/doNotRender";
+import noOptionsMessage from "./overwrites/noOptionsMessage";
 
 export interface IComboBoxOption {
     value: string;
@@ -26,7 +27,7 @@ export interface IComboBoxOption {
 }
 
 interface IProps extends IOptionalComponentID {
-    query: string;
+    query?: string;
     disabled?: boolean;
     className?: string;
     placeholder: string;
@@ -68,25 +69,12 @@ export default class BigSearch extends React.Component<IProps> {
     };
 
     public render() {
-        const { className, disabled, options, loadOptions } = this.props;
-
-        /** The children to be rendered inside the indicator. */
-        const componentOverwrites = {
-            Control: this.bigSearchControl,
-            IndicatorSeparator: doNotRender,
-            DropdownIndicator: doNotRender,
-            ClearIndicator: clearIndicator,
-            SelectContainer: selectContainer,
-            Menu: menu,
-            MenuList: menuList,
-            Option: MenuOption,
-        };
-
+        const { className, disabled, options } = this.props;
         const getTheme = theme => {
             return {
                 ...theme,
                 borderRadius: {},
-                color: {},
+                colors: {},
                 spacing: {},
             };
         };
@@ -102,7 +90,7 @@ export default class BigSearch extends React.Component<IProps> {
             <CreatableSelect
                 id={this.id}
                 inputId={this.searchInputID}
-                components={componentOverwrites}
+                components={this.componentOverwrites}
                 isClearable={true}
                 isDisabled={disabled}
                 options={options}
@@ -153,6 +141,21 @@ export default class BigSearch extends React.Component<IProps> {
                 </div>
             </form>
         );
+    };
+
+    /*
+    * Overwrite components in Select component
+    */
+    private componentOverwrites = {
+        Control: this.bigSearchControl,
+        IndicatorSeparator: doNotRender,
+        DropdownIndicator: doNotRender,
+        ClearIndicator: clearIndicator,
+        SelectContainer: selectContainer,
+        Menu: menu,
+        MenuList: menuList,
+        Option: SearchResultOption,
+        NoOptionsMessage: noOptionsMessage,
     };
 }
 

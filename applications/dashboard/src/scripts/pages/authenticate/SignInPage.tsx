@@ -49,7 +49,7 @@ export class SignInPage extends React.Component<IProps, IRequiredComponentID> {
         }
 
         let showPassword = false;
-        const ssoMethods = authenticatorState.data.filter(a => {
+        const ssoMethods = authenticatorState.data!.filter(a => {
             if (a.type === "password") {
                 showPassword = true;
                 return false;

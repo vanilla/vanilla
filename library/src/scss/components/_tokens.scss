@@ -7,6 +7,9 @@
 
 $tokens-token_fontSize: $metaText_fontSize;
 $tokens-token_bg: mix($global-color_fg, $global-color_bg, 15%);
+$suggestedTextInput-clear_width: 16px;
+$suggestedTextInput-clearIcon_width: 8px;
+
 
 .tokensContainer {
     min-height: $formElement_height;
@@ -31,4 +34,25 @@ $tokens-token_bg: mix($global-color_fg, $global-color_bg, 15%);
 
 .tokens__multi-value {
     user-select: none;
+}
+
+.tokens-clear {
+    width: $suggestedTextInput-clear_width;
+    height: $suggestedTextInput-clear_width;
+    padding: 0;
+    border-radius: 50%;
+    margin-left: 1px;
+    &:hover,
+    &:focus {
+        background-color: $global-color_primary;
+        color: $global-color_bg;
+    }
+}
+
+
+.suggestedTextInput-tokenRemoveIcon {
+    &.icon {
+        width: $suggestedTextInput-clearIcon_width;
+        height: $suggestedTextInput-clearIcon_width;
+    }
 }

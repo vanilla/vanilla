@@ -6,14 +6,16 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { t } from "@library/application";
+import { t, formatUrl } from "@library/application";
 import { leftChevron } from "@library/components/Icons";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 
 interface IProps extends RouteComponentProps<{}> {
-    url?: string | null;
-    title?: string;
+    url?: string;
+    title?: React.ReactNode;
     className?: string;
+    visibleLabel?: boolean;
+    clickHandler?: () => void;
 }
 
 /**
@@ -22,25 +24,25 @@ interface IProps extends RouteComponentProps<{}> {
 export class BackLink extends React.Component<IProps> {
     public static defaultProps = {
         title: t("Back"),
+        visibleLabel: false,
     };
     public render() {
-        if (this.props.url) {
-            return (
-                <div className={classNames("backLink", this.props.className)}>
-                    <Link
-                        to={this.props.url}
-                        aria-label={this.props.title}
-                        title={this.props.title}
-                        onClick={this.clickHandler}
-                        className="backLink-link"
-                    >
-                        {leftChevron("backLink-icon")}
-                    </Link>
-                </div>
-            );
-        } else {
-            return null;
-        }
+        const routingUrl = this.props.url ? this.props.url : formatUrl("/kb");
+
+        return (
+            <div className={classNames("backLink", this.props.className)}>
+                <Link
+                    to={routingUrl}
+                    aria-label={this.props.title as string}
+                    title={this.props.title as string}
+                    onClick={this.clickHandler}
+                    className={classNames("backLink-link", { hasVisibleLabel: this.props.visibleLabel })}
+                >
+                    {leftChevron("backLink-icon")}
+                    {this.props.visibleLabel && <span className="backLink-label">{this.props.title}</span>}
+                </Link>
+            </div>
+        );
     }
 
     /**
@@ -48,9 +50,11 @@ export class BackLink extends React.Component<IProps> {
      * Otherwise fallback to the default behaviour.
      */
     private clickHandler = (event: React.MouseEvent) => {
-        event.preventDefault();
-        event.stopPropagation();
-        this.props.history.goBack();
+        if (!this.props.url) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.props.history.goBack();
+        }
     };
 }
 

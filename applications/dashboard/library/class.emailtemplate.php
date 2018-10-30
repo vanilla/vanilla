@@ -4,6 +4,8 @@
  * @license GPL-2.0-only
  */
 
+use Vanilla\Web\Assets\LegacyAssetModel;
+
 /**
  * Class EmailTemplate
  *
@@ -114,7 +116,7 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
         $this->setDefaultEmailImage();
 
         // Set default view
-        $this->view = AssetModel::viewLocation($view, 'email', 'dashboard');
+        $this->view = LegacyAssetModel::viewLocation($view, 'email', 'dashboard');
     }
 
     /**
@@ -174,7 +176,7 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
      * @throws Exception
      */
     public function setView($view, $controllerName = 'email', $applicationFolder = 'dashboard') {
-        $this->view = AssetModel::viewLocation($view, $controllerName, $applicationFolder);
+        $this->view = LegacyAssetModel::viewLocation($view, $controllerName, $applicationFolder);
         return $this;
     }
 

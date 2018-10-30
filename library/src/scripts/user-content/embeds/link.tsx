@@ -24,7 +24,7 @@ export class LinkEmbed extends BaseEmbed {
         const { name, attributes, url, photoUrl, body } = this.props.data;
         const title = name ? <h3 className="embedText-title embedLink-title">{name}</h3> : null;
 
-        const source = <span className="embedLink-source meta">{url}</span>;
+        const source = <span className="embedLink-source metaStyle">{url}</span>;
 
         let linkImage: JSX.Element | null = null;
         if (photoUrl) {
@@ -32,7 +32,7 @@ export class LinkEmbed extends BaseEmbed {
         }
         const dateTime =
             attributes.timestamp && attributes.humanTime ? (
-                <time className="embedLink-dateTime meta" dateTime={attributes.timestamp}>
+                <time className="embedLink-dateTime metaStyle" dateTime={attributes.timestamp}>
                     {attributes.humanTime}
                 </time>
             ) : null;

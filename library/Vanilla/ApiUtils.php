@@ -14,6 +14,9 @@ use Vanilla\Utility\CapitalCaseScheme;
 
 class ApiUtils {
 
+    // Expand field value to indicate expanding all fields.
+    const EXPAND_ALL = "all";
+
     /**
      * Convert array keys for functions that aren't compatible with camelCase.
      *
@@ -56,8 +59,12 @@ class ApiUtils {
      * @return array
      */
     public static function getExpandDefinition(array $fields, $default = false) {
+        if (!in_array(self::EXPAND_ALL, $fields)) {
+            $fields[] = self::EXPAND_ALL;
+        }
+
         $result = [
-            'description' => 'Expand associated records using one or more valid field names. A boolean true expands all expandable fields.',
+            'description' => 'Expand associated records using one or more valid field names. A value of "'.self::EXPAND_ALL.'" will expand all expandable fields.',
             'default' => $default,
             'items' => [
                 'enum' => $fields,

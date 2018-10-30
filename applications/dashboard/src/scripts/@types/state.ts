@@ -6,7 +6,7 @@
  */
 
 import { ILoadable } from "@library/@types/api";
-import { IUserFragment } from "@dashboard/@types/api";
+import { IUserFragment } from "@library/@types/api";
 import { IUserAuthenticator } from "@dashboard/@types/api/authenticate";
 
 export type IAuthenticatorState = ILoadable<IUserAuthenticator[]>;

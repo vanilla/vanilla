@@ -318,7 +318,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      *
      *
      * @param $themeName
-     * @return mixed
+     * @return array|bool
      */
     public function getThemeInfo($themeName) {
         $theme = $this->addonManager->lookupTheme($themeName);

@@ -2,7 +2,9 @@
 applications/**
 bootstrap.php
 cache/**
-conf/**
+conf/.htaccess
+conf/config-defaults.php
+conf/constants.php
 dist/**
 container.html
 environment.php

@@ -90,23 +90,33 @@ $global-color_linkedIn                               : #007bb6;
     Typography
 \* -------------------------------------------------------------- */
 
-$global-title_fontSize                               : 30px !default;
-$global-subTitle_fontSize                            : 18px !default;
-
 $global-large_fontSize                               : 16px !default;
 $global-medium_fontSize                              : 14px !default;
 $global-small_fontSize                               : 12px !default;
 
+$global-title_fontSize                               : 32px !default;
+$global-subTitle_fontSize                            : 18px !default;
+
+$userContent_fontSize                                : $global-medium_fontSize !default; // 14 for forums, but 16 for KB
+
+$userContent-fontSizeH1                              : 2em !default;
+$userContent-fontSizeH2                              : 1.5em !default;
+$userContent-fontSizeH3                              : 1.25em !default;
+$userContent-fontSizeH4                              : 1em !default;
+$userContent-fontSizeH5                              : .875em !default;
+$userContent-fontSizeH6                              : .85em !default;
 
 $global-heading_topMargin                            : 1.5 * $global-medium_fontSize;
 
 $global-normal_fontWeight                            : 400 !default;
 $global-bold_fontWeight                              : 600 !default;
 
-$global-block_margin                                 : $global-medium_fontSize !default;
+$global-block_margin                                 : $userContent_fontSize !default;
 
 $global-base_lineHeight                              : 1.5 !default;
 $global-condensed_lineHeight                         : 1.25 !default;
+
+$global_spacer                                       : $userContent_fontSize * $global-base_lineHeight;
 
 $global-heading_fontFamily                           : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 $global-heading_fontWeight                           : $global-bold_fontWeight !default; // Derived
@@ -116,11 +126,10 @@ $global-body_fontFamily                              : "Open Sans", "Segoe UI", 
 $global-body_fontWeight                              : $global-normal_fontWeight !default; // Derived
 $global-body_lineHeightRatio                         : $global-heading_lineHeightRatio;
 
-$link_default-color                                  : $global-color_primary !default;
-$link_default_hover-color                            : $global-color_secondary !default;
-$link_default_focus-color                            : $global-color_secondary !default;
-$link_default_visited-color                          : mix($global-color_secondary, $global-color_fg, 90%) !default;
-
+$link-default_color                                  : $global-color_primary !default;
+$link-default_hover_color                            : $global-color_secondary !default;
+$link-default_focus_color                            : $global-color_secondary !default;
+$link-default_visited_color                          : mix($global-color_secondary, $global-color_fg, 90%) !default;
 
 /* -------------------------------------------------------------- *\
     Animation
@@ -141,12 +150,18 @@ $icon-small_size                                     : 16px !default;
     Layout
 \* -------------------------------------------------------------- */
 
-$global-gutter_size                                  : $utility-baseUnit * 4;
+$global-gutter_size                                  : $global_spacer;
 $global-gutter_halfSize                              : $global-gutter_size / 2;
 $global-gutter_quarterSize                           : $global-gutter_size / 4;
-$global-main_width                                   : 1124px !default;
-$global-main_paddedWidth                             : $global-main_width + 2 * $global-gutter_size !default;  // Derived
+
+$global-panel_spacerOuter                            : 18px !default;
 $global-panel_width                                  : 226px !default;
+$global-panel_paddedWidth                            : $global-panel_width + $global-panel_spacerOuter !default;
+
+$global-middleColumn_width                           : 660px;
+
+$global-main_width                                   : $global-panel_paddedWidth * 2 + $global-middleColumn_width !default;
+$global-main_paddedWidth                             : $global-main_width + 2 * $global-gutter_size !default;  // Derived
 
 $global-twoColumn_breakpoint                         : 900px !default; // Generic breakpoint for 2 columns
 
@@ -183,7 +198,7 @@ $component-titleBar_viewMoreColor                    : mix($global-color_bg, $gl
 \* -------------------------------------------------------------- */
 
 // Global
-$global-widgetInner_padding                          : $global-gutter_quarterSize !default; // sections of widget
+$global-widgetInner_padding                          : $global-gutter_halfSize !default; // sections of widget
 $global-widgetSection-gap                            : 0 !default; // Between widget sections
 $global-widget_gap                                   : $global-gutter_halfSize !default; // Between widgets
 $global-widget_bg                                    : transparent !default;
@@ -255,8 +270,15 @@ $formElement_heightWithBorder                        : $formElement_height + 2 *
 $formElement_borderColor                             : $global-border_color !default; // Derived
 $formElement_borderStyle                             : solid;
 $formElement_borderRadius                            : $global_borderRadius !default;
-$formElement_giantInput_height                       : 51px !default;
-$formElement_giantInput_fontSize                     : $utility-baseUnit * 4 !default; // Derived
+
+// For Home Page
+$formElement_giantInput_height                       : 82px !default;
+$formElement_giantInput_fontSize                     : 24px !default;
+
+// For Search
+$formElement_largeInput_height                       : 48px !default;
+$formElement_largeInput_fontSize                     : 16px !default;
+
 $formElement_halfHeight                              : $formElement_height / 2 !default; // Derived
 $formElement-borderWidthFull                         : $formElement_borderWidth * 2 !default; // Derived
 $formElement_horizontalPadding                       : $utility-baseUnit * 2 !default; // Derived

@@ -200,7 +200,10 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                 <div className={classNames("siteNavNode-contents")}>
                     <Link
                         onKeyDownCapture={this.handleKeyDown}
-                        className={classNames("siteNavNode-link")}
+                        className={classNames("siteNavNode-link", {
+                            hasChildren,
+                            isFirstLevel: this.props.depth === 0,
+                        })}
                         tabIndex={0}
                         to={this.props.url}
                     >
@@ -254,6 +257,9 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
      * @param event
      */
     private handleKeyDown = event => {
+        if (document.activeElement === null) {
+            return;
+        }
         const currentLink = document.activeElement;
         const siteNavRoot = currentLink.closest(".siteNav");
         const tabHandler = new TabHandler(siteNavRoot!);

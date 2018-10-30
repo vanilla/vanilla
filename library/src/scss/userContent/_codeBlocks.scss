@@ -11,7 +11,7 @@ $code-inline_borderRadius: $code_borderRadius !default;
 $code-inline_padding: .2em .4em !default;
 
 $code-block_borderRadius: $code_borderRadius !default;
-$code-block_padding: $global-medium_fontSize !default;
+$code-block_padding: $userContent_fontSize !default;
 
 // Code
 .userContent {

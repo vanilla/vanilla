@@ -57,19 +57,33 @@ export default class DeviceChecker extends React.Component<IDeviceCheckerProps> 
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public componentDidMount() {
-        window.addEventListener("resize", e => {
-            debounce(
-                () => {
-                    window.requestAnimationFrame(data => {
-                        this.props.doUpdate();
-                    });
-                },
-                100,
-                {
-                    leading: true,
-                },
-            )();
-        });
+        window.addEventListener("resize", this.debouncedUpdateOnResize);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public componentWillUnmount() {
+        window.removeEventListener("resize", this.debouncedUpdateOnResize);
+    }
+
+    /**
+     * Call the props update function when the window resizes.
+     */
+    private updateOnResize = () => {
+        window.requestAnimationFrame(data => {
+            this.props.doUpdate();
+        });
+    };
+
+    /**
+     * A debounced version of updateOnResize.
+     */
+    private debouncedUpdateOnResize = debounce(this.updateOnResize, 100, {
+        leading: true,
+    });
 }

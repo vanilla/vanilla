@@ -100,7 +100,7 @@ class BanModel extends Gdn_Model {
                 $newUsers = $this->SQL
                     ->select('u.UserID, u.Banned')
                     ->from('User u')
-                    ->where($this->banWhere($newBan))
+                    ->where($this->banWhere($newBan), null, false)
                     ->where('Admin', 0)// No banning superadmins, pls.
                     ->get()->resultArray();
             } catch (Exception $e) {
@@ -427,7 +427,7 @@ class BanModel extends Gdn_Model {
             $countUsers = $this->SQL
                 ->select('UserID', 'count', 'CountUsers')
                 ->from('User u')
-                ->where($this->banWhere($data))
+                ->where($this->banWhere($data), null, false)
                 ->get()->value('CountUsers', 0);
         } catch (Exception $e) {
             Logger::log(

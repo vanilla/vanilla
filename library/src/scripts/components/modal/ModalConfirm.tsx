@@ -12,6 +12,7 @@ import SmartAlign from "@library/components/SmartAlign";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import { getRequiredID } from "@library/componentIDs";
 import Modal from "@library/components/modal/Modal";
+import ButtonLoader from "@library/components/ButtonLoader";
 
 interface IProps {
     title: string; // required for accessibility
@@ -20,6 +21,7 @@ interface IProps {
     onCancel: () => void;
     onConfirm: () => void;
     children: React.ReactNode;
+    isConfirmLoading?: boolean;
 }
 
 interface IState {
@@ -34,35 +36,43 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
         srOnlyTitle: false,
     };
 
+    private cancelRef;
+    private id;
+
     constructor(props) {
         super(props);
-        this.state = {
-            id: getRequiredID(props, "modalConfirm-"),
-        };
+        this.cancelRef = React.createRef();
+        this.id = getRequiredID(props, "confirmModal");
     }
 
-    public get cancelID() {
-        return this.state.id + "-cancelButton";
+    public get titleID() {
+        return this.id + "-title";
     }
 
     public render() {
+        const { onCancel, onConfirm, srOnlyTitle, isConfirmLoading, title, children } = this.props;
         return (
-            <Modal size={ModalSizes.SMALL} elementToFocus={this.cancelID} exitHandler={this.props.onCancel}>
+            <Modal
+                size={ModalSizes.SMALL}
+                elementToFocus={this.cancelRef.current}
+                exitHandler={onCancel}
+                titleID={this.titleID}
+            >
                 <Frame>
-                    <FrameHeader closeFrame={this.props.onCancel} srOnlyTitle={this.props.srOnlyTitle!}>
-                        {this.props.title}
+                    <FrameHeader titleID={this.titleID} closeFrame={onCancel} srOnlyTitle={srOnlyTitle!}>
+                        {title}
                     </FrameHeader>
                     <FrameBody>
                         <FramePanel>
-                            <SmartAlign className="frameBody-contents">{this.props.children}</SmartAlign>
+                            <SmartAlign className="frameBody-contents">{children}</SmartAlign>
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter>
-                        <Button id={this.cancelID} onClick={this.props.onCancel}>
+                        <Button ref={this.cancelRef} onClick={onCancel}>
                             {t("Cancel")}
                         </Button>
-                        <Button onClick={this.props.onConfirm} className="buttonPrimary">
-                            {t("Ok")}
+                        <Button onClick={onConfirm} className="buttonPrimary" disabled={isConfirmLoading}>
+                            {isConfirmLoading ? <ButtonLoader /> : t("Ok")}
                         </Button>
                     </FrameFooter>
                 </Frame>

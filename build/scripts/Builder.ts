@@ -14,7 +14,7 @@ import { getOptions, BuildMode, IBuildOptions } from "./options";
 import chalk from "chalk";
 import { installNodeModulesInDir } from "./utility/moduleUtils";
 import { makePolyfillConfig } from "./configs/makePolyfillConfig";
-import { printError, print, fail } from "./utility/utils";
+import { print, fail } from "./utility/utils";
 import { DIST_DIRECTORY, VANILLA_APPS } from "./env";
 import EntryModel from "./utility/EntryModel";
 
@@ -28,13 +28,7 @@ import EntryModel from "./utility/EntryModel";
  * - A production build that only builds polyfills. (BuildMode.POLYFILLS)
  */
 export default class Builder {
-    private statOptions = {
-        chunks: false, // Makes the build much quieter
-        modules: false,
-        entrypoints: false,
-        warnings: false,
-        colors: true, // Shows colors in the console
-    };
+    private statOptions: any = this.options.verbose ? "normal" : "minimal";
 
     private entryModel: EntryModel;
 
@@ -57,8 +51,6 @@ export default class Builder {
                 return await this.runProd();
             case BuildMode.DEVELOPMENT:
                 return await this.runDev();
-            case BuildMode.POLYFILLS:
-                return await this.runPolyfill();
         }
     }
 
@@ -87,28 +79,15 @@ export default class Builder {
         // Cleanup
         del.sync(path.join(DIST_DIRECTORY, "**"));
         const sections = await this.entryModel.getSections();
-        const config = await Promise.all(sections.map(section => makeProdConfig(this.entryModel, section)));
+        const config = await Promise.all([
+            ...sections.map(section => makeProdConfig(this.entryModel, section)),
+            makePolyfillConfig(this.entryModel),
+        ]);
         const compiler = webpack(config);
         compiler.run((err: Error, stats: Stats) => {
             if (err || stats.hasErrors()) {
                 print(stats.toString(this.statOptions));
                 fail(`\nThe build encountered an error: ${err}`);
-            }
-
-            print(stats.toString(this.statOptions));
-        });
-    }
-
-    /**
-     * Build the polyfill files. This is entirely independant of any other files.
-     * This should only need to be run if we change browser support.
-     */
-    private async runPolyfill() {
-        const config = await makePolyfillConfig(this.entryModel);
-        const compiler = webpack(config);
-        compiler.run((err: Error, stats: Stats) => {
-            if (err) {
-                printError("The build encountered an error:" + err);
             }
 
             print(stats.toString(this.statOptions));

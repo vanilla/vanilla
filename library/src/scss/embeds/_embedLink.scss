@@ -7,8 +7,8 @@
 $embedLink-linkImage_width: 225px !default;
 $embedLink-linkImage_mobileWidth: 100px !default;
 $embedLink-image_separatorColor: rgba($global-color_fg, .1) !default;
-$embedLink-source_fontSize: $global-medium_fontSize !default;
-$embedLink-excerpt_fontSize: $global-medium_fontSize !default;
+$embedLink-source_fontSize: $userContent_fontSize !default;
+$embedLink-excerpt_fontSize: $userContent_fontSize !default;
 $embedLink-excerpt_lineHeight: $global-base_lineHeight !default;
 
 .embedLink-image {

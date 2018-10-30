@@ -1,4 +1,4 @@
-$embedText-header_fontSize: $global-medium_fontSize !default;
+$embedText-header_fontSize: $userContent_fontSize !default;
 $embedText-title_fontWeight: $global-bold_fontWeight !default;
 $embedText-content_boxShadowColor: rgba($global-color_fg, .3) !default;
 $embedText-content_bg: #ffffff !default;
@@ -63,7 +63,7 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
         margin: {
             top: #{(1 - $global-condensed_lineHeight) * .5em} !important;
             right: 0;
-            bottom: #{$global-medium_fontSize / 2.2};
+            bottom: #{$userContent_fontSize / 2.2};
             left: 0;
         }
     }

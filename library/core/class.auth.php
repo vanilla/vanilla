@@ -60,7 +60,7 @@ class Gdn_Auth extends Gdn_Pluggable {
         $this->fireEvent('startAuthenticator');
 
         // Start the 'session'
-        if ($this->authHandled === false) {
+        if (!Gdn::session()->isValid()) {
             Gdn::session()->start(false, false);
         }
 

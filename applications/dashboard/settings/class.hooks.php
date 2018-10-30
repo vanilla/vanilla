@@ -670,11 +670,8 @@ class DashboardHooks extends Gdn_Plugin {
      *
      * @param Gdn_Auth $sender
      */
-    public function gdn_auth_startAuthenticator_handler($sender) {
+    public function gdn_auth_startAuthenticator_handler() {
         $this->checkAccessToken();
-        if (Gdn::session()->isValid()) {
-            $sender->authHandled = true;
-        }
     }
 
     /**

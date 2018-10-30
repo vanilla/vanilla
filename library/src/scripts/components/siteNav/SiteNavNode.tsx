@@ -257,6 +257,9 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
      * @param event
      */
     private handleKeyDown = event => {
+        if (document.activeElement === null) {
+            return;
+        }
         const currentLink = document.activeElement;
         const siteNavRoot = currentLink.closest(".siteNav");
         const tabHandler = new TabHandler(siteNavRoot!);

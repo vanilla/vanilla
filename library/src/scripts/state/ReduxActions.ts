@@ -186,6 +186,7 @@ export interface IAction<T extends string> {
 
 export interface IActionWithPayload<T extends string, P> extends IAction<T> {
     payload: P;
+    meta?: any;
 }
 
 export interface IActionCreator<T extends string> {

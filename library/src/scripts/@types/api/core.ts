@@ -5,43 +5,23 @@
 
 import { Omit } from "@library/@types/utils";
 
-export const enum LoadStatus {
+export enum LoadStatus {
     PENDING = "PENDING",
     LOADING = "LOADING",
     SUCCESS = "SUCCESS",
     ERROR = "ERROR",
 }
 
-interface IPendingValue {
-    status: LoadStatus.PENDING;
-    data?: undefined;
-    error?: undefined;
-}
-
-interface ILoadingValue<T> {
-    status: LoadStatus.LOADING;
-    data?: T;
+export interface ILoadable<T> {
+    status: LoadStatus;
     error?: IApiError;
-}
-
-interface ISuccessValue<T> {
-    status: LoadStatus.SUCCESS;
-    data: T;
-    error?: undefined;
-}
-
-interface IErrorValue<T> {
-    status: LoadStatus.ERROR;
-    error: IApiError;
     data?: T;
 }
-
-export type ILoadable<T> = IPendingValue | ILoadingValue<T> | ISuccessValue<T> | IErrorValue<T>;
 
 export interface IApiResponse<DataType = any> {
     data: DataType;
     status: number;
-    headers: any;
+    headers?: any;
 }
 
 export interface IFieldError {

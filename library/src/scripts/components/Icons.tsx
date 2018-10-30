@@ -70,6 +70,24 @@ export function close(className?: string, noPadding: boolean = false) {
     );
 }
 
+export function clear(className?: string, noPadding: boolean = false) {
+    const title = t("Clear");
+    return (
+        <svg
+            className={classNames("icon", "icon-close", className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+            <path
+                fill="currentColor"
+                d="M12,5a7,7,0,1,0,7,7A7,7,0,0,0,12,5Zm2.873,5.244L13.118,12l1.755,1.756a.337.337,0,0,1,0,.479l-.638.638a.337.337,0,0,1-.479,0L12,13.118l-1.756,1.755a.337.337,0,0,1-.479,0l-.638-.638a.337.337,0,0,1,0-.479L10.882,12,9.127,10.244a.337.337,0,0,1,0-.479l.638-.638a.337.337,0,0,1,.479,0L12,10.882l1.756-1.755a.337.337,0,0,1,.479,0l.638.638A.337.337,0,0,1,14.873,10.244Z"
+            />
+        </svg>
+    );
+}
+
 export function check(className?: string) {
     const title = `✓`;
     return (
@@ -255,4 +273,106 @@ export function downTriangle(className?: string, title: string = "▾", deg?: nu
 
 export function rightTriangle(title: string = `▶`, className?: string) {
     return downTriangle(className, title, -90);
+}
+
+export function revisionStatus_revision(className?: string) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            className={classNames("icon", "revisionIcon", "revisionIcon-revision", className)}
+            aria-hidden="true"
+        >
+            <rect width="24" height="24" rx="0" ry="0" fill="transparent" />
+        </svg>
+    );
+}
+
+export function revisionStatus_draft(className?: string) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            className={classNames("icon", "revisionIcon", "revisionIcon-draft", className)}
+            aria-hidden="true"
+        >
+            <path
+                fill="currentColor"
+                d="M3.745,21a.483.483,0,0,0,.2-.025L9.109,19.47a1.539,1.539,0,0,0,.742-.444L20.506,8.387A1.733,1.733,0,0,0,21,7.153a1.676,1.676,0,0,0-.494-1.209L18.058,3.5a1.748,1.748,0,0,0-2.447,0L4.981,14.138a2.047,2.047,0,0,0-.445.74L3.028,20.037a.762.762,0,0,0,.2.74A.754.754,0,0,0,3.745,21ZM13.856,7.375l2.793,2.789L9.307,17.5,6.514,14.706ZM16.7,4.537a.267.267,0,0,1,.173-.074.225.225,0,0,1,.173.074L19.492,6.98a.429.429,0,0,1,.074.173.2.2,0,0,1-.074.173L17.712,9.1,14.919,6.314ZM5.747,16.014l2.225,2.221-3.14.913Z"
+            />
+            <path
+                fill="currentColor"
+                d="M3.745,21a.483.483,0,0,0,.2-.025L9.109,19.47a1.539,1.539,0,0,0,.742-.444L20.506,8.387A1.733,1.733,0,0,0,21,7.153a1.676,1.676,0,0,0-.494-1.209L18.058,3.5a1.748,1.748,0,0,0-2.447,0L4.981,14.138a2.047,2.047,0,0,0-.445.74L3.028,20.037a.762.762,0,0,0,.2.74A.754.754,0,0,0,3.745,21ZM13.856,7.375l2.793,2.789L9.307,17.5,6.514,14.706ZM16.7,4.537a.267.267,0,0,1,.173-.074.225.225,0,0,1,.173.074L19.492,6.98a.429.429,0,0,1,.074.173.2.2,0,0,1-.074.173L17.712,9.1,14.919,6.314ZM5.747,16.014l2.225,2.221-3.14.913Z"
+            />
+        </svg>
+    );
+}
+
+export function revisionStatus_pending(className?: string) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            className={classNames("icon", "revisionIcon", "revisionIcon-pending", className)}
+            aria-hidden="true"
+        >
+            <path
+                fill="currentColor"
+                d="M12,3.875a8.194,8.194,0,1,0,8.194,8.194A8.193,8.193,0,0,0,12,3.875Zm0,14.8a6.608,6.608,0,1,1,6.608-6.608A6.606,6.606,0,0,1,12,18.677Zm2.042-3.449-2.8-2.039a.4.4,0,0,1-.162-.32V7.443a.4.4,0,0,1,.4-.4h1.058a.4.4,0,0,1,.4.4v4.682l2.207,1.606a.4.4,0,0,1,.086.555l-.621.856a.4.4,0,0,1-.555.086Z"
+            />
+        </svg>
+    );
+}
+
+export function revisionStatus_published(className?: string) {
+    return checkCompact(className);
+}
+
+export function revisionStatus_deleted(className?: string) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            className={classNames("icon", "revisionIcon", "revisionIcon-deleted", className)}
+            aria-hidden="true"
+        >
+            <path
+                style={currentColorFill}
+                d="M19.444,6.651a.334.334,0,0,0-.247-.1H15.888l-.75-1.788a1.484,1.484,0,0,0-.578-.675,1.512,1.512,0,0,0-.846-.279H10.286a1.512,1.512,0,0,0-.846.279,1.484,1.484,0,0,0-.578.675l-.75,1.788H4.8A.33.33,0,0,0,4.46,6.9v.685a.329.329,0,0,0,.343.343H5.831v10.2a2.348,2.348,0,0,0,.5,1.516,1.507,1.507,0,0,0,1.21.626h8.912a1.5,1.5,0,0,0,1.21-.647,2.438,2.438,0,0,0,.5-1.537V7.925H19.2a.329.329,0,0,0,.343-.343V6.9a.333.333,0,0,0-.1-.246ZM10.126,5.3a.3.3,0,0,1,.182-.118H13.7a.308.308,0,0,1,.182.118L14.4,6.554H9.6L10.126,5.3ZM16.8,18.079a1.212,1.212,0,0,1-.075.433.965.965,0,0,1-.155.289c-.054.061-.091.091-.112.091H7.544c-.021,0-.058-.03-.112-.091a.943.943,0,0,1-.155-.289,1.212,1.212,0,0,1-.075-.433V7.925h9.6V18.079ZM8.915,16.836H9.6a.33.33,0,0,0,.343-.343V10.324A.33.33,0,0,0,9.6,9.982H8.915a.329.329,0,0,0-.342.342v6.169a.329.329,0,0,0,.342.343Zm2.742,0h.686a.329.329,0,0,0,.342-.343V10.324a.329.329,0,0,0-.342-.342h-.686a.329.329,0,0,0-.342.342v6.169a.329.329,0,0,0,.342.343Zm2.742,0h.686a.329.329,0,0,0,.342-.343V10.324a.329.329,0,0,0-.342-.342H14.4a.33.33,0,0,0-.343.342v6.169a.33.33,0,0,0,.343.343Z"
+            />
+        </svg>
+    );
+}
+
+export function help(className?: string) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            className={classNames("icon", "icon-help", className)}
+            aria-hidden="true"
+        >
+            <path
+                d="M12,19a7,7,0,1,0-7-7A7,7,0,0,0,12,19Zm0,1a8,8,0,1,1,8-8A8,8,0,0,1,12,20Zm-.866-6.5v-.338a2,2,0,0,1,.211-.969,2.757,2.757,0,0,1,.741-.8,4.09,4.09,0,0,0,.812-.773,1.156,1.156,0,0,0,.183-.656.826.826,0,0,0-.3-.683,1.333,1.333,0,0,0-.851-.238A2.941,2.941,0,0,0,11,9.185a6.65,6.65,0,0,0-.836.344L9.721,8.6a4.653,4.653,0,0,1,2.3-.6,2.485,2.485,0,0,1,1.645.508,1.727,1.727,0,0,1,.609,1.4,1.983,1.983,0,0,1-.117.706,2.006,2.006,0,0,1-.352.59,5.653,5.653,0,0,1-.812.731,3.088,3.088,0,0,0-.659.64,1.229,1.229,0,0,0-.166.682V13.5Zm-.217,1.688a.7.7,0,0,1,.778-.8.775.775,0,0,1,.582.209.818.818,0,0,1,.2.59.838.838,0,0,1-.2.595.878.878,0,0,1-1.156.006A.844.844,0,0,1,10.917,15.185Z"
+                transform="translate(-4 -4)"
+                fill="currentColor"
+            />
+        </svg>
+    );
+}
+
+export function compose(className?: string) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            className={classNames("icon", "icon-compose", className)}
+            aria-hidden="true"
+        >
+            <path
+                fill="currentColor"
+                d="M23.591,1.27l-.9-.9a1.289,1.289,0,0,0-1.807,0l-.762.863,2.6,2.587.868-.751a1.24,1.24,0,0,0,.248-.373,1.255,1.255,0,0,0,0-1.052A1.232,1.232,0,0,0,23.591,1.27ZM19.5,20.5H3.5V4.5H15.4l1.4-1.431H2.751A1,1,0,0,0,2,4.07V20.939a1,1,0,0,0,1,1H20.011a1,1,0,0,0,1-1V7L19.5,8.445ZM21.364,3.449l-9.875,9.8-.867-.861,9.874-9.8-.867-.863-4.938,4.9-4.938,4.9L8.74,15.167l3.617-1.055,9.875-9.8Z"
+            />
+        </svg>
+    );
 }

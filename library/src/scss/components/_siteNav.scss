@@ -60,8 +60,6 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     }
 
     &.hasChildren {
-        font-weight: $global-semiBold_fontWeight;
-
         &.isFirstLevel {
             font-weight: $global-bold_fontWeight;
         }

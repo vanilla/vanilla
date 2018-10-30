@@ -280,8 +280,8 @@ $formButton_border:                      1px solid !default;
     Bullets
 \* -------------------------------------------------------------- */
 
-$bullet_borderColor:                     orange !default;
-$bullet_bg:                              orange !default;
+$bullet_borderColor:                     $global-color_secondary !default;
+$bullet_bg:                              $global-color_secondary !default;
 $bullet_fg:                              $global-color_white !default;
 
 /* -------------------------------------------------------------- *\

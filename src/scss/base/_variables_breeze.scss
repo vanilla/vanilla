@@ -113,6 +113,14 @@ $formElement_height:                     36px !default;
 $formElement_borderRadius:               #{$formElement_height / 2} !default;
 
 /* -------------------------------------------------------------- *\
+    Bullets
+\* -------------------------------------------------------------- */
+
+$bullet_borderColor:                     $global-color_butter !default;
+$bullet_bg:                              $global-color_butter !default;
+$bullet_fg:                              $global-color_white !default;
+
+/* -------------------------------------------------------------- *\
     Buttons
 \* -------------------------------------------------------------- */
 

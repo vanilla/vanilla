@@ -17,6 +17,7 @@ $global-color_transparent:              transparent;
 $global-color_classic:                  #465775;
 $global-color_navy:                     #333A56;
 $global-color_ash:                      #f0f0f0;
+$global-color_powder:                   #01b4bc;
 
 $global-color_primary:                  $global-color_classic !default;
 $global-color_primaryAlt:               lighten($global-color_primary, 8%) !default;
@@ -69,7 +70,7 @@ $footer-link-hover_color:                $global-color_white !default;
     Navigation
 \* -------------------------------------------------------------- */
 
-$navigation_bg:             $global-color_secondary !default;
+$navigation_bg:                          $global-color_secondary !default;
 $navigation_button-bg:                   $global-color_primary !default;
 
 /* -------------------------------------------------------------- *\
@@ -77,3 +78,10 @@ $navigation_button-bg:                   $global-color_primary !default;
 \* -------------------------------------------------------------- */
 
 $component-item_spacing:                 0 !default;
+
+/* -------------------------------------------------------------- *\
+    Bullets
+\* -------------------------------------------------------------- */
+
+$bullet_borderColor:                     $global-color_powder !default;
+$bullet_bg:                              $global-color_powder !default;

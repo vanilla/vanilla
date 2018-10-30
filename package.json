@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "@vanillaforums/theme-boilerplate": "../theme-boilerplate/vanillaforums-theme-boilerplate-1.0.10.tgz"
+    "@vanillaforums/theme-boilerplate": "^1.0.10"
   }
 }

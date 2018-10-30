@@ -14,13 +14,13 @@ import menu from "@library/components/forms/select/overwrites/menu";
 import selectContainer from "@library/components/forms/select/overwrites/selectContainer";
 import doNotRender from "@library/components/forms/select/overwrites/doNotRender";
 import Paragraph from "@library/components/Paragraph";
-import { IComboBoxOption } from "./BigSearch";
 import SelectOption from "@library/components/forms/select/overwrites/selectOption";
 import { IFieldError } from "@library/@types/api";
 import ErrorMessages from "@library/components/forms/ErrorMessages";
 import valueContainer from "@library/components/forms/select/overwrites/valueContainer";
 import controlContainer from "@library/components/forms/select/overwrites/controlContainer";
 import noOptionsMessage from "./overwrites/noOptionsMessage";
+import { IComboBoxOption } from "./SearchBar";
 
 interface IProps extends IOptionalComponentID {
     label: string;

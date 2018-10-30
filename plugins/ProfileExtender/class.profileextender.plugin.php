@@ -231,11 +231,15 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      * @access private
      */
     private function profileFields($Sender) {
+
+        /** @var \Garden\EventManager $eventManager */
+        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
         // Retrieve user's existing profile fields
         $this->ProfileFields = $this->getProfileFields();
-
+        $this->ProfileFields = $eventManager->fireFilter("modifyProfileFields", $this->ProfileFields);
         // Get user-specific data
         $this->UserFields = Gdn::userModel()->getMeta($Sender->Form->getValue('UserID'), 'Profile.%', 'Profile.');
+        $this->UserFields = $eventManager->fireFilter("modifyUserFields", $this->UserFields);
 
         $this->fireEvent('beforeGetProfileFields');
         // Fill in user data on form

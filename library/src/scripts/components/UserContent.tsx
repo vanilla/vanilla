@@ -28,7 +28,32 @@ export default class UserContent extends React.Component<IUserContent> {
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public componentDidMount() {
         initAllUserContent();
+        this.scrollToHash();
+        window.addEventListener("hashchange", this.scrollToHash);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public componentWillUnmount() {
+        window.removeEventListener("hashchange", this.scrollToHash);
+    }
+
+    /**
+     * Scroll to the window's current hash value.
+     */
+    private scrollToHash = (event?: HashChangeEvent) => {
+        event && event.preventDefault();
+        const id = window.location.hash.replace("#", "");
+        const element = document.querySelector(`[data-id="${id}"]`) as HTMLElement;
+        if (element) {
+            const top = window.pageYOffset + element.getBoundingClientRect().top;
+            window.scrollTo({ top, behavior: "smooth" });
+        }
+    };
 }

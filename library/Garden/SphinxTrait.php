@@ -69,5 +69,4 @@ trait SphinxTrait {
         $prefix = str_replace(['-'], '_', c('Database.Name')) . '_';
         return $prefix . $index;
     }
-
 }

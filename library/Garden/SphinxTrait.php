@@ -2,7 +2,7 @@
 /**
  * @author Alexander Kim <alexander.k@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL v2
+ * @license GPL-2.0-only
  */
 
 namespace Garden;
@@ -43,7 +43,7 @@ trait SphinxTrait {
      */
     public static function sphinxClient(): \SphinxClient {
         if (!self::checkSphinxClient()) {
-            return null;
+            throw new \Exception('Sphinx client class not found.');
         }
         $sphinxHost = c('Plugins.Sphinx.Server', c('Database.Host', 'localhost'));
         $sphinxPort = c('Plugins.Sphinx.Port', 9312);

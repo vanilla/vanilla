@@ -6,8 +6,9 @@
 
 import React from "react";
 import classNames from "classnames";
-import { getRequiredID, IRequiredComponentID } from "../../componentIDs";
+
 import { IFieldError } from "@library/@types/api";
+import { getRequiredID, IRequiredComponentID } from "@library/componentIDs";
 
 interface IProps extends IRequiredComponentID {
     className?: string;

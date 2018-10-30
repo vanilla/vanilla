@@ -18,7 +18,6 @@ interface IProps extends ITabProps {
 /**
  * Implement what looks like a tab, but what is semantically radio button. To be used in the RadioButtonsAsTabs component
  */
-// export default class RadioButtonTab extends React.Component<IRadioButtonTab> {
 class RadioButtonTab extends React.Component<IProps> {
     public render() {
         return (

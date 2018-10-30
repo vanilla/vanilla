@@ -1,14 +1,16 @@
-/**
+/*
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React, { ReactNode } from "react";
 import classNames from "classnames";
+
+import Paragraph from "../Paragraph";
 import { getRequiredID, IOptionalComponentID } from "@library/componentIDs";
-import { IFieldError } from "@library/@types/api";
-import Paragraph from "@library/components/Paragraph";
-import ErrorMessages from "@dashboard/components/forms/ErrorMessages";
+import { IFieldError } from "@library/@types/api/core";
+import ErrorMessages from "./ErrorMessages";
 
 export enum InputTextBlockBaseClass {
     STANDARD = "inputBlock",

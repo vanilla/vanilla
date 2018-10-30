@@ -5,7 +5,7 @@
 
 import { Omit } from "@library/@types/utils";
 
-export const enum LoadStatus {
+export enum LoadStatus {
     PENDING = "PENDING",
     LOADING = "LOADING",
     SUCCESS = "SUCCESS",

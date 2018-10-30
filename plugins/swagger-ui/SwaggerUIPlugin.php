@@ -11,6 +11,7 @@ use AssetModel;
 use Gdn_Plugin;
 use SettingsController;
 use Vanilla\Addon;
+use Vanilla\Web\Assets\LegacyAssetModel;
 
 /**
  * Handles the swagger UI menu options.
@@ -47,7 +48,7 @@ class SwaggerUIPlugin extends Gdn_Plugin {
         $relScripts = ['js/custom.js'];
         $js = [];
         foreach ($relScripts as $path) {
-            $search = AssetModel::jsPath($path, $folder);
+            $search = LegacyAssetModel::jsPath($path, $folder);
             if (!$search) {
                 continue;
             }

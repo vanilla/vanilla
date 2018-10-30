@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { IUserFragment } from "@dashboard/@types/api";
+import { IUserFragment } from "@library/@types/api";
 
 export interface IUserAuthenticator {
     authenticatorID: string;
@@ -21,7 +21,7 @@ export interface IUserAuthenticator {
     sso?: any;
 }
 
-export const enum AuthenticationStep {
+export enum AuthenticationStep {
     AUTHENTICATED = "authenticated",
     LINK_USER = "linkUser",
 }
@@ -40,3 +40,7 @@ export interface IAuthenticatePasswordParams {
 }
 
 export interface IAuthenticatePasswordResponseData extends IUserFragment {}
+
+export interface IRequestPasswordOptions {
+    email: string;
+}

@@ -270,8 +270,15 @@ $formElement_heightWithBorder                        : $formElement_height + 2 *
 $formElement_borderColor                             : $global-border_color !default; // Derived
 $formElement_borderStyle                             : solid;
 $formElement_borderRadius                            : $global_borderRadius !default;
+
+// For Home Page
 $formElement_giantInput_height                       : 82px !default;
 $formElement_giantInput_fontSize                     : 24px !default;
+
+// For Search
+$formElement_largeInput_height                       : 48px !default;
+$formElement_largeInput_fontSize                     : 16px !default;
+
 $formElement_halfHeight                              : $formElement_height / 2 !default; // Derived
 $formElement-borderWidthFull                         : $formElement_borderWidth * 2 !default; // Derived
 $formElement_horizontalPadding                       : $utility-baseUnit * 2 !default; // Derived

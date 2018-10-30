@@ -8,7 +8,7 @@ import React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
 import { splitStringLoosely } from "@library/utility";
-import { IUserFragment } from "@dashboard/@types/api";
+import { IUserFragment } from "@library/@types/api";
 
 export interface IMentionSuggestionData extends IUserFragment {
     domID: string;

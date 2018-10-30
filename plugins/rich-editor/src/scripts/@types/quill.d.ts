@@ -293,6 +293,8 @@ declare module "quill/modules/clipboard" {
     import { DeltaStatic, Sources } from "quill/core";
     import Module from "quill/core/module";
     export default class ClipboardModule extends Module {
+        public container: HTMLElement;
+
         addMatcher(
             selectorOrNodeType: string | number,
             callback: (node: any, delta: DeltaStatic) => DeltaStatic | undefined,

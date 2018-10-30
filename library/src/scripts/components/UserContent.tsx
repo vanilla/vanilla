@@ -8,8 +8,9 @@ import * as React from "react";
 import className from "classnames";
 import { initAllUserContent } from "../user-content/index";
 
-interface IUserContent {
+interface IProps {
     className?: string;
+    scrollToOffset?: number;
     content: string;
 }
 
@@ -18,7 +19,11 @@ interface IUserContent {
  *
  * This will ensure that all embeds/etc are initialized.
  */
-export default class UserContent extends React.Component<IUserContent> {
+export default class UserContent extends React.Component<IProps> {
+    public static defaultProps: Partial<IProps> = {
+        scrollToOffset: 0,
+    };
+
     public render() {
         return (
             <div
@@ -52,7 +57,7 @@ export default class UserContent extends React.Component<IUserContent> {
         const id = window.location.hash.replace("#", "");
         const element = document.querySelector(`[data-id="${id}"]`) as HTMLElement;
         if (element) {
-            const top = window.pageYOffset + element.getBoundingClientRect().top;
+            const top = window.pageYOffset + element.getBoundingClientRect().top + this.props.scrollToOffset!;
             window.scrollTo({ top, behavior: "smooth" });
         }
     };

@@ -59,7 +59,7 @@ export class SiteNav extends React.Component<IProps, IState> {
                 <h2 id={this.titleID} className="sr-only">
                     {t("Site Navigation")}
                 </h2>
-                <ul className={`siteNav-children hasDepth-${0}`} role="tree" aria-labelledby={this.titleID}>
+                <ul className="siteNav-children hasDepth-0" role="tree" aria-labelledby={this.titleID}>
                     {content}
                 </ul>
             </nav>

@@ -27,8 +27,6 @@ $global-color_fg:                       darken(desaturate($global-color_primary,
 
 $global-body_bg:                        $global-color_bg !default;
 
-$link_default_hover-color:              $global-color_coral !default;
-
 /* -------------------------------------------------------------- *\
     Theme Colors
 \* -------------------------------------------------------------- */
@@ -99,32 +97,26 @@ $mebox_hover_bg:                         mix($global-color_black, $header-bg, 12
 $searchbox-button_borderWidth:           0 !default;
 
 /* -------------------------------------------------------------- *\
-    Count
-\* -------------------------------------------------------------- */
-
-$count-hover_bg:                         $global-color_butter !default;
-
-/* -------------------------------------------------------------- *\
     Form Elements
 \* -------------------------------------------------------------- */
 
 $formElement_height:                     36px !default;
-$formElement_borderRadius:               #{$formElement_height / 2} !default;
+$formElement_borderRadius:               25px !default;
 
-///* -------------------------------------------------------------- *\
-//    Bullets
-//\* -------------------------------------------------------------- */
-//
-//$bullet_borderColor:                     $global-color_primary !default;
-//$bullet_bg:                              $global-color_primary !default;
-//$bullet_fg:                              $global-color_white !default;
-//
-///* -------------------------------------------------------------- *\
-//    Count
-//\* -------------------------------------------------------------- */
-//
-//$count-hover_bg:                         $global-color_primary !default;
-//$count-hover_borderColor:                $global-color_primary !default;
+/* -------------------------------------------------------------- *\
+    Bullets
+\* -------------------------------------------------------------- */
+
+$bullet_borderColor:                     $global-color_butter !default;
+$bullet_bg:                              $global-color_butter !default;
+$bullet_fg:                              $global-color_white !default;
+
+/* -------------------------------------------------------------- *\
+    Count
+\* -------------------------------------------------------------- */
+
+$count-hover_bg:                         $global-color_primary !default;
+$count-hover_borderColor:                $global-color_primary !default;
 
 /* -------------------------------------------------------------- *\
     Buttons

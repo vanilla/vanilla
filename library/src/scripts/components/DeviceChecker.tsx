@@ -50,6 +50,8 @@ export default class DeviceChecker extends React.Component<IDeviceCheckerProps> 
                 case "3":
                     device = Devices.NO_BLEED;
                     break;
+                default:
+                    device = Devices.DESKTOP;
             }
             return device;
         } else {

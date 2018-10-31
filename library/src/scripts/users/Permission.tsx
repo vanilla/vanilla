@@ -9,6 +9,7 @@ import { connect } from "react-redux";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import { LoadStatus } from "@library/@types/api";
 import UsersActions, { IInjectableUsersActions } from "@library/users/UsersActions";
+import { logError } from "@library/utility";
 
 interface IProps extends IInjectableUserState, IInjectableUsersActions {
     permission: string | string[];
@@ -33,6 +34,13 @@ export class Permission extends React.Component<IProps> {
         if (this.props.currentUser.status === LoadStatus.PENDING) {
             void this.props.usersActions.getMe();
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public componentDidCatch(error, info) {
+        logError(error, info);
     }
 
     /**

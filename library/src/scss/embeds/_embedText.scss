@@ -1,8 +1,13 @@
 $embedText-header_fontSize: $userContent_fontSize !default;
-$embedText-title_fontWeight: $global-bold_fontWeight !default;
+$embedText-title_fontWeight: $global-fontWeight_bold !default;
 $embedText-content_boxShadowColor: rgba($global-color_fg, .3) !default;
 $embedText-content_bg: #ffffff !default;
 $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !default;
+
+.embedText {
+    font-size: $global-medium_fontSize;
+}
+
 
 .embedText-content {
     display: block;

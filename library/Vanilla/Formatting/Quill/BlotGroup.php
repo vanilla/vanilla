@@ -277,12 +277,18 @@ class BlotGroup {
     }
 
     /**
-     * Get heading text with html tags stripped out.
+     * Get the text value of a heading. This is not sanitized, so be sure to HTML escape before using.
      *
      * @return string
      */
-    public function getText(): string {
-        $text = strip_tags($this->render());
+    public function getUnsafeText(): string {
+        $text = "";
+        foreach ($this->blots as $blot) {
+            if ($blot instanceof TextBlot) {
+                $text .= $blot->getContent();
+            }
+        }
+
         return $text;
     }
 }

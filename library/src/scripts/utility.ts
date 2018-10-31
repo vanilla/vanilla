@@ -125,6 +125,22 @@ export function hashString(str: string): number {
 }
 
 /**
+ * Parse a string into a URL friendly format.
+ *
+ * Eg. Why Uber isn’t spelled Über -> why-uber-isnt-spelled-uber
+ *
+ * @param str The string to parse.
+ */
+export function slugify(str: string): string {
+    return str
+        .normalize("NFD") // Normalize accented characters into ASCII equivalents
+        .replace(/[^\w\s$*_+~.()'"!\-:@]/g, "") // REmove characters that don't URL encode well
+        .trim() // Trim whitespace
+        .replace(/[-\s]+/g, "-") // Normalize whitespace
+        .toLocaleLowerCase(); // Convert to locale aware lowercase.
+}
+
+/**
  * Split a string in multiple pieces similar to String.prototype.split but ignore most acccent characters.
  *
  * This will still return pieces with accents.

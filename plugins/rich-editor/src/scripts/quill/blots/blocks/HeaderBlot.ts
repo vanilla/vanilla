@@ -5,7 +5,7 @@
  */
 
 import Header from "quill/formats/header";
-import { hashString } from "@library/utility";
+import { slugify } from "@library/utility";
 
 interface IValue {
     level: 2;
@@ -16,8 +16,12 @@ interface IValue {
  * Overridden heading blot that keeps a deterministicly calculated reference to its contents.
  */
 export default class HeaderBlot extends Header {
+    /**
+     * Extend the existing header blot creation to allow for extra data saved.
+     *
+     * @param value - Either the basic header blot format (just the number of the level), or an expanded one with a ref.
+     */
     public static create(value: IValue | number) {
-        console.log(value);
         let level;
         if (typeof value === "number") {
             level = value;
@@ -32,14 +36,21 @@ export default class HeaderBlot extends Header {
         return element;
     }
 
+    /**
+     * Calculate a "unique" ID for the header.
+     * This is deterministic but there can be collisions if headings are identical.
+     *
+     * @param val
+     */
     private static calcUniqueID(val: string): string {
-        val = val.replace(/[\s\!\@\#\$\%\^\&\*\(\)\?]+/, "-");
-        if (val.length > 50) {
-            val = val.substring(0, 50) + "-" + hashString(val);
-        }
-        return encodeURIComponent(val);
+        return encodeURIComponent(slugify(val));
     }
 
+    /**
+     * Override built in formats method to return a unique ID in addition to the heading level.
+     *
+     * @param domNode The element to pull a value out of.
+     */
     public static formats(domNode: Element): IValue {
         return {
             level: super.formats(domNode),

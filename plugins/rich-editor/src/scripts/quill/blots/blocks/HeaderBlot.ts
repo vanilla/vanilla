@@ -6,10 +6,17 @@
 
 import Header from "quill/formats/header";
 import { slugify } from "@library/utility";
+import { setData, getData } from "@library/dom";
 
 interface IValue {
     level: 2;
     ref: string;
+}
+
+interface IContext {
+    headerIDCounts: {
+        [id: string]: number;
+    };
 }
 
 /**
@@ -29,11 +36,11 @@ export default class HeaderBlot extends Header {
             level = value.level;
         }
 
-        const element = super.create(level) as Element;
-        if (typeof value === "object" && value.ref) {
-            element.setAttribute("data-id", value.ref);
+        const heading = super.create(level) as Element;
+        if (typeof value === "object") {
+            heading.setAttribute("data-id", value.ref);
         }
-        return element;
+        return heading;
     }
 
     /**
@@ -42,7 +49,7 @@ export default class HeaderBlot extends Header {
      *
      * @param val
      */
-    private static calcUniqueID(val: string): string {
+    public static calcUniqueID(val: string): string {
         return encodeURIComponent(slugify(val));
     }
 
@@ -54,7 +61,7 @@ export default class HeaderBlot extends Header {
     public static formats(domNode: Element): IValue {
         return {
             level: super.formats(domNode),
-            ref: this.calcUniqueID(domNode.textContent || ""),
+            ref: domNode.getAttribute("data-id") || "",
         };
     }
 }

@@ -8,7 +8,7 @@ import React from "react";
 import { t } from "@library/application";
 import getStore from "@library/state/getStore";
 import { log, debug } from "@library/utility";
-import { delegateEvent, removeDelegatedEvent } from "@library/dom";
+import { delegateEvent, removeDelegatedEvent, setData } from "@library/dom";
 import EmbedPopover from "@rich-editor/components/popovers/EmbedPopover";
 import EmojiPopover from "@rich-editor/components/popovers/EmojiPopover";
 import MentionToolbar from "@rich-editor/components/toolbars/MentionToolbar";
@@ -28,6 +28,7 @@ import registerQuill from "@rich-editor/quill/registerQuill";
 import { uniqueId } from "lodash";
 import classNames from "classnames";
 import Permission from "@library/users/Permission";
+import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -204,8 +205,39 @@ export class Editor extends React.Component<IProps> {
      * Get the content out of the quill editor.
      */
     public getEditorOperations(): DeltaOperation[] | undefined {
+        this.ensureUniqueHeaderIDs();
         return this.quill.getContents().ops;
     }
+
+    /**
+     * Loop through the editor document and ensure every header has a unique data-id.
+     */
+    private ensureUniqueHeaderIDs() {
+        const headers = this.quill.root.querySelectorAll("h2, h3");
+        this.headerCounts = {};
+        headers.forEach(this.setUniqueIDForHeader);
+    }
+
+    private headerCounts = {};
+
+    /**
+     * Generate and set a uniqueID on an element.
+     */
+    private setUniqueIDForHeader = (element: Element) => {
+        let id = HeaderBlot.calcUniqueID(element.textContent || "");
+        let inc: number | null = null;
+        if (!this.headerCounts[id]) {
+            this.headerCounts[id] = 1;
+        } else {
+            inc = this.headerCounts[id];
+            this.headerCounts[id]++;
+        }
+
+        if (inc !== null) {
+            id += "-" + inc;
+        }
+        element.setAttribute("data-id", id);
+    };
 
     /**
      * Get the content out of the quill editor.

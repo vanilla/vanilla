@@ -30,7 +30,7 @@
     @include maxWidth {
         height: auto;
         background-image: none !important;
-        background: transparent;
+        background: $content_bg;
 
         .HomepageTitle,
         .PageDescription {

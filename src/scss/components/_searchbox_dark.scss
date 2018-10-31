@@ -5,7 +5,7 @@
  */
 
 .Frame-content .SearchBox {
-    #Form_search,
+    .InputBox.BigInput,
     #Form_Search {
         background-color: $global-color_bg;
         color: $global-color_white;
@@ -17,7 +17,7 @@
 }
 
 .Herobanner .SearchBox {
-    #Form_search,
+    .InputBox.BigInput,
     #Form_Search {
 
         @include maxWidth {

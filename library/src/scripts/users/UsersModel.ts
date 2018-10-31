@@ -33,9 +33,9 @@ export default class UsersModel implements ReduxReducer<IUsersState> {
      * @param state
      */
     public static mapStateToProps(state: IUsersStoreState): IInjectableUserState {
-        if (!("users" in state)) {
+        if (!state.users || !state.users.current) {
             throw new Error(
-                `It seems you did not initialize the users model correctly. Could not find "users" in state: ${state}`,
+                `It seems you did not initialize the users model correctly. Could not find "users.current" in state: ${state}`,
             );
         }
 

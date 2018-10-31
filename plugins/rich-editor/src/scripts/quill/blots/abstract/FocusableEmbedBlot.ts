@@ -30,8 +30,6 @@ export default class FocusableEmbedBlot extends BlockEmbed {
         return node;
     }
 
-    public domNode: HTMLElement;
-
     constructor(domNode) {
         super(domNode);
         this.focusableElement.setAttribute("tabindex", -1);
@@ -97,6 +95,9 @@ export default class FocusableEmbedBlot extends BlockEmbed {
      * Get the focusable element inside of this blot. This is not necessarily the one we set here in child nodes. It will be whatever gets the FOCUS_CLASS.
      */
     private get focusableElement(): HTMLElement {
+        if (!(this.domNode instanceof HTMLElement)) {
+            throw new Error("A focusable embed blot must be initialize with an HTMLElement.");
+        }
         if (this.domNode.classList.contains(FOCUS_CLASS)) {
             return this.domNode;
         } else {

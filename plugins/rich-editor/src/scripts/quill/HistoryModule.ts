@@ -35,7 +35,7 @@ export default class HistoryModule extends BaseHistoryModule {
     public undoKeyboardListener = (event: KeyboardEvent) => {
         // Quill's Keyboard.match() FAILS to match a shortkey + z for some reason. Just check it ourself.
         if (event.keyCode === this.Z_KEYCODE && event[SHORTKEY]) {
-            if (document.activeElement.classList.contains(FOCUS_CLASS)) {
+            if (document.activeElement && document.activeElement.classList.contains(FOCUS_CLASS)) {
                 if (event.shiftKey) {
                     this.redo();
                 } else {

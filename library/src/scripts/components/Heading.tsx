@@ -10,6 +10,7 @@ import classNames from "classnames";
 export interface ICommonHeadingProps {
     id?: string;
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
+    renderAsDepth?: 1 | 2 | 3 | 4 | 5 | 6;
     className?: string;
 }
 
@@ -18,7 +19,7 @@ export interface IStringTitle extends ICommonHeadingProps {
 }
 
 export interface IComponentTitle extends ICommonHeadingProps {
-    children: JSX.Element | string;
+    children: React.ReactNode;
 }
 
 export type IHeadingProps = IStringTitle | IComponentTitle;
@@ -31,6 +32,10 @@ export default class Heading extends React.Component<IHeadingProps> {
         depth: 2,
     };
 
+    private get renderAsDepth(): number {
+        return this.props.renderAsDepth ? this.props.renderAsDepth : this.props.depth!;
+    }
+
     public render() {
         const Tag = `h${this.props.depth}`;
         const stringTitle = "title" in this.props ? this.props.title : this.props.children;
@@ -41,8 +46,8 @@ export default class Heading extends React.Component<IHeadingProps> {
                 id={this.props.id}
                 className={classNames(
                     "heading",
-                    `heading-${this.props.depth}`,
-                    { pageTitle: this.props.depth === 1 },
+                    `heading-${this.renderAsDepth}`,
+                    { pageTitle: this.renderAsDepth === 1 },
                     this.props.className,
                 )}
             >

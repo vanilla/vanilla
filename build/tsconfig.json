@@ -12,7 +12,8 @@
         "paths": {
             "happypack": ["scripts/@types/happypack"],
             "prettier-webpack-plugin": ["scripts/@types/prettier-webpack-plugin"],
-          }
+            "terser-webpack-plugin": ["scripts/@types/terser-webpack-plugin"]
+        }
     },
     "include": ["scripts/**/*.ts"],
 }

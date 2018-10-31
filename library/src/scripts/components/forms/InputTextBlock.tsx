@@ -1,18 +1,27 @@
-/**
+/*
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { ReactNode } from "react";
 import classNames from "classnames";
+
+import Paragraph from "../Paragraph";
 import { getRequiredID, IOptionalComponentID } from "@library/componentIDs";
-import { IFieldError } from "@library/@types/api";
-import Paragraph from "@library/components/Paragraph";
-import ErrorMessages from "@dashboard/components/forms/ErrorMessages";
+import { IFieldError } from "@library/@types/api/core";
+import ErrorMessages from "./ErrorMessages";
+
+export enum InputTextBlockBaseClass {
+    STANDARD = "inputBlock",
+    CUSTOM = "",
+}
 
 export interface IInputTextProps extends IOptionalComponentID {
     className?: string;
-    label: string;
+    label: ReactNode;
+    labelClassName?: string;
+    noteAfterInput?: string;
     value: string;
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     labelNote?: string;
@@ -26,6 +35,7 @@ export interface IInputTextProps extends IOptionalComponentID {
     required?: boolean;
     errors?: IFieldError[];
     disabled?: boolean;
+    baseClass?: InputTextBlockBaseClass;
 }
 
 interface IState {
@@ -37,6 +47,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
         disabled: false,
         type: "text",
         errors: [],
+        baseClass: InputTextBlockBaseClass.STANDARD,
     };
 
     private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
@@ -49,7 +60,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
     }
 
     public render() {
-        const componentClasses = classNames("inputBlock", this.props.className);
+        const componentClasses = classNames(this.props.baseClass, this.props.className);
         const inputClasses = classNames("inputBlock-inputText", "InputBox", "inputText", this.props.inputClassNames);
         const hasErrors = !!this.props.errors && this.props.errors.length > 0;
 
@@ -61,8 +72,10 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
         return (
             <label className={componentClasses}>
                 <span id={this.labelID} className="inputBlock-labelAndDescription">
-                    <span className="inputBlock-labelText">{this.props.label}</span>
-                    <Paragraph id={false} className="inputBlock-labelNote" children={this.props.labelNote} />
+                    <span className={classNames("inputBlock-labelText", this.props.labelClassName)}>
+                        {this.props.label}
+                    </span>
+                    <Paragraph className="inputBlock-labelNote" children={this.props.labelNote} />
                 </span>
 
                 <span className="inputBlock-inputWrap">
@@ -82,6 +95,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
                         ref={this.inputRef}
                     />
                 </span>
+                <Paragraph className="inputBlock-labelNote" children={this.props.noteAfterInput} />
                 <ErrorMessages id={this.errorID} errors={this.props.errors} />
             </label>
         );

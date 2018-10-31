@@ -14,27 +14,26 @@ $global-color_black:                    #000;
 $global-color_white:                    #fff;
 $global-color_transparent:              transparent;
 
-$global-color_breeze:                   #7fafba;
-$global-color_butter:                   #eec563;
-$global-color_salmon:                   #C98474;
-$global-color_cream:                    #fdfdfd;
+$global-color_navy:                     #22252C;
+$global-color_butter:                   #E9B000;
+$global-color_coral:                    #E14658;
 
-$global-color_primary:                  $global-color_salmon !default;
+$global-color_primary:                  $global-color_coral !default;
 $global-color_primaryAlt:               darken($global-color_primary, 8%) !default;
-$global-color_secondary:                $global-color_breeze !default;
+$global-color_secondary:                $global-color_navy !default;
 
 $global-color_bg:                       $global-color_white !default;
-$global-color_fg:                       darken(desaturate($global-color_salmon, 70%), 12%) !default; // text color | should have high contrast between $global-color_bg
+$global-color_fg:                       darken(desaturate($global-color_primary, 70%), 12%) !default; // text color | should have high contrast between $global-color_bg
 
 $global-body_bg:                        $global-color_bg !default;
 
-$link_default_hover-color:              $global-color_secondary !default;
+$link_default_hover-color:              $global-color_coral !default;
 
 /* -------------------------------------------------------------- *\
     Theme Colors
 \* -------------------------------------------------------------- */
 
-$theme-border_color:                    rgba(mix($global-color_fg, $global-color_primary, 34%), .2) !default;
+$theme-border_color:                    rgba(mix($global-color_fg, $global-color_secondary, 34%), .2) !default;
 $theme-hover_color:                     rgba(mix($global-color_fg, $global-color_primary, 12%), .2) !default;
 
 $theme-link-hover_textDecoration:       underline !default;
@@ -47,7 +46,7 @@ $theme-heading-hover_color:             $global-color_primary !default;
 \* -------------------------------------------------------------- */
 
 $header_minHeight:                       48px !default;
-$header_bg:                              $global-color_breeze !default;
+$header_bg:                              $global-color_navy !default;
 
 /* -------------------------------------------------------------- *\
     Navigation
@@ -72,7 +71,7 @@ $footer_bg:                              rgba($global-color_secondary, .2) !defa
     Navigation
 \* -------------------------------------------------------------- */
 
-$navigation_bg:                          darken($header_bg, 6%) !default;
+$navigation_bg:                          lighten($header_bg, 10%) !default;
 
 /* -------------------------------------------------------------- *\
     Components

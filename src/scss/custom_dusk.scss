@@ -6,7 +6,7 @@
 
 /* ------------------ Theme ------------------ */
 
-@import "base/variables_blueberry";
+@import "base/variables_dark";
 @import "base/variables";
 
 /* --------------- Boilerplate --------------- */
@@ -16,12 +16,11 @@
 /* --------------- Components --------------- */
 
 @import "components/herobanner";
-@import "components/form_blueberry";
-@import "components/lists_blueberry";
-@import "components/searchbox";
+@import "components/lists_dark";
+@import "components/searchbox_dark";
 
 /* ------------------ Sections ------------------ */
 
-@import "sections/footer_blueberry";
-@import "sections/panel_blueberry";
+@import "sections/header_dark";
+@import "sections/navigation_dark";
 @import "sections/themeoptions";

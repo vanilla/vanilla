@@ -6,7 +6,7 @@
 
 /* ------------------ Theme ------------------ */
 
-@import "base/variables_breeze";
+@import "base/variables_coral";
 @import "base/variables";
 
 /* --------------- Boilerplate --------------- */
@@ -16,9 +16,9 @@
 /* --------------- Components --------------- */
 
 @import "components/herobanner";
-@import "components/lists_breeze";
+@import "components/lists_coral";
 
 /* ------------------ Sections ------------------ */
 
-@import "sections/header_breeze";
+@import "sections/header_coral";
 @import "sections/themeoptions";

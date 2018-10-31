@@ -22,8 +22,9 @@
             "Default": "%s_default",
             "Classic": "%s_classic",
             "Dark": "%s_dark",
-            "Blueberry": "%s_blueberry",
-            "Breeze": "%s_breeze"
+            "Cerulean": "%s_cerulean",
+            "Coral": "%s_coral",
+            "Dusk": "%s_dusk"
         }
     }
 }

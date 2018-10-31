@@ -14,8 +14,8 @@ $global-color_black:                    #000;
 $global-color_white:                    #FFF;
 $global-color_transparent:              transparent;
 
-$global-color_blueberry:                #6B7A8F;
-$global-color_apricot:                  #F7882F;
+$global-color_cerulean:                 #6B7A8F;
+$global-color_apricot:                  #E77A2F;
 $global-color_powderblue:               #3d8ac1;
 
 $global-color_primary:                  $global-color_powderblue !default;
@@ -23,13 +23,15 @@ $global-color_primaryAlt:               darken($global-color_primary, 8%) !defau
 $global-color_secondary:                $global-color_apricot !default;
 
 $global-color_bg:                       $global-color_white !default;
-$global-color_fg:                       darken(desaturate($global-color_blueberry, 1%), 10%) !default; // text color | should have high contrast between $global-color_bg
+$global-color_fg:                       darken(desaturate($global-color_cerulean, 1%), 10%) !default; // text color | should have high contrast between $global-color_bg
 
 $global-body_bg:                        $global-color_bg !default;
 
 /* -------------------------------------------------------------- *\
     Theme
 \* -------------------------------------------------------------- */
+
+$theme-border_color:                     mix($global-color_fg, $global-color_bg, 24%) !default;
 
 $theme-link-hover_textDecoration:        underline !default;
 $theme-photo_size:                       52px !default;
@@ -39,7 +41,7 @@ $theme-photo_size:                       52px !default;
 \* -------------------------------------------------------------- */
 
 $header_minHeight:                       50px !default;
-$header_bg:                              $global-color_blueberry !default;
+$header_bg:                              $global-color_cerulean !default;
 $header_color:                           $global-color_white !default;
 $header-hover_color:                     $global-color_white !default;
 $header_border:                          1px solid rgba($header_bg, .3) !default;
@@ -47,6 +49,8 @@ $header_border:                          1px solid rgba($header_bg, .3) !default
 /* -------------------------------------------------------------- *\
     Panel
 \* -------------------------------------------------------------- */
+
+$panel-hover_bg:                         transparent  !default;
 
 $panel_item-spacing:                     6px !default;
 $panel_item-borderRadius:                $global_borderRadius !default;
@@ -64,7 +68,7 @@ $footer-link-hover_color:                darken($global-color_secondary, 8%) !de
     Navigation
 \* -------------------------------------------------------------- */
 
-$navigation_bg:                           darken($global-color_blueberry, 8%) !default;
+$navigation_bg:                           darken($global-color_cerulean, 8%) !default;
 $navigation_color:                        $global-color_white !default;
 $navigation_button-bg:                    $global-color_primary !default;
 $navigation_button-hover-bg:              $global-color_primaryAlt !default;
@@ -80,6 +84,27 @@ $hamburger_color:                         $global-color_white !default;
 \* -------------------------------------------------------------- */
 
 $component_borderWidth:                  0 !default;
+$component_borderColor:                  $theme-border_color !default;
 $component_boxShadow:                    0 1px 4px 0 rgba(0,0,0, .3) !default;
 $component-meta-link_color:              $global-color_primary !default;
 $component-meta-link-hover_color:        $global-color_primaryAlt !default;
+
+/* -------------------------------------------------------------- *\
+    Pager
+\* -------------------------------------------------------------- */
+
+$pager_border:                           1px solid $component_borderColor !default;
+
+/* -------------------------------------------------------------- *\
+    Bullet
+\* -------------------------------------------------------------- */
+
+$bullet_bg:                              $global-color_secondary !default;
+$bullet_borderColor:                     $global-color_secondary !default;
+
+/* -------------------------------------------------------------- *\
+    Count
+\* -------------------------------------------------------------- */
+
+$count-hover_bg:                         $global-color_secondary !default;
+$count-hover_borderColor:                $global-color_secondary !default;

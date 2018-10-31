@@ -5,14 +5,13 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Library\Core;
+use PHPUnit\Framework\TestCase;
 
-use VanillaTests\SharedBootstrapTestCase;
 
 /**
  * Test some of the global functions that operate (or mostly operate) on arrays.
  */
-class IpEncodeDecodeTest extends SharedBootstrapTestCase {
+class IpEncodeDecodeTest extends TestCase {
     /**
      * Test encoding/decoding IPs in array.
      *

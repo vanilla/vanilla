@@ -63,13 +63,13 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
         return $embedManager;
     }
 
-    // @codingStandardsIgnoreLineStart
     /**
      * Provide parameters for verifying rendered data.
      *
      * @return array
      */
     public function provideRenderedData() {
+        // @codingStandardsIgnoreStart
         $data = [
             [
                 [
@@ -614,9 +614,9 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
 </div>'
             ]
         ];
+        // @codingStandardsIgnoreEnd
         return $data;
     }
-    // @codingStandardsIgnoreLineEnd
 
     /**
      * Verify rendered data results.

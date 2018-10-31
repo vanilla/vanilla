@@ -11,7 +11,6 @@ import { downTriangle, rightTriangle } from "@library/components/Icons";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
 import TabHandler from "@library/TabHandler";
-import { ReactNodeArray } from "react";
 
 interface IProps {
     name: string;
@@ -40,6 +39,78 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
             open: false,
             current: false,
         };
+    }
+
+    public render() {
+        const hasChildren = this.props.children && this.props.children.length > 0;
+        const depthClass = `hasDepth-${this.props.depth + 1}`;
+        const childrenContents =
+            hasChildren &&
+            this.props.children.map((child, i) => {
+                return (
+                    <SiteNavNode
+                        {...child}
+                        key={"siteNavNode-" + this.props.counter + "-" + i}
+                        counter={this.props.counter! + 1}
+                        openParent={this.openSelfAndOpenParent}
+                        location={this.props.location}
+                        depth={this.props.depth + 1}
+                    />
+                );
+            });
+        return (
+            <li
+                className={classNames("siteNavNode", this.props.className, depthClass, {
+                    isCurrent: this.state.current,
+                })}
+                role="treeitem"
+                aria-expanded={this.state.open}
+            >
+                {hasChildren && (
+                    <div className="siteNavNode-buttonOffset">
+                        <Button
+                            tabIndex={-1}
+                            ariaHidden={true}
+                            title={t("Toggle Category")}
+                            ariaLabel={t("Toggle Category")}
+                            onClick={this.handleClick as any}
+                            baseClass={ButtonBaseClass.CUSTOM}
+                            className="siteNavNode-toggle"
+                        >
+                            {this.state.open ? downTriangle(t("Expand")) : rightTriangle(t("Collapse"))}
+                        </Button>
+                    </div>
+                )}
+                {!hasChildren && (
+                    <span className="siteNavNode-spacer" aria-hidden={true}>
+                        {` `}
+                    </span>
+                )}
+                <div className={classNames("siteNavNode-contents")}>
+                    <Link
+                        onKeyDownCapture={this.handleKeyDown}
+                        className={classNames("siteNavNode-link", {
+                            hasChildren,
+                            isFirstLevel: this.props.depth === 0,
+                        })}
+                        tabIndex={0}
+                        to={this.props.url}
+                    >
+                        <span className="siteNavNode-label">{this.props.name}</span>
+                    </Link>
+                    {hasChildren && (
+                        <ul
+                            className={classNames("siteNavNode-children", depthClass, {
+                                isHidden: !this.state.open,
+                            })}
+                            role="group"
+                        >
+                            {childrenContents}
+                        </ul>
+                    )}
+                </div>
+            </li>
+        );
     }
 
     /**
@@ -159,73 +230,6 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
         this.openRecursive();
     }
 
-    public render() {
-        const hasChildren = this.props.children && this.props.children.length > 0;
-        const childrenContents =
-            hasChildren &&
-            this.props.children.map((child, i) => {
-                return (
-                    <SiteNavNode
-                        {...child}
-                        key={"siteNavNode-" + this.props.counter + "-" + i}
-                        counter={this.props.counter! + 1}
-                        openParent={this.openSelfAndOpenParent}
-                        location={this.props.location}
-                    />
-                );
-            });
-
-        const spacer = <span className="siteNavNode-spacer" aria-hidden={true}>{` `}</span>;
-        const spacers: JSX.Element[] = [];
-        for (let i = 0; i < this.props.depth; i++) {
-            spacers.push(spacer);
-        }
-
-        return (
-            <li
-                className={classNames("siteNavNode", this.props.className, { isCurrent: this.state.current })}
-                role="treeitem"
-                aria-expanded={this.state.open}
-            >
-                <div className={classNames("siteNavNode-contents")}>
-                    {spacer}
-                    {!hasChildren && spacer}
-                    {hasChildren && (
-                        <Button
-                            tabIndex={-1}
-                            ariaHidden={true}
-                            title={t("Toggle Category")}
-                            ariaLabel={t("Toggle Category")}
-                            onClick={this.handleClick as any}
-                            baseClass={ButtonBaseClass.CUSTOM}
-                            className="siteNavNode-toggle"
-                        >
-                            {this.state.open ? downTriangle(t("Expand")) : rightTriangle(t("Collapse"))}
-                        </Button>
-                    )}
-                    <Link
-                        onKeyDownCapture={this.handleKeyDown}
-                        className={classNames("siteNavNode-link", {
-                            hasChildren,
-                            isFirstLevel: this.props.depth === 0,
-                        })}
-                        tabIndex={0}
-                        to={this.props.url}
-                    >
-                        <span className="siteNavNode-label">{this.props.name}</span>
-                    </Link>
-                </div>
-                {hasChildren && (
-                    <React.Fragment>
-                        <ul className={classNames("siteNavNode-children", { isHidden: !this.state.open })} role="group">
-                            {childrenContents}
-                        </ul>
-                    </React.Fragment>
-                )}
-            </li>
-        );
-    }
-
     /**
      * Select next visible elemnt in tree
      * @param tabHandler The tab handler handler
@@ -249,6 +253,13 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
             prevElement.focus();
         }
     };
+
+    /**
+     * Keyboard handler for arrow up, arrow down, home and end.
+     * For full accessibility docs, see https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
+     * Note that some of the events are on the SiteNavNode
+     * @param event
+     */
 
     /**
      * Keyboard handler for arrow right and arrow left.

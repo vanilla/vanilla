@@ -32,6 +32,9 @@ export default class ParagraphToolbarMenuItems extends React.PureComponent<IProp
                 isParagraphEnabled = false;
             }
         });
+
+        const headerObjectLevel = typeof activeFormats.header === "object" ? activeFormats.header.level : null;
+
         return [
             {
                 icon: icons.pilcrow(),
@@ -44,15 +47,15 @@ export default class ParagraphToolbarMenuItems extends React.PureComponent<IProp
                 icon: icons.heading2(),
                 label: t("Format as Title"),
                 onClick: this.formatH2,
-                isActive: activeFormats.header === 2,
-                isDisabled: activeFormats.header === 2,
+                isActive: activeFormats.header === 2 || headerObjectLevel === 2,
+                isDisabled: activeFormats.header === 2 || headerObjectLevel === 2,
             },
             {
                 icon: icons.heading3(),
                 label: t("Format as Subtitle"),
                 onClick: this.formatH3,
-                isActive: activeFormats.header === 3,
-                isDisabled: activeFormats.header === 3,
+                isActive: activeFormats.header === 3 || headerObjectLevel === 3,
+                isDisabled: activeFormats.header === 3 || headerObjectLevel === 3,
             },
             {
                 icon: icons.blockquote(),

@@ -135,9 +135,9 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
     }
 }
 
-function mapStateToProps({ users }: IStoreState) {
+function mapStateToProps({ authenticate }: IStoreState) {
     return {
-        requestPasswordState: users.requestPassword,
+        requestPasswordState: authenticate.password,
     };
 }
 

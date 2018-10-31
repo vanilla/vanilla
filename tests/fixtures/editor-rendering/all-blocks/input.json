@@ -1,6 +1,6 @@
 [
     { "insert": "Block operations H2 Title here. Code Block next." },
-    { "attributes": { "header": 2 }, "insert": "\n" },
+    { "attributes": { "header": { "level": 2, "ref": "testRef"} }, "insert": "\n" },
     { "insert": "/**" },
     { "attributes": { "codeBlock": true }, "insert": "\n" },
     { "insert": " *adds locale data to the view, and adds a respond button to the discussion page." },

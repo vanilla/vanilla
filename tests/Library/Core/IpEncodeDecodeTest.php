@@ -7,7 +7,6 @@
 
 use PHPUnit\Framework\TestCase;
 
-
 /**
  * Test some of the global functions that operate (or mostly operate) on arrays.
  */

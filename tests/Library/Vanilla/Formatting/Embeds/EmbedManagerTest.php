@@ -63,6 +63,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
         return $embedManager;
     }
 
+    // @codingStandardsIgnoreLineStart
     /**
      * Provide parameters for verifying rendered data.
      *
@@ -615,6 +616,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
         ];
         return $data;
     }
+    // @codingStandardsIgnoreLineEnd
 
     /**
      * Verify rendered data results.

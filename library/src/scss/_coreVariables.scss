@@ -155,9 +155,8 @@ $global-gutter_size                                  : $global_spacer;
 $global-gutter_halfSize                              : $global-gutter_size / 2;
 $global-gutter_quarterSize                           : $global-gutter_size / 4;
 
-$global-panel_spacerOuter                            : 18px !default;
-$global-panel_width                                  : 226px !default;
-$global-panel_paddedWidth                            : $global-panel_width + $global-panel_spacerOuter !default;
+$global-panel_width                                  : 250px !default;
+$global-panel_paddedWidth                            : $global-panel_width + $global_gutter_size !default;
 
 $global-middleColumn_width                           : 660px;
 
@@ -199,7 +198,8 @@ $component-titleBar_viewMoreColor                    : mix($global-color_bg, $gl
 \* -------------------------------------------------------------- */
 
 // Global
-$global-widgetInner_padding                          : $global-gutter_halfSize !default; // sections of widget
+$global-widgetInnerVertical_padding                  : $global-gutter_halfSize !default; // sections of widget
+$global-widgetInnerHorizontal_padding                : $global-gutter_quarterSize !default; // sections of widget
 $global-widgetSection-gap                            : 0 !default; // Between widget sections
 $global-widget_gap                                   : $global-gutter_halfSize !default; // Between widgets
 $global-widget_bg                                    : transparent !default;
@@ -221,41 +221,6 @@ $widget_borderRadius                                 : $global-widgetBorder_radi
 
 // Widget Contents - no padding on this guy, comes from wrapper or sub sections
 $widget-contents_bg                                  : $global-widget_bg !default;
-
-// Widget Head
-$widget-head_topPadding                              : $global-widgetInner_padding !default;
-$widget-head_rightPadding                            : $global-widgetInner_padding !default;
-$widget-head_bottomPadding                           : $global-widgetInner_padding !default;
-$widget-head_leftPadding                             : $global-widgetInner_padding !default;
-$widget-head_bg                                      : $global-widget_bg !default;
-$widget-head_fg                                      : $global-widget_fg !default;
-$widget-head_gap                                     : $global-widgetSection-gap !default;  // Bottom Margin
-$widget-head_borderColor                             : $global-widgetBorder_color !default;
-$widget-head_borderWidth                             : 0 !default;
-$widget-head_borderRadius                            : $global-widgetBorder_radius !default;
-
-// Widget Body
-$widget-body_topPadding                              : $global-widgetInner_padding !default;
-$widget-body_bottomPadding                           : $global-widgetInner_padding !default;
-$widget-body_leftPadding                             : $global-widgetInner_padding !default;
-$widget-body_rightPadding                            : $global-widgetInner_padding !default;
-$widget-body_bg                                      : transparent !default;
-$widget-body_fg                                      : $global-widget_fg !default;
-$widget-body_borderColor                             : $global-widgetBorder_color !default;
-$widget-body_borderWidth                             : 0 !default;
-$widget-body_borderRadius                            : $global-widgetBorder_radius !default;
-
-// Widget Footer
-$widget-footer_topPadding                            : $global-widgetInner_padding !default;
-$widget-footer_bottomPadding                         : $global-widgetInner_padding !default;
-$widget-footer_leftPadding                           : $global-widgetInner_padding !default;
-$widget-footer_rightPadding                          : $global-widgetInner_padding !default;
-$widget-footer_bg                                    : transparent !default;
-$widget-footer_fg                                    : $global-widget_fg !default;
-$widget-footer_gap                                   : $global-widgetSection-gap !default; // Top Margin
-$widget-footer_borderColor                           : $global-widgetBorder_color !default;
-$widget-footer_borderWidth                           : 0 !default;
-$widget-footer_borderRadius                          : $global-widgetBorder_radius !default;
 
 
 

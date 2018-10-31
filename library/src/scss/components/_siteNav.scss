@@ -6,9 +6,13 @@
 
 $siteNav-node_fontSize              : $global-medium_fontSize;
 $siteNav-node_color                 : $global-color_fg;
+
 $siteNav-nodeToggle_height          : $siteNav-node_fontSize * $global-condensed_lineHeight;
 $siteNav-nodeToggle_width           : $global-gutter_size;
+$siteNav-nodeToggleIcon_width       : 7px;
+
 $siteNav-spacer_width               : 7px;
+
 $siteNav-node_active_color          : $link-default_color;
 $siteNav-node_borderWidth           : 1px;
 $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWidth;
@@ -16,6 +20,12 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
 .siteNav {
     position: relative;
     display: block;
+    //margin-left: -#{$siteNav-spacer_width};
+    margin-left: -$global-gutter_halfSize;
+
+    @include mediaQuery-panelLayout_noBleed {
+        margin-left: #{($siteNav-nodeToggle_width - $siteNav-nodeToggleIcon_width) / 2 - $siteNav-spacer_width};
+    }
 }
 
 .siteNav-children {
@@ -23,6 +33,9 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     display: block;
 }
 
+.siteNavNode-children {
+    margin-left: $siteNav-spacer_width;
+}
 
 .siteNavNode {
     position: relative;
@@ -42,7 +55,6 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
 .siteNavNode-contents {
     display: block;
     width: 100%;
-    max-width: calc(100% - #{$siteNav-nodeToggle_width});
 }
 
 .siteNavNode-link {
@@ -123,5 +135,5 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     justify-content: flex-end;
     height: $siteNav-nodeToggle_height;
     width: $siteNav-nodeToggle_width;
-    margin-left: -#{$siteNav-nodeToggle_width - $siteNav-spacer_width};
+    margin-left: -#{$siteNav-nodeToggle_width};
 }

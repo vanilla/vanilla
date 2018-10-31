@@ -67,7 +67,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                 aria-expanded={this.state.open}
             >
                 {hasChildren && (
-                    <div className="siteNavNode-buttonOffset">
+                    <div className={classNames("siteNavNode-buttonOffset", { hasNoOffset: this.props.depth === 1 })}>
                         <Button
                             tabIndex={-1}
                             ariaHidden={true}

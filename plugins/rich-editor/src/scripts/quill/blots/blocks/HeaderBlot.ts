@@ -12,6 +12,9 @@ interface IValue {
     ref: string;
 }
 
+/**
+ * Overridden heading blot that keeps a deterministicly calculated reference to its contents.
+ */
 export default class HeaderBlot extends Header {
     public static create(value: IValue | number) {
         console.log(value);
@@ -30,7 +33,7 @@ export default class HeaderBlot extends Header {
     }
 
     private static calcUniqueID(val: string): string {
-        val = val.replace(" ", "-");
+        val = val.replace(/[\s\!\@\#\$\%\^\&\*\(\)\?]+/, "-");
         if (val.length > 50) {
             val = val.substring(0, 50) + "-" + hashString(val);
         }

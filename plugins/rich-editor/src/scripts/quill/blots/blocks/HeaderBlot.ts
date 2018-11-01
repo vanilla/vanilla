@@ -64,4 +64,35 @@ export default class HeaderBlot extends Header {
             ref: domNode.getAttribute("data-id") || "",
         };
     }
+
+    private static headerCounts = {};
+
+    /**
+     * Reset the counters for generating unique IDs.
+     */
+    public static resetCounters() {
+        this.headerCounts = {};
+    }
+
+    /**
+     * Set a contextually generated ID on the domNode.
+     *
+     * This will keep a reference to every generated ID to prevent duplicates.
+     * Be sure to call the static `resetCounters()` to start fresh.
+     */
+    public setGeneratedID() {
+        let id = HeaderBlot.calcUniqueID(this.domNode.textContent || "");
+        let inc: number | null = null;
+        if (!HeaderBlot.headerCounts[id]) {
+            HeaderBlot.headerCounts[id] = 1;
+        } else {
+            inc = HeaderBlot.headerCounts[id];
+            HeaderBlot.headerCounts[id]++;
+        }
+
+        if (inc !== null) {
+            id += "-" + inc;
+        }
+        this.domNode.setAttribute("data-id", id);
+    }
 }

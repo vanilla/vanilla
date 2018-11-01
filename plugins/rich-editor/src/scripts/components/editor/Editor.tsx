@@ -213,31 +213,15 @@ export class Editor extends React.Component<IProps> {
      * Loop through the editor document and ensure every header has a unique data-id.
      */
     private ensureUniqueHeaderIDs() {
-        const headers = this.quill.root.querySelectorAll("h2, h3");
-        this.headerCounts = {};
-        headers.forEach(this.setUniqueIDForHeader);
+        HeaderBlot.resetCounters();
+        const headers = (this.quill.scroll.descendants(
+            blot => blot instanceof HeaderBlot,
+            0,
+            this.quill.scroll.length(),
+        ) as unknown[]) as HeaderBlot[]; // Explicit mapping of types because the parchments types suck.
+
+        headers.forEach(header => header.setGeneratedID());
     }
-
-    private headerCounts = {};
-
-    /**
-     * Generate and set a uniqueID on an element.
-     */
-    private setUniqueIDForHeader = (element: Element) => {
-        let id = HeaderBlot.calcUniqueID(element.textContent || "");
-        let inc: number | null = null;
-        if (!this.headerCounts[id]) {
-            this.headerCounts[id] = 1;
-        } else {
-            inc = this.headerCounts[id];
-            this.headerCounts[id]++;
-        }
-
-        if (inc !== null) {
-            id += "-" + inc;
-        }
-        element.setAttribute("data-id", id);
-    };
 
     /**
      * Get the content out of the quill editor.

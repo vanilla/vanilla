@@ -56,7 +56,7 @@ export default class OpUtils {
         return OpUtils.op(lineContent, { [CodeBlockBlot.blotName]: true });
     }
     public static heading(level: number = 2, lineContent: string = "\n") {
-        return OpUtils.op(lineContent, { [HeadingBlot.blotName]: level });
+        return OpUtils.op(lineContent, { [HeadingBlot.blotName]: { level, ref: "" } });
     }
     public static quoteLine(lineContent: string = "\n") {
         return OpUtils.op(lineContent, { [BlockquoteLineBlot.blotName]: true });

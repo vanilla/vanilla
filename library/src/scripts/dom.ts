@@ -9,6 +9,8 @@ import { log, hashString } from "@library/utility";
 import twemoji from "twemoji";
 import debounce from "lodash/debounce";
 import "focus-visible";
+import smoothscroll from "smoothscroll-polyfill";
+smoothscroll.polyfill();
 
 /**
  * Use the browser's built-in functionality to quickly and safely escape a string.

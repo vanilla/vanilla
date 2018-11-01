@@ -218,7 +218,7 @@ export class Editor extends React.Component<IProps> {
             blot => blot instanceof HeaderBlot,
             0,
             this.quill.scroll.length(),
-        ) as unknown[]) as HeaderBlot[]; // Explicit mapping of types because the parchments types suck.
+        ) as any) as HeaderBlot[]; // Explicit mapping of types because the parchments types suck.
 
         headers.forEach(header => header.setGeneratedID());
     }

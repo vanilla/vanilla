@@ -982,7 +982,7 @@ class Gdn_Request implements RequestInterface {
 
         $parsedWebRoot = trim($webRoot, '/');
         $this->webRoot($parsedWebRoot);
-        $this->assetRoot($parsedWebRoot);
+        $this->setAssetRoot($parsedWebRoot);
 
         /**
          * Resolve Domain

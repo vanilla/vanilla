@@ -634,7 +634,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->_Definitions['context'] += [
             'host' => Gdn::request()->domain(),
             'basePath' => rtrim('/'.trim(Gdn::request()->webRoot(), '/'), '/'),
-            'assetPath' => rtrim('/'.trim(Gdn::request()->assetRoot(), '/'), '/'),
+            'assetPath' => rtrim('/'.trim(Gdn::request()->getAssetRoot(), '/'), '/'),
         ];
         $this->_Definitions['ui'] += [
             'siteName' => c('Garden.Title'),

@@ -10,7 +10,7 @@ namespace Vanilla\Web\Assets;
 /**
  * An asset representing a file created by the webpack build process.
  */
-class WebpackAsset extends AbstractAsset {
+class WebpackAsset extends SiteAsset {
     const SCRIPT_EXTENSION = ".min.js";
     const STYLE_EXTENSION = ".min.css";
 
@@ -27,10 +27,13 @@ class WebpackAsset extends AbstractAsset {
     protected $webSubpath;
 
     /**
-     * @inheritdoc
-     * @see https://docs.vanillaforums.com/developer/tools/building-frontend/#site-sections
+     * Constructor.
+     *
+     * @param \Gdn_Request $request The current request.
+     * @param DeploymentCacheBuster $cacheBuster A cache buster instance.
      * @param string $extension The file extension to use.
      * @param string $section The section of the site to get scripts for.
+     * @see https://docs.vanillaforums.com/developer/tools/building-frontend/#site-sections
      * @param string $assetName The name of the asset to get.
      */
     public function __construct(
@@ -62,7 +65,7 @@ class WebpackAsset extends AbstractAsset {
      * Get the file path of the asset.
      */
     public function getFilePath(): string {
-        return AbstractAsset::joinFilePath(
+        return SiteAsset::joinFilePath(
             PATH_ROOT,
             "dist",
             $this->fileSubpath,

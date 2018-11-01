@@ -10,12 +10,15 @@ namespace Vanilla\Web\Assets;
 /**
  * An asset representing a script containing data for a particular locale.
  */
-class LocaleAsset extends AbstractAsset {
+class LocaleAsset extends SiteAsset {
     /** @var string */
     private $localeKey;
 
     /**
-     * @inheritdoc
+     * Constructor.
+     *
+     * @param \Gdn_Request $request The current request.
+     * @param DeploymentCacheBuster $cacheBuster A cache buster instance.
      * @param string $localeKey The key of the locale for the asset to represent.
      */
     public function __construct(\Gdn_Request $request, DeploymentCacheBuster $cacheBuster, string $localeKey) {
@@ -29,11 +32,11 @@ class LocaleAsset extends AbstractAsset {
     public function getWebPath(): string {
         // We need a web-root url, not an asset URL because this is an API endpoint resource that is dynamically generated.
         // It cannot have the assetPath joined onto the beginning.
-        return AbstractAsset::joinWebPath(
+        return SiteAsset::joinWebPath(
             $this->request->webRoot(),
             '/api/v2/locales',
             $this->localeKey,
-            'translations.js'
+            'translations.js' . '?h=' . $this->cacheBuster->value()
         );
     }
 }

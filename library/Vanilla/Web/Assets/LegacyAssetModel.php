@@ -44,6 +44,12 @@ class LegacyAssetModel extends Gdn_Model {
     /** @var DeploymentCacheBuster */
     private $cacheBuster;
 
+    /**
+     * LegacyAssetModel constructor.
+     *
+     * @param \Vanilla\AddonManager $addonManager
+     * @param DeploymentCacheBuster $cacheBuster
+     */
     public function __construct(\Vanilla\AddonManager $addonManager, DeploymentCacheBuster $cacheBuster) {
         parent::__construct();
         // Set the old class name for Gdn_Pluggable.

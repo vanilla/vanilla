@@ -7,7 +7,10 @@
 
 namespace Vanilla\Web\Assets;
 
-abstract class AbstractAsset {
+/**
+ * Class representing an asset from the current site.
+ */
+abstract class SiteAsset implements IAsset {
 
     /** @var \Gdn_Request */
     protected $request;
@@ -16,10 +19,10 @@ abstract class AbstractAsset {
     protected $cacheBuster;
 
     /**
-     * AbstractAsset constructor.
+     * SiteAsset constructor.
      *
-     * @param \Gdn_Request $request
-     * @param DeploymentCacheBuster $cacheBuster
+     * @param \Gdn_Request $request The current request.
+     * @param DeploymentCacheBuster $cacheBuster A cache buster instance.
      */
     public function __construct(\Gdn_Request $request, DeploymentCacheBuster $cacheBuster) {
         $this->request = $request;
@@ -27,20 +30,18 @@ abstract class AbstractAsset {
     }
 
     /**
-     * Get the full web ready URL of the asset.
-     *
-     * @return string
+     * @inheritdoc
      */
     abstract public function getWebPath(): string;
 
     /**
      * Utility function for calculating a full asset URL w/the domain of site, and the asset root.
      *
-     * @param string ...$pieces The pieces of the web path.
+     * @param string[] $pieces The pieces of the web path.
      * @return string The full web path.
      */
     protected function makeAssetPath(string ...$pieces): string {
-        return AbstractAsset::joinWebPath(
+        return SiteAsset::joinWebPath(
             $this->request->urlDomain(),
             $this->request->assetRoot(),
             ...$pieces
@@ -50,7 +51,7 @@ abstract class AbstractAsset {
     /**
      * Utility for joining together path pieces with a `/` (such as a web url).
      *
-     * @param string ...$pieces The pieces of the url.
+     * @param string[] $pieces The pieces of the url.
      * @return string A joined version of the pieces with no duplicate `/`s
      */
     public static function joinWebPath(string ...$pieces): string {
@@ -69,7 +70,7 @@ abstract class AbstractAsset {
      *
      * Prevents duplicate separators.
      *
-     * @param string ...$pieces The pieces of the path to join together.
+     * @param string[] $pieces The pieces of the path to join together.
      * @return string A joined version of the pieces with no duplicate separators.
      */
     public static function joinFilePath(string ...$pieces): string {

@@ -8,7 +8,7 @@ import React from "react";
 import { t } from "@library/application";
 import getStore from "@library/state/getStore";
 import { log, debug } from "@library/utility";
-import { delegateEvent, removeDelegatedEvent } from "@library/dom";
+import { delegateEvent, removeDelegatedEvent, setData } from "@library/dom";
 import EmbedPopover from "@rich-editor/components/popovers/EmbedPopover";
 import EmojiPopover from "@rich-editor/components/popovers/EmojiPopover";
 import MentionToolbar from "@rich-editor/components/toolbars/MentionToolbar";
@@ -28,6 +28,7 @@ import registerQuill from "@rich-editor/quill/registerQuill";
 import { uniqueId } from "lodash";
 import classNames from "classnames";
 import Permission from "@library/users/Permission";
+import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -167,6 +168,7 @@ export class Editor extends React.Component<IProps> {
         if (this.props.isLoading) {
             this.quill.disable();
         }
+        window.quill = this.quill;
         this.quillID = getIDForQuill(this.quill);
 
         // Setup syncing
@@ -203,7 +205,22 @@ export class Editor extends React.Component<IProps> {
      * Get the content out of the quill editor.
      */
     public getEditorOperations(): DeltaOperation[] | undefined {
+        this.ensureUniqueHeaderIDs();
         return this.quill.getContents().ops;
+    }
+
+    /**
+     * Loop through the editor document and ensure every header has a unique data-id.
+     */
+    private ensureUniqueHeaderIDs() {
+        HeaderBlot.resetCounters();
+        const headers = (this.quill.scroll.descendants(
+            blot => blot instanceof HeaderBlot,
+            0,
+            this.quill.scroll.length(),
+        ) as any) as HeaderBlot[]; // Explicit mapping of types because the parchments types suck.
+
+        headers.forEach(header => header.setGeneratedID());
     }
 
     /**

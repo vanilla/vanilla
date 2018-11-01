@@ -27,6 +27,7 @@
         "redux": "4.0.1",
         "redux-thunk": "2.3.0",
         "shave": "2.5.2",
+        "smoothscroll-polyfill": "0.4.3",
         "sprintf-js": "1.1.1",
         "tabbable": "3.1.1",
         "twemoji": "2.5.1",

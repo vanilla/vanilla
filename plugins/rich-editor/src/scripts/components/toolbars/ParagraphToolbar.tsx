@@ -124,10 +124,19 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      */
     private get activeFormatIcon(): JSX.Element {
         const { activeFormats } = this.props;
-        if (activeFormats[HeadingBlot.blotName] === 2) {
+        const headingFormat = activeFormats[HeadingBlot.blotName];
+        if (typeof headingFormat === "object") {
+            if (headingFormat.level === 2) {
+                return icons.heading2();
+            }
+            if (headingFormat.level === 3) {
+                return icons.heading3();
+            }
+        }
+        if (headingFormat === 2) {
             return icons.heading2();
         }
-        if (activeFormats[HeadingBlot.blotName] === 3) {
+        if (headingFormat === 3) {
             return icons.heading3();
         }
         if (activeFormats[BlockquoteLineBlot.blotName] === true) {

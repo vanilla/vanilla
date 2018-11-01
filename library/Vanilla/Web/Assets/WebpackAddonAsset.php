@@ -7,6 +7,7 @@
 
 namespace Vanilla\Web\Assets;
 
+use Garden\Web\RequestInterface;
 use Vanilla\Addon;
 
 /**
@@ -16,7 +17,7 @@ class WebpackAddonAsset extends WebpackAsset {
     /**
      * Constructor.
      *
-     * @param \Gdn_Request $request The current request.
+     * @param RequestInterface $request The current request.
      * @param DeploymentCacheBuster $cacheBuster A cache buster instance.
      * @param string $extension The file extension to use.
      * @param string $section The section of the site to get scripts for.
@@ -24,7 +25,7 @@ class WebpackAddonAsset extends WebpackAsset {
      * @param Addon $addon The addon to get an asset for.
      */
     public function __construct(
-        \Gdn_Request $request,
+        RequestInterface $request,
         DeploymentCacheBuster $cacheBuster,
         string $extension,
         string $section,

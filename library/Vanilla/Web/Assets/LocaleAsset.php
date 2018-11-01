@@ -7,6 +7,8 @@
 
 namespace Vanilla\Web\Assets;
 
+use Garden\Web\RequestInterface;
+
 /**
  * An asset representing a script containing data for a particular locale.
  */
@@ -17,11 +19,11 @@ class LocaleAsset extends SiteAsset {
     /**
      * Constructor.
      *
-     * @param \Gdn_Request $request The current request.
+     * @param RequestInterface $request The current request.
      * @param DeploymentCacheBuster $cacheBuster A cache buster instance.
      * @param string $localeKey The key of the locale for the asset to represent.
      */
-    public function __construct(\Gdn_Request $request, DeploymentCacheBuster $cacheBuster, string $localeKey) {
+    public function __construct(RequestInterface $request, DeploymentCacheBuster $cacheBuster, string $localeKey) {
         parent::__construct($request, $cacheBuster);
         $this->localeKey = $localeKey;
     }

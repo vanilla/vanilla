@@ -7,6 +7,8 @@
 
 namespace Vanilla\Web\Assets;
 
+use Garden\Web\RequestInterface;
+
 /**
  * An asset representing a file created by the webpack build process.
  */
@@ -29,7 +31,7 @@ class WebpackAsset extends SiteAsset {
     /**
      * Constructor.
      *
-     * @param \Gdn_Request $request The current request.
+     * @param RequestInterface $request The current request.
      * @param DeploymentCacheBuster $cacheBuster A cache buster instance.
      * @param string $extension The file extension to use.
      * @param string $section The section of the site to get scripts for.
@@ -37,7 +39,7 @@ class WebpackAsset extends SiteAsset {
      * @param string $assetName The name of the asset to get.
      */
     public function __construct(
-        \Gdn_Request $request,
+        RequestInterface $request,
         DeploymentCacheBuster $cacheBuster,
         string $extension,
         string $section,

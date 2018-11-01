@@ -7,6 +7,9 @@
 
 namespace Vanilla\Web\Assets;
 
+/**
+ * A web asset interface.
+ */
 interface IAsset {
     /**
      * Get the full web ready URL of the asset.

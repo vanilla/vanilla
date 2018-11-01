@@ -7,12 +7,14 @@
 
 namespace Vanilla\Web\Assets;
 
+use Garden\Web\RequestInterface;
+
 /**
  * Class representing an asset from the current site.
  */
 abstract class SiteAsset implements IAsset {
 
-    /** @var \Gdn_Request */
+    /** @var RequestInterface */
     protected $request;
 
     /** @var DeploymentCacheBuster */
@@ -21,10 +23,10 @@ abstract class SiteAsset implements IAsset {
     /**
      * SiteAsset constructor.
      *
-     * @param \Gdn_Request $request The current request.
+     * @param RequestInterface $request The current request.
      * @param DeploymentCacheBuster $cacheBuster A cache buster instance.
      */
-    public function __construct(\Gdn_Request $request, DeploymentCacheBuster $cacheBuster) {
+    public function __construct(RequestInterface $request, DeploymentCacheBuster $cacheBuster) {
         $this->request = $request;
         $this->cacheBuster = $cacheBuster;
     }
@@ -43,7 +45,7 @@ abstract class SiteAsset implements IAsset {
     protected function makeAssetPath(string ...$pieces): string {
         return SiteAsset::joinWebPath(
             $this->request->urlDomain(),
-            $this->request->assetRoot(),
+            $this->request->getAssetRoot(),
             ...$pieces
         );
     }

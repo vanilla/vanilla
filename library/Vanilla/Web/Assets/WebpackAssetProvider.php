@@ -7,6 +7,7 @@
 
 namespace Vanilla\Web\Assets;
 
+use Garden\Web\RequestInterface;
 use Vanilla\AddonManager;
 use Vanilla\Config\ConfigInterface;
 
@@ -15,7 +16,7 @@ use Vanilla\Config\ConfigInterface;
  */
 class WebpackAssetProvider {
 
-    /** @var \Gdn_Request */
+    /** @var RequestInterface */
     private $request;
 
     /** @var DeploymentCacheBuster */
@@ -33,14 +34,14 @@ class WebpackAssetProvider {
     /**
      * WebpackAssetProvider constructor.
      *
-     * @param \Gdn_Request $request
+     * @param RequestInterface $request
      * @param DeploymentCacheBuster $cacheBuster
      * @param AddonManager $addonManager
      * @param ConfigInterface $config
      * @param \Gdn_Locale $locale
      */
     public function __construct(
-        \Gdn_Request $request,
+        RequestInterface $request,
         DeploymentCacheBuster $cacheBuster,
         AddonManager $addonManager,
         ConfigInterface $config,
@@ -71,8 +72,6 @@ class WebpackAssetProvider {
         // Return early with the hot build if that flag is enabled.
         if ($this->config->get('HotReload.Enabled')) {
             return [new HotBuildAsset(
-                $this->request,
-                $this->cacheBuster,
                 $section,
                 $this->config->get('HotReload.IP', null)
             )];

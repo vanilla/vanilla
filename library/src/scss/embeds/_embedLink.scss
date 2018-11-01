@@ -7,9 +7,9 @@
 $embedLink-linkImage_width: 225px !default;
 $embedLink-linkImage_mobileWidth: 100px !default;
 $embedLink-image_separatorColor: rgba($global-color_fg, .1) !default;
-$embedLink-source_fontSize: $userContent_fontSize !default;
-$embedLink-excerpt_fontSize: $userContent_fontSize !default;
-$embedLink-excerpt_lineHeight: $global-base_lineHeight !default;
+$embedLink-source_fontSize: $global-medium_fontSize !default;
+$embedLink-excerpt_fontSize: $global-medium_fontSize !default;
+$embedLink-excerpt_lineHeight: 1.4 !default;
 
 .embedLink-image {
     position: absolute;
@@ -62,13 +62,14 @@ $embedLink-excerpt_lineHeight: $global-base_lineHeight !default;
 }
 
 .embedLink-excerpt {
-    font-size: $embedLink-excerpt_fontSize;
     color: #555A62;
     overflow: hidden;
     text-overflow: ellipsis;
     word-break: break-word;
     max-width: 100%;
+    font-size: $embedLink-excerpt_fontSize;
     line-height: $embedLink-excerpt_lineHeight;
     max-height: #{$embedLink-excerpt_lineHeight * $embedLink-excerpt_fontSize * 3};
     white-space: normal;
+    margin-top: $utility-baseUnit;
 }

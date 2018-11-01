@@ -22,7 +22,7 @@ export function initLinkEmbeds() {
 export class LinkEmbed extends BaseEmbed {
     public render() {
         const { name, attributes, url, photoUrl, body } = this.props.data;
-        const title = name ? <h3 className="embedText-title embedLink-title">{name}</h3> : null;
+        const title = name ? <h3 className="embedText-title">{name}</h3> : null;
 
         const source = <span className="embedLink-source metaStyle">{url}</span>;
 

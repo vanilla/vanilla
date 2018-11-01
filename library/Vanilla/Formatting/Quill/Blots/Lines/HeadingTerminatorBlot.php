@@ -16,15 +16,18 @@ use Vanilla\Formatting\Quill\BlotGroup;
 class HeadingTerminatorBlot extends AbstractLineTerminatorBlot {
 
     /** @var array Valid heading levels. */
-    private static $validLevels = [2, 3];
+    const VALID_LEVELS = [2, 3];
+
+    /** @var int the default heading level if a none is provided. */
+    const DEFAULT_LEVEL = 2;
 
     /**
      * @inheritDoc
      */
     public static function matches(array $operation): bool {
         return
-            static::opAttrsContainKeyWithValue($operation, "header", static::$validLevels)
-            || static::opAttrsContainKeyWithValue($operation, "header.level", static::$validLevels);
+            static::opAttrsContainKeyWithValue($operation, "header", self::VALID_LEVELS)
+            || static::opAttrsContainKeyWithValue($operation, "header.level", self::VALID_LEVELS);
     }
 
     /**
@@ -86,12 +89,11 @@ class HeadingTerminatorBlot extends AbstractLineTerminatorBlot {
      * @throws \Exception if the level is not a valid integer.
      */
     public function getHeadingLevel(): int {
-        $defaultLevel = 2;
         // Heading attributes generally live in the next operation.
         // For empty headings there is only one operation, so it could be in the current op.
         return $this->currentOperation["attributes"]["header"]["level"]
             ?? $this->currentOperation["attributes"]["header"]
-            ?? $defaultLevel;
+            ?? self::DEFAULT_LEVEL;
     }
 
     /**

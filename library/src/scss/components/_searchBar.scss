@@ -1,0 +1,98 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$searchBar-search_minWidth: 109px;
+
+.searchBar-clear {
+    position: relative;
+    color: inherit;
+    display: flex;
+    box-sizing: border-box;
+    height: $formElement-height;
+    width: $formElement-height;
+}
+
+.searchBar-form {
+    display: block;
+}
+
+.searchBar-content {
+    display: flex;
+}
+
+.searchBar-inputWrap {
+    flex-grow: 1;
+}
+
+.heading.searchBar-heading {
+    margin-bottom: $global_spacer;
+}
+
+
+// Classes from react-select
+
+.searchBar__placeholder {
+    color: $formElement-placeholderColor;
+    margin: auto;
+}
+
+
+.searchBar-content { // For specificity
+    .searchBar-submitButton {
+        position: relative;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        margin-left: -1px;
+        min-width: $searchBar-search_minWidth;
+        flex-basis: $searchBar-search_minWidth;
+
+        &:hover,
+        &:focus {
+            z-index: 1;
+        }
+    }
+
+    .searchBar__control {
+        display: flex;
+        border: 0;
+        background-color: transparent;
+        height: 100%;
+
+
+        &.searchBar__control--is-focused {
+            box-shadow: none;
+
+
+            .inputText {
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+                border-color: $button-basic_focus_border;
+            }
+        }
+    }
+
+    .searchBar__value-container {
+        overflow: auto;
+    }
+}
+
+.searchBar-actionButton {
+    margin: {
+        left: auto;
+        right: -($buttonIcon-iconPadding_offset + 3); // the "3" is to offset the pencil
+    }
+    opacity: .8;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.searchBar-label {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}

@@ -108,9 +108,9 @@ $userContent-fontSizeH6                              : .85em !default;
 
 $global-heading_topMargin                            : 1.5 * $global-medium_fontSize;
 
-$global-normal_fontWeight                            : 400 !default;
-$global-semiBold_fontWeight                          : 600 !default;
-$global-bold_fontWeight                              : 700 !default;
+$global-fontWeight_normal                            : 400 !default;
+$global-fontWeight_semiBold                          : 600 !default;
+$global-fontWeight_bold                              : 700 !default;
 
 $global-block_margin                                 : $userContent_fontSize !default;
 
@@ -120,18 +120,17 @@ $global-condensed_lineHeight                         : 1.25 !default;
 $global_spacer                                       : $userContent_fontSize * $global-base_lineHeight;
 
 $global-heading_fontFamily                           : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
-$global-heading_fontWeight                           : $global-bold_fontWeight !default; // Derived
+$global-heading_fontWeight                           : $global-fontWeight_bold !default; // Derived
 $global-heading_lineHeightRatio                      : .8;
 
 $global-body_fontFamily                              : "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
-$global-body_fontWeight                              : $global-normal_fontWeight !default; // Derived
+$global-body_fontWeight                              : $global-fontWeight_normal !default; // Derived
 $global-body_lineHeightRatio                         : $global-heading_lineHeightRatio;
 
-$link_default-color                                  : $global-color_primary !default;
-$link_default_hover-color                            : $global-color_secondary !default;
-$link_default_focus-color                            : $global-color_secondary !default;
-$link_default_visited-color                          : mix($global-color_secondary, $global-color_fg, 90%) !default;
-
+$link-default_color                                  : $global-color_primary !default;
+$link-default_hover_color                            : $global-color_secondary !default;
+$link-default_focus_color                            : $global-color_secondary !default;
+$link-default_visited_color                          : mix($global-color_secondary, $global-color_fg, 90%) !default;
 
 /* -------------------------------------------------------------- *\
     Animation
@@ -156,9 +155,8 @@ $global-gutter_size                                  : $global_spacer;
 $global-gutter_halfSize                              : $global-gutter_size / 2;
 $global-gutter_quarterSize                           : $global-gutter_size / 4;
 
-$global-panel_spacerOuter                            : 36px !default;
-$global-panel_width                                  : 226px !default;
-$global-panel_paddedWidth                            : $global-panel_width + $global-panel_spacerOuter !default;
+$global-panel_width                                  : 250px !default;
+$global-panel_paddedWidth                            : $global-panel_width + $global_gutter_size !default;
 
 $global-middleColumn_width                           : 660px;
 
@@ -200,7 +198,8 @@ $component-titleBar_viewMoreColor                    : mix($global-color_bg, $gl
 \* -------------------------------------------------------------- */
 
 // Global
-$global-widgetInner_padding                          : $global-gutter_halfSize !default; // sections of widget
+$global-widgetInnerVertical_padding                  : $global-gutter_halfSize !default; // sections of widget
+$global-widgetInnerHorizontal_padding                : $global-gutter_quarterSize !default; // sections of widget
 $global-widgetSection-gap                            : 0 !default; // Between widget sections
 $global-widget_gap                                   : $global-gutter_halfSize !default; // Between widgets
 $global-widget_bg                                    : transparent !default;
@@ -223,41 +222,6 @@ $widget_borderRadius                                 : $global-widgetBorder_radi
 // Widget Contents - no padding on this guy, comes from wrapper or sub sections
 $widget-contents_bg                                  : $global-widget_bg !default;
 
-// Widget Head
-$widget-head_topPadding                              : $global-widgetInner_padding !default;
-$widget-head_rightPadding                            : $global-widgetInner_padding !default;
-$widget-head_bottomPadding                           : $global-widgetInner_padding !default;
-$widget-head_leftPadding                             : $global-widgetInner_padding !default;
-$widget-head_bg                                      : $global-widget_bg !default;
-$widget-head_fg                                      : $global-widget_fg !default;
-$widget-head_gap                                     : $global-widgetSection-gap !default;  // Bottom Margin
-$widget-head_borderColor                             : $global-widgetBorder_color !default;
-$widget-head_borderWidth                             : 0 !default;
-$widget-head_borderRadius                            : $global-widgetBorder_radius !default;
-
-// Widget Body
-$widget-body_topPadding                              : $global-widgetInner_padding !default;
-$widget-body_bottomPadding                           : $global-widgetInner_padding !default;
-$widget-body_leftPadding                             : $global-widgetInner_padding !default;
-$widget-body_rightPadding                            : $global-widgetInner_padding !default;
-$widget-body_bg                                      : transparent !default;
-$widget-body_fg                                      : $global-widget_fg !default;
-$widget-body_borderColor                             : $global-widgetBorder_color !default;
-$widget-body_borderWidth                             : 0 !default;
-$widget-body_borderRadius                            : $global-widgetBorder_radius !default;
-
-// Widget Footer
-$widget-footer_topPadding                            : $global-widgetInner_padding !default;
-$widget-footer_bottomPadding                         : $global-widgetInner_padding !default;
-$widget-footer_leftPadding                           : $global-widgetInner_padding !default;
-$widget-footer_rightPadding                          : $global-widgetInner_padding !default;
-$widget-footer_bg                                    : transparent !default;
-$widget-footer_fg                                    : $global-widget_fg !default;
-$widget-footer_gap                                   : $global-widgetSection-gap !default; // Top Margin
-$widget-footer_borderColor                           : $global-widgetBorder_color !default;
-$widget-footer_borderWidth                           : 0 !default;
-$widget-footer_borderRadius                          : $global-widgetBorder_radius !default;
-
 
 
 /* -------------------------------------------------------------- *\
@@ -272,8 +236,15 @@ $formElement_heightWithBorder                        : $formElement_height + 2 *
 $formElement_borderColor                             : $global-border_color !default; // Derived
 $formElement_borderStyle                             : solid;
 $formElement_borderRadius                            : $global_borderRadius !default;
+
+// For Home Page
 $formElement_giantInput_height                       : 82px !default;
 $formElement_giantInput_fontSize                     : 24px !default;
+
+// For Search
+$formElement_largeInput_height                       : 48px !default;
+$formElement_largeInput_fontSize                     : 16px !default;
+
 $formElement_halfHeight                              : $formElement_height / 2 !default; // Derived
 $formElement-borderWidthFull                         : $formElement_borderWidth * 2 !default; // Derived
 $formElement_horizontalPadding                       : $utility-baseUnit * 2 !default; // Derived
@@ -325,6 +296,8 @@ $overlay-borderRadius                                   : $global_borderRadius !
 // Icon Button Size
 
 $buttonIcon_size                                     : 36px !default;
+
+$buttonIcon-iconPadding_offset                       : ($buttonIcon_size - $icon-default_size) / 2;
 
 // Global Button options
 

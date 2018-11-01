@@ -10,7 +10,7 @@ import DocumentTitle from "@library/components/DocumentTitle";
 import React from "react";
 import ButtonSubmit from "@library/components/forms/ButtonSubmit";
 import Paragraph from "@library/components/Paragraph";
-import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
+import InputTextBlock from "@library/components/forms/InputTextBlock";
 import uniqueId from "lodash/uniqueId";
 import { IStoreState, IRequestPasswordState } from "@dashboard/@types/state";
 import { IRequestPasswordOptions } from "@dashboard/@types/api";
@@ -135,9 +135,9 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
     }
 }
 
-function mapStateToProps({ users }: IStoreState) {
+function mapStateToProps({ authenticate }: IStoreState) {
     return {
-        requestPasswordState: users.requestPassword,
+        requestPasswordState: authenticate.password,
     };
 }
 

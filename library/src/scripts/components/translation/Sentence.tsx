@@ -8,7 +8,7 @@ import classNames from "classnames";
 import { Link } from "react-router-dom";
 import * as React from "react";
 
-export const enum InlineTypes {
+export enum InlineTypes {
     TEXT = "TEXT",
     LINK = "LINK",
     DATETIME = "DATETIME",

@@ -1,12 +1,14 @@
-/**
+/*
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
 import classNames from "classnames";
-import { getRequiredID, IRequiredComponentID } from "@library/componentIDs";
+
 import { IFieldError } from "@library/@types/api";
+import { getRequiredID, IRequiredComponentID } from "@library/componentIDs";
 
 interface IProps extends IRequiredComponentID {
     className?: string;

@@ -47,7 +47,7 @@ export class VideoEmbed extends BaseEmbed<IEmbedProps, IState> {
                     type="button"
                     data-url={embedUrl}
                     aria-label={name || undefined}
-                    className="embedVideo-playButton iconButton"
+                    className="embedVideo-playButton"
                 >
                     <img
                         onClick={this.clickHandler}

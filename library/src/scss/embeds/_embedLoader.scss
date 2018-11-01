@@ -1,3 +1,9 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 $embedLoader_width: 135px !default;
 $embedLoader-box_bg: #FFFFFF !default;
 $embedLoader-box_boxShadow: 0 0 2px 0 rgba(0, 0, 0, .3) !default;
@@ -5,7 +11,6 @@ $embedLoader_spinner-width: 42px !default;
 $embedLoader-spinner-color: $global-color_primary !default;
 $embedLoader-embedError-bg: rgba(255, 57, 52, .12) !default;
 $embedLoader-embedError-padding: 15px !default;
-$embedLoader-embedError-shadow: 0 1px 3px 0 rgba(0, 0, 0, .3) !default;
 $embedLoader-closeButton_width: 24px !default;
 $embedLoader-closeButton_opacity: .7 !default;
 
@@ -40,12 +45,12 @@ $embedLoader-closeButton_opacity: .7 !default;
 }
 
 .embedLoader-error {
+    @include shadow-embed;
     display: flex;
     overflow: hidden;
     align-items: center;
     list-style: none;
     margin:0;
-    box-shadow: $embedLoader-embedError-shadow;
     padding: $embedLoader-embedError-padding;
     background: $embedded-error_bg;
     transition: 0.2s ease box-shadow;

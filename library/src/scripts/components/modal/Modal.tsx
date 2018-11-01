@@ -8,24 +8,32 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 import TabHandler from "@library/TabHandler";
-import { getRequiredID } from "@library/componentIDs";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
 import classNames from "classnames";
 import ModalSizes from "@library/components/modal/ModalSizes";
 
-interface IProps {
+interface IHeadingDescription {
+    titleID: string;
+}
+
+interface ITextDescription {
+    label: string; // Necessary if there's no proper title
+}
+
+interface IModalCommonProps {
     className?: string;
     exitHandler?: () => void;
-    appContainer?: Element;
+    pageContainer?: Element;
     container?: Element;
+    description?: string;
     children: React.ReactNode;
-    elementToFocus?: string;
-    description?: string; //For Accessibility
+    elementToFocus?: HTMLElement;
     size: ModalSizes;
 }
 
-interface IState {
-    id: string;
-}
+interface IModalTextDescription extends IModalCommonProps, ITextDescription {}
+
+interface IModalHeadingDescription extends IModalCommonProps, IHeadingDescription {}
 
 /**
  * An accessible Modal component.
@@ -37,29 +45,24 @@ interface IState {
  * - Prevents scrolling of the body.
  * - Focuses the first focusable element in the Modal.
  */
-export default class Modal extends React.Component<IProps, IState> {
+export default class Modal extends React.Component<IModalTextDescription | IModalHeadingDescription> {
     public static defaultProps = {
-        appContainer: document.getElementById("app"),
+        pageContainer: document.getElementById("page"),
         container: document.getElementById("modals"),
     };
 
     public static focusHistory: HTMLElement[] = [];
+    public static stack: Modal[] = [];
 
+    private id = uniqueIDFromPrefix("modal");
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
 
     private get modalID() {
-        return this.state.id + "-modal";
+        return this.id + "-modal";
     }
 
     private get descriptionID() {
-        return this.state.id + "-description";
-    }
-
-    public constructor(props) {
-        super(props);
-        this.state = {
-            id: getRequiredID(props, "modal"),
-        };
+        return this.id + "-description";
     }
 
     /**
@@ -67,7 +70,7 @@ export default class Modal extends React.Component<IProps, IState> {
      */
     public render() {
         return ReactDOM.createPortal(
-            <div className="overlay" onKeyDown={this.handleEscapeKeyPress} onClick={this.handleScrimClick}>
+            <div className="overlay" onClick={this.handleScrimClick}>
                 <div
                     id={this.modalID}
                     role="dialog"
@@ -86,11 +89,15 @@ export default class Modal extends React.Component<IProps, IState> {
                     ref={this.selfRef}
                     onKeyDown={this.handleTabbing}
                     onClick={this.handleModalClick}
-                    aria-describedby={this.descriptionID}
+                    aria-label={"label" in this.props ? this.props.label : undefined}
+                    aria-labelledby={"titleID" in this.props ? this.props.titleID : undefined}
+                    aria-describedby={this.props.description ? this.descriptionID : undefined}
                 >
-                    <div id={this.descriptionID} className="sr-only">
-                        {this.props.description}
-                    </div>
+                    {this.props.description && (
+                        <div id={this.descriptionID} className="sr-only">
+                            {this.props.description}
+                        </div>
+                    )}
                     {this.props.children}
                 </div>
             </div>,
@@ -115,16 +122,32 @@ export default class Modal extends React.Component<IProps, IState> {
      */
     public componentDidMount() {
         this.focusInitialElement();
-        this.props.appContainer!.setAttribute("aria-hidden", true);
+        this.props.pageContainer!.setAttribute("aria-hidden", true);
         disableBodyScroll(this.selfRef.current!);
+
+        // Add the escape keyboard listener only on the first modal in the stack.
+        if (Modal.stack.length === 0) {
+            document.addEventListener("keydown", this.handleDocumentEscapePress);
+        }
+        Modal.stack.push(this);
     }
 
     /**
      * Tear down setup from componentDidMount
      */
     public componentWillUnmount() {
-        this.props.appContainer!.removeAttribute("aria-hidden");
-        enableBodyScroll(this.selfRef.current!);
+        // Set aria-hidden on page and reenable scrolling if we're removing the last modal
+        Modal.stack.pop();
+        if (Modal.stack.length === 0) {
+            this.props.pageContainer!.removeAttribute("aria-hidden");
+            enableBodyScroll(this.selfRef.current!);
+
+            // This event listener is only added once (on the top modal).
+            // So we only remove when clearing the last one.
+            document.removeEventListener("keydown", this.handleDocumentEscapePress);
+        } else {
+            this.props.pageContainer!.setAttribute("aria-hidden", true);
+        }
         const prevFocussedElement = Modal.focusHistory.pop() || document.body;
         prevFocussedElement.focus();
     }
@@ -135,13 +158,13 @@ export default class Modal extends React.Component<IProps, IState> {
     private focusInitialElement() {
         let targetElement;
         if (this.props.elementToFocus) {
-            targetElement = document.getElementById(this.props.elementToFocus);
+            targetElement = this.props.elementToFocus;
         } else {
             targetElement = this.tabHandler.getInitial();
         }
-        const elementToFocus = !!targetElement ? targetElement : document.body;
-        elementToFocus.focus();
-        Modal.focusHistory.push(elementToFocus);
+        targetElement = !!targetElement ? targetElement : document.body;
+        targetElement.focus();
+        Modal.focusHistory.push(targetElement);
     }
 
     /**
@@ -158,18 +181,22 @@ export default class Modal extends React.Component<IProps, IState> {
     };
 
     /**
-     * Handle the escape key.
+     * Handle escape press and close the top modal.
      *
-     * This needs to be a global listener or it will not work if something in the component isn't focused.
+     * This listener is added to the document in the event a non-focusable element inside the modal is clicked.
+     * In that case focus will be on the document.
+     *
+     * Because of this we have to be smarter and call only the top modal's escape handler.
      */
-    private handleEscapeKeyPress = (event: React.KeyboardEvent) => {
+    private handleDocumentEscapePress = (event: KeyboardEvent) => {
+        const topModal = Modal.stack[Modal.stack.length - 1];
         const escKey = 27;
 
         if (event.keyCode === escKey) {
             event.preventDefault();
             event.stopPropagation();
-            if (this.props.exitHandler) {
-                this.props.exitHandler();
+            if (topModal.props.exitHandler) {
+                topModal.props.exitHandler();
             }
         }
     };

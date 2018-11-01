@@ -9,12 +9,21 @@ import { Route } from "react-router-dom";
 import Router from "@dashboard/components/Router";
 import { stickyHeader } from "@library/dom";
 import { registerReducer } from "@library/state/reducerRegistry";
+// The forum section needs these legacy scripts that have been moved into the bundled JS so it could be refactored.
+// Other sections should not need this yet.
+import "@dashboard/legacy";
+import { initAllUserContent } from "@library/user-content";
+import authenticateReducer from "@dashboard/pages/authenticate/authenticateReducer";
+import SignInPage from "@dashboard/pages/authenticate/SignInPage";
+import PasswordPage from "@dashboard/pages/authenticate/PasswordPage";
+import RecoverPasswordPage from "@dashboard/pages/recoverPassword/RecoverPasswordPage";
+import UsersModel from "@library/users/UsersModel";
 
 initAllUserContent();
 
 // Redux
 registerReducer("authenticate", authenticateReducer);
-registerReducer("users", usersReducer);
+registerReducer("users", new UsersModel().reducer);
 
 // Routing
 addComponent("App", Router);
@@ -28,13 +37,3 @@ addRoutes([
 onReady(() => {
     stickyHeader();
 });
-
-// The forum section needs these legacy scripts that have been moved into the bundled JS so it could be refactored.
-// Other sections should not need this yet.
-import "@dashboard/legacy";
-import { initAllUserContent } from "@library/user-content";
-import authenticateReducer from "@dashboard/pages/authenticate/authenticateReducer";
-import usersReducer from "@dashboard/usersReducer";
-import SignInPage from "@dashboard/pages/authenticate/SignInPage";
-import PasswordPage from "@dashboard/pages/authenticate/PasswordPage";
-import RecoverPasswordPage from "@dashboard/pages/recoverPassword/RecoverPasswordPage";

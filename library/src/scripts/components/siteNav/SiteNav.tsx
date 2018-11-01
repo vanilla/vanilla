@@ -28,7 +28,7 @@ export interface IState {
 export class SiteNav extends React.Component<IProps, IState> {
     private id;
 
-    public constructor(props) {
+    public constructor(props: IProps) {
         super(props);
         this.id = getRequiredID(props, "siteNav");
     }
@@ -59,7 +59,7 @@ export class SiteNav extends React.Component<IProps, IState> {
                 <h2 id={this.titleID} className="sr-only">
                     {t("Site Navigation")}
                 </h2>
-                <ul className="siteNav-children" role="tree" aria-labelledby={this.titleID}>
+                <ul className="siteNav-children hasDepth-0" role="tree" aria-labelledby={this.titleID}>
                     {content}
                 </ul>
             </nav>
@@ -91,6 +91,9 @@ export class SiteNav extends React.Component<IProps, IState> {
      * @param event
      */
     private handleKeyDown = (event: React.KeyboardEvent) => {
+        if (document.activeElement === null) {
+            return;
+        }
         const currentLink = document.activeElement;
         const selectedNode = currentLink.closest(".siteNavNode");
         const siteNavRoot = currentLink.closest(".siteNav");

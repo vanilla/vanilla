@@ -10,6 +10,7 @@
 import { onReady } from "@library/application";
 import { logError } from "@library/utility";
 import { Reducer, ReducersMapObject } from "redux";
+import UsersModel from "@library/users/UsersModel";
 
 let haveGot = false;
 let wasReadyCalled = false;
@@ -35,6 +36,7 @@ export function getReducers(): ReducersMapObject<any, any> {
     }
 
     return {
+        users: new UsersModel().reducer,
         ...reducers,
     };
 }

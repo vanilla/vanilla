@@ -37,6 +37,7 @@
 }
 
 .richEditor-menu {
+    @include shadow-dropDown;
     display: inline-block;
     position: relative;
     background-color: $global-color_bg;
@@ -46,7 +47,6 @@
         style: $global-border_style;
         width: $global-border_width;
     }
-    box-shadow: $overlay-dropShadow;
 }
 
 .richEditorParagraphMenu {
@@ -319,6 +319,7 @@
 
 // Insert Media
 .richEditorFlyout {
+    @include shadow-dropDown;
     position: relative;
     overflow: hidden;
     background-color: $global-color_bg;
@@ -328,7 +329,6 @@
         style: $global-border_style;
         width: $global-border_width;
     }
-    box-shadow: $overlay-dropShadow;
     z-index: 6;
 
     .InputBox {
@@ -404,12 +404,12 @@
 }
 
 .richEditorFlyout {
+    @include shadow-dropDown;
     position: absolute;
     bottom: 100%;
     left: 0;
     width: #{$richEditor-flyout_paddingHorizontal * 2 + 7 * $richEditor-menuButton_size};
     border: $formElement-borderWidth $formElement-borderStyle $formElement_borderColor;
-    box-shadow: $overlay-dropShadow;
     background: $global-color_bg;
     border-radius: $global-borderRadius;
 }

@@ -6,37 +6,31 @@
 
 import { Configuration } from "webpack";
 import { makeBaseConfig } from "./makeBaseConfig";
-import { POLYFILL_SOURCE_FILE, TS_CONFIG_FILE, DIST_DIRECTORY } from "../env";
+import { POLYFILL_SOURCE_FILE, DIST_DIRECTORY } from "../env";
+import TerserWebpackPlugin from "terser-webpack-plugin";
 import EntryModel from "../utility/EntryModel";
 
 /**
  * Create a config for building the polyfills file. This should be built entirely on its own.
  */
 export async function makePolyfillConfig(entryModel: EntryModel) {
-    const baseConfig: Configuration = await makeBaseConfig(entryModel, "");
+    const baseConfig: Configuration = await makeBaseConfig(entryModel, "polyfill");
     baseConfig.mode = "production";
     baseConfig.devtool = "source-map";
     baseConfig.entry = POLYFILL_SOURCE_FILE;
     baseConfig.output = {
-        filename: `js/webpack/polyfills.min.js`,
+        filename: `polyfills.min.js`,
         path: DIST_DIRECTORY,
     };
-    baseConfig.module!.rules = [
-        {
-            test: /\.tsx?$/,
-            exclude: ["node_modules"],
-            use: [
-                {
-                    loader: "ts-loader",
-                    options: {
-                        configFile: TS_CONFIG_FILE,
-                    },
-                },
-            ],
-        },
-    ];
     baseConfig.optimization = {
         splitChunks: false,
+        minimizer: [
+            new TerserWebpackPlugin({
+                cache: true,
+                parallel: true,
+                sourceMap: true, // set to true if you want JS source maps
+            }),
+        ],
     };
 
     return baseConfig;

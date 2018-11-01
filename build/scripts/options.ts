@@ -1,6 +1,15 @@
 import yargs from "yargs";
 import { getVanillaConfig } from "./utility/configUtils";
 
+export enum BuildMode {
+    DEVELOPMENT = "development",
+    PRODUCTION = "production",
+    ANALYZE = "analyze",
+    TEST = "test",
+    TEST_WATCH = "testwatch",
+    TEST_DEBUG = "testdebug",
+}
+
 yargs
     .option("verbose", {
         alias: "v",
@@ -23,13 +32,6 @@ yargs
         alias: "i",
         default: false,
     });
-
-export const enum BuildMode {
-    DEVELOPMENT = "development",
-    PRODUCTION = "production",
-    ANALYZE = "analyze",
-    POLYFILLS = "polyfills",
-}
 
 export interface IBuildOptions {
     mode: BuildMode;

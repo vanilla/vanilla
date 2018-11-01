@@ -6,15 +6,26 @@
 
 $siteNav-node_fontSize              : $global-medium_fontSize;
 $siteNav-node_color                 : $global-color_fg;
+
 $siteNav-nodeToggle_height          : $siteNav-node_fontSize * $global-condensed_lineHeight;
 $siteNav-nodeToggle_width           : $global-gutter_size;
-$siteNav-node_active_bg             : mix($global-color_fg, $global-color_bg, 10%);
+$siteNav-nodeToggleIcon_width       : 7px;
+
+$siteNav-spacer_width               : 7px;
+
+$siteNav-node_active_color          : $link-default_color;
 $siteNav-node_borderWidth           : 1px;
 $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWidth;
 
 .siteNav {
     position: relative;
     display: block;
+    //margin-left: -#{$siteNav-spacer_width};
+    margin-left: -$global-gutter_halfSize;
+
+    @include mediaQuery-panelLayout_noBleed {
+        margin-left: #{($siteNav-nodeToggle_width - $siteNav-nodeToggleIcon_width) / 2 - $siteNav-spacer_width};
+    }
 }
 
 .siteNav-children {
@@ -22,6 +33,9 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     display: block;
 }
 
+.siteNavNode-children {
+    margin-left: $siteNav-spacer_width;
+}
 
 .siteNavNode {
     position: relative;
@@ -30,22 +44,23 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     justify-content: flex-start;
     flex-wrap: nowrap;
     font-size: $siteNav-node_fontSize;
+    color: $siteNav-node_color;
 
     &.isCurrent {
-        background-color: $siteNav-node_active_bg;
+        color: $siteNav-node_active_color;
+        font-weight: $global-fontWeight_bold;
     }
 }
 
 .siteNavNode-contents {
     display: block;
     width: 100%;
-    max-width: calc(100% - #{$siteNav-nodeToggle_width});
 }
 
 .siteNavNode-link {
     display: block;
     flex-grow: 1;
-    color: $siteNav-node_color;
+    color: inherit;
     line-height: $global-condensed_lineHeight;
     outline: 0;
 
@@ -60,10 +75,11 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     }
 
     &.hasChildren {
-        font-weight: $global-semiBold_fontWeight;
+        font-weight: $global-fontWeight_semiBold;
 
         &.isFirstLevel {
-            font-weight: $global-bold_fontWeight;
+            font-size: $global-large_fontSize;
+            font-weight: $global-fontWeight_bold;
         }
     }
 }
@@ -89,7 +105,7 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
 .siteNavNode-spacer {
     display: block;
     height: $siteNav-nodeToggle_height;
-    width: $siteNav-nodeToggle_width;
+    width: $siteNav-spacer_width;
     margin: $utility-baseUnit 0;
 }
 
@@ -113,3 +129,11 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     width: $siteNav-nodeToggle_width;
 }
 
+
+.siteNavNode-buttonOffset {
+    display: flex;
+    justify-content: flex-end;
+    height: $siteNav-nodeToggle_height;
+    width: $siteNav-nodeToggle_width;
+    margin-left: -#{$siteNav-nodeToggle_width};
+}

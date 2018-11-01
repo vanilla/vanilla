@@ -6,12 +6,12 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import Sentence, { IWord } from "@library/components/Sentence";
+import Sentence, { IWord } from "@library/components/translation/Sentence";
 import DropDownItem from "./DropDownItem";
 
 interface IProps {
     className?: string;
-    children: IWord[] | string;
+    children: React.ReactNode;
 }
 
 /**
@@ -21,7 +21,7 @@ export default class DropDownItemMetas extends React.Component<IProps> {
     public render() {
         return (
             <DropDownItem className={classNames("dropDown-metasItem", this.props.className)}>
-                <Sentence>{this.props.children}</Sentence>
+                {this.props.children}
             </DropDownItem>
         );
     }

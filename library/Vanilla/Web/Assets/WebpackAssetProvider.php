@@ -37,6 +37,7 @@ class WebpackAssetProvider {
      * @param CacheBusterInterface $cacheBuster
      * @param AddonManager $addonManager
      * @param ConfigInterface $config
+     * @param \Gdn_Locale $locale
      */
     public function __construct(
         \Gdn_Request $request,
@@ -63,7 +64,7 @@ class WebpackAssetProvider {
      * - addon chunks
      * - bootstrap
      *
-     * @param string $sectionName - The section of the site to lookup.
+     * @param string $section - The section of the site to lookup.
      * @return WebpackAsset[] The assets files for all webpack scripts.
      */
     public function getScripts(string $section): array {
@@ -77,6 +78,7 @@ class WebpackAssetProvider {
             )];
         }
 
+        // A couple of required assets.
         $scripts = [
             $this->makeScript($section, 'runtime'),
             $this->makeScript($section, 'vendors'),
@@ -110,7 +112,13 @@ class WebpackAssetProvider {
         return $scripts;
     }
 
-    /** Returns all  */
+    /**
+     * Get all stylesheets for a particular site section.
+     *
+     * @param string $section
+     *
+     * @return WebpackAsset[]
+     */
     public function getStylesheets(string $section): array {
         if ($this->config->get('HotReload.Enabled')) {
             return [];
@@ -140,6 +148,8 @@ class WebpackAssetProvider {
      *
      * @param string $section The section of the script.
      * @param string $name The name of the script.
+     *
+     * @return WebpackAsset A webpack script asset.
      */
     private function makeScript(string $section, string $name): WebpackAsset {
         return new WebpackAsset(
@@ -161,7 +171,20 @@ class WebpackAssetProvider {
     }
 
     /**
-     * @return string
+     * Get content for an inline polyfill script.
+     *
+     * It checks for support for the following:
+     * - Promise,
+     * - fetch,
+     * - Symbol,
+     * - Various new Element/NodeList methods.
+     *
+     * If a single one is missing we will block the page load to add all polyfills.
+     * This allows to us to
+     * - keep the polyfill simple.
+     * - Ship 0 polyfills to users modern browsers (basically after 2016 release).
+     *
+     * @return string The contents of the script.
      */
     public function getInlinePolyfillContents(): string {
         $polyfillAsset = new PolyfillAsset($this->request, $this->cacheBuster);

@@ -1890,9 +1890,16 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $this->Head->addScript(null, null, false, ["content" => $polyfillContent]);
 
                 // Add the built webpack javascript files.
-                $jsAssets = $webpackAssetProvider->getScripts($this->MasterView === 'admin' ? 'admin' : 'forum');
+                $section = $this->MasterView === 'admin' ? 'admin' : 'forum';
+                $jsAssets = $webpackAssetProvider->getScripts($section);
                 foreach ($jsAssets as $asset) {
                     $this->Head->addScript($asset->getWebPath(), 'text/javascript', false, ['defer' => 'true']);
+                }
+
+                // The the built stylesheets
+                $styleAssets = $webpackAssetProvider->getStylesheets($section);
+                foreach ($styleAssets as $asset) {
+                    $this->Head->addCss($asset->getWebPath(), null, false);
                 }
 
                 foreach ($this->_JsFiles as $Index => $JsInfo) {

@@ -14,7 +14,7 @@ class HotBuildAsset extends AbstractAsset {
     /** @var string */
     private $section;
 
-    public function __construct(\Gdn_Request $request, CacheBusterInterface $cacheBuster, string $section, $ip = null) {
+    public function __construct(\Gdn_Request $request, DeploymentCacheBuster $cacheBuster, string $section, $ip = null) {
         parent::__construct($request, $cacheBuster);
         if ($ip === null) {
             $ip = "127.0.0.1";

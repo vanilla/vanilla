@@ -18,7 +18,7 @@ class WebpackAssetProvider {
     /** @var \Gdn_Request */
     private $request;
 
-    /** @var CacheBusterInterface */
+    /** @var DeploymentCacheBuster */
     private $cacheBuster;
 
     /** @var AddonManager */
@@ -34,14 +34,14 @@ class WebpackAssetProvider {
      * WebpackAssetProvider constructor.
      *
      * @param \Gdn_Request $request
-     * @param CacheBusterInterface $cacheBuster
+     * @param DeploymentCacheBuster $cacheBuster
      * @param AddonManager $addonManager
      * @param ConfigInterface $config
      * @param \Gdn_Locale $locale
      */
     public function __construct(
         \Gdn_Request $request,
-        CacheBusterInterface $cacheBuster,
+        DeploymentCacheBuster $cacheBuster,
         AddonManager $addonManager,
         ConfigInterface $config,
         \Gdn_Locale $locale

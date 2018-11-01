@@ -35,7 +35,7 @@ class WebpackAsset extends AbstractAsset {
      */
     public function __construct(
         \Gdn_Request $request,
-        CacheBusterInterface $cacheBuster,
+        DeploymentCacheBuster $cacheBuster,
         string $extension,
         string $section,
         string $assetName

@@ -18,7 +18,7 @@ class LocaleAsset extends AbstractAsset {
      * @inheritdoc
      * @param string $localeKey The key of the locale for the asset to represent.
      */
-    public function __construct(\Gdn_Request $request, CacheBusterInterface $cacheBuster, string $localeKey) {
+    public function __construct(\Gdn_Request $request, DeploymentCacheBuster $cacheBuster, string $localeKey) {
         parent::__construct($request, $cacheBuster);
         $this->localeKey = $localeKey;
     }

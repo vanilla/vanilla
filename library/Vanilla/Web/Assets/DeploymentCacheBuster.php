@@ -9,7 +9,13 @@ namespace Vanilla\Web\Assets;
 
 use Vanilla\Config\ConfigInterface;
 
-class DeploymentCacheBuster implements CacheBusterInterface {
+/**
+ * A cache buster that works based on the last deployment time.
+ *
+ * Settings the config value `Garden.Deployed` to the current unix timestamp on a deploy
+ * will allow this cache buster to work properly.
+ */
+class DeploymentCacheBuster {
 
     /**
      * The number of seconds to wait after a deploy before switching the cache buster.

@@ -12,7 +12,7 @@ use Vanilla\Addon;
 class WebpackAddonAsset extends WebpackAsset {
     public function __construct(
         \Gdn_Request $request,
-        CacheBusterInterface $cacheBuster,
+        DeploymentCacheBuster $cacheBuster,
         string $extension,
         string $section,
         Addon $addon

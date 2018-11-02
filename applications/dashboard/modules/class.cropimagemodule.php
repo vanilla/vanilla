@@ -45,6 +45,11 @@ class CropImageModule extends Gdn_Module {
     public $saveButton = true;
 
     /**
+     * maximum allowed crop size
+     */
+    const MAX_CROP_SIZE = 10000;
+
+    /**
      * Constructor
      *
      * Adds assets to the sender object and adds the required hidden fields to the form.
@@ -170,31 +175,63 @@ class CropImageModule extends Gdn_Module {
     }
 
     /**
+     * Gets the cropped image height.
+     *
      * @return int The height of the cropped image.
+     * @throws Exception If the crop height is over the maximum allowed size.
      */
     public function getCropHeight() {
-        return $this->form->getValue('h');
+        $value = $this->form->getValue('h');
+        if ($value > self::MAX_CROP_SIZE) {
+            throw new Exception('Crop height is greater than the allowed size');
+        }
+
+        return $value;
     }
 
     /**
+     * Gets the cropped image width.
+     *
      * @return int The width of the cropped image.
+     * @throws Exception If the crop width is over the maximum allowed size.
      */
     public function getCropWidth() {
-        return $this->form->getValue('w');
+        $value = $this->form->getValue('w');
+        if ($value > self::MAX_CROP_SIZE) {
+            throw new Exception('Crop width is greater than the allowed size');
+        }
+
+        return $value;
     }
 
     /**
+     * Gets the cropped image x value.
+     *
      * @return int The x value of the cropped image's location.
+     * @throws Exception If the crop x value is over the maximum allowed size.
      */
     public function getCropXValue() {
-        return $this->form->getValue('x');
+        $value = $this->form->getValue('x');
+        if ($value > self::MAX_CROP_SIZE) {
+            throw new Exception('Crop x value is greater than the allowed size');
+        }
+
+        return $value;
     }
 
     /**
+     * Gets the cropped image y value.
+     *
      * @return int The y value of the cropped image's location.
+     * @throws Exception If the crop y value is over the maximum allowed size.
      */
     public function getCropYValue() {
-        return $this->form->getValue('y');
+        $value = $this->form->getValue('y');
+        if ($value > self::MAX_CROP_SIZE) {
+            throw new Exception('Crop y value is greater than the allowed size');
+        }
+
+        return $value;
     }
 
     /**

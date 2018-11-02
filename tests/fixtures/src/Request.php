@@ -192,7 +192,7 @@ class Request implements RequestInterface {
     /**
      * @inheritdoc
      */
-    public function setAssetRoot(string $assetRoot): string {
+    public function setAssetRoot(string $assetRoot) {
         $this->root = rtrim('/'.trim($assetRoot, '/'), '/');
         return $this;
     }

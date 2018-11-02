@@ -44,11 +44,17 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
      * @return string The full web path.
      */
     protected function makeAssetPath(string ...$pieces): string {
-        return SiteAsset::joinWebPath(
+        $path = SiteAsset::joinWebPath(
             $this->request->urlDomain(),
             $this->request->getAssetRoot(),
             ...$pieces
         );
+
+        $buster = $this->cacheBuster->value();
+        if ($buster !== "") {
+            $path .= "?h=" . $buster;
+        }
+        return $path;
     }
 
     /**
@@ -58,14 +64,7 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
      * @return string A joined version of the pieces with no duplicate `/`s
      */
     public static function joinWebPath(string ...$pieces): string {
-        $path = "";
-        foreach ($pieces as $piece) {
-            if ($piece !== '') {
-                $path .= trim($piece, '/') . '/';
-            }
-        }
-
-        return rtrim($path, '/');
+        return self::joinPieces('/', ...$pieces);
     }
 
     /**
@@ -77,11 +76,22 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
      * @return string A joined version of the pieces with no duplicate separators.
      */
     public static function joinFilePath(string ...$pieces): string {
+        return self::joinPieces(DS, ...$pieces);
+    }
+
+    /**
+     * @param string $joiner
+     * @param string ...$pieces
+     * @return string
+     */
+    private static function joinPieces(string $joiner, string ...$pieces): string {
         $path = "";
         foreach ($pieces as $piece) {
-            $path .= DS . trim($piece, DS);
+            if ($piece !== '') {
+                $path .= trim($piece, $joiner) . $joiner;
+            }
         }
 
-        return $path;
+        return rtrim($path, $joiner);
     }
 }

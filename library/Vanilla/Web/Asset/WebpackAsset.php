@@ -18,6 +18,9 @@ class WebpackAsset extends SiteAsset {
     const STYLE_EXTENSION = ".min.css";
 
     /** @var string */
+    protected $fsRoot = PATH_ROOT;
+
+    /** @var string */
     protected $assetName;
 
     /** @var string */
@@ -60,19 +63,30 @@ class WebpackAsset extends SiteAsset {
         return $this->makeAssetPath(
             'dist',
             $this->webSubpath,
-            $this->assetName . $this->extension . '?h=' . $this->cacheBuster->value()
+            $this->assetName . $this->extension
         );
+    }
+
+    public function existsOnFs(): bool {
+        return file_exists($this->getFilePath());
     }
 
     /**
      * Get the file path of the asset.
      */
-    public function getFilePath(): string {
+    private function getFilePath(): string {
         return SiteAsset::joinFilePath(
-            PATH_ROOT,
+            $this->fsRoot,
             "dist",
             $this->fileSubpath,
             $this->assetName . $this->extension
         );
+    }
+
+    /**
+     * @param string $assetRoot
+     */
+    public function setFsRoot(string $assetRoot) {
+        $this->fsRoot = $assetRoot;
     }
 }

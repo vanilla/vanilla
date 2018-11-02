@@ -33,7 +33,7 @@ class WebpackAssetTest extends TestCase {
         );
         $asset->setFsRoot($fs->url());
 
-        $this->assertTrue($asset->existsOnFS());
+        $this->assertTrue($asset->existsOnFs());
 
         $asset = new WebpackAsset(
             new Request(),
@@ -43,7 +43,7 @@ class WebpackAssetTest extends TestCase {
             "badAsset"
         );
         $asset->setFsRoot($fs->url());
-        $this->assertFalse($asset->existsOnFS());
+        $this->assertFalse($asset->existsOnFs());
     }
 
     /**

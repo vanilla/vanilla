@@ -84,7 +84,7 @@ class WebpackAssetProvider {
 
         // The library chunk is not always created if there is nothing shared between entry-points.
         $shared = $this->makeScript($section, 'shared');
-        if (file_exists($shared->getFilePath())) {
+        if ($shared->existsOnFs()) {
             $scripts[] = $shared;
         }
 
@@ -98,7 +98,7 @@ class WebpackAssetProvider {
                 $addon
             );
 
-            if (file_exists($asset->getFilePath())) {
+            if ($asset->existsOnFs()) {
                 $scripts[] = $asset;
             }
         }
@@ -132,7 +132,7 @@ class WebpackAssetProvider {
                 $addon
             );
 
-            if (file_exists($asset->getFilePath())) {
+            if ($asset->existsOnFs()) {
                 $styles[] = $asset;
             }
         }

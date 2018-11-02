@@ -56,6 +56,7 @@ class Gdn_Auth extends Gdn_Pluggable {
             return;
         }
 
+        // This event was created for token based authentication to hook on. See hook for more info.
         $this->fireEvent('startAuthenticator');
 
         // Start the 'session'

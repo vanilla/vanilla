@@ -667,6 +667,9 @@ class DashboardHooks extends Gdn_Plugin {
 
     /**
      * Check if we have a valid token associated with the request.
+     * The checkAccessToken was previously done in gdn_dispatcher_appStartup_handler hook.
+     * It was changed to have the access token auth happen as close as possible to standard auth.
+     * It's necessary to do it via events until Vanilla overhauls its authentication workflow.
      */
     public function gdn_auth_startAuthenticator_handler() {
         $this->checkAccessToken();

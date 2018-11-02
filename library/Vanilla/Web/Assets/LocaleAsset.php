@@ -35,7 +35,7 @@ class LocaleAsset extends SiteAsset {
         // We need a web-root url, not an asset URL because this is an API endpoint resource that is dynamically generated.
         // It cannot have the assetPath joined onto the beginning.
         return SiteAsset::joinWebPath(
-            $this->request->webRoot(),
+            $this->request->getRoot(),
             '/api/v2/locales',
             $this->localeKey,
             'translations.js' . '?h=' . $this->cacheBuster->value()

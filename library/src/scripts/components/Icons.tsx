@@ -376,3 +376,19 @@ export function compose(className?: string) {
         </svg>
     );
 }
+
+export function plusCircle(className?: string) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 14 14"
+            className={classNames("icon", "icon-plusCircle", className)}
+            aria-hidden="true"
+        >
+            <path
+                fill="currentColor"
+                d="M14,7A7,7,0,1,1,7,0,7,7,0,0,1,14,7Zm-3.727.79a.339.339,0,0,0,.34-.338h0v-.9a.339.339,0,0,0-.339-.339H7.79V3.727a.339.339,0,0,0-.338-.34h-.9a.339.339,0,0,0-.339.339h0V6.21H3.727a.339.339,0,0,0-.34.338h0v.9a.339.339,0,0,0,.339.339H6.21v2.483a.339.339,0,0,0,.338.34h.9a.339.339,0,0,0,.339-.339h0V7.79Z"
+            />
+        </svg>
+    );
+}

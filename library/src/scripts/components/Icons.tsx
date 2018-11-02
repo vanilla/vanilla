@@ -181,7 +181,7 @@ export function checkCompact(className?: string) {
 }
 
 export function fileGeneric(className?: string, fileType?: string) {
-    const title = fileType | t("File");
+    const title = !!fileType ? fileType : t("File");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -245,6 +245,7 @@ export function fileExcel(className?: string) {
 export function filePDF(className?: string) {
     const textFill = "#fff";
     const title = t("PDF");
+    const unabbreviatedType = getUnabbreviatedAttachmentType(AttachmentType.PDF);
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -254,9 +255,7 @@ export function filePDF(className?: string) {
             aria-label={getUnabbreviatedAttachmentType(AttachmentType.PDF)}
         >
             <title>
-                <abbr className="sr-only" title={getUnabbreviatedAttachmentType(AttachmentType.PDF)}>
-                    {AttachmentType.PDF}
-                </abbr>
+                <abbr title={unabbreviatedType || undefined}>{AttachmentType.PDF}</abbr>
             </title>
             <rect width="18" height="18" style={{ fill: "#ff3934" }} />
             <path

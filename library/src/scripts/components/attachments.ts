@@ -27,7 +27,7 @@ export function getAttachmentIcon(type: AttachmentType, className?: string) {
     }
 }
 
-export function getUnabbreviatedAttachmentType(type: AttachmentType) {
+export function getUnabbreviatedAttachmentType(type: AttachmentType): string | null {
     switch (type) {
         case AttachmentType.EXCEL:
             return t("Microsoft Excel Document");

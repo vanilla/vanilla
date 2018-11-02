@@ -10,7 +10,7 @@ namespace Vanilla\Config;
 /**
  * Interface for reading configuration values.
  */
-interface ConfigInterface {
+interface IConfiguration {
     /**
      * Gets a setting from the configuration array. Returns $defaultValue if the value isn't found.
      *

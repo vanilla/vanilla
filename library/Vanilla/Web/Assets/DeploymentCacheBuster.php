@@ -7,7 +7,7 @@
 
 namespace Vanilla\Web\Assets;
 
-use Vanilla\Config\ConfigInterface;
+use Vanilla\Config\IConfiguration;
 
 /**
  * A cache buster that works based on the last deployment time.
@@ -25,16 +25,16 @@ class DeploymentCacheBuster {
     /** @var \DateTimeInterface */
     private $currentTime;
 
-    /** @var ConfigInterface */
+    /** @var IConfiguration */
     private $config;
 
     /**
      * DeploymentCacheBuster constructor.
      *
      * @param \DateTimeInterface $currentTime
-     * @param ConfigInterface $config
+     * @param IConfiguration $config
      */
-    public function __construct(\DateTimeInterface $currentTime, ConfigInterface $config) {
+    public function __construct(\DateTimeInterface $currentTime, IConfiguration $config) {
         $this->currentTime = $currentTime;
         $this->config = $config;
     }

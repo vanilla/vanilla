@@ -8,8 +8,8 @@
 namespace Vanilla\Web\Assets;
 
 use Garden\Web\RequestInterface;
-use Vanilla\AddonManager;
-use Vanilla\Config\ConfigInterface;
+use Vanilla\Addon\IAddonProvider;
+use Vanilla\Config\IConfiguration;
 
 /**
  * Class to provide assets from the webpack build process.
@@ -22,10 +22,10 @@ class WebpackAssetProvider {
     /** @var DeploymentCacheBuster */
     private $cacheBuster;
 
-    /** @var AddonManager */
-    private $addonManager;
+    /** @var IAddonProvider */
+    private $addonProvider;
 
-    /** @var ConfigInterface */
+    /** @var IConfiguration */
     private $config;
 
     /** @var \Gdn_Locale */
@@ -36,20 +36,20 @@ class WebpackAssetProvider {
      *
      * @param RequestInterface $request
      * @param DeploymentCacheBuster $cacheBuster
-     * @param AddonManager $addonManager
-     * @param ConfigInterface $config
+     * @param IAddonProvider $addonProvider
+     * @param IConfiguration $config
      * @param \Gdn_Locale $locale
      */
     public function __construct(
         RequestInterface $request,
         DeploymentCacheBuster $cacheBuster,
-        AddonManager $addonManager,
-        ConfigInterface $config,
+        IAddonProvider $addonProvider,
+        IConfiguration $config,
         \Gdn_Locale $locale
     ) {
         $this->request = $request;
         $this->cacheBuster = $cacheBuster;
-        $this->addonManager = $addonManager;
+        $this->addonProvider = $addonProvider;
         $this->config = $config;
         $this->locale = $locale;
     }
@@ -90,7 +90,7 @@ class WebpackAssetProvider {
         }
 
         // Grab all of the addon based assets.
-        foreach ($this->addonManager->getEnabled() as $addon) {
+        foreach ($this->addonProvider->getEnabled() as $addon) {
             $asset = new WebpackAddonAsset(
                 $this->request,
                 $this->cacheBuster,
@@ -106,7 +106,6 @@ class WebpackAssetProvider {
 
         // The bootstrap asset ties everything together.
         $scripts[] = $this->makeScript($section, 'bootstrap');
-
 
         return $scripts;
     }
@@ -125,7 +124,7 @@ class WebpackAssetProvider {
 
         $styles = [];
         // Grab all of the addon based assets.
-        foreach ($this->addonManager->getEnabled() as $addon) {
+        foreach ($this->addonProvider->getEnabled() as $addon) {
             $asset = new WebpackAddonAsset(
                 $this->request,
                 $this->cacheBuster,

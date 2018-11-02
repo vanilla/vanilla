@@ -47,7 +47,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Gdn_Configuration')
     ->setShared(true)
     ->addAlias('Config')
-    ->addAlias(\Vanilla\Config\ConfigInterface::class)
+    ->addAlias(\Vanilla\Config\IConfiguration::class)
 
     // AddonManager
     ->rule(Vanilla\AddonManager::class)
@@ -61,6 +61,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
         PATH_CACHE
     ])
     ->addAlias('AddonManager')
+    ->addAlias(Addon\IAddonProvider::class)
     ->addCall('registerAutoloader')
 
     // ApplicationManager

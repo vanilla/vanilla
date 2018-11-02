@@ -8,7 +8,7 @@
 namespace Vanilla\Web\Assets;
 
 use Garden\Web\RequestInterface;
-use Vanilla\Addon;
+use Vanilla\Addon\IAddon;
 
 /**
  * An webpack asset that it specific to an addon.
@@ -22,14 +22,14 @@ class WebpackAddonAsset extends WebpackAsset {
      * @param string $extension The file extension to use.
      * @param string $section The section of the site to get scripts for.
      * @see https://docs.vanillaforums.com/developer/tools/building-frontend/#site-sections
-     * @param Addon $addon The addon to get an asset for.
+     * @param IAddon $addon The addon to get an asset for.
      */
     public function __construct(
         RequestInterface $request,
         DeploymentCacheBuster $cacheBuster,
         string $extension,
         string $section,
-        Addon $addon
+        IAddon $addon
     ) {
         parent::__construct($request, $cacheBuster, $extension, $section, $addon->getKey());
         $this->fileSubpath = $section . DS . 'addons';

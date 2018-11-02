@@ -8,6 +8,7 @@
 namespace Vanilla;
 
 use Garden\EventManager;
+use Vanilla\Addon\IAddonProvider;
 
 /**
  * A class to manage all of the addons in the application.
@@ -19,7 +20,7 @@ use Garden\EventManager;
  * - The addon can declare a class ending in "Plugin" and its events will be registered.
  * - Any translations the addon has declared will be loaded for the currently enabled locale.
  */
-class AddonManager {
+class AddonManager implements IAddonProvider {
 
     /// Constants ///
 
@@ -859,11 +860,9 @@ class AddonManager {
     }
 
     /**
-     * Get the enabled addons, sorted by priority with the highest priority first.
-     *
-     * @return array[Addon] Returns an array of {@link Addon} objects.
+     * @inheritdoc
      */
-    public function getEnabled() {
+    public function getEnabled(): array {
         if (!$this->enabledSorted) {
             uasort($this->enabled, ['\Vanilla\Addon', 'comparePriority']);
             $this->enabledSorted = true;

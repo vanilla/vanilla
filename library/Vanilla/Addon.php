@@ -7,13 +7,13 @@
 
 namespace Vanilla;
 
-
+use Vanilla\Addon\IAddon;
 use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * Contains the information for a single addon.
  */
-class Addon {
+class Addon implements IAddon {
     const TYPE_ADDON = 'addon';
     const TYPE_LOCALE = 'locale';
     const TYPE_THEME = 'theme';
@@ -194,7 +194,7 @@ class Addon {
      *
      * @return string Returns the subdir.
      */
-    public function getSubdir() {
+    public function getSubdir(): string {
         return $this->subdir;
     }
 
@@ -807,7 +807,7 @@ class Addon {
      *
      * @return string Returns the key as a string.
      */
-    public function getKey() {
+    public function getKey(): string {
         return empty($this->info['key']) ? '' : $this->info['key'];
     }
 

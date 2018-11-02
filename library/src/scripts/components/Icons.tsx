@@ -7,6 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
+import { AttachmentType, getUnabbreviatedAttachmentType } from "@knowledge/modules/common/AttachmentIcon";
 
 const currentColorFill = {
     fill: "currentColor",
@@ -167,7 +168,8 @@ export function checkCompact(className?: string) {
             xmlns="http://www.w3.org/2000/svg"
             className={classNames("icon", "icon-selectedCategory", className)}
             viewBox="0 0 16.8 13"
-            aria-hidden="true"
+            role="img"
+            aria-label={title}
         >
             <title>{title}</title>
             <polygon
@@ -178,16 +180,18 @@ export function checkCompact(className?: string) {
     );
 }
 
-export function fileGeneric(className?: string) {
+export function fileGeneric(className?: string, fileType?: string) {
+    const title = fileType | t("File");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 18 18"
             className={classNames("icon", "icon-fileGeneric", "attachmentIcon", className)}
-            aria-hidden="true"
+            role="img"
+            aria-label={title}
         >
-            <title>{t("Document")}</title>
-            <rect width="18" height="18" rx="1" ry="1" style={{ fill: "#4c4c4c" }} />
+            <title>{title}</title>
+            <rect width="18" height="18" style={{ fill: "#4c4c4c" }} />
             <path
                 d="M9.616,6.558,13.1,10.045a1.869,1.869,0,0,1,.093,2.688,1.849,1.849,0,0,1-2.688-.094L4.764,6.9c-.1-.1-.99-1.05-.186-1.854s1.749.083,1.854.186l5.189,5.189a.483.483,0,0,1,.01.732.5.5,0,0,1-.754.007L7.948,8.226l-.556.556,2.931,2.931A1.311,1.311,0,1,0,12.177,9.86L6.987,4.67a2.054,2.054,0,0,0-2.965-.185A2.054,2.054,0,0,0,4.207,7.45L9.953,13.2a2.624,2.624,0,1,0,3.706-3.707L10.172,6Z"
                 style={{ fill: "#fff" }}
@@ -198,15 +202,17 @@ export function fileGeneric(className?: string) {
 
 export function fileWord(className?: string) {
     const textFill = "#fff";
+    const title = t("Word");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 18 18"
             className={classNames("icon", "icon-fileWord", "attachmentIcon", className)}
-            aria-hidden="true"
+            role="img"
+            aria-label={getUnabbreviatedAttachmentType(AttachmentType.WORD)}
         >
-            <title>{t("Word Document")}</title>
-            <rect width="18" height="18" rx="1" ry="1" fill="#2b5599" />
+            <title>{title}</title>
+            <rect width="18" height="18" fill="#2b5599" />
             <polygon
                 style={{ fill: "#fff" }}
                 points="6.133 13.543 4 5 5.365 5 6.707 11.07 6.73 11.07 8.389 5 9.326 5 10.979 11.07 11.002 11.07 12.35 5 13.715 5 11.582 13.543 10.498 13.543 8.869 7.385 8.846 7.385 7.211 13.543 6.133 13.543"
@@ -216,15 +222,18 @@ export function fileWord(className?: string) {
 }
 
 export function fileExcel(className?: string) {
+    const title = t("Excel");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 18 18"
             className={classNames("icon", "icon-fileExcel", "attachmentIcon", className)}
-            aria-hidden="true"
+            role="img"
+            aria-label={getUnabbreviatedAttachmentType(AttachmentType.EXCEL)}
         >
+            <title>{title}</title>
             <title>{t("Excel Document")}</title>
-            <rect width="18" height="18" rx="1" ry="1" fill="#2f7d32" />
+            <rect width="18" height="18" fill="#2f7d32" />
             <polygon
                 style={{ fill: "#fff" }}
                 points="9.334 10.361 7.459 13.543 6 13.543 8.613 9.166 6.164 5 7.629 5 9.334 7.965 11.039 5 12.498 5 10.055 9.166 12.668 13.543 11.203 13.543 9.334 10.361"
@@ -235,15 +244,21 @@ export function fileExcel(className?: string) {
 
 export function filePDF(className?: string) {
     const textFill = "#fff";
+    const title = t("PDF");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 18 18"
             className={classNames("icon", "icon-filePDF", "attachmentIcon", className)}
-            aria-hidden="true"
+            role="img"
+            aria-label={getUnabbreviatedAttachmentType(AttachmentType.PDF)}
         >
-            <title>{t("PDF Document")}</title>
-            <rect width="18" height="18" rx="1" ry="1" style={{ fill: "#ff3934" }} />
+            <title>
+                <abbr className="sr-only" title={getUnabbreviatedAttachmentType(AttachmentType.PDF)}>
+                    {AttachmentType.PDF}
+                </abbr>
+            </title>
+            <rect width="18" height="18" style={{ fill: "#ff3934" }} />
             <path
                 style={{ fill: "#fff" }}
                 d="M2,13.767V5H3.884a2.815,2.815,0,0,1,.911.135,1.75,1.75,0,0,1,.714.481,1.889,1.889,0,0,1,.444.806,5.053,5.053,0,0,1,.123,1.25,6.2,6.2,0,0,1-.068,1,2.1,2.1,0,0,1-.289.764,1.851,1.851,0,0,1-.69.671,2.325,2.325,0,0,1-1.133.24h-.64V13.77ZM3.256,6.182v2.98h.6a1.29,1.29,0,0,0,.591-.111.7.7,0,0,0,.308-.308,1.112,1.112,0,0,0,.117-.455c.012-.181.019-.382.019-.6s0-.4-.013-.585a1.254,1.254,0,0,0-.111-.486.7.7,0,0,0-.295-.32,1.163,1.163,0,0,0-.566-.111Zm3.755,7.585V5h1.86a2.159,2.159,0,0,1,1.644.591,2.343,2.343,0,0,1,.56,1.675v4.1a2.446,2.446,0,0,1-.6,1.816,2.356,2.356,0,0,1-1.718.585ZM8.267,6.182v6.4h.579a.931.931,0,0,0,.751-.265,1.279,1.279,0,0,0,.222-.831V7.266a1.323,1.323,0,0,0-.21-.8.891.891,0,0,0-.763-.283Zm3.99,7.585V5H16V6.182H13.513v2.66H15.68v1.182H13.513v3.743Z"
@@ -276,26 +291,32 @@ export function rightTriangle(title: string = `▶`, className?: string) {
 }
 
 export function revisionStatus_revision(className?: string) {
+    const title = t("Revision");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             className={classNames("icon", "revisionIcon", "revisionIcon-revision", className)}
-            aria-hidden="true"
+            role="img"
+            aria-label={title}
         >
-            <rect width="24" height="24" rx="0" ry="0" fill="transparent" />
+            <title>{title}</title>
+            <rect width="24" height="24" fill="transparent" />
         </svg>
     );
 }
 
 export function revisionStatus_draft(className?: string) {
+    const title = t("Draft");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             className={classNames("icon", "revisionIcon", "revisionIcon-draft", className)}
-            aria-hidden="true"
+            role="img"
+            aria-label={title}
         >
+            <title>{title}</title>
             <path
                 fill="currentColor"
                 d="M3.745,21a.483.483,0,0,0,.2-.025L9.109,19.47a1.539,1.539,0,0,0,.742-.444L20.506,8.387A1.733,1.733,0,0,0,21,7.153a1.676,1.676,0,0,0-.494-1.209L18.058,3.5a1.748,1.748,0,0,0-2.447,0L4.981,14.138a2.047,2.047,0,0,0-.445.74L3.028,20.037a.762.762,0,0,0,.2.74A.754.754,0,0,0,3.745,21ZM13.856,7.375l2.793,2.789L9.307,17.5,6.514,14.706ZM16.7,4.537a.267.267,0,0,1,.173-.074.225.225,0,0,1,.173.074L19.492,6.98a.429.429,0,0,1,.074.173.2.2,0,0,1-.074.173L17.712,9.1,14.919,6.314ZM5.747,16.014l2.225,2.221-3.14.913Z"
@@ -309,13 +330,16 @@ export function revisionStatus_draft(className?: string) {
 }
 
 export function revisionStatus_pending(className?: string) {
+    const title = t("Pending");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             className={classNames("icon", "revisionIcon", "revisionIcon-pending", className)}
-            aria-hidden="true"
+            role="img"
+            aria-label={title}
         >
+            <title>{title}</title>
             <path
                 fill="currentColor"
                 d="M12,3.875a8.194,8.194,0,1,0,8.194,8.194A8.193,8.193,0,0,0,12,3.875Zm0,14.8a6.608,6.608,0,1,1,6.608-6.608A6.606,6.606,0,0,1,12,18.677Zm2.042-3.449-2.8-2.039a.4.4,0,0,1-.162-.32V7.443a.4.4,0,0,1,.4-.4h1.058a.4.4,0,0,1,.4.4v4.682l2.207,1.606a.4.4,0,0,1,.086.555l-.621.856a.4.4,0,0,1-.555.086Z"
@@ -329,13 +353,16 @@ export function revisionStatus_published(className?: string) {
 }
 
 export function revisionStatus_deleted(className?: string) {
+    const title = t("Deleted");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             className={classNames("icon", "revisionIcon", "revisionIcon-deleted", className)}
-            aria-hidden="true"
+            role="img"
+            aria-label={title}
         >
+            <title>{title}</title>
             <path
                 style={currentColorFill}
                 d="M19.444,6.651a.334.334,0,0,0-.247-.1H15.888l-.75-1.788a1.484,1.484,0,0,0-.578-.675,1.512,1.512,0,0,0-.846-.279H10.286a1.512,1.512,0,0,0-.846.279,1.484,1.484,0,0,0-.578.675l-.75,1.788H4.8A.33.33,0,0,0,4.46,6.9v.685a.329.329,0,0,0,.343.343H5.831v10.2a2.348,2.348,0,0,0,.5,1.516,1.507,1.507,0,0,0,1.21.626h8.912a1.5,1.5,0,0,0,1.21-.647,2.438,2.438,0,0,0,.5-1.537V7.925H19.2a.329.329,0,0,0,.343-.343V6.9a.333.333,0,0,0-.1-.246ZM10.126,5.3a.3.3,0,0,1,.182-.118H13.7a.308.308,0,0,1,.182.118L14.4,6.554H9.6L10.126,5.3ZM16.8,18.079a1.212,1.212,0,0,1-.075.433.965.965,0,0,1-.155.289c-.054.061-.091.091-.112.091H7.544c-.021,0-.058-.03-.112-.091a.943.943,0,0,1-.155-.289,1.212,1.212,0,0,1-.075-.433V7.925h9.6V18.079ZM8.915,16.836H9.6a.33.33,0,0,0,.343-.343V10.324A.33.33,0,0,0,9.6,9.982H8.915a.329.329,0,0,0-.342.342v6.169a.329.329,0,0,0,.342.343Zm2.742,0h.686a.329.329,0,0,0,.342-.343V10.324a.329.329,0,0,0-.342-.342h-.686a.329.329,0,0,0-.342.342v6.169a.329.329,0,0,0,.342.343Zm2.742,0h.686a.329.329,0,0,0,.342-.343V10.324a.329.329,0,0,0-.342-.342H14.4a.33.33,0,0,0-.343.342v6.169a.33.33,0,0,0,.343.343Z"
@@ -345,13 +372,16 @@ export function revisionStatus_deleted(className?: string) {
 }
 
 export function help(className?: string) {
+    const title = t("Help");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
             className={classNames("icon", "icon-help", className)}
-            aria-hidden="true"
+            role="img"
+            aria-label={title}
         >
+            <title>{title}</title>
             <path
                 d="M12,19a7,7,0,1,0-7-7A7,7,0,0,0,12,19Zm0,1a8,8,0,1,1,8-8A8,8,0,0,1,12,20Zm-.866-6.5v-.338a2,2,0,0,1,.211-.969,2.757,2.757,0,0,1,.741-.8,4.09,4.09,0,0,0,.812-.773,1.156,1.156,0,0,0,.183-.656.826.826,0,0,0-.3-.683,1.333,1.333,0,0,0-.851-.238A2.941,2.941,0,0,0,11,9.185a6.65,6.65,0,0,0-.836.344L9.721,8.6a4.653,4.653,0,0,1,2.3-.6,2.485,2.485,0,0,1,1.645.508,1.727,1.727,0,0,1,.609,1.4,1.983,1.983,0,0,1-.117.706,2.006,2.006,0,0,1-.352.59,5.653,5.653,0,0,1-.812.731,3.088,3.088,0,0,0-.659.64,1.229,1.229,0,0,0-.166.682V13.5Zm-.217,1.688a.7.7,0,0,1,.778-.8.775.775,0,0,1,.582.209.818.818,0,0,1,.2.59.838.838,0,0,1-.2.595.878.878,0,0,1-1.156.006A.844.844,0,0,1,10.917,15.185Z"
                 transform="translate(-4 -4)"
@@ -372,6 +402,25 @@ export function compose(className?: string) {
             <path
                 fill="currentColor"
                 d="M23.591,1.27l-.9-.9a1.289,1.289,0,0,0-1.807,0l-.762.863,2.6,2.587.868-.751a1.24,1.24,0,0,0,.248-.373,1.255,1.255,0,0,0,0-1.052A1.232,1.232,0,0,0,23.591,1.27ZM19.5,20.5H3.5V4.5H15.4l1.4-1.431H2.751A1,1,0,0,0,2,4.07V20.939a1,1,0,0,0,1,1H20.011a1,1,0,0,0,1-1V7L19.5,8.445ZM21.364,3.449l-9.875,9.8-.867-.861,9.874-9.8-.867-.863-4.938,4.9-4.938,4.9L8.74,15.167l3.617-1.055,9.875-9.8Z"
+            />
+        </svg>
+    );
+}
+
+export function download(className?: string) {
+    const title = t("Download");
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            className={classNames("icon", "icon-compose", className)}
+            role="img"
+            aria-label={title}
+        >
+            <title>{title}</title>
+            <path
+                d="M6.483,10.462h.005a.5.5,0,0,1,.707.01l3.954,4.066V3.887a.5.5,0,0,1,.5-.5h.621a.5.5,0,0,1,.5.5V14.533l4.035-4.073h0a.5.5,0,0,1,.707,0l.437.437a.5.5,0,0,1,0,.707h0l-5.6,5.6a.5.5,0,0,1-.707,0h0l-5.6-5.6a.5.5,0,0,1,0-.707h0ZM20.25,19.5V17.25a.75.75,0,0,1,1.5,0v3A.75.75,0,0,1,21,21H3a.75.75,0,0,1-.75-.75v-3a.75.75,0,0,1,1.5,0V19.5Z"
+                fill="currentColor"
             />
         </svg>
     );

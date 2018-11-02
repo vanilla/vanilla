@@ -8,7 +8,7 @@
 namespace Vanilla;
 
 use Garden\EventManager;
-use Vanilla\Addon\IAddonProvider;
+use Vanilla\Contracts;
 
 /**
  * A class to manage all of the addons in the application.
@@ -20,7 +20,7 @@ use Vanilla\Addon\IAddonProvider;
  * - The addon can declare a class ending in "Plugin" and its events will be registered.
  * - Any translations the addon has declared will be loaded for the currently enabled locale.
  */
-class AddonManager implements IAddonProvider {
+class AddonManager implements Contracts\AddonProvider {
 
     /// Constants ///
 

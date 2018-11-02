@@ -9,13 +9,14 @@
  * @since 2.1
  */
 
-namespace Vanilla\Web\Assets;
+namespace Vanilla\Web\Asset;
 
 use Gdn_Controller;
 use Vanilla\Addon;
 use Gdn_Model;
 use Gdn;
 use Vanilla\AliasLoader;
+use Vanilla\Contracts;
 
 /**
  * Manages Assets.
@@ -27,23 +28,18 @@ class LegacyAssetModel extends Gdn_Model {
      /** @var string */
     public $UrlPrefix = '';
 
-    /** @var \Vanilla\AddonManager */
-    private $addonManager;
-
     /** @var DeploymentCacheBuster */
     private $cacheBuster;
 
     /**
      * LegacyAssetModel constructor.
      *
-     * @param \Vanilla\AddonManager $addonManager
      * @param DeploymentCacheBuster $cacheBuster
      */
-    public function __construct(\Vanilla\AddonManager $addonManager, DeploymentCacheBuster $cacheBuster) {
+    public function __construct(DeploymentCacheBuster $cacheBuster) {
         parent::__construct();
         // Set the old class name for Gdn_Pluggable.
         $this->ClassName = "AssetModel";
-        $this->addonManager = $addonManager;
         $this->cacheBuster = $cacheBuster;
     }
 

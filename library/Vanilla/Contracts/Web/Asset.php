@@ -5,12 +5,12 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Web\Assets;
+namespace Vanilla\Contracts\Web;
 
 /**
  * A web asset interface.
  */
-interface IAsset {
+interface Asset {
     /**
      * Get the full web ready URL of the asset.
      *

@@ -5,9 +5,10 @@
  * @since 2.8
  */
 
-namespace Vanilla\Web\Assets;
+namespace Vanilla\Web\Asset;
 
 use Garden\Web\RequestInterface;
+use Vanilla\Contracts;
 
 /**
  * An asset representing a file created by the webpack build process.
@@ -32,7 +33,7 @@ class WebpackAsset extends SiteAsset {
      * Constructor.
      *
      * @param RequestInterface $request The current request.
-     * @param DeploymentCacheBuster $cacheBuster A cache buster instance.
+     * @param Contracts\Web\CacheBuster $cacheBuster A cache buster instance.
      * @param string $extension The file extension to use.
      * @param string $section The section of the site to get scripts for.
      * @see https://docs.vanillaforums.com/developer/tools/building-frontend/#site-sections
@@ -40,7 +41,7 @@ class WebpackAsset extends SiteAsset {
      */
     public function __construct(
         RequestInterface $request,
-        DeploymentCacheBuster $cacheBuster,
+        Contracts\Web\CacheBuster $cacheBuster,
         string $extension,
         string $section,
         string $assetName

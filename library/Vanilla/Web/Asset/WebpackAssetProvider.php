@@ -5,11 +5,10 @@
  * @since 2.8
  */
 
-namespace Vanilla\Web\Assets;
+namespace Vanilla\Web\Asset;
 
 use Garden\Web\RequestInterface;
-use Vanilla\Addon\IAddonProvider;
-use Vanilla\Config\IConfiguration;
+use Vanilla\Contracts;
 
 /**
  * Class to provide assets from the webpack build process.
@@ -19,13 +18,13 @@ class WebpackAssetProvider {
     /** @var RequestInterface */
     private $request;
 
-    /** @var DeploymentCacheBuster */
+    /** @var Contracts\Web\CacheBuster */
     private $cacheBuster;
 
-    /** @var IAddonProvider */
+    /** @var Contracts\AddonProvider */
     private $addonProvider;
 
-    /** @var IConfiguration */
+    /** @var Contracts\Configuration */
     private $config;
 
     /** @var \Gdn_Locale */
@@ -35,16 +34,16 @@ class WebpackAssetProvider {
      * WebpackAssetProvider constructor.
      *
      * @param RequestInterface $request
-     * @param DeploymentCacheBuster $cacheBuster
-     * @param IAddonProvider $addonProvider
-     * @param IConfiguration $config
+     * @param Contracts\Web\CacheBuster $cacheBuster
+     * @param Contracts\AddonProvider $addonProvider
+     * @param Contracts\Configuration $config
      * @param \Gdn_Locale $locale
      */
     public function __construct(
         RequestInterface $request,
-        DeploymentCacheBuster $cacheBuster,
-        IAddonProvider $addonProvider,
-        IConfiguration $config,
+        Contracts\Web\CacheBuster $cacheBuster,
+        Contracts\AddonProvider $addonProvider,
+        Contracts\Configuration $config,
         \Gdn_Locale $locale
     ) {
         $this->request = $request;

@@ -5,7 +5,7 @@
  * @since 2.8
  */
 
-namespace Vanilla\Web\Assets;
+namespace Vanilla\Web\Asset;
 
 /**
  * A class representing the polyfill file loaded by

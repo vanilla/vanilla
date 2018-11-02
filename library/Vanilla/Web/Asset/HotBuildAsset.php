@@ -5,13 +5,15 @@
  * @since 2.8
  */
 
-namespace Vanilla\Web\Assets;
+namespace Vanilla\Web\Asset;
+
+use Vanilla\Contracts;
 
 /**
  * Class representing the asset used by hot webpack build. Eg.
  * `yarn build:dev`.It points to the development bundle on the webpack dev server.
  */
-class HotBuildAsset implements IAsset {
+class HotBuildAsset implements Contracts\Web\Asset {
     /** @var string */
     private $ip;
 

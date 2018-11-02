@@ -5,12 +5,12 @@
  * @since 2.8
  */
 
-namespace Vanilla\Config;
+namespace Vanilla\Contracts;
 
 /**
  * Interface for reading configuration values.
  */
-interface IConfiguration {
+interface Configuration {
     /**
      * Gets a setting from the configuration array. Returns $defaultValue if the value isn't found.
      *

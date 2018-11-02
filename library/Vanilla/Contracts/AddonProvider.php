@@ -5,16 +5,16 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Addon;
+namespace Vanilla\Contracts;
 
 /**
  * Interface for providing addons.
  */
-interface IAddonProvider {
+interface AddonProvider {
     /**
      * Get the enabled addons, sorted by priority with the highest priority first.
      *
-     * @return IAddon[] Returns an array of {@link IAddon} objects.
+     * @return Addon[] Returns an array of {@link Addon} objects.
      */
     public function getEnabled(): array;
 }

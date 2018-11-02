@@ -11,7 +11,7 @@ use AssetModel;
 use Gdn_Plugin;
 use SettingsController;
 use Vanilla\Addon;
-use Vanilla\Web\Assets\LegacyAssetModel;
+use Vanilla\Web\Asset\LegacyAssetModel;
 
 /**
  * Handles the swagger UI menu options.

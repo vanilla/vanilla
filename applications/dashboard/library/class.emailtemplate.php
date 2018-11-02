@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-use Vanilla\Web\Assets\LegacyAssetModel;
+use Vanilla\Web\Asset\LegacyAssetModel;
 
 /**
  * Class EmailTemplate

@@ -5,9 +5,10 @@
  * @since 2.8
  */
 
-namespace Vanilla\Web\Assets;
+namespace Vanilla\Web\Asset;
 
 use Garden\Web\RequestInterface;
+use Vanilla\Contracts;
 
 /**
  * An asset representing a script containing data for a particular locale.
@@ -20,10 +21,10 @@ class LocaleAsset extends SiteAsset {
      * Constructor.
      *
      * @param RequestInterface $request The current request.
-     * @param DeploymentCacheBuster $cacheBuster A cache buster instance.
+     * @param Contracts\Web\CacheBuster $cacheBuster A cache buster instance.
      * @param string $localeKey The key of the locale for the asset to represent.
      */
-    public function __construct(RequestInterface $request, DeploymentCacheBuster $cacheBuster, string $localeKey) {
+    public function __construct(RequestInterface $request, Contracts\Web\CacheBuster $cacheBuster, string $localeKey) {
         parent::__construct($request, $cacheBuster);
         $this->localeKey = $localeKey;
     }

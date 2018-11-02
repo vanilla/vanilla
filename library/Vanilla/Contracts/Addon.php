@@ -5,12 +5,12 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Addon;
+namespace Vanilla\Contracts;
 
 /**
  * A simple addon interface.
  */
-interface IAddon {
+interface Addon {
     /**
      * Get the subdirectory of the addon.
      *

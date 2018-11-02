@@ -5,28 +5,29 @@
  * @since 2.8
  */
 
-namespace Vanilla\Web\Assets;
+namespace Vanilla\Web\Asset;
 
 use Garden\Web\RequestInterface;
+use Vanilla\Contracts;
 
 /**
  * Class representing an asset from the current site.
  */
-abstract class SiteAsset implements IAsset {
+abstract class SiteAsset implements Contracts\Web\Asset {
 
     /** @var RequestInterface */
     protected $request;
 
-    /** @var DeploymentCacheBuster */
+    /** @var Contracts\Web\CacheBuster */
     protected $cacheBuster;
 
     /**
      * SiteAsset constructor.
      *
      * @param RequestInterface $request The current request.
-     * @param DeploymentCacheBuster $cacheBuster A cache buster instance.
+     * @param Contracts\Web\CacheBuster $cacheBuster A cache buster instance.
      */
-    public function __construct(RequestInterface $request, DeploymentCacheBuster $cacheBuster) {
+    public function __construct(RequestInterface $request, Contracts\Web\CacheBuster $cacheBuster) {
         $this->request = $request;
         $this->cacheBuster = $cacheBuster;
     }

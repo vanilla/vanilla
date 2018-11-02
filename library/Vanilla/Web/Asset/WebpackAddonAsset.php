@@ -5,10 +5,10 @@
  * @since 2.8
  */
 
-namespace Vanilla\Web\Assets;
+namespace Vanilla\Web\Asset;
 
 use Garden\Web\RequestInterface;
-use Vanilla\Addon\IAddon;
+use Vanilla\Contracts;
 
 /**
  * An webpack asset that it specific to an addon.
@@ -18,18 +18,18 @@ class WebpackAddonAsset extends WebpackAsset {
      * Constructor.
      *
      * @param RequestInterface $request The current request.
-     * @param DeploymentCacheBuster $cacheBuster A cache buster instance.
+     * @param Contracts\Web\CacheBuster $cacheBuster A cache buster instance.
      * @param string $extension The file extension to use.
      * @param string $section The section of the site to get scripts for.
      * @see https://docs.vanillaforums.com/developer/tools/building-frontend/#site-sections
-     * @param IAddon $addon The addon to get an asset for.
+     * @param Contracts\Addon $addon The addon to get an asset for.
      */
     public function __construct(
         RequestInterface $request,
-        DeploymentCacheBuster $cacheBuster,
+        Contracts\Web\CacheBuster $cacheBuster,
         string $extension,
         string $section,
-        IAddon $addon
+        Contracts\Addon $addon
     ) {
         parent::__construct($request, $cacheBuster, $extension, $section, $addon->getKey());
         $this->fileSubpath = $section . DS . 'addons';

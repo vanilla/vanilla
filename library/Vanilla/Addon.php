@@ -7,13 +7,13 @@
 
 namespace Vanilla;
 
-use Vanilla\Addon\IAddon;
+use Vanilla\Contracts;
 use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * Contains the information for a single addon.
  */
-class Addon implements IAddon {
+class Addon implements Contracts\Addon {
     const TYPE_ADDON = 'addon';
     const TYPE_LOCALE = 'locale';
     const TYPE_THEME = 'theme';

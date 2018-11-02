@@ -4,6 +4,7 @@ use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
 use Vanilla\InjectableInterface;
+use Vanilla\Contracts;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -47,7 +48,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Gdn_Configuration')
     ->setShared(true)
     ->addAlias('Config')
-    ->addAlias(\Vanilla\Config\IConfiguration::class)
+    ->addAlias(Contracts\Configuration::class)
+
+    ->rule(Contracts\Web\CacheBuster::class)
+    ->setClass(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
 
     // AddonManager
     ->rule(Vanilla\AddonManager::class)
@@ -61,7 +65,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
         PATH_CACHE
     ])
     ->addAlias('AddonManager')
-    ->addAlias(Addon\IAddonProvider::class)
+    ->addAlias(Contracts\AddonProvider::class)
     ->addCall('registerAutoloader')
 
     // ApplicationManager

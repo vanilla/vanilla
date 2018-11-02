@@ -544,7 +544,7 @@ class EditorPlugin extends Gdn_Plugin {
 
         // If user wants to modify styling of Wysiwyg content in editor,
         // they can override the styles with this file.
-        $cssInfo = \Vanilla\Web\Assets\LegacyAssetModel::cssPath('wysiwyg.css', 'plugins/editor');
+        $cssInfo = \Vanilla\Web\Asset\LegacyAssetModel::cssPath('wysiwyg.css', 'plugins/editor');
         if ($cssInfo) {
             $cssPath = asset($cssInfo[1]);
         }

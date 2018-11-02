@@ -12,7 +12,7 @@
  * @abstract
  */
 
-use \Vanilla\Web\Assets\LegacyAssetModel;
+use \Vanilla\Web\Asset\LegacyAssetModel;
 
 /**
  * Controller base class.
@@ -1879,8 +1879,8 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $this->Head->addScript('', 'text/javascript', false, ['content' => $this->definitionList(false)]);
 
                 // Webpack based scripts
-                /** @var \Vanilla\Web\Assets\WebpackAssetProvider $webpackAssetProvider */
-                $webpackAssetProvider = Gdn::getContainer()->get(\Vanilla\Web\Assets\WebpackAssetProvider::class);
+                /** @var \Vanilla\Web\Asset\WebpackAssetProvider $webpackAssetProvider */
+                $webpackAssetProvider = Gdn::getContainer()->get(\Vanilla\Web\Asset\WebpackAssetProvider::class);
 
                 // Add the client-side translations.
                 $localeScriptPath = $webpackAssetProvider->getLocaleAsset()->getWebPath();

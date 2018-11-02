@@ -11,7 +11,7 @@ use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\TestCase;
 use org\bovigo\vfs\vfsStream;
 use Vanilla\Web\Asset\WebpackAsset;
-use VanillaTests\Fixtures\MockCacheBusterInterface;
+use VanillaTests\Fixtures\MockCacheBuster;
 use VanillaTests\Fixtures\Request;
 
 class WebpackAssetTest extends TestCase {
@@ -26,7 +26,7 @@ class WebpackAssetTest extends TestCase {
         $fs = $this->getFsWithFile("bootstrap.min.js");
         $asset = new WebpackAsset(
             new Request(),
-            new MockCacheBusterInterface(),
+            new MockCacheBuster(),
             ".min.js",
             "test",
             "bootstrap"
@@ -37,7 +37,7 @@ class WebpackAssetTest extends TestCase {
 
         $asset = new WebpackAsset(
             new Request(),
-            new MockCacheBusterInterface(),
+            new MockCacheBuster(),
             ".min.js",
             "test",
             "badAsset"
@@ -48,12 +48,12 @@ class WebpackAssetTest extends TestCase {
 
     /**
      * @param Request $req
-     * @param MockCacheBusterInterface $buster
+     * @param MockCacheBuster $buster
      * @param string $expected
      *
      * @dataProvider webPathProvider
      */
-    public function testWebPath(Request $req, MockCacheBusterInterface $buster, string $expected) {
+    public function testWebPath(Request $req, MockCacheBuster $buster, string $expected) {
         $asset = new WebpackAsset($req, $buster, WebpackAsset::SCRIPT_EXTENSION, "testSec", "test");
         $this->assertEquals($expected, $asset->getWebPath());
     }
@@ -62,17 +62,17 @@ class WebpackAssetTest extends TestCase {
         return [
             [
                 (new Request()),
-                new MockCacheBusterInterface(),
+                new MockCacheBuster(),
                 "http://example.com/dist/testSec/test.min.js",
             ],
             [
                 (new Request())->setAssetRoot("/someRoot"),
-                new MockCacheBusterInterface(),
+                new MockCacheBuster(),
                 "http://example.com/someRoot/dist/testSec/test.min.js",
             ],
             [
                 (new Request())->setHost("me.com"),
-                new MockCacheBusterInterface("cacheBuster"),
+                new MockCacheBuster("cacheBuster"),
                 "http://me.com/dist/testSec/test.min.js?h=cacheBuster",
             ],
         ];

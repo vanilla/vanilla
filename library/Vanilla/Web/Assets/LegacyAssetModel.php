@@ -21,17 +21,6 @@ use Vanilla\AliasLoader;
  * Manages Assets.
  */
 class LegacyAssetModel extends Gdn_Model {
-    /**
-     * The number of seconds to wait after a deploy before switching the cache buster.
-     */
-    const CACHE_GRACE_PERIOD = 90;
-
-    /** @var string Directory for webpack-built files. */
-    const WEBPACK_DIST_DIRECTORY_NAME = "dist";
-
-    /** @var string Webpack built script extension. */
-    const WEBPACK_SCRIPT_EXTENSION = ".min.js";
-
     /** @var array List of CSS files to serve. */
     protected $_CssFiles = [];
 

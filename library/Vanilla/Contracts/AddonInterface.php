@@ -10,7 +10,7 @@ namespace Vanilla\Contracts;
 /**
  * A simple addon interface.
  */
-interface Addon {
+interface AddonInterface {
     /**
      * Get the subdirectory of the addon.
      *

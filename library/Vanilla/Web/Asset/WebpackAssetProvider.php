@@ -18,13 +18,13 @@ class WebpackAssetProvider {
     /** @var RequestInterface */
     private $request;
 
-    /** @var Contracts\Web\CacheBuster */
+    /** @var Contracts\Web\CacheBusterInterface */
     private $cacheBuster;
 
-    /** @var Contracts\AddonProvider */
+    /** @var Contracts\AddonProviderInterface */
     private $addonProvider;
 
-    /** @var Contracts\Configuration */
+    /** @var Contracts\ConfigurationInterface */
     private $config;
 
     /** @var \Gdn_Locale */
@@ -34,16 +34,16 @@ class WebpackAssetProvider {
      * WebpackAssetProvider constructor.
      *
      * @param RequestInterface $request
-     * @param Contracts\Web\CacheBuster $cacheBuster
-     * @param Contracts\AddonProvider $addonProvider
-     * @param Contracts\Configuration $config
+     * @param Contracts\Web\CacheBusterInterface $cacheBuster
+     * @param Contracts\AddonProviderInterface $addonProvider
+     * @param Contracts\ConfigurationInterface $config
      * @param \Gdn_Locale $locale
      */
     public function __construct(
         RequestInterface $request,
-        Contracts\Web\CacheBuster $cacheBuster,
-        Contracts\AddonProvider $addonProvider,
-        Contracts\Configuration $config,
+        Contracts\Web\CacheBusterInterface $cacheBuster,
+        Contracts\AddonProviderInterface $addonProvider,
+        Contracts\ConfigurationInterface $config,
         \Gdn_Locale $locale
     ) {
         $this->request = $request;

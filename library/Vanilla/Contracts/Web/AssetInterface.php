@@ -10,7 +10,7 @@ namespace Vanilla\Contracts\Web;
 /**
  * A web asset interface.
  */
-interface Asset {
+interface AssetInterface {
     /**
      * Get the full web ready URL of the asset.
      *

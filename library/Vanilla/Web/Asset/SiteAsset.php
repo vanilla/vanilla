@@ -13,21 +13,21 @@ use Vanilla\Contracts;
 /**
  * Class representing an asset from the current site.
  */
-abstract class SiteAsset implements Contracts\Web\Asset {
+abstract class SiteAsset implements Contracts\Web\AssetInterface {
 
     /** @var RequestInterface */
     protected $request;
 
-    /** @var Contracts\Web\CacheBuster */
+    /** @var Contracts\Web\CacheBusterInterface */
     protected $cacheBuster;
 
     /**
      * SiteAsset constructor.
      *
      * @param RequestInterface $request The current request.
-     * @param Contracts\Web\CacheBuster $cacheBuster A cache buster instance.
+     * @param Contracts\Web\CacheBusterInterface $cacheBuster A cache buster instance.
      */
-    public function __construct(RequestInterface $request, Contracts\Web\CacheBuster $cacheBuster) {
+    public function __construct(RequestInterface $request, Contracts\Web\CacheBusterInterface $cacheBuster) {
         $this->request = $request;
         $this->cacheBuster = $cacheBuster;
     }

@@ -10,7 +10,7 @@ namespace Vanilla\Contracts;
 /**
  * Interface for reading configuration values.
  */
-interface Configuration {
+interface ConfigurationInterface {
     /**
      * Gets a setting from the configuration array. Returns $defaultValue if the value isn't found.
      *

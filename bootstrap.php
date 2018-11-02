@@ -48,9 +48,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Gdn_Configuration')
     ->setShared(true)
     ->addAlias('Config')
-    ->addAlias(Contracts\Configuration::class)
+    ->addAlias(Contracts\ConfigurationInterface::class)
 
-    ->rule(Contracts\Web\CacheBuster::class)
+    ->rule(Contracts\Web\CacheBusterInterface::class)
     ->setClass(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
 
     // AddonManager
@@ -65,7 +65,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
         PATH_CACHE
     ])
     ->addAlias('AddonManager')
-    ->addAlias(Contracts\AddonProvider::class)
+    ->addAlias(Contracts\AddonProviderInterface::class)
     ->addCall('registerAutoloader')
 
     // ApplicationManager

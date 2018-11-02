@@ -21,10 +21,10 @@ class LocaleAsset extends SiteAsset {
      * Constructor.
      *
      * @param RequestInterface $request The current request.
-     * @param Contracts\Web\CacheBuster $cacheBuster A cache buster instance.
+     * @param Contracts\Web\CacheBusterInterface $cacheBuster A cache buster instance.
      * @param string $localeKey The key of the locale for the asset to represent.
      */
-    public function __construct(RequestInterface $request, Contracts\Web\CacheBuster $cacheBuster, string $localeKey) {
+    public function __construct(RequestInterface $request, Contracts\Web\CacheBusterInterface $cacheBuster, string $localeKey) {
         parent::__construct($request, $cacheBuster);
         $this->localeKey = $localeKey;
     }

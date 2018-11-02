@@ -10,7 +10,7 @@ namespace Vanilla\Contracts\Web;
 /**
  * An interface for providing cache busting values.
  */
-interface CacheBuster {
+interface CacheBusterInterface {
 
     /**
      * Get a string capable of busting the cache of an asset when if it changes.

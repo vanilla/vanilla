@@ -13,7 +13,7 @@ use Vanilla\Contracts;
  * Class representing the asset used by hot webpack build. Eg.
  * `yarn build:dev`.It points to the development bundle on the webpack dev server.
  */
-class HotBuildAsset implements Contracts\Web\Asset {
+class HotBuildAsset implements Contracts\Web\AssetInterface {
     /** @var string */
     private $ip;
 

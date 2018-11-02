@@ -10,7 +10,7 @@ namespace Vanilla\Contracts;
 /**
  * Interface for providing addons.
  */
-interface AddonProvider {
+interface AddonProviderInterface {
     /**
      * Get the enabled addons, sorted by priority with the highest priority first.
      *

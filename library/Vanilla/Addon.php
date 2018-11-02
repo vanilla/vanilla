@@ -13,7 +13,8 @@ use Vanilla\Utility\CamelCaseScheme;
 /**
  * Contains the information for a single addon.
  */
-class Addon implements Contracts\Addon {
+class Addon implements Contracts\AddonInterface {
+
     const TYPE_ADDON = 'addon';
     const TYPE_LOCALE = 'locale';
     const TYPE_THEME = 'theme';

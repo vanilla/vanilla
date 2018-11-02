@@ -33,7 +33,7 @@ class WebpackAsset extends SiteAsset {
      * Constructor.
      *
      * @param RequestInterface $request The current request.
-     * @param Contracts\Web\CacheBuster $cacheBuster A cache buster instance.
+     * @param Contracts\Web\CacheBusterInterface $cacheBuster A cache buster instance.
      * @param string $extension The file extension to use.
      * @param string $section The section of the site to get scripts for.
      * @see https://docs.vanillaforums.com/developer/tools/building-frontend/#site-sections
@@ -41,7 +41,7 @@ class WebpackAsset extends SiteAsset {
      */
     public function __construct(
         RequestInterface $request,
-        Contracts\Web\CacheBuster $cacheBuster,
+        Contracts\Web\CacheBusterInterface $cacheBuster,
         string $extension,
         string $section,
         string $assetName

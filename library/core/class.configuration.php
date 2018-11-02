@@ -14,7 +14,7 @@
  * retrieve settings from the arrays, assign new values to the arrays, and save
  * the arrays back to the files.
  */
-class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Configuration {
+class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\ConfigurationInterface {
 
     /** Cache key format. */
     const CONFIG_FILE_CACHE_KEY = 'garden.config.%s';

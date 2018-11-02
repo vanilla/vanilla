@@ -28,15 +28,15 @@ class LegacyAssetModel extends Gdn_Model {
      /** @var string */
     public $UrlPrefix = '';
 
-    /** @var DeploymentCacheBuster */
+    /** @var Contracts\Web\CacheBusterInterface */
     private $cacheBuster;
 
     /**
      * LegacyAssetModel constructor.
      *
-     * @param DeploymentCacheBuster $cacheBuster
+     * @param Contracts\Web\CacheBusterInterface $cacheBuster
      */
-    public function __construct(DeploymentCacheBuster $cacheBuster) {
+    public function __construct(Contracts\Web\CacheBusterInterface $cacheBuster) {
         parent::__construct();
         // Set the old class name for Gdn_Pluggable.
         $this->ClassName = "AssetModel";
@@ -454,10 +454,10 @@ class LegacyAssetModel extends Gdn_Model {
     /**
      * Return a cache buster string
      *
-     * @deprecated 2.8 DeploymentCacheBuster::class
+     * @deprecated 2.8 Contracts\Web\CacheBusterInterface::class
      */
     public function cacheBuster(): string {
-        deprecated(DeploymentCacheBuster::class);
+        deprecated(Contracts\Web\CacheBusterInterface::class);
         return $this->cacheBuster->value();
     }
 

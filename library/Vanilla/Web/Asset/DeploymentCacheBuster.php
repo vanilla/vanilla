@@ -15,7 +15,7 @@ use Vanilla\Contracts;
  * Settings the config value `Garden.Deployed` to the current unix timestamp on a deploy
  * will allow this cache buster to work properly.
  */
-class DeploymentCacheBuster implements Contracts\Web\CacheBuster {
+class DeploymentCacheBuster implements Contracts\Web\CacheBusterInterface {
 
     /**
      * The number of seconds to wait after a deploy before switching the cache buster.
@@ -25,16 +25,16 @@ class DeploymentCacheBuster implements Contracts\Web\CacheBuster {
     /** @var \DateTimeInterface */
     private $currentTime;
 
-    /** @var Contracts\Configuration */
+    /** @var Contracts\ConfigurationInterface */
     private $config;
 
     /**
      * DeploymentCacheBuster constructor.
      *
      * @param \DateTimeInterface $currentTime
-     * @param Contracts\Configuration $config
+     * @param Contracts\ConfigurationInterface $config
      */
-    public function __construct(\DateTimeInterface $currentTime, Contracts\Configuration $config) {
+    public function __construct(\DateTimeInterface $currentTime, Contracts\ConfigurationInterface $config) {
         $this->currentTime = $currentTime;
         $this->config = $config;
     }

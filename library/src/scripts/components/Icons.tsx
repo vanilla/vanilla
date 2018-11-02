@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
-import { AttachmentType, getUnabbreviatedAttachmentType } from "@knowledge/modules/common/AttachmentIcon";
+import { AttachmentType, getUnabbreviatedAttachmentType } from "@library/components/attachments";
 
 const currentColorFill = {
     fill: "currentColor",

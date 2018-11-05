@@ -91,3 +91,8 @@ $datePicker-padding: $utility-baseUnit * 1.5;
     width: $icon-small_size;
     height: $icon-small_size;
 }
+
+.DayPicker-Day,
+.DayPicker-Weekday {
+    white-space: nowrap;
+}

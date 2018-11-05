@@ -6,8 +6,6 @@
 
 import React from "react";
 import classNames from "classnames";
-import { t } from "@library/application";
-import { newFolder } from "@library/components/icons/icons";
 
 export interface IFrameFooterProps {
     className?: string;

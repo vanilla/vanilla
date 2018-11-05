@@ -6,11 +6,6 @@
 .richEditor {
     color: $global-color_fg;
     padding-left: $richEditor_horizontalPadding;
-    border: {
-        width: $formElement_borderWidth;
-        style: solid;
-        color: $formElement_borderColor;
-    }
 
     blockquote {
         display: block;
@@ -230,6 +225,10 @@ body.hasRichEditor {
 
 .richEditor-text {
     overflow: visible;
+    padding: {
+        right: $richEditor_innerPadding;
+        left: $richEditor_innerPadding;
+    }
     &:focus {
         outline: {
             offset: $richEditor-text_offset;
@@ -249,5 +248,7 @@ body.isMobile {
 @include mediaQuery-richEditor_mobile {
     @include legacyMobileStyles();
 }
-
-
+//
+//.richEditorFlyout {
+//    bottom: 100%;
+//}

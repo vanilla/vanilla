@@ -961,4 +961,42 @@ class Gdn_Model extends Gdn_Pluggable {
 
         return $canEdit;
     }
+
+    /**
+     * Locks a resource so that it can only be accessed one at a time.
+     *
+     * @param string $lockKey Cache key to be assigned.
+     * @param int $gracePeriod Period of time the key will stay valid.
+     * @return bool $hasMasterKey Whether a master key has been assigned.
+     */
+    protected static function buildCacheLock(string $lockKey, int $gracePeriod = 60):bool {
+        $hasMasterKey = null;
+
+        if (is_null($hasMasterKey)) {
+            // First instance will receive the $master key and lock the record.
+            $instanceKey = getmypid();
+            $masterKey = Gdn::cache()->add($lockKey, $instanceKey, [
+                Gdn_Cache::FEATURE_EXPIRY => $gracePeriod
+            ]);
+            $hasMasterKey = ($instanceKey == $masterKey);
+        }
+
+        return (bool)$hasMasterKey;
+    }
+
+    /**
+     * Releases a locked resource so that it can be used again.
+     *
+     * @param string $lockKey Cache key to be assigned.
+     * @return bool $keyHasBeenRelease Whether a master key has been released.
+     */
+    protected function releaseCacheLock($lockKey = ''):bool {
+        $keyHasBeenRelease = false;
+
+        if (isset($lockKey)) {
+           $keyHasBeenRelease = Gdn::cache()->remove($lockKey);
+        }
+
+        return $keyHasBeenRelease;
+    }
 }

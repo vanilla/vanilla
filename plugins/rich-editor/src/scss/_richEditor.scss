@@ -84,15 +84,11 @@
     min-height: $richEditor_minHeight;
     padding: {
         top: $richEditor_verticalPadding;
-        right: $richEditor_innerPadding;
         bottom: $richEditor_verticalPadding;
-        left: $richEditor_innerPadding;
     }
     outline-color: transparent;
     white-space: pre-wrap !important; // Needed for spaces around embed blots to work properly!
     overflow: auto;
-
-
 }
 
 .ql-clipboard {
@@ -399,7 +395,6 @@
 .richEditorFlyout {
     @include shadow-dropDown;
     position: absolute;
-    bottom: 100%;
     left: 0;
     width: #{$richEditor-flyout_paddingHorizontal * 2 + 7 * $richEditor-menuButton_size};
     border: $formElement-borderWidth $formElement-borderStyle $formElement_borderColor;

@@ -8,7 +8,7 @@ import React from "react";
 import Quill from "quill/core";
 import HeadingBlot from "quill/formats/header";
 import { t } from "@library/application";
-import * as icons from "@rich-editor/components/icons";
+import * as icons from "@library/components/icons/editor";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { isEmbedSelected, forceSelectionUpdate } from "@rich-editor/quill/utility";
 import Formatter from "@rich-editor/quill/Formatter";

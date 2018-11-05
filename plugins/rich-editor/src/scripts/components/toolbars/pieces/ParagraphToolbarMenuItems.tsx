@@ -7,7 +7,7 @@
 import React from "react";
 import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
 import { t } from "@library/application";
-import * as icons from "@rich-editor/components/icons";
+import * as icons from "@library/components/icons/editor";
 import Formatter from "@rich-editor/quill/Formatter";
 import { IFormats, RangeStatic } from "quill/core";
 

@@ -9,12 +9,12 @@ import KeyboardModule from "quill/modules/keyboard";
 import { isAllowedUrl, t } from "@library/application";
 import { getRequiredID, IRequiredComponentID } from "@library/componentIDs";
 import { IWithEditorProps, withEditor } from "@rich-editor/components/context";
-import * as Icons from "@rich-editor/components/icons";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import Popover from "@rich-editor/components/popovers/pieces/Popover";
 import PopoverController, { IPopoverControllerChildParameters } from "@library/components/PopoverController";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import { ButtonBaseClass } from "@library/components/forms/Button";
+import { embed } from "@library/components/icons/editor";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -49,7 +49,7 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
 
     public render() {
         const title = t("Insert Media");
-        const Icon = <Icons.embed />;
+        const Icon = embed();
 
         return (
             <PopoverController

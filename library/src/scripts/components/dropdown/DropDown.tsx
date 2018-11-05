@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { dropDownMenu } from "@library/components/Icons";
+import { dropDownMenu } from "@library/components/icons/common";
 import { getRequiredID } from "@library/componentIDs";
 import PopoverController from "@library/components/PopoverController";
 import DropDownContents from "./DropDownContents";

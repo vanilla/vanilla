@@ -8,12 +8,12 @@ import React from "react";
 import { Grid, AutoSizer } from "react-virtualized";
 import classNames from "classnames";
 import { t } from "@library/application";
-import * as Icons from "@rich-editor/components/icons";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { EMOJIS, EMOJI_GROUPS } from "@rich-editor/components/popovers/pieces/emojiData";
 import Popover from "@rich-editor/components/popovers/pieces/Popover";
 import EmojiButton from "@rich-editor/components/popovers/pieces/EmojiButton";
 import { IPopoverControllerChildParameters } from "@library/components/PopoverController";
+import { emoji } from "@library/components/icons/editor";
 
 const BUTTON_SIZE = 36;
 const COL_SIZE = 7;
@@ -85,7 +85,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             </button>
         );
 
-        const Icon = <Icons.emoji />;
+        const Icon = emoji();
 
         const footer = (
             <div id={this.categoryPickerID} className="emojiGroups" aria-label={t("Emoji Categories")} tabIndex={-1}>

@@ -5,7 +5,7 @@
  */
 
 import React, { MouseEvent, ChangeEvent } from "react";
-import * as Icons from "@rich-editor/components/icons";
+import * as Icons from "@library/components/icons/editor";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { uploadImage } from "@library/apiv2";

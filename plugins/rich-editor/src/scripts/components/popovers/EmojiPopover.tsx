@@ -5,13 +5,13 @@
  */
 
 import React from "react";
-import * as Icons from "@rich-editor/components/icons";
 import { getRequiredID, IOptionalComponentID, IRequiredComponentID } from "@library/componentIDs";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import EmojiPicker from "@rich-editor/components/popovers/pieces/EmojiPicker";
 import PopoverController, { IPopoverControllerChildParameters } from "@library/components/PopoverController";
 import { t } from "@library/application";
 import { ButtonBaseClass } from "@library/components/forms/Button";
+import { emoji } from "@library/components/icons/editor";
 
 interface IProps extends IOptionalComponentID {
     disabled?: boolean;
@@ -29,7 +29,7 @@ export default class EmojiPopover extends React.Component<IProps, IRequiredCompo
      * @inheritDoc
      */
     public render() {
-        const icon = Icons.emoji();
+        const icon = emoji();
 
         return (
             <PopoverController

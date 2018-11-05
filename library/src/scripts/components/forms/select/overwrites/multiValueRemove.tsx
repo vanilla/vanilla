@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { components } from "react-select";
-import { close } from "@library/components/Icons";
+import { close } from "@library/components/icons/common";
 import { ButtonBaseClass } from "../../Button";
 import classNames from "classnames";
 import { t } from "@library/application";

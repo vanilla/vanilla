@@ -10,7 +10,7 @@ import classNames from "classnames";
 import { getRequiredID } from "../componentIDs";
 import { t } from "../application";
 import DropDownItemButton from "@library/components/dropdown/items/DropDownItemButton";
-import { checkCompact, downTriangle } from "@library/components/Icons";
+import { checkCompact, downTriangle } from "@library/components/icons/common";
 import DropDown from "@library/components/dropdown/DropDown";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 

@@ -22,11 +22,18 @@ class JsonFieldProcessorTest extends TestCase {
      * @return array
      */
     public function provideReadOperations() {
-        $complexType = ["foo" => "bar"];
-        $json = json_encode($complexType);
+        $expected = [
+            "foo" => "bar",
+            "bar" => "baz",
+            "attributes" => [
+                "one" => 1,
+                "two" => "deux",
+            ]
+        ];
+        $row = $expected;
+        $row["attributes"] = json_encode($row["attributes"]);
         return [
-            [Operation::TYPE_SELECT, ["attributes" => $json], ["attributes" => $complexType]],
-            [Operation::TYPE_SELECT, ["notAttributes" => $json], ["notAttributes" => $json]],
+            [Operation::TYPE_SELECT, $row, $expected],
         ];
     }
 
@@ -36,12 +43,19 @@ class JsonFieldProcessorTest extends TestCase {
      * @return array
      */
     public function provideWriteOperations() {
-        $complexType = ["foo" => "bar"];
-        $json = json_encode($complexType);
+        $set = [
+            "foo" => "bar",
+            "bar" => "baz",
+            "attributes" => [
+                "one" => 1,
+                "two" => "deux",
+            ]
+        ];
+        $expected = $set;
+        $expected["attributes"] = json_encode($expected["attributes"]);
         return [
-            [Operation::TYPE_INSERT, ["attributes" => $complexType], ["attributes" => $json]],
-            [Operation::TYPE_UPDATE, ["attributes" => $complexType], ["attributes" => $json]],
-            [Operation::TYPE_INSERT, ["notAttributes" => $complexType], ["notAttributes" => $complexType]],
+            [Operation::TYPE_INSERT, $set, $expected],
+            [Operation::TYPE_UPDATE, $set, $expected],
         ];
     }
 
@@ -82,11 +96,9 @@ class JsonFieldProcessorTest extends TestCase {
         $model->addPipelineProcessor($processor);
 
         $operation = new Operation();
-        $operation->setType(Operation::TYPE_SELECT);
+        $operation->setType($type);
         $operation->setCaller($model);
-        $result = $model->doSelectOperation($operation, [
-            $row
-        ]);
+        $result = $model->doSelectOperation($operation, [$row]);
         $this->assertEquals([$expected], $result);
     }
 }

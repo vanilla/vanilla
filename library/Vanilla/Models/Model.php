@@ -127,7 +127,7 @@ class Model implements InjectableInterface {
      *    - offset (int): Row offset before capturing the result.
      * @return array
      * @throws ValidationException If a row fails to validate against the schema.
-     * @throws Exception If no rows could be found.
+     * @throws NoResultsException If no rows could be found.
      */
     public function selectSingle(array $where = [], array $options = []): array {
         $options["limit"] = 1;

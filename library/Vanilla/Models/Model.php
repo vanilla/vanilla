@@ -61,6 +61,25 @@ class Model implements InjectableInterface {
     }
 
     /**
+     * Delete resource rows.
+     *
+     * @param array $where Conditions to restrict the deletion.
+     * @param array $options Options for the delete query.
+     *    - limit (int): Limit on the results to be deleted.
+     * @throws Exception If an error is encountered while performing the query.
+     * @return bool True.
+     */
+    public function delete(array $where, array $options = []): bool {
+        // Lazy load schemas.
+        $this->ensureSchemas();
+        $limit = $options["limit"] ?? false;
+
+        $this->sql()->delete($this->table, $where, $limit);
+        // If fully executed without an exception bubbling up, consider this a success.
+        return true;
+    }
+
+    /**
      * Make sure we have configured schemas available to the instance.
      */
     protected function ensureSchemas() {

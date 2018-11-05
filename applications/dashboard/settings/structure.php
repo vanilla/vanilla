@@ -853,7 +853,7 @@ $Construct
 
 $Construct
     ->table("contentDraft")
-    ->primaryKey("contentDraftID")
+    ->primaryKey("draftID")
     ->column("recordType", "varchar(64)", false, ["index", "index.record", "index.parentRecord"])
     ->column("recordID", "int", true, "index.record")
     ->column("parentRecordID", "int", true, "index.parentRecord")

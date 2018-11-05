@@ -854,7 +854,8 @@ $Construct
 $Construct
     ->table("contentDraft")
     ->primaryKey("contentDraftID")
-    ->column("recordType", "varchar(64)", false, ["index", "index.parentRecord"])
+    ->column("recordType", "varchar(64)", false, ["index", "index.record", "index.parentRecord"])
+    ->column("recordID", "int", true, "index.record")
     ->column("parentRecordID", "int", true, "index.parentRecord")
     ->column("attributes", "text")
     ->column("insertUserID", "int", false, "index")

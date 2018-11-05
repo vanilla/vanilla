@@ -121,6 +121,7 @@ export class Editor extends React.Component<IProps> {
                     }}
                 >
                     <EditorDescriptions id={this.descriptionID} />
+                    {!this.props.legacyMode && quillDependantItems}
                     <div className="richEditor-frame InputBox">
                         <div className="richEditor-textWrap" ref={this.quillMountRef}>
                             <div
@@ -131,7 +132,7 @@ export class Editor extends React.Component<IProps> {
                                 tabIndex={0}
                             />
                         </div>
-                        {quillDependantItems}
+                        {this.props.legacyMode && quillDependantItems}
                     </div>
                 </EditorProvider>
             </ReduxProvider>

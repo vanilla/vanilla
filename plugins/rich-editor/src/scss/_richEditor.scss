@@ -92,14 +92,7 @@
     white-space: pre-wrap !important; // Needed for spaces around embed blots to work properly!
     overflow: auto;
 
-    &:focus {
-        outline: {
-            offset: $richEditor-text_offset;
-            style: solid;
-            width: $formElement_borderWidth;
-            color: $richEditor-outline_color;
-        }
-    }
+
 }
 
 .ql-clipboard {

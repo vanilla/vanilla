@@ -149,7 +149,8 @@ export function categoryIcon(className?: string) {
             xmlns="http://www.w3.org/2000/svg"
             className={classNames("icon", "icon-categoryIcon", className)}
             viewBox="0 0 14.25 12.75"
-            aria-hidden="true"
+            role="img"
+            aria-label={title}
         >
             <title>{title}</title>
             <path

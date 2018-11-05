@@ -4,6 +4,12 @@
  * @license GPL-2.0-only
  */
 
+
+/**
+ * This file is not included in the "legacy" build.
+ */
+$richEditorForm-title_color: mixContentBgAndFg(50%);
+
 .richEditorForm {
     position: relative;
     height: 100vh;
@@ -11,11 +17,22 @@
 
 .richEditorForm-title {
     position: relative;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    font-weight: $global-fontWeight_bold;
+    font-size: $global-title_fontSize;
+    line-height: $global-condensed_lineHeight;
+    height: $global-condensed_lineHeight * $global-title_fontSize;
+    color: $richEditorForm-title_color;
+    border: 0;
+    border-radius: 0;
+    margin-bottom: $global_spacer;
+    padding: {
+        left: 0;
+        right: 0;
+    }
 
+    &:active,
     &:focus {
-        z-index: 1;
+        box-shadow: none;
     }
 }
 
@@ -37,4 +54,17 @@
     margin: {
         bottom: $global-gutter_size;
     }
+}
+
+.richEditor-inlineMenuItems {
+    border-bottom: {
+        width: $formElement_borderWidth;
+        style: solid;
+        color: $formElement_borderColor;
+    }
+}
+
+
+.richEditor-frame {
+    overflow: auto;
 }

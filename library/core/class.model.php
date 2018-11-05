@@ -994,7 +994,7 @@ class Gdn_Model extends Gdn_Pluggable {
         $keyHasBeenRelease = false;
 
         if (isset($lockKey)) {
-           $keyHasBeenRelease = Gdn::cache()->remove($lockKey);
+            $keyHasBeenRelease = Gdn::cache()->remove($lockKey);
         }
 
         return $keyHasBeenRelease;

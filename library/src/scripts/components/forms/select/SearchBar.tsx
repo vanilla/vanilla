@@ -7,7 +7,7 @@
 import * as React from "react";
 import { components } from "react-select";
 import CreatableSelect from "react-select/lib/Creatable";
-import { uniqueIDFromPrefix, getRequiredID, IOptionalComponentID } from "@library/componentIDs";
+import { getRequiredID, IOptionalComponentID } from "@library/componentIDs";
 import classNames from "classnames";
 import { t } from "@library/application";
 import Button from "@library/components/forms/Button";
@@ -28,20 +28,16 @@ export interface IComboBoxOption {
 }
 
 interface IProps extends IOptionalComponentID {
-    query?: string;
     disabled?: boolean;
     className?: string;
     placeholder: string;
     options?: any[];
     loadOptions?: any[];
-    setQuery: (value) => void;
+    value: string;
+    onChange: (option: IComboBoxOption | null) => void;
     isBigInput?: boolean;
     noHeading: boolean;
-    children: ReactNode;
-}
-
-interface IState {
-    value: IComboBoxOption;
+    title: ReactNode;
 }
 
 /**
@@ -52,7 +48,7 @@ export default class BigSearch extends React.Component<IProps> {
         disabled: false,
         isBigInput: false,
         noHeading: false,
-        children: t("Search"),
+        title: t("Search"),
     };
 
     private id: string;
@@ -67,35 +63,20 @@ export default class BigSearch extends React.Component<IProps> {
         this.searchInputID = this.id + "-searchInput";
     }
 
-    private handleOnChange = (newValue: any, actionMeta: any) => {
-        this.props.setQuery(newValue.label || "");
-    };
-
-    private handleInputChange = (newValue: any, actionMeta: any) => {
-        this.props.setQuery(newValue.label || "");
-    };
-
     public render() {
         const { className, disabled, options } = this.props;
 
-        const getTheme = theme => {
-            return {
-                ...theme,
-                borderRadius: {},
-                colors: {},
-                spacing: {},
-            };
-        };
-
-        const customStyles = {
-            option: () => ({}),
-            menu: base => {
-                return { ...base, backgroundColor: null, boxShadow: null };
-            },
-        };
+        const value = this.props.value
+            ? {
+                  label: this.props.value,
+                  value: this.props.value,
+              }
+            : null;
 
         return (
             <CreatableSelect
+                onChange={this.props.onChange}
+                value={value}
                 id={this.id}
                 inputId={this.searchInputID}
                 components={this.componentOverwrites}
@@ -108,19 +89,27 @@ export default class BigSearch extends React.Component<IProps> {
                 aria-label={t("Search")}
                 escapeClearsValue={true}
                 pageSize={20}
-                theme={getTheme}
-                styles={customStyles}
+                theme={this.getTheme}
+                styles={this.customStyles}
                 backspaceRemovesValue={true}
             />
         );
     }
 
-    public getValue = value => {
-        return value;
+    private customStyles = {
+        option: () => ({}),
+        menu: base => {
+            return { ...base, backgroundColor: null, boxShadow: null };
+        },
     };
 
-    public preventFormSubmission = e => {
-        e.preventDefault();
+    private getTheme = theme => {
+        return {
+            ...theme,
+            borderRadius: {},
+            colors: {},
+            spacing: {},
+        };
     };
 
     /**
@@ -129,15 +118,12 @@ export default class BigSearch extends React.Component<IProps> {
      * @param props
      */
     private searchControl = props => {
-        const id = uniqueIDFromPrefix("searchInputBlock");
-        const labelID = id + "-label";
-
         return (
             <form className="searchBar-form" onSubmit={this.preventFormSubmission}>
                 {!this.props.noHeading && (
                     <Heading depth={1} className="searchBar-heading">
                         <label className="searchBar-label" htmlFor={this.searchInputID}>
-                            {this.props.children}
+                            {this.props.title}
                         </label>
                     </Heading>
                 )}
@@ -163,6 +149,10 @@ export default class BigSearch extends React.Component<IProps> {
         );
     };
 
+    private preventFormSubmission = e => {
+        e.preventDefault();
+    };
+
     /*
     * Overwrite components in Select component
     */
@@ -178,5 +168,3 @@ export default class BigSearch extends React.Component<IProps> {
         NoOptionsMessage: noOptionsMessage,
     };
 }
-
-// Role search on input

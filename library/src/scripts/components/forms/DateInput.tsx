@@ -1,11 +1,12 @@
-/*
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPL-2.0-only
  */
+
 import * as React from "react";
 import DayPickerInput from "react-day-picker/DayPickerInput";
-import MomentLocaleUtils, { formatDate, parseDate } from "react-day-picker/moment";
+import { formatDate, parseDate } from "react-day-picker/moment";
 import { guessOperatingSystem, OS } from "@library/utility";
 import classNames from "classnames";
 import { t } from "@library/application";

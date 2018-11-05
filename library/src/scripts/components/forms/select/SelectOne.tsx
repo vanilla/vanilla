@@ -28,7 +28,7 @@ interface IProps extends IOptionalComponentID {
     className?: string;
     placeholder?: string;
     options: IComboBoxOption[];
-    setData: (data: any) => void;
+    onChange: (data: IComboBoxOption) => void;
     labelNote?: string;
     noteAfterInput?: string;
     errors?: IFieldError[];
@@ -51,10 +51,6 @@ export default class SelectOne extends React.Component<IProps> {
         this.errorID = this.id + "-errors";
     }
 
-    private handleOnChange = (newValue: any, actionMeta: any) => {
-        this.props.setData(newValue);
-    };
-
     public render() {
         const { className, disabled, options, searchable } = this.props;
         let describedBy;
@@ -75,6 +71,7 @@ export default class SelectOne extends React.Component<IProps> {
                         id={this.id}
                         options={options}
                         inputId={this.inputID}
+                        onChange={this.props.onChange}
                         components={this.componentOverwrites}
                         isClearable={true}
                         isDisabled={disabled}

@@ -12,6 +12,7 @@ import { IUserSuggestion } from "@library/users/suggestion/IUserSuggestion";
 import ReduxActions from "@library/state/ReduxActions";
 import UserSuggestionModel from "@library/users/suggestion/UserSuggestionModel";
 import { IUsersStoreState } from "@library/users/UsersModel";
+import debounce from "lodash/debounce";
 
 interface ILookupUserOptions {
     username: string;
@@ -74,7 +75,7 @@ export default class UserSuggestionActions extends ReduxActions {
     /**
      * Make an API request for mention suggestions. These results are cached by the lookup username.
      */
-    public loadUsers(username: string) {
+    private interalLoadUsers = (username: string) => {
         return this.dispatch((dispatch: Dispatch<any>, getState: () => IUsersStoreState) => {
             const trie = UserSuggestionModel.selectSuggestionsTrie(getState());
             // Attempt an exact lookup first.
@@ -156,5 +157,7 @@ export default class UserSuggestionActions extends ReduxActions {
                     dispatch(UserSuggestionActions.loadUsersACs.error(error, { username }));
                 });
         });
-    }
+    };
+
+    public loadUsers = debounce(this.interalLoadUsers, 50);
 }

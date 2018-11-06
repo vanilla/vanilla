@@ -25,6 +25,7 @@ export interface IInjectableSuggestionsProps {
     activeSuggestionID: string;
     activeSuggestionIndex: number;
     suggestions: ILoadable<IUserSuggestion[]>;
+    isLoading: boolean;
 }
 
 export default class UserSuggestionModel implements ReduxReducer<IUserSuggestionState> {
@@ -35,13 +36,17 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
     public static mapStateToProps(state: IUsersStoreState): IInjectableSuggestionsProps {
         const stateSlice = Object.assign({}, UserSuggestionModel.stateSlice(state));
         const { trie, ...rest } = stateSlice;
-        const suggestions = stateSlice.currentUsername
-            ? trie.getValue(stateSlice.currentUsername) || UserSuggestionModel.defaultSuggestions
+        const suggestions = stateSlice.lastSuccessfulUsername
+            ? trie.getValue(stateSlice.lastSuccessfulUsername) || UserSuggestionModel.defaultSuggestions
             : UserSuggestionModel.defaultSuggestions;
+
+        const currentNode = stateSlice.currentUsername && trie.getValue(stateSlice.currentUsername);
+        const isLoading = !!currentNode && currentNode.status === LoadStatus.LOADING;
 
         return {
             ...rest,
             suggestions,
+            isLoading,
         };
     }
 

@@ -1,11 +1,11 @@
 .DataList,
 .MessageList {
 
-     .Item.Read,
-     .Item:not(.CategoryHeading) {
-         border-left-width: 0;
-         border-right-width: 0;
-     }
+    .Item.Read,
+    .Item:not(.CategoryHeading) {
+        border-left-width: 0;
+        border-right-width: 0;
+    }
 
     .Item:not(.CategoryHeading):first-child {
         border-top-width: 0;
@@ -14,4 +14,4 @@
     .Item:not(.CategoryHeading):last-child {
         border-bottom-width: 0;
     }
- }
+}

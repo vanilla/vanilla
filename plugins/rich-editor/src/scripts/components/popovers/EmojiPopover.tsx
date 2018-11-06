@@ -47,7 +47,14 @@ export default class EmojiPopover extends React.Component<IProps, IRequiredCompo
                 renderLeft={this.props.renderLeft}
             >
                 {(options: IPopoverControllerChildParameters) => {
-                    return <EmojiPicker {...options} contentID={options.id} />;
+                    return (
+                        <EmojiPicker
+                            {...options}
+                            renderAbove={this.props.renderAbove}
+                            renderLeft={this.props.renderLeft}
+                            contentID={options.id}
+                        />
+                    );
                 }}
             </PopoverController>
         );

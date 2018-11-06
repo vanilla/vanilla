@@ -183,7 +183,7 @@ class CropImageModule extends Gdn_Module {
     public function getCropHeight() {
         $value = $this->form->getValue('h');
         if ($value > self::MAX_CROP_SIZE) {
-            throw new Exception('Crop height is greater than the allowed size');
+            throw new Exception('CropH value $value is greater than the allowed size');
         }
 
         return $value;
@@ -198,7 +198,7 @@ class CropImageModule extends Gdn_Module {
     public function getCropWidth() {
         $value = $this->form->getValue('w');
         if ($value > self::MAX_CROP_SIZE) {
-            throw new Exception('Crop width is greater than the allowed size');
+            throw new Exception('CropW value $value is greater than the allowed size');
         }
 
         return $value;
@@ -213,7 +213,7 @@ class CropImageModule extends Gdn_Module {
     public function getCropXValue() {
         $value = $this->form->getValue('x');
         if ($value > self::MAX_CROP_SIZE) {
-            throw new Exception('Crop x value is greater than the allowed size');
+            throw new Exception('CropX value $value is greater than the allowed size');
         }
 
         return $value;
@@ -228,7 +228,7 @@ class CropImageModule extends Gdn_Module {
     public function getCropYValue() {
         $value = $this->form->getValue('y');
         if ($value > self::MAX_CROP_SIZE) {
-            throw new Exception('Crop y value is greater than the allowed size');
+            throw new Exception('CropY value $value is greater than the allowed size');
         }
 
         return $value;

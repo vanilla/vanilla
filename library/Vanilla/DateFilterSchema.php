@@ -329,8 +329,8 @@ class DateFilterSchema extends Schema {
     public static function dateFilterRange(array $dateData): array {
         $validOperators = ['=', '>', '<', '>=', '<=', '[]', '()'];
         $result = [
-            'startDate' => (new \DateTime())->setDate(1970, 1, 1)->setTime( 0, 0, 0),
-            'endDate' => (new \DateTime())->setDate(2100, 12, 31)->setTime( 0, 0, 0),
+            'startDate' => (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0),
+            'endDate' => (new \DateTime())->setDate(2100, 12, 31)->setTime(0, 0, 0),
             'exclude' => false
         ];
 

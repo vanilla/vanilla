@@ -10,7 +10,10 @@ use Vanilla\DateFilterSphinxSchema;
 use VanillaTests\SharedBootstrapTestCase;
 use DateTimeImmutable;
 
-
+/**
+ * Class DateFilterSphinxSchemaTest
+ * check implementation: https://github.com/vanilla/knowledge/pull/310
+ */
 class DateFilterSphinxSchemaTest extends SharedBootstrapTestCase {
     /**
      * Test static method DateFilterSphinxSchema::dateFilterRange

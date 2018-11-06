@@ -4,11 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
-import { filterSuggestions } from "@rich-editor/state/mention/mentionActions";
 import { expect } from "chai";
+import { IUserSuggestion } from "@library/users/suggestion/IUserSuggestion";
+import UserSuggestionActions from "@library/users/suggestion/UserSuggestionActions";
 
-function makeMentionSuggestion(username: string): IMentionSuggestionData {
+function makeMentionSuggestion(username: string): IUserSuggestion {
     return {
         name: username,
         domID: "",
@@ -18,7 +18,7 @@ function makeMentionSuggestion(username: string): IMentionSuggestionData {
     };
 }
 
-describe("filterSuggestions()", () => {
+describe("UserSuggestionActions.filterSuggestions()", () => {
     const SHORTER_STRINGS = ["tes", "te", "t"].map(makeMentionSuggestion);
     const LONGER_STRINGS = ["testi", "testing", "test ias.df asidf", "test ias.df asidf12431`234"].map(
         makeMentionSuggestion,
@@ -29,10 +29,10 @@ describe("filterSuggestions()", () => {
     const initalSuggestions = [...SHORTER_STRINGS, ...LONGER_STRINGS, ...NON_MATCHING, ...MATCHING];
     const lookup = "test";
 
-    let results: IMentionSuggestionData[] = [];
+    let results: IUserSuggestion[] = [];
 
     before(() => {
-        results = filterSuggestions(initalSuggestions, lookup);
+        results = UserSuggestionActions.filterSuggestions(initalSuggestions, lookup);
     });
 
     it("removes strings that are shorter than the current string", () => {

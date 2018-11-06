@@ -40,12 +40,11 @@ export default class DateInput extends React.PureComponent<IProps> {
             <DayPickerInput
                 format="YYYY-MM-DD"
                 placeholder="yyyy-mm-dd"
-                value={"2018-11-06"}
                 formatDate={formatDate}
                 parseDate={parseDate}
                 overlayComponent={this.CustomOverlay}
                 onDayChange={this.props.onChange}
-                showOverlay={true}
+                // showOverlay={true}
                 dayPickerProps={{
                     captionElement: this.CustomCaptionElement,
                     navbarElement: this.CustomNavBar,
@@ -68,10 +67,13 @@ export default class DateInput extends React.PureComponent<IProps> {
 
     private handleDayChange = (selectedDay: Date) => {};
 
-    private CustomOverlay = ({ classNames, selectedDay, children, ...props }) => {
+    private CustomOverlay = ({ classNames: c, selectedDay, children, ...props }) => {
+        const contentsClasses = classNames("dropDown-contents", "isOwnWidth", {
+            isRightAligned: this.props.alignment === "right",
+        });
         return (
             <div className="dropDown" {...props}>
-                <div className="dropDown-contents isOwnWidth">{children}</div>
+                <div className={contentsClasses}>{children}</div>
             </div>
         );
     };

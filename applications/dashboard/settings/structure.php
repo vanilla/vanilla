@@ -953,4 +953,9 @@ if (c('Plugins.TouchIcon.Uploaded')) {
     removeFromConfig('Plugins.TouchIcon.Uploaded');
 }
 
+// Remove AllowJSONP globally
+if (c('Garden.AllowJSONP')) {
+    removeFromConfig('Garden.AllowJSONP');
+}
+
 Gdn::router()->setRoute('apple-touch-icon.png', 'utility/showtouchicon', 'Internal');

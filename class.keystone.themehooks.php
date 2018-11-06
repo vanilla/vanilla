@@ -139,7 +139,7 @@ class KeystoneThemeHooks extends Gdn_Plugin {
     }
 
     /**
-     * Overwrites method to support `hasHeroBanner`, `hasFeatureSearchbox` and `panelToLeft` custom fields
+     * Add support to `hasHeroBanner`, `hasFeatureSearchbox` and `panelToLeft` custom fields
      *
      * @param SettingsController $sender
      */
@@ -152,10 +152,6 @@ class KeystoneThemeHooks extends Gdn_Plugin {
 
         $themeManager = Gdn::themeManager();
         $sender->setData('ThemeInfo', $themeManager->enabledThemeInfo());
-        //$themeInfo = Gdn::addonManager()->getTheme()->getInfo();
-        //$themeKey = $themeInfo["key"];
-        //$sender->setData('ThemeInfo', $themeManager->enabledThemeInfo());
-        //$sender->setData('ThemeInfo', $themeInfo);
 
         // set hasHeroImagePlugin to view
         $sender->setData('hasHeroImagePlugin', class_exists('HeroImagePlugin'));

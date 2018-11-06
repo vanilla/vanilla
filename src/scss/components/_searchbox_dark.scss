@@ -12,6 +12,11 @@
     }
 }
 
+.groupSearch .InputBox.BigInput {
+    background-color: $frame_backgroundColor;
+    color: $global-color_white;
+}
+
 .SearchForm .InputAndButton .Button {
     color: transparent;
 }

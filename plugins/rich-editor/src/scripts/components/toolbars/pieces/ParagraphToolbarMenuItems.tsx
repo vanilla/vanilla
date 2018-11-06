@@ -90,31 +90,31 @@ export default class ParagraphToolbarMenuItems extends React.PureComponent<IProp
     private formatParagraph = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         this.props.formatter.paragraph(this.props.lastGoodSelection);
-        this.props.afterClickHandler ? this.props.afterClickHandler() : null;
+        this.props.afterClickHandler && this.props.afterClickHandler();
     };
     private formatH2 = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         this.props.formatter.h2(this.props.lastGoodSelection);
-        this.props.afterClickHandler ? this.props.afterClickHandler() : null;
+        this.props.afterClickHandler && this.props.afterClickHandler();
     };
     private formatH3 = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         this.props.formatter.h3(this.props.lastGoodSelection);
-        this.props.afterClickHandler ? this.props.afterClickHandler() : null;
+        this.props.afterClickHandler && this.props.afterClickHandler();
     };
     private formatBlockquote = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         this.props.formatter.blockquote(this.props.lastGoodSelection);
-        this.props.afterClickHandler ? this.props.afterClickHandler() : null;
+        this.props.afterClickHandler && this.props.afterClickHandler();
     };
     private formatCodeBlock = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         this.props.formatter.codeBlock(this.props.lastGoodSelection);
-        this.props.afterClickHandler ? this.props.afterClickHandler() : null;
+        this.props.afterClickHandler && this.props.afterClickHandler();
     };
     private formatSpoiler = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         this.props.formatter.spoiler(this.props.lastGoodSelection);
-        this.props.afterClickHandler ? this.props.afterClickHandler() : null;
+        this.props.afterClickHandler && this.props.afterClickHandler();
     };
 }

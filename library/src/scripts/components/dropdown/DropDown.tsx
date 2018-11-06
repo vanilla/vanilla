@@ -24,6 +24,7 @@ export interface IProps {
     buttonContents?: React.ReactNode;
     buttonClassName?: string;
     buttonBaseClass?: ButtonBaseClass;
+    disabled?: boolean;
 }
 
 export interface IState {
@@ -68,6 +69,7 @@ export default class DropDown extends React.Component<IProps, IState> {
                 buttonContents={this.props.buttonContents || dropDownMenu()}
                 buttonClassName={this.props.buttonClassName}
                 selectedItemLabel={this.selectedText}
+                disabled={this.props.disabled}
             >
                 {params => {
                     return (

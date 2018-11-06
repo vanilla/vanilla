@@ -106,7 +106,7 @@ export class Editor extends React.Component<IProps> {
                         {isMobile && (
                             <React.Fragment>
                                 <li className="richEditor-menuItem" role="menuitem">
-                                    <ParagraphDropDown />
+                                    <ParagraphDropDown disabled={this.props.isLoading} />
                                 </li>
                             </React.Fragment>
                         )}

@@ -21,7 +21,9 @@ import { ButtonBaseClass } from "@library/components/forms/Button";
 import { heading2, heading3, blockquote, codeBlock, spoiler } from "@library/components/icons/editor";
 import * as editorIcons from "@library/components/icons/editor";
 
-interface IProps extends IWithEditorProps {}
+interface IProps extends IWithEditorProps {
+    disabled?: boolean;
+}
 
 interface IState {
     hasFocus: boolean;
@@ -60,8 +62,10 @@ export class ParagraphDropDown extends React.PureComponent<IProps, IState> {
                 id={this.ID}
                 className="mobileParagraphMenu-dropDown"
                 stickTop={true}
+                stickRight={false}
                 buttonContents={editorIcons.pilcrow()}
                 buttonBaseClass={ButtonBaseClass.ICON}
+                disabled={this.props.disabled}
             >
                 <ParagraphToolbarMenuItems
                     menuRef={this.menuRef}

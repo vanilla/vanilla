@@ -8,11 +8,6 @@
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
- */
-/*!
- * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
  */.NoPanel .Frame-content>.Container{max-width:800px}.NoPanel .Frame-content .Content{width:100%}.NoPanel .Panel{display:none}@media screen and (max-width:992px){.NoScroll{height:100vh;overflow:hidden}}.PageTitle{margin-bottom:18px}
 
 /*!
@@ -243,16 +238,5 @@
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
- */.SearchForm .InputAndButton .Button{color:rgba(0,0,0,0)}
-/*!
- * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */.Panel-main .Box.Box a:before,.Panel-main .BoxFilter.BoxFilter a:before{content:none}
-
-/*!
- * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */.ThemeOptions-panelToLeft .Panel-main{margin-left:0}.ThemeOptions-panelToLeft .BreadcrumbsBox,.ThemeOptions-panelToLeft .MainContent{-ms-flex-order:2;-webkit-box-ordinal-group:3;margin-left:auto;order:2}@media screen and (max-width:992px){.ThemeOptions-panelToLeft .BreadcrumbsBox,.ThemeOptions-panelToLeft .MainContent{-ms-flex-order:0;-webkit-box-ordinal-group:1;order:0}}.ThemeOptions-panelToLeft .BreadcrumbsBox{-ms-flex-order:2;-webkit-box-ordinal-group:3;margin-left:auto;order:2;width:calc(100% - 292px)}@media screen and (max-width:992px){.ThemeOptions-panelToLeft .BreadcrumbsBox{-ms-flex-order:initial;-webkit-box-ordinal-group:initial;margin-left:0;order:0;width:auto}}.ThemeOptions-panelToLeft .SearchBox{margin-left:0}@media screen and (max-width:992px){.ThemeOptions-panelToLeft .SearchBox{margin-left:auto}}.ThemeOptions-hasHeroBanner .MainContent .HomepageTitle,.ThemeOptions-hasHeroBanner .MainContent .PageDescription{display:none}.ThemeOptions-hasHeroBanner .MainContent .BreadcrumbsBox{margin-left:0;width:100%}
+ */.SearchForm .InputAndButton .Button{color:rgba(0,0,0,0)}.Panel-main .Box.Box a:before,.Panel-main .BoxFilter.BoxFilter a:before{content:none}.ThemeOptions-panelToLeft .Panel-main{margin-left:0}.ThemeOptions-panelToLeft .BreadcrumbsBox,.ThemeOptions-panelToLeft .MainContent{-ms-flex-order:2;-webkit-box-ordinal-group:3;margin-left:auto;order:2}@media screen and (max-width:992px){.ThemeOptions-panelToLeft .BreadcrumbsBox,.ThemeOptions-panelToLeft .MainContent{-ms-flex-order:0;-webkit-box-ordinal-group:1;order:0}}.ThemeOptions-panelToLeft .BreadcrumbsBox{-ms-flex-order:2;-webkit-box-ordinal-group:3;margin-left:auto;order:2;width:calc(100% - 292px)}@media screen and (max-width:992px){.ThemeOptions-panelToLeft .BreadcrumbsBox{-ms-flex-order:initial;-webkit-box-ordinal-group:initial;margin-left:0;order:0;width:auto}}.ThemeOptions-panelToLeft .SearchBox{margin-left:0}@media screen and (max-width:992px){.ThemeOptions-panelToLeft .SearchBox{margin-left:auto}}.ThemeOptions-hasHeroBanner .MainContent .HomepageTitle,.ThemeOptions-hasHeroBanner .MainContent .PageDescription{display:none}.ThemeOptions-hasHeroBanner .MainContent .BreadcrumbsBox{margin-left:0;width:100%}
 /*# sourceMappingURL=custom_classic.css.map */

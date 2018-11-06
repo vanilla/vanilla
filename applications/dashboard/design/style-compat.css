@@ -1537,6 +1537,7 @@ body.isMobile .Popup.hasRichEditor .Border {
  * @license GPL-2.0-only
  */
 .userContent .code {
+  position: relative;
   display: inline;
   vertical-align: middle;
   line-height: inherit;
@@ -1553,7 +1554,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 .userContent .codeInline {
   display: inline;
   white-space: normal;
-  padding: 0.2em 0.4em;
+  padding-top: 0.2em;
   border-radius: 0;
 }
 

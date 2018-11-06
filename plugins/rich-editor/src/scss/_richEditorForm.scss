@@ -15,12 +15,10 @@ $richEditorForm-placeholder_color: mixContentBgAndFg(50%);
     height: 100vh;
 }
 
-.richEditorForm-title {
+.inputText.richEditorForm-title {
+    @include textInputSizing(50px, $global-title_fontSize, $utility-baseUnit);
     position: relative;
     font-weight: $global-fontWeight_semiBold;
-    font-size: $global-title_fontSize;
-    line-height: $global-condensed_lineHeight;
-    height: $global-condensed_lineHeight * $global-title_fontSize;
     border: 0;
     border-radius: 0;
     margin-bottom: $global_spacer;
@@ -28,6 +26,7 @@ $richEditorForm-placeholder_color: mixContentBgAndFg(50%);
         left: 0;
         right: 0;
     }
+
 
     &:active,
     &:focus {

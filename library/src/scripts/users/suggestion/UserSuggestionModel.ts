@@ -4,21 +4,61 @@
  * @license GPL-2.0-only
  */
 
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus, ILoadable } from "@library/@types/api";
 import { IUserSuggestion } from "@library/users/suggestion/IUserSuggestion";
 import SuggestionTrie from "@library/users/suggestion/SuggestionTrie";
 import ReduxReducer from "@library/state/ReduxReducer";
 import UserSuggestionActions from "@library/users/suggestion/UserSuggestionActions";
+import { IUsersStoreState } from "@library/users/UsersModel";
 
 export interface IUserSuggestionState {
     lastSuccessfulUsername: string | null;
     currentUsername: string | null;
-    usersTrie: SuggestionTrie;
+    trie: SuggestionTrie;
     activeSuggestionID: string;
     activeSuggestionIndex: number;
 }
 
+export interface IInjectableSuggestionsProps {
+    lastSuccessfulUsername: string | null;
+    currentUsername: string | null;
+    activeSuggestionID: string;
+    activeSuggestionIndex: number;
+    suggestions: ILoadable<IUserSuggestion[]>;
+}
+
 export default class UserSuggestionModel implements ReduxReducer<IUserSuggestionState> {
+    private static readonly defaultSuggestions: ILoadable<IUserSuggestion[]> = {
+        status: LoadStatus.PENDING,
+    };
+
+    public static mapStateToProps(state: IUsersStoreState): IInjectableSuggestionsProps {
+        const stateSlice = Object.assign({}, UserSuggestionModel.stateSlice(state));
+        const { trie, ...rest } = stateSlice;
+        const suggestions = stateSlice.currentUsername
+            ? trie.getValue(stateSlice.currentUsername) || UserSuggestionModel.defaultSuggestions
+            : UserSuggestionModel.defaultSuggestions;
+
+        return {
+            ...rest,
+            suggestions,
+        };
+    }
+
+    public static selectSuggestionsTrie(state: IUsersStoreState): SuggestionTrie {
+        return UserSuggestionModel.stateSlice(state).trie;
+    }
+
+    private static stateSlice(state: IUsersStoreState): IUserSuggestionState {
+        if (!state.users || !state.users.suggestions) {
+            throw new Error(
+                `Could not find users.suggestions in state ${state}. Be sure to initialize the UsersModel.reducer()`,
+            );
+        }
+
+        return state.users.suggestions;
+    }
+
     public static sortSuggestions(users: IUserSuggestion[], searchName: string) {
         const looseCollator = Intl.Collator("en", {
             usage: "sort",
@@ -45,7 +85,7 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
     public readonly initialState: IUserSuggestionState = {
         lastSuccessfulUsername: null,
         currentUsername: null,
-        usersTrie: new SuggestionTrie(),
+        trie: new SuggestionTrie(),
         activeSuggestionID: "",
         activeSuggestionIndex: 0,
     };
@@ -54,7 +94,7 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
         switch (action.type) {
             case UserSuggestionActions.LOAD_USERS_REQUEST: {
                 const { username } = action.meta;
-                state.usersTrie.insert(username, {
+                state.trie.insert(username, {
                     status: LoadStatus.LOADING,
                 });
 
@@ -76,10 +116,10 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
                     lastSuccessfulUsername: shouldKeepPreviousResults ? state.lastSuccessfulUsername : null,
                 };
             }
-            case UserSuggestionActions.LOAD_USERS_FAILURE: {
+            case UserSuggestionActions.LOAD_USERS_ERROR: {
                 const error = action.payload;
                 const { username } = action.meta;
-                state.usersTrie.insert(username, {
+                state.trie.insert(username, {
                     status: LoadStatus.ERROR,
                     data: undefined,
                     error,
@@ -89,7 +129,7 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
             case UserSuggestionActions.LOAD_USERS_RESPONSE: {
                 const users = action.payload.data;
                 const { username } = action.meta;
-                state.usersTrie.insert(username, {
+                state.trie.insert(username, {
                     status: LoadStatus.SUCCESS,
                     data: UserSuggestionModel.sortSuggestions(users, username),
                 });
@@ -100,7 +140,7 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
                     activeSuggestionID: firstUserID,
                     activeSuggestionIndex: 0,
                     lastSuccessfulUsername: username,
-                    currentUsername: username === state.currentUsername ? null : state.currentUsername,
+                    currentUsername: username,
                 };
             }
             case UserSuggestionActions.SET_ACTIVE_SUGGESTION: {

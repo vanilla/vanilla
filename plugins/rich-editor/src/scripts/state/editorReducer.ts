@@ -8,7 +8,6 @@ import instanceReducer from "@rich-editor/state/instance/instanceReducer";
 import { combineReducers } from "redux";
 
 const editorReducer = combineReducers({
-    mentions: () => {},
     instances: instanceReducer,
 });
 

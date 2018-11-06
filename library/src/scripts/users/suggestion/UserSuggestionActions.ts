@@ -5,12 +5,13 @@
  */
 
 import { Dispatch } from "redux";
-import { ActionsUnion, createAction } from "@library/state/utility";
+import { ActionsUnion } from "@library/state/utility";
 import api from "@library/apiv2";
-import { IStoreState } from "@rich-editor/@types/store";
-import { IApiError, LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api";
 import { IUserSuggestion } from "@library/users/suggestion/IUserSuggestion";
 import ReduxActions from "@library/state/ReduxActions";
+import UserSuggestionModel from "@library/users/suggestion/UserSuggestionModel";
+import { IUsersStoreState } from "@library/users/UsersModel";
 
 interface ILookupUserOptions {
     username: string;
@@ -19,8 +20,8 @@ interface ILookupUserOptions {
 export default class UserSuggestionActions extends ReduxActions {
     public static readonly SET_ACTIVE_SUGGESTION = "@@mentions/SET_ACTIVE_SUGGESTION";
     public static readonly LOAD_USERS_REQUEST = "@@mentions/GET_USERS_REQUEST";
-    public static readonly LOAD_USERS_FAILURE = "@@mentions/LOAD_USERS_FAILURE";
     public static readonly LOAD_USERS_RESPONSE = "@@mentions/LOAD_USERS_RESPONSE";
+    public static readonly LOAD_USERS_ERROR = "@@mentions/LOAD_USERS_ERROR";
 
     public static readonly ACTION_TYPES:
         | ActionsUnion<typeof UserSuggestionActions.loadUsersACs>
@@ -33,7 +34,7 @@ export default class UserSuggestionActions extends ReduxActions {
     public static loadUsersACs = ReduxActions.generateApiActionCreators(
         UserSuggestionActions.LOAD_USERS_REQUEST,
         UserSuggestionActions.LOAD_USERS_RESPONSE,
-        UserSuggestionActions.LOAD_USERS_FAILURE,
+        UserSuggestionActions.LOAD_USERS_ERROR,
         {} as IUserSuggestion[],
         {} as ILookupUserOptions,
     );
@@ -68,21 +69,25 @@ export default class UserSuggestionActions extends ReduxActions {
         });
     }
 
+    public setActive = this.bindDispatch(UserSuggestionActions.setActiveAC);
+
     /**
      * Make an API request for mention suggestions. These results are cached by the lookup username.
      */
     public loadUsers(username: string) {
-        return (dispatch: Dispatch<any>, getState: () => IStoreState) => {
-            const { usersTrie } = getState().editor.mentions;
-
+        return this.dispatch((dispatch: Dispatch<any>, getState: () => IUsersStoreState) => {
+            const trie = UserSuggestionModel.selectSuggestionsTrie(getState());
             // Attempt an exact lookup first.
-            const exactLookup = usersTrie.getValue(username);
+            const exactLookup = trie.getValue(username);
             if (exactLookup != null) {
                 switch (exactLookup.status) {
                     case LoadStatus.SUCCESS:
                         if (exactLookup.data) {
                             return dispatch(
-                                UserSuggestionActions.loadUsersACs.response(exactLookup.data, { username }),
+                                UserSuggestionActions.loadUsersACs.response(
+                                    { data: exactLookup.data, status: 200 },
+                                    { username },
+                                ),
                             );
                         }
                     case LoadStatus.LOADING:
@@ -91,13 +96,13 @@ export default class UserSuggestionActions extends ReduxActions {
                     case LoadStatus.ERROR:
                         // Previously failed.
                         if (exactLookup.error) {
-                            return dispatch(UserSuggestionActions.loadUsersACs.error(exactLookup.error!, { username }));
+                            return dispatch(UserSuggestionActions.loadUsersACs.error(exactLookup.error, { username }));
                         }
                 }
             }
 
             // Attempt a partial lookup to try and see if we can get results without an API request
-            const partialLookup = usersTrie.getValueFromPartialsOfWord(username);
+            const partialLookup = trie.getValueFromPartialsOfWord(username);
             if (partialLookup != null) {
                 switch (partialLookup.status) {
                     case LoadStatus.SUCCESS: {
@@ -138,17 +143,18 @@ export default class UserSuggestionActions extends ReduxActions {
                     }
 
                     // Add unique domIDs to each user.
-                    const users = response.data.map(data => {
+                    response.data = response.data.map(data => {
                         data.domID = "mentionSuggestion" + data.userID;
                         return data;
                     });
 
                     // Result is good. Lets GO!
-                    dispatch(UserSuggestionActions.loadUsersACs.response(users, { username }));
+                    dispatch(UserSuggestionActions.loadUsersACs.response(response, { username }));
                 })
                 .catch(error => {
+                    console.error(error);
                     dispatch(UserSuggestionActions.loadUsersACs.error(error, { username }));
                 });
-        };
+        });
     }
 }

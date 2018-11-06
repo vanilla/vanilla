@@ -22,9 +22,9 @@ import { ReactNode } from "react";
 import noOptionsMessage from "./overwrites/noOptionsMessage";
 
 export interface IComboBoxOption {
-    value: string;
+    value: string | number;
     label: string;
-    data: any;
+    data?: any;
 }
 
 interface IProps extends IOptionalComponentID {

@@ -53,7 +53,7 @@ describe("MentionModel", () => {
         describe("LOAD_USERS_REQUEST", () => {
             it("can set the current value to loading", () => {
                 const action = UserSuggestionActions.loadUsersACs.request({ username: "test" });
-                expect(model.reducer(undefined, action).usersTrie.getValue("test")).deep.equals({
+                expect(model.reducer(undefined, action).trie.getValue("test")).deep.equals({
                     status: LoadStatus.LOADING,
                 });
             });
@@ -101,7 +101,7 @@ describe("MentionModel", () => {
             const error = new Error("Failure!");
             state = model.reducer(state, UserSuggestionActions.loadUsersACs.error(error as any, { username: "test" }));
 
-            expect(state.usersTrie.getValue("test")).deep.equals({
+            expect(state.trie.getValue("test")).deep.equals({
                 status: LoadStatus.ERROR,
                 data: undefined,
                 error,

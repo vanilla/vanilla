@@ -28,8 +28,12 @@ interface IProps extends IOptionalComponentID {
     disabled?: boolean;
     className?: string;
     placeholder?: string;
-    options: IComboBoxOption[];
-    setAuthor: (authors: IComboBoxOption[]) => void;
+    options: IComboBoxOption[] | undefined;
+    isLoading?: boolean;
+    value: IComboBoxOption[];
+    onChange: (tokens: IComboBoxOption[]) => void;
+    inputValue: string;
+    onInputChange: (value: string) => void;
 }
 
 /**
@@ -43,16 +47,11 @@ export default class Tokens extends React.Component<IProps> {
     constructor(props: IProps) {
         super(props);
         this.id = getRequiredID(props, this.prefix);
-        // this.searchButtonID = this.id + "-searchButton";
         this.inputID = this.id + "-tokenInput";
     }
 
-    private handleOnChange = (newValue: any, actionMeta: any) => {
-        this.props.setAuthor(newValue);
-    };
-
     public render() {
-        const { className, disabled, options } = this.props;
+        const { className, disabled, options, isLoading } = this.props;
 
         return (
             <div className={classNames("tokens", "inputBlock", this.props.className)}>
@@ -66,9 +65,13 @@ export default class Tokens extends React.Component<IProps> {
                         id={this.id}
                         inputId={this.inputID}
                         components={this.componentOverwrites}
+                        onChange={this.props.onChange}
+                        onInputChange={this.props.onInputChange}
                         isClearable={true}
                         isDisabled={disabled}
+                        inputValue={this.props.inputValue}
                         options={options}
+                        isLoading={isLoading}
                         classNamePrefix={this.prefix}
                         className={classNames(this.prefix, className)}
                         placeholder={this.props.placeholder}

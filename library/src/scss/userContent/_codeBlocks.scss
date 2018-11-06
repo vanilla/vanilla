@@ -34,6 +34,7 @@ $code-block_padding: $userContent_fontSize !default;
         background-color: $code_bg;
         border: 0;
         overflow-x: auto;
+        flex-shrink: 0;
     }
 
     .codeInline {

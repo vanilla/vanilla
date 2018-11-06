@@ -1531,6 +1531,10 @@ body.isMobile .Popup.hasRichEditor .Border {
   opacity: 0.6;
 }
 
+.emojiPicker {
+  position: relative;
+}
+
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
@@ -1542,25 +1546,27 @@ body.isMobile .Popup.hasRichEditor .Border {
   vertical-align: middle;
   line-height: inherit;
   font-size: 0.85em;
-  box-sizing: border-box;
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   max-width: 100%;
   margin: 0;
   color: #26282b;
   background-color: #f7f7f7;
   border: 0;
+  overflow-x: auto;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
 }
 
 .userContent .codeInline {
   display: inline;
   white-space: normal;
-  padding-top: 0.2em;
+  padding: 0.2em 0.4em;
   border-radius: 0;
 }
 
 .userContent .codeBlock {
   display: block;
-  overflow-x: auto;
   word-wrap: normal;
   line-height: 1.45;
   white-space: pre;

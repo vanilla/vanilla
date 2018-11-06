@@ -238,10 +238,10 @@ class DateFilterSchema extends Schema {
 
         // Sort the operators so that the matches occur on the longest operators first.
         $sortedSimpleOperators = $this->simpleOperators;
-        usort($sortedSimpleOperators, function($a, $b) {
+        usort($sortedSimpleOperators, function ($a, $b) {
             if (strlen($a) > strlen($b)) {
                 return -1;
-            } else if (strlen($a) < strlen($b)) {
+            } elseif (strlen($a) < strlen($b)) {
                 return 1;
             }
             return 0;
@@ -305,6 +305,69 @@ class DateFilterSchema extends Schema {
                                 "{$field} <=" => $dates[1],
                             ];
                         }
+                        break;
+                }
+            }
+        } else {
+            throw new Exception('Invalid data supplied to dateFilterField');
+        }
+
+        return $result;
+    }
+
+    /**
+     * If the parameter value is a valid date filter value,
+     * return a structure: startDate, endDate, exclude flag.
+     * Useful for Sphinx setFilterRange
+     *
+     * @param mixed $dateData The decoded and validated date data.
+     *
+     * @throws Exception If dateData structure is wrong throw exception.
+     *
+     * @return array Structure: DateTime startDate, DateTime endDate, Boolean inclusive
+     */
+    public static function dateFilterRange(array $dateData) {
+        $validOperators = ['=', '>', '<', '>=', '<=', '[]', '()'];
+        $result = [
+            'startDate' => (new \DateTime())->setDate(1970, 1, 1),
+            'endDate' => (new \DateTime())->setDate(2100, 12, 31), // '2100-12-12'
+            'exclude' => false
+        ];
+
+        if (array_key_exists('operator', $dateData)
+            && array_key_exists('date', $dateData)
+            && is_array($dateData['date'])
+        ) {
+            $op = $dateData['operator'];
+            $dates = $dateData['date'];
+
+            if (in_array($op, $validOperators)) {
+                switch ($op) {
+                    case '>':
+                    case '>=':
+                        $result['startDate'] = $dates[0];
+                        if ($op === '>') {
+                            $result['exclude'] = true;
+                        }
+                        break;
+                    case '<':
+                    case '<=':
+                        $result['endDate'] = $dates[0];
+                        if ($op === '<') {
+                            $result['exclude'] = true;
+                        }
+                        break;
+                    case '[]':
+                    case '()':
+                        $result['startDate'] = $dates[0];
+                        $result['endDate'] = $dates[1];
+                        if ($op === '()') {
+                            $result['exclude'] = true;
+                        }
+                        break;
+                    case '=':
+                        $result['startDate'] = $dates[0];
+                        $result['endDate'] = $dates[0];
                         break;
                 }
             }

@@ -31,6 +31,7 @@ import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import { Devices } from "@library/components/DeviceChecker";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import ParagraphDropDown from "@rich-editor/components/toolbars/ParagraphDropdown";
+import ParagraphToolbar from "@rich-editor/components/toolbars/ParagraphToolbar";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -93,6 +94,7 @@ export class Editor extends React.Component<IProps> {
                 {!this.props.isLoading && (
                     <React.Fragment>
                         <InlineToolbar />
+                        <ParagraphToolbar />
                         <MentionToolbar />
                     </React.Fragment>
                 )}
@@ -110,7 +112,7 @@ export class Editor extends React.Component<IProps> {
                         )}
                         {!isMobile && (
                             <li className="richEditor-menuItem u-richEditorHiddenOnMobile" role="menuitem">
-                                <EmojiPopover disabled={this.props.isLoading} renderAbove={false} />
+                                <EmojiPopover disabled={this.props.isLoading} renderAbove={true} />
                             </li>
                         )}
                         <Permission permission="uploads.add">
@@ -120,7 +122,7 @@ export class Editor extends React.Component<IProps> {
                         </Permission>
 
                         <li className="richEditor-menuItem" role="menuitem">
-                            <EmbedPopover disabled={this.props.isLoading} renderAbove={!this.props.legacyMode} />
+                            <EmbedPopover disabled={this.props.isLoading} renderAbove={this.props.legacyMode} />
                         </li>
                     </ul>
                 </div>

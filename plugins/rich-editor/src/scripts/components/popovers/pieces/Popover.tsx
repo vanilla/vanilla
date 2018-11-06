@@ -102,11 +102,7 @@ export class Popover extends React.Component<IProps, IState> {
                     </h2>
                     {screenReaderDescription}
 
-                    <CloseButton
-                        onClick={this.props.onCloseClick}
-                        className="richEditor-close"
-                        legacyMode={this.props.legacyMode}
-                    />
+                    <CloseButton onClick={this.props.onCloseClick} className="richEditor-close" />
 
                     {this.props.additionalHeaderContent && this.props.additionalHeaderContent}
                 </div>

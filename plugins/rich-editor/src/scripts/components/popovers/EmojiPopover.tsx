@@ -17,6 +17,7 @@ interface IProps extends IOptionalComponentID {
     disabled?: boolean;
     renderAbove?: boolean;
     renderLeft?: boolean;
+    legacyMode?: boolean;
 }
 
 export default class EmojiPopover extends React.Component<IProps, IRequiredComponentID> {
@@ -45,6 +46,7 @@ export default class EmojiPopover extends React.Component<IProps, IRequiredCompo
                 buttonBaseClass={ButtonBaseClass.ICON}
                 renderAbove={this.props.renderAbove}
                 renderLeft={this.props.renderLeft}
+                legacyMode={this.props.legacyMode}
             >
                 {(options: IPopoverControllerChildParameters) => {
                     return (

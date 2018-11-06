@@ -18,6 +18,7 @@ export interface IPopoverControllerChildParameters {
     closeMenuHandler(event?: React.SyntheticEvent<any>);
     renderAbove?: boolean;
     renderLeft?: boolean;
+    legacyMode?: boolean;
 }
 
 export interface IPopoverControllerProps {
@@ -32,6 +33,7 @@ export interface IPopoverControllerProps {
     onVisibilityChange?: () => void;
     renderAbove?: boolean;
     renderLeft?: boolean;
+    legacyMode?: boolean;
 }
 
 export interface IPopoverControllerPropsWithIcon extends IPopoverControllerProps {
@@ -94,6 +96,7 @@ export default class PopoverController extends React.PureComponent<
                         closeMenuHandler: this.closeMenuHandler,
                         renderAbove: this.props.renderAbove,
                         renderLeft: this.props.renderLeft,
+                        legacyMode: this.props.legacyMode,
                     })}
             </div>
         );

@@ -248,7 +248,7 @@ body.isMobile {
 @include mediaQuery-richEditor_mobile {
     @include legacyMobileStyles();
 }
-//
-//.richEditorFlyout {
-//    bottom: 100%;
-//}
+
+.richEditorFlyout {
+    bottom: 100%;
+}

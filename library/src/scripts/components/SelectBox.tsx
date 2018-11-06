@@ -26,8 +26,8 @@ interface IProps {
     className?: string;
     id?: string;
     children: ISelectBoxItem[];
-    stickTop?: boolean; // Adjusts the flyout position vertically
-    stickRight?: boolean; // Adjusts the flyout position horizontally
+    renderAbove?: boolean; // Adjusts the flyout position vertically
+    renderLeft?: boolean; // Adjusts the flyout position horizontally
     buttonClassName?: string;
     buttonBaseClass?: ButtonBaseClass;
     widthOfParent?: boolean;
@@ -128,8 +128,8 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         buttonClassName={classNames(this.props.buttonClassName, "selectBox-toggle")}
                         contentsClassName={classNames({ isParentWidth: this.props.widthOfParent })}
                         buttonBaseClass={this.props.buttonBaseClass}
-                        stickTop={this.props.stickTop}
-                        stickRight={this.props.stickRight}
+                        renderAbove={this.props.renderAbove}
+                        renderLeft={this.props.renderLeft}
                     >
                         {selectItems}
                     </DropDown>

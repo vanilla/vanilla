@@ -104,15 +104,13 @@ export class Editor extends React.Component<IProps> {
                         aria-label={t("Inline Level Formatting Menu")}
                     >
                         {isMobile && (
-                            <React.Fragment>
-                                <li className="richEditor-menuItem" role="menuitem">
-                                    <ParagraphDropDown disabled={this.props.isLoading} />
-                                </li>
-                            </React.Fragment>
+                            <li className="richEditor-menuItem" role="menuitem">
+                                <ParagraphDropDown disabled={this.props.isLoading} />
+                            </li>
                         )}
                         {!isMobile && (
                             <li className="richEditor-menuItem u-richEditorHiddenOnMobile" role="menuitem">
-                                <EmojiPopover disabled={this.props.isLoading} />
+                                <EmojiPopover disabled={this.props.isLoading} renderAbove={false} />
                             </li>
                         )}
                         <Permission permission="uploads.add">
@@ -122,7 +120,7 @@ export class Editor extends React.Component<IProps> {
                         </Permission>
 
                         <li className="richEditor-menuItem" role="menuitem">
-                            <EmbedPopover disabled={this.props.isLoading} />
+                            <EmbedPopover disabled={this.props.isLoading} renderAbove={!this.props.legacyMode} />
                         </li>
                     </ul>
                 </div>

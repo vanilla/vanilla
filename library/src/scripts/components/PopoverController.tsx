@@ -28,6 +28,8 @@ export interface IPopoverControllerProps {
     buttonBaseClass: ButtonBaseClass;
     buttonClassName?: string;
     onVisibilityChange?: () => void;
+    renderAbove?: boolean;
+    renderLeft?: boolean;
 }
 
 export interface IPopoverControllerPropsWithIcon extends IPopoverControllerProps {

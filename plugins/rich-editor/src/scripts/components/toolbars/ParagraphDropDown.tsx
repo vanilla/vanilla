@@ -23,6 +23,8 @@ import * as editorIcons from "@library/components/icons/editor";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
+    renderAbove?: boolean;
+    renderLeft?: boolean;
 }
 
 interface IState {
@@ -61,11 +63,11 @@ export class ParagraphDropDown extends React.PureComponent<IProps, IState> {
             <DropDown
                 id={this.ID}
                 className="mobileParagraphMenu-dropDown"
-                stickTop={true}
-                stickRight={false}
                 buttonContents={editorIcons.pilcrow()}
                 buttonBaseClass={ButtonBaseClass.ICON}
                 disabled={this.props.disabled}
+                renderAbove={this.props.renderAbove}
+                renderLeft={this.props.renderLeft}
             >
                 <ParagraphToolbarMenuItems
                     menuRef={this.menuRef}

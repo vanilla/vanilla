@@ -17,8 +17,8 @@ export interface IProps {
     name?: string;
     children: React.ReactNode;
     className?: string;
-    stickTop?: boolean; // Adjusts the flyout position vertically
-    stickRight?: boolean; // Adjusts the flyout position horizontally
+    renderAbove?: boolean; // Adjusts the flyout position vertically
+    renderLeft?: boolean; // Adjusts the flyout position horizontally
     describedBy?: string;
     contentsClassName?: string;
     buttonContents?: React.ReactNode;
@@ -36,11 +36,6 @@ export interface IState {
  * Creates a drop down menu
  */
 export default class DropDown extends React.Component<IProps, IState> {
-    public static defaultProps = {
-        stickRight: true,
-        stickTop: true,
-    };
-
     public constructor(props) {
         super(props);
         this.state = {
@@ -77,9 +72,9 @@ export default class DropDown extends React.Component<IProps, IState> {
                             id={this.state.id + "-handle"}
                             parentID={this.state.id}
                             className={classNames("dropDown-contents", this.props.contentsClassName)}
-                            isPositionedFromRight={this.props.stickRight!}
-                            isPositionedFromTop={this.props.stickTop!}
                             onClick={params.closeMenuHandler}
+                            renderLeft={!!this.props.renderLeft}
+                            renderAbove={!!this.props.renderAbove}
                             {...params}
                         >
                             <ul className="dropDownItems">{this.props.children}</ul>

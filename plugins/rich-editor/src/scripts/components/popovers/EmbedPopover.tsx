@@ -18,6 +18,8 @@ import { embed } from "@library/components/icons/editor";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
+    renderAbove?: boolean;
+    renderLeft?: boolean;
 }
 
 interface IState extends IRequiredComponentID {
@@ -62,6 +64,8 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                 name={t("Embed")}
                 buttonContents={Icon}
                 buttonBaseClass={ButtonBaseClass.CUSTOM}
+                renderAbove={this.props.renderAbove}
+                renderLeft={this.props.renderLeft}
             >
                 {(params: IPopoverControllerChildParameters) => {
                     const { initialFocusRef, closeMenuHandler, isVisible } = params;

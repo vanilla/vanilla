@@ -7,12 +7,15 @@
 import React from "react";
 import MenuItem, { IMenuItemData } from "@rich-editor/components/toolbars/pieces/MenuItem";
 import classNames from "classnames";
+import { flyoutPosition } from "@rich-editor/components/popovers/pieces/flyoutPosition";
 
 interface IProps {
     menuItemData: IMenuItemData[];
     itemRole?: "menuitem" | "menuitemradio";
     orientation?: "horizontal" | "vertical";
     menuItemsClass?: string;
+    renderAbove?: boolean;
+    renderLeft?: boolean;
 }
 
 /**
@@ -34,7 +37,12 @@ export default class MenuItems extends React.Component<IProps, {}> {
         const lastIndex = menuItemData.length - 1;
         const menuItemsClass = classNames("richEditor-menu", this.props.menuItemsClass);
         return (
-            <div className={menuItemsClass} role="menu" aria-orientation={this.props.orientation!}>
+            <div
+                className={menuItemsClass}
+                role="menu"
+                style={flyoutPosition(!!this.props.renderAbove, !!this.props.renderLeft)}
+                aria-orientation={this.props.orientation!}
+            >
                 <div className="richEditor-menuItems">
                     {this.props.menuItemData.map((itemData, index) => {
                         const prevIndex = index === firstIndex ? lastIndex : index - 1;

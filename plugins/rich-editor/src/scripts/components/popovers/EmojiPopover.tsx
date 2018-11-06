@@ -15,6 +15,8 @@ import { emoji } from "@library/components/icons/editor";
 
 interface IProps extends IOptionalComponentID {
     disabled?: boolean;
+    renderAbove?: boolean;
+    renderLeft?: boolean;
 }
 
 export default class EmojiPopover extends React.Component<IProps, IRequiredComponentID> {
@@ -41,6 +43,8 @@ export default class EmojiPopover extends React.Component<IProps, IRequiredCompo
                 name={t("Emoji Picker")}
                 buttonContents={icon}
                 buttonBaseClass={ButtonBaseClass.ICON}
+                renderAbove={this.props.renderAbove}
+                renderLeft={this.props.renderLeft}
             >
                 {(options: IPopoverControllerChildParameters) => {
                     return <EmojiPicker {...options} contentID={options.id} />;

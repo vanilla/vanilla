@@ -36,6 +36,8 @@ const lastEmojiIndex = EMOJIS.length - 1;
 
 interface IProps extends IWithEditorProps, IPopoverControllerChildParameters {
     contentID: string;
+    renderAbove?: boolean;
+    renderLeft?: boolean;
 }
 
 interface IState {
@@ -157,6 +159,8 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 additionalClassRoot="insertEmoji"
                 onCloseClick={this.props.closeMenuHandler}
                 isVisible={this.props.isVisible}
+                renderAbove={this.props.renderAbove}
+                renderLeft={this.props.renderLeft}
             />
         );
     }

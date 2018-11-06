@@ -18,11 +18,21 @@ interface IProps {
     lastGoodSelection: RangeStatic;
     afterClickHandler?: () => void;
     menuRef?: React.RefObject<MenuItems>;
+    renderAbove?: boolean;
+    renderLeft?: boolean;
 }
 
 export default class ParagraphToolbarMenuItems extends React.PureComponent<IProps> {
     public render() {
-        return <MenuItems itemRole={"menuitemradio"} ref={this.props.menuRef} menuItemData={this.menuItemData} />;
+        return (
+            <MenuItems
+                itemRole={"menuitemradio"}
+                ref={this.props.menuRef}
+                menuItemData={this.menuItemData}
+                renderAbove={this.props.renderAbove}
+                renderLeft={this.props.renderLeft}
+            />
+        );
     }
 
     private get menuItemData() {

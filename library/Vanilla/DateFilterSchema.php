@@ -326,7 +326,7 @@ class DateFilterSchema extends Schema {
      *
      * @return array Structure: DateTime startDate, DateTime endDate, Boolean inclusive
      */
-    public static function dateFilterRange(array $dateData) {
+    public static function dateFilterRange(array $dateData): array {
         $validOperators = ['=', '>', '<', '>=', '<=', '[]', '()'];
         $result = [
             'startDate' => (new \DateTime())->setDate(1970, 1, 1)->setTime( 0, 0, 0),
@@ -372,7 +372,7 @@ class DateFilterSchema extends Schema {
                 }
             }
         } else {
-            throw new Exception('Invalid data supplied to dateFilterField');
+            throw new Exception('Invalid data supplied to dateFilterRange');
         }
 
         return $result;

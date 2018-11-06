@@ -4,15 +4,16 @@
  * @license GPL-2.0-only
  */
 
-
-/**
- * This file is not included in the "legacy" build.
- */
 $richEditorForm-placeholder_color: mixContentBgAndFg(50%);
 
 .richEditorForm {
     position: relative;
     height: 100vh;
+
+    // Only applies to non legacy
+    .richEditor-frame {
+        overflow: auto;
+    }
 }
 
 .inputText.richEditorForm-title {
@@ -65,11 +66,6 @@ $richEditorForm-placeholder_color: mixContentBgAndFg(50%);
         style: solid;
         color: $formElement_borderColor;
     }
-}
-
-
-.richEditor-frame {
-    overflow: auto;
 }
 
 .richEditorFlyout {

@@ -94,7 +94,7 @@ export class Editor extends React.Component<IProps> {
                 {!this.props.isLoading && (
                     <React.Fragment>
                         <InlineToolbar />
-                        <ParagraphToolbar />
+                        {!isMobile && <ParagraphToolbar />}
                         <MentionToolbar />
                     </React.Fragment>
                 )}

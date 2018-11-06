@@ -317,74 +317,113 @@ class DateFilterSchemaTest extends SharedBootstrapTestCase {
             'Equal (DateTime)' => [
                 $schema->validate('2017-01-01 00:00:00'),
                 [
-                    'dateInserted' => new DateTimeImmutable('2017-01-01 00:00:00'),
+                    'startDate' => new DateTimeImmutable('2017-01-01 00:00:00'),
+                    'endDate' => new DateTimeImmutable('2017-01-01 00:00:00'),
+                    'exclude' => false
                 ]
             ],
             'Greater-Than (Date)' => [
                 $schema->validate('>2017-01-01'),
-                ['dateInserted >' => new DateTimeImmutable('2017-01-01 00:00:00')]
+                [
+                    'startDate' => new DateTimeImmutable('2017-01-01 00:00:00'),
+                    'endDate' => new DateTimeImmutable('2100-12-31 00:00:00'),
+                    'exclude' => true
+                ]
             ],
             'Greater-Than (DateTime)' => [
                 $schema->validate('>2017-01-01 00:00:10'),
-                ['dateInserted >' => new DateTimeImmutable('2017-01-01 00:00:10')]
+                [
+                    'startDate' => new DateTimeImmutable('2017-01-01 00:00:10'),
+                    'endDate' => new DateTimeImmutable('2100-12-31 00:00:00'),
+                    'exclude' => true
+                ]
             ],
             'Greater-Than or Equal (Date)' => [
                 $schema->validate('>=2017-01-01'),
-                ['dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:00')]
+                [
+                    'startDate' => new DateTimeImmutable('2017-01-01 00:00:00'),
+                    'endDate' => new DateTimeImmutable('2100-12-31 00:00:00'),
+                    'exclude' => false
+                ]
             ],
             'Greater-Than or Equal (DateTime)' => [
                 $schema->validate('>=2017-01-01 00:00:10'),
-                ['dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:10')]
+                [
+                    'startDate' => new DateTimeImmutable('2017-01-01 00:00:10'),
+                    'endDate' => new DateTimeImmutable('2100-12-31 00:00:00'),
+                    'exclude' => false
+                ]
             ],
             'Less-Than (Date)' => [
                 $schema->validate('<2017-01-01'),
-                ['dateInserted <' => new DateTimeImmutable('2017-01-01 00:00:00')]
+                [
+                    'startDate' => new DateTimeImmutable('1970-01-01 00:00:00'),
+                    'endDate' => new DateTimeImmutable('2017-01-01 00:00:00'),
+                    'exclude' => true
+                ]
             ],
             'Less-Than (DateTime)' => [
                 $schema->validate('<2017-01-01 00:00:10'),
-                ['dateInserted <' => new DateTimeImmutable('2017-01-01 00:00:10')]
+                [
+                    'startDate' => new DateTimeImmutable('1970-01-01 00:00:00'),
+                    'endDate' => new DateTimeImmutable('2017-01-01 00:00:10'),
+                    'exclude' => true
+                ]
             ],
             'Less-Than or Equal (Date)' => [
                 $schema->validate('<=2017-01-01'),
-                ['dateInserted <=' => new DateTimeImmutable('2017-01-01 00:00:00')]
+                [
+                    'startDate' => new DateTimeImmutable('1970-01-01 00:00:00'),
+                    'endDate' => new DateTimeImmutable('2017-01-01 00:00:00'),
+                    'exclude' => false
+                ]
             ],
             'Less-Than or Equal (DateTime)' => [
                 $schema->validate('<=2017-01-01 00:00:10'),
-                ['dateInserted <=' => new DateTimeImmutable('2017-01-01 00:00:10')]
+                [
+                    'startDate' => new DateTimeImmutable('1970-01-01 00:00:00'),
+                    'endDate' => new DateTimeImmutable('2017-01-01 00:00:10'),
+                    'exclude' => false
+                ]
             ],
             'Range Inclusive (Date,Date)' => [
                 $schema->validate('[2017-01-01,2017-01-31]'),
                 [
-                    'dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:00'),
-                    'dateInserted <=' => new DateTimeImmutable('2017-01-31 23:59:59')
+                    'startDate' => new DateTimeImmutable('2017-01-01 00:00:00'),
+                    'endDate' => new DateTimeImmutable('2017-01-31 23:59:59'),
+                    'exclude' => false
                 ]
             ],
             'Range Inclusive (DateTime,DateTime)' => [
                 $schema->validate('[2017-01-01 00:00:00,2017-01-31 00:00:10]'),
                 [
-                    'dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:00'),
-                    'dateInserted <=' => new DateTimeImmutable('2017-01-31 00:00:10')
+                    'startDate' => new DateTimeImmutable('2017-01-01 00:00:00'),
+                    'endDate' => new DateTimeImmutable('2017-01-31 00:00:10'),
+                    'exclude' => false
                 ]
             ],
             'Range Inclusive (Date,DateTime)' => [
                 $schema->validate('[2017-01-01,2017-01-31 00:00:10]'),
                 [
-                    'dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:00'),
-                    'dateInserted <=' => new DateTimeImmutable('2017-01-31 00:00:10')
+                    'startDate' => new DateTimeImmutable('2017-01-01 00:00:00'),
+                    'endDate' => new DateTimeImmutable('2017-01-31 00:00:10'),
+                    'exclude' => false
                 ]
             ],
             'Range Exclusive (Date,Date)' => [
                 $schema->validate('(2017-01-01,2017-01-31)'),
                 [
-                    'dateInserted >=' => new DateTimeImmutable('2017-01-02 00:00:00'),
-                    'dateInserted <=' => new DateTimeImmutable('2017-01-30 23:59:59')
+                    'startDate' => new DateTimeImmutable('2017-01-02 00:00:00'),
+                    'endDate' => new DateTimeImmutable('2017-01-30 23:59:59'),
+                    'exclude' => true
                 ]
             ],
             'Range Exclusive (DateTime,DateTime)' => [
                 $schema->validate('(2017-01-01 00:00:10,2017-01-31 00:00:50)'),
                 [
-                    'dateInserted >=' => new DateTimeImmutable('2017-01-01 00:00:11'),
-                    'dateInserted <=' => new DateTimeImmutable('2017-01-31 00:00:49')
+                    'startDate' => new DateTimeImmutable('2017-01-01 00:00:11'),
+                    'endDate' => new DateTimeImmutable('2017-01-31 00:00:49'),
+                    'exclude' => true
                 ]
             ]
         ];

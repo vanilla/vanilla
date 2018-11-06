@@ -991,12 +991,12 @@ class Gdn_Model extends Gdn_Pluggable {
      * @return bool $keyHasBeenRelease Whether a master key has been released.
      */
     protected function releaseCacheLock($lockKey = ''):bool {
-        $keyHasBeenRelease = false;
+        $keyReleased = false;
 
         if (isset($lockKey)) {
-            $keyHasBeenRelease = Gdn::cache()->remove($lockKey);
+            $keyReleased = Gdn::cache()->remove($lockKey);
         }
 
-        return $keyHasBeenRelease;
+        return $keyReleased;
     }
 }

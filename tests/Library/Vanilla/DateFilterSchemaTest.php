@@ -145,6 +145,8 @@ class DateFilterSchemaTest extends SharedBootstrapTestCase {
     }
 
     /**
+     * Test static method DateFilterSchema::dateFilterRange
+     *
      * @param array $data A representation of request data (e.g. query string or request body).
      * @param array|bool $expectedResult
      * @dataProvider provideDateFilterRange

@@ -6,19 +6,15 @@
 
 import React from "react";
 import Quill from "quill/core";
-import HeadingBlot from "quill/formats/header";
+
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import Formatter from "@rich-editor/quill/Formatter";
 import ParagraphToolbarMenuItems from "@rich-editor/components/toolbars/pieces/ParagraphToolbarMenuItems";
-import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
-import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
-import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
-import FocusWatcher from "@library/FocusWatcher";
 import DropDown from "@library/components/dropdown/DropDown";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import { heading2, heading3, blockquote, codeBlock, spoiler } from "@library/components/icons/editorIcons";
 import * as editorIcons from "@library/components/icons/editorIcons";
+import ActiveFormatIcon from "./pieces/ActiveFormatIcon";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -49,9 +45,6 @@ export class ParagraphDropDown extends React.PureComponent<IProps, IState> {
         this.quill = props.quill;
         this.formatter = new Formatter(this.quill);
         this.ID = this.props.editorID + "paragraphMenu";
-        this.componentID = this.ID + "-component";
-        this.menuID = this.ID + "-menu";
-        this.buttonID = this.ID + "-button";
         this.state = {
             hasFocus: false,
         };
@@ -71,46 +64,12 @@ export class ParagraphDropDown extends React.PureComponent<IProps, IState> {
                 <ParagraphToolbarMenuItems
                     menuRef={this.menuRef}
                     formatter={this.formatter}
-                    activeFormats={this.props.activeFormats}
+                    activeFormats={<ActiveFormatIcon activeFormats={this.props.activeFormats} />}
                     lastGoodSelection={this.props.instanceState.lastGoodSelection}
                     onKeyDown={this.handlePilcrowKeyDown}
                 />
             </DropDown>
         );
-    }
-
-    /**
-     * Get the active format for the current line.
-     */
-    private get activeFormatIcon(): JSX.Element {
-        const { activeFormats } = this.props;
-        const headingFormat = activeFormats[HeadingBlot.blotName];
-        if (typeof headingFormat === "object") {
-            if (headingFormat.level === 2) {
-                return heading2();
-            }
-            if (headingFormat.level === 3) {
-                return heading3();
-            }
-        }
-        if (headingFormat === 2) {
-            return heading2();
-        }
-        if (headingFormat === 3) {
-            return heading3();
-        }
-        if (activeFormats[BlockquoteLineBlot.blotName] === true) {
-            return blockquote();
-        }
-        if (activeFormats[CodeBlockBlot.blotName] === true) {
-            return codeBlock();
-        }
-        if (activeFormats[SpoilerLineBlot.blotName] === true) {
-            return spoiler("richEditorButton-icon");
-        }
-
-        // Fallback to paragraph formatting.
-        return editorIcons.pilcrow();
     }
 
     /**

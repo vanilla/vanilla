@@ -19,6 +19,7 @@ import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
 import classNames from "classnames";
 import FocusWatcher from "@library/FocusWatcher";
+import ActiveFormatIcon from "@rich-editor/components/toolbars/pieces/ActiveFormatIcon";
 
 interface IProps extends IWithEditorProps {}
 
@@ -104,7 +105,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                     onClick={this.pilcrowClickHandler}
                     onKeyDown={this.handlePilcrowKeyDown}
                 >
-                    {this.activeFormatIcon}
+                    <ActiveFormatIcon activeFormats={this.props.activeFormats} />
                 </button>
                 <div id={this.menuID} className={this.toolbarClasses} style={this.toolbarStyles} role="menu">
                     <ParagraphToolbarMenuItems
@@ -117,40 +118,6 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                 </div>
             </div>
         );
-    }
-
-    /**
-     * Get the active format for the current line.
-     */
-    private get activeFormatIcon(): JSX.Element {
-        const { activeFormats } = this.props;
-        const headingFormat = activeFormats[HeadingBlot.blotName];
-        if (typeof headingFormat === "object") {
-            if (headingFormat.level === 2) {
-                return icons.heading2();
-            }
-            if (headingFormat.level === 3) {
-                return icons.heading3();
-            }
-        }
-        if (headingFormat === 2) {
-            return icons.heading2();
-        }
-        if (headingFormat === 3) {
-            return icons.heading3();
-        }
-        if (activeFormats[BlockquoteLineBlot.blotName] === true) {
-            return icons.blockquote();
-        }
-        if (activeFormats[CodeBlockBlot.blotName] === true) {
-            return icons.codeBlock();
-        }
-        if (activeFormats[SpoilerLineBlot.blotName] === true) {
-            return icons.spoiler("richEditorButton-icon");
-        }
-
-        // Fallback to paragraph formatting.
-        return icons.pilcrow();
     }
 
     /**

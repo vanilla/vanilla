@@ -32,9 +32,6 @@ interface IState {
 export class ParagraphDropDown extends React.PureComponent<IProps, IState> {
     private quill: Quill;
     private ID: string;
-    private componentID: string;
-    private menuID: string;
-    private buttonID: string;
     private menuRef: React.RefObject<MenuItems> = React.createRef();
     private formatter: Formatter;
 

@@ -38,7 +38,6 @@ interface IProps extends IWithEditorProps, IPopoverControllerChildParameters {
     contentID: string;
     renderAbove?: boolean;
     renderLeft?: boolean;
-    legacyMode?: boolean;
 }
 
 interface IState {
@@ -162,7 +161,6 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 isVisible={this.props.isVisible}
                 renderAbove={this.props.renderAbove}
                 renderLeft={this.props.renderLeft}
-                legacyMode={!!this.props.legacyMode}
             />
         );
     }

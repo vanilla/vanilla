@@ -111,11 +111,7 @@ export class Editor extends React.Component<IProps> {
                         )}
                         {!isMobile && (
                             <li className="richEditor-menuItem u-richEditorHiddenOnMobile" role="menuitem">
-                                <EmojiPopover
-                                    disabled={this.props.isLoading}
-                                    renderAbove={!!this.props.legacyMode}
-                                    legacyMode={this.props.legacyMode}
-                                />
+                                <EmojiPopover disabled={this.props.isLoading} renderAbove={!!this.props.legacyMode} />
                             </li>
                         )}
                         <Permission permission="uploads.add">
@@ -125,7 +121,7 @@ export class Editor extends React.Component<IProps> {
                         </Permission>
 
                         <li className="richEditor-menuItem" role="menuitem">
-                            <EmbedPopover disabled={this.props.isLoading} legacyMode={!!this.props.legacyMode} />
+                            <EmbedPopover disabled={this.props.isLoading} />
                         </li>
                     </ul>
                 </div>
@@ -299,7 +295,7 @@ export class Editor extends React.Component<IProps> {
             return;
         }
 
-        const { legacyTextArea } = this.props;
+        const { legacyTextArea } = this.props as ILegacyProps;
         if (!legacyTextArea) {
             return;
         }
@@ -388,7 +384,7 @@ export class Editor extends React.Component<IProps> {
         if (!this.props.legacyMode) {
             return;
         }
-        const { legacyTextArea } = this.props;
+        const { legacyTextArea } = this.props as ILegacyProps;
 
         if (debug() && legacyTextArea) {
             legacyTextArea.addEventListener("paste", event => {

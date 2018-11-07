@@ -20,7 +20,6 @@ interface IProps extends IWithEditorProps {
     disabled?: boolean;
     renderAbove?: boolean;
     renderLeft?: boolean;
-    legacyMode: boolean;
 }
 
 interface IState extends IRequiredComponentID {
@@ -67,10 +66,9 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                 buttonBaseClass={ButtonBaseClass.CUSTOM}
                 renderAbove={!!this.props.renderAbove}
                 renderLeft={!!this.props.renderLeft}
-                legacyMode={this.props.legacyMode}
             >
                 {(params: IPopoverControllerChildParameters) => {
-                    const { initialFocusRef, closeMenuHandler, isVisible, legacyMode } = params;
+                    const { initialFocusRef, closeMenuHandler, isVisible } = params;
                     const body = (
                         <React.Fragment>
                             <p id={this.descriptionID} className="insertMedia-description">
@@ -117,7 +115,6 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                             isVisible={isVisible}
                             renderAbove={!!this.props.renderAbove}
                             renderLeft={!!this.props.renderLeft}
-                            legacyMode={!!this.props.legacyMode}
                         />
                     );
                 }}

@@ -7,7 +7,7 @@
 import * as React from "react";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
-import { downTriangle, rightTriangle } from "@library/components/Icons";
+import { downTriangle, rightTriangle } from "@library/components/icons/common";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
 import TabHandler from "@library/TabHandler";

@@ -116,6 +116,7 @@ $global-block_margin                                 : $userContent_fontSize !de
 
 $global-base_lineHeight                              : 1.5 !default;
 $global-condensed_lineHeight                         : 1.25 !default;
+$global-code_lineHeight                              : 1.45 !default;
 
 $global_spacer                                       : $userContent_fontSize * $global-base_lineHeight;
 
@@ -386,8 +387,8 @@ $metaText_margin                                     : $utility-baseUnit !defaul
       Thumbnails
 \* -------------------------------------------------------------- */
 
-$thumbnail-border_color: mix($global-color_fg, $global-color_bg, 10%) !default; // Derived
-$thumbnail-border_width: 0;
+$thumbnail-border_color                             : mix($global-color_fg, $global-color_bg, 10%) !default; // Derived
+$thumbnail-border_width                             : 0;
 
 /* -------------------------------------------------------------- *\
     Separators
@@ -409,17 +410,17 @@ $selectBox-separator_color                          : $global-separator_color !d
     DropDown
 \* -------------------------------------------------------------- */
 
-$dropDown_width                                : 250px;
-$dropDown_borderRadius                         : 1px;
-$dropDown_bg                                   : $global-color_bg;
+$dropDown_width                                     : 250px;
+$dropDown_borderRadius                              : 1px;
+$dropDown_bg                                        : $global-color_bg;
 
-$dropDown-metas_verticalPadding                : 6px;
-$dropDown-metas_horizontalPadding              : 18px;
+$dropDown-metas_verticalPadding                     : 6px;
+$dropDown-metas_horizontalPadding                   : 18px;
 
-$dropDown-item_verticalPadding                 : 6px;
-$dropDown-item_horizontalPadding               : 18px;
+$dropDown-item_verticalPadding                      : 6px;
+$dropDown-item_horizontalPadding                    : 18px;
 
-$dropDown-item_minHeight                       : 45px;
+$dropDown-item_minHeight                            : 45px;
 
 /* -------------------------------------------------------------- *\
     Header
@@ -438,6 +439,7 @@ $global-footer_height                               : 50px !default;
 \* -------------------------------------------------------------- */
 
 $embeddedText_padding                               : $global-medium_fontSize;
+$embedded-select_borderWidth                        : 2px;
 
 /* -------------------------------------------------------------- *\
     user content

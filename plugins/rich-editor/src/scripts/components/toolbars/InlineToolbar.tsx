@@ -159,7 +159,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
      * Mount quill listeners.
      */
     public componentDidMount() {
-        document.addEventListener("keydown", this.escFunction, false);
+        this.quill.root.addEventListener("keydown", this.escFunction, false);
         this.focusWatcher = new FocusWatcher(this.selfRef.current!, this.handleFocusChange);
         this.focusWatcher.start();
 
@@ -179,7 +179,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
      * Be sure to remove the listeners when the component unmounts.
      */
     public componentWillUnmount() {
-        document.removeEventListener("keydown", this.escFunction, false);
+        this.quill.root.removeEventListener("keydown", this.escFunction, false);
         this.focusWatcher.stop();
     }
 
@@ -243,9 +243,13 @@ export class InlineToolbar extends React.Component<IProps, IState> {
         if (event.keyCode === 27) {
             if (this.isLinkMenuVisible) {
                 event.preventDefault();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
                 this.clearLinkInput();
             } else if (this.isFormatMenuVisible) {
                 event.preventDefault();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
                 this.cancel();
             }
         }
@@ -291,12 +295,14 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     /**
      * Handle key-presses for the link toolbar.
      */
-    private onInputKeyDown = (event: React.KeyboardEvent<any>) => {
+    private onInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (Keyboard.match(event.nativeEvent, "enter")) {
             event.preventDefault();
             this.formatter.link(this.props.instanceState.lastGoodSelection, this.state.inputValue);
             this.clearLinkInput();
         }
+
+        this.escFunction(event.nativeEvent);
     };
 
     /**

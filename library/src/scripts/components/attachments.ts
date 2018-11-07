@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { fileExcel, fileGeneric, filePDF, fileWord } from "@library/components/Icons";
+import { fileExcel, fileGeneric, filePDF, fileWord } from "@library/components/icons/fileTypes";
 import { t } from "@library/application";
 
 export enum AttachmentType {

@@ -5,7 +5,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { close } from "@library/components/Icons";
+import { close } from "@library/components/icons/common";
 import { t } from "@library/application";
 import { ILegacyProps } from "@library/@types/legacy";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";

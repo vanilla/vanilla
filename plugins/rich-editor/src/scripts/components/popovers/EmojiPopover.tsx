@@ -5,16 +5,18 @@
  */
 
 import React from "react";
-import * as Icons from "@rich-editor/components/icons";
 import { getRequiredID, IOptionalComponentID, IRequiredComponentID } from "@library/componentIDs";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import EmojiPicker from "@rich-editor/components/popovers/pieces/EmojiPicker";
 import PopoverController, { IPopoverControllerChildParameters } from "@library/components/PopoverController";
 import { t } from "@library/application";
 import { ButtonBaseClass } from "@library/components/forms/Button";
+import { emoji } from "@library/components/icons/editorIcons";
 
 interface IProps extends IOptionalComponentID {
     disabled?: boolean;
+    renderAbove?: boolean;
+    renderLeft?: boolean;
 }
 
 export default class EmojiPopover extends React.Component<IProps, IRequiredComponentID> {
@@ -29,7 +31,7 @@ export default class EmojiPopover extends React.Component<IProps, IRequiredCompo
      * @inheritDoc
      */
     public render() {
-        const icon = Icons.emoji();
+        const icon = emoji();
 
         return (
             <PopoverController
@@ -41,9 +43,18 @@ export default class EmojiPopover extends React.Component<IProps, IRequiredCompo
                 name={t("Emoji Picker")}
                 buttonContents={icon}
                 buttonBaseClass={ButtonBaseClass.ICON}
+                renderAbove={this.props.renderAbove}
+                renderLeft={this.props.renderLeft}
             >
                 {(options: IPopoverControllerChildParameters) => {
-                    return <EmojiPicker {...options} contentID={options.id} />;
+                    return (
+                        <EmojiPicker
+                            {...options}
+                            renderAbove={this.props.renderAbove}
+                            renderLeft={this.props.renderLeft}
+                            contentID={options.id}
+                        />
+                    );
                 }}
             </PopoverController>
         );

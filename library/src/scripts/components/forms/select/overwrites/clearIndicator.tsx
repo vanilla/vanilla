@@ -9,7 +9,7 @@ import * as React from "react";
 import classNames from "classnames";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
-import { clear } from "@library/components/Icons";
+import { clear } from "@library/components/icons/common";
 
 /**
  * Overwrite for the clearIndicator component in React Select

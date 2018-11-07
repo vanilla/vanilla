@@ -14,7 +14,6 @@ import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
-import classNames from "classnames";
 import FocusWatcher from "@library/FocusWatcher";
 import DropDown from "@library/components/dropdown/DropDown";
 import { ButtonBaseClass } from "@library/components/forms/Button";

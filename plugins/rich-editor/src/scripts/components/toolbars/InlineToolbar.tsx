@@ -249,7 +249,7 @@ export class InlineToolbar extends React.Component<IProps, IState> {
             } else if (this.isFormatMenuVisible) {
                 event.preventDefault();
                 event.stopPropagation();
-                event.stopImmediatePropagation;
+                event.stopImmediatePropagation();
                 this.cancel();
             }
         }
@@ -295,12 +295,14 @@ export class InlineToolbar extends React.Component<IProps, IState> {
     /**
      * Handle key-presses for the link toolbar.
      */
-    private onInputKeyDown = (event: React.KeyboardEvent<any>) => {
+    private onInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (Keyboard.match(event.nativeEvent, "enter")) {
             event.preventDefault();
             this.formatter.link(this.props.instanceState.lastGoodSelection, this.state.inputValue);
             this.clearLinkInput();
         }
+
+        this.escFunction(event.nativeEvent);
     };
 
     /**

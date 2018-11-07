@@ -172,6 +172,8 @@ export default class PopoverController extends React.PureComponent<
         if (event.detail && event.detail.firingKey && event.detail.firingKey === this.constructor.name) {
             return;
         }
+        event.stopPropagation();
+        event.preventDefault();
 
         this.props.onClose && this.props.onClose();
 

@@ -10,10 +10,17 @@ $richEditorForm-placeholder_color: mixContentBgAndFg(50%);
     position: relative;
     height: 100vh;
 
-    // Only applies to non legacy
-    .richEditor-frame {
-        overflow: auto;
-    }
+}
+
+// We want the shadows to overflow, but not the rest, so we need this workaround.
+.richEditor-frame {
+    width: calc(100% + #{$global-gutter_halfSize});
+    margin-left: - $global-gutter_quarterSize;
+    overflow-y: auto;
+}
+
+.richEditor-textWrap {
+    padding: 0 $global-gutter_quarterSize;
 }
 
 .inputText.richEditorForm-title {

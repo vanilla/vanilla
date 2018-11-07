@@ -90,15 +90,24 @@
 
     .embedExternal-content,
     .embedLinkLoader-link {
-        transition: 0.2s ease box-shadow;
         cursor: pointer;
+        // Use a pseudo element so it can be positionned on top the the image and use the "inset" property
+        &:after {
+            @include absolute-fullSizeOfParent;
+            content: "";
+            transition: 0.2s ease box-shadow;
+        }
 
         &:hover {
-            box-shadow: 0 0 0 $embedded-select_borderWidth rgba($embed-focus-color, 0.5) inset;
+            &:after {
+                box-shadow: 0 0 0 $embedded-select_borderWidth rgba($embed-focus-color, 0.5) inset;
+            }
         }
 
         &:focus {
-            box-shadow: 0 0 0 $embedded-select_borderWidth $embed-focus-color inset;
+            &:after {
+                box-shadow: 0 0 0 $embedded-select_borderWidth $embed-focus-color inset;
+            }
         }
 
         > * {

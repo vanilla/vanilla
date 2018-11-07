@@ -5,7 +5,7 @@
  */
 
 export * from "./common";
-export * from "./editor";
+export * from "./editorIcons";
 export * from "./emojiGroups";
 export * from "./fileTypes";
-export * from "./revisions";
+export * from "./revisionIcons";

@@ -18,8 +18,8 @@ import classNames from "classnames";
 import FocusWatcher from "@library/FocusWatcher";
 import DropDown from "@library/components/dropdown/DropDown";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import { heading2, heading3, blockquote, codeBlock, spoiler } from "@library/components/icons/editor";
-import * as editorIcons from "@library/components/icons/editor";
+import { heading2, heading3, blockquote, codeBlock, spoiler } from "@library/components/icons/editorIcons";
+import * as editorIcons from "@library/components/icons/editorIcons";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -74,6 +74,7 @@ export class ParagraphDropDown extends React.PureComponent<IProps, IState> {
                     formatter={this.formatter}
                     activeFormats={this.props.activeFormats}
                     lastGoodSelection={this.props.instanceState.lastGoodSelection}
+                    onKeyDown={this.handlePilcrowKeyDown}
                 />
             </DropDown>
         );

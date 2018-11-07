@@ -33,7 +33,7 @@ interface IProps extends IWithEditorProps {
     onCloseClick(event?: React.MouseEvent<any>);
     renderAbove?: boolean;
     renderLeft?: boolean;
-    legacyMode?: boolean;
+    legacyMode: boolean;
 }
 
 export class Popover extends React.Component<IProps, IState> {
@@ -88,7 +88,7 @@ export class Popover extends React.Component<IProps, IState> {
                 className={classes}
                 role="dialog"
                 aria-hidden={!this.props.isVisible}
-                style={flyoutPosition(!!this.props.renderAbove, !!this.props.renderLeft, !!this.props.legacyMode)}
+                style={flyoutPosition(!!this.props.renderAbove, !!this.props.renderLeft, this.props.legacyMode)}
             >
                 {alertMessage}
                 <div className={headerClasses}>

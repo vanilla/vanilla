@@ -17,6 +17,7 @@ interface IProps {
     renderAbove?: boolean;
     renderLeft?: boolean;
     legacyMode?: boolean;
+    onKeyDown?: (e) => any;
 }
 
 /**
@@ -43,6 +44,7 @@ export default class MenuItems extends React.Component<IProps, {}> {
                 role="menu"
                 style={flyoutPosition(!!this.props.renderAbove, !!this.props.renderLeft, !!this.props.legacyMode)}
                 aria-orientation={this.props.orientation!}
+                onKeyDown={this.props.onKeyDown}
             >
                 <div className="richEditor-menuItems">
                     {this.props.menuItemData.map((itemData, index) => {

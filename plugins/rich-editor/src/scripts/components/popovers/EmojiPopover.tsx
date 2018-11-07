@@ -11,7 +11,7 @@ import EmojiPicker from "@rich-editor/components/popovers/pieces/EmojiPicker";
 import PopoverController, { IPopoverControllerChildParameters } from "@library/components/PopoverController";
 import { t } from "@library/application";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import { emoji } from "@library/components/icons/editor";
+import { emoji } from "@library/components/icons/editorIcons";
 
 interface IProps extends IOptionalComponentID {
     disabled?: boolean;

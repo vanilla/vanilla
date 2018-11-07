@@ -7,10 +7,10 @@
 import React from "react";
 import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
 import { t } from "@library/application";
-import * as icons from "@library/components/icons/editor";
+import * as icons from "@library/components/icons/editorIcons";
 import Formatter from "@rich-editor/quill/Formatter";
 import { IFormats, RangeStatic } from "quill/core";
-import { spoiler, codeBlock, blockquote, heading3, heading2, pilcrow } from "@library/components/icons/editor";
+import { spoiler, codeBlock, blockquote, heading3, heading2, pilcrow } from "@library/components/icons/editorIcons";
 
 interface IProps {
     formatter: Formatter;
@@ -20,6 +20,7 @@ interface IProps {
     menuRef?: React.RefObject<MenuItems>;
     renderAbove?: boolean;
     renderLeft?: boolean;
+    onKeyDown?: (e) => any;
 }
 
 export default class ParagraphToolbarMenuItems extends React.PureComponent<IProps> {
@@ -31,6 +32,7 @@ export default class ParagraphToolbarMenuItems extends React.PureComponent<IProp
                 menuItemData={this.menuItemData}
                 renderAbove={this.props.renderAbove}
                 renderLeft={this.props.renderLeft}
+                onKeyDown={this.props.onKeyDown}
             />
         );
     }

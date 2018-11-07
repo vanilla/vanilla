@@ -14,13 +14,13 @@ import Popover from "@rich-editor/components/popovers/pieces/Popover";
 import PopoverController, { IPopoverControllerChildParameters } from "@library/components/PopoverController";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import { embed } from "@library/components/icons/editor";
+import { embed } from "@library/components/icons/editorIcons";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
     renderAbove?: boolean;
     renderLeft?: boolean;
-    legacyMode?: boolean;
+    legacyMode: boolean;
 }
 
 interface IState extends IRequiredComponentID {
@@ -65,11 +65,12 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                 name={t("Embed")}
                 buttonContents={Icon}
                 buttonBaseClass={ButtonBaseClass.CUSTOM}
-                renderAbove={this.props.renderAbove}
-                renderLeft={this.props.renderLeft}
+                renderAbove={!!this.props.renderAbove}
+                renderLeft={!!this.props.renderLeft}
+                legacyMode={this.props.legacyMode}
             >
                 {(params: IPopoverControllerChildParameters) => {
-                    const { initialFocusRef, closeMenuHandler, isVisible } = params;
+                    const { initialFocusRef, closeMenuHandler, isVisible, legacyMode } = params;
                     const body = (
                         <React.Fragment>
                             <p id={this.descriptionID} className="insertMedia-description">
@@ -114,8 +115,8 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                             additionalClassRoot="insertMedia"
                             onCloseClick={closeMenuHandler}
                             isVisible={isVisible}
-                            renderAbove={this.props.renderAbove}
-                            renderLeft={this.props.renderLeft}
+                            renderAbove={!!this.props.renderAbove}
+                            renderLeft={!!this.props.renderLeft}
                             legacyMode={!!this.props.legacyMode}
                         />
                     );

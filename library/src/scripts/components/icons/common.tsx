@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import classNames from "classnames";
 import { t } from "@library/application";
+import classNames from "classnames";
 
 const currentColorFill = {
     fill: "currentColor",

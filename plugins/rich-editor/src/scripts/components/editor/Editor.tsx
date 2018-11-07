@@ -47,8 +47,8 @@ interface ILegacyProps extends ICommonProps {
 }
 
 interface INewProps extends ICommonProps {
-    legacyMode?: false;
     className?: string;
+    legacyMode: boolean;
 }
 
 type IProps = ILegacyProps | INewProps;
@@ -83,7 +83,7 @@ export class Editor extends React.Component<IProps> {
     public render() {
         // These items CANNOT be rendered before quill is ready, but the main text area is required for quill to render.
         // These should all re-render after componentDidMount calls forceUpdate().
-
+        const legacyMode = "legacyMode" in this.props ? this.props.legacyMode : false;
         let isMobile = false; // fallback for legacy: isMobile is always false
         if (!this.props.legacyMode && this.props.device) {
             isMobile = this.props.device === Devices.MOBILE;
@@ -126,7 +126,7 @@ export class Editor extends React.Component<IProps> {
                         </Permission>
 
                         <li className="richEditor-menuItem" role="menuitem">
-                            <EmbedPopover disabled={this.props.isLoading} legacyMode={this.props.legacyMode} />
+                            <EmbedPopover disabled={this.props.isLoading} legacyMode={!!legacyMode} />
                         </li>
                     </ul>
                 </div>

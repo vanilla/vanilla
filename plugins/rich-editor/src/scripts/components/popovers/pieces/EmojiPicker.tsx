@@ -13,7 +13,7 @@ import { EMOJIS, EMOJI_GROUPS } from "@rich-editor/components/popovers/pieces/em
 import Popover from "@rich-editor/components/popovers/pieces/Popover";
 import EmojiButton from "@rich-editor/components/popovers/pieces/EmojiButton";
 import { IPopoverControllerChildParameters } from "@library/components/PopoverController";
-import { emoji } from "@library/components/icons/editor";
+import { emoji } from "@library/components/icons/editorIcons";
 
 const BUTTON_SIZE = 36;
 const COL_SIZE = 7;
@@ -38,6 +38,7 @@ interface IProps extends IWithEditorProps, IPopoverControllerChildParameters {
     contentID: string;
     renderAbove?: boolean;
     renderLeft?: boolean;
+    legacyMode?: boolean;
 }
 
 interface IState {
@@ -161,6 +162,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 isVisible={this.props.isVisible}
                 renderAbove={this.props.renderAbove}
                 renderLeft={this.props.renderLeft}
+                legacyMode={!!this.props.legacyMode}
             />
         );
     }
@@ -329,22 +331,23 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             switch (event.code) {
                 case "PageUp":
                     event.preventDefault();
-                    event.stopPropagation();
+                    event.stopImmediatePropagation();
                     this.jumpIndex(-ROW_SIZE * COL_SIZE);
                     break;
                 case "PageDown":
                     event.preventDefault();
-                    event.stopPropagation();
+                    event.stopImmediatePropagation();
                     this.jumpIndex(ROW_SIZE * COL_SIZE);
                     break;
                 case "Home":
                     event.preventDefault();
-                    event.stopPropagation();
+                    event.stopImmediatePropagation();
                     this.jumpIndex(-lastEmojiIndex);
+                    event.stopImmediatePropagation();
                     break;
                 case "End":
                     event.preventDefault();
-                    event.stopPropagation();
+                    event.stopImmediatePropagation();
                     this.jumpIndex(lastEmojiIndex);
                     break;
             }

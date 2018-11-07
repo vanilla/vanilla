@@ -9,7 +9,7 @@ import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { uploadImage } from "@library/apiv2";
 import { isFileImage } from "@library/utility";
-import { image } from "@library/components/icons/editor";
+import { image } from "@library/components/icons/editorIcons";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;

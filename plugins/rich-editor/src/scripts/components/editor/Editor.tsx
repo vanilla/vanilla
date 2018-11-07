@@ -29,8 +29,7 @@ import classNames from "classnames";
 import Permission from "@library/users/Permission";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import { Devices } from "@library/components/DeviceChecker";
-import { uniqueIDFromPrefix } from "@library/componentIDs";
-import ParagraphDropDown from "@rich-editor/components/toolbars/ParagraphDropdown";
+import ParagraphDropDown from "@rich-editor/components/toolbars/ParagraphDropDown";
 import ParagraphToolbar from "@rich-editor/components/toolbars/ParagraphToolbar";
 
 interface ICommonProps {
@@ -57,8 +56,6 @@ type IProps = ILegacyProps | INewProps;
  * React component for instantiating a rich editor.
  */
 export class Editor extends React.Component<IProps> {
-    private dropDownID = uniqueIDFromPrefix("paragraphMenuMobile");
-
     /** Ref for a dom node for quill to mount into. */
     private quillMountRef: React.RefObject<HTMLDivElement> = React.createRef();
 

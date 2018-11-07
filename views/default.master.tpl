@@ -186,10 +186,10 @@
                                                 </div>
                                                 <div class="Profile-name">
                                                     <h1 class="Profile-username">
-                                                        {$Profile.Name}
+                                                        {$Profile.Name|escape:'html'}
                                                     </h1>
                                                     {if isset($Rank)}
-                                                        <span class="Profile-rank">{$Rank.Label}</span>
+                                                        <span class="Profile-rank">{$Rank.Label|escape:'html'}</span>
                                                     {/if}
                                                 </div>
                                             </div>

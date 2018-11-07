@@ -30,17 +30,17 @@ interface IState {
     hasFocus: boolean;
 }
 
+/**
+ * Implemented ParagraphDropDown component, this is for mobile
+ */
 export class ParagraphDropDown extends React.PureComponent<IProps, IState> {
     private quill: Quill;
     private ID: string;
     private componentID: string;
     private menuID: string;
     private buttonID: string;
-    private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
-    private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
     private menuRef: React.RefObject<MenuItems> = React.createRef();
     private formatter: Formatter;
-    private focusWatcher: FocusWatcher;
 
     constructor(props: IProps) {
         super(props);

@@ -56,11 +56,11 @@ $embedLoader-closeButton_opacity: .7 !default;
     cursor: pointer;
 
     &:hover {
-        box-shadow: 0 0 0 2px rgba($embed-focus-color, 0.5);
+        box-shadow: 0 0 0 $embedded-select_borderWidth rgba($embed-focus-color, 0.5) inset;
     }
 
     &:focus {
-        box-shadow: 0 0 0 2px $embed-focus-color;
+        box-shadow: 0 0 0 $embedded-select_borderWidth $embed-focus-color inset;
     }
 
     + .embedLoader-error {

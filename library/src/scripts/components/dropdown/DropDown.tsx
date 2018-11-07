@@ -71,7 +71,7 @@ export default class DropDown extends React.Component<IProps, IState> {
                         <DropDownContents
                             id={this.state.id + "-handle"}
                             parentID={this.state.id}
-                            className={classNames("dropDown-contents", this.props.contentsClassName)}
+                            className={this.props.contentsClassName}
                             onClick={params.closeMenuHandler}
                             renderLeft={!!this.props.renderLeft}
                             renderAbove={!!this.props.renderAbove}

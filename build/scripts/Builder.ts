@@ -109,7 +109,7 @@ export default class Builder {
         if (buildOptions.mode === BuildMode.DEVELOPMENT && !hotReloadConfigSet) {
             const message = chalk.red(`
 You've enabled a development build without enabling hot reload. Add the following to your config.
-${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = false;")}`);
+${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
             fail(message);
         }
 

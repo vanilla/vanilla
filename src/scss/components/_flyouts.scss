@@ -76,6 +76,14 @@ $flyout-progress_size:                  24px;
     }
 }
 
+.MenuItems-Reactions {
+    top: initial !important;
+}
+
+.ReactButton {
+    position: relative;
+}
+
 .MenuItems.Flags {
     padding: $utility-small_padding;
 
@@ -100,30 +108,6 @@ $flyout-progress_size:                  24px;
     visibility: visible;
 }
 
-.MenuItems-Reactions.MenuItems-Reactions {
-    padding: 0;
-
-    .PhotoWrapSmall.PhotoWrapSmall {
-        margin-right: 0;
-        @include photoWrap(24px);
-    }
-
-    a {
-        margin-right: 0;
-        padding: 0 !important;
-        font-size: $global-small_fontSize;
-        line-height: 24px;
-        @include ellipsis;
-        max-width: calc(100% - (24px + #{$utility-small_padding}));
-
-        &:focus,
-        &:hover {
-            background: transparent !important;
-        }
-    }
-
-}
-
 .MenuItems.MenuItems {
     padding: 0;
 
@@ -135,7 +119,7 @@ $flyout-progress_size:                  24px;
         transition: 0.2s ease-out color;
         padding: $utility-small_padding $utility-xLarge_padding;
         min-height: 45px;
-        display: flex;
+        display: flex !important;
         align-items: center;
         margin: 0;
 
@@ -161,6 +145,33 @@ $flyout-progress_size:                  24px;
         width: 24px;
         padding: 0 !important;
         margin: 0 0 0 $utility-small_padding;
+    }
+
+    &.MenuItems-Reactions {
+        .PhotoWrap {
+            position: absolute;
+            left: 0;
+            margin-left: 12px;
+            top: 50%;
+            min-height: initial;
+            transform: translateY(-50%);
+            @include photoWrap(24px);
+
+            + a {
+                display: inline-block !important;
+                padding-left: 45px !important;
+                line-height: 45px;
+                padding-right: 12px !important;;
+                @include ellipsis;
+                overflow: hidden;
+                max-width: 100%;
+            }
+        }
+
+        li {
+            position: relative;
+            display: flex;
+        }
     }
 }
 

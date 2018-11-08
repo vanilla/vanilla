@@ -21,6 +21,8 @@ import multiValueLabel from "./overwrites/multiValueLabel";
 import multiValueRemove from "./overwrites/multiValueRemove";
 import noOptionsMessage from "./overwrites/noOptionsMessage";
 import { IComboBoxOption } from "./SearchBar";
+import ButtonLoader from "@library/components/ButtonLoader";
+import LoadingOptions from "@library/components/forms/select/overwrites/LoadingOption";
 
 interface IProps extends IOptionalComponentID {
     label: string;
@@ -32,7 +34,6 @@ interface IProps extends IOptionalComponentID {
     isLoading?: boolean;
     value: IComboBoxOption[];
     onChange: (tokens: IComboBoxOption[]) => void;
-    inputValue: string;
     onInputChange: (value: string) => void;
 }
 
@@ -69,7 +70,6 @@ export default class Tokens extends React.Component<IProps> {
                         onInputChange={this.props.onInputChange}
                         isClearable={true}
                         isDisabled={disabled}
-                        inputValue={this.props.inputValue}
                         options={options}
                         isLoading={isLoading}
                         classNamePrefix={this.prefix}
@@ -91,19 +91,24 @@ export default class Tokens extends React.Component<IProps> {
     /*
     * Overwrite components in Select component
     */
-    private componentOverwrites = {
-        IndicatorsContainer: doNotRender,
-        SelectContainer: selectContainer,
-        Menu: menu,
-        MenuList: menuList,
-        Option: selectOption,
-        ValueContainer: valueContainerTokens,
-        Control: multiValueContainer,
-        MultiValueContainer: multiValueContainer,
-        MultiValueLabel: multiValueLabel,
-        MultiValueRemove: multiValueRemove,
-        NoOptionsMessage: noOptionsMessage,
-    };
+    private get componentOverwrites() {
+        return {
+            ClearIndicator: doNotRender,
+            DropdownIndicator: doNotRender,
+            LoadingMessage: LoadingOptions,
+            SelectContainer: selectContainer,
+            Menu: menu,
+            MenuList: menuList,
+            Option: selectOption,
+            ValueContainer: valueContainerTokens,
+            Control: multiValueContainer,
+            MultiValueContainer: multiValueContainer,
+            MultiValueLabel: multiValueLabel,
+            MultiValueRemove: multiValueRemove,
+            NoOptionsMessage: this.props.isLoading ? LoadingOptions : noOptionsMessage,
+            LoadingIndicator: doNotRender,
+        };
+    }
 
     /**
      * Overwrite theme in Select component
@@ -121,18 +126,25 @@ export default class Tokens extends React.Component<IProps> {
      */
     private getStyles = () => {
         return {
-            option: () => ({}),
-            menu: base => {
-                return { ...base, backgroundColor: null, boxShadow: null };
+            option: (provided: React.CSSProperties) => ({
+                ...provided,
+            }),
+            menu: (provided: React.CSSProperties, state) => {
+                return { ...provided, backgroundColor: undefined, boxShadow: undefined };
             },
-            control: () => ({
+            control: (provided: React.CSSProperties) => ({
+                ...provided,
                 borderWidth: 0,
             }),
-            multiValue: base => {
-                return { ...base, borderRadius: null };
+            multiValue: (provided: React.CSSProperties, state) => {
+                return {
+                    ...provided,
+                    borderRadius: undefined,
+                    opacity: state.isFocused ? 1 : 0.85,
+                };
             },
-            multiValueLabel: base => {
-                return { ...base, borderRadius: null };
+            multiValueLabel: (provided: React.CSSProperties) => {
+                return { ...provided, borderRadius: undefined };
             },
         };
     };

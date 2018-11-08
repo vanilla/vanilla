@@ -5,19 +5,13 @@
  */
 
 import * as React from "react";
-import { components } from "react-select";
+import Menu, { MenuProps } from "react-select/lib/components/Menu";
 
 /**
  * Overwrite for the menu component in React Select
  * Note that this is NOT a true react component and gets called within the react select plugin
  * @param props - menu props
  */
-export default function menu(props: any) {
-    return (
-        <React.Fragment>
-            <components.Menu {...props} className="suggestedTextInput-menu dropDown-contents">
-                {props.children}
-            </components.Menu>
-        </React.Fragment>
-    );
+export default function menu(props: MenuProps<any>) {
+    return <Menu {...props} className="suggestedTextInput-menu dropDown-contents" />;
 }

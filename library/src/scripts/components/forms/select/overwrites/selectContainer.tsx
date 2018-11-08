@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { components } from "react-select";
+import { SelectContainer, ContainerProps } from "react-select/lib/components/containers";
 
 /**
  * Overwrite for the selectContainer component in React Select
@@ -13,10 +13,6 @@ import { components } from "react-select";
  * @param children
  * @param props
  */
-export default function selectContainer({ children, ...props }: any) {
-    return (
-        <components.SelectContainer {...props} className="suggestedTextInput-selectContainer">
-            {children}
-        </components.SelectContainer>
-    );
+export default function selectContainer(props: ContainerProps<any>) {
+    return <SelectContainer {...props} className="suggestedTextInput-selectContainer" />;
 }

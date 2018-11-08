@@ -21,7 +21,7 @@ interface IProps extends IInjectableSuggestionsProps {
 
 export class MultiUserInput extends React.Component<IProps> {
     public render() {
-        const { suggestions, currentUsername, lastSuccessfulUsername } = this.props;
+        const { suggestions, currentUsername } = this.props;
         let options: IComboBoxOption[] | undefined = undefined;
         if (suggestions.status === LoadStatus.SUCCESS && suggestions.data) {
             options = suggestions.data.map(suggestion => {
@@ -36,10 +36,9 @@ export class MultiUserInput extends React.Component<IProps> {
             <Tokens
                 label={t("Author")}
                 options={options}
-                isLoading={suggestions.status === LoadStatus.LOADING}
+                isLoading={suggestions.status === LoadStatus.LOADING || suggestions.status === LoadStatus.PENDING}
                 onChange={val => console.log(val)}
                 value={[]}
-                inputValue={currentUsername || ""}
                 onInputChange={this.onInputChange}
             />
         );

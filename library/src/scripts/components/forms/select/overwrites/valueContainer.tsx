@@ -6,6 +6,8 @@
 
 import * as React from "react";
 import { components } from "react-select";
+import { ValueContainerProps, ValueContainer } from "react-select/lib/components/containers";
+import classNames from "classnames";
 
 /**
  * Overwrite for the valueContainer component in React Select
@@ -13,13 +15,6 @@ import { components } from "react-select";
  * @param children
  * @param props
  */
-export default function valueContainer({ children, ...props }: any) {
-    return (
-        <components.ValueContainer
-            {...props}
-            className="suggestedTextInput-valueContainer inputBlock-inputText inputText"
-        >
-            {children}
-        </components.ValueContainer>
-    );
+export default function valueContainer(props: ValueContainerProps<any>) {
+    return <ValueContainer {...props} className="suggestedTextInput-valueContainer inputBlock-inputText inputText" />;
 }

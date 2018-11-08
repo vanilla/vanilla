@@ -24,7 +24,8 @@ $suggestedTextInput-clearButton_width: 16px;
     text-align: left;
 
     &:hover,
-    &:focus {
+    &:focus,
+    &.isFocused {
         background-color: $state-hover_color;
     }
 }

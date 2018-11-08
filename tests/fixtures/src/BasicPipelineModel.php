@@ -29,6 +29,20 @@ class BasicPipelineModel extends PipelineModel {
     }
 
     /**
+     * Perform a dummy "select" database operation using the configured pipeline.
+     *
+     * @param Operation $databaseOperation
+     * @param array $dummyResult
+     * @return Operation
+     */
+    public function doSelectOperation(Operation $databaseOperation, array $dummyResult): array {
+        $result = $this->pipeline->process($databaseOperation, function () use ($dummyResult) {
+            return $dummyResult;
+        });
+        return $result;
+    }
+
+    /**
      * Make sure we have configured schemas available to the instance.
      */
     protected function ensureSchemas() {

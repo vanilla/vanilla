@@ -146,7 +146,7 @@ export default class Tokens extends React.Component<IProps, IState> {
                 };
             },
             multiValueLabel: (provided: React.CSSProperties) => {
-                return { ...provided, borderRadius: undefined };
+                return { ...provided, borderRadius: undefined, padding: 0 };
             },
         };
     };

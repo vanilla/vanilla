@@ -22,8 +22,8 @@ $suggestedTextInput-clearIcon_width: 8px;
     padding: {
         left: 0;
         right: 0;
-        top: $utility-baseUnit / 2;
-        bottom: $utility-baseUnit / 2;
+        // top: $utility-baseUnit / 2;
+        // bottom: $utility-baseUnit / 2;
     }
 
     .tokens__value-container--has-value & {
@@ -44,9 +44,6 @@ $suggestedTextInput-clearIcon_width: 8px;
     };
     margin: $utility-baseUnit / 2;
     background-color: $tokens-token_bg;
-}
-
-.tokens__multi-value {
     user-select: none;
 }
 

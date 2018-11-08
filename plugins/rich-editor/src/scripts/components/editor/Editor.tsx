@@ -142,7 +142,7 @@ export class Editor extends React.Component<IProps> {
                             <div
                                 className="ql-editor richEditor-text userContent"
                                 data-gramm="false"
-                                contentEditable={true}
+                                contentEditable={!!this.props.isLoading}
                                 data-placeholder="Create a new post..."
                                 tabIndex={0}
                             />

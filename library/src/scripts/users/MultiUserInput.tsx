@@ -45,7 +45,6 @@ export class MultiUserInput extends React.Component<IProps> {
     }
 
     private onInputChange = (value: string) => {
-        console.log("New input vlaue", value);
         this.props.suggestionActions.loadUsers(value);
     };
 }

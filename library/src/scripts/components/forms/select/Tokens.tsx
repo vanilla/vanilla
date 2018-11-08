@@ -37,19 +37,20 @@ interface IProps extends IOptionalComponentID {
     onInputChange: (value: string) => void;
 }
 
+interface IState {
+    inputValue: string;
+}
+
 /**
  * Implements the search bar component
  */
-export default class Tokens extends React.Component<IProps> {
-    private id: string;
+export default class Tokens extends React.Component<IProps, IState> {
     private prefix = "tokens";
-    private inputID: string;
-
-    constructor(props: IProps) {
-        super(props);
-        this.id = getRequiredID(props, this.prefix);
-        this.inputID = this.id + "-tokenInput";
-    }
+    private id: string = getRequiredID(this.props, this.prefix);
+    private inputID: string = this.id + "-tokenInput";
+    public state: IState = {
+        inputValue: "",
+    };
 
     public render() {
         const { className, disabled, options, isLoading } = this.props;
@@ -67,11 +68,12 @@ export default class Tokens extends React.Component<IProps> {
                         inputId={this.inputID}
                         components={this.componentOverwrites}
                         onChange={this.props.onChange}
-                        onInputChange={this.props.onInputChange}
+                        inputValue={this.state.inputValue}
+                        onInputChange={this.handleInputChange}
                         isClearable={true}
                         isDisabled={disabled}
                         options={options}
-                        isLoading={isLoading}
+                        isLoading={this.showLoader}
                         classNamePrefix={this.prefix}
                         className={classNames(this.prefix, className)}
                         placeholder={this.props.placeholder}
@@ -88,6 +90,15 @@ export default class Tokens extends React.Component<IProps> {
         );
     }
 
+    private get showLoader(): boolean {
+        return !!this.props.isLoading && this.state.inputValue.length > 0;
+    }
+
+    private handleInputChange = val => {
+        this.setState({ inputValue: val });
+        this.props.onInputChange(val);
+    };
+
     /*
     * Overwrite components in Select component
     */
@@ -97,7 +108,7 @@ export default class Tokens extends React.Component<IProps> {
             DropdownIndicator: doNotRender,
             LoadingMessage: LoadingOptions,
             SelectContainer: selectContainer,
-            Menu: menu,
+            Menu: this.state.inputValue.length > 0 ? menu : doNotRender,
             MenuList: menuList,
             Option: selectOption,
             ValueContainer: valueContainerTokens,
@@ -105,7 +116,11 @@ export default class Tokens extends React.Component<IProps> {
             MultiValueContainer: multiValueContainer,
             MultiValueLabel: multiValueLabel,
             MultiValueRemove: multiValueRemove,
-            NoOptionsMessage: this.props.isLoading ? LoadingOptions : noOptionsMessage,
+            NoOptionsMessage: this.showLoader
+                ? LoadingOptions
+                : this.state.inputValue.length > 0
+                    ? noOptionsMessage
+                    : doNotRender,
             LoadingIndicator: doNotRender,
         };
     }

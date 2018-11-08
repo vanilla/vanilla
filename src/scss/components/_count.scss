@@ -8,7 +8,7 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$count_fontWeight:                  inherit !default;
+$count_fontWeight:                  bold !default;
 $count_fontSize:                    $global-small_fontSize !default;
 $count_borderRadius:                $formButton_borderRadius !default;
 $count_height:                      $formButton_height !default;
@@ -26,12 +26,14 @@ $count-hover_color:                 $global-color_white !default;
     border-color: darken($count_bg, 8%);
     border: $count_border;
     border-radius: $count_borderRadius;
-    padding: 0 $utility-xSmall_padding;
+    padding: 0 $utility-small_padding;
     font-size: $count_fontSize;
     line-height: $global-base_lineHeight;
     white-space: nowrap;
-    display: inline-block;
-    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    font-weight: $count_fontWeight;
+    justify-content: center;
     @if ($formButton_borderRadius == $formButton_height) {
         min-width: 22px;
     }
@@ -47,6 +49,7 @@ $count-hover_color:                 $global-color_white !default;
 }
 
 .Count,
+.Alert,
 .Reactions .Count {
     @include Count;
 }

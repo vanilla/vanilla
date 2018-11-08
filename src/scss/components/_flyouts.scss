@@ -15,12 +15,14 @@ $flyout_fg:                             mix($global-color_black, $flyout_bg, 70%
 $flyout-link_color:                     $global-color_primary !default;
 $flyout-link-hover_color:               $global-color_primaryAlt !default;
 
+$flyout_width:                          200px !default;
+
 $flyout-link-alt_color:                 $global-color_secondary !default;
 $flyout-link-altHover_color:            darken($global-color_secondary, 8%) !default;
 
 $flyout_border:                         1px solid $theme-border_color !default;
 $flyout_borderRadius:                   $global_borderRadius !default;
-$flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.2) !default;
+$flyout_boxShadow:                      0 5px 10px 0 rgba($global-color_black, 0.15) !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -28,14 +30,22 @@ $flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.
 
 .MenuItems,
 .FlyoutMenu {
-    border: $flyout_border;
     box-shadow: $flyout_boxShadow;
-    border-radius: $flyout_borderRadius;
+    position: absolute;
+    top: 100% !important;
+    min-width: $flyout_width;
+    background-color: $flyout_bg;
+    border: {
+        radius: $flyout_borderRadius;
+        style: solid;
+        width: 1px;
+        color: $global-border_color;
+    }
     color: $flyout_fg;
-    line-height: $global-base_lineHeight;
 
-    &::before {
-        opacity: 0.4;
+    &::before,
+    &::after {
+        display: none;
     }
 
     input[type= "text"],
@@ -70,17 +80,10 @@ $flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.
 .ButtonGroup.Open .Dropdown,
 .editor-dropdown-open .Flyout.Flyout.Flyout {
     visibility: visible;
-
-    li {
-        font-size: $global-medium_fontSize;
-        line-height: $global-base_lineHeight;
-    }
 }
 
-
-
 .MenuItems-Reactions.MenuItems-Reactions {
-    padding: $utility-small_padding;
+    padding: 0;
 
     .PhotoWrapSmall.PhotoWrapSmall {
         margin-right: 0;
@@ -103,25 +106,36 @@ $flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.
 
 }
 
-.MenuItems {
-    padding-top: $utility-small_padding;
-    padding-bottom: $utility-small_padding;
+.MenuItems.MenuItems {
+    padding: 0;
 
-    a {
+    li > a {
+        font-size: $global-medium_fontSize;
+        line-height: $global-base_lineHeight;
         text-transform: none;
         text-align: initial;
         transition: 0.2s ease-out color;
+        padding: $utility-small_padding $utility-xLarge_padding;
+        min-height: 45px;
+        display: flex;
+        align-items: center;
+        margin: 0;
 
-        &:hover {
-            color: $global-color_primary !important;
+        &:hover,
+        &:focus {
             text-decoration: none;
-            background-color: rgba($global-color_black, 0.04) !important;
+            color: $global-color_fg !important;
+            background-color: $global-color_active_primaryBg !important;
+        }
+
+        .Alert,
+        .Count {
+            margin-left: $utility-medium_padding;
         }
     }
 
     hr {
-        margin-bottom: $utility-small_padding;
-        margin-top: $utility-small_padding;
+        margin: 0;
     }
 
     .PhotoWrap {

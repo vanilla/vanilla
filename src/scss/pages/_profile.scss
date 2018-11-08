@@ -41,6 +41,28 @@ body.Section-Profile {
         margin-top: -$global-bodylineHeight_offset;
     }
 
+    .User .H {
+        display: flex;
+        align-items: center;
+    }
+
+    .Gloss,
+    .Profile-rank {
+        font-weight: normal;
+        font-size: 10px;
+        color: $global-color_primary;
+        text-transform: uppercase;
+        border: 1px solid $global-color-primary;
+        padding: $utility-xSmall_padding;
+        display: inline-flex;
+        border-radius: $global_borderRadius;
+    }
+
+    .H .Gloss {
+        margin-left: 1em;
+        margin-top: 0.5em;
+    }
+
     .MainContent {
 
         > .FormTitleWrapper {
@@ -78,8 +100,7 @@ body.Section-Profile {
         @include maxWidth($theme-breakpoint_tablet) {
             width: 100%;
 
-            .Profile-rank,
-            .Profile-username {
+            .Profile-row {
                 display: block;
                 width: inherit;
                 text-align: center;
@@ -88,7 +109,6 @@ body.Section-Profile {
     }
 
     .Profile-photo {
-
         @include maxWidth($theme-breakpoint_tablet) {
             width: 100%;
             display: flex;
@@ -104,13 +124,14 @@ body.Section-Profile {
         }
 
         > .PhotoLarge {
-            @include photoWrap(120px);
+            @include photoWrap(145px);
+            margin-bottom: 8px;
         }
 
         .PhotoWrapLarge {
             position: absolute;
-            height: 120px;
-            width: 120px;
+            height: 145px;
+            width: 145px;
 
             img {
                 display: none;
@@ -188,11 +209,6 @@ body.Section-Profile {
                 margin-bottom: $utility-large_padding;
             }
         }
-    }
-
-    .Profile-rank {
-        text-transform: uppercase;
-        color: $global-color_fg;
     }
 
     .Panel-main {

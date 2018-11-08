@@ -185,12 +185,16 @@
                                                     {module name="UserPhotoModule"}
                                                 </div>
                                                 <div class="Profile-name">
-                                                    <h1 class="Profile-username">
-                                                        {$Profile.Name|escape:'html'}
-                                                    </h1>
-                                                    {if isset($Rank)}
-                                                        <span class="Profile-rank">{$Rank.Label|escape:'html'}</span>
-                                                    {/if}
+                                                    <div class="Profile-row">
+                                                        <h1 class="Profile-username">
+                                                            {$Profile.Name}
+                                                        </h1>
+                                                    </div>
+                                                    <div class="Profile-row">
+                                                        {if isset($Rank)}
+                                                            <span class="Profile-rank">{$Rank.Label}</span>
+                                                        {/if}
+                                                    </div>
                                                 </div>
                                             </div>
                                         {/if}

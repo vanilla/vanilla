@@ -29,11 +29,14 @@ interface IModalCommonProps {
     children: React.ReactNode;
     elementToFocus?: HTMLElement;
     size: ModalSizes;
+    elementToFocusOnExit?: HTMLElement; // remove
 }
 
 interface IModalTextDescription extends IModalCommonProps, ITextDescription {}
 
 interface IModalHeadingDescription extends IModalCommonProps, IHeadingDescription {}
+
+type IProps = IModalTextDescription | IModalHeadingDescription;
 
 /**
  * An accessible Modal component.
@@ -45,7 +48,7 @@ interface IModalHeadingDescription extends IModalCommonProps, IHeadingDescriptio
  * - Prevents scrolling of the body.
  * - Focuses the first focusable element in the Modal.
  */
-export default class Modal extends React.Component<IModalTextDescription | IModalHeadingDescription> {
+export default class Modal extends React.Component<IProps> {
     public static defaultProps = {
         pageContainer: document.getElementById("page"),
         container: document.getElementById("modals"),
@@ -63,6 +66,11 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
 
     private get descriptionID() {
         return this.id + "-description";
+    }
+
+    private constructor(props) {
+        super(props);
+        Modal.focusHistory.push(props.elementToFocusOnExit || document.activeElement);
     }
 
     /**
@@ -131,6 +139,14 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
         }
         Modal.stack.push(this);
     }
+    /**
+     * We need to check again for focus if the focus is by ref
+     */
+    public componentDidUpdate(prevProps: IProps) {
+        if (prevProps.elementToFocus !== this.props.elementToFocus) {
+            this.focusInitialElement(true);
+        }
+    }
 
     /**
      * Tear down setup from componentDidMount
@@ -155,7 +171,7 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
     /**
      * Focus the initial element in the Modal.
      */
-    private focusInitialElement() {
+    private focusInitialElement(replaceItemInHistory = false) {
         let targetElement;
         if (this.props.elementToFocus) {
             targetElement = this.props.elementToFocus;
@@ -164,7 +180,12 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
         }
         targetElement = !!targetElement ? targetElement : document.body;
         targetElement.focus();
-        Modal.focusHistory.push(targetElement);
+        if (replaceItemInHistory) {
+            // if we need to rerender the component, we don't want to include a bad value in the focus history
+            Modal.focusHistory[Modal.focusHistory.length - 1] = targetElement;
+        } else {
+            Modal.focusHistory.push(targetElement);
+        }
     }
 
     /**

@@ -41,12 +41,16 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
 
     constructor(props) {
         super(props);
-        this.cancelRef = React.createRef();
         this.id = getRequiredID(props, "confirmModal");
+        this.cancelRef = React.createRef();
     }
 
     public get titleID() {
         return this.id + "-title";
+    }
+
+    public componentDidMount() {
+        this.forceUpdate();
     }
 
     public render() {
@@ -68,7 +72,7 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter>
-                        <Button ref={this.cancelRef} onClick={onCancel}>
+                        <Button buttonRef={this.cancelRef} onClick={onCancel}>
                             {t("Cancel")}
                         </Button>
                         <Button onClick={onConfirm} className="buttonPrimary" disabled={isConfirmLoading}>

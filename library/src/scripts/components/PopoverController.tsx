@@ -69,7 +69,12 @@ export default class PopoverController extends React.PureComponent<
         const title = "name" in this.props ? this.props.name : this.props.selectedItemLabel;
 
         return (
-            <div id={this.state.id} className={this.props.classNameRoot} ref={this.controllerRef}>
+            <div
+                id={this.state.id}
+                className={this.props.classNameRoot}
+                ref={this.controllerRef}
+                onClick={this.stopPropagation}
+            >
                 <Button
                     id={this.buttonID}
                     onClick={this.togglePopover}
@@ -158,7 +163,8 @@ export default class PopoverController extends React.PureComponent<
     /**
      * Toggle Menu menu
      */
-    private togglePopover = () => {
+    private togglePopover = e => {
+        e.stopPropagation();
         this.setState((prevState: IState) => {
             return { isVisible: !prevState.isVisible };
         });
@@ -187,5 +193,12 @@ export default class PopoverController extends React.PureComponent<
         if (parentElement && parentElement.contains(activeElement)) {
             this.buttonRef.current && this.buttonRef.current.focus();
         }
+    };
+
+    /**
+     * Stop click propagation outside popover
+     */
+    private stopPropagation = e => {
+        e.stopPropagation();
     };
 }

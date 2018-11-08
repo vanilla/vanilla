@@ -43,7 +43,6 @@ body {
 
 .DataList,
 .MessageList {
-
     .Item,
     .Item.Read {
         background-color: transparent;
@@ -52,7 +51,6 @@ body {
 }
 
 .Item {
-
     .BlockTitle {
         font-size: inherit;
     }
@@ -149,6 +147,10 @@ body {
 
 .PageTitle .Options {
     height: initial;
+
+    .Bookmark {
+        margin-left: $utility-small_padding;
+    }
 }
 
 .ItemDiscussion {

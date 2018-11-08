@@ -117,7 +117,7 @@ $flyout-progress_size:                  24px;
         text-transform: none;
         text-align: initial;
         transition: 0.2s ease-out color;
-        padding: $utility-small_padding $utility-xLarge_padding;
+        padding: $utility-small_padding $utility-xLarge_padding !important;
         min-height: 45px;
         display: flex !important;
         align-items: center;
@@ -133,6 +133,10 @@ $flyout-progress_size:                  24px;
         .Alert,
         .Count {
             margin-left: $utility-medium_padding;
+        }
+
+        .ReactSprite {
+            margin-right: $utility-medium_padding;
         }
     }
 

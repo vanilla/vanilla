@@ -157,6 +157,7 @@
         }
     }
 
+    .Author .Username,
     .Meta > *,
     .MItem,
     .AuthorInfo *,
@@ -325,12 +326,12 @@
         }
 
         .ReactButton {
-            color: $component-meta-link_color;
+            // color: $component-meta-link_color;
             margin: $utility-small_padding $utility-small_padding 0;
 
             &:focus,
             &:hover {
-                color: $component-meta-link-hover_color;
+                // color: $component-meta-link-hover_color;
             }
 
             @include maxWidth {
@@ -399,7 +400,7 @@
 
     .ItemComment,
     .ItemDiscussion {
-        padding: 0 !important;
+        padding: $utility-small_padding !important;
 
         .Options {
             top: $utility-medium_padding;
@@ -456,6 +457,14 @@
             .MItem.Rank {
                 display: inline;
                 white-space: normal;
+                font-weight: normal;
+                font-size: 10px;
+                color: $global-color_primary;
+                text-transform: uppercase;
+                border: 1px solid $global-color-primary;
+                padding: $utility-xSmall_padding;
+                display: inline-flex;
+                border-radius: $global_borderRadius;
             }
 
             .Meta,

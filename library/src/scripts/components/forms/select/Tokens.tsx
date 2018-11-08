@@ -9,20 +9,9 @@ import Select from "react-select";
 import { getRequiredID, IOptionalComponentID } from "@library/componentIDs";
 import classNames from "classnames";
 import { t } from "@library/application";
-import menuList from "@library/components/forms/select/overwrites/menuList";
-import menu from "@library/components/forms/select/overwrites/menu";
-import selectContainer from "@library/components/forms/select/overwrites/selectContainer";
-import doNotRender from "@library/components/forms/select/overwrites/doNotRender";
 import Paragraph from "@library/components/Paragraph";
-import selectOption from "@library/components/forms/select/overwrites/selectOption";
-import valueContainerTokens from "@library/components/forms/select/overwrites/valueContainerTokens";
-import multiValueContainer from "./overwrites/multiValueContainer";
-import multiValueLabel from "./overwrites/multiValueLabel";
-import multiValueRemove from "./overwrites/multiValueRemove";
-import noOptionsMessage from "./overwrites/noOptionsMessage";
+import * as selectOverrides from "./overwrites";
 import { IComboBoxOption } from "./SearchBar";
-import ButtonLoader from "@library/components/ButtonLoader";
-import LoadingOptions from "@library/components/forms/select/overwrites/LoadingOption";
 
 interface IProps extends IOptionalComponentID {
     label: string;
@@ -104,24 +93,21 @@ export default class Tokens extends React.Component<IProps, IState> {
     */
     private get componentOverwrites() {
         return {
-            ClearIndicator: doNotRender,
-            DropdownIndicator: doNotRender,
-            LoadingMessage: LoadingOptions,
-            SelectContainer: selectContainer,
-            Menu: this.state.inputValue.length > 0 ? menu : doNotRender,
-            MenuList: menuList,
-            Option: selectOption,
-            ValueContainer: valueContainerTokens,
-            Control: multiValueContainer,
-            MultiValueContainer: multiValueContainer,
-            MultiValueLabel: multiValueLabel,
-            MultiValueRemove: multiValueRemove,
+            ClearIndicator: selectOverrides.NullComponent,
+            DropdownIndicator: selectOverrides.NullComponent,
+            LoadingMessage: selectOverrides.OptionLoader,
+            Menu: this.state.inputValue.length > 0 ? selectOverrides.Menu : selectOverrides.NullComponent,
+            MenuList: selectOverrides.MenuList,
+            Option: selectOverrides.SelectOption,
+            ValueContainer: selectOverrides.ValueContainer,
+            Control: selectOverrides.Control,
+            MultiValueRemove: selectOverrides.MultiValueRemove,
             NoOptionsMessage: this.showLoader
-                ? LoadingOptions
+                ? selectOverrides.OptionLoader
                 : this.state.inputValue.length > 0
-                    ? noOptionsMessage
-                    : doNotRender,
-            LoadingIndicator: doNotRender,
+                    ? selectOverrides.NoOptionsMessage
+                    : selectOverrides.NullComponent,
+            LoadingIndicator: selectOverrides.NullComponent,
         };
     }
 
@@ -136,6 +122,7 @@ export default class Tokens extends React.Component<IProps, IState> {
             spacing: {},
         };
     };
+
     /**
      * Overwrite styles in Select component
      */

@@ -20,6 +20,7 @@ import selectContainer from "@library/components/forms/select/overwrites/selectC
 import doNotRender from "@library/components/forms/select/overwrites/doNotRender";
 import { ReactNode } from "react";
 import noOptionsMessage from "./overwrites/noOptionsMessage";
+import { ActionMeta, InputActionTypes } from "react-select/lib/types";
 
 export interface IComboBoxOption {
     value: string | number;
@@ -40,15 +41,23 @@ interface IProps extends IOptionalComponentID {
     title: ReactNode;
 }
 
+interface IState {
+    inputValue: string;
+}
+
 /**
  * Implements the search bar component
  */
-export default class BigSearch extends React.Component<IProps> {
+export default class BigSearch extends React.Component<IProps, IState> {
     public static defaultProps = {
         disabled: false,
         isBigInput: false,
         noHeading: false,
         title: t("Search"),
+    };
+
+    public state = {
+        inputValue: "",
     };
 
     private id: string;
@@ -79,6 +88,8 @@ export default class BigSearch extends React.Component<IProps> {
                 value={value}
                 id={this.id}
                 inputId={this.searchInputID}
+                inputValue={this.state.inputValue}
+                onInputChange={this.handleInputChange as any} // The d.ts file for this is wrong!
                 components={this.componentOverwrites}
                 isClearable={true}
                 isDisabled={disabled}
@@ -95,6 +106,12 @@ export default class BigSearch extends React.Component<IProps> {
             />
         );
     }
+
+    private handleInputChange = (value: string, reason: string) => {
+        if (reason !== "input-blur") {
+            this.setState({ inputValue: value });
+        }
+    };
 
     private customStyles = {
         option: () => ({}),

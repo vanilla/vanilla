@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "d01750c9e401959d8c74c018ef29edc2",
@@ -442,7 +442,7 @@
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.9.0",
+            "version": "v1.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
@@ -500,16 +500,16 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.9.0",
+            "version": "v1.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "d0cd638f4634c16d8df4508e847f14e9e43168b8"
+                "reference": "c79c051f5b3a46be09205c73b80b346e4153e494"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/d0cd638f4634c16d8df4508e847f14e9e43168b8",
-                "reference": "d0cd638f4634c16d8df4508e847f14e9e43168b8",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/c79c051f5b3a46be09205c73b80b346e4153e494",
+                "reference": "c79c051f5b3a46be09205c73b80b346e4153e494",
                 "shasum": ""
             },
             "require": {
@@ -555,20 +555,20 @@
                 "portable",
                 "shim"
             ],
-            "time": "2018-08-06T14:22:27+00:00"
+            "time": "2018-09-21T13:07:52+00:00"
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.4.15",
+            "version": "v3.4.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "c2f4812ead9f847cb69e90917ca7502e6892d6b8"
+                "reference": "640b6c27fed4066d64b64d5903a86043f4a4de7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/c2f4812ead9f847cb69e90917ca7502e6892d6b8",
-                "reference": "c2f4812ead9f847cb69e90917ca7502e6892d6b8",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/640b6c27fed4066d64b64d5903a86043f4a4de7f",
+                "reference": "640b6c27fed4066d64b64d5903a86043f4a4de7f",
                 "shasum": ""
             },
             "require": {
@@ -614,7 +614,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2018-08-10T07:34:36+00:00"
+            "time": "2018-10-02T16:33:53+00:00"
         },
         {
             "name": "tburry/pquery",
@@ -870,16 +870,16 @@
         },
         {
             "name": "vanilla/garden-schema",
-            "version": "v1.9",
+            "version": "v1.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-schema.git",
-                "reference": "3370db6fe8a2987813a28e64e3afdf95cb3b9443"
+                "reference": "89fcb21ee27ff7dbe8ea85cee7ef38f572e51aa4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/3370db6fe8a2987813a28e64e3afdf95cb3b9443",
-                "reference": "3370db6fe8a2987813a28e64e3afdf95cb3b9443",
+                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/89fcb21ee27ff7dbe8ea85cee7ef38f572e51aa4",
+                "reference": "89fcb21ee27ff7dbe8ea85cee7ef38f572e51aa4",
                 "shasum": ""
             },
             "require": {
@@ -905,7 +905,7 @@
                 }
             ],
             "description": "A simple data validation and cleaning library based on JSON Schema.",
-            "time": "2018-06-26T20:36:25+00:00"
+            "time": "2018-11-08T18:07:38+00:00"
         },
         {
             "name": "vanilla/htmlawed",
@@ -1272,16 +1272,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.0.3",
+            "version": "v4.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "bd088dc940a418f09cda079a9b5c7c478890fb8d"
+                "reference": "d0230c5c77a7e3cfa69446febf340978540958c0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/bd088dc940a418f09cda079a9b5c7c478890fb8d",
-                "reference": "bd088dc940a418f09cda079a9b5c7c478890fb8d",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/d0230c5c77a7e3cfa69446febf340978540958c0",
+                "reference": "d0230c5c77a7e3cfa69446febf340978540958c0",
                 "shasum": ""
             },
             "require": {
@@ -1297,7 +1297,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "4.0-dev"
+                    "dev-master": "4.1-dev"
                 }
             },
             "autoload": {
@@ -1319,7 +1319,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2018-07-15T17:25:16+00:00"
+            "time": "2018-10-10T09:24:14+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -2591,16 +2591,16 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.3.1",
+            "version": "3.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "628a481780561150481a9ec74709092b9759b3ec"
+                "reference": "6ad28354c04b364c3c71a34e4a18b629cc3b231e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/628a481780561150481a9ec74709092b9759b3ec",
-                "reference": "628a481780561150481a9ec74709092b9759b3ec",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/6ad28354c04b364c3c71a34e4a18b629cc3b231e",
+                "reference": "6ad28354c04b364c3c71a34e4a18b629cc3b231e",
                 "shasum": ""
             },
             "require": {
@@ -2638,20 +2638,20 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2018-07-26T23:47:18+00:00"
+            "time": "2018-09-23T23:08:17+00:00"
         },
         {
             "name": "symfony/css-selector",
-            "version": "v3.4.15",
+            "version": "v3.4.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/css-selector.git",
-                "reference": "edda5a6155000ff8c3a3f85ee5c421af93cca416"
+                "reference": "3503415d4aafabc31cd08c3a4ebac7f43fde8feb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/css-selector/zipball/edda5a6155000ff8c3a3f85ee5c421af93cca416",
-                "reference": "edda5a6155000ff8c3a3f85ee5c421af93cca416",
+                "url": "https://api.github.com/repos/symfony/css-selector/zipball/3503415d4aafabc31cd08c3a4ebac7f43fde8feb",
+                "reference": "3503415d4aafabc31cd08c3a4ebac7f43fde8feb",
                 "shasum": ""
             },
             "require": {
@@ -2691,7 +2691,7 @@
             ],
             "description": "Symfony CssSelector Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T09:06:28+00:00"
+            "time": "2018-10-02T16:33:53+00:00"
         },
         {
             "name": "theseer/tokenizer",
@@ -2761,21 +2761,22 @@
         },
         {
             "name": "voku/html-min",
-            "version": "3.0.3",
+            "version": "3.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/HtmlMin.git",
-                "reference": "52b680a8ee979d9cf5b397b4c136d368773cab35"
+                "reference": "58d870b95ca52bc9f55f91baed784556c2ca4a13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/HtmlMin/zipball/52b680a8ee979d9cf5b397b4c136d368773cab35",
-                "reference": "52b680a8ee979d9cf5b397b4c136d368773cab35",
+                "url": "https://api.github.com/repos/voku/HtmlMin/zipball/58d870b95ca52bc9f55f91baed784556c2ca4a13",
+                "reference": "58d870b95ca52bc9f55f91baed784556c2ca4a13",
                 "shasum": ""
             },
             "require": {
+                "ext-dom": "*",
                 "php": ">=7.0.0",
-                "voku/simple_html_dom": "^4.1.4"
+                "voku/simple_html_dom": "^4.1.7"
             },
             "require-dev": {
                 "phpunit/phpunit": "~6.0"
@@ -2805,23 +2806,26 @@
                 "html",
                 "minifier"
             ],
-            "time": "2018-05-08T13:21:25+00:00"
+            "time": "2018-10-17T19:56:12+00:00"
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.1.5",
+            "version": "4.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "b8fd3094da6be3a5fda2a17642f12b81bc24cb71"
+                "reference": "935663ebc6917f4db45c7e613b5e8cb84cabac59"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/b8fd3094da6be3a5fda2a17642f12b81bc24cb71",
-                "reference": "b8fd3094da6be3a5fda2a17642f12b81bc24cb71",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/935663ebc6917f4db45c7e613b5e8cb84cabac59",
+                "reference": "935663ebc6917f4db45c7e613b5e8cb84cabac59",
                 "shasum": ""
             },
             "require": {
+                "ext-dom": "*",
+                "ext-libxml": "*",
+                "ext-simplexml": "*",
                 "php": ">=7.0.0",
                 "symfony/css-selector": "~3.0|~4.0"
             },
@@ -2861,7 +2865,7 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2018-05-09T23:22:11+00:00"
+            "time": "2018-10-17T19:23:47+00:00"
         },
         {
             "name": "webmozart/assert",

@@ -21,6 +21,11 @@ class Gdn_UploadImage extends Gdn_Upload {
     const PNG_COMPRESSION = 9;
 
     /**
+     * Maximum allowed crop size.
+     */
+    const MAX_CROP_SIZE = 10000;
+
+    /**
      * Check that we have the necessary tools to allow image uploading.
      *
      * @return bool
@@ -108,6 +113,7 @@ class Gdn_UploadImage extends Gdn_Upload {
      * @param int An integer value indicating the maximum allowed height of the image (in pixels).
      * @param int An integer value indicating the maximum allowed width of the image (in pixels).
      * @param array Options additional options for saving the image.
+     * @throws Exception If the crop size is over the maximum allowed size.
      *  - <b>Crop</b>: Image proportions will always remain constrained. The Crop parameter is a boolean value indicating if the image should be cropped when one dimension (height or width) goes beyond the constrained proportions.
      *  - <b>OutputType</b>: The format in which the output image should be saved. Options are: jpg, png, and gif. Default is jpg.
      *  - <b>ImageQuality</b>: An integer value representing the qualityof the saved image. Ranging from 0 (worst quality, smaller file) to 100 (best quality, biggest file).
@@ -118,7 +124,13 @@ class Gdn_UploadImage extends Gdn_Upload {
         $crop = false;
         $outputType = '';
         $imageQuality = c('Garden.UploadImage.Quality', 100);
+        $imageDimension = array('SourceX', 'SourceY', 'SourceWidth', 'SourceHeight');
 
+        foreach($options as $key => $value) {
+            if (in_array($key, $imageDimension) && $value > self::MAX_CROP_SIZE) {
+                throw new Exception($key . ' value of ' . $value . ' is greater than the allowed size');
+            }
+        }
         // Make function work like it used to.
         $args = func_get_args();
         $saveGif = false;

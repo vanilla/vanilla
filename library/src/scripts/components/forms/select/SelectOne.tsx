@@ -8,18 +8,10 @@ import * as React from "react";
 import Select from "react-select";
 import { getRequiredID, IOptionalComponentID } from "@library/componentIDs";
 import classNames from "classnames";
-import { t } from "@library/application";
-import menuList from "@library/components/forms/select/overwrites/menuList";
-import menu from "@library/components/forms/select/overwrites/menu";
-import selectContainer from "@library/components/forms/select/overwrites/selectContainer";
-import doNotRender from "@library/components/forms/select/overwrites/doNotRender";
 import Paragraph from "@library/components/Paragraph";
-import SelectOption from "@library/components/forms/select/overwrites/selectOption";
 import { IFieldError } from "@library/@types/api";
 import ErrorMessages from "@library/components/forms/ErrorMessages";
-import valueContainer from "@library/components/forms/select/overwrites/valueContainer";
-import controlContainer from "@library/components/forms/select/overwrites/controlContainer";
-import noOptionsMessage from "./overwrites/noOptionsMessage";
+import * as selectOverrides from "./overwrites";
 import { IComboBoxOption } from "./SearchBar";
 
 interface IProps extends IOptionalComponentID {
@@ -95,14 +87,12 @@ export default class SelectOne extends React.Component<IProps> {
     * Overwrite components in Select component
     */
     private componentOverwrites = {
-        IndicatorsContainer: doNotRender,
-        SelectContainer: selectContainer,
-        Menu: menu,
-        MenuList: menuList,
-        Option: SelectOption,
-        ValueContainer: valueContainer,
-        Control: controlContainer,
-        NoOptionsMessage: noOptionsMessage,
+        IndicatorsContainer: selectOverrides.NullComponent,
+        Menu: selectOverrides.Menu,
+        MenuList: selectOverrides.MenuList,
+        Option: selectOverrides.SelectOption,
+        ValueContainer: selectOverrides.ValueContainer,
+        NoOptionsMessage: selectOverrides.NoOptionsMessage,
     };
 
     /**

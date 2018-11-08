@@ -12,15 +12,8 @@ import classNames from "classnames";
 import { t } from "@library/application";
 import Button from "@library/components/forms/Button";
 import Heading from "@library/components/Heading";
-import { clearIndicator } from "@library/components/forms/select/overwrites/clearIndicator";
-import SearchResultOption from "@library/components/forms/select/overwrites/searchResultOption";
-import menuList from "@library/components/forms/select/overwrites/menuList";
-import menu from "@library/components/forms/select/overwrites/menu";
-import selectContainer from "@library/components/forms/select/overwrites/selectContainer";
-import doNotRender from "@library/components/forms/select/overwrites/doNotRender";
-import { ReactNode } from "react";
-import noOptionsMessage from "./overwrites/noOptionsMessage";
-import { ActionMeta, InputActionTypes } from "react-select/lib/types";
+import { InputActionMeta } from "react-select/lib/types";
+import * as selectOverrides from "./overwrites";
 
 export interface IComboBoxOption {
     value: string | number;
@@ -38,7 +31,7 @@ interface IProps extends IOptionalComponentID {
     onChange: (option: IComboBoxOption | null) => void;
     isBigInput?: boolean;
     noHeading: boolean;
-    title: ReactNode;
+    title: React.ReactNode;
 }
 
 interface IState {
@@ -89,7 +82,7 @@ export default class BigSearch extends React.Component<IProps, IState> {
                 id={this.id}
                 inputId={this.searchInputID}
                 inputValue={this.state.inputValue}
-                onInputChange={this.handleInputChange as any} // The d.ts file for this is wrong!
+                onInputChange={this.handleInputChange}
                 components={this.componentOverwrites}
                 isClearable={true}
                 isDisabled={disabled}
@@ -107,8 +100,8 @@ export default class BigSearch extends React.Component<IProps, IState> {
         );
     }
 
-    private handleInputChange = (value: string, reason: string) => {
-        if (reason !== "input-blur") {
+    private handleInputChange = (value: string, reason: InputActionMeta) => {
+        if (!["input-blur", "menu-close"].includes(reason.action)) {
             this.setState({ inputValue: value });
         }
     };
@@ -175,13 +168,12 @@ export default class BigSearch extends React.Component<IProps, IState> {
     */
     private componentOverwrites = {
         Control: this.searchControl,
-        IndicatorSeparator: doNotRender,
-        DropdownIndicator: doNotRender,
-        ClearIndicator: clearIndicator,
-        SelectContainer: selectContainer,
-        Menu: menu,
-        MenuList: menuList,
-        Option: SearchResultOption,
-        NoOptionsMessage: noOptionsMessage,
+        IndicatorSeparator: selectOverrides.NullComponent,
+        DropdownIndicator: selectOverrides.NullComponent,
+        ClearIndicator: selectOverrides.ClearIndicator,
+        Menu: selectOverrides.Menu,
+        MenuList: selectOverrides.MenuList,
+        Option: selectOverrides.SearchResultOption,
+        NoOptionsMessage: selectOverrides.NoOptionsMessage,
     };
 }

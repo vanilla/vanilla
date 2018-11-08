@@ -24,6 +24,8 @@ $flyout_border:                         1px solid $theme-border_color !default;
 $flyout_borderRadius:                   $global_borderRadius !default;
 $flyout_boxShadow:                      0 5px 10px 0 rgba($global-color_black, 0.15) !default;
 
+$flyout-progress_size:                  24px;
+
 /* -------------------------------------------------------------- *\
     Styles
 \* -------------------------------------------------------------- */
@@ -55,6 +57,22 @@ $flyout_boxShadow:                      0 5px 10px 0 rgba($global-color_black, 0
     select {
         border-color: $formElement_borderColor;
         color: $formElement_color;
+    }
+
+    .InProgress {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: $flyout-progress_size * 2;
+        width: 100%;
+        padding-top: $flyout-progress_size;
+        padding-bottom: $flyout-progress_size;
+    
+        &::after {
+            @include spinnerLoader($flyout-progress_size, 4px);
+            content: '';
+        }
     }
 }
 

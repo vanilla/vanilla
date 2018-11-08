@@ -126,7 +126,7 @@ class Gdn_UploadImage extends Gdn_Upload {
         $imageQuality = c('Garden.UploadImage.Quality', 100);
         $imageDimension = array('SourceX', 'SourceY', 'SourceWidth', 'SourceHeight');
 
-        foreach($options as $key => $value) {
+        foreach ($options as $key => $value) {
             if (in_array($key, $imageDimension) && $value > self::MAX_CROP_SIZE) {
                 throw new Exception($key . ' value of ' . $value . ' is greater than the allowed size');
             }

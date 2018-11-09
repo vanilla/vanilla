@@ -171,6 +171,9 @@ export default class Modal extends React.Component<IProps, IState> {
         }
         const prevFocussedElement = Modal.focusHistory.pop() || document.body;
         prevFocussedElement.focus();
+        setImmediate(() => {
+            prevFocussedElement.focus();
+        });
     }
 
     /**

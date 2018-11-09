@@ -32,9 +32,9 @@ export interface IPopoverControllerProps {
     onVisibilityChange?: () => void;
     renderAbove?: boolean;
     renderLeft?: boolean;
-    setButtonElement?: (buttonElement: HTMLElement) => void;
     PopoverController?: string;
     toggleButtonClassName?: string;
+    setExternalButtonRef?: (ref: React.RefObject<HTMLButtonElement>) => void;
 }
 
 export interface IPopoverControllerPropsWithIcon extends IPopoverControllerProps {
@@ -143,6 +143,9 @@ export default class PopoverController extends React.PureComponent<
             this.closeMenuHandler,
         );
         this.escapeListener.start();
+        if (this.props.setExternalButtonRef) {
+            this.props.setExternalButtonRef(this.buttonRef);
+        }
     }
 
     /**
@@ -175,9 +178,6 @@ export default class PopoverController extends React.PureComponent<
         this.setState((prevState: IState) => {
             return { isVisible: !prevState.isVisible };
         });
-        if (this.props.setButtonElement) {
-            this.props.setButtonElement(e.current);
-        }
     };
 
     /**

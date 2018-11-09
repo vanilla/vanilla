@@ -46,14 +46,6 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
         this.cancelRef = React.createRef();
     }
 
-    public get titleID() {
-        return this.id + "-title";
-    }
-
-    public componentDidMount() {
-        this.forceUpdate();
-    }
-
     public render() {
         const { onCancel, onConfirm, srOnlyTitle, isConfirmLoading, title, children } = this.props;
         return (
@@ -84,5 +76,13 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                 </Frame>
             </Modal>
         );
+    }
+
+    public get titleID() {
+        return this.id + "-title";
+    }
+
+    public componentDidMount() {
+        this.forceUpdate();
     }
 }

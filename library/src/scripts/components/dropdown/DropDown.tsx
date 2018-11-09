@@ -24,8 +24,8 @@ export interface IProps {
     buttonClassName?: string;
     buttonBaseClass?: ButtonBaseClass;
     disabled?: boolean;
-    setButtonElement?: (buttonElement: HTMLElement) => void;
     toggleButtonClassName?: string;
+    setExternalButtonRef?: (ref: React.RefObject<HTMLButtonElement>) => void;
 }
 
 export interface IState {
@@ -66,7 +66,7 @@ export default class DropDown extends React.Component<IProps, IState> {
                 buttonClassName={this.props.buttonClassName}
                 selectedItemLabel={this.selectedText}
                 disabled={this.props.disabled}
-                setButtonElement={this.props.setButtonElement}
+                setExternalButtonRef={this.props.setExternalButtonRef}
                 toggleButtonClassName={this.props.toggleButtonClassName}
             >
                 {params => {

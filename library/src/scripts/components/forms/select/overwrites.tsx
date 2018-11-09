@@ -8,7 +8,7 @@ import * as React from "react";
 import classNames from "classnames";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
-import { clear, close } from "@library/components/Icons";
+import { clear, close } from "@library/components/icons";
 import { components } from "react-select";
 import ButtonLoader from "@library/components/ButtonLoader";
 import { OptionProps } from "react-select/lib/components/Option";

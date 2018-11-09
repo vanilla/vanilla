@@ -13,10 +13,12 @@ import Tokens from "@library/components/forms/select/Tokens";
 import { t } from "@library/application";
 import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 import { dummyAuthors } from "@knowledge/modules/search/state/dummyAuthors";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus, IUserFragment } from "@library/@types/api";
 
 interface IProps extends IInjectableSuggestionsProps {
     suggestionActions: UserSuggestionActions;
+    onChange: (users: IComboBoxOption[]) => void;
+    value: IComboBoxOption[];
 }
 
 export class MultiUserInput extends React.Component<IProps> {
@@ -37,8 +39,8 @@ export class MultiUserInput extends React.Component<IProps> {
                 label={t("Author")}
                 options={options}
                 isLoading={suggestions.status === LoadStatus.LOADING || suggestions.status === LoadStatus.PENDING}
-                onChange={val => console.log(val)}
-                value={[]}
+                onChange={this.props.onChange}
+                value={this.props.value}
                 onInputChange={this.onInputChange}
             />
         );

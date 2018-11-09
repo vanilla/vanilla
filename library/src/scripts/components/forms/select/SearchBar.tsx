@@ -28,29 +28,21 @@ interface IProps extends IOptionalComponentID {
     options?: any[];
     loadOptions?: any[];
     value: string;
-    onChange: (option: IComboBoxOption | null) => void;
+    onChange: (value) => void;
     isBigInput?: boolean;
     noHeading: boolean;
     title: React.ReactNode;
 }
 
-interface IState {
-    inputValue: string;
-}
-
 /**
  * Implements the search bar component
  */
-export default class BigSearch extends React.Component<IProps, IState> {
+export default class BigSearch extends React.Component<IProps> {
     public static defaultProps = {
         disabled: false,
         isBigInput: false,
         noHeading: false,
         title: t("Search"),
-    };
-
-    public state = {
-        inputValue: "",
     };
 
     private id: string;
@@ -66,14 +58,7 @@ export default class BigSearch extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const { className, disabled, options } = this.props;
-
-        const value = this.props.value
-            ? {
-                  label: this.props.value,
-                  value: this.props.value,
-              }
-            : null;
+        const { className, disabled, options, value } = this.props;
 
         return (
             <CreatableSelect
@@ -81,7 +66,7 @@ export default class BigSearch extends React.Component<IProps, IState> {
                 value={value}
                 id={this.id}
                 inputId={this.searchInputID}
-                inputValue={this.state.inputValue}
+                inputValue={this.props.value}
                 onInputChange={this.handleInputChange}
                 components={this.componentOverwrites}
                 isClearable={true}
@@ -102,7 +87,7 @@ export default class BigSearch extends React.Component<IProps, IState> {
 
     private handleInputChange = (value: string, reason: InputActionMeta) => {
         if (!["input-blur", "menu-close"].includes(reason.action)) {
-            this.setState({ inputValue: value });
+            this.props.onChange(value);
         }
     };
 

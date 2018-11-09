@@ -11,7 +11,7 @@ import { guessOperatingSystem, OS } from "@library/utility";
 import classNames from "classnames";
 import { t } from "@library/application";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import { leftChevron, rightChevron } from "@library/components/Icons";
+import { leftChevron, rightChevron } from "@library/components/icons";
 
 interface IProps {
     value: Date;
@@ -29,6 +29,8 @@ export default class DateInput extends React.PureComponent<IProps> {
     };
 
     public render() {
+        // Attempt to use a native input on operating systems that have nice, accessible built in date pickers.
+        // EG. mobile
         const os = guessOperatingSystem();
         const useNativeInput = os === OS.ANDROID || os === OS.IOS;
 
@@ -44,7 +46,6 @@ export default class DateInput extends React.PureComponent<IProps> {
                 parseDate={parseDate}
                 overlayComponent={this.CustomOverlay}
                 onDayChange={this.props.onChange}
-                // showOverlay={true}
                 dayPickerProps={{
                     captionElement: this.CustomCaptionElement,
                     navbarElement: this.CustomNavBar,
@@ -58,14 +59,14 @@ export default class DateInput extends React.PureComponent<IProps> {
     }
 
     private renderNativeInput() {
-        return <input className="inputText" type="date" />;
+        // The native date input MUST have it's value in short ISO format, even it doesn't display that way.
+        const value = this.props.value ? this.props.value.toISOString().substr(0, 10) : undefined;
+        return <input className="inputText" type="date" onChange={this.handleNativeInputChange} value={value} />;
     }
 
     private handleNativeInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        this.props.onChange(new Date(event.target.value));
+        this.props.onChange(event.target.valueAsDate);
     };
-
-    private handleDayChange = (selectedDay: Date) => {};
 
     private CustomOverlay = ({ classNames: c, selectedDay, children, ...props }) => {
         const contentsClasses = classNames("dropDown-contents", "isOwnWidth", {

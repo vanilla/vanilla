@@ -12,16 +12,8 @@ import { clear, close } from "@library/components/Icons";
 import { components } from "react-select";
 import ButtonLoader from "@library/components/ButtonLoader";
 import { OptionProps } from "react-select/lib/components/Option";
-import BaseMenu, {
-    MenuProps,
-    MenuListComponentProps,
-    MenuList as BaseMenuList,
-} from "react-select/lib/components/Menu";
-import {
-    ContainerProps,
-    SelectContainer as BaseSelectContainer,
-    ValueContainerProps,
-} from "react-select/lib/components/containers";
+import { MenuProps, MenuListComponentProps } from "react-select/lib/components/Menu";
+import { ValueContainerProps } from "react-select/lib/components/containers";
 import DateTime from "@library/components/DateTime";
 import BreadCrumbString from "@library/components/BreadCrumbString";
 import { IndicatorProps } from "react-select/lib/components/indicators";

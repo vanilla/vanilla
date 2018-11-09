@@ -17,11 +17,12 @@ import * as selectOverrides from "./overwrites";
 import ButtonLoader from "@library/components/ButtonLoader";
 import { OptionProps } from "react-select/lib/components/Option";
 import { ISearchResult } from "@knowledge/@types/api";
+import Translate from "@library/components/translation/Translate";
 
-export interface IComboBoxOption {
+export interface IComboBoxOption<T = any> {
     value: string | number;
     label: string;
-    data?: any;
+    data?: T;
 }
 
 interface IProps extends IOptionalComponentID {
@@ -99,7 +100,7 @@ export default class BigSearch extends React.Component<IProps, IState> {
                 styles={this.customStyles}
                 backspaceRemovesValue={true}
                 createOptionPosition="first"
-                formatCreateLabel={inputValue => "Search for " + inputValue}
+                formatCreateLabel={this.createLabel}
             />
         );
     }
@@ -115,6 +116,10 @@ export default class BigSearch extends React.Component<IProps, IState> {
                 this.props.onSearch && this.props.onSearch();
             });
         }
+    };
+
+    private createLabel = (inputValue: string) => {
+        return <Translate source="Search for <0/>" c0={<strong>{inputValue}</strong>} />;
     };
 
     private handleInputChange = (value: string, reason: InputActionMeta) => {
@@ -182,46 +187,6 @@ export default class BigSearch extends React.Component<IProps, IState> {
         );
     };
 
-    /**
-     * Overwrite for the menuOption component in React Select
-     * @param props
-     */
-    private SearchResultOption = (props: OptionProps<any>) => {
-        const value = (props as any).data;
-        console.log(props);
-        // const hasLocationData = locationData && locationData.length > 0;
-
-        return (
-            <li className={classNames("suggestedTextInput-item")}>
-                <button
-                    {...props.innerProps}
-                    type="button"
-                    aria-label={value.label}
-                    className="suggestedTextInput-option"
-                >
-                    <span className="suggestedTextInput-head">
-                        <span className="suggestedTextInput-title">{props.children}</span>
-                    </span>
-                    {/* {dateUpdated &&
-                        hasLocationData && (
-                            <span className="suggestedTextInput-main">
-                                <span className="metas isFlexed">
-                                    {dateUpdated && (
-                                        <span className="meta">
-                                            <DateTime className="meta" timestamp={dateUpdated} />
-                                        </span>
-                                    )}
-                                    {hasLocationData && (
-                                        <BreadCrumbString className="meta">{locationData}</BreadCrumbString>
-                                    )}
-                                </span>
-                            </span>
-                        )} */}
-                </button>
-            </li>
-        );
-    };
-
     private preventFormSubmission = e => {
         e.preventDefault();
     };
@@ -234,7 +199,7 @@ export default class BigSearch extends React.Component<IProps, IState> {
         IndicatorSeparator: selectOverrides.NullComponent,
         Menu: selectOverrides.Menu,
         MenuList: selectOverrides.MenuList,
-        Option: this.SearchResultOption,
+        Option: selectOverrides.SelectOption,
         NoOptionsMessage: selectOverrides.NoOptionsMessage,
         ClearIndicator: selectOverrides.NullComponent,
         DropdownIndicator: selectOverrides.NullComponent,

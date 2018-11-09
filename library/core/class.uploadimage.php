@@ -124,7 +124,7 @@ class Gdn_UploadImage extends Gdn_Upload {
         $crop = false;
         $outputType = '';
         $imageQuality = c('Garden.UploadImage.Quality', 100);
-        $imageDimension = array('SourceX', 'SourceY', 'SourceWidth', 'SourceHeight');
+        $imageDimension = ['SourceX', 'SourceY', 'SourceWidth', 'SourceHeight'];
 
         foreach ($options as $key => $value) {
             if (in_array($key, $imageDimension) && $value > self::MAX_CROP_SIZE) {

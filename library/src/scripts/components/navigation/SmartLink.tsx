@@ -9,7 +9,7 @@ import { formatUrl } from "@library/application";
 import { NavLinkProps, NavLink } from "react-router-dom";
 import { LocationDescriptor } from "history";
 
-export const LinkContext = React.createContext(formatUrl(""));
+export const LinkContext = React.createContext(formatUrl("/"));
 
 interface IProps extends NavLinkProps {}
 
@@ -21,7 +21,7 @@ export default function SmartLink(props: IProps) {
 
                 if (href.startsWith(contextRoot)) {
                     let newTo: LocationDescriptor;
-                    let newPath = props.to.toString().replace(contextRoot, "");
+                    let newPath = props.to.toString().replace(window.location.origin, "");
 
                     if (typeof props.to === "string") {
                         newTo = {
@@ -36,6 +36,8 @@ export default function SmartLink(props: IProps) {
 
                     return <NavLink {...props} to={newTo} />;
                 } else {
+                    console.log("href", href);
+                    console.log("ctx", contextRoot);
                     return <a {...props} href={props.to.toString()} />;
                 }
             }}

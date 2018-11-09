@@ -14,8 +14,8 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { leftChevron, rightChevron } from "@library/components/icons";
 
 interface IProps {
-    value: Date;
-    onChange: (value: Date) => void;
+    value: string; // ISO formatted date
+    onChange: (value: string) => void;
     className?: string;
     alignment: "left" | "right";
 }
@@ -44,8 +44,9 @@ export default class DateInput extends React.PureComponent<IProps> {
                 placeholder="yyyy-mm-dd"
                 formatDate={formatDate}
                 parseDate={parseDate}
+                value={new Date(this.props.value)}
                 overlayComponent={this.CustomOverlay}
-                onDayChange={this.props.onChange}
+                onDayChange={this.handleDayChange}
                 dayPickerProps={{
                     captionElement: this.CustomCaptionElement,
                     navbarElement: this.CustomNavBar,
@@ -60,9 +61,13 @@ export default class DateInput extends React.PureComponent<IProps> {
 
     private renderNativeInput() {
         // The native date input MUST have it's value in short ISO format, even it doesn't display that way.
-        const value = this.props.value ? this.props.value.toISOString().substr(0, 10) : undefined;
+        const value = this.props.value ? this.props.value.substr(0, 10) : undefined;
         return <input className="inputText" type="date" onChange={this.handleNativeInputChange} value={value} />;
     }
+
+    private handleDayChange = (day: Date) => {
+        this.props.onChange(day.toISOString());
+    };
 
     private handleNativeInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         this.props.onChange(event.target.valueAsDate);

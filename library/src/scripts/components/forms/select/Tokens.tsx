@@ -58,6 +58,7 @@ export default class Tokens extends React.Component<IProps, IState> {
                         components={this.componentOverwrites}
                         onChange={this.props.onChange}
                         inputValue={this.state.inputValue}
+                        value={this.props.value}
                         onInputChange={this.handleInputChange}
                         isClearable={true}
                         isDisabled={disabled}

@@ -16,6 +16,8 @@ export interface IPopoverControllerChildParameters {
     initialFocusRef?: React.RefObject<any>;
     isVisible: boolean;
     closeMenuHandler(event?: React.SyntheticEvent<any>);
+    renderAbove?: boolean;
+    renderLeft?: boolean;
 }
 
 export interface IPopoverControllerProps {
@@ -28,6 +30,8 @@ export interface IPopoverControllerProps {
     buttonBaseClass: ButtonBaseClass;
     buttonClassName?: string;
     onVisibilityChange?: () => void;
+    renderAbove?: boolean;
+    renderLeft?: boolean;
 }
 
 export interface IPopoverControllerPropsWithIcon extends IPopoverControllerProps {
@@ -88,6 +92,8 @@ export default class PopoverController extends React.PureComponent<
                         initialFocusRef: this.initalFocusRef,
                         isVisible: this.state.isVisible,
                         closeMenuHandler: this.closeMenuHandler,
+                        renderAbove: this.props.renderAbove,
+                        renderLeft: this.props.renderLeft,
                     })}
             </div>
         );
@@ -166,6 +172,8 @@ export default class PopoverController extends React.PureComponent<
         if (event.detail && event.detail.firingKey && event.detail.firingKey === this.constructor.name) {
             return;
         }
+        event.stopPropagation();
+        event.preventDefault();
 
         this.props.onClose && this.props.onClose();
 

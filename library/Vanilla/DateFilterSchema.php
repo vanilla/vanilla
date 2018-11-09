@@ -238,10 +238,10 @@ class DateFilterSchema extends Schema {
 
         // Sort the operators so that the matches occur on the longest operators first.
         $sortedSimpleOperators = $this->simpleOperators;
-        usort($sortedSimpleOperators, function($a, $b) {
+        usort($sortedSimpleOperators, function ($a, $b) {
             if (strlen($a) > strlen($b)) {
                 return -1;
-            } else if (strlen($a) < strlen($b)) {
+            } elseif (strlen($a) < strlen($b)) {
                 return 1;
             }
             return 0;

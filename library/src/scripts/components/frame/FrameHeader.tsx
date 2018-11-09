@@ -8,10 +8,10 @@ import React from "react";
 import classNames from "classnames";
 
 import { t } from "@library/application";
-import { leftChevron } from "@library/components/Icons";
 import CloseButton from "@library/components/CloseButton";
 import Heading, { ICommonHeadingProps } from "@library/components/Heading";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import { leftChevron } from "@library/components/icons/common";
 
 interface ICommonFrameHeaderProps extends ICommonHeadingProps {
     closeFrame: () => void;

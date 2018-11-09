@@ -22,7 +22,7 @@ import {
     emojiGroup_objects,
     emojiGroup_symbols,
     emojiGroup_flags,
-} from "@rich-editor/components/icons";
+} from "@library/components/icons/emojiGroups";
 
 export const EMOJI_GROUPS = [
     {

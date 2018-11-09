@@ -7,12 +7,11 @@
 import React from "react";
 import { t } from "@library/application";
 import getStore from "@library/state/getStore";
-import { log, debug } from "@library/utility";
-import { delegateEvent, removeDelegatedEvent, setData } from "@library/dom";
+import { debug, log } from "@library/utility";
+import { delegateEvent, removeDelegatedEvent } from "@library/dom";
 import EmbedPopover from "@rich-editor/components/popovers/EmbedPopover";
 import EmojiPopover from "@rich-editor/components/popovers/EmojiPopover";
 import MentionToolbar from "@rich-editor/components/toolbars/MentionToolbar";
-import ParagraphToolbar from "@rich-editor/components/toolbars/ParagraphToolbar";
 import InlineToolbar from "@rich-editor/components/toolbars/InlineToolbar";
 import UploadButton from "@rich-editor/components/editor/pieces/EditorUploadButton";
 import { EditorProvider } from "@rich-editor/components/context";
@@ -22,19 +21,23 @@ import { actions } from "@rich-editor/state/instance/instanceActions";
 import { getIDForQuill, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import { IStoreState } from "@rich-editor/@types/store";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
-import Quill, { Sources, DeltaOperation } from "quill/core";
+import Quill, { DeltaOperation, Sources } from "quill/core";
 import { hot } from "react-hot-loader";
 import registerQuill from "@rich-editor/quill/registerQuill";
 import { uniqueId } from "lodash";
 import classNames from "classnames";
 import Permission from "@library/users/Permission";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
+import { Devices } from "@library/components/DeviceChecker";
+import ParagraphDropDown from "@rich-editor/components/toolbars/ParagraphDropDown";
+import ParagraphToolbar from "@rich-editor/components/toolbars/ParagraphToolbar";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
     isLoading?: boolean;
     onChange?: (newContent: DeltaOperation[]) => void;
     allowUpload: boolean;
+    device?: Devices;
 }
 
 interface ILegacyProps extends ICommonProps {
@@ -43,8 +46,8 @@ interface ILegacyProps extends ICommonProps {
 }
 
 interface INewProps extends ICommonProps {
-    legacyMode?: false;
     className?: string;
+    legacyMode: boolean;
 }
 
 type IProps = ILegacyProps | INewProps;
@@ -77,12 +80,17 @@ export class Editor extends React.Component<IProps> {
     public render() {
         // These items CANNOT be rendered before quill is ready, but the main text area is required for quill to render.
         // These should all re-render after componentDidMount calls forceUpdate().
+        let isMobile = false; // fallback for legacy: isMobile is always false
+        if (!this.props.legacyMode && this.props.device) {
+            isMobile = this.props.device === Devices.MOBILE;
+        }
+
         const quillDependantItems = this.quill && (
             <React.Fragment>
                 {!this.props.isLoading && (
                     <React.Fragment>
                         <InlineToolbar />
-                        <ParagraphToolbar />
+                        {!isMobile && <ParagraphToolbar />}
                         <MentionToolbar />
                     </React.Fragment>
                 )}
@@ -93,9 +101,16 @@ export class Editor extends React.Component<IProps> {
                         role="menubar"
                         aria-label={t("Inline Level Formatting Menu")}
                     >
-                        <li className="richEditor-menuItem u-richEditorHiddenOnMobile" role="menuitem">
-                            <EmojiPopover disabled={this.props.isLoading} />
-                        </li>
+                        {isMobile && (
+                            <li className="richEditor-menuItem" role="menuitem">
+                                <ParagraphDropDown disabled={this.props.isLoading} />
+                            </li>
+                        )}
+                        {!isMobile && (
+                            <li className="richEditor-menuItem u-richEditorHiddenOnMobile" role="menuitem">
+                                <EmojiPopover disabled={this.props.isLoading} renderAbove={!!this.props.legacyMode} />
+                            </li>
+                        )}
                         <Permission permission="uploads.add">
                             <li className="richEditor-menuItem" role="menuitem">
                                 <UploadButton disabled={this.props.isLoading} />
@@ -121,6 +136,7 @@ export class Editor extends React.Component<IProps> {
                     }}
                 >
                     <EditorDescriptions id={this.descriptionID} />
+                    {!this.props.legacyMode && quillDependantItems} {/* Menu above */}
                     <div className="richEditor-frame InputBox">
                         <div className="richEditor-textWrap" ref={this.quillMountRef}>
                             <div
@@ -131,7 +147,7 @@ export class Editor extends React.Component<IProps> {
                                 tabIndex={0}
                             />
                         </div>
-                        {quillDependantItems}
+                        {this.props.legacyMode && quillDependantItems} {/* Menu below */}
                     </div>
                 </EditorProvider>
             </ReduxProvider>
@@ -276,7 +292,7 @@ export class Editor extends React.Component<IProps> {
             return;
         }
 
-        const { legacyTextArea } = this.props;
+        const { legacyTextArea } = this.props as ILegacyProps;
         if (!legacyTextArea) {
             return;
         }
@@ -365,7 +381,7 @@ export class Editor extends React.Component<IProps> {
         if (!this.props.legacyMode) {
             return;
         }
-        const { legacyTextArea } = this.props;
+        const { legacyTextArea } = this.props as ILegacyProps;
 
         if (debug() && legacyTextArea) {
             legacyTextArea.addEventListener("paste", event => {

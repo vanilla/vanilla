@@ -851,6 +851,19 @@ $Construct
     ->column('UpdateIPAddress', 'ipaddress', true)
     ->set($Explicit, $Drop);
 
+$Construct
+    ->table("contentDraft")
+    ->primaryKey("draftID")
+    ->column("recordType", "varchar(64)", false, ["index", "index.record", "index.parentRecord"])
+    ->column("recordID", "int", true, "index.record")
+    ->column("parentRecordID", "int", true, "index.parentRecord")
+    ->column("attributes", "text")
+    ->column("insertUserID", "int", false, "index")
+    ->column("dateInserted", "datetime")
+    ->column("updateUserID", "int")
+    ->column("dateUpdated", "datetime")
+    ->set($Explicit, $Drop);
+
 // If the AllIPAddresses column exists, attempt to migrate legacy IP data to the UserIP table.
 if (!$captureOnly && $AllIPAddressesExists) {
     $limit = 10000;
@@ -951,6 +964,11 @@ touchFolder(PATH_CACHE.'/Smarty/compile');
 if (c('Plugins.TouchIcon.Uploaded')) {
     saveToConfig('Garden.TouchIcon', 'TouchIcon/apple-touch-icon.png');
     removeFromConfig('Plugins.TouchIcon.Uploaded');
+}
+
+// Remove AllowJSONP globally
+if (c('Garden.AllowJSONP')) {
+    removeFromConfig('Garden.AllowJSONP');
 }
 
 Gdn::router()->setRoute('apple-touch-icon.png', 'utility/showtouchicon', 'Internal');

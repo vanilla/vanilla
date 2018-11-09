@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { components } from "react-select";
-import CreatableSelect from "react-select/lib/Creatable";
+import AsyncCreatableSelect from "react-select/lib/AsyncCreatable";
 import { getRequiredID, IOptionalComponentID } from "@library/componentIDs";
 import classNames from "classnames";
 import { t } from "@library/application";
@@ -14,6 +14,9 @@ import Button from "@library/components/forms/Button";
 import Heading from "@library/components/Heading";
 import { InputActionMeta } from "react-select/lib/types";
 import * as selectOverrides from "./overwrites";
+import ButtonLoader from "@library/components/ButtonLoader";
+import { OptionProps } from "react-select/lib/components/Option";
+import { ISearchResult } from "@knowledge/@types/api";
 
 export interface IComboBoxOption {
     value: string | number;
@@ -26,18 +29,25 @@ interface IProps extends IOptionalComponentID {
     className?: string;
     placeholder: string;
     options?: any[];
-    loadOptions?: any[];
+    loadOptions?: (inputValue: string) => Promise<any>;
+    optionComponent: React.ComponentType;
     value: string;
-    onChange: (value) => void;
+    onChange: (value: string) => void;
     isBigInput?: boolean;
     noHeading: boolean;
     title: React.ReactNode;
+    isLoading: boolean;
+    onSearch: () => void;
+}
+
+interface IState {
+    forceMenuClosed: boolean;
 }
 
 /**
  * Implements the search bar component
  */
-export default class BigSearch extends React.Component<IProps> {
+export default class BigSearch extends React.Component<IProps, IState> {
     public static defaultProps = {
         disabled: false,
         isBigInput: false,
@@ -45,6 +55,9 @@ export default class BigSearch extends React.Component<IProps> {
         title: t("Search"),
     };
 
+    public state: IState = {
+        forceMenuClosed: false,
+    };
     private id: string;
     private prefix = "searchBar";
     private searchButtonID: string;
@@ -58,20 +71,24 @@ export default class BigSearch extends React.Component<IProps> {
     }
 
     public render() {
-        const { className, disabled, options, value } = this.props;
+        const { className, disabled, isLoading } = this.props;
 
         return (
-            <CreatableSelect
-                onChange={this.props.onChange}
-                value={value}
+            <AsyncCreatableSelect
                 id={this.id}
+                value={undefined}
+                onChange={this.handleOptionChange}
+                closeMenuOnSelect={false}
                 inputId={this.searchInputID}
                 inputValue={this.props.value}
                 onInputChange={this.handleInputChange}
                 components={this.componentOverwrites}
-                isClearable={true}
-                isDisabled={disabled}
-                options={options}
+                isClearable={false}
+                blurInputOnSelect={false}
+                controlShouldRenderValue={false}
+                isDisabled={disabled || isLoading}
+                loadOptions={this.props.loadOptions}
+                menuIsOpen={this.isMenuVisible}
                 classNamePrefix={this.prefix}
                 className={classNames(this.prefix, className)}
                 placeholder={this.props.placeholder}
@@ -81,21 +98,43 @@ export default class BigSearch extends React.Component<IProps> {
                 theme={this.getTheme}
                 styles={this.customStyles}
                 backspaceRemovesValue={true}
+                createOptionPosition="first"
+                formatCreateLabel={inputValue => "Search for " + inputValue}
             />
         );
     }
 
+    private get isMenuVisible(): boolean | undefined {
+        return this.state.forceMenuClosed || this.props.value.length === 0 ? false : undefined;
+    }
+
+    private handleOptionChange = (option: IComboBoxOption) => {
+        if (option) {
+            this.props.onChange(option.label);
+            this.setState({ forceMenuClosed: true }, () => {
+                this.props.onSearch && this.props.onSearch();
+            });
+        }
+    };
+
     private handleInputChange = (value: string, reason: InputActionMeta) => {
         if (!["input-blur", "menu-close"].includes(reason.action)) {
             this.props.onChange(value);
+            this.setState({ forceMenuClosed: false });
         }
     };
 
     private customStyles = {
-        option: () => ({}),
-        menu: base => {
-            return { ...base, backgroundColor: null, boxShadow: null };
+        option: (provided: React.CSSProperties) => ({
+            ...provided,
+        }),
+        menu: (provided: React.CSSProperties, state) => {
+            return { ...provided, backgroundColor: undefined, boxShadow: undefined };
         },
+        control: (provided: React.CSSProperties) => ({
+            ...provided,
+            borderWidth: 0,
+        }),
     };
 
     private getTheme = theme => {
@@ -109,10 +148,9 @@ export default class BigSearch extends React.Component<IProps> {
 
     /**
      * Overwrite for the Control component in react select
-     * Note that this is NOT a real react component and it needs to be defined here because we need to access the props from the plugin
      * @param props
      */
-    private searchControl = props => {
+    private SearchControl = props => {
         return (
             <form className="searchBar-form" onSubmit={this.preventFormSubmission}>
                 {!this.props.noHeading && (
@@ -137,10 +175,50 @@ export default class BigSearch extends React.Component<IProps> {
                         <components.Control {...props} />
                     </div>
                     <Button type="submit" id={this.searchButtonID} className="buttonPrimary searchBar-submitButton">
-                        {t("Search")}
+                        {this.props.isLoading ? <ButtonLoader /> : t("Search")}
                     </Button>
                 </div>
             </form>
+        );
+    };
+
+    /**
+     * Overwrite for the menuOption component in React Select
+     * @param props
+     */
+    private SearchResultOption = (props: OptionProps<any>) => {
+        const value = (props as any).data;
+        console.log(props);
+        // const hasLocationData = locationData && locationData.length > 0;
+
+        return (
+            <li className={classNames("suggestedTextInput-item")}>
+                <button
+                    {...props.innerProps}
+                    type="button"
+                    aria-label={value.label}
+                    className="suggestedTextInput-option"
+                >
+                    <span className="suggestedTextInput-head">
+                        <span className="suggestedTextInput-title">{props.children}</span>
+                    </span>
+                    {/* {dateUpdated &&
+                        hasLocationData && (
+                            <span className="suggestedTextInput-main">
+                                <span className="metas isFlexed">
+                                    {dateUpdated && (
+                                        <span className="meta">
+                                            <DateTime className="meta" timestamp={dateUpdated} />
+                                        </span>
+                                    )}
+                                    {hasLocationData && (
+                                        <BreadCrumbString className="meta">{locationData}</BreadCrumbString>
+                                    )}
+                                </span>
+                            </span>
+                        )} */}
+                </button>
+            </li>
         );
     };
 
@@ -152,13 +230,14 @@ export default class BigSearch extends React.Component<IProps> {
     * Overwrite components in Select component
     */
     private componentOverwrites = {
-        Control: this.searchControl,
+        Control: this.SearchControl,
         IndicatorSeparator: selectOverrides.NullComponent,
-        DropdownIndicator: selectOverrides.NullComponent,
-        ClearIndicator: selectOverrides.ClearIndicator,
         Menu: selectOverrides.Menu,
         MenuList: selectOverrides.MenuList,
-        Option: selectOverrides.SearchResultOption,
+        Option: this.SearchResultOption,
         NoOptionsMessage: selectOverrides.NoOptionsMessage,
+        ClearIndicator: selectOverrides.NullComponent,
+        DropdownIndicator: selectOverrides.NullComponent,
+        LoadingMessage: selectOverrides.OptionLoader,
     };
 }

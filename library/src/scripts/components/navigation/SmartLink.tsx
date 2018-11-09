@@ -36,8 +36,6 @@ export default function SmartLink(props: IProps) {
 
                     return <NavLink {...props} to={newTo} />;
                 } else {
-                    console.log("href", href);
-                    console.log("ctx", contextRoot);
                     return <a {...props} href={props.to.toString()} />;
                 }
             }}

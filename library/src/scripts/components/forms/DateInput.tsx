@@ -18,14 +18,25 @@ interface IProps {
     onChange: (value: string) => void;
     className?: string;
     alignment: "left" | "right";
+    disabledDays?: any; // See http://react-day-picker.js.org/examples/disabled
+}
+
+interface IState {
+    hasBadValue: boolean;
+    wasBlurred: boolean;
 }
 
 /**
  * Implements the DateRange component
  */
-export default class DateInput extends React.PureComponent<IProps> {
+export default class DateInput extends React.PureComponent<IProps, IState> {
     public static defaultProps: Partial<IProps> = {
         alignment: "left",
+    };
+
+    public state: IState = {
+        hasBadValue: false,
+        wasBlurred: false,
     };
 
     public render() {
@@ -38,22 +49,29 @@ export default class DateInput extends React.PureComponent<IProps> {
     }
 
     private renderReactInput() {
+        const value = this.props.value ? new Date(this.props.value) : undefined;
         return (
             <DayPickerInput
                 format="YYYY-MM-DD"
                 placeholder="yyyy-mm-dd"
                 formatDate={formatDate}
                 parseDate={parseDate}
-                value={new Date(this.props.value)}
+                value={value}
                 overlayComponent={this.CustomOverlay}
-                onDayChange={this.handleDayChange}
+                onDayChange={this.handleDateChange}
+                onChange={this.handleTextChange}
                 dayPickerProps={{
                     captionElement: this.CustomCaptionElement,
                     navbarElement: this.CustomNavBar,
+                    disabledDays: this.props.disabledDays,
                 }}
                 inputProps={{
-                    className: classNames("inputText", this.props.className),
+                    className: classNames("inputText", this.props.className, {
+                        isInvalid: this.state.hasBadValue && this.state.wasBlurred,
+                    }),
                     "aria-label": t("Date Input ") + "(yyyy-mm-dd)",
+                    onBlur: this.handleBlur,
+                    onFocus: this.handleFocus,
                 }}
             />
         );
@@ -65,8 +83,28 @@ export default class DateInput extends React.PureComponent<IProps> {
         return <input className="inputText" type="date" onChange={this.handleNativeInputChange} value={value} />;
     }
 
-    private handleDayChange = (day: Date) => {
-        this.props.onChange(day.toISOString());
+    private handleDateChange = (date?: Date) => {
+        if (date) {
+            this.setState({ hasBadValue: false });
+            this.props.onChange(date.toISOString());
+        } else {
+            // invalid date
+            this.setState({ hasBadValue: true });
+            this.props.onChange("");
+        }
+    };
+
+    private handleBlur = (event: React.FocusEvent) => {
+        this.setState({ wasBlurred: true });
+    };
+
+    private handleFocus = (event: React.FocusEvent) => {
+        this.setState({ wasBlurred: false });
+    };
+
+    private handleTextChange = (event: React.ChangeEvent<any>) => {
+        const date = new Date(event.target.value);
+        this.handleDateChange(date);
     };
 
     private handleNativeInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {

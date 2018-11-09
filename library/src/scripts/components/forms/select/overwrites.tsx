@@ -14,12 +14,9 @@ import ButtonLoader from "@library/components/ButtonLoader";
 import { OptionProps } from "react-select/lib/components/Option";
 import { MenuProps, MenuListComponentProps } from "react-select/lib/components/Menu";
 import { ValueContainerProps } from "react-select/lib/components/containers";
-import DateTime from "@library/components/DateTime";
-import BreadCrumbString from "@library/components/BreadCrumbString";
 import { IndicatorProps } from "react-select/lib/components/indicators";
 import { ControlProps } from "react-select/lib/components/Control";
 import { MultiValueRemoveProps } from "react-select/lib/components/MultiValue";
-import { ISearchResult } from "@knowledge/@types/api";
 
 /**
  * Overwrite for the ClearIndicator component in React Select
@@ -149,52 +146,6 @@ export function NoOptionsMessage(props: OptionProps<any>) {
         className: classNames("suggestedTextInput-noOptions", props.className),
     };
     return <components.NoOptionsMessage {...props} />;
-}
-
-/**
- * Overwrite for the menuOption component in React Select
- * @param props
- */
-export function SearchResultOption(props: OptionProps<ISearchResult>) {
-    const { dateUpdated, locationData } = props.getValue();
-    const hasLocationData = locationData && locationData.length > 0;
-    console.log(props.getValue());
-
-    const handleClick = e => {
-        e.preventDefault();
-        props.innerProps.onClick();
-    };
-
-    return (
-        <li className={classNames("suggestedTextInput-item")}>
-            <button
-                type="button"
-                // title={props.get}
-                aria-label={props.children}
-                className="suggestedTextInput-option"
-                onClick={handleClick}
-            >
-                <span className="suggestedTextInput-head">
-                    <span className="suggestedTextInput-title">{props.children}</span>
-                </span>
-                {dateUpdated &&
-                    hasLocationData && (
-                        <span className="suggestedTextInput-main">
-                            <span className="metas isFlexed">
-                                {dateUpdated && (
-                                    <span className="meta">
-                                        <DateTime className="meta" timestamp={dateUpdated} />
-                                    </span>
-                                )}
-                                {hasLocationData && (
-                                    <BreadCrumbString className="meta">{locationData}</BreadCrumbString>
-                                )}
-                            </span>
-                        </span>
-                    )}
-            </button>
-        </li>
-    );
 }
 
 export function NullComponent() {

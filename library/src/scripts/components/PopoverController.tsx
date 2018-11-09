@@ -211,12 +211,4 @@ export default class PopoverController extends React.PureComponent<
     private stopPropagation = e => {
         e.stopPropagation();
     };
-    // /**
-    //  * Set Ref to toggle button
-    //  */
-    // private setButtonRef = () => {
-    //     if (!!this.props.setButtonElement && !!this.setButtonElement && !!this.setButtonElement.current) {
-    //         this.props.setButtonElement(this.buttonRef.current);
-    //     }
-    // };
 }

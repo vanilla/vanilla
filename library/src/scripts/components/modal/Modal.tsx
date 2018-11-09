@@ -142,7 +142,6 @@ export default class Modal extends React.Component<IProps, IState> {
         }
         Modal.stack.push(this);
         this.forceUpdate();
-        console.log("Modal did mount (Modal.focusHistory): ", Modal.focusHistory);
     }
     /**
      * We need to check again for focus if the focus is by ref
@@ -158,7 +157,6 @@ export default class Modal extends React.Component<IProps, IState> {
      * Tear down setup from componentDidMount
      */
     public componentWillUnmount() {
-        console.log("Modal will unmount (Modal.focusHistory): ", Modal.focusHistory);
         // Set aria-hidden on page and reenable scrolling if we're removing the last modal
         Modal.stack.pop();
         if (Modal.stack.length === 0) {

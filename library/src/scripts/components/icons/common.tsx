@@ -154,7 +154,7 @@ export function categoryIcon(className?: string) {
             <title>{title}</title>
             <path
                 d="M9.369,3.164H14.75a.375.375,0,0,1,.375.375V13a.375.375,0,0,1-.375.375H1.25A.375.375,0,0,1,.875,13V1A.375.375,0,0,1,1.25.625H8a.375.375,0,0,1,.343.223ZM1.625,1.375v11.25h12.75V3.914H9.125a.375.375,0,0,1-.343-.223L7.756,1.375Z"
-                transform="translate(-0.875 -1)"
+                transform="translate(-0.875 -0.625)"
                 fill="currentColor"
             />
         </svg>

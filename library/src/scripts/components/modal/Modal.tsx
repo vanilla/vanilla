@@ -38,6 +38,10 @@ interface IModalHeadingDescription extends IModalCommonProps, IHeadingDescriptio
 
 type IProps = IModalTextDescription | IModalHeadingDescription;
 
+interface IState {
+    exitElementSet: boolean;
+}
+
 /**
  * An accessible Modal component.
  *
@@ -48,7 +52,7 @@ type IProps = IModalTextDescription | IModalHeadingDescription;
  * - Prevents scrolling of the body.
  * - Focuses the first focusable element in the Modal.
  */
-export default class Modal extends React.Component<IProps> {
+export default class Modal extends React.Component<IProps, IState> {
     public static defaultProps = {
         pageContainer: document.getElementById("page"),
         container: document.getElementById("modals"),
@@ -67,6 +71,10 @@ export default class Modal extends React.Component<IProps> {
     private get descriptionID() {
         return this.id + "-description";
     }
+
+    public state = {
+        exitElementSet: false,
+    };
 
     /**
      * Render the contents into a portal.
@@ -125,7 +133,6 @@ export default class Modal extends React.Component<IProps> {
      */
     public componentDidMount() {
         this.focusInitialElement();
-        this.setCloseFocusElement();
         this.props.pageContainer!.setAttribute("aria-hidden", true);
         disableBodyScroll(this.selfRef.current!);
 
@@ -141,12 +148,10 @@ export default class Modal extends React.Component<IProps> {
      * We need to check again for focus if the focus is by ref
      */
     public componentDidUpdate(prevProps: IProps) {
-        if (prevProps.elementToFocusOnExit !== this.props.elementToFocusOnExit) {
-            this.setCloseFocusElement();
-        }
         if (prevProps.elementToFocus !== this.props.elementToFocus) {
             this.focusInitialElement();
         }
+        this.setCloseFocusElement();
     }
 
     /**
@@ -185,8 +190,11 @@ export default class Modal extends React.Component<IProps> {
      */
     private setCloseFocusElement() {
         // if we need to rerender the component, we don't want to include a bad value in the focus history
-        if (this.props.elementToFocusOnExit) {
+        if (this.props.elementToFocusOnExit && !this.state.exitElementSet) {
             Modal.focusHistory.push(this.props.elementToFocusOnExit);
+            this.setState({
+                exitElementSet: true,
+            });
         }
     }
 

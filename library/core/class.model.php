@@ -967,17 +967,22 @@ class Gdn_Model extends Gdn_Pluggable {
      *
      * @param string $lockKey Cache key to be assigned.
      * @param int $gracePeriod Period of time the key will stay valid.
-     * @return bool $hasMasterKey Whether a master key has been assigned.
+     * @return bool Whether a master key has been assigned.
      */
-    protected static function buildCacheLock(string $lockKey, int $gracePeriod = 60):bool {
-        $hasMasterKey = null;
+    protected static function buildCacheLock(string $lockKey, int $gracePeriod = 60): bool {
+        static $hasMasterKey = null;
+        $masterKey = null;
 
         if (is_null($hasMasterKey)) {
             // First instance will receive the $master key and lock the record.
             $instanceKey = getmypid();
-            $masterKey = Gdn::cache()->add($lockKey, $instanceKey, [
+            $keyAdded = Gdn::cache()->add($lockKey, $instanceKey, [
                 Gdn_Cache::FEATURE_EXPIRY => $gracePeriod
             ]);
+
+            if ($keyAdded) {
+                $masterKey = Gdn::cache()->get($lockKey);
+            }
             $hasMasterKey = ($instanceKey == $masterKey);
         }
 
@@ -990,7 +995,7 @@ class Gdn_Model extends Gdn_Pluggable {
      * @param string $lockKey Cache key to be assigned.
      * @return bool $keyHasBeenRelease Whether a master key has been released.
      */
-    protected function releaseCacheLock($lockKey = ''):bool {
+    protected function releaseCacheLock($lockKey = ''): bool {
         $keyReleased = false;
 
         if (isset($lockKey)) {

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { RefObject } from "react";
 import { getRequiredID } from "@library/componentIDs";
 import classNames from "classnames";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
@@ -22,7 +22,7 @@ export interface IPopoverControllerChildParameters {
 
 export interface IPopoverControllerProps {
     id: string;
-    classNameRoot: string;
+    className?: string;
     buttonContents: React.ReactNode;
     disabled?: boolean;
     children: (props: IPopoverControllerChildParameters) => JSX.Element;
@@ -32,6 +32,9 @@ export interface IPopoverControllerProps {
     onVisibilityChange?: () => void;
     renderAbove?: boolean;
     renderLeft?: boolean;
+    setButtonElement?: (buttonElement: HTMLElement) => void;
+    PopoverController?: string;
+    toggleButtonClassName?: string;
 }
 
 export interface IPopoverControllerPropsWithIcon extends IPopoverControllerProps {
@@ -61,8 +64,12 @@ export default class PopoverController extends React.PureComponent<
     private focusWatcher: FocusWatcher;
     private escapeListener: EscapeListener;
 
+    public constructor(props) {
+        super(props);
+    }
+
     public render() {
-        const buttonClasses = classNames(this.props.buttonClassName, {
+        const buttonClasses = classNames(this.props.buttonClassName, this.props.toggleButtonClassName, {
             isOpen: this.state.isVisible,
         });
 
@@ -71,7 +78,7 @@ export default class PopoverController extends React.PureComponent<
         return (
             <div
                 id={this.state.id}
-                className={this.props.classNameRoot}
+                className={classNames("dropDown", this.props.className)}
                 ref={this.controllerRef}
                 onClick={this.stopPropagation}
             >
@@ -168,6 +175,9 @@ export default class PopoverController extends React.PureComponent<
         this.setState((prevState: IState) => {
             return { isVisible: !prevState.isVisible };
         });
+        if (this.props.setButtonElement) {
+            this.props.setButtonElement(e.current);
+        }
     };
 
     /**
@@ -201,4 +211,12 @@ export default class PopoverController extends React.PureComponent<
     private stopPropagation = e => {
         e.stopPropagation();
     };
+    // /**
+    //  * Set Ref to toggle button
+    //  */
+    // private setButtonRef = () => {
+    //     if (!!this.props.setButtonElement && !!this.setButtonElement && !!this.setButtonElement.current) {
+    //         this.props.setButtonElement(this.buttonRef.current);
+    //     }
+    // };
 }

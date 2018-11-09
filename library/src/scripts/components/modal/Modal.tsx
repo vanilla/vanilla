@@ -29,7 +29,7 @@ interface IModalCommonProps {
     children: React.ReactNode;
     elementToFocus?: HTMLElement;
     size: ModalSizes;
-    elementToFocusOnExit?: HTMLElement; // remove
+    elementToFocusOnExit: HTMLElement; // Should either be a specific element or use document.activeElement
 }
 
 interface IModalTextDescription extends IModalCommonProps, ITextDescription {}
@@ -66,11 +66,6 @@ export default class Modal extends React.Component<IProps> {
 
     private get descriptionID() {
         return this.id + "-description";
-    }
-
-    private constructor(props) {
-        super(props);
-        Modal.focusHistory.push(props.elementToFocusOnExit || document.activeElement);
     }
 
     /**
@@ -130,6 +125,7 @@ export default class Modal extends React.Component<IProps> {
      */
     public componentDidMount() {
         this.focusInitialElement();
+        this.setCloseFocusElement();
         this.props.pageContainer!.setAttribute("aria-hidden", true);
         disableBodyScroll(this.selfRef.current!);
 
@@ -138,13 +134,18 @@ export default class Modal extends React.Component<IProps> {
             document.addEventListener("keydown", this.handleDocumentEscapePress);
         }
         Modal.stack.push(this);
+        this.forceUpdate();
+        console.log("Modal did mount (Modal.focusHistory): ", Modal.focusHistory);
     }
     /**
      * We need to check again for focus if the focus is by ref
      */
     public componentDidUpdate(prevProps: IProps) {
+        if (prevProps.elementToFocusOnExit !== this.props.elementToFocusOnExit) {
+            this.setCloseFocusElement();
+        }
         if (prevProps.elementToFocus !== this.props.elementToFocus) {
-            this.focusInitialElement(true);
+            this.focusInitialElement();
         }
     }
 
@@ -152,6 +153,7 @@ export default class Modal extends React.Component<IProps> {
      * Tear down setup from componentDidMount
      */
     public componentWillUnmount() {
+        console.log("Modal will unmount (Modal.focusHistory): ", Modal.focusHistory);
         // Set aria-hidden on page and reenable scrolling if we're removing the last modal
         Modal.stack.pop();
         if (Modal.stack.length === 0) {
@@ -171,20 +173,20 @@ export default class Modal extends React.Component<IProps> {
     /**
      * Focus the initial element in the Modal.
      */
-    private focusInitialElement(replaceItemInHistory = false) {
-        let targetElement;
-        if (this.props.elementToFocus) {
-            targetElement = this.props.elementToFocus;
-        } else {
-            targetElement = this.tabHandler.getInitial();
+    private focusInitialElement() {
+        const focusElement = !!this.props.elementToFocus ? this.props.elementToFocus : this.tabHandler.getInitial();
+        if (focusElement) {
+            focusElement!.focus();
         }
-        targetElement = !!targetElement ? targetElement : document.body;
-        targetElement.focus();
-        if (replaceItemInHistory) {
-            // if we need to rerender the component, we don't want to include a bad value in the focus history
-            Modal.focusHistory[Modal.focusHistory.length - 1] = targetElement;
-        } else {
-            Modal.focusHistory.push(targetElement);
+    }
+
+    /**
+     * Set focus on element to target when we close the modal
+     */
+    private setCloseFocusElement() {
+        // if we need to rerender the component, we don't want to include a bad value in the focus history
+        if (this.props.elementToFocusOnExit) {
+            Modal.focusHistory.push(this.props.elementToFocusOnExit);
         }
     }
 

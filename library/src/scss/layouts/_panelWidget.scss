@@ -1,0 +1,28 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+.panelWidget {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding: {
+        top: $global-gutter_halfSize;
+        right: $global-gutter_halfSize;
+        bottom: $global-gutter_halfSize;
+        left: $global-gutter_halfSize;
+    }
+
+    &.hasNoHorizontalPadding {
+        padding: {
+            left: 0;
+            right: 0;
+        }
+    }
+
+    &.isSelfPadded {
+        padding: 0;
+    }
+}

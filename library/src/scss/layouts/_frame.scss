@@ -1,0 +1,132 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$frame-bgColor: $global-color_bg !default;
+$frame-large_width: 720px;
+$frame-medium_width: 516px;
+$frame-small_width: 375px;
+$frame-border_radius: $global-borderRadius;
+
+$frame_padding: 36px;
+
+$frame-header_minHeight: 60px;
+$frame-header_spacing: 12px;
+$frame-header_fontSize: $global-subTitle_fontSize;
+
+$frame-footer_minHeight: $frame-header_minHeight;
+$frame-footer_spacing: $frame-header_spacing;
+
+
+$frame-header_boxShadow: 0 1px 2px 0 $overlay_bgColor;
+$frame-footer_boxShadow: 0 -1px 2px 0 $overlay_bgColor;
+
+$frame-panel_minHeight: 500px;
+
+
+.frame {
+    @include shadow-modal;
+    position: relative;
+    background-color: $frame-bgColor;
+    border: {
+        style: solid;
+        width: 1px;
+        color: $overlay-border_color;
+        radius: $frame-border_radius;
+    }
+}
+
+.frameHeader {
+    display: flex;
+    position: relative;
+    align-items: center;
+    flex-wrap: nowrap;
+    width: 100%;
+    min-height: $frame-header_minHeight;
+    padding: $frame-header_spacing;
+    z-index: 1;
+
+    &.isShadowed {
+        box-shadow: $frame-header_boxShadow;
+    }
+}
+
+.frameHeader-backButton {
+    &.buttonIcon {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 1;
+        height: #{($global-large_fontSize * $global-condensed_lineHeight) - (2 * $frame-header_spacing)};
+        width: $icon_small_size;
+        margin: {
+            right: $utility-baseUnit;
+            left: -10px;
+        }
+    }
+}
+
+.frameHeader-heading {
+    flex-grow: 1;
+    font-size: $frame-header_fontSize;
+    text-overflow: ellipsis;
+}
+
+.frameHeader-closePosition {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 1;
+    height: $formElement-height;
+}
+
+.frameBody {
+    position: relative;
+    max-height: 100%;
+    padding: {
+        left: $utility-baseUnit * 2;
+        right: $utility-baseUnit * 2;
+    }
+
+    &.isSelfPadded {
+        padding: {
+            left: 0;
+            right: 0;
+        }
+    }
+}
+
+.frameBody-contents {
+    margin-bottom: $frame-header_spacing / 2;
+}
+
+.framePanel {
+    position: relative;
+    height: 100%;
+    background-color: $frame-bgColor;
+    overflow: auto;
+    max-height: calc(100vh - #{$frame-header_minHeight + $frame-footer_minHeight + $frame_padding * 2});
+
+}
+
+.frameFooter {
+    display: flex;
+    position: relative;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    padding: $frame-footer_spacing;
+    min-height: $frame-footer_minHeight;
+    z-index: 1;
+
+    &.isShadowed {
+        box-shadow: $frame-footer_boxShadow;
+    }
+
+    .button + .button {
+        margin-left: $utility-baseUnit * 2 - $formElement-borderWidth;
+    }
+}

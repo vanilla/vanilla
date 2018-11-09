@@ -10,7 +10,6 @@ import { getRequiredID } from "@library/componentIDs";
 import PopoverController from "@library/components/PopoverController";
 import DropDownContents from "./DropDownContents";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import classNames from "classnames";
 
 export interface IProps {
     id?: string;
@@ -25,6 +24,8 @@ export interface IProps {
     buttonClassName?: string;
     buttonBaseClass?: ButtonBaseClass;
     disabled?: boolean;
+    setButtonElement?: (buttonElement: HTMLElement) => void;
+    toggleButtonClassName?: string;
 }
 
 export interface IState {
@@ -58,13 +59,15 @@ export default class DropDown extends React.Component<IProps, IState> {
         return (
             <PopoverController
                 id={this.id}
-                classNameRoot="dropDown"
+                className={this.props.className}
                 buttonBaseClass={this.props.buttonBaseClass || ButtonBaseClass.CUSTOM}
                 name={this.props.name}
                 buttonContents={this.props.buttonContents || dropDownMenu()}
                 buttonClassName={this.props.buttonClassName}
                 selectedItemLabel={this.selectedText}
                 disabled={this.props.disabled}
+                setButtonElement={this.props.setButtonElement}
+                toggleButtonClassName={this.props.toggleButtonClassName}
             >
                 {params => {
                     return (

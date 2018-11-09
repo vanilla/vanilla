@@ -50,8 +50,6 @@
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Footer
 \* -------------------------------------------------------------- */
-/* -------------------------------------------------------------- *    Embedded content
-\* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    user content
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Etc
@@ -1112,6 +1110,853 @@ body.isMobile .Popup.hasRichEditor .Border {
   bottom: 100%;
 }
 
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedResponsive {
+  text-align: center;
+}
+
+.embedResponsive-initialLink {
+  text-align: start;
+  padding: 14px;
+}
+
+.embedExternal {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  width: 640px;
+  position: relative;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  box-sizing: border-box;
+}
+
+.embedExternal-content {
+  position: relative;
+  margin: auto;
+  width: 640px;
+  max-width: 100%;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.embedExternal-content iframe {
+  display: block;
+  box-sizing: border-box !important;
+}
+
+.embedExternal-content > * {
+  margin: auto !important;
+}
+
+.embedExternal-ratio {
+  position: relative;
+  display: block;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+}
+
+.embedLinkLoader {
+  text-align: left;
+  display: block;
+}
+
+.embedLinkLoader-failIcon {
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  margin: 0;
+  vertical-align: -0.14em;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
+.embedLinkLoader-loader {
+  -webkit-transition-duration: opacity;
+          transition-duration: opacity;
+  -webkit-transition-timing-function: ease-out;
+          transition-timing-function: ease-out;
+  display: block;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  border-top: 3px solid #0291db;
+  border-right: 3px solid rgba(2, 145, 219, 0.3);
+  border-bottom: 3px solid rgba(2, 145, 219, 0.3);
+  border-left: 3px solid rgba(2, 145, 219, 0.3);
+  -webkit-transform: translateZ(0);
+          transform: translateZ(0);
+  -webkit-animation: spinnerLoader 0.7s infinite ease-in-out;
+          animation: spinnerLoader 0.7s infinite ease-in-out;
+  display: inline-block;
+  vertical-align: -0.14em;
+}
+
+.embedLinkLoader-loader::after {
+  border-radius: 50%;
+  width: 1em;
+  height: 1em;
+}
+
+.embedLinkLoader-link {
+  display: inline-block;
+  white-space: normal;
+  padding: 2px 4px;
+}
+
+.richEditor .embedExternal {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
+.richEditor .embedExternal-content,
+.richEditor .embedLinkLoader-link {
+  cursor: pointer;
+}
+
+.richEditor .embedExternal-content:after,
+.richEditor .embedLinkLoader-link:after {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  content: "";
+  -webkit-transition: 0.2s ease box-shadow;
+          transition: 0.2s ease box-shadow;
+}
+
+.richEditor .embedExternal-content:hover:after,
+.richEditor .embedLinkLoader-link:hover:after {
+  box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5) inset;
+}
+
+.richEditor .embedExternal-content:focus:after,
+.richEditor .embedLinkLoader-link:focus:after {
+  box-shadow: 0 0 0 2px #0291db inset;
+}
+
+.richEditor .embedExternal-content > *,
+.richEditor .embedLinkLoader-link > * {
+  pointer-events: none;
+}
+
+.embed-focusableElement {
+  cursor: pointer;
+}
+
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedVideo .embedExternal-content {
+  position: relative;
+  display: block;
+  width: 640px;
+  max-width: 100%;
+  margin: auto;
+}
+
+.embedVideo .embedExternal-content:focus .embedVideo-playIcon, .embedVideo .embedExternal-content:hover .embedVideo-playIcon {
+  -webkit-transform: scale(1.1);
+      -ms-transform: scale(1.1);
+          transform: scale(1.1);
+}
+
+.richEditor .embedVideo .embedExternal-content:focus .embedVideo-playIcon, .richEditor .embedVideo .embedExternal-content:hover .embedVideo-playIcon {
+  -webkit-transform: scale(1);
+      -ms-transform: scale(1);
+          transform: scale(1);
+}
+
+.embedVideo-iframe,
+.embedVideo-thumbnail {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.embedVideo-thumbnail {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  height: auto;
+  width: 100%;
+  background-color: black;
+}
+
+@supports (object-fit: cover) {
+  .embedVideo-thumbnail {
+    object-fit: cover;
+    object-position: center;
+    height: 100%;
+  }
+}
+
+.embedVideo-scrim {
+  content: "";
+  display: block;
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
+}
+
+.embedVideo-ratio {
+  position: relative;
+  display: block;
+  background-color: #000000;
+  margin: 0;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+}
+
+.embedVideo-ratio.is21by9 {
+  padding-top: 42.8571428571%;
+}
+
+.embedVideo-ratio.is16by9 {
+  padding-top: 56.25%;
+}
+
+.embedVideo-ratio.is4by3 {
+  padding-top: 75%;
+}
+
+.embedVideo-ratio.is1by1 {
+  padding-top: 100%;
+}
+
+.embedVideo-playButton {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.embedVideo-playIcon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 80px;
+  height: 80px;
+  color: white;
+}
+
+.embedVideo-playIconPath {
+  stroke: rgba(0, 0, 0, 0.1);
+}
+
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedImage .embedExternal-content {
+  width: auto;
+  max-width: 640px;
+}
+
+@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+  .embedImage .embedExternal-content {
+    width: 100%;
+  }
+}
+
+.Message img .embedImage-img,
+.embedImage-img {
+  display: block;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
+}
+
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedText {
+  font-size: 14px;
+}
+
+.embedText-content {
+  display: block;
+  background: #ffffff;
+  box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
+}
+
+.embedText-content, .embedText-content:hover, .embedText-content:focus {
+  color: inherit;
+  text-decoration: none !important;
+}
+
+.embedText-body {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  pointer-events: initial !important;
+}
+
+.embedText-main {
+  padding: 14px;
+  box-sizing: border-box;
+}
+
+.embedText-header {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.embedText-titleLink,
+.embedText-title {
+  display: block;
+  width: 100%;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.25;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.embedText-titleLink {
+  margin: 0;
+  color: inherit;
+}
+
+.embedText .embedText-title {
+  margin-top: 0 !important;
+  margin-right: 0;
+  margin-bottom: 4px;
+  margin-left: 0;
+}
+
+.richEditor .embedText-titleLink {
+  pointer-events: none;
+}
+
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedLink-image {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  margin-top: auto;
+  margin-bottom: auto;
+  width: 225px;
+}
+
+@supports (object-fit: cover) {
+  .embedLink-image {
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+}
+
+.embedLink-image + .embedText-main {
+  margin-left: auto;
+  width: -webkit-calc(100% - 225px);
+  width: calc(100% - 225px);
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-left-color: rgba(85, 90, 98, 0.1);
+}
+
+@media (max-width: 550px) {
+  .embedLink-image {
+    position: relative;
+    width: 100%;
+    padding-top: 0;
+  }
+  .embedLink-image + .embedText-main {
+    width: 100%;
+    border-right: none;
+  }
+}
+
+.embedLink-source {
+  font-size: 12px;
+  color: #6f737a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.embedLink-excerpt {
+  font-size: 14px;
+  color: #555A62;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  max-width: 100%;
+  margin-top: 4px;
+  line-height: 1.45;
+  max-height: 60.9px;
+  white-space: normal;
+}
+
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedQuote {
+  display: block;
+  width: 100%;
+}
+
+.embedQuote-content {
+  display: block;
+  width: 100%;
+}
+
+.embedQuote-header {
+  position: relative;
+}
+
+.embedQuote-userLink {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.embedQuote-userName {
+  margin: 0 0 0 6px;
+  padding: 0;
+  color: #6f737a;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.embedQuote-userPhoto {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 2px;
+}
+
+.embedQuote-excerpt {
+  white-space: normal;
+}
+
+.embedQuote-collapseButton {
+  position: absolute;
+  top: 0;
+  right: 8px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: auto;
+  height: 36px;
+  width: 36px;
+  opacity: 0.6;
+  padding: 0;
+}
+
+.embedQuote-collapseButton:active {
+  opacity: 1;
+}
+
+.embedQuote-collapseButton:focus {
+  opacity: 1;
+  outline: none;
+}
+
+.embedQuote-collapseButton:hover {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.embedQuote-title {
+  max-width: -webkit-calc(100% - 36px);
+  max-width: calc(100% - 36px);
+}
+
+.embedQuote-chevronUp,
+.embedQuote-chevronDown {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: .2em;
+}
+
+.embedQuote-dateTime {
+  font-size: 12px;
+  color: #6f737a;
+  margin-left: 12px;
+}
+
+.embedQuote-header {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  padding-top: 14px;
+  padding-left: 14px;
+  padding-right: 14px;
+  padding-bottom: 0;
+}
+
+.embedQuote-body {
+  display: block;
+  margin: 0;
+}
+
+.embedQuote-metaLink {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+}
+
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedLoader-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  -webkit-flex-basis: 24px;
+      -ms-flex-preferred-size: 24px;
+          flex-basis: 24px;
+}
+
+.embedLoader {
+  display: block;
+  position: relative;
+}
+
+.embedLoader-box {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  background: #FFFFFF;
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.3);
+  width: 135px;
+  height: 135px;
+  margin: auto;
+  overflow: hidden;
+}
+
+.embedLoader-loader {
+  -webkit-transition-duration: opacity;
+          transition-duration: opacity;
+  -webkit-transition-timing-function: ease-out;
+          transition-timing-function: ease-out;
+  display: block;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border-top: 3px solid #0291db;
+  border-right: 3px solid rgba(2, 145, 219, 0.3);
+  border-bottom: 3px solid rgba(2, 145, 219, 0.3);
+  border-left: 3px solid rgba(2, 145, 219, 0.3);
+  -webkit-transform: translateZ(0);
+          transform: translateZ(0);
+  -webkit-animation: spinnerLoader 0.7s infinite ease-in-out;
+          animation: spinnerLoader 0.7s infinite ease-in-out;
+}
+
+.embedLoader-loader::after {
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+}
+
+.embedLoader-error {
+  box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  overflow: hidden;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 15px;
+  background: #ffebeb;
+  -webkit-transition: 0.2s ease box-shadow;
+          transition: 0.2s ease box-shadow;
+  cursor: pointer;
+}
+
+.embedLoader-error:hover {
+  box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5) inset;
+}
+
+.embedLoader-error:focus {
+  box-shadow: 0 0 0 2px #0291db inset;
+}
+
+.embedLoader-error + .embedLoader-error {
+  margin-top: 12px;
+}
+
+.embedLoader-error .embedLoader-warningIcon {
+  -webkit-align-self: flex-start;
+      -ms-flex-item-align: start;
+          align-self: flex-start;
+}
+
+.embedLoader-error .closeButton {
+  opacity: 0.7;
+  width: 24px;
+  height: 24px;
+  -webkit-flex-basis: 24px;
+      -ms-flex-preferred-size: 24px;
+          flex-basis: 24px;
+  -webkit-align-self: flex-start;
+      -ms-flex-item-align: start;
+          align-self: flex-start;
+  margin: 0 0 0 auto;
+  cursor: pointer;
+  position: relative;
+}
+
+.embedLoader-error .closeButton, .embedLoader-error .closeButton:hover, .embedLoader-error .closeButton:focus {
+  background: none !important;
+  border: 0 !important;
+  color: inherit !important;
+  line-height: normal;
+  overflow: hidden;
+  padding: 0 !important;
+  -webkit-appearance: button !important;
+  /* for input */
+  -webkit-user-select: none !important;
+  /* for button */
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+.embedLoader-error .closeButton:hover, .embedLoader-error .closeButton:focus {
+  opacity: 1;
+}
+
+.embedLoader-error .closeButton .embedLoader-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.userContent .embedLoader-errorMessage {
+  max-width: -webkit-calc(100% - 72px);
+  max-width: calc(100% - 72px);
+  padding-left: 24px;
+}
+
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedGetty {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  margin: auto;
+}
+
+.embedGetty .getty {
+  display: block !important;
+  background-color: white;
+}
+
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedGiphy {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  margin: auto;
+}
+
+.embedGiphy .embedGiphy-iframe {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedInstagram {
+  width: auto;
+}
+
+.instagram-media {
+  margin-bottom: 0 !important;
+  width: 100% !important;
+}
+
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedImgur .embedExternal-content {
+  width: auto;
+}
+
+.embedImgur iframe {
+  max-width: 100%;
+}
+
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedTwitter .embedExternal-content {
+  border-radius: 4px;
+  width: auto;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+}
+
+.twitter-tweet {
+  margin: 0 auto !important;
+  min-width: 100% !important;
+}
+
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedSoundcloud {
+  position: relative;
+  width: 640px;
+}
+
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.embedInstagram {
+  width: auto;
+}
+
+.instagram-media {
+  margin-bottom: 0 !important;
+  width: 100% !important;
+}
+
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
@@ -1576,839 +2421,5 @@ body.isMobile .Popup.hasRichEditor .Border {
   white-space: pre;
   padding: 14px;
   border-radius: 0;
-}
-
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.embedResponsive {
-  text-align: center;
-}
-
-.embedResponsive-initialLink {
-  text-align: start;
-  padding: 14px;
-}
-
-.embedExternal {
-  display: block;
-  margin: 0 auto;
-  max-width: 100%;
-  width: 640px;
-  position: relative;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  box-sizing: border-box;
-}
-
-.embedExternal-content {
-  position: relative;
-  margin: auto;
-  width: 640px;
-  max-width: 100%;
-  text-align: center;
-  box-sizing: border-box;
-}
-
-.embedExternal-content iframe {
-  display: block;
-  box-sizing: border-box !important;
-}
-
-.embedExternal-content > * {
-  margin: auto !important;
-}
-
-.embedExternal-ratio {
-  position: relative;
-  display: block;
-  margin: 0;
-  width: 100%;
-  box-sizing: border-box;
-  padding-left: 0;
-  padding-right: 0;
-  padding-bottom: 0;
-}
-
-.embedLinkLoader {
-  text-align: left;
-  display: block;
-}
-
-.embedLinkLoader-failIcon {
-  display: inline-block;
-  height: 1em;
-  width: 1em;
-  margin: 0;
-  vertical-align: -0.14em;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-}
-
-.embedLinkLoader-loader {
-  -webkit-transition-duration: opacity;
-          transition-duration: opacity;
-  -webkit-transition-timing-function: ease-out;
-          transition-timing-function: ease-out;
-  display: block;
-  width: 1em;
-  height: 1em;
-  border-radius: 50%;
-  border-top: 3px solid #0291db;
-  border-right: 3px solid rgba(2, 145, 219, 0.3);
-  border-bottom: 3px solid rgba(2, 145, 219, 0.3);
-  border-left: 3px solid rgba(2, 145, 219, 0.3);
-  -webkit-transform: translateZ(0);
-          transform: translateZ(0);
-  -webkit-animation: spinnerLoader 0.7s infinite ease-in-out;
-          animation: spinnerLoader 0.7s infinite ease-in-out;
-  display: inline-block;
-  vertical-align: -0.14em;
-}
-
-.embedLinkLoader-loader::after {
-  border-radius: 50%;
-  width: 1em;
-  height: 1em;
-}
-
-.embedLinkLoader-link {
-  display: inline-block;
-  white-space: normal;
-}
-
-.richEditor .embedExternal {
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-}
-
-.richEditor .embedExternal-content,
-.richEditor .embedLinkLoader-link {
-  -webkit-transition: 0.2s ease box-shadow;
-          transition: 0.2s ease box-shadow;
-  cursor: pointer;
-}
-
-.richEditor .embedExternal-content:hover,
-.richEditor .embedLinkLoader-link:hover {
-  box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5);
-}
-
-.richEditor .embedExternal-content:focus,
-.richEditor .embedLinkLoader-link:focus {
-  box-shadow: 0 0 0 2px #0291db;
-}
-
-.richEditor .embedExternal-content > *,
-.richEditor .embedLinkLoader-link > * {
-  pointer-events: none;
-}
-
-.embed-focusableElement {
-  cursor: pointer;
-}
-
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.embedVideo .embedExternal-content {
-  position: relative;
-  display: block;
-  width: 640px;
-  max-width: 100%;
-  margin: auto;
-}
-
-.embedVideo .embedExternal-content:focus .embedVideo-playIcon, .embedVideo .embedExternal-content:hover .embedVideo-playIcon {
-  -webkit-transform: scale(1.1);
-      -ms-transform: scale(1.1);
-          transform: scale(1.1);
-}
-
-.richEditor .embedVideo .embedExternal-content:focus .embedVideo-playIcon, .richEditor .embedVideo .embedExternal-content:hover .embedVideo-playIcon {
-  -webkit-transform: scale(1);
-      -ms-transform: scale(1);
-          transform: scale(1);
-}
-
-.embedVideo-iframe,
-.embedVideo-thumbnail {
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-}
-
-.embedVideo-thumbnail {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  margin: auto;
-  height: auto;
-  width: 100%;
-  background-color: black;
-}
-
-@supports (object-fit: cover) {
-  .embedVideo-thumbnail {
-    object-fit: cover;
-    object-position: center;
-    height: 100%;
-  }
-}
-
-.embedVideo-scrim {
-  content: "";
-  display: block;
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));
-}
-
-.embedVideo-ratio {
-  position: relative;
-  display: block;
-  background-color: #000000;
-  margin: 0;
-  width: 100%;
-  padding-left: 0;
-  padding-right: 0;
-  padding-bottom: 0;
-}
-
-.embedVideo-ratio.is21by9 {
-  padding-top: 42.8571428571%;
-}
-
-.embedVideo-ratio.is16by9 {
-  padding-top: 56.25%;
-}
-
-.embedVideo-ratio.is4by3 {
-  padding-top: 75%;
-}
-
-.embedVideo-ratio.is1by1 {
-  padding-top: 100%;
-}
-
-.embedVideo-playButton {
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  cursor: pointer;
-  overflow: hidden;
-}
-
-.embedVideo-playIcon {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  width: 80px;
-  height: 80px;
-  color: white;
-}
-
-.embedVideo-playIconPath {
-  stroke: rgba(0, 0, 0, 0.1);
-}
-
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.embedImage .embedExternal-content {
-  width: auto;
-  max-width: 640px;
-}
-
-@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
-  .embedImage .embedExternal-content {
-    width: 100%;
-  }
-}
-
-.Message img .embedImage-img,
-.embedImage-img {
-  display: block;
-  position: relative;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 100%;
-}
-
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.embedText {
-  font-size: 14px;
-}
-
-.embedText-content {
-  display: block;
-  background: #ffffff;
-  box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
-}
-
-.embedText-content, .embedText-content:hover, .embedText-content:focus {
-  color: inherit;
-  text-decoration: none !important;
-}
-
-.embedText-body {
-  display: block;
-  position: relative;
-  overflow: hidden;
-  text-align: left;
-  pointer-events: initial !important;
-}
-
-.embedText-main {
-  padding: 14px;
-  box-sizing: border-box;
-}
-
-.embedText-header {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: start;
-  -webkit-justify-content: flex-start;
-      -ms-flex-pack: start;
-          justify-content: flex-start;
-  font-size: 14px;
-  line-height: 1.25;
-}
-
-.embedText-titleLink,
-.embedText-title {
-  display: block;
-  width: 100%;
-  padding: 0;
-  font-size: 14px;
-  line-height: 1.25;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.embedText-titleLink {
-  margin: 0;
-  color: inherit;
-}
-
-.embedText .embedText-title {
-  margin-top: -0.125em !important;
-  margin-right: 0;
-  margin-bottom: 6.3636363636px;
-  margin-left: 0;
-}
-
-.richEditor .embedText-titleLink {
-  pointer-events: none;
-}
-
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.embedLink-image {
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  margin-top: auto;
-  margin-bottom: auto;
-  width: 225px;
-}
-
-@supports (object-fit: cover) {
-  .embedLink-image {
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-  }
-}
-
-.embedLink-image + .embedText-main {
-  margin-left: auto;
-  width: -webkit-calc(100% - 225px);
-  width: calc(100% - 225px);
-  border-left-style: solid;
-  border-left-width: 1px;
-  border-left-color: rgba(85, 90, 98, 0.1);
-}
-
-@media (max-width: 550px) {
-  .embedLink-image {
-    position: relative;
-    width: 100%;
-    padding-top: 0;
-  }
-  .embedLink-image + .embedText-main {
-    width: 100%;
-    border-right: none;
-  }
-}
-
-.embedLink-source {
-  font-size: 12px;
-  color: #6f737a;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin: 0;
-}
-
-.embedLink-excerpt {
-  font-size: 14px;
-  color: #555A62;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-break: break-word;
-  max-width: 100%;
-  line-height: 1.5;
-  max-height: 63px;
-  white-space: normal;
-}
-
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.embedQuote {
-  display: block;
-  width: 100%;
-}
-
-.embedQuote-content {
-  display: block;
-  width: 100%;
-}
-
-.embedQuote-header {
-  position: relative;
-}
-
-.embedQuote-userLink {
-  display: -webkit-inline-box;
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-}
-
-.embedQuote-userName {
-  margin: 0 0 0 6px;
-  padding: 0;
-  color: #6f737a;
-  font-weight: 700;
-  font-size: 12px;
-}
-
-.embedQuote-userPhoto {
-  display: block;
-  width: 24px;
-  height: 24px;
-  border-radius: 2px;
-}
-
-.embedQuote-excerpt {
-  white-space: normal;
-}
-
-.embedQuote-collapseButton {
-  position: absolute;
-  top: 0;
-  right: 8px;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin-left: auto;
-  height: 36px;
-  width: 36px;
-  opacity: 0.6;
-  padding: 0;
-}
-
-.embedQuote-collapseButton:active {
-  opacity: 1;
-}
-
-.embedQuote-collapseButton:focus {
-  opacity: 1;
-  outline: none;
-}
-
-.embedQuote-collapseButton:hover {
-  opacity: 1;
-  cursor: pointer;
-}
-
-.embedQuote-title {
-  max-width: -webkit-calc(100% - 36px);
-  max-width: calc(100% - 36px);
-}
-
-.embedQuote-chevronUp,
-.embedQuote-chevronDown {
-  width: 24px;
-  height: 24px;
-  display: inline-block;
-  vertical-align: .2em;
-}
-
-.embedQuote-dateTime {
-  font-size: 12px;
-  color: #6f737a;
-  margin-left: 12px;
-}
-
-.embedQuote-header {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: start;
-  -webkit-justify-content: flex-start;
-      -ms-flex-pack: start;
-          justify-content: flex-start;
-  padding-top: 14px;
-  padding-left: 14px;
-  padding-right: 14px;
-  padding-bottom: 0;
-}
-
-.embedQuote-body {
-  display: block;
-  margin: 0;
-}
-
-.embedQuote-metaLink {
-  display: -webkit-inline-box;
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-}
-
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.embedLoader-icon {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  -webkit-flex-basis: 24px;
-      -ms-flex-preferred-size: 24px;
-          flex-basis: 24px;
-}
-
-.embedLoader {
-  display: block;
-  position: relative;
-}
-
-.embedLoader-box {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  background: #FFFFFF;
-  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.3);
-  width: 135px;
-  height: 135px;
-  margin: auto;
-  overflow: hidden;
-}
-
-.embedLoader-loader {
-  -webkit-transition-duration: opacity;
-          transition-duration: opacity;
-  -webkit-transition-timing-function: ease-out;
-          transition-timing-function: ease-out;
-  display: block;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border-top: 3px solid #0291db;
-  border-right: 3px solid rgba(2, 145, 219, 0.3);
-  border-bottom: 3px solid rgba(2, 145, 219, 0.3);
-  border-left: 3px solid rgba(2, 145, 219, 0.3);
-  -webkit-transform: translateZ(0);
-          transform: translateZ(0);
-  -webkit-animation: spinnerLoader 0.7s infinite ease-in-out;
-          animation: spinnerLoader 0.7s infinite ease-in-out;
-}
-
-.embedLoader-loader::after {
-  border-radius: 50%;
-  width: 42px;
-  height: 42px;
-}
-
-.embedLoader-error {
-  box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  overflow: hidden;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  list-style: none;
-  margin: 0;
-  padding: 15px;
-  background: #ffebeb;
-  -webkit-transition: 0.2s ease box-shadow;
-          transition: 0.2s ease box-shadow;
-  cursor: pointer;
-}
-
-.embedLoader-error:hover {
-  box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5);
-}
-
-.embedLoader-error:focus {
-  box-shadow: 0 0 0 2px #0291db;
-}
-
-.embedLoader-error + .embedLoader-error {
-  margin-top: 12px;
-}
-
-.embedLoader-error .embedLoader-warningIcon {
-  -webkit-align-self: flex-start;
-      -ms-flex-item-align: start;
-          align-self: flex-start;
-}
-
-.embedLoader-error .closeButton {
-  opacity: 0.7;
-  width: 24px;
-  height: 24px;
-  -webkit-flex-basis: 24px;
-      -ms-flex-preferred-size: 24px;
-          flex-basis: 24px;
-  -webkit-align-self: flex-start;
-      -ms-flex-item-align: start;
-          align-self: flex-start;
-  margin: 0 0 0 auto;
-  cursor: pointer;
-  position: relative;
-}
-
-.embedLoader-error .closeButton, .embedLoader-error .closeButton:hover, .embedLoader-error .closeButton:focus {
-  background: none !important;
-  border: 0 !important;
-  color: inherit !important;
-  line-height: normal;
-  overflow: hidden;
-  padding: 0 !important;
-  -webkit-appearance: button !important;
-  /* for input */
-  -webkit-user-select: none !important;
-  /* for button */
-  -moz-user-select: none !important;
-  -ms-user-select: none !important;
-}
-
-.embedLoader-error .closeButton:hover, .embedLoader-error .closeButton:focus {
-  opacity: 1;
-}
-
-.embedLoader-error .closeButton .embedLoader-icon {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.userContent .embedLoader-errorMessage {
-  max-width: -webkit-calc(100% - 72px);
-  max-width: calc(100% - 72px);
-  padding-left: 24px;
-}
-
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.embedGetty {
-  position: relative;
-  display: block;
-  max-width: 100%;
-  margin: auto;
-}
-
-.embedGetty .getty {
-  display: block !important;
-  background-color: white;
-}
-
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.embedGiphy {
-  position: relative;
-  display: block;
-  max-width: 100%;
-  margin: auto;
-}
-
-.embedGiphy .embedGiphy-iframe {
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-}
-
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.embedInstagram {
-  width: auto;
-}
-
-.instagram-media {
-  margin-bottom: 0 !important;
-  width: 100% !important;
-}
-
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.embedImgur .embedExternal-content {
-  width: auto;
-}
-
-.embedImgur iframe {
-  max-width: 100%;
-}
-
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.embedTwitter .embedExternal-content {
-  border-radius: 4px;
-  width: auto;
-  display: -webkit-inline-box;
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-}
-
-.twitter-tweet {
-  margin: 0 auto !important;
-  min-width: 100% !important;
-}
-
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.embedSoundcloud {
-  position: relative;
-  width: 640px;
-}
-
-/*!
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-.embedInstagram {
-  width: auto;
-}
-
-.instagram-media {
-  margin-bottom: 0 !important;
-  width: 100% !important;
 }
 /*# sourceMappingURL=style-compat.css.map */

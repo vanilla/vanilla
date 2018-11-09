@@ -36,7 +36,7 @@ export default class EmojiPopover extends React.Component<IProps, IRequiredCompo
         return (
             <PopoverController
                 id={this.state.id}
-                classNameRoot="emojiPicker"
+                className="emojiPicker"
                 buttonClassName="richEditor-button richEditor-embedButton"
                 onVisibilityChange={forceSelectionUpdate}
                 disabled={this.props.disabled}

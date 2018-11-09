@@ -22,6 +22,7 @@ interface IProps {
     onConfirm: () => void;
     children: React.ReactNode;
     isConfirmLoading?: boolean;
+    elementToFocusOnExit: HTMLElement;
 }
 
 interface IState {
@@ -61,6 +62,7 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                 elementToFocus={this.cancelRef.current}
                 exitHandler={onCancel}
                 titleID={this.titleID}
+                elementToFocusOnExit={this.props.elementToFocusOnExit}
             >
                 <Frame>
                     <FrameHeader titleID={this.titleID} closeFrame={onCancel} srOnlyTitle={srOnlyTitle!}>

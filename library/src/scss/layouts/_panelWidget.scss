@@ -15,6 +15,13 @@
         left: $global-gutter_halfSize;
     }
 
+    &.hasNoVerticalPadding {
+        padding: {
+            top: 0;
+            bottom: 0;
+        }
+    }
+
     &.hasNoHorizontalPadding {
         padding: {
             left: 0;

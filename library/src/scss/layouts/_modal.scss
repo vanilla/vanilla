@@ -34,3 +34,12 @@ $modal-border_radius: $global-borderRadius;
         width: $modal-small_width;
     }
 }
+
+.modal-pageHeader {
+    @include shadow-embed();
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: $formElement_height + $global-gutter_halfSize;
+    margin-bottom: $global_spacer * 1.5;
+}

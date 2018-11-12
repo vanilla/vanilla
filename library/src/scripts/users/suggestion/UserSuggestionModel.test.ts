@@ -38,7 +38,7 @@ function createSortTestData(basicData: SortProviderTuple[]): ISortTestData[] {
     });
 }
 
-describe("MentionModel", () => {
+describe("UserSuggestionModel", () => {
     let model: UserSuggestionModel;
 
     beforeEach(() => {
@@ -134,7 +134,7 @@ describe("MentionModel", () => {
             });
 
             it("Can save the user data", () => {
-                const trieValue = state.usersTrie.getValue("test");
+                const trieValue = state.trie.getValue("test");
                 expect(trieValue.status).deep.equals(LoadStatus.SUCCESS);
                 expect(trieValue.data!).deep.equals(users);
             });

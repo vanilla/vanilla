@@ -87,6 +87,7 @@ export default class BigSearch extends React.Component<IProps, IState> {
                 components={this.componentOverwrites}
                 isClearable={false}
                 blurInputOnSelect={false}
+                allowCreateWhileLoading={true}
                 controlShouldRenderValue={false}
                 isDisabled={disabled || isLoading}
                 loadOptions={this.props.loadOptions}

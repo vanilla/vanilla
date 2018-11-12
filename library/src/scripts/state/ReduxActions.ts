@@ -177,6 +177,12 @@ export default class ReduxActions {
             this.dispatch(actionCreators.error(error));
         }
     }
+
+    protected getState<T>(): T {
+        return this.dispatch((c, getState) => {
+            return getState();
+        });
+    }
 }
 
 // Action interfaces

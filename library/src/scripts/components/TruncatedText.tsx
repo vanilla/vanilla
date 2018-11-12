@@ -24,9 +24,9 @@ export default class TruncatedText extends React.PureComponent<IProps> {
 
     public render() {
         return (
-            <div className="truncatedText" ref={this.ref}>
+            <span className="truncatedText" ref={this.ref}>
                 {this.props.children}
-            </div>
+            </span>
         );
     }
 

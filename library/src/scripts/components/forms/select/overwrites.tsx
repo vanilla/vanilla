@@ -45,7 +45,7 @@ export function OptionLoader(props: OptionProps<any>) {
  * @param props - menu props
  */
 export function Menu(props: MenuProps<any>) {
-    return <components.Menu {...props} className="suggestedTextInput-menu dropDown-contents" />;
+    return <components.Menu {...props} className="suggestedTextInput-menu dropDown-contents isParentWidth" />;
 }
 
 /**

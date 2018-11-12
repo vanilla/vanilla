@@ -225,6 +225,7 @@ export default class BigSearch extends React.Component<IProps, IState> {
         event.preventDefault();
         this.props.onChange("");
         this.ref.current!.focus();
+        this.props.onSearch();
     };
 
     /**

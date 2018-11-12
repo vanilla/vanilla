@@ -68,6 +68,7 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
                     captionElement: NullComponent,
                     navbarElement: this.CustomNavBar,
                     disabledDays: this.props.disabledDays,
+                    showOutsideDays: true,
                 }}
                 inputProps={{
                     className: classNames("inputText", this.props.className, {
@@ -86,8 +87,16 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
      */
     private renderNativeInput() {
         // The native date input MUST have it's value in short ISO format, even it doesn't display that way.
-        const value = this.props.value ? this.props.value.substr(0, 10) : undefined;
-        return <input className="inputText" type="date" onChange={this.handleNativeInputChange} value={value} />;
+        const value = this.props.value ? this.props.value.substr(0, 10) : "";
+        return (
+            <input
+                className="inputText"
+                type="date"
+                placeholder={t(`yyyy-mm-dd`)}
+                onChange={this.handleNativeInputChange}
+                value={value}
+            />
+        );
     }
 
     /**
@@ -130,7 +139,7 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
      * Handle changes in the native input.
      */
     private handleNativeInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        this.props.onChange(event.target.valueAsDate);
+        this.handleDateChange(event.target.valueAsDate);
     };
 
     /**

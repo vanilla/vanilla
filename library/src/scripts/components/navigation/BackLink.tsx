@@ -7,7 +7,7 @@
 import * as React from "react";
 import classNames from "classnames";
 import { t, formatUrl } from "@library/application";
-import { leftChevron } from "@library/components/icons/common";
+import { leftChevronCompact } from "@library/components/icons/common";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 
 interface IProps extends RouteComponentProps<{}> {
@@ -38,7 +38,7 @@ export class BackLink extends React.Component<IProps> {
                     onClick={this.clickHandler}
                     className={classNames("backLink-link", { hasVisibleLabel: this.props.visibleLabel })}
                 >
-                    {leftChevron("backLink-icon")}
+                    {leftChevronCompact("backLink-icon")}
                     {this.props.visibleLabel && <span className="backLink-label">{this.props.title}</span>}
                 </Link>
             </div>

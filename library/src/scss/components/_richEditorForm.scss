@@ -54,12 +54,6 @@ $richEditorForm-placeholder_color: mixContentBgAndFg(50%);
     margin-top: -$formElement-borderWidth;
 }
 
-.richEditorForm-header {
-    margin: {
-        top: $global-gutter_quarterSize;
-    }
-}
-
 .richEditorForm-body {
     height: calc(100% - #{$global-gutter_halfSize + $global-gutter_size * 4});
     margin: {

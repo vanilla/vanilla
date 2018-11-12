@@ -1,0 +1,174 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$panelLayout_topMargin                                                : 0;
+$panelLayout_bottomMargin                                             : 48px;
+
+$panelLayout-noBleed_breakpoint                                       : $global-main_paddedWidth !default;
+$panelLayout-twoColumn_breakpoint                                     : $global-main_width !default;
+$panelLayout-oneColumn_breakpoint                                     : $global-twoColumn_breakpoint !default;
+
+$panelLayout-border_color                                             : rgba($global-border_color, .4) !default;
+
+@mixin mediaQuery-panelLayout_noBleed {
+    @media (max-width: #{$panelLayout-noBleed_breakpoint}) {
+        @content;
+    }
+}
+
+@mixin mediaQuery-panelLayout_twoColumn {
+    @media (max-width: #{$panelLayout-twoColumn_breakpoint}) {
+        @content;
+    }
+}
+
+@mixin mediaQuery-panelLayout_oneColumn {
+    @media (max-width: #{$panelLayout-oneColumn_breakpoint}) {
+        @content;
+    }
+}
+
+.panelLayout {
+    margin: {
+        top: $panelLayout_topMargin;
+        bottom: $panelLayout_bottomMargin;
+    }
+
+    &.noBreadcrumbs {
+        > .panelLayout-main {
+            padding-top: $global-gutter_size;
+        }
+    }
+}
+
+.overlay .panelLayout.noBreadcrumbs .panelLayout-main {
+    padding-top: 0;
+}
+
+
+.panelLayout,
+.panelLayout-panel,
+.panelLayout-top,
+.panelLayout-main {
+    width: 100%;
+}
+
+.panelLayout {
+    &.isOneCol {
+        width: $global-middleColumn_width;
+        max-width: 100%;
+        margin: auto;
+
+        @include mediaQuery-panelLayout_oneColumn {
+            width: 100%;
+        }
+    }
+}
+
+.panelLayout-container {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.panelLayout-top {
+    margin-bottom: $global-gutter_halfSize;
+}
+
+
+// Left Section
+.panelLayout-left {
+    position: relative;
+    width: $global-panel_paddedWidth;
+    flex-basis: $global-panel_paddedWidth;
+    z-index: 2;
+    padding: {
+        left: $global-gutter_halfSize;
+        right: $global-gutter_halfSize;
+    }
+}
+
+.panelLayout-right {
+    width: $global-panel_paddedWidth;
+    flex-basis: $global-panel_paddedWidth;
+    padding: {
+        left: $global-gutter_halfSize;
+        right: $global-gutter_halfSize;
+    }
+}
+
+// Middle Column
+.panelLayout-middle {
+    flex-grow: 1;
+    width: 100%;
+    padding: {
+        left: $global-gutter_halfSize;
+        right: $global-gutter_halfSize;
+    }
+
+    &.hasAdjacentPanel {
+        flex-basis: calc(100% - #{$global-panel_paddedWidth});
+        max-width: calc(100% - #{$global-panel_paddedWidth});
+
+        @include mediaQuery-panelLayout_oneColumn {
+            width: 100%;
+            max-width: 100%;
+            flex-basis: 100%;
+        }
+    }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        padding: {
+            left: 0;
+            right: 0;
+        }
+    }
+}
+
+
+.panelLayout-breadcrumbs {
+    padding: {
+        top: $global-gutter_halfSize;
+        bottom: $global-gutter_halfSize;
+    }
+
+    &.hasAdjacentPanel {
+        flex-basis: calc(100% - #{$global-panel_paddedWidth});
+        max-width: calc(100% - #{$global-panel_paddedWidth});
+
+        @include mediaQuery-panelLayout_oneColumn {
+            flex-basis: 100%;
+            max-width: 100%;
+        }
+    }
+}
+
+// Content section
+.panelLayout-content {
+    display: flex;
+    flex-grow: 1;
+    width: 100%;
+
+    &.hasAdjacentPanel {
+        flex-basis: calc(100% - #{$global-panel_paddedWidth});
+        max-width: calc(100% - #{$global-panel_paddedWidth});
+
+        @include mediaQuery-panelLayout_oneColumn {
+            @include backLinkNoBleedStyles;
+            max-width: 100%;
+            flex-basis: 100%;
+        }
+    }
+}
+
+
+@include mediaQuery-panelLayout_oneColumn {
+    .panelLayout-sticky {
+        position: relative;
+        top: auto;
+        left: auto;
+        bottom: auto;
+    }
+}

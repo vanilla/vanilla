@@ -1,0 +1,12 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+
+.headerLogo-logo {
+    display: block;
+    height: #{$global-header_height - 3 * $utility-baseUnit};
+    width: auto;
+}

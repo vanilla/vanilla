@@ -31,6 +31,9 @@ export function rightChevron(className?: string) {
     );
 }
 
+const leftChefronPath =
+    "M14.9,7.7l-4.4,4.4,4.4,4.4a.5.5,0,0,1,0,.6l-.6.6a.5.5,0,0,1-.6,0L8.5,12.5a.5.5,0,0,1,0-.6l5.2-5.2a.5.5,0,0,1,.6,0s.676.543.7.7A.325.325,0,0,1,14.9,7.7Z";
+
 export function leftChevron(className?: string) {
     const title = `<`;
     return (
@@ -41,10 +44,21 @@ export function leftChevron(className?: string) {
             aria-hidden="true"
         >
             <title>{title}</title>
-            <path
-                d="M14.9,7.7l-4.4,4.4,4.4,4.4a.5.5,0,0,1,0,.6l-.6.6a.5.5,0,0,1-.6,0L8.5,12.5a.5.5,0,0,1,0-.6l5.2-5.2a.5.5,0,0,1,.6,0s.676.543.7.7A.325.325,0,0,1,14.9,7.7Z"
-                style={currentColorFill}
-            />
+            <path d={leftChefronPath} style={currentColorFill} />
+        </svg>
+    );
+}
+
+export function leftChevronCompact(className?: string) {
+    const title = `<`;
+    return (
+        <svg
+            className={classNames("icon-chevronLeftCompact", className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 6.606 11.2"
+        >
+            <title>{title}</title>
+            <path d={leftChefronPath} transform="translate(-8.4 -6.6)" style={currentColorFill} />
         </svg>
     );
 }

@@ -47,7 +47,6 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
     justify-content: flex-start;
     font-size: $embedText-header_fontSize;
     line-height: $global-condensed_lineHeight;
-    //margin-bottom: $utility-baseUnit;
 }
 
 .embedText-titleLink,
@@ -71,16 +70,15 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
 .embedText { // for compatibility
     .embedText-title {
         margin: {
-            top: #{(1 - $global-condensed_lineHeight) * .5em} !important;
+            top: 0 !important;
             right: 0;
-            bottom: #{$userContent_fontSize / 2.2};
+            bottom: $embedded-small_spacing;
             left: 0;
         }
     }
 }
 
 // Edit Mode
-
 .richEditor {
     .embedText-titleLink {
         pointer-events: none;

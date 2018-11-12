@@ -29,11 +29,18 @@ interface IModalCommonProps {
     children: React.ReactNode;
     elementToFocus?: HTMLElement;
     size: ModalSizes;
+    elementToFocusOnExit: HTMLElement; // Should either be a specific element or use document.activeElement
 }
 
 interface IModalTextDescription extends IModalCommonProps, ITextDescription {}
 
 interface IModalHeadingDescription extends IModalCommonProps, IHeadingDescription {}
+
+type IProps = IModalTextDescription | IModalHeadingDescription;
+
+interface IState {
+    exitElementSet: boolean;
+}
 
 /**
  * An accessible Modal component.
@@ -45,7 +52,7 @@ interface IModalHeadingDescription extends IModalCommonProps, IHeadingDescriptio
  * - Prevents scrolling of the body.
  * - Focuses the first focusable element in the Modal.
  */
-export default class Modal extends React.Component<IModalTextDescription | IModalHeadingDescription> {
+export default class Modal extends React.Component<IProps, IState> {
     public static defaultProps = {
         pageContainer: document.getElementById("page"),
         container: document.getElementById("modals"),
@@ -64,6 +71,10 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
     private get descriptionID() {
         return this.id + "-description";
     }
+
+    public state = {
+        exitElementSet: false,
+    };
 
     /**
      * Render the contents into a portal.
@@ -130,6 +141,16 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
             document.addEventListener("keydown", this.handleDocumentEscapePress);
         }
         Modal.stack.push(this);
+        this.forceUpdate();
+    }
+    /**
+     * We need to check again for focus if the focus is by ref
+     */
+    public componentDidUpdate(prevProps: IProps) {
+        if (prevProps.elementToFocus !== this.props.elementToFocus) {
+            this.focusInitialElement();
+        }
+        this.setCloseFocusElement();
     }
 
     /**
@@ -150,21 +171,32 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
         }
         const prevFocussedElement = Modal.focusHistory.pop() || document.body;
         prevFocussedElement.focus();
+        setImmediate(() => {
+            prevFocussedElement.focus();
+        });
     }
 
     /**
      * Focus the initial element in the Modal.
      */
     private focusInitialElement() {
-        let targetElement;
-        if (this.props.elementToFocus) {
-            targetElement = this.props.elementToFocus;
-        } else {
-            targetElement = this.tabHandler.getInitial();
+        const focusElement = !!this.props.elementToFocus ? this.props.elementToFocus : this.tabHandler.getInitial();
+        if (focusElement) {
+            focusElement!.focus();
         }
-        targetElement = !!targetElement ? targetElement : document.body;
-        targetElement.focus();
-        Modal.focusHistory.push(targetElement);
+    }
+
+    /**
+     * Set focus on element to target when we close the modal
+     */
+    private setCloseFocusElement() {
+        // if we need to rerender the component, we don't want to include a bad value in the focus history
+        if (this.props.elementToFocusOnExit && !this.state.exitElementSet) {
+            Modal.focusHistory.push(this.props.elementToFocusOnExit);
+            this.setState({
+                exitElementSet: true,
+            });
+        }
     }
 
     /**

@@ -56,7 +56,7 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
         return (
             <PopoverController
                 id={this.state.id}
-                classNameRoot="embedDialogue"
+                className="embedDialogue"
                 onClose={this.clearInput}
                 buttonClassName="richEditor-button richEditor-embedButton"
                 onVisibilityChange={forceSelectionUpdate}

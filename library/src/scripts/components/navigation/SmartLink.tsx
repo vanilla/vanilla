@@ -13,6 +13,21 @@ export const LinkContext = React.createContext(formatUrl("/", true));
 
 interface IProps extends NavLinkProps {}
 
+/**
+ * Link component that checks it's <LinkContext /> to know if it needs to do a full refresh
+ * or a partial refresh of the page.
+ *
+ * If the passed `to` is a subset of the context then a partial navigation will be completed.
+ *
+ * Eg.
+ * Context = https://test.com/root
+ * To = https://test.com/root/someUrl/deeper/nested
+ * Result = /root/someUrl/deeper/nested (react router navigation)
+ *
+ * Context = https://test.com/otherRoot
+ * To = https://test.com/root/someUrl/deeper/nested
+ * Result = https://test.com/root/someUrl/deeper/nested (full refresh)
+ */
 export default function SmartLink(props: IProps) {
     return (
         <LinkContext.Consumer>

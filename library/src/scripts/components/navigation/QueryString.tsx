@@ -14,6 +14,9 @@ interface IProps extends RouteComponentProps<any> {
     };
 }
 
+/**
+ * Component for automatically peristing it's props into the window's querystring.
+ */
 class QueryString extends React.Component<IProps> {
     public render(): React.ReactNode {
         return null;

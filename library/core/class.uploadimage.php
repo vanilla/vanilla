@@ -113,12 +113,12 @@ class Gdn_UploadImage extends Gdn_Upload {
      * @param int An integer value indicating the maximum allowed height of the image (in pixels).
      * @param int An integer value indicating the maximum allowed width of the image (in pixels).
      * @param array Options additional options for saving the image.
-     * @throws Exception If the crop size is over the maximum allowed size.
      *  - <b>Crop</b>: Image proportions will always remain constrained. The Crop parameter is a boolean value indicating if the image should be cropped when one dimension (height or width) goes beyond the constrained proportions.
      *  - <b>OutputType</b>: The format in which the output image should be saved. Options are: jpg, png, and gif. Default is jpg.
      *  - <b>ImageQuality</b>: An integer value representing the qualityof the saved image. Ranging from 0 (worst quality, smaller file) to 100 (best quality, biggest file).
      *  - <b>SourceX, SourceY</b>: If you want to create a thumbnail that is a crop of the image these are the coordinates of the thumbnail.
      *  - <b>SourceHeight. SourceWidth</b>: If you want to create a thumbnail that is a crop of the image these are it's dimensions.
+     * @throws Exception If the crop size is over the maximum allowed size.
      */
     public static function saveImageAs($source, $target, $height = '', $width = '', $options = []) {
         $crop = false;

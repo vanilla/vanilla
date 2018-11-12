@@ -7,7 +7,6 @@
 import * as React from "react";
 import classNames from "classnames";
 import ReactDOM from "react-dom";
-import { vanillaLogo } from "./icons/common";
 import { MeBox } from "@library/components/mebox/MeBox";
 import { dummyOtherLanguagesData } from "@knowledge/modules/categories/state/dummyOtherLanguages";
 import { dummyLogoData } from "./mebox/state/dummyLogoData";
@@ -36,12 +35,13 @@ export class VanillaHeader extends React.Component<IProps> {
                 className={this.props.className}
                 logoData={dummyLogoData}
                 notificationsData={dummyNotificationsData}
-                navigationData={dummyNavigationData}
+                navigationData={{ data: dummyNavigationData }}
                 languagesData={dummyOtherLanguagesData}
                 messagesData={dummyMessagesData}
                 userDropDownData={dummyUserDropDownData}
                 device={this.props.device}
                 homePage={!!this.props.homePage}
+                headerStyles={{}} // Defaults for now
             />,
             this.props.container || document.getElementById("vanillaHeader")!,
         );

@@ -3,8 +3,19 @@
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { INotificationsDropDownProps } from "@library/components/mebox/pieces/NotificationsDropDown";
+import { IHeaderNavigationItemProps } from "../pieces/HeaderNavigationItem";
 
-export const dummyNavigationData: INotificationsDropDownProps = {
-    data: [{}],
-};
+export const dummyNavigationData: IHeaderNavigationItemProps[] = [
+    {
+        to: "/discussions",
+        name: "Discussions",
+    },
+    {
+        to: "/kb/categories",
+        name: "KB Categories",
+    },
+    {
+        to: "/",
+        name: "Forum",
+    },
+];

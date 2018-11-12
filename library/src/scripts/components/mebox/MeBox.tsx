@@ -19,11 +19,12 @@ import UserDropdown, { IUserDropDownProps } from "./pieces/UserDropdown";
 import Container from "@knowledge/layouts/components/Container";
 import { PanelWidgetHorizontalPadding } from "@knowledge/layouts/PanelLayout";
 import LanguagesDropDown, { ILanguageDropDownProps } from "@knowledge/modules/article/components/LanguagesDropDown";
+import { dummyNavigationData } from "./state/dummyNavigationData";
 
 export interface IHeaderStyles {
     bgColor?: string;
     fgColor?: string;
-    notificationColor: string;
+    notificationColor?: string;
 }
 
 export interface IMeBoxProps extends IDeviceProps {
@@ -72,7 +73,7 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                         <CompactMenu {...this.props} />
                     </div>
                     <div className={classNames("vanillaHeader-homeBottom")}>
-                        <HeaderNavigation />
+                        <HeaderNavigation data={dummyNavigationData} />
                     </div>
                 </React.Fragment>
             );

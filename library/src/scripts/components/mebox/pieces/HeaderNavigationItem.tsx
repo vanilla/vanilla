@@ -7,25 +7,28 @@
 import * as React from "react";
 import classNames from "classnames";
 import InternalOrExternalLink from "@library/components/InternalOrExternalLink";
+import { withRouter, RouteComponentProps } from "react-router-dom";
+import { IRoute } from "express";
 
 export interface IHeaderNavigationItemProps {
     className?: string;
-    location: any;
-    url: string;
+    to: string;
     name: string;
 }
+
+interface IProps extends IHeaderNavigationItemProps, RouteComponentProps<{}> {}
 
 /**
  * Implements Navigation component for header
  */
-export default class HeaderNavigationItem extends React.Component<IHeaderNavigationItemProps> {
+export class HeaderNavigationItem extends React.Component<IProps> {
     public render() {
         return (
             <li
                 className={classNames("headerNavigation-item", this.props.className, { isCurrent: this.currentPage() })}
             >
                 <InternalOrExternalLink
-                    to={this.props.url}
+                    to={this.props.to}
                     className={classNames("headerNavigation-link", { isCurrent: this.currentPage() })}
                 >
                     {this.props.name}
@@ -40,9 +43,11 @@ export default class HeaderNavigationItem extends React.Component<IHeaderNavigat
      */
     public currentPage = (): boolean => {
         if (this.props.location && this.props.location.pathname) {
-            return this.props.location.pathname === this.props.url;
+            return this.props.location.pathname === this.props.to;
         } else {
             return false;
         }
     };
 }
+
+export default withRouter<IProps>(HeaderNavigationItem);

@@ -8,7 +8,7 @@ import * as React from "react";
 import classNames from "classnames";
 import HeaderNavigationItem, { IHeaderNavigationItemProps } from "./HeaderNavigationItem";
 
-interface IHeaderNavigationProps {
+export interface IHeaderNavigationProps {
     className?: string;
     data: IHeaderNavigationItemProps[];
 }

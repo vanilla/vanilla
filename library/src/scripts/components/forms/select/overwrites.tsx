@@ -88,8 +88,7 @@ export function Menu(props: MenuProps<any>) {
  * @param props - props for menuList
  */
 export function MenuList(props: MenuListComponentProps<any>) {
-    let { className, ...rest } = props;
-    className = classNames(props.className, "suggestedTextInput-token");
+    const { ...rest } = props;
     return (
         <components.MenuList {...rest}>
             <ul className="suggestedTextInput-menuItems">{props.children}</ul>

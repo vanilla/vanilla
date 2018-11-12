@@ -12,8 +12,7 @@ import apiv2 from "@library/apiv2";
 import Tokens from "@library/components/forms/select/Tokens";
 import { t } from "@library/application";
 import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
-import { dummyAuthors } from "@knowledge/modules/search/state/dummyAuthors";
-import { LoadStatus, IUserFragment } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api";
 
 interface IProps extends IInjectableSuggestionsProps {
     suggestionActions: UserSuggestionActions;
@@ -24,7 +23,7 @@ interface IProps extends IInjectableSuggestionsProps {
 export class MultiUserInput extends React.Component<IProps> {
     public render() {
         const { suggestions, currentUsername } = this.props;
-        let options: IComboBoxOption[] | undefined = undefined;
+        let options: IComboBoxOption[] | undefined;
         if (suggestions.status === LoadStatus.SUCCESS && suggestions.data) {
             options = suggestions.data.map(suggestion => {
                 return {

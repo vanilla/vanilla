@@ -13,6 +13,7 @@ import ReduxActions from "@library/state/ReduxActions";
 import UserSuggestionModel from "@library/users/suggestion/UserSuggestionModel";
 import { IUsersStoreState } from "@library/users/UsersModel";
 import debounce from "lodash/debounce";
+import { logError } from "@library/utility";
 
 interface ILookupUserOptions {
     username: string;
@@ -153,7 +154,7 @@ export default class UserSuggestionActions extends ReduxActions {
                     dispatch(UserSuggestionActions.loadUsersACs.response(response, { username }));
                 })
                 .catch(error => {
-                    console.error(error);
+                    logError(error);
                     dispatch(UserSuggestionActions.loadUsersACs.error(error, { username }));
                 });
         });

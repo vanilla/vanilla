@@ -53,7 +53,7 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
         return (
             <DayPickerInput
                 format="YYYY-MM-DD"
-                placeholder="yyyy-mm-dd"
+                placeholder={t(`yyyy-mm-dd`)}
                 formatDate={formatDate}
                 parseDate={parseDate}
                 value={value}

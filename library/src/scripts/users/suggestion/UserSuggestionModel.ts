@@ -34,7 +34,7 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
     };
 
     public static mapStateToProps(state: IUsersStoreState): IInjectableSuggestionsProps {
-        const stateSlice = Object.assign({}, UserSuggestionModel.stateSlice(state));
+        const stateSlice = { ...UserSuggestionModel.stateSlice(state) };
         const { trie, ...rest } = stateSlice;
         const suggestions = stateSlice.lastSuccessfulUsername
             ? trie.getValue(stateSlice.lastSuccessfulUsername) || UserSuggestionModel.defaultSuggestions

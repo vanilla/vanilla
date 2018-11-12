@@ -355,7 +355,7 @@ export enum OS {
  * OS specific input elements for things like datetimes.
  */
 export function guessOperatingSystem(): OS {
-    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
     if (/android/i.test(userAgent)) {
         return OS.ANDROID;

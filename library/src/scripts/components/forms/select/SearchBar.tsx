@@ -31,14 +31,14 @@ interface IProps extends IOptionalComponentID {
     placeholder: string;
     options?: any[];
     loadOptions?: (inputValue: string) => Promise<any>;
-    optionComponent: React.ComponentType;
     value: string;
     onChange: (value: string) => void;
     isBigInput?: boolean;
     noHeading: boolean;
     title: React.ReactNode;
-    isLoading: boolean;
+    isLoading?: boolean;
     onSearch: () => void;
+    optionComponent?: React.ComponentType<OptionProps<any>>;
 }
 
 interface IState {
@@ -49,11 +49,13 @@ interface IState {
  * Implements the search bar component
  */
 export default class BigSearch extends React.Component<IProps, IState> {
-    public static defaultProps = {
+    public static defaultProps: Partial<IProps> = {
         disabled: false,
         isBigInput: false,
         noHeading: false,
         title: t("Search"),
+        isLoading: false,
+        optionComponent: selectOverrides.SelectOption,
     };
 
     public state: IState = {
@@ -199,7 +201,7 @@ export default class BigSearch extends React.Component<IProps, IState> {
         IndicatorSeparator: selectOverrides.NullComponent,
         Menu: selectOverrides.Menu,
         MenuList: selectOverrides.MenuList,
-        Option: selectOverrides.SelectOption,
+        Option: this.props.optionComponent!,
         NoOptionsMessage: selectOverrides.NoOptionsMessage,
         ClearIndicator: selectOverrides.NullComponent,
         DropdownIndicator: selectOverrides.NullComponent,

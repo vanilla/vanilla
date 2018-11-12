@@ -16,6 +16,14 @@ use Vanilla\UploadedFileSchema;
  * API Controller for `/media`.
  */
 class MediaApiController extends AbstractApiController {
+    const TYPE_IMAGE = 'image';
+    const TYPE_TEXT = 'text';
+    const TYPE_ARCHIVE = 'archive';
+    const TYPE_BINARY = 'binary';
+
+    const EXTENSIONS_TEXT = ['txt', 'csv', 'doc', 'docx', 'pdf', 'md', 'rtf'];
+    const EXTENSIONS_BINARY = ['xls', 'xlsx', 'ppt'];
+    const EXTENSIONS_ARCHIVE = ['zip', 'tar', 'gzip', '7z', 'arj', 'deb', 'pkg', 'gz', 'z', 'rpm', 'iso', 'cab'];
 
     /** @var Schema */
     private $idParamSchema;
@@ -47,7 +55,6 @@ class MediaApiController extends AbstractApiController {
 
         $in = $this->idParamSchema()->setDescription('Delete a media item.');
         $out = $this->schema($this->fullSchema(), 'out');
-
         $row = $this->mediaByID($id);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->permission('Garden.Moderation.Manage');
@@ -97,7 +104,7 @@ class MediaApiController extends AbstractApiController {
         ];
 
         switch ($type) {
-            case 'image':
+            case self::TYPE_IMAGE:
                 $imageSize = getimagesize($file);
                 if (is_array($imageSize)) {
                     $media['ImageWidth'] = $imageSize[0];
@@ -129,8 +136,8 @@ class MediaApiController extends AbstractApiController {
             'name:s' => 'The original filename of the upload.',
             'type:s' => 'MIME type',
             'size:i' =>'File size in bytes',
-            'width:i|n' => 'Image width',
-            'height:i|n' => 'Image height',
+            'width:i|n?' => 'Image width',
+            'height:i|n?' => 'Image height',
             'dateInserted:dt' => 'When the media item was created.',
             'insertUserID:i' => 'The user that created the media item.',
             'foreignType:s|n' => 'Table the media is linked to.',
@@ -158,6 +165,11 @@ class MediaApiController extends AbstractApiController {
         }
 
         $row = $this->normalizeOutput($row);
+        $ext = pathinfo($row['url'], PATHINFO_EXTENSION);
+        if (!in_array($ext, array_keys(ImageResizer::getExtType()))) {
+            unset($row['width']);
+            unset($row['height']);
+        }
         $result = $out->validate($row);
         return $result;
     }
@@ -292,15 +304,36 @@ class MediaApiController extends AbstractApiController {
     public function post(array $body) {
         $this->permission('Garden.Uploads.Add');
 
+        switch ($body['type']) {
+            case self::TYPE_TEXT:
+                $uploadExtensions = self::EXTENSIONS_TEXT;
+                break;
+            case self::TYPE_BINARY:
+                $uploadExtensions = self::EXTENSIONS_BINARY;
+                break;
+            case self::TYPE_ARCHIVE:
+                $uploadExtensions = self::EXTENSIONS_ARCHIVE;
+                break;
+            case self::TYPE_IMAGE:
+            default:
+                $uploadExtensions = array_keys(ImageResizer::getExtType());
+        }
+
         $uploadSchema = new UploadedFileSchema([
-            'allowedExtensions' => array_keys(ImageResizer::getExtType())
+            'allowedExtensions' => $uploadExtensions
         ]);
 
         $in = $this->schema([
             'file' => $uploadSchema,
             'type:s' => [
                 'description' => 'The upload type.',
-                'enum' => ['image']
+                'default' => self::TYPE_IMAGE,
+                'enum' => [
+                    self::TYPE_IMAGE,
+                    self::TYPE_TEXT,
+                    self::TYPE_ARCHIVE,
+                    self::TYPE_BINARY,
+                ]
             ]
         ],'in')->setDescription('Add a media item.');
         $out = $this->schema($this->fullSchema(), 'out');

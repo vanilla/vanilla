@@ -12,7 +12,7 @@ import { IOptionalComponentID, getOptionalID } from "@library/componentIDs";
 interface IProps extends IOptionalComponentID {
     id?: string;
     className?: string;
-    checked: boolean | "true" | "false";
+    checked: boolean;
     disabled?: boolean;
     onChange: any;
     label: string;
@@ -52,7 +52,7 @@ export default class Checkbox extends React.Component<IProps, IState> {
                     aria-labelledby={this.labelID}
                     type="checkbox"
                     onChange={this.props.onChange}
-                    checked={this.checked}
+                    checked={this.props.checked}
                 />
                 <span className="checkbox-box" aria-hidden="true">
                     <span className="checkbox-state">
@@ -74,13 +74,5 @@ export default class Checkbox extends React.Component<IProps, IState> {
                 </span>
             </label>
         );
-    }
-
-    private get checked(): boolean {
-        if (typeof this.props.checked === "boolean") {
-            return this.props.checked;
-        } else {
-            return this.props.checked === "true";
-        }
     }
 }

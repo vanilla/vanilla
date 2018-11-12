@@ -17,6 +17,7 @@ import * as selectOverrides from "./overwrites";
 import ButtonLoader from "@library/components/ButtonLoader";
 import { OptionProps } from "react-select/lib/components/Option";
 import Translate from "@library/components/translation/Translate";
+import { ClearButton } from "@library/components/forms/select/ClearButton";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;
@@ -64,6 +65,7 @@ export default class BigSearch extends React.Component<IProps, IState> {
     private prefix = "searchBar";
     private searchButtonID: string;
     private searchInputID: string;
+    private ref = React.createRef<AsyncCreatableSelect<any>>();
 
     constructor(props: IProps) {
         super(props);
@@ -77,6 +79,7 @@ export default class BigSearch extends React.Component<IProps, IState> {
 
         return (
             <AsyncCreatableSelect
+                ref={this.ref}
                 id={this.id}
                 value={undefined}
                 onChange={this.handleOptionChange}
@@ -208,6 +211,7 @@ export default class BigSearch extends React.Component<IProps, IState> {
                         )}
                     >
                         <components.Control {...props} />
+                        {this.props.value && <ClearButton onClick={this.clear} />}
                     </div>
                     <Button type="submit" id={this.searchButtonID} className="buttonPrimary searchBar-submitButton">
                         {this.props.isLoading ? <ButtonLoader /> : t("Search")}
@@ -215,6 +219,12 @@ export default class BigSearch extends React.Component<IProps, IState> {
                 </div>
             </form>
         );
+    };
+
+    private clear = (event: React.SyntheticEvent) => {
+        event.preventDefault();
+        this.props.onChange("");
+        this.ref.current!.focus();
     };
 
     /**

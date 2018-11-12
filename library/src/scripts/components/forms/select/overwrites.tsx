@@ -19,41 +19,6 @@ import { ControlProps } from "react-select/lib/components/Control";
 import { MultiValueRemoveProps } from "react-select/lib/components/MultiValue";
 
 /**
- * Overwrite for the ClearIndicator component in React Select
- */
-export function ClearIndicator(props: IndicatorProps<any>) {
-    const { children, innerProps, ...rest } = props;
-
-    // We need to bind the function to the props for that component
-    const handleKeyDown = event => {
-        switch (event.key) {
-            case "Enter":
-            case "Spacebar":
-            case " ":
-                innerProps.onMouseDown(event);
-                break;
-        }
-    };
-
-    return (
-        <button
-            {...innerProps}
-            className={classNames(ButtonBaseClass.ICON, rest.className, "suggestedTextInput-clear")}
-            type="button"
-            style={{}}
-            aria-hidden={null} // Unset the prop in innerProps
-            onKeyDown={handleKeyDown}
-            onClick={innerProps.onMouseDown}
-            onTouchEnd={innerProps.onTouchEnd}
-            title={t("Clear")}
-            aria-label={t("Clear")}
-        >
-            {clear()}
-        </button>
-    );
-}
-
-/**
  * Overwrite for the controlContainer component in React Select
  * @param props
  */

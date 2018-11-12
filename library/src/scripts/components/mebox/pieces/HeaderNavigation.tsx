@@ -10,7 +10,7 @@ import HeaderNavigationItem, { IHeaderNavigationItemProps } from "./HeaderNaviga
 
 export interface IHeaderNavigationProps {
     className?: string;
-    data: IHeaderNavigationItemProps[];
+    children: IHeaderNavigationItemProps[];
 }
 
 /**
@@ -18,7 +18,8 @@ export interface IHeaderNavigationProps {
  */
 export default class HeaderNavigation extends React.Component<IHeaderNavigationProps> {
     public render() {
-        const content = this.props.data.map((item, key) => {
+        console.log("props: ", this.props);
+        const content = this.props.children.map((item, key) => {
             return (
                 <React.Fragment key={`headerNavItem-${key}`}>
                     <HeaderNavigationItem {...item} />

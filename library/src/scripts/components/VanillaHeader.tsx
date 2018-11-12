@@ -32,30 +32,20 @@ export class VanillaHeader extends React.Component<IProps> {
     public render() {
         return ReactDOM.createPortal(
             <MeBox
-                className={this.props.className}
-                logoData={dummyLogoData}
-                notificationsData={dummyNotificationsData}
-                navigationData={{ data: dummyNavigationData }}
-                languagesData={dummyOtherLanguagesData}
-                messagesData={dummyMessagesData}
-                userDropDownData={dummyUserDropDownData}
-                device={this.props.device}
                 homePage={!!this.props.homePage}
+                className={this.props.className}
+                logoProps={dummyLogoData}
+                notificationsProps={dummyNotificationsData}
+                navigationProps={{ children: dummyNavigationData.children, className: "vanillaHeader-nav" }}
+                languagesProps={dummyOtherLanguagesData}
+                messagesProps={dummyMessagesData}
+                userDropDownProps={dummyUserDropDownData}
+                device={this.props.device}
                 headerStyles={{}} // Defaults for now
             />,
             this.props.container || document.getElementById("vanillaHeader")!,
         );
     }
-
-    /*<header className={classNames("vanillaHeader")}>*/
-    /*{!this.props.homePage && (*/
-    /*<div className="vanillaHeader-top">*/
-    /*{this.props.logoUrl && <img src={this.props.logoUrl} alt={this.props.logoAlt} />}*/
-    /*{!this.props.logoUrl && vanillaLogo("vanillaHeader-logo")}*/
-    /*</div>*/
-    /*)}*/
-    /*<div className="vanillaHeader-main" />*/
-    /*</header>*/
 }
 
 export default withDevice(VanillaHeader);

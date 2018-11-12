@@ -30,12 +30,12 @@ export interface IHeaderStyles {
 export interface IMeBoxProps extends IDeviceProps {
     homePage: boolean;
     className?: string;
-    logoData: IHeaderLogo;
-    navigationData: IHeaderNavigationProps;
-    languagesData: ILanguageDropDownProps;
-    notificationsData: INotificationsDropDownProps;
-    messagesData: IMessagesDropDownProps;
-    userDropDownData: IUserDropDownProps;
+    logoProps: IHeaderLogo;
+    navigationProps: IHeaderNavigationProps;
+    languagesProps: ILanguageDropDownProps;
+    notificationsProps: INotificationsDropDownProps;
+    messagesProps: IMessagesDropDownProps;
+    userDropDownProps: IUserDropDownProps;
     headerStyles: IHeaderStyles;
 }
 
@@ -69,11 +69,11 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                 <React.Fragment>
                     <div className={classNames("vanillaHeader-homeTop")}>
                         <FlexSpacer className="vanillaHeader-flexSpacer" />
-                        <HeaderLogo {...this.props.logoData} logoClassName="vanillaHeader-logo" />
+                        <HeaderLogo {...this.props.logoProps} logoClassName="vanillaHeader-logo" />
                         <CompactMenu {...this.props} />
                     </div>
                     <div className={classNames("vanillaHeader-homeBottom")}>
-                        <HeaderNavigation data={dummyNavigationData} />
+                        <HeaderNavigation children={dummyNavigationData} />
                     </div>
                 </React.Fragment>
             );
@@ -84,21 +84,21 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                         {!hideNonSearchElements && (
                             <React.Fragment>
                                 <HeaderLogo
-                                    {...this.props.logoData}
+                                    {...this.props.logoProps}
                                     className="vanillaHeader-headerLogo hasRightMargin"
                                     logoClassName="vanillaHeader-logo"
                                     color={styles.fg}
                                 />
-                                <HeaderNavigation {...this.props.navigationData} />
-                                <LanguagesDropDown {...this.props.languagesData} />
+                                <HeaderNavigation {...this.props.navigationProps} />
+                                <LanguagesDropDown {...this.props.languagesProps} />
                             </React.Fragment>
                         )}
                         <CompactSearch onClick={this.toggleSearch} open={this.state.openSearch} />
                         {!hideNonSearchElements && (
                             <React.Fragment>
-                                <NotificationsDropdown {...this.props.notificationsData} />
-                                <MessagesDropDown {...this.props.messagesData} />
-                                <UserDropdown {...this.props.userDropDownData} />
+                                <NotificationsDropdown {...this.props.notificationsProps} />
+                                <MessagesDropDown {...this.props.messagesProps} />
+                                <UserDropdown {...this.props.userDropDownProps} />
                             </React.Fragment>
                         )}
                     </div>

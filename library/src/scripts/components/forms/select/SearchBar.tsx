@@ -16,7 +16,6 @@ import { InputActionMeta } from "react-select/lib/types";
 import * as selectOverrides from "./overwrites";
 import ButtonLoader from "@library/components/ButtonLoader";
 import { OptionProps } from "react-select/lib/components/Option";
-import { ISearchResult } from "@knowledge/@types/api";
 import Translate from "@library/components/translation/Translate";
 
 export interface IComboBoxOption<T = any> {
@@ -102,15 +101,29 @@ export default class BigSearch extends React.Component<IProps, IState> {
                 styles={this.customStyles}
                 backspaceRemovesValue={true}
                 createOptionPosition="first"
-                formatCreateLabel={this.createLabel}
+                formatCreateLabel={this.createFormatLabel}
             />
         );
     }
 
+    /**
+     * Determine if we should show the menu or not.
+     *
+     * - Menu can be forced closed through state.
+     * - Having no value in the input keeps the search closed.
+     * - Otherwise falls back to what is determined by react-select.
+     */
     private get isMenuVisible(): boolean | undefined {
         return this.state.forceMenuClosed || this.props.value.length === 0 ? false : undefined;
     }
 
+    /**
+     * Handle changes in option.
+     *
+     * - Update the input value.
+     * - Force the menu closed.
+     * - Trigger a search.
+     */
     private handleOptionChange = (option: IComboBoxOption) => {
         if (option) {
             this.props.onChange(option.label);
@@ -120,10 +133,18 @@ export default class BigSearch extends React.Component<IProps, IState> {
         }
     };
 
-    private createLabel = (inputValue: string) => {
+    /**
+     * Create a label for React Select's "Add option" option.
+     */
+    private createFormatLabel = (inputValue: string) => {
         return <Translate source="Search for <0/>" c0={<strong>{inputValue}</strong>} />;
     };
 
+    /**
+     * Handle changes in the select's text input.
+     *
+     * Ignores change caused by blurring or closing the menu. These normally clear the input.
+     */
     private handleInputChange = (value: string, reason: InputActionMeta) => {
         if (!["input-blur", "menu-close"].includes(reason.action)) {
             this.props.onChange(value);
@@ -131,6 +152,9 @@ export default class BigSearch extends React.Component<IProps, IState> {
         }
     };
 
+    /**
+     * Unset some of the inline styles of react select.
+     */
     private customStyles = {
         option: (provided: React.CSSProperties) => ({
             ...provided,
@@ -144,6 +168,9 @@ export default class BigSearch extends React.Component<IProps, IState> {
         }),
     };
 
+    /**
+     * Unset many of react-selects theme values.
+     */
     private getTheme = theme => {
         return {
             ...theme,
@@ -159,7 +186,7 @@ export default class BigSearch extends React.Component<IProps, IState> {
      */
     private SearchControl = props => {
         return (
-            <form className="searchBar-form" onSubmit={this.preventFormSubmission}>
+            <form className="searchBar-form" onSubmit={this.onFormSubmit}>
                 {!this.props.noHeading && (
                     <Heading depth={1} className="searchBar-heading">
                         <label className="searchBar-label" htmlFor={this.searchInputID}>
@@ -189,8 +216,12 @@ export default class BigSearch extends React.Component<IProps, IState> {
         );
     };
 
-    private preventFormSubmission = e => {
-        e.preventDefault();
+    /**
+     * Handle the form submission.
+     */
+    private onFormSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
+        this.props.onSearch();
     };
 
     /*

@@ -12,6 +12,7 @@ import classNames from "classnames";
 import { t } from "@library/application";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { leftChevron, rightChevron } from "@library/components/icons";
+import { NullComponent } from "@library/components/forms/select/overwrites";
 
 interface IProps {
     value: string; // ISO formatted date
@@ -48,6 +49,9 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
         return useNativeInput ? this.renderNativeInput() : this.renderReactInput();
     }
 
+    /**
+     * Render a react day picker component.
+     */
     private renderReactInput() {
         const value = this.props.value ? new Date(this.props.value) : undefined;
         return (
@@ -61,7 +65,7 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
                 onDayChange={this.handleDateChange}
                 onChange={this.handleTextChange}
                 dayPickerProps={{
-                    captionElement: this.CustomCaptionElement,
+                    captionElement: NullComponent,
                     navbarElement: this.CustomNavBar,
                     disabledDays: this.props.disabledDays,
                 }}
@@ -77,13 +81,19 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
         );
     }
 
+    /**
+     * Render a native date picker component. These can be much nicer on mobile devices.
+     */
     private renderNativeInput() {
         // The native date input MUST have it's value in short ISO format, even it doesn't display that way.
         const value = this.props.value ? this.props.value.substr(0, 10) : undefined;
         return <input className="inputText" type="date" onChange={this.handleNativeInputChange} value={value} />;
     }
 
-    private handleDateChange = (date?: Date) => {
+    /**
+     * Handle a new date.
+     */
+    private handleDateChange = (date?: Date | null) => {
         if (date) {
             this.setState({ hasBadValue: false });
             this.props.onChange(date.toISOString());
@@ -94,23 +104,38 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
         }
     };
 
+    /**
+     * Track blurred state.
+     */
     private handleBlur = (event: React.FocusEvent) => {
         this.setState({ wasBlurred: true });
     };
 
+    /**
+     * Track blurred state.
+     */
     private handleFocus = (event: React.FocusEvent) => {
         this.setState({ wasBlurred: false });
     };
 
+    /**
+     * Handle text changes in the main input.
+     */
     private handleTextChange = (event: React.ChangeEvent<any>) => {
         const date = new Date(event.target.value);
         this.handleDateChange(date);
     };
 
+    /**
+     * Handle changes in the native input.
+     */
     private handleNativeInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         this.props.onChange(event.target.valueAsDate);
     };
 
+    /**
+     * Override for the date pickers dropdown.
+     */
     private CustomOverlay = ({ classNames: c, selectedDay, children, ...props }) => {
         const contentsClasses = classNames("dropDown-contents", "isOwnWidth", {
             isRightAligned: this.props.alignment === "right",
@@ -122,10 +147,9 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
         );
     };
 
-    private CustomCaptionElement = () => {
-        return null;
-    };
-
+    /**
+     * Override date pickers navigation component to use our icons.
+     */
     private CustomNavBar = ({ month, onPreviousClick, onNextClick, className }) => {
         // The example override shows these methods being rebound in this way.
         // If you attempt to pass these callbacks directly to the overriden component,

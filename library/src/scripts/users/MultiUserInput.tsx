@@ -20,6 +20,9 @@ interface IProps extends IInjectableSuggestionsProps {
     value: IComboBoxOption[];
 }
 
+/**
+ * Form component for searching/selecting users.
+ */
 export class MultiUserInput extends React.Component<IProps> {
     public render() {
         const { suggestions, currentUsername } = this.props;
@@ -45,6 +48,9 @@ export class MultiUserInput extends React.Component<IProps> {
         );
     }
 
+    /**
+     * React to changes in the token input.
+     */
     private onInputChange = (value: string) => {
         this.props.suggestionActions.loadUsers(value);
     };

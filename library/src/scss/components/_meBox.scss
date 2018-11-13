@@ -5,6 +5,7 @@
  */
 
 $meBox-button_borderRadius: 3px;
+$meBox-button_width: 40px;
 
 .meBox-languages {
     margin-left: auto;
@@ -12,6 +13,8 @@ $meBox-button_borderRadius: 3px;
 
 .meBox-button {
     color: inherit;
+    height: $global-header_height;
+    width: $meBox-button_width;
 
     &:hover,
     &:focus {
@@ -21,3 +24,9 @@ $meBox-button_borderRadius: 3px;
         }
     }
 }
+
+.meBox-locale {
+    margin-left: auto;
+    margin-right: $global_spacer;
+}
+

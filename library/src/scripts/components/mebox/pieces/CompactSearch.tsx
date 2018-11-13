@@ -70,12 +70,12 @@ export default class CompactSearch extends React.Component<ICompactSearchProps> 
                         />
                         <Button
                             onClick={this.props.closeSearch}
-                            className={classNames("compactSearch-close")}
+                            className={classNames("compactSearch-close meBox-button")}
                             title={t("Search")}
                             aria-expanded={true}
                             aria-haspopup="true"
                             aria-controls={this.id}
-                            baseClass={ButtonBaseClass.ICON}
+                            baseClass={ButtonBaseClass.CUSTOM}
                         >
                             {t("Cancel")}
                         </Button>

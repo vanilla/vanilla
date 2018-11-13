@@ -90,7 +90,11 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                                     color={styles.fg}
                                 />
                                 <VanillaHeaderNav {...this.props.navigationProps} />
-                                <LanguagesDropDown {...this.props.languagesProps} renderLeft={true} />
+                                <LanguagesDropDown
+                                    {...this.props.languagesProps}
+                                    renderLeft={true}
+                                    className="meBox-locale"
+                                />
                             </React.Fragment>
                         )}
                         <CompactSearch

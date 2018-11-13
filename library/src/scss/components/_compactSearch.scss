@@ -4,4 +4,22 @@
  * @license GPL-2.0-only
  */
 
+.compactSearch {
 
+    .searchBar{
+        flex-grow: 1;
+    }
+}
+
+.compactSearch-contents {
+    display: flex;
+    flex-wrap: nowrap;
+
+    min-width: 200px;
+}
+
+
+.compactSearch-close {
+    color: inherit;
+    white-space: nowrap;
+}

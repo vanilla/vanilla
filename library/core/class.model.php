@@ -970,10 +970,17 @@ class Gdn_Model extends Gdn_Pluggable {
      * @return bool Whether a master key has been assigned.
      */
     protected static function buildCacheLock(string $lockKey, int $gracePeriod = 60): bool {
+        // If caching isn't enabled bail out
+        $cacheEnabled = Gdn_Cache::activeEnabled();
+        if(!$cacheEnabled) {
+            return true;
+        }
+
         /**
          * Attempt to add lock using our process ID. A failure likely means the
          * cache key already exists, which would mean the lock is already in place.
          */
+
         $instanceKey = getmypid();
         $added = Gdn::cache()->add($lockKey, $instanceKey, [
             Gdn_Cache::FEATURE_EXPIRY => $gracePeriod
@@ -992,6 +999,11 @@ class Gdn_Model extends Gdn_Pluggable {
      * @return bool Whether a master key has been released.
      */
     protected function releaseCacheLock(string $lockKey): bool {
+        // If caching isn't enabled bail out
+        $cacheEnabled = Gdn_Cache::activeEnabled();
+        if(!$cacheEnabled) {
+            return true;
+        }
         $keyReleased = Gdn::cache()->remove($lockKey);
         return $keyReleased;
     }

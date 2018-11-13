@@ -15,6 +15,7 @@ $meBox-button_width: 40px;
     color: inherit;
     height: $global-header_height;
     width: $meBox-button_width;
+    padding: 0;
 
     &:hover,
     &:focus {

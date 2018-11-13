@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { IMessagesDropDownProps } from "../pieces/MessagesDropdown";
+import { IMessagesDropDownProps } from "../pieces/MessagesDropDown";
 
 export const dummyMessagesData: IMessagesDropDownProps = {
     data: [],

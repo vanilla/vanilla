@@ -36,7 +36,7 @@ interface IState {
 /**
  * Implements Messages Drop down for header
  */
-export default class MessagesDropdown extends React.Component<IMessagesDropDownProps, IState> {
+export default class MessagesDropDown extends React.Component<IMessagesDropDownProps, IState> {
     private id = uniqueIDFromPrefix("messagesDropDown");
 
     public constructor(props) {

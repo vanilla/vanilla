@@ -14,7 +14,7 @@ import CompactMenu from "./pieces/CompactMenu";
 import VanillaHeaderNav, { IVanillaHeaderNavProps } from "./pieces/VanillaHeaderNav";
 import CompactSearch from "./pieces/CompactSearch";
 import NotificationsDropdown, { INotificationsDropDownProps } from "./pieces/NotificationsDropdown";
-import MessagesDropDown, { IMessagesDropDownProps } from "./pieces/MessagesDropdown";
+import MessagesDropDown, { IMessagesDropDownProps } from "./pieces/MessagesDropDown";
 import UserDropdown from "./pieces/UserDropdown";
 import Container from "@knowledge/layouts/components/Container";
 import { PanelWidgetHorizontalPadding } from "@knowledge/layouts/PanelLayout";

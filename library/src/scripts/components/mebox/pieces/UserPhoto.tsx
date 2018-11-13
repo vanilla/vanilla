@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { noUserPhoto } from "@library/components/icons/common";
+import { noUserPhoto, user } from "@library/components/icons/header";
 import classNames from "classnames";
 import { IUserFragment } from "@library/@types/api";
 
@@ -44,7 +44,7 @@ export class UserPhoto extends React.Component<IProps, IState> {
         return (
             <div className={classNames("userPhoto", className, { isOpen: this.state.open })}>
                 {!!photoUrl && <img src={photoUrl} alt={name || ""} className={classNames("userPhoto-photo", size)} />}
-                {!photoUrl && noUserPhoto("userPhoto-photo")}
+                {!photoUrl && user(this.state.open, "userPhoto-photo")}
             </div>
         );
     }

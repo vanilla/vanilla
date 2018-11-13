@@ -6,8 +6,8 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import InternalOrExternalLink from "@library/components/InternalOrExternalLink";
 import { withRouter, RouteComponentProps } from "react-router-dom";
+import SmartLink from "@library/components/navigation/SmartLink";
 
 export interface IVanillaHeaderNavItemProps {
     className?: string;
@@ -26,19 +26,19 @@ export class VanillaHeaderNavItem extends React.Component<IProps> {
             <li
                 className={classNames("vanillaHeaderNav-item", this.props.className, { isCurrent: this.currentPage() })}
             >
-                <InternalOrExternalLink
+                <SmartLink
                     to={this.props.to}
                     className={classNames("vanillaHeaderNav-link", { isCurrent: this.currentPage() })}
                 >
                     {this.props.name}
-                </InternalOrExternalLink>
+                </SmartLink>
             </li>
         );
     }
 
     /**
      * Checks if we're on the current page
-     * Note that this won't work with non-canonical URLs
+     * Note that this won't work with non-canonical URLHeaderLogo.tsxs
      */
     public currentPage = (): boolean => {
         if (this.props.location && this.props.location.pathname) {

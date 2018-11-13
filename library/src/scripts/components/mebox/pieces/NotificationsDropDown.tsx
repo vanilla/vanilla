@@ -15,7 +15,7 @@ import FrameFooter from "@library/components/frame/FrameFooter";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import LinkAsButton from "@library/components/LinkAsButton";
 import Frame from "@library/components/frame/Frame";
-import { notifications, settings } from "@library/components/icons/common";
+import { notifications, settings } from "@library/components/icons/header";
 
 export interface INotification {
     unread?: boolean;
@@ -50,8 +50,8 @@ export default class NotificationsDropDown extends React.Component<INotification
         return (
             <DropDown
                 id={this.id}
-                name={t("Messages")}
-                buttonClassName={"vanillaHeader-messages"}
+                name={t("Notifications")}
+                buttonClassName={"vanillaHeader-notifications"}
                 renderLeft={true}
                 buttonContents={notifications(this.state.open)}
                 onVisibilityChange={this.setOpen}
@@ -60,7 +60,7 @@ export default class NotificationsDropDown extends React.Component<INotification
                     <FrameHeader className="isShadowed" title={t("Notifications")}>
                         <LinkAsButton
                             title={t("Notification Preferences")}
-                            className="headerDropDown-headerButton headerDropDown-messages button-pushRight"
+                            className="headerDropDown-headerButton headerDropDown-notifications button-pushRight"
                             to={`/profile/preferences/${this.props.userSlug}`}
                             baseClass={ButtonBaseClass.TEXT}
                         >
@@ -73,18 +73,20 @@ export default class NotificationsDropDown extends React.Component<INotification
                     <FrameFooter className="isShadowed">
                         <LinkAsButton
                             className="headerDropDown-footerButton headerDropDown-allButton button-pushLeft"
-                            to={"/kb/messages"}
+                            to={"/profile/notifications"}
                             baseClass={ButtonBaseClass.TEXT}
                         >
-                            {t("All Messages")}
+                            {t("All Notifications")}
                         </LinkAsButton>
-                        <Button
-                            onClick={this.handleAllRead}
-                            disabled={this.state.hasUnread}
-                            baseClass={ButtonBaseClass.TEXT}
-                        >
-                            {t("Mark All Read")}
-                        </Button>
+                        {this.state.hasUnread && (
+                            <Button
+                                onClick={this.handleAllRead}
+                                disabled={this.state.hasUnread}
+                                baseClass={ButtonBaseClass.TEXT}
+                            >
+                                {t("Mark All Read")}
+                            </Button>
+                        )}
                     </FrameFooter>
                 </Frame>
             </DropDown>

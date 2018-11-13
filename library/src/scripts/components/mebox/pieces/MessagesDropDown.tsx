@@ -17,7 +17,7 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import LinkAsButton from "@library/components/LinkAsButton";
 import Frame from "@library/components/frame/Frame";
 import Heading from "@library/components/Heading";
-import { compose, messages } from "@library/components/icons/common";
+import { compose, messages } from "@library/components/icons/header";
 
 export interface IMessage {
     unread?: boolean;

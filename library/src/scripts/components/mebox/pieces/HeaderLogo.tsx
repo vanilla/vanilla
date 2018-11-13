@@ -6,8 +6,8 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import InternalOrExternalLink from "@library/components/InternalOrExternalLink";
-import { vanillaLogo } from "@library/components/icons/common";
+import { vanillaLogo } from "@library/components/icons/header";
+import SmartLink from "@library/components/navigation/SmartLink";
 
 export interface IHeaderLogo {
     className?: string;
@@ -37,12 +37,9 @@ export default class HeaderLogo extends React.Component<IHeaderLogo> {
             contents = vanillaLogo(logoClassName, this.props.color);
         }
         return (
-            <InternalOrExternalLink
-                to={this.props.to || "/kb"}
-                className={classNames("headerLogo", this.props.className)}
-            >
+            <SmartLink to={this.props.to || "/kb"} className={classNames("headerLogo", this.props.className)}>
                 {contents}
-            </InternalOrExternalLink>
+            </SmartLink>
         );
     }
 }

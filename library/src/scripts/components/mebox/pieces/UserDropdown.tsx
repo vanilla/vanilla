@@ -15,7 +15,6 @@ import FrameFooter from "@library/components/frame/FrameFooter";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import LinkAsButton from "@library/components/LinkAsButton";
 import Frame from "@library/components/frame/Frame";
-import { settings } from "@library/components/icons/common";
 import { IUserFragment } from "@library/@types/api/users";
 import { UserPhotoSize, UserPhoto } from "@library/components/mebox/pieces/UserPhoto";
 import { logError } from "@library/utility";
@@ -40,7 +39,7 @@ interface IState {
  * Implements Messages Drop down for header
  */
 export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
-    private id = uniqueIDFromPrefix("notificationsDropDown");
+    private id = uniqueIDFromPrefix("userDropDown");
 
     public constructor(props) {
         super(props);
@@ -73,43 +72,13 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                 onVisibilityChange={this.setOpen}
             >
                 <Frame>
-                    <FrameHeader className="isShadowed" title={t("Notifications")}>
-                        <LinkAsButton
-                            title={t("Notification Preferences")}
-                            className="headerDropDown-headerButton headerDropDown-messages button-pushRight"
-                            to={`/profile/preferences/${userInfo.userID}`}
-                            baseClass={ButtonBaseClass.TEXT}
-                        >
-                            {settings()}
-                        </LinkAsButton>
-                    </FrameHeader>
                     <FrameBody className="isSelfPadded">
-                        <FramePanel>{t("Messages Here")}</FramePanel>
+                        <FramePanel>{t("Stuff Here")}</FramePanel>
                     </FrameBody>
-                    <FrameFooter className="isShadowed">
-                        <LinkAsButton
-                            className="headerDropDown-footerButton headerDropDown-allButton button-pushLeft"
-                            to={"/kb/messages"}
-                            baseClass={ButtonBaseClass.TEXT}
-                        >
-                            {t("All Messages")}
-                        </LinkAsButton>
-                        <Button
-                            onClick={this.handleAllRead}
-                            disabled={this.state.hasUnread}
-                            baseClass={ButtonBaseClass.TEXT}
-                        >
-                            {t("Mark All Read")}
-                        </Button>
-                    </FrameFooter>
                 </Frame>
             </DropDown>
         );
     }
-
-    private handleAllRead = e => {
-        alert("Todo!");
-    };
 
     private setOpen = open => {
         this.setState({

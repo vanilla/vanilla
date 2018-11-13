@@ -5,4 +5,7 @@
  */
 import { INotificationsDropDownProps } from "@library/components/mebox/pieces/NotificationsDropDown";
 
-export const dummyNotificationsData: INotificationsDropDownProps = {};
+export const dummyNotificationsData: INotificationsDropDownProps = {
+    userSlug: "admin",
+    data: [],
+};

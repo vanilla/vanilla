@@ -15,7 +15,7 @@ import VanillaHeaderNav, { IVanillaHeaderNavProps } from "./pieces/VanillaHeader
 import CompactSearch from "./pieces/CompactSearch";
 import NotificationsDropdown, { INotificationsDropDownProps } from "./pieces/NotificationsDropdown";
 import MessagesDropDown, { IMessagesDropDownProps } from "./pieces/MessagesDropdown";
-import UserDropdown, { IUserDropDownProps } from "./pieces/UserDropdown";
+import UserDropdown from "./pieces/UserDropdown";
 import Container from "@knowledge/layouts/components/Container";
 import { PanelWidgetHorizontalPadding } from "@knowledge/layouts/PanelLayout";
 import LanguagesDropDown, { ILanguageDropDownProps } from "@knowledge/modules/article/components/LanguagesDropDown";
@@ -35,7 +35,7 @@ export interface IMeBoxProps extends IDeviceProps {
     languagesProps: ILanguageDropDownProps;
     notificationsProps: INotificationsDropDownProps;
     messagesProps: IMessagesDropDownProps;
-    userDropDownProps: IUserDropDownProps;
+    userDropDownProps: any;
     headerStyles: IHeaderStyles;
 }
 

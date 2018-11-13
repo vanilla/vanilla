@@ -6,4 +6,6 @@
 
 import { IMessagesDropDownProps } from "../pieces/MessagesDropdown";
 
-export const dummyMessagesData: IMessagesDropDownProps = {};
+export const dummyMessagesData: IMessagesDropDownProps = {
+    data: [],
+};

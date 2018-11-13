@@ -62,7 +62,7 @@ export default class MessagesDropdown extends React.Component<IMessagesDropDownP
                         <LinkAsButton
                             title={t("New Message")}
                             className="headerDropDown-headerButton headerDropDown-messages button-pushRight"
-                            to={"/messages/add"}
+                            to={"/messages/inbox"}
                             baseClass={ButtonBaseClass.TEXT}
                         >
                             {compose()}
@@ -79,7 +79,11 @@ export default class MessagesDropdown extends React.Component<IMessagesDropDownP
                         >
                             {t("All Notifications")}
                         </LinkAsButton>
-                        <Button onClick={this.handleAllRead} disabled={this.state.hasUnread}>
+                        <Button
+                            onClick={this.handleAllRead}
+                            disabled={this.state.hasUnread}
+                            baseClass={ButtonBaseClass.TEXT}
+                        >
                             {t("Mark All Read")}
                         </Button>
                     </FrameFooter>

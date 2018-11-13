@@ -332,6 +332,25 @@ export function vanillaLogo(className?: string, fill: string = "currentColor") {
     );
 }
 
+export function settings(className?: string) {
+    const title = t("Settings");
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 18"
+            className={classNames("icon", "icon-settings", className)}
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+            <path
+                d="M6,18v-.5a.5.5,0,0,1,.5-.5h4a.5.5,0,0,1,.5.5V18H22v2H11v.5a.5.5,0,0,1-.5.5h-4a.5.5,0,0,1-.5-.5V20H2V18Zm9-7v-.5a.5.5,0,0,1,.5-.5h4a.5.5,0,0,1,.5.5V11h2v2H20v.5a.5.5,0,0,1-.5.5h-4a.5.5,0,0,1-.5-.5V13H2V11ZM4,4V3.5A.5.5,0,0,1,4.5,3h4a.5.5,0,0,1,.5.5V4H22V6H9v.5a.5.5,0,0,1-.5.5h-4A.5.5,0,0,1,4,6.5V6H2V4ZM5,4V6H8V4Zm11,7v2h3V11ZM7,18v2h3V18Z"
+                transform="translate(-2 -3)"
+                fill="currentColor"
+            />
+        </svg>
+    );
+}
+
 export function search(className?: string) {
     const title = t("Search");
     return (
@@ -351,7 +370,7 @@ export function search(className?: string) {
     );
 }
 
-export function notification(filled?: boolean, className?: string) {
+export function notifications(filled?: boolean, className?: string) {
     const title = t("Notifications");
     return (
         <svg
@@ -361,13 +380,13 @@ export function notification(filled?: boolean, className?: string) {
             aria-hidden="true"
         >
             <title>{title}</title>
-            {filled && (
+            {!filled && (
                 <path
                     d="M10,1.066A5.742,5.742,0,0,1,15,7v3q0,2.288,2.51,4.574A1.5,1.5,0,0,1,18,15.683V16.5A1.5,1.5,0,0,1,16.5,18H11a2,2,0,0,1-4,0H1.5A1.5,1.5,0,0,1,0,16.5v-.817a1.5,1.5,0,0,1,.49-1.109Q3,12.287,3,10V7A5.742,5.742,0,0,1,8,1.066V.958C8,.429,8.3,0,8.677,0h.646C9.7,0,10,.422,10,.951ZM1.5,16.5h15v-.817C14.541,13.9,13.5,12,13.5,10V7A4.262,4.262,0,0,0,9.49,2.5,4.45,4.45,0,0,0,9,2.5,4.262,4.262,0,0,0,4.5,6.51,4.45,4.45,0,0,0,4.5,7v3c0,2-1.041,3.9-3,5.682Z"
                     fill="currentColor"
                 />
             )}
-            {!filled && (
+            {filled && (
                 <path
                     d="M10,1.066A5.742,5.742,0,0,1,15,7v3q0,2.288,2.51,4.574A1.5,1.5,0,0,1,18,15.683V16.5A1.5,1.5,0,0,1,16.5,18H11a2,2,0,0,1-4,0H1.5A1.5,1.5,0,0,1,0,16.5v-.817a1.5,1.5,0,0,1,.49-1.109Q3,12.287,3,10V7A5.742,5.742,0,0,1,8,1.066V.958C8,.429,8.3,0,8.677,0h.646C9.7,0,10,.422,10,.951Z"
                     fill="currentColor"

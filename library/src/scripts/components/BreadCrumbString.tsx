@@ -5,7 +5,6 @@
  */
 
 import * as React from "react";
-import { t } from "@library/application";
 import classNames from "classnames";
 
 export interface ICrumbString {
@@ -13,7 +12,7 @@ export interface ICrumbString {
 }
 
 export interface IProps {
-    children: ICrumbString[];
+    crumbs: ICrumbString[];
     className?: string;
 }
 
@@ -23,9 +22,9 @@ export interface IProps {
 export default class BreadCrumbString extends React.Component<IProps> {
     public render() {
         const crumbSeparator = ` › `;
-        const crumbCount = this.props.children.length - 1;
+        const crumbCount = this.props.crumbs.length - 1;
 
-        const contents = this.props.children.map((crumb, index) => {
+        const contents = this.props.crumbs.map((crumb, index) => {
             const lastElement = index === crumbCount;
             return crumb.name + (lastElement ? "" : crumbSeparator);
         });

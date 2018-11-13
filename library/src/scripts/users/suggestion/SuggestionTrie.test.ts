@@ -4,24 +4,24 @@
  * @license GPL-2.0-only
  */
 
-import MentionTrie, { IMentionNode, IMentionValue } from "@rich-editor/state/mention/MentionTrie";
 import { expect } from "chai";
 import { LoadStatus } from "@library/@types/api";
+import SuggestionTrie, { ISuggestionValue, ISuggestionNode } from "@library/users/suggestion/SuggestionTrie";
 
-const LOADING_VALUE: IMentionValue = {
+const LOADING_VALUE: ISuggestionValue = {
     status: LoadStatus.LOADING,
 };
 
-const SUCCESSFUL_VALUE: IMentionValue = {
+const SUCCESSFUL_VALUE: ISuggestionValue = {
     status: LoadStatus.SUCCESS,
     data: [],
 };
 
-describe("MentionTrie", () => {
+describe("SuggestionTrie", () => {
     describe("insert", () => {
         it("can insert values", () => {
-            const trie = new MentionTrie();
-            const expected: IMentionNode = {
+            const trie = new SuggestionTrie();
+            const expected: ISuggestionNode = {
                 children: {
                     t: {
                         children: {
@@ -63,7 +63,7 @@ describe("MentionTrie", () => {
         });
 
         it("Does not invalidate a parent value with a child insertion", () => {
-            const trie = new MentionTrie();
+            const trie = new SuggestionTrie();
             trie.insert("t", LOADING_VALUE);
             trie.insert("t", SUCCESSFUL_VALUE);
             expect(trie.getValue("t")).deep.equals(SUCCESSFUL_VALUE);
@@ -76,7 +76,7 @@ describe("MentionTrie", () => {
 
     describe("getValue", () => {
         it("can retrieve a value", () => {
-            const trie = new MentionTrie();
+            const trie = new SuggestionTrie();
             trie.insert("test", LOADING_VALUE);
             trie.insert("teft", SUCCESSFUL_VALUE);
 
@@ -85,7 +85,7 @@ describe("MentionTrie", () => {
         });
 
         it("returns null if its value cannot be found", () => {
-            const trie = new MentionTrie();
+            const trie = new SuggestionTrie();
             trie.insert("test", LOADING_VALUE);
             trie.insert("teft", SUCCESSFUL_VALUE);
 
@@ -95,7 +95,7 @@ describe("MentionTrie", () => {
         });
 
         it("will overwrite an existing value", () => {
-            const trie = new MentionTrie();
+            const trie = new SuggestionTrie();
             trie.insert("test", LOADING_VALUE);
             trie.insert("test", SUCCESSFUL_VALUE);
 

@@ -116,7 +116,7 @@ export function isAllowedUrl(input: string): boolean {
  *
  * @returns Returns a URL that can be used in the APP.
  */
-export function formatUrl(path: string): string {
+export function formatUrl(path: string, withDomain: boolean = false): string {
     if (path.indexOf("//") >= 0) {
         return path;
     } // this is an absolute path.
@@ -124,8 +124,10 @@ export function formatUrl(path: string): string {
     // The context paths that come down are expect to have no / at the end of them.
     // Normally a domain like so: https://someforum.com
     // When we don't have that we want to fallback to "" so that our path with a / can get passed.
-    const urlFormat = getMeta("context.basePath", "");
-    return urlFormat + path;
+    const urlBase = withDomain
+        ? window.location.origin + getMeta("context.basePath", "")
+        : getMeta("context.basePath", "");
+    return urlBase + path;
 }
 
 /**

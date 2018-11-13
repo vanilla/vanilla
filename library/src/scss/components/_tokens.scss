@@ -10,13 +10,27 @@ $tokens-token_bg: mix($global-color_fg, $global-color_bg, 15%);
 $suggestedTextInput-clear_width: 16px;
 $suggestedTextInput-clearIcon_width: 8px;
 
-
-.tokensContainer {
+.tokens__value-container {
     min-height: $formElement_height;
-    padding: 0 $utility-baseUnit;
 
     &.tokens__value-container--has-value {
         padding: $utility-baseUnit / 2;
+    }
+}
+
+.tokens__input {
+    padding: {
+        left: 0;
+        right: 0;
+        // top: $utility-baseUnit / 2;
+        // bottom: $utility-baseUnit / 2;
+    }
+
+    .tokens__value-container--has-value & {
+        padding: {
+            left: $utility-baseUnit;
+            right: $utility-baseUnit;
+        }
     }
 }
 
@@ -30,9 +44,6 @@ $suggestedTextInput-clearIcon_width: 8px;
     };
     margin: $utility-baseUnit / 2;
     background-color: $tokens-token_bg;
-}
-
-.tokens__multi-value {
     user-select: none;
 }
 

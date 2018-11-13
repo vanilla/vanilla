@@ -9,6 +9,7 @@ import produce from "immer";
 import { IMe } from "@library/@types/api";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import UsersActions from "@library/users/UsersActions";
+import UserSuggestionModel, { IUserSuggestionState } from "@library/users/suggestion/UserSuggestionModel";
 
 export interface IInjectableUserState {
     currentUser: ILoadable<IMe>;
@@ -16,6 +17,7 @@ export interface IInjectableUserState {
 
 interface IUsersState {
     current: ILoadable<IMe>;
+    suggestions: IUserSuggestionState;
 }
 
 export interface IUsersStoreState {
@@ -44,6 +46,8 @@ export default class UsersModel implements ReduxReducer<IUsersState> {
         };
     }
 
+    private userSuggestionModel = new UserSuggestionModel();
+
     /**
      * @inheritdoc
      */
@@ -51,6 +55,7 @@ export default class UsersModel implements ReduxReducer<IUsersState> {
         current: {
             status: LoadStatus.PENDING,
         },
+        suggestions: this.userSuggestionModel.reducer(undefined, "" as any),
     };
 
     /**
@@ -74,6 +79,8 @@ export default class UsersModel implements ReduxReducer<IUsersState> {
                     draft.current.error = action.payload;
                     break;
             }
+
+            draft.suggestions = this.userSuggestionModel.reducer(state.suggestions, action as any);
         });
     };
 }

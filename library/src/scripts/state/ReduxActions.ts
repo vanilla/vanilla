@@ -169,13 +169,23 @@ export default class ReduxActions {
     ): Promise<AxiosResponse<T> | undefined> {
         this.dispatch(actionCreators.request(params));
         try {
-            const response: AxiosResponse<T> = await this.api[requestType as any](endpoint, params);
+            const requestPromise =
+                requestType === "get"
+                    ? this.api.get(endpoint, { params })
+                    : this.api[requestType as any](endpoint, params);
+            const response: AxiosResponse<T> = await requestPromise;
             this.dispatch(actionCreators.response(response, params));
             return response;
         } catch (axiosError) {
             const error = axiosError.response ? axiosError.response.data : (axiosError as any);
             this.dispatch(actionCreators.error(error));
         }
+    }
+
+    protected getState<T>(): T {
+        return this.dispatch((c, getState) => {
+            return getState();
+        });
     }
 }
 

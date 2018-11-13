@@ -28,6 +28,7 @@
         "react-virtualized": "9.21.0",
         "redux": "4.0.1",
         "redux-thunk": "2.3.0",
+        "reselect": "4.0.0",
         "shave": "2.5.2",
         "smoothscroll-polyfill": "0.4.3",
         "sprintf-js": "1.1.1",

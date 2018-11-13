@@ -14,10 +14,11 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { leftChevron } from "@library/components/icons/common";
 
 interface ICommonFrameHeaderProps extends ICommonHeadingProps {
-    closeFrame: () => void;
+    closeFrame?: () => void; // Necessary when in modal, but not if in dropdown
     onBackClick?: () => void;
     srOnlyTitle?: boolean;
     titleID?: string;
+    children?: React.ReactNode;
 }
 
 export interface IStringTitle extends ICommonFrameHeaderProps {
@@ -59,6 +60,15 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
             );
         }
 
+        let closeButton;
+        if (this.props.closeFrame) {
+            closeButton = (
+                <div className="frameHeader-closePosition">
+                    <CloseButton className="frameHeader-close" onClick={this.props.closeFrame} />
+                </div>
+            );
+        }
+
         return (
             <header className={classNames("frameHeader", this.props.className)}>
                 {backLink}
@@ -70,9 +80,8 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                 >
                     {componentTitle}
                 </Heading>
-                <div className="frameHeader-closePosition">
-                    <CloseButton className="frameHeader-close" onClick={this.props.closeFrame} />
-                </div>
+                {closeButton}
+                {this.props.children}
             </header>
         );
     }

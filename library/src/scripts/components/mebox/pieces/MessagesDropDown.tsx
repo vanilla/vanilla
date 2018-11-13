@@ -6,17 +6,95 @@
 
 import * as React from "react";
 import classNames from "classnames";
+import { uniqueIDFromPrefix } from "@library/componentIDs";
+import DropDown from "@library/components/dropdown/DropDown";
+import { t } from "@library/application";
+import FrameHeader from "@library/components/frame/FrameHeader";
+import FrameBody from "@library/components/frame/FrameBody";
+import FramePanel from "@library/components/frame/FramePanel";
+import FrameFooter from "@library/components/frame/FrameFooter";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import LinkAsButton from "@library/components/LinkAsButton";
+import Frame from "@library/components/frame/Frame";
+import Heading from "@library/components/Heading";
+import { compose, messages } from "@library/components/icons/common";
+
+export interface IMessage {
+    unread?: boolean;
+}
 
 export interface IMessagesDropDownProps {
     className?: string;
+    data: IMessage[];
 }
-interface IState {}
+
+interface IState {
+    hasUnread: false;
+    open: boolean;
+}
 
 /**
  * Implements Messages Drop down for header
  */
-export default class MessagesDropdown extends React.Component<IMessagesDropDownProps> {
-    public render() {
-        return <div className={classNames(this.props.className)} />;
+export default class MessagesDropdown extends React.Component<IMessagesDropDownProps, IState> {
+    private id = uniqueIDFromPrefix("messagesDropDown");
+
+    public constructor(props) {
+        super(props);
+        this.state = {
+            hasUnread: false,
+            open: false,
+        };
     }
+
+    public render() {
+        return (
+            <DropDown
+                id={this.id}
+                name={t("Messages")}
+                buttonClassName={"vanillaHeader-messages"}
+                renderLeft={true}
+                buttonContents={messages(this.state.open)}
+                onVisibilityChange={this.setOpen}
+            >
+                <Frame>
+                    <FrameHeader className="isShadowed" title={t("Messages")}>
+                        <LinkAsButton
+                            title={t("New Message")}
+                            className="headerDropDown-headerButton headerDropDown-messages button-pushRight"
+                            to={"/messages/add"}
+                            baseClass={ButtonBaseClass.TEXT}
+                        >
+                            {compose()}
+                        </LinkAsButton>
+                    </FrameHeader>
+                    <FrameBody className="isSelfPadded">
+                        <FramePanel>{t("Messages Here")}</FramePanel>
+                    </FrameBody>
+                    <FrameFooter className="isShadowed">
+                        <LinkAsButton
+                            className="headerDropDown-footerButton headerDropDown-allButton button-pushLeft"
+                            to={"/kb/"}
+                            baseClass={ButtonBaseClass.TEXT}
+                        >
+                            {t("All Notifications")}
+                        </LinkAsButton>
+                        <Button onClick={this.handleAllRead} disabled={this.state.hasUnread}>
+                            {t("Mark All Read")}
+                        </Button>
+                    </FrameFooter>
+                </Frame>
+            </DropDown>
+        );
+    }
+
+    private handleAllRead = e => {
+        alert("Todo!");
+    };
+
+    private setOpen = open => {
+        this.setState({
+            open,
+        });
+    };
 }

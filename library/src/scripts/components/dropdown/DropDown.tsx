@@ -26,6 +26,7 @@ export interface IProps {
     disabled?: boolean;
     toggleButtonClassName?: string;
     setExternalButtonRef?: (ref: React.RefObject<HTMLButtonElement>) => void;
+    onVisibilityChange?: (isVisible: boolean) => void;
 }
 
 export interface IState {
@@ -68,6 +69,7 @@ export default class DropDown extends React.Component<IProps, IState> {
                 disabled={this.props.disabled}
                 setExternalButtonRef={this.props.setExternalButtonRef}
                 toggleButtonClassName={this.props.toggleButtonClassName}
+                onVisibilityChange={this.props.onVisibilityChange}
             >
                 {params => {
                     return (
@@ -76,7 +78,7 @@ export default class DropDown extends React.Component<IProps, IState> {
                             id={this.id + "-handle"}
                             parentID={this.id}
                             className={this.props.contentsClassName}
-                            onClick={params.closeMenuHandler}
+                            onClick={this.doNothing}
                             renderLeft={!!this.props.renderLeft}
                             renderAbove={!!this.props.renderAbove}
                         >
@@ -87,4 +89,8 @@ export default class DropDown extends React.Component<IProps, IState> {
             </PopoverController>
         );
     }
+
+    private doNothing = e => {
+        e.stopPropagation();
+    };
 }

@@ -19,5 +19,9 @@ export const dummyNavigationData: IVanillaHeaderNavProps = {
             to: "/",
             name: "Forum",
         },
+        {
+            to: "/kb",
+            name: "Knowledge Base",
+        },
     ],
 };

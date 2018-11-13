@@ -14,6 +14,7 @@ import Popover from "@rich-editor/components/popovers/pieces/Popover";
 import EmojiButton from "@rich-editor/components/popovers/pieces/EmojiButton";
 import { IPopoverControllerChildParameters } from "@library/components/PopoverController";
 import { emoji } from "@library/components/icons/editorIcons";
+import { EmojiGroupButton } from "@rich-editor/components/popovers/pieces/EmojiGroupButton";
 
 const BUTTON_SIZE = 36;
 const COL_SIZE = 7;
@@ -87,30 +88,21 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             </button>
         );
 
-        const Icon = emoji();
-
         const footer = (
             <div id={this.categoryPickerID} className="emojiGroups" aria-label={t("Emoji Categories")} tabIndex={-1}>
                 {Object.values(EMOJI_GROUPS).map((group, groupIndex) => {
                     const { name, icon } = group;
                     const isSelected = this.state.selectedGroupIndex === groupIndex;
-                    const buttonClasses = classNames("richEditor-button", "emojiGroup", { isSelected });
-
-                    const onClick = event => this.handleCategoryClick(event, groupIndex);
 
                     return (
-                        <button
-                            type="button"
-                            onClick={onClick}
-                            aria-current={isSelected}
-                            aria-label={t("Jump to emoji category: ") + t(name)}
-                            key={"emojiGroup-" + name}
-                            title={t(name)}
-                            className={buttonClasses}
-                        >
-                            {icon}
-                            <span className="sr-only">{t("Jump to emoji category: ") + t(name)}</span>
-                        </button>
+                        <EmojiGroupButton
+                            key={groupIndex}
+                            name={name}
+                            icon={icon}
+                            isSelected={isSelected}
+                            navigateToGroup={this.scrollToCategory}
+                            groupIndex={groupIndex}
+                        />
                     );
                 })}
             </div>
@@ -197,12 +189,6 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
             title: t(EMOJI_GROUPS[selectedGroupIndex].name),
         });
     };
-
-    private handleCategoryClick(event: React.MouseEvent<any>, categoryID: number) {
-        event.preventDefault();
-        event.stopPropagation();
-        this.scrollToCategory(categoryID);
-    }
 
     /**
      * Scroll to category

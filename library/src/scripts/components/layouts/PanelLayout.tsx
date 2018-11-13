@@ -7,7 +7,7 @@
 import * as React from "react";
 import { Devices, IDeviceProps } from "../DeviceChecker";
 import classNames from "classnames";
-import CompoundComponent from "../../../../../plugins/knowledge/src/scripts/layouts/CompoundComponent";
+import CompoundComponent from "./CompoundComponent";
 
 interface IPanelLayoutProps extends IDeviceProps {
     children: React.ReactNode;

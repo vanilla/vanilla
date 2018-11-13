@@ -18,6 +18,7 @@ import LinkAsButton from "@library/components/LinkAsButton";
 import Frame from "@library/components/frame/Frame";
 import Heading from "@library/components/Heading";
 import { compose, messages } from "@library/components/icons/header";
+import Count from "@library/components/mebox/pieces/Count";
 
 export interface IMessage {
     unread?: boolean;
@@ -26,6 +27,7 @@ export interface IMessage {
 export interface IMessagesDropDownProps {
     className?: string;
     data: IMessage[];
+    count?: number;
 }
 
 interface IState {
@@ -54,7 +56,16 @@ export default class MessagesDropDown extends React.Component<IMessagesDropDownP
                 name={t("Messages")}
                 buttonClassName={"vanillaHeader-messages meBox-button"}
                 renderLeft={true}
-                buttonContents={<div className="meBox-buttonContent">{messages(this.state.open)}</div>}
+                buttonContents={
+                    <div className="meBox-buttonContent">
+                        {messages(this.state.open)}{" "}
+                        <Count
+                            className="vanillaHeader-notificationsCount"
+                            label={t("Messages: ")}
+                            count={this.props.count}
+                        />
+                    </div>
+                }
                 onVisibilityChange={this.setOpen}
             >
                 <Frame>

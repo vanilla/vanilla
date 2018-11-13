@@ -12,9 +12,9 @@ import { dummyNotificationsData } from "@library/components/mebox/state/dummyNot
 import { dummyMessagesData } from "@library/components/mebox/state/dummyMessagesData";
 import { dummyNavigationData } from "./mebox/state/dummyNavigationData";
 import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
-import { dummyOtherLanguagesData } from "@knowledge/modules/categories/state/dummyOtherLanguages";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@library/contexts/DeviceContext";
+import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 
 interface IProps extends IDeviceProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.

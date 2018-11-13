@@ -8,18 +8,18 @@ import * as React from "react";
 import classNames from "classnames";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@library/contexts/DeviceContext";
-import FlexSpacer from "../flexSpacer";
 import HeaderLogo, { IHeaderLogo } from "./pieces/HeaderLogo";
 import CompactMenu from "./pieces/CompactMenu";
 import VanillaHeaderNav, { IVanillaHeaderNavProps } from "./pieces/VanillaHeaderNav";
 import CompactSearch from "./pieces/CompactSearch";
-import NotificationsDropdown, { INotificationsDropDownProps } from "./pieces/NotificationsDropdown";
+import NotificationsDropdown, { INotificationsDropDownProps } from "./pieces/NotificationsDropDown";
 import MessagesDropDown, { IMessagesDropDownProps } from "./pieces/MessagesDropDown";
 import UserDropdown from "./pieces/UserDropdown";
-import Container from "@knowledge/layouts/components/Container";
+import Container from "@library/components/layouts/components/Container";
 import { dummyNavigationData } from "./state/dummyNavigationData";
 import LanguagesDropDown, { ILanguageDropDownProps } from "@library/components/LanguagesDropDown";
 import { PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
+import FlexSpacer from "@library/components/FlexSpacer";
 
 export interface IHeaderStyles {
     bgColor?: string;

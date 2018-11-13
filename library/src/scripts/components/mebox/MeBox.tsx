@@ -11,7 +11,7 @@ import { withDevice } from "@knowledge/contexts/DeviceContext";
 import FlexSpacer from "../flexSpacer";
 import HeaderLogo, { IHeaderLogo } from "./pieces/HeaderLogo";
 import CompactMenu from "./pieces/CompactMenu";
-import HeaderNavigation, { IHeaderNavigationProps } from "./pieces/HeaderNavigation";
+import VanillaHeaderNav, { IVanillaHeaderNavProps } from "./pieces/VanillaHeaderNav";
 import CompactSearch from "./pieces/CompactSearch";
 import NotificationsDropdown, { INotificationsDropDownProps } from "./pieces/NotificationsDropdown";
 import MessagesDropDown, { IMessagesDropDownProps } from "./pieces/MessagesDropdown";
@@ -31,7 +31,7 @@ export interface IMeBoxProps extends IDeviceProps {
     homePage: boolean;
     className?: string;
     logoProps: IHeaderLogo;
-    navigationProps: IHeaderNavigationProps;
+    navigationProps: IVanillaHeaderNavProps;
     languagesProps: ILanguageDropDownProps;
     notificationsProps: INotificationsDropDownProps;
     messagesProps: IMessagesDropDownProps;
@@ -73,7 +73,7 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                         <CompactMenu {...this.props} />
                     </div>
                     <div className={classNames("vanillaHeader-homeBottom")}>
-                        <HeaderNavigation children={dummyNavigationData} />
+                        <VanillaHeaderNav {...dummyNavigationData} />
                     </div>
                 </React.Fragment>
             );
@@ -89,8 +89,8 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                                     logoClassName="vanillaHeader-logo"
                                     color={styles.fg}
                                 />
-                                <HeaderNavigation {...this.props.navigationProps} />
-                                <LanguagesDropDown {...this.props.languagesProps} />
+                                <VanillaHeaderNav {...this.props.navigationProps} />
+                                <LanguagesDropDown {...this.props.languagesProps} renderLeft={true} />
                             </React.Fragment>
                         )}
                         <CompactSearch onClick={this.toggleSearch} open={this.state.openSearch} />

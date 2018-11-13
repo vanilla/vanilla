@@ -6,23 +6,22 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import HeaderNavigationItem, { IHeaderNavigationItemProps } from "./HeaderNavigationItem";
+import VanillaHeaderNavItem, { IVanillaHeaderNavItemProps } from "./VanillaHeaderNavItem";
 
-export interface IHeaderNavigationProps {
+export interface IVanillaHeaderNavProps {
     className?: string;
-    children: IHeaderNavigationItemProps[];
+    children: IVanillaHeaderNavItemProps[];
 }
 
 /**
  * Implements Navigation component for header
  */
-export default class HeaderNavigation extends React.Component<IHeaderNavigationProps> {
+export default class VanillaHeaderNav extends React.Component<IVanillaHeaderNavProps> {
     public render() {
-        console.log("props: ", this.props);
         const content = this.props.children.map((item, key) => {
             return (
                 <React.Fragment key={`headerNavItem-${key}`}>
-                    <HeaderNavigationItem {...item} />
+                    <VanillaHeaderNavItem {...item} />
                 </React.Fragment>
             );
         });

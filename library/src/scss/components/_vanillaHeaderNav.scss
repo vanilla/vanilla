@@ -1,0 +1,27 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$vanillaHeaderNav-spacer_width: 24px;
+
+.headerNavigation-items {
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+    color: inherit;
+}
+
+.vanillaHeaderNav-item {
+    + .vanillaHeaderNav-item {
+        margin-left: $vanillaHeaderNav-spacer_width;
+    }
+}
+
+.vanillaHeaderNav-link {
+    height: $global-header_height;
+    color: inherit;
+
+
+}

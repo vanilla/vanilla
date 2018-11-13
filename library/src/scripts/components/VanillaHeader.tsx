@@ -37,7 +37,11 @@ export class VanillaHeader extends React.Component<IProps> {
                 logoProps={dummyLogoData}
                 notificationsProps={dummyNotificationsData}
                 navigationProps={{ children: dummyNavigationData.children, className: "vanillaHeader-nav" }}
-                languagesProps={dummyOtherLanguagesData}
+                languagesProps={{
+                    ...dummyOtherLanguagesData,
+                    className: "vanillaHeader-locales",
+                    buttonClassName: "vanillaHeader-localesToggle",
+                }}
                 messagesProps={dummyMessagesData}
                 userDropDownProps={dummyUserDropDownData}
                 device={this.props.device}

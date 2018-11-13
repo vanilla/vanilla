@@ -3,9 +3,9 @@
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { IHeaderNavigationProps } from "../pieces/HeaderNavigation";
+import { IVanillaHeaderNavProps } from "../pieces/VanillaHeaderNav";
 
-export const dummyNavigationData: IHeaderNavigationProps = {
+export const dummyNavigationData: IVanillaHeaderNavProps = {
     children: [
         {
             to: "/discussions",

@@ -25,3 +25,26 @@ $vanillaHeader-logoSpacer_width: 48px;
         margin-right: $vanillaHeader-logoSpacer_width;
     }
 }
+
+
+.vanillaHeader-nav {
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+    color: inherit;
+}
+
+.vanillaHeader-locales {
+    margin-left: auto;
+}
+
+.vanillaHeader-localesToggle {
+    height: $global-header_height;
+
+    &.buttonAsText {
+        &:hover,
+        &:focus {
+            color: inherit;
+        }
+    }
+}

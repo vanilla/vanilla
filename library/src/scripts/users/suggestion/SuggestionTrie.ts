@@ -4,24 +4,24 @@
  * @license GPL-2.0-only
  */
 
-import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 import { ILoadable } from "@library/@types/api";
+import { IUserSuggestion } from "@library/users/suggestion/IUserSuggestion";
 
-export type IMentionValue = ILoadable<IMentionSuggestionData[]>;
+export type ISuggestionValue = ILoadable<IUserSuggestion[]>;
 
-export interface IMentionNode {
+export interface ISuggestionNode {
     children?: {
-        [key: string]: IMentionNode;
+        [key: string]: ISuggestionNode;
     };
-    value?: IMentionValue;
+    value?: ISuggestionValue;
 }
 
 /**
  * A trie for storage of mention data.
  */
-export default class MentionTrie {
+export default class SuggestionTrie {
     public MAX_PARTIAL_LOOKUP_ITERATIONS = 10;
-    private root: IMentionNode = {};
+    private root: ISuggestionNode = {};
 
     /**
      * Insert a value into a node for the word. This will overwrite whatever value the node already has
@@ -29,7 +29,7 @@ export default class MentionTrie {
      * @param word - The location in the trie.
      * @param value - The value for the node.
      */
-    public insert(word: string, value: IMentionValue): void {
+    public insert(word: string, value: ISuggestionValue): void {
         let current = this.root;
 
         for (let i = 0; i < word.length; i++) {
@@ -39,7 +39,7 @@ export default class MentionTrie {
             }
 
             if (!(letter in current.children)) {
-                const contents: IMentionNode = i !== word.length - 1 ? {} : { children: {} };
+                const contents: ISuggestionNode = i !== word.length - 1 ? {} : { children: {} };
                 current.children[letter] = contents;
             }
 
@@ -56,7 +56,7 @@ export default class MentionTrie {
      *
      * @param word - The word to lookup.
      */
-    public getNode(word?: string): IMentionNode | null {
+    public getNode(word?: string): ISuggestionNode | null {
         let node = this.root;
         if (word === undefined) {
             return node;
@@ -78,7 +78,7 @@ export default class MentionTrie {
      *
      * @param word - The word to lookup.
      */
-    public getValue(word: string): IMentionValue | null {
+    public getValue(word: string): ISuggestionValue | null {
         const node = this.getNode(word);
         return (node && node.value) || null;
     }
@@ -96,7 +96,7 @@ export default class MentionTrie {
      *
      * And return immediately if it finds a result.
      */
-    public getValueFromPartialsOfWord(word: string): IMentionValue | null {
+    public getValueFromPartialsOfWord(word: string): ISuggestionValue | null {
         const startingLength = Math.min(this.MAX_PARTIAL_LOOKUP_ITERATIONS, word.length);
         for (let x = startingLength; x > 0; x--) {
             const substring = word.substring(0, x);

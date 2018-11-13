@@ -73,23 +73,27 @@ export class PasswordForm extends React.Component<IProps, IState> {
                 />
                 <InputTextBlock
                     label={t("Email/Username")}
-                    required={true}
-                    disabled={!this.allowEdit}
                     errors={getFieldErrors(this.props.passwordState, "username")}
-                    defaultValue={this.props.defaultUsername || ""}
                     ref={this.usernameInput}
-                    onChange={this.handleUsernameChange}
-                    value={this.state.username}
+                    inputProps={{
+                        required: true,
+                        disabled: !this.allowEdit,
+                        onChange: this.handleUsernameChange,
+                        defaultValue: this.props.defaultUsername || "",
+                        value: this.state.username,
+                    }}
                 />
                 <InputTextBlock
                     label={t("Password")}
-                    required={true}
-                    disabled={!this.allowEdit}
-                    errors={getFieldErrors(this.props.passwordState, "password")}
-                    type="password"
                     ref={this.passwordInput}
-                    onChange={this.handlePasswordChange}
-                    value={this.state.password}
+                    errors={getFieldErrors(this.props.passwordState, "password")}
+                    inputProps={{
+                        required: true,
+                        disabled: !this.allowEdit,
+                        type: "password",
+                        onChange: this.handlePasswordChange,
+                        value: this.state.password,
+                    }}
                 />
                 <div className="inputBlock inputBlock-tighter">
                     <div className="rememberMeAndForgot">

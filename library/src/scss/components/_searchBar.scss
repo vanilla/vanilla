@@ -57,6 +57,7 @@ $searchBar-search_minWidth: 109px;
 
     .searchBar__control {
         display: flex;
+        flex: 1;
         border: 0;
         background-color: transparent;
         height: 100%;
@@ -72,10 +73,33 @@ $searchBar-search_minWidth: 109px;
                 border-color: $button-basic_focus_border;
             }
         }
-    }
+    };
 
     .searchBar__value-container {
         overflow: auto;
+
+        > div {
+            width: 100%;
+        }
+    }
+}
+
+.searchBar-valueContainer {
+    display: flex;
+    align-items: center;
+}
+
+.searchBar__indicators {
+    display: none;
+}
+
+.searchBar__input {
+    width: 100%;
+    display: block !important;
+
+    input {
+        width: 100%;
+        line-height: $global-base_lineHeight;
     }
 }
 

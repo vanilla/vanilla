@@ -12,23 +12,21 @@ import isEqual from "lodash/isEqual";
 import Keyboard from "quill/modules/keyboard";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import MentionSuggestionList from "@rich-editor/components/toolbars/pieces/MentionSuggestionList";
-import { thunks as mentionThunks, actions as mentionActions } from "@rich-editor/state/mention/mentionActions";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
 import { getBlotAtIndex } from "@rich-editor/quill/utility";
-import { IMentionValue } from "@rich-editor/state/mention/MentionTrie";
 import { connect } from "react-redux";
 import { IMentionSuggestionData, IMentionProps } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 import { IStoreState } from "@rich-editor/@types/store";
 import { LoadStatus } from "@library/@types/api";
+import UserSuggestionModel, {
+    IUserSuggestionState,
+    IInjectableSuggestionsProps,
+} from "@library/users/suggestion/UserSuggestionModel";
+import UserSuggestionActions from "@library/users/suggestion/UserSuggestionActions";
+import apiv2 from "@library/apiv2";
 
-interface IProps extends IWithEditorProps {
-    lookupMentions: (username: string, editorID: string) => void;
-    setActiveItem: (itemID: string, itemIndex: number) => void;
-    suggestions: IMentionValue;
-    lastSuccessfulUsername: string;
-    activeSuggestionID: string;
-    activeSuggestionIndex: number;
-    showLoader: boolean;
+interface IProps extends IWithEditorProps, IInjectableSuggestionsProps {
+    suggestionActions: UserSuggestionActions;
     inActiveMention: boolean;
 }
 
@@ -77,7 +75,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
 
         if (!isEqual(mentionSelection, prevMentionSelection) && mentionSelection) {
             const text = this.quill.getText(mentionSelection.index, mentionSelection.length).replace("@", "");
-            this.props.lookupMentions(text, this.props.editorID);
+            this.props.suggestionActions.loadUsers(text);
         }
 
         // If we have loading or valid suggestions and a valid mention selection
@@ -114,7 +112,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
     }
 
     public render() {
-        const { suggestions, lastSuccessfulUsername, showLoader, activeSuggestionID } = this.props;
+        const { suggestions, lastSuccessfulUsername, activeSuggestionID, isLoading } = this.props;
         const data =
             suggestions && suggestions.status === LoadStatus.SUCCESS && suggestions.data ? suggestions.data : [];
 
@@ -122,11 +120,11 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             <MentionSuggestionList
                 onItemClick={this.onItemClick}
                 mentionProps={this.createMentionProps(data)}
-                matchedString={lastSuccessfulUsername}
+                matchedString={lastSuccessfulUsername || ""}
                 activeItemId={activeSuggestionID}
                 id={this.ID}
                 loaderID={this.loaderID}
-                showLoader={showLoader}
+                showLoader={isLoading}
                 mentionSelection={this.props.instanceState.mentionSelection}
             />
         );
@@ -176,7 +174,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      * Keydown listener for ARIA compliance with
      */
     private keyDownListener = (event: KeyboardEvent) => {
-        const { suggestions, activeSuggestionIndex, activeSuggestionID, showLoader } = this.props;
+        const { suggestions, activeSuggestionIndex, activeSuggestionID, isLoading } = this.props;
         const { mentionSelection } = this.props.instanceState;
         const inActiveMention = mentionSelection !== null;
 
@@ -196,18 +194,18 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             const nextIndex = activeSuggestionIndex + 1;
             const prevIndex = activeSuggestionIndex - 1;
             const userLength = Math.min(MentionToolbar.SUGGESTION_LIMIT, suggestions.data.length);
-            const lastIndex = showLoader ? userLength : userLength - 1;
+            const lastIndex = isLoading ? userLength : userLength - 1;
             const currentItemIsLoader = activeSuggestionID === this.loaderID;
 
             const getIDFromIndex = (newIndex: number) => {
-                return showLoader && newIndex === lastIndex ? this.loaderID : suggestions.data![newIndex].domID;
+                return isLoading && newIndex === lastIndex ? this.loaderID : suggestions.data![newIndex].domID;
             };
 
             switch (true) {
                 case Keyboard.match(event, Keyboard.keys.DOWN): {
                     const newIndex = activeSuggestionIndex === lastIndex ? firstIndex : nextIndex;
                     const newItemID = getIDFromIndex(newIndex);
-                    this.props.setActiveItem(newItemID, newIndex);
+                    this.props.suggestionActions.setActive(newItemID, newIndex);
                     event.preventDefault();
                     event.stopPropagation();
                     break;
@@ -215,7 +213,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
                 case Keyboard.match(event, Keyboard.keys.UP): {
                     const newIndex = activeSuggestionIndex === firstIndex ? lastIndex : prevIndex;
                     const newItemID = getIDFromIndex(newIndex);
-                    this.props.setActiveItem(newItemID, newIndex);
+                    this.props.suggestionActions.setActive(newItemID, newIndex);
                     event.preventDefault();
                     event.stopPropagation();
                     break;
@@ -267,7 +265,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
     private createMentionProps(suggestions: IMentionSuggestionData[]): Array<Partial<IMentionProps>> {
         return suggestions.slice(0, MentionToolbar.SUGGESTION_LIMIT).map((data, index) => {
             const onMouseEnter = () => {
-                this.props.setActiveItem(data.domID, index);
+                this.props.suggestionActions.setActive(data.domID, index);
             };
 
             return {
@@ -361,40 +359,11 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
     };
 }
 
-function mapDispatchToProps(dispatch) {
-    const mentionLookupFn = (username: string) => dispatch(mentionThunks.loadUsers(username));
-
-    return {
-        lookupMentions: debounce(mentionLookupFn, 50) as any,
-        setActiveItem: (itemID: string, itemIndex: number) =>
-            dispatch(mentionActions.setActiveSuggestion(itemID, itemIndex)),
-    };
-}
-
-function mapStateToProps(state: IStoreState) {
-    const {
-        lastSuccessfulUsername,
-        currentUsername,
-        usersTrie,
-        activeSuggestionID,
-        activeSuggestionIndex,
-    } = state.editor.mentions;
-
-    const currentNode = currentUsername && usersTrie.getValue(currentUsername);
-    const showLoader = currentNode && currentNode.status === LoadStatus.LOADING;
-
-    return {
-        suggestions: lastSuccessfulUsername ? usersTrie.getValue(lastSuccessfulUsername) : null,
-        lastSuccessfulUsername,
-        activeSuggestionID,
-        activeSuggestionIndex,
-        showLoader,
-    };
-}
-
 const withRedux = connect(
-    mapStateToProps,
-    mapDispatchToProps,
+    UserSuggestionModel.mapStateToProps,
+    dispatch => ({
+        suggestionActions: new UserSuggestionActions(dispatch, apiv2),
+    }),
 );
 
-export default withRedux(withEditor(MentionToolbar as any));
+export default withRedux(withEditor(MentionToolbar));

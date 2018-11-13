@@ -9,17 +9,8 @@ import Select from "react-select";
 import { getRequiredID, IOptionalComponentID } from "@library/componentIDs";
 import classNames from "classnames";
 import { t } from "@library/application";
-import menuList from "@library/components/forms/select/overwrites/menuList";
-import menu from "@library/components/forms/select/overwrites/menu";
-import selectContainer from "@library/components/forms/select/overwrites/selectContainer";
-import doNotRender from "@library/components/forms/select/overwrites/doNotRender";
 import Paragraph from "@library/components/Paragraph";
-import selectOption from "@library/components/forms/select/overwrites/selectOption";
-import valueContainerTokens from "@library/components/forms/select/overwrites/valueContainerTokens";
-import multiValueContainer from "./overwrites/multiValueContainer";
-import multiValueLabel from "./overwrites/multiValueLabel";
-import multiValueRemove from "./overwrites/multiValueRemove";
-import noOptionsMessage from "./overwrites/noOptionsMessage";
+import * as selectOverrides from "./overwrites";
 import { IComboBoxOption } from "./SearchBar";
 
 interface IProps extends IOptionalComponentID {
@@ -28,31 +19,30 @@ interface IProps extends IOptionalComponentID {
     disabled?: boolean;
     className?: string;
     placeholder?: string;
-    options: IComboBoxOption[];
-    setAuthor: (authors: IComboBoxOption[]) => void;
+    options: IComboBoxOption[] | undefined;
+    isLoading?: boolean;
+    value: IComboBoxOption[];
+    onChange: (tokens: IComboBoxOption[]) => void;
+    onInputChange: (value: string) => void;
+}
+
+interface IState {
+    inputValue: string;
 }
 
 /**
  * Implements the search bar component
  */
-export default class Tokens extends React.Component<IProps> {
-    private id: string;
+export default class Tokens extends React.Component<IProps, IState> {
     private prefix = "tokens";
-    private inputID: string;
-
-    constructor(props: IProps) {
-        super(props);
-        this.id = getRequiredID(props, this.prefix);
-        // this.searchButtonID = this.id + "-searchButton";
-        this.inputID = this.id + "-tokenInput";
-    }
-
-    private handleOnChange = (newValue: any, actionMeta: any) => {
-        this.props.setAuthor(newValue);
+    private id: string = getRequiredID(this.props, this.prefix);
+    private inputID: string = this.id + "-tokenInput";
+    public state: IState = {
+        inputValue: "",
     };
 
     public render() {
-        const { className, disabled, options } = this.props;
+        const { className, disabled, options, isLoading } = this.props;
 
         return (
             <div className={classNames("tokens", "inputBlock", this.props.className)}>
@@ -66,9 +56,14 @@ export default class Tokens extends React.Component<IProps> {
                         id={this.id}
                         inputId={this.inputID}
                         components={this.componentOverwrites}
+                        onChange={this.props.onChange}
+                        inputValue={this.state.inputValue}
+                        value={this.props.value}
+                        onInputChange={this.handleInputChange}
                         isClearable={true}
                         isDisabled={disabled}
                         options={options}
+                        isLoading={this.showLoader}
                         classNamePrefix={this.prefix}
                         className={classNames(this.prefix, className)}
                         placeholder={this.props.placeholder}
@@ -85,22 +80,37 @@ export default class Tokens extends React.Component<IProps> {
         );
     }
 
+    private get showLoader(): boolean {
+        return !!this.props.isLoading && this.state.inputValue.length > 0;
+    }
+
+    private handleInputChange = val => {
+        this.setState({ inputValue: val });
+        this.props.onInputChange(val);
+    };
+
     /*
     * Overwrite components in Select component
     */
-    private componentOverwrites = {
-        IndicatorsContainer: doNotRender,
-        SelectContainer: selectContainer,
-        Menu: menu,
-        MenuList: menuList,
-        Option: selectOption,
-        ValueContainer: valueContainerTokens,
-        Control: multiValueContainer,
-        MultiValueContainer: multiValueContainer,
-        MultiValueLabel: multiValueLabel,
-        MultiValueRemove: multiValueRemove,
-        NoOptionsMessage: noOptionsMessage,
-    };
+    private get componentOverwrites() {
+        return {
+            ClearIndicator: selectOverrides.NullComponent,
+            DropdownIndicator: selectOverrides.NullComponent,
+            LoadingMessage: selectOverrides.OptionLoader,
+            Menu: this.state.inputValue.length > 0 ? selectOverrides.Menu : selectOverrides.NullComponent,
+            MenuList: selectOverrides.MenuList,
+            Option: selectOverrides.SelectOption,
+            ValueContainer: selectOverrides.ValueContainer,
+            Control: selectOverrides.Control,
+            MultiValueRemove: selectOverrides.MultiValueRemove,
+            NoOptionsMessage: this.showLoader
+                ? selectOverrides.OptionLoader
+                : this.state.inputValue.length > 0
+                    ? selectOverrides.NoOptionsMessage
+                    : selectOverrides.NullComponent,
+            LoadingIndicator: selectOverrides.NullComponent,
+        };
+    }
 
     /**
      * Overwrite theme in Select component
@@ -113,23 +123,31 @@ export default class Tokens extends React.Component<IProps> {
             spacing: {},
         };
     };
+
     /**
      * Overwrite styles in Select component
      */
     private getStyles = () => {
         return {
-            option: () => ({}),
-            menu: base => {
-                return { ...base, backgroundColor: null, boxShadow: null };
+            option: (provided: React.CSSProperties) => ({
+                ...provided,
+            }),
+            menu: (provided: React.CSSProperties, state) => {
+                return { ...provided, backgroundColor: undefined, boxShadow: undefined };
             },
-            control: () => ({
+            control: (provided: React.CSSProperties) => ({
+                ...provided,
                 borderWidth: 0,
             }),
-            multiValue: base => {
-                return { ...base, borderRadius: null };
+            multiValue: (provided: React.CSSProperties, state) => {
+                return {
+                    ...provided,
+                    borderRadius: undefined,
+                    opacity: state.isFocused ? 1 : 0.85,
+                };
             },
-            multiValueLabel: base => {
-                return { ...base, borderRadius: null };
+            multiValueLabel: (provided: React.CSSProperties) => {
+                return { ...provided, borderRadius: undefined, padding: 0 };
             },
         };
     };

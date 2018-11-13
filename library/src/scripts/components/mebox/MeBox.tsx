@@ -17,9 +17,9 @@ import NotificationsDropdown, { INotificationsDropDownProps } from "./pieces/Not
 import MessagesDropDown, { IMessagesDropDownProps } from "./pieces/MessagesDropDown";
 import UserDropdown from "./pieces/UserDropdown";
 import Container from "@knowledge/layouts/components/Container";
-import { PanelWidgetHorizontalPadding } from "@knowledge/layouts/PanelLayout";
-import LanguagesDropDown, { ILanguageDropDownProps } from "@knowledge/modules/article/components/LanguagesDropDown";
 import { dummyNavigationData } from "./state/dummyNavigationData";
+import LanguagesDropDown, { ILanguageDropDownProps } from "@library/components/LanguagesDropDown";
+import { PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 
 export interface IHeaderStyles {
     bgColor?: string;

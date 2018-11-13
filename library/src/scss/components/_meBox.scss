@@ -26,6 +26,11 @@ $meBox-button_width: 40px;
     }
 }
 
+.meBox-buttonContent {
+    @include flexCenterContent;
+    height: $meBox-button_width;
+}
+
 .meBox-locale {
     margin-left: auto;
     margin-right: $global_spacer;

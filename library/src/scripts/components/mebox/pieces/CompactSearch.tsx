@@ -8,13 +8,13 @@ import * as React from "react";
 import SearchBar from "@library/components/forms/select/SearchBar";
 import { t } from "@library/application";
 import qs from "qs";
-import SearchOption from "@knowledge/modules/search/components/SearchOption";
 import apiv2 from "@library/apiv2";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
 import { search } from "@library/components/icons/header";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import AsyncCreatableSelect from "react-select/lib/AsyncCreatable";
+import SearchOption from "@library/components/search/SearchOption";
 
 export interface ICompactSearchProps {
     className?: string;

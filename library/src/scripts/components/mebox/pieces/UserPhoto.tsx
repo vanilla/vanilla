@@ -21,7 +21,7 @@ interface IProps {
 }
 
 /**
- * Implements Messages Drop down for header
+ * Implements User Photo Component
  */
 export class UserPhoto extends React.Component<IProps> {
     public render() {

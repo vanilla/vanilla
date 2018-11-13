@@ -1,7 +1,7 @@
-/**
- * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+/*
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPL-2.0-only
  */
 
 import * as React from "react";
@@ -13,6 +13,9 @@ export interface IContainer {
     tag?: string;
 }
 
+/*
+ * Implements "Container" component used to set max width of content of page.
+ */
 export default class Container extends React.Component<IContainer> {
     public static defaultProps = {
         tag: "div",

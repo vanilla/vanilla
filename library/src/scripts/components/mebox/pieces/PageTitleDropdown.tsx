@@ -13,7 +13,7 @@ export interface IPageTitleDropDownProps {
 interface IState {}
 
 /**
- * Implements Notifications for mobile header
+ * Implements PageTitleDropDown, used for Mobile
  */
 export default class PageTitleDropdown extends React.Component<IPageTitleDropDownProps> {
     public render() {

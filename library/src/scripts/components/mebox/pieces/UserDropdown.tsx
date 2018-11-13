@@ -32,7 +32,7 @@ interface IState {
 }
 
 /**
- * Implements Messages Drop down for header
+ * Implements User Drop down for header
  */
 export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
     private id = uniqueIDFromPrefix("userDropDown");

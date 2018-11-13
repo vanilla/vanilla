@@ -18,7 +18,7 @@ export interface IVanillaHeaderNavItemProps {
 interface IProps extends IVanillaHeaderNavItemProps, RouteComponentProps<{}> {}
 
 /**
- * Implements Navigation component for header
+ * Implements Navigation item component for header
  */
 export class VanillaHeaderNavItem extends React.Component<IProps> {
     public render() {

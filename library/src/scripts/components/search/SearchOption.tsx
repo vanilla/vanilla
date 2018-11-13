@@ -8,13 +8,12 @@ import * as React from "react";
 import DateTime from "../DateTime";
 import BreadCrumbString from "../BreadCrumbString";
 import { OptionProps } from "react-select/lib/components/Option";
-import { IComboBoxOption } from "../forms/select/SearchBar";
 import { SelectOption } from "../forms/select/overwrites";
 import classNames from "classnames";
-import { ISearchResult } from "@knowledge/@types/api/search";
+import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 
 interface IProps extends OptionProps<any> {
-    data: IComboBoxOption<ISearchResult>;
+    data: IComboBoxOption<any>;
 }
 
 /**

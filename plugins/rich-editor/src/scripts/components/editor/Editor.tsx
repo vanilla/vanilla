@@ -274,7 +274,7 @@ export class Editor extends React.Component<IProps> {
         let shouldDispatch = false;
         if (type === Quill.events.SELECTION_CHANGE) {
             shouldDispatch = true;
-        } else if (type !== Quill.events.TEXT_CHANGE && source !== Quill.sources.SILENT) {
+        } else if (source !== Quill.sources.SILENT) {
             shouldDispatch = true;
         }
 

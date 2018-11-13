@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import debounce from "lodash/debounce";
+import throttle from "lodash/throttle";
 
 export enum Devices {
     MOBILE = "mobile",
@@ -63,14 +63,14 @@ export default class DeviceChecker extends React.Component<IDeviceCheckerProps> 
      * @inheritDoc
      */
     public componentDidMount() {
-        window.addEventListener("resize", this.debouncedUpdateOnResize);
+        window.addEventListener("resize", this.throttledUpdateOnResize);
     }
 
     /**
      * @inheritDoc
      */
     public componentWillUnmount() {
-        window.removeEventListener("resize", this.debouncedUpdateOnResize);
+        window.removeEventListener("resize", this.throttledUpdateOnResize);
     }
 
     /**
@@ -83,9 +83,9 @@ export default class DeviceChecker extends React.Component<IDeviceCheckerProps> 
     };
 
     /**
-     * A debounced version of updateOnResize.
+     * A throttled version of updateOnResize.
      */
-    private debouncedUpdateOnResize = debounce(this.updateOnResize, 100, {
+    private throttledUpdateOnResize = throttle(this.updateOnResize, 100, {
         leading: true,
     });
 }

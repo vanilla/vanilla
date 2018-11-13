@@ -81,11 +81,13 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
                         />
                         <InputTextBlock
                             label={t("Email")}
-                            required={true}
-                            disabled={!this.allowEdit}
+                            inputProps={{
+                                required: true,
+                                value: this.state.email,
+                                onChange: this.handleEmailChange,
+                                disabled: !this.allowEdit,
+                            }}
                             errors={getFieldErrors(this.props.requestPasswordState, "email")}
-                            value={this.state.email}
-                            onChange={this.handleEmailChange}
                             ref={this.emainInput}
                         />
                         <ButtonSubmit disabled={!this.allowEdit || this.state.email.length === 0} legacyMode={true}>

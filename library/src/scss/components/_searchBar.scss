@@ -6,6 +6,15 @@
 
 $searchBar-search_minWidth: 109px;
 
+.searchBar-clear {
+    position: relative;
+    color: inherit;
+    display: flex;
+    box-sizing: border-box;
+    height: $formElement-height;
+    width: $formElement-height;
+}
+
 .searchBar-form {
     display: block;
 }
@@ -75,19 +84,9 @@ $searchBar-search_minWidth: 109px;
     }
 }
 
-.suggestedTextInput-inputText {
-    position: relative;
-    overflow: auto;
-}
-
-.searchBar-clear{
-    border: none;
-    box-shadow: none;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    margin: auto;
+.searchBar-valueContainer {
+    display: flex;
+    align-items: center;
 }
 
 .searchBar__indicators {

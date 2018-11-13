@@ -18,15 +18,6 @@ $suggestedTextInput-clearButton_width: 16px;
     padding: $suggestedTextInput-option_padding;
 }
 
-.suggestedTextInput-clear{
-    position: relative;
-    color: inherit;
-    display: flex;
-    box-sizing: border-box;
-    height: $formElement-height;
-    width: $formElement-height;
-}
-
 .suggestedTextInput-option {
     width: 100%;
     padding: $suggestedTextInput-option_padding;

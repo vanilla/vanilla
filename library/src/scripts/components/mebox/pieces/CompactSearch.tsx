@@ -86,7 +86,7 @@ export default class CompactSearch extends React.Component<ICompactSearchProps> 
     }
 
     public onSearch = () => {
-        console.log("To do");
+        // Do nothing;
     };
 
     public getRef = ref => {

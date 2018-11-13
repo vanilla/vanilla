@@ -991,7 +991,7 @@ class Gdn_Model extends Gdn_Pluggable {
      * @param string $lockKey Cache key to be assigned.
      * @return bool Whether a master key has been released.
      */
-    protected function releaseCacheLock($lockKey = ''): bool {
+    protected function releaseCacheLock(string $lockKey): bool {
         $keyReleased = Gdn::cache()->remove($lockKey);
         return $keyReleased;
     }

@@ -970,23 +970,19 @@ class Gdn_Model extends Gdn_Pluggable {
      * @return bool Whether a master key has been assigned.
      */
     protected static function buildCacheLock(string $lockKey, int $gracePeriod = 60): bool {
-        static $hasMasterKey = null;
-        $masterKey = null;
-
-        if (is_null($hasMasterKey)) {
-            // First instance will receive the $master key and lock the record.
-            $instanceKey = getmypid();
-            $keyAdded = Gdn::cache()->add($lockKey, $instanceKey, [
-                Gdn_Cache::FEATURE_EXPIRY => $gracePeriod
-            ]);
-
-            if ($keyAdded) {
-                $masterKey = Gdn::cache()->get($lockKey);
-            }
-            $hasMasterKey = ($instanceKey == $masterKey);
+        /**
+         * Attempt to add lock using our process ID. A failure likely means the
+         * cache key already exists, which would mean the lock is already in place.
+         */
+        $instanceKey = getmypid();
+        $added = Gdn::cache()->add($lockKey, $instanceKey, [
+            Gdn_Cache::FEATURE_EXPIRY => $gracePeriod
+        ]);
+        if ($added) {
+            return true;
+        } else {
+            return ($instanceKey === Gdn::cache()->get($lockKey));
         }
-
-        return (bool)$hasMasterKey;
     }
 
     /**

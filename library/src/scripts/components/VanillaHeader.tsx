@@ -5,17 +5,16 @@
  */
 
 import * as React from "react";
-import classNames from "classnames";
 import ReactDOM from "react-dom";
 import { MeBox } from "@library/components/mebox/MeBox";
 import { dummyLogoData } from "./mebox/state/dummyLogoData";
 import { dummyNotificationsData } from "@library/components/mebox/state/dummyNotificationsData";
 import { dummyMessagesData } from "@library/components/mebox/state/dummyMessagesData";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
-import { IDeviceProps } from "@library/components/DeviceChecker";
 import { dummyNavigationData } from "./mebox/state/dummyNavigationData";
 import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
 import { dummyOtherLanguagesData } from "@knowledge/modules/categories/state/dummyOtherLanguages";
+import { IDeviceProps } from "@library/components/DeviceChecker";
+import { withDevice } from "@library/contexts/DeviceContext";
 
 interface IProps extends IDeviceProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.

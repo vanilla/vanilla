@@ -7,7 +7,7 @@
 import * as React from "react";
 import classNames from "classnames";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import { withDevice } from "@knowledge/contexts/DeviceContext";
+import { withDevice } from "@library/contexts/DeviceContext";
 import FlexSpacer from "../flexSpacer";
 import HeaderLogo, { IHeaderLogo } from "./pieces/HeaderLogo";
 import CompactMenu from "./pieces/CompactMenu";

@@ -8,12 +8,8 @@ import * as React from "react";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DropDown from "@library/components/dropdown/DropDown";
 import { t } from "@library/application";
-import FrameHeader from "@library/components/frame/FrameHeader";
 import FrameBody from "@library/components/frame/FrameBody";
 import FramePanel from "@library/components/frame/FramePanel";
-import FrameFooter from "@library/components/frame/FrameFooter";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import LinkAsButton from "@library/components/LinkAsButton";
 import Frame from "@library/components/frame/Frame";
 import { IUserFragment } from "@library/@types/api/users";
 import { UserPhotoSize, UserPhoto } from "@library/components/mebox/pieces/UserPhoto";
@@ -59,15 +55,17 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
             <DropDown
                 id={this.id}
                 name={t("My Account")}
-                buttonClassName={"vanillaHeader-account"}
+                buttonClassName={"vanillaHeader-account meBox-button"}
                 renderLeft={true}
                 buttonContents={
-                    <UserPhoto
-                        userInfo={userInfo}
-                        open={this.state.open}
-                        className="headerDropDown-user"
-                        size={UserPhotoSize.SMALL}
-                    />
+                    <div className="meBox-buttonContent">
+                        <UserPhoto
+                            userInfo={userInfo}
+                            open={this.state.open}
+                            className="headerDropDown-user"
+                            size={UserPhotoSize.SMALL}
+                        />
+                    </div>
                 }
                 onVisibilityChange={this.setOpen}
             >
@@ -95,4 +93,4 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
 }
 
 const withRedux = connect(UsersModel.mapStateToProps);
-export default withRedux(UserPhoto);
+export default withRedux(UserDropDown);

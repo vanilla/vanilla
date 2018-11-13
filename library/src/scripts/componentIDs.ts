@@ -18,8 +18,8 @@ export interface IRequiredComponentID {
 }
 
 // Generates unique ID from suffix
-export function uniqueIDFromPrefix(suffix: string) {
-    return (suffix + uniqueId()) as string;
+export function uniqueIDFromPrefix(prefix: string) {
+    return (prefix + uniqueId()) as string;
 }
 
 // Get required ID, will either return ID given through props or generate unique ID from suffix

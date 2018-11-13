@@ -93,7 +93,12 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                                 <LanguagesDropDown {...this.props.languagesProps} renderLeft={true} />
                             </React.Fragment>
                         )}
-                        <CompactSearch onClick={this.toggleSearch} open={this.state.openSearch} />
+                        <CompactSearch
+                            className="vanillaHeader-search"
+                            open={this.state.openSearch}
+                            openSearch={this.openSearch}
+                            closeSearch={this.closeSearch}
+                        />
                         {!hideNonSearchElements && (
                             <React.Fragment>
                                 <NotificationsDropdown {...this.props.notificationsProps} />
@@ -120,10 +125,20 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
         );
     }
 
-    public toggleSearch = () => {
+    public openSearch = () => {
         this.setState({
-            openSearch: !this.state.openSearch,
+            openSearch: true,
         });
+    };
+
+    public closeSearch = () => {
+        this.setState({
+            openSearch: false,
+        });
+    };
+
+    private doSearch = () => {
+        alert("todo !");
     };
 }
 

@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { noUserPhoto, user } from "@library/components/icons/header";
+import { user } from "@library/components/icons/header";
 import classNames from "classnames";
 import { IUserFragment } from "@library/@types/api";
 
@@ -20,31 +20,20 @@ interface IProps {
     userInfo: IUserFragment;
 }
 
-interface IState {
-    open?: boolean; // When used as dropdown icon
-}
-
 /**
  * Implements Messages Drop down for header
  */
-export class UserPhoto extends React.Component<IProps, IState> {
-    public constructor(props) {
-        super(props);
-        this.state = {
-            open: false,
-        };
-    }
-
+export class UserPhoto extends React.Component<IProps> {
     public render() {
         const { className, size, userInfo } = this.props;
         const photoUrl = userInfo ? userInfo.photoUrl : null;
-        const userID = userInfo ? userInfo.userID : null;
         const name = userInfo ? userInfo.name : null;
+        const open = !!this.props.open;
 
         return (
-            <div className={classNames("userPhoto", className, { isOpen: this.state.open })}>
+            <div className={classNames("userPhoto", className, { isOpen: open })}>
                 {!!photoUrl && <img src={photoUrl} alt={name || ""} className={classNames("userPhoto-photo", size)} />}
-                {!photoUrl && user(this.state.open, "userPhoto-photo")}
+                {!photoUrl && user(open, "userPhoto-photo")}
             </div>
         );
     }

@@ -52,9 +52,9 @@ export default class MessagesDropdown extends React.Component<IMessagesDropDownP
             <DropDown
                 id={this.id}
                 name={t("Messages")}
-                buttonClassName={"vanillaHeader-messages"}
+                buttonClassName={"vanillaHeader-messages meBox-button"}
                 renderLeft={true}
-                buttonContents={messages(this.state.open)}
+                buttonContents={<div className="meBox-buttonContent">{messages(this.state.open)}</div>}
                 onVisibilityChange={this.setOpen}
             >
                 <Frame>

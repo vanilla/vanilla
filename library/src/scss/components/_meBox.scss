@@ -4,7 +4,20 @@
  * @license GPL-2.0-only
  */
 
+$meBox-button_borderRadius: 3px;
+
 .meBox-languages {
     margin-left: auto;
 }
 
+.meBox-button {
+    color: inherit;
+
+    &:hover,
+    &:focus {
+        .meBox-buttonContent {
+            background-color: rgba(#000, .1);
+            border-radius: $meBox-button_borderRadius;
+        }
+    }
+}

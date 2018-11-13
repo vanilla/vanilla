@@ -17,7 +17,7 @@ use Vanilla\UploadedFileSchema;
  */
 class MediaApiController extends AbstractApiController {
     const TYPE_IMAGE = 'image';
-    const TYPE_ANY = 'any';
+    const TYPE_OTHER = 'other';
 
     /** @var Schema */
     private $idParamSchema;
@@ -302,7 +302,7 @@ class MediaApiController extends AbstractApiController {
     public function post(array $body) {
         $this->permission('Garden.Uploads.Add');
         switch ($body['type']) {
-            case self::TYPE_ANY:
+            case self::TYPE_OTHER:
                 $uploadExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
                 break;
             case self::TYPE_IMAGE:
@@ -319,7 +319,7 @@ class MediaApiController extends AbstractApiController {
                 'description' => 'The upload type.',
                 'enum' => [
                     self::TYPE_IMAGE,
-                    self::TYPE_ANY,
+                    self::TYPE_OTHER,
                 ]
             ]
         ],'in')->setDescription('Add a media item.');

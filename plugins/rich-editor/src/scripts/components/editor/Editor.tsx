@@ -281,7 +281,7 @@ export class Editor extends React.Component<IProps> {
         if (shouldDispatch) {
             this.store.dispatch(actions.setSelection(this.quillID, this.quill.getSelection(), this.quill));
         }
-    }, 50);
+    }, 1000 / 60); // Throttle to 60 FPS.
 
     /**
      * Synchronization from quill's contents to the bodybox for legacy contexts.

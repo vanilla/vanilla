@@ -17,13 +17,7 @@ use Vanilla\UploadedFileSchema;
  */
 class MediaApiController extends AbstractApiController {
     const TYPE_IMAGE = 'image';
-    const TYPE_TEXT = 'text';
-    const TYPE_ARCHIVE = 'archive';
-    const TYPE_BINARY = 'binary';
-
-    const EXTENSIONS_TEXT = ['txt', 'csv', 'doc', 'docx', 'pdf', 'md', 'rtf'];
-    const EXTENSIONS_BINARY = ['xls', 'xlsx', 'ppt'];
-    const EXTENSIONS_ARCHIVE = ['zip', 'tar', 'gzip', '7z', 'arj', 'deb', 'pkg', 'gz', 'z', 'rpm', 'iso', 'cab'];
+    const TYPE_ANY = 'any';
 
     /** @var Schema */
     private $idParamSchema;
@@ -34,15 +28,19 @@ class MediaApiController extends AbstractApiController {
     /** @var EmbedManager */
     private $embedManager;
 
+    /** @var Config */
+    private $config;
+
     /**
      * MediaApiController constructor.
      *
      * @param MediaModel $mediaModel
      * @param EmbedManager $embedManager
      */
-    public function __construct(MediaModel $mediaModel, EmbedManager $embedManager) {
+    public function __construct(MediaModel $mediaModel, EmbedManager $embedManager, Gdn_Configuration $config) {
         $this->mediaModel = $mediaModel;
         $this->embedManager = $embedManager;
+        $this->config =  $config;
     }
 
     /**
@@ -165,11 +163,7 @@ class MediaApiController extends AbstractApiController {
         }
 
         $row = $this->normalizeOutput($row);
-        $ext = pathinfo($row['url'], PATHINFO_EXTENSION);
-        if (!in_array($ext, array_keys(ImageResizer::getExtType()))) {
-            unset($row['width']);
-            unset($row['height']);
-        }
+
         $result = $out->validate($row);
         return $result;
     }
@@ -280,12 +274,16 @@ class MediaApiController extends AbstractApiController {
     public function normalizeOutput(array $row) {
         $row['foreignID'] = $row['ForeignID'] ?? null;
         $row['foreignType'] = $row['ForeignTable'] ?? null;
-        $row['height'] = $row['ImageHeight'] ?? null;
-        $row['width'] = $row['ImageWidth'] ?? null;
 
         if (array_key_exists('Path', $row)) {
             $parsed = Gdn_Upload::parse($row['Path']);
             $row['url'] = $parsed['Url'];
+
+            $ext = pathinfo($row['url'], PATHINFO_EXTENSION);
+            if (in_array($ext, array_keys(ImageResizer::getExtType()))) {
+                $row['height'] = $row['ImageHeight'] ?? null;
+                $row['width'] = $row['ImageWidth'] ?? null;
+            }
         } else {
             $row['url'] = null;
         }
@@ -303,22 +301,14 @@ class MediaApiController extends AbstractApiController {
      */
     public function post(array $body) {
         $this->permission('Garden.Uploads.Add');
-
         switch ($body['type']) {
-            case self::TYPE_TEXT:
-                $uploadExtensions = self::EXTENSIONS_TEXT;
-                break;
-            case self::TYPE_BINARY:
-                $uploadExtensions = self::EXTENSIONS_BINARY;
-                break;
-            case self::TYPE_ARCHIVE:
-                $uploadExtensions = self::EXTENSIONS_ARCHIVE;
+            case self::TYPE_ANY:
+                $uploadExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
                 break;
             case self::TYPE_IMAGE:
             default:
                 $uploadExtensions = array_keys(ImageResizer::getExtType());
         }
-
         $uploadSchema = new UploadedFileSchema([
             'allowedExtensions' => $uploadExtensions
         ]);
@@ -327,12 +317,9 @@ class MediaApiController extends AbstractApiController {
             'file' => $uploadSchema,
             'type:s' => [
                 'description' => 'The upload type.',
-                'default' => self::TYPE_IMAGE,
                 'enum' => [
                     self::TYPE_IMAGE,
-                    self::TYPE_TEXT,
-                    self::TYPE_ARCHIVE,
-                    self::TYPE_BINARY,
+                    self::TYPE_ANY,
                 ]
             ]
         ],'in')->setDescription('Add a media item.');

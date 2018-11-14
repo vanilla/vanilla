@@ -16,3 +16,10 @@ $drawer-button_padding: 9px;
     font-weight: $global-fontWeight_semiBold;
     padding: $drawer-button_padding 0;
 }
+
+.drawer-icon {
+    display: inline-flex;
+    min-width: $userContent_fontSize;
+    font-size: $userContent_fontSize;
+
+}

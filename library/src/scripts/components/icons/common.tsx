@@ -56,6 +56,22 @@ export function leftChevronCompact(className?: string) {
             className={classNames("icon-chevronLeftCompact", className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 6.606 11.2"
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+            <path d={leftChefronPath} transform="translate(-8.4 -6.6)" style={currentColorFill} />
+        </svg>
+    );
+}
+
+export function bottomChevron(className?: string) {
+    const title = `↓`;
+    return (
+        <svg
+            className={classNames("icon-chevronLeftCompact", className)}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 6.606 11.2"
+            aria-hidden="true"
         >
             <title>{title}</title>
             <path d={leftChefronPath} transform="translate(-8.4 -6.6)" style={currentColorFill} />

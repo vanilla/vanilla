@@ -8,6 +8,7 @@ import * as React from "react";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
+import { rightChevron } from "../icons/common";
 
 export interface IDrawerProps {
     title: string;
@@ -34,6 +35,8 @@ export default class Drawer extends React.Component<IDrawerProps, IState> {
     }
 
     public render() {
+        const chevronRight = `▸`;
+        const chevronDown = `▾`;
         return (
             <div className={classNames("drawer", this.props.className)}>
                 <Button
@@ -45,6 +48,10 @@ export default class Drawer extends React.Component<IDrawerProps, IState> {
                     className="drawer-toggle"
                     onClick={this.toggle}
                 >
+                    <span aria-hidden={true} className="drawer-icon icon-fake">
+                        {this.state.open && chevronDown}
+                        {!this.state.open && chevronRight}
+                    </span>
                     {this.props.title}
                 </Button>
                 {this.state.open && (

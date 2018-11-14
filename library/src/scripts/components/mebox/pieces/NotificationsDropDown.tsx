@@ -55,6 +55,7 @@ export default class NotificationsDropDown extends React.Component<INotification
                 buttonClassName={"vanillaHeader-notifications meBox-button"}
                 buttonBaseClass={ButtonBaseClass.CUSTOM}
                 renderLeft={true}
+                contentsClassName="meBox-dropDownContents"
                 buttonContents={
                     <div className="meBox-buttonContent">
                         {notifications(this.state.open)}

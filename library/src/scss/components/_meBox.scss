@@ -10,6 +10,7 @@ $meBox-spacer_width: 12px;
 $meBox-count_size: 18px;
 $meBox-count_fontSize: 10px;
 $meBox-count_bg: #D0021B;
+$meBox-dropDownContents_minWidth: 300px;
 
 .meBox-languages {
     margin-left: auto;
@@ -67,4 +68,8 @@ $meBox-count_bg: #D0021B;
     height: $meBox-button_size;
     width: $meBox-button_size;
     overflow: hidden;
+}
+
+.dropDown-contents.meBox-dropDownContents {
+    min-width: $meBox-dropDownContents_minWidth;
 }

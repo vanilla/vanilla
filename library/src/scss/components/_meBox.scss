@@ -61,3 +61,10 @@ $vanillaHeaderNav-spacer_width: 12px;
     height: $meBox-button_size;
     border-radius: $meBox-button_borderRadius;
 }
+
+.meBox-user {
+    position: relative;
+    height: $meBox-button_size;
+    width: $meBox-button_size;
+    overflow: hidden;
+}

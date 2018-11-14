@@ -14,13 +14,13 @@ import VanillaHeaderNav, { IVanillaHeaderNavProps } from "./pieces/VanillaHeader
 import CompactSearch from "./pieces/CompactSearch";
 import NotificationsDropdown, { INotificationsDropDownProps } from "./pieces/NotificationsDropDown";
 import MessagesDropDown, { IMessagesDropDownProps } from "./pieces/MessagesDropDown";
-import UserDropdown from "./pieces/UserDropdown";
 import Container from "@library/components/layouts/components/Container";
 import { dummyNavigationData } from "./state/dummyNavigationData";
 import LanguagesDropDown, { ILanguageDropDownProps } from "@library/components/LanguagesDropDown";
 import { PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 import FlexSpacer from "@library/components/FlexSpacer";
 import { ButtonBaseClass } from "@library/components/forms/Button";
+import UserDropdown from "@library/components/mebox/pieces/UserDropdown";
 
 export interface IHeaderStyles {
     bgColor?: string;

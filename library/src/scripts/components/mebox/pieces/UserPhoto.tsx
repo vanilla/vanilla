@@ -31,7 +31,7 @@ export class UserPhoto extends React.Component<IProps> {
         const open = !!this.props.open;
 
         return (
-            <div className={classNames("userPhoto", className, { isOpen: open })}>
+            <div className={classNames("userPhoto", className, size, { isOpen: open })}>
                 {!!photoUrl && <img src={photoUrl} alt={name || ""} className={classNames("userPhoto-photo", size)} />}
                 {!photoUrl && user(open, "userPhoto-photo")}
             </div>

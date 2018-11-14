@@ -5,9 +5,19 @@
  */
 
 $userPhoto_borderRadius: 50%;
+$userPhoto-small_width: 28px;
 
 
 .userPhoto {
     border-radius: $userPhoto_borderRadius;
     overflow: hidden;
+
+    &.isSmall {
+        width: $userPhoto-small_width;
+        height: $userPhoto-small_width;
+    }
+}
+
+.userPhoto-photo {
+    @include objectFitWithFallback();
 }

@@ -22,7 +22,6 @@ export interface ILinkSection {}
 
 export interface IUserDropDownProps extends IInjectableUserState {
     className?: string;
-    userInfo: IUserFragment;
     linkSections: ILinkSection[];
 }
 
@@ -46,7 +45,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
     }
 
     public render() {
-        const userInfo: IUserFragment = get(this.props.userInfo, "currentUser.data", {
+        const userInfo: IUserFragment = get(this.props, "currentUser.data", {
             name: null,
             userID: null,
             photoUrl: null,
@@ -62,7 +61,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                         <UserPhoto
                             userInfo={userInfo}
                             open={this.state.open}
-                            className="headerDropDown-user"
+                            className="headerDropDown-user meBox-user"
                             size={UserPhotoSize.SMALL}
                         />
                     </div>

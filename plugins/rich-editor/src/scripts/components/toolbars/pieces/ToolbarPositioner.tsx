@@ -45,7 +45,7 @@ interface IState {
     quillWidth: number;
 }
 
-class ToolbarPositioner extends React.PureComponent<IProps, IState> {
+class ToolbarPositioner extends React.Component<IProps, IState> {
     private quill: Quill;
 
     constructor(props) {

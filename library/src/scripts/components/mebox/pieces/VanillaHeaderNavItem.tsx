@@ -9,7 +9,7 @@ import classNames from "classnames";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import SmartLink from "@library/components/navigation/SmartLink";
 
-export interface IVanillaHeaderNavItemProps {
+export interface IHeaderNav {
     className?: string;
     to: string;
     name: string;
@@ -17,7 +17,7 @@ export interface IVanillaHeaderNavItemProps {
     linkContentClassName?: string;
 }
 
-interface IProps extends IVanillaHeaderNavItemProps, RouteComponentProps<{}> {}
+interface IProps extends IHeaderNav, RouteComponentProps<{}> {}
 
 /**
  * Implements Navigation item component for header

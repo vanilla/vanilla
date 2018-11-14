@@ -20,8 +20,8 @@ export interface ICompactSearchProps {
     className?: string;
     placeholder?: string;
     open: boolean;
-    openSearch: () => void;
-    closeSearch: () => void;
+    onOpenSearch: () => void;
+    onCloseSearch: () => void;
     cancelButtonClassName?: string;
 }
 
@@ -29,20 +29,15 @@ export interface ICompactSearchProps {
  * Implements Compact Search component for header
  */
 export default class CompactSearch extends React.Component<ICompactSearchProps> {
-    private id;
     private ref = React.createRef<AsyncCreatableSelect<any>>();
-
-    public constructor(props) {
-        super(props);
-        this.id = uniqueIDFromPrefix("compactSearch");
-    }
+    private id = uniqueIDFromPrefix("compactSearch");
 
     public render() {
         return (
             <div className="compactSearch">
                 {!this.props.open && (
                     <Button
-                        onClick={this.props.openSearch}
+                        onClick={this.props.onOpenSearch}
                         className={classNames("compactSearch-open", "meBox-button")}
                         title={t("Search")}
                         aria-expanded={false}
@@ -70,7 +65,7 @@ export default class CompactSearch extends React.Component<ICompactSearchProps> 
                             hideSearchButton={true}
                         />
                         <Button
-                            onClick={this.props.closeSearch}
+                            onClick={this.props.onCloseSearch}
                             className={classNames("compactSearch-close", this.props.cancelButtonClassName)}
                             title={t("Search")}
                             aria-expanded={true}

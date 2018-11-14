@@ -6,11 +6,11 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import VanillaHeaderNavItem, { IVanillaHeaderNavItemProps } from "./VanillaHeaderNavItem";
+import VanillaHeaderNavItem, { IHeaderNav } from "./VanillaHeaderNavItem";
 
 export interface IVanillaHeaderNavProps {
     className?: string;
-    children: IVanillaHeaderNavItemProps[];
+    children: IHeaderNav[];
     linkClassName?: string;
     linkContentClassName?: string;
 }
@@ -22,13 +22,12 @@ export default class VanillaHeaderNav extends React.Component<IVanillaHeaderNavP
     public render() {
         const content = this.props.children.map((item, key) => {
             return (
-                <React.Fragment key={`headerNavItem-${key}`}>
-                    <VanillaHeaderNavItem
-                        {...item}
-                        linkContentClassName={this.props.linkContentClassName}
-                        linkClassName={this.props.linkClassName}
-                    />
-                </React.Fragment>
+                <VanillaHeaderNavItem
+                    {...item}
+                    linkContentClassName={this.props.linkContentClassName}
+                    linkClassName={this.props.linkClassName}
+                    key={`headerNavItem-${key}`}
+                />
             );
         });
         return (

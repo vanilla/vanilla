@@ -21,11 +21,7 @@ export default class MeBoxMessageList extends React.Component<IVanillaHeaderNavP
     public render() {
         const count = this.props.children.length;
         const content = this.props.children.map((item, key) => {
-            return (
-                <React.Fragment key={`MeBoxMessageList-${key}`}>
-                    <MeBoxMessage {...item} />
-                </React.Fragment>
-            );
+            return <MeBoxMessage {...item} key={`MeBoxMessageList-${key}`} />;
         });
         return (
             <div className={classNames("MeBoxMessageList", this.props.className)}>

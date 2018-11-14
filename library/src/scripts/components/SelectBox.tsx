@@ -20,6 +20,7 @@ export interface ISelectBoxItem {
     onClick?: () => {};
     selected?: boolean;
     outdated?: boolean;
+    lang?: string;
 }
 
 interface IProps {
@@ -91,6 +92,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                     clickData={child}
                     index={i}
                     current={selected}
+                    lang={child.lang}
                     buttonClassName="dropDownItem-button selectBox-buttonItem"
                 >
                     <span className="selectBox-checkContainer sc-only">
@@ -118,7 +120,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                 aria-describedby={"describedBy" in this.props ? this.props.describedBy : undefined}
                 className={classNames("selectBox", this.props.className)}
             >
-                {"label" in this.props && <span className="selectBox-label">{this.props.label}</span>}
+                {"label" in this.props && <span className="selectBox-label sr-only">{this.props.label}</span>}
                 <div className="selectBox-content">
                     <DropDown
                         id={this.state.id}

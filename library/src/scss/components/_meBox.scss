@@ -1,0 +1,75 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$meBox-button_borderRadius: 3px;
+$meBox-button_size: 40px;
+$meBox-spacer_width: 12px;
+$meBox-count_size: 18px;
+$meBox-count_fontSize: 10px;
+$meBox-count_bg: #D0021B;
+$meBox-dropDownContents_minWidth: 300px;
+
+.meBox-languages {
+    margin-left: auto;
+}
+
+.meBox-button {
+    color: inherit;
+    height: $global-header_height;
+    width: $meBox-button_size;
+    padding: 0;
+
+    &:active,
+    &:hover,
+    &:focus {
+        .meBox-navLinkContent,
+        .meBox-buttonContent {
+            background-color: rgba(#000, .1);
+            border-radius: $meBox-button_borderRadius;
+        }
+    }
+}
+
+.meBox-searchCancel,
+.meBox-localeToggle,
+.meBox-navLink {
+    color: inherit;
+    height: $meBox-button_size;
+    padding: 0 $meBox-spacer_width;
+    border-radius: $meBox-button_borderRadius;
+
+    &:active,
+    &:hover,
+    &:focus {
+        background-color: rgba(#000, .1);
+        border-radius: $meBox-button_borderRadius;
+    }
+}
+
+.meBox-searchCancel {
+    height: $formElement_height;
+}
+
+.meBox-buttonContent {
+    @include flexCenterContent;
+    height: $meBox-button_size;
+    pointer-events: none;
+}
+
+.meBox-locale {
+    margin-right: $global_spacer/2;
+}
+
+.meBox-user {
+    position: relative;
+    height: $meBox-button_size;
+    width: $meBox-button_size;
+    overflow: hidden;
+}
+
+.dropDown-contents.meBox-dropDownContents {
+    min-width: $meBox-dropDownContents_minWidth;
+}

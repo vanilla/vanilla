@@ -9,7 +9,7 @@ import classNames from "classnames";
 
 export interface IFrameFooterProps {
     className?: string;
-    children: JSX.Element | JSX.Element[];
+    children: React.ReactNode;
 }
 
 /**

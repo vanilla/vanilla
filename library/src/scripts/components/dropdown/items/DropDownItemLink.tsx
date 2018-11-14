@@ -17,6 +17,7 @@ export interface IDropDownItemLink {
     isModalLink?: boolean;
     children?: React.ReactNode;
     className?: string;
+    lang?: string;
 }
 
 /**
@@ -29,7 +30,13 @@ export default class DropDownItemLink extends React.Component<IDropDownItemLink>
         const LinkComponent = isModalLink ? ModalLink : NavLink;
         return (
             <DropDownItem className={classNames("dropDown-linkItem", className)}>
-                <LinkComponent to={to} title={name} className="dropDownItem-link" activeClassName="isCurrent">
+                <LinkComponent
+                    to={to}
+                    title={name}
+                    lang={this.props.lang}
+                    className="dropDownItem-link"
+                    activeClassName="isCurrent"
+                >
                     {linkContents}
                 </LinkComponent>
             </DropDownItem>

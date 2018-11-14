@@ -18,6 +18,18 @@ use Vanilla\Formatting\Embeds\EmbedManager;
 class VanillaHooks implements Gdn_IPlugin {
 
     /**
+     * Add to valid media attachment types.
+     *
+     * @param \Garden\Schema\Schema $schema
+     */
+    public function articlesPatchAttachmentSchema_init(\Garden\Schema\Schema $schema) {
+        $types = $schema->getField("properties.foreignType.enum");
+        $types[] = "comment";
+        $types[] = "discussion";
+        $schema->setField("properties.foreignType.enum", $types);
+    }
+
+    /**
      * Counter rebuilding.
      *
      * @param DbaController $sender

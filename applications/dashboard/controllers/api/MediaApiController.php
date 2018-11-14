@@ -312,13 +312,16 @@ class MediaApiController extends AbstractApiController {
         $in = $this->schema([
             "foreignType" => [
                 "description" => "Type of resource the media item will be attached to (e.g. comment).",
+                "enum" => [
+                    "embed",
+                ],
                 "type" => "string",
             ],
             "foreignID" => [
                 "description" => "Unique ID of the resource this media item will be attached to.",
                 "type" => "integer",
             ],
-        ], "in")->setDescription("Update a media item's attachment to another record.");
+        ], ["articlesPatchAttachment", "in"])->setDescription("Update a media item's attachment to another record.");
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body);

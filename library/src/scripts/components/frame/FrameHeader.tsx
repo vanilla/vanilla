@@ -43,7 +43,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
     public render() {
         const backTitle = t("Back");
         const stringTitle = "title" in this.props ? this.props.title : null;
-        const componentTitle = "children" in this.props ? this.props.children : null;
+        const children = "children" in this.props ? this.props.children : null;
 
         let backLink;
         if (this.props.onBackClick) {
@@ -78,10 +78,10 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                     depth={this.props.depth}
                     className={classNames("frameHeader-heading", { "sr-only": this.props.srOnlyTitle })}
                 >
-                    {componentTitle}
+                    {stringTitle}
                 </Heading>
                 {closeButton}
-                {this.props.children}
+                {children}
             </header>
         );
     }

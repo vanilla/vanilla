@@ -13,7 +13,6 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
 import { search } from "@library/components/icons/header";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
-import AsyncCreatableSelect from "react-select/lib/AsyncCreatable";
 import SearchOption from "@library/components/search/SearchOption";
 
 export interface ICompactSearchProps {
@@ -29,7 +28,6 @@ export interface ICompactSearchProps {
  * Implements Compact Search component for header
  */
 export default class CompactSearch extends React.Component<ICompactSearchProps> {
-    private ref = React.createRef<AsyncCreatableSelect<any>>();
     private id = uniqueIDFromPrefix("compactSearch");
 
     public render() {
@@ -61,7 +59,6 @@ export default class CompactSearch extends React.Component<ICompactSearchProps> 
                             noHeading={true}
                             title={t("Search")}
                             disabled={!this.props.open}
-                            getRef={this.getRef}
                             hideSearchButton={true}
                         />
                         <Button
@@ -85,10 +82,6 @@ export default class CompactSearch extends React.Component<ICompactSearchProps> 
         // Do nothing;
     };
 
-    public getRef = ref => {
-        this.ref = ref;
-    };
-
     /**
      * Simple data loading function for the search bar/react-select.
      */
@@ -107,14 +100,4 @@ export default class CompactSearch extends React.Component<ICompactSearchProps> 
             };
         });
     };
-
-    /*
-    * Set Focus
-    */
-    public componentDidUpdate(prevProps) {
-        // Typical usage (don't forget to compare props):
-        if (this.props.open && !prevProps.open && this.ref.current) {
-            this.ref.current.focus();
-        }
-    }
 }

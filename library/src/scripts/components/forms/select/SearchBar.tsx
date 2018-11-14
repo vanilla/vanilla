@@ -84,7 +84,6 @@ export default class SearchBar extends React.Component<IProps, IState> {
 
         return (
             <AsyncCreatableSelect
-                ref={this.ref}
                 id={this.id}
                 value={undefined}
                 onChange={this.handleOptionChange}
@@ -251,15 +250,6 @@ export default class SearchBar extends React.Component<IProps, IState> {
         event.preventDefault();
         this.props.onSearch();
     };
-
-    /**
-     * @inheritDoc
-     */
-    public componentDidMount() {
-        if (this.props.getRef) {
-            this.props.getRef(this.ref);
-        }
-    }
 
     /*
     * Overwrite components in Select component

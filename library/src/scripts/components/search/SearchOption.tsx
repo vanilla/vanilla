@@ -15,7 +15,6 @@ import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 interface IProps extends OptionProps<any> {
     data: IComboBoxOption<any>;
 }
-a;
 
 /**
  */

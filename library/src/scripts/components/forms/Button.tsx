@@ -22,6 +22,7 @@ interface IProps extends IOptionalComponentID {
     baseClass?: ButtonBaseClass;
     ariaHidden?: boolean;
     tabIndex?: number;
+    lang?: string;
     buttonRef?: React.RefObject<HTMLButtonElement>;
 }
 
@@ -76,6 +77,7 @@ export default class Button extends React.Component<IProps, IState> {
                 tabIndex={this.props.tabIndex}
                 ref={this.props.buttonRef}
                 onKeyDown={this.props.onKeyDown}
+                lang={this.props.lang}
             >
                 {this.props.children}
             </button>

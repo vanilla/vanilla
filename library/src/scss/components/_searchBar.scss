@@ -5,6 +5,7 @@
  */
 
 $searchBar-search_minWidth: 109px;
+$searchBar-searchIcon_space: 32px;
 
 .searchBar-clear {
     position: relative;
@@ -21,6 +22,7 @@ $searchBar-search_minWidth: 109px;
 
 .searchBar-content {
     display: flex;
+    position: relative;
 }
 
 .searchBar-inputWrap {
@@ -119,4 +121,25 @@ $searchBar-search_minWidth: 109px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
+}
+
+.searchBar-valueContainer.suggestedTextInput-inputText.inputText {
+    padding-left: $searchBar-searchIcon_space;
+}
+
+.searchBar-iconContainer {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: $searchBar-searchIcon_space;
+}
+
+.searchBar-icon {
+    width: 13px;
+    height: 13px;
 }

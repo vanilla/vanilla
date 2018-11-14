@@ -18,6 +18,8 @@ import ButtonLoader from "@library/components/ButtonLoader";
 import { OptionProps } from "react-select/lib/components/Option";
 import Translate from "@library/components/translation/Translate";
 import { ClearButton } from "@library/components/forms/select/ClearButton";
+import ConditionalWrap from "@library/components/ConditionalWrap";
+import { search } from "@library/components/icons/header";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;
@@ -39,6 +41,9 @@ interface IProps extends IOptionalComponentID {
     isLoading?: boolean;
     onSearch: () => void;
     optionComponent?: React.ComponentType<OptionProps<any>>;
+    getRef?: any;
+    buttonClassName?: string;
+    hideSearchButton?: boolean;
 }
 
 interface IState {
@@ -48,7 +53,7 @@ interface IState {
 /**
  * Implements the search bar component
  */
-export default class BigSearch extends React.Component<IProps, IState> {
+export default class SearchBar extends React.Component<IProps, IState> {
     public static defaultProps: Partial<IProps> = {
         disabled: false,
         isBigInput: false,
@@ -213,9 +218,20 @@ export default class BigSearch extends React.Component<IProps, IState> {
                         <components.Control {...props} />
                         {this.props.value && <ClearButton onClick={this.clear} />}
                     </div>
-                    <Button type="submit" id={this.searchButtonID} className="buttonPrimary searchBar-submitButton">
-                        {this.props.isLoading ? <ButtonLoader /> : t("Search")}
-                    </Button>
+                    <ConditionalWrap condition={!!this.props.hideSearchButton} className="sr-only">
+                        <Button
+                            type="submit"
+                            id={this.searchButtonID}
+                            className={classNames(
+                                "buttonPrimary",
+                                "searchBar-submitButton",
+                                this.props.buttonClassName,
+                            )}
+                        >
+                            {this.props.isLoading ? <ButtonLoader /> : t("Search")}
+                        </Button>
+                    </ConditionalWrap>
+                    <div className="searchBar-iconContainer">{search("searchBar-icon")}</div>
                 </div>
             </form>
         );
@@ -235,6 +251,15 @@ export default class BigSearch extends React.Component<IProps, IState> {
         event.preventDefault();
         this.props.onSearch();
     };
+
+    /**
+     * @inheritDoc
+     */
+    public componentDidMount() {
+        if (this.props.getRef) {
+            this.props.getRef(this.ref);
+        }
+    }
 
     /*
     * Overwrite components in Select component

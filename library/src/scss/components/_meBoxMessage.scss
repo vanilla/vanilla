@@ -1,0 +1,74 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$MeBoxMessage-padding: 8px;
+$MeBoxMessage-imageWidth: 40px;
+$MeBoxMessage-unreadDot_width: 12px;
+
+.MeBoxMessage {
+    display: block;
+
+    + .MeBoxMessage {
+        border-top: solid $global-border_color 1px;
+    }
+}
+
+.MeBoxMessage-link {
+    display: flex;
+    flex-wrap: nowrap;
+    padding: $MeBoxMessage-padding;
+    color: inherit;
+
+    &:active,
+    &:focus,
+    &:hover {
+        background-color: $global-color_active_primaryBg;
+        text-decoration: none;
+    }
+}
+
+
+.MeBoxMessage-image {
+    position: relative;
+    width: $MeBoxMessage-imageWidth;
+    height: $MeBoxMessage-imageWidth;
+    flex-basis: $MeBoxMessage-imageWidth;
+}
+
+
+.MeBoxMessage-status {
+    position: relative;
+    width: $MeBoxMessage-unreadDot_width;
+    flex-basis: $MeBoxMessage-unreadDot_width;
+    &.isUnread {
+        &::after {
+            @include absolute-middleRight;
+            content: '';
+            height: $MeBoxMessage-unreadDot_width;
+            width: $MeBoxMessage-unreadDot_width;
+            background-color: $global-color_primary;
+            border-radius: 50%;
+        }
+    }
+}
+
+.MeBoxMessage-contents {
+    flex-grow: 1;
+    padding: {
+        left: $MeBoxMessage-padding;
+        right: $MeBoxMessage-padding;
+    }
+    max-width: calc(100% - #{$MeBoxMessage-unreadDot_width + $MeBoxMessage-imageWidth});
+}
+
+
+.MeBoxMessage-subject {
+    font-weight: $global-fontWeight_semiBold;
+}
+
+.MeBoxMessage-message {
+    line-height: $global-excerpt_lineHeight;
+}

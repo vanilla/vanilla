@@ -32,4 +32,11 @@
     &.isSelfPadded {
         padding: 0;
     }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        padding: {
+            left: 0;
+            right: 0;
+        }
+    }
 }

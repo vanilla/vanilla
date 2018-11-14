@@ -83,7 +83,6 @@ $panelLayout-border_color                                             : rgba($gl
     position: relative;
     width: $global-panel_paddedWidth;
     flex-basis: $global-panel_paddedWidth;
-    z-index: 2;
     padding: {
         left: $global-gutter_halfSize;
         right: $global-gutter_halfSize;

@@ -29,7 +29,7 @@ export interface IPopoverControllerProps {
     onClose?: () => void;
     buttonBaseClass: ButtonBaseClass;
     buttonClassName?: string;
-    onVisibilityChange?: () => void;
+    onVisibilityChange?: (isVisible: boolean) => void;
     renderAbove?: boolean;
     renderLeft?: boolean;
     PopoverController?: string;
@@ -112,17 +112,16 @@ export default class PopoverController extends React.PureComponent<
         prevState: IState,
     ) {
         if (!prevState.isVisible && this.state.isVisible) {
+            if (this.props.onVisibilityChange) {
+                this.props.onVisibilityChange(this.state.isVisible);
+            }
             if (this.initalFocusRef.current) {
                 this.initalFocusRef.current.focus();
-                if (this.props.onVisibilityChange) {
-                    this.props.onVisibilityChange();
-                }
             } else if (this.buttonRef.current) {
                 this.buttonRef.current.focus();
-                if (this.props.onVisibilityChange) {
-                    this.props.onVisibilityChange();
-                }
             }
+        } else if (prevState.isVisible && !this.state.isVisible && this.props.onVisibilityChange) {
+            this.props.onVisibilityChange(this.state.isVisible);
         }
     }
 
@@ -155,6 +154,9 @@ export default class PopoverController extends React.PureComponent<
     private handleFocusChange = hasFocus => {
         if (!hasFocus) {
             this.setState({ isVisible: false });
+            if (this.props.onVisibilityChange) {
+                this.props.onVisibilityChange(false);
+            }
         }
     };
 
@@ -174,6 +176,9 @@ export default class PopoverController extends React.PureComponent<
         this.setState((prevState: IState) => {
             return { isVisible: !prevState.isVisible };
         });
+        if (this.props.onVisibilityChange) {
+            this.props.onVisibilityChange(this.state.isVisible);
+        }
     };
 
     /**
@@ -198,6 +203,9 @@ export default class PopoverController extends React.PureComponent<
 
         if (parentElement && parentElement.contains(activeElement)) {
             this.buttonRef.current && this.buttonRef.current.focus();
+        }
+        if (this.props.onVisibilityChange) {
+            this.props.onVisibilityChange(false);
         }
     };
 

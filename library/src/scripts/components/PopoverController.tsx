@@ -64,10 +64,6 @@ export default class PopoverController extends React.PureComponent<
     private focusWatcher: FocusWatcher;
     private escapeListener: EscapeListener;
 
-    public constructor(props) {
-        super(props);
-    }
-
     public render() {
         const buttonClasses = classNames(this.props.buttonClassName, this.props.toggleButtonClassName, {
             isOpen: this.state.isVisible,

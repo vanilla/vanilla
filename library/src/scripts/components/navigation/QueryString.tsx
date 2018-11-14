@@ -7,6 +7,7 @@
 import React from "react";
 import qs from "qs";
 import { withRouter, RouteComponentProps } from "react-router";
+import isEqual from "lodash/isEqual";
 
 interface IProps extends RouteComponentProps<any> {
     value: {
@@ -22,7 +23,17 @@ class QueryString extends React.Component<IProps> {
         return null;
     }
 
-    public componentDidUpdate() {
+    public componentWillMount() {
+        this.updateQueryString();
+    }
+
+    public componentDidUpdate(prevProps: IProps) {
+        if (!isEqual(prevProps.value, this.props.value)) {
+            this.updateQueryString();
+        }
+    }
+
+    private updateQueryString() {
         const query = qs.stringify(this.props.value);
         this.props.history.replace({
             ...this.props.location,

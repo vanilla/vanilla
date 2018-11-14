@@ -70,8 +70,8 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      * When this component updates we need to see if the selection state has changed and trigger a lookup.
      */
     public componentDidUpdate(prevProps: IProps) {
-        const { mentionSelection } = this.props.instanceState;
-        const prevMentionSelection = prevProps.instanceState.mentionSelection;
+        const { mentionSelection } = this.props;
+        const prevMentionSelection = prevProps.mentionSelection;
 
         if (!isEqual(mentionSelection, prevMentionSelection) && mentionSelection) {
             const text = this.quill.getText(mentionSelection.index, mentionSelection.length).replace("@", "");
@@ -125,7 +125,6 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
                 id={this.ID}
                 loaderID={this.loaderID}
                 showLoader={isLoading}
-                mentionSelection={this.props.instanceState.mentionSelection}
             />
         );
     }
@@ -134,7 +133,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      * Get an autocomplete blot. Creates a new one if we haven't made one yet.
      */
     private createAutoCompleteBlot(): MentionAutoCompleteBlot | null {
-        const { currentSelection, mentionSelection } = this.props.instanceState;
+        const { currentSelection, mentionSelection } = this.props;
         if (!currentSelection || !mentionSelection) {
             return null;
         }
@@ -175,7 +174,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
      */
     private keyDownListener = (event: KeyboardEvent) => {
         const { suggestions, activeSuggestionIndex, activeSuggestionID, isLoading } = this.props;
-        const { mentionSelection } = this.props.instanceState;
+        const { mentionSelection } = this.props;
         const inActiveMention = mentionSelection !== null;
 
         if (!suggestions || suggestions.status !== LoadStatus.SUCCESS || !suggestions.data) {

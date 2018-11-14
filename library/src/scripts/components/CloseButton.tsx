@@ -20,7 +20,7 @@ interface IProps extends Partial<ILegacyProps> {
 /**
  * A standardized close button.
  */
-export default class CloseButton extends React.Component<IProps> {
+export default class CloseButton extends React.PureComponent<IProps> {
     public static defaultProps = {
         legacyMode: false,
         baseClass: ButtonBaseClass.ICON,

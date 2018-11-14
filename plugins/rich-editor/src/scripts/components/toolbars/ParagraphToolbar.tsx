@@ -80,7 +80,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
             "richEditorParagraphMenu-handle",
         );
 
-        if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.instanceState.lastGoodSelection)) {
+        if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
             pilcrowClasses += " isHidden";
         }
 
@@ -113,7 +113,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
                         formatter={this.formatter}
                         afterClickHandler={this.close}
                         activeFormats={this.props.activeFormats}
-                        lastGoodSelection={this.props.instanceState.lastGoodSelection}
+                        lastGoodSelection={this.props.lastGoodSelection}
                     />
                 </div>
             </div>
@@ -124,7 +124,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      * Determine whether or not we should show pilcrow at all.
      */
     private get isPilcrowVisible() {
-        const { currentSelection } = this.props.instanceState;
+        const { currentSelection } = this.props;
         if (!currentSelection) {
             return false;
         }
@@ -136,23 +136,17 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      * Show the menu if we have a valid selection, and a valid focus.
      */
     private get isMenuVisible() {
-        const { instanceState } = this.props;
-        return !!instanceState.lastGoodSelection && this.state.hasFocus;
+        return !!this.props.lastGoodSelection && this.state.hasFocus;
     }
 
     /**
      * Get the inline styles for the pilcrow. This is mostly just positioning it on the Y access currently.
      */
     private get pilcrowStyles(): React.CSSProperties {
-        const { instanceState } = this.props;
-
-        if (!instanceState.lastGoodSelection) {
+        if (!this.props.lastGoodSelection) {
             return {};
         }
-        const bounds = this.quill.getBounds(
-            instanceState.lastGoodSelection.index,
-            instanceState.lastGoodSelection.length,
-        );
+        const bounds = this.quill.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
 
         // This is the pixel offset from the top needed to make things align correctly.
         const offset = 14;
@@ -166,15 +160,10 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      * Get the classes for the toolbar.
      */
     private get toolbarClasses(): string {
-        const { instanceState } = this.props;
-
-        if (!instanceState.lastGoodSelection) {
+        if (!this.props.lastGoodSelection) {
             return "";
         }
-        const bounds = this.quill.getBounds(
-            instanceState.lastGoodSelection.index,
-            instanceState.lastGoodSelection.length,
-        );
+        const bounds = this.quill.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
         let classes = "richEditor-toolbarContainer richEditor-paragraphToolbarContainer";
 
         if (bounds.top > 30) {
@@ -191,7 +180,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      * This could likely be replaced by a CSS class in the future.
      */
     private get toolbarStyles(): React.CSSProperties {
-        if (this.isMenuVisible && !isEmbedSelected(this.quill, this.props.instanceState.lastGoodSelection)) {
+        if (this.isMenuVisible && !isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
             return {};
         } else {
             // We hide the toolbar when its not visible.
@@ -221,7 +210,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      */
     private close = () => {
         this.setState({ hasFocus: false });
-        const { lastGoodSelection } = this.props.instanceState;
+        const { lastGoodSelection } = this.props;
         const newSelection = {
             index: lastGoodSelection.index + lastGoodSelection.length,
             length: 0,

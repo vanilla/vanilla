@@ -31,6 +31,7 @@ import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import { Devices } from "@library/components/DeviceChecker";
 import ParagraphDropDown from "@rich-editor/components/toolbars/ParagraphDropDown";
 import ParagraphToolbar from "@rich-editor/components/toolbars/ParagraphToolbar";
+import throttle from "lodash/throttle";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -265,7 +266,7 @@ export class Editor extends React.Component<IProps> {
      * - Every non-silent event.
      * - Every selection change event (even the "silent" ones).
      */
-    private onQuillUpdate = (type: string, newValue, oldValue, source: Sources) => {
+    private onQuillUpdate = throttle((type: string, newValue, oldValue, source: Sources) => {
         if (this.props.onChange && type === Quill.events.TEXT_CHANGE && source !== Quill.sources.SILENT) {
             this.props.onChange(this.getEditorOperations()!);
         }
@@ -280,7 +281,7 @@ export class Editor extends React.Component<IProps> {
         if (shouldDispatch) {
             this.store.dispatch(actions.setSelection(this.quillID, this.quill.getSelection(), this.quill));
         }
-    };
+    }, 1000 / 60); // Throttle to 60 FPS.
 
     /**
      * Synchronization from quill's contents to the bodybox for legacy contexts.

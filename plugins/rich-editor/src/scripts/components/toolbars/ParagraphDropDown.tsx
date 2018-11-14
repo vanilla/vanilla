@@ -62,7 +62,7 @@ export class ParagraphDropDown extends React.PureComponent<IProps, IState> {
                     menuRef={this.menuRef}
                     formatter={this.formatter}
                     activeFormats={<ActiveFormatIcon activeFormats={this.props.activeFormats} />}
-                    lastGoodSelection={this.props.instanceState.lastGoodSelection}
+                    lastGoodSelection={this.props.lastGoodSelection}
                     onKeyDown={this.handlePilcrowKeyDown}
                 />
             </DropDown>

@@ -17,8 +17,7 @@ interface IContextProps {
     isLoading: boolean;
 }
 
-interface IGeneratedContextProps {
-    instanceState: IEditorInstance;
+interface IGeneratedContextProps extends IEditorInstance {
     activeFormats: IFormats;
 }
 
@@ -37,7 +36,7 @@ function mapStateToProps(state: IStoreState, ownProps: IContextProps) {
     const { lastGoodSelection } = instanceState;
     const activeFormats = lastGoodSelection ? quill.getFormat(lastGoodSelection) : {};
     return {
-        instanceState,
+        ...instanceState,
         activeFormats,
     };
 }

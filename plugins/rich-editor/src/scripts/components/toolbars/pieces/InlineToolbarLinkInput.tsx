@@ -17,7 +17,7 @@ interface IProps extends IWithEditorProps {
     onCloseClick: React.MouseEventHandler<any>;
 }
 
-export class InlineToolbarLinkInput extends React.Component<IProps, {}> {
+export class InlineToolbarLinkInput extends React.PureComponent<IProps, {}> {
     constructor(props) {
         super(props);
 

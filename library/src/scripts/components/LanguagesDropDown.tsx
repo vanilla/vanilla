@@ -54,7 +54,7 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
                 <SelectBox
                     describedBy={this.props.titleID!}
                     label={!this.props.titleID ? t("Locale") : null}
-                    widthOfParent={true}
+                    widthOfParent={!!this.props.widthOfParent}
                     className={classNames("languagesDropDown", this.props.className)}
                     renderLeft={this.props.renderLeft}
                     buttonClassName={this.props.buttonClassName}

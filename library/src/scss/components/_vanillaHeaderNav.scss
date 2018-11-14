@@ -4,7 +4,14 @@
  * @license GPL-2.0-only
  */
 
-$vanillaHeaderNav-spacer_width: 24px;
+$vanillaHeaderNav-vertical_borderWidth: 2px;
+$vanillaHeaderNav-active_borderColor: rgba($global-color_bg, .9);
+$vanillaHeaderNav-active_borderOffset: 12px;
+$vanillaHeaderNav-active_bottomOffset: 2px;
+
+.vanillaHeader-nav {
+    margin-right: auto;
+}
 
 .headerNavigation-items {
     display: flex;
@@ -14,14 +21,43 @@ $vanillaHeaderNav-spacer_width: 24px;
 }
 
 .vanillaHeaderNav-item {
-    + .vanillaHeaderNav-item {
-        margin-left: $vanillaHeaderNav-spacer_width;
-    }
+    @include flexCenterContent;
+    height: $global-header_height;
 }
 
 .vanillaHeaderNav-link {
-    height: $global-header_height;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
     color: inherit;
+}
+
+.vanillaHeaderNav-linkContent {
+    @include flexCenterContent;
+    position: relative;
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: $vanillaHeaderNav-active_borderOffset/2;
+        width: calc(100% - #{$vanillaHeaderNav-active_borderOffset});
+        margin-bottom: -$vanillaHeaderNav-active_bottomOffset;
 
 
+        border: {
+            style: solid;
+            color: transparent;
+            width: $vanillaHeaderNav-vertical_borderWidth 0;
+        }
+    }
+
+
+    &.isCurrent {
+        &::after {
+            border-bottom-color: $vanillaHeaderNav-active_borderColor;
+        }
+    }
 }

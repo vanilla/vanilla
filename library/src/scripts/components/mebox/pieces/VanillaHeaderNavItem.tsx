@@ -13,6 +13,8 @@ export interface IVanillaHeaderNavItemProps {
     className?: string;
     to: string;
     name: string;
+    linkClassName?: string;
+    linkContentClassName?: string;
 }
 
 interface IProps extends IVanillaHeaderNavItemProps, RouteComponentProps<{}> {}
@@ -22,15 +24,17 @@ interface IProps extends IVanillaHeaderNavItemProps, RouteComponentProps<{}> {}
  */
 export class VanillaHeaderNavItem extends React.Component<IProps> {
     public render() {
+        const isCurrent = this.currentPage();
         return (
-            <li
-                className={classNames("vanillaHeaderNav-item", this.props.className, { isCurrent: this.currentPage() })}
-            >
-                <SmartLink
-                    to={this.props.to}
-                    className={classNames("vanillaHeaderNav-link", { isCurrent: this.currentPage() })}
-                >
-                    {this.props.name}
+            <li className={classNames("vanillaHeaderNav-item", this.props.className, { isCurrent })}>
+                <SmartLink to={this.props.to} className={classNames("vanillaHeaderNav-link", this.props.linkClassName)}>
+                    <div
+                        className={classNames("vanillaHeaderNav-linkContent", this.props.linkContentClassName, {
+                            isCurrent,
+                        })}
+                    >
+                        {this.props.name}
+                    </div>
                 </SmartLink>
             </li>
         );

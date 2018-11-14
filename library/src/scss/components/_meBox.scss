@@ -5,7 +5,8 @@
  */
 
 $meBox-button_borderRadius: 3px;
-$meBox-button_width: 40px;
+$meBox-button_size: 40px;
+$vanillaHeaderNav-spacer_width: 12px;
 
 .meBox-languages {
     margin-left: auto;
@@ -14,11 +15,13 @@ $meBox-button_width: 40px;
 .meBox-button {
     color: inherit;
     height: $global-header_height;
-    width: $meBox-button_width;
+    width: $meBox-button_size;
     padding: 0;
 
+    &:active,
     &:hover,
     &:focus {
+        .meBox-navLinkContent,
         .meBox-buttonContent {
             background-color: rgba(#000, .1);
             border-radius: $meBox-button_borderRadius;
@@ -26,13 +29,35 @@ $meBox-button_width: 40px;
     }
 }
 
+.meBox-localeToggle,
+.meBox-navLink {
+    color: inherit;
+    height: $meBox-button_size;
+
+    &:active,
+    &:hover,
+    &:focus {
+        background-color: rgba(#000, .1);
+        border-radius: $meBox-button_borderRadius;
+    }
+}
+
+
 .meBox-buttonContent {
     @include flexCenterContent;
-    height: $meBox-button_width;
+    height: $meBox-button_size;
+    pointer-events: none;
 }
 
 .meBox-locale {
-    margin-left: auto;
     margin-right: $global_spacer;
 }
 
+
+// Button and link side padding
+.meBox-navLinkContent,
+.meBox-localeToggle {
+    padding: 0 $vanillaHeaderNav-spacer_width;
+    height: $meBox-button_size;
+    border-radius: $meBox-button_borderRadius;
+}

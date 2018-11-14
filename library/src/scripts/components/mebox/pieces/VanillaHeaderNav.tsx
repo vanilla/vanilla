@@ -11,6 +11,8 @@ import VanillaHeaderNavItem, { IVanillaHeaderNavItemProps } from "./VanillaHeade
 export interface IVanillaHeaderNavProps {
     className?: string;
     children: IVanillaHeaderNavItemProps[];
+    linkClassName?: string;
+    linkContentClassName?: string;
 }
 
 /**
@@ -21,7 +23,11 @@ export default class VanillaHeaderNav extends React.Component<IVanillaHeaderNavP
         const content = this.props.children.map((item, key) => {
             return (
                 <React.Fragment key={`headerNavItem-${key}`}>
-                    <VanillaHeaderNavItem {...item} />
+                    <VanillaHeaderNavItem
+                        {...item}
+                        linkContentClassName={this.props.linkContentClassName}
+                        linkClassName={this.props.linkClassName}
+                    />
                 </React.Fragment>
             );
         });

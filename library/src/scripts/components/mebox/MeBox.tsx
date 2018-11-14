@@ -20,6 +20,7 @@ import { dummyNavigationData } from "./state/dummyNavigationData";
 import LanguagesDropDown, { ILanguageDropDownProps } from "@library/components/LanguagesDropDown";
 import { PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 import FlexSpacer from "@library/components/FlexSpacer";
+import { ButtonBaseClass } from "@library/components/forms/Button";
 
 export interface IHeaderStyles {
     bgColor?: string;
@@ -89,11 +90,18 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                                     logoClassName="vanillaHeader-logo"
                                     color={styles.fg}
                                 />
-                                <VanillaHeaderNav {...this.props.navigationProps} />
+                                <VanillaHeaderNav
+                                    {...this.props.navigationProps}
+                                    linkClassName="meBox-navLink"
+                                    linkContentClassName="meBox-navLinkContent"
+                                />
                                 <LanguagesDropDown
                                     {...this.props.languagesProps}
                                     renderLeft={true}
                                     className="meBox-locale"
+                                    buttonClassName="meBox-localeToggle"
+                                    buttonBaseClass={ButtonBaseClass.CUSTOM}
+                                    widthOfParent={false}
                                 />
                             </React.Fragment>
                         )}

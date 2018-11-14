@@ -15,6 +15,7 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\Pass;
 use Interop\Container\ContainerInterface;
 use Vanilla\Permissions;
+use Garden\CustomExceptionHandler;
 
 class Dispatcher {
     use MiddlewareAwareTrait;
@@ -169,7 +170,16 @@ class Dispatcher {
                 // Pass to the next route.
                 continue;
             } catch (\Throwable $dispatchEx) {
-                $response = $this->makeResponse($dispatchEx);
+                $response = null;
+                $obj = $action->getCallback()[0] ?? false;
+                if ($obj instanceof CustomExceptionHandler) {
+                    if ($obj->hasHandler($dispatchEx)) {
+                        $response = $obj->handle($dispatchEx);
+                    }
+                }
+                if (empty($response)) {
+                    $response = $this->makeResponse($dispatchEx);
+                }
                 $this->mergeMeta($response, $route->getMetaArray());
                 break;
             }

@@ -17,7 +17,13 @@ use Vanilla\UploadedFileSchema;
  */
 class MediaApiController extends AbstractApiController {
     const TYPE_IMAGE = 'image';
-    const TYPE_OTHER = 'other';
+    const TYPE_TEXT = 'text';
+    const TYPE_ARCHIVE = 'archive';
+    const TYPE_BINARY = 'binary';
+
+    const EXTENSIONS_TEXT = ['txt', 'csv', 'doc', 'docx', 'pdf', 'md', 'rtf'];
+    const EXTENSIONS_BINARY = ['xls', 'xlsx', 'ppt'];
+    const EXTENSIONS_ARCHIVE = ['zip', 'tar', 'gzip', '7z', 'arj', 'deb', 'pkg', 'gz', 'z', 'rpm', 'iso', 'cab'];
 
     /** @var Schema */
     private $idParamSchema;
@@ -302,13 +308,21 @@ class MediaApiController extends AbstractApiController {
     public function post(array $body) {
         $this->permission('Garden.Uploads.Add');
         switch ($body['type']) {
-            case self::TYPE_OTHER:
-                $uploadExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
+            case self::TYPE_TEXT:
+                $typeExtensions = self::EXTENSIONS_TEXT;
+                break;
+            case self::TYPE_BINARY:
+                $typeExtensions = self::EXTENSIONS_BINARY;
+                break;
+            case self::TYPE_ARCHIVE:
+                $typeExtensions = self::EXTENSIONS_ARCHIVE;
                 break;
             case self::TYPE_IMAGE:
             default:
-                $uploadExtensions = array_keys(ImageResizer::getExtType());
+                $typeExtensions = array_keys(ImageResizer::getExtType());
         }
+        $allowedExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
+        $uploadExtensions = array_intersect($allowedExtensions, $typeExtensions);
         $uploadSchema = new UploadedFileSchema([
             'allowedExtensions' => $uploadExtensions
         ]);
@@ -319,7 +333,9 @@ class MediaApiController extends AbstractApiController {
                 'description' => 'The upload type.',
                 'enum' => [
                     self::TYPE_IMAGE,
-                    self::TYPE_OTHER,
+                    self::TYPE_TEXT,
+                    self::TYPE_ARCHIVE,
+                    self::TYPE_BINARY,
                 ]
             ]
         ],'in')->setDescription('Add a media item.');

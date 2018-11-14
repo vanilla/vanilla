@@ -110,6 +110,7 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                             open={this.state.openSearch}
                             openSearch={this.openSearch}
                             closeSearch={this.closeSearch}
+                            cancelButtonClassName="meBox-searchCancel"
                         />
                         {!hideNonSearchElements && (
                             <React.Fragment>

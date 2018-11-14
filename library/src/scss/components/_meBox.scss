@@ -29,10 +29,13 @@ $vanillaHeaderNav-spacer_width: 12px;
     }
 }
 
+.meBox-searchCancel,
 .meBox-localeToggle,
 .meBox-navLink {
     color: inherit;
     height: $meBox-button_size;
+    padding: 0 $vanillaHeaderNav-spacer_width;
+    border-radius: $meBox-button_borderRadius;
 
     &:active,
     &:hover,
@@ -42,6 +45,9 @@ $vanillaHeaderNav-spacer_width: 12px;
     }
 }
 
+.meBox-searchCancel {
+    height: $formElement_height;
+}
 
 .meBox-buttonContent {
     @include flexCenterContent;
@@ -50,17 +56,12 @@ $vanillaHeaderNav-spacer_width: 12px;
 }
 
 .meBox-locale {
-    margin-right: $global_spacer;
+    margin-right: $global_spacer/2;
 }
 
 
-// Button and link side padding
-.meBox-navLinkContent,
-.meBox-localeToggle {
-    padding: 0 $vanillaHeaderNav-spacer_width;
-    height: $meBox-button_size;
-    border-radius: $meBox-button_borderRadius;
-}
+
+
 
 .meBox-user {
     position: relative;

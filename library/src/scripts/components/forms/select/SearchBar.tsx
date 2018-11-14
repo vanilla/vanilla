@@ -19,6 +19,7 @@ import { OptionProps } from "react-select/lib/components/Option";
 import Translate from "@library/components/translation/Translate";
 import { ClearButton } from "@library/components/forms/select/ClearButton";
 import ConditionalWrap from "@library/components/ConditionalWrap";
+import { search } from "@library/components/icons/header";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;
@@ -230,6 +231,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                             {this.props.isLoading ? <ButtonLoader /> : t("Search")}
                         </Button>
                     </ConditionalWrap>
+                    <div className="searchBar-iconContainer">{search("searchBar-icon")}</div>
                 </div>
             </form>
         );

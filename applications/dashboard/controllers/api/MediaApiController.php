@@ -118,6 +118,21 @@ class MediaApiController extends AbstractApiController {
     }
 
     /**
+     * Given a media row, verify the current user has permissions to edit it.
+     *
+     * @param array $row
+     */
+    private function editPermission(array $row) {
+        $insertUserID = $row["InsertUserID"] ?? null;
+        if ($this->getSession()->UserID === $insertUserID) {
+            // Make sure we can still perform uploads.
+            $this->permission("Garden.Uploads.Add");
+        } else {
+            $this->permission("Garden.Moderation.Manage");
+        }
+    }
+
+    /**
      * Get a schema instance comprised of all available media fields.
      *
      * @return Schema
@@ -280,6 +295,48 @@ class MediaApiController extends AbstractApiController {
 
         $schemaRecord = ApiUtils::convertOutputKeys($row);
         return $schemaRecord;
+    }
+
+    /**
+     * Update a media item's attachment to another record.
+     *
+     * @param int $id
+     * @param array $body
+     * @return array
+     * @throws NotFoundException If the media item could not be found.
+     * @throws Garden\Schema\ValidationException If input validation fails.
+     * @throws Garden\Schema\ValidationException If output validation fails.
+     */
+    public function patch_attachment(int $id, array $body): array {
+        $this->idParamSchema();
+        $in = $this->schema([
+            "foreignType" => [
+                "description" => "Type of resource the media item will be attached to (e.g. comment).",
+                "type" => "string",
+            ],
+            "foreignID" => [
+                "description" => "Unique ID of the resource this media item will be attached to.",
+                "type" => "integer",
+            ],
+        ], "in")->setDescription("Update a media item's attachment to another record.");
+        $out = $this->schema($this->fullSchema(), "out");
+
+        $body = $in->validate($body);
+
+        $original = $this->mediaByID($id);
+        $this->editPermission($original);
+
+        $this->mediaModel->update(
+            [
+                "ForeignID" => $body["foreignID"],
+                "ForeignTable" => $body["foreignType"],
+            ],
+            ["MediaID" => $id]
+        );
+        $row = $this->mediaByID($id);
+        $row = $this->normalizeOutput($row);
+        $result = $out->validate($row);
+        return $result;
     }
 
     /**

@@ -171,10 +171,12 @@ class Dispatcher {
                 continue;
             } catch (\Throwable $dispatchEx) {
                 $response = null;
-                $obj = $action->getCallback()[0] ?? false;
-                if ($obj instanceof CustomExceptionHandler) {
-                    if ($obj->hasHandler($dispatchEx)) {
-                        $response = $obj->handle($dispatchEx);
+                if ($action instanceof Action) {
+                    $obj = $action->getCallback()[0] ?? false;
+                    if ($obj instanceof CustomExceptionHandler) {
+                        if ($obj->hasHandler($dispatchEx)) {
+                            $response = $obj->handle($dispatchEx);
+                        }
                     }
                 }
                 if (empty($response)) {

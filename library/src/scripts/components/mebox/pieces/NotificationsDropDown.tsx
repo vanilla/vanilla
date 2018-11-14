@@ -18,14 +18,12 @@ import Frame from "@library/components/frame/Frame";
 import { notifications, settings } from "@library/components/icons/header";
 import Count from "@library/components/mebox/pieces/Count";
 import classNames from "classnames";
-
-export interface INotification {
-    unread?: boolean;
-}
+import DropDownMessage, { IDropDownMessage } from "@library/components/mebox/pieces/DropDownMesssage";
+import DropDownMessageList from "./DropDownMessageList";
 
 export interface INotificationsDropDownProps {
     className?: string;
-    data: INotification[];
+    data: IDropDownMessage[];
     userSlug: string;
     count?: number;
     countClass?: string;
@@ -71,7 +69,7 @@ export default class NotificationsDropDown extends React.Component<INotification
                 onVisibilityChange={this.setOpen}
             >
                 <Frame>
-                    <FrameHeader className="isShadowed" title={t("Notifications")}>
+                    <FrameHeader className="isShadowed isCompact" title={t("Notifications")}>
                         <LinkAsButton
                             title={t("Notification Preferences")}
                             className="headerDropDown-headerButton headerDropDown-notifications button-pushRight"
@@ -82,11 +80,18 @@ export default class NotificationsDropDown extends React.Component<INotification
                         </LinkAsButton>
                     </FrameHeader>
                     <FrameBody className="isSelfPadded">
-                        <FramePanel>{t("Messages Here")}</FramePanel>
+                        <FramePanel>
+                            <DropDownMessageList
+                                emptyMessage={t("You do not have any notifications yet.")}
+                                className="headerDropDown-notifications"
+                            >
+                                {this.props.data || []}
+                            </DropDownMessageList>
+                        </FramePanel>
                     </FrameBody>
-                    <FrameFooter className="isShadowed">
+                    <FrameFooter className="isShadowed isCompact">
                         <LinkAsButton
-                            className="headerDropDown-footerButton headerDropDown-allButton button-pushLeft"
+                            className="headerDropDown-footerButton frameFooter-allButton button-pushLeft"
                             to={"/profile/notifications"}
                             baseClass={ButtonBaseClass.TEXT}
                         >
@@ -97,6 +102,7 @@ export default class NotificationsDropDown extends React.Component<INotification
                                 onClick={this.handleAllRead}
                                 disabled={this.state.hasUnread}
                                 baseClass={ButtonBaseClass.TEXT}
+                                className="frameFooter-markRead"
                             >
                                 {t("Mark All Read")}
                             </Button>

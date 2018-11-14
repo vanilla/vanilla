@@ -6,7 +6,6 @@
 
 $vanillaHeaderNav-vertical_borderWidth: 2px;
 $vanillaHeaderNav-active_borderColor: rgba($global-color_bg, .9);
-$vanillaHeaderNav-active_borderOffset: 12px;
 $vanillaHeaderNav-active_bottomOffset: 2px;
 
 .vanillaHeader-nav {
@@ -42,8 +41,8 @@ $vanillaHeaderNav-active_bottomOffset: 2px;
         top: 0;
         right: 0;
         bottom: 0;
-        left: $vanillaHeaderNav-active_borderOffset/2;
-        width: calc(100% - #{$vanillaHeaderNav-active_borderOffset});
+        left: 0;
+        width: 100%;
         margin-bottom: -$vanillaHeaderNav-active_bottomOffset;
 
 

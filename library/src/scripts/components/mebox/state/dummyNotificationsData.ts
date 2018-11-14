@@ -8,5 +8,34 @@ import { INotificationsDropDownProps } from "@library/components/mebox/pieces/No
 export const dummyNotificationsData: INotificationsDropDownProps = {
     userSlug: "admin",
     count: 1000,
-    data: [],
+    data: [
+        {
+            unread: false,
+            userInfo: {
+                userID: 1,
+                name: "Tom",
+                photoUrl: "https://pbs.twimg.com/profile_images/911337163488247809/xUFM7Ugx_400x400.jpg",
+                dateLastActive: null,
+            },
+            message: '<0/> commented on the discussion: "How do I command a space ship?"',
+            timestamp: "2018-10-22T16:56:37.423Z",
+        },
+        {
+            unread: false,
+            userInfo: {
+                userID: 1,
+                name: "Tom",
+                photoUrl: "https://pbs.twimg.com/profile_images/911337163488247809/xUFM7Ugx_400x400.jpg",
+                dateLastActive: null,
+            },
+            message: '<0/> commented on the discussion: "How do I command a space ship?"',
+            timestamp: "2018-10-22T16:56:37.423Z",
+        },
+        {
+            unread: true,
+            warning: true,
+            message: "<0/> been warned.",
+            timestamp: "2018-10-22T16:56:37.423Z",
+        },
+    ],
 };

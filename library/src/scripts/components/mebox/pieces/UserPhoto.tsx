@@ -15,7 +15,7 @@ export enum UserPhotoSize {
 
 interface IProps {
     className?: string;
-    size: UserPhotoSize;
+    size?: UserPhotoSize;
     open?: boolean; // Only useful when using as dropdown button with SVG.
     userInfo: IUserFragment;
 }
@@ -25,10 +25,11 @@ interface IProps {
  */
 export class UserPhoto extends React.Component<IProps> {
     public render() {
-        const { className, size, userInfo } = this.props;
+        const { className, userInfo } = this.props;
         const photoUrl = userInfo ? userInfo.photoUrl : null;
         const name = userInfo ? userInfo.name : null;
         const open = !!this.props.open;
+        const size = this.props.size ? this.props.size : UserPhotoSize.SMALL;
 
         return (
             <div className={classNames("userPhoto", className, size, { isOpen: open })}>

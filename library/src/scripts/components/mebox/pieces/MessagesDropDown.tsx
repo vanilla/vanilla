@@ -19,14 +19,12 @@ import Frame from "@library/components/frame/Frame";
 import Heading from "@library/components/Heading";
 import { compose, messages } from "@library/components/icons/header";
 import Count from "@library/components/mebox/pieces/Count";
-
-export interface IMessage {
-    unread?: boolean;
-}
+import DropDownMessageList from "@library/components/mebox/pieces/DropDownMessageList";
+import { IDropDownMessage } from "./DropDownMesssage";
 
 export interface IMessagesDropDownProps {
     className?: string;
-    data: IMessage[];
+    data: IDropDownMessage[];
     count?: number;
     countClass?: string;
 }
@@ -59,7 +57,7 @@ export default class MessagesDropDown extends React.Component<IMessagesDropDownP
                 renderLeft={true}
                 buttonContents={
                     <div className="meBox-buttonContent">
-                        {messages(this.state.open)}{" "}
+                        {messages(this.state.open)}
                         <Count
                             className={classNames("vanillaHeader-messagesCount", this.props.countClass)}
                             label={t("Messages: ")}
@@ -70,7 +68,7 @@ export default class MessagesDropDown extends React.Component<IMessagesDropDownP
                 onVisibilityChange={this.setOpen}
             >
                 <Frame>
-                    <FrameHeader className="isShadowed" title={t("Messages")}>
+                    <FrameHeader className="isShadowed isCompact" title={t("Messages")}>
                         <LinkAsButton
                             title={t("New Message")}
                             className="headerDropDown-headerButton headerDropDown-messages button-pushRight"
@@ -81,9 +79,16 @@ export default class MessagesDropDown extends React.Component<IMessagesDropDownP
                         </LinkAsButton>
                     </FrameHeader>
                     <FrameBody className="isSelfPadded">
-                        <FramePanel>{t("Messages Here")}</FramePanel>
+                        <FramePanel>
+                            <DropDownMessageList
+                                emptyMessage={t("You do not have any messages yet.")}
+                                className="headerDropDown-messages"
+                            >
+                                {this.props.data || []}
+                            </DropDownMessageList>
+                        </FramePanel>
                     </FrameBody>
-                    <FrameFooter className="isShadowed">
+                    <FrameFooter className="isShadowed isCompact">
                         <LinkAsButton
                             className="headerDropDown-footerButton headerDropDown-allButton button-pushLeft"
                             to={"/kb/"}

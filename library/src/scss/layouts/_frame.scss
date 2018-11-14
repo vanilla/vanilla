@@ -13,6 +13,7 @@ $frame-border_radius: $global-borderRadius;
 $frame_padding: 36px;
 
 $frame-header_minHeight: 60px;
+$frame-header_compactMinHeight: 44px;
 $frame-header_spacing: 12px;
 $frame-header_fontSize: $global-subTitle_fontSize;
 
@@ -50,6 +51,12 @@ $frame-panel_minHeight: 500px;
 
     &.isShadowed {
         box-shadow: $frame-header_boxShadow;
+    }
+
+    &.isCompact {
+        min-height: $frame-header_compactMinHeight;
+        padding-top: 0;
+        padding-bottom: 0;
     }
 }
 
@@ -99,6 +106,10 @@ $frame-panel_minHeight: 500px;
     }
 }
 
+.frameBody-noContentMessage {
+    padding: $frame-header_spacing * 2 $frame-header_spacing;
+}
+
 .frameBody-contents {
     margin-bottom: $frame-header_spacing / 2;
 }
@@ -129,4 +140,15 @@ $frame-panel_minHeight: 500px;
     .button + .button {
         margin-left: $utility-baseUnit * 2 - $formElement-borderWidth;
     }
+
+    &.isCompact {
+        min-height: $frame-header_compactMinHeight;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+}
+
+.frameFooter-markRead {
+    font-weight: $global-fontWeight_semiBold;
+    color: $global-color_primary;
 }

@@ -17,6 +17,7 @@ export default class DateTime extends React.Component<IProps> {
     public static defaultProps: Partial<IProps> = {
         mode: "fixed",
     };
+    private interval;
 
     public render() {
         return (
@@ -24,6 +25,20 @@ export default class DateTime extends React.Component<IProps> {
                 {this.humanTime}
             </time>
         );
+    }
+
+    public componentDidMount() {
+        if (this.props.mode === "relative") {
+            this.interval = setInterval(() => {
+                this.forceUpdate();
+            }, 30000);
+        }
+    }
+
+    public componentWillUnmount() {
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
     }
 
     /**

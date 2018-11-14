@@ -8,4 +8,5 @@ import { IMessagesDropDownProps } from "../pieces/MessagesDropDown";
 
 export const dummyMessagesData: IMessagesDropDownProps = {
     data: [],
+    count: 2,
 };

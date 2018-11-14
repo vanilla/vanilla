@@ -28,7 +28,11 @@ export default class Count extends React.Component<IProps> {
                 <span className="sr-only" aria-live="polite">
                     {hasCount ? this.props.label + ` ${this.props.count}` : ""}
                 </span>
-                {hasCount && <div className="count-circle">{visibleCount}</div>}
+                {hasCount && (
+                    <div className="count-text" aria-hidden={true}>
+                        {visibleCount}
+                    </div>
+                )}
             </div>
         );
     }

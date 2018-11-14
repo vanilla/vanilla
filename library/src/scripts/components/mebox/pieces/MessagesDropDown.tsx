@@ -28,6 +28,7 @@ export interface IMessagesDropDownProps {
     className?: string;
     data: IMessage[];
     count?: number;
+    countClass?: string;
 }
 
 interface IState {
@@ -60,7 +61,7 @@ export default class MessagesDropDown extends React.Component<IMessagesDropDownP
                     <div className="meBox-buttonContent">
                         {messages(this.state.open)}{" "}
                         <Count
-                            className="vanillaHeader-notificationsCount"
+                            className={classNames("vanillaHeader-messagesCount", this.props.countClass)}
                             label={t("Messages: ")}
                             count={this.props.count}
                         />

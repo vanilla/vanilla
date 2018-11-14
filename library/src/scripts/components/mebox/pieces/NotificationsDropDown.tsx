@@ -17,6 +17,7 @@ import LinkAsButton from "@library/components/LinkAsButton";
 import Frame from "@library/components/frame/Frame";
 import { notifications, settings } from "@library/components/icons/header";
 import Count from "@library/components/mebox/pieces/Count";
+import classNames from "classnames";
 
 export interface INotification {
     unread?: boolean;
@@ -27,6 +28,7 @@ export interface INotificationsDropDownProps {
     data: INotification[];
     userSlug: string;
     count?: number;
+    countClass?: string;
 }
 
 interface IState {
@@ -60,7 +62,7 @@ export default class NotificationsDropDown extends React.Component<INotification
                     <div className="meBox-buttonContent">
                         {notifications(this.state.open)}
                         <Count
-                            className="vanillaHeader-notificationsCount"
+                            className={classNames("vanillaHeader-notificationsCount", this.props.countClass)}
                             label={t("Notifications: ")}
                             count={this.props.count}
                         />

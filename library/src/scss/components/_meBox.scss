@@ -6,7 +6,10 @@
 
 $meBox-button_borderRadius: 3px;
 $meBox-button_size: 40px;
-$vanillaHeaderNav-spacer_width: 12px;
+$meBox-spacer_width: 12px;
+$meBox-count_size: 18px;
+$meBox-count_fontSize: 10px;
+$meBox-count_bg: #D0021B;
 
 .meBox-languages {
     margin-left: auto;
@@ -34,7 +37,7 @@ $vanillaHeaderNav-spacer_width: 12px;
 .meBox-navLink {
     color: inherit;
     height: $meBox-button_size;
-    padding: 0 $vanillaHeaderNav-spacer_width;
+    padding: 0 $meBox-spacer_width;
     border-radius: $meBox-button_borderRadius;
 
     &:active,
@@ -58,10 +61,6 @@ $vanillaHeaderNav-spacer_width: 12px;
 .meBox-locale {
     margin-right: $global_spacer/2;
 }
-
-
-
-
 
 .meBox-user {
     position: relative;

@@ -114,8 +114,8 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                         />
                         {!hideNonSearchElements && (
                             <React.Fragment>
-                                <NotificationsDropdown {...this.props.notificationsProps} />
-                                <MessagesDropDown {...this.props.messagesProps} />
+                                <NotificationsDropdown {...this.props.notificationsProps} countClass="meBox-count" />
+                                <MessagesDropDown {...this.props.messagesProps} countClass="meBox-count" />
                                 <UserDropdown {...this.props.userDropDownProps} />
                             </React.Fragment>
                         )}

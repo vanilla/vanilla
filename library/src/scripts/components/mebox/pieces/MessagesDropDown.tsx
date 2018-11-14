@@ -16,21 +16,19 @@ import FrameFooter from "@library/components/frame/FrameFooter";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import LinkAsButton from "@library/components/LinkAsButton";
 import Frame from "@library/components/frame/Frame";
-import Heading from "@library/components/Heading";
 import { compose, messages } from "@library/components/icons/header";
 import Count from "@library/components/mebox/pieces/Count";
-import DropDownMessageList from "@library/components/mebox/pieces/DropDownMessageList";
-import { IDropDownMessage } from "./DropDownMesssage";
+import { IMeBoxMessage } from "./MeBoxMessage";
+import MeBoxMessageList from "./MeBoxMessageList";
 
 export interface IMessagesDropDownProps {
     className?: string;
-    data: IDropDownMessage[];
+    data: IMeBoxMessage[];
     count?: number;
     countClass?: string;
 }
 
 interface IState {
-    hasUnread: false;
     open: boolean;
 }
 
@@ -43,12 +41,12 @@ export default class MessagesDropDown extends React.Component<IMessagesDropDownP
     public constructor(props) {
         super(props);
         this.state = {
-            hasUnread: false,
             open: false,
         };
     }
 
     public render() {
+        const count = this.props.count ? this.props.count : 0;
         return (
             <DropDown
                 id={this.id}
@@ -80,12 +78,12 @@ export default class MessagesDropDown extends React.Component<IMessagesDropDownP
                     </FrameHeader>
                     <FrameBody className="isSelfPadded">
                         <FramePanel>
-                            <DropDownMessageList
+                            <MeBoxMessageList
                                 emptyMessage={t("You do not have any messages yet.")}
                                 className="headerDropDown-messages"
                             >
                                 {this.props.data || []}
-                            </DropDownMessageList>
+                            </MeBoxMessageList>
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter className="isShadowed isCompact">
@@ -96,13 +94,16 @@ export default class MessagesDropDown extends React.Component<IMessagesDropDownP
                         >
                             {t("All Notifications")}
                         </LinkAsButton>
-                        <Button
-                            onClick={this.handleAllRead}
-                            disabled={this.state.hasUnread}
-                            baseClass={ButtonBaseClass.TEXT}
-                        >
-                            {t("Mark All Read")}
-                        </Button>
+
+                        {count > 0 && (
+                            <Button
+                                onClick={this.handleAllRead}
+                                baseClass={ButtonBaseClass.TEXT}
+                                className="frameFooter-markRead"
+                            >
+                                {t("Mark All Read")}
+                            </Button>
+                        )}
                     </FrameFooter>
                 </Frame>
             </DropDown>

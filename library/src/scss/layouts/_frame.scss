@@ -148,7 +148,7 @@ $frame-panel_minHeight: 500px;
     }
 }
 
-.frameFooter-markRead {
+.frameFooter-markRead.buttonAsText {
     font-weight: $global-fontWeight_semiBold;
     color: $global-color_primary;
 }

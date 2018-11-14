@@ -19,6 +19,7 @@ export const dummyNotificationsData: INotificationsDropDownProps = {
             },
             message: '<0/> commented on the discussion: "How do I command a space ship?"',
             timestamp: "2018-10-22T16:56:37.423Z",
+            to: "/kb/#todo",
         },
         {
             unread: false,
@@ -30,12 +31,14 @@ export const dummyNotificationsData: INotificationsDropDownProps = {
             },
             message: '<0/> commented on the discussion: "How do I command a space ship?"',
             timestamp: "2018-10-22T16:56:37.423Z",
+            to: "/kb/#todo",
         },
         {
             unread: true,
             warning: true,
             message: "<0/> been warned.",
             timestamp: "2018-10-22T16:56:37.423Z",
+            to: "/kb/#todo",
         },
     ],
 };

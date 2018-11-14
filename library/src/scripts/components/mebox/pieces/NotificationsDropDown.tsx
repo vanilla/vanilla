@@ -18,19 +18,18 @@ import Frame from "@library/components/frame/Frame";
 import { notifications, settings } from "@library/components/icons/header";
 import Count from "@library/components/mebox/pieces/Count";
 import classNames from "classnames";
-import DropDownMessage, { IDropDownMessage } from "@library/components/mebox/pieces/DropDownMesssage";
-import DropDownMessageList from "./DropDownMessageList";
+import { IMeBoxMessage } from "@library/components/mebox/pieces/MeBoxMessage";
+import MeBoxMessageList from "./MeBoxMessageList";
 
 export interface INotificationsDropDownProps {
     className?: string;
-    data: IDropDownMessage[];
+    data: IMeBoxMessage[];
     userSlug: string;
     count?: number;
     countClass?: string;
 }
 
 interface IState {
-    hasUnread: false;
     open: boolean;
 }
 
@@ -43,12 +42,12 @@ export default class NotificationsDropDown extends React.Component<INotification
     public constructor(props) {
         super(props);
         this.state = {
-            hasUnread: false,
             open: false,
         };
     }
 
     public render() {
+        const count = this.props.count ? this.props.count : 0;
         return (
             <DropDown
                 id={this.id}
@@ -81,12 +80,12 @@ export default class NotificationsDropDown extends React.Component<INotification
                     </FrameHeader>
                     <FrameBody className="isSelfPadded">
                         <FramePanel>
-                            <DropDownMessageList
+                            <MeBoxMessageList
                                 emptyMessage={t("You do not have any notifications yet.")}
                                 className="headerDropDown-notifications"
                             >
                                 {this.props.data || []}
-                            </DropDownMessageList>
+                            </MeBoxMessageList>
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter className="isShadowed isCompact">
@@ -97,10 +96,9 @@ export default class NotificationsDropDown extends React.Component<INotification
                         >
                             {t("All Notifications")}
                         </LinkAsButton>
-                        {this.state.hasUnread && (
+                        {count > 0 && (
                             <Button
                                 onClick={this.handleAllRead}
-                                disabled={this.state.hasUnread}
                                 baseClass={ButtonBaseClass.TEXT}
                                 className="frameFooter-markRead"
                             >

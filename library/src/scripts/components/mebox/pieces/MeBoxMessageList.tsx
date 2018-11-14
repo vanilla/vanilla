@@ -6,30 +6,30 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import DropDownMessage, { IDropDownMessage } from "./DropDownMesssage";
+import MeBoxMessage, { IMeBoxMessage } from "./MeBoxMessage";
 
 export interface IVanillaHeaderNavProps {
     className?: string;
-    children: IDropDownMessage[];
+    children: IMeBoxMessage[];
     emptyMessage?: string;
 }
 
 /**
  * Implements Navigation component for header
  */
-export default class DropDownMessageList extends React.Component<IVanillaHeaderNavProps> {
+export default class MeBoxMessageList extends React.Component<IVanillaHeaderNavProps> {
     public render() {
         const count = this.props.children.length;
         const content = this.props.children.map((item, key) => {
             return (
-                <React.Fragment key={`dropDownMessageList-${key}`}>
-                    <DropDownMessage {...item} />
+                <React.Fragment key={`MeBoxMessageList-${key}`}>
+                    <MeBoxMessage {...item} />
                 </React.Fragment>
             );
         });
         return (
-            <div className={classNames("dropDownMessageList", this.props.className)}>
-                {count > 0 && <ul className="dropDownMessageList-items">{content}</ul>}
+            <div className={classNames("MeBoxMessageList", this.props.className)}>
+                {count > 0 && <ul className="MeBoxMessageList-items">{content}</ul>}
                 {count === 0 && <div className="frameBody-noContentMessage">{this.props.emptyMessage}</div>}
             </div>
         );

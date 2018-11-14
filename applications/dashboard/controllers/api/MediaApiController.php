@@ -6,6 +6,7 @@
 
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
+use Garden\EventManager;
 use Vanilla\ApiUtils;
 use Vanilla\Formatting\Embeds\EmbedManager;
 use Vanilla\ImageResizer;
@@ -25,6 +26,9 @@ class MediaApiController extends AbstractApiController {
     const EXTENSIONS_BINARY = ['xls', 'xlsx', 'ppt'];
     const EXTENSIONS_ARCHIVE = ['zip', 'tar', 'gzip', '7z', 'arj', 'deb', 'pkg', 'gz', 'z', 'rpm', 'iso', 'cab'];
 
+    /** @var array */
+    private $foreignTypes = ["embed"];
+
     /** @var Schema */
     private $idParamSchema;
 
@@ -34,7 +38,7 @@ class MediaApiController extends AbstractApiController {
     /** @var EmbedManager */
     private $embedManager;
 
-    /** @var Config */
+    /** @var Gdn_Configuration */
     private $config;
 
     /**
@@ -42,11 +46,21 @@ class MediaApiController extends AbstractApiController {
      *
      * @param MediaModel $mediaModel
      * @param EmbedManager $embedManager
+     * @param Gdn_Configuration $config
+     * @param EventManager $eventManager
      */
-    public function __construct(MediaModel $mediaModel, EmbedManager $embedManager, Gdn_Configuration $config) {
+    public function __construct(
+        MediaModel $mediaModel,
+        EmbedManager $embedManager,
+        Gdn_Configuration $config,
+        EventManager $eventManager
+    ) {
         $this->mediaModel = $mediaModel;
         $this->embedManager = $embedManager;
         $this->config =  $config;
+
+        $foreignTypes = $eventManager->fireFilter("getMediaForeignTypes", $this->foreignTypes);
+        $this->setForeignTypes($foreignTypes);
     }
 
     /**
@@ -190,6 +204,15 @@ class MediaApiController extends AbstractApiController {
     }
 
     /**
+     * Get allowed values for the foreign type field.
+     *
+     * @return array
+     */
+    private function getForeignTypes(): array {
+        return $this->foreignTypes;
+    }
+
+    /**
      * Get a media item's information by its URL.
      *
      * @param $query The request query.
@@ -328,9 +351,7 @@ class MediaApiController extends AbstractApiController {
         $in = $this->schema([
             "foreignType" => [
                 "description" => "Type of resource the media item will be attached to (e.g. comment).",
-                "enum" => [
-                    "embed",
-                ],
+                "enum" => $this->getForeignTypes(),
                 "type" => "string",
             ],
             "foreignID" => [
@@ -450,5 +471,16 @@ class MediaApiController extends AbstractApiController {
 
         $result = $out->validate($pageInfo);
         return $result;
+    }
+
+    /**
+     * Set allowed values for the foreign type field.
+     *
+     * @param array $foreignTypes
+     * @return self
+     */
+    private function setForeignTypes(array $foreignTypes): self {
+        $this->foreignTypes = $foreignTypes;
+        return $this;
     }
 }

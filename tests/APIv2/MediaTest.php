@@ -31,7 +31,7 @@ class MediaTest extends AbstractAPIv2Test {
 
         $updatedAttachment = [
             "foreignID" => 31337,
-            "foreignType" => "discussion",
+            "foreignType" => "embed",
         ];
         $result = $this->api()->patch(
             "{$this->baseUrl}/{$mediaID}/attachment",

@@ -8,6 +8,7 @@ import React from "react";
 import qs from "qs";
 import { withRouter, RouteComponentProps } from "react-router";
 import isEqual from "lodash/isEqual";
+import throttle from "lodash/throttle";
 
 interface IProps extends RouteComponentProps<any> {
     value: {
@@ -33,13 +34,20 @@ class QueryString extends React.Component<IProps> {
         }
     }
 
-    private updateQueryString() {
-        const query = qs.stringify(this.props.value);
-        this.props.history.replace({
-            ...this.props.location,
-            search: query,
+    /**
+     * Update the query string of the window.
+     *
+     * This is throttle and put in request animation frame so that it does not take priority over the UI.
+     */
+    private updateQueryString = throttle(() => {
+        requestAnimationFrame(() => {
+            const query = qs.stringify(this.props.value);
+            this.props.history.replace({
+                ...this.props.location,
+                search: query,
+            });
         });
-    }
+    }, 100);
 }
 
 export default withRouter(QueryString);

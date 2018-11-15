@@ -6,12 +6,13 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import MeBoxMessage, { IMeBoxMessage } from "./MeBoxMessage";
+import MeBoxMessage, { IMeBoxNotification, IMeBoxNotificationMessage, MeBoxMessageType } from "./MeBoxMessage";
 
 export interface IVanillaHeaderNavProps {
     className?: string;
-    children: IMeBoxMessage[];
+    data: Array<IMeBoxNotification | IMeBoxNotificationMessage>;
     emptyMessage?: string;
+    type: MeBoxMessageType;
 }
 
 /**
@@ -19,13 +20,18 @@ export interface IVanillaHeaderNavProps {
  */
 export default class MeBoxMessageList extends React.Component<IVanillaHeaderNavProps> {
     public render() {
-        const count = this.props.children.length;
-        const content = this.props.children.map((item, key) => {
-            return <MeBoxMessage {...item} key={`MeBoxMessageList-${key}`} />;
-        });
+        const count = this.props.data.length;
         return (
             <div className={classNames("MeBoxMessageList", this.props.className)}>
-                {count > 0 && <ul className="MeBoxMessageList-items">{content}</ul>}
+                {count > 0 && (
+                    <ul className="MeBoxMessageList-items">
+                        {this.props.data.map((item, key) => {
+                            return (
+                                <MeBoxMessage {...item} type={this.props.type as any} key={`MeBoxMessageList-${key}`} />
+                            );
+                        })}
+                    </ul>
+                )}
                 {count === 0 && <div className="frameBody-noContentMessage">{this.props.emptyMessage}</div>}
             </div>
         );

@@ -18,14 +18,15 @@ import LinkAsButton from "@library/components/LinkAsButton";
 import Frame from "@library/components/frame/Frame";
 import { compose, messages } from "@library/components/icons/header";
 import Count from "@library/components/mebox/pieces/Count";
-import { IMeBoxMessage } from "./MeBoxMessage";
+import { IMeBoxNotification, IMeBoxNotificationMessage, MeBoxMessageType } from "./MeBoxMessage";
 import MeBoxMessageList from "./MeBoxMessageList";
 
 export interface IMessagesDropDownProps {
     className?: string;
-    data: IMeBoxMessage[];
+    data: IMeBoxNotification[] | IMeBoxNotificationMessage[];
     count?: number;
     countClass?: string;
+    type: MeBoxMessageType.MESSAGE;
 }
 
 interface IState {
@@ -82,9 +83,9 @@ export default class MessagesDropDown extends React.Component<IMessagesDropDownP
                             <MeBoxMessageList
                                 emptyMessage={t("You do not have any messages yet.")}
                                 className="headerDropDown-messages"
-                            >
-                                {this.props.data || []}
-                            </MeBoxMessageList>
+                                type={MeBoxMessageType.MESSAGE}
+                                data={this.props.data || []}
+                            />
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter className="isShadowed isCompact">

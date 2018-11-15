@@ -15,54 +15,104 @@ import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
 import SmartLink from "@library/components/navigation/SmartLink";
 
-export interface IMeBoxMessage {
-    unread?: boolean;
-    userInfo?: IUserFragment;
-    message: string;
-    timestamp: string;
-    warning?: boolean;
-    to: string;
+export enum MeBoxMessageType {
+    NOTIFICATION = "notification",
+    MESSAGE = "message",
 }
 
-interface IProps extends IMeBoxMessage {
+// Common to both notifications and messages dropdowns
+interface IMeBoxMessageItem {
+    unread?: boolean;
+    timestamp: string;
+    to: string;
     className?: string;
+    message: string;
 }
+
+export interface IMeBoxNotification extends IMeBoxMessageItem {
+    authors: IUserFragment[];
+    featuredUser: IUserFragment;
+    count: number;
+    type: MeBoxMessageType.MESSAGE;
+}
+
+export interface IMeBoxNotificationMessage extends IMeBoxMessageItem {
+    featuredUser: IUserFragment; // Whom is the message about?
+    warning?: boolean;
+    type: MeBoxMessageType.NOTIFICATION;
+}
+
+type IProps = IMeBoxNotificationMessage | IMeBoxNotification;
 
 /**
  * Implements Drop down message (for notifications or messages)
  */
 export default class MeBoxMessage extends React.Component<IProps> {
     public render() {
-        const { unread, userInfo, message, timestamp, warning, to } = this.props;
-        const subject = warning ? t("You've") : userInfo!.name;
+        const { unread, message, timestamp, to, featuredUser } = this.props;
+
+        let warning: boolean;
+        let count: number;
+        let subject: string;
+        let authors: JSX.Element[];
+
+        if (this.props.type === MeBoxMessageType.NOTIFICATION) {
+            // Notification
+            warning = !!this.props.warning;
+            subject = warning ? t("You've") : this.props.featuredUser.name;
+        } else {
+            // Message
+            warning = false;
+            count = this.props.count;
+            const authorCount = this.props.authors.length;
+            if ("authors" in this.props && authorCount > 0) {
+                authors = this.props.authors!.map((user, index) => {
+                    return (
+                        <React.Fragment>
+                            <strong>{user.name}</strong>
+                            {`${index < authorCount - 1 ? t(", ") : ""}`}
+                        </React.Fragment>
+                    );
+                });
+            }
+        }
+
+        const image = warning ? (
+            userWarning(`meBoxMessage-photo ${UserPhotoSize.MEDIUM} userPhoto`)
+        ) : (
+            <UserPhoto size={UserPhotoSize.MEDIUM} className="meBoxMessage-photo" userInfo={featuredUser!} />
+        );
+
         return (
-            <li className={classNames("MeBoxMessage", this.props.className)}>
-                <SmartLink to={to} className="MeBoxMessage-link" tabIndex={0}>
-                    <div className="MeBoxMessage-image">
-                        {userInfo && (
-                            <UserPhoto
-                                size={UserPhotoSize.MEDIUM}
-                                className="MeBoxMessage-photo"
-                                userInfo={this.props.userInfo!}
-                            />
-                        )}
-                        {!userInfo && userWarning(`MeBoxMessage-photo ${UserPhotoSize.MEDIUM} userPhoto`)}
-                    </div>
-                    <div className="MeBoxMessage-contents">
-                        <div className="MeBoxMessage-message">
+            <li className={classNames("meBoxMessage", this.props.className)}>
+                <SmartLink to={to} className="meBoxMessage-link" tabIndex={0}>
+                    <div className="meBoxMessage-image">{image}</div>
+                    <div className="meBoxMessage-contents">
+                        {!!authors! && <div className="meBoxMessage-message">{authors!}</div>}
+                        <div className="meBoxMessage-message">
                             <Translate
                                 source={message}
-                                c0={<strong className="MeBoxMessage-subject">{subject}</strong>}
+                                c0={<strong className="meBoxMessage-subject">{subject!}</strong>}
                             />
                         </div>
-                        {timestamp && (
-                            <div className="MeBoxMessage-metas metas">
+                        {(timestamp || !!count!) && (
+                            <div className="meBoxMessage-metas metas">
                                 <DateTime timestamp={timestamp} className="meta" />
+                                {!!count! && (
+                                    <span className="meta">
+                                        {count! === 1 && <Translate source="<0/> message" c0={1} />}
+                                        {count! > 1 && <Translate source="<0/> messages" c0={count!} />}
+                                    </span>
+                                )}
                             </div>
                         )}
                     </div>
-                    {unread && <div className="MeBoxMessage-status isRead" />}
-                    {!unread && <FlexSpacer className="MeBoxMessage-status isUnread">{t("Unread")}</FlexSpacer>}
+                    {!unread && <div className="meBoxMessage-status isRead" />}
+                    {unread && (
+                        <FlexSpacer title={t("Unread")} className="meBoxMessage-status isUnread">
+                            {t("Unread")}
+                        </FlexSpacer>
+                    )}
                 </SmartLink>
             </li>
         );

@@ -4,16 +4,22 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { Component } from "react";
 import moment from "moment";
 
 interface IProps {
+    /** The timestamp to format and display */
     timestamp: string;
+    /** An additional classname to apply to the root of the component */
     className?: string;
+    /** Display a fixed or relative visible time. */
     mode?: "relative" | "fixed";
 }
 
-export default class DateTime extends React.Component<IProps> {
+/**
+ * Component for displaying an accessible nicely formatted time string.
+ */
+export default class DateTime extends Component<IProps> {
     public static defaultProps: Partial<IProps> = {
         mode: "fixed",
     };

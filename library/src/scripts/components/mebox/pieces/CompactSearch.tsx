@@ -29,6 +29,8 @@ export interface ICompactSearchProps {
  */
 export default class CompactSearch extends React.Component<ICompactSearchProps> {
     private id = uniqueIDFromPrefix("compactSearch");
+    private searchBarRef: React.RefObject<SearchBar> = React.createRef();
+    private searchButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
 
     public render() {
         return (
@@ -42,6 +44,7 @@ export default class CompactSearch extends React.Component<ICompactSearchProps> 
                         aria-haspopup="true"
                         baseClass={ButtonBaseClass.CUSTOM}
                         aria-controls={this.id}
+                        buttonRef={this.searchButtonRef}
                     >
                         <div className="meBox-buttonContent">{search()}</div>
                     </Button>
@@ -60,6 +63,7 @@ export default class CompactSearch extends React.Component<ICompactSearchProps> 
                             title={t("Search")}
                             disabled={!this.props.open}
                             hideSearchButton={true}
+                            ref={this.searchBarRef}
                         />
                         <Button
                             onClick={this.props.onCloseSearch}
@@ -100,4 +104,12 @@ export default class CompactSearch extends React.Component<ICompactSearchProps> 
             };
         });
     };
+
+    public componentDidUpdate(prevProps) {
+        if (!prevProps.open && this.props.open) {
+            this.searchBarRef.current!.focus();
+        } else if (prevProps.open && !this.props.open) {
+            this.searchButtonRef.current!.focus();
+        }
+    }
 }

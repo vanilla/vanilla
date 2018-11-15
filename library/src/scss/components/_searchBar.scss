@@ -63,6 +63,7 @@ $searchBar-searchIcon_space: 32px;
         border: 0;
         background-color: transparent;
         height: 100%;
+        max-width: calc(100% - #{$formElement-height});
 
 
         &.searchBar__control--is-focused {
@@ -100,7 +101,7 @@ $searchBar-searchIcon_space: 32px;
     display: block !important;
 
     input {
-        width: 100%;
+        width: 100% !important;
         line-height: $global-base_lineHeight;
     }
 }
@@ -131,7 +132,7 @@ $searchBar-searchIcon_space: 32px;
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 0;
+    left: 2px;
     height: 100%;
     display: flex;
     align-items: center;

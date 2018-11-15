@@ -39,6 +39,8 @@ ${chalk.green(aliases)}`;
         babelPlugins.push(require.resolve("react-hot-loader/babel"));
     }
 
+    const storybookLoaders = section === "storybook" ? [require.resolve("react-docgen-typescript-loader")] : [];
+
     const config: any = {
         context: VANILLA_ROOT,
         module: {
@@ -58,7 +60,7 @@ ${chalk.green(aliases)}`;
                                 cacheDirectory: true,
                             },
                         },
-                        require.resolve("react-docgen-typescript-loader"),
+                        ...storybookLoaders,
                     ],
                 },
                 {

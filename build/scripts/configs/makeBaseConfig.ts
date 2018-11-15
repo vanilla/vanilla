@@ -58,6 +58,7 @@ ${chalk.green(aliases)}`;
                                 cacheDirectory: true,
                             },
                         },
+                        require.resolve("react-docgen-typescript-loader"),
                     ],
                 },
                 {

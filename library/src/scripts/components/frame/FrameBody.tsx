@@ -9,7 +9,7 @@ import classNames from "classnames";
 
 export interface IFrameBodyProps {
     className?: string;
-    children: React.ReactNode;
+    children: JSX.Element;
 }
 
 /**

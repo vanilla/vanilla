@@ -34,14 +34,14 @@ export class VanillaHeader extends React.Component<IProps> {
                 homePage={!!this.props.homePage}
                 className={this.props.className}
                 logoProps={dummyLogoData}
-                notificationsProps={dummyNotificationsData}
+                notificationsProps={dummyNotificationsData as any}
                 navigationProps={{ children: dummyNavigationData.children, className: "vanillaHeader-nav" }}
                 languagesProps={{
                     ...dummyOtherLanguagesData,
                     className: "vanillaHeader-locales",
                     buttonClassName: "vanillaHeader-localesToggle",
                 }}
-                messagesProps={dummyMessagesData}
+                messagesProps={dummyMessagesData as any}
                 userDropDownProps={dummyUserDropDownData}
                 device={this.props.device}
                 headerStyles={{}} // Defaults for now

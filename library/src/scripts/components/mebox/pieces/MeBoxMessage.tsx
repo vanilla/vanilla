@@ -70,7 +70,7 @@ export default class MeBoxMessage extends React.Component<IProps> {
                     return (
                         <React.Fragment>
                             <strong>{user.name}</strong>
-                            {`${index < authorCount - 1 ? t(", ") : ""}`}
+                            {`${index < authorCount - 1 ? `, ` : ""}`}
                         </React.Fragment>
                     );
                 });

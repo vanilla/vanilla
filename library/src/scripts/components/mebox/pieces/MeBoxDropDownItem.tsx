@@ -96,7 +96,7 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
                             />
                         </div>
                         {(timestamp || !!count!) && (
-                            <div className="meBoxMessage-metas metas">
+                            <div className="meBoxMessage-metas metas isFlexed">
                                 <DateTime timestamp={timestamp} className="meta" />
                                 {!!count! && (
                                     <span className="meta">

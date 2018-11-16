@@ -12,6 +12,7 @@ import { IUserFragment } from "@library/@types/api";
 export enum UserPhotoSize {
     SMALL = "isSmall",
     MEDIUM = "isMedium",
+    LARGE = "isLarge",
 }
 
 interface IProps {

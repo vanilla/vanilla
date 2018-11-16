@@ -9,14 +9,14 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DropDown from "@library/components/dropdown/DropDown";
 import { t } from "@library/application";
 import FrameBody from "@library/components/frame/FrameBody";
-import FramePanel from "@library/components/frame/FramePanel";
 import Frame from "@library/components/frame/Frame";
 import { IUserFragment } from "@library/@types/api/users";
-import { UserPhotoSize, UserPhoto } from "@library/components/mebox/pieces/UserPhoto";
+import { UserPhoto, UserPhotoSize } from "@library/components/mebox/pieces/UserPhoto";
 import { logError } from "@library/utility";
 import { connect } from "react-redux";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import get from "lodash/get";
+import LinkList from "@library/components/linkLists/LinkList";
 
 export interface ILinkSection {}
 
@@ -26,7 +26,6 @@ export interface IUserDropDownProps extends IInjectableUserState {
 }
 
 interface IState {
-    hasUnread: false;
     open: boolean;
 }
 
@@ -39,7 +38,6 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
     public constructor(props) {
         super(props);
         this.state = {
-            hasUnread: false,
             open: false,
         };
     }
@@ -50,6 +48,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
             userID: null,
             photoUrl: null,
         });
+
         return (
             <DropDown
                 id={this.id}
@@ -68,9 +67,17 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                 }
                 onVisibilityChange={this.setOpen}
             >
-                <Frame>
+                <Frame className="userDropDown">
                     <FrameBody className="isSelfPadded">
-                        <FramePanel>{t("Stuff Here")}</FramePanel>
+                        <div className="userDropDown-userCard">
+                            <UserPhoto
+                                className="userDropDown-userCardPhoto"
+                                userInfo={this.props.currentUser.data!}
+                                size={UserPhotoSize.LARGE}
+                            />
+                            <div className="userDropDown-userCardName">{this.props.currentUser.data!.name}</div>
+                        </div>
+                        <LinkList data={} />
                     </FrameBody>
                 </Frame>
             </DropDown>

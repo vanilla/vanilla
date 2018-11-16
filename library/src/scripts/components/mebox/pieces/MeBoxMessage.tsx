@@ -107,11 +107,11 @@ export default class MeBoxMessage extends React.Component<IProps> {
                             </div>
                         )}
                     </div>
-                    {!unread && <div className="meBoxMessage-status isRead" />}
+                    {!unread && <FlexSpacer className="meBoxMessage-status isRead" />}
                     {unread && (
-                        <FlexSpacer title={t("Unread")} className="meBoxMessage-status isUnread">
-                            {t("Unread")}
-                        </FlexSpacer>
+                        <div title={t("Unread")} className="u-flexSpacer meBoxMessage-status isUnread">
+                            <span className="sr-only">{t("Unread")}</span>
+                        </div>
                     )}
                 </SmartLink>
             </li>

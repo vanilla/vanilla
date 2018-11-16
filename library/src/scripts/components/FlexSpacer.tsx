@@ -8,7 +8,6 @@ import * as React from "react";
 import classNames from "classnames";
 
 interface IProps {
-    title?: string;
     className: string;
     children?: React.ReactNode;
 }
@@ -20,7 +19,7 @@ export default class FlexSpacer extends React.Component<IProps> {
     public render() {
         const content = ` `;
         return (
-            <div title={this.props.title} className={classNames("u-flexSpacer", this.props.className)}>
+            <div className={classNames("u-flexSpacer", this.props.className)}>
                 {content}
                 {this.props.children && <span className="sr-only">{this.props.children}</span>}
             </div>

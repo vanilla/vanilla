@@ -39,6 +39,7 @@ interface ICommonProps {
     onChange?: (newContent: DeltaOperation[]) => void;
     allowUpload: boolean;
     device?: Devices;
+    initialValue?: DeltaOperation[];
 }
 
 interface ILegacyProps extends ICommonProps {
@@ -182,6 +183,9 @@ export class Editor extends React.Component<IProps> {
         registerQuill();
         const options = { theme: "vanilla" };
         this.quill = new Quill(this.quillMountRef.current!, options);
+        if (this.props.initialValue) {
+            this.quill.setContents(this.props.initialValue);
+        }
         if (this.props.isLoading) {
             this.quill.disable();
         }

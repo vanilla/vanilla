@@ -18,15 +18,14 @@ import LinkAsButton from "@library/components/LinkAsButton";
 import Frame from "@library/components/frame/Frame";
 import { compose, messages } from "@library/components/icons/header";
 import Count from "@library/components/mebox/pieces/Count";
-import { IMeBoxNotification, IMeBoxNotificationMessage, MeBoxMessageType } from "./MeBoxMessage";
-import MeBoxMessageList from "./MeBoxMessageList";
+import { IMeBoxMessageItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
+import MeBoxDropDownItemList from "@library/components/mebox/pieces/MeBoxDropDownItemList";
 
 export interface IMessagesDropDownProps {
     className?: string;
-    data: IMeBoxNotification[] | IMeBoxNotificationMessage[];
+    data: IMeBoxMessageItem[];
     count?: number;
     countClass?: string;
-    type: MeBoxMessageType.MESSAGE;
 }
 
 interface IState {
@@ -80,10 +79,10 @@ export default class MessagesDropDown extends React.Component<IMessagesDropDownP
                     </FrameHeader>
                     <FrameBody className="isSelfPadded">
                         <FramePanel>
-                            <MeBoxMessageList
+                            <MeBoxDropDownItemList
                                 emptyMessage={t("You do not have any messages yet.")}
                                 className="headerDropDown-messages"
-                                type={MeBoxMessageType.MESSAGE}
+                                type={MeBoxItemType.MESSAGE}
                                 data={this.props.data || []}
                             />
                         </FramePanel>

@@ -6,19 +6,23 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import MeBoxMessage, { IMeBoxNotification, IMeBoxNotificationMessage, MeBoxMessageType } from "./MeBoxMessage";
+import MeBoxDropDownItem, {
+    IMeBoxMessageItem,
+    IMeBoxNotificationItem,
+    MeBoxItemType,
+} from "@library/components/mebox/pieces/MeBoxDropDownItem";
 
 export interface IVanillaHeaderNavProps {
     className?: string;
-    data: Array<IMeBoxNotification | IMeBoxNotificationMessage>;
+    data: Array<IMeBoxMessageItem | IMeBoxNotificationItem>;
     emptyMessage?: string;
-    type: MeBoxMessageType;
+    type: MeBoxItemType;
 }
 
 /**
  * Implements Navigation component for header
  */
-export default class MeBoxMessageList extends React.Component<IVanillaHeaderNavProps> {
+export default class MeBoxDropDownItemList extends React.Component<IVanillaHeaderNavProps> {
     public render() {
         const count = this.props.data.length;
         return (
@@ -27,7 +31,11 @@ export default class MeBoxMessageList extends React.Component<IVanillaHeaderNavP
                     <ul className="MeBoxMessageList-items">
                         {this.props.data.map((item, key) => {
                             return (
-                                <MeBoxMessage {...item} type={this.props.type as any} key={`MeBoxMessageList-${key}`} />
+                                <MeBoxDropDownItem
+                                    {...item}
+                                    type={this.props.type as any}
+                                    key={`MeBoxDropDownItemList-${this.props.type}-${key}`}
+                                />
                             );
                         })}
                     </ul>

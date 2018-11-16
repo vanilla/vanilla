@@ -3,8 +3,6 @@
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { INotificationsDropDownProps } from "@library/components/mebox/pieces/NotificationsDropDown";
-import { MeBoxMessageType } from "@library/components/mebox/pieces/MeBoxMessage";
 
 export const dummyNotificationsData = {
     userSlug: "admin",

@@ -15,13 +15,13 @@ import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
 import SmartLink from "@library/components/navigation/SmartLink";
 
-export enum MeBoxMessageType {
+export enum MeBoxItemType {
     NOTIFICATION = "notification",
     MESSAGE = "message",
 }
 
 // Common to both notifications and messages dropdowns
-interface IMeBoxMessageItem {
+interface IMeBoxItem {
     unread?: boolean;
     timestamp: string;
     to: string;
@@ -29,25 +29,25 @@ interface IMeBoxMessageItem {
     message: string;
 }
 
-export interface IMeBoxNotification extends IMeBoxMessageItem {
+export interface IMeBoxMessageItem extends IMeBoxItem {
     authors: IUserFragment[];
     featuredUser: IUserFragment;
     count: number;
-    type: MeBoxMessageType.MESSAGE;
+    type: MeBoxItemType.MESSAGE;
 }
 
-export interface IMeBoxNotificationMessage extends IMeBoxMessageItem {
+export interface IMeBoxNotificationItem extends IMeBoxItem {
     featuredUser: IUserFragment; // Whom is the message about?
     warning?: boolean;
-    type: MeBoxMessageType.NOTIFICATION;
+    type: MeBoxItemType.NOTIFICATION;
 }
 
-type IProps = IMeBoxNotificationMessage | IMeBoxNotification;
+type IProps = IMeBoxMessageItem | IMeBoxNotificationItem;
 
 /**
  * Implements Drop down message (for notifications or messages)
  */
-export default class MeBoxMessage extends React.Component<IProps> {
+export default class MeBoxDropDownItem extends React.Component<IProps> {
     public render() {
         const { unread, message, timestamp, to, featuredUser } = this.props;
 
@@ -56,7 +56,7 @@ export default class MeBoxMessage extends React.Component<IProps> {
         let subject: string;
         let authors: JSX.Element[];
 
-        if (this.props.type === MeBoxMessageType.NOTIFICATION) {
+        if (this.props.type === MeBoxItemType.NOTIFICATION) {
             // Notification
             warning = !!this.props.warning;
             subject = warning ? t("You've") : this.props.featuredUser.name;
@@ -68,7 +68,7 @@ export default class MeBoxMessage extends React.Component<IProps> {
             if ("authors" in this.props && authorCount > 0) {
                 authors = this.props.authors!.map((user, index) => {
                     return (
-                        <React.Fragment>
+                        <React.Fragment key={`meBoxAuthor-${index}`}>
                             <strong>{user.name}</strong>
                             {`${index < authorCount - 1 ? `, ` : ""}`}
                         </React.Fragment>

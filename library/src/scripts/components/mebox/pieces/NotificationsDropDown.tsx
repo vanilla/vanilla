@@ -18,20 +18,15 @@ import Frame from "@library/components/frame/Frame";
 import { notifications, settings } from "@library/components/icons/header";
 import Count from "@library/components/mebox/pieces/Count";
 import classNames from "classnames";
-import {
-    IMeBoxNotification,
-    IMeBoxNotificationMessage,
-    MeBoxMessageType,
-} from "@library/components/mebox/pieces/MeBoxMessage";
-import MeBoxMessageList from "./MeBoxMessageList";
+import MeBoxDropDownItemList from "@library/components/mebox/pieces/MeBoxDropDownItemList";
+import { IMeBoxNotificationItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
 
 export interface INotificationsDropDownProps {
     className?: string;
-    data: IMeBoxNotificationMessage[] | IMeBoxNotification[];
+    data: IMeBoxNotificationItem[];
     userSlug: string;
     count?: number;
     countClass?: string;
-    type: MeBoxMessageType.NOTIFICATION;
 }
 
 interface IState {
@@ -86,10 +81,10 @@ export default class NotificationsDropDown extends React.Component<INotification
                     </FrameHeader>
                     <FrameBody className="isSelfPadded">
                         <FramePanel>
-                            <MeBoxMessageList
+                            <MeBoxDropDownItemList
                                 emptyMessage={t("You do not have any notifications yet.")}
                                 className="headerDropDown-notifications"
-                                type={MeBoxMessageType.NOTIFICATION}
+                                type={MeBoxItemType.NOTIFICATION}
                                 data={this.props.data || []}
                             />
                         </FramePanel>

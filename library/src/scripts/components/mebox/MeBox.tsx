@@ -20,7 +20,7 @@ import LanguagesDropDown, { ILanguageDropDownProps } from "@library/components/L
 import { PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 import FlexSpacer from "@library/components/FlexSpacer";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import UserDropdown from "@library/components/mebox/pieces/UserDropdown";
+import UserDropdown from "./pieces/UserDropdown";
 
 export interface IHeaderStyles {
     bgColor?: string;
@@ -36,7 +36,7 @@ export interface IMeBoxProps extends IDeviceProps {
     languagesProps: ILanguageDropDownProps;
     notificationsProps: INotificationsDropDownProps;
     messagesProps: IMessagesDropDownProps;
-    userDropDownProps: any;
+    counts: any;
     headerStyles: IHeaderStyles;
 }
 
@@ -116,7 +116,7 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                             <React.Fragment>
                                 <NotificationsDropdown {...this.props.notificationsProps} countClass="meBox-count" />
                                 <MessagesDropDown {...this.props.messagesProps} countClass="meBox-count" />
-                                <UserDropdown {...this.props.userDropDownProps} />
+                                <UserDropdown counts={this.props.counts} className="meBox-userDropdown" />
                             </React.Fragment>
                         )}
                     </div>

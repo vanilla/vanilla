@@ -11,10 +11,10 @@ import { dummyLogoData } from "./mebox/state/dummyLogoData";
 import { dummyNotificationsData } from "@library/components/mebox/state/dummyNotificationsData";
 import { dummyMessagesData } from "@library/components/mebox/state/dummyMessagesData";
 import { dummyNavigationData } from "./mebox/state/dummyNavigationData";
-import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
+import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
 
 interface IProps extends IDeviceProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -42,7 +42,7 @@ export class VanillaHeader extends React.Component<IProps> {
                     buttonClassName: "vanillaHeader-localesToggle",
                 }}
                 messagesProps={dummyMessagesData}
-                userDropDownProps={dummyUserDropDownData}
+                counts={dummyUserDropDownData}
                 device={this.props.device}
                 headerStyles={{}} // Defaults for now
             />,

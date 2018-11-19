@@ -25,3 +25,12 @@ export const dummyNavigationData: IVanillaHeaderNavProps = {
         },
     ],
 };
+
+export const dummyGuestNavigationData: IVanillaHeaderNavProps = {
+    children: [
+        {
+            to: `/entry/signin?target=${window.location.pathname}`,
+            name: "Sign In",
+        },
+    ],
+};

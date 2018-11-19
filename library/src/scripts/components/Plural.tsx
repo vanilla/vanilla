@@ -16,7 +16,7 @@ interface IProps {
 }
 
 /**
- * A component representing a element.
+ * Implements helper plural components for displaying singular or plural translation strings based on the count and locale.
  */
 export default class Plural extends React.Component<IProps> {
     public render() {

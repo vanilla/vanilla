@@ -16,7 +16,7 @@ interface IProps extends IDropDownItemLink {
 }
 
 /**
- * Implements link type of item for DropDownMenu
+ * Implements link type of item with count for DropDown menu
  */
 export default class DropDownItemLinkWithCount extends React.Component<IProps> {
     public static defaultProps = {

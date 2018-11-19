@@ -18,7 +18,7 @@ interface IProps {
 }
 
 /**
- * Implements line separator type of item for DropDownMenu
+ * Implements DropDownSection component. It add a heading to a group of elements in a DropDown menu
  */
 export default class DropDownSection extends React.Component<IProps> {
     public render() {

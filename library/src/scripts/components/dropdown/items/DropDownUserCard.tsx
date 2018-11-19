@@ -17,7 +17,7 @@ export interface IProps extends IInjectableUserState {
 }
 
 /**
- * Generic wrap for items in DropDownMenu
+ * Implements DropDownUserCard component for DropDown menus.
  */
 export class DropDownUserCard extends React.Component<IProps> {
     public render() {

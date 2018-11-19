@@ -61,13 +61,13 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
     }
     public render() {
         const isMobile = this.props.device === Devices.MOBILE;
-        const hideNonSearchElements = this.state.openSearch && isMobile;
+        const showNonSearchItems = !this.state.openSearch && !isMobile;
         const currentUser = get(this.props, "currentUser.data", {
             name: null,
             userID: null,
             photoUrl: null,
         });
-        const isGuest = currentUser!.userID === UsersModel.GUEST_ID;
+        const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
         const styles = {
             fg: this.props.headerStyles && this.props.headerStyles.fgColor ? this.props.headerStyles.fgColor : "#fff",
             bg:
@@ -93,7 +93,7 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
             content = (
                 <React.Fragment>
                     <div className="vanillaHeader-bar">
-                        {!hideNonSearchElements && (
+                        {showNonSearchItems && (
                             <React.Fragment>
                                 <HeaderLogo
                                     {...this.props.logoProps}
@@ -123,7 +123,7 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                             onCloseSearch={this.closeSearch}
                             cancelButtonClassName="meBox-searchCancel"
                         />
-                        {!hideNonSearchElements &&
+                        {showNonSearchItems &&
                             !isGuest && (
                                 <React.Fragment>
                                     <NotificationsDropdown
@@ -134,13 +134,14 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                                     <UserDropdown counts={this.props.counts} className="meBox-userDropdown" />
                                 </React.Fragment>
                             )}
-                        {isGuest && (
-                            <VanillaHeaderNav
-                                {...this.props.guestNavigationProps}
-                                linkClassName="meBox-navLink"
-                                linkContentClassName="meBox-navLinkContent"
-                            />
-                        )}
+                        {showNonSearchItems &&
+                            isGuest && (
+                                <VanillaHeaderNav
+                                    {...this.props.guestNavigationProps}
+                                    linkClassName="meBox-navLink"
+                                    linkContentClassName="meBox-navLinkContent"
+                                />
+                            )}
                     </div>
                 </React.Fragment>
             );

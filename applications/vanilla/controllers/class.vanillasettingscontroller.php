@@ -28,7 +28,7 @@ class VanillaSettingsController extends Gdn_Controller {
     /** @var array An array of category records. */
     public $OtherCategories;
 
-    /** @var int The maximum length a post can be. */
+    /** @var int The maximum length*/
     const MAX_POST_LENGTH = 50000;
 
     /**
@@ -78,12 +78,9 @@ class VanillaSettingsController extends Gdn_Controller {
 
         // Fire an filter event gather extra form HTML for specific format items.
         // The form is added so the form can be enhanced and the config model needs to passed to add extra fields.
-        $extraFormatFormHTML = $eventManager->fireFilter(
-            'postingSettings_formatSpecificFormItems',
-            "",
+        $extraFormatFormHTML = $eventManager->fireFilter('postingSettings_formatSpecificFormItems', "",
             $this->Form,
-            $configurationModel
-        );
+            $configurationModel);
         $this->setData('extraFormatFormHTML', $extraFormatFormHTML);
 
         // Set the model on the form.
@@ -99,11 +96,7 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', !$disableUrlEmbeds);
 
             if ($this->Form->_FormValues['Vanilla.Comment.MaxLength'] > self::MAX_POST_LENGTH) {
-                $this->Form->addError(
-                    'Max comment length of'.$this->Form->_FormValues['Vanilla.Comment.MaxLength'].
-                    ' value of is greater than the allowed size of'
-                    . self::MAX_POST_LENGTH . '.'
-                );
+                $this->Form->addError('Max comment length of' . $this->Form->_FormValues['Vanilla.Comment.MaxLength'] . ' value of is greater than the allowed size of' . self::MAX_POST_LENGTH . '.');
             }
 
             // Define some validation rules for the fields being saved

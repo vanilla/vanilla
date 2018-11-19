@@ -76,7 +76,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                 onVisibilityChange={this.setOpen}
             >
                 <Frame>
-                    <FrameBody className="isSelfPadded">
+                    <FrameBody className="dropDownItem-verticalPadding">
                         <DropDownUserCard currentUser={this.props.currentUser!} className="userDropDown-userCard" />
                         <DropDownItemSeparator />
                         <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />

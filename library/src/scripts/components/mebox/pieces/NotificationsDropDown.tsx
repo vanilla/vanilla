@@ -18,12 +18,12 @@ import Frame from "@library/components/frame/Frame";
 import { notifications, settings } from "@library/components/icons/header";
 import Count from "@library/components/mebox/pieces/Count";
 import classNames from "classnames";
-import { IMeBoxMessage } from "@library/components/mebox/pieces/MeBoxMessage";
-import MeBoxMessageList from "./MeBoxMessageList";
+import MeBoxDropDownItemList from "@library/components/mebox/pieces/MeBoxDropDownItemList";
+import { IMeBoxNotificationItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
 
 export interface INotificationsDropDownProps {
     className?: string;
-    data: IMeBoxMessage[];
+    data: IMeBoxNotificationItem[];
     userSlug: string;
     count?: number;
     countClass?: string;
@@ -81,12 +81,12 @@ export default class NotificationsDropDown extends React.Component<INotification
                     </FrameHeader>
                     <FrameBody className="isSelfPadded">
                         <FramePanel>
-                            <MeBoxMessageList
+                            <MeBoxDropDownItemList
                                 emptyMessage={t("You do not have any notifications yet.")}
                                 className="headerDropDown-notifications"
-                            >
-                                {this.props.data || []}
-                            </MeBoxMessageList>
+                                type={MeBoxItemType.NOTIFICATION}
+                                data={this.props.data || []}
+                            />
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter className="isShadowed isCompact">

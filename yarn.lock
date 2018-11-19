@@ -1580,6 +1580,13 @@
   dependencies:
     redux "^3.6.0"
 
+"@types/redux-test-utils@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@types/redux-test-utils/-/redux-test-utils-0.2.0.tgz#372fb9e2f55a24dd9d257b91257edbae146505c2"
+  integrity sha512-uEMO7/mnLpo8X9N2J04RfdbkMCYWNnbyhVM1SFL+dbFwXmmYydDqdmFlLdn0gUB4ado6UcQFWgRS+FAc2vvSFw==
+  dependencies:
+    redux "^3.6.0"
+
 "@types/serve-static@*":
   version "1.13.2"
   resolved "https://registry.yarnpkg.com/@types/serve-static/-/serve-static-1.13.2.tgz#f5ac4d7a6420a99a6a45af4719f4dcd8cd907a48"
@@ -9871,12 +9878,12 @@ reduce-reducers@0.4.3:
   resolved "https://registry.yarnpkg.com/reduce-reducers/-/reduce-reducers-0.4.3.tgz#8e052618801cd8fc2714b4915adaa8937eb6d66c"
   integrity sha512-+CNMnI8QhgVMtAt54uQs3kUxC3Sybpa7Y63HR14uGLgI9/QR5ggHvpxwhGGe3wmx5V91YwqQIblN9k5lspAmGw==
 
-redux-mock-store@1.5.3:
-  version "1.5.3"
-  resolved "https://registry.yarnpkg.com/redux-mock-store/-/redux-mock-store-1.5.3.tgz#1f10528949b7ce8056c2532624f7cafa98576c6d"
-  integrity sha512-ryhkkb/4D4CUGpAV2ln1GOY/uh51aczjcRz9k2L2bPx/Xja3c5pSGJJPyR25GNVRXtKIExScdAgFdiXp68GmJA==
+redux-test-utils@0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/redux-test-utils/-/redux-test-utils-0.3.0.tgz#0a788c1c7d73f8360af7d2559ffc7c3788fce173"
+  integrity sha512-Ee0SB+FjOJ1efnJZY/0MptkmgKodyZfMiHu/g7O5EfoYDOZvWGHF+WD2xBNuwE6sfEzBiHP/7MkJsASoV/Pq/A==
   dependencies:
-    lodash.isplainobject "^4.0.6"
+    fast-deep-equal "^2.0.1"
 
 redux-thunk@2.3.0:
   version "2.3.0"

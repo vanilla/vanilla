@@ -10,6 +10,9 @@ $userDropDown-userCard_bottomMargin: 24px;
 $userDropDown-userName_topMargin: 9px;
 $userDropDown-userName_bottomMargin: 24px;
 
+.userDropDown-userCardPhotoLink {
+    display: block;
+}
 
 .userDropDown-userCardPhoto {
     margin: {
@@ -21,6 +24,8 @@ $userDropDown-userName_bottomMargin: 24px;
 }
 
 .userDropDown-userCardName {
+    display: block;
+    color: inherit;
     font-weight: $global-fontWeight_semiBold;
     font-size: $global-large_fontSize;
     line-height: $global-condensed_lineHeight;

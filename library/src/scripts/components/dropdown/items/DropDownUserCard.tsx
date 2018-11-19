@@ -10,6 +10,7 @@ import { UserPhoto, UserPhotoSize } from "@library/components/mebox/pieces/UserP
 import { IInjectableUserState } from "@library/users/UsersModel";
 import { connect } from "react-redux";
 import UsersModel from "@library/users/UsersModel";
+import SmartLink from "@library/components/navigation/SmartLink";
 
 export interface IProps extends IInjectableUserState {
     className?: string;
@@ -22,14 +23,19 @@ export interface IProps extends IInjectableUserState {
 export class DropDownUserCard extends React.Component<IProps> {
     public render() {
         const currentUser = this.props.currentUser.data!;
+        const profileLink = `${window.location.origin}/profile/${currentUser.name}`;
         return (
             <li className={classNames("dropDown-userCard", this.props.className)}>
-                <UserPhoto
-                    className="userDropDown-userCardPhoto"
-                    userInfo={currentUser}
-                    size={this.props.photoSize || UserPhotoSize.LARGE}
-                />
-                <div className="userDropDown-userCardName">{currentUser.name}</div>
+                <SmartLink to={profileLink} className="userDropDown-userCardPhotoLink">
+                    <UserPhoto
+                        className="userDropDown-userCardPhoto"
+                        userInfo={currentUser}
+                        size={this.props.photoSize || UserPhotoSize.LARGE}
+                    />
+                </SmartLink>
+                <SmartLink to={profileLink} className="userDropDown-userCardName" tabIndex={-1}>
+                    {currentUser.name}
+                </SmartLink>
             </li>
         );
     }

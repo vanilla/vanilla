@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import ReactDOM from "react-dom";
-import { MeBox } from "@library/components/mebox/MeBox";
+import MeBox from "@library/components/mebox/MeBox";
 import { dummyLogoData } from "./mebox/state/dummyLogoData";
 import { dummyNotificationsData } from "@library/components/mebox/state/dummyNotificationsData";
 import { dummyMessagesData } from "@library/components/mebox/state/dummyMessagesData";

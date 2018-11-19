@@ -20,7 +20,12 @@ import LanguagesDropDown, { ILanguageDropDownProps } from "@library/components/L
 import { PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 import FlexSpacer from "@library/components/FlexSpacer";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import UserDropdown from "./pieces/UserDropdown";
+import UserDropdown, { UserDropDown } from "./pieces/UserDropdown";
+import { IInjectableUserState } from "@library/users/UsersModel";
+import UsersModel from "@library/users/UsersModel";
+import { connect } from "react-redux";
+import get from "lodash/get";
+import SmartLink from "@library/components/navigation/SmartLink";
 
 export interface IHeaderStyles {
     bgColor?: string;
@@ -28,7 +33,7 @@ export interface IHeaderStyles {
     notificationColor?: string;
 }
 
-export interface IMeBoxProps extends IDeviceProps {
+export interface IMeBoxProps extends IDeviceProps, IInjectableUserState {
     homePage: boolean;
     className?: string;
     logoProps: IHeaderLogo;
@@ -57,6 +62,12 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
     public render() {
         const isMobile = this.props.device === Devices.MOBILE;
         const hideNonSearchElements = this.state.openSearch && isMobile;
+        const currentUser = get(this.props, "currentUser.data", {
+            name: null,
+            userID: null,
+            photoUrl: null,
+        });
+        const isGuest = currentUser!.userID === UsersModel.GUEST_ID;
         const styles = {
             fg: this.props.headerStyles && this.props.headerStyles.fgColor ? this.props.headerStyles.fgColor : "#fff",
             bg:
@@ -112,13 +123,18 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                             onCloseSearch={this.closeSearch}
                             cancelButtonClassName="meBox-searchCancel"
                         />
-                        {!hideNonSearchElements && (
-                            <React.Fragment>
-                                <NotificationsDropdown {...this.props.notificationsProps} countClass="meBox-count" />
-                                <MessagesDropDown {...this.props.messagesProps} countClass="meBox-count" />
-                                <UserDropdown counts={this.props.counts} className="meBox-userDropdown" />
-                            </React.Fragment>
-                        )}
+                        {!hideNonSearchElements &&
+                            !isGuest && (
+                                <React.Fragment>
+                                    <NotificationsDropdown
+                                        {...this.props.notificationsProps}
+                                        countClass="meBox-count"
+                                    />
+                                    <MessagesDropDown {...this.props.messagesProps} countClass="meBox-count" />
+                                    <UserDropdown counts={this.props.counts} className="meBox-userDropdown" />
+                                </React.Fragment>
+                            )}
+                        {isGuest && <SmartLink to={"/entry/signout"} />}
                     </div>
                 </React.Fragment>
             );
@@ -155,4 +171,5 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
     };
 }
 
-export default withDevice(MeBox);
+const withRedux = connect(UsersModel.mapStateToProps);
+export default withRedux(MeBox);

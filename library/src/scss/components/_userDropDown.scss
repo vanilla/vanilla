@@ -1,0 +1,37 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$userDropDown-userCard_topMargin: 38px;
+$userDropDown-userCard_bottomMargin: 24px;
+
+$userDropDown-userName_topMargin: 9px;
+$userDropDown-userName_bottomMargin: 24px;
+
+
+.userDropDown-userCardPhoto {
+    margin: {
+        top: $userDropDown-userCard_topMargin;
+        right: auto;
+        left: auto;
+    }
+}
+
+.userDropDown-userCardName {
+    font-weight: $global-fontWeight_semiBold;
+    font-size: $global-large_fontSize;
+    line-height: $global-condensed_lineHeight;
+    text-align: center;
+    margin: {
+        top: $userDropDown-userName_topMargin;
+        right: auto;
+        bottom: $userDropDown-userCard_bottomMargin;
+        left: auto;
+    }
+    padding: {
+        right: $dropDown-item_horizontalPadding;
+        left: $dropDown-item_horizontalPadding;
+    }
+}

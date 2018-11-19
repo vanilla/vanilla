@@ -36,8 +36,6 @@ class VanillaSettingsController extends Gdn_Controller {
      *
      * Allows setting configuration values via form elements.
      *
-     * @throws Exception
-     *
      * @since 2.0.0
      * @access public
      */
@@ -96,7 +94,11 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', !$disableUrlEmbeds);
 
             if ($this->Form->_FormValues['Vanilla.Comment.MaxLength'] > self::MAX_POST_LENGTH) {
-                $this->Form->addError('Max comment length of' . $this->Form->_FormValues['Vanilla.Comment.MaxLength'] . ' value of is greater than the allowed size of' . self::MAX_POST_LENGTH . '.');
+                $this->Form->addError(
+                    'Max comment length of' .
+                    $this->Form->_FormValues['Vanilla.Comment.MaxLength'] .
+                    ' value of is greater than the allowed size of' . self::MAX_POST_LENGTH . '.'
+                );
             }
 
             // Define some validation rules for the fields being saved

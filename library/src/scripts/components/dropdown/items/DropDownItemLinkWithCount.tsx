@@ -28,7 +28,7 @@ export default class DropDownItemLinkWithCount extends React.Component<IProps> {
         const showCount = !!count && !(this.props.hideCountWhenZero && this.props.count === 0);
         return (
             <DropDownItemLink {...this.props}>
-                {linkContents}
+                <span className="dropDownItem-text">{linkContents}</span>
                 {showCount && (
                     <NumberFormatted
                         className={classNames("dropDownItem-count", this.props.className)}

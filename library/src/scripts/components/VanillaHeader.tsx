@@ -10,7 +10,7 @@ import MeBox from "@library/components/mebox/MeBox";
 import { dummyLogoData } from "./mebox/state/dummyLogoData";
 import { dummyNotificationsData } from "@library/components/mebox/state/dummyNotificationsData";
 import { dummyMessagesData } from "@library/components/mebox/state/dummyMessagesData";
-import { dummyNavigationData } from "./mebox/state/dummyNavigationData";
+import { dummyGuestNavigationData, dummyNavigationData } from "./mebox/state/dummyNavigationData";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
@@ -36,6 +36,10 @@ export class VanillaHeader extends React.Component<IProps> {
                 logoProps={dummyLogoData}
                 notificationsProps={dummyNotificationsData as any}
                 navigationProps={{ children: dummyNavigationData.children, className: "vanillaHeader-nav" }}
+                guestNavigationProps={{
+                    children: dummyGuestNavigationData.children,
+                    className: "vanillaHeader-nav vanillaHeader-guestNav",
+                }}
                 languagesProps={{
                     ...dummyOtherLanguagesData,
                     className: "vanillaHeader-locales",

@@ -25,7 +25,6 @@ import { IInjectableUserState } from "@library/users/UsersModel";
 import UsersModel from "@library/users/UsersModel";
 import { connect } from "react-redux";
 import get from "lodash/get";
-import SmartLink from "@library/components/navigation/SmartLink";
 
 export interface IHeaderStyles {
     bgColor?: string;
@@ -38,6 +37,7 @@ export interface IMeBoxProps extends IDeviceProps, IInjectableUserState {
     className?: string;
     logoProps: IHeaderLogo;
     navigationProps: IVanillaHeaderNavProps;
+    guestNavigationProps: IVanillaHeaderNavProps;
     languagesProps: ILanguageDropDownProps;
     notificationsProps: INotificationsDropDownProps;
     messagesProps: IMessagesDropDownProps;
@@ -134,7 +134,13 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                                     <UserDropdown counts={this.props.counts} className="meBox-userDropdown" />
                                 </React.Fragment>
                             )}
-                        {isGuest && <SmartLink to={"/entry/signout"} />}
+                        {isGuest && (
+                            <VanillaHeaderNav
+                                {...this.props.guestNavigationProps}
+                                linkClassName="meBox-navLink"
+                                linkContentClassName="meBox-navLinkContent"
+                            />
+                        )}
                     </div>
                 </React.Fragment>
             );

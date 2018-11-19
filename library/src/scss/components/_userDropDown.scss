@@ -17,6 +17,7 @@ $userDropDown-userName_bottomMargin: 24px;
         right: auto;
         left: auto;
     }
+    border: solid 1px mixContentBgAndFg(90%);
 }
 
 .userDropDown-userCardName {
@@ -34,4 +35,8 @@ $userDropDown-userName_bottomMargin: 24px;
         right: $dropDown-item_horizontalPadding;
         left: $dropDown-item_horizontalPadding;
     }
+}
+
+.userDropDown-contents {
+    width: 300px;
 }

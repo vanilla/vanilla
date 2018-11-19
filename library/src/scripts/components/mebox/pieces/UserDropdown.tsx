@@ -61,6 +61,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                 name={t("My Account")}
                 className={classNames("userDropDown", this.props.className)}
                 buttonClassName={"vanillaHeader-account meBox-button"}
+                contentsClassName="userDropDown-contents"
                 renderLeft={true}
                 buttonContents={
                     <div className="meBox-buttonContent">
@@ -74,14 +75,14 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                 }
                 onVisibilityChange={this.setOpen}
             >
-                <Frame className="userDropDown">
+                <Frame>
                     <FrameBody className="isSelfPadded">
                         <DropDownUserCard currentUser={this.props.currentUser!} className="userDropDown-userCard" />
                         <DropDownItemSeparator />
                         <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
                         <DropDownSection title={t("Discussions")}>
                             <DropDownItemLinkWithCount
-                                to="/discussions/bookmarked"
+                                to={`${window.location.origin}/discussions/bookmarked`}
                                 name={t("Bookmarks")}
                                 count={counts.bookmarkCount}
                             />
@@ -92,30 +93,30 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                         <Permission permission={["community.moderate"]}>
                             <DropDownSection title={t("Moderation")}>
                                 <DropDownItemLinkWithCount
-                                    to="/dashboard/user/applicants"
+                                    to={`${window.location.origin}/dashboard/user/applicants`}
                                     name={t("Applicants")}
                                     count={counts.applicantsCount}
                                 />
                                 <DropDownItemLinkWithCount
-                                    to="/dashboard/log/spam"
+                                    to={`${window.location.origin}/dashboard/log/spam`}
                                     name={t("Spam Queue")}
                                     count={counts.spamQueueCount}
                                 />
                                 <DropDownItemLinkWithCount
-                                    to="/dashboard/log/moderation"
+                                    to={`${window.location.origin}/dashboard/log/moderation`}
                                     name={t("Moderation Queue")}
                                     count={counts.moderationQueueCount}
                                 />
                                 <DropDownItemLinkWithCount
-                                    to="/badge/requests"
+                                    to={`${window.location.origin}/badge/requests`}
                                     name={t("Badge Requests")}
                                     count={counts.badgeRequestCount}
                                 />
                             </DropDownSection>
                         </Permission>
                         <DropDownItemSeparator />
-                        <DropDownItemLink to="/dashboard/settings" name={t("Dashboard")} />
-                        <DropDownItemLink to="/entry/signout" name={t("Sign Out")} />
+                        <DropDownItemLink to={`${window.location.origin}/dashboard/settings`} name={t("Dashboard")} />
+                        <DropDownItemLink to={`${window.location.origin}/entry/signout`} name={t("Sign Out")} />
                     </FrameBody>
                 </Frame>
             </DropDown>

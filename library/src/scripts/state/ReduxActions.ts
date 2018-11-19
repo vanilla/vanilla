@@ -141,8 +141,13 @@ export default class ReduxActions {
      *
      * @param dispatch A redux dispatch function.
      * @param api An API instance.
+     * @param getState Optionally override the getState method. (generally for testin purposes.)
      */
-    constructor(protected dispatch: any, protected api: AxiosInstance) {}
+    constructor(protected dispatch: any, protected api: AxiosInstance, getState?: () => any) {
+        if (getState) {
+            this.getState = getState;
+        }
+    }
 
     /**
      * Bind dispatch to an action creator.

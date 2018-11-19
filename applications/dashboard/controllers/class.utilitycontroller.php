@@ -22,6 +22,9 @@ class UtilityController extends DashboardController {
     /** @var  Gdn_Form $Form */
     public $Form;
 
+    /** @var int The maximum length a post can be. */
+    const MAX_POST_LENGTH = 50000;
+
     /**
      * @var array Special-case HTTP headers that are otherwise unidentifiable as HTTP headers.
      * Typically, HTTP headers in the $_SERVER array will be prefixed with
@@ -310,13 +313,12 @@ class UtilityController extends DashboardController {
 
         try {
             $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
-            if ($maxCommentLength > 30000) {
-                saveToConfig('Vanilla.Comment.MaxLength', 30000);
+            if ($maxCommentLength > self::MAX_POST_LENGTH) {
+                saveToConfig('Vanilla.Comment.MaxLength', self::MAX_POST_LENGTH);
             }
         } catch (Exception $ex) {
             $this->setData('Success', false);
             $this->setData('Error', $ex->getMessage());
-
         }
 
         if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {

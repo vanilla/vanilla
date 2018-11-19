@@ -28,7 +28,8 @@ class VanillaSettingsController extends Gdn_Controller {
     /** @var array An array of category records. */
     public $OtherCategories;
 
-    const MAX_POST_LENGTH = 30000;
+    /** @var int The maximum length a post can be. */
+    const MAX_POST_LENGTH = 50000;
 
     /**
      * Posting settings.
@@ -77,9 +78,12 @@ class VanillaSettingsController extends Gdn_Controller {
 
         // Fire an filter event gather extra form HTML for specific format items.
         // The form is added so the form can be enhanced and the config model needs to passed to add extra fields.
-        $extraFormatFormHTML = $eventManager->fireFilter('postingSettings_formatSpecificFormItems', "",
+        $extraFormatFormHTML = $eventManager->fireFilter(
+            'postingSettings_formatSpecificFormItems',
+            "",
             $this->Form,
-            $configurationModel);
+            $configurationModel
+        );
         $this->setData('extraFormatFormHTML', $extraFormatFormHTML);
 
         // Set the model on the form.
@@ -87,8 +91,6 @@ class VanillaSettingsController extends Gdn_Controller {
 
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack() === false) {
-
-
             // Apply the config settings to the form.
             $this->Form->setData($configurationModel->Data);
         } else {
@@ -97,7 +99,11 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', !$disableUrlEmbeds);
 
             if ($this->Form->_FormValues['Vanilla.Comment.MaxLength'] > self::MAX_POST_LENGTH) {
-                throw new Exception($this->Form->_FormValues['Vanilla.Comment.MaxLength'] . ' value of is greater than the allowed size');
+                $this->Form->addError(
+                    'Max comment length of'.$this->Form->_FormValues['Vanilla.Comment.MaxLength'].
+                    ' value of is greater than the allowed size of'
+                    . self::MAX_POST_LENGTH . '.'
+                );
             }
 
             // Define some validation rules for the fields being saved

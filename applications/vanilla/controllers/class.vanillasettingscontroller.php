@@ -28,10 +28,14 @@ class VanillaSettingsController extends Gdn_Controller {
     /** @var array An array of category records. */
     public $OtherCategories;
 
+    const MAX_POST_LENGTH = 30000;
+
     /**
      * Posting settings.
      *
      * Allows setting configuration values via form elements.
+     *
+     * @throws Exception
      *
      * @since 2.0.0
      * @access public
@@ -91,6 +95,10 @@ class VanillaSettingsController extends Gdn_Controller {
             // This is a "reverse" field on the form. Disabling URL embeds is associated with a toggle that enables them.
             $disableUrlEmbeds = $this->Form->getFormValue('Garden.Format.DisableUrlEmbeds', true);
             $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', !$disableUrlEmbeds);
+
+            if ($this->Form->_FormValues['Vanilla.Comment.MaxLength'] > self::MAX_POST_LENGTH) {
+                throw new Exception($this->Form->_FormValues['Vanilla.Comment.MaxLength'] . ' value of is greater than the allowed size');
+            }
 
             // Define some validation rules for the fields being saved
             $configurationModel->Validation->applyRule('Garden.InputFormatter', 'Required');

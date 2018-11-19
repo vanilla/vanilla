@@ -308,6 +308,17 @@ class UtilityController extends DashboardController {
             }
         }
 
+        try {
+            $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
+            if ($maxCommentLength > 30000) {
+                saveToConfig('Vanilla.Comment.MaxLength', 30000);
+            }
+        } catch (Exception $ex) {
+            $this->setData('Success', false);
+            $this->setData('Error', $ex->getMessage());
+
+        }
+
         if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
             saveToConfig('Garden.Version', APPLICATION_VERSION);
         }

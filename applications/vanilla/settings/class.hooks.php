@@ -1053,16 +1053,6 @@ class VanillaHooks implements Gdn_IPlugin {
     }
 
     /**
-     * Config updates.
-     */
-    public function structure() {
-        $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
-        if ($maxCommentLength > DiscussionModel::MAX_POST_LENGTH) {
-            saveToConfig('Vanilla.Comment.MaxLength', DiscussionModel::MAX_POST_LENGTH);
-        }
-    }
-
-    /**
      * Automatically executed when application is enabled.
      *
      * @since 2.0.0
@@ -1076,8 +1066,6 @@ class VanillaHooks implements Gdn_IPlugin {
         // Call structure.php to update database
         $Validation = new Gdn_Validation(); // Needed by structure.php to validate permission names
         include(PATH_APPLICATIONS.DS.'vanilla'.DS.'settings'.DS.'structure.php');
-
-        $this->structure();
 
         saveToConfig('Routes.DefaultController', 'discussions');
     }

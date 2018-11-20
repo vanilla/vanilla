@@ -22,7 +22,6 @@ class UtilityController extends DashboardController {
     /** @var  Gdn_Form $Form */
     public $Form;
 
-
     /**
      * @var array Special-case HTTP headers that are otherwise unidentifiable as HTTP headers.
      * Typically, HTTP headers in the $_SERVER array will be prefixed with

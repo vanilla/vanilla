@@ -14,8 +14,9 @@ import classNames from "classnames";
 import { search } from "@library/components/icons/header";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import SearchOption from "@library/components/search/SearchOption";
+import { withApi, IApiProps } from "@library/contexts/ApiContext";
 
-export interface ICompactSearchProps {
+export interface ICompactSearchProps extends IApiProps {
     className?: string;
     placeholder?: string;
     open: boolean;
@@ -27,7 +28,7 @@ export interface ICompactSearchProps {
 /**
  * Implements Compact Search component for header
  */
-export default class CompactSearch extends React.Component<ICompactSearchProps> {
+export class CompactSearch extends React.Component<ICompactSearchProps> {
     private id = uniqueIDFromPrefix("compactSearch");
 
     public render() {
@@ -51,15 +52,12 @@ export default class CompactSearch extends React.Component<ICompactSearchProps> 
                         <SearchBar
                             id={this.id}
                             placeholder={this.props.placeholder}
-                            onChange={this.onSearch}
-                            loadOptions={this.loadOptions}
-                            value={""}
-                            onSearch={this.onSearch}
                             optionComponent={SearchOption}
                             noHeading={true}
                             title={t("Search")}
                             disabled={!this.props.open}
                             hideSearchButton={true}
+                            loadOptions={this.props.searchOptionProvider}
                         />
                         <Button
                             onClick={this.props.onCloseSearch}
@@ -77,10 +75,6 @@ export default class CompactSearch extends React.Component<ICompactSearchProps> 
             </div>
         );
     }
-
-    public onSearch = () => {
-        // Do nothing;
-    };
 
     /**
      * Simple data loading function for the search bar/react-select.
@@ -101,3 +95,5 @@ export default class CompactSearch extends React.Component<ICompactSearchProps> 
         });
     };
 }
+
+export default withApi<ICompactSearchProps>(CompactSearch);

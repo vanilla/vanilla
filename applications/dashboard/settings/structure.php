@@ -857,7 +857,7 @@ $Construct
     ->column("recordType", "varchar(64)", false, ["index", "index.record", "index.parentRecord"])
     ->column("recordID", "int", true, "index.record")
     ->column("parentRecordID", "int", true, "index.parentRecord")
-    ->column("attributes", "text")
+    ->column("attributes", "mediumtext")
     ->column("insertUserID", "int", false, "index")
     ->column("dateInserted", "datetime")
     ->column("updateUserID", "int")

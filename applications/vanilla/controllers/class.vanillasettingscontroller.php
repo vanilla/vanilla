@@ -28,9 +28,6 @@ class VanillaSettingsController extends Gdn_Controller {
     /** @var array An array of category records. */
     public $OtherCategories;
 
-    /** @var int The maximum length*/
-    const MAX_POST_LENGTH = 50000;
-
     /**
      * Posting settings.
      *
@@ -93,12 +90,8 @@ class VanillaSettingsController extends Gdn_Controller {
             $disableUrlEmbeds = $this->Form->getFormValue('Garden.Format.DisableUrlEmbeds', true);
             $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', !$disableUrlEmbeds);
 
-            if ($this->Form->_FormValues['Vanilla.Comment.MaxLength'] > self::MAX_POST_LENGTH) {
-                $this->Form->addError(
-                    'Max comment length of' .
-                    $this->Form->_FormValues['Vanilla.Comment.MaxLength'] .
-                    ' value of is greater than the allowed size of' . self::MAX_POST_LENGTH . '.'
-                );
+            if ($this->Form->_FormValues['Vanilla.Comment.MaxLength'] > DiscussionModel::MAX_POST_LENGTH) {
+                $this->Form->addError('The highest allowed limit is 50,000 characters');
             }
 
             // Define some validation rules for the fields being saved

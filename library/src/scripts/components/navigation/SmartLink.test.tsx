@@ -56,7 +56,7 @@ describe("<SmartLink />", () => {
             expect(result.find(Link).length).eq(0);
         });
     });
-    it("uses relative URLs navigation links within its context", () => {
+    it("uses relative URLs and react links within its context", () => {
         const valid: [LocationDescriptor, string][] = [
             [CONTEXT_BASE + "/somePath", SUBPATH + "/somePath"],
             [

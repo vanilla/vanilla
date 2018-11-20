@@ -40,7 +40,7 @@ export default function SmartLink(props: IProps) {
         <LinkContext.Consumer>
             {contextRoot => {
                 if (href.startsWith(contextRoot)) {
-                    return <NavLink {...passthru} to={makeSmartLocation(props.to, href)} />;
+                    return <NavLink {...passthru} to={makeDynamicHref(props.to, href)} />;
                 } else {
                     return <a {...passthru} href={href} />;
                 }
@@ -49,7 +49,15 @@ export default function SmartLink(props: IProps) {
     );
 }
 
-function makeSmartLocation(initial: LocationDescriptor, newHref: string): LocationDescriptor {
+/**
+ * Create a new LocationDescriptor with a "relative" path.
+ *
+ * This way we ensure we use react-router's navigation and not a full refresh.
+ *
+ * @param initial The starting location. We may want to preserve state here if we can.
+ * @param newHref The new string url to point to.
+ */
+function makeDynamicHref(initial: LocationDescriptor, newHref: string): LocationDescriptor {
     // Get the search and pathName
     const link = document.createElement("a");
     link.href = newHref;

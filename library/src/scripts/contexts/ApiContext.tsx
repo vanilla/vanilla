@@ -12,7 +12,7 @@ import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 const ApiContext = React.createContext<IApiProps>({} as any);
 export default ApiContext;
 
-interface ISearchOptionProvider {
+export interface ISearchOptionProvider {
     autocomplete(query: string): Promise<Array<IComboBoxOption<ISearchOptionData>>>;
     makeSearchUrl(query: string): string;
 }

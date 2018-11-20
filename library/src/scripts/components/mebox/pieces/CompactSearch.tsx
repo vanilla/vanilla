@@ -15,6 +15,7 @@ import { search } from "@library/components/icons/header";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import SearchOption from "@library/components/search/SearchOption";
 import { withApi, IApiProps } from "@library/contexts/ApiContext";
+import { Redirect } from "react-router-dom";
 
 export interface ICompactSearchProps extends IApiProps {
     className?: string;
@@ -25,13 +26,26 @@ export interface ICompactSearchProps extends IApiProps {
     cancelButtonClassName?: string;
 }
 
+interface IState {
+    query: string;
+    redirectTo: string | null;
+}
+
 /**
  * Implements Compact Search component for header
  */
-export class CompactSearch extends React.Component<ICompactSearchProps> {
+export class CompactSearch extends React.Component<ICompactSearchProps, IState> {
     private id = uniqueIDFromPrefix("compactSearch");
+    public state: IState = {
+        query: "",
+        redirectTo: null,
+    };
 
     public render() {
+        if (this.state.redirectTo) {
+            return <Redirect to={this.state.redirectTo} />;
+        }
+
         return (
             <div className="compactSearch">
                 {!this.props.open && (
@@ -55,9 +69,12 @@ export class CompactSearch extends React.Component<ICompactSearchProps> {
                             optionComponent={SearchOption}
                             noHeading={true}
                             title={t("Search")}
+                            value={this.state.query}
                             disabled={!this.props.open}
                             hideSearchButton={true}
-                            loadOptions={this.props.searchOptionProvider}
+                            onChange={this.searchChangeHandler}
+                            onSearch={this.submitHandler}
+                            loadOptions={this.props.searchOptionProvider.autocomplete}
                         />
                         <Button
                             onClick={this.props.onCloseSearch}
@@ -76,23 +93,14 @@ export class CompactSearch extends React.Component<ICompactSearchProps> {
         );
     }
 
-    /**
-     * Simple data loading function for the search bar/react-select.
-     */
-    private loadOptions = async (value: string) => {
-        const queryObj = {
-            name: value,
-            expand: ["user", "category"],
-        };
-        const query = qs.stringify(queryObj);
-        const response = await apiv2.get(`/knowledge/search?${query}`);
-        return response.data.map(result => {
-            return {
-                label: result.name,
-                value: result.name,
-                data: result,
-            };
-        });
+    private searchChangeHandler = (newQuery: string) => {
+        this.setState({ query: newQuery });
+    };
+
+    private submitHandler = () => {
+        const { searchOptionProvider } = this.props;
+        const { query } = this.state;
+        this.setState({ redirectTo: searchOptionProvider.makeSearchUrl(query) });
     };
 }
 

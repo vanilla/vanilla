@@ -6,15 +6,16 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import TabFlaps from "@library/components/tabs/pieces/TabList";
-import TabPanels from "@library/components/tabs/pieces/TabPanels";
+import TabPanels, { ITabPanel } from "@library/components/tabs/pieces/TabPanels";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
+import TabButton, { ITabButton } from "@library/components/tabs/pieces/TabButton";
 
-export interface ITab {}
+export interface ITab extends ITabPanel, ITabButton {}
 
 interface IProps {
-    tabs: ITab[];
     className?: string;
+    tabs: ITab[];
+    label: string;
 }
 
 interface IState {
@@ -37,18 +38,21 @@ export default class Tabs extends React.PureComponent<IProps, IState> {
         const { tabs, className } = this.props;
         return (
             <div className={classNames("tabs", className)}>
-                <TabFlaps
+                <TabButton
                     tabs={this.props.tabs}
                     selectedTab={this.state.selectedTab}
                     setTab={this.setSelectedTab}
                     getTabFlapID={this.tabFlapId}
                     getTabPanelID={this.tabPanelId}
+                    label={this.props.label}
+                    parentID={this.id}
                 />
                 <TabPanels
                     tabs={this.props.tabs}
                     selectedTab={this.state.selectedTab}
                     getTabFlapID={this.tabFlapId}
                     getTabPanelID={this.tabPanelId}
+                    parentID={this.id}
                 />
             </div>
         );

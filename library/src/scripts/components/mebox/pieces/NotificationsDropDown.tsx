@@ -9,7 +9,7 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DropDown from "@library/components/dropdown/DropDown";
 import { t } from "@library/application";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import { notifications, settings } from "@library/components/icons/header";
+import { notifications } from "@library/components/icons/header";
 import Count from "@library/components/mebox/pieces/Count";
 import classNames from "classnames";
 import NotificationsContents, { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
@@ -28,12 +28,9 @@ interface IState {
 export default class NotificationsDropDown extends React.Component<IProps, IState> {
     private id = uniqueIDFromPrefix("notificationsDropDown");
 
-    public constructor(props) {
-        super(props);
-        this.state = {
-            open: false,
-        };
-    }
+    public state = {
+        open: false,
+    };
 
     public render() {
         const count = this.props.count ? this.props.count : 0;

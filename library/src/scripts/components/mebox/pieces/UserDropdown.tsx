@@ -39,12 +39,9 @@ interface IState {
 export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
     private id = uniqueIDFromPrefix("userDropDown");
 
-    public constructor(props) {
-        super(props);
-        this.state = {
-            open: false,
-        };
-    }
+    public state = {
+        open: false,
+    };
 
     public render() {
         const userInfo: IUserFragment = get(this.props, "currentUser.data", {

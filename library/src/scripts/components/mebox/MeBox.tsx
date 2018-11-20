@@ -12,8 +12,8 @@ import HeaderLogo, { IHeaderLogo } from "./pieces/HeaderLogo";
 import CompactMenu from "./pieces/CompactMenu";
 import VanillaHeaderNav, { IVanillaHeaderNavProps } from "./pieces/VanillaHeaderNav";
 import CompactSearch from "./pieces/CompactSearch";
-import NotificationsDropdown, { INotificationsDropDownProps } from "./pieces/NotificationsDropDown";
-import MessagesDropDown, { IMessagesDropDownProps } from "./pieces/MessagesDropDown";
+import NotificationsDropdown from "./pieces/NotificationsDropDown";
+import MessagesDropDown from "./pieces/MessagesDropDown";
 import Container from "@library/components/layouts/components/Container";
 import { dummyNavigationData } from "./state/dummyNavigationData";
 import LanguagesDropDown, { ILanguageDropDownProps } from "@library/components/LanguagesDropDown";
@@ -26,6 +26,9 @@ import UsersModel from "@library/users/UsersModel";
 import { connect } from "react-redux";
 import get from "lodash/get";
 import Condition from "@library/components/Condition";
+import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
+import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
+import { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
 
 export interface IHeaderStyles {
     bgColor?: string;
@@ -40,8 +43,8 @@ export interface IMeBoxProps extends IDeviceProps, IInjectableUserState {
     navigationProps: IVanillaHeaderNavProps;
     guestNavigationProps: IVanillaHeaderNavProps;
     languagesProps: ILanguageDropDownProps;
-    notificationsProps: INotificationsDropDownProps;
-    messagesProps: IMessagesDropDownProps;
+    notificationsProps: INotificationsProps;
+    messagesProps: IMessagesContentsProps;
     counts: any;
     headerStyles: IHeaderStyles;
 }
@@ -54,12 +57,10 @@ interface IState {
  * Implements MeBox component. Note that this component handles all the logic of what components to display, but does not contain the content its self
  */
 export class MeBox extends React.Component<IMeBoxProps, IState> {
-    public constructor(props) {
-        super(props);
-        this.state = {
-            openSearch: false,
-        };
-    }
+    public state = {
+        openSearch: false,
+    };
+
     public render() {
         const isMobile = this.props.device === Devices.MOBILE;
         const showNonSearchItems = !this.state.openSearch && !isMobile;
@@ -129,7 +130,7 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                                         <UserDropdown counts={this.props.counts} className="meBox-userDropdown" />
                                     </Condition>
                                     <Condition if={isMobile}>
-                                        <
+                                        <CompactMeBox />
                                     </Condition>
                                 </Condition>
                                 <Condition if={isGuest}>

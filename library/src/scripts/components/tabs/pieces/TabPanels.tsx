@@ -6,14 +6,13 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { ITab } from "@library/components/tabs/Tabs";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 
-interface ITabPanel {
-    className?: string;
+export interface ITabPanel {
+    panelContent: React.ReactNode;
 }
 
 interface IProps {
+    parentID: string;
     tabs: ITabPanel[];
     className?: string;
     selectedTab: number;
@@ -38,7 +37,7 @@ export default class TabPanels extends React.Component<IProps> {
                     tabIndex={0}
                     key={key}
                 >
-                    {content}
+                    {tab.panelContent}
                 </div>
             ) : (
                 <React.Fragment key={key} />

@@ -7,18 +7,17 @@
 import * as React from "react";
 import classNames from "classnames";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import Condition from "@library/components/Condition";
 import TabHandler from "@library/TabHandler";
 
-interface ITabFlap {
+export interface ITabButton {
     controls: string;
-    contents: React.ReactNode;
-    openContents?: React.ReactNode; // Optional overwrite when open
+    buttonContent: React.ReactNode;
+    openButtonContent?: React.ReactNode; // Optional overwrite when open
 }
 
 interface IProps {
     parentID: string;
-    tabs: ITabFlap[];
+    tabs: ITabButton[];
     className?: string;
     selectedTab: number;
     setTab: (selectedTab: number) => void;
@@ -30,13 +29,13 @@ interface IProps {
 /**
  * Clean up conditional renders with this component
  */
-export default class TabFlaps extends React.Component<IProps> {
+export default class TabButton extends React.Component<IProps> {
     private tabFlaps: React.RefObject<HTMLDivElement> = React.createRef();
     public render() {
         const { className, label, tabs, selectedTab, getTabFlapID, getTabPanelID } = this.props;
-        const content = tabs.map((tab: ITabFlap, index) => {
+        const content = tabs.map((tab: ITabButton, index) => {
             const isSelected = selectedTab === index;
-            const hasAlternateContents = !!tab.openContents;
+            const hasAlternateContents = !!tab.openButtonContent;
             return (
                 <Button
                     id={getTabFlapID(index)}
@@ -48,8 +47,8 @@ export default class TabFlaps extends React.Component<IProps> {
                     role="tab"
                     tabIndex={isSelected ? 0 : -1}
                 >
-                    {!hasAlternateContents || (!isSelected && tab.contents)}
-                    {hasAlternateContents && isSelected && tab.openContents}
+                    {!hasAlternateContents || (!isSelected && tab.buttonContent)}
+                    {hasAlternateContents && isSelected && tab.openButtonContent}
                 </Button>
             );
         });
@@ -79,26 +78,20 @@ export default class TabFlaps extends React.Component<IProps> {
             event.key // See SiteNavNode for the rest of the keyboard handler
         ) {
             case "ArrowRight":
-                /*
-                    Moves focus one row or one cell down, depending on whether a row or cell is currently focused.
-                    If focus is on the bottom row, focus does not move.
-                 */
-                // if (siteNavRoot) {
-                //     event.preventDefault();
-                //     event.stopPropagation();
-                //     if (selectedNode && currentLink) {
-                //         const nextElement = tabHandler.getNext(currentLink, false, false);
-                //         if (nextElement) {
-                //             nextElement.focus();
-                //         }
-                //     }
-                // }
+                event.stopPropagation();
+                tabHandler.getNext();
                 break;
             case "ArrowLeft":
+                event.stopPropagation();
+                tabHandler.getNext(currentLink, true);
                 break;
             case "Home":
+                event.stopPropagation();
+                tabHandler.getInitial();
                 break;
             case "End":
+                event.stopPropagation();
+                tabHandler.getLast();
                 break;
         }
     };

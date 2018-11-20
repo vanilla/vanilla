@@ -53,6 +53,13 @@ export class VanillaHeader extends React.Component<IProps> {
             this.props.container || document.getElementById("vanillaHeader")!,
         );
     }
+
+    // Todo: remove
+    public componentDidMount() {
+        setTimeout(() => {
+            window.dispatchEvent(new Event("resize"));
+        }, 200);
+    }
 }
 
 export default withDevice(VanillaHeader);

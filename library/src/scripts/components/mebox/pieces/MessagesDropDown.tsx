@@ -27,12 +27,9 @@ interface IState {
 export default class MessagesDropDown extends React.Component<IProps, IState> {
     private id = uniqueIDFromPrefix("messagesDropDown");
 
-    public constructor(props) {
-        super(props);
-        this.state = {
-            open: false,
-        };
-    }
+    public state = {
+        open: false,
+    };
 
     public render() {
         const count = this.props.count ? this.props.count : 0;

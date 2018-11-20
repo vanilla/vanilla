@@ -44,6 +44,7 @@ interface IProps extends IOptionalComponentID {
     getRef?: any;
     buttonClassName?: string;
     hideSearchButton?: boolean;
+    triggerSearchOnAllUpdates?: boolean;
 }
 
 interface IState {
@@ -137,7 +138,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
         if (option) {
             this.props.onChange(option.label);
             this.setState({ forceMenuClosed: true }, () => {
-                this.props.onSearch && this.props.onSearch();
+                this.props.triggerSearchOnAllUpdates && this.props.onSearch();
             });
         }
     };
@@ -241,7 +242,9 @@ export default class SearchBar extends React.Component<IProps, IState> {
     private clear = (event: React.SyntheticEvent) => {
         event.preventDefault();
         this.props.onChange("");
-        this.props.onSearch();
+        if (this.props.triggerSearchOnAllUpdates) {
+            this.props.onSearch();
+        }
         this.inputRef.current!.focus();
     };
 

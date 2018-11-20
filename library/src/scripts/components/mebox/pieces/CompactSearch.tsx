@@ -78,6 +78,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                             onSearch={this.submitHandler}
                             loadOptions={this.props.searchOptionProvider.autocomplete}
                             ref={this.searchInputRef}
+                            triggerSearchOnAllUpdates={false}
                         />
                         <Button
                             onClick={this.props.onCloseSearch}

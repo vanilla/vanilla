@@ -7,8 +7,6 @@
 import * as React from "react";
 import SearchBar from "@library/components/forms/select/SearchBar";
 import { t } from "@library/application";
-import qs from "qs";
-import apiv2 from "@library/apiv2";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
 import { search } from "@library/components/icons/header";
@@ -16,6 +14,7 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import SearchOption from "@library/components/search/SearchOption";
 import { withApi, IApiProps } from "@library/contexts/ApiContext";
 import { Redirect } from "react-router-dom";
+import AsyncCreatableSelect from "react-select/lib/AsyncCreatable";
 
 export interface ICompactSearchProps extends IApiProps {
     className?: string;
@@ -36,6 +35,8 @@ interface IState {
  */
 export class CompactSearch extends React.Component<ICompactSearchProps, IState> {
     private id = uniqueIDFromPrefix("compactSearch");
+    private openSearchButton: React.RefObject<HTMLButtonElement> = React.createRef();
+    private searchInputRef: React.RefObject<SearchBar> = React.createRef();
     public state: IState = {
         query: "",
         redirectTo: null,
@@ -57,6 +58,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                         aria-haspopup="true"
                         baseClass={ButtonBaseClass.CUSTOM}
                         aria-controls={this.id}
+                        buttonRef={this.openSearchButton}
                     >
                         <div className="meBox-buttonContent">{search()}</div>
                     </Button>
@@ -75,6 +77,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                             onChange={this.searchChangeHandler}
                             onSearch={this.submitHandler}
                             loadOptions={this.props.searchOptionProvider.autocomplete}
+                            ref={this.searchInputRef}
                         />
                         <Button
                             onClick={this.props.onCloseSearch}
@@ -102,6 +105,14 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
         const { query } = this.state;
         this.setState({ redirectTo: searchOptionProvider.makeSearchUrl(query) });
     };
+
+    public componentDidUpdate(prevProps) {
+        if (!prevProps.open && this.props.open) {
+            this.searchInputRef.current!.focus();
+        } else if (prevProps.open && !this.props.open) {
+            this.openSearchButton.current!.focus();
+        }
+    }
 }
 
 export default withApi<ICompactSearchProps>(CompactSearch);

@@ -20,7 +20,11 @@ import LanguagesDropDown, { ILanguageDropDownProps } from "@library/components/L
 import { PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 import FlexSpacer from "@library/components/FlexSpacer";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import UserDropdown from "@library/components/mebox/pieces/UserDropdown";
+import UserDropdown, { UserDropDown } from "./pieces/UserDropdown";
+import { IInjectableUserState } from "@library/users/UsersModel";
+import UsersModel from "@library/users/UsersModel";
+import { connect } from "react-redux";
+import get from "lodash/get";
 
 export interface IHeaderStyles {
     bgColor?: string;
@@ -28,15 +32,16 @@ export interface IHeaderStyles {
     notificationColor?: string;
 }
 
-export interface IMeBoxProps extends IDeviceProps {
+export interface IMeBoxProps extends IDeviceProps, IInjectableUserState {
     homePage: boolean;
     className?: string;
     logoProps: IHeaderLogo;
     navigationProps: IVanillaHeaderNavProps;
+    guestNavigationProps: IVanillaHeaderNavProps;
     languagesProps: ILanguageDropDownProps;
     notificationsProps: INotificationsDropDownProps;
     messagesProps: IMessagesDropDownProps;
-    userDropDownProps: any;
+    counts: any;
     headerStyles: IHeaderStyles;
 }
 
@@ -56,7 +61,13 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
     }
     public render() {
         const isMobile = this.props.device === Devices.MOBILE;
-        const hideNonSearchElements = this.state.openSearch && isMobile;
+        const showNonSearchItems = !this.state.openSearch && !isMobile;
+        const currentUser = get(this.props, "currentUser.data", {
+            name: null,
+            userID: null,
+            photoUrl: null,
+        });
+        const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
         const styles = {
             fg: this.props.headerStyles && this.props.headerStyles.fgColor ? this.props.headerStyles.fgColor : "#fff",
             bg:
@@ -82,7 +93,7 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
             content = (
                 <React.Fragment>
                     <div className="vanillaHeader-bar">
-                        {!hideNonSearchElements && (
+                        {showNonSearchItems && (
                             <React.Fragment>
                                 <HeaderLogo
                                     {...this.props.logoProps}
@@ -112,13 +123,25 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                             onCloseSearch={this.closeSearch}
                             cancelButtonClassName="meBox-searchCancel"
                         />
-                        {!hideNonSearchElements && (
-                            <React.Fragment>
-                                <NotificationsDropdown {...this.props.notificationsProps} countClass="meBox-count" />
-                                <MessagesDropDown {...this.props.messagesProps} countClass="meBox-count" />
-                                <UserDropdown {...this.props.userDropDownProps} />
-                            </React.Fragment>
-                        )}
+                        {showNonSearchItems &&
+                            !isGuest && (
+                                <React.Fragment>
+                                    <NotificationsDropdown
+                                        {...this.props.notificationsProps}
+                                        countClass="meBox-count"
+                                    />
+                                    <MessagesDropDown {...this.props.messagesProps} countClass="meBox-count" />
+                                    <UserDropdown counts={this.props.counts} className="meBox-userDropdown" />
+                                </React.Fragment>
+                            )}
+                        {showNonSearchItems &&
+                            isGuest && (
+                                <VanillaHeaderNav
+                                    {...this.props.guestNavigationProps}
+                                    linkClassName="meBox-navLink"
+                                    linkContentClassName="meBox-navLinkContent"
+                                />
+                            )}
                     </div>
                 </React.Fragment>
             );
@@ -155,4 +178,5 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
     };
 }
 
-export default withDevice(MeBox);
+const withRedux = connect(UsersModel.mapStateToProps);
+export default withRedux(MeBox);

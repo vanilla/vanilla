@@ -9,24 +9,27 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DropDown from "@library/components/dropdown/DropDown";
 import { t } from "@library/application";
 import FrameBody from "@library/components/frame/FrameBody";
-import FramePanel from "@library/components/frame/FramePanel";
 import Frame from "@library/components/frame/Frame";
 import { IUserFragment } from "@library/@types/api/users";
-import { UserPhotoSize, UserPhoto } from "@library/components/mebox/pieces/UserPhoto";
+import { UserPhoto, UserPhotoSize } from "@library/components/mebox/pieces/UserPhoto";
 import { logError } from "@library/utility";
 import { connect } from "react-redux";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import get from "lodash/get";
-
-export interface ILinkSection {}
+import { DropDownUserCard } from "@library/components/dropdown/items/DropDownUserCard";
+import DropDownItemSeparator from "@library/components/dropdown/items/DropDownItemSeparator";
+import DropDownItemLink from "@library/components/dropdown/items/DropDownItemLink";
+import DropDownSection from "@library/components/dropdown/items/DropDownSection";
+import DropDownItemLinkWithCount from "@library/components/dropdown/items/DropDownItemLinkWithCount";
+import Permission from "@library/users/Permission";
+import classNames from "classnames";
 
 export interface IUserDropDownProps extends IInjectableUserState {
     className?: string;
-    linkSections: ILinkSection[];
+    counts: any;
 }
 
 interface IState {
-    hasUnread: false;
     open: boolean;
 }
 
@@ -39,7 +42,6 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
     public constructor(props) {
         super(props);
         this.state = {
-            hasUnread: false,
             open: false,
         };
     }
@@ -50,11 +52,16 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
             userID: null,
             photoUrl: null,
         });
+
+        const counts = this.props.counts;
+
         return (
             <DropDown
                 id={this.id}
                 name={t("My Account")}
+                className={classNames("userDropDown", this.props.className)}
                 buttonClassName={"vanillaHeader-account meBox-button"}
+                contentsClassName="userDropDown-contents"
                 renderLeft={true}
                 buttonContents={
                     <div className="meBox-buttonContent">
@@ -69,8 +76,47 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                 onVisibilityChange={this.setOpen}
             >
                 <Frame>
-                    <FrameBody className="isSelfPadded">
-                        <FramePanel>{t("Stuff Here")}</FramePanel>
+                    <FrameBody className="dropDownItem-verticalPadding">
+                        <DropDownUserCard currentUser={this.props.currentUser!} className="userDropDown-userCard" />
+                        <DropDownItemSeparator />
+                        <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
+                        <DropDownSection title={t("Discussions")}>
+                            <DropDownItemLinkWithCount
+                                to={`${window.location.origin}/discussions/bookmarked`}
+                                name={t("Bookmarks")}
+                                count={counts.bookmarkCount}
+                            />
+                            <DropDownItemLinkWithCount to="/drafts" name={t("Drafts")} count={counts.draftsCount} />
+                            <DropDownItemLink to="/discussions/mine" name={t("My Discussions")} />
+                            <DropDownItemLink to="/activity" name={t("Participated")} />
+                        </DropDownSection>
+                        <Permission permission={["community.moderate"]}>
+                            <DropDownSection title={t("Moderation")}>
+                                <DropDownItemLinkWithCount
+                                    to={`${window.location.origin}/dashboard/user/applicants`}
+                                    name={t("Applicants")}
+                                    count={counts.applicantsCount}
+                                />
+                                <DropDownItemLinkWithCount
+                                    to={`${window.location.origin}/dashboard/log/spam`}
+                                    name={t("Spam Queue")}
+                                    count={counts.spamQueueCount}
+                                />
+                                <DropDownItemLinkWithCount
+                                    to={`${window.location.origin}/dashboard/log/moderation`}
+                                    name={t("Moderation Queue")}
+                                    count={counts.moderationQueueCount}
+                                />
+                                <DropDownItemLinkWithCount
+                                    to={`${window.location.origin}/badge/requests`}
+                                    name={t("Badge Requests")}
+                                    count={counts.badgeRequestCount}
+                                />
+                            </DropDownSection>
+                        </Permission>
+                        <DropDownItemSeparator />
+                        <DropDownItemLink to={`${window.location.origin}/dashboard/settings`} name={t("Dashboard")} />
+                        <DropDownItemLink to={`${window.location.origin}/entry/signout`} name={t("Sign Out")} />
                     </FrameBody>
                 </Frame>
             </DropDown>

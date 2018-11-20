@@ -36,16 +36,21 @@ export default function SmartLink(props: IProps) {
 
                 if (href.startsWith(contextRoot)) {
                     let newTo: LocationDescriptor;
-                    const newPath = props.to.toString().replace(window.location.origin, "");
+                    const relativeUrl = props.to.toString().replace(window.location.origin, "");
+                    const link = document.createElement("a");
+                    link.href = relativeUrl;
+                    const { search, pathname } = link;
 
                     if (typeof props.to === "string") {
                         newTo = {
-                            pathname: newPath,
+                            pathname,
+                            search,
                         };
                     } else {
                         newTo = {
                             ...props.to,
-                            pathname: newPath,
+                            pathname,
+                            search,
                         };
                     }
 

@@ -441,7 +441,7 @@ if (!$captureOnly) {
     }
 }
 
-// Check the if the max post and adjust it appropriately.
+// Override MaxLength settings that are too high for the database
 $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
 if ($maxCommentLength > DiscussionModel::MAX_POST_LENGTH) {
     saveToConfig('Vanilla.Comment.MaxLength', DiscussionModel::MAX_POST_LENGTH);

@@ -33,7 +33,7 @@ function renderLocation(loc: LocationDescriptor, formatter: any) {
 describe("<SmartLink />", () => {
     const urlFormatter = (url: string, withDomain: boolean) => url;
 
-    const passthroughs: [LocationDescriptor, string][] = [
+    const passthroughs: Array<[LocationDescriptor, string]> = [
         ["https://test.com", "https://test.com"],
         ["https://myforum.com/somePath", "https://myforum.com/somePath"],
         ["http://test.com", "http://test.com"],
@@ -57,7 +57,7 @@ describe("<SmartLink />", () => {
         });
     });
     it("uses relative URLs and react links within its context", () => {
-        const valid: [LocationDescriptor, string][] = [
+        const valid: Array<[LocationDescriptor, string]> = [
             [CONTEXT_BASE + "/somePath", SUBPATH + "/somePath"],
             [
                 CONTEXT_BASE + "/someOtherPath?withQuery=true&OtherQuery=false",
@@ -86,7 +86,6 @@ describe("<SmartLink />", () => {
         const data = [CONTEXT_BASE + "/test", SUBPATH + "/testOther"];
         data.forEach(loc => {
             const result = renderLocation(loc, forcedFormatter);
-            const FORCED_RESULT = "https://directFormatterResult.com";
             expect(result.find("a").prop("href"), `Input was ${loc}`).eq(FORCED_RESULT);
         });
     });

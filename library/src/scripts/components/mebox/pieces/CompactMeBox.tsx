@@ -6,7 +6,6 @@
 
 import * as React from "react";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
-import DropDown from "@library/components/dropdown/DropDown";
 import { t } from "@library/application";
 import FrameBody from "@library/components/frame/FrameBody";
 import Frame from "@library/components/frame/Frame";
@@ -17,9 +16,20 @@ import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import get from "lodash/get";
 import classNames from "classnames";
 import Tabs from "@library/components/tabs/Tabs";
+import { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
+import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
+import Modal from "@library/components/modal/Modal";
+import ModalSizes from "@library/components/modal/ModalSizes";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import CloseButton from "@library/components/CloseButton";
 
 export interface IUserDropDownProps extends IInjectableUserState {
     className?: string;
+    notifcationsProps: INotificationsProps;
+    messagesProps: IMessagesContentsProps;
+    counts: any;
+    buttonClass?: string;
+    userPhotoClass?: string;
 }
 
 interface IState {
@@ -31,6 +41,7 @@ interface IState {
  */
 export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
     private id = uniqueIDFromPrefix("compactMeBox");
+    private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
 
     public state = {
         open: false,
@@ -44,38 +55,46 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
         });
 
         return (
-            <DropDown
-                id={this.id}
-                name={t("My Account")}
-                className={classNames("userDropDown", this.props.className)}
-                buttonClassName={"vanillaHeader-account meBox-button"}
-                contentsClassName="userDropDown-contents"
-                renderLeft={true}
-                buttonContents={
-                    <div className="meBox-buttonContent">
-                        <UserPhoto
-                            userInfo={userInfo}
-                            open={this.state.open}
-                            className="headerDropDown-user meBox-user"
-                            size={UserPhotoSize.SMALL}
-                        />
-                    </div>
-                }
-                onVisibilityChange={this.setOpen}
-            >
-                <Frame>
-                    <FrameBody className="dropDownItem-verticalPadding">
-                        {/*<Tabs tabs={{}} />*/}
-                        {t("hi")}
-                    </FrameBody>
-                </Frame>
-            </DropDown>
+            <div className={classNames("compactMeBox", this.props.className)}>
+                <Button
+                    title={t("My Account")}
+                    className={classNames("meBox-button", "compactMeBox-openButton", this.props.buttonClass)}
+                    onClick={this.open}
+                    buttonRef={this.buttonRef}
+                    baseClass={ButtonBaseClass.CUSTOM}
+                >
+                    <UserPhoto
+                        userInfo={userInfo}
+                        open={this.state.open}
+                        className="meBox-user"
+                        size={UserPhotoSize.SMALL}
+                        forceIcon={true}
+                    />
+                </Button>
+                {this.state.open && (
+                    <Modal
+                        size={ModalSizes.MOBILE_FULL_SCREEN_DROP_DOWN}
+                        label={t("Article Revisions")}
+                        elementToFocusOnExit={this.buttonRef.current!}
+                        className="compactMeBox-modal"
+                    >
+                        <div className="compactMeBox-header">
+                            <CloseButton onClick={this.close} />
+                        </div>
+                    </Modal>
+                )}
+            </div>
         );
     }
 
-    private setOpen = open => {
+    private open = () => {
         this.setState({
-            open,
+            open: true,
+        });
+    };
+    private close = () => {
+        this.setState({
+            open: false,
         });
     };
 }

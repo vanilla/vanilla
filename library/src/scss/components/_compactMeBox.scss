@@ -4,7 +4,10 @@
  * @license GPL-2.0-only
  */
 
-.headerDropDown-user,
-.headerDropDown-headerButton {
-    color: white; // Todo: fix after other PR is merged
+.compactMeBox {
+    display: block;
+}
+
+.compactMeBox-openButton {
+    color: #fff;
 }

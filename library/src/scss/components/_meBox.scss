@@ -69,3 +69,7 @@ $meBox-dropDownContents_minWidth: 300px;
 .dropDown-contents.meBox-dropDownContents {
     min-width: $meBox-dropDownContents_minWidth;
 }
+
+.meBox-button {
+    @include flexCenterContent;
+}

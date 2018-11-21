@@ -49,6 +49,7 @@ $vanillaHeader-logoSpacer_width: 48px;
     }
 }
 
+
 .vanillaHeader-messages {
     color: $global-color_bg;
 }
@@ -56,3 +57,9 @@ $vanillaHeader-logoSpacer_width: 48px;
 .vanillaHeader-notifications {
     color: inherit;
 }
+
+.vanillaHeader-compactSearch {
+    margin-left: auto;
+}
+
+

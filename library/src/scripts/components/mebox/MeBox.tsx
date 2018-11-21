@@ -7,25 +7,20 @@
 import * as React from "react";
 import classNames from "classnames";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import { withDevice } from "@library/contexts/DeviceContext";
 import HeaderLogo, { IHeaderLogo } from "./pieces/HeaderLogo";
-import CompactMenu from "./pieces/CompactMenu";
 import VanillaHeaderNav, { IVanillaHeaderNavProps } from "./pieces/VanillaHeaderNav";
 import CompactSearch from "./pieces/CompactSearch";
 import NotificationsDropdown from "./pieces/NotificationsDropDown";
 import MessagesDropDown from "./pieces/MessagesDropDown";
 import Container from "@library/components/layouts/components/Container";
-import { dummyNavigationData } from "./state/dummyNavigationData";
-import LanguagesDropDown, { ILanguageDropDownProps } from "@library/components/LanguagesDropDown";
+import { ILanguageDropDownProps } from "@library/components/LanguagesDropDown";
 import { PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
-import FlexSpacer from "@library/components/FlexSpacer";
-import { ButtonBaseClass } from "@library/components/forms/Button";
-import UserDropdown, { UserDropDown } from "./pieces/UserDropdown";
+
+import UserDropdown from "./pieces/UserDropdown";
 import { IInjectableUserState } from "@library/users/UsersModel";
 import UsersModel from "@library/users/UsersModel";
 import { connect } from "react-redux";
 import get from "lodash/get";
-import Condition from "@library/components/Condition";
 import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
 import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
 import { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
@@ -95,16 +90,17 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                                     logoClassName="vanillaHeader-logo"
                                     color={styles.fg}
                                 />
-                                {!this.state.openSearch && (
-                                    <VanillaHeaderNav
-                                        {...this.props.navigationProps}
-                                        linkClassName="meBox-navLink"
-                                        linkContentClassName="meBox-navLinkContent"
-                                    />
-                                )}
+                                {!this.state.openSearch &&
+                                    !isMobile && (
+                                        <VanillaHeaderNav
+                                            {...this.props.navigationProps}
+                                            linkClassName="meBox-navLink"
+                                            linkContentClassName="meBox-navLinkContent"
+                                        />
+                                    )}
                             </React.Fragment>
                             <CompactSearch
-                                className="vanillaHeader-search"
+                                className="vanillaHeader-compactSearch"
                                 open={this.state.openSearch}
                                 onOpenSearch={this.openSearch}
                                 onCloseSearch={this.closeSearch}
@@ -122,7 +118,15 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                                             <UserDropdown counts={this.props.counts} className="meBox-userDropdown" />
                                         </React.Fragment>
                                     )}
-                                    {isMobile && <CompactMeBox />}
+                                    {isMobile && (
+                                        <CompactMeBox
+                                            notifcationsProps={this.props.notificationsProps}
+                                            messagesProps={this.props.messagesProps}
+                                            counts={this.props.counts}
+                                            buttonClass="vanillaHeader-account"
+                                            userPhotoClass="headerDropDown-user"
+                                        />
+                                    )}
                                 </React.Fragment>
                             )}
                             {isGuest && (

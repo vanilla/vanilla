@@ -32,7 +32,7 @@ export default class CompactSearch extends React.Component<ICompactSearchProps> 
 
     public render() {
         return (
-            <div className="compactSearch">
+            <div className={classNames("compactSearch", this.props.className)}>
                 {!this.props.open && (
                     <Button
                         onClick={this.props.onOpenSearch}

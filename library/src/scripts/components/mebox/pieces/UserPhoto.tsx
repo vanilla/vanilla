@@ -20,6 +20,7 @@ interface IProps {
     size?: UserPhotoSize;
     open?: boolean; // Only useful when using as dropdown button with SVG.
     userInfo: IUserFragment;
+    forceIcon?: boolean;
 }
 
 /**
@@ -27,8 +28,8 @@ interface IProps {
  */
 export class UserPhoto extends React.Component<IProps> {
     public render() {
-        const { className, userInfo } = this.props;
-        const photoUrl = userInfo ? userInfo.photoUrl : null;
+        const { className, userInfo, forceIcon } = this.props;
+        const photoUrl = userInfo && !forceIcon ? userInfo.photoUrl : null;
         const name = userInfo ? userInfo.name : null;
         const open = !!this.props.open;
         const size = this.props.size ? this.props.size : UserPhotoSize.SMALL;

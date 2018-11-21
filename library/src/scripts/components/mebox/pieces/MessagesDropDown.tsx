@@ -57,10 +57,6 @@ export default class MessagesDropDown extends React.Component<IProps, IState> {
         );
     }
 
-    private handleAllRead = e => {
-        alert("Todo!");
-    };
-
     private setOpen = open => {
         this.setState({
             open,

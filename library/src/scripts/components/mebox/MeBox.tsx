@@ -63,7 +63,6 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
 
     public render() {
         const isMobile = this.props.device === Devices.MOBILE;
-        const showNonSearchItems = !this.state.openSearch && !isMobile;
         const currentUser = get(this.props, "currentUser.data", {
             name: null,
             userID: null,
@@ -89,29 +88,21 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                 <Container>
                     <PanelWidgetHorizontalPadding>
                         <div className="vanillaHeader-bar">
-                            {showNonSearchItems && (
-                                <React.Fragment>
-                                    <HeaderLogo
-                                        {...this.props.logoProps}
-                                        className="vanillaHeader-headerLogo hasRightMargin"
-                                        logoClassName="vanillaHeader-logo"
-                                        color={styles.fg}
-                                    />
+                            <React.Fragment>
+                                <HeaderLogo
+                                    {...this.props.logoProps}
+                                    className="vanillaHeader-headerLogo hasRightMargin"
+                                    logoClassName="vanillaHeader-logo"
+                                    color={styles.fg}
+                                />
+                                {!this.state.openSearch && (
                                     <VanillaHeaderNav
                                         {...this.props.navigationProps}
                                         linkClassName="meBox-navLink"
                                         linkContentClassName="meBox-navLinkContent"
                                     />
-                                    <LanguagesDropDown
-                                        {...this.props.languagesProps}
-                                        renderLeft={true}
-                                        className="meBox-locale"
-                                        buttonClassName="meBox-localeToggle"
-                                        buttonBaseClass={ButtonBaseClass.CUSTOM}
-                                        widthOfParent={false}
-                                    />
-                                </React.Fragment>
-                            )}
+                                )}
+                            </React.Fragment>
                             <CompactSearch
                                 className="vanillaHeader-search"
                                 open={this.state.openSearch}
@@ -119,28 +110,28 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
                                 onCloseSearch={this.closeSearch}
                                 cancelButtonClassName="meBox-searchCancel"
                             />
-                            <Condition if={showNonSearchItems}>
-                                <Condition if={!isGuest}>
-                                    <Condition if={!isMobile}>
-                                        <NotificationsDropdown
-                                            {...this.props.notificationsProps}
-                                            countClass="meBox-count"
-                                        />
-                                        <MessagesDropDown {...this.props.messagesProps} countClass="meBox-count" />
-                                        <UserDropdown counts={this.props.counts} className="meBox-userDropdown" />
-                                    </Condition>
-                                    <Condition if={isMobile}>
-                                        <CompactMeBox />
-                                    </Condition>
-                                </Condition>
-                                <Condition if={isGuest}>
-                                    <VanillaHeaderNav
-                                        {...this.props.guestNavigationProps}
-                                        linkClassName="meBox-navLink"
-                                        linkContentClassName="meBox-navLinkContent"
-                                    />
-                                </Condition>
-                            </Condition>
+                            {!isGuest && (
+                                <React.Fragment>
+                                    {!isMobile && (
+                                        <React.Fragment>
+                                            <NotificationsDropdown
+                                                {...this.props.notificationsProps}
+                                                countClass="meBox-count"
+                                            />
+                                            <MessagesDropDown {...this.props.messagesProps} countClass="meBox-count" />
+                                            <UserDropdown counts={this.props.counts} className="meBox-userDropdown" />
+                                        </React.Fragment>
+                                    )}
+                                    {isMobile && <CompactMeBox />}
+                                </React.Fragment>
+                            )}
+                            {isGuest && (
+                                <VanillaHeaderNav
+                                    {...this.props.guestNavigationProps}
+                                    linkClassName="meBox-navLink"
+                                    linkContentClassName="meBox-navLinkContent"
+                                />
+                            )}
                         </div>
                     </PanelWidgetHorizontalPadding>
                 </Container>
@@ -158,10 +149,6 @@ export class MeBox extends React.Component<IMeBoxProps, IState> {
         this.setState({
             openSearch: false,
         });
-    };
-
-    private doSearch = () => {
-        alert("todo !");
     };
 }
 

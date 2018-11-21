@@ -21,7 +21,7 @@ $vanillaHeaderNav-active_bottomOffset: 2px;
 
 .vanillaHeaderNav-item {
     @include flexCenterContent;
-    height: $global-header_height;
+    height: $vanillaHeader_height;
 }
 
 .vanillaHeaderNav-link {

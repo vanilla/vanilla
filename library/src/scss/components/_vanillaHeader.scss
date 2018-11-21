@@ -7,14 +7,23 @@
 $vanillaHeader-logoSpacer_width: 48px;
 
 .vanillaHeader {
-    min-height: $global-header_height;
+    min-height: $vanillaHeader_height;
+
+    .suggestedTextInput-clear.searchBar-clear {
+        &:hover,
+        &:active,
+        &:focus {
+            color: $vanillaHeader-fg;
+        }
+    }
+
 }
 
 .vanillaHeader-bar {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    min-height: $global-header_height;
+    min-height: $vanillaHeader_height;
 }
 
 .vanillaHeader-headerLogo {
@@ -39,7 +48,7 @@ $vanillaHeader-logoSpacer_width: 48px;
 }
 
 .vanillaHeader-localesToggle {
-    height: $global-header_height;
+    height: $vanillaHeader_height;
 
     &.buttonAsText {
         &:hover,

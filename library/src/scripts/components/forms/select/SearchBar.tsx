@@ -44,6 +44,7 @@ interface IProps extends IOptionalComponentID {
     getRef?: any;
     buttonClassName?: string;
     hideSearchButton?: boolean;
+    triggerSearchOnAllUpdates?: boolean;
 }
 
 interface IState {
@@ -70,7 +71,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
     private prefix = "searchBar";
     private searchButtonID: string;
     private searchInputID: string;
-    private ref = React.createRef<AsyncCreatableSelect<any>>();
+    private inputRef: React.RefObject<AsyncCreatableSelect<any>> = React.createRef();
 
     constructor(props: IProps) {
         super(props);
@@ -110,6 +111,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                 backspaceRemovesValue={true}
                 createOptionPosition="first"
                 formatCreateLabel={this.createFormatLabel}
+                ref={this.inputRef}
             />
         );
     }
@@ -136,7 +138,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
         if (option) {
             this.props.onChange(option.label);
             this.setState({ forceMenuClosed: true }, () => {
-                this.props.onSearch && this.props.onSearch();
+                this.props.triggerSearchOnAllUpdates && this.props.onSearch();
             });
         }
     };
@@ -226,6 +228,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 "searchBar-submitButton",
                                 this.props.buttonClassName,
                             )}
+                            tabIndex={!!this.props.hideSearchButton ? -1 : 0}
                         >
                             {this.props.isLoading ? <ButtonLoader /> : t("Search")}
                         </Button>
@@ -239,8 +242,10 @@ export default class SearchBar extends React.Component<IProps, IState> {
     private clear = (event: React.SyntheticEvent) => {
         event.preventDefault();
         this.props.onChange("");
-        this.ref.current!.focus();
-        this.props.onSearch();
+        if (this.props.triggerSearchOnAllUpdates) {
+            this.props.onSearch();
+        }
+        this.inputRef.current!.focus();
     };
 
     /**
@@ -265,4 +270,8 @@ export default class SearchBar extends React.Component<IProps, IState> {
         DropdownIndicator: selectOverrides.NullComponent,
         LoadingMessage: selectOverrides.OptionLoader,
     };
+
+    public focus() {
+        this.inputRef.current!.focus();
+    }
 }

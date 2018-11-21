@@ -9,11 +9,11 @@ $searchBar-searchIcon_space: 32px;
 
 .searchBar-clear {
     position: relative;
-    color: inherit;
     display: flex;
     box-sizing: border-box;
     height: $formElement-height;
     width: $formElement-height;
+    color: $vanillaHeader_fg;
 }
 
 .searchBar-form {
@@ -98,6 +98,7 @@ $searchBar-searchIcon_space: 32px;
 .searchBar__input {
     width: 100%;
     display: block !important;
+    color: $vanillaHeader-fg;
 
     input {
         width: 100%;

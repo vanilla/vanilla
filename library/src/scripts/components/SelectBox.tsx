@@ -13,6 +13,8 @@ import DropDownItemButton from "@library/components/dropdown/items/DropDownItemB
 import { checkCompact, downTriangle } from "@library/components/icons/common";
 import DropDown from "@library/components/dropdown/DropDown";
 import { ButtonBaseClass } from "@library/components/forms/Button";
+import Frame from "@library/components/frame/Frame";
+import FrameBody from "@library/components/frame/FrameBody";
 
 export interface ISelectBoxItem {
     name: string;
@@ -133,7 +135,9 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         renderAbove={this.props.renderAbove}
                         renderLeft={this.props.renderLeft}
                     >
-                        {selectItems}
+                        <Frame>
+                            <FrameBody className="dropDownItem-verticalPadding">{selectItems}</FrameBody>
+                        </Frame>
                     </DropDown>
                 </div>
             </div>

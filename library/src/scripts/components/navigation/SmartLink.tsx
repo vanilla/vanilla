@@ -7,11 +7,13 @@
 import React from "react";
 import { formatUrl } from "@library/application";
 import { NavLinkProps, NavLink } from "react-router-dom";
-import { LocationDescriptor } from "history";
+import { LocationDescriptor, createPath } from "history";
 
-export const LinkContext = React.createContext(formatUrl("/", true));
+export const LinkContext = React.createContext("https://changeme.dev.localhost");
 
-interface IProps extends NavLinkProps {}
+interface IProps extends NavLinkProps {
+    urlFormatter?: (url: string, withDomain?: boolean) => string;
+}
 
 /**
  * Link component that checks it's <LinkContext /> to know if it needs to do a full refresh
@@ -29,31 +31,48 @@ interface IProps extends NavLinkProps {}
  * Result = https://test.com/root/someUrl/deeper/nested (full refresh)
  */
 export default function SmartLink(props: IProps) {
+    const { urlFormatter, ...passthru } = props;
+    const finalUrlFormatter = urlFormatter ? urlFormatter : formatUrl;
+    const stringUrl = typeof props.to === "string" ? props.to : createPath(props.to);
+    const href = finalUrlFormatter(stringUrl, true);
+
     return (
         <LinkContext.Consumer>
             {contextRoot => {
-                const href = formatUrl(props.to.toString(), true);
-
                 if (href.startsWith(contextRoot)) {
-                    let newTo: LocationDescriptor;
-                    const newPath = props.to.toString().replace(window.location.origin, "");
-
-                    if (typeof props.to === "string") {
-                        newTo = {
-                            pathname: newPath,
-                        };
-                    } else {
-                        newTo = {
-                            ...props.to,
-                            pathname: newPath,
-                        };
-                    }
-
-                    return <NavLink {...props} to={newTo} />;
+                    return <NavLink {...passthru} to={makeDynamicHref(props.to, href)} />;
                 } else {
-                    return <a {...props} href={props.to.toString()} />;
+                    return <a {...passthru} href={href} />;
                 }
             }}
         </LinkContext.Consumer>
     );
+}
+
+/**
+ * Create a new LocationDescriptor with a "relative" path.
+ *
+ * This way we ensure we use react-router's navigation and not a full refresh.
+ *
+ * @param initial The starting location. We may want to preserve state here if we can.
+ * @param newHref The new string url to point to.
+ */
+function makeDynamicHref(initial: LocationDescriptor, newHref: string): LocationDescriptor {
+    // Get the search and pathName
+    const link = document.createElement("a");
+    link.href = newHref;
+    const { search, pathname } = link;
+
+    if (typeof initial === "string") {
+        return {
+            pathname,
+            search,
+        };
+    } else {
+        return {
+            ...initial,
+            pathname,
+            search,
+        };
+    }
 }

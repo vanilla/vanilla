@@ -35,9 +35,13 @@ $modal-dropDown_padding: $global_spacer;
         width: $modal-small_width;
     }
 
-    &.isFakeDropDown {
+    &.isPseudoDropDown {
         margin-left: $modal-dropDown_padding;
     }
+}
+
+.modal-content {
+    @include shadow-modal;
 }
 
 .modal-pageHeader {

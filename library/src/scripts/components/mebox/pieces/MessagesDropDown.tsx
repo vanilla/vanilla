@@ -12,6 +12,7 @@ import { t } from "@library/application";
 import { messages } from "@library/components/icons/header";
 import Count from "@library/components/mebox/pieces/Count";
 import MessagesContents, { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
+import MessagesToggle from "@library/components/mebox/pieces/MessagesToggle";
 
 interface IProps extends IMessagesContentsProps {
     className?: string;
@@ -41,14 +42,11 @@ export default class MessagesDropDown extends React.Component<IProps, IState> {
                 renderLeft={true}
                 contentsClassName="meBox-dropDownContents"
                 buttonContents={
-                    <div className="meBox-buttonContent">
-                        {messages(this.state.open)}
-                        <Count
-                            className={classNames("vanillaHeader-messagesCount", this.props.countClass)}
-                            label={t("Messages: ")}
-                            count={this.props.count}
-                        />
-                    </div>
+                    <MessagesToggle
+                        open={this.state.open}
+                        count={this.props.count}
+                        countClass={classNames("vanillaHeader-messagesCount", this.props.countClass)}
+                    />
                 }
                 onVisibilityChange={this.setOpen}
             >

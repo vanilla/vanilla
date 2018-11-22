@@ -9,6 +9,10 @@ $vanillaHeader-logoSpacer_width: 48px;
 .vanillaHeader {
     min-height: $vanillaHeader_height;
 
+    .searchBar__control {
+        color: $vanillaHeader-fg;
+    }
+
     .suggestedTextInput-clear.searchBar-clear {
         &:hover,
         &:active,

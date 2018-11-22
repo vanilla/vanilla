@@ -10,7 +10,6 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import TabHandler from "@library/TabHandler";
 
 export interface ITabButton {
-    controls: string;
     buttonContent: React.ReactNode;
     openButtonContent?: React.ReactNode; // Optional overwrite when open
 }
@@ -22,28 +21,28 @@ interface IProps {
     selectedTab: number;
     setTab: (selectedTab: number) => void;
     label: string;
-    getTabFlapID: (index: number) => string;
+    getTabButtonID: (index: number) => string;
     getTabPanelID: (index: number) => string;
 }
 
 /**
  * Clean up conditional renders with this component
  */
-export default class TabButton extends React.Component<IProps> {
-    private tabFlaps: React.RefObject<HTMLDivElement> = React.createRef();
+export default class TabButtons extends React.Component<IProps> {
+    private tabButtons: React.RefObject<HTMLDivElement> = React.createRef();
     public render() {
-        const { className, label, tabs, selectedTab, getTabFlapID, getTabPanelID } = this.props;
+        const { className, label, tabs, selectedTab, getTabButtonID, getTabPanelID } = this.props;
         const content = tabs.map((tab: ITabButton, index) => {
             const isSelected = selectedTab === index;
             const hasAlternateContents = !!tab.openButtonContent;
             return (
                 <Button
-                    id={getTabFlapID(index)}
+                    id={getTabButtonID(index)}
                     aria-controls={getTabPanelID(index)}
                     aria-selected={isSelected}
-                    key={`tabFlap-${index}`}
+                    key={`tabButton-${index}`}
                     baseClass={ButtonBaseClass.TAB}
-                    className={classNames("tabFlap", isSelected)}
+                    className={classNames("tabButton", isSelected)}
                     role="tab"
                     tabIndex={isSelected ? 0 : -1}
                 >
@@ -58,7 +57,7 @@ export default class TabButton extends React.Component<IProps> {
                 role="tablist"
                 aria-label={label}
                 className={classNames("tabs", className)}
-                ref={this.tabFlaps}
+                ref={this.tabButtons}
             >
                 {content}
             </div>
@@ -72,7 +71,7 @@ export default class TabButton extends React.Component<IProps> {
      */
     private handleKeyPress = (event: React.KeyboardEvent) => {
         const currentLink = document.activeElement;
-        const tabHandler = new TabHandler(this.tabFlaps.current!);
+        const tabHandler = new TabHandler(this.tabButtons.current!);
 
         switch (
             event.key // See SiteNavNode for the rest of the keyboard handler

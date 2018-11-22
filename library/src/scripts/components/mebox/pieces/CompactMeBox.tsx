@@ -22,6 +22,12 @@ import Modal from "@library/components/modal/Modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import CloseButton from "@library/components/CloseButton";
+import { user } from "@library/components/icons/header";
+import UserDropdownContents from "@library/components/mebox/pieces/UserDropdownContents";
+import NotificationsToggle from "@library/components/mebox/pieces/NotificationsToggle";
+import MessagesToggle from "@library/components/mebox/pieces/MessagesToggle";
+import MessagesDropDown from "@library/components/mebox/pieces/MessagesDropDown";
+import NotificationsDropDown from "@library/components/mebox/pieces/NotificationsDropDown";
 
 export interface IUserDropDownProps extends IInjectableUserState {
     className?: string;
@@ -30,6 +36,7 @@ export interface IUserDropDownProps extends IInjectableUserState {
     counts: any;
     buttonClass?: string;
     userPhotoClass?: string;
+    userInfo: IUserFragment;
 }
 
 interface IState {
@@ -54,6 +61,8 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
             photoUrl: null,
         });
 
+        const { counts } = this.props;
+
         return (
             <div className={classNames("compactMeBox", this.props.className)}>
                 <Button
@@ -73,13 +82,88 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                 </Button>
                 {this.state.open && (
                     <Modal
-                        size={ModalSizes.MOBILE_FULL_SCREEN_DROP_DOWN}
+                        size={ModalSizes.PSEUDO_DROP_DOWN}
                         label={t("Article Revisions")}
                         elementToFocusOnExit={this.buttonRef.current!}
                         className="compactMeBox-modal"
+                        exitHandler={this.close}
                     >
-                        <div className="compactMeBox-header">
+                        <div className="compactMeBox-contents">
                             <CloseButton onClick={this.close} />
+                            <Tabs
+                                label={t("My Account Tabx")}
+                                tabs={[
+                                    {
+                                        buttonContent: user(false, "userPhoto-photo"),
+                                        openButtonContent: user(true, "userPhoto-photo"),
+                                        panelContent: (
+                                            <div className="meBox-buttonContent">
+                                                <UserDropdownContents counts={counts} />
+                                            </div>
+                                        ),
+                                    },
+                                    {
+                                        buttonContent: (
+                                            <NotificationsToggle
+                                                open={false}
+                                                count={this.props.count}
+                                                countClass={classNames(
+                                                    "vanillaHeader-messagesCount",
+                                                    this.props.countClass,
+                                                )}
+                                            />
+                                        ),
+                                        openButtonContent: (
+                                            <NotificationsToggle
+                                                open={true}
+                                                count={this.props.count}
+                                                countClass={classNames(
+                                                    "vanillaHeader-messagesCount",
+                                                    this.props.countClass,
+                                                )}
+                                            />
+                                        ),
+                                        panelContent: (
+                                            <NotificationsDropDown
+                                                count={this.props.count}
+                                                open={this.state.open}
+                                                countClass={this.props.countClass}
+                                                data={this.props.notifcationsProps}
+                                            />
+                                        ),
+                                    },
+                                    {
+                                        buttonContent: (
+                                            <MessagesToggle
+                                                open={false}
+                                                count={this.props.count}
+                                                countClass={classNames(
+                                                    "vanillaHeader-messagesCount",
+                                                    this.props.countClass,
+                                                )}
+                                            />
+                                        ),
+                                        openButtonContent: (
+                                            <MessagesToggle
+                                                open={true}
+                                                count={this.props.count}
+                                                countClass={classNames(
+                                                    "vanillaHeader-messagesCount",
+                                                    this.props.countClass,
+                                                )}
+                                            />
+                                        ),
+                                        panelContent: (
+                                            <MessagesDropDown
+                                                count={this.props.count}
+                                                open={this.state.open}
+                                                countClass={this.props.countClass}
+                                                data={this.props.messagesProps}
+                                            />
+                                        ),
+                                    },
+                                ]}
+                            />
                         </div>
                     </Modal>
                 )}

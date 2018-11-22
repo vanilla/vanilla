@@ -23,10 +23,10 @@ import DropDownSection from "@library/components/dropdown/items/DropDownSection"
 import DropDownItemLinkWithCount from "@library/components/dropdown/items/DropDownItemLinkWithCount";
 import Permission from "@library/users/Permission";
 import classNames from "classnames";
+import { IUserDropDownContentsProps } from "@library/components/mebox/pieces/UserDropdownContents";
 
-export interface IUserDropDownProps extends IInjectableUserState {
+export interface IUserDropDownProps extends IInjectableUserState, IUserDropDownContentsProps {
     className?: string;
-    counts: any;
 }
 
 interface IState {

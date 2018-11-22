@@ -90,9 +90,9 @@ export default class Modal extends React.Component<IProps, IState> {
                     className={classNames(
                         "modal",
                         {
-                            isFullScreen: size === ModalSizes.FULL_SCREEN || size === ModalSizes.FAKE_DROP_DOWN,
+                            isFullScreen: size === ModalSizes.FULL_SCREEN || size === ModalSizes.PSEUDO_DROP_DOWN,
                             inheritHeight: size === ModalSizes.FULL_SCREEN,
-                            isMobileDropDown: size === ModalSizes.FAKE_DROP_DOWN,
+                            isPseudoDropDown: size === ModalSizes.PSEUDO_DROP_DOWN,
                             isLarge: size === ModalSizes.LARGE,
                             isMedium: size === ModalSizes.MEDIUM,
                             isSmall: size === ModalSizes.SMALL,

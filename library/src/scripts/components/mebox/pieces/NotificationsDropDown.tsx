@@ -13,6 +13,7 @@ import { notifications } from "@library/components/icons/header";
 import Count from "@library/components/mebox/pieces/Count";
 import classNames from "classnames";
 import NotificationsContents, { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
+import NotificationsToggle from "@library/components/mebox/pieces/NotificationsToggle";
 
 interface IProps extends INotificationsProps {
     className?: string;
@@ -43,14 +44,11 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
                 renderLeft={true}
                 contentsClassName="meBox-dropDownContents"
                 buttonContents={
-                    <div className="meBox-buttonContent">
-                        {notifications(this.state.open)}
-                        <Count
-                            className={classNames("vanillaHeader-notificationsCount", this.props.countClass)}
-                            label={t("Notifications: ")}
-                            count={this.props.count}
-                        />
-                    </div>
+                    <NotificationsToggle
+                        count={this.props.count}
+                        open={this.state.open}
+                        countClass={this.props.countClass}
+                    />
                 }
                 onVisibilityChange={this.setOpen}
             >

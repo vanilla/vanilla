@@ -8,14 +8,14 @@ import * as React from "react";
 import classNames from "classnames";
 import TabPanels, { ITabPanel } from "@library/components/tabs/pieces/TabPanels";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
-import TabButton, { ITabButton } from "@library/components/tabs/pieces/TabButton";
+import TabButtons, { ITabButton } from "@library/components/tabs/pieces/TabButtons";
 
 export interface ITab extends ITabPanel, ITabButton {}
 
 interface IProps {
     className?: string;
-    tabs: ITab[];
     label: string;
+    tabs: ITab[];
 }
 
 interface IState {
@@ -38,11 +38,11 @@ export default class Tabs extends React.PureComponent<IProps, IState> {
         const { tabs, className } = this.props;
         return (
             <div className={classNames("tabs", className)}>
-                <TabButton
+                <TabButtons
                     tabs={this.props.tabs}
                     selectedTab={this.state.selectedTab}
                     setTab={this.setSelectedTab}
-                    getTabFlapID={this.tabFlapId}
+                    getTabButtonID={this.tabButtonID}
                     getTabPanelID={this.tabPanelId}
                     label={this.props.label}
                     parentID={this.id}
@@ -50,7 +50,7 @@ export default class Tabs extends React.PureComponent<IProps, IState> {
                 <TabPanels
                     tabs={this.props.tabs}
                     selectedTab={this.state.selectedTab}
-                    getTabFlapID={this.tabFlapId}
+                    getTabButtonID={this.tabButtonID}
                     getTabPanelID={this.tabPanelId}
                     parentID={this.id}
                 />
@@ -64,8 +64,8 @@ export default class Tabs extends React.PureComponent<IProps, IState> {
         });
     }
 
-    private tabFlapId = (index: number) => {
-        return `${this.id}-tabFlap-${index}`;
+    private tabButtonID = (index: number) => {
+        return `${this.id}-tabButton-${index}`;
     };
 
     private tabPanelId = (index: number) => {

@@ -6,7 +6,7 @@
 
 enum ModalSizes {
     FULL_SCREEN = "full screen",
-    FAKE_DROP_DOWN = "fake drop down",
+    PSEUDO_DROP_DOWN = "fake drop down",
     LARGE = "large",
     MEDIUM = "medium",
     SMALL = "small",

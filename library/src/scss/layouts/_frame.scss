@@ -28,7 +28,6 @@ $frame-panel_minHeight: 500px;
 
 
 .frame {
-    @include shadow-modal;
     position: relative;
     background-color: $frame-bgColor;
     border: {

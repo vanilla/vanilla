@@ -8,7 +8,7 @@ import * as React from "react";
 import classNames from "classnames";
 import TabPanel, { ITabPanel } from "@library/components/tabs/pieces/TabPanel";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
-import TabButtons, { ITabButton } from "@library/components/tabs/pieces/TabButtons";
+import TabButtonList, { ITabButton } from "@library/components/tabs/pieces/TabButtonList";
 
 export interface ITab extends ITabPanel, ITabButton {}
 
@@ -39,7 +39,7 @@ export default class Tabs extends React.PureComponent<IProps, IState> {
         const { tabs, className } = this.props;
         return (
             <div className={classNames("tabs", className)}>
-                <TabButtons
+                <TabButtonList
                     tabs={this.props.tabs}
                     selectedTab={this.state.selectedTab}
                     setTab={this.setSelectedTab}
@@ -60,11 +60,11 @@ export default class Tabs extends React.PureComponent<IProps, IState> {
         );
     }
 
-    private setSelectedTab(selectedTab: number) {
+    private setSelectedTab = (selectedTab: number) => {
         this.setState({
             selectedTab,
         });
-    }
+    };
 
     private tabButtonID = (index: number) => {
         return `${this.id}-tabButton-${index}`;

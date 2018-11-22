@@ -8,6 +8,7 @@ import * as React from "react";
 import classNames from "classnames";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import TabHandler from "@library/TabHandler";
+import TabButton from "@library/components/tabs/pieces/TabButton";
 
 export interface ITabButton {
     buttonContent: React.ReactNode;
@@ -29,7 +30,7 @@ interface IProps {
 /**
  * Clean up conditional renders with this component
  */
-export default class TabButtons extends React.Component<IProps> {
+export default class TabButtonList extends React.Component<IProps> {
     private tabButtons: React.RefObject<HTMLDivElement> = React.createRef();
     public render() {
         const { className, label, tabs, selectedTab, getTabButtonID, getTabPanelID, buttonClass } = this.props;
@@ -37,19 +38,20 @@ export default class TabButtons extends React.Component<IProps> {
             const isSelected = selectedTab === index;
             const hasAlternateContents = !!tab.openButtonContent;
             return (
-                <Button
+                <TabButton
                     id={getTabButtonID(index)}
-                    aria-controls={getTabPanelID(index)}
-                    aria-selected={isSelected}
+                    ariaControls={getTabPanelID(index)}
+                    ariaSelected={isSelected}
                     key={`tabButton-${index}`}
                     baseClass={ButtonBaseClass.TAB}
                     className={classNames("tabButton", isSelected, buttonClass)}
-                    role="tab"
                     tabIndex={isSelected ? 0 : -1}
+                    index={index}
+                    setTab={this.props.setTab}
                 >
                     {!hasAlternateContents || (!isSelected && tab.buttonContent)}
                     {hasAlternateContents && isSelected && tab.openButtonContent}
-                </Button>
+                </TabButton>
             );
         });
         return (

@@ -25,6 +25,9 @@ import MessagesToggle from "@library/components/mebox/pieces/MessagesToggle";
 import MessagesDropDown from "@library/components/mebox/pieces/MessagesDropDown";
 import NotificationsDropDown from "@library/components/mebox/pieces/NotificationsDropDown";
 import { IMeBoxProps } from "@library/components/mebox/MeBox";
+import NotificationsContents from "@library/components/mebox/pieces/NotificationsContents";
+import Message from "@knowledge/modules/common/Message";
+import MessagesContents from "@library/components/mebox/pieces/MessagesContents";
 
 export interface IUserDropDownProps extends IInjectableUserState, IMeBoxProps {
     buttonClass?: string;
@@ -109,7 +112,7 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                             />
                                         ),
                                         panelContent: (
-                                            <NotificationsDropDown
+                                            <NotificationsContents
                                                 {...this.props.notificationsProps}
                                                 countClass={countClass}
                                             />
@@ -131,7 +134,7 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                             />
                                         ),
                                         panelContent: (
-                                            <MessagesDropDown
+                                            <MessagesContents
                                                 count={this.props.messagesProps.count}
                                                 countClass={this.props.countsClass}
                                                 data={this.props.messagesProps.data}

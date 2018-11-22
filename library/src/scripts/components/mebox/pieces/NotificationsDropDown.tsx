@@ -17,6 +17,7 @@ import NotificationsToggle from "@library/components/mebox/pieces/NotificationsT
 
 interface IProps extends INotificationsProps {
     className?: string;
+    buttonClassName?: string;
 }
 
 interface IState {
@@ -39,7 +40,7 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
             <DropDown
                 id={this.id}
                 name={t("Notifications")}
-                buttonClassName={"vanillaHeader-notifications meBox-button"}
+                buttonClassName={classNames("vanillaHeader-notifications", this.props.buttonClassName)}
                 buttonBaseClass={ButtonBaseClass.CUSTOM}
                 renderLeft={true}
                 contentsClassName="meBox-dropDownContents"

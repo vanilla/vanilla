@@ -6,155 +6,47 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import HeaderLogo, { IHeaderLogo } from "./pieces/HeaderLogo";
-import VanillaHeaderNav, { IVanillaHeaderNavProps } from "./pieces/VanillaHeaderNav";
-import CompactSearch from "./pieces/CompactSearch";
 import NotificationsDropdown from "./pieces/NotificationsDropDown";
 import MessagesDropDown from "./pieces/MessagesDropDown";
-import Container from "@library/components/layouts/components/Container";
-import { ILanguageDropDownProps } from "@library/components/LanguagesDropDown";
-import { PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
-
 import UserDropdown from "./pieces/UserDropdown";
-import { IInjectableUserState } from "@library/users/UsersModel";
-import UsersModel from "@library/users/UsersModel";
-import { connect } from "react-redux";
-import get from "lodash/get";
-import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
 import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
 import { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
 
-export interface IHeaderStyles {
-    bgColor?: string;
-    fgColor?: string;
-    notificationColor?: string;
-}
-
-export interface IMeBoxProps extends IDeviceProps, IInjectableUserState {
-    homePage: boolean;
+export interface IMeBoxProps {
     className?: string;
-    logoProps: IHeaderLogo;
-    navigationProps: IVanillaHeaderNavProps;
-    guestNavigationProps: IVanillaHeaderNavProps;
-    languagesProps: ILanguageDropDownProps;
     notificationsProps: INotificationsProps;
     messagesProps: IMessagesContentsProps;
     counts: any;
-    headerStyles: IHeaderStyles;
-}
-
-interface IState {
-    openSearch: boolean;
+    countsClass?: string;
+    buttonClassName?: string;
 }
 
 /**
- * Implements MeBox component. Note that this component handles all the logic of what components to display, but does not contain the content its self
+ * Implements MeBox component. Note that on mobile we use the CompactMeBox component but they share children components
  */
-export class MeBox extends React.Component<IMeBoxProps, IState> {
-    public state = {
-        openSearch: false,
-    };
-
+export default class MeBox extends React.Component<IMeBoxProps> {
     public render() {
-        const isMobile = this.props.device === Devices.MOBILE;
-        const currentUser = get(this.props, "currentUser.data", {
-            name: null,
-            userID: null,
-            photoUrl: null,
-        });
-        const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
-        const styles = {
-            fg: this.props.headerStyles && this.props.headerStyles.fgColor ? this.props.headerStyles.fgColor : "#fff",
-            bg:
-                this.props.headerStyles && this.props.headerStyles.bgColor
-                    ? this.props.headerStyles.bgColor
-                    : "#0291DB",
-        };
-
+        const countClass = classNames("meBox-count", this.props.countsClass);
+        const buttonClassName = this.props.buttonClassName;
         return (
-            <header
-                className={classNames("vanillaHeader", this.props.className)}
-                style={{
-                    backgroundColor: styles.bg,
-                    color: styles.fg,
-                }}
-            >
-                <Container>
-                    <PanelWidgetHorizontalPadding>
-                        <div className="vanillaHeader-bar">
-                            <React.Fragment>
-                                <HeaderLogo
-                                    {...this.props.logoProps}
-                                    className="vanillaHeader-headerLogo hasRightMargin"
-                                    logoClassName="vanillaHeader-logo"
-                                    color={styles.fg}
-                                />
-                                {!this.state.openSearch &&
-                                    !isMobile && (
-                                        <VanillaHeaderNav
-                                            {...this.props.navigationProps}
-                                            linkClassName="meBox-navLink"
-                                            linkContentClassName="meBox-navLinkContent"
-                                        />
-                                    )}
-                            </React.Fragment>
-                            <CompactSearch
-                                className="vanillaHeader-compactSearch"
-                                open={this.state.openSearch}
-                                onOpenSearch={this.openSearch}
-                                onCloseSearch={this.closeSearch}
-                                cancelButtonClassName="meBox-searchCancel"
-                            />
-                            {!isGuest && (
-                                <React.Fragment>
-                                    {!isMobile && (
-                                        <React.Fragment>
-                                            <NotificationsDropdown
-                                                {...this.props.notificationsProps}
-                                                countClass="meBox-count"
-                                            />
-                                            <MessagesDropDown {...this.props.messagesProps} countClass="meBox-count" />
-                                            <UserDropdown counts={this.props.counts} className="meBox-userDropdown" />
-                                        </React.Fragment>
-                                    )}
-                                    {isMobile && (
-                                        <CompactMeBox
-                                            notifcationsProps={this.props.notificationsProps}
-                                            messagesProps={this.props.messagesProps}
-                                            counts={this.props.counts}
-                                            buttonClass="vanillaHeader-account"
-                                            userPhotoClass="headerDropDown-user"
-                                        />
-                                    )}
-                                </React.Fragment>
-                            )}
-                            {isGuest && (
-                                <VanillaHeaderNav
-                                    {...this.props.guestNavigationProps}
-                                    linkClassName="meBox-navLink"
-                                    linkContentClassName="meBox-navLinkContent"
-                                />
-                            )}
-                        </div>
-                    </PanelWidgetHorizontalPadding>
-                </Container>
-            </header>
+            <div className={classNames("meBox", this.props.className)}>
+                <NotificationsDropdown
+                    {...this.props.notificationsProps}
+                    countClass={countClass}
+                    buttonClassName={buttonClassName}
+                />
+                <MessagesDropDown
+                    {...this.props.messagesProps}
+                    countClass={countClass}
+                    buttonClassName={buttonClassName}
+                />
+                <UserDropdown
+                    counts={this.props.counts}
+                    className="meBox-userDropdown"
+                    countsClass={countClass}
+                    buttonClassName={buttonClassName}
+                />
+            </div>
         );
     }
-
-    public openSearch = () => {
-        this.setState({
-            openSearch: true,
-        });
-    };
-
-    public closeSearch = () => {
-        this.setState({
-            openSearch: false,
-        });
-    };
 }
-
-const withRedux = connect(UsersModel.mapStateToProps);
-export default withRedux(MeBox);

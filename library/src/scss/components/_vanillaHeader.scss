@@ -5,9 +5,21 @@
  */
 
 $vanillaHeader-logoSpacer_width: 48px;
+$vanillaHeader-button_borderRadius: 3px;
+$vanillaHeader-button_size: 40px;
+$vanillaHeader-spacer_width: 12px;
+
+$vanillaHeader-count_size: 18px;
+$vanillaHeader-count_fontSize: 10px;
+$vanillaHeader-count_bg: #D0021B;
+
+$vanillaHeader-dropDownContents_minWidth: 300px;
+
 
 .vanillaHeader {
     min-height: $vanillaHeader_height;
+    background-color: $vanillaHeader_bg;
+    color: $vanillaHeader_fg;
 
     .searchBar__control {
         color: $vanillaHeader-fg;
@@ -33,12 +45,12 @@ $vanillaHeader-logoSpacer_width: 48px;
 .vanillaHeader-headerLogo {
     display: inline-flex;
     align-self: center;
+    color: $vanillaHeader_fg;
 
     &.hasRightMargin {
         margin-right: $vanillaHeader-logoSpacer_width;
     }
 }
-
 
 .vanillaHeader-nav {
     display: flex;
@@ -76,3 +88,67 @@ $vanillaHeader-logoSpacer_width: 48px;
 }
 
 
+
+.vanillaHeader-searchCancel,
+.vanillaHeader-localeToggle,
+.vanillaHeader-navLink {
+    color: inherit;
+    height: $vanillaHeader-button_size;
+    padding: 0 $vanillaHeader-spacer_width;
+    border-radius: $vanillaHeader-button_borderRadius;
+
+    &:active,
+    &:hover,
+    &:focus {
+        background-color: rgba(#000, .1);
+        border-radius: $vanillaHeader-button_borderRadius;
+    }
+}
+
+
+
+.vanillaHeader-languages {
+    margin-left: auto;
+}
+
+.vanillaHeader-button {
+    color: inherit;
+    height: $vanillaHeader_height;
+    width: $vanillaHeader-button_size;
+    padding: 0;
+
+    &:active,
+    &:hover,
+    &:focus {
+        .vanillaHeader-navLinkContent,
+        .vanillaHeader-buttonContent {
+            background-color: rgba(#000, .1);
+            border-radius: $vanillaHeader-button_borderRadius;
+        }
+    }
+}
+
+.vanillaHeader-searchCancel {
+    height: $formElement_height;
+}
+
+.vanillaHeader-buttonContent {
+    @include flexCenterContent;
+    height: $vanillaHeader-button_size;
+    pointer-events: none;
+}
+
+.vanillaHeader-user {
+    position: relative;
+    height: $vanillaHeader-button_size;
+    width: $vanillaHeader-button_size;
+    overflow: hidden;
+}
+
+.dropDown-contents {
+    min-width: $vanillaHeader-dropDownContents_minWidth;
+}
+
+.vanillaHeader-button {
+    @include flexCenterContent;
+}

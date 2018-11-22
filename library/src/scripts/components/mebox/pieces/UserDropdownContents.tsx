@@ -14,15 +14,14 @@ import DropDownItemLink from "@library/components/dropdown/items/DropDownItemLin
 import DropDownSection from "@library/components/dropdown/items/DropDownSection";
 import DropDownItemLinkWithCount from "@library/components/dropdown/items/DropDownItemLinkWithCount";
 import Permission from "@library/users/Permission";
-import classNames from "classnames";
-import { IUserFragment } from "@library/@types/api";
 import { IInjectableUserState } from "@library/users/UsersModel";
 import { connect } from "react-redux";
 import UsersModel from "@library/users/UsersModel";
-import { UserDropDown } from "@library/components/mebox/pieces/UserDropdown";
 
 export interface IUserDropDownContentsProps extends IInjectableUserState {
     counts: any;
+    countsClass?: string;
+    className?: string;
 }
 
 /**
@@ -32,7 +31,7 @@ export class UserDropdownContents extends React.Component<IUserDropDownContentsP
     public render() {
         const counts = this.props.counts;
         return (
-            <Frame>
+            <Frame className={this.props.className}>
                 <FrameBody className="dropDownItem-verticalPadding">
                     <DropDownUserCard currentUser={this.props.currentUser!} className="userDropDown-userCard" />
                     <DropDownItemSeparator />
@@ -53,21 +52,25 @@ export class UserDropdownContents extends React.Component<IUserDropDownContentsP
                                 to={`${window.location.origin}/dashboard/user/applicants`}
                                 name={t("Applicants")}
                                 count={counts.applicantsCount}
+                                countsClass={this.props.countsClass}
                             />
                             <DropDownItemLinkWithCount
                                 to={`${window.location.origin}/dashboard/log/spam`}
                                 name={t("Spam Queue")}
                                 count={counts.spamQueueCount}
+                                countsClass={this.props.countsClass}
                             />
                             <DropDownItemLinkWithCount
                                 to={`${window.location.origin}/dashboard/log/moderation`}
                                 name={t("Moderation Queue")}
                                 count={counts.moderationQueueCount}
+                                countsClass={this.props.countsClass}
                             />
                             <DropDownItemLinkWithCount
                                 to={`${window.location.origin}/badge/requests`}
                                 name={t("Badge Requests")}
                                 count={counts.badgeRequestCount}
+                                countsClass={this.props.countsClass}
                             />
                         </DropDownSection>
                     </Permission>

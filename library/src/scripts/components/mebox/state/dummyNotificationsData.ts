@@ -5,8 +5,6 @@
  */
 
 export const dummyNotificationsData = {
-    userSlug: "admin",
-    count: 1000,
     data: [
         {
             unread: false,

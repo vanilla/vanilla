@@ -16,6 +16,7 @@ import MessagesToggle from "@library/components/mebox/pieces/MessagesToggle";
 
 interface IProps extends IMessagesContentsProps {
     className?: string;
+    buttonClassName?: string;
 }
 
 interface IState {
@@ -38,9 +39,9 @@ export default class MessagesDropDown extends React.Component<IProps, IState> {
             <DropDown
                 id={this.id}
                 name={t("Messages")}
-                buttonClassName={"vanillaHeader-messages meBox-button"}
+                buttonClassName={classNames("vanillaHeader-messages", this.props.buttonClassName)}
                 renderLeft={true}
-                contentsClassName="meBox-dropDownContents"
+                contentsClassName={"meBox-dropDownContents"}
                 buttonContents={
                     <MessagesToggle
                         open={this.state.open}

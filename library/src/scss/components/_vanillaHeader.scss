@@ -12,6 +12,7 @@ $vanillaHeader-spacer_width: 12px;
 $vanillaHeader-count_size: 18px;
 $vanillaHeader-count_fontSize: 10px;
 $vanillaHeader-count_bg: #D0021B;
+$vanillaHeader-count_fg: $vanillaHeader_fg;
 
 $vanillaHeader-dropDownContents_minWidth: 300px;
 
@@ -151,4 +152,11 @@ $vanillaHeader-dropDownContents_minWidth: 300px;
 
 .vanillaHeader-button {
     @include flexCenterContent;
+}
+
+.vanillaHeader-count {
+    height: $vanillaHeader-count_size;
+    font-size: $vanillaHeader-count_fontSize;
+    background-color: $vanillaHeader-count_bg;
+    color: $vanillaHeader-count_fg;
 }

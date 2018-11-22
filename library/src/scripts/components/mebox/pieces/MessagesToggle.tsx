@@ -15,6 +15,7 @@ interface IProps {
     count?: number;
     countClass?: string;
     open: boolean;
+    className?: string;
 }
 
 /**
@@ -30,13 +31,9 @@ export default class MessagesToggle extends React.PureComponent<IProps> {
     public render() {
         const count = this.props.count ? this.props.count : 0;
         return (
-            <div className="meBox-buttonContent">
+            <div className={classNames(this.props.className, "messagesToggle")}>
                 {messages(this.props.open)}
-                <Count
-                    className={classNames("vanillaHeader-messagesCount", this.props.countClass)}
-                    label={t("Messages: ")}
-                    count={this.props.count}
-                />
+                <Count className={this.props.countClass} label={t("Messages: ")} count={this.props.count} />
             </div>
         );
     }

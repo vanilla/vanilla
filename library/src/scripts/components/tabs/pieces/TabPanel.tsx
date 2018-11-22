@@ -23,7 +23,7 @@ interface IProps {
 /**
  * Clean up conditional renders with this component
  */
-export default class TabPanels extends React.Component<IProps> {
+export default class TabPanel extends React.Component<IProps> {
     public render() {
         const { className, tabs, selectedTab, getTabButtonID, getTabPanelID } = this.props;
         const content = tabs.map((tab: ITabPanel, index) => {

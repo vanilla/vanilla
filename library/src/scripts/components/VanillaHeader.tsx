@@ -24,7 +24,6 @@ import CompactSearch from "@library/components/mebox/pieces/CompactSearch";
 import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
 import { connect } from "react-redux";
 import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
-import { getRequiredID } from "@library/componentIDs";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -49,11 +48,20 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const currentUser = this.props.currentUser.data;
         const isMobile = this.props.device === Devices.MOBILE;
         const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
+        const countClass = "vanillaHeader-count";
+        const buttonClass = "vanillaHeader-button";
+
         const notificationProps = {
             data: dummyNotificationsData.data,
             userSlug: currentUser!.name,
             count: 108,
-            countClass: "vanillaHeader-count",
+            countClass: classNames(countClass, "vanillaHeader-notificationsCount"),
+        };
+
+        const messagesProps = {
+            ...dummyMessagesData,
+            buttonClass,
+            countClass: classNames(countClass, "vanillaHeader-messagesCount"),
         };
 
         return ReactDOM.createPortal(
@@ -90,7 +98,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                         !this.state.openSearch && (
                                             <MeBox
                                                 notificationsProps={notificationProps as INotificationsProps}
-                                                messagesProps={dummyMessagesData as any}
+                                                messagesProps={messagesProps as any}
                                                 counts={dummyUserDropDownData}
                                                 buttonClassName="vanillaHeader-button"
                                             />
@@ -98,9 +106,9 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                     {isMobile && (
                                         <CompactMeBox
                                             notificationsProps={notificationProps as INotificationsProps}
-                                            messagesProps={dummyMessagesData as any}
+                                            messagesProps={messagesProps as any}
                                             counts={dummyUserDropDownData}
-                                            buttonClass="vanillaHeader-account"
+                                            buttonClass="vanillaHeader-button"
                                             userPhotoClass="headerDropDown-user"
                                         />
                                     )}

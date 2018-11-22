@@ -23,6 +23,7 @@ interface IProps {
     label: string;
     getTabButtonID: (index: number) => string;
     getTabPanelID: (index: number) => string;
+    buttonClass?: string;
 }
 
 /**
@@ -31,7 +32,7 @@ interface IProps {
 export default class TabButtons extends React.Component<IProps> {
     private tabButtons: React.RefObject<HTMLDivElement> = React.createRef();
     public render() {
-        const { className, label, tabs, selectedTab, getTabButtonID, getTabPanelID } = this.props;
+        const { className, label, tabs, selectedTab, getTabButtonID, getTabPanelID, buttonClass } = this.props;
         const content = tabs.map((tab: ITabButton, index) => {
             const isSelected = selectedTab === index;
             const hasAlternateContents = !!tab.openButtonContent;
@@ -42,7 +43,7 @@ export default class TabButtons extends React.Component<IProps> {
                     aria-selected={isSelected}
                     key={`tabButton-${index}`}
                     baseClass={ButtonBaseClass.TAB}
-                    className={classNames("tabButton", isSelected)}
+                    className={classNames("tabButton", isSelected, buttonClass)}
                     role="tab"
                     tabIndex={isSelected ? 0 : -1}
                 >

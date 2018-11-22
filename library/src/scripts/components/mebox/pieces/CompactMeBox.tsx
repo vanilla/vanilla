@@ -54,6 +54,8 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
         });
 
         const { counts } = this.props;
+        const countClass = this.props.countsClass;
+        const buttonClass = this.props.buttonClass;
 
         return (
             <div className={classNames("compactMeBox", this.props.className)}>
@@ -82,81 +84,62 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                     >
                         <div className="compactMeBox-contents">
                             <CloseButton onClick={this.close} />
-                            {/*<Tabs*/}
-                            {/*label={t("My Account Tabx")}*/}
-                            {/*tabs={[*/}
-                            {/*{*/}
-                            {/*buttonContent: user(false, "userPhoto-photo"),*/}
-                            {/*openButtonContent: user(true, "userPhoto-photo"),*/}
-                            {/*panelContent: (*/}
-                            {/*<div className="meBox-buttonContent">*/}
-                            {/*<UserDropdownContents counts={counts} />*/}
-                            {/*</div>*/}
-                            {/*),*/}
-                            {/*},*/}
-                            {/*{*/}
-                            {/*buttonContent: (*/}
-                            {/*<NotificationsToggle*/}
-                            {/*open={false}*/}
-                            {/*count={this.props.notificationsProps.count}*/}
-                            {/*countClass={classNames(*/}
-                            {/*"vanillaHeader-messagesCount",*/}
-                            {/*this.props.notificationsProps.countClass,*/}
-                            {/*)}*/}
-                            {/*/>*/}
-                            {/*),*/}
-                            {/*openButtonContent: (*/}
-                            {/*<NotificationsToggle*/}
-                            {/*open={true}*/}
-                            {/*count={this.props.notificationsProps.count}*/}
-                            {/*countClass={classNames(*/}
-                            {/*"vanillaHeader-messagesCount",*/}
-                            {/*this.props.countsClass,*/}
-                            {/*)}*/}
-                            {/*/>*/}
-                            {/*),*/}
-                            {/*panelContent: (*/}
-                            {/*<NotificationsDropDown*/}
-                            {/*count={this.props.count}*/}
-                            {/*open={this.state.open}*/}
-                            {/*countClass={this.props.countsClass}*/}
-                            {/*data={this.props.notifcationsProps}*/}
-                            {/*userSlug={this.props.currentUser.data!.name}*/}
-                            {/*/>*/}
-                            {/*),*/}
-                            {/*},*/}
-                            {/*{*/}
-                            {/*buttonContent: (*/}
-                            {/*<MessagesToggle*/}
-                            {/*open={false}*/}
-                            {/*count={this.props.count}*/}
-                            {/*countClass={classNames(*/}
-                            {/*"vanillaHeader-messagesCount",*/}
-                            {/*this.props.countsClass,*/}
-                            {/*)}*/}
-                            {/*/>*/}
-                            {/*),*/}
-                            {/*openButtonContent: (*/}
-                            {/*<MessagesToggle*/}
-                            {/*open={true}*/}
-                            {/*count={this.props.count}*/}
-                            {/*countClass={classNames(*/}
-                            {/*"vanillaHeader-messagesCount",*/}
-                            {/*this.props.countsClass,*/}
-                            {/*)}*/}
-                            {/*/>*/}
-                            {/*),*/}
-                            {/*panelContent: (*/}
-                            {/*<MessagesDropDown*/}
-                            {/*count={this.props.count}*/}
-                            {/*open={this.state.open}*/}
-                            {/*countClass={this.props.countsClass}*/}
-                            {/*data={this.props.messagesProps}*/}
-                            {/*/>*/}
-                            {/*),*/}
-                            {/*},*/}
-                            {/*]}*/}
-                            {/*/>*/}
+                            <Tabs
+                                label={t("My Account Tabx")}
+                                buttonClass={buttonClass}
+                                tabs={[
+                                    {
+                                        buttonContent: user(false, "userPhoto-photo"),
+                                        openButtonContent: user(true, "userPhoto-photo"),
+                                        panelContent: <UserDropdownContents counts={counts} />,
+                                    },
+                                    {
+                                        buttonContent: (
+                                            <NotificationsToggle
+                                                open={false}
+                                                count={this.props.notificationsProps.count}
+                                                countClass={this.props.notificationsProps.countClass}
+                                            />
+                                        ),
+                                        openButtonContent: (
+                                            <NotificationsToggle
+                                                open={true}
+                                                count={this.props.notificationsProps.count}
+                                                countClass={this.props.notificationsProps.countClass}
+                                            />
+                                        ),
+                                        panelContent: (
+                                            <NotificationsDropDown
+                                                {...this.props.notificationsProps}
+                                                countClass={countClass}
+                                            />
+                                        ),
+                                    },
+                                    {
+                                        buttonContent: (
+                                            <MessagesToggle
+                                                open={false}
+                                                count={this.props.messagesProps.count}
+                                                countClass={this.props.messagesProps.countClass}
+                                            />
+                                        ),
+                                        openButtonContent: (
+                                            <MessagesToggle
+                                                open={true}
+                                                count={this.props.messagesProps.count}
+                                                countClass={this.props.messagesProps.countClass}
+                                            />
+                                        ),
+                                        panelContent: (
+                                            <MessagesDropDown
+                                                count={this.props.messagesProps.count}
+                                                countClass={this.props.countsClass}
+                                                data={this.props.messagesProps.data}
+                                            />
+                                        ),
+                                    },
+                                ]}
+                            />
                         </div>
                     </Modal>
                 )}

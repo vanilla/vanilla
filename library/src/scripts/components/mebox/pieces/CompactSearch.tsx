@@ -61,7 +61,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                         aria-controls={this.id}
                         buttonRef={this.openSearchButton}
                     >
-                        <div className="meBox-buttonContent">{search()}</div>
+                        <div className="compactSearch-buttonContent">{search()}</div>
                     </Button>
                 )}
                 {this.props.open && (

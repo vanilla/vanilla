@@ -26,7 +26,7 @@ export interface IMeBoxProps {
  */
 export default class MeBox extends React.Component<IMeBoxProps> {
     public render() {
-        const countClass = classNames("meBox-count", this.props.countsClass);
+        const countClass = this.props.countsClass;
         const buttonClassName = this.props.buttonClassName;
         return (
             <div className={classNames("meBox", this.props.className)}>

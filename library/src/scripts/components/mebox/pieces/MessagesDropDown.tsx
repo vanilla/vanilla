@@ -41,12 +41,13 @@ export default class MessagesDropDown extends React.Component<IProps, IState> {
                 name={t("Messages")}
                 buttonClassName={classNames("vanillaHeader-messages", this.props.buttonClassName)}
                 renderLeft={true}
-                contentsClassName={"meBox-dropDownContents"}
+                contentsClassName={"vanillaHeader-dropDownContents"}
+                toggleButtonClassName="vanillaHeader-button"
                 buttonContents={
                     <MessagesToggle
                         open={this.state.open}
                         count={this.props.count}
-                        countClass={classNames("vanillaHeader-messagesCount", this.props.countClass)}
+                        countClass={this.props.countClass}
                     />
                 }
                 onVisibilityChange={this.setOpen}

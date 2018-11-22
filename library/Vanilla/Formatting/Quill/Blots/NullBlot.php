@@ -39,6 +39,10 @@ class NullBlot extends AbstractBlot {
         return $this->content;
     }
 
+    public function getContent(): string {
+        return empty($this->content) ? $this->currentOperation["insert"]["embed-external"]["data"]["url"] ?? "" : $this->content;
+    }
+
     /**
      * A null blot should not have any affect on anything around it.
      * @inheritDoc

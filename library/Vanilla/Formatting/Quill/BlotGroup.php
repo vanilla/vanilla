@@ -13,6 +13,7 @@ use Vanilla\Formatting\Quill\Blots\CodeLineBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\CodeLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\ParagraphLineTerminatorBlot;
+use Vanilla\Formatting\Quill\Blots\NullBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
 /**
@@ -285,6 +286,8 @@ class BlotGroup {
         $text = "";
         foreach ($this->blots as $blot) {
             if ($blot instanceof TextBlot) {
+                $text .= $blot->getContent();
+            } elseif ($blot instanceof NullBlot) {
                 $text .= $blot->getContent();
             }
         }

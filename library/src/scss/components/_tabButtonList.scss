@@ -4,3 +4,12 @@
  * @license GPL-2.0-only
  */
 
+.tabButtonList {
+    display: flex;
+    align-items: center;
+    justify-content: stretch;
+}
+
+.tabButtonList-button {
+    flex-grow: 1;
+}

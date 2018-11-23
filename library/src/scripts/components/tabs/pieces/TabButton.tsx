@@ -17,6 +17,7 @@ interface IProps {
     children: React.ReactNode;
     setTab: (selectedTab: number) => void;
     index: number;
+    onKeyDown?: (event: React.KeyboardEvent) => void;
 }
 
 /**
@@ -35,6 +36,7 @@ export default class TabButton extends React.Component<IProps> {
                 role="tab"
                 tabIndex={tabIndex}
                 onClick={this.handleClick}
+                onKeyDown={this.props.onKeyDown}
             >
                 {children}
             </Button>

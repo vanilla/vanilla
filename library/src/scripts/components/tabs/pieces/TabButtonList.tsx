@@ -27,11 +27,18 @@ interface IProps {
     buttonClass?: string;
 }
 
+interface IState {
+    setAllTabIndexes: boolean;
+}
+
 /**
  * Clean up conditional renders with this component
  */
-export default class TabButtonList extends React.Component<IProps> {
+export default class TabButtonList extends React.Component<IProps, IState> {
     private tabButtons: React.RefObject<HTMLDivElement> = React.createRef();
+    public state = {
+        setAllTabIndexes: false,
+    };
     public render() {
         const { className, label, tabs, selectedTab, getTabButtonID, getTabPanelID, buttonClass } = this.props;
         const content = tabs.map((tab: ITabButton, index) => {
@@ -45,9 +52,10 @@ export default class TabButtonList extends React.Component<IProps> {
                     key={`tabButton-${index}`}
                     baseClass={ButtonBaseClass.TAB}
                     className={classNames("tabButton", "tabButtonList-button", isSelected, buttonClass)}
-                    tabIndex={isSelected ? 0 : -1}
+                    tabIndex={isSelected || this.state.setAllTabIndexes ? 0 : -1}
                     index={index}
                     setTab={this.props.setTab}
+                    onKeyDown={this.handleKeyDown}
                 >
                     {!hasAlternateContents || (!isSelected && tab.buttonContent)}
                     {hasAlternateContents && isSelected && tab.openButtonContent}
@@ -56,7 +64,6 @@ export default class TabButtonList extends React.Component<IProps> {
         });
         return (
             <div
-                onKeyPressCapture={this.handleKeyPress}
                 role="tablist"
                 aria-label={label}
                 className={classNames("tabButtonList", className)}
@@ -72,29 +79,50 @@ export default class TabButtonList extends React.Component<IProps> {
      * For full accessibility docs, see https://www.w3.org/TR/wai-aria-practices-1.1/examples/tabs/tabs-2/tabs.html
      * @param event
      */
-    private handleKeyPress = (event: React.KeyboardEvent) => {
-        const currentLink = document.activeElement;
-        const tabHandler = new TabHandler(this.tabButtons.current!);
-
-        switch (
-            event.key // See SiteNavNode for the rest of the keyboard handler
-        ) {
-            case "ArrowRight":
-                event.stopPropagation();
-                tabHandler.getNext();
-                break;
-            case "ArrowLeft":
-                event.stopPropagation();
-                tabHandler.getNext(currentLink, true);
-                break;
-            case "Home":
-                event.stopPropagation();
-                tabHandler.getInitial();
-                break;
-            case "End":
-                event.stopPropagation();
-                tabHandler.getLast();
-                break;
-        }
+    private handleKeyDown = (event: React.KeyboardEvent) => {
+        event.persist();
+        const currentEl = event.currentTarget;
+        this.setState(
+            {
+                setAllTabIndexes: true,
+            },
+            () => {
+                const tabHandler = new TabHandler(this.tabButtons.current!);
+                console.log("event.key: ", event.key);
+                switch (event.key) {
+                    case "ArrowRight":
+                        event.stopPropagation();
+                        const nextElement = tabHandler.getNext(currentEl, false, true);
+                        if (nextElement) {
+                            nextElement.focus();
+                        }
+                        break;
+                    case "ArrowLeft":
+                        event.stopPropagation();
+                        const prevElement = tabHandler.getNext(currentEl, true, true);
+                        if (prevElement) {
+                            prevElement.focus();
+                        }
+                        break;
+                    case "Home":
+                        event.stopPropagation();
+                        const firstElement = tabHandler.getInitial();
+                        if (firstElement) {
+                            firstElement.focus();
+                        }
+                        break;
+                    case "End":
+                        event.stopPropagation();
+                        const lastElement = tabHandler.getLast();
+                        if (lastElement) {
+                            lastElement.focus();
+                        }
+                        break;
+                }
+                this.setState({
+                    setAllTabIndexes: false,
+                });
+            },
+        );
     };
 }

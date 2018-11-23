@@ -5,8 +5,8 @@
  */
 
 
-$compactMeBox-button_width: $formElement_height;
-$compactMeBox-close_offset: $dropDown-item_horizontalPadding - ($compactMeBox-button_width - $icon-small_size)/2;
+$compactMeBox-button_width: $vanillaHeader_height;
+
 
 .compactMeBox {
     display: block;
@@ -20,12 +20,20 @@ $compactMeBox-close_offset: $dropDown-item_horizontalPadding - ($compactMeBox-bu
     position: relative;
 }
 
-.compactMeBox-closeModal {
-    @include absolute-topRight($compactMeBox-close_offset, $compactMeBox-close_offset);
+.buttonClose.compactMeBox-closeModal {
+    @include absolute-topRight();
+    width: $compactMeBox-button_width;
+    height: $compactMeBox-button_width;
 }
 
 
 .compactMeBox-tabList {
-    margin-right: #{$formElement_height + $dropDown-item_horizontalPadding};
+    margin-right: $vanillaHeader_height;
 }
 
+.compactSearch-tabButtonContent {
+    @include flexCenterContent;
+    position: relative;
+    width: $compactMeBox-button_width;
+    height: $compactMeBox-button_width;
+}

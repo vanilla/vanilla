@@ -5,8 +5,8 @@
  */
 import { IVanillaHeaderNavProps } from "../pieces/VanillaHeaderNav";
 
-export const dummyNavigationData: IVanillaHeaderNavProps = {
-    children: [
+export const dummyNavigationData = {
+    data: [
         {
             to: "/discussions",
             name: "Discussions",
@@ -26,8 +26,8 @@ export const dummyNavigationData: IVanillaHeaderNavProps = {
     ],
 };
 
-export const dummyGuestNavigationData: IVanillaHeaderNavProps = {
-    children: [
+export const dummyGuestNavigationData = {
+    data: [
         {
             to: `/entry/signin?target=${window.location.pathname}`,
             name: "Sign In",

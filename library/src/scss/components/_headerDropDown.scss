@@ -4,10 +4,7 @@
  * @license GPL-2.0-only
  */
 
+.headerDropDown-user,
 .headerDropDown-headerButton {
-    color: $global-color_fg;
-}
-
-.vanillaHeader-account {
-    color: inherit;
+    color: white; // Todo: fix after other PR is merged
 }

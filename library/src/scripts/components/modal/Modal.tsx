@@ -80,6 +80,7 @@ export default class Modal extends React.Component<IProps, IState> {
      * Render the contents into a portal.
      */
     public render() {
+        const { size } = this.props;
         return ReactDOM.createPortal(
             <div className="overlay" onClick={this.handleScrimClick}>
                 <div
@@ -89,11 +90,12 @@ export default class Modal extends React.Component<IProps, IState> {
                     className={classNames(
                         "modal",
                         {
-                            isFullScreen: this.props.size === ModalSizes.FULL_SCREEN,
-                            inheritHeight: this.props.size === ModalSizes.FULL_SCREEN,
-                            isLarge: this.props.size === ModalSizes.LARGE,
-                            isMedium: this.props.size === ModalSizes.MEDIUM,
-                            isSmall: this.props.size === ModalSizes.SMALL,
+                            isFullScreen: size === ModalSizes.FULL_SCREEN || size === ModalSizes.PSEUDO_DROP_DOWN,
+                            inheritHeight: size === ModalSizes.FULL_SCREEN,
+                            isPseudoDropDown: size === ModalSizes.PSEUDO_DROP_DOWN,
+                            isLarge: size === ModalSizes.LARGE,
+                            isMedium: size === ModalSizes.MEDIUM,
+                            isSmall: size === ModalSizes.SMALL,
                         },
                         this.props.className,
                     )}

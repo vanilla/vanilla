@@ -10,7 +10,7 @@ import VanillaHeaderNavItem, { IHeaderNav } from "./VanillaHeaderNavItem";
 
 export interface IVanillaHeaderNavProps {
     className?: string;
-    children: IHeaderNav[];
+    data: IHeaderNav[];
     linkClassName?: string;
     linkContentClassName?: string;
 }
@@ -20,7 +20,7 @@ export interface IVanillaHeaderNavProps {
  */
 export default class VanillaHeaderNav extends React.Component<IVanillaHeaderNavProps> {
     public render() {
-        const content = this.props.children.map((item, key) => {
+        const content = this.props.data.map((item, key) => {
             return (
                 <VanillaHeaderNavItem
                     {...item}

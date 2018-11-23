@@ -24,6 +24,7 @@ interface IProps extends IOptionalComponentID {
     tabIndex?: number;
     lang?: string;
     buttonRef?: React.RefObject<HTMLButtonElement>;
+    role?: string;
 }
 
 interface IState {
@@ -34,6 +35,7 @@ export enum ButtonBaseClass {
     STANDARD = "button",
     ICON = "buttonIcon",
     TEXT = "buttonAsText",
+    TAB = "buttonAsTab",
     CUSTOM = "",
 }
 
@@ -78,6 +80,7 @@ export default class Button extends React.Component<IProps, IState> {
                 ref={this.props.buttonRef}
                 onKeyDown={this.props.onKeyDown}
                 lang={this.props.lang}
+                role={this.props.role}
             >
                 {this.props.children}
             </button>

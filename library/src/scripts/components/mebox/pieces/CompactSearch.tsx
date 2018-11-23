@@ -23,6 +23,7 @@ export interface ICompactSearchProps extends IApiProps {
     onOpenSearch: () => void;
     onCloseSearch: () => void;
     cancelButtonClassName?: string;
+    buttonClass?: string;
 }
 
 interface IState {
@@ -48,11 +49,11 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
         }
 
         return (
-            <div className="compactSearch">
+            <div className={classNames("compactSearch", this.props.className)}>
                 {!this.props.open && (
                     <Button
                         onClick={this.props.onOpenSearch}
-                        className={classNames("compactSearch-open", "meBox-button")}
+                        className={classNames("compactSearch-open", this.props.buttonClass)}
                         title={t("Search")}
                         aria-expanded={false}
                         aria-haspopup="true"
@@ -60,7 +61,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                         aria-controls={this.id}
                         buttonRef={this.openSearchButton}
                     >
-                        <div className="meBox-buttonContent">{search()}</div>
+                        <div className="compactSearch-buttonContent">{search()}</div>
                     </Button>
                 )}
                 {this.props.open && (

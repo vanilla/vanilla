@@ -9,6 +9,7 @@ $modal-large_width: 720px;
 $modal-medium_width: 516px;
 $modal-small_width: 375px;
 $modal-border_radius: $global-borderRadius;
+$modal-dropDown_padding: $global_spacer;
 
 
 .modal {
@@ -33,6 +34,14 @@ $modal-border_radius: $global-borderRadius;
     &.isSmall {
         width: $modal-small_width;
     }
+
+    &.isPseudoDropDown {
+        margin-left: $modal-dropDown_padding;
+    }
+}
+
+.modal-content {
+    @include shadow-modal;
 }
 
 .modal-pageHeader {

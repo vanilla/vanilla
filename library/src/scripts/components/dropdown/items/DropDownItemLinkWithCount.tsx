@@ -13,6 +13,7 @@ interface IProps extends IDropDownItemLink {
     count?: number;
     hideCountWhenZero?: boolean;
     className?: string;
+    countsClass?: string;
 }
 
 /**
@@ -31,7 +32,7 @@ export default class DropDownItemLinkWithCount extends React.Component<IProps> {
                 <span className="dropDownItem-text">{linkContents}</span>
                 {showCount && (
                     <NumberFormatted
-                        className={classNames("dropDownItem-count", this.props.className)}
+                        className={classNames("dropDownItem-count", this.props.countsClass)}
                         value={count!}
                     />
                 )}

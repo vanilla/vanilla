@@ -142,13 +142,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
             openSearch: false,
         });
     };
-
-    // Todo: remove
-    public componentDidMount() {
-        setTimeout(() => {
-            window.dispatchEvent(new Event("resize"));
-        }, 200);
-    }
 }
 
 const withRedux = connect(UsersModel.mapStateToProps);

@@ -1345,7 +1345,8 @@ class CategoryModel extends Gdn_Model {
         self::updateLastPost($discussion);
 
         // Update the aggregate discussion count for this category and all its parents.
-        self::incrementAggregateCount($categoryID, self::AGGREGATE_DISCUSSION);
+        self::incrementAggregateCount($categoryID, self::AGGREGATE_DISCUSSION, 1, false);
+        CategoryModel::clearCache();
 
         // Set the new LastCategoryID.
         self::setAsLastCategory($categoryID);
@@ -1408,7 +1409,8 @@ class CategoryModel extends Gdn_Model {
         self::updateLastPost($discussion, $comment);
 
         // Update the aggregate comment count for this category and all its parents.
-        self::incrementAggregateCount($categoryID, self::AGGREGATE_COMMENT);
+        self::incrementAggregateCount($categoryID, self::AGGREGATE_COMMENT, 1, false);
+        CategoryModel::clearCache();
 
         // Set the new LastCategoryID.
         self::setAsLastCategory($categoryID);

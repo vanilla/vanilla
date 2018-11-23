@@ -20,7 +20,6 @@ import Translate from "@library/components/translation/Translate";
 import { ClearButton } from "@library/components/forms/select/ClearButton";
 import ConditionalWrap from "@library/components/ConditionalWrap";
 import { search } from "@library/components/icons/header";
-import TabHandler from "@library/TabHandler";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;
@@ -46,8 +45,6 @@ interface IProps extends IOptionalComponentID {
     buttonClassName?: string;
     hideSearchButton?: boolean;
     triggerSearchOnAllUpdates?: boolean;
-    allowFormSubmission?: boolean;
-    doSearch?: () => void;
 }
 
 interface IState {
@@ -115,7 +112,6 @@ export default class SearchBar extends React.Component<IProps, IState> {
                 createOptionPosition="first"
                 formatCreateLabel={this.createFormatLabel}
                 ref={this.inputRef}
-                onKeyDown={this.props.doSearch ? this.keyPressHandler : undefined}
             />
         );
     }
@@ -200,7 +196,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
      */
     private SearchControl = props => {
         return (
-            <form className="searchBar-form">
+            <form className="searchBar-form" onSubmit={this.onFormSubmit}>
                 {!this.props.noHeading && (
                     <Heading depth={1} className="searchBar-heading">
                         <label className="searchBar-label" htmlFor={this.searchInputID}>
@@ -252,14 +248,12 @@ export default class SearchBar extends React.Component<IProps, IState> {
         this.inputRef.current!.focus();
     };
 
-    private keyPressHandler = (event: React.KeyboardEvent) => {
-        switch (event.key) {
-            case "Enter":
-                this.props.doSearch!();
-                break;
-            default:
-                event.stopPropagation();
-        }
+    /**
+     * Handle the form submission.
+     */
+    private onFormSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
+        this.props.onSearch();
     };
 
     /*

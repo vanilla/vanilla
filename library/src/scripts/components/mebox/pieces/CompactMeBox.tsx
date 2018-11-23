@@ -56,6 +56,8 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
         const { counts } = this.props;
         const countClass = this.props.countsClass;
         const buttonClass = this.props.buttonClass;
+        const panelContentClass = "compactMeBox-panel inheritHeight";
+        const panelBodyClass = "compactMeBox-body inheritHeight";
 
         return (
             <div className={classNames("compactMeBox", this.props.className)}>
@@ -86,7 +88,10 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                             <CloseButton onClick={this.close} className="compactMeBox-closeModal" />
                             <Tabs
                                 label={t("My Account Tab")}
+                                className="compactMeBox-tabs inheritHeight"
                                 tabListClass="compactMeBox-tabList"
+                                tabPanelsClass="compactMeBox-tabPanels inheritHeight"
+                                tabPanelClass="compactMeBox-tabPanel inheritHeight"
                                 buttonClass={classNames(buttonClass, "compactMeBox-tabButton")}
                                 tabs={[
                                     {
@@ -100,7 +105,13 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                                 {user(true, "userPhoto-photo")}
                                             </div>
                                         ),
-                                        panelContent: <UserDropdownContents counts={counts} />,
+                                        panelContent: (
+                                            <UserDropdownContents
+                                                counts={counts}
+                                                className={panelContentClass}
+                                                panelBodyClass={panelBodyClass}
+                                            />
+                                        ),
                                     },
                                     {
                                         buttonContent: (
@@ -123,6 +134,8 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                             <NotificationsContents
                                                 {...this.props.notificationsProps}
                                                 countClass={countClass}
+                                                className={panelContentClass}
+                                                panelBodyClass={panelBodyClass}
                                             />
                                         ),
                                     },
@@ -148,6 +161,8 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                                 count={this.props.messagesProps.count}
                                                 countClass={this.props.countsClass}
                                                 data={this.props.messagesProps.data}
+                                                className={panelContentClass}
+                                                panelBodyClass={panelBodyClass}
                                             />
                                         ),
                                     },

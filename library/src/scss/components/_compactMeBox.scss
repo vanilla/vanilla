@@ -18,6 +18,9 @@ $compactMeBox-button_width: $vanillaHeader_height;
 
 .compactMeBox-contents {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .buttonClose.compactMeBox-closeModal {
@@ -29,6 +32,8 @@ $compactMeBox-button_width: $vanillaHeader_height;
 
 .compactMeBox-tabList {
     margin-right: $vanillaHeader_height;
+    height: $vanillaHeader_height;
+    flex-basis: $vanillaHeader_height;
 }
 
 .compactSearch-tabButtonContent {
@@ -36,4 +41,8 @@ $compactMeBox-button_width: $vanillaHeader_height;
     position: relative;
     width: $compactMeBox-button_width;
     height: $compactMeBox-button_width;
+}
+
+.compactMeBox-tabPanels {
+    height: calc(100vh - #{$compactMeBox-button_width});
 }

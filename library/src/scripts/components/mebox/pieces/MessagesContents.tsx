@@ -17,11 +17,13 @@ import Frame from "@library/components/frame/Frame";
 import { compose, messages } from "@library/components/icons/header";
 import { IMeBoxMessageItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
 import MeBoxDropDownItemList from "@library/components/mebox/pieces/MeBoxDropDownItemList";
+import UserDropdownContents from "@library/components/mebox/pieces/UserDropdownContents";
 
 export interface IMessagesContentsProps {
     data: IMeBoxMessageItem[];
     count?: number;
     countClass?: string;
+    panelBodyClass?: string;
     markAllRead?: () => void;
 }
 
@@ -48,7 +50,7 @@ export default class MessagesContents extends React.Component<IProps> {
                         {compose()}
                     </LinkAsButton>
                 </FrameHeader>
-                <FrameBody className="isSelfPadded">
+                <FrameBody className={classNames("isSelfPadded", this.props.panelBodyClass)}>
                     <FramePanel>
                         <MeBoxDropDownItemList
                             emptyMessage={t("You do not have any messages yet.")}

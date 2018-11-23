@@ -26,9 +26,9 @@ export default class MeBoxDropDownItemList extends React.Component<IVanillaHeade
     public render() {
         const count = this.props.data.length;
         return (
-            <div className={classNames("MeBoxMessageList", this.props.className)}>
+            <div className={classNames("meBoxMessageList", this.props.className)}>
                 {count > 0 && (
-                    <ul className="MeBoxMessageList-items">
+                    <ul className="meBoxMessageList-items">
                         {this.props.data.map((item, key) => {
                             return (
                                 <MeBoxDropDownItem

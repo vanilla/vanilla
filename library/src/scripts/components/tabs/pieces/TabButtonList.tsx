@@ -88,7 +88,6 @@ export default class TabButtonList extends React.Component<IProps, IState> {
             },
             () => {
                 const tabHandler = new TabHandler(this.tabButtons.current!);
-                console.log("event.key: ", event.key);
                 switch (event.key) {
                     case "ArrowRight":
                         event.stopPropagation();

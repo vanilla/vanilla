@@ -15,6 +15,7 @@ interface IProps {
     parentID: string;
     tabs: ITabPanel[];
     className?: string;
+    tabPanelClass?: string;
     selectedTab: number;
     getTabButtonID: (index: number) => string;
     getTabPanelID: (index: number) => string;
@@ -25,7 +26,7 @@ interface IProps {
  */
 export default class TabPanel extends React.Component<IProps> {
     public render() {
-        const { className, tabs, selectedTab, getTabButtonID, getTabPanelID } = this.props;
+        const { className, tabs, selectedTab, getTabButtonID, getTabPanelID, tabPanelClass } = this.props;
         const content = tabs.map((tab: ITabPanel, index) => {
             const key = `tabPanel-${index}`;
             return selectedTab === index ? (
@@ -33,7 +34,7 @@ export default class TabPanel extends React.Component<IProps> {
                     id={getTabPanelID(index)}
                     aria-labelledby={getTabButtonID(index)}
                     role="tabpanel"
-                    className={classNames("tabPanel", className)}
+                    className={classNames("tabPanel", tabPanelClass)}
                     tabIndex={0}
                     key={key}
                 >

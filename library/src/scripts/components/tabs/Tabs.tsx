@@ -17,6 +17,8 @@ interface IProps {
     label: string;
     buttonClass?: string;
     tabListClass?: string;
+    tabPanelsClass?: string;
+    tabPanelClass?: string;
     tabs: ITab[];
 }
 
@@ -57,6 +59,8 @@ export default class Tabs extends React.PureComponent<IProps, IState> {
                     getTabButtonID={this.tabButtonID}
                     getTabPanelID={this.tabPanelId}
                     parentID={this.id}
+                    tabPanelClass={this.props.tabPanelClass}
+                    className={this.props.tabPanelsClass}
                 />
             </div>
         );

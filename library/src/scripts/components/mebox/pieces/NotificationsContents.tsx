@@ -18,12 +18,14 @@ import Frame from "@library/components/frame/Frame";
 import { settings } from "@library/components/icons/header";
 import MeBoxDropDownItemList from "@library/components/mebox/pieces/MeBoxDropDownItemList";
 import { IMeBoxNotificationItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
+import classNames from "classnames";
 
 export interface INotificationsProps {
     data: IMeBoxNotificationItem[];
     userSlug: string;
     count?: number;
     countClass?: string;
+    panelBodyClass?: string;
     markAllRead?: () => void;
 }
 
@@ -50,7 +52,7 @@ export default class NotificationsContents extends React.Component<IProps> {
                         {settings()}
                     </LinkAsButton>
                 </FrameHeader>
-                <FrameBody className="isSelfPadded">
+                <FrameBody className={classNames("isSelfPadded", this.props.panelBodyClass)}>
                     <FramePanel>
                         <MeBoxDropDownItemList
                             emptyMessage={t("You do not have any notifications yet.")}

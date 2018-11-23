@@ -14,7 +14,7 @@ $vanillaHeader-count_fontSize: 10px;
 $vanillaHeader-count_bg: #D0021B;
 $vanillaHeader-count_fg: $vanillaHeader_fg;
 
-$vanillaHeader-dropDownContents_minWidth: 300px;
+$vanillaHeader-dropDownContents_minWidth: 350px;
 
 
 .vanillaHeader {
@@ -146,7 +146,7 @@ $vanillaHeader-dropDownContents_minWidth: 300px;
     overflow: hidden;
 }
 
-.dropDown-contents {
+.dropDown-contents.vanillaHeader-dropDownContents {
     min-width: $vanillaHeader-dropDownContents_minWidth;
 }
 

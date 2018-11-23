@@ -14,6 +14,7 @@ interface IProps {
     count?: number;
     open?: boolean;
     countClass?: string;
+    className?: string;
 }
 
 /**
@@ -23,7 +24,7 @@ export default class NotificationsToggle extends React.PureComponent<IProps> {
     public render() {
         const count = this.props.count ? this.props.count : 0;
         return (
-            <div className="meBox-buttonContent">
+            <div className={classNames("meBox-buttonContent", this.props.className)}>
                 {notifications(!!this.props.open)}
                 <Count
                     className={classNames("vanillaHeader-notificationsCount", this.props.countClass)}

@@ -4,6 +4,10 @@
  * @license GPL-2.0-only
  */
 
+
+$compactMeBox-button_width: $formElement_height;
+$compactMeBox-close_offset: $dropDown-item_horizontalPadding - ($compactMeBox-button_width - $icon-small_size)/2;
+
 .compactMeBox {
     display: block;
 }
@@ -11,3 +15,17 @@
 .compactMeBox-openButton {
     color: #fff;
 }
+
+.compactMeBox-contents {
+    position: relative;
+}
+
+.compactMeBox-closeModal {
+    @include absolute-topRight($compactMeBox-close_offset, $compactMeBox-close_offset);
+}
+
+
+.compactMeBox-tabList {
+    margin-right: #{$formElement_height + $dropDown-item_horizontalPadding};
+}
+

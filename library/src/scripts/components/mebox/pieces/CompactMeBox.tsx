@@ -13,21 +13,11 @@ import { connect } from "react-redux";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import get from "lodash/get";
 import classNames from "classnames";
-import Tabs from "@library/components/tabs/Tabs";
 import Modal from "@library/components/modal/Modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import CloseButton from "@library/components/CloseButton";
-import { user } from "@library/components/icons/header";
-import UserDropdownContents from "@library/components/mebox/pieces/UserDropdownContents";
-import NotificationsToggle from "@library/components/mebox/pieces/NotificationsToggle";
-import MessagesToggle from "@library/components/mebox/pieces/MessagesToggle";
-import MessagesDropDown from "@library/components/mebox/pieces/MessagesDropDown";
-import NotificationsDropDown from "@library/components/mebox/pieces/NotificationsDropDown";
 import { IMeBoxProps } from "@library/components/mebox/MeBox";
-import NotificationsContents from "@library/components/mebox/pieces/NotificationsContents";
-import Message from "@knowledge/modules/common/Message";
-import MessagesContents from "@library/components/mebox/pieces/MessagesContents";
 
 export interface IUserDropDownProps extends IInjectableUserState, IMeBoxProps {
     buttonClass?: string;
@@ -87,62 +77,6 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                     >
                         <div className="compactMeBox-contents">
                             <CloseButton onClick={this.close} />
-                            <Tabs
-                                label={t("My Account Tabx")}
-                                buttonClass={buttonClass}
-                                tabs={[
-                                    {
-                                        buttonContent: user(false, "userPhoto-photo"),
-                                        openButtonContent: user(true, "userPhoto-photo"),
-                                        panelContent: <UserDropdownContents counts={counts} />,
-                                    },
-                                    {
-                                        buttonContent: (
-                                            <NotificationsToggle
-                                                open={false}
-                                                count={this.props.notificationsProps.count}
-                                                countClass={this.props.notificationsProps.countClass}
-                                            />
-                                        ),
-                                        openButtonContent: (
-                                            <NotificationsToggle
-                                                open={true}
-                                                count={this.props.notificationsProps.count}
-                                                countClass={this.props.notificationsProps.countClass}
-                                            />
-                                        ),
-                                        panelContent: (
-                                            <NotificationsContents
-                                                {...this.props.notificationsProps}
-                                                countClass={countClass}
-                                            />
-                                        ),
-                                    },
-                                    {
-                                        buttonContent: (
-                                            <MessagesToggle
-                                                open={false}
-                                                count={this.props.messagesProps.count}
-                                                countClass={this.props.messagesProps.countClass}
-                                            />
-                                        ),
-                                        openButtonContent: (
-                                            <MessagesToggle
-                                                open={true}
-                                                count={this.props.messagesProps.count}
-                                                countClass={this.props.messagesProps.countClass}
-                                            />
-                                        ),
-                                        panelContent: (
-                                            <MessagesContents
-                                                count={this.props.messagesProps.count}
-                                                countClass={this.props.countsClass}
-                                                data={this.props.messagesProps.data}
-                                            />
-                                        ),
-                                    },
-                                ]}
-                            />
                         </div>
                     </Modal>
                 )}

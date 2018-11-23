@@ -5,9 +5,6 @@
  */
 
 
-$compactMeBox-button_width: $vanillaHeader_height;
-
-
 .compactMeBox {
     display: block;
 }
@@ -25,24 +22,24 @@ $compactMeBox-button_width: $vanillaHeader_height;
 
 .buttonClose.compactMeBox-closeModal {
     @include absolute-topRight();
-    width: $compactMeBox-button_width;
-    height: $compactMeBox-button_width;
+    width: $compactMeBox-tab_height;
+    height: $compactMeBox-tab_height;
 }
 
 
 .compactMeBox-tabList {
-    margin-right: $vanillaHeader_height;
-    height: $vanillaHeader_height;
-    flex-basis: $vanillaHeader_height;
+    margin-right: $compactMeBox-tab_height;
+    height: $compactMeBox-tab_height;
+    flex-basis: $compactMeBox-tab_height;
 }
 
 .compactSearch-tabButtonContent {
     @include flexCenterContent;
     position: relative;
-    width: $compactMeBox-button_width;
-    height: $compactMeBox-button_width;
+    width: $compactMeBox-tab_height;
+    height: $compactMeBox-tab_height;
 }
 
 .compactMeBox-tabPanels {
-    height: calc(100vh - #{$compactMeBox-button_width});
+    height: calc(100vh - #{$compactMeBox-tab_height});
 }

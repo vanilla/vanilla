@@ -24,6 +24,7 @@ import CompactSearch from "@library/components/mebox/pieces/CompactSearch";
 import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
 import { connect } from "react-redux";
 import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
+import TabHandler from "@library/TabHandler";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -33,6 +34,7 @@ interface IProps extends IDeviceProps, IInjectableUserState {
 
 interface IState {
     openSearch: boolean;
+    showingSuggestions: boolean;
 }
 
 /**
@@ -44,6 +46,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
     private resultsRef: React.RefObject<HTMLDivElement> = React.createRef();
     public state = {
         openSearch: false,
+        showingSuggestions: false,
     };
     public render() {
         const currentUser = this.props.currentUser.data;
@@ -95,6 +98,9 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                 cancelButtonClassName="vanillaHeader-searchCancel"
                                 buttonClass="vanillaHeader-button"
                                 resultsRef={this.resultsRef}
+                                showingSuggestions={this.state.showingSuggestions}
+                                onOpenSuggestions={this.setOpenSuggestions}
+                                onCloseSuggestions={this.setCloseSuggestions}
                             />
                             {!isGuest && (
                                 <React.Fragment>
@@ -146,6 +152,24 @@ export class VanillaHeader extends React.Component<IProps, IState> {
     public closeSearch = () => {
         this.setState({
             openSearch: false,
+        });
+    };
+
+    /**
+     * Keep track of visibility of suggestions
+     */
+    public setOpenSuggestions = () => {
+        this.setState({
+            showingSuggestions: true,
+        });
+    };
+
+    /**
+     * Keep track of visibility of suggestions
+     */
+    public setCloseSuggestions = () => {
+        this.setState({
+            showingSuggestions: false,
         });
     };
 }

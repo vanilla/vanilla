@@ -48,6 +48,9 @@ interface IProps extends IOptionalComponentID {
     hideSearchButton?: boolean;
     triggerSearchOnAllUpdates?: boolean;
     resultsRef?: React.RefObject<HTMLDivElement>;
+    handleOnKeyDown?: (event: React.KeyboardEvent) => void;
+    onOpenSuggestions?: () => void;
+    onCloseSuggestions?: () => void;
 }
 
 interface IState {
@@ -115,6 +118,9 @@ export default class SearchBar extends React.Component<IProps, IState> {
                 createOptionPosition="first"
                 formatCreateLabel={this.createFormatLabel}
                 ref={this.inputRef}
+                onKeyDown={this.props.handleOnKeyDown}
+                onMenuOpen={this.props.onOpenSuggestions}
+                onMenuClose={this.props.onCloseSuggestions}
             />
         );
     }

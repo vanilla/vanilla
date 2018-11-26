@@ -8,12 +8,12 @@
 namespace Vanilla\Formatting\Quill;
 
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
+use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\CodeLineBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\CodeLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\ParagraphLineTerminatorBlot;
-use Vanilla\Formatting\Quill\Blots\NullBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
 /**
@@ -285,9 +285,8 @@ class BlotGroup {
     public function getUnsafeText(): string {
         $text = "";
         foreach ($this->blots as $blot) {
-            if ($blot instanceof TextBlot) {
-                $text .= $blot->getContent();
-            } elseif ($blot instanceof NullBlot) {
+            if ($blot instanceof TextBlot
+                || $blot instanceof ExternalBlot) {
                 $text .= $blot->getContent();
             }
         }

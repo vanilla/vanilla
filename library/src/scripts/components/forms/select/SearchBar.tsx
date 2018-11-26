@@ -181,6 +181,9 @@ export default class SearchBar extends React.Component<IProps, IState> {
         menu: (provided: React.CSSProperties, state) => {
             return { ...provided, backgroundColor: undefined, boxShadow: undefined };
         },
+        menuList: (provided: React.CSSProperties, state) => {
+            return { ...provided, maxHeight: undefined };
+        },
         control: (provided: React.CSSProperties) => ({
             ...provided,
             borderWidth: 0,

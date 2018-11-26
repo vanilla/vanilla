@@ -144,3 +144,6 @@ $searchBar-searchIcon_space: 32px;
     height: 13px;
 }
 
+.searchBar__menu-list {
+    max-height: calc(100vh - #{$vanillaHeader_height});
+}

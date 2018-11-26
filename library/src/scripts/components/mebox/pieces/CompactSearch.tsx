@@ -24,6 +24,7 @@ export interface ICompactSearchProps extends IApiProps {
     onCloseSearch: () => void;
     cancelButtonClassName?: string;
     buttonClass?: string;
+    resultsRef?: React.RefObject<HTMLDivElement>;
 }
 
 interface IState {
@@ -38,7 +39,6 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
     private id = uniqueIDFromPrefix("compactSearch");
     private openSearchButton: React.RefObject<HTMLButtonElement> = React.createRef();
     private searchInputRef: React.RefObject<SearchBar> = React.createRef();
-    private resultsContainer: React.RefObject<HTMLDivElement> = React.createRef();
     public state: IState = {
         query: "",
         redirectTo: null,
@@ -82,7 +82,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                                 loadOptions={this.props.searchOptionProvider.autocomplete}
                                 ref={this.searchInputRef}
                                 triggerSearchOnAllUpdates={false}
-                                resultsRef={this.resultsContainer}
+                                resultsRef={this.props.resultsRef}
                             />
                             <Button
                                 onClick={this.props.onCloseSearch}
@@ -96,7 +96,6 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                                 {t("Cancel")}
                             </Button>
                         </div>
-                        <div ref={this.resultsContainer} className="searchBar-results" />
                     </React.Fragment>
                 )}
             </div>

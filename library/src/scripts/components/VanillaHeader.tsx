@@ -41,6 +41,7 @@ interface IState {
  * render in a specific div in the default-master.
  */
 export class VanillaHeader extends React.Component<IProps, IState> {
+    private resultsRef: React.RefObject<HTMLDivElement> = React.createRef();
     public state = {
         openSearch: false,
     };
@@ -93,6 +94,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                 onCloseSearch={this.closeSearch}
                                 cancelButtonClassName="vanillaHeader-searchCancel"
                                 buttonClass="vanillaHeader-button"
+                                resultsRef={this.resultsRef}
                             />
                             {!isGuest && (
                                 <React.Fragment>
@@ -129,6 +131,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                         </div>
                     </PanelWidgetHorizontalPadding>
                 </Container>
+                <div ref={this.resultsRef} className="vanillaHeader-results" />
             </header>,
             this.props.container || document.getElementById("vanillaHeader")!,
         );

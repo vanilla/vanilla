@@ -240,7 +240,6 @@ export default class SearchBar extends React.Component<IProps, IState> {
                         <div className="searchBar-iconContainer">{search("searchBar-icon")}</div>
                     </div>
                 </form>
-                <div ref={this.props.resultsRef} className="searchBar-results" />
             </div>
         );
     };
@@ -269,7 +268,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
     private Menu = (props: MenuProps<any>) => {
         return ReactDOM.createPortal(
             <components.Menu {...props} className="suggestedTextInput-menu dropDown-contents isParentWidth" />,
-            this.props.resultsRef!.current,
+            this.props.resultsRef!.current!,
         );
     };
 

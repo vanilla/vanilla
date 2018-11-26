@@ -265,6 +265,8 @@ class ResourceRouteTest extends TestCase {
     }
 
     /**
+     * Test allowing resource routes to specify a root controller.
+     *
      * @param string $method The HTTP method of the request.
      * @param string $path The path to test.
      * @param array|null $expectedCall The expected callback signature in the form `[className, methodName]`.

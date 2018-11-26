@@ -7,8 +7,18 @@
 
 namespace VanillaTests\Fixtures;
 
+/**
+ * Class ArticlesHelpController
+ *
+ * @package VanillaTests\Fixtures
+ */
 class ArticlesHelpController {
-    public function get(int $id) {
 
+    /**
+     * Dummy GET method.
+     *
+     * @param int $id
+     */
+    public function get(int $id) {
     }
 }

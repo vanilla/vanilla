@@ -7,12 +7,24 @@
 
 namespace VanillaTests\Fixtures;
 
+/**
+ * Class RootHelpController
+ *
+ * @package VanillaTests\Fixtures
+ */
 class RootHelpController {
-    public function index() {
 
+    /**
+     * Dummy index method.
+     */
+    public function index() {
     }
 
+    /**
+     * Dummy GET method.
+     *
+     * @param string $code
+     */
     public function get(string $code) {
-
     }
 }

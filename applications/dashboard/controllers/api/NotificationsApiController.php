@@ -22,6 +22,9 @@ class NotificationsApiController extends AbstractApiController {
     /** Default limit on number of rows allowed in a page of a paginated response. */
     const PAGE_SIZE_DEFAULT = 30;
 
+    /** Maximum allowable number of items in a page of a paginated response. */
+    const PAGE_SIZE_MAXIMUM = 100;
+
     /** @var ActivityModel */
     private $activityModel;
 
@@ -79,17 +82,23 @@ class NotificationsApiController extends AbstractApiController {
      * List notifications for the current user.
      *
      * @param array $query
-     * @return array
+     * @return Data
      * @throws \Garden\Schema\ValidationException If the request fails validation.
      * @throws \Garden\Schema\ValidationException If the response fails validation.
      * @throws \Garden\Web\Exception\HttpException If the user has a permission-based ban in their session.
      * @throws \Vanilla\Exception\PermissionException If the user does not have permission to access notifications.
      * @throws \Exception If unable to parse pagination input.
      */
-    public function index(array $query): array {
+    public function index(array $query): Data {
         $this->permission("Garden.SignIn.Allow");
 
         $in = $this->schema([
+            "limit:i?" => [
+                "description" => "Desired number of items per page.",
+                "default" => self::PAGE_SIZE_DEFAULT,
+                "minimum" => 1,
+                "maximum" => self::PAGE_SIZE_MAXIMUM,
+            ],
             "page" => [
                 "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
                 "default" => 1,
@@ -101,7 +110,7 @@ class NotificationsApiController extends AbstractApiController {
         ], "out");
 
         $query = $in->validate($query);
-        list($offset, $limit) = offsetLimit("p".$query["page"], self::PAGE_SIZE_DEFAULT);
+        list($offset, $limit) = offsetLimit("p".$query["page"], $query["limit"]);
 
         $rows = $this->activityModel->getWhere([
             "NotifyUserID" => $this->getSession()->UserID
@@ -111,7 +120,11 @@ class NotificationsApiController extends AbstractApiController {
         }
 
         $result = $out->validate($rows);
-        return $result;
+
+        return new Data(
+            $result,
+            ["paging" => ApiUtils::morePagerInfo($rows, "/api/v2/notifications", $query, $in)]
+        );
     }
 
     /**

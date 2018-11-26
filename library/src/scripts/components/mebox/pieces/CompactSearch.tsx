@@ -49,7 +49,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
         }
 
         return (
-            <div className={classNames("compactSearch", this.props.className)}>
+            <div className={classNames("compactSearch", this.props.className, { isOpen: this.props.open })}>
                 {!this.props.open && (
                     <Button
                         onClick={this.props.onOpenSearch}

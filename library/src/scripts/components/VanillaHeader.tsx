@@ -69,11 +69,13 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                 <Container>
                     <PanelWidgetHorizontalPadding>
                         <div className="vanillaHeader-bar">
-                            <HeaderLogo
-                                {...dummyLogoData}
-                                className="vanillaHeader-headerLogo hasRightMargin"
-                                logoClassName="vanillaHeader-logo"
-                            />
+                            {!this.state.openSearch && (
+                                <HeaderLogo
+                                    {...dummyLogoData}
+                                    className="vanillaHeader-headerLogo hasRightMargin"
+                                    logoClassName="vanillaHeader-logo"
+                                />
+                            )}
                             {!this.state.openSearch &&
                                 !isMobile && (
                                     <VanillaHeaderNav
@@ -104,15 +106,16 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                 contentClassName="vanillaHeader-dropDownContents"
                                             />
                                         )}
-                                    {isMobile && (
-                                        <CompactMeBox
-                                            notificationsProps={notificationProps as INotificationsProps}
-                                            messagesProps={messagesProps as any}
-                                            counts={dummyUserDropDownData}
-                                            buttonClass="vanillaHeader-button"
-                                            userPhotoClass="headerDropDown-user"
-                                        />
-                                    )}
+                                    {isMobile &&
+                                        !this.state.openSearch && (
+                                            <CompactMeBox
+                                                notificationsProps={notificationProps as INotificationsProps}
+                                                messagesProps={messagesProps as any}
+                                                counts={dummyUserDropDownData}
+                                                buttonClass="vanillaHeader-button"
+                                                userPhotoClass="headerDropDown-user"
+                                            />
+                                        )}
                                 </React.Fragment>
                             )}
                             {isGuest && (

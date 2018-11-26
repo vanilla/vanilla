@@ -59,20 +59,24 @@ $suggestedTextInput-clearButton_width: 16px;
 }
 
 .suggestedTextInput-clear {
-    padding: 0;
-    width: $suggestedTextInput-clearButton_width;
-    border-radius: 50%;
-    margin-left: 3px;
-    border: none;
-    opacity: .8;
-
-    &:active,
-    &:hover,
-    &:focus {
+    &,
+    &.buttonIcon {
+        padding: 0;
+        width: $suggestedTextInput-clearButton_width;
+        border-radius: 50%;
+        margin-left: 3px;
         border: none;
-        box-shadow: none;
-        color: $global-color_primary;
-        opacity: 1;
+        opacity: .8;
+        color: $vanillaHeader_fg;
+
+        &:active,
+        &:hover,
+        &:focus {
+            border: none;
+            box-shadow: none;
+            color: $global-color_primary;
+            opacity: 1;
+        }
     }
 }
 

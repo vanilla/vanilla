@@ -131,6 +131,7 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
 
 .vanillaHeader-searchCancel {
     height: $formElement_height;
+    user-select: none;
 }
 
 .vanillaHeader-buttonContent {

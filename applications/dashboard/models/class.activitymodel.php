@@ -1621,6 +1621,19 @@ class ActivityModel extends Gdn_Model {
     }
 
     /**
+     * Update a single activity's notification fields to reflect a read status.
+     *
+     * @param int $activityID
+     */
+    public function markSingleRead(int $activityID) {
+        $this->SQL->put(
+            "Activity",
+            ["Notified" => self::SENT_OK, "Emailed" => self::SENT_OK],
+            ["ActivityID" => $activityID]
+        );
+    }
+
+    /**
      *
      *
      * @param $userID

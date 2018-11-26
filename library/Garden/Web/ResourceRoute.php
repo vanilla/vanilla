@@ -405,6 +405,12 @@ class ResourceRoute extends Route {
 
         if ($method === 'get') {
             $result[] = ['index', null];
+        } elseif ($method === "patch" && empty($pathArgs)) {
+            /**
+             * Kludge to allow patch requests to a resource's index. Necessary because current dispatching cannot
+             * differentiate between an index or resource-specific reqeust by the method name, only its parameters.
+             */
+            $result[] = ['patch_index', null];
         } elseif ($method === 'post' && !empty($pathArgs)) {
             // This is a bit of a kludge to allow POST to be used against the usual PATCH method to allow for
             // multipart/form-data on PATCH (edit) endpoints.

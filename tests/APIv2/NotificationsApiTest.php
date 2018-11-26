@@ -38,6 +38,7 @@ class NotificationsApiTest extends AbstractAPIv2Test {
 
     /**
      * This method is called before a test is executed.
+     *
      * @throws \Garden\Container\ContainerException If an error was encountered while retrieving an entry from the container.
      * @throws \Garden\Container\NotFoundException If unable to find an entry in the container.
      */

@@ -7,7 +7,9 @@
 
 namespace VanillaTests\Library\Garden\Web;
 
-use VanillaTests\SharedBootstrapTestCase;
+use PHPUnit\Framework\TestCase;
+use VanillaTests\Fixtures\RootHelpController;
+use VanillaTests\Fixtures\ArticlesHelpController;
 use Garden\Web\Action;
 use Garden\Web\ResourceRoute;
 use Garden\Web\Route;
@@ -19,7 +21,7 @@ use VanillaTests\Fixtures\Request;
 /**
  * Test the {@link ResourceRoute} class.
  */
-class ResourceRouteTest extends SharedBootstrapTestCase {
+class ResourceRouteTest extends TestCase {
     /**
      * Create a new {@link ResourceRoute} initialized for testing with fixtures.
      */
@@ -260,5 +262,53 @@ class ResourceRouteTest extends SharedBootstrapTestCase {
 
         $a = $route->match($request);
         $this->assertNull($a);
+    }
+
+    /**
+     * @param string $method The HTTP method of the request.
+     * @param string $path The path to test.
+     * @param array|null $expectedCall The expected callback signature in the form `[className, methodName]`.
+     * @param array $expectedArgs The expected arguments.
+     *
+     * @dataProvider provideRootControllerTests
+     */
+    public function testRootController(string $method, string $path, $expectedCall, $expectedArgs = []) {
+        $route = new ResourceRoute(
+            '/help/',
+            '\\VanillaTests\\Fixtures\\%sHelpController'
+        );
+        $route->setRootController(RootHelpController::class);
+
+        $request = new Request($path, $method, $method === 'GET' ? [] : ['!']);
+
+        $match = $route->match($request);
+
+        if ($expectedCall === null) {
+            $this->assertNull($match);
+        } else {
+            $this->assertInstanceOf(Action::class, $match, "The route was supposed to match and return an array.");
+            $callback = $match->getCallback();
+            $this->assertSame($expectedCall[0], get_class($callback[0]));
+            $this->assertEquals(strtolower($expectedCall[1]), strtolower($callback[1]));
+            $this->assertEquals((array)$expectedArgs, $match->getArgs());
+        }
+    }
+
+    /**
+     * Provide path mapping tests.
+     *
+     * @return array Returns a data provider.
+     */
+    public function provideRootControllerTests() {
+        $ac = ArticlesHelpController::class;
+        $rc = RootHelpController::class;
+
+        $r = [
+            'non-root' => ['GET', '/help/articles/123', [$ac, 'get'], ['id' => 123]],
+            'root-index' => ['GET', '/help', [$rc, 'index']],
+            'root-get' => ['GET', '/help/something', [$rc, 'get'], ['code' => 'something']],
+        ];
+
+        return $r;
     }
 }

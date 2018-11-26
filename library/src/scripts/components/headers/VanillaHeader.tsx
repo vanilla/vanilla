@@ -6,24 +6,24 @@
 
 import * as React from "react";
 import ReactDOM from "react-dom";
-import MeBox from "../mebox/MeBox";
-import { dummyLogoData } from "../mebox/state/dummyLogoData";
-import { dummyNotificationsData } from "../mebox/state/dummyNotificationsData";
-import { dummyMessagesData } from "../mebox/state/dummyMessagesData";
-import { dummyGuestNavigationData, dummyNavigationData } from "../mebox/state/dummyNavigationData";
-import { Devices, IDeviceProps } from "../DeviceChecker";
-import { withDevice } from "../../contexts/DeviceContext";
-import { dummyUserDropDownData } from "../mebox/state/dummyUserDropDownData";
-import UsersModel, { IInjectableUserState } from "../../users/UsersModel";
+import MeBox from "@library/components/mebox/MeBox";
+import { dummyLogoData } from "@library/components/mebox/state/dummyLogoData";
+import { dummyNotificationsData } from "@library/components/mebox/state/dummyNotificationsData";
+import { dummyMessagesData } from "@library/components/mebox/state/dummyMessagesData";
+import { dummyGuestNavigationData, dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
+import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
+import { withDevice } from "@library/contexts/DeviceContext";
+import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
 import classNames from "classnames";
-import Container from "../layouts/components/Container";
-import { PanelWidgetHorizontalPadding } from "../layouts/PanelLayout";
-import HeaderLogo from "../mebox/pieces/HeaderLogo";
-import VanillaHeaderNav from "../mebox/pieces/VanillaHeaderNav";
-import CompactSearch from "../mebox/pieces/CompactSearch";
-import CompactMeBox from "../mebox/pieces/CompactMeBox";
+import Container from "@library/components/layouts/components/Container";
+import { PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
+import HeaderLogo from "@library/components/mebox/pieces/HeaderLogo";
+import VanillaHeaderNav from "@library/components/mebox/pieces/VanillaHeaderNav";
+import CompactSearch from "@library/components/mebox/pieces/CompactSearch";
+import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
 import { connect } from "react-redux";
-import { INotificationsProps } from "../mebox/pieces/NotificationsContents";
+import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
+import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.

@@ -29,6 +29,7 @@ export interface IUserDropDownProps extends IInjectableUserState, IUserDropDownC
     className?: string;
     countsClass?: string;
     buttonClassName?: string;
+    contentsClassName?: string;
 }
 
 interface IState {
@@ -60,7 +61,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                 name={t("My Account")}
                 className={classNames("userDropDown", this.props.className)}
                 buttonClassName={classNames("vanillaHeader-account", this.props.buttonClassName)}
-                contentsClassName="userDropDown-contents"
+                contentsClassName={classNames("userDropDown-contents", this.props.contentsClassName)}
                 renderLeft={true}
                 buttonContents={
                     <div className="meBox-buttonContent">

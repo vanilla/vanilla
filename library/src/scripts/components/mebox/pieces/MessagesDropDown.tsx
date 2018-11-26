@@ -9,14 +9,13 @@ import classNames from "classnames";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DropDown from "@library/components/dropdown/DropDown";
 import { t } from "@library/application";
-import { messages } from "@library/components/icons/header";
-import Count from "@library/components/mebox/pieces/Count";
 import MessagesContents, { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
 import MessagesToggle from "@library/components/mebox/pieces/MessagesToggle";
 
 interface IProps extends IMessagesContentsProps {
     className?: string;
     buttonClassName?: string;
+    contentsClassName?: string;
 }
 
 interface IState {
@@ -41,7 +40,7 @@ export default class MessagesDropDown extends React.Component<IProps, IState> {
                 name={t("Messages")}
                 buttonClassName={classNames("vanillaHeader-messages", this.props.buttonClassName)}
                 renderLeft={true}
-                contentsClassName={"vanillaHeader-dropDownContents"}
+                contentsClassName={this.props.contentsClassName}
                 toggleButtonClassName="vanillaHeader-button"
                 buttonContents={
                     <MessagesToggle

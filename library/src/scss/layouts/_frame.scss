@@ -103,6 +103,12 @@ $frame-panel_minHeight: 500px;
             right: 0;
         }
     }
+
+    &.inheritHeight {
+        .framePanel {
+            max-height: 100%;
+        }
+    }
 }
 
 .frameBody-noContentMessage {

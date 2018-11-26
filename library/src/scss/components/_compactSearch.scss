@@ -24,13 +24,16 @@
             opacity: 1;
         }
     }
+
+    &.isOpen {
+        width: 100%;
+    }
 }
 
 .compactSearch-contents {
     display: flex;
     align-items: center;
     flex-wrap: nowrap;
-    min-width: 300px;
 }
 
 
@@ -39,5 +42,3 @@
     white-space: nowrap;
     font-weight: $global_fontWeight_semiBold;
 }
-
-

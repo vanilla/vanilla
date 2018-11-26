@@ -16,7 +16,7 @@ interface IProps extends IOptionalComponentID {
     prefix?: string;
     legacyMode?: boolean;
     onClick?: (e) => void;
-    onKeyDown?: () => void;
+    onKeyDown?: (e) => void;
     title?: string;
     ariaLabel?: string;
     baseClass?: ButtonBaseClass;

@@ -124,7 +124,12 @@ $searchBar-searchIcon_space: 32px;
 }
 
 .searchBar-valueContainer.suggestedTextInput-inputText.inputText {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
     padding-left: $searchBar-searchIcon_space;
+
 }
 
 .searchBar-iconContainer {
@@ -142,4 +147,8 @@ $searchBar-searchIcon_space: 32px;
 .searchBar-icon {
     width: 13px;
     height: 13px;
+}
+
+.searchBar__menu-list {
+    max-height: calc(100vh - #{$vanillaHeader_height});
 }

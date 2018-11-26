@@ -14,7 +14,6 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import SearchOption from "@library/components/search/SearchOption";
 import { withApi, IApiProps } from "@library/contexts/ApiContext";
 import { Redirect } from "react-router-dom";
-import AsyncCreatableSelect from "react-select/lib/AsyncCreatable";
 
 export interface ICompactSearchProps extends IApiProps {
     className?: string;
@@ -24,6 +23,10 @@ export interface ICompactSearchProps extends IApiProps {
     onCloseSearch: () => void;
     cancelButtonClassName?: string;
     buttonClass?: string;
+    resultsRef?: React.RefObject<HTMLDivElement>;
+    showingSuggestions?: boolean;
+    onOpenSuggestions?: () => void;
+    onCloseSuggestions?: () => void;
 }
 
 interface IState {
@@ -49,7 +52,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
         }
 
         return (
-            <div className={classNames("compactSearch", this.props.className)}>
+            <div className={classNames("compactSearch", this.props.className, { isOpen: this.props.open })}>
                 {!this.props.open && (
                     <Button
                         onClick={this.props.onOpenSearch}
@@ -80,6 +83,10 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                             loadOptions={this.props.searchOptionProvider.autocomplete}
                             ref={this.searchInputRef}
                             triggerSearchOnAllUpdates={false}
+                            resultsRef={this.props.resultsRef}
+                            handleOnKeyDown={this.handleKeyDown}
+                            onOpenSuggestions={this.props.onOpenSuggestions}
+                            onCloseSuggestions={this.props.onCloseSuggestions}
                         />
                         <Button
                             onClick={this.props.onCloseSearch}
@@ -115,6 +122,20 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
             this.openSearchButton.current!.focus();
         }
     }
+
+    /**
+     * Keyboard handler
+     * @param event
+     */
+    private handleKeyDown = (event: React.KeyboardEvent) => {
+        if (!this.props.showingSuggestions) {
+            switch (event.key) {
+                case "Escape":
+                    this.props.onCloseSearch();
+                    break;
+            }
+        }
+    };
 }
 
 export default withApi<ICompactSearchProps>(CompactSearch);

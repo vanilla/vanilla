@@ -24,6 +24,7 @@ import CompactSearch from "@library/components/mebox/pieces/CompactSearch";
 import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
 import { connect } from "react-redux";
 import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
+import TabHandler from "@library/TabHandler";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -33,6 +34,7 @@ interface IProps extends IDeviceProps, IInjectableUserState {
 
 interface IState {
     openSearch: boolean;
+    showingSuggestions: boolean;
 }
 
 /**
@@ -41,8 +43,10 @@ interface IState {
  * render in a specific div in the default-master.
  */
 export class VanillaHeader extends React.Component<IProps, IState> {
+    private resultsRef: React.RefObject<HTMLDivElement> = React.createRef();
     public state = {
         openSearch: false,
+        showingSuggestions: false,
     };
     public render() {
         const currentUser = this.props.currentUser.data;
@@ -69,11 +73,13 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                 <Container>
                     <PanelWidgetHorizontalPadding>
                         <div className="vanillaHeader-bar">
-                            <HeaderLogo
-                                {...dummyLogoData}
-                                className="vanillaHeader-headerLogo hasRightMargin"
-                                logoClassName="vanillaHeader-logo"
-                            />
+                            {!this.state.openSearch && (
+                                <HeaderLogo
+                                    {...dummyLogoData}
+                                    className="vanillaHeader-headerLogo hasRightMargin"
+                                    logoClassName="vanillaHeader-logo"
+                                />
+                            )}
                             {!this.state.openSearch &&
                                 !isMobile && (
                                     <VanillaHeaderNav
@@ -91,6 +97,10 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                 onCloseSearch={this.closeSearch}
                                 cancelButtonClassName="vanillaHeader-searchCancel"
                                 buttonClass="vanillaHeader-button"
+                                resultsRef={this.resultsRef}
+                                showingSuggestions={this.state.showingSuggestions}
+                                onOpenSuggestions={this.setOpenSuggestions}
+                                onCloseSuggestions={this.setCloseSuggestions}
                             />
                             {!isGuest && (
                                 <React.Fragment>
@@ -101,17 +111,19 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                 messagesProps={messagesProps as any}
                                                 counts={dummyUserDropDownData}
                                                 buttonClassName="vanillaHeader-button"
+                                                contentClassName="vanillaHeader-dropDownContents"
                                             />
                                         )}
-                                    {isMobile && (
-                                        <CompactMeBox
-                                            notificationsProps={notificationProps as INotificationsProps}
-                                            messagesProps={messagesProps as any}
-                                            counts={dummyUserDropDownData}
-                                            buttonClass="vanillaHeader-button"
-                                            userPhotoClass="headerDropDown-user"
-                                        />
-                                    )}
+                                    {isMobile &&
+                                        !this.state.openSearch && (
+                                            <CompactMeBox
+                                                notificationsProps={notificationProps as INotificationsProps}
+                                                messagesProps={messagesProps as any}
+                                                counts={dummyUserDropDownData}
+                                                buttonClass="vanillaHeader-button"
+                                                userPhotoClass="headerDropDown-user"
+                                            />
+                                        )}
                                 </React.Fragment>
                             )}
                             {isGuest && (
@@ -125,6 +137,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                         </div>
                     </PanelWidgetHorizontalPadding>
                 </Container>
+                <div ref={this.resultsRef} className="vanillaHeader-results" />
             </header>,
             this.props.container || document.getElementById("vanillaHeader")!,
         );
@@ -142,12 +155,23 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         });
     };
 
-    // Todo: remove
-    public componentDidMount() {
-        setTimeout(() => {
-            window.dispatchEvent(new Event("resize"));
-        }, 200);
-    }
+    /**
+     * Keep track of visibility of suggestions
+     */
+    public setOpenSuggestions = () => {
+        this.setState({
+            showingSuggestions: true,
+        });
+    };
+
+    /**
+     * Keep track of visibility of suggestions
+     */
+    public setCloseSuggestions = () => {
+        this.setState({
+            showingSuggestions: false,
+        });
+    };
 }
 
 const withRedux = connect(UsersModel.mapStateToProps);

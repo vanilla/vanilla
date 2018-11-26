@@ -13,11 +13,18 @@ import { connect } from "react-redux";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import get from "lodash/get";
 import classNames from "classnames";
+import Tabs from "@library/components/tabs/Tabs";
 import Modal from "@library/components/modal/Modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import CloseButton from "@library/components/CloseButton";
+import { user } from "@library/components/icons/header";
+import UserDropdownContents from "@library/components/mebox/pieces/UserDropdownContents";
+import NotificationsToggle from "@library/components/mebox/pieces/NotificationsToggle";
+import MessagesToggle from "@library/components/mebox/pieces/MessagesToggle";
 import { IMeBoxProps } from "@library/components/mebox/MeBox";
+import NotificationsContents from "@library/components/mebox/pieces/NotificationsContents";
+import MessagesContents from "@library/components/mebox/pieces/MessagesContents";
 
 export interface IUserDropDownProps extends IInjectableUserState, IMeBoxProps {
     buttonClass?: string;
@@ -49,6 +56,8 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
         const { counts } = this.props;
         const countClass = this.props.countsClass;
         const buttonClass = this.props.buttonClass;
+        const panelContentClass = "compactMeBox-panel inheritHeight";
+        const panelBodyClass = "compactMeBox-body inheritHeight";
 
         return (
             <div className={classNames("compactMeBox", this.props.className)}>
@@ -76,7 +85,89 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                         exitHandler={this.close}
                     >
                         <div className="compactMeBox-contents">
-                            <CloseButton onClick={this.close} />
+                            <CloseButton onClick={this.close} className="compactMeBox-closeModal" />
+                            <Tabs
+                                label={t("My Account Tab")}
+                                className="compactMeBox-tabs inheritHeight"
+                                tabListClass="compactMeBox-tabList"
+                                tabPanelsClass="compactMeBox-tabPanels inheritHeight"
+                                tabPanelClass="compactMeBox-tabPanel inheritHeight"
+                                buttonClass={classNames(buttonClass, "compactMeBox-tabButton")}
+                                tabs={[
+                                    {
+                                        buttonContent: (
+                                            <div className="compactSearch-tabButtonContent">
+                                                {user(false, "userPhoto-photo")}
+                                            </div>
+                                        ),
+                                        openButtonContent: (
+                                            <div className="compactSearch-tabButtonContent">
+                                                {user(true, "userPhoto-photo")}
+                                            </div>
+                                        ),
+                                        panelContent: (
+                                            <UserDropdownContents
+                                                counts={counts}
+                                                className={panelContentClass}
+                                                panelBodyClass={panelBodyClass}
+                                            />
+                                        ),
+                                    },
+                                    {
+                                        buttonContent: (
+                                            <NotificationsToggle
+                                                open={false}
+                                                className="compactSearch-tabButtonContent"
+                                                count={this.props.notificationsProps.count}
+                                                countClass={this.props.notificationsProps.countClass}
+                                            />
+                                        ),
+                                        openButtonContent: (
+                                            <NotificationsToggle
+                                                open={true}
+                                                className="compactSearch-tabButtonContent"
+                                                count={this.props.notificationsProps.count}
+                                                countClass={this.props.notificationsProps.countClass}
+                                            />
+                                        ),
+                                        panelContent: (
+                                            <NotificationsContents
+                                                {...this.props.notificationsProps}
+                                                countClass={countClass}
+                                                className={panelContentClass}
+                                                panelBodyClass={panelBodyClass}
+                                            />
+                                        ),
+                                    },
+                                    {
+                                        buttonContent: (
+                                            <MessagesToggle
+                                                open={false}
+                                                className="compactSearch-tabButtonContent"
+                                                count={this.props.messagesProps.count}
+                                                countClass={this.props.messagesProps.countClass}
+                                            />
+                                        ),
+                                        openButtonContent: (
+                                            <MessagesToggle
+                                                open={true}
+                                                className="compactSearch-tabButtonContent"
+                                                count={this.props.messagesProps.count}
+                                                countClass={this.props.messagesProps.countClass}
+                                            />
+                                        ),
+                                        panelContent: (
+                                            <MessagesContents
+                                                count={this.props.messagesProps.count}
+                                                countClass={this.props.countsClass}
+                                                data={this.props.messagesProps.data}
+                                                className={panelContentClass}
+                                                panelBodyClass={panelBodyClass}
+                                            />
+                                        ),
+                                    },
+                                ]}
+                            />
                         </div>
                     </Modal>
                 )}

@@ -19,6 +19,7 @@ export interface IMeBoxProps {
     counts: any;
     countsClass?: string;
     buttonClassName?: string;
+    contentClassName?: string;
 }
 
 /**
@@ -28,23 +29,27 @@ export default class MeBox extends React.Component<IMeBoxProps> {
     public render() {
         const countClass = this.props.countsClass;
         const buttonClassName = this.props.buttonClassName;
+        const contentClassName = this.props.contentClassName;
         return (
             <div className={classNames("meBox", this.props.className)}>
                 <NotificationsDropdown
                     {...this.props.notificationsProps}
                     countClass={countClass}
                     buttonClassName={buttonClassName}
+                    contentsClassName={contentClassName}
                 />
                 <MessagesDropDown
                     {...this.props.messagesProps}
                     countClass={countClass}
                     buttonClassName={buttonClassName}
+                    contentsClassName={contentClassName}
                 />
                 <UserDropdown
                     counts={this.props.counts}
                     className="meBox-userDropdown"
                     countsClass={countClass}
                     buttonClassName={buttonClassName}
+                    contentsClassName={contentClassName}
                 />
             </div>
         );

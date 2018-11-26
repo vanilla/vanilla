@@ -9,8 +9,6 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DropDown from "@library/components/dropdown/DropDown";
 import { t } from "@library/application";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import { notifications } from "@library/components/icons/header";
-import Count from "@library/components/mebox/pieces/Count";
 import classNames from "classnames";
 import NotificationsContents, { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
 import NotificationsToggle from "@library/components/mebox/pieces/NotificationsToggle";
@@ -18,6 +16,7 @@ import NotificationsToggle from "@library/components/mebox/pieces/NotificationsT
 interface IProps extends INotificationsProps {
     className?: string;
     buttonClassName?: string;
+    contentsClassName?: string;
 }
 
 interface IState {
@@ -43,7 +42,7 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
                 buttonClassName={classNames("vanillaHeader-notifications", this.props.buttonClassName)}
                 buttonBaseClass={ButtonBaseClass.CUSTOM}
                 renderLeft={true}
-                contentsClassName="meBox-dropDownContents"
+                contentsClassName={this.props.contentsClassName}
                 buttonContents={
                     <NotificationsToggle
                         count={this.props.count}

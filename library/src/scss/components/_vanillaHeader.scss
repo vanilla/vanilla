@@ -14,7 +14,7 @@ $vanillaHeader-count_fontSize: 10px;
 $vanillaHeader-count_bg: #D0021B;
 $vanillaHeader-count_fg: $vanillaHeader_fg;
 
-$vanillaHeader-dropDownContents_minWidth: 300px;
+$vanillaHeader-dropDownContents_minWidth: 350px;
 
 
 .vanillaHeader {
@@ -131,6 +131,7 @@ $vanillaHeader-dropDownContents_minWidth: 300px;
 
 .vanillaHeader-searchCancel {
     height: $formElement_height;
+    user-select: none;
 }
 
 .vanillaHeader-buttonContent {
@@ -146,7 +147,7 @@ $vanillaHeader-dropDownContents_minWidth: 300px;
     overflow: hidden;
 }
 
-.dropDown-contents {
+.dropDown-contents.vanillaHeader-dropDownContents {
     min-width: $vanillaHeader-dropDownContents_minWidth;
 }
 
@@ -159,4 +160,8 @@ $vanillaHeader-dropDownContents_minWidth: 300px;
     font-size: $vanillaHeader-count_fontSize;
     background-color: $vanillaHeader-count_bg;
     color: $vanillaHeader-count_fg;
+}
+
+.vanillaHeader-results {
+    position: relative;
 }

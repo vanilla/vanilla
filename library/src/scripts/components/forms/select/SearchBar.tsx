@@ -20,6 +20,8 @@ import Translate from "@library/components/translation/Translate";
 import { ClearButton } from "@library/components/forms/select/ClearButton";
 import ConditionalWrap from "@library/components/ConditionalWrap";
 import { search } from "@library/components/icons/header";
+import { MenuProps } from "react-select/lib/components/Menu";
+import ReactDOM from "react-dom";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;
@@ -45,6 +47,7 @@ interface IProps extends IOptionalComponentID {
     buttonClassName?: string;
     hideSearchButton?: boolean;
     triggerSearchOnAllUpdates?: boolean;
+    resultsRef?: React.RefObject<HTMLDivElement>;
 }
 
 interface IState {
@@ -196,46 +199,49 @@ export default class SearchBar extends React.Component<IProps, IState> {
      */
     private SearchControl = props => {
         return (
-            <form className="searchBar-form" onSubmit={this.onFormSubmit}>
-                {!this.props.noHeading && (
-                    <Heading depth={1} className="searchBar-heading">
-                        <label className="searchBar-label" htmlFor={this.searchInputID}>
-                            {this.props.title}
-                        </label>
-                    </Heading>
-                )}
-                <div className="searchBar-content">
-                    <div
-                        className={classNames(
-                            `${this.prefix}-valueContainer`,
-                            "suggestedTextInput-inputText",
-                            "inputText",
-                            "isClearable",
-                            {
-                                isLarge: this.props.isBigInput,
-                            },
-                        )}
-                    >
-                        <components.Control {...props} />
-                        {this.props.value && <ClearButton onClick={this.clear} />}
-                    </div>
-                    <ConditionalWrap condition={!!this.props.hideSearchButton} className="sr-only">
-                        <Button
-                            type="submit"
-                            id={this.searchButtonID}
+            <div className="searchBar">
+                <form className="searchBar-form" onSubmit={this.onFormSubmit}>
+                    {!this.props.noHeading && (
+                        <Heading depth={1} className="searchBar-heading">
+                            <label className="searchBar-label" htmlFor={this.searchInputID}>
+                                {this.props.title}
+                            </label>
+                        </Heading>
+                    )}
+                    <div className="searchBar-content">
+                        <div
                             className={classNames(
-                                "buttonPrimary",
-                                "searchBar-submitButton",
-                                this.props.buttonClassName,
+                                `${this.prefix}-valueContainer`,
+                                "suggestedTextInput-inputText",
+                                "inputText",
+                                "isClearable",
+                                {
+                                    isLarge: this.props.isBigInput,
+                                },
                             )}
-                            tabIndex={!!this.props.hideSearchButton ? -1 : 0}
                         >
-                            {this.props.isLoading ? <ButtonLoader /> : t("Search")}
-                        </Button>
-                    </ConditionalWrap>
-                    <div className="searchBar-iconContainer">{search("searchBar-icon")}</div>
-                </div>
-            </form>
+                            <components.Control {...props} />
+                            {this.props.value && <ClearButton onClick={this.clear} />}
+                        </div>
+                        <ConditionalWrap condition={!!this.props.hideSearchButton} className="sr-only">
+                            <Button
+                                type="submit"
+                                id={this.searchButtonID}
+                                className={classNames(
+                                    "buttonPrimary",
+                                    "searchBar-submitButton",
+                                    this.props.buttonClassName,
+                                )}
+                                tabIndex={!!this.props.hideSearchButton ? -1 : 0}
+                            >
+                                {this.props.isLoading ? <ButtonLoader /> : t("Search")}
+                            </Button>
+                        </ConditionalWrap>
+                        <div className="searchBar-iconContainer">{search("searchBar-icon")}</div>
+                    </div>
+                </form>
+                <div ref={this.props.resultsRef} className="searchBar-results" />
+            </div>
         );
     };
 
@@ -256,13 +262,24 @@ export default class SearchBar extends React.Component<IProps, IState> {
         this.props.onSearch();
     };
 
+    /**
+     * Pass menu function with ref to results container
+     */
+
+    private Menu = (props: MenuProps<any>) => {
+        return ReactDOM.createPortal(
+            <components.Menu {...props} className="suggestedTextInput-menu dropDown-contents isParentWidth" />,
+            this.props.resultsRef!.current,
+        );
+    };
+
     /*
     * Overwrite components in Select component
     */
     private componentOverwrites = {
         Control: this.SearchControl,
         IndicatorSeparator: selectOverrides.NullComponent,
-        Menu: selectOverrides.Menu,
+        Menu: !!this.props.resultsRef ? this.Menu : selectOverrides.Menu,
         MenuList: selectOverrides.MenuList,
         Option: this.props.optionComponent!,
         NoOptionsMessage: selectOverrides.NoOptionsMessage,

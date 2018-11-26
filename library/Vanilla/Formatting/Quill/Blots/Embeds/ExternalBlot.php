@@ -38,7 +38,10 @@ class ExternalBlot extends AbstractBlot {
         string $parseMode = Parser::PARSE_MODE_NORMAL
     ) {
         parent::__construct($currentOperation, $previousOperation, $nextOperation, $parseMode);
-
+        $this->content = $this->currentOperation["insert"]["embed-external"]['data']['url'] ?? '';
+        if ($this->content !== '') {
+            $this->content .= "\n";
+        }
         /** @var EmbedManager embedManager */
         $this->embedManager = Gdn::getContainer()->get(EmbedManager::class);
     }

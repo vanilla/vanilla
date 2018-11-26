@@ -29,7 +29,6 @@ import TabHandler from "@library/TabHandler";
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
     className?: string;
-    homePage?: boolean;
 }
 
 interface IState {

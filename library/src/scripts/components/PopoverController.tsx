@@ -10,6 +10,9 @@ import classNames from "classnames";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import FocusWatcher from "@library/FocusWatcher";
 import EscapeListener from "@library/EscapeListener";
+import Modal from "@library/components/modal/Modal";
+import { t } from "@library/application";
+import ModalSizes from "@library/components/modal/ModalSizes";
 
 export interface IPopoverControllerChildParameters {
     id: string;
@@ -35,6 +38,7 @@ export interface IPopoverControllerProps {
     PopoverController?: string;
     toggleButtonClassName?: string;
     setExternalButtonRef?: (ref: React.RefObject<HTMLButtonElement>) => void;
+    openAsModal?: boolean;
 }
 
 export interface IPopoverControllerPropsWithIcon extends IPopoverControllerProps {
@@ -71,10 +75,23 @@ export default class PopoverController extends React.PureComponent<
 
         const title = "name" in this.props ? this.props.name : this.props.selectedItemLabel;
 
+        const childrenData = {
+            id: this.contentID,
+            initialFocusRef: this.initalFocusRef,
+            isVisible: this.state.isVisible,
+            closeMenuHandler: this.closeMenuHandler,
+            renderAbove: this.props.renderAbove,
+            renderLeft: this.props.renderLeft,
+            openAsModal: this.props.openAsModal,
+        };
+
         return (
             <div
                 id={this.state.id}
-                className={classNames("dropDown", this.props.className)}
+                className={classNames(
+                    { dropDown: !this.props.openAsModal, asModal: this.props.openAsModal },
+                    this.props.className,
+                )}
                 ref={this.controllerRef}
                 onClick={this.stopPropagation}
             >
@@ -94,15 +111,23 @@ export default class PopoverController extends React.PureComponent<
                 >
                     {this.props.buttonContents}
                 </Button>
+
                 {!this.props.disabled &&
-                    this.props.children({
-                        id: this.contentID,
-                        initialFocusRef: this.initalFocusRef,
-                        isVisible: this.state.isVisible,
-                        closeMenuHandler: this.closeMenuHandler,
-                        renderAbove: this.props.renderAbove,
-                        renderLeft: this.props.renderLeft,
-                    })}
+                    this.state.isVisible && (
+                        <React.Fragment>
+                            {!this.props.openAsModal && this.props.children(childrenData)}
+                            {this.props.openAsModal && (
+                                <Modal
+                                    label={t("title")}
+                                    size={ModalSizes.SMALL}
+                                    exitHandler={this.closeMenuHandler}
+                                    elementToFocusOnExit={this.buttonRef.current!}
+                                >
+                                    {this.props.children(childrenData)}
+                                </Modal>
+                            )}
+                        </React.Fragment>
+                    )}
             </div>
         );
     }

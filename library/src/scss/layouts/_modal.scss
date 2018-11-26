@@ -35,6 +35,9 @@ $modal-dropDown_padding: $global_spacer;
         width: $modal-small_width;
     }
 
+    &.isSidePanel {
+        margin-left: $modal-dropDown_padding;
+    }
     &.isPseudoDropDown {
         margin-left: $modal-dropDown_padding;
     }

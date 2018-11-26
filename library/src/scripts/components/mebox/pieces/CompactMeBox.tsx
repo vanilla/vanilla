@@ -78,7 +78,7 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                 </Button>
                 {this.state.open && (
                     <Modal
-                        size={ModalSizes.PSEUDO_DROP_DOWN}
+                        size={ModalSizes.MODAL_AS_SIDE_PANEL}
                         label={t("Article Revisions")}
                         elementToFocusOnExit={this.buttonRef.current!}
                         className="compactMeBox-modal"

@@ -68,40 +68,38 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                     </Button>
                 )}
                 {this.props.open && (
-                    <React.Fragment>
-                        <div className={classNames("compactSearch-contents")}>
-                            <SearchBar
-                                id={this.id}
-                                placeholder={this.props.placeholder}
-                                optionComponent={SearchOption}
-                                noHeading={true}
-                                title={t("Search")}
-                                value={this.state.query}
-                                disabled={!this.props.open}
-                                hideSearchButton={true}
-                                onChange={this.searchChangeHandler}
-                                onSearch={this.submitHandler}
-                                loadOptions={this.props.searchOptionProvider.autocomplete}
-                                ref={this.searchInputRef}
-                                triggerSearchOnAllUpdates={false}
-                                resultsRef={this.props.resultsRef}
-                                handleOnKeyDown={this.handleKeyDown}
-                                onOpenSuggestions={this.props.onOpenSuggestions}
-                                onCloseSuggestions={this.props.onCloseSuggestions}
-                            />
-                            <Button
-                                onClick={this.props.onCloseSearch}
-                                className={classNames("compactSearch-close", this.props.cancelButtonClassName)}
-                                title={t("Search")}
-                                aria-expanded={true}
-                                aria-haspopup="true"
-                                aria-controls={this.id}
-                                baseClass={ButtonBaseClass.CUSTOM}
-                            >
-                                {t("Cancel")}
-                            </Button>
-                        </div>
-                    </React.Fragment>
+                    <div className={classNames("compactSearch-contents")}>
+                        <SearchBar
+                            id={this.id}
+                            placeholder={this.props.placeholder}
+                            optionComponent={SearchOption}
+                            noHeading={true}
+                            title={t("Search")}
+                            value={this.state.query}
+                            disabled={!this.props.open}
+                            hideSearchButton={true}
+                            onChange={this.searchChangeHandler}
+                            onSearch={this.submitHandler}
+                            loadOptions={this.props.searchOptionProvider.autocomplete}
+                            ref={this.searchInputRef}
+                            triggerSearchOnAllUpdates={false}
+                            resultsRef={this.props.resultsRef}
+                            handleOnKeyDown={this.handleKeyDown}
+                            onOpenSuggestions={this.props.onOpenSuggestions}
+                            onCloseSuggestions={this.props.onCloseSuggestions}
+                        />
+                        <Button
+                            onClick={this.props.onCloseSearch}
+                            className={classNames("compactSearch-close", this.props.cancelButtonClassName)}
+                            title={t("Search")}
+                            aria-expanded={true}
+                            aria-haspopup="true"
+                            aria-controls={this.id}
+                            baseClass={ButtonBaseClass.CUSTOM}
+                        >
+                            {t("Cancel")}
+                        </Button>
+                    </div>
                 )}
             </div>
         );

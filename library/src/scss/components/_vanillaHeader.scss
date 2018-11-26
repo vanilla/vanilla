@@ -15,6 +15,7 @@ $vanillaHeader-count_bg: #D0021B;
 $vanillaHeader-count_fg: $vanillaHeader_fg;
 
 $vanillaHeader-dropDownContents_minWidth: 350px;
+$vanillaHeader-button_mobile_fontSize: 16px;
 
 
 .vanillaHeader {
@@ -33,7 +34,10 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
             color: $vanillaHeader-fg;
         }
     }
+}
 
+.vanillaHeaderHome {
+    min-height: $vanillaHeader_mobile_height * 2;
 }
 
 .vanillaHeader-bar {
@@ -41,6 +45,14 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
     justify-content: flex-start;
     align-items: center;
     min-height: $vanillaHeader_height;
+
+    &.isHome {
+        justify-content: space-between;
+    }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        min-height: $vanillaHeader_mobile_height;
+    }
 }
 
 .vanillaHeader-headerLogo {
@@ -57,14 +69,11 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
     display: flex;
     flex-wrap: wrap;
     height: 100%;
+    width: 100%;
     color: inherit;
 }
 
 .vanillaHeader-locales {
-    margin-left: auto;
-}
-
-.vanillaHeader-localesToggle {
     height: $vanillaHeader_height;
 
     &.buttonAsText {
@@ -72,6 +81,10 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
         &:focus {
             color: inherit;
         }
+    }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        height: $vanillaHeader_mobile_height;
     }
 }
 
@@ -94,7 +107,6 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
 .vanillaHeader-localeToggle,
 .vanillaHeader-navLink {
     color: inherit;
-    height: $vanillaHeader-button_size;
     padding: 0 $vanillaHeader-spacer_width;
     border-radius: $vanillaHeader-button_borderRadius;
 
@@ -104,9 +116,20 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
         background-color: rgba(#000, .1);
         border-radius: $vanillaHeader-button_borderRadius;
     }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        font-size: $vanillaHeader-button_mobile_fontSize;
+        white-space: nowrap;
+    }
 }
 
+.vanillaHeader-localeToggle {
+    height: $vanillaHeader_height;
 
+    @include mediaQuery-panelLayout_oneColumn {
+        height: $vanillaHeader_mobile_height;
+    }
+}
 
 .vanillaHeader-languages {
     margin-left: auto;
@@ -126,6 +149,10 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
             background-color: rgba(#000, .1);
             border-radius: $vanillaHeader-button_borderRadius;
         }
+    }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        height: $vanillaHeader_mobile_height;
     }
 }
 
@@ -164,4 +191,23 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
 
 .vanillaHeader-results {
     position: relative;
+}
+
+// Home - Mobile
+
+.vanillaHeader-horizontalScroll {
+    overflow-x: auto;
+}
+
+.vanillaHeaderHome-bottom {
+    background-color: rgba($vanillaHeader_fg, .1);
+}
+
+.vanillaHeaderHome-left {
+    width: $vanillaHeader-button_size;
+    flex-basis: $vanillaHeader-button_size;
+}
+
+.vanillaHeader-horizontalScrollWrap {
+    display: block;
 }

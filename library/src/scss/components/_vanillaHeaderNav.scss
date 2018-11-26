@@ -8,20 +8,27 @@ $vanillaHeaderNav-vertical_borderWidth: 2px;
 $vanillaHeaderNav-active_borderColor: rgba($global-color_bg, .9);
 $vanillaHeaderNav-active_bottomOffset: 2px;
 
-.vanillaHeader-nav {
-    margin-right: auto;
-}
 
 .headerNavigation-items {
     display: flex;
     flex-wrap: wrap;
     height: 100%;
     color: inherit;
+
+    &.isScrolled {
+        align-items: center;
+        justify-content: center;
+        flex-wrap: nowrap;
+    }
 }
 
 .vanillaHeaderNav-item {
     @include flexCenterContent;
     height: $vanillaHeader_height;
+
+    @include mediaQuery-panelLayout_oneColumn {
+        height: $vanillaHeader_mobile_height;
+    }
 }
 
 .vanillaHeaderNav-link {
@@ -29,6 +36,11 @@ $vanillaHeaderNav-active_bottomOffset: 2px;
     justify-content: center;
     align-items: stretch;
     color: inherit;
+    height: $vanillaHeader_height;
+
+    @include mediaQuery-panelLayout_oneColumn {
+        height: $vanillaHeader_mobile_height;
+    }
 }
 
 .vanillaHeaderNav-linkContent {
@@ -59,3 +71,4 @@ $vanillaHeaderNav-active_bottomOffset: 2px;
         }
     }
 }
+

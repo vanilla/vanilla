@@ -5,8 +5,6 @@
  */
 
 import * as React from "react";
-import { uniqueIDFromPrefix } from "@library/componentIDs";
-import DropDown from "@library/components/dropdown/DropDown";
 import { t } from "@library/application";
 import FrameHeader from "@library/components/frame/FrameHeader";
 import FrameBody from "@library/components/frame/FrameBody";
@@ -23,7 +21,6 @@ import classNames from "classnames";
 export interface INotificationsProps {
     data: IMeBoxNotificationItem[];
     userSlug: string;
-    count?: number;
     countClass?: string;
     panelBodyClass?: string;
     markAllRead?: () => void;
@@ -39,7 +36,6 @@ interface IProps extends INotificationsProps {
  */
 export default class NotificationsContents extends React.Component<IProps> {
     public render() {
-        const count = this.props.count ? this.props.count : 0;
         return (
             <Frame className={this.props.className}>
                 <FrameHeader className="isShadowed isCompact" title={t("Notifications")}>
@@ -71,7 +67,7 @@ export default class NotificationsContents extends React.Component<IProps> {
                         {t("All Notifications")}
                     </LinkAsButton>
                     {this.props.markAllRead &&
-                        count > 0 && (
+                        this.props.data.length > 0 && (
                             <Button
                                 onClick={this.props.markAllRead}
                                 baseClass={ButtonBaseClass.TEXT}

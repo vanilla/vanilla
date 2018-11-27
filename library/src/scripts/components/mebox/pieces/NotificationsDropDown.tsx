@@ -12,11 +12,17 @@ import { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
 import NotificationsContents, { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
 import NotificationsToggle from "@library/components/mebox/pieces/NotificationsToggle";
+import { connect } from "react-redux";
+import { IMeBoxNotificationItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
+import apiv2 from "@library/apiv2";
+import NotificationsActions from "@library/notifications/NotificationsActions";
+import { LoadStatus } from "@library/@types/api";
 
 interface IProps extends INotificationsProps {
     className?: string;
     buttonClassName?: string;
     contentsClassName?: string;
+    actions: NotificationsActions;
 }
 
 interface IState {
@@ -26,15 +32,25 @@ interface IState {
 /**
  * Implements Messages Drop down for header
  */
-export default class NotificationsDropDown extends React.Component<IProps, IState> {
+class NotificationsDropDown extends React.Component<IProps, IState> {
     private id = uniqueIDFromPrefix("notificationsDropDown");
+
+    public componentDidMount() {
+        this.props.actions.getNotifications();
+    }
+
+    public markAllNotificationsRead() {
+        return async () => {
+            await this.props.actions.markAllRead();
+            this.props.actions.getNotifications();
+        };
+    }
 
     public state = {
         open: false,
     };
 
     public render() {
-        const count = this.props.count ? this.props.count : 0;
         return (
             <DropDown
                 id={this.id}
@@ -45,7 +61,7 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
                 contentsClassName={this.props.contentsClassName}
                 buttonContents={
                     <NotificationsToggle
-                        count={this.props.count}
+                        count={this.props.data.length}
                         open={this.state.open}
                         countClass={this.props.countClass}
                     />
@@ -54,9 +70,9 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
             >
                 <NotificationsContents
                     data={this.props.data}
-                    count={this.props.count}
                     countClass={this.props.countClass}
                     userSlug={this.props.userSlug}
+                    markAllRead={this.markAllNotificationsRead()}
                 />
             </DropDown>
         );
@@ -68,3 +84,40 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
         });
     };
 }
+
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: new NotificationsActions(dispatch, apiv2),
+    };
+}
+
+function mapStateToProps(state) {
+    const data: IMeBoxNotificationItem[] = [];
+
+    if (state.notifications.notificationsByID.status === LoadStatus.SUCCESS) {
+        const notificationsByID = state.notifications.notificationsByID.data;
+        for (const id in notificationsByID) {
+            if (notificationsByID.hasOwnProperty(id)) {
+                const notification = notificationsByID[id];
+                data.push({
+                    message: notification.body,
+                    photo: notification.photoUrl,
+                    to: notification.url,
+                    recordID: notification.notificationID,
+                    timestamp: notification.dateInserted,
+                    unread: !notification.read,
+                    type: MeBoxItemType.NOTIFICATION,
+                });
+            }
+        }
+    }
+
+    return {
+        data,
+    };
+}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(NotificationsDropDown);

@@ -74,7 +74,7 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
                         {this.props.photo ? (
                             <img className="meBoxMessage-photo" src={this.props.photo} />
                         ) : (
-                            noUserPhoto()
+                            noUserPhoto("meBoxMessage-photo")
                         )}
                     </div>
                     <div className="meBoxMessage-contents">

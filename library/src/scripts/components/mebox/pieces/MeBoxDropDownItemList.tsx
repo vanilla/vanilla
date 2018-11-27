@@ -31,10 +31,7 @@ export default class MeBoxDropDownItemList extends React.Component<IVanillaHeade
                     <ul className="meBoxMessageList-items">
                         {this.props.data.map((item, key) => {
                             return (
-                                <MeBoxDropDownItem
-                                    {...item}
-                                    key={`MeBoxDropDownItemList-${this.props.type}-${key}`}
-                                />
+                                <MeBoxDropDownItem {...item} key={`MeBoxDropDownItemList-${this.props.type}-${key}`} />
                             );
                         })}
                     </ul>

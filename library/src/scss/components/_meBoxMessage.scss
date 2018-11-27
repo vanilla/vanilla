@@ -36,6 +36,9 @@ $meBoxMessage-unreadDot_width: 12px;
     width: $meBoxMessage-imageWidth;
     height: $meBoxMessage-imageWidth;
     flex-basis: $meBoxMessage-imageWidth;
+    border-radius: 50%;
+    overflow: hidden;
+    border: solid mixContentBgAndFg(95%) 1px;
 }
 
 

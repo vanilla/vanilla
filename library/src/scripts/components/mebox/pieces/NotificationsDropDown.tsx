@@ -17,6 +17,7 @@ import { IMeBoxNotificationItem, MeBoxItemType } from "@library/components/mebox
 import apiv2 from "@library/apiv2";
 import NotificationsActions from "@library/notifications/NotificationsActions";
 import { INotificationsStoreState } from "@library/notifications/NotificationsModel";
+import get from "lodash/get";
 
 interface IProps extends INotificationsProps {
     className?: string;
@@ -33,7 +34,6 @@ interface IState {
  * Implements Messages Drop down for header
  */
 export class NotificationsDropDown extends React.Component<IProps, IState> {
-
     private id = uniqueIDFromPrefix("notificationsDropDown");
 
     public state: IState = {
@@ -75,7 +75,7 @@ export class NotificationsDropDown extends React.Component<IProps, IState> {
     private markAllNotificationsRead = async () => {
         await this.props.actions.markAllRead();
         void this.props.actions.getNotifications();
-    }
+    };
 
     private setOpen = open => {
         this.setState({
@@ -92,7 +92,7 @@ function mapDispatchToProps(dispatch) {
 
 function mapStateToProps(state: INotificationsStoreState) {
     const data: IMeBoxNotificationItem[] = [];
-    const notificationsByID = state.notifications.notificationsByID.data;
+    const notificationsByID = get(state, "notifications.notificationsByID.data", false);
 
     if (notificationsByID) {
         for (const notification of Object.values(notificationsByID)) {

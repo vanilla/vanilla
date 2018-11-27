@@ -9,11 +9,8 @@ import { t } from "@library/application";
 import getStore from "@library/state/getStore";
 import { debug, log } from "@library/utility";
 import { delegateEvent, removeDelegatedEvent } from "@library/dom";
-import EmbedPopover from "@rich-editor/components/popovers/EmbedPopover";
-import EmojiPopover from "@rich-editor/components/popovers/EmojiPopover";
 import MentionToolbar from "@rich-editor/components/toolbars/MentionToolbar";
 import InlineToolbar from "@rich-editor/components/toolbars/InlineToolbar";
-import UploadButton from "@rich-editor/components/editor/pieces/EditorUploadButton";
 import { EditorProvider } from "@rich-editor/components/context";
 import EditorDescriptions from "@rich-editor/components/editor/pieces/EditorDescriptions";
 import { Provider as ReduxProvider } from "react-redux";
@@ -21,17 +18,16 @@ import { actions } from "@rich-editor/state/instance/instanceActions";
 import { getIDForQuill, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import { IStoreState } from "@rich-editor/@types/store";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
-import Quill, { DeltaOperation, Sources } from "quill/core";
+import Quill, { DeltaOperation, Sources, QuillOptionsStatic } from "quill/core";
 import { hot } from "react-hot-loader";
 import registerQuill from "@rich-editor/quill/registerQuill";
 import { uniqueId } from "lodash";
 import classNames from "classnames";
-import Permission from "@library/users/Permission";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import { Devices } from "@library/components/DeviceChecker";
-import ParagraphDropDown from "@rich-editor/components/toolbars/ParagraphDropDown";
 import ParagraphToolbar from "@rich-editor/components/toolbars/ParagraphToolbar";
 import throttle from "lodash/throttle";
+import EmbedBar from "@rich-editor/components/editor/pieces/EmbedBar";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -59,7 +55,13 @@ type IProps = ILegacyProps | INewProps;
  */
 export class Editor extends React.Component<IProps> {
     /** Ref for a dom node for quill to mount into. */
-    private quillMountRef: React.RefObject<HTMLDivElement> = React.createRef();
+    private quillMountRef = React.createRef<HTMLDivElement>();
+
+    /** Ref for the embedBar height */
+    private embedBarRef = React.createRef<HTMLDivElement>();
+
+    /** Ref for the scroll container */
+    private scrollContainerRef = React.createRef<HTMLDivElement>();
 
     /** The ID of the root rich editor node. */
     private domID: string = uniqueId("editor-");
@@ -80,6 +82,7 @@ export class Editor extends React.Component<IProps> {
     private quoteHandler: string;
 
     public render() {
+        const { isLoading, legacyMode } = this.props;
         // These items CANNOT be rendered before quill is ready, but the main text area is required for quill to render.
         // These should all re-render after componentDidMount calls forceUpdate().
         let isMobile = false; // fallback for legacy: isMobile is always false
@@ -88,43 +91,31 @@ export class Editor extends React.Component<IProps> {
         }
 
         const quillDependantItems = this.quill && (
-            <React.Fragment>
-                {!this.props.isLoading && (
-                    <React.Fragment>
-                        <InlineToolbar />
-                        {!isMobile && <ParagraphToolbar />}
-                        <MentionToolbar />
-                    </React.Fragment>
-                )}
+            <>
+                {!this.props.isLoading &&
+                    this.embedBarHeight !== null &&
+                    this.scrollContainerRef.current && (
+                        <>
+                            <InlineToolbar />
+                            {!isMobile && (
+                                <ParagraphToolbar
+                                    scrollContainer={this.scrollContainerRef.current}
+                                    verticalOffset={this.embedBarHeight}
+                                    container={this.scrollContainerRef.current}
+                                    isScrolling={true}
+                                />
+                            )}
+                            <MentionToolbar />
+                        </>
+                    )}
 
-                <div className="richEditor-embedBar">
-                    <ul
-                        className="richEditor-menuItems richEditor-inlineMenuItems"
-                        role="menubar"
-                        aria-label={t("Inline Level Formatting Menu")}
-                    >
-                        {isMobile && (
-                            <li className="richEditor-menuItem" role="menuitem">
-                                <ParagraphDropDown disabled={this.props.isLoading} />
-                            </li>
-                        )}
-                        {!isMobile && (
-                            <li className="richEditor-menuItem u-richEditorHiddenOnMobile" role="menuitem">
-                                <EmojiPopover disabled={this.props.isLoading} renderAbove={!!this.props.legacyMode} />
-                            </li>
-                        )}
-                        <Permission permission="uploads.add">
-                            <li className="richEditor-menuItem" role="menuitem">
-                                <UploadButton disabled={this.props.isLoading} />
-                            </li>
-                        </Permission>
-
-                        <li className="richEditor-menuItem" role="menuitem">
-                            <EmbedPopover disabled={this.props.isLoading} />
-                        </li>
-                    </ul>
-                </div>
-            </React.Fragment>
+                <EmbedBar
+                    isLoading={!!isLoading}
+                    isMobile={isMobile}
+                    legacyMode={legacyMode}
+                    barRef={this.embedBarRef}
+                />
+            </>
         );
 
         let mainContent = (
@@ -133,23 +124,23 @@ export class Editor extends React.Component<IProps> {
                     value={{
                         quill: this.quill,
                         editorID: this.quillID,
-                        legacyMode: !!this.props.legacyMode,
-                        isLoading: !!this.props.isLoading,
+                        legacyMode,
+                        isLoading: !!isLoading,
                     }}
                 >
                     <EditorDescriptions id={this.descriptionID} />
-                    {!this.props.legacyMode && quillDependantItems} {/* Menu above */}
-                    <div className="richEditor-frame InputBox">
+                    {!legacyMode && quillDependantItems} {/* Menu above */}
+                    <div className="richEditor-frame InputBox" id="testScroll" ref={this.scrollContainerRef}>
                         <div className="richEditor-textWrap" ref={this.quillMountRef}>
                             <div
                                 className="ql-editor richEditor-text userContent"
                                 data-gramm="false"
-                                contentEditable={!!this.props.isLoading}
+                                contentEditable={!!isLoading}
                                 data-placeholder="Create a new post..."
                                 tabIndex={0}
                             />
                         </div>
-                        {this.props.legacyMode && quillDependantItems} {/* Menu below */}
+                        {legacyMode && quillDependantItems} {/* Menu below */}
                     </div>
                 </EditorProvider>
             </ReduxProvider>
@@ -181,7 +172,10 @@ export class Editor extends React.Component<IProps> {
 
         // Setup quill
         registerQuill();
-        const options = { theme: "vanilla" };
+        const options: QuillOptionsStatic = {
+            theme: "vanilla",
+            scrollingContainer: "#" + this.scrollContainerRef.current!.id,
+        };
         this.quill = new Quill(this.quillMountRef.current!, options);
         if (this.props.initialValue) {
             this.quill.setContents(this.props.initialValue);
@@ -212,6 +206,8 @@ export class Editor extends React.Component<IProps> {
     public componentWillUnmount() {
         this.removeGlobalSelectionHandler();
         this.removeQuoteHandler();
+        this.quill.off(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
+        this.store.dispatch(actions.deleteInstance(this.quillID));
     }
 
     public componentDidUpdate(oldProps: IProps) {
@@ -228,6 +224,14 @@ export class Editor extends React.Component<IProps> {
     public getEditorOperations(): DeltaOperation[] | undefined {
         this.ensureUniqueHeaderIDs();
         return this.quill.getContents().ops;
+    }
+
+    private get embedBarHeight(): number | null {
+        if (this.embedBarRef.current) {
+            return this.embedBarRef.current.clientHeight;
+        } else {
+            return null;
+        }
     }
 
     /**

@@ -46,18 +46,10 @@ interface IState {
 }
 
 class ToolbarPositioner extends React.Component<IProps, IState> {
-    private quill: Quill;
-
-    constructor(props) {
-        super(props);
-
-        // Quill can directly on the class as it won't ever change in a single instance.
-        this.quill = props.quill;
-
-        this.state = {
-            quillWidth: this.quill.root.offsetWidth,
-        };
-    }
+    private quill: Quill = this.props.quill!;
+    public state: IState = {
+        quillWidth: this.quill.root.offsetWidth,
+    };
 
     /**
      * This component is particularly performance sensitive (the calculations for a re-render are very expensive).

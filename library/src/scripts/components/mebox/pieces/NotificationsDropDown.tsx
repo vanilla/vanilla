@@ -21,9 +21,10 @@ import get from "lodash/get";
 import { INotification } from "@library/@types/api";
 
 interface IProps extends INotificationsProps {
-    className?: string;
     buttonClassName?: string;
+    className?: string;
     contentsClassName?: string;
+    countUnread: number;
     actions: NotificationsActions;
 }
 
@@ -52,7 +53,7 @@ export class NotificationsDropDown extends React.Component<IProps, IState> {
                 contentsClassName={this.props.contentsClassName}
                 buttonContents={
                     <NotificationsToggle
-                        count={this.props.data.length}
+                        count={this.props.countUnread}
                         open={this.state.open}
                         countClass={this.props.countClass}
                     />
@@ -92,24 +93,43 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state: INotificationsStoreState) {
+    let countUnread: number = 0;
     const data: IMeBoxNotificationItem[] = [];
     const notificationsByID = get(state, "notifications.notificationsByID.data", false);
 
     if (notificationsByID) {
         for (const notification of Object.values(notificationsByID) as INotification[]) {
+            if (notification.read === false) {
+                countUnread++;
+            }
             data.push({
                 message: notification.body,
                 photo: notification.photoUrl || null,
                 to: notification.url,
                 recordID: notification.notificationID,
-                timestamp: notification.dateInserted,
+                timestamp: notification.dateUpdated,
                 unread: !notification.read,
                 type: MeBoxItemType.NOTIFICATION,
             });
         }
+
+        // Notifications are indexed by ID, which means they'll be sorted by date inserted, ascending. Adjust for that.
+        const test = data.sort((itemA: IMeBoxNotificationItem, itemB: IMeBoxNotificationItem) => {
+            const timeA = new Date(itemA.timestamp).getTime();
+            const timeB = new Date(itemB.timestamp).getTime();
+
+            if (timeA < timeB) {
+                return 1;
+            } else if (timeA > timeB) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
     }
 
     return {
+        countUnread,
         data,
     };
 }

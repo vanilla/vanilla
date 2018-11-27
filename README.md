@@ -52,7 +52,7 @@ Essentially you can overwrite whatever you like but be careful! Some variables a
 
 ### Version
 
-1.1.0 - Updated `default.master.tpl` to solve security vunerability.
+1.1.0 - Updated `default.master.tpl` to solve security vulnerability.
 
 ### Building Styles / Javascript / Images
 

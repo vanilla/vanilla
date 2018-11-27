@@ -41,7 +41,6 @@ interface IState {
  * render in a specific div in the default-master.
  */
 export class VanillaHeader extends React.Component<IProps, IState> {
-    private resultsRef: React.RefObject<HTMLDivElement> = React.createRef();
     public state = {
         openSearch: false,
         showingSuggestions: false,
@@ -71,10 +70,10 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                 <Container>
                     <PanelWidgetHorizontalPadding>
                         <div className="vanillaHeader-bar">
-                            {!this.state.openSearch && (
+                            {(!isMobile || (!this.state.openSearch && isMobile)) && (
                                 <HeaderLogo
                                     {...dummyLogoData}
-                                    className="vanillaHeader-headerLogo hasRightMargin"
+                                    className="vanillaHeader-headerLogo"
                                     logoClassName="vanillaHeader-logo"
                                 />
                             )}
@@ -82,36 +81,44 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                 !isMobile && (
                                     <VanillaHeaderNav
                                         {...dummyNavigationData}
-                                        className="vanillaHeader-nav"
+                                        className="vanillaHeader-nav hasLeftMargin"
                                         linkClassName="vanillaHeader-navLink"
                                         linkContentClassName="vanillaHeader-navLinkContent"
                                     />
                                 )}
 
                             <CompactSearch
-                                className="vanillaHeader-compactSearch"
+                                className={classNames("vanillaHeader-compactSearch", {
+                                    isCentered: this.state.openSearch,
+                                })}
                                 open={this.state.openSearch}
                                 onOpenSearch={this.openSearch}
                                 onCloseSearch={this.closeSearch}
                                 cancelButtonClassName="vanillaHeader-searchCancel"
                                 buttonClass="vanillaHeader-button"
-                                resultsRef={this.resultsRef}
                                 showingSuggestions={this.state.showingSuggestions}
                                 onOpenSuggestions={this.setOpenSuggestions}
                                 onCloseSuggestions={this.setCloseSuggestions}
                             />
-                            {!isGuest && (
+                            {isGuest ? (
+                                <VanillaHeaderNav
+                                    {...dummyGuestNavigationData}
+                                    linkClassName="vanillaHeader-navLink"
+                                    linkContentClassName="vanillaHeader-navLinkContent"
+                                    className="vanillaHeader-nav vanillaHeader-guestNav"
+                                />
+                            ) : (
                                 <React.Fragment>
-                                    {!isMobile &&
-                                        !this.state.openSearch && (
-                                            <MeBox
-                                                notificationsProps={notificationProps as INotificationsProps}
-                                                messagesProps={messagesProps as any}
-                                                counts={dummyUserDropDownData}
-                                                buttonClassName="vanillaHeader-button"
-                                                contentClassName="vanillaHeader-dropDownContents"
-                                            />
-                                        )}
+                                    {!isMobile && (
+                                        <MeBox
+                                            className="vanillaHeader-meBox"
+                                            notificationsProps={notificationProps as INotificationsProps}
+                                            messagesProps={messagesProps as any}
+                                            counts={dummyUserDropDownData}
+                                            buttonClassName="vanillaHeader-button"
+                                            contentClassName="vanillaHeader-dropDownContents"
+                                        />
+                                    )}
                                     {isMobile &&
                                         !this.state.openSearch && (
                                             <CompactMeBox
@@ -125,18 +132,9 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                         )}
                                 </React.Fragment>
                             )}
-                            {isGuest && (
-                                <VanillaHeaderNav
-                                    {...dummyGuestNavigationData}
-                                    linkClassName="vanillaHeader-navLink"
-                                    linkContentClassName="vanillaHeader-navLinkContent"
-                                    className="vanillaHeader-nav vanillaHeader-guestNav"
-                                />
-                            )}
                         </div>
                     </PanelWidgetHorizontalPadding>
                 </Container>
-                <div ref={this.resultsRef} className="vanillaHeader-results" />
             </header>,
             this.props.container || document.getElementById("vanillaHeader")!,
         );

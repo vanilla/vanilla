@@ -26,11 +26,13 @@ export default class NotificationsToggle extends React.PureComponent<IProps> {
         return (
             <div className={classNames("meBox-buttonContent", this.props.className)}>
                 {notifications(!!this.props.open)}
-                <Count
-                    className={classNames("vanillaHeader-notificationsCount", this.props.countClass)}
-                    label={t("Notifications: ")}
-                    count={this.props.count}
-                />
+                {count > 0 && (
+                    <Count
+                        className={classNames("vanillaHeader-notificationsCount", this.props.countClass)}
+                        label={t("Notifications: ")}
+                        count={this.props.count}
+                    />
+                )}
             </div>
         );
     }

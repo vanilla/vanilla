@@ -11,7 +11,7 @@ import Modal from "@library/components/modal/Modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import CloseButton from "@library/components/CloseButton";
-import { downTriangle, user } from "@library/components/icons/header";
+import { downTriangle } from "@library/components/icons/header";
 import { Panel } from "@library/components/layouts/PanelLayout";
 
 export interface IProps {
@@ -36,7 +36,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
     };
 
     public render() {
-        return this.props.mobileDropDownContent && this.props.mobileDropDownContent.current ? (
+        return this.props.mobileDropDownContent ? (
             <div className={classNames("headerDropDown", this.props.className)}>
                 <Button
                     title={this.props.title}
@@ -45,9 +45,8 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                     buttonRef={this.buttonRef}
                     baseClass={ButtonBaseClass.CUSTOM}
                 >
-                    <span className="headerDropDown-title">
-                        {this.props.title} {downTriangle()}
-                    </span>
+                    <span className="headerDropDown-title">{this.props.title}</span>
+                    {downTriangle()}
                 </Button>
                 {this.state.open && (
                     <Modal
@@ -64,7 +63,9 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                     </Modal>
                 )}
             </div>
-        ) : null;
+        ) : (
+            <span className="headerDropDown-title">{this.props.title}</span>
+        );
     }
 
     private open = () => {

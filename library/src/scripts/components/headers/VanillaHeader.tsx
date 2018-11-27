@@ -54,7 +54,8 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
         const countClass = "vanillaHeader-count";
         const buttonClass = "vanillaHeader-button";
-        const showMobileDropDown = !this.state.openSearch && this.props.title && this.props.mobileDropDownContent;
+        const showMobileDropDown =
+            isMobile && !this.state.openSearch && this.props.title && this.props.mobileDropDownContent;
 
         const notificationProps = {
             data: dummyNotificationsData.data,
@@ -95,6 +96,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                 <MobileDropDown
                                     title={this.props.title!}
                                     mobileDropDownContent={this.props.mobileDropDownContent!}
+                                    buttonClass="vanillaHeader-mobileDropDown"
                                 />
                             )}
 

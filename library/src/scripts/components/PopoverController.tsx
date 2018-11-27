@@ -38,7 +38,7 @@ export interface IPopoverControllerProps {
     PopoverController?: string;
     toggleButtonClassName?: string;
     setExternalButtonRef?: (ref: React.RefObject<HTMLButtonElement>) => void;
-    openAsModal?: boolean;
+    openAsModal: boolean;
 }
 
 export interface IPopoverControllerPropsWithIcon extends IPopoverControllerProps {

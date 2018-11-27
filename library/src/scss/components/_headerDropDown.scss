@@ -4,7 +4,16 @@
  * @license GPL-2.0-only
  */
 
-.headerDropDown-user,
-.headerDropDown-headerButton {
-    color: white; // Todo: fix after other PR is merged
+.headerDropDown {
+    position: relative;
+    flex-grow: 1;
+}
+
+.headerDropDown-toggleButton {
+    margin: auto;
+    max-width: 100%;
+}
+
+.headerDropDown-title {
+    margin-right: .5em;
 }

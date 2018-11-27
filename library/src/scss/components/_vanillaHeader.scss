@@ -121,6 +121,7 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 
 
 
+.vanillaHeader-mobileDropDown,
 .vanillaHeader-searchCancel,
 .vanillaHeader-localeToggle,
 .vanillaHeader-navLink {
@@ -241,4 +242,8 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
     @include mediaQuery-panelLayout_oneColumn {
         top: #{($vanillaHeader_mobile_height - $formElement_height + $formElement_borderWidth) / 2};
     }
+}
+
+.vanillaHeader-mobileDropDown {
+    height: $vanillaHeader_mobile_height;
 }

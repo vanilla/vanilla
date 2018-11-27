@@ -23,7 +23,7 @@ export enum MeBoxItemType {
 interface IMeBoxItem {
     className?: string;
     message: string;
-    photo?: string;
+    photo: string | null;
     recordID: number;
     timestamp: string;
     to: string;
@@ -48,8 +48,8 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
     public render() {
         const { unread, message, timestamp, to } = this.props;
 
-        let count: number;
-        let subject: string;
+        const count: number = 0;
+        const subject: string = "";
         let authors: JSX.Element[];
 
         if (this.props.type === MeBoxItemType.MESSAGE) {
@@ -70,22 +70,24 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
         return (
             <li className={classNames("meBoxMessage", this.props.className)}>
                 <SmartLink to={to} className="meBoxMessage-link" tabIndex={0}>
-                    <div className="meBoxMessage-image">{noUserPhoto()}</div>
+                    <div className="meBoxMessage-image">
+                        {this.props.photo ? (
+                            <img className="meBoxMessage-photo" src={this.props.photo} />
+                        ) : (
+                            noUserPhoto()
+                        )}
+                    </div>
                     <div className="meBoxMessage-contents">
                         {!!authors! && <div className="meBoxMessage-message">{authors!}</div>}
-                        <div className="meBoxMessage-message">
-                            <Translate
-                                source={message}
-                                c0={<strong className="meBoxMessage-subject">{subject!}</strong>}
-                            />
-                        </div>
-                        {(timestamp || !!count!) && (
+                        {/* Current notifications API returns HTML-formatted messages. Should be updated to return something aside from raw HTML. */}
+                        <div className="meBoxMessage-message" dangerouslySetInnerHTML={{ __html: message }} />
+                        {(timestamp || !!count) && (
                             <div className="meBoxMessage-metas metas isFlexed">
                                 <DateTime timestamp={timestamp} className="meta" />
-                                {!!count! && (
+                                {!!count && (
                                     <span className="meta">
-                                        {count! === 1 && <Translate source="<0/> message" c0={1} />}
-                                        {count! > 1 && <Translate source="<0/> messages" c0={count!} />}
+                                        {count === 1 && <Translate source="<0/> message" c0={1} />}
+                                        {count > 1 && <Translate source="<0/> messages" c0={count} />}
                                     </span>
                                 )}
                             </div>

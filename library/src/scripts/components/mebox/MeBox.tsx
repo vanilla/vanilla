@@ -11,7 +11,6 @@ import MessagesDropDown from "./pieces/MessagesDropDown";
 import UserDropdown from "./pieces/UserDropdown";
 import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
 import { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
-import NotificationsActions from "@library/notifications/NotificationsActions";
 
 export interface IMeBoxProps {
     className?: string;

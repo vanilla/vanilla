@@ -16,7 +16,7 @@ import { connect } from "react-redux";
 import { IMeBoxNotificationItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
 import apiv2 from "@library/apiv2";
 import NotificationsActions from "@library/notifications/NotificationsActions";
-import { LoadStatus } from "@library/@types/api";
+import { INotificationsStoreState } from "@library/notifications/NotificationsModel";
 
 interface IProps extends INotificationsProps {
     className?: string;
@@ -32,21 +32,11 @@ interface IState {
 /**
  * Implements Messages Drop down for header
  */
-class NotificationsDropDown extends React.Component<IProps, IState> {
+export class NotificationsDropDown extends React.Component<IProps, IState> {
+
     private id = uniqueIDFromPrefix("notificationsDropDown");
 
-    public componentDidMount() {
-        this.props.actions.getNotifications();
-    }
-
-    public markAllNotificationsRead() {
-        return async () => {
-            await this.props.actions.markAllRead();
-            this.props.actions.getNotifications();
-        };
-    }
-
-    public state = {
+    public state: IState = {
         open: false,
     };
 
@@ -72,10 +62,19 @@ class NotificationsDropDown extends React.Component<IProps, IState> {
                     data={this.props.data}
                     countClass={this.props.countClass}
                     userSlug={this.props.userSlug}
-                    markAllRead={this.markAllNotificationsRead()}
+                    markAllRead={this.markAllNotificationsRead}
                 />
             </DropDown>
         );
+    }
+
+    public componentDidMount() {
+        void this.props.actions.getNotifications();
+    }
+
+    private markAllNotificationsRead = async () => {
+        await this.props.actions.markAllRead();
+        void this.props.actions.getNotifications();
     }
 
     private setOpen = open => {
@@ -91,24 +90,21 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state: INotificationsStoreState) {
     const data: IMeBoxNotificationItem[] = [];
+    const notificationsByID = state.notifications.notificationsByID.data;
 
-    if (state.notifications.notificationsByID.status === LoadStatus.SUCCESS) {
-        const notificationsByID = state.notifications.notificationsByID.data;
-        for (const id in notificationsByID) {
-            if (notificationsByID.hasOwnProperty(id)) {
-                const notification = notificationsByID[id];
-                data.push({
-                    message: notification.body,
-                    photo: notification.photoUrl,
-                    to: notification.url,
-                    recordID: notification.notificationID,
-                    timestamp: notification.dateInserted,
-                    unread: !notification.read,
-                    type: MeBoxItemType.NOTIFICATION,
-                });
-            }
+    if (notificationsByID) {
+        for (const notification of Object.values(notificationsByID)) {
+            data.push({
+                message: notification.body,
+                photo: notification.photoUrl || null,
+                to: notification.url,
+                recordID: notification.notificationID,
+                timestamp: notification.dateInserted,
+                unread: !notification.read,
+                type: MeBoxItemType.NOTIFICATION,
+            });
         }
     }
 

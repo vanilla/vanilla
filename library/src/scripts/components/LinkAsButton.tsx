@@ -6,9 +6,9 @@
 
 import React from "react";
 import classNames from "classnames";
-import { getOptionalID, IOptionalComponentID } from "../componentIDs";
+import { IOptionalComponentID } from "../componentIDs";
 import { ButtonBaseClass } from "./forms/Button";
-import { Link } from "react-router-dom";
+import SmartLink from "@library/components/navigation/SmartLink";
 
 interface IProps extends IOptionalComponentID {
     children: React.ReactNode;
@@ -23,14 +23,14 @@ interface IProps extends IOptionalComponentID {
  * A Link component that looks like a Button component.
  */
 export default class LinkAsButton extends React.Component<IProps> {
-    public static defaultProps = {
+    public static defaultProps: Partial<IProps> = {
         baseClass: ButtonBaseClass.STANDARD,
     };
 
     public render() {
         const componentClasses = classNames(this.props.baseClass, this.props.className);
         return (
-            <Link
+            <SmartLink
                 className={componentClasses}
                 title={this.props.title}
                 aria-label={this.props.ariaLabel || this.props.title}
@@ -38,7 +38,7 @@ export default class LinkAsButton extends React.Component<IProps> {
                 to={this.props.to}
             >
                 {this.props.children}
-            </Link>
+            </SmartLink>
         );
     }
 }

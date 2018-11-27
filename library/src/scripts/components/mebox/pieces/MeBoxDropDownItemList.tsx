@@ -33,7 +33,6 @@ export default class MeBoxDropDownItemList extends React.Component<IVanillaHeade
                             return (
                                 <MeBoxDropDownItem
                                     {...item}
-                                    type={this.props.type as any}
                                     key={`MeBoxDropDownItemList-${this.props.type}-${key}`}
                                 />
                             );

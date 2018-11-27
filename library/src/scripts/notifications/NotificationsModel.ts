@@ -5,18 +5,21 @@
 
 import ReduxReducer from "@library/state/ReduxReducer";
 import produce from "immer";
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { ILoadable, LoadStatus, INotification } from "@library/@types/api";
 import NotificationsActions from "@library/notifications/NotificationsActions";
-import { INotification } from "@library/@types/api";
 
 interface INotificationsState {
     notificationsByID: ILoadable<{ [key: number]: INotification }>;
 }
 
-export default class UsersModel implements ReduxReducer<INotificationsState> {
+export interface INotificationsStoreState {
+    notifications: INotificationsState;
+}
+
+export default class NotificationsModel implements ReduxReducer<INotificationsState> {
     public readonly initialState: INotificationsState = {
         notificationsByID: {
-            data: [],
+            data: {},
             status: LoadStatus.PENDING,
         },
     };
@@ -25,22 +28,22 @@ export default class UsersModel implements ReduxReducer<INotificationsState> {
         state: INotificationsState = this.initialState,
         action: typeof NotificationsActions.ACTION_TYPES,
     ): INotificationsState => {
-        return produce(state, draft => {
+        return produce(state, nextState => {
             switch (action.type) {
                 case NotificationsActions.GET_NOTIFICATIONS_REQUEST:
-                    draft.notificationsByID.status = LoadStatus.LOADING;
+                    nextState.notificationsByID.status = LoadStatus.LOADING;
                     break;
                 case NotificationsActions.GET_NOTIFICATIONS_RESPONSE:
-                    draft.notificationsByID.status = LoadStatus.SUCCESS;
-                    draft.notificationsByID.data = {};
+                    nextState.notificationsByID.status = LoadStatus.SUCCESS;
+                    nextState.notificationsByID.data = {};
                     const notifications = action.payload.data as INotification[];
                     notifications.forEach(notification => {
-                        draft.notificationsByID.data![notification.notificationID] = notification;
+                        nextState.notificationsByID.data![notification.notificationID] = notification;
                     });
                     break;
                 case NotificationsActions.GET_NOTIFICATIONS_ERROR:
-                    draft.notificationsByID.status = LoadStatus.ERROR;
-                    draft.notificationsByID.error = action.payload;
+                    nextState.notificationsByID.status = LoadStatus.ERROR;
+                    nextState.notificationsByID.error = action.payload;
                     break;
             }
         });

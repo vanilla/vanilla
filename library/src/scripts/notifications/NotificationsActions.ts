@@ -4,6 +4,7 @@
  */
 
 import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
+import { INotification } from "@library/@types/api";
 
 /**
  * Redux actions for the current user's notification data.
@@ -17,7 +18,7 @@ export default class NotificationsActions extends ReduxActions {
         NotificationsActions.GET_NOTIFICATION_REQUEST,
         NotificationsActions.GET_NOTIFICATION_RESPONSE,
         NotificationsActions.GET_NOTIFICATION_ERROR,
-        {},
+        {} as INotification,
         {},
     );
 
@@ -29,7 +30,7 @@ export default class NotificationsActions extends ReduxActions {
         NotificationsActions.GET_NOTIFICATIONS_REQUEST,
         NotificationsActions.GET_NOTIFICATIONS_RESPONSE,
         NotificationsActions.GET_NOTIFICATIONS_ERROR,
-        {},
+        {} as INotification[],
         {},
     );
 
@@ -41,7 +42,7 @@ export default class NotificationsActions extends ReduxActions {
         NotificationsActions.MARK_READ_REQUEST,
         NotificationsActions.MARK_READ_RESPONSE,
         NotificationsActions.MARK_READ_ERROR,
-        {},
+        {} as INotification,
         {},
     );
 

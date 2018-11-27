@@ -93,6 +93,7 @@ export default class Modal extends React.Component<IProps, IState> {
                             isFullScreen: size === ModalSizes.FULL_SCREEN || size === ModalSizes.MODAL_AS_SIDE_PANEL,
                             inheritHeight: size === ModalSizes.FULL_SCREEN,
                             isSidePanel: size === ModalSizes.MODAL_AS_SIDE_PANEL,
+                            isDropDown: size === ModalSizes.MODAL_AS_DROP_DOWN,
                             isLarge: size === ModalSizes.LARGE,
                             isMedium: size === ModalSizes.MEDIUM,
                             isSmall: size === ModalSizes.SMALL,

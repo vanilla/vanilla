@@ -92,6 +92,9 @@
 
 .ql-clipboard {
     @include sr-only();
+
+    // Fixed https://github.com/quilljs/quill/issues/1374#issuecomment-415333651
+    position: fixed;
 }
 
 .richEditor-menuItems {

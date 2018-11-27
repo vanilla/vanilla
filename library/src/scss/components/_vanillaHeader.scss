@@ -4,7 +4,6 @@
  * @license GPL-2.0-only
  */
 
-$vanillaHeader-logoSpacer_width: 48px;
 $vanillaHeader-button_borderRadius: 3px;
 $vanillaHeader-button_size: 40px;
 $vanillaHeader-spacer_width: 12px;
@@ -15,10 +14,15 @@ $vanillaHeader-count_bg: #D0021B;
 $vanillaHeader-count_fg: $vanillaHeader_fg;
 
 $vanillaHeader-dropDownContents_minWidth: 350px;
+$vanillaHeader-button_mobile_fontSize: 16px;
+
+$vanillaHeader-endElements_flexBasis: $vanillaHeader-button_size * 4;
+
+$vanillaHeader-compactSearch_maxWidth: 672px;
 
 
 .vanillaHeader {
-    min-height: $vanillaHeader_height;
+    height: $vanillaHeader_height;
     background-color: $vanillaHeader_bg;
     color: $vanillaHeader_fg;
 
@@ -34,6 +38,13 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
         }
     }
 
+    @include mediaQuery-panelLayout_oneColumn {
+        height: $vanillaHeader_mobile_height;
+    }
+}
+
+.vanillaHeaderHome {
+    min-height: $vanillaHeader_mobile_height * 2;
 }
 
 .vanillaHeader-bar {
@@ -41,15 +52,35 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
     justify-content: flex-start;
     align-items: center;
     min-height: $vanillaHeader_height;
+    width: 100%;
+
+    &.isHome {
+        justify-content: space-between;
+    }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        min-height: $vanillaHeader_mobile_height;
+    }
 }
 
-.vanillaHeader-headerLogo {
+.vanillaHeader-logoContainer {
     display: inline-flex;
     align-self: center;
     color: $vanillaHeader_fg;
+    flex-basis: $vanillaHeader-endElements_flexBasis;
+}
 
-    &.hasRightMargin {
-        margin-right: $vanillaHeader-logoSpacer_width;
+.headerLogo-logo {
+    &.isCentred {
+        margin: auto;
+    }
+}
+
+.vanillaHeader-meBox {
+    justify-content: flex-end;
+
+    &.hasFlexBasis {
+        flex-basis: $vanillaHeader-endElements_flexBasis;
     }
 }
 
@@ -61,10 +92,6 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
 }
 
 .vanillaHeader-locales {
-    margin-left: auto;
-}
-
-.vanillaHeader-localesToggle {
     height: $vanillaHeader_height;
 
     &.buttonAsText {
@@ -72,6 +99,10 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
         &:focus {
             color: inherit;
         }
+    }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        height: $vanillaHeader_mobile_height;
     }
 }
 
@@ -94,7 +125,6 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
 .vanillaHeader-localeToggle,
 .vanillaHeader-navLink {
     color: inherit;
-    height: $vanillaHeader-button_size;
     padding: 0 $vanillaHeader-spacer_width;
     border-radius: $vanillaHeader-button_borderRadius;
 
@@ -104,9 +134,20 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
         background-color: rgba(#000, .1);
         border-radius: $vanillaHeader-button_borderRadius;
     }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        font-size: $vanillaHeader-button_mobile_fontSize;
+        white-space: nowrap;
+    }
 }
 
+.vanillaHeader-localeToggle {
+    height: $vanillaHeader_height;
 
+    @include mediaQuery-panelLayout_oneColumn {
+        height: $vanillaHeader_mobile_height;
+    }
+}
 
 .vanillaHeader-languages {
     margin-left: auto;
@@ -126,6 +167,10 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
             background-color: rgba(#000, .1);
             border-radius: $vanillaHeader-button_borderRadius;
         }
+    }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        height: $vanillaHeader_mobile_height;
     }
 }
 
@@ -162,6 +207,38 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
     color: $vanillaHeader-count_fg;
 }
 
-.vanillaHeader-results {
+// Home - Mobile
+
+.vanillaHeader-horizontalScroll {
+    overflow-x: auto;
+}
+
+.vanillaHeaderHome-bottom {
+    background-color: rgba($vanillaHeader_fg, .1);
+}
+
+.vanillaHeaderHome-left {
+    height: 1px;
+    width: $vanillaHeader-button_size;
+    flex-basis: $vanillaHeader-button_size;
+}
+
+.vanillaHeader-horizontalScrollWrap {
+    display: block;
+}
+
+.vanillaHeader-compactSearch {
+    max-width: $vanillaHeader-compactSearch_maxWidth;
+}
+
+.vanillaHeader-compactSearchResults {
+    top: #{($vanillaHeader_height - $formElement_height + $formElement_borderWidth) / 2};
     position: relative;
+    display: block;
+    margin: auto;
+    max-width: $vanillaHeader-compactSearch_maxWidth;
+
+    @include mediaQuery-panelLayout_oneColumn {
+        top: #{($vanillaHeader_mobile_height - $formElement_height + $formElement_borderWidth) / 2};
+    }
 }

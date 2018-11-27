@@ -73,7 +73,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                             {(!isMobile || (!this.state.openSearch && isMobile)) && (
                                 <HeaderLogo
                                     {...dummyLogoData}
-                                    className="vanillaHeader-headerLogo"
+                                    className="vanillaHeader-logoContainer"
                                     logoClassName="vanillaHeader-logo"
                                 />
                             )}
@@ -101,12 +101,14 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                 onCloseSuggestions={this.setCloseSuggestions}
                             />
                             {isGuest ? (
-                                <VanillaHeaderNav
-                                    {...dummyGuestNavigationData}
-                                    linkClassName="vanillaHeader-navLink"
-                                    linkContentClassName="vanillaHeader-navLinkContent"
-                                    className="vanillaHeader-nav vanillaHeader-guestNav"
-                                />
+                                !this.state.openSearch && (
+                                    <VanillaHeaderNav
+                                        {...dummyGuestNavigationData}
+                                        linkClassName="vanillaHeader-navLink"
+                                        linkContentClassName="vanillaHeader-navLinkContent"
+                                        className="vanillaHeader-nav vanillaHeader-guestNav"
+                                    />
+                                )
                             ) : (
                                 <React.Fragment>
                                     {!isMobile && (

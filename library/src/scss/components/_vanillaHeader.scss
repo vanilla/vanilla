@@ -64,11 +64,17 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
     }
 }
 
-.vanillaHeader-headerLogo {
+.vanillaHeader-logoContainer {
     display: inline-flex;
     align-self: center;
     color: $vanillaHeader_fg;
     flex-basis: $vanillaHeader-endElements_flexBasis;
+}
+
+.headerLogo-logo {
+    &.isCentred {
+        margin: auto;
+    }
 }
 
 .vanillaHeader-meBox {
@@ -80,7 +86,6 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
     display: flex;
     flex-wrap: wrap;
     height: 100%;
-    width: 100%;
     color: inherit;
 
     &.hasLeftMargin {
@@ -215,6 +220,7 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 }
 
 .vanillaHeaderHome-left {
+    height: 1px;
     width: $vanillaHeader-button_size;
     flex-basis: $vanillaHeader-button_size;
 }

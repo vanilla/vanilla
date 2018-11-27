@@ -8,6 +8,7 @@ import React from "react";
 import debounce from "lodash/debounce";
 import Quill, { RangeStatic, BoundsStatic } from "quill/core";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
+import { withBounds, IWithBoundsProps } from "@rich-editor/components/toolbars/pieces/BoundsProvider";
 
 interface IXCoordinates {
     position: number;
@@ -28,7 +29,7 @@ interface IParameters {
 type HorizontalAlignment = "center" | "start";
 type VerticalAlignment = "above" | "below";
 
-interface IProps extends IWithEditorProps {
+interface IProps extends IWithEditorProps, IWithBoundsProps {
     children: (params: IParameters) => JSX.Element;
     selectionTransformer?: (selection: RangeStatic) => RangeStatic | null;
     flyoutHeight: number | null;
@@ -142,20 +143,7 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
             return null;
         }
 
-        const numLines = this.quill.getLines(selectionIndex, selectionLength);
-        let bounds;
-
-        if (numLines.length <= 1) {
-            bounds = this.quill.getBounds(selectionIndex, selectionLength);
-        } else {
-            // If multi-line we want to position at the center of the last line's selection.
-            const lastLine = numLines[numLines.length - 1];
-            const index = this.quill.getIndex(lastLine);
-            const length = Math.min(lastLine.length() - 1, selectionIndex + selectionLength - index);
-            bounds = this.quill.getBounds(index, length);
-        }
-
-        return bounds;
+        return this.props.getBounds({ index: selectionIndex, length: selectionLength });
     }
 
     /**
@@ -236,4 +224,4 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
     }
 }
 
-export default withEditor<IProps>(ToolbarPositioner);
+export default withEditor(withBounds(ToolbarPositioner));

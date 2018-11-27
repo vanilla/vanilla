@@ -17,10 +17,7 @@ import FocusWatcher from "@library/FocusWatcher";
 import ActiveFormatIcon from "@rich-editor/components/toolbars/pieces/ActiveFormatIcon";
 import { withBounds, IWithBoundsProps } from "@rich-editor/components/toolbars/pieces/BoundsProvider";
 
-interface IProps extends IWithEditorProps, IWithBoundsProps {
-    scrollContainer?: HTMLElement;
-    verticalOffset?: number;
-}
+interface IProps extends IWithEditorProps, IWithBoundsProps {}
 
 interface IState {
     hasFocus: boolean;
@@ -124,7 +121,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      */
     private get isPilcrowVisible() {
         const { currentSelection } = this.props;
-        if (!currentSelection || this.props.isScrolledOff) {
+        if (!currentSelection || this.props.getBounds(this.props.lastGoodSelection).isScrolledOff) {
             return false;
         }
 
@@ -145,8 +142,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
         if (!this.props.lastGoodSelection) {
             return {};
         }
-        const bounds = this.props.selectionBounds;
-        console.log(this.props.selectionBounds);
+        const bounds = this.props.getBounds(this.props.lastGoodSelection);
 
         // This is the pixel offset from the top needed to make things align correctly.
         const offset = 12;
@@ -163,7 +159,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
         if (!this.props.lastGoodSelection) {
             return "";
         }
-        const bounds = this.props.selectionBounds;
+        const bounds = this.props.getBounds(this.props.lastGoodSelection);
         let classes = "richEditor-toolbarContainer richEditor-paragraphToolbarContainer";
 
         if (bounds.top > 30) {

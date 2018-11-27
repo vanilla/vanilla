@@ -28,6 +28,7 @@ import { Devices } from "@library/components/DeviceChecker";
 import ParagraphToolbar from "@rich-editor/components/toolbars/ParagraphToolbar";
 import throttle from "lodash/throttle";
 import EmbedBar from "@rich-editor/components/editor/pieces/EmbedBar";
+import BoundsProvider from "@rich-editor/components/toolbars/pieces/BoundsProvider";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -97,14 +98,7 @@ export class Editor extends React.Component<IProps> {
                     this.scrollContainerRef.current && (
                         <>
                             <InlineToolbar />
-                            {!isMobile && (
-                                <ParagraphToolbar
-                                    scrollContainer={this.scrollContainerRef.current}
-                                    verticalOffset={this.embedBarHeight}
-                                    container={this.scrollContainerRef.current}
-                                    isScrolling={true}
-                                />
-                            )}
+                            {!isMobile && <ParagraphToolbar />}
                             <MentionToolbar />
                         </>
                     )}
@@ -128,20 +122,29 @@ export class Editor extends React.Component<IProps> {
                         isLoading: !!isLoading,
                     }}
                 >
-                    <EditorDescriptions id={this.descriptionID} />
-                    {!legacyMode && quillDependantItems} {/* Menu above */}
-                    <div className="richEditor-frame InputBox" id="testScroll" ref={this.scrollContainerRef}>
-                        <div className="richEditor-textWrap" ref={this.quillMountRef}>
-                            <div
-                                className="ql-editor richEditor-text userContent"
-                                data-gramm="false"
-                                contentEditable={!!isLoading}
-                                data-placeholder="Create a new post..."
-                                tabIndex={0}
-                            />
+                    <BoundsProvider
+                        value={{
+                            container: this.scrollContainerRef.current,
+                            isScrolling: this.props.legacyMode,
+                            quill: this.quill,
+                            verticalOffset: this.embedBarHeight,
+                        }}
+                    >
+                        <EditorDescriptions id={this.descriptionID} />
+                        {!legacyMode && quillDependantItems} {/* Menu above */}
+                        <div className="richEditor-frame InputBox" id="testScroll" ref={this.scrollContainerRef}>
+                            <div className="richEditor-textWrap" ref={this.quillMountRef}>
+                                <div
+                                    className="ql-editor richEditor-text userContent"
+                                    data-gramm="false"
+                                    contentEditable={!!isLoading}
+                                    data-placeholder="Create a new post..."
+                                    tabIndex={0}
+                                />
+                            </div>
+                            {legacyMode && quillDependantItems} {/* Menu below */}
                         </div>
-                        {legacyMode && quillDependantItems} {/* Menu below */}
-                    </div>
+                    </BoundsProvider>
                 </EditorProvider>
             </ReduxProvider>
         );
@@ -226,11 +229,11 @@ export class Editor extends React.Component<IProps> {
         return this.quill.getContents().ops;
     }
 
-    private get embedBarHeight(): number | null {
+    private get embedBarHeight(): number {
         if (this.embedBarRef.current) {
             return this.embedBarRef.current.clientHeight;
         } else {
-            return null;
+            return 0;
         }
     }
 

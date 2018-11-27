@@ -29,6 +29,7 @@ export interface ILanguageDropDownProps {
     buttonClassName?: string;
     buttonBaseClass?: ButtonBaseClass;
     renderLeft?: boolean;
+    openAsModal?: boolean;
 }
 
 /**
@@ -59,6 +60,7 @@ export default class LanguagesDropDown extends React.Component<ILanguageDropDown
                     renderLeft={this.props.renderLeft}
                     buttonClassName={this.props.buttonClassName}
                     buttonBaseClass={this.props.buttonBaseClass}
+                    openAsModal={this.props.openAsModal}
                 >
                     {processedChildren}
                 </SelectBox>

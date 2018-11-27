@@ -13,6 +13,8 @@ export interface IVanillaHeaderNavProps {
     data: IHeaderNav[];
     linkClassName?: string;
     linkContentClassName?: string;
+    children?: React.ReactNode;
+    listClassName?: string;
 }
 
 /**
@@ -32,7 +34,10 @@ export default class VanillaHeaderNav extends React.Component<IVanillaHeaderNavP
         });
         return (
             <nav className={classNames("headerNavigation", this.props.className)}>
-                <ul className="headerNavigation-items">{content}</ul>
+                <ul className={classNames("headerNavigation-items", this.props.listClassName)}>
+                    {content}
+                    {this.props.children}
+                </ul>
             </nav>
         );
     }

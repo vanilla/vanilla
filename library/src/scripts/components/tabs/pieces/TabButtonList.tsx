@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import { ButtonBaseClass } from "@library/components/forms/Button";
 import TabHandler from "@library/TabHandler";
 import TabButton from "@library/components/tabs/pieces/TabButton";
 

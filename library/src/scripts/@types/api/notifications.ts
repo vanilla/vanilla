@@ -3,12 +3,20 @@
  * @license GPL-2.0-only
  */
 
-export interface INotification {
+// All available notification resource API fields.
+export interface INotification extends INotificationWritable, INotificationServerManaged {}
+
+// Valid fields for a patch request.
+export interface INotificationWritable {
+    read: boolean;
+}
+
+// Fields maintained by the site.
+interface INotificationServerManaged {
     notificationID: number;
     body: string;
     photoUrl: string | null;
     url: string;
     dateInserted: string;
     dateUpdated: string;
-    read: boolean;
 }

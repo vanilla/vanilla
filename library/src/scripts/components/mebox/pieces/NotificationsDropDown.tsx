@@ -33,7 +33,7 @@ interface IState {
 }
 
 /**
- * Implements Messages Drop down for header
+ * Implements Notifications menu for header
  */
 export class NotificationsDropDown extends React.Component<IProps, IState> {
     private id = uniqueIDFromPrefix("notificationsDropDown");
@@ -42,6 +42,11 @@ export class NotificationsDropDown extends React.Component<IProps, IState> {
         open: false,
     };
 
+    /**
+     * Get the React component to added to the page.
+     *
+     * @returns A DropDown component, configured to display notifications.
+     */
     public render() {
         return (
             <DropDown
@@ -70,15 +75,26 @@ export class NotificationsDropDown extends React.Component<IProps, IState> {
         );
     }
 
+    /**
+     * A method to be invoked immediately after a component is inserted into the tree.
+     */
     public componentDidMount() {
         void this.props.actions.getNotifications();
     }
 
+    /**
+     * Mark all of the current user's notifications as read, then refresh the store of notifications.
+     */
     private markAllNotificationsRead = async () => {
         await this.props.actions.markAllRead();
         void this.props.actions.getNotifications();
     };
 
+    /**
+     * Assign the open (visibile) state of this component.
+     *
+     * @param open Is this menu open and visible?
+     */
     private setOpen = open => {
         this.setState({
             open,
@@ -86,18 +102,29 @@ export class NotificationsDropDown extends React.Component<IProps, IState> {
     };
 }
 
+/**
+ * Create action creators on the component, bound to a Redux dispatch function.
+ *
+ * @param dispatch Redux dispatch function.
+ */
 function mapDispatchToProps(dispatch) {
     return {
         actions: new NotificationsActions(dispatch, apiv2),
     };
 }
 
+/**
+ * Update the component state, based on changes to the Redux store.
+ *
+ * @param state Current Redux store state.
+ */
 function mapStateToProps(state: INotificationsStoreState) {
     let countUnread: number = 0;
     const data: IMeBoxNotificationItem[] = [];
     const notificationsByID = get(state, "notifications.notificationsByID.data", false);
 
     if (notificationsByID) {
+        // Tally the total unread notifications. Massage rows into something that will fit into IMeBoxNotificationItem.
         for (const notification of Object.values(notificationsByID) as INotification[]) {
             if (notification.read === false) {
                 countUnread++;
@@ -113,8 +140,8 @@ function mapStateToProps(state: INotificationsStoreState) {
             });
         }
 
-        // Notifications are indexed by ID, which means they'll be sorted by date inserted, ascending. Adjust for that.
-        const test = data.sort((itemA: IMeBoxNotificationItem, itemB: IMeBoxNotificationItem) => {
+        // Notifications are indexed by ID, which means they'll be sorted by when they were inserted, ascending. Adjust for that.
+        data.sort((itemA: IMeBoxNotificationItem, itemB: IMeBoxNotificationItem) => {
             const timeA = new Date(itemA.timestamp).getTime();
             const timeB = new Date(itemB.timestamp).getTime();
 
@@ -134,6 +161,7 @@ function mapStateToProps(state: INotificationsStoreState) {
     };
 }
 
+// Connect Redux to the React component.
 export default connect(
     mapStateToProps,
     mapDispatchToProps,

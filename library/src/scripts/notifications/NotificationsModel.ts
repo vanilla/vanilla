@@ -16,6 +16,9 @@ export interface INotificationsStoreState {
     notifications: INotificationsState;
 }
 
+/**
+ * Manage notification state in Redux.
+ */
 export default class NotificationsModel implements ReduxReducer<INotificationsState> {
     public readonly initialState: INotificationsState = {
         notificationsByID: {
@@ -24,6 +27,12 @@ export default class NotificationsModel implements ReduxReducer<INotificationsSt
         },
     };
 
+    /**
+     * Update the notifications state, based on the dispatched action.
+     *
+     * @param state Previous state of the store.
+     * @param action Name for the type of action that was dispatched.
+     */
     public reducer = (
         state: INotificationsState = this.initialState,
         action: typeof NotificationsActions.ACTION_TYPES,

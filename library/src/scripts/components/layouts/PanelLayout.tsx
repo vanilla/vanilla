@@ -8,6 +8,7 @@ import * as React from "react";
 import { Devices, IDeviceProps } from "../DeviceChecker";
 import classNames from "classnames";
 import CompoundComponent from "./CompoundComponent";
+import RenderToMobileDropDown from "@library/components/headers/pieces/RenderToMobileDropDown";
 
 interface IPanelLayoutProps extends IDeviceProps {
     children: React.ReactNode;
@@ -15,6 +16,7 @@ interface IPanelLayoutProps extends IDeviceProps {
     toggleMobileMenu?: (isOpen: boolean) => void;
     contentTag?: string;
     growMiddleBottom?: boolean;
+    mobileDropDownContent?: React.RefObject<HTMLDivElement>; // Needed for mobile dropdown
 }
 
 /**
@@ -186,6 +188,13 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                         </ContentTag>
                     </div>
                 </main>
+                {/* Renders in header */}
+                {renderMobilePanel &&
+                    this.props.mobileDropDownContent && (
+                        <RenderToMobileDropDown contentRef={this.props.mobileDropDownContent}>
+                            {children.leftBottom}
+                        </RenderToMobileDropDown>
+                    )}
             </div>
         );
     }

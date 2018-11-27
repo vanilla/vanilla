@@ -27,6 +27,7 @@ export interface IProps {
     toggleButtonClassName?: string;
     setExternalButtonRef?: (ref: React.RefObject<HTMLButtonElement>) => void;
     onVisibilityChange?: (isVisible: boolean) => void;
+    openAsModal?: boolean;
 }
 
 export interface IState {
@@ -70,6 +71,7 @@ export default class DropDown extends React.Component<IProps, IState> {
                 setExternalButtonRef={this.props.setExternalButtonRef}
                 toggleButtonClassName={this.props.toggleButtonClassName}
                 onVisibilityChange={this.props.onVisibilityChange}
+                openAsModal={this.props.openAsModal}
             >
                 {params => {
                     return (
@@ -81,6 +83,7 @@ export default class DropDown extends React.Component<IProps, IState> {
                             onClick={this.doNothing}
                             renderLeft={!!this.props.renderLeft}
                             renderAbove={!!this.props.renderAbove}
+                            openAsModal={this.props.openAsModal}
                         >
                             <ul className="dropDownItems">{this.props.children}</ul>
                         </DropDownContents>

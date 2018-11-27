@@ -18,6 +18,7 @@ export interface IProps {
     renderLeft: boolean;
     onClick: (event: React.MouseEvent) => void;
     legacyMode?: boolean;
+    openAsModal?: boolean;
 }
 /**
  * The contents of the dropdown (not the wrapper and not the button to toggle it).
@@ -30,7 +31,10 @@ export default class DropDownContents extends React.Component<IProps> {
                 <div
                     id={this.props.id}
                     aria-labelledby={this.props.parentID}
-                    className={classNames("dropDown-contents", this.props.className)}
+                    className={classNames(
+                        { "dropDown-contents": !this.props.openAsModal, "dropDown-asModal": this.props.openAsModal },
+                        this.props.className,
+                    )}
                     style={flyoutPosition(this.props.renderAbove, this.props.renderLeft, !!this.props.legacyMode)}
                     onClick={this.props.onClick}
                 >

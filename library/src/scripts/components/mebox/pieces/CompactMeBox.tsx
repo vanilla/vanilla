@@ -29,6 +29,7 @@ import MessagesContents from "@library/components/mebox/pieces/MessagesContents"
 export interface IUserDropDownProps extends IInjectableUserState, IMeBoxProps {
     buttonClass?: string;
     userPhotoClass?: string;
+    forceIcon?: boolean;
 }
 
 interface IState {
@@ -73,12 +74,12 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                         open={this.state.open}
                         className="meBox-user"
                         size={UserPhotoSize.SMALL}
-                        forceIcon={true}
+                        forceIcon={this.props.forceIcon}
                     />
                 </Button>
                 {this.state.open && (
                     <Modal
-                        size={ModalSizes.PSEUDO_DROP_DOWN}
+                        size={ModalSizes.MODAL_AS_SIDE_PANEL}
                         label={t("Article Revisions")}
                         elementToFocusOnExit={this.buttonRef.current!}
                         className="compactMeBox-modal"
@@ -97,12 +98,24 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                     {
                                         buttonContent: (
                                             <div className="compactSearch-tabButtonContent">
-                                                {user(false, "userPhoto-photo")}
+                                                <UserPhoto
+                                                    userInfo={userInfo}
+                                                    open={this.state.open}
+                                                    className="compactSearch-tabButtonContent"
+                                                    size={UserPhotoSize.SMALL}
+                                                    forceIcon={false}
+                                                />
                                             </div>
                                         ),
                                         openButtonContent: (
                                             <div className="compactSearch-tabButtonContent">
-                                                {user(true, "userPhoto-photo")}
+                                                <UserPhoto
+                                                    userInfo={userInfo}
+                                                    open={this.state.open}
+                                                    className="compactSearch-tabButtonContent"
+                                                    size={UserPhotoSize.SMALL}
+                                                    forceIcon={true}
+                                                />
                                             </div>
                                         ),
                                         panelContent: (

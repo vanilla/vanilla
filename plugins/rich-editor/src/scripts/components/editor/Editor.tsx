@@ -28,7 +28,6 @@ import { Devices } from "@library/components/DeviceChecker";
 import ParagraphToolbar from "@rich-editor/components/toolbars/ParagraphToolbar";
 import throttle from "lodash/throttle";
 import EmbedBar from "@rich-editor/components/editor/pieces/EmbedBar";
-import BoundsProvider from "@rich-editor/components/toolbars/pieces/BoundsProvider";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -83,36 +82,100 @@ export class Editor extends React.Component<IProps> {
     private quoteHandler: string;
 
     public render() {
-        const { isLoading, legacyMode } = this.props;
-        // These items CANNOT be rendered before quill is ready, but the main text area is required for quill to render.
-        // These should all re-render after componentDidMount calls forceUpdate().
-        let isMobile = false; // fallback for legacy: isMobile is always false
-        if (!this.props.legacyMode && this.props.device) {
-            isMobile = this.props.device === Devices.MOBILE;
-        }
+        return this.props.legacyMode ? this.renderLegacy() : this.renderModern();
+    }
 
-        const quillDependantItems = this.quill && (
-            <>
-                {!this.props.isLoading &&
-                    this.embedBarHeight !== null &&
-                    this.scrollContainerRef.current && (
-                        <>
-                            <InlineToolbar />
-                            {!isMobile && <ParagraphToolbar />}
-                            <MentionToolbar />
-                        </>
-                    )}
+    /**
+     * The modern view is characterized by a contextual menu at the top and it's own scroll container.
+     */
+    private renderModern(): React.ReactNode {
+        const { className } = this.props as INewProps;
+        return (
+            <div
+                className={classNames("richEditor", className, { isDisabled: this.props.isLoading })}
+                aria-label={t("Type your message.")}
+                aria-describedby={this.descriptionID}
+                role="textbox"
+                aria-multiline={true}
+                id={this.domID}
+            >
+                {this.renderContexts(
+                    <>
+                        {this.renderEmbedBar()}
+                        <div className="richEditor-scrollContainer" ref={this.scrollContainerRef}>
+                            {this.renderParagraphToolbar()}
+                            <div className={classNames("richEditor-frame InputBox isMenuInset")} id="testScroll">
+                                {this.renderInlineToolbars()}
+                                {this.renderMountPoint()}
+                            </div>
+                        </div>
+                    </>,
+                )}
+            </div>
+        );
+    }
 
+    /**
+     * The legacy rendering mode has everything at the bottom, and uses the document as it's scroll container.
+     */
+    private renderLegacy(): React.ReactNode {
+        return this.renderContexts(
+            <div className={classNames("richEditor-frame InputBox")} id="testScroll">
+                {this.renderMountPoint()}
+                {this.renderParagraphToolbar()}
+                {this.renderInlineToolbars()}
+                {this.renderEmbedBar()}
+            </div>,
+        );
+    }
+
+    private renderMountPoint(): React.ReactNode {
+        return (
+            <div className="richEditor-textWrap" ref={this.quillMountRef}>
+                <div
+                    className="ql-editor richEditor-text userContent"
+                    data-gramm="false"
+                    contentEditable={this.props.isLoading}
+                    data-placeholder="Create a new post..."
+                    tabIndex={0}
+                />
+            </div>
+        );
+    }
+
+    private renderEmbedBar(): React.ReactNode {
+        return (
+            this.quill && (
                 <EmbedBar
-                    isLoading={!!isLoading}
-                    isMobile={isMobile}
-                    legacyMode={legacyMode}
+                    isLoading={!!this.props.isLoading}
+                    isMobile={this.isMobile}
+                    legacyMode={this.props.legacyMode}
                     barRef={this.embedBarRef}
                 />
-            </>
+            )
         );
+    }
 
-        let mainContent = (
+    private renderParagraphToolbar(): React.ReactNode {
+        return this.quill && !this.props.isLoading && !this.isMobile && <ParagraphToolbar />;
+    }
+
+    private renderInlineToolbars(): React.ReactNode {
+        return (
+            this.quill &&
+            !this.props.isLoading && (
+                <>
+                    <InlineToolbar />
+                    <MentionToolbar />
+                </>
+            )
+        );
+    }
+
+    private renderContexts(content: React.ReactNode): React.ReactNode {
+        const { isLoading, legacyMode } = this.props;
+
+        return (
             <ReduxProvider store={this.store}>
                 <EditorProvider
                     value={{
@@ -122,49 +185,22 @@ export class Editor extends React.Component<IProps> {
                         isLoading: !!isLoading,
                     }}
                 >
-                    <BoundsProvider
-                        value={{
-                            container: this.scrollContainerRef.current,
-                            isScrolling: this.props.legacyMode,
-                            quill: this.quill,
-                            verticalOffset: this.embedBarHeight,
-                        }}
-                    >
-                        <EditorDescriptions id={this.descriptionID} />
-                        {!legacyMode && quillDependantItems} {/* Menu above */}
-                        <div className="richEditor-frame InputBox" id="testScroll" ref={this.scrollContainerRef}>
-                            <div className="richEditor-textWrap" ref={this.quillMountRef}>
-                                <div
-                                    className="ql-editor richEditor-text userContent"
-                                    data-gramm="false"
-                                    contentEditable={!!isLoading}
-                                    data-placeholder="Create a new post..."
-                                    tabIndex={0}
-                                />
-                            </div>
-                            {legacyMode && quillDependantItems} {/* Menu below */}
-                        </div>
-                    </BoundsProvider>
+                    <EditorDescriptions id={this.descriptionID} />
+                    {content}
                 </EditorProvider>
             </ReduxProvider>
         );
+    }
 
-        if (!this.props.legacyMode) {
-            mainContent = (
-                <div
-                    className={classNames("richEditor", this.props.className, { isDisabled: this.props.isLoading })}
-                    aria-label={t("Type your message.")}
-                    aria-describedby={this.descriptionID}
-                    role="textbox"
-                    aria-multiline={true}
-                    id={this.domID}
-                >
-                    {mainContent}
-                </div>
-            );
+    /**
+     * Determine if we are in mobile view or not. Always false for legacy mode.
+     */
+    private get isMobile(): boolean {
+        let isMobile = false; // fallback for legacy: isMobile is always false
+        if (!this.props.legacyMode && this.props.device) {
+            isMobile = this.props.device === Devices.MOBILE;
         }
-
-        return mainContent;
+        return isMobile;
     }
 
     /**
@@ -177,7 +213,7 @@ export class Editor extends React.Component<IProps> {
         registerQuill();
         const options: QuillOptionsStatic = {
             theme: "vanilla",
-            scrollingContainer: "#" + this.scrollContainerRef.current!.id,
+            scrollingContainer: this.scrollContainerRef.current || document.documentElement!,
         };
         this.quill = new Quill(this.quillMountRef.current!, options);
         if (this.props.initialValue) {

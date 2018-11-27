@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import Quill, { BoundsStatic } from "quill/core";
+import Quill from "quill/core";
 import { t } from "@library/application";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { isEmbedSelected, forceSelectionUpdate } from "@rich-editor/quill/utility";
@@ -15,9 +15,8 @@ import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
 import classNames from "classnames";
 import FocusWatcher from "@library/FocusWatcher";
 import ActiveFormatIcon from "@rich-editor/components/toolbars/pieces/ActiveFormatIcon";
-import { withBounds, IWithBoundsProps } from "@rich-editor/components/toolbars/pieces/BoundsProvider";
 
-interface IProps extends IWithEditorProps, IWithBoundsProps {}
+interface IProps extends IWithEditorProps {}
 
 interface IState {
     hasFocus: boolean;
@@ -84,7 +83,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
             <div
                 id={this.componentID}
                 style={this.pilcrowStyles}
-                className="richEditorParagraphMenu"
+                className={classNames("richEditorParagraphMenu", { isMenuInset: !this.props.legacyMode })}
                 onKeyDown={this.handleKeyDown}
                 ref={this.selfRef}
             >
@@ -121,7 +120,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      */
     private get isPilcrowVisible() {
         const { currentSelection } = this.props;
-        if (!currentSelection || this.props.getBounds(this.props.lastGoodSelection).isScrolledOff) {
+        if (!currentSelection) {
             return false;
         }
 
@@ -142,13 +141,13 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
         if (!this.props.lastGoodSelection) {
             return {};
         }
-        const bounds = this.props.getBounds(this.props.lastGoodSelection);
+        const bounds = this.quill.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
 
         // This is the pixel offset from the top needed to make things align correctly.
-        const offset = 12;
+        const offset = 14;
 
         return {
-            top: bounds.top + bounds.height / 2 - offset,
+            top: (bounds.top + bounds.bottom) / 2 - offset,
         };
     }
 
@@ -159,7 +158,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
         if (!this.props.lastGoodSelection) {
             return "";
         }
-        const bounds = this.props.getBounds(this.props.lastGoodSelection);
+        const bounds = this.quill.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
         let classes = "richEditor-toolbarContainer richEditor-paragraphToolbarContainer";
 
         if (bounds.top > 30) {
@@ -176,7 +175,6 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
      * This could likely be replaced by a CSS class in the future.
      */
     private get toolbarStyles(): React.CSSProperties {
-        console.log(this.isMenuVisible);
         if (this.isMenuVisible && !isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
             return {};
         } else {
@@ -250,4 +248,4 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     };
 }
 
-export default withEditor(withBounds(ParagraphToolbar));
+export default withEditor<IProps>(ParagraphToolbar);

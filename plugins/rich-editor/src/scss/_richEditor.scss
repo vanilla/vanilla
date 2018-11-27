@@ -27,12 +27,25 @@
     }
 }
 
+.richEditor-scrollContainer {
+    overflow-y: auto;
+    height: auto;
+    width: calc(100% + 68px);
+    margin-left: -34px;
+    padding-left: 34px;
+    padding-right: 34px;
+    position: relative;
+}
+
 .richEditor-frame {
-    &.InputBox {
+    position: relative;
+    background: $richEditor_bg;
+    height: auto;
+    padding: 0;
+
+    &.isMenuInset {
+        overflow: initial;
         position: relative;
-        background: $richEditor_bg;
-        height: auto;
-        padding: 0;
     }
 }
 
@@ -69,6 +82,10 @@
                 cursor: default;
             }
         }
+    }
+
+    &.isMenuInset {
+        transform: none;
     }
 }
 

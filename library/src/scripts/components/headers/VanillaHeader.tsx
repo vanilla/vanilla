@@ -24,12 +24,12 @@ import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
 import { connect } from "react-redux";
 import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
-import MobileDropDown, { IMobileDropDownProps } from "@library/components/headers/pieces/MobileDropDown";
+import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
     className?: string;
-    pageTitle?: string; // Needed for mobile dropdown
+    title?: string; // Needed for mobile dropdown
     mobileDropDownContent?: React.RefObject<HTMLDivElement>; // Needed for mobile dropdown
 }
 
@@ -54,7 +54,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
         const countClass = "vanillaHeader-count";
         const buttonClass = "vanillaHeader-button";
-        const showMobileDropDown = !this.state.openSearch && this.props.pageTitle && this.props.mobileDropDownContent;
+        const showMobileDropDown = !this.state.openSearch && this.props.title && this.props.mobileDropDownContent;
 
         const notificationProps = {
             data: dummyNotificationsData.data,
@@ -93,7 +93,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
 
                             {showMobileDropDown && (
                                 <MobileDropDown
-                                    pageTitle={this.props.pageTitle!}
+                                    pageTitle={this.props.title!}
                                     mobileDropDownContent={this.props.mobileDropDownContent!}
                                 />
                             )}

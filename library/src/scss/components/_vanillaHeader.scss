@@ -4,7 +4,6 @@
  * @license GPL-2.0-only
  */
 
-$vanillaHeader-navSpacer_width: 48px;
 $vanillaHeader-button_borderRadius: 3px;
 $vanillaHeader-button_size: 40px;
 $vanillaHeader-spacer_width: 12px;
@@ -79,7 +78,10 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 
 .vanillaHeader-meBox {
     justify-content: flex-end;
-    flex-basis: $vanillaHeader-endElements_flexBasis;
+
+    &.hasFlexBasis {
+        flex-basis: $vanillaHeader-endElements_flexBasis;
+    }
 }
 
 .vanillaHeader-nav {
@@ -87,10 +89,6 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
     flex-wrap: wrap;
     height: 100%;
     color: inherit;
-
-    &.hasLeftMargin {
-        margin-left: $vanillaHeader-navSpacer_width;
-    }
 }
 
 .vanillaHeader-locales {

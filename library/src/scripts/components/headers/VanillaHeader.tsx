@@ -81,7 +81,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                 !isMobile && (
                                     <VanillaHeaderNav
                                         {...dummyNavigationData}
-                                        className="vanillaHeader-nav hasLeftMargin"
+                                        className="vanillaHeader-nav"
                                         linkClassName="vanillaHeader-navLink"
                                         linkContentClassName="vanillaHeader-navLinkContent"
                                     />
@@ -101,7 +101,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                 onCloseSuggestions={this.setCloseSuggestions}
                             />
                             {isGuest ? (
-                                !this.state.openSearch && (
+                                (!this.state.openSearch || !isMobile) && (
                                     <VanillaHeaderNav
                                         {...dummyGuestNavigationData}
                                         linkClassName="vanillaHeader-navLink"
@@ -113,7 +113,9 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                 <React.Fragment>
                                     {!isMobile && (
                                         <MeBox
-                                            className="vanillaHeader-meBox"
+                                            className={classNames("vanillaHeader-meBox", {
+                                                hasFlexBasis: this.state.openSearch,
+                                            })}
                                             notificationsProps={notificationProps as INotificationsProps}
                                             messagesProps={messagesProps as any}
                                             counts={dummyUserDropDownData}

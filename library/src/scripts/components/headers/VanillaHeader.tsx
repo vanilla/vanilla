@@ -24,14 +24,13 @@ import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
 import { connect } from "react-redux";
 import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
-import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
+import MobileDropDown, { IMobileDropDownProps } from "@library/components/headers/pieces/MobileDropDown";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
-    pageTitle: string;
-
     container?: Element; // Element containing header. Should be the default most if not all of the time.
     className?: string;
-    mobileDropDownContent: React.RefObject<HTMLDivElement>;
+    pageTitle?: string; // Needed for mobile dropdown
+    mobileDropDownContent?: React.RefObject<HTMLDivElement>; // Needed for mobile dropdown
 }
 
 interface IState {
@@ -55,6 +54,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
         const countClass = "vanillaHeader-count";
         const buttonClass = "vanillaHeader-button";
+        const showMobileDropDown = !this.state.openSearch && this.props.pageTitle && this.props.mobileDropDownContent;
 
         const notificationProps = {
             data: dummyNotificationsData.data,
@@ -91,10 +91,10 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                     />
                                 )}
 
-                            {!this.state.openSearch && (
+                            {showMobileDropDown && (
                                 <MobileDropDown
-                                    title={this.props.pageTitle}
-                                    contentRef={this.props.mobileDropDownContent}
+                                    pageTitle={this.props.pageTitle!}
+                                    mobileDropDownContent={this.props.mobileDropDownContent!}
                                 />
                             )}
 

@@ -9,8 +9,9 @@ import { Devices, IDeviceProps } from "../DeviceChecker";
 import { withDevice } from "../../contexts/DeviceContext";
 import VanillaMobileHomeHeader from "@library/components/headers/pieces/VanillaMobileHomeHeader";
 import VanillaHeader from "@library/components/headers/VanillaHeader";
+import { IMobileDropDownProps } from "@library/components/headers/pieces/MobileDropDown";
 
-interface IProps extends IDeviceProps {}
+interface IProps extends IDeviceProps, IMobileDropDownProps {}
 
 /**
  * Implements Vanilla Header component. Note that this component uses a react portal.

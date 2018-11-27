@@ -14,9 +14,12 @@ import CloseButton from "@library/components/CloseButton";
 import { downTriangle, user } from "@library/components/icons/header";
 import { Panel } from "@library/components/layouts/PanelLayout";
 
-export interface IProps {
-    title: string;
-    contentRef: React.RefObject<HTMLDivElement>;
+export interface IMobileDropDownProps {
+    pageTitle: string;
+    mobileDropDownContent: React.RefObject<HTMLDivElement>;
+}
+
+export interface IProps extends IMobileDropDownProps {
     className?: string;
     buttonClass?: string;
 }
@@ -36,17 +39,17 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
     };
 
     public render() {
-        return this.props.contentRef && this.props.contentRef.current ? (
+        return this.props.mobileDropDownContent && this.props.mobileDropDownContent.current ? (
             <div className={classNames("headerDropDown", this.props.className)}>
                 <Button
-                    title={this.props.title}
+                    title={this.props.pageTitle}
                     className={classNames("headerDropDown-toggleButton", this.props.buttonClass)}
                     onClick={this.open}
                     buttonRef={this.buttonRef}
                     baseClass={ButtonBaseClass.CUSTOM}
                 >
                     <span className="headerDropDown-title">
-                        {this.props.title} {downTriangle()}
+                        {this.props.pageTitle} {downTriangle()}
                     </span>
                 </Button>
                 {this.state.open && (
@@ -59,7 +62,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                     >
                         <Panel className="headerDropDown-panel">
                             <CloseButton onClick={this.close} className="headerDropDown-closeModal" />
-                            <div className="headerDropDown-contents" ref={this.props.contentRef} />
+                            <div className="headerDropDown-contents" ref={this.props.mobileDropDownContent} />
                         </Panel>
                     </Modal>
                 )}

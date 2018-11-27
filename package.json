@@ -36,6 +36,7 @@
         "smoothscroll-polyfill": "0.4.3",
         "sprintf-js": "1.1.1",
         "tabbable": "3.1.1",
+        "tsc-watch": "1.0.31",
         "twemoji": "2.5.1",
         "validator": "10.8.0"
     },
@@ -128,7 +129,6 @@
         "ts-lint": "4.5.1",
         "ts-loader": "5.2.2",
         "ts-node": "7.0.1",
-        "tsc-watch": "1.0.30",
         "tsconfig-paths-webpack-plugin": "3.2.0",
         "tslint": "5.11.0",
         "typescript": "3.1.3",

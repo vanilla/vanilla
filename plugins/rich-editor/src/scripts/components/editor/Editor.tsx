@@ -284,14 +284,6 @@ export class Editor extends React.Component<IProps> {
         return this.quill.getContents().ops;
     }
 
-    private get embedBarHeight(): number {
-        if (this.embedBarRef.current) {
-            return this.embedBarRef.current.clientHeight;
-        } else {
-            return 0;
-        }
-    }
-
     /**
      * Loop through the editor document and ensure every header has a unique data-id.
      */

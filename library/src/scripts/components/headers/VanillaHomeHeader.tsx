@@ -11,7 +11,7 @@ import VanillaMobileHomeHeader from "@library/components/headers/pieces/VanillaM
 import VanillaHeader from "@library/components/headers/VanillaHeader";
 import { IMobileDropDownProps } from "@library/components/headers/pieces/MobileDropDown";
 
-interface IProps extends IDeviceProps, IMobileDropDownProps {}
+interface IProps extends IDeviceProps {}
 
 /**
  * Implements Vanilla Header component. Note that this component uses a react portal.

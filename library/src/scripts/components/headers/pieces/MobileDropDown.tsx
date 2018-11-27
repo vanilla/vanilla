@@ -14,14 +14,11 @@ import CloseButton from "@library/components/CloseButton";
 import { downTriangle, user } from "@library/components/icons/header";
 import { Panel } from "@library/components/layouts/PanelLayout";
 
-export interface IMobileDropDownProps {
-    pageTitle: string;
-    mobileDropDownContent: React.RefObject<HTMLDivElement>;
-}
-
-export interface IProps extends IMobileDropDownProps {
+export interface IProps {
     className?: string;
     buttonClass?: string;
+    title: string;
+    mobileDropDownContent: React.ReactNode;
 }
 
 interface IState {
@@ -42,14 +39,14 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
         return this.props.mobileDropDownContent && this.props.mobileDropDownContent.current ? (
             <div className={classNames("headerDropDown", this.props.className)}>
                 <Button
-                    title={this.props.pageTitle}
+                    title={this.props.title}
                     className={classNames("headerDropDown-toggleButton", this.props.buttonClass)}
                     onClick={this.open}
                     buttonRef={this.buttonRef}
                     baseClass={ButtonBaseClass.CUSTOM}
                 >
                     <span className="headerDropDown-title">
-                        {this.props.pageTitle} {downTriangle()}
+                        {this.props.title} {downTriangle()}
                     </span>
                 </Button>
                 {this.state.open && (
@@ -62,7 +59,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                     >
                         <Panel className="headerDropDown-panel">
                             <CloseButton onClick={this.close} className="headerDropDown-closeModal" />
-                            <div className="headerDropDown-contents" ref={this.props.mobileDropDownContent} />
+                            {this.props.mobileDropDownContent}
                         </Panel>
                     </Modal>
                 )}

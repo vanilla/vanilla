@@ -30,7 +30,7 @@ interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
     className?: string;
     title?: string; // Needed for mobile dropdown
-    mobileDropDownContent?: React.RefObject<HTMLDivElement>; // Needed for mobile dropdown
+    mobileDropDownContent?: React.ReactNode; // Needed for mobile dropdown
 }
 
 interface IState {
@@ -93,7 +93,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
 
                             {showMobileDropDown && (
                                 <MobileDropDown
-                                    pageTitle={this.props.title!}
+                                    title={this.props.title!}
                                     mobileDropDownContent={this.props.mobileDropDownContent!}
                                 />
                             )}
@@ -187,4 +187,4 @@ export class VanillaHeader extends React.Component<IProps, IState> {
 }
 
 const withRedux = connect(UsersModel.mapStateToProps);
-export default withRedux(withDevice(VanillaHeader));
+export default withRedux(withDevice<IProps>(VanillaHeader));

@@ -81,6 +81,9 @@ export class Editor extends React.Component<IProps> {
     /** The hash of our delegated quote event handler. Used to unset the handler on unmount. */
     private quoteHandler: string;
 
+    /**
+     * Render either the legacy or modern view for the editor.
+     */
     public render() {
         return this.props.legacyMode ? this.renderLegacy() : this.renderModern();
     }
@@ -129,6 +132,9 @@ export class Editor extends React.Component<IProps> {
         );
     }
 
+    /**
+     * Render the elements that Quill will mount into.
+     */
     private renderMountPoint(): React.ReactNode {
         return (
             <div className="richEditor-textWrap" ref={this.quillMountRef}>
@@ -143,6 +149,9 @@ export class Editor extends React.Component<IProps> {
         );
     }
 
+    /**
+     * Conditionally render the embed bar.
+     */
     private renderEmbedBar(): React.ReactNode {
         return (
             this.quill && (
@@ -156,10 +165,16 @@ export class Editor extends React.Component<IProps> {
         );
     }
 
+    /**
+     * Conditionally render the paragraph toolbar.
+     */
     private renderParagraphToolbar(): React.ReactNode {
         return this.quill && !this.props.isLoading && !this.isMobile && <ParagraphToolbar />;
     }
 
+    /**
+     * Conditionally render the inline toolbars.
+     */
     private renderInlineToolbars(): React.ReactNode {
         return (
             this.quill &&
@@ -172,6 +187,10 @@ export class Editor extends React.Component<IProps> {
         );
     }
 
+    /**
+     * Render the top level contexts for the editor.
+     * @param content The content to nest inside of the contexts.
+     */
     private renderContexts(content: React.ReactNode): React.ReactNode {
         const { isLoading, legacyMode } = this.props;
 

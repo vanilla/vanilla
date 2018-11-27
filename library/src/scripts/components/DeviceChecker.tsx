@@ -6,8 +6,6 @@
 
 import * as React from "react";
 import throttle from "lodash/throttle";
-import { debug } from "@library/utility";
-import get from "lodash/get";
 
 export enum Devices {
     MOBILE = "mobile",
@@ -66,7 +64,7 @@ export default class DeviceChecker extends React.Component<IDeviceCheckerProps> 
      */
     public componentDidMount() {
         window.addEventListener("resize", this.throttledUpdateOnResize);
-        if (get(window, "gdn.meta.context.debug", false)) {
+        if (module.hot) {
             setTimeout(() => {
                 window.dispatchEvent(new Event("resize"));
             }, 1000);

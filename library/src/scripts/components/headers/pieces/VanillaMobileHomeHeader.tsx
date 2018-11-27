@@ -69,8 +69,8 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                             <FlexSpacer className="vanillaHeaderHome-left" />
                             <HeaderLogo
                                 {...dummyLogoData}
-                                className="vanillaHeader-headerLogo"
-                                logoClassName="vanillaHeader-logo"
+                                className="vanillaHeader-logoContainer"
+                                logoClassName="vanillaHeader-logo isCentred"
                             />
                             <CompactMeBox
                                 notificationsProps={notificationProps as INotificationsProps}

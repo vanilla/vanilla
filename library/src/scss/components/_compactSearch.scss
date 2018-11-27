@@ -4,6 +4,8 @@
  * @license GPL-2.0-only
  */
 
+
+
 .compactSearch {
     .searchBar{
         flex-grow: 1;
@@ -28,6 +30,10 @@
     &.isOpen {
         width: 100%;
     }
+
+    &.isCentered {
+        margin: auto;
+    }
 }
 
 .compactSearch-contents {
@@ -42,3 +48,4 @@
     white-space: nowrap;
     font-weight: $global_fontWeight_semiBold;
 }
+

@@ -70,11 +70,11 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
         return (
             <li className={classNames("meBoxMessage", this.props.className)}>
                 <SmartLink to={to} className="meBoxMessage-link" tabIndex={0}>
-                    <div className="meBoxMessage-image">
+                    <div className="meBoxMessage-imageContainer">
                         {this.props.photo ? (
-                            <img className="meBoxMessage-photo" src={this.props.photo} />
+                            <img className="meBoxMessage-image" src={this.props.photo} />
                         ) : (
-                            noUserPhoto("meBoxMessage-photo")
+                            noUserPhoto("meBoxMessage-image")
                         )}
                     </div>
                     <div className="meBoxMessage-contents">

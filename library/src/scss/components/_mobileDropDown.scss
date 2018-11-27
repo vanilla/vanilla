@@ -4,25 +4,25 @@
  * @license GPL-2.0-only
  */
 
-$headerDropDown-title_letterSpacing: -.26px;
+$mobileDropDown-title_letterSpacing: -.26px;
 
-.headerDropDown {
+.mobileDropDown {
     position: relative;
     flex-grow: 1;
 }
 
-.headerDropDown-toggleButton {
+.mobileDropDown-toggleButton {
     @include flexCenterContent(nowrap);
     margin: auto;
     max-width: 100%;
 }
 
-.headerDropDown-title {
-    letter-spacing: $headerDropDown-title_letterSpacing;
+.mobileDropDown-title {
+    letter-spacing: $mobileDropDown-title_letterSpacing;
     font-weight: $global-fontWeight_semiBold;
 }
 
-.headerDropDown-icon {
+.mobileDropDown-icon {
     flex-basis: 16px;
     margin-left: 8px;
 }

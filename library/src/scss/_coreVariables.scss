@@ -423,7 +423,10 @@ $dropDown-metas_horizontalPadding                   : 18px;
 $dropDown-item_verticalPadding                      : 6px;
 $dropDown-item_horizontalPadding                    : 18px;
 
-$dropDown-item_minHeight                            : 45px;
+$dropDown-item_minHeight                            : 30px;
+$dropDown-item_mobile_minHeight                     : 44px;
+
+$dropDown-item_mobile_fontSize                      : 18px;
 
 /* -------------------------------------------------------------- *\
     Header

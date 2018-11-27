@@ -37,41 +37,43 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
 
     public render() {
         return this.props.mobileDropDownContent ? (
-            <div className={classNames("headerDropDown", this.props.className)}>
+            <div className={classNames("mobileDropDown", this.props.className)}>
                 <Button
                     title={this.props.title}
-                    className={classNames("headerDropDown-toggleButton", this.props.buttonClass)}
+                    className={classNames("mobileDropDown-toggleButton", this.props.buttonClass)}
                     onClick={this.open}
                     buttonRef={this.buttonRef}
                     baseClass={ButtonBaseClass.CUSTOM}
                 >
-                    <span className="headerDropDown-title">{this.props.title}</span>
-                    <span className="headerDropDown-icon">{downTriangle("headerDropDown-downTriangle")}</span>
+                    <span className="mobileDropDown-title">{this.props.title}</span>
+                    <span className="mobileDropDown-icon">{downTriangle("mobileDropDown-downTriangle")}</span>
                 </Button>
                 {this.state.open && (
                     <Modal
                         size={ModalSizes.MODAL_AS_DROP_DOWN}
                         label={t("Page Menu")}
                         elementToFocusOnExit={this.buttonRef.current!}
-                        className="headerDropDown-modal"
+                        className="mobileDropDown-modal"
                         exitHandler={this.close}
                     >
-                        <Panel className="headerDropDown-panel">
-                            <CloseButton onClick={this.close} className="headerDropDown-closeModal" />
-                            {this.props.mobileDropDownContent}
-                            <Button
-                                onClick={this.close}
-                                baseClass={ButtonBaseClass.CUSTOM}
-                                className="headerDropDown-closeModal"
-                            >
-                                {chevronUp("headerDropDown-closeModalIcon")}
-                            </Button>
-                        </Panel>
+                        <div className="mobileDropDown-content">
+                            <Panel className="mobileDropDown-panel">
+                                <CloseButton onClick={this.close} className="mobileDropDown-closeModal" />
+                                {this.props.mobileDropDownContent}
+                                <Button
+                                    onClick={this.close}
+                                    baseClass={ButtonBaseClass.CUSTOM}
+                                    className="mobileDropDown-closeModal"
+                                >
+                                    {chevronUp("mobileDropDown-closeModalIcon")}
+                                </Button>
+                            </Panel>
+                        </div>
                     </Modal>
                 )}
             </div>
         ) : (
-            <span className="headerDropDown-title">{this.props.title}</span>
+            <span className="mobileDropDown-title">{this.props.title}</span>
         );
     }
 

@@ -40,7 +40,7 @@ export interface IState {
 export default class DropDown extends React.Component<IProps, IState> {
     private id;
     public static defaultProps = {
-        openAsModal: true,
+        openAsModal: false,
     };
     public constructor(props) {
         super(props);

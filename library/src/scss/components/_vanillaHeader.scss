@@ -78,10 +78,6 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 
 .vanillaHeader-meBox {
     justify-content: flex-end;
-
-    &.hasFlexBasis {
-        flex-basis: $vanillaHeader-endElements_flexBasis;
-    }
 }
 
 .vanillaHeader-nav {
@@ -246,4 +242,12 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 
 .vanillaHeader-mobileDropDown {
     height: $vanillaHeader_mobile_height;
+}
+
+.vanillaHeader-rightFlexBasis {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    flex-basis: $vanillaHeader-endElements_flexBasis;
 }

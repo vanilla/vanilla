@@ -25,6 +25,7 @@ import { connect } from "react-redux";
 import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
+import ConditionalWrap from "@library/components/ConditionalWrap";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -100,55 +101,55 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                 />
                             )}
 
-                            <CompactSearch
-                                className={classNames("vanillaHeader-compactSearch", {
-                                    isCentered: this.state.openSearch,
-                                })}
-                                open={this.state.openSearch}
-                                onOpenSearch={this.openSearch}
-                                onCloseSearch={this.closeSearch}
-                                cancelButtonClassName="vanillaHeader-searchCancel"
-                                buttonClass="vanillaHeader-button"
-                                showingSuggestions={this.state.showingSuggestions}
-                                onOpenSuggestions={this.setOpenSuggestions}
-                                onCloseSuggestions={this.setCloseSuggestions}
-                            />
-                            {isGuest ? (
-                                (!this.state.openSearch || !isMobile) && (
-                                    <VanillaHeaderNav
-                                        {...dummyGuestNavigationData}
-                                        linkClassName="vanillaHeader-navLink"
-                                        linkContentClassName="vanillaHeader-navLinkContent"
-                                        className="vanillaHeader-nav vanillaHeader-guestNav"
-                                    />
-                                )
-                            ) : (
-                                <React.Fragment>
-                                    {!isMobile && (
-                                        <MeBox
-                                            className={classNames("vanillaHeader-meBox", {
-                                                hasFlexBasis: this.state.openSearch,
-                                            })}
-                                            notificationsProps={notificationProps as INotificationsProps}
-                                            messagesProps={messagesProps as any}
-                                            counts={dummyUserDropDownData}
-                                            buttonClassName="vanillaHeader-button"
-                                            contentClassName="vanillaHeader-dropDownContents"
+                            <ConditionalWrap className="vanillaHeader-rightFlexBasis" condition={!!showMobileDropDown}>
+                                <CompactSearch
+                                    className={classNames("vanillaHeader-compactSearch", {
+                                        isCentered: this.state.openSearch,
+                                    })}
+                                    open={this.state.openSearch}
+                                    onOpenSearch={this.openSearch}
+                                    onCloseSearch={this.closeSearch}
+                                    cancelButtonClassName="vanillaHeader-searchCancel"
+                                    buttonClass="vanillaHeader-button"
+                                    showingSuggestions={this.state.showingSuggestions}
+                                    onOpenSuggestions={this.setOpenSuggestions}
+                                    onCloseSuggestions={this.setCloseSuggestions}
+                                />
+                                {isGuest ? (
+                                    (!this.state.openSearch || !isMobile) && (
+                                        <VanillaHeaderNav
+                                            {...dummyGuestNavigationData}
+                                            linkClassName="vanillaHeader-navLink"
+                                            linkContentClassName="vanillaHeader-navLinkContent"
+                                            className="vanillaHeader-nav vanillaHeader-guestNav"
                                         />
-                                    )}
-                                    {isMobile &&
-                                        !this.state.openSearch && (
-                                            <CompactMeBox
+                                    )
+                                ) : (
+                                    <React.Fragment>
+                                        {!isMobile && (
+                                            <MeBox
+                                                className="vanillaHeader-meBox"
                                                 notificationsProps={notificationProps as INotificationsProps}
                                                 messagesProps={messagesProps as any}
                                                 counts={dummyUserDropDownData}
-                                                buttonClass="vanillaHeader-button"
-                                                userPhotoClass="headerDropDown-user"
-                                                forceIcon={true}
+                                                buttonClassName="vanillaHeader-button"
+                                                contentClassName="vanillaHeader-dropDownContents"
                                             />
                                         )}
-                                </React.Fragment>
-                            )}
+                                        {isMobile &&
+                                            !this.state.openSearch && (
+                                                <CompactMeBox
+                                                    notificationsProps={notificationProps as INotificationsProps}
+                                                    messagesProps={messagesProps as any}
+                                                    counts={dummyUserDropDownData}
+                                                    buttonClass="vanillaHeader-button"
+                                                    userPhotoClass="headerDropDown-user"
+                                                    forceIcon={true}
+                                                />
+                                            )}
+                                    </React.Fragment>
+                                )}
+                            </ConditionalWrap>
                         </div>
                     </PanelWidgetHorizontalPadding>
                 </Container>

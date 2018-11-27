@@ -11,7 +11,7 @@ import Modal from "@library/components/modal/Modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import CloseButton from "@library/components/CloseButton";
-import { downTriangle } from "@library/components/icons/header";
+import { chevronUp, downTriangle } from "@library/components/icons/header";
 import { Panel } from "@library/components/layouts/PanelLayout";
 
 export interface IProps {
@@ -46,7 +46,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                     baseClass={ButtonBaseClass.CUSTOM}
                 >
                     <span className="headerDropDown-title">{this.props.title}</span>
-                    {downTriangle()}
+                    <span className="headerDropDown-icon">{downTriangle("headerDropDown-downTriangle")}</span>
                 </Button>
                 {this.state.open && (
                     <Modal
@@ -59,6 +59,13 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                         <Panel className="headerDropDown-panel">
                             <CloseButton onClick={this.close} className="headerDropDown-closeModal" />
                             {this.props.mobileDropDownContent}
+                            <Button
+                                onClick={this.close}
+                                baseClass={ButtonBaseClass.CUSTOM}
+                                className="headerDropDown-closeModal"
+                            >
+                                {chevronUp("headerDropDown-closeModalIcon")}
+                            </Button>
                         </Panel>
                     </Modal>
                 )}

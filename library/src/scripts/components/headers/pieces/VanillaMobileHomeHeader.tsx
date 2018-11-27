@@ -46,10 +46,9 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
         const countClass = "vanillaHeader-count";
         const buttonClass = "vanillaHeader-button";
 
-        const notificationProps = {
-            data: dummyNotificationsData.data,
+        const notificationProps: INotificationsProps = {
+            data: [],
             userSlug: currentUser!.name,
-            count: 108,
             countClass: classNames(countClass, "vanillaHeader-notificationsCount"),
         };
 
@@ -73,7 +72,7 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                                 logoClassName="vanillaHeader-logo isCentred"
                             />
                             <CompactMeBox
-                                notificationsProps={notificationProps as INotificationsProps}
+                                notificationsProps={notificationProps}
                                 messagesProps={messagesProps as any}
                                 counts={dummyUserDropDownData}
                                 buttonClass="vanillaHeader-button"

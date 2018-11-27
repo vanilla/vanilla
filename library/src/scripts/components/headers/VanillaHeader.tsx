@@ -52,10 +52,9 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const countClass = "vanillaHeader-count";
         const buttonClass = "vanillaHeader-button";
 
-        const notificationProps = {
-            data: dummyNotificationsData.data,
+        const notificationProps: INotificationsProps = {
+            data: [],
             userSlug: currentUser!.name,
-            count: 108,
             countClass: classNames(countClass, "vanillaHeader-notificationsCount"),
         };
 
@@ -116,7 +115,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                             className={classNames("vanillaHeader-meBox", {
                                                 hasFlexBasis: this.state.openSearch,
                                             })}
-                                            notificationsProps={notificationProps as INotificationsProps}
+                                            notificationsProps={notificationProps}
                                             messagesProps={messagesProps as any}
                                             counts={dummyUserDropDownData}
                                             buttonClassName="vanillaHeader-button"
@@ -126,7 +125,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                     {isMobile &&
                                         !this.state.openSearch && (
                                             <CompactMeBox
-                                                notificationsProps={notificationProps as INotificationsProps}
+                                                notificationsProps={notificationProps}
                                                 messagesProps={messagesProps as any}
                                                 counts={dummyUserDropDownData}
                                                 buttonClass="vanillaHeader-button"

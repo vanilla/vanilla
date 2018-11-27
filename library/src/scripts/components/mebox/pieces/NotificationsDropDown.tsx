@@ -18,6 +18,7 @@ import apiv2 from "@library/apiv2";
 import NotificationsActions from "@library/notifications/NotificationsActions";
 import { INotificationsStoreState } from "@library/notifications/NotificationsModel";
 import get from "lodash/get";
+import { INotification } from "@library/@types/api";
 
 interface IProps extends INotificationsProps {
     className?: string;
@@ -95,7 +96,7 @@ function mapStateToProps(state: INotificationsStoreState) {
     const notificationsByID = get(state, "notifications.notificationsByID.data", false);
 
     if (notificationsByID) {
-        for (const notification of Object.values(notificationsByID)) {
+        for (const notification of Object.values(notificationsByID) as INotification[]) {
             data.push({
                 message: notification.body,
                 photo: notification.photoUrl || null,

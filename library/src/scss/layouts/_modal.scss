@@ -52,6 +52,10 @@ $modal-dropDown_padding: $global_spacer;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: $formElement_height + $global-gutter_halfSize;
+    min-height: $vanillaHeader_height;
     margin-bottom: $global_spacer * 1.5;
+
+    @include mediaQuery-panelLayout_oneColumn {
+        min-height: $vanillaHeader_mobile_height;
+    }
 }

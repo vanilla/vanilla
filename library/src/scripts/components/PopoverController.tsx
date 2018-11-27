@@ -115,8 +115,7 @@ export default class PopoverController extends React.PureComponent<
                 {!this.props.disabled &&
                     this.state.isVisible && (
                         <React.Fragment>
-                            {!this.props.openAsModal && this.props.children(childrenData)}
-                            {this.props.openAsModal && (
+                            {this.props.openAsModal ? (
                                 <Modal
                                     label={t("title")}
                                     size={ModalSizes.SMALL}
@@ -125,6 +124,8 @@ export default class PopoverController extends React.PureComponent<
                                 >
                                     {this.props.children(childrenData)}
                                 </Modal>
+                            ) : (
+                                this.props.children(childrenData)
                             )}
                         </React.Fragment>
                     )}

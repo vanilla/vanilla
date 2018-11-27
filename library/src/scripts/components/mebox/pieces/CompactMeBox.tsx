@@ -131,7 +131,7 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                             <NotificationsToggle
                                                 open={false}
                                                 className="compactSearch-tabButtonContent"
-                                                count={this.props.notificationsProps.count}
+                                                count={this.props.notificationsProps.data.length}
                                                 countClass={this.props.notificationsProps.countClass}
                                             />
                                         ),
@@ -139,7 +139,7 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                             <NotificationsToggle
                                                 open={true}
                                                 className="compactSearch-tabButtonContent"
-                                                count={this.props.notificationsProps.count}
+                                                count={this.props.notificationsProps.data.length}
                                                 countClass={this.props.notificationsProps.countClass}
                                             />
                                         ),

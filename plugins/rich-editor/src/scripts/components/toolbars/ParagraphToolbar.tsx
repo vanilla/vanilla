@@ -144,11 +144,20 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
         const bounds = this.quill.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
 
         // This is the pixel offset from the top needed to make things align correctly.
-        const offset = 14;
 
         return {
-            top: (bounds.top + bounds.bottom) / 2 - offset,
+            top: (bounds.top + bounds.bottom) / 2 - this.verticalOffset,
         };
+    }
+
+    private static readonly DEFAULT_OFFSET = 12;
+    private static readonly LEGACY_EXTRA_OFFSET = 2;
+
+    private get verticalOffset(): number {
+        const calculatedOffset =
+            parseInt(window.getComputedStyle(this.quill.root).paddingTop!, 10) || ParagraphToolbar.DEFAULT_OFFSET;
+        const extraOffset = this.props.legacyMode ? ParagraphToolbar.LEGACY_EXTRA_OFFSET : 0;
+        return calculatedOffset + extraOffset;
     }
 
     /**

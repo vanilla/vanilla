@@ -223,7 +223,7 @@ export function chevronUp(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 51 17"
-            className={classNames("icon", "icon-triangleRight", className)}
+            className={classNames("icon", "icon-chevronUp", className)}
             aria-hidden="true"
         >
             <title>{title}</title>

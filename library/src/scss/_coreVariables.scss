@@ -166,6 +166,7 @@ $global-main_width                                   : $global-panel_paddedWidth
 $global-main_paddedWidth                             : $global-main_width + 2 * $global-gutter_size !default;  // Derived
 
 $global-twoColumn_breakpoint                         : 900px !default; // Generic breakpoint for 2 columns
+$global-xs_breakpoint                                : 500px !default;
 
 // Hard coded columns
 $evenColumns_breakpoint                              : $global-twoColumn_breakpoint !default;

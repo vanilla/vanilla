@@ -38,8 +38,13 @@ $modal-dropDown_padding: $global_spacer;
     &.isSidePanel {
         margin-left: $modal-dropDown_padding;
     }
-    &.isPseudoDropDown {
-        margin-left: $modal-dropDown_padding;
+
+    &.isDropDown {
+        overflow: auto;
+        width: 100%;
+        background-color: $modal-bgColor;
+        margin-bottom: auto;
+        max-height: 100vh;
     }
 }
 

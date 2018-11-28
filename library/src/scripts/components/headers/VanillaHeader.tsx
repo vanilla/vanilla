@@ -94,11 +94,9 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                 )}
 
                             {showMobileDropDown && (
-                                <MobileDropDown
-                                    title={this.props.title!}
-                                    mobileDropDownContent={this.props.mobileDropDownContent!}
-                                    buttonClass="vanillaHeader-mobileDropDown"
-                                />
+                                <MobileDropDown title={this.props.title!} buttonClass="vanillaHeader-mobileDropDown">
+                                    {this.props.mobileDropDownContent}
+                                </MobileDropDown>
                             )}
 
                             <ConditionalWrap className="vanillaHeader-rightFlexBasis" condition={!!showMobileDropDown}>

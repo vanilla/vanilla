@@ -50,6 +50,8 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 .vanillaHeader-bar {
     display: flex;
     justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow: hidden;
     align-items: center;
     min-height: $vanillaHeader_height;
     width: 100%;
@@ -68,6 +70,11 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
     align-self: center;
     color: $vanillaHeader_fg;
     flex-basis: $vanillaHeader-endElements_flexBasis;
+
+    @include mediaQuery-panelLayout_oneColumn {
+        flex-shrink: 1;
+        flex-basis: auto;
+    }
 }
 
 .headerLogo-logo {
@@ -250,4 +257,9 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
     justify-content: flex-end;
     align-items: center;
     flex-basis: $vanillaHeader-endElements_flexBasis;
+
+    @include mediaQuery-panelLayout_oneColumn {
+        flex-basis: auto;
+        flex-shrink: 1;
+    }
 }

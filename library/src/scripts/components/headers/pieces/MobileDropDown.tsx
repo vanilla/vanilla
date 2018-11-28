@@ -10,15 +10,16 @@ import classNames from "classnames";
 import Modal from "@library/components/modal/Modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import CloseButton from "@library/components/CloseButton";
 import { chevronUp, downTriangle } from "@library/components/icons/header";
 import { Panel } from "@library/components/layouts/PanelLayout";
+import { Frame, FrameBody, FrameFooter, FrameHeader, FramePanel } from "@library/components/frame";
+import SmartAlign from "@library/components/SmartAlign";
 
 export interface IProps {
     className?: string;
     buttonClass?: string;
     title: string;
-    mobileDropDownContent: React.ReactNode;
+    children: React.ReactNode;
 }
 
 interface IState {
@@ -36,11 +37,12 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
     };
 
     public render() {
-        return this.props.mobileDropDownContent ? (
-            <div className={classNames("mobileDropDown", this.props.className)}>
+        const { className, children, title, buttonClass } = this.props;
+        return children ? (
+            <div className={classNames("mobileDropDown", className)}>
                 <Button
                     title={this.props.title}
-                    className={classNames("mobileDropDown-toggleButton", this.props.buttonClass)}
+                    className={classNames("mobileDropDown-toggleButton", buttonClass)}
                     onClick={this.open}
                     buttonRef={this.buttonRef}
                     baseClass={ButtonBaseClass.CUSTOM}
@@ -51,22 +53,28 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                 {this.state.open && (
                     <Modal
                         size={ModalSizes.MODAL_AS_DROP_DOWN}
-                        label={t("Page Menu")}
+                        label={t("Menu")}
                         elementToFocusOnExit={this.buttonRef.current!}
                         className="mobileDropDown-modal"
                         exitHandler={this.close}
                     >
                         <div className="mobileDropDown-content">
                             <Panel className="mobileDropDown-panel">
-                                <CloseButton onClick={this.close} className="mobileDropDown-closeModal" />
-                                {this.props.mobileDropDownContent}
-                                <Button
-                                    onClick={this.close}
-                                    baseClass={ButtonBaseClass.CUSTOM}
-                                    className="mobileDropDown-closeModal"
-                                >
-                                    {chevronUp("mobileDropDown-closeModalIcon")}
-                                </Button>
+                                <Frame>
+                                    <FrameHeader centredTitle={true} closeFrame={this.close}>
+                                        <SmartAlign>{title}</SmartAlign>
+                                    </FrameHeader>
+                                    <FrameBody>{children}</FrameBody>
+                                    <FrameFooter className="isCompact">
+                                        <Button
+                                            onClick={this.close}
+                                            baseClass={ButtonBaseClass.CUSTOM}
+                                            className="mobileDropDown-closeModal"
+                                        >
+                                            {chevronUp("mobileDropDown-closeModalIcon")}
+                                        </Button>
+                                    </FrameFooter>
+                                </Frame>
                             </Panel>
                         </div>
                     </Modal>

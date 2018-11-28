@@ -33,11 +33,11 @@ $mobileDropDown-chevron_color: mixContentBgAndFg(70%);
     @include flexCenterContent(nowrap);
     user-select: none;
     margin: auto;
-    max-width: 100%;
+    max-width: calc(100% - #{$global_spacer});
     flex-grow: 1;
     margin: {
-        left: $global_spacer;
-        right: $global_spacer;
+        left: $global_spacer / 2;
+        right: $global_spacer / 2;
     }
 }
 

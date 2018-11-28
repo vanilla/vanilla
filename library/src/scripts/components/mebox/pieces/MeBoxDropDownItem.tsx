@@ -20,7 +20,7 @@ export enum MeBoxItemType {
 }
 
 // Common to both notifications and messages dropdowns
-interface IMeBoxItem {
+export interface IMeBoxItem {
     className?: string;
     message: string;
     photo: string | null;
@@ -32,6 +32,7 @@ interface IMeBoxItem {
 
 export interface IMeBoxMessageItem extends IMeBoxItem {
     authors: IUserFragment[];
+    countMessages: number;
     type: MeBoxItemType.MESSAGE;
 }
 
@@ -48,8 +49,6 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
     public render() {
         const { unread, message, timestamp, to } = this.props;
 
-        const count: number = 0;
-        const subject: string = "";
         let authors: JSX.Element[];
 
         if (this.props.type === MeBoxItemType.MESSAGE) {
@@ -81,17 +80,17 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
                         {!!authors! && <div className="meBoxMessage-message">{authors!}</div>}
                         {/* Current notifications API returns HTML-formatted messages. Should be updated to return something aside from raw HTML. */}
                         <div className="meBoxMessage-message" dangerouslySetInnerHTML={{ __html: message }} />
-                        {(timestamp || !!count) && (
-                            <div className="meBoxMessage-metas metas isFlexed">
-                                <DateTime timestamp={timestamp} className="meta" />
-                                {!!count && (
-                                    <span className="meta">
-                                        {count === 1 && <Translate source="<0/> message" c0={1} />}
-                                        {count > 1 && <Translate source="<0/> messages" c0={count} />}
-                                    </span>
-                                )}
-                            </div>
-                        )}
+                        <div className="meBoxMessage-metas metas isFlexed">
+                            {timestamp && <DateTime timestamp={timestamp} className="meta" />}
+                            {this.props.type === MeBoxItemType.MESSAGE && (
+                                <span className="meta">
+                                    {this.props.countMessages === 1 && <Translate source="<0/> message" c0={1} />}
+                                    {this.props.countMessages > 1 && (
+                                        <Translate source="<0/> messages" c0={this.props.countMessages} />
+                                    )}
+                                </span>
+                            )}
+                        </div>
                     </div>
                     {!unread && <FlexSpacer className="meBoxMessage-status isRead" />}
                     {unread && (

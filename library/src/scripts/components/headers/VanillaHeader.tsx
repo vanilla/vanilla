@@ -136,8 +136,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                         {isMobile &&
                                             !this.state.openSearch && (
                                                 <CompactMeBox
-                                                    notificationsProps={notificationProps}
-                                                    messagesProps={messagesProps as any}
                                                     counts={dummyUserDropDownData}
                                                     buttonClass="vanillaHeader-button"
                                                     userPhotoClass="headerDropDown-user"

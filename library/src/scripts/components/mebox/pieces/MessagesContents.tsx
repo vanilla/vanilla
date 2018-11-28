@@ -14,10 +14,9 @@ import FrameFooter from "@library/components/frame/FrameFooter";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import LinkAsButton from "@library/components/LinkAsButton";
 import Frame from "@library/components/frame/Frame";
-import { compose, messages } from "@library/components/icons/header";
+import { compose } from "@library/components/icons/header";
 import { IMeBoxMessageItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
 import MeBoxDropDownItemList from "@library/components/mebox/pieces/MeBoxDropDownItemList";
-import UserDropdownContents from "@library/components/mebox/pieces/UserDropdownContents";
 
 export interface IMessagesContentsProps {
     data: IMeBoxMessageItem[];
@@ -63,10 +62,10 @@ export default class MessagesContents extends React.Component<IProps> {
                 <FrameFooter className="isShadowed isCompact">
                     <LinkAsButton
                         className="headerDropDown-footerButton headerDropDown-allButton button-pushLeft"
-                        to={"/kb/"}
+                        to={"/messages/inbox"}
                         baseClass={ButtonBaseClass.TEXT}
                     >
-                        {t("All Notifications")}
+                        {t("All Messages")}
                     </LinkAsButton>
 
                     {this.props.markAllRead &&

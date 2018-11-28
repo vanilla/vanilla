@@ -326,7 +326,11 @@ class ConversationsApiController extends AbstractApiController {
                 $offset
             )->resultArray();
 
-            $this->conversationModel->joinParticipants($conversations);
+            $this->conversationModel->joinParticipants(
+                $conversations,
+                5,
+                ["Name", "Email", "Photo", "DateLastActive"]
+            );
         } else {
             $participantUserID = isset($query['participantUserID']) ? $query['participantUserID'] : $this->getSession()->UserID;
 
@@ -548,11 +552,19 @@ class ConversationsApiController extends AbstractApiController {
         } else {
             $dbRecord['Status'] = 'deleted';
         }
-        if (isset($row['Name']) && isset($row['Photo'])) {
+
+        // Normalize the user fragment.
+        if (isset($dbRecord["User"]) && is_array($dbRecord["User"])) {
+            $dbRecord["User"] = array_intersect_key(
+                $dbRecord["User"],
+                array_flip(["UserID", "Name", "PhotoUrl", "DateLastActive"])
+            );
+        } elseif (isset($dbRecord["UserID"]) && isset($dbRecord["Name"])) {
             $dbRecord['User'] = [
-                'UserID' => $row['UserID'],
-                'Name' => $row['Name'],
-                'PhotoUrl' => empty($dbRecord['PhotoUrl']) ? UserModel::getDefaultAvatarUrl($dbRecord) : Gdn_Upload::url($dbRecord['PhotoUrl'])
+                'UserID' => $dbRecord['UserID'],
+                'Name' => $dbRecord['Name'],
+                'PhotoUrl' => empty($dbRecord['PhotoUrl']) ? UserModel::getDefaultAvatarUrl($dbRecord) : Gdn_Upload::url($dbRecord['PhotoUrl']),
+                "DateLastActive" => $dbRecord["DateLastActive"] ?? null,
             ];
         }
 

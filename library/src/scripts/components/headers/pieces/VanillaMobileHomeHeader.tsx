@@ -71,18 +71,27 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                                 className="vanillaHeader-logoContainer"
                                 logoClassName="vanillaHeader-logo isCentred"
                             />
-                            <CompactMeBox
-                                counts={dummyUserDropDownData}
-                                buttonClass="vanillaHeader-button"
-                                userPhotoClass="headerDropDown-user"
-                            />
+                            {isGuest ? (
+                                <VanillaHeaderNav
+                                    {...dummyGuestNavigationData}
+                                    linkClassName="vanillaHeader-navLink"
+                                    linkContentClassName="vanillaHeader-navLinkContent"
+                                    className="vanillaHeader-nav vanillaHeader-guestNav"
+                                />
+                            ) : (
+                                <CompactMeBox
+                                    counts={dummyUserDropDownData}
+                                    buttonClass="vanillaHeader-button"
+                                    userPhotoClass="headerDropDown-user"
+                                />
+                            )}
                         </div>
                     </PanelWidgetHorizontalPadding>
                 </Container>
                 <div className="vanillaHeaderHome-bottom">
                     <div className="vanillaHeader-horizontalScroll">
                         <VanillaHeaderNav
-                            {...navData}
+                            {...dummyNavigationData}
                             linkClassName="vanillaHeader-navLink"
                             linkContentClassName="vanillaHeader-navLinkContent"
                             className={classNames("vanillaHeader-nav", "isScrolled", {

@@ -26,12 +26,15 @@ import { INotificationsProps } from "@library/components/mebox/pieces/Notificati
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
 import ConditionalWrap from "@library/components/ConditionalWrap";
+import FlexSpacer from "@library/components/FlexSpacer";
+import BackLink from "@library/components/navigation/BackLink";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
     className?: string;
     title?: string; // Needed for mobile dropdown
     mobileDropDownContent?: React.ReactNode; // Needed for mobile dropdown
+    backUrl?: string;
 }
 
 interface IState {
@@ -70,12 +73,20 @@ export class VanillaHeader extends React.Component<IProps, IState> {
             countClass: classNames(countClass, "vanillaHeader-messagesCount"),
         };
 
+        const leftEl = !!this.props.backUrl ? (
+            <FlexSpacer className="pageHeading-leftSpacer" />
+        ) : (
+            <BackLink url={this.props.backUrl} className="pageHeading-backLink" />
+        );
+
         return ReactDOM.createPortal(
             <header className={classNames("vanillaHeader", this.props.className)}>
                 <Container>
                     <PanelWidgetHorizontalPadding>
                         <div className="vanillaHeader-bar">
-                            {(!isMobile || (!this.state.openSearch && isMobile)) && (
+                            {!this.state.openSearch && isMobile ? (
+                                leftEl
+                            ) : (
                                 <HeaderLogo
                                     {...dummyLogoData}
                                     className="vanillaHeader-logoContainer"
@@ -91,7 +102,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                         linkContentClassName="vanillaHeader-navLinkContent"
                                     />
                                 )}
-
                             {showMobileDropDown && (
                                 <MobileDropDown title={this.props.title!} buttonClass="vanillaHeader-mobileDropDown">
                                     {this.props.mobileDropDownContent}

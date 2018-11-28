@@ -20,7 +20,7 @@ export enum MeBoxItemType {
 }
 
 // Common to both notifications and messages dropdowns
-interface IMeBoxItem {
+export interface IMeBoxItem {
     className?: string;
     message: string;
     photo: string | null;

@@ -71,7 +71,7 @@ $modal-horizontalMargin: $global_spacer / 2;
     align-items: center;
     justify-content: center;
     min-height: $vanillaHeader_height;
-    margin-bottom: $global_spacer * 1.5;
+    margin-bottom: 32px;
 
     @include mediaQuery-panelLayout_oneColumn {
         min-height: $vanillaHeader_mobile_height;

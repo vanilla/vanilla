@@ -61,7 +61,6 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 
     @include mediaQuery-panelLayout_oneColumn {
         min-height: $vanillaHeader_mobile_height;
-        overflow: hidden;
     }
 }
 

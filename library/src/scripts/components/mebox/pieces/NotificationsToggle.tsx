@@ -28,7 +28,7 @@ export default class NotificationsToggle extends React.PureComponent<IProps> {
                 {notifications(!!this.props.open)}
                 {count > 0 && (
                     <Count
-                        className={classNames("vanillaHeader-notificationsCount", this.props.countClass)}
+                        className={classNames("vanillaHeader-count", this.props.countClass)}
                         label={t("Notifications: ")}
                         count={this.props.count}
                     />

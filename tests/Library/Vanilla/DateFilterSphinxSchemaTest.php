@@ -69,7 +69,7 @@ class DateFilterSphinxSchemaTest extends SharedBootstrapTestCase {
             'Greater-Than or Equal (Date)' => [
                 '>=2017-01-01',
                 [
-                    'startDate' => new DateTimeImmutable('2017-01-01 23:59:59'),
+                    'startDate' => new DateTimeImmutable('2017-01-01 00:00:00'),
                     'endDate' => null,
                     'exclude' => false
                 ]

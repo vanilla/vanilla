@@ -187,7 +187,6 @@ class DateFilterSchema extends Schema {
                     ];
                     break;
                 case "<=":
-                case ">=":
                     $dateTimes = [$dateTimes[0]->modify('+1 day')->modify('-1 second')];
                     break;
             }

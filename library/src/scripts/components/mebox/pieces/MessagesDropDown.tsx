@@ -126,6 +126,7 @@ function mapStateToProps(state: IConversationsStoreState) {
             });
             data.push({
                 authors,
+                countMessages: conversation.countMessages,
                 message: messageDoc.body.textContent || "",
                 photo: conversation.lastMessage!.insertUser.photoUrl || null,
                 to: conversation.url,

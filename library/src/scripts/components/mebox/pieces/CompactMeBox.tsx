@@ -223,7 +223,7 @@ function mapDispatchToProps(dispatch) {
  *
  * @param state Current Redux store state.
  */
-function mapStateToProps(state: INotificationsStoreState) {
+function mapStateToProps(state) {
     let countUnreadMessages: number = 0;
     let countUnreadNotifications: number = 0;
     const notificationsProps: INotificationsProps = {
@@ -295,15 +295,15 @@ function mapStateToProps(state: INotificationsStoreState) {
     notificationsProps.data.sort(sortByTimestamp);
     messagesProps.data.sort(sortByTimestamp);
 
-    const userProps = UsersModel.mapStateToProps;
-
-    return {
+    const userProps = UsersModel.mapStateToProps(state);
+    const props = {
         ...userProps,
         countUnreadMessages,
         countUnreadNotifications,
         messagesProps,
         notificationsProps,
     };
+    return props;
 }
 
 const withRedux = connect(mapStateToProps);

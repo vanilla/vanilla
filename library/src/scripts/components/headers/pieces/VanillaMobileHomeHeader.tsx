@@ -72,8 +72,6 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                                 logoClassName="vanillaHeader-logo isCentred"
                             />
                             <CompactMeBox
-                                notificationsProps={notificationProps}
-                                messagesProps={messagesProps as any}
                                 counts={dummyUserDropDownData}
                                 buttonClass="vanillaHeader-button"
                                 userPhotoClass="headerDropDown-user"

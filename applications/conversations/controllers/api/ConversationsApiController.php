@@ -505,7 +505,7 @@ class ConversationsApiController extends AbstractApiController {
         $dbRecord['body'] = isset($dbRecord['LastBody'])
             ? Gdn_Format::to($dbRecord['LastBody'], $dbRecord['LastFormat'])
             : t('No messages.');
-        $dbRecord['url'] = url("/conversations/{$dbRecord['ConversationID']}", true);
+        $dbRecord['url'] = url("/messages/{$dbRecord['ConversationID']}", true);
 
         if (array_key_exists('CountNewMessages', $dbRecord)) {
             $dbRecord['unread'] = $dbRecord['CountNewMessages'] > 0;

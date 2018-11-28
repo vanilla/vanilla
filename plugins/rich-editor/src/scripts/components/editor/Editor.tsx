@@ -36,6 +36,7 @@ interface ICommonProps {
     allowUpload: boolean;
     device?: Devices;
     initialValue?: DeltaOperation[];
+    reinitialize?: boolean;
 }
 
 interface ILegacyProps extends ICommonProps {
@@ -273,6 +274,12 @@ export class Editor extends React.Component<IProps> {
             this.quill.enable();
         } else if (!oldProps.isLoading && this.props.isLoading) {
             this.quill.disable();
+        }
+
+        if (!oldProps.reinitialize && this.props.reinitialize) {
+            if (this.props.initialValue) {
+                this.setEditorContent(this.props.initialValue);
+            }
         }
     }
 

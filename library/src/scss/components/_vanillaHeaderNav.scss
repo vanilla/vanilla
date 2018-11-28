@@ -11,7 +11,7 @@ $vanillaHeaderNav-active_bottomOffset: 2px;
 
 .headerNavigation-items {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     height: 100%;
     color: inherit;
 

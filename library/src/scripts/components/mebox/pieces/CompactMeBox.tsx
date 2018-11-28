@@ -63,8 +63,8 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
         const { counts } = this.props;
         const countClass = this.props.countsClass;
         const buttonClass = this.props.buttonClass;
-        const panelContentClass = "compactMeBox-panel inheritHeight";
-        const panelBodyClass = "compactMeBox-body inheritHeight";
+        const panelContentClass = "compactMeBox-panel";
+        const panelBodyClass = "compactMeBox-body";
 
         return (
             <div className={classNames("compactMeBox", this.props.className)}>

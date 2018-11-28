@@ -9,11 +9,8 @@ import { t } from "@library/application";
 import getStore from "@library/state/getStore";
 import { debug, log } from "@library/utility";
 import { delegateEvent, removeDelegatedEvent } from "@library/dom";
-import EmbedPopover from "@rich-editor/components/popovers/EmbedPopover";
-import EmojiPopover from "@rich-editor/components/popovers/EmojiPopover";
 import MentionToolbar from "@rich-editor/components/toolbars/MentionToolbar";
 import InlineToolbar from "@rich-editor/components/toolbars/InlineToolbar";
-import UploadButton from "@rich-editor/components/editor/pieces/EditorUploadButton";
 import { EditorProvider } from "@rich-editor/components/context";
 import EditorDescriptions from "@rich-editor/components/editor/pieces/EditorDescriptions";
 import { Provider as ReduxProvider } from "react-redux";
@@ -21,17 +18,16 @@ import { actions } from "@rich-editor/state/instance/instanceActions";
 import { getIDForQuill, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import { IStoreState } from "@rich-editor/@types/store";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
-import Quill, { DeltaOperation, Sources } from "quill/core";
+import Quill, { DeltaOperation, Sources, QuillOptionsStatic } from "quill/core";
 import { hot } from "react-hot-loader";
 import registerQuill from "@rich-editor/quill/registerQuill";
 import { uniqueId } from "lodash";
 import classNames from "classnames";
-import Permission from "@library/users/Permission";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import { Devices } from "@library/components/DeviceChecker";
-import ParagraphDropDown from "@rich-editor/components/toolbars/ParagraphDropDown";
 import ParagraphToolbar from "@rich-editor/components/toolbars/ParagraphToolbar";
 import throttle from "lodash/throttle";
+import EmbedBar from "@rich-editor/components/editor/pieces/EmbedBar";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -59,7 +55,13 @@ type IProps = ILegacyProps | INewProps;
  */
 export class Editor extends React.Component<IProps> {
     /** Ref for a dom node for quill to mount into. */
-    private quillMountRef: React.RefObject<HTMLDivElement> = React.createRef();
+    private quillMountRef = React.createRef<HTMLDivElement>();
+
+    /** Ref for the embedBar height */
+    private embedBarRef = React.createRef<HTMLDivElement>();
+
+    /** Ref for the scroll container */
+    private scrollContainerRef = React.createRef<HTMLDivElement>();
 
     /** The ID of the root rich editor node. */
     private domID: string = uniqueId("editor-");
@@ -79,98 +81,145 @@ export class Editor extends React.Component<IProps> {
     /** The hash of our delegated quote event handler. Used to unset the handler on unmount. */
     private quoteHandler: string;
 
+    /**
+     * Render either the legacy or modern view for the editor.
+     */
     public render() {
-        // These items CANNOT be rendered before quill is ready, but the main text area is required for quill to render.
-        // These should all re-render after componentDidMount calls forceUpdate().
-        let isMobile = false; // fallback for legacy: isMobile is always false
-        if (!this.props.legacyMode && this.props.device) {
-            isMobile = this.props.device === Devices.MOBILE;
-        }
+        return this.props.legacyMode ? this.renderLegacy() : this.renderModern();
+    }
 
-        const quillDependantItems = this.quill && (
-            <React.Fragment>
-                {!this.props.isLoading && (
-                    <React.Fragment>
-                        <InlineToolbar />
-                        {!isMobile && <ParagraphToolbar />}
-                        <MentionToolbar />
-                    </React.Fragment>
+    /**
+     * The modern view is characterized by a contextual menu at the top and it's own scroll container.
+     */
+    private renderModern(): React.ReactNode {
+        const { className } = this.props as INewProps;
+        return (
+            <div
+                className={classNames("richEditor", className, { isDisabled: this.props.isLoading })}
+                aria-label={t("Type your message.")}
+                aria-describedby={this.descriptionID}
+                role="textbox"
+                aria-multiline={true}
+                id={this.domID}
+            >
+                {this.renderContexts(
+                    <>
+                        {this.renderEmbedBar()}
+                        <div className="richEditor-scrollContainer" ref={this.scrollContainerRef}>
+                            <div className={classNames("richEditor-frame InputBox isMenuInset")} id="testScroll">
+                                {this.renderMountPoint()}
+                                {this.renderInlineToolbars()}
+                            </div>
+                            {this.renderParagraphToolbar()}
+                        </div>
+                    </>,
                 )}
-
-                <div className="richEditor-embedBar">
-                    <ul
-                        className="richEditor-menuItems richEditor-inlineMenuItems"
-                        role="menubar"
-                        aria-label={t("Inline Level Formatting Menu")}
-                    >
-                        {isMobile && (
-                            <li className="richEditor-menuItem" role="menuitem">
-                                <ParagraphDropDown disabled={this.props.isLoading} />
-                            </li>
-                        )}
-                        {!isMobile && (
-                            <li className="richEditor-menuItem u-richEditorHiddenOnMobile" role="menuitem">
-                                <EmojiPopover disabled={this.props.isLoading} renderAbove={!!this.props.legacyMode} />
-                            </li>
-                        )}
-                        <Permission permission="uploads.add">
-                            <li className="richEditor-menuItem" role="menuitem">
-                                <UploadButton disabled={this.props.isLoading} />
-                            </li>
-                        </Permission>
-
-                        <li className="richEditor-menuItem" role="menuitem">
-                            <EmbedPopover disabled={this.props.isLoading} />
-                        </li>
-                    </ul>
-                </div>
-            </React.Fragment>
+            </div>
         );
+    }
 
-        let mainContent = (
+    /**
+     * The legacy rendering mode has everything at the bottom, and uses the document as it's scroll container.
+     */
+    private renderLegacy(): React.ReactNode {
+        return this.renderContexts(
+            <div className={classNames("richEditor-frame InputBox")} id="testScroll">
+                {this.renderMountPoint()}
+                {this.renderParagraphToolbar()}
+                {this.renderInlineToolbars()}
+                {this.renderEmbedBar()}
+            </div>,
+        );
+    }
+
+    /**
+     * Render the elements that Quill will mount into.
+     */
+    private renderMountPoint(): React.ReactNode {
+        return (
+            <div className="richEditor-textWrap" ref={this.quillMountRef}>
+                <div
+                    className="ql-editor richEditor-text userContent"
+                    data-gramm="false"
+                    contentEditable={this.props.isLoading}
+                    data-placeholder="Create a new post..."
+                    tabIndex={0}
+                />
+            </div>
+        );
+    }
+
+    /**
+     * Conditionally render the embed bar.
+     */
+    private renderEmbedBar(): React.ReactNode {
+        return (
+            this.quill && (
+                <EmbedBar
+                    isLoading={!!this.props.isLoading}
+                    isMobile={this.isMobile}
+                    legacyMode={this.props.legacyMode}
+                    barRef={this.embedBarRef}
+                />
+            )
+        );
+    }
+
+    /**
+     * Conditionally render the paragraph toolbar.
+     */
+    private renderParagraphToolbar(): React.ReactNode {
+        return this.quill && !this.props.isLoading && !this.isMobile && <ParagraphToolbar />;
+    }
+
+    /**
+     * Conditionally render the inline toolbars.
+     */
+    private renderInlineToolbars(): React.ReactNode {
+        return (
+            this.quill &&
+            !this.props.isLoading && (
+                <>
+                    <InlineToolbar />
+                    <MentionToolbar />
+                </>
+            )
+        );
+    }
+
+    /**
+     * Render the top level contexts for the editor.
+     * @param content The content to nest inside of the contexts.
+     */
+    private renderContexts(content: React.ReactNode): React.ReactNode {
+        const { isLoading, legacyMode } = this.props;
+
+        return (
             <ReduxProvider store={this.store}>
                 <EditorProvider
                     value={{
                         quill: this.quill,
                         editorID: this.quillID,
-                        legacyMode: !!this.props.legacyMode,
-                        isLoading: !!this.props.isLoading,
+                        legacyMode,
+                        isLoading: !!isLoading,
                     }}
                 >
                     <EditorDescriptions id={this.descriptionID} />
-                    {!this.props.legacyMode && quillDependantItems} {/* Menu above */}
-                    <div className="richEditor-frame InputBox">
-                        <div className="richEditor-textWrap" ref={this.quillMountRef}>
-                            <div
-                                className="ql-editor richEditor-text userContent"
-                                data-gramm="false"
-                                contentEditable={!!this.props.isLoading}
-                                data-placeholder="Create a new post..."
-                                tabIndex={0}
-                            />
-                        </div>
-                        {this.props.legacyMode && quillDependantItems} {/* Menu below */}
-                    </div>
+                    {content}
                 </EditorProvider>
             </ReduxProvider>
         );
+    }
 
-        if (!this.props.legacyMode) {
-            mainContent = (
-                <div
-                    className={classNames("richEditor", this.props.className, { isDisabled: this.props.isLoading })}
-                    aria-label={t("Type your message.")}
-                    aria-describedby={this.descriptionID}
-                    role="textbox"
-                    aria-multiline={true}
-                    id={this.domID}
-                >
-                    {mainContent}
-                </div>
-            );
+    /**
+     * Determine if we are in mobile view or not. Always false for legacy mode.
+     */
+    private get isMobile(): boolean {
+        let isMobile = false; // fallback for legacy: isMobile is always false
+        if (!this.props.legacyMode && this.props.device) {
+            isMobile = this.props.device === Devices.MOBILE;
         }
-
-        return mainContent;
+        return isMobile;
     }
 
     /**
@@ -181,7 +230,10 @@ export class Editor extends React.Component<IProps> {
 
         // Setup quill
         registerQuill();
-        const options = { theme: "vanilla" };
+        const options: QuillOptionsStatic = {
+            theme: "vanilla",
+            scrollingContainer: this.scrollContainerRef.current || document.documentElement!,
+        };
         this.quill = new Quill(this.quillMountRef.current!, options);
         if (this.props.initialValue) {
             this.quill.setContents(this.props.initialValue);
@@ -212,6 +264,8 @@ export class Editor extends React.Component<IProps> {
     public componentWillUnmount() {
         this.removeGlobalSelectionHandler();
         this.removeQuoteHandler();
+        this.quill.off(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
+        this.store.dispatch(actions.deleteInstance(this.quillID));
     }
 
     public componentDidUpdate(oldProps: IProps) {

@@ -39,6 +39,9 @@ export interface IState {
  */
 export default class DropDown extends React.Component<IProps, IState> {
     private id;
+    public static defaultProps = {
+        openAsModal: false,
+    };
     public constructor(props) {
         super(props);
         this.id = getRequiredID(props, "dropDown");
@@ -71,7 +74,7 @@ export default class DropDown extends React.Component<IProps, IState> {
                 setExternalButtonRef={this.props.setExternalButtonRef}
                 toggleButtonClassName={this.props.toggleButtonClassName}
                 onVisibilityChange={this.props.onVisibilityChange}
-                openAsModal={this.props.openAsModal}
+                openAsModal={!!this.props.openAsModal}
             >
                 {params => {
                     return (

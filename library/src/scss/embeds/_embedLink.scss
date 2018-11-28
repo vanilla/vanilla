@@ -10,6 +10,10 @@ $embedLink-source_fontSize: $userContent_fontSize !default;
 $embedLink-excerpt_fontSize: $userContent_fontSize !default;
 $embedLink-excerpt_lineHeight: $global-excerpt_lineHeight !default;
 
+.embedLink-link {
+    color: inherit;
+}
+
 .embedLink-image {
     position: absolute;
     display: block;

@@ -106,11 +106,11 @@ export class Editor extends React.Component<IProps> {
                     <>
                         {this.renderEmbedBar()}
                         <div className="richEditor-scrollContainer" ref={this.scrollContainerRef}>
-                            {this.renderParagraphToolbar()}
                             <div className={classNames("richEditor-frame InputBox isMenuInset")} id="testScroll">
-                                {this.renderInlineToolbars()}
                                 {this.renderMountPoint()}
+                                {this.renderInlineToolbars()}
                             </div>
+                            {this.renderParagraphToolbar()}
                         </div>
                     </>,
                 )}

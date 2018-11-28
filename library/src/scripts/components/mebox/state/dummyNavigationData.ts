@@ -9,19 +9,15 @@ export const dummyNavigationData = {
     data: [
         {
             to: "/discussions",
-            name: "Discussions",
+            name: "Community",
         },
         {
-            to: "/kb/categories",
-            name: "KB Categories",
-        },
-        {
-            to: "/",
-            name: "Forum",
+            to: "/categories",
+            name: "Categories",
         },
         {
             to: "/kb",
-            name: "Knowledge Base",
+            name: "Help",
         },
     ],
 };

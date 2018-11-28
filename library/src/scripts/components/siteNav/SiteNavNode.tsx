@@ -22,6 +22,7 @@ interface IProps {
     openParent?: () => void;
     location: any;
     depth: number;
+    expand?: boolean;
 }
 
 interface IState {
@@ -44,6 +45,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
     public render() {
         const hasChildren = this.props.children && this.props.children.length > 0;
         const depthClass = `hasDepth-${this.props.depth + 1}`;
+        const expand = !!this.props.expand;
         const childrenContents =
             hasChildren &&
             this.props.children.map((child, i) => {
@@ -55,6 +57,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                         openParent={this.openSelfAndOpenParent}
                         location={this.props.location}
                         depth={this.props.depth + 1}
+                        expand={expand}
                     />
                 );
             });
@@ -66,7 +69,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                 role="treeitem"
                 aria-expanded={this.state.open}
             >
-                {hasChildren && (
+                {hasChildren && !expand ? (
                     <div className={classNames("siteNavNode-buttonOffset", { hasNoOffset: this.props.depth === 1 })}>
                         <Button
                             tabIndex={-1}
@@ -80,8 +83,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                             {this.state.open ? downTriangle(t("Expand")) : rightTriangle(t("Collapse"))}
                         </Button>
                     </div>
-                )}
-                {!hasChildren && (
+                ) : (
                     <span className="siteNavNode-spacer" aria-hidden={true}>
                         {` `}
                     </span>
@@ -101,7 +103,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                     {hasChildren && (
                         <ul
                             className={classNames("siteNavNode-children", depthClass, {
-                                isHidden: !this.state.open,
+                                isHidden: !this.state.open && !expand,
                             })}
                             role="group"
                         >

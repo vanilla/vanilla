@@ -20,6 +20,7 @@ interface IProps extends IWithEditorProps {
     disabled?: boolean;
     renderAbove?: boolean;
     renderLeft?: boolean;
+    openAsModal?: boolean;
 }
 
 interface IState extends IRequiredComponentID {
@@ -66,6 +67,7 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                 buttonBaseClass={ButtonBaseClass.CUSTOM}
                 renderAbove={!!this.props.renderAbove}
                 renderLeft={!!this.props.renderLeft}
+                openAsModal={this.props.legacyMode ? false : !!this.props.openAsModal}
             >
                 {(params: IPopoverControllerChildParameters) => {
                     const { initialFocusRef, closeMenuHandler, isVisible } = params;

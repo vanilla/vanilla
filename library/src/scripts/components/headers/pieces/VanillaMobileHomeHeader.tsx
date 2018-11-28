@@ -83,29 +83,26 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                 </Container>
                 <div className="vanillaHeaderHome-bottom">
                     <div className="vanillaHeader-horizontalScroll">
-                        <Container>
-                            <PanelWidgetHorizontalPadding className="vanillaHeaderHome-nav">
-                                <VanillaHeaderNav
-                                    {...navData}
-                                    linkClassName="vanillaHeader-navLink"
-                                    linkContentClassName="vanillaHeader-navLinkContent"
-                                    className={classNames("vanillaHeader-nav", { "vanillaHeader-guestNav": isGuest })}
-                                    listClassName="isScrolled"
-                                >
-                                    <li className="vanillaHeaderNav-item">
-                                        <LanguagesDropDown
-                                            {...dummyOtherLanguagesData}
-                                            renderLeft={true}
-                                            className="vanillaHeader-locales"
-                                            buttonClassName="vanillaHeader-localeToggle"
-                                            buttonBaseClass={ButtonBaseClass.CUSTOM}
-                                            widthOfParent={false}
-                                            openAsModal={isMobile}
-                                        />
-                                    </li>
-                                </VanillaHeaderNav>
-                            </PanelWidgetHorizontalPadding>
-                        </Container>
+                        <VanillaHeaderNav
+                            {...navData}
+                            linkClassName="vanillaHeader-navLink"
+                            linkContentClassName="vanillaHeader-navLinkContent"
+                            className={classNames("vanillaHeader-nav", "isScrolled", {
+                                "vanillaHeader-guestNav": isGuest,
+                            })}
+                        >
+                            <li className="vanillaHeaderNav-item">
+                                <LanguagesDropDown
+                                    {...dummyOtherLanguagesData}
+                                    renderLeft={true}
+                                    className="vanillaHeader-locales"
+                                    buttonClassName="vanillaHeader-localeToggle"
+                                    buttonBaseClass={ButtonBaseClass.CUSTOM}
+                                    widthOfParent={false}
+                                    openAsModal={isMobile}
+                                />
+                            </li>
+                        </VanillaHeaderNav>
                     </div>
                 </div>
             </header>,

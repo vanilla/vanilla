@@ -28,8 +28,11 @@ $frame-panel_minHeight: 500px;
 
 
 .frame {
+    display: flex;
+    flex-direction: column;
     position: relative;
     background-color: $frame-bgColor;
+    max-height: 100vh;
     border: {
         style: solid;
         width: 1px;
@@ -77,9 +80,31 @@ $frame-panel_minHeight: 500px;
 
 .frameHeader-heading {
     flex-grow: 1;
-    font-size: $frame-header_fontSize;
     text-overflow: ellipsis;
 }
+
+.frameHeader-left {
+    font-size: $frame-header_fontSize;
+}
+
+.frameHeader-centred {
+    text-align: center;
+    text-transform: uppercase;
+    color: mixContentBgAndFg(60%);
+    font-size: $global-small_fontSize;
+}
+
+.frameHeader-leftSpacer {
+    display: block;
+    height: $formElement_height;
+    flex-basis: $formElement_height;
+    width: $formElement_height;
+
+    @include mediaQuery-panelLayout_xs {
+        display: none;
+    }
+}
+
 
 .frameHeader-closePosition {
     display: flex;
@@ -92,6 +117,7 @@ $frame-panel_minHeight: 500px;
 .frameBody {
     position: relative;
     max-height: 100%;
+    overflow: auto;
     padding: {
         left: $utility-baseUnit * 2;
         right: $utility-baseUnit * 2;

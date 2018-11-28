@@ -10,6 +10,7 @@ $modal-medium_width: 516px;
 $modal-small_width: 375px;
 $modal-border_radius: $global-borderRadius;
 $modal-dropDown_padding: $global_spacer;
+$modal-horizontalMargin: $global_spacer / 2;
 
 
 .modal {
@@ -19,27 +20,44 @@ $modal-dropDown_padding: $global_spacer;
     &.isFullScreen {
         overflow: auto;
         width: 100%;
-        height: 100%;
+        height: 100vh;
         background-color: $modal-bgColor;
     }
 
     &.isLarge {
         width: $modal-large_width;
+        margin: {
+            left: $modal-horizontalMargin;
+            right: $modal-horizontalMargin;
+        }
     }
 
     &.isMedium {
         width: $modal-medium_width;
+        margin: {
+            left: $modal-horizontalMargin;
+            right: $modal-horizontalMargin;
+        }
     }
 
     &.isSmall {
         width: $modal-small_width;
+        margin: {
+            left: $modal-horizontalMargin;
+            right: $modal-horizontalMargin;
+        }
     }
 
     &.isSidePanel {
         margin-left: $modal-dropDown_padding;
     }
-    &.isPseudoDropDown {
-        margin-left: $modal-dropDown_padding;
+
+    &.isDropDown {
+        overflow: auto;
+        width: 100%;
+        background-color: $modal-bgColor;
+        margin-bottom: auto;
+        max-height: 100vh;
     }
 }
 

@@ -31,6 +31,12 @@ $panelLayout-border_color                                             : rgba($gl
     }
 }
 
+@mixin mediaQuery-panelLayout_xs {
+    @media (max-width: #{$global-xs_breakpoint}) {
+        @content;
+    }
+}
+
 .panelLayout {
     margin: {
         top: $panelLayout_topMargin;

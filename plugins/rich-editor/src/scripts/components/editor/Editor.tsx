@@ -36,7 +36,7 @@ interface ICommonProps {
     allowUpload: boolean;
     device?: Devices;
     initialValue?: DeltaOperation[];
-    reinitialize: boolean;
+    reinitialize?: boolean;
 }
 
 interface ILegacyProps extends ICommonProps {

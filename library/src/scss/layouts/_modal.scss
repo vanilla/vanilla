@@ -57,5 +57,6 @@ $modal-dropDown_padding: $global_spacer;
 
     @include mediaQuery-panelLayout_oneColumn {
         min-height: $vanillaHeader_mobile_height;
+        overflow: hidden;
     }
 }

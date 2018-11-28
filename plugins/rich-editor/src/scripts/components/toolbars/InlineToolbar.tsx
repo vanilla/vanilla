@@ -88,6 +88,7 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
                         onLinkClick={this.toggleLinkMenu}
                         activeFormats={activeFormats}
                         lastGoodSelection={this.props.lastGoodSelection}
+                        className="likeDropDownContent"
                     />
                 </ToolbarContainer>
                 <ToolbarContainer selection={this.props.lastGoodSelection} isVisible={this.isLinkMenuVisible}>

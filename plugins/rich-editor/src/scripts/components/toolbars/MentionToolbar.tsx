@@ -27,7 +27,6 @@ import apiv2 from "@library/apiv2";
 
 interface IProps extends IWithEditorProps, IInjectableSuggestionsProps {
     suggestionActions: UserSuggestionActions;
-    inActiveMention: boolean;
 }
 
 interface IMentionState {

@@ -33,7 +33,9 @@ export default class MessagesToggle extends React.PureComponent<IProps> {
         return (
             <div className={classNames(this.props.className, "messagesToggle")}>
                 {messages(this.props.open)}
-                <Count className={this.props.countClass} label={t("Messages: ")} count={this.props.count} />
+                {count > 0 && (
+                    <Count className={this.props.countClass} label={t("Messages: ")} count={this.props.count} />
+                )}
             </div>
         );
     }

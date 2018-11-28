@@ -92,6 +92,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                     />
                                 )}
 
+<<<<<<< HEAD
                             {showMobileDropDown && (
                                 <MobileDropDown title={this.props.title!} buttonClass="vanillaHeader-mobileDropDown">
                                     {this.props.mobileDropDownContent}
@@ -126,7 +127,49 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                         {!isMobile && (
                                             <MeBox
                                                 className="vanillaHeader-meBox"
+                                                notificationsProps={notificationProps as INotificationsProps}
+=======
+                            <CompactSearch
+                                className={classNames("vanillaHeader-compactSearch", {
+                                    isCentered: this.state.openSearch,
+                                })}
+                                open={this.state.openSearch}
+                                onOpenSearch={this.openSearch}
+                                onCloseSearch={this.closeSearch}
+                                cancelButtonClassName="vanillaHeader-searchCancel"
+                                buttonClass="vanillaHeader-button"
+                                showingSuggestions={this.state.showingSuggestions}
+                                onOpenSuggestions={this.setOpenSuggestions}
+                                onCloseSuggestions={this.setCloseSuggestions}
+                            />
+                            {isGuest ? (
+                                (!this.state.openSearch || !isMobile) && (
+                                    <VanillaHeaderNav
+                                        {...dummyGuestNavigationData}
+                                        linkClassName="vanillaHeader-navLink"
+                                        linkContentClassName="vanillaHeader-navLinkContent"
+                                        className="vanillaHeader-nav vanillaHeader-guestNav"
+                                    />
+                                )
+                            ) : (
+                                <React.Fragment>
+                                    {!isMobile && (
+                                        <MeBox
+                                            className={classNames("vanillaHeader-meBox", {
+                                                hasFlexBasis: this.state.openSearch,
+                                            })}
+                                            notificationsProps={notificationProps}
+                                            messagesProps={messagesProps as any}
+                                            counts={dummyUserDropDownData}
+                                            buttonClassName="vanillaHeader-button"
+                                            contentClassName="vanillaHeader-dropDownContents"
+                                        />
+                                    )}
+                                    {isMobile &&
+                                        !this.state.openSearch && (
+                                            <CompactMeBox
                                                 notificationsProps={notificationProps}
+>>>>>>> master
                                                 messagesProps={messagesProps as any}
                                                 counts={dummyUserDropDownData}
                                                 buttonClassName="vanillaHeader-button"
@@ -136,7 +179,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                         {isMobile &&
                                             !this.state.openSearch && (
                                                 <CompactMeBox
-                                                    notificationsProps={notificationProps}
+                                                    notificationsProps={notificationProps as INotificationsProps}
                                                     messagesProps={messagesProps as any}
                                                     counts={dummyUserDropDownData}
                                                     buttonClass="vanillaHeader-button"

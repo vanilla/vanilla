@@ -5,7 +5,7 @@
  */
 
 $meBoxMessage-padding: 8px;
-$meBoxMessage-imageWidth: 40px;
+$meBoxMessage-imageContainerWidth: 40px;
 $meBoxMessage-unreadDot_width: 12px;
 
 .meBoxMessage {
@@ -31,13 +31,19 @@ $meBoxMessage-unreadDot_width: 12px;
 }
 
 
-.meBoxMessage-image {
+.meBoxMessage-imageContainer {
     position: relative;
-    width: $meBoxMessage-imageWidth;
-    height: $meBoxMessage-imageWidth;
-    flex-basis: $meBoxMessage-imageWidth;
+    width: $meBoxMessage-imageContainerWidth;
+    height: $meBoxMessage-imageContainerWidth;
+    flex-basis: $meBoxMessage-imageContainerWidth;
+    border-radius: 50%;
+    overflow: hidden;
+    border: solid mixContentBgAndFg(95%) 1px;
 }
 
+.meBoxMessage-image {
+    @include objectFitWithFallback;
+}
 
 .meBoxMessage-status {
     position: relative;
@@ -61,7 +67,7 @@ $meBoxMessage-unreadDot_width: 12px;
         left: $meBoxMessage-padding;
         right: $meBoxMessage-padding;
     }
-    max-width: calc(100% - #{$meBoxMessage-unreadDot_width + $meBoxMessage-imageWidth});
+    max-width: calc(100% - #{$meBoxMessage-unreadDot_width + $meBoxMessage-imageContainerWidth});
 }
 
 

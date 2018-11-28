@@ -51,7 +51,6 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
     display: flex;
     justify-content: flex-start;
     flex-wrap: nowrap;
-    overflow: hidden;
     align-items: center;
     min-height: $vanillaHeader_height;
     width: 100%;
@@ -62,6 +61,7 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 
     @include mediaQuery-panelLayout_oneColumn {
         min-height: $vanillaHeader_mobile_height;
+        overflow: hidden;
     }
 }
 

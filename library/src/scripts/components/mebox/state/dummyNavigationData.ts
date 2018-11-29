@@ -3,30 +3,20 @@
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { IVanillaHeaderNavProps } from "../pieces/VanillaHeaderNav";
 
 export const dummyNavigationData = {
     data: [
         {
             to: "/discussions",
-            name: "Community",
+            children: "Community",
         },
         {
             to: "/categories",
-            name: "Categories",
+            children: "Categories",
         },
         {
             to: "/kb",
-            name: "Help",
-        },
-    ],
-};
-
-export const dummyGuestNavigationData = {
-    data: [
-        {
-            to: `/entry/signin?target=${window.location.pathname}`,
-            name: "Sign In",
+            children: "Help",
         },
     ],
 };

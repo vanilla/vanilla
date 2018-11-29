@@ -289,16 +289,37 @@ export function download(className?: string) {
 }
 
 export function plusCircle(className?: string) {
+    const title = `+`;
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 14 14"
             className={classNames("icon", "icon-plusCircle", className)}
+            role="img"
             aria-hidden="true"
         >
+            <title>{title}</title>
             <path
                 fill="currentColor"
                 d="M14,7A7,7,0,1,1,7,0,7,7,0,0,1,14,7Zm-3.727.79a.339.339,0,0,0,.34-.338h0v-.9a.339.339,0,0,0-.339-.339H7.79V3.727a.339.339,0,0,0-.338-.34h-.9a.339.339,0,0,0-.339.339h0V6.21H3.727a.339.339,0,0,0-.34.338h0v.9a.339.339,0,0,0,.339.339H6.21v2.483a.339.339,0,0,0,.338.34h.9a.339.339,0,0,0,.339-.339h0V7.79Z"
+            />
+        </svg>
+    );
+}
+
+export function signIn(className?: string) {
+    const title = t("Sign In");
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            className={classNames("icon", "icon-signIn", className)}
+            role="img"
+        >
+            <title>{title}</title>
+            <path
+                fill="currentColor"
+                d="M20.25,5.5H16A.75.75,0,0,1,16,4h5a.75.75,0,0,1,.75.75v15a.75.75,0,0,1-.75.75H16A.75.75,0,0,1,16,19h4.25ZM10.574,17.722l0-.005a.5.5,0,0,1,.01-.707l4.395-4.275H3.5a.5.5,0,0,1-.5-.5v-.741a.5.5,0,0,1,.5-.5H14.974l-4.4-4.361v0a.5.5,0,0,1,0-.707l.523-.523a.5.5,0,0,1,.707,0l6.066,6.067a.5.5,0,0,1,0,.707L11.8,18.241a.5.5,0,0,1-.707,0Z"
             />
         </svg>
     );

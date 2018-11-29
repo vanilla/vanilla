@@ -34,7 +34,6 @@ import ConversationsActions from "@library/conversations/ConversationsActions";
 export interface IUserDropDownProps extends IInjectableUserState, IMeBoxProps {
     buttonClass?: string;
     userPhotoClass?: string;
-    forceIcon?: boolean;
     countUnreadMessages: number;
     countUnreadNotifications: number;
 }
@@ -80,7 +79,6 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                         open={this.state.open}
                         className="meBox-user"
                         size={UserPhotoSize.SMALL}
-                        forceIcon={this.props.forceIcon}
                     />
                 </Button>
                 {this.state.open && (
@@ -109,7 +107,6 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                                     open={this.state.open}
                                                     className="compactSearch-tabButtonContent"
                                                     size={UserPhotoSize.SMALL}
-                                                    forceIcon={false}
                                                 />
                                             </div>
                                         ),
@@ -120,7 +117,6 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                                     open={this.state.open}
                                                     className="compactSearch-tabButtonContent"
                                                     size={UserPhotoSize.SMALL}
-                                                    forceIcon={true}
                                                 />
                                             </div>
                                         ),

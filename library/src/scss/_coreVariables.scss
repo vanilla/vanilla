@@ -24,7 +24,6 @@ $global-color_transparent                            : transparent;
 $global-color_fg                                     : #555a62 !default;
 $global-color_bg                                     : #fff !default;
 $global-color_primary                                : #0291db !default;
-$global-color_active_primaryBg                       : rgba($global-color_primary, .05) !default; // Derived
 $global-color_secondary                              : darken($global-color_primary, 10%) !default; // Derived
 $global-color_warning                                : #ffce00 !default;
 
@@ -55,6 +54,7 @@ $state-focus_color                                   : mix($global-color_primary
 $state-focus_opacity                                 : 1 !default;
 $state-focus_outline                                 : none !default;
 
+$global-color_active_primaryBg                       : rgba($global-color_primary, .05) !default; // Derived
 $state-active_color                                  : mix($global-color_primary, $global-color_bg, 95%) !default; // #0075f5
 $state-active_opacity                                : 1 !default;
 
@@ -116,6 +116,8 @@ $global-block_margin                                 : $userContent_fontSize !de
 
 $global-base_lineHeight                              : 1.5 !default;
 $global-condensed_lineHeight                         : 1.25 !default;
+$global-code_lineHeight                              : 1.45 !default;
+$global-excerpt_lineHeight                           : 1.45 !default;
 
 $global_spacer                                       : $userContent_fontSize * $global-base_lineHeight;
 
@@ -164,6 +166,7 @@ $global-main_width                                   : $global-panel_paddedWidth
 $global-main_paddedWidth                             : $global-main_width + 2 * $global-gutter_size !default;  // Derived
 
 $global-twoColumn_breakpoint                         : 900px !default; // Generic breakpoint for 2 columns
+$global-xs_breakpoint                                : 500px !default;
 
 // Hard coded columns
 $evenColumns_breakpoint                              : $global-twoColumn_breakpoint !default;
@@ -270,6 +273,8 @@ $formElement-panel_shadowColor                       : rgba($global-color_fg, .2
 $formElement-panel_boxShadow                         : 0 1px 3px 0 $formElement-panel_shadowColor !default;
 
 $formElement-disabled_opacity                        : .5 !default;
+
+$buttonToIconMargin                                  : ($formElement_height - $icon_default_size) / 2; // To align sides of icon with padding of parent
 
 /* -------------------------------------------------------------- *\
     Overlays (Menus, flyouts and Modals)
@@ -379,15 +384,15 @@ $buttonPrimary: (
 \* -------------------------------------------------------------- */
 
 $metaText_fontSize                                   : $global-small_fontSize;
-$metaText_color                                      : mix($global-color_fg, $global-color_bg, 80%) !default;
-$metaText_margin                                     : $utility-baseUnit !default;
+$metaText_color                                      : mix($global-color_fg, $global-color_bg, 85%) !default;
+$metaText_margin                                     : 4px !default;
 
 /* -------------------------------------------------------------- *\
       Thumbnails
 \* -------------------------------------------------------------- */
 
-$thumbnail-border_color: mix($global-color_fg, $global-color_bg, 10%) !default; // Derived
-$thumbnail-border_width: 0;
+$thumbnail-border_color                             : mix($global-color_fg, $global-color_bg, 10%) !default; // Derived
+$thumbnail-border_width                             : 0;
 
 /* -------------------------------------------------------------- *\
     Separators
@@ -409,35 +414,36 @@ $selectBox-separator_color                          : $global-separator_color !d
     DropDown
 \* -------------------------------------------------------------- */
 
-$dropDown_width                                : 250px;
-$dropDown_borderRadius                         : 1px;
-$dropDown_bg                                   : $global-color_bg;
+$dropDown_width                                     : 250px;
+$dropDown_borderRadius                              : 1px;
+$dropDown_bg                                        : $global-color_bg;
 
-$dropDown-metas_verticalPadding                : 6px;
-$dropDown-metas_horizontalPadding              : 18px;
+$dropDown-metas_verticalPadding                     : 6px;
+$dropDown-metas_horizontalPadding                   : 18px;
 
-$dropDown-item_verticalPadding                 : 6px;
-$dropDown-item_horizontalPadding               : 18px;
+$dropDown-item_verticalPadding                      : 6px;
+$dropDown-item_horizontalPadding                    : 18px;
 
-$dropDown-item_minHeight                       : 45px;
+$dropDown-item_minHeight                            : 30px;
+$dropDown-item_mobile_minHeight                     : 44px;
+
+$dropDown-item_mobile_fontSize                      : 18px;
 
 /* -------------------------------------------------------------- *\
     Header
 \* -------------------------------------------------------------- */
 
-$global-header_height                               : 50px !default;
+$vanillaHeader_height                               : 50px !default;
+$vanillaHeader_mobile_height                        : 44px !default;
+$vanillaHeader_fg                                   : #fff !default;
+$vanillaHeader_bg                                   : $global-color_primary !default;
 
+$compactMeBox-tab_height                            : 44px !default;
 /* -------------------------------------------------------------- *\
     Footer
 \* -------------------------------------------------------------- */
 
 $global-footer_height                               : 50px !default;
-
-/* -------------------------------------------------------------- *\
-    Embedded content
-\* -------------------------------------------------------------- */
-
-$embeddedText_padding                               : $global-medium_fontSize;
 
 /* -------------------------------------------------------------- *\
     user content

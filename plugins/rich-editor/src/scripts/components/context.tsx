@@ -17,8 +17,7 @@ interface IContextProps {
     isLoading: boolean;
 }
 
-interface IGeneratedContextProps {
-    instanceState: IEditorInstance;
+interface IGeneratedContextProps extends IEditorInstance {
     activeFormats: IFormats;
 }
 
@@ -37,7 +36,7 @@ function mapStateToProps(state: IStoreState, ownProps: IContextProps) {
     const { lastGoodSelection } = instanceState;
     const activeFormats = lastGoodSelection ? quill.getFormat(lastGoodSelection) : {};
     return {
-        instanceState,
+        ...instanceState,
         activeFormats,
     };
 }
@@ -50,11 +49,9 @@ const withRedux = connect(mapStateToProps);
  *
  * @returns A component with a quill context injected as props.
  */
-export function withEditor<T extends IWithEditorProps = IWithEditorProps>(
-    WrappedComponent: React.ComponentClass<IWithEditorProps>,
-) {
+export function withEditor<T extends IWithEditorProps = IWithEditorProps>(WrappedComponent: React.ComponentType<T>) {
     // the func used to compute this HOC's displayName from the wrapped component's displayName.
-    const ReduxComponent = withRedux(WrappedComponent);
+    const ReduxComponent = withRedux(WrappedComponent as any);
     const displayName = WrappedComponent.displayName || WrappedComponent.name || "Component";
     class ComponentWithEditor extends React.Component<Omit<T, keyof IWithEditorProps>> {
         public static displayName = `withEditor(${displayName})`;

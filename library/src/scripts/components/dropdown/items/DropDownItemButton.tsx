@@ -20,6 +20,7 @@ export interface IDropDownItemButton {
     clickData?: ISelectBoxItem;
     index?: number;
     current?: boolean;
+    lang?: string;
 }
 
 /**
@@ -43,6 +44,7 @@ export default class DropDownItemButton extends React.Component<IDropDownItemBut
                     baseClass={ButtonBaseClass.CUSTOM}
                     disabled={this.props.disabled}
                     aria-current={this.props.current ? "true" : "false"}
+                    lang={this.props.lang}
                 >
                     {buttonContent}
                 </Button>

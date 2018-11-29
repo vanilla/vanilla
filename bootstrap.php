@@ -157,7 +157,6 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule(\Garden\Web\Dispatcher::class)
     ->setShared(true)
     ->addCall('addRoute', ['route' => new Reference('@api-v2-route'), 'api-v2'])
-    ->addCall('addRoute', ['route' => new Reference("@page-route"), 'page-route'])
     ->addCall('addRoute', ['route' => new \Garden\Container\Callback(function () {
         return new \Garden\Web\PreflightRoute('/api/v2', true);
     })])
@@ -190,11 +189,6 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('@view-application/json')
     ->setClass(\Vanilla\Web\JsonView::class)
     ->setShared(true)
-
-    ->rule('@page-route')
-    ->setClass(\Garden\Web\ResourceRoute::class)
-    ->setConstructorArgs(['/', '*\\%sPageController'])
-    ->addCall('setMeta', ['CONTENT_TYPE', 'text/html; charset=utf-8'])
 
     ->rule(\Garden\ClassLocator::class)
     ->setClass(\Vanilla\VanillaClassLocator::class)

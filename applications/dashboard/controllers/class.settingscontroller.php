@@ -947,26 +947,29 @@ class SettingsController extends DashboardController {
      * Echoes out a test email with the colors and image in the post request.
      *
      * @throws Exception
-     * @throws Gdn_UserException
      */
     public function emailPreview() {
-        $request = Gdn::request();
-        $image = $request->post('image', '');
-        $textColor = $request->post('textColor', '');
-        $backGroundColor = $request->post('backgroundColor', '');
-        $containerBackGroundColor = $request->post('containerBackgroundColor', '');
-        $buttonTextColor = $request->post('buttonTextColor', '');
-        $buttonBackgroundColor = $request->post('buttonBackgroundColor', '');
+        $this->permission('Garden.Settings.Manage');
 
-        echo $this->getTestEmail($image, $textColor, $backGroundColor, $containerBackGroundColor, $buttonTextColor, $buttonBackgroundColor)->getEmailTemplate()->toString();
+        if ($this->Form->authenticatedPostBack() !== false) {
+            $request = Gdn::request();
+            $image = $request->post('image', '');
+            $textColor = $request->post('textColor', '');
+            $backGroundColor = $request->post('backgroundColor', '');
+            $containerBackGroundColor = $request->post('containerBackgroundColor', '');
+            $buttonTextColor = $request->post('buttonTextColor', '');
+            $buttonBackgroundColor = $request->post('buttonBackgroundColor', '');
+
+            echo $this->getTestEmail($image, $textColor, $backGroundColor, $containerBackGroundColor, $buttonTextColor, $buttonBackgroundColor)->getEmailTemplate()->toString();
+        }
     }
 
     /**
      * Form for sending a test email.
+     *
      * On postback, sends a test email to the addresses specified in the form.
      *
      * @throws Exception
-     * @throws Gdn_UserException
      */
     public function emailTest() {
         if (!Gdn::session()->checkPermission('Garden.Community.Manage')) {

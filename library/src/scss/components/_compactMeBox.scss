@@ -1,0 +1,45 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+
+.compactMeBox {
+    display: block;
+}
+
+.compactMeBox-openButton {
+    color: #fff;
+}
+
+.compactMeBox-contents {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.buttonClose.compactMeBox-closeModal {
+    @include absolute-topRight();
+    width: $compactMeBox-tab_height;
+    height: $compactMeBox-tab_height;
+}
+
+
+.compactMeBox-tabList {
+    margin-right: $compactMeBox-tab_height;
+    height: $compactMeBox-tab_height;
+    flex-basis: $compactMeBox-tab_height;
+}
+
+.compactSearch-tabButtonContent {
+    @include flexCenterContent;
+    position: relative;
+    width: $compactMeBox-tab_height;
+    height: $compactMeBox-tab_height;
+}
+
+.compactMeBox-tabPanels {
+    height: calc(100vh - #{$compactMeBox-tab_height});
+}

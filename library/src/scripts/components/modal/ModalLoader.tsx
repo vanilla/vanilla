@@ -19,7 +19,12 @@ interface IProps extends RouteComponentProps<{}> {}
 class ModalLoader extends React.Component<IProps> {
     public render() {
         return (
-            <Modal label={t("Loading Modal")} size={ModalSizes.FULL_SCREEN} exitHandler={this.navigateToBacklink}>
+            <Modal
+                label={t("Loading Modal")}
+                size={ModalSizes.FULL_SCREEN}
+                exitHandler={this.navigateToBacklink}
+                elementToFocusOnExit={document.activeElement as HTMLElement}
+            >
                 <FullPageLoader />
             </Modal>
         );

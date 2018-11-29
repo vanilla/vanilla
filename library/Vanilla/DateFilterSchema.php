@@ -178,11 +178,18 @@ class DateFilterSchema extends Schema {
         }
 
         // If all we have is a date, give us a range in that date.
-        if ($operator == '=' && !preg_match('/\d\d:\d\d:\d\d/', $date)) {
-            $dateTimes = [
-                $dateTimes[0],
-                $dateTimes[0]->modify('+1 day')->modify('-1 second'),
-            ];
+        if (!preg_match('/\d\d:\d\d:\d\d/', $date)) {
+            switch ($operator) {
+                case "=":
+                    $dateTimes = [
+                        $dateTimes[0],
+                        $dateTimes[0]->modify('+1 day')->modify('-1 second'),
+                    ];
+                    break;
+                case "<=":
+                    $dateTimes = [$dateTimes[0]->modify('+1 day')->modify('-1 second')];
+                    break;
+            }
         }
 
         $result = [
@@ -238,10 +245,10 @@ class DateFilterSchema extends Schema {
 
         // Sort the operators so that the matches occur on the longest operators first.
         $sortedSimpleOperators = $this->simpleOperators;
-        usort($sortedSimpleOperators, function($a, $b) {
+        usort($sortedSimpleOperators, function ($a, $b) {
             if (strlen($a) > strlen($b)) {
                 return -1;
-            } else if (strlen($a) < strlen($b)) {
+            } elseif (strlen($a) < strlen($b)) {
                 return 1;
             }
             return 0;

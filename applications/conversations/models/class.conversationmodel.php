@@ -181,7 +181,7 @@ class ConversationModel extends ConversationsModel {
         }
 
         // Join the participants.
-        $this->joinParticipants($result);
+        $this->joinParticipants($result, 5, ["Name", "Email", "Photo", "DateLastActive"]);
 
         // Join in the last message.
         Gdn_DataSet::join(
@@ -359,7 +359,7 @@ class ConversationModel extends ConversationsModel {
      * @param array $data
      * @param int $max
      */
-    public function joinParticipants(&$data, $max = 5) {
+    public function joinParticipants(&$data, $max = 5, array $fields = ["Name", "Email", "Photo"]) {
         // Loop through the data and find the conversations with >= $Max participants.
         $ids = [];
         foreach ($data as $row) {
@@ -374,7 +374,11 @@ class ConversationModel extends ConversationsModel {
             ->whereIn('uc.ConversationID', $ids)
             ->get()->resultArray();
 
-        Gdn::userModel()->joinUsers($users, ['UserID']);
+        Gdn::userModel()->joinUsers(
+            $users,
+            ['UserID'],
+            ["Join" => $fields]
+        );
 
         $users = Gdn_DataSet::index($users, ['ConversationID'], ['Unique' => false]);
 

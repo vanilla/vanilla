@@ -22,18 +22,25 @@ interface ITextDescription {
 
 interface IModalCommonProps {
     className?: string;
-    exitHandler?: () => void;
+    exitHandler?: (event?: React.SyntheticEvent<any>) => void;
     pageContainer?: Element;
     container?: Element;
     description?: string;
     children: React.ReactNode;
     elementToFocus?: HTMLElement;
     size: ModalSizes;
+    elementToFocusOnExit: HTMLElement; // Should either be a specific element or use document.activeElement
 }
 
 interface IModalTextDescription extends IModalCommonProps, ITextDescription {}
 
 interface IModalHeadingDescription extends IModalCommonProps, IHeadingDescription {}
+
+type IProps = IModalTextDescription | IModalHeadingDescription;
+
+interface IState {
+    exitElementSet: boolean;
+}
 
 /**
  * An accessible Modal component.
@@ -45,7 +52,7 @@ interface IModalHeadingDescription extends IModalCommonProps, IHeadingDescriptio
  * - Prevents scrolling of the body.
  * - Focuses the first focusable element in the Modal.
  */
-export default class Modal extends React.Component<IModalTextDescription | IModalHeadingDescription> {
+export default class Modal extends React.Component<IProps, IState> {
     public static defaultProps = {
         pageContainer: document.getElementById("page"),
         container: document.getElementById("modals"),
@@ -65,10 +72,15 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
         return this.id + "-description";
     }
 
+    public state = {
+        exitElementSet: false,
+    };
+
     /**
      * Render the contents into a portal.
      */
     public render() {
+        const { size } = this.props;
         return ReactDOM.createPortal(
             <div className="overlay" onClick={this.handleScrimClick}>
                 <div
@@ -78,11 +90,13 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
                     className={classNames(
                         "modal",
                         {
-                            isFullScreen: this.props.size === ModalSizes.FULL_SCREEN,
-                            inheritHeight: this.props.size === ModalSizes.FULL_SCREEN,
-                            isLarge: this.props.size === ModalSizes.LARGE,
-                            isMedium: this.props.size === ModalSizes.MEDIUM,
-                            isSmall: this.props.size === ModalSizes.SMALL,
+                            isFullScreen: size === ModalSizes.FULL_SCREEN || size === ModalSizes.MODAL_AS_SIDE_PANEL,
+                            inheritHeight: size === ModalSizes.FULL_SCREEN,
+                            isSidePanel: size === ModalSizes.MODAL_AS_SIDE_PANEL,
+                            isDropDown: size === ModalSizes.MODAL_AS_DROP_DOWN,
+                            isLarge: size === ModalSizes.LARGE,
+                            isMedium: size === ModalSizes.MEDIUM,
+                            isSmall: size === ModalSizes.SMALL,
                         },
                         this.props.className,
                     )}
@@ -130,6 +144,16 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
             document.addEventListener("keydown", this.handleDocumentEscapePress);
         }
         Modal.stack.push(this);
+        this.forceUpdate();
+    }
+    /**
+     * We need to check again for focus if the focus is by ref
+     */
+    public componentDidUpdate(prevProps: IProps) {
+        if (prevProps.elementToFocus !== this.props.elementToFocus) {
+            this.focusInitialElement();
+        }
+        this.setCloseFocusElement();
     }
 
     /**
@@ -150,21 +174,32 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
         }
         const prevFocussedElement = Modal.focusHistory.pop() || document.body;
         prevFocussedElement.focus();
+        setImmediate(() => {
+            prevFocussedElement.focus();
+        });
     }
 
     /**
      * Focus the initial element in the Modal.
      */
     private focusInitialElement() {
-        let targetElement;
-        if (this.props.elementToFocus) {
-            targetElement = this.props.elementToFocus;
-        } else {
-            targetElement = this.tabHandler.getInitial();
+        const focusElement = !!this.props.elementToFocus ? this.props.elementToFocus : this.tabHandler.getInitial();
+        if (focusElement) {
+            focusElement!.focus();
         }
-        targetElement = !!targetElement ? targetElement : document.body;
-        targetElement.focus();
-        Modal.focusHistory.push(targetElement);
+    }
+
+    /**
+     * Set focus on element to target when we close the modal
+     */
+    private setCloseFocusElement() {
+        // if we need to rerender the component, we don't want to include a bad value in the focus history
+        if (this.props.elementToFocusOnExit && !this.state.exitElementSet) {
+            Modal.focusHistory.push(this.props.elementToFocusOnExit);
+            this.setState({
+                exitElementSet: true,
+            });
+        }
     }
 
     /**
@@ -188,15 +223,15 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
      *
      * Because of this we have to be smarter and call only the top modal's escape handler.
      */
-    private handleDocumentEscapePress = (event: KeyboardEvent) => {
+    private handleDocumentEscapePress = (event: React.SyntheticEvent | KeyboardEvent) => {
         const topModal = Modal.stack[Modal.stack.length - 1];
         const escKey = 27;
 
-        if (event.keyCode === escKey) {
+        if ("keyCode" in event && event.keyCode === escKey) {
             event.preventDefault();
             event.stopPropagation();
             if (topModal.props.exitHandler) {
-                topModal.props.exitHandler();
+                topModal.props.exitHandler(event as any);
             }
         }
     };
@@ -215,7 +250,7 @@ export default class Modal extends React.Component<IModalTextDescription | IModa
     private handleScrimClick = (event: React.MouseEvent) => {
         event.preventDefault();
         if (this.props.exitHandler) {
-            this.props.exitHandler();
+            this.props.exitHandler(event);
         }
     };
 

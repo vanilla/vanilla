@@ -1,6 +1,8 @@
-$selectBox-toggle_lineHeight: 13px !default;
-$selectBox-toggle_fontSize: 13px !default;
-$selectBox-separator_color: #dddee0 !default;
+$selectBox-toggle_lineHeight                    : 13px !default;
+$selectBox-toggle_fontSize                      : 13px !default;
+$selectBox-separator_color                      : #dddee0 !default;
+
+$dropDown-asModal_fontSize                      : $global-subTitle_fontSize;
 
 .selectBox {
     display: inline-block;

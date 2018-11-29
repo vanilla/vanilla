@@ -7,7 +7,6 @@
     color: $global-color_fg;
     padding-left: $richEditor_horizontalPadding;
 
-
     blockquote {
         display: block;
         margin: 0;
@@ -74,6 +73,19 @@
         }
     }
 }
+
+
+.richEditor-menu {
+    @include shadow-embed;
+    background-color: $global-color_bg;
+    border: {
+        radius: $global-borderRadius;
+        color: $global-border_color;
+        style: $global-border_style;
+        width: $global-border_width;
+    }
+}
+
 
 .richEditor-button {
     user-select: none;
@@ -226,6 +238,18 @@ body.hasRichEditor {
 
 .richEditor-text {
     overflow: visible;
+    padding: {
+        right: $richEditor_innerPadding;
+        left: $richEditor_innerPadding;
+    }
+    &:focus {
+        outline: {
+            offset: $richEditor-text_offset;
+            style: solid;
+            width: $formElement_borderWidth;
+            color: $richEditor-outline_color;
+        }
+    }
 }
 
 
@@ -238,4 +262,6 @@ body.isMobile {
     @include legacyMobileStyles();
 }
 
-
+.richEditorFlyout {
+    bottom: 100%;
+}

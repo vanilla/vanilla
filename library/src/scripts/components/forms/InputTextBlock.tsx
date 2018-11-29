@@ -4,45 +4,32 @@
  * @license GPL-2.0-only
  */
 
-import React, { ReactNode } from "react";
+import React from "react";
 import classNames from "classnames";
-
-import Paragraph from "../Paragraph";
-import { getRequiredID, IOptionalComponentID } from "@library/componentIDs";
-import { IFieldError } from "@library/@types/api/core";
-import ErrorMessages from "./ErrorMessages";
+import { getRequiredID } from "@library/componentIDs";
+import InputBlock, { IInputBlockProps } from "@library/components/forms/InputBlock";
+import { Omit } from "@library/@types/utils";
 
 export enum InputTextBlockBaseClass {
     STANDARD = "inputBlock",
     CUSTOM = "",
 }
 
-export interface IInputTextProps extends IOptionalComponentID {
-    className?: string;
-    label: ReactNode;
-    labelClassName?: string;
-    noteAfterInput?: string;
-    value: string;
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    labelNote?: string;
-    inputClassNames?: string;
-    type?: string;
-    labelID?: string;
-    defaultValue?: string;
-    placeholder?: string;
-    valid?: boolean;
-    descriptionID?: string;
-    required?: boolean;
-    errors?: IFieldError[];
-    disabled?: boolean;
-    baseClass?: InputTextBlockBaseClass;
+export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {
+    inputProps: {
+        value: string;
+        onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+        inputClassNames?: string;
+        type?: string;
+        defaultValue?: string;
+        placeholder?: string;
+        valid?: boolean;
+        required?: boolean;
+        disabled?: boolean;
+    };
 }
 
-interface IState {
-    id: string;
-}
-
-export default class InputTextBlock extends React.Component<IInputTextProps, IState> {
+export default class InputTextBlock extends React.Component<IInputTextProps> {
     public static defaultProps = {
         disabled: false,
         type: "text",
@@ -50,54 +37,45 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
         baseClass: InputTextBlockBaseClass.STANDARD,
     };
 
+    private id: string;
     private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
 
     public constructor(props) {
         super(props);
-        this.state = {
-            id: getRequiredID(props, "inputText") as string,
-        };
+        this.id = getRequiredID(props, "inputText");
     }
 
     public render() {
-        const componentClasses = classNames(this.props.baseClass, this.props.className);
-        const inputClasses = classNames("inputBlock-inputText", "InputBox", "inputText", this.props.inputClassNames);
-        const hasErrors = !!this.props.errors && this.props.errors.length > 0;
-
-        let describedBy;
-        if (hasErrors) {
-            describedBy = this.errorID;
-        }
+        const { inputProps, ...blockProps } = this.props;
+        const inputClasses = classNames("inputBlock-inputText", "InputBox", "inputText", inputProps.inputClassNames);
 
         return (
-            <label className={componentClasses}>
-                <span id={this.labelID} className="inputBlock-labelAndDescription">
-                    <span className={classNames("inputBlock-labelText", this.props.labelClassName)}>
-                        {this.props.label}
-                    </span>
-                    <Paragraph className="inputBlock-labelNote" children={this.props.labelNote} />
-                </span>
-
-                <span className="inputBlock-inputWrap">
-                    <input
-                        id={this.state.id}
-                        className={inputClasses}
-                        defaultValue={this.props.defaultValue}
-                        value={this.props.value}
-                        type={this.props.type}
-                        disabled={this.props.disabled}
-                        required={this.props.required}
-                        placeholder={this.props.placeholder}
-                        aria-invalid={hasErrors}
-                        aria-describedby={describedBy}
-                        aria-labelledby={this.labelID}
-                        onChange={this.onChange}
-                        ref={this.inputRef}
-                    />
-                </span>
-                <Paragraph className="inputBlock-labelNote" children={this.props.noteAfterInput} />
-                <ErrorMessages id={this.errorID} errors={this.props.errors} />
-            </label>
+            <InputBlock {...blockProps}>
+                {blockParams => {
+                    const { labelID, errorID, hasErrors } = blockParams;
+                    let describedBy;
+                    if (hasErrors) {
+                        describedBy = errorID;
+                    }
+                    return (
+                        <input
+                            id={this.id}
+                            className={inputClasses}
+                            defaultValue={inputProps.defaultValue}
+                            value={inputProps.value}
+                            type={inputProps.type}
+                            disabled={inputProps.disabled}
+                            required={inputProps.required}
+                            placeholder={inputProps.placeholder}
+                            aria-invalid={hasErrors}
+                            aria-describedby={describedBy}
+                            aria-labelledby={labelID}
+                            onChange={this.onChange}
+                            ref={this.inputRef}
+                        />
+                    );
+                }}
+            </InputBlock>
         );
     }
 
@@ -136,16 +114,8 @@ export default class InputTextBlock extends React.Component<IInputTextProps, ISt
     }
 
     private onChange = event => {
-        if (this.props.onChange) {
-            this.props.onChange(event);
+        if (this.props.inputProps.onChange) {
+            this.props.inputProps.onChange(event);
         }
     };
-
-    private get labelID(): string {
-        return this.state.id + "-label";
-    }
-
-    private get errorID(): string {
-        return this.state.id + "-errors";
-    }
 }

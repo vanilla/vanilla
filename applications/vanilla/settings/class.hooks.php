@@ -18,6 +18,45 @@ use Vanilla\Formatting\Embeds\EmbedManager;
 class VanillaHooks implements Gdn_IPlugin {
 
     /**
+     * Add to valid media attachment types.
+     *
+     * @param \Garden\Schema\Schema $schema
+     */
+    public function articlesPatchAttachmentSchema_init(\Garden\Schema\Schema $schema) {
+        $types = $schema->getField("properties.foreignType.enum");
+        $types[] = "comment";
+        $types[] = "discussion";
+        $schema->setField("properties.foreignType.enum", $types);
+    }
+
+    /**
+     * Verify the current user can attach a media item to a Vanilla post.
+     *
+     * @param bool $canAttach
+     * @param string $foreignType
+     * @param int $foreignID
+     * @return bool
+     */
+    public function canAttachMedia_handler(bool $canAttach, string $foreignType, int $foreignID): bool {
+        switch ($foreignType) {
+            case "comment":
+                $model = new CommentModel();
+                break;
+            case "discussion":
+                $model = new DiscussionModel();
+                break;
+            default:
+                return $canAttach;
+        }
+
+        $row = $model->getID($foreignID, DATASET_TYPE_ARRAY);
+        if (!$row) {
+            return false;
+        }
+        return ($row["InsertUserID"] === Gdn::session()->UserID || Gdn::session()->checkRankedPermission("Garden.Moderation.Manage"));
+    }
+
+    /**
      * Counter rebuilding.
      *
      * @param DbaController $sender

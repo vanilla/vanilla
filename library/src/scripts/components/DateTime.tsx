@@ -4,20 +4,47 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { Component } from "react";
+import moment from "moment";
 
 interface IProps {
+    /** The timestamp to format and display */
     timestamp: string;
+    /** An additional classname to apply to the root of the component */
     className?: string;
+    /** Display a fixed or relative visible time. */
+    mode?: "relative" | "fixed";
 }
 
-export default class DateTime extends React.Component<IProps> {
+/**
+ * Component for displaying an accessible nicely formatted time string.
+ */
+export default class DateTime extends Component<IProps> {
+    public static defaultProps: Partial<IProps> = {
+        mode: "fixed",
+    };
+    private interval;
+
     public render() {
         return (
             <time className={this.props.className} dateTime={this.props.timestamp} title={this.titleTime}>
                 {this.humanTime}
             </time>
         );
+    }
+
+    public componentDidMount() {
+        if (this.props.mode === "relative") {
+            this.interval = setInterval(() => {
+                this.forceUpdate();
+            }, 30000);
+        }
+    }
+
+    public componentWillUnmount() {
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
     }
 
     /**
@@ -40,6 +67,11 @@ export default class DateTime extends React.Component<IProps> {
      */
     private get humanTime(): string {
         const date = new Date(this.props.timestamp);
-        return date.toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric" });
+
+        if (this.props.mode === "relative") {
+            return moment(date).from(moment());
+        } else {
+            return date.toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric" });
+        }
     }
 }

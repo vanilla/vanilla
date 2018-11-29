@@ -1,5 +1,4 @@
-/**
- * @author Adam Charron <adam.c@vanillaforums.com>
+/*!
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
@@ -9,7 +8,11 @@ $embedLink-linkImage_mobileWidth: 100px !default;
 $embedLink-image_separatorColor: rgba($global-color_fg, .1) !default;
 $embedLink-source_fontSize: $userContent_fontSize !default;
 $embedLink-excerpt_fontSize: $userContent_fontSize !default;
-$embedLink-excerpt_lineHeight: $global-base_lineHeight !default;
+$embedLink-excerpt_lineHeight: $global-excerpt_lineHeight !default;
+
+.embedLink-link {
+    color: inherit;
+}
 
 .embedLink-image {
     position: absolute;
@@ -68,6 +71,7 @@ $embedLink-excerpt_lineHeight: $global-base_lineHeight !default;
     text-overflow: ellipsis;
     word-break: break-word;
     max-width: 100%;
+    margin-top: $embedded-small_spacing;
     line-height: $embedLink-excerpt_lineHeight;
     max-height: #{$embedLink-excerpt_lineHeight * $embedLink-excerpt_fontSize * 3};
     white-space: normal;

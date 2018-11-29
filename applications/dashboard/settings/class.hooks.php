@@ -624,7 +624,7 @@ class DashboardHooks extends Gdn_Plugin {
     public function gdn_dispatcher_appStartup_handler($sender) {
         safeHeader('P3P: CP="CAO PSA OUR"', true);
 
-        if ($sSO = Gdn::request()->get('sso')) {
+        if ($sso = Gdn::request()->get('sso')) {
             saveToConfig('Garden.Registration.SendConnectEmail', false, false);
 
             $deliveryMethod = $sender->getDeliveryMethod(Gdn::request());
@@ -633,7 +633,7 @@ class DashboardHooks extends Gdn_Plugin {
             $userID = false;
             try {
                 $currentUserID = Gdn::session()->UserID;
-                $userID = Gdn::userModel()->sso($sSO);
+                $userID = Gdn::userModel()->sso($sso);
             } catch (Exception $ex) {
                 trace($ex, TRACE_ERROR);
             }
@@ -663,6 +663,15 @@ class DashboardHooks extends Gdn_Plugin {
                 redirectTo($url);
             }
         }
+    }
+
+    /**
+     * Check if we have a valid token associated with the request.
+     * The checkAccessToken was previously done in gdn_dispatcher_appStartup_handler hook.
+     * It was changed to have the access token auth happen as close as possible to standard auth.
+     * It's necessary to do it via events until Vanilla overhauls its authentication workflow.
+     */
+    public function gdn_auth_startAuthenticator_handler() {
         $this->checkAccessToken();
     }
 

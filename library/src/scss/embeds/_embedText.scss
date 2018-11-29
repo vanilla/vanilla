@@ -1,3 +1,8 @@
+/*!
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 $embedText-header_fontSize: $userContent_fontSize !default;
 $embedText-title_fontWeight: $global-fontWeight_bold !default;
 $embedText-content_boxShadowColor: rgba($global-color_fg, .3) !default;
@@ -42,7 +47,6 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
     justify-content: flex-start;
     font-size: $embedText-header_fontSize;
     line-height: $global-condensed_lineHeight;
-    //margin-bottom: $utility-baseUnit;
 }
 
 .embedText-titleLink,
@@ -66,16 +70,15 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
 .embedText { // for compatibility
     .embedText-title {
         margin: {
-            top: #{(1 - $global-condensed_lineHeight) * .5em} !important;
+            top: 0 !important;
             right: 0;
-            bottom: #{$userContent_fontSize / 2.2};
+            bottom: $embedded-small_spacing;
             left: 0;
         }
     }
 }
 
 // Edit Mode
-
 .richEditor {
     .embedText-titleLink {
         pointer-events: none;

@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use Vanilla\Formatting\Embeds\EmbedManager;
@@ -16,6 +17,14 @@ use Vanilla\UploadedFileSchema;
  * API Controller for `/media`.
  */
 class MediaApiController extends AbstractApiController {
+    const TYPE_IMAGE = 'image';
+    const TYPE_TEXT = 'text';
+    const TYPE_ARCHIVE = 'archive';
+    const TYPE_BINARY = 'binary';
+
+    const EXTENSIONS_TEXT = ['txt', 'csv', 'doc', 'docx', 'pdf', 'md', 'rtf'];
+    const EXTENSIONS_BINARY = ['xls', 'xlsx', 'ppt'];
+    const EXTENSIONS_ARCHIVE = ['zip', 'tar', 'gzip', '7z', 'arj', 'deb', 'pkg', 'gz', 'z', 'rpm', 'iso', 'cab'];
 
     /** @var Schema */
     private $idParamSchema;
@@ -26,15 +35,19 @@ class MediaApiController extends AbstractApiController {
     /** @var EmbedManager */
     private $embedManager;
 
+    /** @var Config */
+    private $config;
+
     /**
      * MediaApiController constructor.
      *
      * @param MediaModel $mediaModel
      * @param EmbedManager $embedManager
      */
-    public function __construct(MediaModel $mediaModel, EmbedManager $embedManager) {
+    public function __construct(MediaModel $mediaModel, EmbedManager $embedManager, Gdn_Configuration $config) {
         $this->mediaModel = $mediaModel;
         $this->embedManager = $embedManager;
+        $this->config =  $config;
     }
 
     /**
@@ -47,7 +60,6 @@ class MediaApiController extends AbstractApiController {
 
         $in = $this->idParamSchema()->setDescription('Delete a media item.');
         $out = $this->schema($this->fullSchema(), 'out');
-
         $row = $this->mediaByID($id);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->permission('Garden.Moderation.Manage');
@@ -97,7 +109,7 @@ class MediaApiController extends AbstractApiController {
         ];
 
         switch ($type) {
-            case 'image':
+            case self::TYPE_IMAGE:
                 $imageSize = getimagesize($file);
                 if (is_array($imageSize)) {
                     $media['ImageWidth'] = $imageSize[0];
@@ -118,6 +130,21 @@ class MediaApiController extends AbstractApiController {
     }
 
     /**
+     * Given a media row, verify the current user has permissions to edit it.
+     *
+     * @param array $row
+     */
+    private function editPermission(array $row) {
+        $insertUserID = $row["InsertUserID"] ?? null;
+        if ($this->getSession()->UserID === $insertUserID) {
+            // Make sure we can still perform uploads.
+            $this->permission("Garden.Uploads.Add");
+        } else {
+            $this->permission("Garden.Moderation.Manage");
+        }
+    }
+
+    /**
      * Get a schema instance comprised of all available media fields.
      *
      * @return Schema
@@ -129,8 +156,8 @@ class MediaApiController extends AbstractApiController {
             'name:s' => 'The original filename of the upload.',
             'type:s' => 'MIME type',
             'size:i' =>'File size in bytes',
-            'width:i|n' => 'Image width',
-            'height:i|n' => 'Image height',
+            'width:i|n?' => 'Image width',
+            'height:i|n?' => 'Image height',
             'dateInserted:dt' => 'When the media item was created.',
             'insertUserID:i' => 'The user that created the media item.',
             'foreignType:s|n' => 'Table the media is linked to.',
@@ -158,6 +185,7 @@ class MediaApiController extends AbstractApiController {
         }
 
         $row = $this->normalizeOutput($row);
+
         $result = $out->validate($row);
         return $result;
     }
@@ -268,18 +296,77 @@ class MediaApiController extends AbstractApiController {
     public function normalizeOutput(array $row) {
         $row['foreignID'] = $row['ForeignID'] ?? null;
         $row['foreignType'] = $row['ForeignTable'] ?? null;
-        $row['height'] = $row['ImageHeight'] ?? null;
-        $row['width'] = $row['ImageWidth'] ?? null;
 
         if (array_key_exists('Path', $row)) {
             $parsed = Gdn_Upload::parse($row['Path']);
             $row['url'] = $parsed['Url'];
+
+            $ext = pathinfo($row['url'], PATHINFO_EXTENSION);
+            if (in_array($ext, array_keys(ImageResizer::getExtType()))) {
+                $row['height'] = $row['ImageHeight'] ?? null;
+                $row['width'] = $row['ImageWidth'] ?? null;
+            }
         } else {
             $row['url'] = null;
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($row);
         return $schemaRecord;
+    }
+
+    /**
+     * Update a media item's attachment to another record.
+     *
+     * @param int $id
+     * @param array $body
+     * @return array
+     * @throws NotFoundException If the media item could not be found.
+     * @throws Garden\Schema\ValidationException If input validation fails.
+     * @throws Garden\Schema\ValidationException If output validation fails.
+     */
+    public function patch_attachment(int $id, array $body): array {
+        $this->idParamSchema();
+        $in = $this->schema([
+            "foreignType" => [
+                "description" => "Type of resource the media item will be attached to (e.g. comment).",
+                "enum" => [
+                    "embed",
+                ],
+                "type" => "string",
+            ],
+            "foreignID" => [
+                "description" => "Unique ID of the resource this media item will be attached to.",
+                "type" => "integer",
+            ],
+        ], ["articlesPatchAttachment", "in"])->setDescription("Update a media item's attachment to another record.");
+        $out = $this->schema($this->fullSchema(), "out");
+
+        $body = $in->validate($body);
+
+        $original = $this->mediaByID($id);
+        $this->editPermission($original);
+
+        $canAttach = $this->getEventManager()->fireFilter(
+            "canAttachMedia",
+            ($body["foreignType"] === "embed" && $body["foreignID"] === $this->getSession()->UserID),
+            $body["foreignType"],
+            $body["foreignID"]
+        );
+        if ($canAttach !== true) {
+            throw new ClientException("Unable to attach to this record. It may not exist or you may have improper permissions to access it.");
+        }
+
+        $this->mediaModel->update(
+            [
+                "ForeignID" => $body["foreignID"],
+                "ForeignTable" => $body["foreignType"],
+            ],
+            ["MediaID" => $id]
+        );
+        $row = $this->mediaByID($id);
+        $row = $this->normalizeOutput($row);
+        $result = $out->validate($row);
+        return $result;
     }
 
     /**
@@ -291,16 +378,36 @@ class MediaApiController extends AbstractApiController {
      */
     public function post(array $body) {
         $this->permission('Garden.Uploads.Add');
-
+        switch ($body['type']) {
+            case self::TYPE_TEXT:
+                $typeExtensions = self::EXTENSIONS_TEXT;
+                break;
+            case self::TYPE_BINARY:
+                $typeExtensions = self::EXTENSIONS_BINARY;
+                break;
+            case self::TYPE_ARCHIVE:
+                $typeExtensions = self::EXTENSIONS_ARCHIVE;
+                break;
+            case self::TYPE_IMAGE:
+            default:
+                $typeExtensions = array_keys(ImageResizer::getExtType());
+        }
+        $allowedExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
+        $uploadExtensions = array_intersect($allowedExtensions, $typeExtensions);
         $uploadSchema = new UploadedFileSchema([
-            'allowedExtensions' => array_keys(ImageResizer::getExtType())
+            'allowedExtensions' => $uploadExtensions
         ]);
 
         $in = $this->schema([
             'file' => $uploadSchema,
             'type:s' => [
                 'description' => 'The upload type.',
-                'enum' => ['image']
+                'enum' => [
+                    self::TYPE_IMAGE,
+                    self::TYPE_TEXT,
+                    self::TYPE_ARCHIVE,
+                    self::TYPE_BINARY,
+                ]
             ]
         ],'in')->setDescription('Add a media item.');
         $out = $this->schema($this->fullSchema(), 'out');

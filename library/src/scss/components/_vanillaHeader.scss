@@ -1,0 +1,264 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$vanillaHeader-button_borderRadius: 3px;
+$vanillaHeader-button_size: 40px;
+$vanillaHeader-spacer_width: 12px;
+
+$vanillaHeader-count_size: 18px;
+$vanillaHeader-count_fontSize: 10px;
+$vanillaHeader-count_bg: #D0021B;
+$vanillaHeader-count_fg: $vanillaHeader_fg;
+
+$vanillaHeader-dropDownContents_minWidth: 350px;
+$vanillaHeader-button_mobile_fontSize: 16px;
+
+$vanillaHeader-endElements_flexBasis: $vanillaHeader-button_size * 4;
+
+$vanillaHeader-compactSearch_maxWidth: 672px;
+
+
+.vanillaHeader {
+    height: $vanillaHeader_height;
+    background-color: $vanillaHeader_bg;
+    color: $vanillaHeader_fg;
+
+    .searchBar__control {
+        color: $vanillaHeader-fg;
+    }
+
+    .suggestedTextInput-clear.searchBar-clear {
+        &:hover,
+        &:active,
+        &:focus {
+            color: $vanillaHeader-fg;
+        }
+    }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        height: $vanillaHeader_mobile_height;
+    }
+}
+
+.vanillaHeaderHome {
+    min-height: $vanillaHeader_mobile_height * 2;
+}
+
+.vanillaHeader-bar {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    align-items: center;
+    min-height: $vanillaHeader_height;
+    width: 100%;
+
+    &.isHome {
+        justify-content: space-between;
+    }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        min-height: $vanillaHeader_mobile_height;
+    }
+}
+
+.vanillaHeader-logoContainer {
+    display: inline-flex;
+    align-self: center;
+    color: $vanillaHeader_fg;
+    flex-basis: $vanillaHeader-endElements_flexBasis;
+
+    @include mediaQuery-panelLayout_oneColumn {
+        flex-shrink: 1;
+        flex-basis: auto;
+    }
+}
+
+.headerLogo-logo {
+    &.isCentred {
+        margin: auto;
+    }
+}
+
+.vanillaHeader-meBox {
+    justify-content: flex-end;
+}
+
+.vanillaHeader-nav {
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+    color: inherit;
+}
+
+.vanillaHeader-locales {
+    height: $vanillaHeader_height;
+
+    &.buttonAsText {
+        &:hover,
+        &:focus {
+            color: inherit;
+        }
+    }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        height: $vanillaHeader_mobile_height;
+    }
+}
+
+
+.vanillaHeader-messages {
+    color: $global-color_bg;
+}
+
+.vanillaHeader-notifications {
+    color: inherit;
+}
+
+.vanillaHeader-compactSearch {
+    margin-left: auto;
+}
+
+
+
+.vanillaHeader-mobileDropDown,
+.vanillaHeader-searchCancel,
+.vanillaHeader-localeToggle,
+.vanillaHeader-navLink {
+    color: inherit;
+    padding: 0 $vanillaHeader-spacer_width;
+    border-radius: $vanillaHeader-button_borderRadius;
+
+    &:active,
+    &:hover,
+    &:focus {
+        background-color: rgba(#000, .1);
+        border-radius: $vanillaHeader-button_borderRadius;
+    }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        font-size: $vanillaHeader-button_mobile_fontSize;
+        white-space: nowrap;
+    }
+}
+
+.vanillaHeader-localeToggle {
+    height: $vanillaHeader_height;
+
+    @include mediaQuery-panelLayout_oneColumn {
+        height: $vanillaHeader_mobile_height;
+    }
+}
+
+.vanillaHeader-languages {
+    margin-left: auto;
+}
+
+.vanillaHeader-button {
+    color: inherit;
+    height: $vanillaHeader_height;
+    width: $vanillaHeader-button_size;
+    padding: 0;
+
+    &:active,
+    &:hover,
+    &:focus {
+        .vanillaHeader-navLinkContent,
+        .vanillaHeader-buttonContent {
+            background-color: rgba(#000, .1);
+            border-radius: $vanillaHeader-button_borderRadius;
+        }
+    }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        height: $vanillaHeader_mobile_height;
+    }
+}
+
+.vanillaHeader-searchCancel {
+    height: $formElement_height;
+    user-select: none;
+}
+
+.vanillaHeader-buttonContent {
+    @include flexCenterContent;
+    height: $vanillaHeader-button_size;
+    pointer-events: none;
+}
+
+.vanillaHeader-user {
+    position: relative;
+    height: $vanillaHeader-button_size;
+    width: $vanillaHeader-button_size;
+    overflow: hidden;
+}
+
+.dropDown-contents.vanillaHeader-dropDownContents {
+    min-width: $vanillaHeader-dropDownContents_minWidth;
+}
+
+.vanillaHeader-button {
+    @include flexCenterContent;
+}
+
+.vanillaHeader-count {
+    height: $vanillaHeader-count_size;
+    font-size: $vanillaHeader-count_fontSize;
+    background-color: $vanillaHeader-count_bg;
+    color: $vanillaHeader-count_fg;
+}
+
+// Home - Mobile
+
+.vanillaHeader-horizontalScroll {
+    overflow-x: auto;
+}
+
+.vanillaHeaderHome-bottom {
+    background-color: rgba($vanillaHeader_fg, .1);
+}
+
+.vanillaHeaderHome-left {
+    height: 1px;
+    width: $vanillaHeader-button_size;
+    flex-basis: $vanillaHeader-button_size;
+}
+
+.vanillaHeader-horizontalScrollWrap {
+    display: block;
+}
+
+.vanillaHeader-compactSearch {
+    max-width: $vanillaHeader-compactSearch_maxWidth;
+}
+
+.vanillaHeader-compactSearchResults {
+    top: #{($vanillaHeader_height - $formElement_height + $formElement_borderWidth) / 2};
+    position: relative;
+    display: block;
+    margin: auto;
+    max-width: $vanillaHeader-compactSearch_maxWidth;
+
+    @include mediaQuery-panelLayout_oneColumn {
+        top: #{($vanillaHeader_mobile_height - $formElement_height + $formElement_borderWidth) / 2};
+    }
+}
+
+.vanillaHeader-mobileDropDown {
+    height: $vanillaHeader_mobile_height;
+}
+
+.vanillaHeader-rightFlexBasis {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    flex-basis: $vanillaHeader-endElements_flexBasis;
+
+    @include mediaQuery-panelLayout_oneColumn {
+        flex-basis: auto;
+        flex-shrink: 1;
+    }
+}

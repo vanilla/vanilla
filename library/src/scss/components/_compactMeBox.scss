@@ -43,3 +43,14 @@
 .compactMeBox-tabPanels {
     height: calc(100vh - #{$compactMeBox-tab_height});
 }
+.compactMeBox-tabButton {
+    @include flexCenterContent;
+}
+
+.compactMeBox-tabButtonContent {
+    @include flexCenterContent;
+    position: relative;
+    color: $global-color_fg;
+    width: $compactMeBox-tab_height;
+    height: $compactMeBox-tab_height;
+}

@@ -8,7 +8,6 @@ import * as React from "react";
 import ReactDOM from "react-dom";
 import MeBox from "@library/components/mebox/MeBox";
 import { dummyLogoData } from "@library/components/mebox/state/dummyLogoData";
-import { dummyNotificationsData } from "@library/components/mebox/state/dummyNotificationsData";
 import { dummyMessagesData } from "@library/components/mebox/state/dummyMessagesData";
 import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
@@ -36,7 +35,6 @@ interface IProps extends IDeviceProps, IInjectableUserState {
     className?: string;
     title?: string; // Needed for mobile dropdown
     mobileDropDownContent?: React.ReactNode; // Needed for mobile dropdown
-    backUrl?: string;
     onSearchIconClick?: () => void;
 }
 
@@ -75,12 +73,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
             countClass: classNames(countClass, "vanillaHeader-messagesCount"),
         };
 
-        const leftEl = !!this.props.backUrl ? (
-            <FlexSpacer className="pageHeading-leftSpacer" />
-        ) : (
-            <BackLink url={this.props.backUrl} className="pageHeading-backLink" />
-        );
-
         const onSearchClick = this.props.onSearchIconClick ? this.props.onSearchIconClick : this.openSearch;
 
         return ReactDOM.createPortal(
@@ -89,7 +81,11 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                     <PanelWidgetHorizontalPadding>
                         <div className="vanillaHeader-bar">
                             {!this.state.openSearch && isMobile ? (
-                                leftEl
+                                <BackLink
+                                    className="vanillaHeader-leftFlexBasis vanillaHeader-backLink"
+                                    linkClassName="vanillaHeader-button"
+                                    fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
+                                />
                             ) : (
                                 <HeaderLogo
                                     {...dummyLogoData}
@@ -134,6 +130,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                             className="vanillaHeader-nav vanillaHeader-guestNav"
                                         >
                                             <VanillaHeaderNavItem
+                                                className="vanillaHeader-button"
                                                 to={`/entry/signin?target=${window.location.pathname}`}
                                             >
                                                 {signIn("vanillaHeader-signInIcon")}
@@ -155,8 +152,9 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                         {isMobile &&
                                             !this.state.openSearch && (
                                                 <CompactMeBox
+                                                    className={"vanillaHeader-button"}
                                                     counts={dummyUserDropDownData}
-                                                    buttonClass="vanillaHeader-button"
+                                                    buttonClass="vanillaHeader-tabButton"
                                                     userPhotoClass="headerDropDown-user"
                                                 />
                                             )}

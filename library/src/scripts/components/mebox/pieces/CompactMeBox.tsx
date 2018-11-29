@@ -101,21 +101,21 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                 tabs={[
                                     {
                                         buttonContent: (
-                                            <div className="compactSearch-tabButtonContent">
+                                            <div className="compactMeBox-tabButtonContent">
                                                 <UserPhoto
                                                     userInfo={userInfo}
                                                     open={this.state.open}
-                                                    className="compactSearch-tabButtonContent"
+                                                    className="compactMeBox-tabButtonContent"
                                                     size={UserPhotoSize.SMALL}
                                                 />
                                             </div>
                                         ),
                                         openButtonContent: (
-                                            <div className="compactSearch-tabButtonContent">
+                                            <div className="compactMeBox-tabButtonContent">
                                                 <UserPhoto
                                                     userInfo={userInfo}
                                                     open={this.state.open}
-                                                    className="compactSearch-tabButtonContent"
+                                                    className="compactMeBox-tabButtonContent"
                                                     size={UserPhotoSize.SMALL}
                                                 />
                                             </div>
@@ -132,7 +132,7 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                         buttonContent: (
                                             <NotificationsToggle
                                                 open={false}
-                                                className="compactSearch-tabButtonContent"
+                                                className="compactMeBox-tabButtonContent"
                                                 count={this.props.countUnreadNotifications}
                                                 countClass={this.props.notificationsProps.countClass}
                                             />
@@ -140,7 +140,7 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                         openButtonContent: (
                                             <NotificationsToggle
                                                 open={true}
-                                                className="compactSearch-tabButtonContent"
+                                                className="compactMeBox-tabButtonContent"
                                                 count={this.props.countUnreadNotifications}
                                                 countClass={this.props.notificationsProps.countClass}
                                             />
@@ -158,7 +158,7 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                         buttonContent: (
                                             <MessagesToggle
                                                 open={false}
-                                                className="compactSearch-tabButtonContent"
+                                                className="compactMeBox-tabButtonContent"
                                                 count={this.props.countUnreadMessages}
                                                 countClass={this.props.messagesProps.countClass}
                                             />
@@ -166,7 +166,7 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                         openButtonContent: (
                                             <MessagesToggle
                                                 open={true}
-                                                className="compactSearch-tabButtonContent"
+                                                className="compactMeBox-tabButtonContent"
                                                 count={this.props.countUnreadMessages}
                                                 countClass={this.props.messagesProps.countClass}
                                             />

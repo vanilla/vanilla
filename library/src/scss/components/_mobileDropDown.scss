@@ -47,6 +47,8 @@ $mobileDropDown-chevron_color: mixContentBgAndFg(70%);
     max-width: calc(100% - #{$mobileDropDown-chevron_width * 2});
     overflow: hidden;
     text-overflow: ellipsis;
+    flex-grow: 1;
+    text-align: center;
 }
 
 .mobileDropDown-icon {

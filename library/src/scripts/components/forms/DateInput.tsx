@@ -104,7 +104,6 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
      * Handle a new date.
      */
     private updateDate = (date?: Moment | null, isEmpty: boolean = false) => {
-        console.log("Date changed", date, isEmpty);
         if (date) {
             this.setState({ hasBadValue: false });
             this.props.onChange(this.normalizeIsoString(date.toISOString()));
@@ -151,19 +150,9 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
     };
 
     /**
-     * Handle text changes in the main input.
-     */
-    private handleTextChange = (event: React.ChangeEvent<any>) => {
-        const { value } = event.target.value;
-        const date = moment(event.target.value);
-        this.updateDate(date, value === "");
-    };
-
-    /**
      * Handle changes in the native input.
      */
     private handleNativeInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(event);
         this.updateDate(event.target.valueAsDate, event.target.value === "");
     };
 

@@ -39,7 +39,8 @@ interface IProps extends IOptionalComponentID {
     onChange: (value: string) => void;
     isBigInput?: boolean;
     noHeading: boolean;
-    title: React.ReactNode;
+    title: string;
+    titleAsComponent?: React.ReactNode;
     isLoading?: boolean;
     onSearch: () => void;
     optionComponent?: React.ComponentType<OptionProps<any>>;
@@ -211,9 +212,9 @@ export default class SearchBar extends React.Component<IProps, IState> {
             <div className="searchBar">
                 <form className="searchBar-form" onSubmit={this.onFormSubmit}>
                     {!this.props.noHeading && (
-                        <Heading depth={1} className="searchBar-heading">
+                        <Heading depth={1} className="searchBar-heading" title={this.props.title}>
                             <label className="searchBar-label" htmlFor={this.searchInputID}>
-                                {this.props.title}
+                                {this.props.titleAsComponent ? this.props.titleAsComponent : this.props.title}
                             </label>
                         </Heading>
                     )}

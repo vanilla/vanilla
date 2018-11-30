@@ -58,9 +58,12 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                 className="isCompact"
             >
                 <Frame>
-                    <FrameHeader titleID={this.titleID} closeFrame={onCancel} srOnlyTitle={srOnlyTitle!}>
-                        {title}
-                    </FrameHeader>
+                    <FrameHeader
+                        titleID={this.titleID}
+                        closeFrame={onCancel}
+                        srOnlyTitle={srOnlyTitle!}
+                        title={title}
+                    />
                     <FrameBody>
                         <FramePanel>
                             <SmartAlign className="frameBody-contents">{children}</SmartAlign>

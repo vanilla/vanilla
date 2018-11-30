@@ -17,6 +17,7 @@ import Frame from "@library/components/frame/Frame";
 import { compose } from "@library/components/icons/header";
 import { IMeBoxMessageItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
 import MeBoxDropDownItemList from "@library/components/mebox/pieces/MeBoxDropDownItemList";
+import FrameHeaderWithAction from "@library/components/frame/FrameHeaderWithAction";
 
 export interface IMessagesContentsProps {
     data: IMeBoxMessageItem[];
@@ -37,18 +38,19 @@ interface IProps extends IMessagesContentsProps {
 export default class MessagesContents extends React.Component<IProps> {
     public render() {
         const count = this.props.count ? this.props.count : 0;
+        const title = t("Messages");
         return (
             <Frame className={this.props.className}>
-                <FrameHeader className="isShadowed isCompact" title={t("Messages")}>
+                <FrameHeaderWithAction title={title}>
                     <LinkAsButton
                         title={t("New Message")}
                         className="headerDropDown-headerButton headerDropDown-messages button-pushRight"
                         to={"/messages/inbox"}
-                        baseClass={ButtonBaseClass.TEXT}
+                        baseClass={ButtonBaseClass.ICON}
                     >
                         {compose()}
                     </LinkAsButton>
-                </FrameHeader>
+                </FrameHeaderWithAction>
                 <FrameBody className={classNames("isSelfPadded", this.props.panelBodyClass)}>
                     <FramePanel>
                         <MeBoxDropDownItemList

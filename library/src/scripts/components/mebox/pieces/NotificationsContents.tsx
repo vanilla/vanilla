@@ -17,6 +17,7 @@ import { settings } from "@library/components/icons/header";
 import MeBoxDropDownItemList from "@library/components/mebox/pieces/MeBoxDropDownItemList";
 import { IMeBoxNotificationItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
 import classNames from "classnames";
+import FrameHeaderWithAction from "@library/components/frame/FrameHeaderWithAction";
 
 export interface INotificationsProps {
     data: IMeBoxNotificationItem[];
@@ -36,18 +37,19 @@ interface IProps extends INotificationsProps {
  */
 export default class NotificationsContents extends React.Component<IProps> {
     public render() {
+        const title = t("Notifications");
         return (
             <Frame className={this.props.className}>
-                <FrameHeader className="isShadowed isCompact" title={t("Notifications")}>
+                <FrameHeaderWithAction className="hasAction" title={title}>
                     <LinkAsButton
                         title={t("Notification Preferences")}
                         className="headerDropDown-headerButton headerDropDown-notifications button-pushRight"
                         to={`/profile/preferences/${this.props.userSlug}`}
-                        baseClass={ButtonBaseClass.TEXT}
+                        baseClass={ButtonBaseClass.ICON}
                     >
                         {settings()}
                     </LinkAsButton>
-                </FrameHeader>
+                </FrameHeaderWithAction>
                 <FrameBody className={classNames("isSelfPadded", this.props.panelBodyClass)}>
                     <FramePanel>
                         <MeBoxDropDownItemList

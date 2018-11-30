@@ -10,7 +10,8 @@ import BackLink from "@library/components/navigation/BackLink";
 import Heading from "@library/components/Heading";
 
 interface IPageHeading {
-    children: React.ReactNode;
+    title: string;
+    children?: React.ReactNode;
     backUrl?: string;
     className?: string;
     actions?: React.ReactNode;
@@ -31,7 +32,9 @@ export default class PageHeading extends React.Component<IPageHeading> {
                         fallbackElement={null}
                     />
                     {/* Will not render if no url is passed */}
-                    <Heading depth={1}>{this.props.children}</Heading>
+                    <Heading depth={1} title={this.props.title}>
+                        {this.props.children}
+                    </Heading>
                 </div>
                 {this.props.actions && <div className="pageHeading-actions">{this.props.actions}</div>}
             </div>

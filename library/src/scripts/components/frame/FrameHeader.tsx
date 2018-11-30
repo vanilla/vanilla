@@ -20,7 +20,6 @@ interface ICommonFrameHeaderProps extends ICommonHeadingProps {
     srOnlyTitle?: boolean;
     titleID?: string;
     children?: React.ReactNode;
-    centredTitle?: boolean;
 }
 
 export interface IStringTitle extends ICommonFrameHeaderProps {
@@ -40,13 +39,12 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
     public static defaultProps = {
         heading: 2,
         srOnlyTitle: false,
-        centredTitle: false,
     };
 
     public render() {
         const backTitle = t("Back");
         const stringTitle = "title" in this.props ? this.props.title : null;
-        const componentTitle = "children" in this.props ? this.props.children : null;
+        const componentTitle = "children" in this.props ? this.props.children : stringTitle;
 
         let backLink;
         if (this.props.onBackClick) {
@@ -73,22 +71,18 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
         }
 
         return (
-            <header className={classNames("frameHeader", "isCompact", this.props.className)}>
-                {backLink && !this.props.centredTitle ? backLink : <FlexSpacer className="frameHeader-leftSpacer" />}
+            <header className={classNames("frameHeader", this.props.className)}>
                 <Heading
                     id={this.props.titleID}
-                    title={stringTitle!}
+                    title={stringTitle}
                     depth={this.props.depth}
                     className={classNames("frameHeader-heading", {
-                        "frameHeader-left": !this.props.centredTitle,
-                        "frameHeader-centred": this.props.centredTitle,
                         "sr-only": this.props.srOnlyTitle,
                     })}
                 >
                     {componentTitle}
                 </Heading>
                 {closeButton}
-                {!componentTitle ? this.props.children : null}
             </header>
         );
     }

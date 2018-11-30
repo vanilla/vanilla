@@ -12,17 +12,12 @@ $frame-border_radius: $global-borderRadius;
 
 $frame_padding: 36px;
 
-$frame-header_minHeight: 60px;
-$frame-header_compactMinHeight: 44px;
+$frame-header_minHeight: 44px;
 $frame-header_spacing: 12px;
 $frame-header_fontSize: $global-subTitle_fontSize;
 
-$frame-footer_minHeight: $frame-header_minHeight;
 $frame-footer_spacing: $frame-header_spacing;
-
-
-$frame-header_boxShadow: 0 1px 2px 0 $overlay_bgColor;
-$frame-footer_boxShadow: 0 -1px 2px 0 $overlay_bgColor;
+$frame-footer_minHeight: $frame-header_minHeight;
 
 $frame-panel_minHeight: 500px;
 
@@ -48,17 +43,22 @@ $frame-panel_minHeight: 500px;
     flex-wrap: nowrap;
     width: 100%;
     min-height: $frame-header_minHeight;
-    padding: $frame-header_spacing;
+    padding: 0 $frame-header_spacing;
+    z-index: 1;
+}
+
+.frameFooter {
+    display: flex;
+    position: relative;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    padding: $frame-footer_spacing;
+    min-height: $frame-footer_minHeight;
     z-index: 1;
 
-    &.isShadowed {
-        box-shadow: $frame-header_boxShadow;
-    }
-
-    &.isCompact {
-        min-height: $frame-header_compactMinHeight;
-        padding-top: 0;
-        padding-bottom: 0;
+    .button + .button {
+        margin-left: $utility-baseUnit * 2 - $formElement-borderWidth;
     }
 }
 
@@ -105,13 +105,13 @@ $frame-panel_minHeight: 500px;
     }
 }
 
-
 .frameHeader-closePosition {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 1;
     height: $formElement-height;
+    transform: translateX(#{($formElement_height - $icon-small_size) / 2}); // offset so the side of the icon lines up, not the edge of the button
 }
 
 .frameBody {
@@ -152,31 +152,6 @@ $frame-panel_minHeight: 500px;
     overflow: auto;
     max-height: calc(100vh - #{$frame-header_minHeight + $frame-footer_minHeight + $frame_padding * 2});
 
-}
-
-.frameFooter {
-    display: flex;
-    position: relative;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    align-items: center;
-    padding: $frame-footer_spacing;
-    min-height: $frame-footer_minHeight;
-    z-index: 1;
-
-    &.isShadowed {
-        box-shadow: $frame-footer_boxShadow;
-    }
-
-    .button + .button {
-        margin-left: $utility-baseUnit * 2 - $formElement-borderWidth;
-    }
-
-    &.isCompact {
-        min-height: $frame-header_compactMinHeight;
-        padding-top: 0;
-        padding-bottom: 0;
-    }
 }
 
 .frameFooter-markRead.buttonAsText {

@@ -50,7 +50,7 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 
 .vanillaHeader-bar {
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     flex-wrap: nowrap;
     align-items: center;
     height: $vanillaHeader_height;
@@ -297,6 +297,10 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
     @include mediaQuery-panelLayout_oneColumn {
         flex-basis: $vanillaHeader-endElements_mobile_flexBasis;
         flex-shrink: 1;
+    }
+
+    @include mediaQuery-panelLayout_xs {
+        flex-basis: $formElement_height;
     }
 }
 

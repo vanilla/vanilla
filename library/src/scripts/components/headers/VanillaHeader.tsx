@@ -80,13 +80,16 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                 <Container>
                     <PanelWidgetHorizontalPadding>
                         <div className="vanillaHeader-bar">
-                            {!this.state.openSearch && isMobile ? (
-                                <BackLink
-                                    className="vanillaHeader-leftFlexBasis vanillaHeader-backLink"
-                                    linkClassName="vanillaHeader-button"
-                                    fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
-                                />
-                            ) : (
+                            {!this.state.openSearch &&
+                                isMobile && (
+                                    <BackLink
+                                        className="vanillaHeader-leftFlexBasis vanillaHeader-backLink"
+                                        linkClassName="vanillaHeader-button"
+                                        fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
+                                    />
+                                )}
+
+                            {!isMobile && (
                                 <HeaderLogo
                                     {...dummyLogoData}
                                     className="vanillaHeader-logoContainer"

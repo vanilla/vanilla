@@ -12,6 +12,12 @@ $modal-border_radius: $global-borderRadius;
 $modal-dropDown_padding: $global_spacer;
 $modal-horizontalMargin: $global_spacer / 2;
 
+$modal-headerFooter_minHeight: 60px;
+$modal-headerFooter_verticalPadding: 12px;
+
+$frame-header_boxShadow: 0 1px 2px 0 $overlay_bgColor;
+$frame-footer_boxShadow: 0 -1px 2px 0 $overlay_bgColor;
+
 
 .modal {
     position: relative;
@@ -58,6 +64,22 @@ $modal-horizontalMargin: $global_spacer / 2;
         background-color: $modal-bgColor;
         margin-bottom: auto;
         max-height: 100vh;
+    }
+
+    &:not(.isCompact) {
+        .frameHeader {
+            box-shadow: $frame-header_boxShadow;
+            min-height: $modal-headerFooter_minHeight;
+            padding: {
+                top: $modal-headerFooter_verticalPadding;
+                bottom: $modal-headerFooter_verticalPadding;
+            }
+        }
+
+        .frameFooter {
+            min-height: $modal-headerFooter_minHeight;
+            box-shadow: $frame-footer_boxShadow;
+        }
     }
 }
 

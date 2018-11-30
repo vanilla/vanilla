@@ -55,6 +55,7 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                 exitHandler={onCancel}
                 titleID={this.titleID}
                 elementToFocusOnExit={this.props.elementToFocusOnExit}
+                className="isCompact"
             >
                 <Frame>
                     <FrameHeader titleID={this.titleID} closeFrame={onCancel} srOnlyTitle={srOnlyTitle!}>

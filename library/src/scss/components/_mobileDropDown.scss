@@ -10,7 +10,6 @@ $mobileDropDown-chevron_width: 8px;
 $mobileDropDown-chevron_color: mixContentBgAndFg(70%);
 
 .mobileDropDown {
-    //@include flexCenterContent(nowrap);
     position: relative;
     flex-grow: 1;
     overflow: hidden;

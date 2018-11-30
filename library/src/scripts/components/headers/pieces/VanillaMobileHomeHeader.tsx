@@ -7,9 +7,7 @@
 import * as React from "react";
 import ReactDOM from "react-dom";
 import { dummyLogoData } from "../../mebox/state/dummyLogoData";
-import { dummyNotificationsData } from "../../mebox/state/dummyNotificationsData";
 import { dummyMessagesData } from "../../mebox/state/dummyMessagesData";
-import { dummyGuestNavigationData, dummyNavigationData } from "../../mebox/state/dummyNavigationData";
 import { Devices, IDeviceProps } from "../../DeviceChecker";
 import { withDevice } from "../../../contexts/DeviceContext";
 import { dummyUserDropDownData } from "../../mebox/state/dummyUserDropDownData";
@@ -26,6 +24,10 @@ import LanguagesDropDown from "../../LanguagesDropDown";
 import { dummyOtherLanguagesData } from "../../../state/dummyOtherLanguages";
 import { ButtonBaseClass } from "../../forms/Button";
 import FlexSpacer from "../../FlexSpacer";
+import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
+import { signIn } from "@library/components/icons";
+import VanillaHeaderListItem from "@library/components/mebox/pieces/VanillaHeaderListItem";
+import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -58,8 +60,6 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
             countClass: classNames(countClass, "vanillaHeader-messagesCount"),
         };
 
-        const navData = isGuest ? dummyGuestNavigationData : dummyNavigationData;
-
         return ReactDOM.createPortal(
             <header className={classNames("vanillaHeader", "vanillaHeaderHome", this.props.className)}>
                 <Container className="vanillaHeaderHome-top">
@@ -71,25 +71,35 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                                 className="vanillaHeader-logoContainer"
                                 logoClassName="vanillaHeader-logo isCentred"
                             />
-                            <CompactMeBox
-                                counts={dummyUserDropDownData}
-                                buttonClass="vanillaHeader-button"
-                                userPhotoClass="headerDropDown-user"
-                            />
+                            {isGuest ? (
+                                <VanillaHeaderNav
+                                    linkClassName="vanillaHeader-navLink"
+                                    linkContentClassName="vanillaHeader-navLinkContent"
+                                    className="vanillaHeader-nav vanillaHeader-guestNav"
+                                >
+                                    <VanillaHeaderNavItem to={`/entry/signin?target=${window.location.pathname}`}>
+                                        {signIn("vanillaHeader-signInIcon")}
+                                    </VanillaHeaderNavItem>
+                                </VanillaHeaderNav>
+                            ) : (
+                                <CompactMeBox
+                                    counts={dummyUserDropDownData}
+                                    buttonClass="vanillaHeader-button"
+                                    userPhotoClass="headerDropDown-user"
+                                />
+                            )}
                         </div>
                     </PanelWidgetHorizontalPadding>
                 </Container>
                 <div className="vanillaHeaderHome-bottom">
                     <div className="vanillaHeader-horizontalScroll">
                         <VanillaHeaderNav
-                            {...navData}
+                            {...dummyNavigationData}
                             linkClassName="vanillaHeader-navLink"
                             linkContentClassName="vanillaHeader-navLinkContent"
-                            className={classNames("vanillaHeader-nav", "isScrolled", {
-                                "vanillaHeader-guestNav": isGuest,
-                            })}
+                            className={classNames("vanillaHeader-nav", "isScrolled")}
                         >
-                            <li className="vanillaHeaderNav-item">
+                            <VanillaHeaderListItem>
                                 <LanguagesDropDown
                                     {...dummyOtherLanguagesData}
                                     renderLeft={true}
@@ -99,7 +109,7 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                                     widthOfParent={false}
                                     openAsModal={isMobile}
                                 />
-                            </li>
+                            </VanillaHeaderListItem>
                         </VanillaHeaderNav>
                     </div>
                 </div>

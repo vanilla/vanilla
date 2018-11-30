@@ -10,11 +10,11 @@ import VanillaHeaderNavItem, { IHeaderNav } from "./VanillaHeaderNavItem";
 
 export interface IVanillaHeaderNavProps {
     className?: string;
-    data: IHeaderNav[];
     linkClassName?: string;
     linkContentClassName?: string;
-    children?: React.ReactNode;
     listClassName?: string;
+    data?: IHeaderNav[];
+    children?: React.ReactNode;
 }
 
 /**
@@ -22,21 +22,24 @@ export interface IVanillaHeaderNavProps {
  */
 export default class VanillaHeaderNav extends React.Component<IVanillaHeaderNavProps> {
     public render() {
-        const content = this.props.data.map((item, key) => {
-            return (
-                <VanillaHeaderNavItem
-                    {...item}
-                    linkContentClassName={this.props.linkContentClassName}
-                    linkClassName={this.props.linkClassName}
-                    key={`headerNavItem-${key}`}
-                />
-            );
-        });
+        const content = !!this.props.data
+            ? this.props.data.map((item, key) => {
+                  return (
+                      <VanillaHeaderNavItem
+                          {...item}
+                          linkContentClassName={this.props.linkContentClassName}
+                          linkClassName={this.props.linkClassName}
+                          key={`headerNavItem-${key}`}
+                      />
+                  );
+              })
+            : null;
+
         return (
             <nav className={classNames("headerNavigation", this.props.className)}>
                 <ul className={classNames("headerNavigation-items", this.props.listClassName)}>
-                    {content}
-                    {this.props.children}
+                    {!!content && content}
+                    {!!this.props.children && this.props.children}
                 </ul>
             </nav>
         );

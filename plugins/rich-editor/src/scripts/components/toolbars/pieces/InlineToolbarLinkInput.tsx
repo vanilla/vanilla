@@ -34,7 +34,7 @@ export class InlineToolbarLinkInput extends React.PureComponent<IProps, {}> {
 
     public render() {
         return (
-            <div className="richEditor-menu insertLink" role="dialog" aria-label={t("Insert Url")}>
+            <div className="richEditor-menu insertLink likeDropDownContent" role="dialog" aria-label={t("Insert Url")}>
                 <input
                     value={this.props.inputValue}
                     onChange={this.props.onInputChange}

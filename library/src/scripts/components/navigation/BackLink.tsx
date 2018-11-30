@@ -11,11 +11,13 @@ import { leftChevronCompact } from "@library/components/icons/common";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 
 interface IProps extends RouteComponentProps<{}> {
-    url?: string;
+    fallbackUrl?: string;
     title?: React.ReactNode;
     className?: string;
+    linkClassName?: string;
     visibleLabel?: boolean;
     clickHandler?: () => void;
+    fallbackElement?: React.ReactNode;
 }
 
 /**
@@ -27,22 +29,30 @@ export class BackLink extends React.Component<IProps> {
         visibleLabel: false,
     };
     public render() {
-        const routingUrl = this.props.url ? this.props.url : formatUrl("/kb");
-
-        return (
-            <div className={classNames("backLink", this.props.className)}>
-                <Link
-                    to={routingUrl}
-                    aria-label={this.props.title as string}
-                    title={this.props.title as string}
-                    onClick={this.clickHandler}
-                    className={classNames("backLink-link", { hasVisibleLabel: this.props.visibleLabel })}
-                >
-                    {leftChevronCompact("backLink-icon")}
-                    {this.props.visibleLabel && <span className="backLink-label">{this.props.title}</span>}
-                </Link>
-            </div>
-        );
+        if (this.props.history.length === 0 && !this.props.fallbackUrl && this.props.fallbackElement) {
+            // Optional fallback element to render if no history exists and no fallback url given
+            return this.props.fallbackElement;
+        } else {
+            const routingUrl = this.props.fallbackUrl ? this.props.fallbackUrl : formatUrl("/kb");
+            return (
+                <div className={classNames("backLink", this.props.className)}>
+                    <Link
+                        to={routingUrl}
+                        aria-label={this.props.title as string}
+                        title={this.props.title as string}
+                        onClick={this.clickHandler}
+                        className={classNames(
+                            "backLink-link",
+                            { hasVisibleLabel: !!this.props.visibleLabel },
+                            this.props.linkClassName,
+                        )}
+                    >
+                        {leftChevronCompact("backLink-icon")}
+                        {this.props.visibleLabel && <span className="backLink-label">{this.props.title}</span>}
+                    </Link>
+                </div>
+            );
+        }
     }
 
     /**
@@ -50,7 +60,7 @@ export class BackLink extends React.Component<IProps> {
      * Otherwise fallback to the default behaviour.
      */
     private clickHandler = (event: React.MouseEvent) => {
-        if (!this.props.url) {
+        if (!this.props.fallbackUrl) {
             event.preventDefault();
             event.stopPropagation();
             this.props.history.goBack();

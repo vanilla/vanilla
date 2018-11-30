@@ -34,7 +34,6 @@ import ConversationsActions from "@library/conversations/ConversationsActions";
 export interface IUserDropDownProps extends IInjectableUserState, IMeBoxProps {
     buttonClass?: string;
     userPhotoClass?: string;
-    forceIcon?: boolean;
     countUnreadMessages: number;
     countUnreadNotifications: number;
 }
@@ -80,7 +79,6 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                         open={this.state.open}
                         className="meBox-user"
                         size={UserPhotoSize.SMALL}
-                        forceIcon={this.props.forceIcon}
                     />
                 </Button>
                 {this.state.open && (
@@ -103,24 +101,22 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                 tabs={[
                                     {
                                         buttonContent: (
-                                            <div className="compactSearch-tabButtonContent">
+                                            <div className="compactMeBox-tabButtonContent">
                                                 <UserPhoto
                                                     userInfo={userInfo}
                                                     open={this.state.open}
-                                                    className="compactSearch-tabButtonContent"
+                                                    className="compactMeBox-tabButtonContent"
                                                     size={UserPhotoSize.SMALL}
-                                                    forceIcon={false}
                                                 />
                                             </div>
                                         ),
                                         openButtonContent: (
-                                            <div className="compactSearch-tabButtonContent">
+                                            <div className="compactMeBox-tabButtonContent">
                                                 <UserPhoto
                                                     userInfo={userInfo}
                                                     open={this.state.open}
-                                                    className="compactSearch-tabButtonContent"
+                                                    className="compactMeBox-tabButtonContent"
                                                     size={UserPhotoSize.SMALL}
-                                                    forceIcon={true}
                                                 />
                                             </div>
                                         ),
@@ -136,7 +132,7 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                         buttonContent: (
                                             <NotificationsToggle
                                                 open={false}
-                                                className="compactSearch-tabButtonContent"
+                                                className="compactMeBox-tabButtonContent"
                                                 count={this.props.countUnreadNotifications}
                                                 countClass={this.props.notificationsProps.countClass}
                                             />
@@ -144,7 +140,7 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                         openButtonContent: (
                                             <NotificationsToggle
                                                 open={true}
-                                                className="compactSearch-tabButtonContent"
+                                                className="compactMeBox-tabButtonContent"
                                                 count={this.props.countUnreadNotifications}
                                                 countClass={this.props.notificationsProps.countClass}
                                             />
@@ -162,7 +158,7 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                         buttonContent: (
                                             <MessagesToggle
                                                 open={false}
-                                                className="compactSearch-tabButtonContent"
+                                                className="compactMeBox-tabButtonContent"
                                                 count={this.props.countUnreadMessages}
                                                 countClass={this.props.messagesProps.countClass}
                                             />
@@ -170,7 +166,7 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                         openButtonContent: (
                                             <MessagesToggle
                                                 open={true}
-                                                className="compactSearch-tabButtonContent"
+                                                className="compactMeBox-tabButtonContent"
                                                 count={this.props.countUnreadMessages}
                                                 countClass={this.props.messagesProps.countClass}
                                             />

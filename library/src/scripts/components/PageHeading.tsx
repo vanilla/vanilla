@@ -6,12 +6,13 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import BackLink from "@library/components/BackLink";
+import BackLink from "@library/components/navigation/BackLink";
 import Heading from "@library/components/Heading";
 
 interface IPageHeading {
-    children: React.ReactNode;
-    backUrl?: string | null; // back link
+    title: string;
+    children?: React.ReactNode;
+    backUrl?: string;
     className?: string;
     actions?: React.ReactNode;
 }
@@ -25,11 +26,15 @@ export default class PageHeading extends React.Component<IPageHeading> {
         return (
             <div className={classNames("pageHeading", this.props.className)}>
                 <div className="pageHeading-main">
-                    {this.props.backUrl === null ? null : (
-                        <BackLink url={this.props.backUrl} className="pageHeading-backLink" />
-                    )}
+                    <BackLink
+                        fallbackUrl={this.props.backUrl}
+                        className="pageHeading-backLink"
+                        fallbackElement={null}
+                    />
                     {/* Will not render if no url is passed */}
-                    <Heading depth={1}>{this.props.children}</Heading>
+                    <Heading depth={1} title={this.props.title}>
+                        {this.props.children}
+                    </Heading>
                 </div>
                 {this.props.actions && <div className="pageHeading-actions">{this.props.actions}</div>}
             </div>

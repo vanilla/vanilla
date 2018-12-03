@@ -4,30 +4,41 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { RefObject } from "react";
 import { getRequiredID } from "@library/componentIDs";
 import classNames from "classnames";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import FocusWatcher from "@library/FocusWatcher";
 import EscapeListener from "@library/EscapeListener";
+import Modal from "@library/components/modal/Modal";
+import { t } from "@library/application";
+import ModalSizes from "@library/components/modal/ModalSizes";
 
 export interface IPopoverControllerChildParameters {
     id: string;
     initialFocusRef?: React.RefObject<any>;
     isVisible: boolean;
     closeMenuHandler(event?: React.SyntheticEvent<any>);
+    renderAbove?: boolean;
+    renderLeft?: boolean;
 }
 
 export interface IPopoverControllerProps {
     id: string;
-    classNameRoot: string;
+    className?: string;
     buttonContents: React.ReactNode;
     disabled?: boolean;
     children: (props: IPopoverControllerChildParameters) => JSX.Element;
     onClose?: () => void;
     buttonBaseClass: ButtonBaseClass;
     buttonClassName?: string;
-    onVisibilityChange?: () => void;
+    onVisibilityChange?: (isVisible: boolean) => void;
+    renderAbove?: boolean;
+    renderLeft?: boolean;
+    PopoverController?: string;
+    toggleButtonClassName?: string;
+    setExternalButtonRef?: (ref: React.RefObject<HTMLButtonElement>) => void;
+    openAsModal: boolean;
 }
 
 export interface IPopoverControllerPropsWithIcon extends IPopoverControllerProps {
@@ -58,14 +69,32 @@ export default class PopoverController extends React.PureComponent<
     private escapeListener: EscapeListener;
 
     public render() {
-        const buttonClasses = classNames(this.props.buttonClassName, {
+        const buttonClasses = classNames(this.props.buttonClassName, this.props.toggleButtonClassName, {
             isOpen: this.state.isVisible,
         });
 
         const title = "name" in this.props ? this.props.name : this.props.selectedItemLabel;
 
+        const childrenData = {
+            id: this.contentID,
+            initialFocusRef: this.initalFocusRef,
+            isVisible: this.state.isVisible,
+            closeMenuHandler: this.closeMenuHandler,
+            renderAbove: this.props.renderAbove,
+            renderLeft: this.props.renderLeft,
+            openAsModal: this.props.openAsModal,
+        };
+
         return (
-            <div id={this.state.id} className={this.props.classNameRoot} ref={this.controllerRef}>
+            <div
+                id={this.state.id}
+                className={classNames(
+                    { dropDown: !this.props.openAsModal, asModal: this.props.openAsModal },
+                    this.props.className,
+                )}
+                ref={this.controllerRef}
+                onClick={this.stopPropagation}
+            >
                 <Button
                     id={this.buttonID}
                     onClick={this.togglePopover}
@@ -82,13 +111,24 @@ export default class PopoverController extends React.PureComponent<
                 >
                     {this.props.buttonContents}
                 </Button>
+
                 {!this.props.disabled &&
-                    this.props.children({
-                        id: this.contentID,
-                        initialFocusRef: this.initalFocusRef,
-                        isVisible: this.state.isVisible,
-                        closeMenuHandler: this.closeMenuHandler,
-                    })}
+                    this.state.isVisible && (
+                        <React.Fragment>
+                            {this.props.openAsModal ? (
+                                <Modal
+                                    label={t("title")}
+                                    size={ModalSizes.SMALL}
+                                    exitHandler={this.closeMenuHandler}
+                                    elementToFocusOnExit={this.buttonRef.current!}
+                                >
+                                    {this.props.children(childrenData)}
+                                </Modal>
+                            ) : (
+                                this.props.children(childrenData)
+                            )}
+                        </React.Fragment>
+                    )}
             </div>
         );
     }
@@ -98,17 +138,16 @@ export default class PopoverController extends React.PureComponent<
         prevState: IState,
     ) {
         if (!prevState.isVisible && this.state.isVisible) {
+            if (this.props.onVisibilityChange) {
+                this.props.onVisibilityChange(this.state.isVisible);
+            }
             if (this.initalFocusRef.current) {
                 this.initalFocusRef.current.focus();
-                if (this.props.onVisibilityChange) {
-                    this.props.onVisibilityChange();
-                }
             } else if (this.buttonRef.current) {
                 this.buttonRef.current.focus();
-                if (this.props.onVisibilityChange) {
-                    this.props.onVisibilityChange();
-                }
             }
+        } else if (prevState.isVisible && !this.state.isVisible && this.props.onVisibilityChange) {
+            this.props.onVisibilityChange(this.state.isVisible);
         }
     }
 
@@ -125,6 +164,9 @@ export default class PopoverController extends React.PureComponent<
             this.closeMenuHandler,
         );
         this.escapeListener.start();
+        if (this.props.setExternalButtonRef) {
+            this.props.setExternalButtonRef(this.buttonRef);
+        }
     }
 
     /**
@@ -138,6 +180,9 @@ export default class PopoverController extends React.PureComponent<
     private handleFocusChange = hasFocus => {
         if (!hasFocus) {
             this.setState({ isVisible: false });
+            if (this.props.onVisibilityChange) {
+                this.props.onVisibilityChange(false);
+            }
         }
     };
 
@@ -152,10 +197,14 @@ export default class PopoverController extends React.PureComponent<
     /**
      * Toggle Menu menu
      */
-    private togglePopover = () => {
+    private togglePopover = e => {
+        e.stopPropagation();
         this.setState((prevState: IState) => {
             return { isVisible: !prevState.isVisible };
         });
+        if (this.props.onVisibilityChange) {
+            this.props.onVisibilityChange(this.state.isVisible);
+        }
     };
 
     /**
@@ -166,6 +215,8 @@ export default class PopoverController extends React.PureComponent<
         if (event.detail && event.detail.firingKey && event.detail.firingKey === this.constructor.name) {
             return;
         }
+        event.stopPropagation();
+        event.preventDefault();
 
         this.props.onClose && this.props.onClose();
 
@@ -179,5 +230,15 @@ export default class PopoverController extends React.PureComponent<
         if (parentElement && parentElement.contains(activeElement)) {
             this.buttonRef.current && this.buttonRef.current.focus();
         }
+        if (this.props.onVisibilityChange) {
+            this.props.onVisibilityChange(false);
+        }
+    };
+
+    /**
+     * Stop click propagation outside popover
+     */
+    private stopPropagation = e => {
+        e.stopPropagation();
     };
 }

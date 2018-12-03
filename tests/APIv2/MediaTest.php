@@ -23,6 +23,25 @@ class MediaTest extends AbstractAPIv2Test {
     private $baseUrl = '/media';
 
     /**
+     * Test updating a media item's attachment state.
+     */
+    public function testPatchAttachment() {
+        $row = $this->testPost();
+        $mediaID = $row["responseBody"]["mediaID"];
+
+        // Attachments default as "embed" and to the current user. Try attaching to a discussion.
+        $updatedAttachment = [
+            "foreignID" => 1,
+            "foreignType" => "discussion",
+        ];
+        $result = $this->api()->patch(
+            "{$this->baseUrl}/{$mediaID}/attachment",
+            $updatedAttachment
+        );
+        $this->assertArraySubset($updatedAttachment, $result->getBody());
+    }
+
+    /**
      * Test posting.
      *
      * @return array ['uploadedFile' => UploadedFile, 'responseBody' => $body]

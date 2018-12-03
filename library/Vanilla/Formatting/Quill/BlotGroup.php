@@ -8,9 +8,11 @@
 namespace Vanilla\Formatting\Quill;
 
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
+use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\CodeLineBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\CodeLineTerminatorBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\ParagraphLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
@@ -276,33 +278,19 @@ class BlotGroup {
     }
 
     /**
-     * Get heading text with html tags stripped out.
+     * Get the text value of a heading. This is not sanitized, so be sure to HTML escape before using.
      *
      * @return string
      */
-    public function getText(): string {
-        $text = strip_tags($this->render());
-        return $text;
-    }
-
-    /**
-     * Get the internal reference  for the blot.
-     *
-     * @return string Interdoc reference. Ex: #my-title, #hello-heading
-     */
-    public function getReference(): string {
-        $blot = $this->getPrimaryBlot();
-        $ref = '#';
-        if ($blot instanceof HeadingTerminatorBlot) {
-            $ref .= $blot->getReference();
-        }
-        if ($ref ===  '#') {
-            $text = str_replace(' ', '-', $this->getText());
-            if (strlen($text) > 100) {
-                $text = substr($text, 0, 50) . '-' . md5($text);
+    public function getUnsafeText(): string {
+        $text = "";
+        foreach ($this->blots as $blot) {
+            if ($blot instanceof TextBlot
+                || $blot instanceof ExternalBlot) {
+                $text .= $blot->getContent();
             }
-            $ref .= urlencode($text);
         }
-        return $ref;
+
+        return $text;
     }
 }

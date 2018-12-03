@@ -1,0 +1,19 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+.panelArea {
+    width: 100%;
+
+    .heading {
+        @include lineHeightAdjustment($global-condensed_lineHeight, $global-heading_lineHeightRatio);
+    }
+
+    &.inheritHeight {
+        > .panelWidget {
+            flex-grow: 1;
+        }
+    }
+}

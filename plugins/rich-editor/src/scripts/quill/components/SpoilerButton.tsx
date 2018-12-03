@@ -5,7 +5,7 @@
 
 import React from "react";
 import { t } from "@library/application";
-import { spoiler } from "@rich-editor/components/icons";
+import { spoiler } from "@library/components/icons/editorIcons";
 
 export default class SpoilerButton extends React.Component<{}> {
     public render() {

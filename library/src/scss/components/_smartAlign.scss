@@ -1,0 +1,16 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+// The styles for this component keeps text centred if there's not enough text to wrap and is left aligned if wrapped
+.smartAlign-outer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.smartAlign-inner {
+    text-align: left;
+}

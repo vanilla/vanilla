@@ -50,6 +50,12 @@ export default function instanceReducer(
                 [action.payload.editorID]: defaultInstance,
             };
         }
+        case instanceActions.DELETE_INSTANCE: {
+            validateIDExistance(state, action);
+            const newState = { ...state };
+            delete newState[action.payload.editorID];
+            return newState;
+        }
         case instanceActions.SET_SELECTION: {
             validateIDExistance(state, action);
             const { selection, editorID, quill } = action.payload;

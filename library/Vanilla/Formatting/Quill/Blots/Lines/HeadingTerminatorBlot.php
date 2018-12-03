@@ -16,13 +16,18 @@ use Vanilla\Formatting\Quill\BlotGroup;
 class HeadingTerminatorBlot extends AbstractLineTerminatorBlot {
 
     /** @var array Valid heading levels. */
-    private static $validLevels = [2, 3];
+    const VALID_LEVELS = [2, 3];
+
+    /** @var int the default heading level if a none is provided. */
+    const DEFAULT_LEVEL = 2;
 
     /**
      * @inheritDoc
      */
     public static function matches(array $operation): bool {
-        return static::opAttrsContainKeyWithValue($operation, "header", static::$validLevels);
+        return
+            static::opAttrsContainKeyWithValue($operation, "header", self::VALID_LEVELS)
+            || static::opAttrsContainKeyWithValue($operation, "header.level", self::VALID_LEVELS);
     }
 
     /**
@@ -30,7 +35,10 @@ class HeadingTerminatorBlot extends AbstractLineTerminatorBlot {
      * @throws \Exception
      */
     public function getGroupOpeningTag(): string {
-        return "<h" . $this->getHeadingLevel() . ' id="' . $this->getReference() . '" >';
+        $ref = $this->getReference();
+        $idTag = $ref ? ' data-id="' . $ref . '"' : "";
+        $level = $this->getHeadingLevel();
+        return "<h$level$idTag>";
     }
 
     /**
@@ -81,10 +89,11 @@ class HeadingTerminatorBlot extends AbstractLineTerminatorBlot {
      * @throws \Exception if the level is not a valid integer.
      */
     public function getHeadingLevel(): int {
-        $defaultLevel = 2;
         // Heading attributes generally live in the next operation.
         // For empty headings there is only one operation, so it could be in the current op.
-        return $this->currentOperation["attributes"]["header"] ?? $defaultLevel;
+        return $this->currentOperation["attributes"]["header"]["level"]
+            ?? $this->currentOperation["attributes"]["header"]
+            ?? self::DEFAULT_LEVEL;
     }
 
     /**
@@ -93,6 +102,6 @@ class HeadingTerminatorBlot extends AbstractLineTerminatorBlot {
      * @return string
      */
     public function getReference(): string {
-        return $this->currentOperation["attributes"]["ref"] ?? '';
+        return $this->currentOperation["attributes"]["header"]["ref"] ?? '';
     }
 }

@@ -5,29 +5,32 @@
  */
 
 import * as React from "react";
-import { dropDownMenu } from "@library/components/Icons";
+import { dropDownMenu } from "@library/components/icons/common";
 import { getRequiredID } from "@library/componentIDs";
 import PopoverController from "@library/components/PopoverController";
 import DropDownContents from "./DropDownContents";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import classNames from "classnames";
 
 export interface IProps {
-    id: string;
+    id?: string;
     name?: string;
     children: React.ReactNode;
     className?: string;
-    stickTop?: boolean; // Adjusts the flyout position vertically
-    stickRight?: boolean; // Adjusts the flyout position horizontally
+    renderAbove?: boolean; // Adjusts the flyout position vertically
+    renderLeft?: boolean; // Adjusts the flyout position horizontally
     describedBy?: string;
     contentsClassName?: string;
     buttonContents?: React.ReactNode;
     buttonClassName?: string;
     buttonBaseClass?: ButtonBaseClass;
+    disabled?: boolean;
+    toggleButtonClassName?: string;
+    setExternalButtonRef?: (ref: React.RefObject<HTMLButtonElement>) => void;
+    onVisibilityChange?: (isVisible: boolean) => void;
+    openAsModal?: boolean;
 }
 
 export interface IState {
-    id: string;
     selectedText: string;
 }
 
@@ -35,15 +38,14 @@ export interface IState {
  * Creates a drop down menu
  */
 export default class DropDown extends React.Component<IProps, IState> {
+    private id;
     public static defaultProps = {
-        stickRight: true,
-        stickTop: true,
+        openAsModal: false,
     };
-
     public constructor(props) {
         super(props);
+        this.id = getRequiredID(props, "dropDown");
         this.state = {
-            id: getRequiredID(props, "dropDown"),
             selectedText: "",
         };
     }
@@ -61,24 +63,30 @@ export default class DropDown extends React.Component<IProps, IState> {
     public render() {
         return (
             <PopoverController
-                id={this.state.id}
-                classNameRoot="dropDown"
+                id={this.id}
+                className={this.props.className}
                 buttonBaseClass={this.props.buttonBaseClass || ButtonBaseClass.CUSTOM}
                 name={this.props.name}
                 buttonContents={this.props.buttonContents || dropDownMenu()}
                 buttonClassName={this.props.buttonClassName}
                 selectedItemLabel={this.selectedText}
+                disabled={this.props.disabled}
+                setExternalButtonRef={this.props.setExternalButtonRef}
+                toggleButtonClassName={this.props.toggleButtonClassName}
+                onVisibilityChange={this.props.onVisibilityChange}
+                openAsModal={!!this.props.openAsModal}
             >
                 {params => {
                     return (
                         <DropDownContents
-                            id={this.state.id + "-handle"}
-                            parentID={this.state.id}
-                            className={classNames("dropDown-contents", this.props.contentsClassName)}
-                            isPositionedFromRight={this.props.stickRight!}
-                            isPositionedFromTop={this.props.stickTop!}
-                            onClick={params.closeMenuHandler}
                             {...params}
+                            id={this.id + "-handle"}
+                            parentID={this.id}
+                            className={this.props.contentsClassName}
+                            onClick={this.doNothing}
+                            renderLeft={!!this.props.renderLeft}
+                            renderAbove={!!this.props.renderAbove}
+                            openAsModal={this.props.openAsModal}
                         >
                             <ul className="dropDownItems">{this.props.children}</ul>
                         </DropDownContents>
@@ -87,4 +95,8 @@ export default class DropDown extends React.Component<IProps, IState> {
             </PopoverController>
         );
     }
+
+    private doNothing = e => {
+        e.stopPropagation();
+    };
 }

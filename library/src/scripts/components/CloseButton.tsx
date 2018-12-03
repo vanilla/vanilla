@@ -5,7 +5,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { close } from "@library/components/Icons";
+import { close } from "@library/components/icons/common";
 import { t } from "@library/application";
 import { ILegacyProps } from "@library/@types/legacy";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
@@ -20,7 +20,7 @@ interface IProps extends Partial<ILegacyProps> {
 /**
  * A standardized close button.
  */
-export default class CloseButton extends React.Component<IProps> {
+export default class CloseButton extends React.PureComponent<IProps> {
     public static defaultProps = {
         legacyMode: false,
         baseClass: ButtonBaseClass.ICON,

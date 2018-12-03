@@ -104,7 +104,16 @@ describe("Formatter", () => {
     function assertQuillInputOutput(input: any[], expectedOutput: any[], formattingFunction: () => void) {
         quill.setContents(input, Quill.sources.USER);
         formattingFunction();
-        const result = quill.getContents().ops;
+
+        const stripRefs = op => {
+            if (op.attributes && op.attributes.header && op.attributes.header.ref) {
+                op.attributes.header.ref = "";
+            }
+            return op;
+        };
+        // Kludge out the dynamically generated refs.
+        const result = quill.getContents().ops!.map(stripRefs);
+        expectedOutput = expectedOutput.map(stripRefs);
         expect(result).deep.equals(expectedOutput);
     }
 

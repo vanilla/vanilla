@@ -1,0 +1,98 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+@import "~react-day-picker/lib/style.css";
+
+$datePicker-padding: $utility-baseUnit * 1.5;
+
+// Date picker
+.datePicker-header {
+    display: flex;
+    align-items: center;
+    height: $formElement-height;
+    padding-left: $datePicker-padding;
+    margin-top: $datePicker-padding;
+}
+
+.datePicker-title {
+    flex: 1;
+    padding: $datePicker-padding;
+}
+
+.datePicker-navigation {
+    display: flex;
+    align-items: center;
+}
+
+// Day Picker is the react component used for our date picker.
+// Override some of its classes without fully overriding its components.
+
+.DayPicker-wrapper {
+    padding: 0;
+}
+
+.DayPicker-Month {
+    margin: $datePicker-padding;
+}
+
+.DayPicker-Day {
+    border-radius: $global_borderRadius;
+    padding: $datePicker-padding;
+
+    &:hover {
+        background-color: $state-hover_color;
+    }
+}
+
+.DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside) {
+    background-color: $state-active_color;
+
+    &:hover {
+        background-color: $state-active_color;
+    }
+}
+
+.DayPicker-Day--today {
+    color: $global-color-primary;
+}
+
+// Date range
+
+.dateRange-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.dateRange-column {
+    width: calc(50% - #{$utility-baseUnit});
+}
+
+.inputBlock-labelText {
+    &.dateRangeOfLabel {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .icon-help {
+            display: block;
+            opacity: .5;
+        }
+    }
+}
+
+.dateRangeOfLabel-help {
+    display: block;
+    margin-left: auto;
+    width: $icon-small_size;
+    height: $icon-small_size;
+}
+
+.DayPicker-Day,
+.DayPicker-Weekday {
+    white-space: nowrap;
+}

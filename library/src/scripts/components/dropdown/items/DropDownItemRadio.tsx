@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { check } from "@library/components/Icons";
+import { check } from "@library/components/icons/common";
 import classNames from "classnames";
 import DropDownItem from "./DropDownItem";
 

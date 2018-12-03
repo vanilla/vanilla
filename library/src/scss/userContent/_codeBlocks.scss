@@ -22,17 +22,19 @@ $code-block_padding: $userContent_fontSize !default;
 // Code
 .userContent {
     .code {
+        position: relative;
         display: inline;
         vertical-align: middle;
         line-height: inherit;
         font-size: $code_fontSize;
-        box-sizing: border-box;
         font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
         max-width: 100%;
         margin: 0;
         color: $code_fg;
         background-color: $code_bg;
         border: 0;
+        overflow-x: auto;
+        flex-shrink: 0;
     }
 
     .codeInline {
@@ -46,9 +48,8 @@ $code-block_padding: $userContent_fontSize !default;
 
     .codeBlock {
         display: block;
-        overflow-x: auto;
         word-wrap: normal;
-        line-height: 1.45;
+        line-height: $global-code_lineHeight;
         white-space: pre;
         padding: $code-block_padding;
         border:  {

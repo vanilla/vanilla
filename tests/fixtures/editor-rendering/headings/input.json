@@ -9,6 +9,18 @@
         "insert": "\n"
     },
     {
+        "insert": "h2 with ref"
+    },
+    {
+        "attributes": {
+            "header": {
+                "level": "2",
+                "ref": "h2-with-ref"
+            }
+        },
+        "insert": "\n"
+    },
+    {
         "insert": "h3"
     },
     {

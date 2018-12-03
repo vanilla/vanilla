@@ -35,6 +35,9 @@
 @import "compatibility/editor/mixin.legacyEditor";
 @import "compatibility/editor/richEditorLegacy";
 
+// Embeds
+@import "../../../library/src/scss/embeds/embeds";
+
 // User content
 @import "../../../library/src/scss/userContent/animations";
 @import "../../../library/src/scss/userContent/atMention";
@@ -44,6 +47,3 @@
 @import "../../../library/src/scss/userContent/spoiler";
 @import "../../../library/src/scss/userContent/emoji";
 @import "../../../library/src/scss/userContent/codeBlocks";
-
-// Embeds
-@import "../../../library/src/scss/embeds/embeds";

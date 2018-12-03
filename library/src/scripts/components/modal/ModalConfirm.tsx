@@ -22,6 +22,7 @@ interface IProps {
     onConfirm: () => void;
     children: React.ReactNode;
     isConfirmLoading?: boolean;
+    elementToFocusOnExit: HTMLElement;
 }
 
 interface IState {
@@ -41,12 +42,8 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
 
     constructor(props) {
         super(props);
-        this.cancelRef = React.createRef();
         this.id = getRequiredID(props, "confirmModal");
-    }
-
-    public get titleID() {
-        return this.id + "-title";
+        this.cancelRef = React.createRef();
     }
 
     public render() {
@@ -57,18 +54,23 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                 elementToFocus={this.cancelRef.current}
                 exitHandler={onCancel}
                 titleID={this.titleID}
+                elementToFocusOnExit={this.props.elementToFocusOnExit}
+                className="isCompact"
             >
                 <Frame>
-                    <FrameHeader titleID={this.titleID} closeFrame={onCancel} srOnlyTitle={srOnlyTitle!}>
-                        {title}
-                    </FrameHeader>
+                    <FrameHeader
+                        titleID={this.titleID}
+                        closeFrame={onCancel}
+                        srOnlyTitle={srOnlyTitle!}
+                        title={title}
+                    />
                     <FrameBody>
                         <FramePanel>
                             <SmartAlign className="frameBody-contents">{children}</SmartAlign>
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter>
-                        <Button ref={this.cancelRef} onClick={onCancel}>
+                        <Button buttonRef={this.cancelRef} onClick={onCancel}>
                             {t("Cancel")}
                         </Button>
                         <Button onClick={onConfirm} className="buttonPrimary" disabled={isConfirmLoading}>
@@ -78,5 +80,13 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                 </Frame>
             </Modal>
         );
+    }
+
+    public get titleID() {
+        return this.id + "-title";
+    }
+
+    public componentDidMount() {
+        this.forceUpdate();
     }
 }

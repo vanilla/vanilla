@@ -125,6 +125,22 @@ export function hashString(str: string): number {
 }
 
 /**
+ * Parse a string into a URL friendly format.
+ *
+ * Eg. Why Uber isn’t spelled Über -> why-uber-isnt-spelled-uber
+ *
+ * @param str The string to parse.
+ */
+export function slugify(str: string): string {
+    return str
+        .normalize("NFD") // Normalize accented characters into ASCII equivalents
+        .replace(/[^\w\s$*_+~.()'"!\-:@]/g, "") // REmove characters that don't URL encode well
+        .trim() // Trim whitespace
+        .replace(/[-\s]+/g, "-") // Normalize whitespace
+        .toLocaleLowerCase(); // Convert to locale aware lowercase.
+}
+
+/**
  * Split a string in multiple pieces similar to String.prototype.split but ignore most acccent characters.
  *
  * This will still return pieces with accents.
@@ -324,4 +340,31 @@ export function sanitizeUrl(url: string) {
     } else {
         return "unsafe:" + url;
     }
+}
+
+export enum OS {
+    IOS = "ios",
+    ANDROID = "android",
+    UNKNOWN = "unkwown",
+}
+
+/**
+ * Provide relatively rough detection of mobile OS.
+ *
+ * This is not even close to perfect but can be used to try and offer,
+ * OS specific input elements for things like datetimes.
+ */
+export function guessOperatingSystem(): OS {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+    if (/android/i.test(userAgent)) {
+        return OS.ANDROID;
+    }
+
+    // iOS detection from: http://stackoverflow.com/a/9039885/177710
+    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        return OS.IOS;
+    }
+
+    return OS.UNKNOWN;
 }

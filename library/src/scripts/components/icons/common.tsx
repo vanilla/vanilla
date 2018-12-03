@@ -150,27 +150,6 @@ export function dropDownMenu(className?: string) {
     );
 }
 
-export function newFolder(className?: string, title: string = t("New Folder")) {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className={classNames("icon", "icon-dropDownMenu", className)}
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-        >
-            <title>{title}</title>
-            <path
-                d="M12.25,11.438a.5.5,0,0,0-1,0v2.75H8.5a.5.5,0,0,0,0,1h2.75v2.75a.5.5,0,0,0,1,0v-2.75H15a.5.5,0,0,0,0-1H12.25Z"
-                fill="currentColor"
-            />
-            <path
-                d="M21,7.823H13.825L12.457,4.735a.5.5,0,0,0-.457-.3H3a.5.5,0,0,0-.5.5v16a.5.5,0,0,0,.5.5H21a.5.5,0,0,0,.5-.5V8.323A.5.5,0,0,0,21,7.823Zm-.5,12.615H3.5v-15h8.175l1.368,3.087a.5.5,0,0,0,.457.3h7Z"
-                fill="currentColor"
-            />
-        </svg>
-    );
-}
-
 export function categoryIcon(className?: string) {
     const title = t("Folder");
     return (
@@ -299,6 +278,27 @@ export function plusCircle(className?: string) {
             <path
                 fill="currentColor"
                 d="M14,7A7,7,0,1,1,7,0,7,7,0,0,1,14,7Zm-3.727.79a.339.339,0,0,0,.34-.338h0v-.9a.339.339,0,0,0-.339-.339H7.79V3.727a.339.339,0,0,0-.338-.34h-.9a.339.339,0,0,0-.339.339h0V6.21H3.727a.339.339,0,0,0-.34.338h0v.9a.339.339,0,0,0,.339.339H6.21v2.483a.339.339,0,0,0,.338.34h.9a.339.339,0,0,0,.339-.339h0V7.79Z"
+            />
+        </svg>
+    );
+}
+
+export function newFolder(className?: string, title: string = t("New Folder")) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className={classNames("icon", "icon-dropDownMenu", className)}
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+            <path
+                d="M12.25,11.438a.5.5,0,0,0-1,0v2.75H8.5a.5.5,0,0,0,0,1h2.75v2.75a.5.5,0,0,0,1,0v-2.75H15a.5.5,0,0,0,0-1H12.25Z"
+                fill="currentColor"
+            />
+            <path
+                d="M21,7.823H13.825L12.457,4.735a.5.5,0,0,0-.457-.3H3a.5.5,0,0,0-.5.5v16a.5.5,0,0,0,.5.5H21a.5.5,0,0,0,.5-.5V8.323A.5.5,0,0,0,21,7.823Zm-.5,12.615H3.5v-15h8.175l1.368,3.087a.5.5,0,0,0,.457.3h7Z"
+                fill="currentColor"
             />
         </svg>
     );

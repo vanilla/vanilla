@@ -134,27 +134,6 @@ export function dropDownMenu(className?: string) {
     );
 }
 
-export function newFolder(className?: string, title: string = t("New Folder")) {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className={classNames("icon", "icon-dropDownMenu", className)}
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-        >
-            <title>{title}</title>
-            <path
-                d="M12.25,11.438a.5.5,0,0,0-1,0v2.75H8.5a.5.5,0,0,0,0,1h2.75v2.75a.5.5,0,0,0,1,0v-2.75H15a.5.5,0,0,0,0-1H12.25Z"
-                fill="currentColor"
-            />
-            <path
-                d="M21,7.823H13.825L12.457,4.735a.5.5,0,0,0-.457-.3H3a.5.5,0,0,0-.5.5v16a.5.5,0,0,0,.5.5H21a.5.5,0,0,0,.5-.5V8.323A.5.5,0,0,0,21,7.823Zm-.5,12.615H3.5v-15h8.175l1.368,3.087a.5.5,0,0,0,.457.3h7Z"
-                fill="currentColor"
-            />
-        </svg>
-    );
-}
-
 export function categoryIcon(className?: string) {
     const title = t("Folder");
     return (

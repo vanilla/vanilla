@@ -8,4 +8,5 @@ export * from "./common";
 export * from "./editorIcons";
 export * from "./emojiGroups";
 export * from "./fileTypes";
-export * from "./revisionIcons";
+export * from "./revision";
+export * from "./tree";

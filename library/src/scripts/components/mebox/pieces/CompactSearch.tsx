@@ -116,9 +116,8 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
     }
 
     private handleFocusChange = (gainedFocus: boolean) => {
-        console.log("focus changing", gainedFocus, document.activeElement);
-        if (!gainedFocus) {
-            // this.props.onCloseSearch();
+        if (!gainedFocus && !this.selfRef.current!.contains(document.activeElement)) {
+            this.props.onCloseSearch();
         }
     };
 
@@ -136,7 +135,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
         if (!prevProps.open && this.props.open) {
             this.searchInputRef.current!.focus();
         } else if (prevProps.open && !this.props.open) {
-            // this.openSearchButton.current!.focus();
+            this.openSearchButton.current!.focus();
         }
     }
 

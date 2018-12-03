@@ -4,3 +4,35 @@
  * @license GPL-2.0-only
  */
 
+$tree-item_dragging_borderRadius: 2px;
+$tree-item_dragging_borderColor: mixContentBgAndFg(90%);
+$tree-item_dragging_color: mixContentBgAndFg(50%);
+
+.tree-item {
+    &.isDragging {
+        width: auto !important;
+
+        .navigationManager-draggable {
+            @include shadow-dropDown;
+            font-weight: $global-fontWeight_semiBold;
+            border: 1px solid $tree-item_dragging_borderColor;
+            border-radius: $tree-item_dragging_borderRadius;
+
+            padding: 2px 5px !important;
+            color: $tree-item_dragging_color;
+        }
+    }
+}
+
+.navigationManager-draggable {
+    display: flex;
+    align-items: center;
+    background-color: $global-color_bg;
+    line-height: 18px;
+    font-size: $global-medium_fontSize;
+}
+
+
+.tree-itemIcon {
+    color: inherit;
+}

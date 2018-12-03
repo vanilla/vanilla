@@ -249,8 +249,6 @@ class UsersApiController extends AbstractApiController {
      * @return Data
      */
     public function index_byNames(array $query) {
-        $this->permission('Garden.SignIn.Allow');
-
         $in = $this->schema([
             'name:s' => 'Filter for username. Supports full or partial matching with appended wildcard (e.g. User*).',
             'order:s?' => [

@@ -45,6 +45,7 @@ $frame-panel_minHeight: 500px;
     min-height: $frame-header_minHeight;
     padding: 0 $frame-header_spacing;
     z-index: 1;
+    border-bottom: solid $overlay-border_color 1px;
 }
 
 .frameFooter {
@@ -56,6 +57,7 @@ $frame-panel_minHeight: 500px;
     padding: $frame-footer_spacing;
     min-height: $frame-footer_minHeight;
     z-index: 1;
+    border-top: solid $overlay-border_color 1px;
 
     .button + .button {
         margin-left: $utility-baseUnit * 2 - $formElement-borderWidth;

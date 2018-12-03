@@ -48,6 +48,8 @@
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Header
 \* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Compact Me Box
+\* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Footer
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    user content
@@ -1481,29 +1483,25 @@ body.isMobile .Popup.hasRichEditor .Border {
   line-height: 1.25;
 }
 
-.embedText-titleLink,
-.embedText-title {
-  display: block;
-  width: 100%;
-  padding: 0;
-  font-size: 14px;
-  line-height: 1.25;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .embedText-titleLink {
   margin: 0;
   color: inherit;
 }
 
+.embedText .embedText-titleLink,
 .embedText .embedText-title {
-  margin-top: 0 !important;
-  margin-right: 0;
+  margin-top: 0;
   margin-bottom: 4px;
-  margin-left: 0;
+  display: block;
+  width: 100%;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #555a62;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .richEditor .embedText-titleLink {
@@ -1514,10 +1512,6 @@ body.isMobile .Popup.hasRichEditor .Border {
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-.embedLink-link {
-  color: inherit;
-}
-
 .embedLink-image {
   position: absolute;
   display: block;
@@ -1568,15 +1562,15 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLink-excerpt {
-  font-size: 14px;
   color: #555A62;
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-word;
   max-width: 100%;
+  font-size: 14px;
   margin-top: 4px;
-  line-height: 1.45;
-  max-height: 60.9px;
+  line-height: 1.4;
+  max-height: 58.8px;
   white-space: normal;
 }
 

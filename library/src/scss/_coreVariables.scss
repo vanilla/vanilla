@@ -290,7 +290,7 @@ $buttonToIconMargin                                  : ($formElement_height - $i
 
 $overlay_bgColor                                        : rgba(getBlackOrWhiteBasedOnColor($global-color_fg), .2)!default;
 $overlay-dropShadow_color                               : $overlay_bgColor !default;
-$overlay-border_color                                   : mix($global-color_fg, $global-color_bg, 5%) !default;
+$overlay-border_color                                   : mix($global-color_fg, $global-color_bg, 15%) !default;
 $overlay-dropShadow                                     : 0 5px 10px $overlay_bgColor !default;
 $overlay-borderRadius                                   : $global_borderRadius !default;
 
@@ -437,8 +437,16 @@ $vanillaHeader_height                               : 50px !default;
 $vanillaHeader_mobile_height                        : 44px !default;
 $vanillaHeader_fg                                   : #fff !default;
 $vanillaHeader_bg                                   : $global-color_primary !default;
+$vanillaHeader-spacer_width                         : 12px;
+$vanillaHeader-button_borderRadius                  : 3px;
+$vanillaHeader-button_size                          : 40px;
+
+/* -------------------------------------------------------------- *\
+    Compact Me Box
+\* -------------------------------------------------------------- */
 
 $compactMeBox-tab_height                            : 44px !default;
+
 /* -------------------------------------------------------------- *\
     Footer
 \* -------------------------------------------------------------- */

@@ -8,11 +8,12 @@ import * as React from "react";
 import classNames from "classnames";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import SmartLink from "@library/components/navigation/SmartLink";
+import VanillaHeaderListItem from "@library/components/mebox/pieces/VanillaHeaderListItem";
 
 export interface IHeaderNav {
     className?: string;
     to: string;
-    name: string;
+    children: React.ReactNode;
     linkClassName?: string;
     linkContentClassName?: string;
 }
@@ -26,17 +27,17 @@ export class VanillaHeaderNavItem extends React.Component<IProps> {
     public render() {
         const isCurrent = this.currentPage();
         return (
-            <li className={classNames("vanillaHeaderNav-item", this.props.className, { isCurrent })}>
+            <VanillaHeaderListItem className={classNames(this.props.className, { isCurrent })}>
                 <SmartLink to={this.props.to} className={classNames("vanillaHeaderNav-link", this.props.linkClassName)}>
                     <div
                         className={classNames("vanillaHeaderNav-linkContent", this.props.linkContentClassName, {
                             isCurrent,
                         })}
                     >
-                        {this.props.name}
+                        {this.props.children}
                     </div>
                 </SmartLink>
-            </li>
+            </VanillaHeaderListItem>
         );
     }
 

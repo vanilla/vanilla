@@ -10,7 +10,6 @@ $mobileDropDown-chevron_width: 8px;
 $mobileDropDown-chevron_color: mixContentBgAndFg(70%);
 
 .mobileDropDown {
-    @include flexCenterContent(nowrap);
     position: relative;
     flex-grow: 1;
     overflow: hidden;
@@ -33,25 +32,44 @@ $mobileDropDown-chevron_color: mixContentBgAndFg(70%);
     @include flexCenterContent(nowrap);
     user-select: none;
     margin: auto;
+    width: 100%;
     max-width: calc(100% - #{$global_spacer});
-    flex-grow: 1;
     margin: {
         left: $global_spacer / 2;
         right: $global_spacer / 2;
     }
+
+    @include mediaQuery-panelLayout_xs {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+.mobileDropDown-buttonContents {
+    display: inline-block;
+    position: relative;
+    padding-right: $mobileDropDown-chevron_width * 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 
 .mobileDropDown-title {
+    display: inline;
     letter-spacing: $mobileDropDown-title_letterSpacing;
     font-weight: $global-fontWeight_semiBold;
-    max-width: calc(100% - #{$mobileDropDown-chevron_width * 2});
-    overflow: hidden;
-    text-overflow: ellipsis;
+    text-align: center;
+
+    @include mediaQuery-panelLayout_xs {
+        text-align: left;
+    }
 }
 
 .mobileDropDown-icon {
-    flex-basis: $mobileDropDown-chevron_width * 2;
-    margin-left: $mobileDropDown-chevron_width;
+    @include absolute-middleRight();
+    height: $mobileDropDown-chevron_width;
+    width: $mobileDropDown-chevron_width;
 }
 
 .mobileDropDown-closeModalIcon {
@@ -71,3 +89,14 @@ $mobileDropDown-chevron_color: mixContentBgAndFg(70%);
     width: 100%;
     height: 100%;
 }
+
+.mobileDropDown-header {
+    &.frameHeader {
+        min-height: 44px;
+        padding-top: 0;
+        padding-bottom: 0;
+        box-shadow: none;
+    }
+}
+
+

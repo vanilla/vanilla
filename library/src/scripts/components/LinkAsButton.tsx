@@ -9,8 +9,9 @@ import classNames from "classnames";
 import { IOptionalComponentID } from "../componentIDs";
 import { ButtonBaseClass } from "./forms/Button";
 import SmartLink from "@library/components/navigation/SmartLink";
+import { LinkProps } from "react-router-dom";
 
-interface IProps extends IOptionalComponentID {
+interface IProps extends IOptionalComponentID, LinkProps {
     children: React.ReactNode;
     className?: string;
     to: string;
@@ -28,16 +29,18 @@ export default class LinkAsButton extends React.Component<IProps> {
     };
 
     public render() {
-        const componentClasses = classNames(this.props.baseClass, this.props.className);
+        const { baseClass, className, title, ariaLabel, to, children, ...restProps } = this.props;
+        const componentClasses = classNames(baseClass, className);
         return (
             <SmartLink
                 className={componentClasses}
-                title={this.props.title}
-                aria-label={this.props.ariaLabel || this.props.title}
+                title={title}
+                aria-label={ariaLabel || title}
                 tabIndex={-1}
-                to={this.props.to}
+                to={to}
+                {...restProps}
             >
-                {this.props.children}
+                {children}
             </SmartLink>
         );
     }

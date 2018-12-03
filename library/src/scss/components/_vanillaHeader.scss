@@ -4,10 +4,6 @@
  * @license GPL-2.0-only
  */
 
-$vanillaHeader-button_borderRadius: 3px;
-$vanillaHeader-button_size: 40px;
-$vanillaHeader-spacer_width: 12px;
-
 $vanillaHeader-count_size: 18px;
 $vanillaHeader-count_fontSize: 10px;
 $vanillaHeader-count_bg: #D0021B;
@@ -17,6 +13,7 @@ $vanillaHeader-dropDownContents_minWidth: 350px;
 $vanillaHeader-button_mobile_fontSize: 16px;
 
 $vanillaHeader-endElements_flexBasis: $vanillaHeader-button_size * 4;
+$vanillaHeader-endElements_mobile_flexBasis: $vanillaHeader-button_size * 2;
 
 $vanillaHeader-compactSearch_maxWidth: 672px;
 
@@ -49,10 +46,10 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 
 .vanillaHeader-bar {
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     flex-wrap: nowrap;
     align-items: center;
-    min-height: $vanillaHeader_height;
+    height: $vanillaHeader_height;
     width: 100%;
 
     &.isHome {
@@ -60,7 +57,7 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
     }
 
     @include mediaQuery-panelLayout_oneColumn {
-        min-height: $vanillaHeader_mobile_height;
+        height: $vanillaHeader_mobile_height;
     }
 }
 
@@ -127,13 +124,14 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 .vanillaHeader-searchCancel,
 .vanillaHeader-localeToggle,
 .vanillaHeader-navLink {
-    color: inherit;
+    color: $vanillaHeader_fg;
     padding: 0 $vanillaHeader-spacer_width;
     border-radius: $vanillaHeader-button_borderRadius;
 
     &:active,
     &:hover,
     &:focus {
+        color: $vanillaHeader_fg;
         background-color: rgba(#000, .1);
         border-radius: $vanillaHeader-button_borderRadius;
     }
@@ -157,7 +155,7 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 }
 
 .vanillaHeader-button {
-    color: inherit;
+    color: $vanillaHeader_fg;
     height: $vanillaHeader_height;
     width: $vanillaHeader-button_size;
     padding: 0;
@@ -165,16 +163,36 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
     &:active,
     &:hover,
     &:focus {
-        .vanillaHeader-navLinkContent,
-        .vanillaHeader-buttonContent {
-            background-color: rgba(#000, .1);
-            border-radius: $vanillaHeader-button_borderRadius;
-        }
+        color: $vanillaHeader_fg;
+        background-color: rgba(#000, .1);
+        border-radius: $vanillaHeader-button_borderRadius;
     }
 
     @include mediaQuery-panelLayout_oneColumn {
         height: $vanillaHeader_mobile_height;
     }
+}
+
+.vanillaHeader-tabButton {
+    display: block;
+    height: 100%;
+    padding: 0;
+
+    &:active,
+    &:hover,
+    &:focus {
+        color: $global-color_primary;
+        .vanillaHeader-tabButtonContent {
+            color: $vanillaHeader_fg;
+            background-color: rgba(#000, .1);
+            border-radius: $vanillaHeader-button_borderRadius;
+        }
+    }
+}
+
+.vanillaHeader-tabButtonContent {
+    height: $vanillaHeader_mobile_height;
+    width: $vanillaHeader_mobile_height;
 }
 
 .vanillaHeader-searchCancel {
@@ -252,13 +270,36 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 
 .vanillaHeader-rightFlexBasis {
     display: flex;
+    height: $vanillaHeader_height;
     flex-wrap: nowrap;
     justify-content: flex-end;
     align-items: center;
     flex-basis: $vanillaHeader-endElements_flexBasis;
 
     @include mediaQuery-panelLayout_oneColumn {
-        flex-basis: auto;
         flex-shrink: 1;
+        flex-basis: $vanillaHeader-endElements_mobile_flexBasis;
+        height: $vanillaHeader_mobile_height;
     }
 }
+
+.vanillaHeader-leftFlexBasis {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    flex-basis: $vanillaHeader-endElements_flexBasis;
+
+    @include mediaQuery-panelLayout_oneColumn {
+        flex-basis: $vanillaHeader-endElements_mobile_flexBasis;
+        flex-shrink: 1;
+    }
+
+    @include mediaQuery-panelLayout_xs {
+        flex-basis: $formElement_height;
+    }
+}
+
+.vanillaHeader-backLink {
+    transform: translateX(-15px); // so the icon is flush with the side margin, but still has the right padding when hovering.
+}
+

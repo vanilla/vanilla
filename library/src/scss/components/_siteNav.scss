@@ -82,6 +82,11 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
             font-weight: $global-fontWeight_bold;
         }
     }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        font-size: $dropDown-item_mobile_fontSize;
+        min-height: $dropDown_item_mobile_minHeight;
+    }
 }
 
 .siteNavNode-label {

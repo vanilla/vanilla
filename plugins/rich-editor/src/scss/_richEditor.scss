@@ -27,26 +27,31 @@
     }
 }
 
+.richEditor-scrollContainer {
+    overflow-y: auto;
+    height: auto;
+    width: calc(100% + 68px);
+    margin-left: -34px;
+    padding-left: 34px;
+    padding-right: 34px;
+    position: relative;
+}
+
 .richEditor-frame {
-    &.InputBox {
+    position: relative;
+    background: $richEditor_bg;
+    height: auto;
+    padding: 0;
+
+    &.isMenuInset {
+        overflow: initial;
         position: relative;
-        background: $richEditor_bg;
-        height: auto;
-        padding: 0;
     }
 }
 
 .richEditor-menu {
-    @include shadow-embed;
     display: inline-block;
     position: relative;
-    background-color: $global-color_bg;
-    border: {
-        radius: $global-borderRadius;
-        color: $global-border_color;
-        style: $global-border_style;
-        width: $global-border_width;
-    }
 }
 
 .richEditorParagraphMenu {
@@ -70,6 +75,10 @@
             }
         }
     }
+
+    &.isMenuInset {
+        transform: none;
+    }
 }
 
 .richEditorParagraphMenu-handle {
@@ -92,6 +101,9 @@
 
 .ql-clipboard {
     @include sr-only();
+
+    // Fixed https://github.com/quilljs/quill/issues/1374#issuecomment-415333651
+    position: fixed;
 }
 
 .richEditor-menuItems {

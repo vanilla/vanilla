@@ -13,6 +13,8 @@ import DropDownItemButton from "@library/components/dropdown/items/DropDownItemB
 import { checkCompact, downTriangle } from "@library/components/icons/common";
 import DropDown from "@library/components/dropdown/DropDown";
 import { ButtonBaseClass } from "@library/components/forms/Button";
+import Frame from "@library/components/frame/Frame";
+import FrameBody from "@library/components/frame/FrameBody";
 
 export interface ISelectBoxItem {
     name: string;
@@ -32,6 +34,7 @@ interface IProps {
     buttonClassName?: string;
     buttonBaseClass?: ButtonBaseClass;
     widthOfParent?: boolean;
+    openAsModal?: boolean;
 }
 
 export interface ISelfLabelledProps extends IProps {
@@ -93,7 +96,9 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                     index={i}
                     current={selected}
                     lang={child.lang}
-                    buttonClassName="dropDownItem-button selectBox-buttonItem"
+                    buttonClassName={classNames("dropDownItem-button", "selectBox-buttonItem", {
+                        isInModal: this.props.openAsModal,
+                    })}
                 >
                     <span className="selectBox-checkContainer sc-only">
                         {selected && checkCompact("selectBox-selectedIcon")}
@@ -132,8 +137,11 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         buttonBaseClass={this.props.buttonBaseClass}
                         renderAbove={this.props.renderAbove}
                         renderLeft={this.props.renderLeft}
+                        openAsModal={this.props.openAsModal}
                     >
-                        {selectItems}
+                        <Frame>
+                            <FrameBody className="dropDownItem-verticalPadding">{selectItems}</FrameBody>
+                        </Frame>
                     </DropDown>
                 </div>
             </div>

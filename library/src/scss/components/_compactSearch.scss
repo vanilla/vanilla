@@ -4,6 +4,8 @@
  * @license GPL-2.0-only
  */
 
+
+
 .compactSearch {
     .searchBar{
         flex-grow: 1;
@@ -24,13 +26,20 @@
             opacity: 1;
         }
     }
+
+    &.isOpen {
+        width: 100%;
+    }
+
+    &.isCentered {
+        margin: auto;
+    }
 }
 
 .compactSearch-contents {
     display: flex;
     align-items: center;
     flex-wrap: nowrap;
-    min-width: 300px;
 }
 
 

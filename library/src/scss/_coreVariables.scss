@@ -166,6 +166,7 @@ $global-main_width                                   : $global-panel_paddedWidth
 $global-main_paddedWidth                             : $global-main_width + 2 * $global-gutter_size !default;  // Derived
 
 $global-twoColumn_breakpoint                         : 900px !default; // Generic breakpoint for 2 columns
+$global-xs_breakpoint                                : 500px !default;
 
 // Hard coded columns
 $evenColumns_breakpoint                              : $global-twoColumn_breakpoint !default;
@@ -289,7 +290,7 @@ $buttonToIconMargin                                  : ($formElement_height - $i
 
 $overlay_bgColor                                        : rgba(getBlackOrWhiteBasedOnColor($global-color_fg), .2)!default;
 $overlay-dropShadow_color                               : $overlay_bgColor !default;
-$overlay-border_color                                   : mix($global-color_fg, $global-color_bg, 5%) !default;
+$overlay-border_color                                   : mix($global-color_fg, $global-color_bg, 15%) !default;
 $overlay-dropShadow                                     : 0 5px 10px $overlay_bgColor !default;
 $overlay-borderRadius                                   : $global_borderRadius !default;
 
@@ -423,14 +424,21 @@ $dropDown-metas_horizontalPadding                   : 18px;
 $dropDown-item_verticalPadding                      : 6px;
 $dropDown-item_horizontalPadding                    : 18px;
 
-$dropDown-item_minHeight                            : 45px;
+$dropDown-item_minHeight                            : 30px;
+$dropDown-item_mobile_minHeight                     : 44px;
+
+$dropDown-item_mobile_fontSize                      : 18px;
 
 /* -------------------------------------------------------------- *\
     Header
 \* -------------------------------------------------------------- */
 
-$global-header_height                               : 50px !default;
+$vanillaHeader_height                               : 50px !default;
+$vanillaHeader_mobile_height                        : 44px !default;
+$vanillaHeader_fg                                   : #fff !default;
+$vanillaHeader_bg                                   : $global-color_primary !default;
 
+$compactMeBox-tab_height                            : 44px !default;
 /* -------------------------------------------------------------- *\
     Footer
 \* -------------------------------------------------------------- */

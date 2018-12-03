@@ -30,6 +30,33 @@ class VanillaHooks implements Gdn_IPlugin {
     }
 
     /**
+     * Verify the current user can attach a media item to a Vanilla post.
+     *
+     * @param bool $canAttach
+     * @param string $foreignType
+     * @param int $foreignID
+     * @return bool
+     */
+    public function canAttachMedia_handler(bool $canAttach, string $foreignType, int $foreignID): bool {
+        switch ($foreignType) {
+            case "comment":
+                $model = new CommentModel();
+                break;
+            case "discussion":
+                $model = new DiscussionModel();
+                break;
+            default:
+                return $canAttach;
+        }
+
+        $row = $model->getID($foreignID, DATASET_TYPE_ARRAY);
+        if (!$row) {
+            return false;
+        }
+        return ($row["InsertUserID"] === Gdn::session()->UserID || Gdn::session()->checkRankedPermission("Garden.Moderation.Manage"));
+    }
+
+    /**
      * Counter rebuilding.
      *
      * @param DbaController $sender

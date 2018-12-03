@@ -74,6 +74,19 @@
     }
 }
 
+
+.richEditor-menu {
+    @include shadow-embed;
+    background-color: $global-color_bg;
+    border: {
+        radius: $global-borderRadius;
+        color: $global-border_color;
+        style: $global-border_style;
+        width: $global-border_width;
+    }
+}
+
+
 .richEditor-button {
     user-select: none;
     cursor: pointer;

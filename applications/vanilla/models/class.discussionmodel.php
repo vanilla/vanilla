@@ -30,6 +30,9 @@ class DiscussionModel extends Gdn_Model {
     /** Max comments on a discussion before it cannot be auto-deleted by SPAM or moderation actions. */
     const DELETE_COMMENT_THRESHOLD = 10;
 
+    /** @var int The maximum length*/
+    const MAX_POST_LENGTH = 50000;
+
     /** @var array|bool */
     private static $categoryPermissions = null;
 

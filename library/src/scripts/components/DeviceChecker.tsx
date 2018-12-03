@@ -60,10 +60,15 @@ export default class DeviceChecker extends React.Component<IDeviceCheckerProps> 
     }
 
     /**
-     * @inheritDoc
+     * There's a bug in webpack and there's no way to know the styles have loaded from webpack. In debug mode,
      */
     public componentDidMount() {
         window.addEventListener("resize", this.throttledUpdateOnResize);
+        if (module.hot) {
+            setTimeout(() => {
+                window.dispatchEvent(new Event("resize"));
+            }, 1000);
+        }
     }
 
     /**

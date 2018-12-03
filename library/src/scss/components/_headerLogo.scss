@@ -7,6 +7,6 @@
 
 .headerLogo-logo {
     display: block;
-    height: #{$global-header_height - 3 * $utility-baseUnit};
+    height: #{$vanillaHeader_height - 3 * $utility-baseUnit};
     width: auto;
 }

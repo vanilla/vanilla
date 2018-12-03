@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use Vanilla\Formatting\Embeds\EmbedManager;
@@ -344,6 +345,16 @@ class MediaApiController extends AbstractApiController {
 
         $original = $this->mediaByID($id);
         $this->editPermission($original);
+
+        $canAttach = $this->getEventManager()->fireFilter(
+            "canAttachMedia",
+            ($body["foreignType"] === "embed" && $body["foreignID"] === $this->getSession()->UserID),
+            $body["foreignType"],
+            $body["foreignID"]
+        );
+        if ($canAttach !== true) {
+            throw new ClientException("Unable to attach to this record. It may not exist or you may have improper permissions to access it.");
+        }
 
         $this->mediaModel->update(
             [

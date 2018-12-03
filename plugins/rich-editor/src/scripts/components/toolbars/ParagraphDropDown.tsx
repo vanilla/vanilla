@@ -57,6 +57,7 @@ export class ParagraphDropDown extends React.PureComponent<IProps, IState> {
                 disabled={this.props.disabled}
                 renderAbove={this.props.renderAbove}
                 renderLeft={this.props.renderLeft}
+                contentsClassName="noMinWidth"
             >
                 <ParagraphToolbarMenuItems
                     menuRef={this.menuRef}

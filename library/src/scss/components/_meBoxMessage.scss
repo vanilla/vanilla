@@ -4,22 +4,22 @@
  * @license GPL-2.0-only
  */
 
-$MeBoxMessage-padding: 8px;
-$MeBoxMessage-imageWidth: 40px;
-$MeBoxMessage-unreadDot_width: 12px;
+$meBoxMessage-padding: 8px;
+$meBoxMessage-imageContainerWidth: 40px;
+$meBoxMessage-unreadDot_width: 12px;
 
-.MeBoxMessage {
+.meBoxMessage {
     display: block;
 
-    + .MeBoxMessage {
+    + .meBoxMessage {
         border-top: solid $global-border_color 1px;
     }
 }
 
-.MeBoxMessage-link {
+.meBoxMessage-link {
     display: flex;
     flex-wrap: nowrap;
-    padding: $MeBoxMessage-padding;
+    padding: $meBoxMessage-padding;
     color: inherit;
 
     &:active,
@@ -31,44 +31,50 @@ $MeBoxMessage-unreadDot_width: 12px;
 }
 
 
-.MeBoxMessage-image {
+.meBoxMessage-imageContainer {
     position: relative;
-    width: $MeBoxMessage-imageWidth;
-    height: $MeBoxMessage-imageWidth;
-    flex-basis: $MeBoxMessage-imageWidth;
+    width: $meBoxMessage-imageContainerWidth;
+    height: $meBoxMessage-imageContainerWidth;
+    flex-basis: $meBoxMessage-imageContainerWidth;
+    border-radius: 50%;
+    overflow: hidden;
+    border: solid mixContentBgAndFg(95%) 1px;
 }
 
+.meBoxMessage-image {
+    @include objectFitWithFallback;
+}
 
-.MeBoxMessage-status {
+.meBoxMessage-status {
     position: relative;
-    width: $MeBoxMessage-unreadDot_width;
-    flex-basis: $MeBoxMessage-unreadDot_width;
+    width: $meBoxMessage-unreadDot_width;
+    flex-basis: $meBoxMessage-unreadDot_width;
     &.isUnread {
         &::after {
             @include absolute-middleRight;
             content: '';
-            height: $MeBoxMessage-unreadDot_width;
-            width: $MeBoxMessage-unreadDot_width;
+            height: $meBoxMessage-unreadDot_width;
+            width: $meBoxMessage-unreadDot_width;
             background-color: $global-color_primary;
             border-radius: 50%;
         }
     }
 }
 
-.MeBoxMessage-contents {
+.meBoxMessage-contents {
     flex-grow: 1;
     padding: {
-        left: $MeBoxMessage-padding;
-        right: $MeBoxMessage-padding;
+        left: $meBoxMessage-padding;
+        right: $meBoxMessage-padding;
     }
-    max-width: calc(100% - #{$MeBoxMessage-unreadDot_width + $MeBoxMessage-imageWidth});
+    max-width: calc(100% - #{$meBoxMessage-unreadDot_width + $meBoxMessage-imageContainerWidth});
 }
 
 
-.MeBoxMessage-subject {
+.meBoxMessage-subject {
     font-weight: $global-fontWeight_semiBold;
 }
 
-.MeBoxMessage-message {
+.meBoxMessage-message {
     line-height: $global-excerpt_lineHeight;
 }

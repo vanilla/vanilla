@@ -45,6 +45,7 @@ export default class EmojiPopover extends React.Component<IProps, IRequiredCompo
                 buttonBaseClass={ButtonBaseClass.ICON}
                 renderAbove={this.props.renderAbove}
                 renderLeft={this.props.renderLeft}
+                openAsModal={false}
             >
                 {(options: IPopoverControllerChildParameters) => {
                     return (

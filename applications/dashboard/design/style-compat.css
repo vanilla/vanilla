@@ -931,6 +931,15 @@ label.checkbox input.checkbox-input {
   margin-bottom: 0;
 }
 
+.richEditor-menu {
+  box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
+  background-color: #fff;
+  border-radius: 2px;
+  border-color: #d6d7d9;
+  border-style: solid;
+  border-width: 1px;
+}
+
 .richEditor-button {
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -1505,6 +1514,10 @@ body.isMobile .Popup.hasRichEditor .Border {
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+.embedLink-link {
+  color: inherit;
+}
+
 .embedLink-image {
   position: absolute;
   display: block;
@@ -1597,7 +1610,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedQuote-userName {
-  margin: 0 0 0 6px;
+  margin: 0 0 0 4px;
   padding: 0;
   color: #6f737a;
   font-weight: 700;
@@ -1674,7 +1687,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 .embedQuote-dateTime {
   font-size: 12px;
   color: #6f737a;
-  margin-left: 12px;
+  margin-left: 8px;
 }
 
 .embedQuote-header {

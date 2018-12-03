@@ -18,7 +18,6 @@ export interface ISearchOptionProvider {
 }
 
 export interface IWithSearchProps {
-    api: AxiosInstance;
     searchOptionProvider: ISearchOptionProvider;
 }
 

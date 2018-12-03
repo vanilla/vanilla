@@ -29,7 +29,7 @@ export interface IWithPagesProps {
 }
 
 /**
- * HOC to inject API context
+ * HOC to inject pages context
  *
  * @param WrappedComponent - The component to wrap
  */

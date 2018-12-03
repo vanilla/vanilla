@@ -1,25 +1,31 @@
-/*
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+/**
+ * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import * as React from "react";
 import { Omit } from "@library/@types/utils";
-import { AxiosInstance } from "axios";
 import { ISearchOptionData } from "@library/components/search/SearchOption";
 import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
-const ApiContext = React.createContext<IApiProps>({} as any);
-export default ApiContext;
+const PageContext = React.createContext<IWithPagesProps>({ pages: {} });
+export default PageContext;
 
-export interface ISearchOptionProvider {
+export interface IPageProvider {
     autocomplete(query: string): Promise<Array<IComboBoxOption<ISearchOptionData>>>;
     makeSearchUrl(query: string): string;
 }
 
-export interface IApiProps {
-    api: AxiosInstance;
-    searchOptionProvider: ISearchOptionProvider;
+interface IPageLoader {
+    preload(): void;
+    url(data?: undefined): string;
+}
+
+export interface IWithPagesProps {
+    pages: {
+        search?: IPageLoader;
+        drafts?: IPageLoader;
+    };
 }
 
 /**
@@ -27,17 +33,17 @@ export interface IApiProps {
  *
  * @param WrappedComponent - The component to wrap
  */
-export function withApi<T extends IApiProps = IApiProps>(WrappedComponent: React.ComponentClass<IApiProps>) {
+export function withPages<T extends IWithPagesProps = IWithPagesProps>(WrappedComponent: React.ComponentType<T>) {
     const displayName = WrappedComponent.displayName || WrappedComponent.name || "Component";
-    class ComponentWithDevice extends React.Component<Omit<T, keyof IApiProps>> {
-        public static displayName = `withApi(${displayName})`;
+    class ComponentWithDevice extends React.Component<Omit<T, keyof IWithPagesProps>> {
+        public static displayName = `withPages(${displayName})`;
         public render() {
             return (
-                <ApiContext.Consumer>
+                <PageContext.Consumer>
                     {context => {
                         return <WrappedComponent {...context} {...this.props} />;
                     }}
-                </ApiContext.Consumer>
+                </PageContext.Consumer>
             );
         }
     }

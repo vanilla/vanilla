@@ -29,8 +29,9 @@ import FlexSpacer from "@library/components/FlexSpacer";
 import BackLink from "@library/components/navigation/BackLink";
 import { signIn } from "@library/components/icons";
 import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
+import { withPages, IWithPagesProps } from "@library/contexts/PagesContext";
 
-interface IProps extends IDeviceProps, IInjectableUserState {
+interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
     className?: string;
     title?: string; // Needed for mobile dropdown
@@ -173,6 +174,10 @@ export class VanillaHeader extends React.Component<IProps, IState> {
     }
 
     public openSearch = () => {
+        const { pages } = this.props;
+        if (pages.search) {
+            pages.search.preload();
+        }
         this.setState({
             openSearch: true,
         });
@@ -204,4 +209,4 @@ export class VanillaHeader extends React.Component<IProps, IState> {
 }
 
 const withRedux = connect(UsersModel.mapStateToProps);
-export default withRedux(withDevice<IProps>(VanillaHeader));
+export default withPages(withRedux(withDevice<IProps>(VanillaHeader)));

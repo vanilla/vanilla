@@ -1,18 +1,9 @@
-<<<<<<< HEAD
-/**
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
-=======
 /*!
->>>>>>> master
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-<<<<<<< HEAD
 $embedText-header_fontSize: $global-medium_fontSize !default;
-=======
-$embedText-header_fontSize: $userContent_fontSize !default;
->>>>>>> master
 $embedText-title_fontWeight: $global-fontWeight_bold !default;
 $embedText-content_boxShadowColor: rgba($global-color_fg, .3) !default;
 $embedText-content_bg: #ffffff !default;
@@ -67,15 +58,8 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
     .embedText-titleLink,
     .embedText-title {
         margin: {
-<<<<<<< HEAD
             top: 0;
-            bottom: $utility-baseUnit;
-=======
-            top: 0 !important;
-            right: 0;
             bottom: $embedded-small_spacing;
-            left: 0;
->>>>>>> master
         }
         display: block;
         width: 100%;

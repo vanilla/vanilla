@@ -49,7 +49,7 @@ export function collapseAll(className?: string) {
 }
 
 export function folderClosed(className?: string) {
-    const title = t("Folder Closed");
+    const title = t("Closed Folder");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -68,7 +68,7 @@ export function folderClosed(className?: string) {
 }
 
 export function folderOpen(className?: string) {
-    const title = t("Folder Open");
+    const title = t("Open Folder");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"

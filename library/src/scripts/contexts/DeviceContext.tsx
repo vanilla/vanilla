@@ -15,9 +15,7 @@ export default DeviceContext;
  *
  * @param WrappedComponent - The component to wrap
  */
-export function withDevice<T extends IDeviceProps = IDeviceProps>(
-    WrappedComponent: React.ComponentClass<IDeviceProps>,
-) {
+export function withDevice<T extends IDeviceProps = IDeviceProps>(WrappedComponent: React.ComponentType<T>) {
     const displayName = WrappedComponent.displayName || WrappedComponent.name || "Component";
     class ComponentWithDevice extends React.Component<Omit<T, keyof IDeviceProps>> {
         public static displayName = `withDevice(${displayName})`;

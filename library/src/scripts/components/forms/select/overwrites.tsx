@@ -14,7 +14,6 @@ import ButtonLoader from "@library/components/ButtonLoader";
 import { OptionProps } from "react-select/lib/components/Option";
 import { MenuProps, MenuListComponentProps } from "react-select/lib/components/Menu";
 import { ValueContainerProps } from "react-select/lib/components/containers";
-import { IndicatorProps } from "react-select/lib/components/indicators";
 import { ControlProps } from "react-select/lib/components/Control";
 import { MultiValueRemoveProps } from "react-select/lib/components/MultiValue";
 

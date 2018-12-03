@@ -13,11 +13,11 @@ interface IProps {
     menuItemData: IMenuItemData[];
     itemRole?: "menuitem" | "menuitemradio";
     orientation?: "horizontal" | "vertical";
-    menuItemsClass?: string;
     renderAbove?: boolean;
     renderLeft?: boolean;
     legacyMode?: boolean;
     onKeyDown?: (e) => any;
+    className?: string;
 }
 
 /**
@@ -37,10 +37,9 @@ export default class MenuItems extends React.Component<IProps, {}> {
         const { menuItemData } = this.props;
         const firstIndex = 0;
         const lastIndex = menuItemData.length - 1;
-        const menuItemsClass = classNames("richEditor-menu", this.props.menuItemsClass);
         return (
             <div
-                className={menuItemsClass}
+                className={classNames("richEditor-menu", this.props.className)}
                 role="menu"
                 style={flyoutPosition(!!this.props.renderAbove, !!this.props.renderLeft, !!this.props.legacyMode)}
                 aria-orientation={this.props.orientation!}

@@ -29,8 +29,9 @@ class MediaTest extends AbstractAPIv2Test {
         $row = $this->testPost();
         $mediaID = $row["responseBody"]["mediaID"];
 
+        // Attachments default as "embed" and to the current user. Try attaching to a discussion.
         $updatedAttachment = [
-            "foreignID" => 31337,
+            "foreignID" => 1,
             "foreignType" => "discussion",
         ];
         $result = $this->api()->patch(

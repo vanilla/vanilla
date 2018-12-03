@@ -66,9 +66,11 @@ export default class ClipboardModule extends ClipboardBase {
         }
         const range = this.quill.getSelection();
         let delta = new Delta().retain(range.index);
+        const container = this.options.scrollingContainer;
 
         // THIS IS WHAT IS DIFFERENT
         const scrollTop = document.documentElement!.scrollTop || document.body.scrollTop;
+        const containerTop = container ? container.scrollTop : 0;
         this.container.focus();
         (this.quill as any).selection.update(Quill.sources.SILENT);
         setImmediate(() => {
@@ -79,6 +81,9 @@ export default class ClipboardModule extends ClipboardBase {
 
             // THIS IS WHAT IS DIFFERENT
             document.documentElement!.scrollTop = document.body.scrollTop = scrollTop;
+            if (container) {
+                container.scrollTop = containerTop;
+            }
             this.quill.focus();
         });
     }

@@ -22,7 +22,7 @@ interface ITextDescription {
 
 interface IModalCommonProps {
     className?: string;
-    exitHandler?: () => void;
+    exitHandler?: (event?: React.SyntheticEvent<any>) => void;
     pageContainer?: Element;
     container?: Element;
     description?: string;
@@ -80,6 +80,7 @@ export default class Modal extends React.Component<IProps, IState> {
      * Render the contents into a portal.
      */
     public render() {
+        const { size } = this.props;
         return ReactDOM.createPortal(
             <div className="overlay" onClick={this.handleScrimClick}>
                 <div
@@ -89,11 +90,13 @@ export default class Modal extends React.Component<IProps, IState> {
                     className={classNames(
                         "modal",
                         {
-                            isFullScreen: this.props.size === ModalSizes.FULL_SCREEN,
-                            inheritHeight: this.props.size === ModalSizes.FULL_SCREEN,
-                            isLarge: this.props.size === ModalSizes.LARGE,
-                            isMedium: this.props.size === ModalSizes.MEDIUM,
-                            isSmall: this.props.size === ModalSizes.SMALL,
+                            isFullScreen: size === ModalSizes.FULL_SCREEN || size === ModalSizes.MODAL_AS_SIDE_PANEL,
+                            inheritHeight: size === ModalSizes.FULL_SCREEN,
+                            isSidePanel: size === ModalSizes.MODAL_AS_SIDE_PANEL,
+                            isDropDown: size === ModalSizes.MODAL_AS_DROP_DOWN,
+                            isLarge: size === ModalSizes.LARGE,
+                            isMedium: size === ModalSizes.MEDIUM,
+                            isSmall: size === ModalSizes.SMALL,
                         },
                         this.props.className,
                     )}
@@ -220,15 +223,15 @@ export default class Modal extends React.Component<IProps, IState> {
      *
      * Because of this we have to be smarter and call only the top modal's escape handler.
      */
-    private handleDocumentEscapePress = (event: KeyboardEvent) => {
+    private handleDocumentEscapePress = (event: React.SyntheticEvent | KeyboardEvent) => {
         const topModal = Modal.stack[Modal.stack.length - 1];
         const escKey = 27;
 
-        if (event.keyCode === escKey) {
+        if ("keyCode" in event && event.keyCode === escKey) {
             event.preventDefault();
             event.stopPropagation();
             if (topModal.props.exitHandler) {
-                topModal.props.exitHandler();
+                topModal.props.exitHandler(event as any);
             }
         }
     };
@@ -247,7 +250,7 @@ export default class Modal extends React.Component<IProps, IState> {
     private handleScrimClick = (event: React.MouseEvent) => {
         event.preventDefault();
         if (this.props.exitHandler) {
-            this.props.exitHandler();
+            this.props.exitHandler(event);
         }
     };
 

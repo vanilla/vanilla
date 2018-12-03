@@ -11,17 +11,24 @@ import { t } from "@library/application";
 import * as icons from "@library/components/icons/editorIcons";
 import Formatter from "@rich-editor/quill/Formatter";
 import { IFormats, RangeStatic } from "quill/core";
+import classNames from "classnames";
 
 interface IProps {
     formatter: Formatter;
     activeFormats: IFormats;
     lastGoodSelection: RangeStatic;
     onLinkClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+    className?: string;
 }
 
 export default class InlineToolbarMenuItems extends React.PureComponent<IProps> {
     public render() {
-        return <MenuItems menuItemData={this.menuItemData} menuItemsClass="richEditor-inlineToolbarContainer" />;
+        return (
+            <MenuItems
+                menuItemData={this.menuItemData}
+                className={classNames("richEditor-inlineToolbarContainer", this.props.className)}
+            />
+        );
     }
 
     private get menuItemData(): IMenuItemData[] {

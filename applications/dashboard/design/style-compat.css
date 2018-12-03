@@ -840,14 +840,6 @@ label.checkbox input.checkbox-input {
   position: absolute;
 }
 
-.pageHeading-backLink {
-  height: 40px;
-  width: 40px;
-  -webkit-flex-basis: 40px;
-      -ms-flex-preferred-size: 40px;
-          flex-basis: 40px;
-}
-
 /*!
  * @author Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.

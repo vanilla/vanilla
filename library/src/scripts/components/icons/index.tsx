@@ -9,4 +9,4 @@ export * from "./editorIcons";
 export * from "./emojiGroups";
 export * from "./fileTypes";
 export * from "./revision";
-export * from "./tree";
+export * from "./navigationManager";

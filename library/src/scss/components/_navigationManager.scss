@@ -4,29 +4,28 @@
  * @license GPL-2.0-only
  */
 
-$tree-item_dragging_borderRadius: 2px;
-$tree-item_dragging_borderColor: mixContentBgAndFg(90%);
-//$tree-item_dragging_fg: mixContentBgAndFg(50%);
-$tree-item_dragging_bg: mix($global-color_primary, $global-color_bg, 10%);
-$tree-item_maxWidth: 500px;
-$tree-deleteButton_color: #A60215;
+$navigationManager-item_dragging_borderRadius: 2px;
+$navigationManager-item_dragging_borderColor: mixContentBgAndFg(90%);
+$navigationManager-item_dragging_bg: mix($global-color_primary, $global-color_bg, 10%);
+$navigationManager-item_maxWidth: 500px;
+$navigationManager-deleteButton_color: #A60215;
 
-.tree-item {
+.navigationManager-item {
     max-width: 100%;
-    width: $tree-item_maxWidth;
+    width: $navigationManager-item_maxWidth;
 
     &.isDragging {
         width: auto !important;
-        background-color: transparent;
         .navigationManager-draggable {
             @include shadow-dropDown;
             font-weight: $global-fontWeight_semiBold;
-            border: 1px solid $tree-item_dragging_borderColor;
-            border-radius: $tree-item_dragging_borderRadius;
+            border: 1px solid $navigationManager-item_dragging_borderColor;
+            border-radius: $navigationManager-item_dragging_borderRadius;
             padding: 2px 5px !important;
         }
         .navigationManager-action {
-            display: none;
+            opacity: 0;
+            display: none !important;
         }
     }
 
@@ -34,44 +33,53 @@ $tree-deleteButton_color: #A60215;
     &:active,
     &:focus,
     &:hover {
-        background-color: $tree-item_dragging_bg;
-
         .navigationManager-draggable {
-            background-color: $tree-item_dragging_bg;
+            background-color: $navigationManager-item_dragging_bg;
         }
         .navigationManager-action {
-            display: block;
+            opacity: 1;
         }
     }
 }
 
 .navigationManager-action {
-    display: none;
     font-size: $global-medium_fontSize;
     font-weight: $global-fontWeight_semiBold;
     padding: 0 9px;
+    opacity: 0;
 }
 
 .navigationManager-delete {
-    color: $tree-deleteButton_color;
+    color: $navigationManager-deleteButton_color;
 }
 
 .navigationManager-draggable {
     display: flex;
     align-items: center;
-    //background-color: $global-color_bg;
     line-height: 18px;
     font-size: $global-medium_fontSize;
 }
 
 .navigationManager-itemLabel {
     flex-grow: 1;
+    padding-left: 6px;
 }
 
-.tree-itemIcon {
+.navigationManager-itemIcon {
     color: inherit;
 }
 
 .navigationManager-articleIconFill {
     fill: $global-color_bg;
+}
+
+.navigationManager-toggleFolder {
+    display: flex;
+    align-items: center;
+    padding: 0;
+}
+
+.navigationManager-triangle {
+    @include flexLeftMiddle;
+    width: 16px;
 }

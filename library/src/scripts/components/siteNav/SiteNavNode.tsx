@@ -22,7 +22,7 @@ interface IProps {
     openParent?: () => void;
     location: any;
     depth: number;
-    expand?: boolean;
+    collapsible?: boolean;
 }
 
 interface IState {
@@ -43,9 +43,10 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const hasChildren = this.props.children && this.props.children.length > 0;
+        const hasChildren = !!this.props.children && this.props.children.length > 0;
         const depthClass = `hasDepth-${this.props.depth + 1}`;
-        const expand = !!this.props.expand;
+        const collapsible = !!this.props.collapsible;
+
         const childrenContents =
             hasChildren &&
             this.props.children.map((child, i) => {
@@ -57,7 +58,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                         openParent={this.openSelfAndOpenParent}
                         location={this.props.location}
                         depth={this.props.depth + 1}
-                        expand={expand}
+                        collapsible={collapsible}
                     />
                 );
             });
@@ -69,7 +70,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                 role="treeitem"
                 aria-expanded={this.state.open}
             >
-                {hasChildren && !expand ? (
+                {hasChildren && collapsible ? (
                     <div className={classNames("siteNavNode-buttonOffset", { hasNoOffset: this.props.depth === 1 })}>
                         <Button
                             tabIndex={-1}
@@ -103,7 +104,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                     {hasChildren && (
                         <ul
                             className={classNames("siteNavNode-children", depthClass, {
-                                isHidden: !this.state.open && !expand,
+                                isHidden: collapsible ? !this.state.open : false,
                             })}
                             role="group"
                         >
@@ -188,7 +189,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
      * @param e
      */
     public handleClick = e => {
-        e.preventDefault();
+        e.stopPropagation();
         this.toggle();
     };
 

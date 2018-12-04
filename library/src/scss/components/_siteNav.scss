@@ -22,6 +22,7 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     display: block;
     //margin-left: -#{$siteNav-spacer_width};
     margin-left: -$global-gutter_halfSize;
+    z-index: 1;
 
     @include mediaQuery-panelLayout_noBleed {
         margin-left: #{($siteNav-nodeToggle_width - $siteNav-nodeToggleIcon_width) / 2 - $siteNav-spacer_width};
@@ -122,6 +123,7 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     padding: 0;
     height: $siteNav-nodeToggle_height;
     width: $siteNav-nodeToggle_width;
+    z-index: 1;
 }
 
 .siteNavNode-toggle {
@@ -137,7 +139,6 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
 .siteNavNode-buttonOffset {
     display: flex;
     justify-content: flex-end;
-    height: $siteNav-nodeToggle_height;
     width: $siteNav-nodeToggle_width;
     margin-left: -#{$siteNav-nodeToggle_width};
 }

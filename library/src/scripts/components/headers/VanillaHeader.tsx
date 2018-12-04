@@ -36,7 +36,7 @@ interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     className?: string;
     title?: string; // Needed for mobile dropdown
     mobileDropDownContent?: React.ReactNode; // Needed for mobile dropdown
-    onSearchIconClick?: () => void;
+    showSearchIcon?: boolean;
 }
 
 interface IState {
@@ -50,6 +50,11 @@ interface IState {
  * render in a specific div in the default-master.
  */
 export class VanillaHeader extends React.Component<IProps, IState> {
+    public static defaultProps: Partial<IProps> = {
+        showSearchIcon: true,
+        mobileDropDownContent: null,
+    };
+
     public state = {
         openSearch: false,
         showingSuggestions: false,
@@ -73,8 +78,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
             buttonClass,
             countClass: classNames(countClass, "vanillaHeader-messagesCount"),
         };
-
-        const onSearchClick = this.props.onSearchIconClick ? this.props.onSearchIconClick : this.openSearch;
 
         return ReactDOM.createPortal(
             <header className={classNames("vanillaHeader", this.props.className)}>
@@ -113,19 +116,24 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                             )}
 
                             <ConditionalWrap className="vanillaHeader-rightFlexBasis" condition={!!showMobileDropDown}>
-                                <CompactSearch
-                                    className={classNames("vanillaHeader-compactSearch", {
-                                        isCentered: this.state.openSearch,
-                                    })}
-                                    open={this.state.openSearch}
-                                    onSearchButtonClick={onSearchClick}
-                                    onCloseSearch={this.closeSearch}
-                                    cancelButtonClassName="vanillaHeader-searchCancel"
-                                    buttonClass="vanillaHeader-button"
-                                    showingSuggestions={this.state.showingSuggestions}
-                                    onOpenSuggestions={this.setOpenSuggestions}
-                                    onCloseSuggestions={this.setCloseSuggestions}
-                                />
+                                {this.props.showSearchIcon ? (
+                                    <CompactSearch
+                                        className={classNames("vanillaHeader-compactSearch", {
+                                            isCentered: this.state.openSearch,
+                                        })}
+                                        focusOnMount
+                                        open={this.state.openSearch}
+                                        onSearchButtonClick={this.openSearch}
+                                        onCloseSearch={this.closeSearch}
+                                        cancelButtonClassName="vanillaHeader-searchCancel"
+                                        buttonClass="vanillaHeader-button"
+                                        showingSuggestions={this.state.showingSuggestions}
+                                        onOpenSuggestions={this.setOpenSuggestions}
+                                        onCloseSuggestions={this.setCloseSuggestions}
+                                    />
+                                ) : (
+                                    <FlexSpacer className="compactSearch vanillaHeader-compactSearch" />
+                                )}
                                 {isGuest ? (
                                     (!this.state.openSearch || !isMobile) && (
                                         <VanillaHeaderNav

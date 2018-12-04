@@ -27,6 +27,7 @@ export interface ICompactSearchProps extends IWithSearchProps, RouteComponentPro
     showingSuggestions?: boolean;
     onOpenSuggestions?: () => void;
     onCloseSuggestions?: () => void;
+    focusOnMount?: boolean;
 }
 
 interface IState {
@@ -109,6 +110,10 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
     public componentDidMount() {
         this.focusWatcher = new FocusWatcher(this.selfRef.current!, this.handleFocusChange);
         this.focusWatcher.start();
+
+        if (this.props.focusOnMount && this.props.open) {
+            this.searchInputRef.current!.focus();
+        }
     }
 
     public componentWillUnmount() {

@@ -145,7 +145,8 @@ $frame-panel_minHeight: 500px;
 }
 
 .frameBody-contents {
-    margin-bottom: $frame-header_spacing / 2;
+    margin: $frame-header_spacing / 2 0;
+    min-height: 50px;
 }
 
 .framePanel {

@@ -67,14 +67,13 @@ $suggestedTextInput-clearButton_width: 16px;
         margin-left: 3px;
         border: none;
         opacity: .8;
-        color: $vanillaHeader_fg;
+        color: $global-color_primary;
 
         &:active,
         &:hover,
         &:focus {
             border: none;
             box-shadow: none;
-            color: $global-color_primary;
             opacity: 1;
         }
     }

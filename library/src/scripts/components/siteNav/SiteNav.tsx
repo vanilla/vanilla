@@ -16,7 +16,7 @@ interface IProps extends RouteComponentProps<{}> {
     id?: string;
     className?: string;
     children: any[];
-    expand?: boolean;
+    collapsible: boolean;
 }
 
 export interface IState {
@@ -51,7 +51,7 @@ export class SiteNav extends React.Component<IProps, IState> {
                               visible={true}
                               location={this.props.location}
                               depth={0}
-                              expand={!!this.props.expand}
+                              collapsible={this.props.collapsible}
                           />
                       );
                   })

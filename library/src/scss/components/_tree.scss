@@ -6,33 +6,72 @@
 
 $tree-item_dragging_borderRadius: 2px;
 $tree-item_dragging_borderColor: mixContentBgAndFg(90%);
-$tree-item_dragging_color: mixContentBgAndFg(50%);
+//$tree-item_dragging_fg: mixContentBgAndFg(50%);
+$tree-item_dragging_bg: mix($global-color_primary, $global-color_bg, 10%);
+$tree-item_maxWidth: 500px;
+$tree-deleteButton_color: #A60215;
 
 .tree-item {
+    max-width: 100%;
+    width: $tree-item_maxWidth;
+
     &.isDragging {
         width: auto !important;
-
+        background-color: transparent;
         .navigationManager-draggable {
             @include shadow-dropDown;
             font-weight: $global-fontWeight_semiBold;
             border: 1px solid $tree-item_dragging_borderColor;
             border-radius: $tree-item_dragging_borderRadius;
-
             padding: 2px 5px !important;
-            color: $tree-item_dragging_color;
+        }
+        .navigationManager-action {
+            display: none;
         }
     }
+
+    &.isActive,
+    &:active,
+    &:focus,
+    &:hover {
+        background-color: $tree-item_dragging_bg;
+
+        .navigationManager-draggable {
+            background-color: $tree-item_dragging_bg;
+        }
+        .navigationManager-action {
+            display: block;
+        }
+    }
+}
+
+.navigationManager-action {
+    display: none;
+    font-size: $global-medium_fontSize;
+    font-weight: $global-fontWeight_semiBold;
+    padding: 0 9px;
+}
+
+.navigationManager-delete {
+    color: $tree-deleteButton_color;
 }
 
 .navigationManager-draggable {
     display: flex;
     align-items: center;
-    background-color: $global-color_bg;
+    //background-color: $global-color_bg;
     line-height: 18px;
     font-size: $global-medium_fontSize;
 }
 
+.navigationManager-itemLabel {
+    flex-grow: 1;
+}
 
 .tree-itemIcon {
     color: inherit;
+}
+
+.navigationManager-articleIconFill {
+    fill: $global-color_bg;
 }

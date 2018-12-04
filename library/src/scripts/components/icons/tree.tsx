@@ -85,7 +85,7 @@ export function folderOpen(className?: string) {
     );
 }
 
-export function article(className?: string) {
+export function article(className?: string, fillClass?: string) {
     const title = t("Article");
     return (
         <svg
@@ -96,6 +96,7 @@ export function article(className?: string) {
             aria-label={title}
         >
             <title>{title}</title>
+            {!!fillClass && <rect className={fillClass} x="0.75" y="0.75" width="14.5" height="14.5" />}
             <path
                 d="M1,1V15H15V1ZM1,0H15a1,1,0,0,1,1,1V15a1,1,0,0,1-1,1H1a1,1,0,0,1-1-1V1A1,1,0,0,1,1,0ZM4,4V7H7V4ZM3,3H8V8H3Zm0,8h7v1H3ZM3,9H13v1H3ZM9,5h4V6H9ZM9,7h4V8H9ZM9,3h4V4H9Z"
                 fill="currentColor"

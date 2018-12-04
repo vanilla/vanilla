@@ -1,4 +1,4 @@
-def<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="{$CurrentLocale.Key}">
 
 <head>

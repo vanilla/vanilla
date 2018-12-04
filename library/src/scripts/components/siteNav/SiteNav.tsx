@@ -11,11 +11,12 @@ import { getRequiredID } from "@library/componentIDs";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import SiteNavNode from "@library/components/siteNav/SiteNavNode";
 import TabHandler from "@library/TabHandler";
+import { INavigationTreeItem } from "@library/@types/api";
 
 interface IProps extends RouteComponentProps<{}> {
     id?: string;
     className?: string;
-    children: any[];
+    children: INavigationTreeItem[];
     collapsible: boolean;
 }
 
@@ -48,7 +49,6 @@ export class SiteNav extends React.Component<IProps, IState> {
                               key={`navNode-${i}`}
                               counter={i}
                               titleID={this.titleID}
-                              visible={true}
                               location={this.props.location}
                               depth={0}
                               collapsible={this.props.collapsible}

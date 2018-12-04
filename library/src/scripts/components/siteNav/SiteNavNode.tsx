@@ -11,14 +11,13 @@ import { downTriangle, rightTriangle } from "@library/components/icons/common";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
 import TabHandler from "@library/TabHandler";
+import { INavigationTreeItem } from "@library/@types/api";
+import SmartLink from "@library/components/navigation/SmartLink";
 
-interface IProps {
-    name: string;
+interface IProps extends INavigationTreeItem {
     className?: string;
     titleID?: string;
-    children: any[];
     counter: number;
-    url: string;
     openParent?: () => void;
     location: any;
     depth: number;
@@ -90,7 +89,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                     </span>
                 )}
                 <div className={classNames("siteNavNode-contents")}>
-                    <Link
+                    <SmartLink
                         onKeyDownCapture={this.handleKeyDown}
                         className={classNames("siteNavNode-link", {
                             hasChildren,
@@ -100,7 +99,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                         to={this.props.url}
                     >
                         <span className="siteNavNode-label">{this.props.name}</span>
-                    </Link>
+                    </SmartLink>
                     {hasChildren && (
                         <ul
                             className={classNames("siteNavNode-children", depthClass, {

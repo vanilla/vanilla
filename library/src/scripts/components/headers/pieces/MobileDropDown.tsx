@@ -10,7 +10,7 @@ import classNames from "classnames";
 import Modal from "@library/components/modal/Modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import { chevronUp, downTriangle } from "@library/components/icons/header";
+import { chevronUp, downTriangle } from "@library/components/icons/common";
 import { Panel } from "@library/components/layouts/PanelLayout";
 import { Frame, FrameBody, FrameFooter, FrameHeader, FramePanel } from "@library/components/frame";
 import SmartAlign from "@library/components/SmartAlign";

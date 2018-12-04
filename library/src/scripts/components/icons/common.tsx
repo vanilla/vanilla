@@ -324,3 +324,20 @@ export function signIn(className?: string) {
         </svg>
     );
 }
+export function chevronUp(className?: string) {
+    const title = t("Close");
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 51 17"
+            className={classNames("icon", "icon-chevronUp", className)}
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+            <path
+                fill="currentColor"
+                d="M4.9,16.752A3.552,3.552,0,0,1,.329,14.668c-.039-.106-.074-.214-.1-.323A4.185,4.185,0,0,1,2.39,9.152L24.246.252a3.31,3.31,0,0,1,2.508,0l21.856,8.9a4.184,4.184,0,0,1,2.166,5.193,3.552,3.552,0,0,1-4.351,2.511,3.41,3.41,0,0,1-.325-.1L25.5,8.358Z"
+            />
+        </svg>
+    );
+}

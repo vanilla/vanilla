@@ -9,16 +9,15 @@ import { Omit } from "@library/@types/utils";
 import { AxiosInstance } from "axios";
 import { ISearchOptionData } from "@library/components/search/SearchOption";
 import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
-const ApiContext = React.createContext<IApiProps>({} as any);
-export default ApiContext;
+const SearchContext = React.createContext<IWithSearchProps>({} as any);
+export default SearchContext;
 
 export interface ISearchOptionProvider {
     autocomplete(query: string): Promise<Array<IComboBoxOption<ISearchOptionData>>>;
     makeSearchUrl(query: string): string;
 }
 
-export interface IApiProps {
-    api: AxiosInstance;
+export interface IWithSearchProps {
     searchOptionProvider: ISearchOptionProvider;
 }
 
@@ -27,17 +26,17 @@ export interface IApiProps {
  *
  * @param WrappedComponent - The component to wrap
  */
-export function withApi<T extends IApiProps = IApiProps>(WrappedComponent: React.ComponentClass<IApiProps>) {
+export function withSearch<T extends IWithSearchProps = IWithSearchProps>(WrappedComponent: React.ComponentType<T>) {
     const displayName = WrappedComponent.displayName || WrappedComponent.name || "Component";
-    class ComponentWithDevice extends React.Component<Omit<T, keyof IApiProps>> {
-        public static displayName = `withApi(${displayName})`;
+    class ComponentWithDevice extends React.Component<Omit<T, keyof IWithSearchProps>> {
+        public static displayName = `withSearch(${displayName})`;
         public render() {
             return (
-                <ApiContext.Consumer>
+                <SearchContext.Consumer>
                     {context => {
                         return <WrappedComponent {...context} {...this.props} />;
                     }}
-                </ApiContext.Consumer>
+                </SearchContext.Consumer>
             );
         }
     }

@@ -12,10 +12,11 @@ import classNames from "classnames";
 import { search } from "@library/components/icons/header";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import SearchOption from "@library/components/search/SearchOption";
-import { withApi, IApiProps } from "@library/contexts/ApiContext";
-import { Redirect } from "react-router-dom";
+import { withSearch, IWithSearchProps } from "@library/contexts/SearchContext";
+import { withRouter, RouteComponentProps } from "react-router-dom";
+import FocusWatcher from "@library/FocusWatcher";
 
-export interface ICompactSearchProps extends IApiProps {
+export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
     placeholder?: string;
     open: boolean;
@@ -26,11 +27,11 @@ export interface ICompactSearchProps extends IApiProps {
     showingSuggestions?: boolean;
     onOpenSuggestions?: () => void;
     onCloseSuggestions?: () => void;
+    focusOnMount?: boolean;
 }
 
 interface IState {
     query: string;
-    redirectTo: string | null;
 }
 
 /**
@@ -38,21 +39,20 @@ interface IState {
  */
 export class CompactSearch extends React.Component<ICompactSearchProps, IState> {
     private id = uniqueIDFromPrefix("compactSearch");
-    private openSearchButton: React.RefObject<HTMLButtonElement> = React.createRef();
-    private searchInputRef: React.RefObject<SearchBar> = React.createRef();
-    private resultsRef: React.RefObject<HTMLDivElement> = React.createRef();
+    private openSearchButton = React.createRef<HTMLButtonElement>();
+    private selfRef = React.createRef<HTMLDivElement>();
+    private searchInputRef = React.createRef<SearchBar>();
+    private resultsRef = React.createRef<HTMLDivElement>();
     public state: IState = {
         query: "",
-        redirectTo: null,
     };
 
     public render() {
-        if (this.state.redirectTo) {
-            return <Redirect to={this.state.redirectTo} />;
-        }
-
         return (
-            <div className={classNames("compactSearch", this.props.className, { isOpen: this.props.open })}>
+            <div
+                ref={this.selfRef}
+                className={classNames("compactSearch", this.props.className, { isOpen: this.props.open })}
+            >
                 {!this.props.open && (
                     <Button
                         onClick={this.props.onSearchButtonClick}
@@ -78,11 +78,11 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                             value={this.state.query}
                             disabled={!this.props.open}
                             hideSearchButton={true}
-                            onChange={this.searchChangeHandler}
-                            onSearch={this.submitHandler}
+                            onChange={this.handleSearchChange}
+                            onSearch={this.handleSubmit}
                             loadOptions={this.props.searchOptionProvider.autocomplete}
                             ref={this.searchInputRef}
-                            triggerSearchOnAllUpdates={false}
+                            triggerSearchOnClear={false}
                             resultsRef={this.resultsRef}
                             handleOnKeyDown={this.handleKeyDown}
                             onOpenSuggestions={this.props.onOpenSuggestions}
@@ -106,14 +106,34 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
         );
     }
 
-    private searchChangeHandler = (newQuery: string) => {
+    private focusWatcher: FocusWatcher;
+    public componentDidMount() {
+        this.focusWatcher = new FocusWatcher(this.selfRef.current!, this.handleFocusChange);
+        this.focusWatcher.start();
+
+        if (this.props.focusOnMount && this.props.open) {
+            this.searchInputRef.current!.focus();
+        }
+    }
+
+    public componentWillUnmount() {
+        this.focusWatcher.stop();
+    }
+
+    private handleFocusChange = (gainedFocus: boolean) => {
+        if (!gainedFocus && !this.selfRef.current!.contains(document.activeElement)) {
+            this.props.onCloseSearch();
+        }
+    };
+
+    private handleSearchChange = (newQuery: string) => {
         this.setState({ query: newQuery });
     };
 
-    private submitHandler = () => {
-        const { searchOptionProvider } = this.props;
+    private handleSubmit = () => {
+        const { searchOptionProvider, history } = this.props;
         const { query } = this.state;
-        this.setState({ redirectTo: searchOptionProvider.makeSearchUrl(query) });
+        this.props.history.push(searchOptionProvider.makeSearchUrl(query));
     };
 
     public componentDidUpdate(prevProps) {
@@ -139,4 +159,4 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
     };
 }
 
-export default withApi<ICompactSearchProps>(CompactSearch);
+export default withSearch(withRouter(CompactSearch));

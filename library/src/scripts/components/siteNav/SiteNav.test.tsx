@@ -42,7 +42,7 @@ describe("<SiteNav />", () => {
         ];
         const rendered = render(
             <Router>
-                <SiteNav children={children} collapsible={true} />
+                <SiteNav children={children as any} collapsible={true} />
             </Router>,
         );
         expect(rendered.html()).equals(expected);
@@ -80,7 +80,7 @@ describe("<SiteNav />", () => {
         ];
         const rendered = render(
             <Router>
-                <SiteNav children={children} collapsible={false} />
+                <SiteNav children={children as any} collapsible={false} />
             </Router>,
         );
         expect(rendered.html()).equals(expected);

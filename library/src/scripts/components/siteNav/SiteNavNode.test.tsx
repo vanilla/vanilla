@@ -16,6 +16,10 @@ describe("<SiteNavNode />", () => {
         const rendered = render(
             <Router>
                 <SiteNavNode
+                    parentID={-1}
+                    recordID={1}
+                    sort={2}
+                    recordType={""}
                     children={[]}
                     counter={0}
                     depth={0}
@@ -61,7 +65,11 @@ describe("<SiteNavNode />", () => {
         const rendered = render(
             <Router>
                 <SiteNavNode
-                    children={children}
+                    children={children as any}
+                    parentID={-1}
+                    recordID={1}
+                    sort={2}
+                    recordType={""}
                     counter={0}
                     depth={0}
                     location
@@ -107,7 +115,11 @@ describe("<SiteNavNode />", () => {
         const rendered = render(
             <Router>
                 <SiteNavNode
-                    children={children}
+                    children={children as any}
+                    parentID={-1}
+                    recordID={1}
+                    sort={2}
+                    recordType={""}
                     counter={0}
                     depth={0}
                     location

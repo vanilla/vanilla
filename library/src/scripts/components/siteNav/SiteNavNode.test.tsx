@@ -28,7 +28,7 @@ describe("<SiteNavNode />", () => {
         expect(rendered.html()).equals(expected);
     });
 
-    it("render a node with children", () => {
+    it("render a node with children, collapsible", () => {
         const location = "/path/to/first-child";
         const children = [
             {
@@ -60,7 +60,61 @@ describe("<SiteNavNode />", () => {
             '<div class="siteNavNode-buttonOffset"><button type="button" class="siteNavNode-toggle" title="Toggle Category" aria-label="Toggle Category" aria-hidden="true" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8" class="icon icon-triangleRight" aria-hidden="true" style="transform:rotate(-90deg"><title>Collapse</title><polygon points="0 2.594 8 2.594 4 6.594 0 2.594" fill="currentColor"/></svg></button></div><div class="siteNavNode-contents"><a class="siteNavNode-link hasChildren isFirstLevel" tabindex="0" href="/path/to/parent"><span class="siteNavNode-label">Parent</span></a><ul class="siteNavNode-children hasDepth-1 isHidden" role="group"><li class="siteNavNode hasDepth-2" role="treeitem" aria-expanded="false"><span class="siteNavNode-spacer" aria-hidden="true"> </span><div class="siteNavNode-contents"><a class="siteNavNode-link" tabindex="0" href="/path/to/first-child"><span class="siteNavNode-label">First Child</span></a></div></li><li class="siteNavNode hasDepth-2" role="treeitem" aria-expanded="false"><span class="siteNavNode-spacer" aria-hidden="true"> </span><div class="siteNavNode-contents"><a class="siteNavNode-link" tabindex="0" href="/path/to/second-child"><span class="siteNavNode-label">Second Child</span></a></div></li><li class="siteNavNode hasDepth-2" role="treeitem" aria-expanded="false"><span class="siteNavNode-spacer" aria-hidden="true"> </span><div class="siteNavNode-contents"><a class="siteNavNode-link" tabindex="0" href="/path/to/third-child"><span class="siteNavNode-label">Third Child</span></a></div></li></ul></div>';
         const rendered = render(
             <Router>
-                <SiteNavNode children={children} counter={0} depth={0} location name="Parent" url={"/path/to/parent"} />
+                <SiteNavNode
+                    children={children}
+                    counter={0}
+                    depth={0}
+                    location
+                    name="Parent"
+                    url={"/path/to/parent"}
+                    collapsible={true}
+                />
+            </Router>,
+        );
+        expect(rendered.html()).equals(expected);
+    });
+
+    it("render a node with children, not collapsible", () => {
+        const location = "/path/to/first-child";
+        const children = [
+            {
+                children: [],
+                counter: 0,
+                depth: 1,
+                location,
+                name: "First Child",
+                url: "/path/to/first-child",
+            },
+            {
+                children: [],
+                counter: 1,
+                depth: 1,
+                location,
+                name: "Second Child",
+                url: "/path/to/second-child",
+            },
+            {
+                children: [],
+                counter: 2,
+                depth: 1,
+                location,
+                name: "Third Child",
+                url: "/path/to/third-child",
+            },
+        ];
+        const expected =
+            '<span class="siteNavNode-spacer" aria-hidden="true"> </span><div class="siteNavNode-contents"><a class="siteNavNode-link hasChildren isFirstLevel" tabindex="0" href="/path/to/parent"><span class="siteNavNode-label">Parent</span></a><ul class="siteNavNode-children hasDepth-1" role="group"><li class="siteNavNode hasDepth-2" role="treeitem" aria-expanded="false"><span class="siteNavNode-spacer" aria-hidden="true"> </span><div class="siteNavNode-contents"><a class="siteNavNode-link" tabindex="0" href="/path/to/first-child"><span class="siteNavNode-label">First Child</span></a></div></li><li class="siteNavNode hasDepth-2" role="treeitem" aria-expanded="false"><span class="siteNavNode-spacer" aria-hidden="true"> </span><div class="siteNavNode-contents"><a class="siteNavNode-link" tabindex="0" href="/path/to/second-child"><span class="siteNavNode-label">Second Child</span></a></div></li><li class="siteNavNode hasDepth-2" role="treeitem" aria-expanded="false"><span class="siteNavNode-spacer" aria-hidden="true"> </span><div class="siteNavNode-contents"><a class="siteNavNode-link" tabindex="0" href="/path/to/third-child"><span class="siteNavNode-label">Third Child</span></a></div></li></ul></div>';
+        const rendered = render(
+            <Router>
+                <SiteNavNode
+                    children={children}
+                    counter={0}
+                    depth={0}
+                    location
+                    name="Parent"
+                    url={"/path/to/parent"}
+                    collapsible={false}
+                />
             </Router>,
         );
         expect(rendered.html()).equals(expected);

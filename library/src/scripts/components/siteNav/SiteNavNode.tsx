@@ -4,42 +4,41 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import classNames from "classnames";
-import { Link } from "react-router-dom";
-import { downTriangle, rightTriangle } from "@library/components/icons/common";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import { t } from "@library/application";
-import TabHandler from "@library/TabHandler";
 import { INavigationTreeItem } from "@library/@types/api";
+import { t } from "@library/application";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import { downTriangle, rightTriangle } from "@library/components/icons/common";
 import SmartLink from "@library/components/navigation/SmartLink";
+import TabHandler from "@library/TabHandler";
+import classNames from "classnames";
+import * as React from "react";
 
 interface IProps extends INavigationTreeItem {
+    activeRecord: IActiveRecord;
     className?: string;
     titleID?: string;
     counter: number;
     openParent?: () => void;
-    location: any;
     depth: number;
     collapsible?: boolean;
 }
 
 interface IState {
     open: boolean;
-    current: boolean;
+}
+
+export interface IActiveRecord {
+    recordID: number;
+    recordType: string;
 }
 
 /**
  * Recursive component to generate site nav item
  */
 export default class SiteNavNode extends React.Component<IProps, IState> {
-    public constructor(props) {
-        super(props);
-        this.state = {
-            open: false,
-            current: false,
-        };
-    }
+    public state: IState = {
+        open: false,
+    };
 
     public render() {
         const hasChildren = !!this.props.children && this.props.children.length > 0;
@@ -52,10 +51,10 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                 return (
                     <SiteNavNode
                         {...child}
+                        activeRecord={this.props.activeRecord}
                         key={"siteNavNode-" + this.props.counter + "-" + i}
                         counter={this.props.counter! + 1}
-                        openParent={this.openSelfAndOpenParent}
-                        location={this.props.location}
+                        openParent={this.childOpenerCallback}
                         depth={this.props.depth + 1}
                         collapsible={collapsible}
                     />
@@ -64,7 +63,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
         return (
             <li
                 className={classNames("siteNavNode", this.props.className, depthClass, {
-                    isCurrent: this.state.current,
+                    isCurrent: this.isActiveRecord(),
                 })}
                 role="treeitem"
                 aria-expanded={this.state.open}
@@ -150,11 +149,8 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
     /**
      * Triggers opening up each node up the tree if this node is the current page
      */
-    public openRecursive = () => {
-        if (!this.state.current && this.currentPage()) {
-            this.setState({
-                current: true,
-            });
+    public conditionallyExpandParentNodes = () => {
+        if (this.isActiveRecord()) {
             if (this.props.openParent) {
                 this.props.openParent();
             }
@@ -164,7 +160,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
     /**
      * Opens self and calls same function on parent. Opens all the way to the root.
      */
-    public openSelfAndOpenParent = () => {
+    public childOpenerCallback = () => {
         this.setState({
             open: true,
         });
@@ -196,40 +192,19 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
      * Checks if we're on the current page
      * Note that this won't work with non-canonical URLs
      */
-    public currentPage(): boolean {
-        if (this.props.location && this.props.location.pathname) {
-            return this.props.location.pathname === this.props.url;
-        } else {
-            return false;
-        }
+    private isActiveRecord(): boolean {
+        return (
+            this.props.recordType === this.props.activeRecord.recordType &&
+            this.props.recordID === this.props.activeRecord.recordID
+        );
     }
 
-    /**
-     * Updates state with current status
-     */
-    public updateCurrentState() {
-        this.setState({
-            current: this.currentPage(),
-        });
-    }
-
-    /**
-     * When component updates, check if we're the current node, if so open recursively up the tree.
-     * Also check if we're the current page
-     * @param prevProps
-     */
-    public componentDidUpdate(prevProps) {
-        this.openRecursive();
-        if (prevProps.location.pathname !== this.props.location.pathname) {
-            this.updateCurrentState();
-        }
-    }
     /**
      * When component gets added to DOM, check if we're the current node, if so open recursively up the tree
      * @param prevProps
      */
     public componentDidMount() {
-        this.openRecursive();
+        this.conditionallyExpandParentNodes();
     }
 
     /**

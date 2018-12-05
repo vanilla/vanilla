@@ -83,7 +83,7 @@ include $this->fetchViewLocation('helper_functions');
                     ?>
                 </td>
                 <td class="PostType">
-                    <?php echo t($RecordLabel, t('Unknown')); ?>
+                    <?php echo t($RecordLabel, htmlspecialchars($RecordLabel)); ?>
                 </td>
                 <td class="DateCell">
                     <?php echo Gdn_Format::date($Row['DateInserted'], '%a %e %b %Y %r %Z'); ?>

@@ -22,7 +22,7 @@ interface IPageHeading {
  * Can be configured with an options menu and a backlink.
  */
 export default class PageHeading extends React.Component<IPageHeading> {
-    public defaultProps = {
+    public static defaultProps = {
         includeBackLink: true,
     };
     public render() {

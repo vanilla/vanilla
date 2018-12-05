@@ -21,10 +21,8 @@ $navigationManager-deleteButton_color: #A60215;
             font-weight: $global-fontWeight_semiBold;
             border: 1px solid $navigationManager-item_dragging_borderColor;
             border-radius: $navigationManager-item_dragging_borderRadius;
-            padding: 2px 5px !important;
         }
         .navigationManager-action {
-            opacity: 0;
             display: none !important;
         }
     }
@@ -37,7 +35,7 @@ $navigationManager-deleteButton_color: #A60215;
             background-color: $navigationManager-item_dragging_bg;
         }
         .navigationManager-action {
-            opacity: 1;
+            display: block;
         }
     }
 }
@@ -46,7 +44,7 @@ $navigationManager-deleteButton_color: #A60215;
     font-size: $global-medium_fontSize;
     font-weight: $global-fontWeight_semiBold;
     padding: 0 9px;
-    opacity: 0;
+    display: none;
 }
 
 .navigationManager-delete {
@@ -58,6 +56,7 @@ $navigationManager-deleteButton_color: #A60215;
     align-items: center;
     line-height: 18px;
     font-size: $global-medium_fontSize;
+    background-color: $global-color_bg;
 }
 
 .navigationManager-itemLabel {

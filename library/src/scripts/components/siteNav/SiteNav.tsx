@@ -4,16 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { t } from "../../application";
-import classNames from "classnames";
-import { getRequiredID } from "@library/componentIDs";
-import { withRouter, RouteComponentProps } from "react-router-dom";
-import SiteNavNode from "@library/components/siteNav/SiteNavNode";
-import TabHandler from "@library/TabHandler";
 import { INavigationTreeItem } from "@library/@types/api";
+import { getRequiredID } from "@library/componentIDs";
+import SiteNavNode, { IActiveRecord } from "@library/components/siteNav/SiteNavNode";
+import TabHandler from "@library/TabHandler";
+import classNames from "classnames";
+import * as React from "react";
+import { RouteComponentProps, withRouter } from "react-router-dom";
+import { t } from "@library/application";
 
 interface IProps extends RouteComponentProps<{}> {
+    activeRecord: IActiveRecord;
     id?: string;
     className?: string;
     children: INavigationTreeItem[];
@@ -28,17 +29,6 @@ export interface IState {
  * Implementation of SiteNav component
  */
 export class SiteNav extends React.Component<IProps, IState> {
-    private id;
-
-    public constructor(props: IProps) {
-        super(props);
-        this.id = getRequiredID(props, "siteNav");
-    }
-
-    public get titleID() {
-        return this.id + "-title";
-    }
-
     public render() {
         const content =
             this.props.children && this.props.children.length > 0
@@ -46,10 +36,10 @@ export class SiteNav extends React.Component<IProps, IState> {
                       return (
                           <SiteNavNode
                               {...child}
+                              activeRecord={this.props.activeRecord}
                               key={`navNode-${i}`}
                               counter={i}
                               titleID={this.titleID}
-                              location={this.props.location}
                               depth={0}
                               collapsible={this.props.collapsible}
                           />
@@ -66,6 +56,12 @@ export class SiteNav extends React.Component<IProps, IState> {
                 </ul>
             </nav>
         );
+    }
+
+    private id = getRequiredID(this.props, "siteNav");
+
+    public get titleID() {
+        return this.id + "-title";
     }
 
     /**

@@ -1,0 +1,84 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$navigationManager-item_dragging_borderRadius: 2px;
+$navigationManager-item_dragging_borderColor: mixContentBgAndFg(90%);
+$navigationManager-item_dragging_bg: mix($global-color_primary, $global-color_bg, 10%);
+$navigationManager-item_maxWidth: 500px;
+$navigationManager-deleteButton_color: #A60215;
+
+.navigationManager-item {
+    max-width: 100%;
+    width: $navigationManager-item_maxWidth;
+
+    &.isDragging {
+        width: auto !important;
+        .navigationManager-draggable {
+            @include shadow-dropDown;
+            font-weight: $global-fontWeight_semiBold;
+            border: 1px solid $navigationManager-item_dragging_borderColor;
+            border-radius: $navigationManager-item_dragging_borderRadius;
+        }
+        .navigationManager-action {
+            display: none !important;
+        }
+    }
+
+    &.isActive,
+    &:active,
+    &:focus,
+    &:hover {
+        .navigationManager-draggable {
+            background-color: $navigationManager-item_dragging_bg;
+        }
+        .navigationManager-action {
+            display: block;
+        }
+    }
+}
+
+.navigationManager-action {
+    font-size: $global-medium_fontSize;
+    font-weight: $global-fontWeight_semiBold;
+    padding: 0 9px;
+    display: none;
+}
+
+.navigationManager-delete {
+    color: $navigationManager-deleteButton_color;
+}
+
+.navigationManager-draggable {
+    display: flex;
+    align-items: center;
+    line-height: 18px;
+    font-size: $global-medium_fontSize;
+    background-color: $global-color_bg;
+}
+
+.navigationManager-itemLabel {
+    flex-grow: 1;
+    padding-left: 6px;
+}
+
+.navigationManager-itemIcon {
+    color: inherit;
+}
+
+.navigationManager-articleIconFill {
+    fill: $global-color_bg;
+}
+
+.navigationManager-toggleFolder {
+    display: flex;
+    align-items: center;
+    padding: 0;
+}
+
+.navigationManager-triangle {
+    @include flexLeftMiddle;
+    width: 16px;
+}

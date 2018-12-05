@@ -134,27 +134,6 @@ export function dropDownMenu(className?: string) {
     );
 }
 
-export function newFolder(className?: string, title: string = t("New Folder")) {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className={classNames("icon", "icon-dropDownMenu", className)}
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-        >
-            <title>{title}</title>
-            <path
-                d="M12.25,11.438a.5.5,0,0,0-1,0v2.75H8.5a.5.5,0,0,0,0,1h2.75v2.75a.5.5,0,0,0,1,0v-2.75H15a.5.5,0,0,0,0-1H12.25Z"
-                fill="currentColor"
-            />
-            <path
-                d="M21,7.823H13.825L12.457,4.735a.5.5,0,0,0-.457-.3H3a.5.5,0,0,0-.5.5v16a.5.5,0,0,0,.5.5H21a.5.5,0,0,0,.5-.5V8.323A.5.5,0,0,0,21,7.823Zm-.5,12.615H3.5v-15h8.175l1.368,3.087a.5.5,0,0,0,.457.3h7Z"
-                fill="currentColor"
-            />
-        </svg>
-    );
-}
-
 export function categoryIcon(className?: string) {
     const title = t("Folder");
     return (
@@ -189,47 +168,6 @@ export function checkCompact(className?: string) {
             <polygon
                 points="12.136 3.139 13.25 4.253 6.211 11.292 2.75 7.83 3.863 6.717 6.211 9.064 12.136 3.139"
                 fill="currentColor"
-            />
-        </svg>
-    );
-}
-
-export function downTriangle(className?: string, title: string = "▾", deg?: number) {
-    let transform;
-    if (deg) {
-        transform = { transform: `rotate(${deg}deg` };
-    }
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 8 8"
-            className={classNames("icon", "icon-triangleRight", className)}
-            aria-hidden="true"
-            style={transform}
-        >
-            <title>{title}</title>
-            <polygon points="0 2.594 8 2.594 4 6.594 0 2.594" fill="currentColor" />
-        </svg>
-    );
-}
-
-export function rightTriangle(title: string = `▶`, className?: string) {
-    return downTriangle(className, title, -90);
-}
-
-export function chevronUp(className?: string) {
-    const title = t("Close");
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 51 17"
-            className={classNames("icon", "icon-chevronUp", className)}
-            aria-hidden="true"
-        >
-            <title>{title}</title>
-            <path
-                fill="currentColor"
-                d="M4.9,16.752A3.552,3.552,0,0,1,.329,14.668c-.039-.106-.074-.214-.1-.323A4.185,4.185,0,0,1,2.39,9.152L24.246.252a3.31,3.31,0,0,1,2.508,0l21.856,8.9a4.184,4.184,0,0,1,2.166,5.193,3.552,3.552,0,0,1-4.351,2.511,3.41,3.41,0,0,1-.325-.1L25.5,8.358Z"
             />
         </svg>
     );

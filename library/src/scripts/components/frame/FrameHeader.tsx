@@ -14,7 +14,7 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { leftChevron } from "@library/components/icons/common";
 
 export interface IFrameHeaderProps extends ICommonHeadingProps {
-    closeFrame?: () => void; // Necessary when in modal, but not if in dropdown
+    closeFrame?: (e) => void; // Necessary when in modal, but not if in dropdown
     onBackClick?: () => void;
     srOnlyTitle?: boolean;
     titleID?: string;

@@ -12,9 +12,9 @@ import Heading from "@library/components/Heading";
 interface IPageHeading {
     title: string;
     children?: React.ReactNode;
-    backUrl?: string;
     className?: string;
     actions?: React.ReactNode;
+    includeBackLink?: boolean;
 }
 
 /**
@@ -22,16 +22,14 @@ interface IPageHeading {
  * Can be configured with an options menu and a backlink.
  */
 export default class PageHeading extends React.Component<IPageHeading> {
+    public static defaultProps = {
+        includeBackLink: true,
+    };
     public render() {
         return (
             <div className={classNames("pageHeading", this.props.className)}>
                 <div className="pageHeading-main">
-                    <BackLink
-                        fallbackUrl={this.props.backUrl}
-                        className="pageHeading-backLink"
-                        fallbackElement={null}
-                    />
-                    {/* Will not render if no url is passed */}
+                    {this.props.includeBackLink && <BackLink className="pageHeading-backLink" fallbackElement={null} />}
                     <Heading depth={1} title={this.props.title}>
                         {this.props.children}
                     </Heading>

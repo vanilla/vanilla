@@ -47,7 +47,7 @@ interface IProps extends IOptionalComponentID {
     getRef?: any;
     buttonClassName?: string;
     hideSearchButton?: boolean;
-    triggerSearchOnAllUpdates?: boolean;
+    triggerSearchOnClear?: boolean;
     resultsRef?: React.RefObject<HTMLDivElement>;
     handleOnKeyDown?: (event: React.KeyboardEvent) => void;
     onOpenSuggestions?: () => void;
@@ -69,6 +69,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
         title: t("Search"),
         isLoading: false,
         optionComponent: selectOverrides.SelectOption,
+        triggerSearchOnClear: false,
     };
 
     public state: IState = {
@@ -147,9 +148,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
     private handleOptionChange = (option: IComboBoxOption) => {
         if (option) {
             this.props.onChange(option.label);
-            this.setState({ forceMenuClosed: true }, () => {
-                this.props.triggerSearchOnAllUpdates && this.props.onSearch();
-            });
+            this.setState({ forceMenuClosed: true }, this.props.onSearch);
         }
     };
 
@@ -257,7 +256,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
     private clear = (event: React.SyntheticEvent) => {
         event.preventDefault();
         this.props.onChange("");
-        if (this.props.triggerSearchOnAllUpdates) {
+        if (this.props.triggerSearchOnClear) {
             this.props.onSearch();
         }
         this.inputRef.current!.focus();

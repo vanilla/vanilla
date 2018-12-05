@@ -28,6 +28,8 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
     }
 
     .suggestedTextInput-clear.searchBar-clear {
+        color: $vanillaHeader-fg;
+
         &:hover,
         &:active,
         &:focus {

@@ -104,3 +104,26 @@ export function article(className?: string, fillClass?: string) {
         </svg>
     );
 }
+
+export function organize(className?: string) {
+    const rectStyle: React.CSSProperties = {
+        fill: "none",
+        stroke: "#777a80",
+    };
+    return (
+        <svg
+            id="Layer_1"
+            data-name="Layer 1"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            className={classNames("icon", "icon-organize", className)}
+        >
+            <title>{t("Organize")}</title>
+            <g>
+                <rect x="3.5" y="4.5" width="14" height="3" rx="0.5" style={rectStyle} />
+                <rect x="6.5" y="10.5" width="14" height="3" rx="0.5" style={rectStyle} />
+                <rect x="3.5" y="16.5" width="14" height="3" rx="0.5" style={rectStyle} />
+            </g>
+        </svg>
+    );
+}

@@ -20,7 +20,7 @@ function fieldErrorTransformer(responseData) {
     return responseData;
 }
 
-const api = axios.create({
+const apiv2 = axios.create({
     baseURL: formatUrl("/api/v2/"),
     headers: {
         common: {
@@ -31,7 +31,7 @@ const api = axios.create({
     paramsSerializer: params => qs.stringify(params),
 });
 
-export default api;
+export default apiv2;
 
 /**
  * Upload an image using Vanilla's API v2.

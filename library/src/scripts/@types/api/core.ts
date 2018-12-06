@@ -46,3 +46,16 @@ interface IMultiType<T> {
 
 export type MultiTypeRecord<T, Subtract extends keyof T, TypeName extends string> = Omit<T, Subtract> &
     IMultiType<TypeName>;
+
+export interface INavigationItem {
+    name: string;
+    url: string;
+    parentID: number;
+    recordID: number;
+    sort: number | null;
+    recordType: string;
+}
+
+export interface INavigationTreeItem extends INavigationItem {
+    children: INavigationTreeItem[];
+}

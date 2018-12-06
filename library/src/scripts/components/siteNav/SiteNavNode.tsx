@@ -17,7 +17,6 @@ interface IProps extends INavigationTreeItem {
     activeRecord: IActiveRecord;
     className?: string;
     titleID?: string;
-    counter: number;
     openParent?: () => void;
     depth: number;
     collapsible?: boolean;
@@ -45,16 +44,17 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
         const depthClass = `hasDepth-${this.props.depth + 1}`;
         const collapsible = !!this.props.collapsible;
 
+        const { activeRecord } = this.props;
         const childrenContents =
             hasChildren &&
-            this.props.children.map((child, i) => {
+            this.props.children.map(child => {
+                const key = activeRecord.recordType + activeRecord.recordID + "-" + child.recordType + child.recordID;
                 return (
                     <SiteNavNode
                         {...child}
                         activeRecord={this.props.activeRecord}
-                        key={"siteNavNode-" + this.props.counter + "-" + i}
-                        counter={this.props.counter! + 1}
-                        openParent={this.childOpenerCallback}
+                        key={key}
+                        openParent={this.openSelfAndParents}
                         depth={this.props.depth + 1}
                         collapsible={collapsible}
                     />
@@ -118,7 +118,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
      * Opens node. Optional callback if it's already open.
      * @param callbackIfAlreadyOpen
      */
-    public open = (callbackIfAlreadyOpen?: any) => {
+    private open = (callbackIfAlreadyOpen?: any) => {
         if (!this.state.open) {
             this.setState({
                 open: true,
@@ -134,7 +134,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
      * Closes node. Optional callback if already closed.
      * @param callbackIfAlreadyClosed
      */
-    public close = (callbackIfAlreadyClosed?: any) => {
+    private close = (callbackIfAlreadyClosed?: any) => {
         if (this.state.open) {
             this.setState({
                 open: false,
@@ -147,25 +147,11 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
     };
 
     /**
-     * Triggers opening up each node up the tree if this node is the current page
-     */
-    public conditionallyExpandParentNodes = () => {
-        if (this.isActiveRecord()) {
-            if (this.props.openParent) {
-                this.props.openParent();
-            }
-        }
-    };
-
-    /**
      * Opens self and calls same function on parent. Opens all the way to the root.
      */
-    public childOpenerCallback = () => {
-        this.setState({
-            open: true,
-        });
+    private openSelfAndParents = () => {
+        this.open();
         if (this.props.openParent) {
-            this.open();
             this.props.openParent();
         }
     };
@@ -173,7 +159,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
     /**
      * Toggle node
      */
-    public toggle = () => {
+    private toggle = () => {
         this.setState({
             open: !this.state.open,
         });
@@ -183,7 +169,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
      * Handles clicking on the chevron to toggle node
      * @param e
      */
-    public handleClick = e => {
+    private handleClick = e => {
         e.stopPropagation();
         this.toggle();
     };
@@ -204,7 +190,9 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
      * @param prevProps
      */
     public componentDidMount() {
-        this.conditionallyExpandParentNodes();
+        if (this.isActiveRecord()) {
+            this.openSelfAndParents();
+        }
     }
 
     /**

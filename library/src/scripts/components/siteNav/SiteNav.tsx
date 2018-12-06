@@ -38,7 +38,6 @@ export class SiteNav extends React.Component<IProps, IState> {
                               {...child}
                               activeRecord={this.props.activeRecord}
                               key={`navNode-${i}`}
-                              counter={i}
                               titleID={this.titleID}
                               depth={0}
                               collapsible={this.props.collapsible}

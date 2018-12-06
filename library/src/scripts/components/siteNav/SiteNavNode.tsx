@@ -132,7 +132,6 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
 
     /**
      * Closes node. Optional callback if already closed.
-     * @param callbackIfAlreadyClosed
      */
     private close = (callbackIfAlreadyClosed?: any) => {
         if (this.state.open) {

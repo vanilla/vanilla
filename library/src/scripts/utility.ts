@@ -124,6 +124,29 @@ export function hashString(str: string): number {
     return str.split("").reduce(hashReduce, 0);
 }
 
+type CompareReturn = -1 | 0 | 1;
+
+/**
+ * Utility for sorting values. Similar to the <=> operator in PHP.
+ *
+ * @param val1 The first value to compare.
+ * @param val2 The second value to compare.
+ *
+ * @returns -1, 0, or 1
+ */
+export function compare<T extends string | number>(val1: T, val2: T): CompareReturn {
+    if (typeof val1 === "string" && typeof val2 === "string") {
+        return val1.localeCompare(val2) as CompareReturn;
+    } else {
+        if (val1 > val2) {
+            return 1;
+        } else if (val1 < val2) {
+            return -1;
+        }
+        return 0;
+    }
+}
+
 /**
  * Parse a string into a URL friendly format.
  *

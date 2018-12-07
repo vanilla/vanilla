@@ -8,7 +8,8 @@ $navigationManager-item_dragging_borderRadius: 2px;
 $navigationManager-item_dragging_borderColor: mixContentBgAndFg(90%);
 $navigationManager-item_dragging_bg: mix($global-color_primary, $global-color_bg, 10%);
 $navigationManager-item_maxWidth: 500px;
-$navigationManager-deleteButton_color: #A60215;
+$navigationManager-deleteButton_color: #a60215;
+$navigationManager-error_color: $global-error_fg;
 
 .navigationManager-item {
     max-width: 100%;
@@ -62,6 +63,10 @@ $navigationManager-deleteButton_color: #A60215;
 .navigationManager-itemLabel {
     flex-grow: 1;
     padding-left: 6px;
+}
+
+.navigationManager-item.hasError .navigationManager-itemLabel {
+    color: $navigationManager-error_color;
 }
 
 .navigationManager-itemIcon {

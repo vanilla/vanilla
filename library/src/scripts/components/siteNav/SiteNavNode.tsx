@@ -4,59 +4,57 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import classNames from "classnames";
-import { Link } from "react-router-dom";
-import { downTriangle, rightTriangle } from "@library/components/icons/common";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import { INavigationTreeItem } from "@library/@types/api";
 import { t } from "@library/application";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import { downTriangle, rightTriangle } from "@library/components/icons/common";
+import SmartLink from "@library/components/navigation/SmartLink";
 import TabHandler from "@library/TabHandler";
+import classNames from "classnames";
+import * as React from "react";
 
-interface IProps {
-    name: string;
+interface IProps extends INavigationTreeItem {
+    activeRecord: IActiveRecord;
     className?: string;
     titleID?: string;
-    children: any[];
-    counter: number;
-    url: string;
     openParent?: () => void;
-    location: any;
     depth: number;
     collapsible?: boolean;
 }
 
 interface IState {
     open: boolean;
-    current: boolean;
+}
+
+export interface IActiveRecord {
+    recordID: number;
+    recordType: string;
 }
 
 /**
  * Recursive component to generate site nav item
  */
 export default class SiteNavNode extends React.Component<IProps, IState> {
-    public constructor(props) {
-        super(props);
-        this.state = {
-            open: false,
-            current: false,
-        };
-    }
+    public state: IState = {
+        open: false,
+    };
 
     public render() {
         const hasChildren = !!this.props.children && this.props.children.length > 0;
         const depthClass = `hasDepth-${this.props.depth + 1}`;
         const collapsible = !!this.props.collapsible;
 
+        const { activeRecord } = this.props;
         const childrenContents =
             hasChildren &&
-            this.props.children.map((child, i) => {
+            this.props.children.map(child => {
+                const key = activeRecord.recordType + activeRecord.recordID + "-" + child.recordType + child.recordID;
                 return (
                     <SiteNavNode
                         {...child}
-                        key={"siteNavNode-" + this.props.counter + "-" + i}
-                        counter={this.props.counter! + 1}
-                        openParent={this.openSelfAndOpenParent}
-                        location={this.props.location}
+                        activeRecord={this.props.activeRecord}
+                        key={key}
+                        openParent={this.openSelfAndParents}
                         depth={this.props.depth + 1}
                         collapsible={collapsible}
                     />
@@ -65,7 +63,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
         return (
             <li
                 className={classNames("siteNavNode", this.props.className, depthClass, {
-                    isCurrent: this.state.current,
+                    isCurrent: this.isActiveRecord(),
                 })}
                 role="treeitem"
                 aria-expanded={this.state.open}
@@ -90,7 +88,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                     </span>
                 )}
                 <div className={classNames("siteNavNode-contents")}>
-                    <Link
+                    <SmartLink
                         onKeyDownCapture={this.handleKeyDown}
                         className={classNames("siteNavNode-link", {
                             hasChildren,
@@ -100,7 +98,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                         to={this.props.url}
                     >
                         <span className="siteNavNode-label">{this.props.name}</span>
-                    </Link>
+                    </SmartLink>
                     {hasChildren && (
                         <ul
                             className={classNames("siteNavNode-children", depthClass, {
@@ -120,7 +118,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
      * Opens node. Optional callback if it's already open.
      * @param callbackIfAlreadyOpen
      */
-    public open = (callbackIfAlreadyOpen?: any) => {
+    private open = (callbackIfAlreadyOpen?: any) => {
         if (!this.state.open) {
             this.setState({
                 open: true,
@@ -134,9 +132,8 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
 
     /**
      * Closes node. Optional callback if already closed.
-     * @param callbackIfAlreadyClosed
      */
-    public close = (callbackIfAlreadyClosed?: any) => {
+    private close = (callbackIfAlreadyClosed?: any) => {
         if (this.state.open) {
             this.setState({
                 open: false,
@@ -149,28 +146,11 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
     };
 
     /**
-     * Triggers opening up each node up the tree if this node is the current page
-     */
-    public openRecursive = () => {
-        if (!this.state.current && this.currentPage()) {
-            this.setState({
-                current: true,
-            });
-            if (this.props.openParent) {
-                this.props.openParent();
-            }
-        }
-    };
-
-    /**
      * Opens self and calls same function on parent. Opens all the way to the root.
      */
-    public openSelfAndOpenParent = () => {
-        this.setState({
-            open: true,
-        });
+    private openSelfAndParents = () => {
+        this.open();
         if (this.props.openParent) {
-            this.open();
             this.props.openParent();
         }
     };
@@ -178,7 +158,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
     /**
      * Toggle node
      */
-    public toggle = () => {
+    private toggle = () => {
         this.setState({
             open: !this.state.open,
         });
@@ -188,7 +168,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
      * Handles clicking on the chevron to toggle node
      * @param e
      */
-    public handleClick = e => {
+    private handleClick = e => {
         e.stopPropagation();
         this.toggle();
     };
@@ -197,40 +177,21 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
      * Checks if we're on the current page
      * Note that this won't work with non-canonical URLs
      */
-    public currentPage(): boolean {
-        if (this.props.location && this.props.location.pathname) {
-            return this.props.location.pathname === this.props.url;
-        } else {
-            return false;
-        }
+    private isActiveRecord(): boolean {
+        return (
+            this.props.recordType === this.props.activeRecord.recordType &&
+            this.props.recordID === this.props.activeRecord.recordID
+        );
     }
 
-    /**
-     * Updates state with current status
-     */
-    public updateCurrentState() {
-        this.setState({
-            current: this.currentPage(),
-        });
-    }
-
-    /**
-     * When component updates, check if we're the current node, if so open recursively up the tree.
-     * Also check if we're the current page
-     * @param prevProps
-     */
-    public componentDidUpdate(prevProps) {
-        this.openRecursive();
-        if (prevProps.location.pathname !== this.props.location.pathname) {
-            this.updateCurrentState();
-        }
-    }
     /**
      * When component gets added to DOM, check if we're the current node, if so open recursively up the tree
      * @param prevProps
      */
     public componentDidMount() {
-        this.openRecursive();
+        if (this.isActiveRecord()) {
+            this.openSelfAndParents();
+        }
     }
 
     /**

@@ -20,7 +20,7 @@ function fieldErrorTransformer(responseData) {
     return responseData;
 }
 
-const api = axios.create({
+const apiv2 = axios.create({
     baseURL: formatUrl("/api/v2/"),
     headers: {
         common: {
@@ -31,7 +31,7 @@ const api = axios.create({
     paramsSerializer: params => qs.stringify(params),
 });
 
-export default api;
+export default apiv2;
 
 /**
  * Upload an image using Vanilla's API v2.
@@ -51,7 +51,7 @@ export async function uploadImage(image: File): Promise<IEmbedData> {
     data.append("file", image, image.name);
     data.append("type", "image");
 
-    const result = await api.post("/media", data);
+    const result = await apiv2.post("/media", data);
     result.data.type = "image";
     return result.data;
 }

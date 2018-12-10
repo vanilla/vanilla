@@ -8,6 +8,8 @@ $navigationManager-item_dragging_borderRadius: 2px;
 $navigationManager-item_dragging_borderColor: mixContentBgAndFg(90%);
 $navigationManager-item_dragging_bg: mix($global-color_primary, $global-color_bg, 10%);
 $navigationManager-item_maxWidth: 500px;
+$navigationManager-deleteButton_color: #a60215;
+$navigationManager-error_color: $global-error_fg;
 $navigationManager-item_height: 28px;
 $navigationManager-deleteButton_color: #A60215;
 $navigationManager-actionButton_shadowColor: $global-color_bg;
@@ -113,6 +115,10 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
     &.isFolder {
         font-weight: $global-fontWeight_semiBold;
     }
+}
+
+.navigationManager-item.hasError .navigationManager-itemLabel {
+    color: $navigationManager-error_color;
 }
 
 .navigationManager-itemIcon {

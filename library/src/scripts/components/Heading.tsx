@@ -23,7 +23,7 @@ export interface IHeadingProps extends ICommonHeadingProps {
  * A component representing a element.
  */
 export default class Heading extends React.Component<IHeadingProps> {
-    public static defaultProps = {
+    public static defaultProps: Partial<IHeadingProps> = {
         depth: 2,
     };
 

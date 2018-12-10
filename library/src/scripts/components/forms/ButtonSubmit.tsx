@@ -15,6 +15,7 @@ interface IProps extends IOptionalComponentID {
     disabled?: boolean;
     legacyMode?: boolean;
     baseClass?: ButtonBaseClass;
+    tabIndex?: number;
 }
 
 export default class ButtonSubmit extends React.Component<IProps, IOptionalComponentID> {
@@ -45,6 +46,7 @@ export default class ButtonSubmit extends React.Component<IProps, IOptionalCompo
                 prefix="submitButton"
                 legacyMode={this.props.legacyMode}
                 baseClass={this.props.baseClass}
+                tabIndex={this.props.tabIndex}
             >
                 {this.props.children}
             </Button>

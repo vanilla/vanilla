@@ -30,6 +30,7 @@ interface IModalCommonProps {
     elementToFocus?: HTMLElement;
     size: ModalSizes;
     elementToFocusOnExit: HTMLElement; // Should either be a specific element or use document.activeElement
+    isWholePage?: boolean;
 }
 
 interface IModalTextDescription extends IModalCommonProps, ITextDescription {}
@@ -56,6 +57,7 @@ export default class Modal extends React.Component<IProps, IState> {
     public static defaultProps = {
         pageContainer: document.getElementById("page"),
         container: document.getElementById("modals"),
+        isWholePage: false,
     };
 
     public static focusHistory: HTMLElement[] = [];
@@ -230,8 +232,12 @@ export default class Modal extends React.Component<IProps, IState> {
         if ("keyCode" in event && event.keyCode === escKey) {
             event.preventDefault();
             event.stopPropagation();
-            if (topModal.props.exitHandler) {
-                topModal.props.exitHandler(event as any);
+            if (Modal.stack.length === 1 && this.props.isWholePage) {
+                return;
+            } else {
+                if (topModal.props.exitHandler) {
+                    topModal.props.exitHandler(event as any);
+                }
             }
         }
     };
@@ -266,6 +272,7 @@ export default class Modal extends React.Component<IProps, IState> {
         const nextElement = this.tabHandler.getNext(undefined, true);
         if (nextElement) {
             event.preventDefault();
+
             event.stopPropagation();
             nextElement.focus();
         }

@@ -51,7 +51,7 @@ export async function uploadImage(image: File): Promise<IEmbedData> {
     data.append("file", image, image.name);
     data.append("type", "image");
 
-    const result = await api.post("/media", data);
+    const result = await apiv2.post("/media", data);
     result.data.type = "image";
     return result.data;
 }

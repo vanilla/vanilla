@@ -29,7 +29,6 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
     max-width: 100%;
     width: $navigationManager-item_maxWidth;
 
-
     &.isDragging {
         width: auto !important;
         .navigationManager-draggable {
@@ -44,11 +43,17 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
         }
     }
 
-    &.isActive,
-    &:active,
-    &:focus,
     &:hover {
         .navigationManager-draggable {
+            background-color: rgba($navigationManager-item_dragging_bg, .4);
+        }
+    }
+
+    &.isActive,
+    &:active,
+    &:focus {
+        .navigationManager-draggable {
+            border: solid 1px rgba($global-color_primary, .5);
             background-color: $navigationManager-item_dragging_bg;
         }
         .navigationManager-action {
@@ -56,9 +61,13 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
         }
     }
 
-    &:hover {
-        .navigationManager-draggable {
-            background-color: rgba($navigationManager-item_dragging_bg, .4);
+
+
+    &:hover,
+    &:focus {
+        outline: 0;
+        border: {
+            color: $global-color_primary;
         }
     }
 }
@@ -71,6 +80,7 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
     padding-left: $utility-baseUnit;
     font-size: $global-medium_fontSize;
     background-color: $global-color_bg;
+    border: solid 1px transparent;
 }
 
 .navigationManager-action {

@@ -8,16 +8,33 @@ $navigationManager-item_dragging_borderRadius: 2px;
 $navigationManager-item_dragging_borderColor: mixContentBgAndFg(90%);
 $navigationManager-item_dragging_bg: mix($global-color_primary, $global-color_bg, 10%);
 $navigationManager-item_maxWidth: 500px;
+$navigationManager-item_height: 28px;
 $navigationManager-deleteButton_color: #A60215;
+$navigationManager-actionButton_shadowColor: $global-color_bg;
+$navigationManager-folderIcon_color: mixContentBgAndFg(50%);
+$navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
+
+.navigationManagerWrap {
+    padding: {
+        left: $utility-baseUnit * 2;
+        right: $utility-baseUnit * 2;
+    }
+}
+
+.navigationManager {
+    margin-left: -$utility-baseUnit * 2;
+}
 
 .navigationManager-item {
     max-width: 100%;
     width: $navigationManager-item_maxWidth;
 
+
     &.isDragging {
         width: auto !important;
         .navigationManager-draggable {
             @include shadow-dropDown;
+            padding-right: $utility-baseUnit;
             font-weight: $global-fontWeight_semiBold;
             border: 1px solid $navigationManager-item_dragging_borderColor;
             border-radius: $navigationManager-item_dragging_borderRadius;
@@ -38,30 +55,54 @@ $navigationManager-deleteButton_color: #A60215;
             display: block;
         }
     }
+
+    &:hover {
+        .navigationManager-draggable {
+            background-color: rgba($navigationManager-item_dragging_bg, .4);
+        }
+    }
+}
+
+.navigationManager-draggable {
+    display: flex;
+    align-items: center;
+    height: $navigationManager-item_height;
+    line-height: 18px;
+    padding-left: $utility-baseUnit;
+    font-size: $global-medium_fontSize;
+    background-color: $global-color_bg;
 }
 
 .navigationManager-action {
     font-size: $global-medium_fontSize;
-    font-weight: $global-fontWeight_semiBold;
+    font-weight: $global-fontWeight_bold;
+    height: $navigationManager-item_height;
     padding: 0 9px;
     display: none;
+    text-shadow: $navigationManager-actionButton_shadowColor 0 0 2px;
 }
 
 .navigationManager-delete {
     color: $navigationManager-deleteButton_color;
 }
 
-.navigationManager-draggable {
-    display: flex;
-    align-items: center;
-    line-height: 18px;
-    font-size: $global-medium_fontSize;
-    background-color: $global-color_bg;
+.navigationManger-submitRename {
+
+    &[disabled] {
+        cursor: not-allowed;
+        color: $navigationManager-renameButton_disabled_fg;
+    }
 }
+
+
 
 .navigationManager-itemLabel {
     flex-grow: 1;
-    padding-left: 6px;
+    padding-left: 8px;
+
+    &.isFolder {
+        font-weight: $global-fontWeight_semiBold;
+    }
 }
 
 .navigationManager-itemIcon {
@@ -76,9 +117,26 @@ $navigationManager-deleteButton_color: #A60215;
     display: flex;
     align-items: center;
     padding: 0;
+    height: $navigationManager-item_height;
 }
 
 .navigationManager-triangle {
     @include flexLeftMiddle;
     width: 16px;
+    margin-right: 4px;
 }
+
+.navigationManager-folder {
+    color: $navigationManager-folderIcon_color;
+}
+
+.navigationManger-editMode {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.navigationManger-text {
+    flex-grow: 1;
+}
+

@@ -27,6 +27,7 @@ export function expandAll(className?: string) {
             <path
                 d="M8,5H22V7H8ZM8,9H22v1.5H8ZM2,5H7L4.5,7.5Zm6,9H22v2H8ZM2,14H7L4.5,16.5Zm6,4H22v1.5H8Z"
                 fill="currentColor"
+                transform="translate(0 -1)"
             />
         </svg>
     );
@@ -43,7 +44,11 @@ export function collapseAll(className?: string) {
             aria-label={title}
         >
             <title>{title}</title>
-            <path d="M3,12V6L6,9Zm0,7V13l3,3ZM8,8H22v2H8Zm0,7H22v2H8Z" fill="currentColor" />
+            <path
+                d="M3,12V6L6,9Zm0,7V13l3,3ZM8,8H22v2H8Zm0,7H22v2H8Z"
+                fill="currentColor"
+                transform="translate(0 -1.2)"
+            />
         </svg>
     );
 }

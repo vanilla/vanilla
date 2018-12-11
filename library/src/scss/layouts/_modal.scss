@@ -22,6 +22,7 @@ $frame-footer_boxShadow: 0 -1px 2px 0 $overlay_bgColor;
 .modal {
     position: relative;
     max-height: 100%;
+    z-index: 1;
 
     &.isFullScreen {
         overflow: auto;
@@ -83,17 +84,25 @@ $frame-footer_boxShadow: 0 -1px 2px 0 $overlay_bgColor;
     }
 }
 
+.modal-scroll {
+    overflow: auto;
+
+    > .container {
+        padding-top: 32px;
+    }
+}
+
 .modal-content {
     @include shadow-modal;
 }
 
 .modal-pageHeader {
     @include shadow-embed();
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: $vanillaHeader_height;
-    margin-bottom: 32px;
 
     @include mediaQuery-panelLayout_oneColumn {
         min-height: $vanillaHeader_mobile_height;

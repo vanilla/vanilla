@@ -20,11 +20,8 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
     padding: {
         left: $utility-baseUnit * 2;
         right: $utility-baseUnit * 2;
+        bottom: $global-gutter_size;
     }
-}
-
-.navigationManager {
-    margin-left: -$utility-baseUnit * 2;
 }
 
 .navigationManager-item {

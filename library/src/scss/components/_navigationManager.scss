@@ -21,6 +21,7 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
     max-width: 800px;
     width: 100%;
     margin: auto;
+    padding: 0 4px;
 }
 
 .navigationManager-header {
@@ -29,6 +30,10 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
         right: $utility-baseUnit * 4;
         bottom: $global-gutter_size;
     }
+}
+
+.navigationManager {
+    padding-left: 4px;
 }
 
 .navigationManager-item {
@@ -79,14 +84,15 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
 }
 
 .navigationManager-draggable {
+    position: relative;
     display: flex;
     align-items: center;
     height: $navigationManager-item_height;
     line-height: 18px;
-    padding-left: $utility-baseUnit;
     font-size: $global-medium_fontSize;
     background-color: $global-color_bg;
     border: solid 1px transparent;
+    padding-left: $utility-baseUnit * 2.5;
 }
 
 .navigationManager-action {
@@ -114,8 +120,6 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
 
 .navigationManager-itemLabel {
     flex-grow: 1;
-    padding-left: 8px;
-
     &.isFolder {
         font-weight: $global-fontWeight_semiBold;
     }
@@ -130,27 +134,37 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
 }
 
 .navigationManager-articleIcon {
-    margin-left: 21px;
+    display: block;
+    margin: auto;
 }
 
 .navigationManager-articleIconFill {
     fill: $global-color_bg;
 }
 
+.navigationManager-toggleFolder,
+.navigationManager-articlePage {
+    width: #{$icon-default_size + 8px};
+}
+
 .navigationManager-toggleFolder {
     display: flex;
+    position: relative;
     align-items: center;
     padding: 0;
     height: $navigationManager-item_height;
 }
 
 .navigationManager-triangle {
-    @include flexLeftMiddle;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%) translateX(-#{$utility-baseUnit * 2});
     width: 16px;
-    margin-right: 4px;
 }
 
 .navigationManager-folder {
+    margin: auto;
     color: $navigationManager-folderIcon_color;
 }
 

@@ -85,15 +85,13 @@ if (!function_exists('writeComment')) :
         $sender->EventArguments['Permalink'] = $permalink;
 
         // Needed in writeCommentOptions()
-        $discussion = $sender->data('Discussion', null);
-        
-        if ($discussion === null) {
+        if ($sender->data('Discussion', null) === null) {
             $discussionModel = new DiscussionModel();
             $discussion = $discussionModel->getID($comment->DiscussionID);
             $sender->setData('Discussion', $discussion);
         }
         
-        if (val('InsertUserID', $discussion) === $comment->InsertUserID) {
+        if ($sender->data('Discussion.InsertUserID') === $comment->InsertUserID) {
             $cssClass .= ' isOriginalPoster';
         }
 

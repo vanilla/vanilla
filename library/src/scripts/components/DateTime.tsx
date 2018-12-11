@@ -6,6 +6,7 @@
 
 import React, { Component } from "react";
 import moment from "moment";
+import { t } from "@library/application";
 
 interface IProps {
     /** The timestamp to format and display */
@@ -66,12 +67,18 @@ export default class DateTime extends Component<IProps> {
      * Get a shorter human readable time for the time tag.
      */
     private get humanTime(): string {
-        const date = new Date(this.props.timestamp);
+        const inputMoment = moment(this.props.timestamp);
 
         if (this.props.mode === "relative") {
-            return moment(date).from(moment());
+            const difference = moment.duration(moment().diff(inputMoment));
+            const seconds = difference.asSeconds();
+            if (seconds >= 0 && seconds <= 5) {
+                return t("just now");
+            }
+
+            return inputMoment.from(moment());
         } else {
-            return date.toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric" });
+            return inputMoment.toDate().toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric" });
         }
     }
 }

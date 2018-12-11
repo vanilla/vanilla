@@ -8,10 +8,9 @@ $navigationManager-item_dragging_borderRadius: 2px;
 $navigationManager-item_dragging_borderColor: mixContentBgAndFg(90%);
 $navigationManager-item_dragging_bg: mix($global-color_primary, $global-color_bg, 10%);
 $navigationManager-item_maxWidth: 500px;
-$navigationManager-deleteButton_color: #a60215;
 $navigationManager-error_color: $global-error_fg;
 $navigationManager-item_height: 28px;
-$navigationManager-deleteButton_color: #A60215;
+$navigationManager-deleteButton_color: #a60215;
 $navigationManager-actionButton_shadowColor: $global-color_bg;
 $navigationManager-folderIcon_color: mixContentBgAndFg(50%);
 $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
@@ -61,10 +60,8 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
     }
 
     &.isActive,
-    &:active,
     &:focus {
         .navigationManager-draggable {
-            border: solid 1px rgba($global-color_primary, .5);
             background-color: $navigationManager-item_dragging_bg;
         }
         .navigationManager-action {
@@ -72,7 +69,11 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
         }
     }
 
-
+    &:focus{
+        .navigationManager-draggable {
+            border: solid 1px rgba($global-color_primary, .5);
+        }
+    }
 
     &:hover,
     &:focus {
@@ -102,6 +103,11 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
     padding: 0 9px;
     display: none;
     text-shadow: $navigationManager-actionButton_shadowColor 0 0 2px;
+    border: solid 1px transparent;
+
+    &:focus {
+        border: solid 1px rgba($global-color_primary, .5);
+    }
 }
 
 .navigationManager-delete {

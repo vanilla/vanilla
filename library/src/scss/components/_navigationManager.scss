@@ -16,10 +16,17 @@ $navigationManager-actionButton_shadowColor: $global-color_bg;
 $navigationManager-folderIcon_color: mixContentBgAndFg(50%);
 $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
 
-.navigationManagerWrap {
+.navigationManager-container {
+    position: relative;
+    max-width: 800px;
+    width: 100%;
+    margin: auto;
+}
+
+.navigationManager-header {
     padding: {
-        left: $utility-baseUnit * 2;
-        right: $utility-baseUnit * 2;
+        left: $utility-baseUnit * 4;
+        right: $utility-baseUnit * 4;
         bottom: $global-gutter_size;
     }
 }
@@ -122,6 +129,10 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
     color: inherit;
 }
 
+.navigationManager-articleIcon {
+    margin-left: 21px;
+}
+
 .navigationManager-articleIconFill {
     fill: $global-color_bg;
 }
@@ -153,3 +164,6 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
     flex-grow: 1;
 }
 
+*:focus {
+    outline: solid orange 3px !important;
+}

@@ -711,6 +711,8 @@ class ProfileController extends Gdn_Controller {
                 $this->UserModel->Validation->applyRule('OldPassword', 'OldPassword', 'Your old password was incorrect.');
             }
 
+            $this->UserModel->rateLimit($this->User->UserID, 'true');
+
             $this->UserModel->Validation->applyRule('Password', 'Required');
             $this->UserModel->Validation->applyRule('Password', 'Strength');
             $this->UserModel->Validation->applyRule('Password', 'Match');

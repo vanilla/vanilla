@@ -294,6 +294,8 @@ $overlay-border_color                                   : mix($global-color_fg, 
 $overlay-dropShadow                                     : 0 5px 10px $overlay_bgColor !default;
 $overlay-borderRadius                                   : $global_borderRadius !default;
 
+$overlay-fullPageHeading_spacer                         : 32px;
+
 /* -------------------------------------------------------------- *\
     Buttons
 \* -------------------------------------------------------------- */

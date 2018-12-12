@@ -8,6 +8,7 @@ $navigationManagerToolbar-separator_color: mixContentBgAndFg(80%);
 
 .navigationManagerToolbar {
     margin: $global_spacer 0 #{$global_spacer  - 6px};
+    padding: 0 10px;
 }
 
 .navigationManagerToolbar-bar {

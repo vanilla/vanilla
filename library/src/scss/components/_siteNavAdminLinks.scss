@@ -1,0 +1,26 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+.siteNavAdminLinks {
+    display: block;
+    margin: 25px 0 0;
+}
+
+.siteNavAdminLinks-item {
+    display: block;
+}
+
+.siteNavAdminLinks-divider {
+    border-bottom: solid mixContentBgAndFg(50%) 1px;
+    margin-bottom: 25px;
+}
+
+.siteNavAdminLinks-link {
+    color: inherit;
+    font-weight: $global-fontWeight_semiBold;
+    margin-left: 4px;
+
+}

@@ -7,7 +7,7 @@
 $navigationManager-item_dragging_borderRadius: 2px;
 $navigationManager-item_dragging_borderColor: mixContentBgAndFg(90%);
 $navigationManager-item_dragging_bg: mix($global-color_primary, $global-color_bg, 10%);
-$navigationManager-item_maxWidth: 500px;
+$navigationManager-item_maxWidth: 100%;
 $navigationManager-error_color: $global-error_fg;
 $navigationManager-item_height: 28px;
 $navigationManager-deleteButton_color: #a60215;
@@ -40,7 +40,6 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
     width: $navigationManager-item_maxWidth;
 
     &.isDragging {
-        width: auto !important;
         .navigationManager-draggable {
             @include shadow-dropDown;
             padding-right: $utility-baseUnit;
@@ -88,7 +87,7 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
     position: relative;
     display: flex;
     align-items: center;
-    height: $navigationManager-item_height;
+    min-height: $navigationManager-item_height;
     line-height: 18px;
     font-size: $global-medium_fontSize;
     background-color: $global-color_bg;
@@ -99,11 +98,12 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
 .navigationManager-action {
     font-size: $global-medium_fontSize;
     font-weight: $global-fontWeight_bold;
-    height: $navigationManager-item_height;
+    min-height: $navigationManager-item_height;
     padding: 0 9px;
     display: none;
     text-shadow: $navigationManager-actionButton_shadowColor 0 0 2px;
     border: solid 1px transparent;
+    white-space: nowrap;
 
     &:focus {
         border: solid 1px rgba($global-color_primary, .5);
@@ -122,10 +122,15 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
     }
 }
 
-
+.navigationManger-input {
+    padding-left: 5px;
+    margin-left: 10px;
+}
 
 .navigationManager-itemLabel {
     flex-grow: 1;
+    padding: 3px 8px;
+    line-height: #{$navigationManager-item_height - 6px};
     &.isFolder {
         font-weight: $global-fontWeight_semiBold;
     }
@@ -150,7 +155,8 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
 
 .navigationManager-toggleFolder,
 .navigationManager-articlePage {
-    width: #{$icon-default_size + 8px};
+    width: #{$icon-default_size};
+    flex-basis: #{$icon-default_size};
 }
 
 .navigationManager-toggleFolder {
@@ -170,8 +176,8 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
 }
 
 .navigationManager-folder {
-    margin: auto;
     color: $navigationManager-folderIcon_color;
+    margin-left: 8px;
 }
 
 .navigationManger-editMode {

@@ -38,9 +38,6 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     margin-left: $siteNav-spacer_width;
 }
 
-.siteNav-bottomCTA {
-    margin-left: -$siteNav-spacer_width;
-}
 
 .siteNavNode {
     position: relative;
@@ -145,4 +142,11 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     justify-content: flex-end;
     width: $siteNav-nodeToggle_width;
     margin-left: -#{$siteNav-nodeToggle_width};
+}
+
+
+// Admin Links
+
+.siteNavAdminLinks {
+
 }

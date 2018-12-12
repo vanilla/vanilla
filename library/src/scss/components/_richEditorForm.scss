@@ -61,6 +61,7 @@ $richEditorForm-placeholder_color: mixContentBgAndFg(50%);
 }
 
 .richEditorForm-body {
+    padding-top: $overlay-fullPageHeading_spacer;
     height: calc(100% - #{$global-gutter_halfSize + $global-gutter_size * 4});
     margin: {
         bottom: $global-gutter_size;

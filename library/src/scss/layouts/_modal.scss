@@ -88,7 +88,7 @@ $frame-footer_boxShadow: 0 -1px 2px 0 $overlay_bgColor;
     overflow: auto;
 
     > .container {
-        padding-top: 32px;
+        padding-top: $overlay-fullPageHeading_spacer;
     }
 }
 
@@ -103,6 +103,7 @@ $frame-footer_boxShadow: 0 -1px 2px 0 $overlay_bgColor;
     align-items: center;
     justify-content: center;
     min-height: $vanillaHeader_height;
+    z-index: 1;
 
     @include mediaQuery-panelLayout_oneColumn {
         min-height: $vanillaHeader_mobile_height;

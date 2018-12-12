@@ -177,8 +177,8 @@ class FacebookPlugin extends Gdn_Plugin {
             sprite('ReactFacebook', 'Sprite ReactSprite', t('Share on Facebook')),
             url("post/facebook/{$args['RecordType']}?id={$args['RecordID']}", true),
             'ReactButton PopupWindow',
-            ['rel' => 'nofollow'])
-        ;
+            ['rel' => 'nofollow']
+        );
     }
 
     /**

@@ -897,7 +897,7 @@ class TwitterPlugin extends Gdn_Plugin {
             $cssClass = 'ReactButton PopupWindow';
         }
 
-        echo anchor(sprite('ReactTwitter', 'Sprite ReactSprite', t('Share on Twitter')), $url, $cssClass);
+        echo anchor(sprite('ReactTwitter', 'Sprite ReactSprite', t('Share on Twitter')), $url, $cssClass, ['rel' => 'nofollow']);
     }
 
     /**

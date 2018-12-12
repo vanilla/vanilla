@@ -12,7 +12,6 @@ import classNames from "classnames";
 import * as React from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { t } from "@library/application";
-import SiteNavAdminLinks from "@library/components/siteNav/SiteNavAdminLinks";
 
 interface IProps extends RouteComponentProps<{}> {
     activeRecord: IActiveRecord;
@@ -20,7 +19,7 @@ interface IProps extends RouteComponentProps<{}> {
     className?: string;
     children: INavigationTreeItem[];
     collapsible: boolean;
-    kbID: number;
+    bottomCTA: React.ReactNode;
 }
 
 export interface IState {
@@ -55,7 +54,7 @@ export class SiteNav extends React.Component<IProps, IState> {
                 <ul className="siteNav-children hasDepth-0" role="tree" aria-labelledby={this.titleID}>
                     {content}
                 </ul>
-                <SiteNavAdminLinks kbID={this.props.kbID} />
+                {this.props.bottomCTA && this.props.bottomCTA}
             </nav>
         );
     }

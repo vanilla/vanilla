@@ -15,6 +15,11 @@ $navigationManager-actionButton_shadowColor: $global-color_bg;
 $navigationManager-folderIcon_color: mixContentBgAndFg(50%);
 $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
 
+.navigationManager > [data-react-beautiful-dnd-droppable] {
+    padding-bottom: 50px;
+}
+
+
 .navigationManager-container {
     position: relative;
     max-width: 800px;
@@ -40,6 +45,7 @@ $navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
     width: $navigationManager-item_maxWidth;
 
     &.isDragging {
+        width: auto !important;
         .navigationManager-draggable {
             @include shadow-dropDown;
             padding-right: $utility-baseUnit;

@@ -28,9 +28,12 @@ export default class SiteNavAdminLinks extends React.Component<IProps> {
                 <ul className={classNames("siteNavAdminLinks", this.props.className)}>
                     <hr className="siteNavAdminLinks-divider" />
                     <h3 className="sr-only">{t("Admin Links")}</h3>
-                    <li className="siteNavAdminLinks-link">
+                    <li className="siteNavAdminLinks-item">
                         {organize()}
-                        <OrganizeCategoriesRoute.Link data={{ kbID: this.props.kbID }}>
+                        <OrganizeCategoriesRoute.Link
+                            className="siteNavAdminLinks-link"
+                            data={{ kbID: this.props.kbID }}
+                        >
                             {t("Organize Categories")}
                         </OrganizeCategoriesRoute.Link>
                     </li>

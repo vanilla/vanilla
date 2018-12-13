@@ -20,33 +20,34 @@ class AssetController extends DashboardController {
      * @throws Gdn_UserException
      */
     public function deleteConfigImage($config = '') {
-        Gdn::request()->isAuthenticatedPostBack(true);
-        $this->permission('Garden.Settings.Manage');
-
-        if (!$config) {
-            return;
-        }
-
         $validated = false;
         $deleted = false;
-        $config = urldecode($config);
-        $imagePath = c($config, false);
+        if (Gdn::request()->isAuthenticatedPostBack(true)) {
+            $this->permission('Garden.Settings.Manage');
 
-        if ($imagePath) {
-            $ext = pathinfo($imagePath, PATHINFO_EXTENSION);
-            if (in_array($ext, ['gif', 'png', 'jpeg', 'jpg', 'bmp', 'tif', 'tiff', 'svg'])) {
-                $validated = true;
+            if (!$config) {
+                return;
             }
-        }
 
-        if ($validated) {
-            $upload = new Gdn_UploadImage();
-            if ($upload->delete($imagePath)) {
-                // For extra safety, ensure an image has been deleted before removing from config.
-                removeFromConfig($config);
-                $deleted = true;
-                $this->informMessage(t('Image deleted.'));
-                $this->jsonTarget('#'.slugify($config).'-preview-wrapper', '', 'Remove');
+            $config = urldecode($config);
+            $imagePath = c($config, false);
+
+            if ($imagePath) {
+                $ext = pathinfo($imagePath, PATHINFO_EXTENSION);
+                if (in_array($ext, ['gif', 'png', 'jpeg', 'jpg', 'bmp', 'tif', 'tiff', 'svg'])) {
+                    $validated = true;
+                }
+            }
+
+            if ($validated) {
+                $upload = new Gdn_UploadImage();
+                if ($upload->delete($imagePath)) {
+                    // For extra safety, ensure an image has been deleted before removing from config.
+                    removeFromConfig($config);
+                    $deleted = true;
+                    $this->informMessage(t('Image deleted.'));
+                    $this->jsonTarget('#' . slugify($config) . '-preview-wrapper', '', 'Remove');
+                }
             }
         }
 
@@ -54,6 +55,7 @@ class AssetController extends DashboardController {
             $this->informMessage(t('Error deleting image.'));
         }
 
+        $this->redirectTo = '/dashboard/settings';
         $this->render('blank', 'utility', 'dashboard');
     }
 }

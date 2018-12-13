@@ -106,12 +106,15 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
         return (
             <div className={panelClasses}>
                 {children.breadcrumbs && (
-                    <div className="panelLayout-breadcrumbs">
-                        <div className="panelLayout-container">
-                            <Panel className="panel-breadcrumbs">
-                                <PanelArea className="panelArea-breadcrumbs">{children.breadcrumbs}</PanelArea>
-                            </Panel>
-                        </div>
+                    <div className="panelLayout-container">
+                        <Panel className={classNames("panelLayout-left")} ariaHidden={true} />
+                        <Panel
+                            className={classNames("panelLayout-content", "panel-breadcrumbs", {
+                                hasAdjacentPanel: shouldRenderLeftPanel,
+                            })}
+                        >
+                            <PanelArea className="panelArea-breadcrumbs">{children.breadcrumbs}</PanelArea>
+                        </Panel>
                     </div>
                 )}
 
@@ -119,21 +122,24 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                     <div
                         className={classNames("panelLayout-container", { inheritHeight: this.props.growMiddleBottom })}
                     >
-                        {shouldRenderLeftPanel && (
-                            <Panel className={classNames("panelLayout-left")} tag="aside">
-                                {children.leftTop && (
-                                    <PanelArea className="panelArea-leftTop">{children.leftTop}</PanelArea>
-                                )}
-                                {children.leftBottom && (
-                                    <PanelArea className="panelArea-leftBottom">{children.leftBottom}</PanelArea>
-                                )}
-                            </Panel>
-                        )}
+                        {!isMobile &&
+                            shouldRenderLeftPanel && (
+                                <Panel className={classNames("panelLayout-left")} tag="aside">
+                                    {children.leftTop && (
+                                        <PanelArea className="panelArea-leftTop">{children.leftTop}</PanelArea>
+                                    )}
+                                    {children.leftBottom && (
+                                        <PanelArea className="panelArea-leftBottom">{children.leftBottom}</PanelArea>
+                                    )}
+                                </Panel>
+                            )}
 
                         <ContentTag
-                            className={classNames("panelLayout-content", { hasAdjacentPanel: shouldRenderLeftPanel })}
+                            className={classNames("panelLayout-content", {
+                                hasAdjacentPanel: shouldRenderLeftPanel,
+                            })}
                         >
-                            <div
+                            <Panel
                                 className={classNames("panelLayout-middle", {
                                     hasAdjacentPanel: shouldRenderRightPanel,
                                     inheritHeight: this.props.growMiddleBottom,
@@ -167,7 +173,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                                             {children.rightBottom}
                                         </PanelArea>
                                     )}
-                            </div>
+                            </Panel>
                             {shouldRenderRightPanel && (
                                 <Panel className="panelLayout-right">
                                     {children.rightTop && (
@@ -245,11 +251,16 @@ interface IContainerProps {
     className?: string;
     children?: React.ReactNode;
     tag?: string;
+    ariaHidden?: boolean;
 }
 
 export function Panel(props: IContainerProps) {
     const Tag = `${props.tag ? props.tag : "div"}`;
-    return <Tag className={classNames("panelLayout-panel", props.className)}>{props.children}</Tag>;
+    return (
+        <Tag className={classNames("panelLayout-panel", props.className)} aria-hidden={props.ariaHidden}>
+            {props.children}
+        </Tag>
+    );
 }
 
 export function PanelArea(props: IContainerProps) {
@@ -264,6 +275,7 @@ export function PanelWidget(props: IContainerProps) {
 export function PanelWidgetVerticalPadding(props: IContainerProps) {
     return <div className={classNames("panelWidget", "hasNoHorizontalPadding", props.className)}>{props.children}</div>;
 }
+
 export function PanelWidgetHorizontalPadding(props: IContainerProps) {
     return <div className={classNames("panelWidget", "hasNoVerticalPadding", props.className)}>{props.children}</div>;
 }

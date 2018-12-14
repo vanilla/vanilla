@@ -20,8 +20,6 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
 .siteNav {
     position: relative;
     display: block;
-    //margin-left: -#{$siteNav-spacer_width};
-    margin-left: -$global-gutter_halfSize;
     z-index: 1;
 
     @include mediaQuery-panelLayout_noBleed {

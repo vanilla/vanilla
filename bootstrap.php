@@ -392,7 +392,7 @@ $dic->call(function (
 });
 
 // Send out cookie headers.
-register_shutdown_function(function() use ($dic) {
+register_shutdown_function(function () use ($dic) {
     $dic->call(function(Garden\Web\Cookie $cookie) {
         $cookie->flush();
     });

@@ -15,6 +15,9 @@ use VanillaTests\Fixtures\MockAddon;
 use VanillaTests\Fixtures\MockAddonProvider;
 use VanillaTests\Fixtures\Request;
 
+/**
+ * Tests for the asset provider.
+ */
 class WebpackAssetProviderTest extends TestCase {
 
     private $fs;

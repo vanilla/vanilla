@@ -9,6 +9,9 @@ namespace VanillaTests\Fixtures;
 
 use Vanilla\Contracts;
 
+/**
+ * Mock addon class. Assumes key and subdirectory are the same.
+ */
 class MockAddon implements Contracts\AddonInterface {
 
     /** @var string */
@@ -23,10 +26,16 @@ class MockAddon implements Contracts\AddonInterface {
         $this->key = $key;
     }
 
+    /**
+     * @return string
+     */
     public function getSubdir(): string {
         return $this->key;
     }
 
+    /**
+     * @return string
+     */
     public function getKey(): string {
         return $this->key;
     }

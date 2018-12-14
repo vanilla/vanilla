@@ -872,7 +872,7 @@ class PostController extends VanillaController {
         if (property_exists($this, 'Discussion')) {
             $this->EventArguments['Discussion'] = $this->Discussion;
         }
-        if (property_exists($this,  'Comment')) {
+        if (property_exists($this, 'Comment')) {
             $this->EventArguments['Comment'] = $this->Comment;
         }
 

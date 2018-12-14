@@ -217,6 +217,27 @@ class InternalRequest extends HttpRequest implements RequestInterface {
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getAssetRoot() {
+        return $this->getRoot();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAssetRoot(string $root) {
+        $this->setRoot($root);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function urlDomain($withDomain = true): string {
+        return "/";
+    }
+
+    /**
      * Set the root path of the request.
      *
      * @param string $root The new root path of the request.

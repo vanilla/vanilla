@@ -22,6 +22,6 @@ class MockCacheBuster implements Contracts\Web\CacheBusterInterface {
     }
 
     public function value(): string {
-        return $this->value();
+        return $this->value;
     }
 }

@@ -8,8 +8,8 @@ import React from "react";
 import { Switch, RouteComponentProps, withRouter } from "react-router-dom";
 
 interface IProps extends RouteComponentProps<{}> {
-    modalRoutes: JSX.Element[];
-    pageRoutes: JSX.Element[];
+    modalRoutes: React.ReactNode[];
+    pageRoutes: React.ReactNode[];
 }
 
 /**

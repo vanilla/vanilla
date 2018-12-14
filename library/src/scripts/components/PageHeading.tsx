@@ -10,10 +10,11 @@ import BackLink from "@library/components/navigation/BackLink";
 import Heading from "@library/components/Heading";
 
 interface IPageHeading {
-    children: React.ReactNode;
-    backUrl?: string | null; // back link
+    title: string;
+    children?: React.ReactNode;
     className?: string;
     actions?: React.ReactNode;
+    includeBackLink?: boolean;
 }
 
 /**
@@ -21,15 +22,17 @@ interface IPageHeading {
  * Can be configured with an options menu and a backlink.
  */
 export default class PageHeading extends React.Component<IPageHeading> {
+    public static defaultProps = {
+        includeBackLink: true,
+    };
     public render() {
         return (
             <div className={classNames("pageHeading", this.props.className)}>
                 <div className="pageHeading-main">
-                    {this.props.backUrl === null ? null : (
-                        <BackLink url={this.props.backUrl} className="pageHeading-backLink" />
-                    )}
-                    {/* Will not render if no url is passed */}
-                    <Heading depth={1}>{this.props.children}</Heading>
+                    {this.props.includeBackLink && <BackLink className="pageHeading-backLink" fallbackElement={null} />}
+                    <Heading depth={1} title={this.props.title}>
+                        {this.props.children}
+                    </Heading>
                 </div>
                 {this.props.actions && <div className="pageHeading-actions">{this.props.actions}</div>}
             </div>

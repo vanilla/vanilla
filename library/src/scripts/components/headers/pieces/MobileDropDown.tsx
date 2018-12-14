@@ -10,10 +10,14 @@ import classNames from "classnames";
 import Modal from "@library/components/modal/Modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import { chevronUp, downTriangle } from "@library/components/icons/header";
+import { chevronUp, downTriangle } from "@library/components/icons/common";
 import { Panel } from "@library/components/layouts/PanelLayout";
 import { Frame, FrameBody, FrameFooter, FrameHeader, FramePanel } from "@library/components/frame";
 import SmartAlign from "@library/components/SmartAlign";
+import Heading from "@library/components/Heading";
+import CloseButton from "@library/components/CloseButton";
+import { BackLink } from "@library/components/navigation/BackLink";
+import FlexSpacer from "@library/components/FlexSpacer";
 
 export interface IProps {
     className?: string;
@@ -47,8 +51,10 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                     buttonRef={this.buttonRef}
                     baseClass={ButtonBaseClass.CUSTOM}
                 >
-                    <span className="mobileDropDown-title">{this.props.title}</span>
-                    <span className="mobileDropDown-icon">{downTriangle("mobileDropDown-downTriangle")}</span>
+                    <span className="mobileDropDown-buttonContents">
+                        <span className="mobileDropDown-title">{this.props.title}</span>
+                        <span className="mobileDropDown-icon">{downTriangle("mobileDropDown-downTriangle")}</span>
+                    </span>
                 </Button>
                 {this.state.open && (
                     <Modal
@@ -61,9 +67,15 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                         <div className="mobileDropDown-content">
                             <Panel className="mobileDropDown-panel">
                                 <Frame>
-                                    <FrameHeader centredTitle={true} closeFrame={this.close}>
-                                        <SmartAlign>{title}</SmartAlign>
-                                    </FrameHeader>
+                                    <header className="frameHeader mobileDropDown-header">
+                                        <FlexSpacer className="frameHeader-leftSpacer" />
+                                        <Heading title={title} className="frameHeader-heading frameHeader-centred">
+                                            <SmartAlign>{title}</SmartAlign>
+                                        </Heading>
+                                        <div className="frameHeader-closePosition">
+                                            <CloseButton className="frameHeader-close" onClick={this.close} />
+                                        </div>
+                                    </header>
                                     <FrameBody>{children}</FrameBody>
                                     <FrameFooter className="isCompact">
                                         <Button

@@ -1457,6 +1457,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $originHost = parse_url($origin, PHP_URL_HOST);
             if ($originHost && isTrustedDomain($originHost)) {
                 $this->setHeader('Access-Control-Allow-Origin', $origin);
+                $this->setHeader("Access-Control-Allow-Credentials", "true");
             }
         }
     }

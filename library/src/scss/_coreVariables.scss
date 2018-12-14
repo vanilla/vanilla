@@ -294,6 +294,8 @@ $overlay-border_color                                   : mix($global-color_fg, 
 $overlay-dropShadow                                     : 0 5px 10px $overlay_bgColor !default;
 $overlay-borderRadius                                   : $global_borderRadius !default;
 
+$overlay-fullPageHeading_spacer                         : 32px;
+
 /* -------------------------------------------------------------- *\
     Buttons
 \* -------------------------------------------------------------- */
@@ -437,8 +439,16 @@ $vanillaHeader_height                               : 50px !default;
 $vanillaHeader_mobile_height                        : 44px !default;
 $vanillaHeader_fg                                   : #fff !default;
 $vanillaHeader_bg                                   : $global-color_primary !default;
+$vanillaHeader-spacer_width                         : 12px;
+$vanillaHeader-button_borderRadius                  : 3px;
+$vanillaHeader-button_size                          : 40px;
+
+/* -------------------------------------------------------------- *\
+    Compact Me Box
+\* -------------------------------------------------------------- */
 
 $compactMeBox-tab_height                            : 44px !default;
+
 /* -------------------------------------------------------------- *\
     Footer
 \* -------------------------------------------------------------- */

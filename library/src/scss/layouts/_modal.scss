@@ -12,10 +12,17 @@ $modal-border_radius: $global-borderRadius;
 $modal-dropDown_padding: $global_spacer;
 $modal-horizontalMargin: $global_spacer / 2;
 
+$modal-headerFooter_minHeight: 60px;
+$modal-headerFooter_verticalPadding: 12px;
+
+$frame-header_boxShadow: 0 1px 2px 0 $overlay_bgColor;
+$frame-footer_boxShadow: 0 -1px 2px 0 $overlay_bgColor;
+
 
 .modal {
     position: relative;
     max-height: 100%;
+    z-index: 1;
 
     &.isFullScreen {
         overflow: auto;
@@ -59,6 +66,30 @@ $modal-horizontalMargin: $global_spacer / 2;
         margin-bottom: auto;
         max-height: 100vh;
     }
+
+    &:not(.isCompact) {
+        .frameHeader {
+            box-shadow: $frame-header_boxShadow;
+            min-height: $modal-headerFooter_minHeight;
+            padding: {
+                top: $modal-headerFooter_verticalPadding;
+                bottom: $modal-headerFooter_verticalPadding;
+            }
+        }
+
+        .frameFooter {
+            min-height: $modal-headerFooter_minHeight;
+            box-shadow: $frame-footer_boxShadow;
+        }
+    }
+}
+
+.modal-scroll {
+    overflow: auto;
+
+    > .container {
+        padding-top: $overlay-fullPageHeading_spacer;
+    }
 }
 
 .modal-content {
@@ -67,11 +98,12 @@ $modal-horizontalMargin: $global_spacer / 2;
 
 .modal-pageHeader {
     @include shadow-embed();
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: $vanillaHeader_height;
-    margin-bottom: $global_spacer * 1.5;
+    z-index: 1;
 
     @include mediaQuery-panelLayout_oneColumn {
         min-height: $vanillaHeader_mobile_height;

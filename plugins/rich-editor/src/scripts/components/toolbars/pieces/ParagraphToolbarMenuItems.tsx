@@ -34,7 +34,7 @@ export default class ParagraphToolbarMenuItems extends React.PureComponent<IProp
                 renderAbove={this.props.renderAbove}
                 renderLeft={this.props.renderLeft}
                 onKeyDown={this.props.onKeyDown}
-                className={classNames(this.props.className, "likeDropDownContent")}
+                className={classNames(this.props.className)}
             />
         );
     }

@@ -48,6 +48,8 @@
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Header
 \* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    Compact Me Box
+\* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Footer
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    user content
@@ -931,6 +933,15 @@ label.checkbox input.checkbox-input {
   margin-bottom: 0;
 }
 
+.richEditor-menu {
+  box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
+  background-color: #fff;
+  border-radius: 2px;
+  border-color: #d6d7d9;
+  border-style: solid;
+  border-width: 1px;
+}
+
 .richEditor-button {
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -1472,29 +1483,25 @@ body.isMobile .Popup.hasRichEditor .Border {
   line-height: 1.25;
 }
 
-.embedText-titleLink,
-.embedText-title {
-  display: block;
-  width: 100%;
-  padding: 0;
-  font-size: 14px;
-  line-height: 1.25;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .embedText-titleLink {
   margin: 0;
   color: inherit;
 }
 
+.embedText .embedText-titleLink,
 .embedText .embedText-title {
-  margin-top: 0 !important;
-  margin-right: 0;
+  margin-top: 0;
   margin-bottom: 4px;
-  margin-left: 0;
+  display: block;
+  width: 100%;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #555a62;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .richEditor .embedText-titleLink {
@@ -1555,15 +1562,15 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedLink-excerpt {
-  font-size: 14px;
   color: #555A62;
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-word;
   max-width: 100%;
+  font-size: 14px;
   margin-top: 4px;
-  line-height: 1.45;
-  max-height: 60.9px;
+  line-height: 1.4;
+  max-height: 58.8px;
   white-space: normal;
 }
 
@@ -1597,7 +1604,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedQuote-userName {
-  margin: 0 0 0 6px;
+  margin: 0 0 0 4px;
   padding: 0;
   color: #6f737a;
   font-weight: 700;
@@ -1674,7 +1681,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 .embedQuote-dateTime {
   font-size: 12px;
   color: #6f737a;
-  margin-left: 12px;
+  margin-left: 8px;
 }
 
 .embedQuote-header {

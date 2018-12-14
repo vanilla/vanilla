@@ -12,23 +12,18 @@ export interface ICommonHeadingProps {
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
     renderAsDepth?: 1 | 2 | 3 | 4 | 5 | 6;
     className?: string;
-}
-
-export interface IStringTitle extends ICommonHeadingProps {
     title: string;
 }
 
-export interface IComponentTitle extends ICommonHeadingProps {
-    children: React.ReactNode;
+export interface IHeadingProps extends ICommonHeadingProps {
+    children?: React.ReactNode;
 }
-
-export type IHeadingProps = IStringTitle | IComponentTitle;
 
 /**
  * A component representing a element.
  */
 export default class Heading extends React.Component<IHeadingProps> {
-    public static defaultProps = {
+    public static defaultProps: Partial<IHeadingProps> = {
         depth: 2,
     };
 
@@ -37,9 +32,8 @@ export default class Heading extends React.Component<IHeadingProps> {
     }
 
     public render() {
+        const { children, title } = this.props;
         const Tag = `h${this.props.depth}`;
-        const stringTitle = "title" in this.props ? this.props.title : this.props.children;
-        const componentTitle = "children" in this.props ? this.props.children : null;
 
         return (
             <Tag
@@ -51,7 +45,7 @@ export default class Heading extends React.Component<IHeadingProps> {
                     this.props.className,
                 )}
             >
-                {stringTitle || componentTitle}
+                {!!children ? children : title}
             </Tag>
         );
     }

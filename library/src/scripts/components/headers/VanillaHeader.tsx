@@ -8,9 +8,8 @@ import * as React from "react";
 import ReactDOM from "react-dom";
 import MeBox from "@library/components/mebox/MeBox";
 import { dummyLogoData } from "@library/components/mebox/state/dummyLogoData";
-import { dummyNotificationsData } from "@library/components/mebox/state/dummyNotificationsData";
 import { dummyMessagesData } from "@library/components/mebox/state/dummyMessagesData";
-import { dummyGuestNavigationData, dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
+import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
@@ -26,12 +25,18 @@ import { INotificationsProps } from "@library/components/mebox/pieces/Notificati
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
 import ConditionalWrap from "@library/components/ConditionalWrap";
+import FlexSpacer from "@library/components/FlexSpacer";
+import BackLink from "@library/components/navigation/BackLink";
+import { signIn } from "@library/components/icons";
+import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
+import { withPages, IWithPagesProps } from "@library/contexts/PagesContext";
 
-interface IProps extends IDeviceProps, IInjectableUserState {
+interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
     className?: string;
     title?: string; // Needed for mobile dropdown
     mobileDropDownContent?: React.ReactNode; // Needed for mobile dropdown
+    showSearchIcon?: boolean;
 }
 
 interface IState {
@@ -45,6 +50,11 @@ interface IState {
  * render in a specific div in the default-master.
  */
 export class VanillaHeader extends React.Component<IProps, IState> {
+    public static defaultProps: Partial<IProps> = {
+        showSearchIcon: true,
+        mobileDropDownContent: null,
+    };
+
     public state = {
         openSearch: false,
         showingSuggestions: false,
@@ -55,8 +65,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
         const countClass = "vanillaHeader-count";
         const buttonClass = "vanillaHeader-button";
-        const showMobileDropDown =
-            isMobile && !this.state.openSearch && this.props.title && this.props.mobileDropDownContent;
+        const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
 
         const notificationProps: INotificationsProps = {
             data: [],
@@ -75,7 +84,16 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                 <Container>
                     <PanelWidgetHorizontalPadding>
                         <div className="vanillaHeader-bar">
-                            {(!isMobile || (!this.state.openSearch && isMobile)) && (
+                            {!this.state.openSearch &&
+                                isMobile && (
+                                    <BackLink
+                                        className="vanillaHeader-leftFlexBasis vanillaHeader-backLink"
+                                        linkClassName="vanillaHeader-button"
+                                        fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
+                                    />
+                                )}
+
+                            {!isMobile && (
                                 <HeaderLogo
                                     {...dummyLogoData}
                                     className="vanillaHeader-logoContainer"
@@ -91,7 +109,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                         linkContentClassName="vanillaHeader-navLinkContent"
                                     />
                                 )}
-
                             {showMobileDropDown && (
                                 <MobileDropDown title={this.props.title!} buttonClass="vanillaHeader-mobileDropDown">
                                     {this.props.mobileDropDownContent}
@@ -99,27 +116,38 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                             )}
 
                             <ConditionalWrap className="vanillaHeader-rightFlexBasis" condition={!!showMobileDropDown}>
-                                <CompactSearch
-                                    className={classNames("vanillaHeader-compactSearch", {
-                                        isCentered: this.state.openSearch,
-                                    })}
-                                    open={this.state.openSearch}
-                                    onOpenSearch={this.openSearch}
-                                    onCloseSearch={this.closeSearch}
-                                    cancelButtonClassName="vanillaHeader-searchCancel"
-                                    buttonClass="vanillaHeader-button"
-                                    showingSuggestions={this.state.showingSuggestions}
-                                    onOpenSuggestions={this.setOpenSuggestions}
-                                    onCloseSuggestions={this.setCloseSuggestions}
-                                />
+                                {this.props.showSearchIcon ? (
+                                    <CompactSearch
+                                        className={classNames("vanillaHeader-compactSearch", {
+                                            isCentered: this.state.openSearch,
+                                        })}
+                                        focusOnMount
+                                        open={this.state.openSearch}
+                                        onSearchButtonClick={this.openSearch}
+                                        onCloseSearch={this.closeSearch}
+                                        cancelButtonClassName="vanillaHeader-searchCancel"
+                                        buttonClass="vanillaHeader-button"
+                                        showingSuggestions={this.state.showingSuggestions}
+                                        onOpenSuggestions={this.setOpenSuggestions}
+                                        onCloseSuggestions={this.setCloseSuggestions}
+                                    />
+                                ) : (
+                                    <FlexSpacer className="compactSearch vanillaHeader-compactSearch" />
+                                )}
                                 {isGuest ? (
                                     (!this.state.openSearch || !isMobile) && (
                                         <VanillaHeaderNav
-                                            {...dummyGuestNavigationData}
                                             linkClassName="vanillaHeader-navLink"
                                             linkContentClassName="vanillaHeader-navLinkContent"
                                             className="vanillaHeader-nav vanillaHeader-guestNav"
-                                        />
+                                        >
+                                            <VanillaHeaderNavItem
+                                                className="vanillaHeader-button"
+                                                to={`/entry/signin?target=${window.location.pathname}`}
+                                            >
+                                                {signIn("vanillaHeader-signInIcon")}
+                                            </VanillaHeaderNavItem>
+                                        </VanillaHeaderNav>
                                     )
                                 ) : (
                                     <React.Fragment>
@@ -136,10 +164,10 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                         {isMobile &&
                                             !this.state.openSearch && (
                                                 <CompactMeBox
+                                                    className={"vanillaHeader-button"}
                                                     counts={dummyUserDropDownData}
-                                                    buttonClass="vanillaHeader-button"
+                                                    buttonClass="vanillaHeader-tabButton"
                                                     userPhotoClass="headerDropDown-user"
-                                                    forceIcon={true}
                                                 />
                                             )}
                                     </React.Fragment>
@@ -154,6 +182,10 @@ export class VanillaHeader extends React.Component<IProps, IState> {
     }
 
     public openSearch = () => {
+        const { pages } = this.props;
+        if (pages.search) {
+            pages.search.preload();
+        }
         this.setState({
             openSearch: true,
         });
@@ -185,4 +217,4 @@ export class VanillaHeader extends React.Component<IProps, IState> {
 }
 
 const withRedux = connect(UsersModel.mapStateToProps);
-export default withRedux(withDevice<IProps>(VanillaHeader));
+export default withPages(withRedux(withDevice<IProps>(VanillaHeader)));

@@ -39,14 +39,15 @@ interface IProps extends IOptionalComponentID {
     onChange: (value: string) => void;
     isBigInput?: boolean;
     noHeading: boolean;
-    title: React.ReactNode;
+    title: string;
+    titleAsComponent?: React.ReactNode;
     isLoading?: boolean;
     onSearch: () => void;
     optionComponent?: React.ComponentType<OptionProps<any>>;
     getRef?: any;
     buttonClassName?: string;
     hideSearchButton?: boolean;
-    triggerSearchOnAllUpdates?: boolean;
+    triggerSearchOnClear?: boolean;
     resultsRef?: React.RefObject<HTMLDivElement>;
     handleOnKeyDown?: (event: React.KeyboardEvent) => void;
     onOpenSuggestions?: () => void;
@@ -68,6 +69,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
         title: t("Search"),
         isLoading: false,
         optionComponent: selectOverrides.SelectOption,
+        triggerSearchOnClear: false,
     };
 
     public state: IState = {
@@ -146,9 +148,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
     private handleOptionChange = (option: IComboBoxOption) => {
         if (option) {
             this.props.onChange(option.label);
-            this.setState({ forceMenuClosed: true }, () => {
-                this.props.triggerSearchOnAllUpdates && this.props.onSearch();
-            });
+            this.setState({ forceMenuClosed: true }, this.props.onSearch);
         }
     };
 
@@ -211,9 +211,9 @@ export default class SearchBar extends React.Component<IProps, IState> {
             <div className="searchBar">
                 <form className="searchBar-form" onSubmit={this.onFormSubmit}>
                     {!this.props.noHeading && (
-                        <Heading depth={1} className="searchBar-heading">
+                        <Heading depth={1} className="searchBar-heading" title={this.props.title}>
                             <label className="searchBar-label" htmlFor={this.searchInputID}>
-                                {this.props.title}
+                                {this.props.titleAsComponent ? this.props.titleAsComponent : this.props.title}
                             </label>
                         </Heading>
                     )}
@@ -256,7 +256,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
     private clear = (event: React.SyntheticEvent) => {
         event.preventDefault();
         this.props.onChange("");
-        if (this.props.triggerSearchOnAllUpdates) {
+        if (this.props.triggerSearchOnClear) {
             this.props.onSearch();
         }
         this.inputRef.current!.focus();

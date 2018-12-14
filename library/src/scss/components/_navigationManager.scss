@@ -1,0 +1,197 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$navigationManager-item_dragging_borderRadius: 2px;
+$navigationManager-item_dragging_borderColor: mixContentBgAndFg(90%);
+$navigationManager-item_dragging_bg: mix($global-color_primary, $global-color_bg, 10%);
+$navigationManager-item_maxWidth: 100%;
+$navigationManager-error_color: $global-error_fg;
+$navigationManager-item_height: 28px;
+$navigationManager-deleteButton_color: #a60215;
+$navigationManager-actionButton_shadowColor: $global-color_bg;
+$navigationManager-folderIcon_color: mixContentBgAndFg(50%);
+$navigationManager-renameButton_disabled_fg: mixContentBgAndFg(70%);
+
+.navigationManager > [data-react-beautiful-dnd-droppable] {
+    padding-bottom: 50px;
+}
+
+
+.navigationManager-container {
+    position: relative;
+    max-width: 800px;
+    width: 100%;
+    margin: auto;
+    padding: 0 4px;
+}
+
+.navigationManager-header {
+    padding: {
+        left: $utility-baseUnit * 4;
+        right: $utility-baseUnit * 4;
+        bottom: $global-gutter_size;
+    }
+}
+
+.navigationManager {
+    padding-left: 4px;
+}
+
+.navigationManager-item {
+    max-width: 100%;
+    width: $navigationManager-item_maxWidth;
+
+    &.isDragging {
+        width: auto !important;
+        .navigationManager-draggable {
+            @include shadow-dropDown;
+            padding-right: $utility-baseUnit;
+            font-weight: $global-fontWeight_semiBold;
+            border: 1px solid $navigationManager-item_dragging_borderColor;
+            border-radius: $navigationManager-item_dragging_borderRadius;
+        }
+        .navigationManager-action {
+            display: none !important;
+        }
+    }
+
+    &:hover {
+        .navigationManager-draggable {
+            background-color: rgba($navigationManager-item_dragging_bg, .4);
+        }
+    }
+
+    &.isActive,
+    &:focus {
+        .navigationManager-draggable {
+            background-color: $navigationManager-item_dragging_bg;
+        }
+        .navigationManager-action {
+            display: block;
+        }
+    }
+
+    &:focus{
+        .navigationManager-draggable {
+            border: solid 1px rgba($global-color_primary, .5);
+        }
+    }
+
+    &:hover,
+    &:focus {
+        outline: 0;
+        border: {
+            color: $global-color_primary;
+        }
+    }
+}
+
+.navigationManager-draggable {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: $navigationManager-item_height;
+    line-height: 18px;
+    font-size: $global-medium_fontSize;
+    background-color: $global-color_bg;
+    border: solid 1px transparent;
+    padding-left: $utility-baseUnit * 2.5;
+}
+
+.navigationManager-action {
+    font-size: $global-medium_fontSize;
+    font-weight: $global-fontWeight_bold;
+    min-height: $navigationManager-item_height;
+    padding: 0 9px;
+    display: none;
+    text-shadow: $navigationManager-actionButton_shadowColor 0 0 2px;
+    border: solid 1px transparent;
+    white-space: nowrap;
+
+    &:focus {
+        border: solid 1px rgba($global-color_primary, .5);
+    }
+}
+
+.navigationManager-delete {
+    color: $navigationManager-deleteButton_color;
+}
+
+.navigationManger-submitRename {
+
+    &[disabled] {
+        cursor: not-allowed;
+        color: $navigationManager-renameButton_disabled_fg;
+    }
+}
+
+.navigationManger-input {
+    padding-left: 5px;
+    margin-left: 10px;
+}
+
+.navigationManager-itemLabel {
+    flex-grow: 1;
+    padding: 3px 8px;
+    line-height: #{$navigationManager-item_height - 6px};
+    &.isFolder {
+        font-weight: $global-fontWeight_semiBold;
+    }
+}
+
+.navigationManager-item.hasError .navigationManager-itemLabel {
+    color: $navigationManager-error_color;
+}
+
+.navigationManager-itemIcon {
+    color: inherit;
+}
+
+.navigationManager-articleIcon {
+    display: block;
+    margin: auto;
+}
+
+.navigationManager-articleIconFill {
+    fill: $global-color_bg;
+}
+
+.navigationManager-toggleFolder,
+.navigationManager-articlePage {
+    width: #{$icon-default_size};
+    flex-basis: #{$icon-default_size};
+}
+
+.navigationManager-toggleFolder {
+    display: flex;
+    position: relative;
+    align-items: center;
+    padding: 0;
+    height: $navigationManager-item_height;
+}
+
+.navigationManager-triangle {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%) translateX(-#{$utility-baseUnit * 2});
+    width: 16px;
+}
+
+.navigationManager-folder {
+    color: $navigationManager-folderIcon_color;
+    margin-left: 8px;
+}
+
+.navigationManger-editMode {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.navigationManger-text {
+    flex-grow: 1;
+}

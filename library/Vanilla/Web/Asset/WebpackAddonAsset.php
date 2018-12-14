@@ -18,20 +18,20 @@ class WebpackAddonAsset extends WebpackAsset {
      * Constructor.
      *
      * @param RequestInterface $request The current request.
-     * @param Contracts\Web\CacheBusterInterface $cacheBuster A cache buster instance.
      * @param string $extension The file extension to use.
      * @param string $section The section of the site to get scripts for.
      * @see https://docs.vanillaforums.com/developer/tools/building-frontend/#site-sections
      * @param Contracts\AddonInterface $addon The addon to get an asset for.
+     * @param string $cacheBustingKey A string for busting the cache.
      */
     public function __construct(
         RequestInterface $request,
-        Contracts\Web\CacheBusterInterface $cacheBuster,
         string $extension,
         string $section,
-        Contracts\AddonInterface $addon
+        Contracts\AddonInterface $addon,
+        $cacheBustingKey = ""
     ) {
-        parent::__construct($request, $cacheBuster, $extension, $section, $addon->getKey());
+        parent::__construct($request, $extension, $section, $addon->getKey(), $cacheBustingKey);
         $this->fileSubpath = $section . DS . 'addons';
         $this->webSubpath = $section . '/' . 'addons';
     }

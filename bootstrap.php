@@ -5,6 +5,7 @@ use Garden\Container\Reference;
 use Vanilla\Addon;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
+use Vanilla\Utility\ContainerUtils;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -153,6 +154,19 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Gdn_Dispatcher')
     ->setShared(true)
     ->addAlias(Gdn::AliasDispatcher)
+
+    ->rule(\Vanilla\Web\Asset\WebpackAssetProvider::class)
+    ->addCall('setHotReloadEnabled', [
+        ContainerUtils::config('HotReload.Enabled'),
+        ContainerUtils::config('HotReload.IP'),
+    ])
+    ->addCall('setLocaleKey', [ContainerUtils::currentLocale()])
+    ->addCall('setCacheBusterKey', [new \Garden\Container\Callback(
+        function (Container $dic) {
+            $cacheBuster = $dic->get(Contracts\Web\CacheBusterInterface::class);
+            return $cacheBuster->value();
+        }
+    )])
 
     ->rule(\Garden\Web\Dispatcher::class)
     ->setShared(true)

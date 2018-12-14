@@ -36,20 +36,20 @@ class WebpackAsset extends SiteAsset {
      * Constructor.
      *
      * @param RequestInterface $request The current request.
-     * @param Contracts\Web\CacheBusterInterface $cacheBuster A cache buster instance.
      * @param string $extension The file extension to use.
      * @param string $section The section of the site to get scripts for.
      * @see https://docs.vanillaforums.com/developer/tools/building-frontend/#site-sections
      * @param string $assetName The name of the asset to get.
+     * @param string $cacheBusterKey A key to bust the cache.
      */
     public function __construct(
         RequestInterface $request,
-        Contracts\Web\CacheBusterInterface $cacheBuster,
         string $extension,
         string $section,
-        string $assetName
+        string $assetName,
+        $cacheBusterKey = ""
     ) {
-        parent::__construct($request, $cacheBuster);
+        parent::__construct($request, $cacheBusterKey);
         $this->extension = $extension;
         $this->assetName = $assetName;
         $this->fileSubpath = $section;
@@ -67,6 +67,11 @@ class WebpackAsset extends SiteAsset {
         );
     }
 
+    /**
+     * Check if the asset exists on the file system.
+     *
+     * @return bool
+     */
     public function existsOnFs(): bool {
         return file_exists($this->getFilePath());
     }

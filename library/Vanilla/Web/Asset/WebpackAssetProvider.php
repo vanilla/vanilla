@@ -18,39 +18,65 @@ class WebpackAssetProvider {
     /** @var RequestInterface */
     private $request;
 
-    /** @var Contracts\Web\CacheBusterInterface */
-    private $cacheBuster;
-
     /** @var Contracts\AddonProviderInterface */
     private $addonProvider;
 
-    /** @var Contracts\ConfigurationInterface */
-    private $config;
+    /** @var string */
+    private $cacheBustingKey = '';
 
-    /** @var \Gdn_Locale */
-    private $locale;
+    /** @var string */
+    private $localeKey = "";
+
+    /** @var bool */
+    private $hotReloadEnabled = false;
+
+    /** @var string */
+    private $hotReloadIP;
+
+    /** @var string */
+    private $fsRoot = PATH_ROOT;
 
     /**
      * WebpackAssetProvider constructor.
      *
      * @param RequestInterface $request
-     * @param Contracts\Web\CacheBusterInterface $cacheBuster
      * @param Contracts\AddonProviderInterface $addonProvider
-     * @param Contracts\ConfigurationInterface $config
-     * @param \Gdn_Locale $locale
      */
     public function __construct(
         RequestInterface $request,
-        Contracts\Web\CacheBusterInterface $cacheBuster,
-        Contracts\AddonProviderInterface $addonProvider,
-        Contracts\ConfigurationInterface $config,
-        \Gdn_Locale $locale
+        Contracts\AddonProviderInterface $addonProvider
     ) {
         $this->request = $request;
-        $this->cacheBuster = $cacheBuster;
         $this->addonProvider = $addonProvider;
-        $this->config = $config;
-        $this->locale = $locale;
+    }
+
+    /**
+     * Enable loading of hot reloading assets in place of the normal ones.
+     *
+     * @param bool $enabled The enable value.
+     * @param string $ip Optionally override the ip address the hot bundle is served from.
+     */
+    public function setHotReloadEnabled(bool $enabled, string $ip) {
+        $this->hotReloadEnabled = $enabled;
+        $this->hotReloadIP = $ip ?: "127.0.0.1";
+    }
+
+    /**
+     * Set the key of the active locale.
+     *
+     * @param string $key
+     */
+    public function setLocaleKey(string $key) {
+        $this->localeKey = $key;
+    }
+
+    /**
+     * Set a key to be used to bust the caching of assets.
+     *
+     * @param string $key
+     */
+    public function setCacheBusterKey(string $key) {
+        $this->cacheBustingKey = $key;
     }
 
     /**
@@ -68,19 +94,22 @@ class WebpackAssetProvider {
      * @return WebpackAsset[] The assets files for all webpack scripts.
      */
     public function getScripts(string $section): array {
+        $scripts = [];
+
+        // Locale asset is always included if we have a locale set.
+        if ($this->localeKey) {
+            $localeAsset = new LocaleAsset($this->request, $this->localeKey, $this->cacheBustingKey);
+            $scripts[] = $localeAsset;
+        }
+
         // Return early with the hot build if that flag is enabled.
-        if ($this->config->get('HotReload.Enabled')) {
-            return [new HotBuildAsset(
-                $section,
-                $this->config->get('HotReload.IP', null)
-            )];
+        if ($this->hotReloadEnabled) {
+            return [new HotBuildAsset($section, $this->hotReloadIP)];
         }
 
         // A couple of required assets.
-        $scripts = [
-            $this->makeScript($section, 'runtime'),
-            $this->makeScript($section, 'vendors'),
-        ];
+        $scripts[] = $this->makeScript($section, 'runtime');
+        $scripts[] = $this->makeScript($section, 'vendors');
 
         // The library chunk is not always created if there is nothing shared between entry-points.
         $shared = $this->makeScript($section, 'shared');
@@ -92,11 +121,12 @@ class WebpackAssetProvider {
         foreach ($this->addonProvider->getEnabled() as $addon) {
             $asset = new WebpackAddonAsset(
                 $this->request,
-                $this->cacheBuster,
                 WebpackAsset::SCRIPT_EXTENSION,
                 $section,
-                $addon
+                $addon,
+                $this->cacheBustingKey
             );
+            $asset->setFsRoot($this->fsRoot);
 
             if ($asset->existsOnFs()) {
                 $scripts[] = $asset;
@@ -117,7 +147,8 @@ class WebpackAssetProvider {
      * @return WebpackAsset[]
      */
     public function getStylesheets(string $section): array {
-        if ($this->config->get('HotReload.Enabled')) {
+        if ($this->hotReloadEnabled) {
+            // All style sheets are managed by the hot javascript bundle.
             return [];
         }
 
@@ -126,11 +157,12 @@ class WebpackAssetProvider {
         foreach ($this->addonProvider->getEnabled() as $addon) {
             $asset = new WebpackAddonAsset(
                 $this->request,
-                $this->cacheBuster,
                 WebpackAsset::STYLE_EXTENSION,
                 $section,
-                $addon
+                $addon,
+                $this->cacheBustingKey
             );
+            $asset->setFsRoot($this->fsRoot);
 
             if ($asset->existsOnFs()) {
                 $styles[] = $asset;
@@ -138,6 +170,17 @@ class WebpackAssetProvider {
         }
 
         return $styles;
+    }
+
+    /**
+     * Set the root direct this class should use for it's file system.
+     *
+     * @internal
+     *
+     * @param string $fsRoot
+     */
+    public function setFsRoot(string $fsRoot) {
+        $this->fsRoot = $fsRoot;
     }
 
     /**
@@ -149,22 +192,15 @@ class WebpackAssetProvider {
      * @return WebpackAsset A webpack script asset.
      */
     private function makeScript(string $section, string $name): WebpackAsset {
-        return new WebpackAsset(
+        $asset = new WebpackAsset(
             $this->request,
-            $this->cacheBuster,
             WebpackAsset::SCRIPT_EXTENSION,
             $section,
-            $name
+            $name,
+            $this->cacheBustingKey
         );
-    }
-
-    /**
-     * Get a local asset for the current locale.
-     *
-     * @return LocaleAsset
-     */
-    public function getLocaleAsset(): LocaleAsset {
-        return new LocaleAsset($this->request, $this->cacheBuster, $this->locale->current());
+        $asset->setFsRoot($this->fsRoot);
+        return $asset;
     }
 
     /**
@@ -184,8 +220,8 @@ class WebpackAssetProvider {
      * @return string The contents of the script.
      */
     public function getInlinePolyfillContents(): string {
-        $polyfillAsset = new PolyfillAsset($this->request, $this->cacheBuster);
-        $debug = $this->config->get('Debug', false);
+        $polyfillAsset = new PolyfillAsset($this->request, $this->cacheBustingKey);
+        $debug = debug();
         $logAdding = $debug ? 'console.log("Older browser detected. Initiating polyfills.");' : '';
         $logNotAdding = $debug ? 'console.log("Modern browser detected. No polyfills necessary");' : '';
 

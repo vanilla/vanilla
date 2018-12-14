@@ -16,9 +16,6 @@ class PolyfillAsset extends SiteAsset {
      * @inheritdoc
      */
     public function getWebPath(): string {
-        return $this->makeAssetPath(
-            'dist',
-            'polyfills.min.js' . '?h='.$this->cacheBuster->value()
-        );
+        return $this->makeAssetPath('dist', 'polyfills.min.js');
     }
 }

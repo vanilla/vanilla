@@ -151,7 +151,7 @@ class LegacyAssetModel extends Gdn_Model {
         }
 
         // Sort the paths.
-        usort($paths, ['LegacyAssetModel', '_comparePath']);
+        usort($paths, [LegacyAssetModel::class, '_comparePath']);
 
         return $paths;
     }

@@ -7,37 +7,49 @@
 
 namespace VanillaTests\Library\Vanilla\Web\Asset;
 
-use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\TestCase;
 use org\bovigo\vfs\vfsStream;
 use Vanilla\Web\Asset\WebpackAsset;
-use VanillaTests\Fixtures\MockCacheBuster;
 use VanillaTests\Fixtures\Request;
 
+/**
+ * Tests for the WebpackAsset class.
+ */
 class WebpackAssetTest extends TestCase {
 
     private $fs;
 
+    /**
+     * @inheritdoc
+     */
     public function setUp() {
         $this->fs = vfsStream::setup();
     }
 
+    /**
+     * Test that our file exists checks work properly.
+     */
     public function testExists() {
-        $fs = $this->getFsWithFile("bootstrap.min.js");
+        $fs =  vfsStream::create([
+            "dist" => [
+                "test" => [
+                    'bootstrap.min.js' => "helloWorld",
+                ],
+            ],
+        ]);
         $asset = new WebpackAsset(
             new Request(),
-            new MockCacheBuster(),
             ".min.js",
             "test",
             "bootstrap"
         );
-        $asset->setFsRoot($fs->url());
+        $url = $fs->url();
+        $asset->setFsRoot($url);
 
         $this->assertTrue($asset->existsOnFs());
 
         $asset = new WebpackAsset(
             new Request(),
-            new MockCacheBuster(),
             ".min.js",
             "test",
             "badAsset"
@@ -47,46 +59,45 @@ class WebpackAssetTest extends TestCase {
     }
 
     /**
+     * Test that web patches are properly generated.
+     *
      * @param Request $req
-     * @param MockCacheBuster $buster
+     * @param string $buster
      * @param string $expected
      *
      * @dataProvider webPathProvider
      */
-    public function testWebPath(Request $req, MockCacheBuster $buster, string $expected) {
-        $asset = new WebpackAsset($req, $buster, WebpackAsset::SCRIPT_EXTENSION, "testSec", "test");
+    public function testWebPath(Request $req, string $buster, string $expected) {
+        $asset = new WebpackAsset(
+            $req,
+            WebpackAsset::SCRIPT_EXTENSION,
+            "testSec",
+            "test",
+            $buster->value()
+        );
         $this->assertEquals($expected, $asset->getWebPath());
     }
 
+    /**
+     * Provider for for testWebPath
+     */
     public function webPathProvider(): array {
         return [
             [
                 (new Request()),
-                new MockCacheBuster(),
+                "",
                 "http://example.com/dist/testSec/test.min.js",
             ],
             [
                 (new Request())->setAssetRoot("/someRoot"),
-                new MockCacheBuster(),
+                "",
                 "http://example.com/someRoot/dist/testSec/test.min.js",
             ],
             [
                 (new Request())->setHost("me.com"),
-                new MockCacheBuster("cacheBuster"),
+                "cacheBuster",
                 "http://me.com/dist/testSec/test.min.js?h=cacheBuster",
             ],
         ];
-    }
-
-    private function getFsWithFile(string $fileName): vfsStreamDirectory {
-        $structure = [
-            "dist" => [
-                "test" => [
-                    $fileName => "helloWorld",
-                ],
-            ],
-        ];
-
-        return vfsStream::create($structure);
     }
 }

@@ -21,11 +21,11 @@ class LocaleAsset extends SiteAsset {
      * Constructor.
      *
      * @param RequestInterface $request The current request.
-     * @param Contracts\Web\CacheBusterInterface $cacheBuster A cache buster instance.
      * @param string $localeKey The key of the locale for the asset to represent.
+     * @param string $cacheBustingKey A cache busting string..
      */
-    public function __construct(RequestInterface $request, Contracts\Web\CacheBusterInterface $cacheBuster, string $localeKey) {
-        parent::__construct($request, $cacheBuster);
+    public function __construct(RequestInterface $request, string $localeKey, $cacheBustingKey = "") {
+        parent::__construct($request, $cacheBustingKey);
         $this->localeKey = $localeKey;
     }
 
@@ -33,13 +33,10 @@ class LocaleAsset extends SiteAsset {
      * @inheritdoc
      */
     public function getWebPath(): string {
-        // We need a web-root url, not an asset URL because this is an API endpoint resource that is dynamically generated.
-        // It cannot have the assetPath joined onto the beginning.
-        return SiteAsset::joinWebPath(
-            $this->request->getRoot(),
+        return self::makeWebPath(
             '/api/v2/locales',
             $this->localeKey,
-            'translations.js' . '?h=' . $this->cacheBuster->value()
+            'translations.js'
         );
     }
 }

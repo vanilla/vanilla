@@ -43,18 +43,18 @@ class DeploymentCacheBuster implements Contracts\Web\CacheBusterInterface {
     /** @var \DateTimeInterface */
     private $currentTime;
 
-    /** @var Contracts\ConfigurationInterface */
-    private $config;
+    /** @var int|null */
+    private $deploymentTime;
 
     /**
      * DeploymentCacheBuster constructor.
      *
      * @param \DateTimeInterface $currentTime
-     * @param Contracts\ConfigurationInterface $config
+     * @param int|null $deploymentTime
      */
-    public function __construct(\DateTimeInterface $currentTime, Contracts\ConfigurationInterface $config) {
+    public function __construct(\DateTimeInterface $currentTime, $deploymentTime) {
         $this->currentTime = $currentTime;
-        $this->config = $config;
+        $this->deploymentTime = $deploymentTime;
     }
 
     /**
@@ -66,13 +66,12 @@ class DeploymentCacheBuster implements Contracts\Web\CacheBusterInterface {
      * @return string
      */
     public function value(): string {
-        $deployedTime = $this->config->get('Garden.Deployed');
-        if ($deployedTime) {
-            $graced = $deployedTime + self::GRACE_PERIOD;
+        if ($this->deploymentTime) {
+            $graced = $this->deploymentTime + self::GRACE_PERIOD;
             if ($this->currentTime->getTimestamp() >= $graced) {
-                $deployedTime = $graced;
+                $this->deploymentTime = $graced;
             }
-            $result = dechex($deployedTime);
+            $result = dechex($this->deploymentTime);
         } else {
             $result = APPLICATION_VERSION;
         }

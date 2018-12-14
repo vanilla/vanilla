@@ -14,7 +14,7 @@ interface AddonProviderInterface {
     /**
      * Get the enabled addons, sorted by priority with the highest priority first.
      *
-     * @return Addon[] Returns an array of {@link Addon} objects.
+     * @return AddonInterface[] Returns an array of {@link Addon} objects.
      */
     public function getEnabled(): array;
 }

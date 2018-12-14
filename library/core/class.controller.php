@@ -1886,10 +1886,6 @@ class Gdn_Controller extends Gdn_Pluggable {
                 /** @var \Vanilla\Web\Asset\WebpackAssetProvider $webpackAssetProvider */
                 $webpackAssetProvider = Gdn::getContainer()->get(\Vanilla\Web\Asset\WebpackAssetProvider::class);
 
-                // Add the client-side translations.
-                $localeScriptPath = $webpackAssetProvider->getLocaleAsset()->getWebPath();
-                $this->Head->addScript($localeScriptPath, 'text/javascript', false, ['defer' => 'true']);
-
                 $polyfillContent = $webpackAssetProvider->getInlinePolyfillContents();
                 $this->Head->addScript(null, null, false, ["content" => $polyfillContent]);
 

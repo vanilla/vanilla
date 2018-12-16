@@ -15,7 +15,7 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
 import classNames from "classnames";
 import Container from "@library/components/layouts/components/Container";
-import { PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
+import { Panel, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 import HeaderLogo from "@library/components/mebox/pieces/HeaderLogo";
 import VanillaHeaderNav from "@library/components/mebox/pieces/VanillaHeaderNav";
 import CompactSearch from "@library/components/mebox/pieces/CompactSearch";
@@ -82,99 +82,107 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         return ReactDOM.createPortal(
             <header className={classNames("vanillaHeader", this.props.className)}>
                 <Container>
-                    <PanelWidgetHorizontalPadding>
-                        <div className="vanillaHeader-bar">
-                            {!this.state.openSearch &&
-                                isMobile && (
-                                    <BackLink
-                                        className="vanillaHeader-leftFlexBasis vanillaHeader-backLink"
-                                        linkClassName="vanillaHeader-button"
-                                        fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
-                                    />
-                                )}
+                    <Panel className="panelLayout-fullWidth">
+                        <PanelWidgetHorizontalPadding>
+                            <div className="vanillaHeader-bar">
+                                {!this.state.openSearch &&
+                                    isMobile && (
+                                        <BackLink
+                                            className="vanillaHeader-leftFlexBasis vanillaHeader-backLink"
+                                            linkClassName="vanillaHeader-button"
+                                            fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
+                                        />
+                                    )}
 
-                            {!isMobile && (
-                                <HeaderLogo
-                                    {...dummyLogoData}
-                                    className="vanillaHeader-logoContainer"
-                                    logoClassName="vanillaHeader-logo"
-                                />
-                            )}
-                            {!this.state.openSearch &&
-                                !isMobile && (
-                                    <VanillaHeaderNav
-                                        {...dummyNavigationData}
-                                        className="vanillaHeader-nav"
-                                        linkClassName="vanillaHeader-navLink"
-                                        linkContentClassName="vanillaHeader-navLinkContent"
+                                {!isMobile && (
+                                    <HeaderLogo
+                                        {...dummyLogoData}
+                                        className="vanillaHeader-logoContainer"
+                                        logoClassName="vanillaHeader-logo"
                                     />
                                 )}
-                            {showMobileDropDown && (
-                                <MobileDropDown title={this.props.title!} buttonClass="vanillaHeader-mobileDropDown">
-                                    {this.props.mobileDropDownContent}
-                                </MobileDropDown>
-                            )}
-
-                            <ConditionalWrap className="vanillaHeader-rightFlexBasis" condition={!!showMobileDropDown}>
-                                {this.props.showSearchIcon ? (
-                                    <CompactSearch
-                                        className={classNames("vanillaHeader-compactSearch", {
-                                            isCentered: this.state.openSearch,
-                                        })}
-                                        focusOnMount
-                                        open={this.state.openSearch}
-                                        onSearchButtonClick={this.openSearch}
-                                        onCloseSearch={this.closeSearch}
-                                        cancelButtonClassName="vanillaHeader-searchCancel"
-                                        buttonClass="vanillaHeader-button"
-                                        showingSuggestions={this.state.showingSuggestions}
-                                        onOpenSuggestions={this.setOpenSuggestions}
-                                        onCloseSuggestions={this.setCloseSuggestions}
-                                    />
-                                ) : (
-                                    <FlexSpacer className="compactSearch vanillaHeader-compactSearch" />
-                                )}
-                                {isGuest ? (
-                                    (!this.state.openSearch || !isMobile) && (
+                                {!this.state.openSearch &&
+                                    !isMobile && (
                                         <VanillaHeaderNav
+                                            {...dummyNavigationData}
+                                            className="vanillaHeader-nav"
                                             linkClassName="vanillaHeader-navLink"
                                             linkContentClassName="vanillaHeader-navLinkContent"
-                                            className="vanillaHeader-nav vanillaHeader-guestNav"
-                                        >
-                                            <VanillaHeaderNavItem
-                                                className="vanillaHeader-button"
-                                                to={`/entry/signin?target=${window.location.pathname}`}
+                                        />
+                                    )}
+                                {showMobileDropDown && (
+                                    <MobileDropDown
+                                        title={this.props.title!}
+                                        buttonClass="vanillaHeader-mobileDropDown"
+                                    >
+                                        {this.props.mobileDropDownContent}
+                                    </MobileDropDown>
+                                )}
+
+                                <ConditionalWrap
+                                    className="vanillaHeader-rightFlexBasis"
+                                    condition={!!showMobileDropDown}
+                                >
+                                    {this.props.showSearchIcon ? (
+                                        <CompactSearch
+                                            className={classNames("vanillaHeader-compactSearch", {
+                                                isCentered: this.state.openSearch,
+                                            })}
+                                            focusOnMount
+                                            open={this.state.openSearch}
+                                            onSearchButtonClick={this.openSearch}
+                                            onCloseSearch={this.closeSearch}
+                                            cancelButtonClassName="vanillaHeader-searchCancel"
+                                            buttonClass="vanillaHeader-button"
+                                            showingSuggestions={this.state.showingSuggestions}
+                                            onOpenSuggestions={this.setOpenSuggestions}
+                                            onCloseSuggestions={this.setCloseSuggestions}
+                                        />
+                                    ) : (
+                                        <FlexSpacer className="compactSearch vanillaHeader-compactSearch" />
+                                    )}
+                                    {isGuest ? (
+                                        (!this.state.openSearch || !isMobile) && (
+                                            <VanillaHeaderNav
+                                                linkClassName="vanillaHeader-navLink"
+                                                linkContentClassName="vanillaHeader-navLinkContent"
+                                                className="vanillaHeader-nav vanillaHeader-guestNav"
                                             >
-                                                {signIn("vanillaHeader-signInIcon")}
-                                            </VanillaHeaderNavItem>
-                                        </VanillaHeaderNav>
-                                    )
-                                ) : (
-                                    <React.Fragment>
-                                        {!isMobile && (
-                                            <MeBox
-                                                className="vanillaHeader-meBox"
-                                                notificationsProps={notificationProps}
-                                                messagesProps={messagesProps as any}
-                                                counts={dummyUserDropDownData}
-                                                buttonClassName="vanillaHeader-button"
-                                                contentClassName="vanillaHeader-dropDownContents"
-                                            />
-                                        )}
-                                        {isMobile &&
-                                            !this.state.openSearch && (
-                                                <CompactMeBox
-                                                    className={"vanillaHeader-button"}
+                                                <VanillaHeaderNavItem
+                                                    className="vanillaHeader-button"
+                                                    to={`/entry/signin?target=${window.location.pathname}`}
+                                                >
+                                                    {signIn("vanillaHeader-signInIcon")}
+                                                </VanillaHeaderNavItem>
+                                            </VanillaHeaderNav>
+                                        )
+                                    ) : (
+                                        <React.Fragment>
+                                            {!isMobile && (
+                                                <MeBox
+                                                    className="vanillaHeader-meBox"
+                                                    notificationsProps={notificationProps}
+                                                    messagesProps={messagesProps as any}
                                                     counts={dummyUserDropDownData}
-                                                    buttonClass="vanillaHeader-tabButton"
-                                                    userPhotoClass="headerDropDown-user"
+                                                    buttonClassName="vanillaHeader-button"
+                                                    contentClassName="vanillaHeader-dropDownContents"
                                                 />
                                             )}
-                                    </React.Fragment>
-                                )}
-                            </ConditionalWrap>
-                        </div>
-                    </PanelWidgetHorizontalPadding>
+                                            {isMobile &&
+                                                !this.state.openSearch && (
+                                                    <CompactMeBox
+                                                        className={"vanillaHeader-button"}
+                                                        counts={dummyUserDropDownData}
+                                                        buttonClass="vanillaHeader-tabButton"
+                                                        userPhotoClass="headerDropDown-user"
+                                                    />
+                                                )}
+                                        </React.Fragment>
+                                    )}
+                                </ConditionalWrap>
+                            </div>
+                        </PanelWidgetHorizontalPadding>
+                    </Panel>
                 </Container>
             </header>,
             this.props.container || document.getElementById("vanillaHeader")!,

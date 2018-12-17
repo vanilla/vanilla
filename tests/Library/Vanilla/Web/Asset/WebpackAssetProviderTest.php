@@ -20,15 +20,6 @@ use VanillaTests\Fixtures\Request;
  */
 class WebpackAssetProviderTest extends TestCase {
 
-    private $fs;
-
-    /**
-     * @inheritdoc
-     */
-    public function setUp() {
-        $this->fs = vfsStream::setup();
-    }
-
     /**
      * Test the hot reload functionality.
      */

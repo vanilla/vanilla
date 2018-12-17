@@ -56,7 +56,7 @@ class WebpackAssetProvider {
      * @param bool $enabled The enable value.
      * @param string $ip Optionally override the ip address the hot bundle is served from.
      */
-    public function setHotReloadEnabled(bool $enabled, string $ip) {
+    public function setHotReloadEnabled(bool $enabled, string $ip = "") {
         $this->hotReloadEnabled = $enabled;
         $this->hotReloadIP = $ip ?: "127.0.0.1";
     }

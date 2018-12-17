@@ -335,7 +335,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
      * @param mixed $defaultValue If the parameter is not found in the group, this value will be returned.
      * @return mixed The configuration value.
      */
-    public function get(string $name, $defaultValue = false) {
+    public function get($name, $defaultValue = false) {
         // Shortcut, get the whole config
         if ($name == '.') {
             return $this->Data;

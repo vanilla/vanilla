@@ -50,10 +50,7 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
             ...$pieces
         );
 
-        if ($this->cacheBusterKey !== "") {
-            $path .= "?h=" . $this->cacheBusterKey;
-        }
-        return $path;
+        return $this->addCacheBuster($path);
     }
 
     /**
@@ -71,11 +68,21 @@ abstract class SiteAsset implements Contracts\Web\AssetInterface {
             ...$pieces
         );
 
-        if ($this->cacheBusterKey !== "") {
-            $path .= "?h=" . $this->cacheBusterKey;
-        }
+        return $this->addCacheBuster($path);
+    }
 
-        return $path;
+    /**
+     * Add a cache busting query parameter if one is available.
+     *
+     * @param string $url The URL to modify.
+     *
+     * @return string The new URL.
+     */
+    private function addCacheBuster(string $url): string {
+        if ($this->cacheBusterKey !== "") {
+            $url .= "?h=" . $this->cacheBusterKey;
+        }
+        return $url;
     }
 
     /**

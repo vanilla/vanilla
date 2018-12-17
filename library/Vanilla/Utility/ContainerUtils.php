@@ -39,4 +39,18 @@ class ContainerUtils {
             return $locale->current();
         });
     }
+
+    /**
+     * Lazily load a cache busting string for some configuration.
+     *
+     * @return ReferenceInterface
+     */
+    public static function cacheBuster(): ReferenceInterface {
+        return new Callback(
+            function (ContainerInterface $dic) {
+                $cacheBuster = $dic->get(\Vanilla\Web\Asset\DeploymentCacheBuster::class);
+                return $cacheBuster->value();
+            }
+        );
+    }
 }

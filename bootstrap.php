@@ -51,9 +51,6 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addAlias('Config')
     ->addAlias(Contracts\ConfigurationInterface::class)
 
-    ->rule(Contracts\Web\CacheBusterInterface::class)
-    ->setClass(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
-
     // AddonManager
     ->rule(Vanilla\AddonManager::class)
     ->setShared(true)
@@ -161,12 +158,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
         ContainerUtils::config('HotReload.IP'),
     ])
     ->addCall('setLocaleKey', [ContainerUtils::currentLocale()])
-    ->addCall('setCacheBusterKey', [new \Garden\Container\Callback(
-        function (Container $dic) {
-            $cacheBuster = $dic->get(Contracts\Web\CacheBusterInterface::class);
-            return $cacheBuster->value();
-        }
-    )])
+    ->addCall('setCacheBusterKey', [ContainerUtils::cacheBuster()])
+
+    ->rule(\Vanilla\Web\Asset\LegacyAssetModel::class)
+    ->setConstructorArgs([ContainerUtils::cacheBuster()])
 
     ->rule(\Garden\Web\Dispatcher::class)
     ->setShared(true)

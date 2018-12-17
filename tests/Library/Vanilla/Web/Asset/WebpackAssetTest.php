@@ -73,7 +73,7 @@ class WebpackAssetTest extends TestCase {
             WebpackAsset::SCRIPT_EXTENSION,
             "testSec",
             "test",
-            $buster->value()
+            $buster
         );
         $this->assertEquals($expected, $asset->getWebPath());
     }

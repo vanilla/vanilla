@@ -16,7 +16,6 @@ use Vanilla\Addon;
 use Gdn_Model;
 use Gdn;
 use Vanilla\AliasLoader;
-use Vanilla\Contracts;
 
 /**
  * Manages Assets.
@@ -28,15 +27,15 @@ class LegacyAssetModel extends Gdn_Model {
      /** @var string */
     public $UrlPrefix = '';
 
-    /** @var Contracts\Web\CacheBusterInterface */
+    /** @var string */
     private $cacheBuster;
 
     /**
      * LegacyAssetModel constructor.
      *
-     * @param Contracts\Web\CacheBusterInterface $cacheBuster
+     * @param string $cacheBuster
      */
-    public function __construct(Contracts\Web\CacheBusterInterface $cacheBuster) {
+    public function __construct(string $cacheBuster) {
         parent::__construct();
         // Set the old class name for Gdn_Pluggable.
         $this->ClassName = "AssetModel";
@@ -457,8 +456,8 @@ class LegacyAssetModel extends Gdn_Model {
      * @deprecated 2.8 Contracts\Web\CacheBusterInterface::class
      */
     public function cacheBuster(): string {
-        deprecated(Contracts\Web\CacheBusterInterface::class);
-        return $this->cacheBuster->value();
+        deprecated(DeploymentCacheBuster::class);
+        return $this->cacheBuster();
     }
 
     /**

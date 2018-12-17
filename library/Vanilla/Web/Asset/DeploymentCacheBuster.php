@@ -7,8 +7,6 @@
 
 namespace Vanilla\Web\Asset;
 
-use Vanilla\Contracts;
-
 /**
  * A cache buster that works based on the last deployment time.
  *
@@ -33,7 +31,7 @@ use Vanilla\Contracts;
  * EVENTUALLY (after the grace period has completed) we get a fresh start and everything should be consistent.
  * In the intermediary time it is possible a user gets served an old script.
  */
-class DeploymentCacheBuster implements Contracts\Web\CacheBusterInterface {
+class DeploymentCacheBuster {
 
     /**
      * The number of seconds to wait after a deploy before switching the cache buster.

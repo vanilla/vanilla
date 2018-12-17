@@ -22,10 +22,13 @@ $suggestedTextInput-clearButton_width: 16px;
     width: 100%;
     padding: $suggestedTextInput-option_padding;
     text-align: left;
+    display: block;
+    color: inherit;
 
     &:hover,
     &:focus,
     &.isFocused {
+        color: inherit;
         background-color: $state-hover_color;
     }
 }

@@ -8,7 +8,7 @@ import { onReady } from "@library/application";
 onReady(async () => {
     const mountPoint = document.getElementById("swagger-ui");
     if (mountPoint) {
-        const { mountSwagger } = await import("../mountSwagger");
+        const { mountSwagger } = await import(/* webpackChunkName: "mountEditor" */ "../mountSwagger");
         mountSwagger();
     }
 });

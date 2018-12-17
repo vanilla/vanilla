@@ -105,7 +105,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                 blurInputOnSelect={false}
                 allowCreateWhileLoading={true}
                 controlShouldRenderValue={false}
-                isDisabled={disabled || isLoading}
+                isDisabled={disabled}
                 loadOptions={this.props.loadOptions}
                 menuIsOpen={this.isMenuVisible}
                 classNamePrefix={this.prefix}

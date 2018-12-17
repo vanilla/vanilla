@@ -126,7 +126,7 @@ class Gdn_Request implements RequestInterface {
      * @inheritdoc
      */
     public function setAssetRoot(string $assetRoot) {
-        $this->_parsedRequestElement('AssetRoot', rtrim('/'.trim($assetRoot, '/'), '/'));
+        $this->_parsedRequestElement('AssetRoot', rtrim('/' . trim($assetRoot, '/'), '/'));
         return $this;
     }
 

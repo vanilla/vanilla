@@ -15,6 +15,7 @@ interface IPanelLayoutProps extends IDeviceProps {
     toggleMobileMenu?: (isOpen: boolean) => void;
     contentTag?: string;
     growMiddleBottom?: boolean;
+    topPadding?: boolean;
 }
 
 /**
@@ -76,6 +77,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
     public static defaultProps = {
         contentTag: "div",
         growMiddleBottom: false,
+        topPadding: true,
     };
 
     public render() {
@@ -98,6 +100,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
             { noBreadcrumbs: !children.breadcrumbs },
             this.props.className,
             { inheritHeight: this.props.growMiddleBottom },
+            { hasTopPadding: this.props.topPadding },
         );
 
         // If applicable, set semantic tag, like "article"

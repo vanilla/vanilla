@@ -48,6 +48,20 @@ $panelLayout-border_color                                             : rgba($gl
             padding-top: $global-gutter_size;
         }
     }
+
+    &.isOneCol {
+        width: $global-middleColumn_width;
+        max-width: 100%;
+        margin: auto;
+
+        @include mediaQuery-panelLayout_oneColumn {
+            width: 100%;
+        }
+    }
+
+    &.hasTopPadding {
+        padding-top: 30px;
+    }
 }
 
 .overlay .panelLayout.noBreadcrumbs .panelLayout-main {
@@ -66,18 +80,6 @@ $panelLayout-border_color                                             : rgba($gl
     padding: {
         left: $global-gutter_halfSize;
         right: $global-gutter_halfSize;
-    }
-}
-
-.panelLayout {
-    &.isOneCol {
-        width: $global-middleColumn_width;
-        max-width: 100%;
-        margin: auto;
-
-        @include mediaQuery-panelLayout_oneColumn {
-            width: 100%;
-        }
     }
 }
 

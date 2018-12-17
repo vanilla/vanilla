@@ -229,7 +229,7 @@ export function downTriangle(className?: string, title: string = "▾", deg?: nu
     );
 }
 
-export function rightTriangle(title: string = `▶`, className?: string) {
+export function rightTriangle(className?: string, title: string = `▶`) {
     return downTriangle(className, title, -90);
 }
 

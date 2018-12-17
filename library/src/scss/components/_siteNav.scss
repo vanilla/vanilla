@@ -21,7 +21,8 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     position: relative;
     display: block;
     z-index: 1;
-    //margin-top: -#{$siteNav-node_padding - $global-title_fontSize * $global-condensed_lineHeight / 2 - $global-title_fontSize};
+
+    margin-top: #{$siteNav-nodeToggle_height / 2 - $siteNav-node_fontSize / 2};
 
     @include mediaQuery-panelLayout_noBleed {
         margin-left: #{($siteNav-nodeToggle_width - $siteNav-nodeToggleIcon_width) / 2 - $siteNav-spacer_width};
@@ -70,9 +71,13 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
         outline: 0;
         .siteNavNode-label {
             border: {
-                color: $global-color_primary;
+                color: $link-default_color;
             }
         }
+    }
+
+    &:hover {
+        color: $link-default_color;
     }
 
     &.hasChildren {

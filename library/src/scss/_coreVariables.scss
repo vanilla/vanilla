@@ -166,7 +166,7 @@ $global-middleColumn_paddedWidth                     : $global-middleColumn_widt
 
 $global-content_width                                : $global-panel_paddedWidth * 2 + $global-middleColumn_paddedWidth + $global-gutter_size * 3; // *3 from margin between columns and half margin on .container
 
-$global-twoColumn_breakpoint                         : 900px !default; // Generic breakpoint for 2 columns
+$global-twoColumn_breakpoint                         : 1200px !default; // Generic breakpoint for 2 columns
 $global-xs_breakpoint                                : 500px !default;
 
 // Hard coded columns

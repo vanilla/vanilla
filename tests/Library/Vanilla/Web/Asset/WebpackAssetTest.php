@@ -98,6 +98,14 @@ class WebpackAssetTest extends TestCase {
                 "cacheBuster",
                 "http://me.com/dist/testSec/test.min.js?h=cacheBuster",
             ],
+            [
+                (new Request())->setHost("me.com")
+                    ->setPath("/path-should-be-ignored")
+                    ->setRoot("/root-should-be-ignored")
+                    ->setAssetRoot("/assetRoot"),
+                "cacheBuster",
+                "http://me.com/assetRoot/dist/testSec/test.min.js?h=cacheBuster",
+            ],
         ];
     }
 }

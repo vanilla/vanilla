@@ -20,7 +20,7 @@ class MockConfig implements Contracts\ConfigurationInterface {
     /**
      * @inheritdoc
      */
-    public function get(string $key, $defaultValue = false) {
+    public function get($key, $defaultValue = false) {
         return $this->data[$key] ?? $defaultValue;
     }
 

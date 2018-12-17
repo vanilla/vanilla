@@ -18,5 +18,5 @@ interface ConfigurationInterface {
      * @param mixed $defaultValue If the parameter is not found in the group, this value will be returned.
      * @return mixed The configuration value.
      */
-    public function get(string $key, $defaultValue = false);
+    public function get($key, $defaultValue = false);
 }

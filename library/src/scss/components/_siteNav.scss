@@ -21,6 +21,7 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     position: relative;
     display: block;
     z-index: 1;
+    margin-top: -#{$siteNav-node_padding - $global-title_fontSize * $global-condensed_lineHeight / 2 - $global-title_fontSize};
 
     @include mediaQuery-panelLayout_noBleed {
         margin-left: #{($siteNav-nodeToggle_width - $siteNav-nodeToggleIcon_width) / 2 - $siteNav-spacer_width};
@@ -105,6 +106,7 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
         right: $siteNav-node_padding;
         left: $siteNav-nodeToggle_width - $siteNav-node_borderWidth;
     }
+
 }
 
 .siteNavNode-spacer {

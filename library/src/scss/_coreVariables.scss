@@ -123,7 +123,8 @@ $global_spacer                                       : $userContent_fontSize * $
 
 $global-heading_fontFamily                           : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 $global-heading_fontWeight                           : $global-fontWeight_bold !default; // Derived
-$global-heading_lineHeightRatio                      : .8;
+$global-heading_lineHeightRatio                      : .91;
+
 
 $global-body_fontFamily                              : "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
 $global-body_fontWeight                              : $global-fontWeight_normal !default; // Derived
@@ -153,17 +154,17 @@ $icon-small_size                                     : 16px !default;
     Layout
 \* -------------------------------------------------------------- */
 
-$global-gutter_size                                  : $global_spacer;
+$global-gutter_size                                  : 24px;
 $global-gutter_halfSize                              : $global-gutter_size / 2;
 $global-gutter_quarterSize                           : $global-gutter_size / 4;
 
-$global-panel_width                                  : 250px !default;
-$global-panel_paddedWidth                            : $global-panel_width + $global_gutter_size !default;
+$global-panel_width                                  : 216px !default;
+$global-panel_paddedWidth                            : $global-panel_width + $global-gutter_size * 2 !default;
 
-$global-middleColumn_width                           : 660px;
+$global-middleColumn_width                           : 672px;
+$global-middleColumn_paddedWidth                     : $global-middleColumn_width + $global-gutter_size;
 
-$global-main_width                                   : $global-panel_paddedWidth * 2 + $global-middleColumn_width !default;
-$global-main_paddedWidth                             : $global-main_width + 2 * $global-gutter_size !default;  // Derived
+$global-content_width                                : $global-panel_paddedWidth * 2 + $global-middleColumn_paddedWidth + $global-gutter_size * 3; // *3 from margin between columns and half margin on .container
 
 $global-twoColumn_breakpoint                         : 900px !default; // Generic breakpoint for 2 columns
 $global-xs_breakpoint                                : 500px !default;

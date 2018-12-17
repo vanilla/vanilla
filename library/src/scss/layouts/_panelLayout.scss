@@ -7,9 +7,9 @@
 $panelLayout_topMargin                                                : 0;
 $panelLayout_bottomMargin                                             : 48px;
 
-$panelLayout-noBleed_breakpoint                                       : $global-main_paddedWidth !default;
-$panelLayout-twoColumn_breakpoint                                     : $global-main_width !default;
-$panelLayout-oneColumn_breakpoint                                     : $global-twoColumn_breakpoint !default;
+$panelLayout-noBleed_breakpoint                                       : $global-content_width !default;
+$panelLayout-twoColumn_breakpoint                                     : $global-content_width - $global-panel_paddedWidth !default;
+$panelLayout-oneColumn_breakpoint                                     : $global-twoColumn_breakpoint - $global-panel_paddedWidth * 2 !default;
 
 $panelLayout-border_color                                             : rgba($global-border_color, .4) !default;
 
@@ -60,7 +60,7 @@ $panelLayout-border_color                                             : rgba($gl
     }
 
     &.hasTopPadding {
-        padding-top: 30px;
+        padding-top: $global_gutter_halfSize * 1.5;
     }
 }
 
@@ -102,12 +102,13 @@ $panelLayout-border_color                                             : rgba($gl
     position: relative;
     width: $global-panel_paddedWidth;
     flex-basis: $global-panel_paddedWidth;
+    margin-right: $global-gutter_size;
 }
 
 .panelLayout-right {
     width: $global-panel_paddedWidth;
     flex-basis: $global-panel_paddedWidth;
-
+    margin-left: $global-gutter_size;
 }
 
 // Middle Column

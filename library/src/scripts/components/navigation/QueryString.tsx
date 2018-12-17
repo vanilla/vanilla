@@ -10,10 +10,13 @@ import { withRouter, RouteComponentProps } from "react-router";
 import isEqual from "lodash/isEqual";
 import throttle from "lodash/throttle";
 
+interface IStringMap {
+    [key: string]: any;
+}
+
 interface IProps extends RouteComponentProps<any> {
-    value: {
-        [key: string]: any;
-    };
+    value: IStringMap;
+    defaults?: IStringMap;
 }
 
 /**
@@ -29,9 +32,39 @@ class QueryString extends React.Component<IProps> {
     }
 
     public componentDidUpdate(prevProps: IProps) {
-        if (!isEqual(prevProps.value, this.props.value)) {
+        if (
+            !isEqual(
+                this.getFilteredValue(prevProps.value, prevProps.defaults || {}),
+                this.getFilteredValue(this.props.value, this.props.defaults || {}),
+            )
+        ) {
             this.updateQueryString();
         }
+    }
+
+    /**
+     * Get a version of the query string object with only keys that have values.
+     */
+    private getFilteredValue(inputValue: IStringMap, defaults: IStringMap): IStringMap | null {
+        let filteredValue: IStringMap | null = null;
+
+        for (const [key, value] of Object.entries(inputValue)) {
+            if (value === null || value === undefined || value === "") {
+                continue;
+            }
+
+            if (defaults[key] === value) {
+                continue;
+            }
+
+            if (filteredValue === null) {
+                filteredValue = {};
+            }
+
+            filteredValue[key] = value;
+        }
+
+        return filteredValue;
     }
 
     /**
@@ -41,7 +74,7 @@ class QueryString extends React.Component<IProps> {
      */
     private updateQueryString = throttle(() => {
         requestAnimationFrame(() => {
-            const query = qs.stringify(this.props.value);
+            const query = qs.stringify(this.getFilteredValue(this.props.value, this.props.defaults || {}));
             this.props.history.replace({
                 ...this.props.location,
                 search: query,

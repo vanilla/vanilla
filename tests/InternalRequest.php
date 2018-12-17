@@ -234,7 +234,7 @@ class InternalRequest extends HttpRequest implements RequestInterface {
      * @inheritdoc
      */
     public function urlDomain($withDomain = true): string {
-        return "/";
+        return false;
     }
 
     /**

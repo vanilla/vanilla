@@ -21,6 +21,13 @@ use VanillaTests\Fixtures\Request;
 class WebpackAssetProviderTest extends TestCase {
 
     /**
+     * @inheritdoc
+     */
+    public function setUp() {
+        vfsStream::setup();
+    }
+
+    /**
      * Test the hot reload functionality.
      */
     public function testHotReload() {

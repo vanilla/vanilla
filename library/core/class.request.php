@@ -101,7 +101,7 @@ class Gdn_Request implements RequestInterface {
      * @param string? $assetRoot An asset root to set.
      * @return string Returns the current asset root.
      *
-     * @deprecated 2.8. Use the explicit asset functions instead.
+     * @deprecated 2.8 Use the explicit asset functions instead.
      */
     public function assetRoot($assetRoot = null) {
         if ($assetRoot !== null) {

@@ -152,6 +152,11 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addAlias(Gdn::AliasDispatcher)
 
+    ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
+    ->setConstructorArgs([
+        'deploymentTime' => ContainerUtils::config('Garden.Deployed')
+    ])
+
     ->rule(\Vanilla\Web\Asset\WebpackAssetProvider::class)
     ->addCall('setHotReloadEnabled', [
         ContainerUtils::config('HotReload.Enabled'),

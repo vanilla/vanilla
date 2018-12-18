@@ -45,20 +45,6 @@ class SwaggerUIPlugin extends Gdn_Plugin {
 
         $folder = 'plugins/'.$this->getAddon()->getKey();
 
-        $relScripts = ['js/custom.js'];
-        $js = [];
-        foreach ($relScripts as $path) {
-            $search = LegacyAssetModel::jsPath($path, $folder);
-            if (!$search) {
-                continue;
-            }
-            list($path, $url) = $search;
-            $js[] = asset($url, false, true);
-        }
-        $sender->setData('js', $js);
-
-        $sender->addCssFile('swagger-ui.css', $folder);
-
         $sender->title(t('Vanilla API v2'));
         $sender->render('swagger', 'settings', $folder);
     }

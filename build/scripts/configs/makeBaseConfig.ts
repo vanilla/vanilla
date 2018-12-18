@@ -112,9 +112,6 @@ ${chalk.green(aliases)}`;
             new webpack.DefinePlugin({
                 __BUILD__SECTION__: JSON.stringify(section),
             }),
-            new WebpackBar({
-                name: section,
-            }),
         ] as any[],
         resolve: {
             modules: modulePaths,
@@ -150,6 +147,15 @@ ${chalk.green(aliases)}`;
 
     if (options.fix) {
         config.plugins.unshift(getPrettierPlugin());
+    }
+
+    // This is the only flag we are given by infrastructure to indicate we are in a lower memory environment.
+    if (!options.lowMemory) {
+        config.plugins.push(
+            new WebpackBar({
+                name: section,
+            }),
+        );
     }
 
     return config;

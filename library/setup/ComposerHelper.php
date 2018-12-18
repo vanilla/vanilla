@@ -17,6 +17,7 @@ class ComposerHelper {
 
     const NODE_ARGS_ENV = "VANILLA_BUILD_NODE_ARGS";
     const DISABLE_VALIDATION_ENV = "VANILLA_BUILD_DISABLE_CODE_VALIDATION";
+    const LOW_MEMORY_ENV = "VANILLA_BUILD_LOW_MEMORY";
     const DISABLE_AUTO_BUILD = "VANILLA_BUILD_DISABLE_AUTO_BUILD";
 
     /**
@@ -80,8 +81,12 @@ class ComposerHelper {
         }
 
         $nodeArgs = getenv(self::NODE_ARGS_ENV) ?: "";
-        $disableValidationFlag = getenv(self::DISABLE_VALIDATION_ENV) ? "--disable-validation" : "";
-        $buildCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildScript -i $disableValidationFlag";
+
+        // The disable validation flag was used to enable low memory optimizations.
+        // The build no longer does any validation, however, so a new env variable has been added.
+        // So, we check for both.
+        $lowMemoryFlag = getenv(self::DISABLE_VALIDATION_ENV) || getenv(self::LOW_MEMORY_ENV) ? "--low-memory" : "";
+        $buildCommand = "TS_NODE_PROJECT=$tsConfig node $nodeArgs -r $tsNodeRegister $buildScript -i $lowMemoryFlag";
 
         printf("\nBuilding frontend assets\n");
         printf("\n$buildCommand\n");

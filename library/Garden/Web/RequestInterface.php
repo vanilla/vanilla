@@ -57,6 +57,21 @@ interface RequestInterface {
     public function setRoot($root);
 
     /**
+     * Get the root folder for static files.
+     *
+     * @return string Returns the root as a string.
+     */
+    public function getAssetRoot();
+
+    /**
+     * Set the root folder for static files.
+     *
+     * @param string $root The new root path of files.
+     * @return $this
+     */
+    public function setAssetRoot(string $root);
+
+    /**
      * Get the path of the request.
      *
      * @return string
@@ -147,4 +162,12 @@ interface RequestInterface {
      * @return bool Returns **true** if the header exists or **false** otherwise.
      */
     public function hasHeader($header);
+
+    /**
+     * Conditionally gets the domain of the request.
+     *
+     * @param string|bool $withDomain Information about how to return the domain.
+     * @return string Returns the domain.
+     */
+    public function urlDomain($withDomain = true);
 }

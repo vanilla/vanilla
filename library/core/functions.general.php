@@ -326,7 +326,7 @@ if (!function_exists('asset')) {
         if (isUrl($destination)) {
             $result = $destination;
         } else {
-            $result = Gdn::request()->urlDomain($withDomain).Gdn::request()->assetRoot().'/'.ltrim($destination, '/');
+            $result = Gdn::request()->urlDomain($withDomain).Gdn::request()->getAssetRoot().'/'.ltrim($destination, '/');
         }
 
         if ($addVersion) {
@@ -3448,7 +3448,7 @@ if (!function_exists('smartAsset')) {
         if (isUrl($destination)) {
             $result = $destination;
         } else {
-            $result = Gdn::request()->urlDomain($withDomain).Gdn::request()->assetRoot().'/'.ltrim($destination, '/');
+            $result = Gdn::request()->urlDomain($withDomain).Gdn::request()->getAssetRoot().'/'.ltrim($destination, '/');
         }
 
         if ($addVersion) {

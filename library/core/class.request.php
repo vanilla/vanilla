@@ -100,15 +100,36 @@ class Gdn_Request implements RequestInterface {
      *
      * @param string? $assetRoot An asset root to set.
      * @return string Returns the current asset root.
+     *
+     * @deprecated 2.8 Use the explicit asset functions instead.
      */
     public function assetRoot($assetRoot = null) {
         if ($assetRoot !== null) {
-            $result = $this->_parsedRequestElement('AssetRoot', rtrim('/'.trim($assetRoot, '/'), '/'));
+            deprecated(__FUNCTION__, "setAssetRoot");
+            $this->setAssetRoot($assetRoot);
+            return $assetRoot;
         } else {
-            $result = $this->_parsedRequestElement('AssetRoot');
+            deprecated(__FUNCTION__, "addAssetRoot");
+            $result = $this->getAssetRoot();
         }
         return $result;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAssetRoot() {
+        return $this->_parsedRequestElement('AssetRoot');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAssetRoot(string $assetRoot) {
+        $this->_parsedRequestElement('AssetRoot', rtrim('/' . trim($assetRoot, '/'), '/'));
+        return $this;
+    }
+
 
     /**
      * Generic chainable object creation method.
@@ -961,7 +982,7 @@ class Gdn_Request implements RequestInterface {
 
         $parsedWebRoot = trim($webRoot, '/');
         $this->webRoot($parsedWebRoot);
-        $this->assetRoot($parsedWebRoot);
+        $this->setAssetRoot($parsedWebRoot);
 
         /**
          * Resolve Domain

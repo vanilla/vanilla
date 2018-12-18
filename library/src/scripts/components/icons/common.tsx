@@ -107,12 +107,13 @@ export function closeCompact(className?: string) {
             className={classNames("icon", "icon-closeCompact", className)}
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
-            viewBox="0 0 9.53 9.53"
+            viewBox="0 0 9.5 9.5"
         >
             <title>{title}</title>
             <path
                 fill="currentColor"
-                d="M3.35,4.76l-3-3A1,1,0,0,1,.28.3a1,1,0,0,1,1.41,0l0,0,3,3,3-3a1,1,0,0,1,1.42,0,1,1,0,0,1,0,1.41l0,0-3,3,3,3A1,1,0,0,1,7.8,9.22l-3-3-3,3A1,1,0,0,1,.28,7.83l0,0Z"
+                d="M3.38,4.75l-3-3A1,1,0,0,1,.26.33s0,0,0,0a1.05,1.05,0,0,1,1.45,0h0l3,3,3-3A1,1,0,0,1,9.18.3h0a1,1,0,0,1,0,1.4h0l-3,3,3,3a1,1,0,0,1,.06,1.41,1,1,0,0,1-1.38.09l-3-3-3,3a1.05,1.05,0,0,1-1.47.07A1,1,0,0,1,.29,7.8h0Z"
+                transform="translate(-0.01 -0.01)"
             />
         </svg>
     );

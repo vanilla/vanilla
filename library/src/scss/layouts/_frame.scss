@@ -102,10 +102,6 @@ $frame-panel_minHeight: 500px;
     height: $formElement_height;
     flex-basis: $formElement_height;
     width: $formElement_height;
-
-    @include mediaQuery-panelLayout_xs {
-        display: none;
-    }
 }
 
 .frameHeaderWithAction-action,

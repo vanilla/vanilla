@@ -400,7 +400,7 @@
 }
 
 .insertMedia-insert {
-    margin-bottom: 3px;
+    width: auto;
 }
 
 .richEditorFlyout {
@@ -542,4 +542,9 @@
     padding: 0;
     width: $icon-default_size;
     size: $icon-default_size;
+}
+
+
+.richEditor-popoverDescription {
+    margin-bottom: .5em;
 }

@@ -12,6 +12,7 @@ import SmartLink from "@library/components/navigation/SmartLink";
 import TabHandler from "@library/TabHandler";
 import classNames from "classnames";
 import * as React from "react";
+import Hoverable from "@library/utils/Hoverable";
 
 interface IProps extends INavigationTreeItem {
     activeRecord: IActiveRecord;
@@ -20,6 +21,7 @@ interface IProps extends INavigationTreeItem {
     openParent?: () => void;
     depth: number;
     collapsible?: boolean;
+    onItemHover?(item: INavigationTreeItem);
 }
 
 interface IState {
@@ -57,6 +59,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                         openParent={this.openSelfAndParents}
                         depth={this.props.depth + 1}
                         collapsible={collapsible}
+                        onItemHover={this.props.onItemHover}
                     />
                 );
             });
@@ -88,17 +91,22 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                     </span>
                 )}
                 <div className={classNames("siteNavNode-contents")}>
-                    <SmartLink
-                        onKeyDownCapture={this.handleKeyDown}
-                        className={classNames("siteNavNode-link", {
-                            hasChildren,
-                            isFirstLevel: this.props.depth === 0,
-                        })}
-                        tabIndex={0}
-                        to={this.props.url}
-                    >
-                        <span className="siteNavNode-label">{this.props.name}</span>
-                    </SmartLink>
+                    <Hoverable onHover={this.handleHover} duration={50}>
+                        {provided => (
+                            <SmartLink
+                                {...provided}
+                                onKeyDownCapture={this.handleKeyDown}
+                                className={classNames("siteNavNode-link", {
+                                    hasChildren,
+                                    isFirstLevel: this.props.depth === 0,
+                                })}
+                                tabIndex={0}
+                                to={this.props.url}
+                            >
+                                <span className="siteNavNode-label">{this.props.name}</span>
+                            </SmartLink>
+                        )}
+                    </Hoverable>
                     {hasChildren && (
                         <ul
                             className={classNames("siteNavNode-children", depthClass, {
@@ -113,6 +121,15 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
             </li>
         );
     }
+
+    /**
+     * Call the hover callback with the item data.
+     */
+    private handleHover = () => {
+        if (this.props.onItemHover) {
+            this.props.onItemHover(this.props);
+        }
+    };
 
     /**
      * Opens node. Optional callback if it's already open.

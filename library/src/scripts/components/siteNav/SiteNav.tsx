@@ -20,6 +20,7 @@ interface IProps extends RouteComponentProps<{}> {
     children: INavigationTreeItem[];
     collapsible: boolean;
     bottomCTA: React.ReactNode;
+    onItemHover?(item: INavigationTreeItem);
 }
 
 export interface IState {
@@ -42,6 +43,7 @@ export class SiteNav extends React.Component<IProps, IState> {
                               titleID={this.titleID}
                               depth={0}
                               collapsible={this.props.collapsible}
+                              onItemHover={this.props.onItemHover}
                           />
                       );
                   })

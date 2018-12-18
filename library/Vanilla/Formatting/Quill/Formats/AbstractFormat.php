@@ -47,9 +47,9 @@ abstract class AbstractFormat {
     /**
      * Get the string of the attribute key in the insert that determines if the blot applies or not. This key should lead to a boolean value in the attributes array of the insert.
      *
-     * @return string
+     * @return string|array
      */
-    abstract protected static function getAttributeLookupKey(): string;
+    abstract protected static function getAttributeLookupKey();
 
     /**
      * Get the formats allowed that cannot be "nested" inside this one.
@@ -80,8 +80,15 @@ abstract class AbstractFormat {
 
         foreach($operations as $op) {
             $attributes = val("attributes", $op, []);
-            if (array_key_exists(static::getAttributeLookupKey(), $attributes)) {
-                $result = true;
+            $lookupKeys = static::getAttributeLookupKey();
+            if (!is_array()) {
+                $lookupKeys = [$lookupKeys];
+            }
+
+            foreach ($lookupKeys as $lookupKey) {
+                if (array_key_exists($lookupKey, $attributes)) {
+                    $result = true;
+                }
             }
         }
 

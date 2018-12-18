@@ -81,7 +81,7 @@ abstract class AbstractFormat {
         foreach($operations as $op) {
             $attributes = val("attributes", $op, []);
             $lookupKeys = static::getAttributeLookupKey();
-            if (!is_array()) {
+            if (!is_array($lookupKeys)) {
                 $lookupKeys = [$lookupKeys];
             }
 

@@ -92,7 +92,6 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                 onClick={this.close}
                                 className="compactMeBox-closeModal"
                                 baseClass={ButtonBaseClass.CUSTOM}
-                                compact={true}
                             />
                             <Tabs
                                 label={t("My Account Tab")}

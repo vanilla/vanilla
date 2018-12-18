@@ -5,7 +5,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { close, closeCompact } from "@library/components/icons/common";
+import { close } from "@library/components/icons/common";
 import { t } from "@library/application";
 import { ILegacyProps } from "@library/@types/legacy";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
@@ -15,7 +15,6 @@ interface IProps extends Partial<ILegacyProps> {
     disabled?: boolean;
     onClick: any;
     baseClass?: ButtonBaseClass;
-    compact?: boolean;
 }
 
 /**
@@ -25,7 +24,6 @@ export default class CloseButton extends React.PureComponent<IProps> {
     public static defaultProps = {
         legacyMode: false,
         baseClass: ButtonBaseClass.ICON,
-        compact: false,
     };
 
     /**
@@ -47,7 +45,6 @@ export default class CloseButton extends React.PureComponent<IProps> {
             );
         } else {
             const componentClasses = classNames("buttonClose", this.props.className);
-            const iconPadding = !this.props.legacyMode;
             return (
                 <Button
                     disabled={this.props.disabled}
@@ -57,7 +54,7 @@ export default class CloseButton extends React.PureComponent<IProps> {
                     onClick={this.props.onClick}
                     baseClass={this.props.baseClass}
                 >
-                    {this.props.compact ? closeCompact() : close("isSmall", iconPadding)}
+                    {close()}
                 </Button>
             );
         }

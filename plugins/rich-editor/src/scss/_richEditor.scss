@@ -27,14 +27,18 @@
     }
 }
 
+$richEditor-scrollContainer_overshoot: 48px;
+
 .richEditor-scrollContainer {
+    position: relative;
     overflow-y: auto;
     height: auto;
-    width: calc(100% + 68px);
-    margin-left: -34px;
-    padding-left: 34px;
-    padding-right: 34px;
-    position: relative;
+    width: calc(100% + #{$richEditor-scrollContainer_overshoot * 2});
+    margin-left: -$richEditor-scrollContainer_overshoot;
+    padding: {
+        left: $richEditor-scrollContainer_overshoot;
+        right: $richEditor-scrollContainer_overshoot;
+    }
 }
 
 .richEditor-frame {
@@ -60,10 +64,10 @@
     align-items: center;
     justify-content: center;
     top: $richEditor-pilcrow_offset;
-    left: 0;
+    left: $richEditor_horizontalPadding - $icon_default_size + 2px;
     transform: translateX(-100%);
     height: $richEditor-floatingButton_size;
-    width: $richEditor_horizontalPadding;
+    width: $icon_default_size;
     z-index: 1;
     animation: fadein $richEditor-pilcrowAnimation_duration ease;
     animation-iteration-count: 1;
@@ -280,7 +284,7 @@
     max-width: $richEditor-insertLink_width;
     width: 100%;
     padding: {
-        left: 5px;
+        left: 9px;
     }
 }
 
@@ -524,7 +528,6 @@
         top: calc(50% + #{$richEditor_horizontalPadding / 2 - $formElement-borderWidth});
     }
 }
-
 
 
 // Emoji Groups

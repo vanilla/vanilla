@@ -76,7 +76,6 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                                                 className="frameHeader-close"
                                                 onClick={this.close}
                                                 baseClass={ButtonBaseClass.CUSTOM}
-                                                compact={true}
                                             />
                                         </div>
                                     </header>

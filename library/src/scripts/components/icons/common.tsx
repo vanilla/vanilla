@@ -79,35 +79,14 @@ export function bottomChevron(className?: string) {
     );
 }
 
-export function close(className?: string, noPadding: boolean = false) {
+export function close(className?: string) {
     const title = t("Close");
-    const viewBox = noPadding ? "0 0 16 16" : "0 0 24 24";
-    const transform = noPadding ? "translate(-4 -4)" : "";
     return (
         <svg
             className={classNames("icon", "icon-close", className)}
             xmlns="http://www.w3.org/2000/svg"
-            viewBox={viewBox}
-            aria-hidden="true"
-        >
-            <title>{title}</title>
-            <path
-                transform={transform}
-                fill="currentColor"
-                d="M12,10.6293581 L5.49002397,4.11938207 C5.30046135,3.92981944 4.95620859,3.96673045 4.69799105,4.22494799 L4.22494799,4.69799105 C3.97708292,4.94585613 3.92537154,5.29601344 4.11938207,5.49002397 L10.6293581,12 L4.11938207,18.509976 C3.92981944,18.6995387 3.96673045,19.0437914 4.22494799,19.3020089 L4.69799105,19.775052 C4.94585613,20.0229171 5.29601344,20.0746285 5.49002397,19.8806179 L12,13.3706419 L18.509976,19.8806179 C18.6995387,20.0701806 19.0437914,20.0332695 19.3020089,19.775052 L19.775052,19.3020089 C20.0229171,19.0541439 20.0746285,18.7039866 19.8806179,18.509976 L13.3706419,12 L19.8806179,5.49002397 C20.0701806,5.30046135 20.0332695,4.95620859 19.775052,4.69799105 L19.3020089,4.22494799 C19.0541439,3.97708292 18.7039866,3.92537154 18.509976,4.11938207 L12,10.6293581 Z"
-            />
-        </svg>
-    );
-}
-
-export function closeCompact(className?: string) {
-    const title = t("Close");
-    return (
-        <svg
-            className={classNames("icon", "icon-closeCompact", className)}
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
             viewBox="0 0 9.5 9.5"
+            aria-hidden="true"
         >
             <title>{title}</title>
             <path

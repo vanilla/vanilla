@@ -11,6 +11,9 @@ import Formatter from "@rich-editor/quill/Formatter";
 import { IFormats, RangeStatic } from "quill/core";
 import { spoiler, codeBlock, blockquote, heading3, heading2, pilcrow } from "@library/components/icons/editorIcons";
 import classNames from "classnames";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
+import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 
 interface IProps {
     formatter: Formatter;
@@ -42,7 +45,7 @@ export default class ParagraphToolbarMenuItems extends React.PureComponent<IProp
     private get menuItemData() {
         const { activeFormats } = this.props;
         let isParagraphEnabled = true;
-        ["header", "blockquote-line", "codeBlock", "spoiler-line"].forEach(item => {
+        ["header", BlockquoteLineBlot.blotName, CodeBlockBlot.blotName, SpoilerLineBlot.blotName].forEach(item => {
             if (item in activeFormats) {
                 isParagraphEnabled = false;
             }
@@ -76,22 +79,22 @@ export default class ParagraphToolbarMenuItems extends React.PureComponent<IProp
                 icon: blockquote(),
                 label: t("Format as blockquote"),
                 onClick: this.formatBlockquote,
-                isActive: activeFormats["blockquote-line"] === true,
-                isDisabled: activeFormats["blockquote-line"] === true,
+                isActive: activeFormats[BlockquoteLineBlot.blotName] === true,
+                isDisabled: activeFormats[BlockquoteLineBlot.blotName] === true,
             },
             {
                 icon: codeBlock(),
                 label: t("Format as code block"),
                 onClick: this.formatCodeBlock,
-                isActive: activeFormats.codeBlock === true,
-                isDisabled: activeFormats.codeBlock === true,
+                isActive: activeFormats[CodeBlockBlot.blotName] === true,
+                isDisabled: activeFormats[CodeBlockBlot.blotName] === true,
             },
             {
                 icon: spoiler("richEditorButton-icon"),
                 label: t("Format as spoiler"),
                 onClick: this.formatSpoiler,
-                isActive: activeFormats["spoiler-line"] === true,
-                isDisabled: activeFormats["spoiler-line"] === true,
+                isActive: activeFormats[SpoilerLineBlot.blotName] === true,
+                isDisabled: activeFormats[SpoilerLineBlot.blotName] === true,
             },
         ];
     }

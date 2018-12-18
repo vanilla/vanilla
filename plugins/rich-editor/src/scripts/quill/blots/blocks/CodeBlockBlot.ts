@@ -5,9 +5,6 @@
  */
 
 import CodeBlock from "quill/formats/code";
-import Text from "quill/blots/text";
-import Break from "quill/blots/break";
-import Cursor from "quill/blots/cursor";
 
 export default class CodeBlockBlot extends CodeBlock {
     public static create(value) {

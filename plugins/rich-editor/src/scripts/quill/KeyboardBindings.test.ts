@@ -8,9 +8,10 @@ import Delta from "quill-delta";
 import Quill from "quill/core";
 import KeyboardBindings from "@rich-editor/quill/KeyboardBindings";
 import { expect } from "chai";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 const LINE_FORMATS = ["blockquote-line", "spoiler-line"];
 
-const MULTI_LINE_FORMATS = [...LINE_FORMATS, "codeBlock"];
+const MULTI_LINE_FORMATS = [...LINE_FORMATS, CodeBlockBlot.blotName];
 
 describe("KeyboardBindings", () => {
     let quill: Quill;
@@ -69,7 +70,7 @@ describe("KeyboardBindings", () => {
 
     it("handleCodeBlockEnter", () => {
         const delta = new Delta().insert("line\n\n\n", {
-            codeBlock: true,
+            [CodeBlockBlot.blotName]: true,
         });
         quill.setContents(delta);
 
@@ -85,7 +86,7 @@ describe("KeyboardBindings", () => {
             {
                 insert: "\n",
                 attributes: {
-                    ["codeBlock"]: true,
+                    [CodeBlockBlot.blotName]: true,
                 },
             },
             {
@@ -180,7 +181,7 @@ describe("KeyboardBindings", () => {
             length: 0,
         };
 
-        if (blotName === "codeBlock") {
+        if (blotName === CodeBlockBlot.blotName) {
             keyboardBindings.handleCodeBlockBackspace(selection);
         } else {
             keyboardBindings.handleMultiLineBackspace(selection);

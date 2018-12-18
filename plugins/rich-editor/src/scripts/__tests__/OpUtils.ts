@@ -46,7 +46,7 @@ export default class OpUtils {
     public static strike(content: string = "TEST") {
         return OpUtils.op(content, { [StrikeBlot.blotName]: true });
     }
-    public static codeInline(content: string = "TEST") {
+    public static code(content: string = "TEST") {
         return OpUtils.op(content, { [CodeBlot.blotName]: true });
     }
     public static link(href: string = OpUtils.DEFAULT_LINK, content: string = "TEST") {
@@ -91,8 +91,8 @@ export const inlineFormatOps = [
         name: "link",
     },
     {
-        op: OpUtils.codeInline(),
-        name: "codeInline",
+        op: OpUtils.code(),
+        name: "code",
     },
 ];
 export const blockFormatOps = [

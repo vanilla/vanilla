@@ -39,6 +39,7 @@ $frame-panel_minHeight: 500px;
     min-height: $frame-header_minHeight;
     padding: 0 $frame-header_spacing;
     z-index: 1;
+    border-bottom: solid $overlay-border_color 1px;
 }
 
 .frameFooter {
@@ -113,6 +114,7 @@ $frame-panel_minHeight: 500px;
 
 .frameBody {
     position: relative;
+    flex-grow: 1;
     max-height: 100%;
     overflow: auto;
     padding: {
@@ -145,14 +147,26 @@ $frame-panel_minHeight: 500px;
 
 .framePanel {
     position: relative;
+    flex-grow: 1;
     height: 100%;
     background-color: $frame-bgColor;
     overflow: auto;
     max-height: calc(100vh - #{$frame-header_minHeight + $frame-footer_minHeight + $frame_padding * 2});
 
+
+    > .inputBlock {
+        &.isFirst {
+            margin-top: $global_gutter_halfSize;
+        }
+        &.isLast {
+            margin-bottom: $global_gutter_halfSize;
+        }
+    }
 }
 
 .frameFooter-markRead.buttonAsText {
     font-weight: $global-fontWeight_semiBold;
     color: $global-color_primary;
 }
+
+

@@ -34,6 +34,7 @@ export interface IInputBlockProps extends IOptionalComponentID {
     descriptionID?: string;
     errors?: IFieldError[];
     baseClass?: InputTextBlockBaseClass;
+    legacyMode?: boolean;
 }
 
 interface IState {

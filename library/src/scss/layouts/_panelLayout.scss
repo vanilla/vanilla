@@ -46,6 +46,10 @@ $panelLayout-border_color                                             : rgba($gl
     &.noBreadcrumbs {
         > .panelLayout-main {
             padding-top: $global-gutter_size;
+
+            @include mediaQuery-panelLayout_oneColumn {
+                padding-top: 0;
+            }
         }
     }
 

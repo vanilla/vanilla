@@ -60,7 +60,7 @@ export default class NotificationsContents extends React.Component<IProps> {
                         />
                     </FramePanel>
                 </FrameBody>
-                <FrameFooter className="isShadowed isCompact">
+                <FrameFooter>
                     <LinkAsButton
                         className="headerDropDown-footerButton frameFooter-allButton button-pushLeft"
                         to={"/profile/notifications"}

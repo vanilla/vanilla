@@ -66,22 +66,6 @@ $frame-footer_boxShadow: 0 -1px 2px 0 $overlay_bgColor;
         margin-bottom: auto;
         max-height: 100vh;
     }
-
-    &:not(.isCompact) {
-        .frameHeader {
-            box-shadow: $frame-header_boxShadow;
-            min-height: $modal-headerFooter_minHeight;
-            padding: {
-                top: $modal-headerFooter_verticalPadding;
-                bottom: $modal-headerFooter_verticalPadding;
-            }
-        }
-
-        .frameFooter {
-            min-height: $modal-headerFooter_minHeight;
-            box-shadow: $frame-footer_boxShadow;
-        }
-    }
 }
 
 .modal-scroll {

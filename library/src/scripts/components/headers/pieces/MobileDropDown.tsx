@@ -12,11 +12,10 @@ import ModalSizes from "@library/components/modal/ModalSizes";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { chevronUp, downTriangle } from "@library/components/icons/common";
 import { Panel } from "@library/components/layouts/PanelLayout";
-import { Frame, FrameBody, FrameFooter, FrameHeader, FramePanel } from "@library/components/frame";
+import { Frame, FrameBody, FrameFooter } from "@library/components/frame";
 import SmartAlign from "@library/components/SmartAlign";
 import Heading from "@library/components/Heading";
 import CloseButton from "@library/components/CloseButton";
-import { BackLink } from "@library/components/navigation/BackLink";
 import FlexSpacer from "@library/components/FlexSpacer";
 
 export interface IProps {
@@ -73,11 +72,16 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                                             <SmartAlign>{title}</SmartAlign>
                                         </Heading>
                                         <div className="frameHeader-closePosition">
-                                            <CloseButton className="frameHeader-close" onClick={this.close} />
+                                            <CloseButton
+                                                className="frameHeader-close"
+                                                onClick={this.close}
+                                                baseClass={ButtonBaseClass.CUSTOM}
+                                                compact={true}
+                                            />
                                         </div>
                                     </header>
                                     <FrameBody>{children}</FrameBody>
-                                    <FrameFooter className="isCompact">
+                                    <FrameFooter>
                                         <Button
                                             onClick={this.close}
                                             baseClass={ButtonBaseClass.CUSTOM}

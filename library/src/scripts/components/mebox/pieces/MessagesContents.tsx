@@ -61,7 +61,7 @@ export default class MessagesContents extends React.Component<IProps> {
                         />
                     </FramePanel>
                 </FrameBody>
-                <FrameFooter className="isShadowed isCompact">
+                <FrameFooter>
                     <LinkAsButton
                         className="headerDropDown-footerButton headerDropDown-allButton button-pushLeft"
                         to={"/messages/inbox"}

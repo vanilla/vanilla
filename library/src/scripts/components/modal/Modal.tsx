@@ -99,6 +99,7 @@ export default class Modal extends React.Component<IProps, IState> {
                             isLarge: size === ModalSizes.LARGE,
                             isMedium: size === ModalSizes.MEDIUM,
                             isSmall: size === ModalSizes.SMALL,
+                            isShadowed: size === ModalSizes.LARGE || ModalSizes.MEDIUM || ModalSizes.SMALL,
                         },
                         this.props.className,
                     )}

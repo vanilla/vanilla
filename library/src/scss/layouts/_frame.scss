@@ -107,6 +107,10 @@ $frame-panel_minHeight: 500px;
     transform: translateX(12px); // offset so the side of the icon lines up, not the edge of the button
 }
 
+.frameHeader-closePosition {
+    margin-left: auto;
+}
+
 .frameBody {
     position: relative;
     max-height: 100%;

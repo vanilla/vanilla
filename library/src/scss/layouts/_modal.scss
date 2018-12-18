@@ -66,6 +66,16 @@ $frame-footer_boxShadow: 0 -1px 2px 0 $overlay_bgColor;
         margin-bottom: auto;
         max-height: 100vh;
     }
+
+    &.isShadowed {
+        @include shadow-dropDown;
+        border: {
+            radius: $global_borderRadius;
+            style: solid;
+            width: 1px;
+            color: $global-border_color;
+        }
+    }
 }
 
 .modal-scroll {

@@ -11,6 +11,10 @@
         display: block;
         margin: 0;
     }
+
+    .richEditorParagraphMenu {
+        left: 0;
+    }
 }
 
 .userContent {
@@ -249,7 +253,6 @@ body.hasRichEditor {
         }
     }
 }
-
 
 // Mobile
 body.isMobile {

@@ -110,7 +110,9 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
             <div className={panelClasses}>
                 {children.breadcrumbs && (
                     <div className="panelLayout-container">
-                        <Panel className={classNames("panelLayout-left")} ariaHidden={true} />
+                        {shouldRenderLeftPanel && (
+                            <Panel className={classNames("panelLayout-left")} ariaHidden={true} />
+                        )}
                         <Panel
                             className={classNames("panelLayout-content", "panel-breadcrumbs", {
                                 hasAdjacentPanel: shouldRenderLeftPanel,

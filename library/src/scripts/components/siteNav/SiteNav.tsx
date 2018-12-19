@@ -14,7 +14,6 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import { t } from "@library/application";
 import { PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
 import Heading from "@library/components/Heading";
-import has = Reflect.has;
 
 interface IProps extends RouteComponentProps<{}> {
     activeRecord: IActiveRecord;

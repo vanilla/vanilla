@@ -29,6 +29,11 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     }
 }
 
+.siteNav-title {
+    font-size: $global-large_fontSize;
+    font-weight: $global-fontWeight_bold;
+}
+
 .siteNav-children {
     position: relative;
     display: block;

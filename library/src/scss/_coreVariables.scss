@@ -245,7 +245,7 @@ $widget-contents_bg                                  : $global-widget_bg !defaul
 $formElement_borderWidth                             : 1px !default;
 $formElement_fullBorderWidth                         : $formElement_borderWidth * 2;
 $formElement_height                                  : $utility-baseUnit * 6; // Derived
-$formElement_margin                                  : $utility-baseUnit * 4; // Derived
+$formElement_margin                                  : $utility-baseUnit * 2; // Derived
 $formElement_heightWithBorder                        : $formElement_height + 2 * $formElement_borderWidth; // Derived
 $formElement_borderColor                             : $global-border_color !default; // Derived
 $formElement_borderStyle                             : solid;

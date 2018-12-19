@@ -13,6 +13,8 @@ $panelLayout-oneColumn_breakpoint                                     : $panelLa
 
 $panelLayout-border_color                                             : rgba($global-border_color, .4) !default;
 
+$panelLayout-panelAndSpacingWidth                                     : $global-panel_paddedWidth + $global-gutter_size;
+
 @mixin mediaQuery-panelLayout_noBleed {
     @media (max-width: #{$panelLayout-noBleed_breakpoint}) {
         @content;
@@ -90,6 +92,7 @@ $panelLayout-border_color                                             : rgba($gl
 .panelLayout-container {
     display: flex;
     flex-wrap: nowrap;
+    justify-content: space-between;
 }
 
 .panelLayout-top {
@@ -107,23 +110,22 @@ $panelLayout-border_color                                             : rgba($gl
     position: relative;
     width: $global-panel_paddedWidth;
     flex-basis: $global-panel_paddedWidth;
-    margin-right: $global-gutter_size;
 }
 
 .panelLayout-right {
     width: $global-panel_paddedWidth;
     flex-basis: $global-panel_paddedWidth;
-    margin-left: $global-gutter_size;
 }
 
 // Middle Column
 .panelLayout-middle {
+    justify-content: space-between;
     flex-grow: 1;
     width: 100%;
 
     &.hasAdjacentPanel {
-        flex-basis: calc(100% - #{$global-panel_paddedWidth});
-        max-width: calc(100% - #{$global-panel_paddedWidth});
+        flex-basis: calc(100% - #{$panelLayout-panelAndSpacingWidth});
+        max-width: calc(100% - #{$panelLayout-panelAndSpacingWidth});
 
         @include mediaQuery-panelLayout_oneColumn {
             width: 100%;
@@ -148,8 +150,8 @@ $panelLayout-border_color                                             : rgba($gl
     }
 
     &.hasAdjacentPanel {
-        flex-basis: calc(100% - #{$global-panel_paddedWidth});
-        max-width: calc(100% - #{$global-panel_paddedWidth});
+        flex-basis: calc(100% - #{$panelLayout-panelAndSpacingWidth});
+        max-width: calc(100% - #{$panelLayout-panelAndSpacingWidth});
 
         @include mediaQuery-panelLayout_oneColumn {
             flex-basis: 100%;
@@ -163,10 +165,11 @@ $panelLayout-border_color                                             : rgba($gl
     display: flex;
     flex-grow: 1;
     width: 100%;
+    justify-content: space-between;
 
     &.hasAdjacentPanel {
-        flex-basis: calc(100% - #{$global-panel_paddedWidth});
-        max-width: calc(100% - #{$global-panel_paddedWidth});
+        flex-basis: calc(100% - #{$panelLayout-panelAndSpacingWidth});
+        max-width: calc(100% - #{$panelLayout-panelAndSpacingWidth});
 
         @include mediaQuery-panelLayout_oneColumn {
             @include backLinkNoBleedStyles;

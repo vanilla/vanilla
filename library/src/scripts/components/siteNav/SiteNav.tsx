@@ -34,39 +34,43 @@ export interface IState {
  */
 export class SiteNav extends React.Component<IProps, IState> {
     public render() {
-        const content =
-            this.props.children && this.props.children.length > 0
-                ? this.props.children.map((child, i) => {
-                      return (
-                          <SiteNavNode
-                              {...child}
-                              activeRecord={this.props.activeRecord}
-                              key={`navNode-${i}`}
-                              titleID={this.titleID}
-                              depth={0}
-                              collapsible={this.props.collapsible}
-                          />
-                      );
-                  })
-                : null;
-        return (
-            <nav onKeyDownCapture={this.handleKeyDown} className={classNames("siteNav", this.props.className)}>
-                {this.props.title ? (
-                    <PanelWidgetVerticalPadding>
-                        <Heading title={this.props.title} className="siteNav-title" />
-                    </PanelWidgetVerticalPadding>
-                ) : (
-                    <h2 id={this.titleID} className="sr-only">
-                        {t("Navigation")}
-                    </h2>
-                )}
+        const hasChildren = this.props.children && this.props.children.length > 0;
+        const content = hasChildren
+            ? this.props.children.map((child, i) => {
+                  return (
+                      <SiteNavNode
+                          {...child}
+                          activeRecord={this.props.activeRecord}
+                          key={`navNode-${i}`}
+                          titleID={this.titleID}
+                          depth={0}
+                          collapsible={this.props.collapsible}
+                      />
+                  );
+              })
+            : null;
+        if (hasChildren || this.props.bottomCTA) {
+            return (
+                <nav onKeyDownCapture={this.handleKeyDown} className={classNames("siteNav", this.props.className)}>
+                    {this.props.title ? (
+                        <PanelWidgetVerticalPadding>
+                            <Heading title={this.props.title} className="siteNav-title" />
+                        </PanelWidgetVerticalPadding>
+                    ) : (
+                        <h2 id={this.titleID} className="sr-only">
+                            {t("Navigation")}
+                        </h2>
+                    )}
 
-                <ul className="siteNav-children hasDepth-0" role="tree" aria-labelledby={this.titleID}>
-                    {content}
-                </ul>
-                {this.props.bottomCTA && this.props.bottomCTA}
-            </nav>
-        );
+                    <ul className="siteNav-children hasDepth-0" role="tree" aria-labelledby={this.titleID}>
+                        {content}
+                    </ul>
+                    {this.props.bottomCTA ? this.props.bottomCTA : null}
+                </nav>
+            );
+        } else {
+            return null;
+        }
     }
 
     private id = getRequiredID(this.props, "siteNav");

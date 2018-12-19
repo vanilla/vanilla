@@ -1,5 +1,9 @@
-// This file contains javascript that is global to the entire Garden application
-
+/**
+ * Vanilla's legacy javascript core.
+ *
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 
 // Global vanilla library function.
 (function(window, $) {
@@ -202,21 +206,8 @@
         });
     });
 
-    function accessibleButtonsInit() {
-        $(document).delegate("[role=button]", 'keydown', function(event) {
-            var $button = $(this);
-            var ENTER_KEY = 13;
-            var SPACE_KEY = 32;
-            var isActiveElement = document.activeElement === $button[0];
-            var isSpaceOrEnter = event.keyCode === ENTER_KEY || event.keyCode === SPACE_KEY;
-            if (isActiveElement && isSpaceOrEnter) {
-                event.preventDefault();
-                $button.click();
-            }
-        });
-    }
-
-    $(document).on("contentLoad", function(e) {
+    $(document).on("contentLoad", function (e) {
+        
         // Setup AJAX filtering for flat category module.
         // Find each flat category module container, if any.
         $(".BoxFlatCategory", e.target).each(function(index, value){
@@ -265,10 +256,6 @@
             event.initCustomEvent('X-DOMContentReady', true, false, {});
             e.target.dispatchEvent(event);
         });
-
-        // Set up accessible flyouts
-        $('.ToggleFlyout, .editor-dropdown, .ButtonGroup').accessibleFlyoutsInit();
-        accessibleButtonsInit();
     });
 })(window, jQuery);
 
@@ -777,18 +764,6 @@ jQuery(document).ready(function($) {
         });
     }
 
-//   var searchText = gdn.definition('Search', 'Search');
-//   if (!$('div.Search input.InputBox').val())
-//      $('div.Search input.InputBox').val(searchText);
-//   $('div.Search input.InputBox').blur(function() {
-//      if (typeof $(this).val() == 'undefined' || $(this).val() == '')
-//         $(this).val(searchText);
-//   });
-//   $('div.Search input.InputBox').focus(function() {
-//      if ($(this).val() == searchText)
-//         $(this).val('');
-//   });
-
     $.fn.popin = function(options) {
         var settings = $.extend({}, options);
 
@@ -815,156 +790,6 @@ jQuery(document).ready(function($) {
     // Make poplist items with a rel attribute clickable.
     $(document).on('click', '.PopList .Item[rel]', function() {
         window.location.href = $(this).attr('rel');
-    });
-
-    var hijackClick = function(e) {
-        var $elem = $(this);
-        var $parent = $(this).closest('.Item');
-        var $toggleFlyout = $elem.closest('.ToggleFlyout');
-        var href = $elem.attr('href');
-        var progressClass = $elem.hasClass('Bookmark') ? 'Bookmarking' : 'InProgress';
-
-        // If empty, or starts with a fragment identifier, do not send
-        // an async request.
-        if (!href || href.trim().indexOf('#') === 0)
-            return;
-        gdn.disable(this, progressClass);
-        e.stopPropagation();
-
-        $.ajax({
-            type: "POST",
-            url: href,
-            data: {DeliveryType: 'VIEW', DeliveryMethod: 'JSON', TransientKey: gdn.definition('TransientKey')},
-            dataType: 'json',
-            complete: function() {
-                gdn.enable($elem.get(0));
-                $elem.removeClass(progressClass);
-                $elem.attr('href', href);
-
-                // If we are in a flyout, close it.
-                $toggleFlyout
-                    .removeClass('Open')
-                    .find('.Flyout')
-                    .hide()
-                    .setFlyoutAttributes();
-            },
-            error: function(xhr) {
-                gdn.informError(xhr);
-            },
-            success: function(json) {
-                if (json === null) json = {};
-
-                var informed = gdn.inform(json);
-                gdn.processTargets(json.Targets, $elem, $parent);
-                // If there is a redirect url, go to it.
-                if (json.RedirectTo) {
-                    setTimeout(function() {
-                            window.location.replace(json.RedirectTo);
-                        },
-                        informed ? 3000 : 0);
-                }
-            }
-        });
-
-        return false;
-    };
-    $(document).delegate('.Hijack, .js-hijack', 'click', hijackClick);
-
-
-    // Activate ToggleFlyout and ButtonGroup menus
-    $(document).delegate('.ButtonGroup > .Handle', 'click', function() {
-        var $buttonGroup = $(this).closest('.ButtonGroup');
-        if (!$buttonGroup.hasClass('Open')) {
-            $('.ButtonGroup')
-                .removeClass('Open')
-                .setFlyoutAttributes();
-
-            // Open this one
-            $buttonGroup
-                .addClass('Open')
-                .setFlyoutAttributes();
-        } else {
-            $('.ButtonGroup')
-                .removeClass('Open')
-                .setFlyoutAttributes();
-        }
-        return false;
-    });
-
-    var lastOpen = null;
-
-    $(document).delegate('.ToggleFlyout', 'click', function(e) {
-        var $toggleFlyout = $(this);
-        var $flyout = $('.Flyout', this);
-        var isHandle = false;
-
-        if ($(e.target).closest('.Flyout').length === 0) {
-            e.stopPropagation();
-            isHandle = true;
-        } else if ($(e.target).hasClass('Hijack') || $(e.target).closest('a').hasClass('Hijack')) {
-            return;
-        }
-        e.stopPropagation();
-
-        // Dynamically fill the flyout.
-        var rel = $(this).attr('rel');
-        if (rel) {
-            $(this).attr('rel', '');
-            $flyout.html('<div class="InProgress" style="height: 30px"></div>');
-
-            $.ajax({
-                url: gdn.url(rel),
-                data: {DeliveryType: 'VIEW'},
-                success: function(data) {
-                    $flyout.html(data);
-                },
-                error: function(xhr) {
-                    $flyout.html('');
-                    gdn.informError(xhr, true);
-                }
-            });
-        }
-
-        if ($flyout.css('display') == 'none') {
-            if (lastOpen !== null) {
-                $('.Flyout', lastOpen).hide();
-                $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
-                $toggleFlyout.setFlyoutAttributes();
-            }
-
-            $(this).addClass('Open').closest('.Item').addClass('Open');
-            $flyout.show();
-            lastOpen = this;
-            $toggleFlyout.setFlyoutAttributes();
-        } else {
-            $flyout.hide();
-            $(this).removeClass('Open').closest('.Item').removeClass('Open');
-            $toggleFlyout.setFlyoutAttributes();
-        }
-
-        if (isHandle)
-            return false;
-    });
-
-    // Close ToggleFlyout menu even if their links are hijacked
-    $(document).delegate('.ToggleFlyout a', 'mouseup', function() {
-        if ($(this).hasClass('FlyoutButton'))
-            return;
-
-        $('.ToggleFlyout').removeClass('Open').closest('.Item').removeClass('Open');
-        $('.Flyout').hide();
-        $(this).closest('.ToggleFlyout').setFlyoutAttributes();
-    });
-
-    $(document).delegate(document, 'click', function() {
-        if (lastOpen) {
-            $('.Flyout', lastOpen).hide();
-            $(lastOpen).removeClass('Open').closest('.Item').removeClass('Open');
-        }
-
-        $('.ButtonGroup')
-            .removeClass('Open')
-            .setFlyoutAttributes();
     });
 
     // Add a spinner onclick of buttons with this class
@@ -1477,45 +1302,6 @@ jQuery(document).ready(function($) {
     });
 
     /**
-     * GitHub commit embedding
-     *
-     */
-
-// @tim : 2013-08-24
-// Experiment on hold.
-//   if ($('div.github-commit').length) {
-//      // Github embed library
-//      window.GitHubCommit = (function (d,s,id) {
-//         var t, js, fjs = d.getElementsByTagName(s)[0];
-//         if (d.getElementById(id)) return; js=d.createElement(s); js.id=id;
-//         js.src=gdn.url('js/library/github.embed.js'); fjs.parentNode.insertBefore(js, fjs);
-//         return window.GitHubCommit || (t = { _e: [], ready: function(f){ t._e.push(f) } });
-//      }(document, "script", "github-embd"));
-//
-//      GitHubCommit.ready(function(GitHubCommit){
-//         setTimeout(commits, 300);
-//      });
-//   }
-//
-//   function commits(GitHubCommit) {
-//      $('div.github-commit').each(function(i, el){
-//         var commit = $(el);
-//         var commiturl = commit.attr('data-commiturl');
-//         var commituser = commit.attr('data-commituser');
-//         var commitrepo = commit.attr('data-commitrepo');
-//         var commithash = commit.attr('data-commithash');
-//         console.log(el);
-//      });
-//   }
-
-    /**
-     * Vine image embedding
-     *
-     */
-
-    // Automatic, requires no JS
-
-    /**
      * Pintrest pin embedding
      *
      */
@@ -1734,8 +1520,7 @@ if (typeof String.prototype.trim !== 'function') {
 }
 
 (function ($) {
-
-$.fn.extend({
+    $.fn.extend({
     // jQuery UI .effect() replacement using CSS classes.
     effect: function(name) {
         var that = this;
@@ -1746,49 +1531,6 @@ $.fn.extend({
             .one('animationend webkitAnimationEnd', function () {
                 that.removeClass(name);
             });
-    },
-
-    accessibleFlyoutHandle: function (isOpen) {
-        $(this).attr('aria-expanded', isOpen.toString());
-    },
-
-    accessibleFlyout: function (isOpen) {
-        $(this).attr('aria-hidden', (!isOpen).toString());
-    },
-
-    setFlyoutAttributes: function () {
-        $(this).each(function(){
-            var $handle = $(this).find('.FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)');
-            var $flyout = $(this).find('.Flyout, .Dropdown');
-            var isOpen = $flyout.is(':visible');
-
-            $handle.accessibleFlyoutHandle(isOpen);
-            $flyout.accessibleFlyout(isOpen);
-        });
-    },
-
-    accessibleFlyoutsInit: function () {
-        var $context = $(this);
-
-        $context.each(function(){
-
-            $context.find('.FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)').each(function (){
-                $(this)
-                    .attr('tabindex', '0')
-                    .attr('role', 'button')
-                    .attr('aria-haspopup', 'true');
-
-                $(this).accessibleFlyoutHandle(false);
-            });
-
-            $context.find('.Flyout, .Dropdown').each(function (){
-                $(this).accessibleFlyout(false);
-
-                $(this).find('a').each(function() {
-                    $(this).attr('tabindex', '0');
-                });
-            });
-        });
     },
 });
 

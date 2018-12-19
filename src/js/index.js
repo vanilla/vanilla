@@ -9,7 +9,7 @@ import { fixToggleFlyoutBehaviour } from "./overrides";
 
 $(() => {
     setupMobileNavigation();
-    fixToggleFlyoutBehaviour();
+    //fixToggleFlyoutBehaviour();
 
     $("select").wrap('<div class="SelectWrapper"></div>');
 });

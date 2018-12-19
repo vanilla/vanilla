@@ -4,6 +4,10 @@
  * @license GPL-2.0-only
  */
 
+@mixin shadow-dropDown($baseColor: #000) {
+  box-shadow: 0 5px 10px 0 rgba($baseColor, .3);
+}
+
 @mixin font-style-base() {
     font-family: $global-body_fontFamily;
     font-weight: $global-normal_fontWeight;

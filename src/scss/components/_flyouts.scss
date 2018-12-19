@@ -1,13 +1,13 @@
-/*!
- * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-
-/* -------------------------------------------------------------- *\
-    Variables
-\* -------------------------------------------------------------- */
-
+///*!
+// * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+// * @copyright 2009-2018 Vanilla Forums Inc.
+// * @license GPL-2.0-only
+// */
+//
+///* -------------------------------------------------------------- *\
+//    Variables
+//\* -------------------------------------------------------------- */
+//
 $flyout_bg:                             $global-color_white !default;
 $flyout-hover_bg:                       darken($global-color_white, 7%) !default;
 $flyout_fg:                             mix($global-color_black, $flyout_bg, 70%) !default;
@@ -22,493 +22,606 @@ $flyout_border:                         1px solid $theme-border_color !default;
 $flyout_borderRadius:                   $global_borderRadius !default;
 $flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.2) !default;
 
+$dropDown_width:                        350px;
+
+$frame-header_minHeight: 44px;
+$frame-header_spacing: 12px;
+$frame-header_fontSize: $global-subTitle_fontSize;
+$overlay-border_color                                   : mix($global-color_fg, $global-color_bg, 5%) !default;
+
+$meBoxMessage-padding: 8px;
+$meBoxMessage-unreadDot_width: 12px;
+//
 /* -------------------------------------------------------------- *\
     Styles
 \* -------------------------------------------------------------- */
 
-.MenuItems,
-.FlyoutMenu {
-    border: $flyout_border;
-    box-shadow: $flyout_boxShadow;
-    border-radius: $flyout_borderRadius;
-    color: $flyout_fg;
-    line-height: $global-base_lineHeight;
-
-    &::before {
-        opacity: 0.4;
+.Flyout.FlyoutMenu {
+    @include shadow-dropDown;
+    position: absolute;
+    min-width: $dropDown_width;
+    background-color: $global-color_bg;
+    color: $global-color_fg;
+    border: {
+        radius: $global_borderRadius;
+        style: solid;
+        width: 1px;
+        color: $global-border_color;
     }
+    z-index: 1;
 
-    input[type= "text"],
-    textarea,
-    ul.token-input-list,
-    input.InputBox,
-    select {
-        border-color: $formElement_borderColor;
-        color: $formElement_color;
-    }
-}
-
-.MenuItems.Flags {
-    padding: $utility-small_padding;
-
-    .ReactSprite {
-        line-height: inherit;
-        height: inherit;
-    }
-}
-
-.FlagMenu.Open .MenuItems {
-    left: -10px;
-}
-
-.Flyout.Flyout.Flyout,
-.ButtonGroup .Dropdown {
-    visibility: hidden;
-}
-
-.ToggleFlyout.Open .Flyout.Flyout.Flyout,
-.ButtonGroup.Open .Dropdown,
-.editor-dropdown-open .Flyout.Flyout.Flyout {
-    visibility: visible;
-
-    li {
-        font-size: $global-medium_fontSize;
-        line-height: $global-base_lineHeight;
-    }
-}
-
-
-
-.MenuItems-Reactions.MenuItems-Reactions {
-    padding: $utility-small_padding;
-
-    .PhotoWrapSmall.PhotoWrapSmall {
-        margin-right: 0;
-        @include photoWrap(24px);
-    }
-
-    a {
-        margin-right: 0;
-        padding: 0 !important;
-        font-size: $global-small_fontSize;
-        line-height: 24px;
-        @include ellipsis;
-        max-width: calc(100% - (24px + #{$utility-small_padding}));
-
-        &:focus,
-        &:hover {
-            background: transparent !important;
-        }
-    }
-
-}
-
-.MenuItems {
-    padding-top: $utility-small_padding;
-    padding-bottom: $utility-small_padding;
-
-    a {
-        text-transform: none;
-        text-align: initial;
-        transition: 0.2s ease-out color;
-
-        &:hover {
-            color: $global-color_primary !important;
-            text-decoration: none;
-            background-color: rgba($global-color_black, 0.04) !important;
-        }
-    }
-
-    hr {
-        margin-bottom: $utility-small_padding;
-        margin-top: $utility-small_padding;
-    }
-
-    .PhotoWrap {
-        height: 24px;
-        width: 24px;
-        padding: 0 !important;
-        margin: 0 0 0 $utility-small_padding;
-    }
-}
-
-.Flyout.Flyout.Flyout,
-.ButtonGroup .Dropdown {
-
-    .selectBox-link {
-        width: auto;
-    }
-}
-
-.PopList.Conversations .Item,
-.PopList.Activities .Item,
-.PopList.Popin .Item {
-    margin: $utility-small_padding;
-    padding: $utility-small_padding;
-    border-radius: $flyout_borderRadius;
-    border: none;
-    position: relative;
-    transition: background 0.2s ease-out;
-
-    a {
-        color: $flyout-link_color;
-        line-height: inherit;
-        text-transform: none;
-        padding: 0;
-
-        &:focus,
-        &:hover {
-            color: $flyout-link-hover_color;
-        }
-    }
-
-    &:not(.Title):hover {
-        background: $flyout-hover_bg;
-    }
-
-    &.Empty.Empty {
-        text-transform: none;
-        margin: $utility-small_padding;
-
-        &:hover {
-            background: transparent;
-        }
-    }
-
-    &.Center,
-    &.Title {
-        display: block;
-        text-align: center;
-        color: $flyout_fg;
-        font-size: $global-medium_fontSize;
-        text-transform: uppercase;
-        line-height: $global-base_lineHeight;
-        justify-content: center;
-
-        a {
-            color: $flyout-link-alt_color;
-
-            &:focus,
-            &:hover {
-                color: $flyout-link-altHover_color;
-            }
-        }
-    }
-
-    &.Title {
-        @include clearfix;
-
-        a {
-            position: absolute;
-            right: $utility-small_padding;
-        }
-    }
-
-    &:first-child {
-        position: relative;
-        overflow: initial;
-        margin-bottom: $utility-large_padding;
-
-        &::after {
-            content: "";
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            right: 0;
-            width: 100%;
-            height: 1px;
-            background: rgba($global-color_black, 0.2);
-        }
-    }
-
-    &:last-child {
-        position: relative;
-        overflow: initial;
-        margin-top: 16px;
-
-        &::after {
-            content: "";
-            position: absolute;
-            top: -8px;
-            left: 0;
-            right: 0;
-            width: 100%;
-            height: 1px;
-            background: rgba($global-color_black, 0.2);
-        }
-    }
-
-    .Excerpt {
-        color: $flyout_fg;
-    }
-
-    .Author .PhotoWrap {
-        width: $theme-photo-small_size;
-        height: $theme-photo-small_size;
-    }
-
-    .ItemContent {
-        margin-top: -$global-lineHeight_offset;
-        margin-left: calc(#{$theme-photo-small_size} + #{$utility-medium_padding});
-    }
-}
-
-.PopList.Activities .Item.Title {
-     a {
-        position: absolute;
-        right: $utility-small_padding;
-        max-width: 30%;
-        text-align: right;
-        line-height: 1.2em;
-    }
-}
-
-.PopList.Conversations .Item.Empty + .Item:last-child::after {
-    display: none;
-}
-
-.PopList.Conversations .HasNew {
-    border-radius: $formButton_borderRadius;
-    background-color: $bullet_bg;
-    border: 1px solid $bullet_borderColor;
-    color: $bullet_fg;
-    padding: 0px 4px;
-}
-
-.PopList .Item.Empty {
-    margin-top: $utility-small_padding;
-    margin-bottom: $utility-small_padding;
-
+    &::before,
     &::after {
+        content: none;
+    }
+
+    &.isParentWidth {
+        min-width: initial;
+        width: 100%;
+    }
+
+    &.isOwnWidth {
+        width: initial;
+    }
+
+    &.isRightAligned {
+        right: 0;
+        top: 0;
+    }
+
+    &:empty {
         display: none;
     }
-}
 
-.MenuItems a {
-    margin: 0 $utility-small_padding;
-    border-radius: $component_borderRadius;
+    .frame {
+        box-shadow: none;
+    }
 
-    &:hover {
-        background: $flyout-hover_bg !important;
+    &.noMinWidth {
+        min-width: 0;
+    }
+
+    .Item:last-child {
+        border-bottom-width: 0;
     }
 }
 
-.Trace {
-    clear: both;
+.PopList {
+    font-size: $global-medium_fontSize;
 }
 
-.MenuItems.ui-autocomplete {
-    padding: 0;
+.Flyout {
 
-    mark {
-        background-color: rgba($global-color_warning, .5);
-    }
+    .Item {
+        display: flex;
+        flex-wrap: nowrap;
+        padding: $meBoxMessage-padding;
+        color: inherit;
 
-    @include maxWidth {
-        width: calc(100% - (#{$utility-large_padding} * 2)) !important;
-    }
-
-    a {
-        margin: 0;
-        font-weight: inherit;
-
-        .Title {
-            @include ellipsis;
-        }
-
+        &:active,
         &:focus,
         &:hover {
-            color: inherit !important;
+            background-color: $global-color_active_primaryBg;
+            text-decoration: none;
         }
     }
 
-    mark {
-        font-weight: inherit;
-    }
+    .Item.Title {
+        display: flex;
+        position: relative;
+        align-items: center;
+        flex-wrap: nowrap;
+        width: 100%;
+        min-height: $frame-header_minHeight;
+        padding: 0 $frame-header_spacing;
+        z-index: 1;
+        border-bottom: solid $overlay-border_color 1px;
 
-    .ui-menu-item {
-        padding: $utility-small_padding;
-
-        &:last-child {
-            border-bottom: 0;
+        strong {
+            display: block;
+            font-family: $global-heading_fontFamily;
+            font-weight: 700;
+            font-size: $global-medium_fontSize;
+            line-height: $global-condensed_lineHeight;
+            margin: 0;
         }
     }
 
-    .ui-menu-item,
-    a .Gloss {
-        color: $component-base_color;
-        font-size: $component-base_fontSize;
-        font-weight: $component-base_fontWeight;
-    }
-
-    a:focus .Gloss,
-    a:hover .Gloss {
-        color: $component-base_color !important;
-    }
-
-    .Aside {
-        color: $component-meta_color;
-        font-size: $component-meta_fontSize;
-        font-weight: $component-meta_fontWeight;
-    }
-}
-
-@include maxWidth($theme-breakpoint_tablet) {
-
-    .ToggleFlyout,
-    .ButtonGroup {
-        cursor: pointer;
-
-        &::before {
-            cursor: pointer;
+    .PopList .ItemContent {
+        margin: 0;
+        line-height: inherit;
+        flex-grow: 1;
+        padding: {
+            left: $meBoxMessage-padding;
+            right: $meBoxMessage-padding;
         }
+        max-width: calc(100% - #{$meBoxMessage-unreadDot_width + $theme-photo_size});
     }
 }
 
-// ---------- Mobile ---------- //
-
-@include maxWidth($theme-breakpoint_smallTable) {
-
-    .ToggleFlyout,
-    .ButtonGroup {
-
-        &::before {
-            content: "";
-            opacity: 0;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            top: 0;
-            height: 100vh;
-            width: 100vw;
-            padding: 0;
-            border: none;
-            background: rgba($global-color_black, 0.43);
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        &.Open::before {
-            opacity: 1;
-            z-index: 1;
-            pointer-events: initial;
-        }
-    }
-
-    .Flyout.Flyout.Flyout,
-    .ButtonGroup .Dropdown {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100vw;
-        top: initial !important;
-        text-align: center;
-        padding: $utility-medium_padding;
-        border: none;
-        border-top: $component_border;
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-        min-height: 85px;
-        display: block !important;
-        visibility: hidden;
-        box-shadow: 0 -2px 10px 2px rgba($global-color_black, 0.1);
-        opacity: 0;
-        cursor: pointer;
-        max-height: 80vh;
-        overflow: auto;
-        transition:
-            visibility 0s linear $global-default_timing,
-            transform $global-default_easing $global-default_timing,
-            opacity $global-default_easing $global-default_timing;
-        z-index: 100;
-
-        &::before {
-            display: none;
-        }
-
-        .PopList .ItemContent {
-            margin-left: 0;
-            line-height: 1.3em;
-        }
-
-        .PopList {
-            .Item {
-                text-align: left;
-                display: flex;
-                padding: $utility-xSmall_padding 0;
-
-                &:last-child {
-                    border-bottom: none;
-                }
-            }
-        }
-
-        &.selectBox-content {
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .selectBox-link {
-            width: auto;
-        }
-
-        &::after {
-            content: none;
-        }
-
-        .Author .PhotoWrap {
-            width: $theme-photo_size;
-            height: $theme-photo_size;
-            padding: 0;
-            margin-right: $utility-small_padding;
-        }
-    }
-
-    .ToggleFlyout.Open .Flyout.Flyout.Flyout,
-    .ButtonGroup.Open .Dropdown,
-    .editor-dropdown-open .Flyout.Flyout.Flyout {
-        visibility: visible;
-        transition-delay: 0s;
-        opacity: 1;
-
-        &::before {
-            opacity: 1;
-        }
-    }
-
-    .editor-dropdown-open .Flyout.Flyout.Flyout::before {
-        pointer-events: none;
-    }
-
-    .SpDropdownHandle::before {
-        content: $icon-select;
-    }
-
-    .Dropdown {
-        text-align: center;
-    }
-
-    // Editor Specific Flyouts
-    .editor {
-        .editor-dropdown {
-            position: static;
-        }
-
-        .Flyout.Flyout.Flyout {
-            position: absolute;
-            left: 0;
-            right: 0;
-            border: $flyout_border;
-            width: auto;
-            min-height: initial;
-            top: 32px;
-            bottom: initial;
-
-            &::before {
-                display: none;
-            }
-        }
-    }
-}
+//
+//.MenuItems,
+//.FlyoutMenu {
+//    border: $flyout_border;
+//    box-shadow: $flyout_boxShadow;
+//    border-radius: $flyout_borderRadius;
+//    color: $flyout_fg;
+//    line-height: $global-base_lineHeight;
+//
+//    &::before {
+//        opacity: 0.4;
+//    }
+//
+//    input[type= "text"],
+//    textarea,
+//    ul.token-input-list,
+//    input.InputBox,
+//    select {
+//        border-color: $formElement_borderColor;
+//        color: $formElement_color;
+//    }
+//}
+//
+//.MenuItems.Flags {
+//    padding: $utility-baseUnit;
+//
+//    .ReactSprite {
+//        line-height: inherit;
+//        height: inherit;
+//    }
+//}
+//
+//.FlagMenu.Open .MenuItems {
+//    left: -10px;
+//}
+//
+//.Flyout.Flyout.Flyout,
+//.ButtonGroup .Dropdown {
+//    visibility: hidden;
+//}
+//
+//.ToggleFlyout.Open .Flyout.Flyout.Flyout,
+//.ButtonGroup.Open .Dropdown,
+//.editor-dropdown-open .Flyout.Flyout.Flyout {
+//    visibility: visible;
+//
+//    li {
+//        font-size: $global-medium_fontSize;
+//        line-height: $global-base_lineHeight;
+//    }
+//}
+//
+//
+//
+//.MenuItems-Reactions.MenuItems-Reactions {
+//    padding: $utility-baseUnit;
+//
+//    .PhotoWrapSmall.PhotoWrapSmall {
+//        margin-right: 0;
+//        @include photoWrap(24px);
+//    }
+//
+//    a {
+//        margin-right: 0;
+//        padding: 0 !important;
+//        font-size: $global-small_fontSize;
+//        line-height: 24px;
+//        @include ellipsis;
+//        max-width: calc(100% - (24px + #{$utility-baseUnit}));
+//
+//        &:focus,
+//        &:hover {
+//            background: transparent !important;
+//        }
+//    }
+//
+//}
+//
+//.MenuItems {
+//    padding-top: $utility-baseUnit;
+//    padding-bottom: $utility-baseUnit;
+//
+//    a {
+//        text-transform: none;
+//        text-align: initial;
+//        transition: 0.2s ease-out color;
+//
+//        &:hover {
+//            color: $global-color_primary !important;
+//            text-decoration: none;
+//            background-color: rgba($global-color_black, 0.04) !important;
+//        }
+//    }
+//
+//    hr {
+//        margin-bottom: $utility-baseUnit;
+//        margin-top: $utility-baseUnit;
+//    }
+//
+//    .PhotoWrap {
+//        height: 24px;
+//        width: 24px;
+//        padding: 0 !important;
+//        margin: 0 0 0 $utility-baseUnit;
+//    }
+//}
+//
+//.Flyout.Flyout.Flyout,
+//.ButtonGroup .Dropdown {
+//
+//    .selectBox-link {
+//        width: auto;
+//    }
+//}
+//
+//.PopList.Conversations .Item,
+//.PopList.Activities .Item,
+//.PopList.Popin .Item {
+//    margin: $utility-baseUnit;
+//    padding: $utility-baseUnit;
+//    border-radius: $flyout_borderRadius;
+//    border: none;
+//    position: relative;
+//    transition: background 0.2s ease-out;
+//
+//    a {
+//        color: $flyout-link_color;
+//        line-height: inherit;
+//        text-transform: none;
+//        padding: 0;
+//
+//        &:focus,
+//        &:hover {
+//            color: $flyout-link-hover_color;
+//        }
+//    }
+//
+//    &:not(.Title):hover {
+//        background: $flyout-hover_bg;
+//    }
+//
+//    &.Empty.Empty {
+//        text-transform: none;
+//        margin: $utility-baseUnit;
+//
+//        &:hover {
+//            background: transparent;
+//        }
+//    }
+//
+//    &.Center,
+//    &.Title {
+//        display: block;
+//        text-align: center;
+//        color: $flyout_fg;
+//        font-size: $global-medium_fontSize;
+//        text-transform: uppercase;
+//        line-height: $global-base_lineHeight;
+//        justify-content: center;
+//
+//        a {
+//            color: $flyout-link-alt_color;
+//
+//            &:focus,
+//            &:hover {
+//                color: $flyout-link-altHover_color;
+//            }
+//        }
+//    }
+//
+//    &.Title {
+//        @include clearfix;
+//
+//        a {
+//            position: absolute;
+//            right: $utility-baseUnit;
+//        }
+//    }
+//
+//    &:first-child {
+//        position: relative;
+//        overflow: initial;
+//        margin-bottom: $utility-baseUnitDouble;
+//
+//        &::after {
+//            content: "";
+//            position: absolute;
+//            bottom: -8px;
+//            left: 0;
+//            right: 0;
+//            width: 100%;
+//            height: 1px;
+//            background: rgba($global-color_black, 0.2);
+//        }
+//    }
+//
+//    &:last-child {
+//        position: relative;
+//        overflow: initial;
+//        margin-top: 16px;
+//
+//        &::after {
+//            content: "";
+//            position: absolute;
+//            top: -8px;
+//            left: 0;
+//            right: 0;
+//            width: 100%;
+//            height: 1px;
+//            background: rgba($global-color_black, 0.2);
+//        }
+//    }
+//
+//    .Excerpt {
+//        color: $flyout_fg;
+//    }
+//
+//    .Author .PhotoWrap {
+//        width: $theme-photo-small_size;
+//        height: $theme-photo-small_size;
+//    }
+//
+//    .ItemContent {
+//        margin-left: calc(#{$theme-photo-small_size} + #{$utility-baseUnitDouble});
+//    }
+//}
+//
+//.PopList.Activities .Item.Title {
+//     a {
+//        position: absolute;
+//        right: $utility-baseUnit;
+//        max-width: 30%;
+//        text-align: right;
+//        line-height: 1.2em;
+//    }
+//}
+//
+//.PopList.Conversations .Item.Empty + .Item:last-child::after {
+//    display: none;
+//}
+//
+//.PopList.Conversations .HasNew {
+//    border-radius: $formButton_borderRadius;
+//    background-color: $bullet_bg;
+//    border: 1px solid $bullet_borderColor;
+//    color: $bullet_fg;
+//    padding: 0px 4px;
+//}
+//
+//.PopList .Item.Empty {
+//    margin-top: $utility-baseUnit;
+//    margin-bottom: $utility-baseUnit;
+//
+//    &::after {
+//        display: none;
+//    }
+//}
+//
+//.MenuItems a {
+//    margin: 0 $utility-baseUnit;
+//    border-radius: $component_borderRadius;
+//
+//    &:hover {
+//        background: $flyout-hover_bg !important;
+//    }
+//}
+//
+//.Trace {
+//    clear: both;
+//}
+//
+//.MenuItems.ui-autocomplete {
+//    padding: 0;
+//
+//    mark {
+//        background-color: rgba($global-color_warning, .5);
+//    }
+//
+//    @include maxWidth {
+//        width: calc(100% - (#{$utility-baseUnitDouble} * 2)) !important;
+//    }
+//
+//    a {
+//        margin: 0;
+//        font-weight: inherit;
+//
+//        .Title {
+//            @include ellipsis;
+//        }
+//
+//        &:focus,
+//        &:hover {
+//            color: inherit !important;
+//        }
+//    }
+//
+//    mark {
+//        font-weight: inherit;
+//    }
+//
+//    .ui-menu-item {
+//        padding: $utility-baseUnit;
+//
+//        &:last-child {
+//            border-bottom: 0;
+//        }
+//    }
+//
+//    .ui-menu-item,
+//    a .Gloss {
+//        color: $component-base_color;
+//        font-size: $component-base_fontSize;
+//        font-weight: $component-base_fontWeight;
+//    }
+//
+//    a:focus .Gloss,
+//    a:hover .Gloss {
+//        color: $component-base_color !important;
+//    }
+//
+//    .Aside {
+//        color: $component-meta_color;
+//        font-size: $component-meta_fontSize;
+//        font-weight: $component-meta_fontWeight;
+//    }
+//}
+//
+//@include maxWidth($theme-breakpoint_tablet) {
+//
+//    .ToggleFlyout,
+//    .ButtonGroup {
+//        cursor: pointer;
+//
+//        &::before {
+//            cursor: pointer;
+//        }
+//    }
+//}
+//
+//// ---------- Mobile ---------- //
+//
+//@include maxWidth($theme-breakpoint_smallTable) {
+//
+//    .ToggleFlyout,
+//    .ButtonGroup {
+//
+//        &::before {
+//            content: "";
+//            opacity: 0;
+//            position: fixed;
+//            bottom: 0;
+//            left: 0;
+//            right: 0;
+//            top: 0;
+//            height: 100vh;
+//            width: 100vw;
+//            padding: 0;
+//            border: none;
+//            background: rgba($global-color_black, 0.43);
+//            z-index: 1;
+//            pointer-events: none;
+//        }
+//
+//        &.Open::before {
+//            opacity: 1;
+//            z-index: 1;
+//            pointer-events: initial;
+//        }
+//    }
+//
+//    .Flyout.Flyout.Flyout,
+//    .ButtonGroup .Dropdown {
+//        position: fixed;
+//        bottom: 0;
+//        left: 0;
+//        right: 0;
+//        width: 100vw;
+//        top: initial !important;
+//        text-align: center;
+//        padding: $utility-baseUnitDouble;
+//        border: none;
+//        border-top: $component_border;
+//        border-bottom-left-radius: 0;
+//        border-bottom-right-radius: 0;
+//        min-height: 85px;
+//        display: block !important;
+//        visibility: hidden;
+//        box-shadow: 0 -2px 10px 2px rgba($global-color_black, 0.1);
+//        opacity: 0;
+//        cursor: pointer;
+//        max-height: 80vh;
+//        overflow: auto;
+//        transition:
+//            visibility 0s linear $global-default_timing,
+//            transform $global-default_easing $global-default_timing,
+//            opacity $global-default_easing $global-default_timing;
+//        z-index: 100;
+//
+//        &::before {
+//            display: none;
+//        }
+//
+//        .PopList .ItemContent {
+//            margin-left: 0;
+//            line-height: 1.3em;
+//        }
+//
+//        .PopList {
+//            .Item {
+//                text-align: left;
+//                display: flex;
+//                padding: $utility-baseUnit 0;
+//
+//                &:last-child {
+//                    border-bottom: none;
+//                }
+//            }
+//        }
+//
+//        &.selectBox-content {
+//            margin-left: auto;
+//            margin-right: auto;
+//        }
+//
+//        .selectBox-link {
+//            width: auto;
+//        }
+//
+//        &::after {
+//            content: none;
+//        }
+//
+//        .Author .PhotoWrap {
+//            width: $theme-photo_size;
+//            height: $theme-photo_size;
+//            padding: 0;
+//            margin-right: $utility-baseUnit;
+//        }
+//    }
+//
+//    .ToggleFlyout.Open .Flyout.Flyout.Flyout,
+//    .ButtonGroup.Open .Dropdown,
+//    .editor-dropdown-open .Flyout.Flyout.Flyout {
+//        visibility: visible;
+//        transition-delay: 0s;
+//        opacity: 1;
+//
+//        &::before {
+//            opacity: 1;
+//        }
+//    }
+//
+//    .editor-dropdown-open .Flyout.Flyout.Flyout::before {
+//        pointer-events: none;
+//    }
+//
+//    .SpDropdownHandle::before {
+//        content: $icon-select;
+//    }
+//
+//    .Dropdown {
+//        text-align: center;
+//    }
+//
+//    // Editor Specific Flyouts
+//    .editor {
+//        .editor-dropdown {
+//            position: static;
+//        }
+//
+//        .Flyout.Flyout.Flyout {
+//            position: absolute;
+//            left: 0;
+//            right: 0;
+//            border: $flyout_border;
+//            width: auto;
+//            min-height: initial;
+//            top: 32px;
+//            bottom: initial;
+//
+//            &::before {
+//                display: none;
+//            }
+//        }
+//    }
+//}

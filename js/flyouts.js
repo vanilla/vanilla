@@ -7,9 +7,48 @@
 
 // Global vanilla library function.
 (function(window, $) {
-    var USE_NEW_FLYOUTS = gdn.getMeta("Feature.NewFlyouts.Enabled", false);
+    var USE_NEW_FLYOUTS = gdn.getMeta("useNewFlyouts", false);
+    console.log("New flyouts", USE_NEW_FLYOUTS);
 
-    function accessibleButtonsInit() {
+    function initFlyouts() {
+        var $handles = $(".ToggleFlyout, .editor-dropdown, .ButtonGroup");
+
+        $handles.each(function() {
+            $handles
+                .find(".FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)")
+                .each(function() {
+                    $(this)
+                        .attr("tabindex", "0")
+                        .attr("role", "button")
+                        .attr("aria-haspopup", "true");
+
+                    $(this).accessibleFlyoutHandle(false);
+                });
+
+            $handles.find(".Flyout, .Dropdown").each(function() {
+                $(this).accessibleFlyout(false);
+
+                $(this)
+                    .find("a")
+                    .each(function() {
+                        $(this).attr("tabindex", "0");
+                    });
+            });
+        });
+
+        if (USE_NEW_FLYOUTS) {
+            var $contents = $(".Flyout, .ButtonGroup .Dropdown");
+            var wrap = document.createElement("span");
+            wrap.classList.add("mobileFlyoutOverlay");
+
+            $contents.each(function () {
+                if (!this.parentElement.classList.contains("mobileFlyoutOverlay")) {
+                    $(this).wrap(wrap);
+                }
+            });
+        }
+
+        // Button accessibility
         $(document).delegate("[role=button]", "keydown", function(event) {
             var $button = $(this);
             var ENTER_KEY = 13;
@@ -25,7 +64,7 @@
 
     function openFlyout($toggleFlyout, $flyout) {
         closeAllFlyouts();
-        
+
         $toggleFlyout
             .addClass("Open")
             .closest(".Item")
@@ -40,12 +79,12 @@
             .removeClass("Open")
             .closest(".Item")
             .removeClass("Open");
-        
+
         $toggleFlyout.setFlyoutAttributes();
     }
 
     function closeAllFlyouts() {
-        closeFlyout($(".ToggleFlyout"), $(".Flyout"))
+        closeFlyout($(".ToggleFlyout"), $(".Flyout"));
         // Clear the button groups that are open as well.
         $(".ButtonGroup")
             .removeClass("Open")
@@ -54,8 +93,7 @@
 
     $(document).on("contentLoad", function(e) {
         // Set up accessible flyouts
-        $(".ToggleFlyout, .editor-dropdown, .ButtonGroup").accessibleFlyoutsInit();
-        accessibleButtonsInit();
+        initFlyouts();
     });
 
     $(function() {
@@ -81,7 +119,7 @@
                     gdn.enable($elem.get(0));
                     $elem.removeClass(progressClass);
                     $elem.attr("href", href);
-                    $flyout = $toggleFlyout.find('.Flyout');
+                    $flyout = $toggleFlyout.find(".Flyout");
 
                     closeFlyout($toggleFlyout, $flyout);
                 },
@@ -111,7 +149,6 @@
             var $buttonGroup = $(this).closest(".ButtonGroup");
             closeAllFlyouts();
             if (!$buttonGroup.hasClass("Open")) {
-
                 // Open this one
                 $buttonGroup.addClass("Open").setFlyoutAttributes();
             }
@@ -159,7 +196,7 @@
             var isFlyoutClosed = $flyout.css("display") == "none";
             if (USE_NEW_FLYOUTS) {
                 // The new check.
-                isFlyoutClosed = $flyout.is(":visible");
+                isFlyoutClosed = !$flyout.is(":visible");
             }
 
             if (isFlyoutClosed) {
@@ -204,33 +241,6 @@
 
                 $handle.accessibleFlyoutHandle(isOpen);
                 $flyout.accessibleFlyout(isOpen);
-            });
-        },
-
-        accessibleFlyoutsInit: function() {
-            var $context = $(this);
-
-            $context.each(function() {
-                $context
-                    .find(".FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)")
-                    .each(function() {
-                        $(this)
-                            .attr("tabindex", "0")
-                            .attr("role", "button")
-                            .attr("aria-haspopup", "true");
-
-                        $(this).accessibleFlyoutHandle(false);
-                    });
-
-                $context.find(".Flyout, .Dropdown").each(function() {
-                    $(this).accessibleFlyout(false);
-
-                    $(this)
-                        .find("a")
-                        .each(function() {
-                            $(this).attr("tabindex", "0");
-                        });
-                });
             });
         },
     });

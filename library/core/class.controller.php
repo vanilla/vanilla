@@ -649,6 +649,8 @@ class Gdn_Controller extends Gdn_Pluggable {
             'context' => [], 'ui' => []
         ];
 
+        $this->_Definitions['useNewFlyouts'] = \Vanilla\FeatureFlagHelper::featureEnabled('NewFlyouts');
+
         $this->_Definitions['context'] += [
             'host' => Gdn::request()->domain(),
             'basePath' => rtrim('/'.trim(Gdn::request()->webRoot(), '/'), '/'),

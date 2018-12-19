@@ -245,12 +245,12 @@
         if (isHandle) return false;
     }
 
+    /**
+     * Close all of the flyouts unless we are clicking on a button inside of a flyout.
+     */
     function handleToggleFlyoutMouseUp() {
         if ($(this).hasClass("FlyoutButton")) return;
         closeAllFlyouts();
-        $(this)
-            .closest(".ToggleFlyout")
-            .setFlyoutAttributes();
     }
 
     /**

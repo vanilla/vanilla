@@ -6,7 +6,7 @@
 
 import path from "path";
 import del from "del";
-import webpack, { Stats } from "webpack";
+import webpack, { Stats, Configuration } from "webpack";
 import { makeProdConfig } from "./configs/makeProdConfig";
 import { makeDevConfig } from "./configs/makeDevConfig";
 import serve, { InitializedKoa, Options } from "webpack-serve";
@@ -79,18 +79,39 @@ export default class Builder {
         // Cleanup
         del.sync(path.join(DIST_DIRECTORY, "**"));
         const sections = await this.entryModel.getSections();
-        const config = await Promise.all([
+        const configs = await Promise.all([
             ...sections.map(section => makeProdConfig(this.entryModel, section)),
             makePolyfillConfig(this.entryModel),
         ]);
-        const compiler = webpack(config);
-        compiler.run((err: Error, stats: Stats) => {
-            if (err || stats.hasErrors()) {
-                print(stats.toString(this.statOptions));
-                fail(`\nThe build encountered an error: ${err}`);
-            }
 
-            print(stats.toString(this.statOptions));
+        if (this.options.lowMemory) {
+            // In low memory environments we build sequentially instead of in parallel.
+            for (const config of configs) {
+                await this.runBuild(config);
+            }
+        } else {
+            // Otherwise we build all configs at once.
+            await this.runBuild(configs);
+        }
+    }
+
+    /**
+     * Build a single webpack config.
+     *
+     * @param config The config to build.
+     */
+    private async runBuild(config: Configuration | Configuration[]) {
+        return new Promise(resolve => {
+            const compiler = webpack(config as Configuration);
+            compiler.run((err: Error, stats: Stats) => {
+                if (err || stats.hasErrors()) {
+                    print(stats.toString(this.statOptions));
+                    fail(`\nThe build encountered an error: ${err}`);
+                }
+
+                print(stats.toString(this.statOptions));
+                resolve();
+            });
         });
     }
 

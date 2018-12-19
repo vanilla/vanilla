@@ -8,6 +8,10 @@ $navigationManagerToolbar-separator_color: mixContentBgAndFg(80%);
 
 .navigationManagerToolbar {
     margin: $global_spacer 0 #{$global_spacer  - 6px};
+
+    .navigationManagerToolbar-icon {
+        display: inline-flex;
+    }
 }
 
 .navigationManagerToolbar-bar {
@@ -44,3 +48,4 @@ $navigationManagerToolbar-separator_color: mixContentBgAndFg(80%);
 .navigationManagerToolbar-buttonLabel {
     margin-left: 4px;
 }
+

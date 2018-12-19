@@ -62,6 +62,8 @@
         });
     }
 
+    var BODY_CLASS = "flyoutIsOpen";
+
     function openFlyout($toggleFlyout, $flyout) {
         closeAllFlyouts();
 
@@ -71,6 +73,7 @@
             .addClass("Open");
         $flyout.show();
         $toggleFlyout.setFlyoutAttributes();
+        document.body.classList.add(BODY_CLASS);
     }
 
     function closeFlyout($toggleFlyout, $flyout) {
@@ -79,8 +82,8 @@
             .removeClass("Open")
             .closest(".Item")
             .removeClass("Open");
-
         $toggleFlyout.setFlyoutAttributes();
+        document.body.classList.remove(BODY_CLASS);
     }
 
     function closeAllFlyouts() {
@@ -89,6 +92,7 @@
         $(".ButtonGroup")
             .removeClass("Open")
             .setFlyoutAttributes();
+        document.body.classList.remove(BODY_CLASS);
     }
 
     $(document).on("contentLoad", function(e) {

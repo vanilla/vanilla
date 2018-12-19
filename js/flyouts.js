@@ -24,12 +24,7 @@
     }
 
     function openFlyout($toggleFlyout, $flyout) {
-        // Opening a flyout will also close any button groups.
-        console.log("Clear button groups");
-        $(".ButtonGroup")
-            .removeClass("Open")
-            .setFlyoutAttributes();
-        
+        closeAllFlyouts();
         
         $toggleFlyout
             .addClass("Open")
@@ -51,6 +46,10 @@
 
     function closeAllFlyouts() {
         closeFlyout($(".ToggleFlyout"), $(".Flyout"))
+        // Clear the button groups that are open as well.
+        $(".ButtonGroup")
+            .removeClass("Open")
+            .setFlyoutAttributes();
     }
 
     $(document).on("contentLoad", function(e) {
@@ -110,22 +109,14 @@
         // Activate ToggleFlyout and ButtonGroup menus
         $(document).delegate(".ButtonGroup > .Handle", "click", function() {
             var $buttonGroup = $(this).closest(".ButtonGroup");
+            closeAllFlyouts();
             if (!$buttonGroup.hasClass("Open")) {
-                $(".ButtonGroup")
-                    .removeClass("Open")
-                    .setFlyoutAttributes();
 
                 // Open this one
                 $buttonGroup.addClass("Open").setFlyoutAttributes();
-            } else {
-                $(".ButtonGroup")
-                    .removeClass("Open")
-                    .setFlyoutAttributes();
             }
             return false;
         });
-
-        var lastOpen = null;
 
         $(document).delegate(".ToggleFlyout", "click", function(e) {
             var $toggleFlyout = $(this);
@@ -172,14 +163,7 @@
             }
 
             if (isFlyoutClosed) {
-                if (lastOpen !== null) {
-                    $lastOpenFlyout = $(".Flyout", lastOpen);
-                    $lastOpenToggleFlyout = $(lastOpen);
-                    closeFlyout($lastOpenToggleFlyout, $lastOpenFlyout);
-                }
-
                 openFlyout($toggleFlyout, $flyout);
-                lastOpen = this;
             } else {
                 closeFlyout($toggleFlyout, $flyout);
             }
@@ -190,18 +174,14 @@
         // Close ToggleFlyout menu even if their links are hijacked
         $(document).delegate(".ToggleFlyout a", "mouseup", function() {
             if ($(this).hasClass("FlyoutButton")) return;
-            closeFlyout($(".ToggleFlyout"), $(".Flyout"))
+            closeAllFlyouts();
             $(this)
                 .closest(".ToggleFlyout")
                 .setFlyoutAttributes();
         });
 
         $(document).delegate(document, "click", function() {
-            if (lastOpen) {
-                $toggleFlyout = $(lastOpen);
-                $flyout = $(".Flyout", lastOpen);
-                closeFlyout($toggleFlyout, $flyout);
-            }
+            closeAllFlyouts();
         });
     });
 

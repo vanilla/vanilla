@@ -5,12 +5,38 @@
  * @license GPL-2.0-only
  */
 
-// Global vanilla library function.
+/**
+ * IFFE for flyout code.
+ *
+ * @param {Window} window
+ * @param {jQuery} $
+ */
 (function(window, $) {
     var USE_NEW_FLYOUTS = gdn.getMeta("useNewFlyouts", false);
-    console.log("New flyouts", USE_NEW_FLYOUTS);
+    var OPEN_CLASS = 'Open';
 
-    function initFlyouts() {
+    /**
+     * Content load handler, which is fired on first load, and when additional content is loaded in.
+     */
+    $(document).on("contentLoad", function(e) {
+        kludgeFlyoutHTML();
+    });
+
+    /**
+     * Document ready handler. Runs only the first time the page is loaded.
+     */
+    $(function() {
+        $(document).delegate(".Hijack, .js-hijack", "click", handleHijackClick);
+        $(document).delegate(".ButtonGroup > .Handle", "click", handleButtonHandleClick);
+        $(document).delegate(".ToggleFlyout", "click", handleToggleFlyoutClick);
+        $(document).delegate(".ToggleFlyout a", "mouseup", handleToggleFlyoutMouseUp);
+        $(document).delegate(document, "click", closeAllFlyouts);
+    });
+
+    /**
+     * Workarounds for limitations of flyout's HTML structure.
+     */
+    function kludgeFlyoutHTML() {
         var $handles = $(".ToggleFlyout, .editor-dropdown, .ButtonGroup");
 
         $handles.each(function() {
@@ -41,7 +67,7 @@
             var wrap = document.createElement("span");
             wrap.classList.add("mobileFlyoutOverlay");
 
-            $contents.each(function () {
+            $contents.each(function() {
                 if (!this.parentElement.classList.contains("mobileFlyoutOverlay")) {
                     $(this).wrap(wrap);
                 }
@@ -64,125 +90,183 @@
 
     var BODY_CLASS = "flyoutIsOpen";
 
+    /**
+     * Close all flyouts and open the specified one.
+     *
+     * @param {JQuery} $toggleFlyout The flyout handle
+     * @param {JQuery} $flyout The flyout body.
+     */
     function openFlyout($toggleFlyout, $flyout) {
         closeAllFlyouts();
 
         $toggleFlyout
-            .addClass("Open")
+            .addClass(OPEN_CLASS)
             .closest(".Item")
-            .addClass("Open");
-        $flyout.show();
+            .addClass(OPEN_CLASS);
+        
+        if (!USE_NEW_FLYOUTS) {
+            $flyout.show();
+        }
         $toggleFlyout.setFlyoutAttributes();
         document.body.classList.add(BODY_CLASS);
     }
 
+    /**
+     * Close the specified flyout.
+     *
+     * @param {JQuery} $toggleFlyout The flyout handle
+     * @param {JQuery} $flyout The flyout body.
+     */
     function closeFlyout($toggleFlyout, $flyout) {
-        $flyout.hide();
+        if (!USE_NEW_FLYOUTS) {
+            $flyout.hide();
+        }
         $toggleFlyout
-            .removeClass("Open")
+            .removeClass(OPEN_CLASS)
             .closest(".Item")
-            .removeClass("Open");
+            .removeClass(OPEN_CLASS);
         $toggleFlyout.setFlyoutAttributes();
         document.body.classList.remove(BODY_CLASS);
     }
 
+    /**
+     * Close all flyouts, including ButtonGroups.
+     */
     function closeAllFlyouts() {
         closeFlyout($(".ToggleFlyout"), $(".Flyout"));
         // Clear the button groups that are open as well.
         $(".ButtonGroup")
-            .removeClass("Open")
+            .removeClass(OPEN_CLASS)
             .setFlyoutAttributes();
         document.body.classList.remove(BODY_CLASS);
     }
 
-    $(document).on("contentLoad", function(e) {
-        // Set up accessible flyouts
-        initFlyouts();
-    });
+    /**
+     * Take over the clicking of an element in order to make a post request.
+     * 
+     * @param {MouseEvent} e The click event.
+     */
+    function handleHijackClick(e) {
+        var $elem = $(this);
+        var $parent = $(this).closest(".Item");
+        var $toggleFlyout = $elem.closest(".ToggleFlyout");
+        var href = $elem.attr("href");
+        var progressClass = $elem.hasClass("Bookmark") ? "Bookmarking" : "InProgress";
 
-    $(function() {
-        var hijackClick = function(e) {
-            var $elem = $(this);
-            var $parent = $(this).closest(".Item");
-            var $toggleFlyout = $elem.closest(".ToggleFlyout");
-            var href = $elem.attr("href");
-            var progressClass = $elem.hasClass("Bookmark") ? "Bookmarking" : "InProgress";
+        // If empty, or starts with a fragment identifier, do not send
+        // an async request.
+        if (!href || href.trim().indexOf("#") === 0) return;
+        gdn.disable(this, progressClass);
+        e.stopPropagation();
 
-            // If empty, or starts with a fragment identifier, do not send
-            // an async request.
-            if (!href || href.trim().indexOf("#") === 0) return;
-            gdn.disable(this, progressClass);
-            e.stopPropagation();
+        $.ajax({
+            type: "POST",
+            url: href,
+            data: { DeliveryType: "VIEW", DeliveryMethod: "JSON", TransientKey: gdn.definition("TransientKey") },
+            dataType: "json",
+            complete: function() {
+                gdn.enable($elem.get(0));
+                $elem.removeClass(progressClass);
+                $elem.attr("href", href);
+                $flyout = $toggleFlyout.find(".Flyout");
+                closeFlyout($toggleFlyout, $flyout);
+            },
+            error: function(xhr) {
+                gdn.informError(xhr);
+            },
+            success: function(json) {
+                if (json === null) json = {};
 
-            $.ajax({
-                type: "POST",
-                url: href,
-                data: { DeliveryType: "VIEW", DeliveryMethod: "JSON", TransientKey: gdn.definition("TransientKey") },
-                dataType: "json",
-                complete: function() {
-                    gdn.enable($elem.get(0));
-                    $elem.removeClass(progressClass);
-                    $elem.attr("href", href);
-                    $flyout = $toggleFlyout.find(".Flyout");
-
-                    closeFlyout($toggleFlyout, $flyout);
-                },
-                error: function(xhr) {
-                    gdn.informError(xhr);
-                },
-                success: function(json) {
-                    if (json === null) json = {};
-
-                    var informed = gdn.inform(json);
-                    gdn.processTargets(json.Targets, $elem, $parent);
-                    // If there is a redirect url, go to it.
-                    if (json.RedirectTo) {
-                        setTimeout(function() {
-                            window.location.replace(json.RedirectTo);
-                        }, informed ? 3000 : 0);
-                    }
-                },
-            });
-
-            return false;
-        };
-        $(document).delegate(".Hijack, .js-hijack", "click", hijackClick);
-
-        // Activate ToggleFlyout and ButtonGroup menus
-        $(document).delegate(".ButtonGroup > .Handle", "click", function() {
-            var $buttonGroup = $(this).closest(".ButtonGroup");
-            closeAllFlyouts();
-            if (!$buttonGroup.hasClass("Open")) {
-                // Open this one
-                $buttonGroup.addClass("Open").setFlyoutAttributes();
-            }
-            return false;
+                var informed = gdn.inform(json);
+                gdn.processTargets(json.Targets, $elem, $parent);
+                // If there is a redirect url, go to it.
+                if (json.RedirectTo) {
+                    setTimeout(function() {
+                        window.location.replace(json.RedirectTo);
+                    }, informed ? 3000 : 0);
+                }
+            },
         });
 
-        $(document).delegate(".ToggleFlyout", "click", function(e) {
-            var $toggleFlyout = $(this);
-            var $flyout = $(".Flyout", this);
-            var isHandle = false;
+        return false;
+    }
 
-            if ($(e.target).closest(".Flyout").length === 0) {
-                e.stopPropagation();
-                isHandle = true;
-            } else if (
-                $(e.target).hasClass("Hijack") ||
-                $(e.target)
-                    .closest("a")
-                    .hasClass("Hijack")
-            ) {
-                return;
-            }
+    /**
+     * Close existing flyouts and dropdowns and open the dropdown for a particular button handle.
+     */
+    function handleButtonHandleClick() {
+        var $buttonGroup = $(this).closest(".ButtonGroup");
+        closeAllFlyouts();
+        if (!$buttonGroup.hasClass(OPEN_CLASS)) {
+            // Open this one
+            $buttonGroup.addClass(OPEN_CLASS).setFlyoutAttributes();
+        }
+        return false;
+    }
+
+    /**
+     * Handle clicks on the flyout.
+     * 
+     * @param {MouseEvent} e The click event to handle.
+     */
+    function handleToggleFlyoutClick(e) {
+        var $toggleFlyout = $(this);
+        var $flyout = $(".Flyout", this);
+        var isHandle = false;
+
+        if ($(e.target).closest(".Flyout").length === 0) {
             e.stopPropagation();
+            isHandle = true;
+        } else if (
+            $(e.target).hasClass("Hijack") ||
+            $(e.target)
+                .closest("a")
+                .hasClass("Hijack")
+        ) {
+            return;
+        }
+        e.stopPropagation();
+        $toggleFlyout.fillFlyoutDynamically();
 
-            // Dynamically fill the flyout.
+        // The old check.
+        var isFlyoutClosed = $flyout.css("display") == "none";
+        if (USE_NEW_FLYOUTS) {
+            // The new check.
+            isFlyoutClosed = !$toggleFlyout.hasClass(OPEN_CLASS);
+        }
+
+        // Toggling.
+        if (isFlyoutClosed) {
+            openFlyout($toggleFlyout, $flyout);
+        } else {
+            closeFlyout($toggleFlyout, $flyout);
+        }
+
+        if (isHandle) return false;
+    }
+
+    function handleToggleFlyoutMouseUp() {
+        if ($(this).hasClass("FlyoutButton")) return;
+        closeAllFlyouts();
+        $(this)
+            .closest(".ToggleFlyout")
+            .setFlyoutAttributes();
+    }
+
+    /**
+     * jQuery function extensions
+     */
+    $.fn.extend({
+        fillFlyoutDynamically: function() {
             var rel = $(this).attr("rel");
             if (rel) {
+                $flyout = $(this).find(".Flyout");
+
+                // Clear the rel and set a progress indicator.
                 $(this).attr("rel", "");
                 $flyout.html('<div class="InProgress" style="height: 30px"></div>');
 
+                // Fetch the contents dynamically and fill on contents of the flyout.
                 $.ajax({
                     url: gdn.url(rel),
                     data: { DeliveryType: "VIEW" },
@@ -195,38 +279,7 @@
                     },
                 });
             }
-
-            // The old check.
-            var isFlyoutClosed = $flyout.css("display") == "none";
-            if (USE_NEW_FLYOUTS) {
-                // The new check.
-                isFlyoutClosed = !$flyout.is(":visible");
-            }
-
-            if (isFlyoutClosed) {
-                openFlyout($toggleFlyout, $flyout);
-            } else {
-                closeFlyout($toggleFlyout, $flyout);
-            }
-
-            if (isHandle) return false;
-        });
-
-        // Close ToggleFlyout menu even if their links are hijacked
-        $(document).delegate(".ToggleFlyout a", "mouseup", function() {
-            if ($(this).hasClass("FlyoutButton")) return;
-            closeAllFlyouts();
-            $(this)
-                .closest(".ToggleFlyout")
-                .setFlyoutAttributes();
-        });
-
-        $(document).delegate(document, "click", function() {
-            closeAllFlyouts();
-        });
-    });
-
-    $.fn.extend({
+        },
         accessibleFlyoutHandle: function(isOpen) {
             $(this).attr("aria-expanded", isOpen.toString());
         },
@@ -235,13 +288,15 @@
             $(this).attr("aria-hidden", (!isOpen).toString());
         },
 
-        setFlyoutAttributes: function() {
-            $(this).each(function() {
+        setFlyoutAttributes: function () {
+            $toggleFlyouts = $(this);
+            $toggleFlyouts.each(function () {
+                $toggle = $(this);
                 var $handle = $(this).find(
                     ".FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)",
                 );
                 var $flyout = $(this).find(".Flyout, .Dropdown");
-                var isOpen = $flyout.is(":visible");
+                var isOpen = $toggle.hasClass(OPEN_CLASS);
 
                 $handle.accessibleFlyoutHandle(isOpen);
                 $flyout.accessibleFlyout(isOpen);

@@ -49,3 +49,12 @@
     font-weight: $global_fontWeight_semiBold;
 }
 
+
+.compactSearch {
+    .suggestedTextInput-inputText {
+        border: {
+            top-right-radius: $global-borderRadius;
+            bottom-right-radius: $global-borderRadius;
+        }
+    }
+}

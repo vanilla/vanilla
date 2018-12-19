@@ -16,10 +16,5 @@
             flex-grow: 1;
         }
     }
-
-    > .panelWidget {
-        > .panelList {
-            margin-top: #{$global-title_fontSize * $global-condensed_lineHeight / 2 - $global-medium_fontSize/2};
-        }
-    }
 }
+

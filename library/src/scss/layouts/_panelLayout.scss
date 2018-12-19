@@ -192,3 +192,12 @@ $panelLayout-panelAndSpacingWidth                                     : $global-
         bottom: auto;
     }
 }
+
+
+.panelLayout-panel {
+    > .panelArea:first-child {
+        .panelList {
+            margin-top: #{$global-title_fontSize * $global-condensed_lineHeight / 2 - $global-medium_fontSize/2};
+        }
+    }
+}

@@ -6,6 +6,7 @@
 
 $suggestedTextInput-option_padding: 12px;
 $suggestedTextInput-clearButton_width: 16px;
+$suggestedTextInput-clearButton_color: mixContentBgAndFg(25%);
 
 
 // Classes from react-select
@@ -69,15 +70,14 @@ $suggestedTextInput-clearButton_width: 16px;
         border-radius: 50%;
         margin-left: 3px;
         border: none;
-        opacity: .8;
-        color: $global-color_primary;
+        color: $suggestedTextInput-clearButton_color;
 
         &:active,
         &:hover,
         &:focus {
             border: none;
             box-shadow: none;
-            opacity: 1;
+            color: $global-color_primary;
         }
     }
 }
@@ -87,10 +87,6 @@ $suggestedTextInput-clearButton_width: 16px;
         padding: {
             top: 0;
             bottom: 0;
-        }
-        border: {
-            top-right-radius: 0;
-            bottom-right-radius: 0;
         }
     }
 }

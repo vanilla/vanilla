@@ -87,6 +87,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                             handleOnKeyDown={this.handleKeyDown}
                             onOpenSuggestions={this.props.onOpenSuggestions}
                             onCloseSuggestions={this.props.onCloseSuggestions}
+                            className={"compactSearch-searchBar"}
                         />
                         <Button
                             onClick={this.props.onCloseSearch}

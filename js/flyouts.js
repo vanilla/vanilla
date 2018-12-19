@@ -13,7 +13,7 @@
  */
 (function(window, $) {
     var USE_NEW_FLYOUTS = gdn.getMeta("useNewFlyouts", false);
-    var OPEN_CLASS = 'Open';
+    var OPEN_CLASS = "Open";
 
     /**
      * Content load handler, which is fired on first load, and when additional content is loaded in.
@@ -103,7 +103,7 @@
             .addClass(OPEN_CLASS)
             .closest(".Item")
             .addClass(OPEN_CLASS);
-        
+
         if (!USE_NEW_FLYOUTS) {
             $flyout.show();
         }
@@ -143,7 +143,7 @@
 
     /**
      * Take over the clicking of an element in order to make a post request.
-     * 
+     *
      * @param {MouseEvent} e The click event.
      */
     function handleHijackClick(e) {
@@ -206,7 +206,7 @@
 
     /**
      * Handle clicks on the flyout.
-     * 
+     *
      * @param {MouseEvent} e The click event to handle.
      */
     function handleToggleFlyoutClick(e) {
@@ -288,12 +288,12 @@
             $(this).attr("aria-hidden", (!isOpen).toString());
         },
 
-        setFlyoutAttributes: function () {
+        setFlyoutAttributes: function() {
             $toggleFlyouts = $(this);
-            $toggleFlyouts.each(function () {
+            $toggleFlyouts.each(function() {
                 $toggle = $(this);
                 var $handle = $(this).find(
-                    ".FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)",
+                    ".FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)"
                 );
                 var $flyout = $(this).find(".Flyout, .Dropdown");
                 var isOpen = $toggle.hasClass(OPEN_CLASS);

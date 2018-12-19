@@ -366,7 +366,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
     /**
      * Mapping of how certain legacy javascript files have been split up.
-     * 
+     *
      * If you include the key, all of the files in it's value will be included as well.
      */
     const SPLIT_JS_MAPPINGS = [

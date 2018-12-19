@@ -5,6 +5,20 @@
  */
 
 /* -------------------------------------------------------------- *\
+    Brand Colors
+\* -------------------------------------------------------------- */
+
+$global-color_vanillaBlue:              #0291DB;
+$global-color_royalBlue:                #0366D6;
+$global-color_red:                      #D0021B;
+$global-color_grey:                     #555A62;
+$global-color_whitesmoke:               #BCBEC1;
+
+$global-color_black:                    #000;
+$global-color_white:                    #fff;
+$global-color_transparent:              transparent;
+
+/* -------------------------------------------------------------- *\
     Utility Variables
 \* -------------------------------------------------------------- */
 
@@ -23,9 +37,9 @@ $global-heading_fontWeight:             $global-bold_fontWeight !default;
 $global-body_fontFamily:                "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
 $global-body_fontWeight:                $global-normal_fontWeight !default;
 
-$global-large_fontSize:                 18px !default;
-$global-medium_fontSize:                16px !default;
-$global-small_fontSize:                 14px !default;
+$global-large_fontSize:                 16px !default;
+$global-medium_fontSize:                14px !default;
+$global-small_fontSize:                 12px !default;
 
 $global-title_fontSize:                 32px !default;
 $global-subTitle_fontSize:              24px !default;
@@ -41,23 +55,19 @@ $global-default_timing:                 0.35s !default;
 
 $global_borderRadius:                   3px !default;
 
-$global-color_black:                    #000;
-$global-color_white:                    #fff;
-$global-color_transparent:              transparent;
-
-$global-color_primary:                  #007cbb !default;
-$global-color_primaryAlt:               darken($global-color_primary, 8%) !default;
-$global-color_secondary:                #d71950 !default;
+$global-color_primary:                  $global-color_vanillaBlue !default;
+$global-color_primaryAlt:               darken($global-color_primary, 10%) !default;
+$global-color_secondary:                $global-color_red !default;
 
 $global-color_bg:                       $global-color_white !default;
-$global-color_fg:                       lighten(desaturate($global-color_primary, 90%), 8%) !default; // text color | should have high contrast between $global-color_bg
+$global-color_fg:                       $global-color_grey !default; // text color | should have high contrast between $global-color_bg
 
 $global-body_bg:                        $global-color_bg !default;
 
-$icon-default_size:                     20px !default;
-
 $link-default_color:                    $global-color_fg !default;
-$link-default_hover_color:              $global-color_primary !default;
+$link-default_hover_color:              $global-color_royalBlue !default;
+
+$icon-default_size:                     20px !default;
 
 
 /* -------------------------------------------------------------- *\
@@ -305,6 +315,8 @@ $theme-breakpoint_base:                  $theme-breakpoint_smallTable !default;
  * @license GPL-2.0-only
  */
 
+
+
 /* -------------------------------------------------------------- *\
     Utility Variables
 \* -------------------------------------------------------------- */
@@ -326,7 +338,8 @@ $global-medium_fontSize:                14px !default;
 $global-small_fontSize:                 12px !default;
 
 $global-title_fontSize:                 32px !default;
-$global-subTitle_fontSize:              18px !default;
+$global-subTitle_fontSize:              26px !default;
+$global-thirdTitle_fontSize:            22px !default;
 
 $userContent_fontSize:                  $global-medium_fontSize !default; // 14 for forums, but 16 for KB
 
@@ -340,7 +353,8 @@ $userContent-fontSizeH6:                .85em !default;
 $global-heading_topMargin:              1.5 * $global-medium_fontSize;
 
 $global-normal_fontWeight:              400 !default;
-$global-bold_fontWeight:                600 !default;
+$global-semibold_fontWeight:            600 !default;
+$global-bold_fontWeight:                700 !default;
 
 $global-block_marginx:                  $userContent_fontSize !default;
 
@@ -348,7 +362,6 @@ $global-base_lineHeight:                1.5 !default;
 $global-condensed_lineHeight:           1.25 !default;
 $global-code_lineHeight:                1.45 !default;
 $global-excerpt_lineHeight:             1.45 !default;
-
 
 $global_spacer:                         $userContent_fontSize * $global-base_lineHeight;
 
@@ -366,28 +379,12 @@ $global-default_timing:                 0.35s !default;
 
 $global_borderRadius:                   3px !default;
 
-$global-color_black:                    #000;
-$global-color_white:                    #fff;
-$global-color_transparent:              transparent;
-
-$global-color_primary:                  #0291DB !default;
-$global-color_primaryAlt:               darken($global-color_primary, 8%) !default;
-$global-color_secondary:                #d71950 !default;
-
-$global-color_bg:                       $global-color_white !default;
-$global-color_fg:                       lighten(desaturate($global-color_primary, 90%), 8%) !default; // text color | should have high contrast between $global-color_bg
-
-$global-body_bg:                        $global-color_bg !default;
-
-$link-default_color:                    $global-color_fg !default;
-$link-default_hover_color:              $global-color_primary !default;
-
 /* -------------------------------------------------------------- *\
     Theme Colors
 \* -------------------------------------------------------------- */
 
 $theme-border_color:                    mix($global-color_fg, $global-color_bg, 24%) !default;
-$theme-hover_color:                     mix($global-color_fg, $global-color_bg, 12%) !default;
+$theme-hover_color:                     mix($global-color_fg, $global-color_bg, 6%) !default;
 
 $theme-link-hover_textDecoration:       none !default;
 
@@ -398,7 +395,7 @@ $theme-heading-hover_color:             $global-color_primary !default;
     Theme Options
 \* -------------------------------------------------------------- */
 
-$theme-photo_size:                       40px !default;
+$theme-photo_size:                       42px !default;
 $theme-photo-small_size:                 28px !default;
 $theme-photo_round:                      true !default;
 $theme-photo_borderRadius:               $global_borderRadius !default;
@@ -417,9 +414,9 @@ $icon-small_size:                        16px !default;
     Layout
 \* -------------------------------------------------------------- */
 
-$global-gutter_size                                  : $global_spacer;
-$global-gutter_halfSize                              : $global-gutter_size / 2;
-$global-gutter_quarterSize                           : $global-gutter_size / 4;
+$global-gutter_size:                     $global_spacer;
+$global-gutter_halfSize:                 $global-gutter_size / 2;
+$global-gutter_quarterSize:              $global-gutter_size / 4;
 
 /* -------------------------------------------------------------- *\
     Links
@@ -451,11 +448,12 @@ $frame_borderRadius:                     0 !default;
     Header
 \* -------------------------------------------------------------- */
 
-$header_minHeight:                       80px !default;
-$header_bg:                              $global-color_bg !default;
-$header_color:                           $global-color_primary !default;
-$header-hover_color:                     $global-color_primaryAlt !default;
-$header_border:                          1px solid $global-color_primary !default;
+$header_minHeight:                       48px !default;
+$header_bg:                              $global-color_primary !default;
+$header_fg:                              $global-color_white !default;
+$header-link_color:                      $global-color_white !default;
+$header-link-hover_color:                $global-color_white !default;
+$header_border:                          0 !default;
 $header_boxShadow:                       none !default;
 
 /* -------------------------------------------------------------- *\
@@ -492,20 +490,25 @@ $content_borderRadius:                   0 !default;
 
 $panel_toLeft:                           false !default;
 $panel_width:                            220px !default;
-$panel-item_height:                      2.5em !default;
 $panel_bg:                               transparent !default;
-$panel-hover_bg:                         $theme-hover_color !default;
-$panel_color:                            $global-color_fg !default;
-$panel-link_color:                       $global-color_primary !default;
-$panel-link-hover_color:                 $global-color_primaryAlt !default;
 $panel_padding:                          0 !default;
-$panel-border:                           $content_border !default;
-$panel_borderRadius:                     $content_borderRadius !default;
+$panel_border:                           $content_border !default;
+$panel_borderRadius:                     0 !default;
 
-$panel_item-border:                      none !default;
-$panel_item-spacing:                     0 !default;
-$panel_item-borderRadius:                $global_borderRadius !default;
-$panel_item-showIcons:                   false !default;
+$panel-item-showIcons:                   false !default;
+$panel-item_height:                      32px !default;
+$panel-item_spacing:                     0 !default;
+$panel-item_sidePadding:                 6px !default;
+$panel-item_borderRadius:                0 !default;
+$panel-item_border:                      1px solid !default;
+
+$panel-item_bg:                          transparent !default;
+$panel-item_fg:                          $link-default_color !default;
+$panel-item_borderColor:                 transparent !default;
+
+$panel-item-hover_bg:                    transparent !default;
+$panel-item-hover_fg:                    $link-default_hover_color !default;
+$panel-item-hover_borderColor:           transparent !default;
 
 /* -------------------------------------------------------------- *\
     Footer
@@ -513,8 +516,9 @@ $panel_item-showIcons:                   false !default;
 
 $footer_bg:                              $theme-hover_color !default;
 $footer_color:                           $global-color_fg !default;
-$footer-link_color:                      $global-color_primary !default;
-$footer-link-hover_color:                $global-color_primaryAlt !default;
+$footer-link_color:                      $link-default_color !default;
+$footer-link-hover_color:                $global-color_primary !default;
+$footer-link_fontWeight:                 $global-semibold_fontWeight !default;
 $footer-base_fontSize:                   $global-medium_fontSize !default;
 $footer-base_lineHeight:                 $global-base_lineHeight !default;
 
@@ -523,7 +527,7 @@ $footer-base_lineHeight:                 $global-base_lineHeight !default;
 \* -------------------------------------------------------------- */
 
 $component-item_spacing:                 0 !default;
-$component-horizontal_padding:           20px !default;
+$component-horizontal_padding:           8px !default;
 $component-vertical_padding:             16px !default;
 $component-base_padding:                 $component-vertical_padding $component-horizontal_padding !default;
 $component_bg:                           $global-color_bg !default;
@@ -549,7 +553,7 @@ $component-title_lineHeight:             $global-base_lineHeight !default;
 
 $component-meta_color:                   $component-base_color !default;
 $component-meta-link_color:              $link-default_color !default;
-$component-meta-link-hover_color:        $theme-heading-hover_color !default;
+$component-meta-link-hover_color:        $link-default_hover_color !default;
 $component-meta_fontSize:                $global-small_fontSize !default;
 $component-meta_fontWeight:              $global-normal_fontWeight !default;
 $component-meta_lineHeight:              $global-base_lineHeight !default;
@@ -567,27 +571,28 @@ $formElement_borderColor:                lighten($global-color_black, 60%) !defa
 $formElement_placeholderColor:           $formElement_borderColor !default;
 $formElement_border:                     1px solid $formElement_borderColor !default;
 $formElement_fontSize:                   $global-medium_fontSize !default;
-$formElement_borderRadius:               $global_borderRadius !default;
+$formElement_fontWeight:                 $global-medium_fontSize !default;
+$formElement_borderRadius:               6px !default;
 
 /* -------------------------------------------------------------- *\
     Buttons
 \* -------------------------------------------------------------- */
 
-$button-basic_fg:                        $global-color_primary !default;
+$button-basic_fg:                        $global-color_grey !default;
 $button-basic_bg:                        transparent !default;
-$button-basic_border:                    $global-color_primary !default;
+$button-basic_border:                    $global-color_whitesmoke !default;
 
-$button-basic_hover_fg:                  $global-color_white !default;
-$button-basic_hover_bg:                  $global-color_primary !default;
-$button-basic_hover_border:              $global-color_primary !default;
+$button-basic-hover_fg:                  $global-color_primary !default;
+$button-basic-hover_bg:                  transparent !default;
+$button-basic-hover_border:              $global-color_primary !default;
 
 $button-primary_fg:                      $global-color_white !default;
 $button-primary_bg:                      $global-color_primary !default;
-$button-primary_border:                  $global-color_primaryAlt !default;
+$button-primary_border:                  $global-color_primary !default;
 
-$button-primary_hover_fg:                $global-color_white !default;
-$button-primary_hover_bg:                $global-color_primaryAlt !default;
-$button-primary_hover_border:            $global-color_primaryAlt !default;
+$button-primary-hover_fg:                $global-color_white !default;
+$button-primary-hover_bg:                $global-color_primaryAlt !default;
+$button-primary-hover_border:            $global-color_primaryAlt !default;
 
 /* -------------------------------------------------------------- *\
     Form Buttons
@@ -597,7 +602,7 @@ $formButton_bg:                          $button-primary_bg !default;
 $formButton-hover_bg:                    $button-primary_hover_fg !default;
 $formButton_color:                       $button-primary_fg !default;
 $formButton_fontFamily:                  $global-body_fontFamily !default;
-$formButton_fontWeight:                  $global-normal_fontWeight !default;
+$formButton_fontWeight:                  $global-semibold_fontWeight !default;
 $formButton_fontSize:                    $global-medium_fontSize !default;
 $formButton_maxWidth:                    360px !default;
 $formButton_padding:                     $utility-baseUnitDouble !default;
@@ -624,4 +629,3 @@ $theme-breakpoint_tablet:                992px !default;
 $theme-breakpoint_desktop:               1224px !default;
 
 $theme-breakpoint_base:                  $theme-breakpoint_smallTable !default;
-

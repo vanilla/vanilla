@@ -24,9 +24,11 @@ import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import LinkBlot from "quill/formats/link";
 import BlockBlot from "quill/blots/block";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
+import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
+import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 
 export default class KeyboardBindings {
-    private static MULTI_LINE_BLOTS = ["spoiler-line", "blockquote-line", "codeBlock"];
+    private static MULTI_LINE_BLOTS = [SpoilerLineBlot.blotName, BlockquoteLineBlot.blotName, CodeBlockBlot.blotName];
     public bindings: any = {};
 
     constructor(private quill: Quill) {
@@ -155,7 +157,7 @@ export default class KeyboardBindings {
             return true;
         }
 
-        const delta = new Delta().retain(range.index).retain(1, { codeBlock: false });
+        const delta = new Delta().retain(range.index).retain(1, { [CodeBlockBlot.blotName]: false });
         this.quill.updateContents(delta, Emitter.sources.USER);
 
         return false;
@@ -316,7 +318,7 @@ export default class KeyboardBindings {
         this.bindings["CodeBlock Enter"] = {
             key: KeyboardModule.keys.ENTER,
             collapsed: true,
-            format: ["codeBlock"],
+            format: [CodeBlockBlot.blotName],
             handler: this.handleCodeBlockEnter,
         };
     }
@@ -416,7 +418,7 @@ export default class KeyboardBindings {
         this.bindings["CodeBlock Backspace"] = {
             key: KeyboardModule.keys.BACKSPACE,
             collapsed: true,
-            format: ["codeBlock"],
+            format: [CodeBlockBlot.blotName],
             handler: this.handleCodeBlockBackspace,
         };
     }

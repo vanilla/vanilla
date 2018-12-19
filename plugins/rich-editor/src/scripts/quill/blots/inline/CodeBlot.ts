@@ -7,14 +7,11 @@
 import { Code } from "quill/formats/code";
 
 export default class CodeBlot extends Code {
-    public static blotName = "codeInline";
-    public static tagName = "code";
-    public static className = "codeInline";
-
     constructor(domNode) {
         super(domNode);
         domNode.classList.add("code");
         domNode.classList.add("isInline");
+        domNode.classList.add("codeInline");
         domNode.setAttribute("spellcheck", false);
     }
 }

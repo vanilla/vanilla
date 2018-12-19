@@ -26,7 +26,8 @@ class CodeLineTerminatorBlot extends AbstractLineTerminatorBlot {
      * @inheritdoc
      */
     public static function matches(array $operation): bool {
-        return static::opAttrsContainKeyWithValue($operation, "codeBlock");
+        return static::opAttrsContainKeyWithValue($operation, "codeBlock")
+            || static::opAttrsContainKeyWithValue($operation, "code-block");
     }
 
     public function renderLineStart(): string {

@@ -12,8 +12,8 @@ class Code extends AbstractFormat {
     /**
      * @inheritDoc
      */
-    protected static function getAttributeLookupKey(): string {
-        return "codeInline";
+    protected static function getAttributeLookupKey(): array {
+        return ["codeInline", "code"];
     }
 
     /**

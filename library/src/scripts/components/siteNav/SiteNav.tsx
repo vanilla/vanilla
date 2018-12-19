@@ -12,6 +12,8 @@ import classNames from "classnames";
 import * as React from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { t } from "@library/application";
+import { PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
+import Heading from "@library/components/Heading";
 
 interface IProps extends RouteComponentProps<{}> {
     activeRecord: IActiveRecord;
@@ -20,6 +22,7 @@ interface IProps extends RouteComponentProps<{}> {
     children: INavigationTreeItem[];
     collapsible: boolean;
     bottomCTA: React.ReactNode;
+    title?: string; // Title over navigation
 }
 
 export interface IState {
@@ -48,9 +51,16 @@ export class SiteNav extends React.Component<IProps, IState> {
                 : null;
         return (
             <nav onKeyDownCapture={this.handleKeyDown} className={classNames("siteNav", this.props.className)}>
-                <h2 id={this.titleID} className="sr-only">
-                    {t("Site Navigation")}
-                </h2>
+                {this.props.title ? (
+                    <PanelWidgetVerticalPadding>
+                        <Heading title={this.props.title} className="siteNav-title" />
+                    </PanelWidgetVerticalPadding>
+                ) : (
+                    <h2 id={this.titleID} className="sr-only">
+                        {t("Navigation")}
+                    </h2>
+                )}
+
                 <ul className="siteNav-children hasDepth-0" role="tree" aria-labelledby={this.titleID}>
                     {content}
                 </ul>

@@ -14,6 +14,7 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import { t } from "@library/application";
 import { PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
 import Heading from "@library/components/Heading";
+import has = Reflect.has;
 
 interface IProps extends RouteComponentProps<{}> {
     activeRecord: IActiveRecord;
@@ -22,7 +23,8 @@ interface IProps extends RouteComponentProps<{}> {
     children: INavigationTreeItem[];
     collapsible: boolean;
     bottomCTA: React.ReactNode;
-    title?: string; // Title over navigation
+    onItemHover?(item: INavigationTreeItem);
+    title?: string;
 }
 
 export interface IState {
@@ -45,10 +47,12 @@ export class SiteNav extends React.Component<IProps, IState> {
                           titleID={this.titleID}
                           depth={0}
                           collapsible={this.props.collapsible}
+                          onItemHover={this.props.onItemHover}
                       />
                   );
               })
             : null;
+
         if (hasChildren || this.props.bottomCTA) {
             return (
                 <nav onKeyDownCapture={this.handleKeyDown} className={classNames("siteNav", this.props.className)}>
@@ -61,11 +65,10 @@ export class SiteNav extends React.Component<IProps, IState> {
                             {t("Navigation")}
                         </h2>
                     )}
-
                     <ul className="siteNav-children hasDepth-0" role="tree" aria-labelledby={this.titleID}>
                         {content}
                     </ul>
-                    {this.props.bottomCTA ? this.props.bottomCTA : null}
+                    {this.props.bottomCTA}
                 </nav>
             );
         } else {

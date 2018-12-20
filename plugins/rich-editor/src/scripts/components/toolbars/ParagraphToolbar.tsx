@@ -150,7 +150,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
         };
     }
 
-    private static readonly DEFAULT_OFFSET = 1;
+    private static readonly DEFAULT_OFFSET = 2;
     private static readonly LEGACY_EXTRA_OFFSET = 2;
 
     private get verticalOffset(): number {

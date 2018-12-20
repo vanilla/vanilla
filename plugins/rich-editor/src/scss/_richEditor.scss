@@ -34,7 +34,7 @@ $richEditor-scrollContainer_overshoot: 48px;
 
 .richEditor-scrollContainer {
     position: relative;
-    overflow-y: auto;
+    overflow: auto;
     height: 100%;
     width: calc(100% + #{$richEditor-scrollContainer_overshoot * 2});
     margin-left: -$richEditor-scrollContainer_overshoot;
@@ -49,6 +49,7 @@ $richEditor-scrollContainer_overshoot: 48px;
     background: $richEditor_bg;
     height: auto;
     padding: 0;
+    overflow: auto;
 
     &.isMenuInset {
         overflow: initial;

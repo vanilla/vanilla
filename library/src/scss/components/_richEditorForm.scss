@@ -54,10 +54,13 @@ $richEditorForm-placeholder_color: mixContentBgAndFg(50%);
 }
 
 .richEditor-scrollContainer {
-    display: flex;
-    flex-grow: 1;
-    flex-direction: column;
     padding-top: $global_gutter_halfSize;
+}
+
+.richEditor-scrollFrame {
+    @include absolute-bottomLeft;
+    width: 100%;
+    height: calc(100% - #{$formElement-borderWidth + $formElement-height});
 }
 
 .richEditorForm-body {

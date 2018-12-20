@@ -44,9 +44,8 @@ $navigationManager-input_lineHeight: 24px;
 
 .navigationManager-header {
     padding: {
-        left: $utility-baseUnit * 4;
-        right: $utility-baseUnit * 4;
-        bottom: $global-gutter_size;
+        left: $global_gutter_halfSize;
+        right: $global_gutter_halfSize;
     }
 }
 

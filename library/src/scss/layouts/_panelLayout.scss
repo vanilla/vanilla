@@ -163,7 +163,6 @@ $panelLayout-panelAndSpacingWidth                                     : $global-
 // Content section
 .panelLayout-content {
     display: flex;
-    flex-direction: column;
     flex-grow: 1;
     width: 100%;
     justify-content: space-between;

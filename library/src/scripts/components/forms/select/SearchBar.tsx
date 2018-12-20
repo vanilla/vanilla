@@ -211,7 +211,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
             <div className="searchBar">
                 <form className="searchBar-form" onSubmit={this.onFormSubmit}>
                     {!this.props.noHeading && (
-                        <Heading depth={1} renderAsDepth={2} className="searchBar-heading" title={this.props.title}>
+                        <Heading depth={1} className="searchBar-heading pageSmallTitle" title={this.props.title}>
                             <label className="searchBar-label" htmlFor={this.searchInputID}>
                                 {this.props.titleAsComponent ? this.props.titleAsComponent : this.props.title}
                             </label>

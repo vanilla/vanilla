@@ -28,6 +28,7 @@ import { Devices } from "@library/components/DeviceChecker";
 import ParagraphToolbar from "@rich-editor/components/toolbars/ParagraphToolbar";
 import throttle from "lodash/throttle";
 import EmbedBar from "@rich-editor/components/editor/pieces/EmbedBar";
+import hljs from "highlight.js";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -233,6 +234,11 @@ export class Editor extends React.Component<IProps> {
         registerQuill();
         const options: QuillOptionsStatic = {
             theme: "vanilla",
+            modules: {
+                syntax: {
+                    highlight: text => hljs.highlightAuto(text).value,
+                },
+            },
             scrollingContainer: this.scrollContainerRef.current || document.documentElement!,
         };
         this.quill = new Quill(this.quillMountRef.current!, options);

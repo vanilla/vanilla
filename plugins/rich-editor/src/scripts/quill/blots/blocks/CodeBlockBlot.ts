@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import CodeBlock from "quill/formats/code";
+import { CodeBlock } from "quill/modules/syntax";
 
 export default class CodeBlockBlot extends CodeBlock {
     public static create(value) {

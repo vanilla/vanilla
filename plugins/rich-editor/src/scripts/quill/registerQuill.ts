@@ -41,6 +41,7 @@ import HistoryModule from "@rich-editor/quill/HistoryModule";
 import ClipboardModule from "@rich-editor/quill/ClipboardModule";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
+import SyntaxModule from "@rich-editor/quill/SyntaxModule";
 
 export default function registerQuill() {
     Quill.register(
@@ -79,6 +80,7 @@ export default function registerQuill() {
             "modules/embed/focus": FocusModule,
             "modules/history": HistoryModule,
             "modules/clipboard": ClipboardModule,
+            "modules/syntax": SyntaxModule,
         },
         true,
     );

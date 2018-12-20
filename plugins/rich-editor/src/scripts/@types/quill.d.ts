@@ -375,7 +375,20 @@ declare module "quill/modules/keyboard" {
         addBinding(key: KeyBinding | string | number, context: Context, handler: KeyboardHandler): void;
     }
 }
-declare module "quill/modules/syntax";
+declare module "quill/modules/syntax" {
+    import { DeltaStatic, Sources } from "quill/core";
+    import Module from "quill/core/module";
+    import BaseCodeBlock from "quill/formats/code";
+
+    export class CodeBlock extends BaseCodeBlock {}
+
+    export const CodeToken: any;
+
+    export default class SyntaxModule extends Module {
+        public container: HTMLElement;
+        public static register();
+    }
+}
 declare module "quill/modules/toolbar";
 declare module "quill/formats/*";
 declare module "quill-delta";

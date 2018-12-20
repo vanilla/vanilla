@@ -241,7 +241,9 @@ body.hasRichEditor {
 .richEditor-text {
     overflow: visible;
     padding: {
+        top: $richEditor_verticalPadding;
         right: $richEditor_innerPadding;
+        bottom: $richEditor_verticalPadding;
         left: $richEditor_innerPadding;
     }
     &:focus {

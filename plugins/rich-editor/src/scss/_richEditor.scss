@@ -4,6 +4,8 @@
  * @license GPL-2.0-only
  */
 
+$richEditor-scrollContainer_overshoot: 48px;
+
 .richEditor {
     position: relative;
     display: block;
@@ -16,6 +18,9 @@
 
     &.inheritHeight {
         display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+
 
         .richEditor-text,
         .richEditor-textWrap,
@@ -27,12 +32,10 @@
     }
 }
 
-$richEditor-scrollContainer_overshoot: 48px;
-
 .richEditor-scrollContainer {
     position: relative;
     overflow-y: auto;
-    height: auto;
+    height: 100%;
     width: calc(100% + #{$richEditor-scrollContainer_overshoot * 2});
     margin-left: -$richEditor-scrollContainer_overshoot;
     padding: {
@@ -95,10 +98,6 @@ $richEditor-scrollContainer_overshoot: 48px;
 .richEditor-text {
     position: relative;
     min-height: $richEditor_minHeight;
-    padding: {
-        top: $richEditor_verticalPadding;
-        bottom: $richEditor_verticalPadding;
-    }
     outline-color: transparent;
     white-space: pre-wrap !important; // Needed for spaces around embed blots to work properly!
 }

@@ -150,7 +150,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
         };
     }
 
-    private static readonly DEFAULT_OFFSET = 12;
+    private static readonly DEFAULT_OFFSET = 2;
     private static readonly LEGACY_EXTRA_OFFSET = 2;
 
     private get verticalOffset(): number {
@@ -169,6 +169,10 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
         }
         const bounds = this.quill.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
         let classes = "richEditor-toolbarContainer richEditor-paragraphToolbarContainer";
+
+        if (!this.props.legacyMode) {
+            classes += " likeDropDownContent";
+        }
 
         if (bounds.top > 30) {
             classes += " isUp";

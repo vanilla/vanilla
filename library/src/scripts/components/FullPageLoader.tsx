@@ -14,7 +14,7 @@ export default class FullPageLoader extends React.Component {
     public render() {
         return (
             <React.Fragment>
-                <div className="fullPageLoader" aria-hidden="true" />
+                <div className="loader" aria-hidden="true" />
                 <h1 className="sr-only">{t("Loading")}</h1>
             </React.Fragment>
         );

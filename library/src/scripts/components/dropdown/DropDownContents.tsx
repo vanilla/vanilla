@@ -32,7 +32,11 @@ export default class DropDownContents extends React.Component<IProps> {
                     id={this.props.id}
                     aria-labelledby={this.props.parentID}
                     className={classNames(
-                        { "dropDown-contents": !this.props.openAsModal, "dropDown-asModal": this.props.openAsModal },
+                        "hasVerticalPadding",
+                        {
+                            "dropDown-contents": !this.props.openAsModal,
+                            "dropDown-asModal": this.props.openAsModal,
+                        },
                         this.props.className,
                     )}
                     style={flyoutPosition(this.props.renderAbove, this.props.renderLeft, !!this.props.legacyMode)}

@@ -106,12 +106,16 @@ export class Editor extends React.Component<IProps> {
                 {this.renderContexts(
                     <>
                         {this.renderEmbedBar()}
-                        <div className="richEditor-scrollContainer" ref={this.scrollContainerRef}>
-                            <div className={classNames("richEditor-frame InputBox isMenuInset")} id="testScroll">
-                                {this.renderMountPoint()}
-                                {this.renderInlineToolbars()}
+                        <div className="richEditor-scrollFrame">
+                            <div className="richEditor-scrollContainer" ref={this.scrollContainerRef}>
+                                {/*<div className="richEditor-scrollable">*/}
+                                <div className={classNames("richEditor-frame InputBox isMenuInset")} id="testScroll">
+                                    {this.renderMountPoint()}
+                                    {this.renderInlineToolbars()}
+                                </div>
+                                {this.renderParagraphToolbar()}
+                                {/*</div>*/}
                             </div>
-                            {this.renderParagraphToolbar()}
                         </div>
                     </>,
                 )}
@@ -124,7 +128,7 @@ export class Editor extends React.Component<IProps> {
      */
     private renderLegacy(): React.ReactNode {
         return this.renderContexts(
-            <div className={classNames("richEditor-frame InputBox")} id="testScroll">
+            <div className={classNames("richEditor-frame", "InputBox")} id="testScroll">
                 {this.renderMountPoint()}
                 {this.renderParagraphToolbar()}
                 {this.renderInlineToolbars()}

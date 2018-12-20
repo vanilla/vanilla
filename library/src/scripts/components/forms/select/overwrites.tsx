@@ -93,7 +93,7 @@ export function MultiValueRemove(props: MultiValueRemoveProps<any>) {
                 title={t("Clear")}
                 aria-label={t("Clear")}
             >
-                {close("suggestedTextInput-tokenRemoveIcon", true)}
+                {close("suggestedTextInput-tokenRemoveIcon")}
             </button>
         </components.MultiValueRemove>
     );

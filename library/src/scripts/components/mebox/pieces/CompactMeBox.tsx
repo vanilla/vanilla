@@ -23,8 +23,8 @@ import MessagesToggle from "@library/components/mebox/pieces/MessagesToggle";
 import { IMeBoxProps } from "@library/components/mebox/MeBox";
 import NotificationsContents, { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
 import MessagesContents, { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
-import { MeBoxItemType, IMeBoxItem } from "@library/components/mebox/pieces/MeBoxDropDownItem";
-import { INotification, IConversation } from "@library/@types/api";
+import { IMeBoxItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
+import { IConversation, INotification } from "@library/@types/api";
 import NotificationsActions from "@library/notifications/NotificationsActions";
 import apiv2 from "@library/apiv2";
 import ConversationsActions from "@library/conversations/ConversationsActions";
@@ -84,11 +84,15 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                         size={ModalSizes.MODAL_AS_SIDE_PANEL}
                         label={t("Article Revisions")}
                         elementToFocusOnExit={this.buttonRef.current!}
-                        className="compactMeBox-modal isCompact"
+                        className="compactMeBox-modal"
                         exitHandler={this.close}
                     >
                         <div className="compactMeBox-contents">
-                            <CloseButton onClick={this.close} className="compactMeBox-closeModal" />
+                            <CloseButton
+                                onClick={this.close}
+                                className="compactMeBox-closeModal"
+                                baseClass={ButtonBaseClass.CUSTOM}
+                            />
                             <Tabs
                                 label={t("My Account Tab")}
                                 className="compactMeBox-tabs inheritHeight"

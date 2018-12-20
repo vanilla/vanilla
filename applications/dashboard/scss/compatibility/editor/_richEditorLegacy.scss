@@ -11,6 +11,10 @@
         display: block;
         margin: 0;
     }
+
+    .richEditorParagraphMenu {
+        left: 0;
+    }
 }
 
 .userContent {
@@ -237,7 +241,9 @@ body.hasRichEditor {
 .richEditor-text {
     overflow: visible;
     padding: {
+        top: $richEditor_verticalPadding;
         right: $richEditor_innerPadding;
+        bottom: $richEditor_verticalPadding;
         left: $richEditor_innerPadding;
     }
     &:focus {
@@ -249,7 +255,6 @@ body.hasRichEditor {
         }
     }
 }
-
 
 // Mobile
 body.isMobile {

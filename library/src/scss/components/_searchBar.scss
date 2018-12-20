@@ -7,6 +7,15 @@
 $searchBar-search_minWidth: 109px;
 $searchBar-searchIcon_space: 32px;
 
+.searchBar {
+    .suggestedTextInput-inputText {
+        border: {
+            top-right-radius: 0;
+            bottom-right-radius: 0;
+        }
+    }
+}
+
 .searchBar-clear {
     position: relative;
     display: flex;
@@ -30,7 +39,7 @@ $searchBar-searchIcon_space: 32px;
 }
 
 .heading.searchBar-heading {
-    margin-bottom: $global_spacer;
+    margin-bottom: 5px;
 }
 
 

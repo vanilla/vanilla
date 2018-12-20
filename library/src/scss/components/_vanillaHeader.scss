@@ -282,6 +282,8 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
         flex-shrink: 1;
         flex-basis: $vanillaHeader-endElements_mobile_flexBasis;
         height: $vanillaHeader_mobile_height;
+
+        transform: translateX(($vanillaHeader-button_size - $userPhoto-small_width)/2); // so the icon is flush with the side margin, but still has the right padding when hovering.
     }
 }
 
@@ -302,6 +304,6 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 }
 
 .vanillaHeader-backLink {
-    transform: translateX(-15px); // so the icon is flush with the side margin, but still has the right padding when hovering.
+    transform: translateX(-$global-gutter_halfSize); // so the icon is flush with the side margin, but still has the right padding when hovering.
 }
 

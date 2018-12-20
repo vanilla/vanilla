@@ -7,7 +7,7 @@
 $checkRadio-border_width                    : $formElement_borderWidth !default;
 $checkRadio-check_color                     : $global-color_bg !default;
 $checkRadio-bg                              : $global-color_bg !default;
-$checkRadio-border_radius                   : $global_borderRadius;
+$checkRadio-border_radius                   : 2px;
 
 $checkRadio-borderColor                     : mixContentBgAndFg(80%) !default;
 $checkRadio-width                           : 16px;

@@ -4,6 +4,8 @@
  * @license GPL-2.0-only
  */
 
+$richEditor-scrollContainer_overshoot: 48px;
+
 .richEditor {
     position: relative;
     display: block;
@@ -16,6 +18,9 @@
 
     &.inheritHeight {
         display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+
 
         .richEditor-text,
         .richEditor-textWrap,
@@ -28,13 +33,15 @@
 }
 
 .richEditor-scrollContainer {
-    overflow-y: auto;
-    height: auto;
-    width: calc(100% + 68px);
-    margin-left: -34px;
-    padding-left: 34px;
-    padding-right: 34px;
     position: relative;
+    overflow: auto;
+    height: 100%;
+    width: calc(100% + #{$richEditor-scrollContainer_overshoot * 2});
+    margin-left: -$richEditor-scrollContainer_overshoot;
+    padding: {
+        left: $richEditor-scrollContainer_overshoot;
+        right: $richEditor-scrollContainer_overshoot;
+    }
 }
 
 .richEditor-frame {
@@ -42,6 +49,7 @@
     background: $richEditor_bg;
     height: auto;
     padding: 0;
+    overflow: auto;
 
     &.isMenuInset {
         overflow: initial;
@@ -60,10 +68,10 @@
     align-items: center;
     justify-content: center;
     top: $richEditor-pilcrow_offset;
-    left: 0;
+    left: $richEditor_horizontalPadding - $icon_default_size + 2px;
     transform: translateX(-100%);
     height: $richEditor-floatingButton_size;
-    width: $richEditor_horizontalPadding;
+    width: $icon_default_size;
     z-index: 1;
     animation: fadein $richEditor-pilcrowAnimation_duration ease;
     animation-iteration-count: 1;
@@ -91,10 +99,6 @@
 .richEditor-text {
     position: relative;
     min-height: $richEditor_minHeight;
-    padding: {
-        top: $richEditor_verticalPadding;
-        bottom: $richEditor_verticalPadding;
-    }
     outline-color: transparent;
     white-space: pre-wrap !important; // Needed for spaces around embed blots to work properly!
 }
@@ -280,7 +284,7 @@
     max-width: $richEditor-insertLink_width;
     width: 100%;
     padding: {
-        left: 5px;
+        left: 9px;
     }
 }
 
@@ -400,7 +404,7 @@
 }
 
 .insertMedia-insert {
-    margin-bottom: 3px;
+    width: auto;
 }
 
 .richEditorFlyout {
@@ -526,7 +530,6 @@
 }
 
 
-
 // Emoji Groups
 
 .emojiGroups {
@@ -542,4 +545,9 @@
     padding: 0;
     width: $icon-default_size;
     size: $icon-default_size;
+}
+
+
+.richEditor-popoverDescription {
+    margin-bottom: .5em;
 }

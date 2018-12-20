@@ -22,7 +22,7 @@ export interface IProps {
     className?: string;
     buttonClass?: string;
     title: string;
-    children: React.ReactNode;
+    children?: React.ReactNode;
 }
 
 interface IState {
@@ -96,7 +96,9 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                 )}
             </div>
         ) : (
-            <span className="mobileDropDown-title">{this.props.title}</span>
+            <div className="mobileDropDown-toggleButton">
+                <span className="mobileDropDown-title">{this.props.title}</span>
+            </div>
         );
     }
 

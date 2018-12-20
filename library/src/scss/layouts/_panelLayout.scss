@@ -68,6 +68,10 @@ $panelLayout-panelAndSpacingWidth                                     : $global-
     &.hasTopPadding {
         padding-top: $global_gutter_halfSize * 1.5;
     }
+
+    &.hasLargePadding {
+        padding-top: 64px;
+    }
 }
 
 .overlay .panelLayout.noBreadcrumbs .panelLayout-main {

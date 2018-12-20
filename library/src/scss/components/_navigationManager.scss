@@ -53,14 +53,16 @@ $navigationManager-input_lineHeight: 24px;
     max-width: 100%;
 
     &.isDragging {
-        width: auto !important;
+        //width: auto !important;
         min-width: 300px;
+
         .navigationManager-draggable {
-            @include shadow-dropDown;
+            @include shadow-embed;
             padding-right: $utility-baseUnit;
             font-weight: $global-fontWeight_semiBold;
             border: 1px solid $navigationManager-item_dragging_borderColor;
             border-radius: $navigationManager-item_dragging_borderRadius;
+            background-color: $global-color_bg !important;
         }
         .navigationManager-action {
             display: none !important;
@@ -73,7 +75,6 @@ $navigationManager-input_lineHeight: 24px;
         }
     }
 
-    &.isActive,
     &:focus {
         .navigationManager-draggable {
             background-color: $navigationManager-item_dragging_bg;

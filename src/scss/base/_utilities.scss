@@ -687,6 +687,7 @@
     }
 }
 
+.flyoutIsOpen,
 .NoScroll {
     @include maxWidth($theme-breakpoint_tablet) {
         height: 100vh;

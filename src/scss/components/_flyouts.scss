@@ -37,7 +37,10 @@ $frame-footer_minHeight: $frame-header_minHeight;
 
 $formElement-height: 36px;
 
-//
+$modal-large_width: 375px;
+$modal-horizontalMargin: 12px;
+
+
 /* -------------------------------------------------------------- *\
     Styles
 \* -------------------------------------------------------------- */
@@ -49,6 +52,22 @@ $formElement-height: 36px;
 .OptionsMenu .Flyout {
     right: 0;
     top: 110%;
+}
+
+.Flyout {
+    top: 100%;
+}
+
+.ToggleFlyout.Open {
+
+    @include maxWidth {
+        min-width: auto;
+    }
+
+    .MenuItems,
+    .Flyout {
+        display: block;
+    }
 }
 
 .MenuItems,
@@ -65,6 +84,10 @@ $formElement-height: 36px;
         color: $global-border_color;
     }
     z-index: 1;
+
+    @include maxWidth {
+        z-index: 1;
+    }
 
     &::before,
     &::after {
@@ -205,7 +228,7 @@ $formElement-height: 36px;
             }
 
             &::before {
-                @include icon;
+                @include kbicon;
                 display: block;
                 line-height: $formElement-height;
                 font-size: $icon-default_size;
@@ -299,7 +322,7 @@ $formElement-height: 36px;
     .Item.Title a {
 
         &::before {
-            content: $icon-ellipsis;
+            content: $kbicon-settings;
         }
     }
 }
@@ -309,7 +332,89 @@ $formElement-height: 36px;
     .Item.Title a {
 
         &::before {
-            content: $icon-edit;
+            content: $kbicon-compose;
+        }
+    }
+}
+
+@include maxWidth($theme-breakpoint_tablet) {
+
+    .ToggleFlyout,
+    .ButtonGroup {
+        cursor: pointer;
+
+        .mobileFlyoutOverlay {
+            cursor: pointer;
+        }
+    }
+}
+
+@include maxWidth {
+
+.mobileFlyoutOverlay {
+    opacity: 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    width: 100vw;
+    background: rgba($global-color_black, 0.2);
+    z-index: 1;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .ToggleFlyout.Open,
+    .ButtonGroup.Open {
+
+        .mobileFlyoutOverlay {
+            opacity: 1;
+            z-index: 1;
+            pointer-events: initial;
+        }
+
+        .MenuItems.MenuItems,
+        .Flyout.Flyout {
+            visibility: visible;
+            transition-delay: 0s;
+            opacity: 1;
+            top: initial;
+            right: initial;
+            left: initial;
+        }
+    }
+
+    .MenuItems,
+    .Flyout {
+        max-width: $modal-large_width;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        position: fixed;
+        display: block;
+        visibility: hidden;
+        box-shadow: 0 -2px 10px 2px rgba($global-color_black, 0.1);
+        opacity: 0;
+        cursor: pointer;
+        max-height: 80vh;
+        overflow: auto;
+        transition:
+            visibility 0s linear $global-default_timing,
+            transform $global-default_easing $global-default_timing,
+            opacity $global-default_easing $global-default_timing;
+        z-index: 100;
+
+        a {
+            color: $link-default_color;
+
+            &:focus,
+            &:hover {
+                color: $link-default_hover_color;
+            }
         }
     }
 }

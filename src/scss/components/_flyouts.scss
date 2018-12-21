@@ -9,39 +9,31 @@
 \* -------------------------------------------------------------- */
 
 $flyout_bg:                             $global-color_white !default;
-$flyout-hover_bg:                       darken($global-color_white, 7%) !default;
-$flyout_fg:                             mix($global-color_black, $flyout_bg, 70%) !default;
+$flyout-hover_bg:                       $global-color_active_primaryBg !default;
+$flyout_fg:                             $global-color_grey !default;
 
-$flyout-link_color:                     $global-color_primary !default;
-$flyout-link-hover_color:               $global-color_primaryAlt !default;
-
-$flyout-link-alt_color:                 $global-color_secondary !default;
-$flyout-link-altHover_color:            darken($global-color_secondary, 8%) !default;
-
-$flyout_border:                         1px solid $theme-border_color !default;
+$flyoutOverlay-border_color:            mix($flyout_fg, $flyout_bg, 5%) !default;
 $flyout_borderRadius:                   $global_borderRadius !default;
-$flyout_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.2) !default;
+$flyout_border:                         1px solid $flyoutOverlay-border_color !default;
 
-$dropDown_width:                        350px;
-$menuItens_width:                        200px;
+$flyout-link_color:                     $flyout_fg !default;
+$flyout-link-hover_color:               $link-default-hover_color !default;
 
-$frame-header_minHeight: 44px;
-$frame-header_spacing: 12px;
-$frame-header_fontSize: $global-subTitle_fontSize;
-$overlay-border_color                                   : mix($global-color_fg, $global-color_bg, 12%) !default;
+$flyoutHeader_fontSize:                 $global-subTitle_fontSize;
+$flyoutHeader_minHeight:                44px;
+$flyoutHeader_spacing:                  12px;
 
-$meBoxMessage-padding: 8px;
-$meBoxMessage-unreadDot_width: 12px;
+$flyoutMessage_padding:                 8px;
+$flyoutMessage-unreadDot_width:         12px;
 
-$frame-footer_spacing: $frame-header_spacing;
-$frame-footer_minHeight: $frame-header_minHeight;
-$frame_minHeight: calc(44px - #{$meBoxMessage-padding * 2});
+$flyoutFooter_spacing:                  $flyoutHeader_spacing;
+$flyoutFooter_minHeight:                $flyoutHeader_minHeight;
+$flyoutMessage_minHeight:               calc(44px - #{$flyoutMessage_padding * 2});
 
-$formElement-height: 36px;
+$flyoutModal-large_width:               375px;
 
-$modal-large_width: 375px;
-$modal-horizontalMargin: 12px;
-
+$dropDown_width:                        350px !default;
+$menuItems_width:                       200px !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -55,13 +47,18 @@ $modal-horizontalMargin: 12px;
     min-width: 200px;
 }
 
+.Dropdown.MenuItems {
+    width: 100%;
+}
+
 .OptionsMenu .Flyout {
     right: 0;
     top: 110%;
 }
 
 .ToggleFlyout.Open,
-.editor-dropdown-open {
+.editor-dropdown-open,
+.richEditor-button.isOpen {
 
     @include maxWidth {
         min-width: auto;
@@ -74,19 +71,16 @@ $modal-horizontalMargin: 12px;
 }
 
 .MenuItems,
-.Flyout.Flyout {
+.Flyout.Flyout,
+.richEditorFlyout {
 
     @include shadow-dropDown;
     padding: 0;
     position: absolute;
-    background-color: $global-color_bg;
-    color: $global-color_fg;
-    border: {
-        radius: $global_borderRadius;
-        style: solid;
-        width: 1px;
-        color: $global-border_color;
-    }
+    background-color: $flyout_bg;
+    color: $flyout_fg;
+    border: $flyout_border;
+    border-radius: $flyout_borderRadius;
     z-index: 1;
 
     @include maxWidth {
@@ -105,25 +99,25 @@ $modal-horizontalMargin: 12px;
         padding: 0;
         min-height: 0;
         height: 1px;
-        background-color: $overlay-border_color;
+        background-color: $flyoutOverlay-border_color;
         margin: 0;
     }
 
     .Item,
     li:not([role="presentation"]),
     .editor-action {
-        padding: $meBoxMessage-padding;
+        padding: $flyoutMessage_padding;
     }
 
-    .editor-action {
-        color: inherit;
+    .editor-action:not(.editor-action-separator) {
+        color: inherit !important;
 
         &:active,
         &:focus,
         &:hover {
             color: inherit !important;
             background-color: $global-color_active_primaryBg !important;
-            padding: $meBoxMessage-padding;
+            padding: $flyoutMessage_padding;
         }
     }
 
@@ -164,11 +158,11 @@ $modal-horizontalMargin: 12px;
     }
 
     a {
-        color: $link-default_color;
+        color: $flyout-link_color;
 
         &:focus,
         &:hover {
-            color: $link-default_hover_color;
+            color: $flyout-link-hover_color;
         }
     }
 }
@@ -178,39 +172,48 @@ $modal-horizontalMargin: 12px;
     li > a,
     .dropdown-menu-link.dropdown-menu-link,
     .editor-action {
-        padding: $meBoxMessage-padding;
-        min-height: $frame_minHeight;
+        padding: $flyoutMessage_padding;
+        min-height: $flyoutMessage_minHeight;
         display: flex;
         align-items: center;
     }
 
-    .emoji-wrap.emoji-wrap {
+    .emoji-wrap.emoji-wrap.emoji-wrap {
         display: inline-flex;
-        padding: $frame-footer_spacing;
+        padding: $flyoutFooter_spacing;
 
         &:active,
         &:focus,
         &:hover {
-            padding: $frame-footer_spacing;
+            padding: $flyoutFooter_spacing;
         }
     }
 }
 
-.Flyout {
+.Flyout,
+.richEditorFlyout {
 
     .Item + .Item {
-        border-top: solid $overlay-border_color 1px;
+        border-top: solid $flyoutOverlay-border_color 1px;
     }
 
-    .Item.Title {
+    .Item.Title,
+    .richEditorFlyout-header {
         display: flex;
         position: relative;
         align-items: center;
         flex-wrap: nowrap;
         width: 100%;
-        min-height: $frame-header_minHeight;
-        padding: 0 $frame-header_spacing;
+        min-height: $flyoutHeader_minHeight;
+        padding: 0 $flyoutHeader_spacing;
         z-index: 1;
+
+        &:active,
+        &:focus,
+        &:hover {
+            background-color: transparent;
+            text-decoration: none;
+        }
 
         strong {
             display: block;
@@ -231,10 +234,12 @@ $modal-horizontalMargin: 12px;
             color: transparent;
 
             &:focus,
-            &:hover {
+            &:hover,
+            &:active {
+                color: $flyout-link-hover_color;
 
                 &::before {
-                    color: $link-default_hover_color;
+                    color: $flyout-link-hover_color;
                 }
             }
 
@@ -243,7 +248,7 @@ $modal-horizontalMargin: 12px;
                 display: block;
                 line-height: $formElement-height;
                 font-size: $icon-default_size;
-                color: $link-default_color;
+                color: $flyout-link_color;
             }
         }
     }
@@ -253,8 +258,8 @@ $modal-horizontalMargin: 12px;
         position: relative;
         flex-wrap: wrap;
         align-items: center;
-        padding: $frame-footer_spacing;
-        min-height: $frame-footer_minHeight;
+        padding: $flyoutFooter_spacing;
+        min-height: $flyoutFooter_minHeight;
         z-index: 1;
 
         &:active,
@@ -264,9 +269,23 @@ $modal-horizontalMargin: 12px;
             text-decoration: none;
         }
 
+        a {
+            padding: 0 !important;
+
+            &:focus,
+            &:hover,
+            &:active {
+                color: $flyout-link-hover_color !important;
+            }
+        }
+
         .button + .button {
             margin-left: $utility-baseUnit * 2 - $formElement-borderWidth;
         }
+    }
+
+    .Empty {
+        margin: 0;
     }
 
     .ItemContent {
@@ -274,17 +293,17 @@ $modal-horizontalMargin: 12px;
         line-height: inherit;
         flex-grow: 1;
         padding: {
-            left: $meBoxMessage-padding;
-            right: $meBoxMessage-padding;
+            left: $flyoutMessage_padding;
+            right: $flyoutMessage_padding;
         }
-        max-width: calc(100% - #{$meBoxMessage-unreadDot_width + $theme-photo_size});
+        max-width: calc(100% - #{$flyoutMessage-unreadDot_width + $theme-photo_size});
 
         a {
             font-weight: 700;
 
             &:focus,
             &:hover {
-                color: $link-default_color;
+                color: $flyout-link_color;
             }
         }
     }
@@ -311,18 +330,18 @@ $modal-horizontalMargin: 12px;
         color: inherit;
     }
 
-    .HasNew {
+    .HasNew.HasNew {
         color: transparent;
         position: absolute;
         display: block;
         top: 0;
-        right: $meBoxMessage-padding;
+        right: $flyoutMessage_padding;
         bottom: 0;
         max-height: 100%;
         max-width: 100%;
         margin: auto 0;
-        height: $meBoxMessage-unreadDot_width;
-        width: $meBoxMessage-unreadDot_width;
+        height: $flyoutMessage-unreadDot_width;
+        width: $flyoutMessage-unreadDot_width;
         background-color: $global-color_primary;
         border-radius: 50%;
     }
@@ -362,29 +381,25 @@ $modal-horizontalMargin: 12px;
 .editor-dd-link + .mobileFlyoutOverlay {
 
     input.InputBox {
-        width: calc(100% - (#{$meBoxMessage-padding} * 2));
-        margin: $meBoxMessage-padding;
+        width: calc(100% - (#{$flyoutMessage_padding} * 2));
+        margin: $flyoutMessage_padding;
     }
 
 
     .MenuButtons {
-        border-top: solid $overlay-border_color 1px;
-        padding: $meBoxMessage-padding;
-        min-height: $frame_minHeight;
+        border-top: solid $flyoutOverlay-border_color 1px;
+        padding: $flyoutMessage_padding;
+        min-height: $flyoutMessage_minHeight;
     }
 }
 
 .OnlineUserWrap .OnlineUserName,
 .MenuItems-Reactions {
     @include shadow-dropDown;
-    color: $global-color_fg !important;
-    border: {
-        radius: $global_borderRadius !important;
-        style: solid;
-        width: 1px;
-        color: $global-border_color !important;
-    }
-    background-color: $global-color_bg;
+    color: $flyout_bg !important;
+    border: $flyout_border;
+    border-radius: $flyout_borderRadius;
+    background-color: $flyout_bg;
     z-index: 1;
 
     @include maxWidth {
@@ -398,7 +413,7 @@ $modal-horizontalMargin: 12px;
 }
 
 .OnlineUserWrap .OnlineUserName {
-    padding: $meBoxMessage-padding !important;
+    padding: $flyoutMessage_padding !important;
 }
 
 .MenuItems-Reactions.MenuItems-Reactions {
@@ -415,7 +430,22 @@ $modal-horizontalMargin: 12px;
     .PhotoWrap {
         height: $theme-photo-small_size;
         width: $theme-photo-small_size !important;
-        margin-right: $meBoxMessage-padding !important;
+        margin-right: $flyoutMessage_padding !important;
+    }
+}
+
+.richEditorFlyout {
+
+    .richEditorFlyout-header {
+        border-bottom: solid $flyoutOverlay-border_color 1px;
+    }
+
+    .richEditor-button {
+        &:active,
+        &:focus,
+        &:hover {
+            background-color: $global-color_active_primaryBg;
+        }
     }
 }
 
@@ -455,7 +485,8 @@ $modal-horizontalMargin: 12px;
 
     .ToggleFlyout.Open,
     .ButtonGroup.Open,
-    .editor-dropdown-open {
+    .editor-dropdown-open,
+    .richEditor-button.isOpen {
 
         .mobileFlyoutOverlay {
             opacity: 1;
@@ -476,7 +507,7 @@ $modal-horizontalMargin: 12px;
 
     .MenuItems,
     .Flyout {
-        max-width: $modal-large_width;
+        max-width: $flyoutModal-large_width;
         width: 100%;
         margin-left: auto;
         margin-right: auto;
@@ -495,11 +526,11 @@ $modal-horizontalMargin: 12px;
         z-index: 100;
 
         a {
-            color: $link-default_color;
+            color: $flyout-link_color;
 
             &:focus,
             &:hover {
-                color: $link-default_hover_color;
+                color: $flyout-link-hover_color;
             }
         }
     }

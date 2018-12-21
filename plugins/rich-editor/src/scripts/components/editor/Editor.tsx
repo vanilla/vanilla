@@ -70,6 +70,8 @@ export class Editor extends React.Component<IProps> {
     /** The redux store. */
     private store = getStore<IStoreState>();
 
+    private skipCallback = false;
+
     /**
      * The ID of our quill instance.
      * This is needed to work our quill instance's chunk of the redux store
@@ -282,6 +284,7 @@ export class Editor extends React.Component<IProps> {
 
         if (!oldProps.reinitialize && this.props.reinitialize) {
             if (this.props.initialValue) {
+                this.skipCallback = true;
                 this.setEditorContent(this.props.initialValue);
             }
         }
@@ -336,6 +339,10 @@ export class Editor extends React.Component<IProps> {
      * - Every selection change event (even the "silent" ones).
      */
     private onQuillUpdate = throttle((type: string, newValue, oldValue, source: Sources) => {
+        if (this.skipCallback) {
+            this.skipCallback = false;
+            return;
+        }
         if (this.props.onChange && type === Quill.events.TEXT_CHANGE && source !== Quill.sources.SILENT) {
             this.props.onChange(this.getEditorOperations()!);
         }

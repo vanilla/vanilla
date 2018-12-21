@@ -186,10 +186,10 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
                 <h3 className="datePicker-title">{title}</h3>
                 <span className={classNames("datePicker-navigation", className)}>
                     <Button baseClass={ButtonBaseClass.ICON} onClick={prev}>
-                        {leftChevron()}
+                        {leftChevron("", true)}
                     </Button>
                     <Button baseClass={ButtonBaseClass.ICON} onClick={next}>
-                        {rightChevron()}
+                        {rightChevron("", true)}
                     </Button>
                 </span>
             </div>

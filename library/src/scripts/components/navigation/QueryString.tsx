@@ -73,12 +73,10 @@ class QueryString extends React.Component<IProps> {
      * This is throttle and put in request animation frame so that it does not take priority over the UI.
      */
     private updateQueryString = throttle(() => {
-        requestAnimationFrame(() => {
-            const query = qs.stringify(this.getFilteredValue(this.props.value, this.props.defaults || {}));
-            this.props.history.replace({
-                ...this.props.location,
-                search: query,
-            });
+        const query = qs.stringify(this.getFilteredValue(this.props.value, this.props.defaults || {}));
+        this.props.history.replace({
+            ...this.props.location,
+            search: query,
         });
     }, 100);
 }

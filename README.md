@@ -54,10 +54,11 @@ When you enter one of those to reach your web host, your web server shows what i
 
 We strongly recommend:
 
-*  **PHP 7.1** or higher.
-*  MySQL 5.6 or higher (or Percona/MariaDB equivalent).
+*  **PHP 7.2** or higher.
+*  MySQL 5.7 or higher (or Percona/MariaDB equivalent).
+* SSL encyrption (check out [LetsEncrypt](https://letsencrypt.org/)).
 
-If your server is not running PHP 7.1 or higher, **you should address this soon**. While PHP 7.0 will receive security patches until December 2018, Vanilla may end support for it prior to that.
+If your server is not running PHP 7.1 or higher, **you should address this soon**. PHP 7.0 has reached end of life and will no longer receive security patches. **Vanilla's support for PHP 7.0 will end soon**.
 
 Our _minimum_ requirements are now:
 
@@ -68,7 +69,7 @@ Our _minimum_ requirements are now:
 * MySQL 5.0 or newer (or Percona/MariaDB equivalent).
 * MySQL strict mode [disabled](https://www.liquidweb.com/kb/how-to-disable-mysql-strict-mode/).
 
-Vanilla ships with a `.htaccess` file required for Apache support. Using nginx or IIS may require additional configuration.
+Vanilla ships with a `.htaccess` file required for Apache support. Using nginx or IIS may require additional configuration. We have [docs for nginx](https://docs.vanillaforums.com/developer/backend/server-nginx/).
 
 On the client side, Vanilla should run & look good in just about any modern browser.
 Still using IE? How exotic. You'll want IE11 or greater. IE8 *might* work if you squint hard and click gently, but we make no promises.

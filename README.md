@@ -42,11 +42,11 @@ If you professionally run a large community or enterprise forum, our cloud solut
 
 ## Self-Hosting Basics
 
-If you're new to self-hosting, read this section. Otherwise, skip to the [requirements](https://github.com/vanilla/vanilla/blob/master/README.md#self-hosting-requirements) and [installation](https://github.com/vanilla/vanilla/blob/master/README.md#installation)
+If you're new to self-hosting, read this section. Otherwise, skip to the [requirements](https://github.com/vanilla/vanilla/blob/master/README.md#self-hosting-requirements) and [installation](https://github.com/vanilla/vanilla/blob/master/README.md#installation).
 
 Vanilla requires a server with PHP, MySQL, and web server software (like Apache or nginx). You'll probably need to own a domain, and already have it configured on your server with DNS. You usually need to create a database for it via your hosting provider, often via phpMyAdmin. Then you'll need to visit that domain after uploading Vanilla to continue installation. Up to this point, your web host is responsible for all these things. You should consult their docs and contact their support with any questions to getting as far as that.
 
-Say you bought some web space and someone told you how to access it. It might be that you bought a domain like `example.com` or you received only a cryptic sub domain of your provider like `abc123456789.yourwebhoster.com` or you might only have received an IP address, so that you can reach your web space with `1.2.3.4`
+Say you bought some web space and someone told you how to access it. It might be that you bought a domain like `example.com` or you received only a cryptic sub domain of your provider like `abc123456789.yourwebhoster.com` or you might only have received an IP address, so that you can reach your web space with `1.2.3.4`.
 
 When you enter one of those to reach your web host, your web server shows what is in a folder of your web space. Often, that folder is called `public_html`. Say you own `example.com` and that's what you set up on your server. You have created a subfolder called `forum` (always use lowercase letters!) and uploaded Vanilla to it (see [installation below]((https://github.com/vanilla/vanilla/blob/master/README.md#installation)). Then, you will be able to see the Vanilla installer when you visit `example.com/forum` in your browser.
 
@@ -171,7 +171,7 @@ The creators of git flow released a [short intro video](http://vimeo.com/1601841
 The `master` branch is production-ready for our cloud product but is not yet vetted for open source release (alternate platforms & configurations).
 Reviewed, stable changes land against `master` via pull-request.
 
-Our open source release branches are named by version number, e.g. `release/2.5`.
+Our open source release branches are named by version number, e.g. `release/2.6`.
 We begin release branches with a beta (b1) designation and progress them thru release candidate to stable.
 All open source releases (included pre-releases) are tagged.
 

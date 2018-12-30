@@ -26,7 +26,7 @@ Vanilla is free, open source software distributed under the GNU GPL2.
 We accept and encourage contributions from our community and sometimes give hugs in return.
 You can join us on the [Vanilla Community Forums](https://open.vanillaforums.com/discussions) to be part of that discussion.
 
-The latest stable release is always [listed here](https://open.vanillaforums.com/addon/vanilla-core). Currently, it is the `release/2.5` branch.
+The latest stable release is always [listed here](https://open.vanillaforums.com/addon/vanilla-core). Currently, it is the `release/2.6` branch.
 
 New plugins and themes can be listed in the [Official Addon Directory](https://open.vanillaforums.com/addon/).
 We encourage addon developers to release their code under the GPL as well, but do not require it.
@@ -39,6 +39,16 @@ integration assistance, theming and migration services, and exclusive features. 
 you can skip the rest of this technical stuff and [go there directly](https://vanillaforums.com/plans).
 
 If you professionally run a large community or enterprise forum, our cloud solution will make the best technical and economic sense by far.
+
+## Self-Hosting Basics
+
+If you're new to self-hosting, read this section. Otherwise, skip to the [requirements](https://github.com/vanilla/vanilla/blob/master/README.md#self-hosting-requirements) and [installation](https://github.com/vanilla/vanilla/blob/master/README.md#installation)
+
+Vanilla requires a server with PHP, MySQL, and web server software (like Apache or nginx). You'll probably need to own a domain, and already have it configured on your server with DNS. You usually need to create a database for it via your hosting provider, often via phpMyAdmin. Then you'll need to visit that domain after uploading Vanilla to continue installation. Up to this point, your web host is responsible for all these things. You should consult their docs and contact their support with any questions to getting as far as that.
+
+Say you bought some web space and someone told you how to access it. It might be that you bought a domain like `example.com` or you received only a cryptic sub domain of your provider like `abc123456789.yourwebhoster.com` or you might only have received an IP address, so that you can reach your web space with `1.2.3.4`
+
+When you enter one of those to reach your web host, your web server shows what is in a folder of your web space. Often, that folder is called `public_html`. Say you own `example.com` and that's what you set up on your server. You have created a subfolder called `forum` (always use lowercase letters!) and uploaded Vanilla to it (see [installation below]((https://github.com/vanilla/vanilla/blob/master/README.md#installation)). Then, you will be able to see the Vanilla installer when you visit `example.com/forum` in your browser.
 
 ## Self-Hosting Requirements
 

@@ -1,6 +1,6 @@
 /*!
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,7 +8,6 @@ $richEditorForm-placeholder_color: mixContentBgAndFg(50%);
 
 .richEditorForm {
     position: relative;
-    height: 100vh;
 }
 
 // We want the shadows to overflow, but not the rest, so we need this workaround.
@@ -55,21 +54,23 @@ $richEditorForm-placeholder_color: mixContentBgAndFg(50%);
 }
 
 .richEditor-scrollContainer {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    padding-top: $global_gutter_halfSize;
+}
+
+.richEditor-scrollFrame {
+    @include absolute-bottomLeft;
+    width: 100%;
+    height: calc(100% - #{$formElement-borderWidth + $formElement-height});
 }
 
 .richEditorForm-body {
     padding-top: $overlay-fullPageHeading_spacer;
-    height: calc(100% - #{$global-gutter_halfSize + $global-gutter_size * 4});
-    margin: {
-        bottom: $global-gutter_size;
-    }
+    flex-grow: 1;
 }
 
 .richEditor-inlineMenuItems {
     border-bottom: {
+
         width: $formElement_borderWidth;
         style: solid;
         color: $formElement_borderColor;

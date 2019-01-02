@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -71,6 +71,8 @@ export class Editor extends React.Component<IProps> {
     /** The redux store. */
     private store = getStore<IStoreState>();
 
+    private skipCallback = false;
+
     /**
      * The ID of our quill instance.
      * This is needed to work our quill instance's chunk of the redux store
@@ -107,12 +109,16 @@ export class Editor extends React.Component<IProps> {
                 {this.renderContexts(
                     <>
                         {this.renderEmbedBar()}
-                        <div className="richEditor-scrollContainer" ref={this.scrollContainerRef}>
-                            <div className={classNames("richEditor-frame InputBox isMenuInset")} id="testScroll">
-                                {this.renderMountPoint()}
-                                {this.renderInlineToolbars()}
+                        <div className="richEditor-scrollFrame">
+                            <div className="richEditor-scrollContainer" ref={this.scrollContainerRef}>
+                                {/*<div className="richEditor-scrollable">*/}
+                                <div className={classNames("richEditor-frame InputBox isMenuInset")} id="testScroll">
+                                    {this.renderMountPoint()}
+                                    {this.renderInlineToolbars()}
+                                </div>
+                                {this.renderParagraphToolbar()}
+                                {/*</div>*/}
                             </div>
-                            {this.renderParagraphToolbar()}
                         </div>
                     </>,
                 )}
@@ -125,7 +131,7 @@ export class Editor extends React.Component<IProps> {
      */
     private renderLegacy(): React.ReactNode {
         return this.renderContexts(
-            <div className={classNames("richEditor-frame InputBox")} id="testScroll">
+            <div className={classNames("richEditor-frame", "InputBox")} id="testScroll">
                 {this.renderMountPoint()}
                 {this.renderParagraphToolbar()}
                 {this.renderInlineToolbars()}
@@ -284,6 +290,7 @@ export class Editor extends React.Component<IProps> {
 
         if (!oldProps.reinitialize && this.props.reinitialize) {
             if (this.props.initialValue) {
+                this.skipCallback = true;
                 this.setEditorContent(this.props.initialValue);
             }
         }
@@ -338,6 +345,10 @@ export class Editor extends React.Component<IProps> {
      * - Every selection change event (even the "silent" ones).
      */
     private onQuillUpdate = throttle((type: string, newValue, oldValue, source: Sources) => {
+        if (this.skipCallback) {
+            this.skipCallback = false;
+            return;
+        }
         if (this.props.onChange && type === Quill.events.TEXT_CHANGE && source !== Quill.sources.SILENT) {
             this.props.onChange(this.getEditorOperations()!);
         }

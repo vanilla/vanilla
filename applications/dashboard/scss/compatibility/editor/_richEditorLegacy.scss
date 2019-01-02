@@ -1,5 +1,5 @@
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,6 +10,10 @@
     blockquote {
         display: block;
         margin: 0;
+    }
+
+    .richEditorParagraphMenu {
+        left: 0;
     }
 }
 
@@ -237,7 +241,9 @@ body.hasRichEditor {
 .richEditor-text {
     overflow: visible;
     padding: {
+        top: $richEditor_verticalPadding;
         right: $richEditor_innerPadding;
+        bottom: $richEditor_verticalPadding;
         left: $richEditor_innerPadding;
     }
     &:focus {
@@ -249,7 +255,6 @@ body.hasRichEditor {
         }
     }
 }
-
 
 // Mobile
 body.isMobile {

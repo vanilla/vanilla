@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -87,6 +87,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                             handleOnKeyDown={this.handleKeyDown}
                             onOpenSuggestions={this.props.onOpenSuggestions}
                             onCloseSuggestions={this.props.onCloseSuggestions}
+                            className={"compactSearch-searchBar"}
                         />
                         <Button
                             onClick={this.props.onCloseSearch}

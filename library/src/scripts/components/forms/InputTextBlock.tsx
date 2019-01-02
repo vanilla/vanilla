@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -35,6 +35,7 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
         type: "text",
         errors: [],
         baseClass: InputTextBlockBaseClass.STANDARD,
+        legacyMode: false,
     };
 
     private id: string;
@@ -47,7 +48,9 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
 
     public render() {
         const { inputProps, ...blockProps } = this.props;
-        const inputClasses = classNames("inputBlock-inputText", "InputBox", "inputText", inputProps.inputClassNames);
+        const inputClasses = classNames("inputBlock-inputText", "inputText", inputProps.inputClassNames, {
+            InputBox: this.props.legacyMode,
+        });
 
         return (
             <InputBlock {...blockProps}>

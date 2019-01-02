@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -61,7 +61,7 @@ export default class MessagesContents extends React.Component<IProps> {
                         />
                     </FramePanel>
                 </FrameBody>
-                <FrameFooter className="isShadowed isCompact">
+                <FrameFooter>
                     <LinkAsButton
                         className="headerDropDown-footerButton headerDropDown-allButton button-pushLeft"
                         to={"/messages/inbox"}

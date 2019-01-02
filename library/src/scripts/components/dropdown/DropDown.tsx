@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,6 +10,9 @@ import { getRequiredID } from "@library/componentIDs";
 import PopoverController from "@library/components/PopoverController";
 import DropDownContents from "./DropDownContents";
 import { ButtonBaseClass } from "@library/components/forms/Button";
+import Heading from "@library/components/Heading";
+import SmartAlign from "@library/components/SmartAlign";
+import classNames from "classnames";
 
 export interface IProps {
     id?: string;
@@ -28,6 +31,7 @@ export interface IProps {
     setExternalButtonRef?: (ref: React.RefObject<HTMLButtonElement>) => void;
     onVisibilityChange?: (isVisible: boolean) => void;
     openAsModal?: boolean;
+    title?: string;
 }
 
 export interface IState {
@@ -61,6 +65,7 @@ export default class DropDown extends React.Component<IProps, IState> {
     }
 
     public render() {
+        const { title } = this.props;
         return (
             <PopoverController
                 id={this.id}
@@ -88,6 +93,11 @@ export default class DropDown extends React.Component<IProps, IState> {
                             renderAbove={!!this.props.renderAbove}
                             openAsModal={this.props.openAsModal}
                         >
+                            {title ? (
+                                <SmartAlign>
+                                    <Heading title={title} className="dropDown-title" />
+                                </SmartAlign>
+                            ) : null}
                             <ul className="dropDownItems">{this.props.children}</ul>
                         </DropDownContents>
                     );

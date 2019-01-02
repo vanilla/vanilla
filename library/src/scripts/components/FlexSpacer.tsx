@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,6 +10,7 @@ import classNames from "classnames";
 interface IProps {
     className: string;
     children?: React.ReactNode;
+    tag?: string;
 }
 
 /**
@@ -18,11 +19,12 @@ interface IProps {
 export default class FlexSpacer extends React.Component<IProps> {
     public render() {
         const content = ` `;
+        const Tag = `${this.props.tag ? this.props.tag : "div"}`;
         return (
-            <div className={classNames("u-flexSpacer", this.props.className)}>
+            <Tag className={classNames("u-flexSpacer", this.props.className)} aria-hidden={true} tabIndex={-1}>
                 {content}
                 {this.props.children && <span className="sr-only">{this.props.children}</span>}
-            </div>
+            </Tag>
         );
     }
 }

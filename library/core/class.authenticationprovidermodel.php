@@ -3,7 +3,7 @@
  * Authentication Helper: Authentication Provider Model
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0.10

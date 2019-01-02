@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -82,13 +82,15 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                             baseClass={ButtonBaseClass.CUSTOM}
                             className="siteNavNode-toggle"
                         >
-                            {this.state.open ? downTriangle(t("Expand")) : rightTriangle(t("Collapse"))}
+                            {this.state.open ? downTriangle("", t("Expand")) : rightTriangle("", t("Collapse"))}
                         </Button>
                     </div>
                 ) : (
-                    <span className="siteNavNode-spacer" aria-hidden={true}>
-                        {` `}
-                    </span>
+                    this.props.depth !== 0 && (
+                        <span className="siteNavNode-spacer" aria-hidden={true}>
+                            {` `}
+                        </span>
+                    )
                 )}
                 <div className={classNames("siteNavNode-contents")}>
                     <Hoverable onHover={this.handleHover} duration={50}>

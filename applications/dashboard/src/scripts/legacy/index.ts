@@ -3,7 +3,7 @@
  *
  * At some point everything in this folder should be able to be removed (new base theme).
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 

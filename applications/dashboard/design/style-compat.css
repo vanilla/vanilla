@@ -1,11 +1,11 @@
 @charset "UTF-8";
 /*!
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /* -------------------------------------------------------------- *    Utility Variables
@@ -23,6 +23,8 @@
 /* -------------------------------------------------------------- *    Animation
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Icons
+\* -------------------------------------------------------------- */
+/* -------------------------------------------------------------- *    User Photo
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Layout
 \* -------------------------------------------------------------- */
@@ -58,69 +60,69 @@
 \* -------------------------------------------------------------- */
 /*!
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /* ------------------------------- *    Third Party Colors
 \* ------------------------------- */
 /*!
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 @-webkit-keyframes spinnerLoader {
@@ -146,30 +148,30 @@
 
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 em {
@@ -177,7 +179,7 @@ em {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .sr-only {
@@ -200,7 +202,7 @@ em {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /** Hides the image cropper on mobile themes. This image cropper is not mobile compatible. */
@@ -222,7 +224,7 @@ body.isMobile .change-picture .change-picture-instructions {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 button.Close {
@@ -241,7 +243,7 @@ button.Close {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .categoryList-heading + .DataTableWrap > .categoryList-genericHeading {
@@ -249,7 +251,7 @@ button.Close {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .Title-Icon {
@@ -842,17 +844,17 @@ label.checkbox input.checkbox-input {
 
 /*!
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /*!
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /*!
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .accessibility-jumpTo {
@@ -863,7 +865,7 @@ label.checkbox input.checkbox-input {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .richEditor {
@@ -874,6 +876,10 @@ label.checkbox input.checkbox-input {
 .richEditor blockquote {
   display: block;
   margin: 0;
+}
+
+.richEditor .richEditorParagraphMenu {
+  left: 0;
 }
 
 .userContent {
@@ -936,7 +942,7 @@ label.checkbox input.checkbox-input {
 .richEditor-menu {
   box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
   background-color: #fff;
-  border-radius: 2px;
+  border-radius: 6px;
   border-color: #d6d7d9;
   border-style: solid;
   border-width: 1px;
@@ -1039,7 +1045,9 @@ body.hasRichEditor #Form_Preview {
 
 .richEditor-text {
   overflow: visible;
+  padding-top: 12px;
   padding-right: 12px;
+  padding-bottom: 12px;
   padding-left: 12px;
 }
 
@@ -1122,15 +1130,15 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .embedResponsive {
@@ -1283,11 +1291,11 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .embedVideo .embedExternal-content {
@@ -1408,7 +1416,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .embedImage .embedExternal-content {
@@ -1432,7 +1440,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .embedText {
@@ -1509,7 +1517,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .embedLink-image {
@@ -1575,7 +1583,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .embedQuote {
@@ -1615,7 +1623,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   display: block;
   width: 24px;
   height: 24px;
-  border-radius: 2px;
+  border-radius: 6px;
 }
 
 .embedQuote-excerpt {
@@ -1716,7 +1724,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .embedLoader-icon {
@@ -1864,7 +1872,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .embedGetty {
@@ -1880,7 +1888,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .embedGiphy {
@@ -1900,7 +1908,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .embedInstagram {
@@ -1913,7 +1921,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .embedImgur .embedExternal-content {
@@ -1925,7 +1933,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .embedTwitter .embedExternal-content {
@@ -1943,7 +1951,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .embedSoundcloud {
@@ -1952,7 +1960,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .embedInstagram {
@@ -1966,7 +1974,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 @-webkit-keyframes fadein {
@@ -1997,7 +2005,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .atMentionList {
@@ -2110,7 +2118,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .blockquote {
@@ -2138,7 +2146,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .richEditor-text ul,
@@ -2161,7 +2169,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .accessibility-jumpTo {
@@ -2203,11 +2211,11 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .spoiler {
-  border-radius: 2px;
+  border-radius: 6px;
   background-color: #f7f7f7;
 }
 
@@ -2354,7 +2362,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .safeEmoji {
@@ -2393,7 +2401,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 .userContent .code {

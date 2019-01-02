@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -118,13 +118,13 @@ export function organize(className?: string) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
+            viewBox="0 0 18 16"
             className={classNames("icon", "icon-organize", className)}
         >
             <title>{t("Organize")}</title>
-            <rect x="3.5" y="4.5" width="14" height="3" rx="0.5" style={rectStyle} />
-            <rect x="6.5" y="10.5" width="14" height="3" rx="0.5" style={rectStyle} />
-            <rect x="3.5" y="16.5" width="14" height="3" rx="0.5" style={rectStyle} />
+            <rect x="0.5" y="0.5" width="14" height="3" rx="0.5" style={rectStyle} />
+            <rect x="3.5" y="6.5" width="14" height="3" rx="0.5" style={rectStyle} />
+            <rect x="0.5" y="12.5" width="14" height="3" rx="0.5" style={rectStyle} />
         </svg>
     );
 }

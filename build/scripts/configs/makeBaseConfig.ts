@@ -81,7 +81,11 @@ ${chalk.green(aliases)}`;
                 {
                     test: /\.s?css$/,
                     use: [
-                        options.mode === BuildMode.DEVELOPMENT ? "style-loader" : MiniCssExtractPlugin.loader,
+                        [BuildMode.DEVELOPMENT, BuildMode.TEST, BuildMode.TEST_DEBUG, BuildMode.TEST_WATCH].includes(
+                            options.mode,
+                        )
+                            ? "style-loader"
+                            : MiniCssExtractPlugin.loader,
                         {
                             loader: "css-loader",
                             options: {

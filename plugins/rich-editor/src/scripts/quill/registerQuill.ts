@@ -24,8 +24,7 @@ import MentionBlot from "@rich-editor/quill/blots/embeds/MentionBlot";
 import MentionComboBoxBlot from "@rich-editor/quill/blots/embeds/MentionComboBoxBlot";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
 
-// Custom Block Blots
-import BlockBlot from "@rich-editor/quill/blots/blocks/BlockBlot";
+// Custom Block Blot
 import SpoilerLineBlot, { SpoilerWrapperBlot, SpoilerContentBlot } from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import BlockquoteLineBlot, {
     BlockquoteWrapperBlot,
@@ -41,12 +40,12 @@ import HistoryModule from "@rich-editor/quill/HistoryModule";
 import ClipboardModule from "@rich-editor/quill/ClipboardModule";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
+import SyntaxModule from "@rich-editor/quill/SyntaxModule";
 
 export default function registerQuill() {
     Quill.register(
         {
             // Block formats
-            "blots/block": BlockBlot,
             "formats/blockquote/line": BlockquoteLineBlot,
             "formats/blockquote/content": BlockquoteContentBlot,
             "formats/blockquote/wrapper": BlockquoteWrapperBlot,
@@ -79,6 +78,7 @@ export default function registerQuill() {
             "modules/embed/focus": FocusModule,
             "modules/history": HistoryModule,
             "modules/clipboard": ClipboardModule,
+            "modules/syntax": SyntaxModule,
         },
         true,
     );

@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import className from "classnames";
-import { initAllUserContent } from "../user-content/index";
+import { initAllUserContent } from "@library/user-content";
 
 interface IProps {
     className?: string;

@@ -30,7 +30,6 @@ import BackLink from "@library/components/navigation/BackLink";
 import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
 import { withPages, IWithPagesProps } from "@library/contexts/PagesContext";
 import { t } from "@library/application";
-import { style } from "typestyle";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -150,15 +149,13 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                 className="vanillaHeader-nav vanillaHeader-guestNav"
                                             >
                                                 <VanillaHeaderNavItem
-                                                    className={classNames("vanillaHeader-button")}
-                                                    linkClassName="button"
+                                                    linkClassName="button vanillaHeader-guestButton vanillaHeader-signIn"
                                                     to={`/entry/signin?target=${window.location.pathname}`}
                                                 >
                                                     {t("Sign in")}
                                                 </VanillaHeaderNavItem>
                                                 <VanillaHeaderNavItem
-                                                    className="vanillaHeader-button"
-                                                    linkClassName="button"
+                                                    linkClassName="button vanillaHeader-guestButton vanillaHeader-register"
                                                     to={`/entry/register?target=${window.location.pathname}`}
                                                 >
                                                     {t("Register")}

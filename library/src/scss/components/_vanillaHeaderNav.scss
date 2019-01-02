@@ -7,7 +7,7 @@
 $vanillaHeaderNav-vertical_borderWidth: 2px;
 $vanillaHeaderNav-active_borderColor: rgba($global-color_bg, .9);
 $vanillaHeaderNav-active_bottomOffset: 2px;
-$vanillaHeaderNav-item_size: 32px;
+$vanillaHeaderNav-item_size: $formElement_height;
 $vanillaHeaderNav-item_borderRadius: 3px;
 
 
@@ -40,7 +40,6 @@ $vanillaHeaderNav-item_borderRadius: 3px;
     display: flex;
     justify-content: center;
     align-items: stretch;
-    color: inherit;
     height: $vanillaHeaderNav-item_size;
 
     @include mediaQuery-panelLayout_oneColumn {

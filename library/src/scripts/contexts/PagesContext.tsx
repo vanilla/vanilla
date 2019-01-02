@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Omit } from "@library/@types/utils";
+import { Optionalize } from "@library/@types/utils";
 import { ISearchOptionData } from "@library/components/search/SearchOption";
 import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 const PageContext = React.createContext<IWithPagesProps>({ pages: {} });
@@ -35,7 +35,7 @@ export interface IWithPagesProps {
  */
 export function withPages<T extends IWithPagesProps = IWithPagesProps>(WrappedComponent: React.ComponentType<T>) {
     const displayName = WrappedComponent.displayName || WrappedComponent.name || "Component";
-    class ComponentWithDevice extends React.Component<Omit<T, keyof IWithPagesProps>> {
+    class ComponentWithDevice extends React.Component<Optionalize<T, IWithPagesProps>> {
         public static displayName = `withPages(${displayName})`;
         public render() {
             return (

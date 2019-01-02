@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Omit } from "@library/@types/utils";
+import { Optionalize } from "@library/@types/utils";
 import { AxiosInstance } from "axios";
 import { ISearchOptionData } from "@library/components/search/SearchOption";
 import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
@@ -28,7 +28,7 @@ export interface IWithSearchProps {
  */
 export function withSearch<T extends IWithSearchProps = IWithSearchProps>(WrappedComponent: React.ComponentType<T>) {
     const displayName = WrappedComponent.displayName || WrappedComponent.name || "Component";
-    class ComponentWithDevice extends React.Component<Omit<T, keyof IWithSearchProps>> {
+    class ComponentWithDevice extends React.Component<Optionalize<T, IWithSearchProps>> {
         public static displayName = `withSearch(${displayName})`;
         public render() {
             return (

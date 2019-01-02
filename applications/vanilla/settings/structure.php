@@ -450,6 +450,36 @@ if ($maxCommentLength > DiscussionModel::MAX_POST_LENGTH) {
 // Add stub content
 include(PATH_APPLICATIONS.DS.'vanilla'.DS.'settings'.DS.'stub.php');
 
+$defaultEmails = [
+    'system@example.com',
+    'vanilla@stub.vanillacommunity.com',
+    'karen@stub.vanillacommunity.com',
+    'victorine@stub.vanillacommunity.com',
+    'alex@stub.vanillacommunity.com'
+];
+
+$users = [];
+foreach ($defaultEmails as $email) {
+    $user = Gdn::userModel()
+        ->getWhere(['Email' => $email])
+        ->firstRow(DATASET_TYPE_ARRAY);
+
+    if ($user) {
+        $users[] = $user;
+    }
+}
+
+foreach ($users as $user) {
+    if ($user) {
+        $emailPrefix = explode('@', $user['Email']);
+        $SQL->update('User')
+            ->set('Email', $emailPrefix.'@test.com')
+            ->where('email', $user['Email'])
+            ->put();
+    }
+}
+
+
 // Set current Vanilla.Version
 $appInfo = json_decode(file_get_contents(PATH_APPLICATIONS.DS.'vanilla'.DS.'addon.json'), true);
 saveToConfig('Vanilla.Version', val('version', $appInfo, 'Undefined'));

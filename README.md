@@ -183,7 +183,7 @@ We'll work on releasing an updated version as quickly as possible.
 Please do not email non-security issues; use the [issue tracker](https://github.com/vanilla/vanilla/issues) instead.
 
 ## Legal Stuff
-Copyright &copy; 2009-2018 Vanilla Forums Inc.
+Copyright &copy; 2009-2019 Vanilla Forums Inc.
 
 Vanilla Forums is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version.

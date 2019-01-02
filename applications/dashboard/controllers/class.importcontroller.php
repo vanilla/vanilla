@@ -4,7 +4,7 @@
  *
  * This controller could use a code audit. Don't use it as sample code.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0

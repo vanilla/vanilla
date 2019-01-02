@@ -2,7 +2,7 @@
 /**
  * A role model you can look up to.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0
@@ -747,7 +747,7 @@ class RoleModel extends Gdn_Model {
                 ->where(['UserRole.RoleID' => $roleID])
                 ->put();
         }
-        
+
         // Remove permissions for this role.
         $permissionModel = Gdn::permissionModel();
         $permissionModel->delete($roleID);

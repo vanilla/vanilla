@@ -4,7 +4,7 @@
  * @see {\Vanilla\Permsissions} for the server-side implementation.
  * @see {Gdn_Controller->renderMaster()} for the injection of permissions into the client.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 

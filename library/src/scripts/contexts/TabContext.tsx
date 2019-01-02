@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Omit } from "../@types/utils";
+import { Optionalize } from "@library/@types/utils";
 
 export interface ITabProps {
     setData: (data: any) => void;
@@ -22,9 +22,9 @@ export default TabContext;
  *
  * @param WrappedComponent - The component to wrap
  */
-export function withTabs<T extends ITabProps = ITabProps>(WrappedComponent: React.ComponentClass<ITabProps>) {
+export function withTabs<T extends ITabProps = ITabProps>(WrappedComponent: React.ComponentType<T>) {
     const displayName = WrappedComponent.displayName || WrappedComponent.name || "Component";
-    class ComponentWithTabs extends React.Component<Omit<T, keyof ITabProps>> {
+    class ComponentWithTabs extends React.Component<Optionalize<T, ITabProps>> {
         public static displayName = `withTabs(${displayName})`;
         public render() {
             return (

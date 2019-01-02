@@ -7,13 +7,17 @@
 $vanillaHeaderNav-vertical_borderWidth: 2px;
 $vanillaHeaderNav-active_borderColor: rgba($global-color_bg, .9);
 $vanillaHeaderNav-active_bottomOffset: 2px;
+$vanillaHeaderNav-item_size: 32px;
+$vanillaHeaderNav-item_borderRadius: 3px;
 
 
 .headerNavigation-items {
     display: flex;
+    align-items: center;
     flex-wrap: nowrap;
     height: 100%;
     color: inherit;
+    border-radius: $vanillaHeaderNav-item_borderRadius;
 
     &.isScrolled {
         align-items: center;
@@ -25,7 +29,7 @@ $vanillaHeaderNav-active_bottomOffset: 2px;
 
 .vanillaHeaderNav-item {
     @include flexCenterContent;
-    height: $vanillaHeader_height;
+    height: $vanillaHeaderNav-item_size;
 
     @include mediaQuery-panelLayout_oneColumn {
         height: $vanillaHeader_mobile_height;
@@ -37,7 +41,7 @@ $vanillaHeaderNav-active_bottomOffset: 2px;
     justify-content: center;
     align-items: stretch;
     color: inherit;
-    height: $vanillaHeader_height;
+    height: $vanillaHeaderNav-item_size;
 
     @include mediaQuery-panelLayout_oneColumn {
         height: $vanillaHeader_mobile_height;

@@ -6,6 +6,7 @@
 
 import { IApiError, IApiResponse } from "@library/@types/api";
 import { AxiosResponse, AxiosInstance } from "axios";
+import { logError } from "@library/utility";
 
 /**
  * Base class for creating redux actions.
@@ -110,6 +111,7 @@ export default class ReduxActions {
         meta: Meta,
         error: IApiError,
     ): IApiErrorAction<ActionType, Meta> {
+        logError(error);
         return {
             type,
             meta,

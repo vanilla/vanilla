@@ -387,6 +387,7 @@ declare module "quill/modules/syntax" {
     export default class SyntaxModule extends Module {
         public container: HTMLElement;
         public static register();
+        public highlight();
     }
 }
 declare module "quill/modules/toolbar";

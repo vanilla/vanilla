@@ -16,4 +16,15 @@ export default class SyntaxModule extends BaseSyntaxModule {
         super.register();
         Quill.register(CodeBlockBlot);
     }
+
+    /**
+     * Overridden in order to return focus to the element that was focused before we force selected quill.
+     */
+    public highlight() {
+        const selectedElement = document.activeElement;
+        super.highlight();
+        if (selectedElement instanceof HTMLElement) {
+            selectedElement.focus();
+        }
+    }
 }

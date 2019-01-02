@@ -7,7 +7,7 @@
  *  2. Program your method just like any other created controller method.
  *  3. When you browse to <code>/mymethod</code> your method will be called.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.1

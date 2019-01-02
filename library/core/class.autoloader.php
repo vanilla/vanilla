@@ -3,7 +3,7 @@
  * Vanilla framework autoloader: Gdn_Autoloader & Gdn_Autoloader_Map
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0.16
@@ -1061,7 +1061,7 @@ class Gdn_Autoloader_Map {
     /**
      * Normalize paths
      *
-     * Replaces any "\" with "/" and prepends another slash to a single leading slash. 
+     * Replaces any "\" with "/" and prepends another slash to a single leading slash.
      *
      * @param string $path
      * @return string

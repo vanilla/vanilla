@@ -4,7 +4,7 @@
  *
  * Use the AssetModel_StyleCss_Handler event to include CSS files in your plugin.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @since 2.1
  */

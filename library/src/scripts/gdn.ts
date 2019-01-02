@@ -2,7 +2,7 @@
  * A module to isolate meta data passed from the server into a single dependency.
  * This should always be used instead of accessing window.gdn directly.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 

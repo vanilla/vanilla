@@ -24,8 +24,7 @@ import MentionBlot from "@rich-editor/quill/blots/embeds/MentionBlot";
 import MentionComboBoxBlot from "@rich-editor/quill/blots/embeds/MentionComboBoxBlot";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
 
-// Custom Block Blots
-import BlockBlot from "@rich-editor/quill/blots/blocks/BlockBlot";
+// Custom Block Blot
 import SpoilerLineBlot, { SpoilerWrapperBlot, SpoilerContentBlot } from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import BlockquoteLineBlot, {
     BlockquoteWrapperBlot,
@@ -47,7 +46,6 @@ export default function registerQuill() {
     Quill.register(
         {
             // Block formats
-            "blots/block": BlockBlot,
             "formats/blockquote/line": BlockquoteLineBlot,
             "formats/blockquote/content": BlockquoteContentBlot,
             "formats/blockquote/wrapper": BlockquoteWrapperBlot,

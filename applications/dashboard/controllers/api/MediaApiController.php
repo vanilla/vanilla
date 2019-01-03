@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+use Garden\EventManager;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
@@ -43,11 +44,20 @@ class MediaApiController extends AbstractApiController {
      *
      * @param MediaModel $mediaModel
      * @param EmbedManager $embedManager
+     * @param Gdn_Configuration $config
+     * @param EventManager $eventManager
      */
-    public function __construct(MediaModel $mediaModel, EmbedManager $embedManager, Gdn_Configuration $config) {
+    public function __construct(
+        MediaModel $mediaModel,
+        EmbedManager $embedManager,
+        Gdn_Configuration $config,
+        EventManager $eventManager
+    ) {
         $this->mediaModel = $mediaModel;
         $this->embedManager = $embedManager;
         $this->config =  $config;
+
+        $eventManager->fire("registerMediaForeignTypes", $this->mediaModel);
     }
 
     /**
@@ -329,16 +339,14 @@ class MediaApiController extends AbstractApiController {
         $in = $this->schema([
             "foreignType" => [
                 "description" => "Type of resource the media item will be attached to (e.g. comment).",
-                "enum" => [
-                    "embed",
-                ],
+                "enum" => $this->mediaModel->getForeignTypes(),
                 "type" => "string",
             ],
             "foreignID" => [
                 "description" => "Unique ID of the resource this media item will be attached to.",
                 "type" => "integer",
             ],
-        ], ["articlesPatchAttachment", "in"])->setDescription("Update a media item's attachment to another record.");
+        ], "in")->setDescription("Update a media item's attachment to another record.");
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body);
@@ -346,13 +354,7 @@ class MediaApiController extends AbstractApiController {
         $original = $this->mediaByID($id);
         $this->editPermission($original);
 
-        $canAttach = $this->getEventManager()->fireFilter(
-            "canAttachMedia",
-            ($body["foreignType"] === "embed" && $body["foreignID"] === $this->getSession()->UserID),
-            $body["foreignType"],
-            $body["foreignID"]
-        );
-        if ($canAttach !== true) {
+        if (!$this->mediaModel->canAttach($body["foreignType"], $body["foreignID"])) {
             throw new ClientException("Unable to attach to this record. It may not exist or you may have improper permissions to access it.");
         }
 

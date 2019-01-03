@@ -4,16 +4,55 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  */
 
+use Vanilla\Utility\Media\ForeignValidatorInterface;
+
 /**
  * Class MediaModel
  */
 class MediaModel extends Gdn_Model {
+
+    /** @var array */
+    private $foreignTypes = ["embed"];
+
+    /** @var array */
+    private $foreignValidators = [];
 
     /**
      * MediaModel constructor.
      */
     public function __construct() {
         parent::__construct('Media');
+    }
+
+    /**
+     * Register a valid foreign type.
+     *
+     * @param string $foreignType
+     */
+    public function addForeignType(string $foreignType): self {
+        if (!in_array($foreignType, $this->foreignTypes)) {
+            $this->foreignTypes[] = $foreignType;
+        }
+        return $this;
+    }
+
+    /**
+     * Add a foreign row validator.
+     *
+     * @param string $foreignType
+     * @param callable $validator
+     * @return self
+     */
+    public function addForeignValidator(string $foreignType, ForeignValidatorInterface $validator): self {
+        if (!$this->isValidForeignType($foreignType)) {
+            throw new Exception("Invalid foreign type specified.");
+        }
+        if (!array_key_exists($foreignType, $this->foreignValidators)) {
+            $this->foreignValidators[$foreignType] = [];
+        }
+
+        $this->foreignValidators[$foreignType][] = $validator;
+        return $this;
     }
 
     /**
@@ -174,5 +213,61 @@ class MediaModel extends Gdn_Model {
             // Explicitly set the deleteFile option
             $this->delete($media['MediaID'], ['deleteFile' => true]);
         }
+    }
+
+    /**
+     * Verify the current user can attach a file to a particular foreign resource.
+     *
+     * @param string $foreignType
+     * @param string|int $foreignID
+     * @return bool
+     */
+    public function canAttach(string $foreignType, $foreignID): bool {
+        if (!$this->isValidForeignType($foreignType)) {
+            return false;
+        }
+
+        if (!array_key_exists($foreignType, $this->foreignValidators)) {
+            return true;
+        }
+
+        /** @var ForeignValidatorInterface $validator */
+        foreach ($this->foreignValidators[$foreignType] as $validator) {
+            if ($validator->canAttach($foreignType, $foreignID) === false) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Get a list of valid foreign types.
+     *
+     * @return string[]
+     */
+    public function getForeignTypes(): array {
+        return $this->foreignTypes;
+    }
+
+    /**
+     * Determine if the value is a valid foreign type.
+     *
+     * @param string $foreignType
+     * @return bool
+     */
+    public function isValidForeignType(string $foreignType): bool {
+        return in_array($foreignType, $this->foreignTypes);
+    }
+
+    /**
+     * Delete a valid foreign type.
+     *
+     * @param string $foreignType
+     */
+    public function removeForeignType(string $foreignType): self {
+        unset($this->foreignTypes[$foreignType]);
+        unset($this->foreignValidators[$foreignType]);
+        return $this;
     }
 }

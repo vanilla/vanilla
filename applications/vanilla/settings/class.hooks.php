@@ -8,9 +8,9 @@
  * @package Vanilla
  */
 
-use Garden\Container\Container;
-use Garden\Container\Reference;
 use Vanilla\Formatting\Embeds\EmbedManager;
+use Vanilla\Vanilla\Models\CommentForeignValidator;
+use Vanilla\Vanilla\Models\DiscussionForeignValidator;
 
 /**
  * Vanilla's event handlers.
@@ -20,40 +20,22 @@ class VanillaHooks implements Gdn_IPlugin {
     /**
      * Add to valid media attachment types.
      *
-     * @param \Garden\Schema\Schema $schema
+     * @param MediaModel $mediaModel
      */
-    public function articlesPatchAttachmentSchema_init(\Garden\Schema\Schema $schema) {
-        $types = $schema->getField("properties.foreignType.enum");
-        $types[] = "comment";
-        $types[] = "discussion";
-        $schema->setField("properties.foreignType.enum", $types);
-    }
+    public function registerMediaForeignTypes_handler(MediaModel $mediaModel) {
+        if (!$mediaModel->isValidForeignType("comment")) {
+            $mediaModel->addForeignType("comment");
 
-    /**
-     * Verify the current user can attach a media item to a Vanilla post.
-     *
-     * @param bool $canAttach
-     * @param string $foreignType
-     * @param int $foreignID
-     * @return bool
-     */
-    public function canAttachMedia_handler(bool $canAttach, string $foreignType, int $foreignID): bool {
-        switch ($foreignType) {
-            case "comment":
-                $model = new CommentModel();
-                break;
-            case "discussion":
-                $model = new DiscussionModel();
-                break;
-            default:
-                return $canAttach;
+            $commentValidator = new CommentForeignValidator(new CommentModel(), Gdn::session());
+            $mediaModel->addForeignValidator("comment", $commentValidator);
         }
 
-        $row = $model->getID($foreignID, DATASET_TYPE_ARRAY);
-        if (!$row) {
-            return false;
+        if (!$mediaModel->isValidForeignType("discussion")) {
+            $mediaModel->addForeignType("discussion");
+
+            $discussionValidator = new DiscussionForeignValidator(new DiscussionModel(), Gdn::session());
+            $mediaModel->addForeignValidator("discussion", $discussionValidator);
         }
-        return ($row["InsertUserID"] === Gdn::session()->UserID || Gdn::session()->checkRankedPermission("Garden.Moderation.Manage"));
     }
 
     /**

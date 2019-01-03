@@ -40,7 +40,7 @@ class MediaModel extends Gdn_Model {
      * Add a foreign row validator.
      *
      * @param string $foreignType
-     * @param callable $validator
+     * @param ForeignValidatorInterface $validator
      * @return self
      */
     public function addForeignValidator(string $foreignType, ForeignValidatorInterface $validator): self {

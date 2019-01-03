@@ -33,7 +33,11 @@ abstract class PostForeignValidator implements ForeignValidatorInterface {
     }
 
     /**
-     * @inheritDoc
+     * Given a foreign type and record ID, verify whether or not the current user can attach a media item to it.
+     *
+     * @param string $foreignType
+     * @param string|int $foreignID
+     * @return bool
      */
     public function canAttach(string $foreignType, $foreignID): bool {
         $row = $this->model->getID($foreignID, DATASET_TYPE_ARRAY);

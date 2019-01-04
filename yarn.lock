@@ -4333,6 +4333,11 @@ csstype@^2.2.0:
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.5.2.tgz#4534308476ceede8fbe148b9b99f9baf1c80fa06"
   integrity sha512-epoHrKPywwUhFTXadQNA5PPx4GChtkM03SkBeFZTaFtJcn6QfXpBkX2IAc4J9Oe18nha5NrTOo2OMOge+qH1mw==
 
+csstype@^2.4.0:
+  version "2.5.8"
+  resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.5.8.tgz#4ce5aa16ea0d562ef9105fa3ae2676f199586a35"
+  integrity sha512-r4DbsyNJ7slwBSKoGesxDubRWJ71ghG8W2+1HcsDlAo12KGca9dDLv0u98tfdFw7ldBdoA7XmCnI6Q8LpAJXaQ==
+
 csstype@^2.5.2:
   version "2.5.7"
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.5.7.tgz#bf9235d5872141eccfb2d16d82993c6b149179ff"
@@ -5571,6 +5576,11 @@ fragment-cache@^0.2.1:
   integrity sha1-QpD60n8T6Jvn8zeZxrxaCr//DRk=
   dependencies:
     map-cache "^0.2.2"
+
+free-style@2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/free-style/-/free-style-2.5.1.tgz#5e3f684c470d3bba7e4dbb43524e0a08917e873c"
+  integrity sha512-X7dtUSTrlS1KRQBtiQ618NWIRDdRgD91IeajKCSh0fgTqArSixv+n3ea6F/OSvrvg14tPLR+yCq2s+O602+pRw==
 
 fresh@0.5.2, fresh@~0.5.2:
   version "0.5.2"
@@ -11525,6 +11535,14 @@ typescript@3.1.3:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.1.3.tgz#01b70247a6d3c2467f70c45795ef5ea18ce191d5"
   integrity sha512-+81MUSyX+BaSo+u2RbozuQk/UWx6hfG0a5gHu4ANEM4sU96XbuIyAB+rWBW1u70c6a5QuZfuYICn3s2UjuHUpA==
+
+typestyle@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/typestyle/-/typestyle-2.0.1.tgz#9593e6029ce5f23f1a5728ddd3ed6bf1ffa781f8"
+  integrity sha512-3Mv5ZZbYJ3y3G6rX3iRLrgYibAlafK2nsc9VlTsYcEaK8w+9vtNDx0T2TJsznI5FIh+WoBnjJ5F0/26WaGRxXQ==
+  dependencies:
+    csstype "^2.4.0"
+    free-style "2.5.1"
 
 ua-parser-js@^0.7.18:
   version "0.7.19"

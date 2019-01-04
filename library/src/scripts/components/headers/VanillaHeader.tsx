@@ -27,9 +27,9 @@ import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
 import ConditionalWrap from "@library/components/ConditionalWrap";
 import FlexSpacer from "@library/components/FlexSpacer";
 import BackLink from "@library/components/navigation/BackLink";
-import { signIn } from "@library/components/icons";
 import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
 import { withPages, IWithPagesProps } from "@library/contexts/PagesContext";
+import { t } from "@library/application";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -149,10 +149,16 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                 className="vanillaHeader-nav vanillaHeader-guestNav"
                                             >
                                                 <VanillaHeaderNavItem
-                                                    className="vanillaHeader-button"
+                                                    linkClassName="button vanillaHeader-guestButton vanillaHeader-signIn"
                                                     to={`/entry/signin?target=${window.location.pathname}`}
                                                 >
-                                                    {signIn("vanillaHeader-signInIcon")}
+                                                    {t("Sign in")}
+                                                </VanillaHeaderNavItem>
+                                                <VanillaHeaderNavItem
+                                                    linkClassName="button vanillaHeader-guestButton vanillaHeader-register"
+                                                    to={`/entry/register?target=${window.location.pathname}`}
+                                                >
+                                                    {t("Register")}
                                                 </VanillaHeaderNavItem>
                                             </VanillaHeaderNav>
                                         )

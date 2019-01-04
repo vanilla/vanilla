@@ -159,7 +159,7 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 .vanillaHeader-button {
     color: $vanillaHeader_fg;
     height: $vanillaHeader_height;
-    width: $vanillaHeader-button_size;
+    min-width: $vanillaHeader-button_size;
     padding: 0;
 
     &:active,
@@ -305,5 +305,37 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 
 .vanillaHeader-backLink {
     transform: translateX(-$global-gutter_halfSize); // so the icon is flush with the side margin, but still has the right padding when hovering.
+}
+
+// Guest Styles
+.vanillaHeader-signIn,
+.vanillaHeader-register {
+    border: solid $vanillaHeader_fg 1px;
+    font-weight: $global-fontWeight_semiBold;
+
+    &:hover,
+    &:active,
+    &:focus {
+        border: solid $vanillaHeader_bg 1px;
+        color: $vanillaHeader-bg;
+    }
+}
+
+
+.vanillaHeader-signIn {
+    color: $vanillaHeader-fg;
+    background-color: $vanillaMenu-signIn_bg;
+    margin: {
+        left: $vanillaMenu-guest_spacer * 1.5;
+        right: $vanillaMenu-guest_spacer;
+    }
+}
+
+.vanillaHeader-register {
+    color: $vanillaHeader-bg;
+    background-color: $vanillaHeader-fg;
+    margin: {
+        left: $vanillaMenu-guest_spacer;
+    }
 }
 

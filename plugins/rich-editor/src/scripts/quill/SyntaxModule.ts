@@ -18,13 +18,27 @@ export default class SyntaxModule extends BaseSyntaxModule {
     }
 
     /**
-     * Overridden in order to return focus to the element that was focused before we force selected quill.
+     * Overridden to ensure quill has focus before resetting the selection
+     * because quill selection does not always get moved away from quill when focus moves.
+     *
+     * For example opening the paragraph menu retains selection, but the setSelection at the end here
+     * would clear remove focus from the paragraph menu.
+     *
+     * Check if this needs to be removed with Quill 2.0.
      */
     public highlight() {
-        const selectedElement = document.activeElement;
-        super.highlight();
-        if (selectedElement instanceof HTMLElement) {
-            selectedElement.focus();
+        if ((this.quill as any).selection.composing) {
+            return;
+        }
+        this.quill.update(Quill.sources.USER);
+        const range = this.quill.getSelection();
+        const hasFocus = this.quill.hasFocus();
+        (this.quill as any).scroll.descendants(CodeBlockBlot).forEach(code => {
+            code.highlight(this.options.highlight);
+        });
+        this.quill.update(Quill.sources.SILENT);
+        if (range != null && hasFocus) {
+            this.quill.setSelection(range, Quill.sources.SILENT);
         }
     }
 }

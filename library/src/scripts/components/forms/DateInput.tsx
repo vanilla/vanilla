@@ -68,6 +68,7 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
                 classNames={
                     {
                         container: classNames("dayPickerInput-container", this.props.contentClassName),
+                        overlay: "dayPickerInput-overlay",
                     } as any
                 }
                 dayPickerProps={{

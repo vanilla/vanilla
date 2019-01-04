@@ -29,6 +29,8 @@ $frame-footer_boxShadow: 0 -1px 2px 0 $overlay_bgColor;
         overflow: auto;
         width: 100%;
         height: 100vh;
+
+        border-radius: 0;
     }
 
     &.isLarge {
@@ -73,6 +75,11 @@ $frame-footer_boxShadow: 0 -1px 2px 0 $overlay_bgColor;
             style: solid;
             width: 1px;
             color: $global-border_color;
+        }
+
+        @include mediaQuery-panelLayout_oneColumn {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
         }
     }
 }

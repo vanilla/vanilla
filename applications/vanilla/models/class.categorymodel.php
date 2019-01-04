@@ -2045,12 +2045,7 @@ class CategoryModel extends Gdn_Model {
      * Get list of categories (disregarding user permission for admins).
      *
      * @since 2.0.0
-     * @access public
-     *
-     * @param string $OrderFields Ignored.
-     * @param string $OrderDirection Ignored.
-     * @param int $Limit Ignored.
-     * @param int $Offset Ignored.
+     * 
      * @return object SQL results.
      */
     public function getAll() {

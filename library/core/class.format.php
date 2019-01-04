@@ -1939,7 +1939,7 @@ EOT;
                 if (self::$DisplayNoFollow) {
                     $attributes['rel'] = 'nofollow';
                 }
-                $parts[$i] = anchor('@'.$mention, url(str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat), true), '', $attributes).$suffix;
+                $parts[$i] = anchor('@'.$mention, url(str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat), true), 'atMention', $attributes).$suffix;
             } else {
                 $parts[$i] = '@' . $parts[$i];
             }

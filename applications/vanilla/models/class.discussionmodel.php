@@ -1039,6 +1039,11 @@ class DiscussionModel extends Gdn_Model {
                     $discussion->CountUnreadComments = 0;
                 }
             }
+
+            // Discussions are always unread to guests.
+            if (!Gdn::session()->isValid()) {
+                $discussion->Read = false;
+            }
         }
 
         // Logic for incomplete comment count.
@@ -1284,9 +1289,9 @@ class DiscussionModel extends Gdn_Model {
             return new Gdn_DataSet([]);
         }
 
-        // Allow us to set perspective of a different user.
-        if (empty($watchUserID)) {
-            $watchUserID = $userID;
+        // If no user was provided, view from the perspective of a guest.
+        if (!filter_var($watchUserID, FILTER_VALIDATE_INT)) {
+            $watchUserID = UserModel::GUEST_USER_ID;
         }
 
         // The point of this query is to select from one comment table, but filter and sort on another.
@@ -1303,7 +1308,7 @@ class DiscussionModel extends Gdn_Model {
             ->orderBy('d.DiscussionID', 'desc');
 
         // Join in the watch data.
-        if ($watchUserID > 0) {
+        if ($watchUserID > UserModel::GUEST_USER_ID) {
             $this->SQL
                 ->select('w.UserID', '', 'WatchUserID')
                 ->select('w.DateLastViewed, w.Dismissed, w.Bookmarked')
@@ -1312,7 +1317,7 @@ class DiscussionModel extends Gdn_Model {
                 ->join('UserDiscussion w', 'd2.DiscussionID = w.DiscussionID and w.UserID = '.$watchUserID, 'left');
         } else {
             $this->SQL
-                ->select('0', '', 'WatchUserID')
+                ->select((string) UserModel::GUEST_USER_ID, '', 'WatchUserID')
                 ->select('now()', '', 'DateLastViewed')
                 ->select('0', '', 'Dismissed')
                 ->select('0', '', 'Bookmarked')

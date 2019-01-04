@@ -15,6 +15,9 @@ use Garden\EventManager;
  */
 class UserModel extends Gdn_Model {
 
+    /** @var int */
+    const GUEST_USER_ID = 0;
+
     /** Deprecated. */
     const DEFAULT_CONFIRM_EMAIL = 'You need to confirm your email address before you can continue. Please confirm your email address by clicking on the following link: {/entry/emailconfirm,exurl,domain}/{User.UserID,rawurlencode}/{EmailKey,rawurlencode}';
 

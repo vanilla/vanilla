@@ -27,7 +27,12 @@
             "./node_modules/@types"
         ],
         "skipLibCheck": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "plugins": [
+            {
+                "name": "typescript-tslint-plugin",
+            }
+        ]
     },
     "include": [
         "**/*.ts",

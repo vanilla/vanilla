@@ -1,7 +1,7 @@
 /**
  * Wire together the different parts of the application.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -18,6 +18,7 @@ import { initVideoEmbeds } from "@library/user-content/embeds/video";
 import { initEmojiSupport } from "@library/user-content/emoji";
 import { initSpoilers } from "@library/user-content/spoilers";
 import { initQuoteEmbeds, mountQuoteEmbeds } from "@library/user-content/embeds/quote";
+import { initCodeHighlighting } from "@library/user-content/code";
 
 export function initAllUserContent() {
     // User content
@@ -34,6 +35,7 @@ export function initAllUserContent() {
     initTwitterEmbeds();
     initVideoEmbeds();
     initQuoteEmbeds();
+    initCodeHighlighting();
 }
 
 /**

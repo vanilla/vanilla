@@ -1,7 +1,7 @@
 /**
  * Entrypoint for the APIv2 calls. Prepulates an axios instance with some config settings.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 

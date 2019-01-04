@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -28,6 +28,7 @@ import { Devices } from "@library/components/DeviceChecker";
 import ParagraphToolbar from "@rich-editor/components/toolbars/ParagraphToolbar";
 import throttle from "lodash/throttle";
 import EmbedBar from "@rich-editor/components/editor/pieces/EmbedBar";
+import hljs from "highlight.js";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -69,6 +70,8 @@ export class Editor extends React.Component<IProps> {
 
     /** The redux store. */
     private store = getStore<IStoreState>();
+
+    private skipCallback = false;
 
     /**
      * The ID of our quill instance.
@@ -237,6 +240,11 @@ export class Editor extends React.Component<IProps> {
         registerQuill();
         const options: QuillOptionsStatic = {
             theme: "vanilla",
+            modules: {
+                syntax: {
+                    highlight: text => hljs.highlightAuto(text).value,
+                },
+            },
             scrollingContainer: this.scrollContainerRef.current || document.documentElement!,
         };
         this.quill = new Quill(this.quillMountRef.current!, options);
@@ -282,6 +290,7 @@ export class Editor extends React.Component<IProps> {
 
         if (!oldProps.reinitialize && this.props.reinitialize) {
             if (this.props.initialValue) {
+                this.skipCallback = true;
                 this.setEditorContent(this.props.initialValue);
             }
         }
@@ -336,6 +345,10 @@ export class Editor extends React.Component<IProps> {
      * - Every selection change event (even the "silent" ones).
      */
     private onQuillUpdate = throttle((type: string, newValue, oldValue, source: Sources) => {
+        if (this.skipCallback) {
+            this.skipCallback = false;
+            return;
+        }
         if (this.props.onChange && type === Quill.events.TEXT_CHANGE && source !== Quill.sources.SILENT) {
             this.props.onChange(this.getEditorOperations()!);
         }

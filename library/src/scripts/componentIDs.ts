@@ -1,7 +1,7 @@
 /**
  * Utilities and types for handling unique and/or required HTML ids in react components.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 

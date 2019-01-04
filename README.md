@@ -26,7 +26,7 @@ Vanilla is free, open source software distributed under the GNU GPL2.
 We accept and encourage contributions from our community and sometimes give hugs in return.
 You can join us on the [Vanilla Community Forums](https://open.vanillaforums.com/discussions) to be part of that discussion.
 
-The latest stable release is always [listed here](https://open.vanillaforums.com/addon/vanilla-core). Currently, it is the `release/2.5` branch.
+The latest stable release is always [listed here](https://open.vanillaforums.com/addon/vanilla-core). Currently, it is the `release/2.6` branch.
 
 New plugins and themes can be listed in the [Official Addon Directory](https://open.vanillaforums.com/addon/).
 We encourage addon developers to release their code under the GPL as well, but do not require it.
@@ -40,14 +40,25 @@ you can skip the rest of this technical stuff and [go there directly](https://va
 
 If you professionally run a large community or enterprise forum, our cloud solution will make the best technical and economic sense by far.
 
+## Self-Hosting Basics
+
+If you're new to self-hosting, read this section. Otherwise, skip to the [requirements](https://github.com/vanilla/vanilla/blob/master/README.md#self-hosting-requirements) and [installation](https://github.com/vanilla/vanilla/blob/master/README.md#installation).
+
+Vanilla requires a server with PHP, MySQL, and web server software (like Apache or nginx). You'll probably need to own a domain, and already have it configured on your server with DNS. You usually need to create a database for it via your hosting provider, often via phpMyAdmin. Then you'll need to visit that domain after uploading Vanilla to continue installation. Up to this point, your web host is responsible for all these things. You should consult their docs and contact their support with any questions to getting as far as that.
+
+Say you bought some web space and someone told you how to access it. It might be that you bought a domain like `example.com` or you received only a cryptic sub domain of your provider like `abc123456789.yourwebhoster.com` or you might only have received an IP address, so that you can reach your web space with `1.2.3.4`.
+
+When you enter one of those to reach your web host, your web server shows what is in a folder of your web space. Often, that folder is called `public_html`. Say you own `example.com` and that's what you set up on your server. You have created a subfolder called `forum` (always use lowercase letters!) and uploaded Vanilla to it (see [installation below]((https://github.com/vanilla/vanilla/blob/master/README.md#installation)). Then, you will be able to see the Vanilla installer when you visit `example.com/forum` in your browser.
+
 ## Self-Hosting Requirements
 
 We strongly recommend:
 
-*  **PHP 7.1** or higher.
-*  MySQL 5.6 or higher (or Percona/MariaDB equivalent).
+*  **PHP 7.2** or higher.
+*  MySQL 5.7 or higher (or Percona/MariaDB equivalent).
+* SSL encyrption (check out [LetsEncrypt](https://letsencrypt.org/)).
 
-If your server is not running PHP 7.1 or higher, **you should address this soon**. While PHP 7.0 will receive security patches until December 2018, Vanilla may end support for it prior to that.
+If your server is not running PHP 7.1 or higher, **you should address this soon**. PHP 7.0 has reached end of life and will no longer receive security patches. **Vanilla's support for PHP 7.0 will end soon**.
 
 Our _minimum_ requirements are now:
 
@@ -58,7 +69,7 @@ Our _minimum_ requirements are now:
 * MySQL 5.0 or newer (or Percona/MariaDB equivalent).
 * MySQL strict mode [disabled](https://www.liquidweb.com/kb/how-to-disable-mysql-strict-mode/).
 
-Vanilla ships with a `.htaccess` file required for Apache support. Using nginx or IIS may require additional configuration.
+Vanilla ships with a `.htaccess` file required for Apache support. Using nginx or IIS may require additional configuration. We have [docs for nginx](https://docs.vanillaforums.com/developer/backend/server-nginx/).
 
 On the client side, Vanilla should run & look good in just about any modern browser.
 Still using IE? How exotic. You'll want IE11 or greater. IE8 *might* work if you squint hard and click gently, but we make no promises.
@@ -161,7 +172,7 @@ The creators of git flow released a [short intro video](http://vimeo.com/1601841
 The `master` branch is production-ready for our cloud product but is not yet vetted for open source release (alternate platforms & configurations).
 Reviewed, stable changes land against `master` via pull-request.
 
-Our open source release branches are named by version number, e.g. `release/2.5`.
+Our open source release branches are named by version number, e.g. `release/2.6`.
 We begin release branches with a beta (b1) designation and progress them thru release candidate to stable.
 All open source releases (included pre-releases) are tagged.
 
@@ -172,7 +183,7 @@ We'll work on releasing an updated version as quickly as possible.
 Please do not email non-security issues; use the [issue tracker](https://github.com/vanilla/vanilla/issues) instead.
 
 ## Legal Stuff
-Copyright &copy; 2009-2018 Vanilla Forums Inc.
+Copyright &copy; 2009-2019 Vanilla Forums Inc.
 
 Vanilla Forums is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version.

@@ -1,6 +1,6 @@
 /*!
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -65,16 +65,18 @@ $frame-panel_minHeight: 500px;
         justify-content: center;
         align-items: center;
         flex-shrink: 1;
-        height: #{($global-large_fontSize * $global-condensed_lineHeight) - (2 * $frame-header_spacing)};
         width: $icon_small_size;
         margin: {
             right: $utility-baseUnit;
             left: -10px;
+            top: 4px; // Alignment
         }
     }
 }
 
 .frameHeader-heading {
+    display: flex;
+    align-items: center;
     flex-grow: 1;
     text-overflow: ellipsis;
     font-weight: $global-fontWeight_semiBold;

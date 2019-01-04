@@ -96,7 +96,7 @@ echo $this->Form->open(['Action' => url('/entry/passwordrequest'), 'id' => 'Form
         <li class="Buttons">
             <?php
             echo $this->Form->button('Request a new password', ['class' => 'Button Primary']);
-            echo anchor(t('I remember now!'), '/entry/signin', 'ForgotPassword');
+            echo anchor(t('I remember now!'), '/entry/signin', 'ForgotPassword isRemember');
             ?>
         </li>
     </ul>

@@ -65,28 +65,11 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
                 value={value}
                 overlayComponent={this.CustomOverlay}
                 onDayChange={this.handleDayPickerChange}
-                classNames={{
-                    container: classNames("dayPickerInput-container", this.props.contentClassName),
-                    wrapper: "dayPickerInput-wrapper",
-                    interactionDisabled: "dayPickerInput-interactionDisabled",
-                    navBar: "dayPickerInput-navBar",
-                    navButtonPrev: "dayPickerInput-navButtonPrev",
-                    navButtonNext: "dayPickerInput-navButtonNext",
-                    navButtonInteractionDisabled: "dayPickerInput-navButtonInteractionDisabled",
-                    months: "dayPickerInput-months",
-                    month: "dayPickerInput-month",
-                    caption: "dayPickerInput-caption",
-                    weekdays: "dayPickerInput-weekdays",
-                    weekdaysRow: "dayPickerInput-weekdaysRow",
-                    weekday: "dayPickerInput-weekday",
-                    body: "dayPickerInput-body",
-                    week: "dayPickerInput-week",
-                    day: "dayPickerInput-day",
-                    today: "dayPickerInput-today",
-                    selected: "dayPickerInput-selected",
-                    disabled: "dayPickerInput-disabled",
-                    outside: "dayPickerInput-outside",
-                }}
+                classNames={
+                    {
+                        container: classNames("dayPickerInput-container", this.props.contentClassName),
+                    } as any
+                }
                 dayPickerProps={{
                     captionElement: NullComponent,
                     navbarElement: this.CustomNavBar,

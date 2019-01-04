@@ -41,6 +41,7 @@ $datePicker-padding: $utility-baseUnit * 1.5;
 .DayPicker-Day {
     border-radius: $global_borderRadius;
     padding: $datePicker-padding;
+    white-space: nowrap;
 
     &:hover {
         background-color: $state-hover_color;

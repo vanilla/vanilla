@@ -90,6 +90,10 @@ if (!function_exists('writeComment')) :
             $discussion = $discussionModel->getID($comment->DiscussionID);
             $sender->setData('Discussion', $discussion);
         }
+        
+        if ($sender->data('Discussion.InsertUserID') === $comment->InsertUserID) {
+            $cssClass .= ' isOriginalPoster';
+        }
 
         // DEPRECATED ARGUMENTS (as of 2.1)
         $sender->EventArguments['Object'] = &$comment;

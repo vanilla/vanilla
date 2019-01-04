@@ -928,7 +928,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->title(t('Categories'));
 
         // Get category data
-        $categoryData = $this->CategoryModel->getAll('TreeLeft');
+        $categoryData = $this->CategoryModel->getAll();
 
         // Set CanDelete per-category so we can override later if we want.
         $canDelete = checkPermission(['Garden.Community.Manage', 'Garden.Settings.Manage']);

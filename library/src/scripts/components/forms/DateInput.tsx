@@ -18,7 +18,8 @@ import moment, { Moment } from "moment";
 interface IProps {
     value: string; // ISO formatted date
     onChange: (value: string) => void;
-    className?: string;
+    contentClassName?: string;
+    inputClassName?: string;
     alignment: "left" | "right";
     disabledDays?: any; // See http://react-day-picker.js.org/examples/disabled
 }
@@ -64,6 +65,28 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
                 value={value}
                 overlayComponent={this.CustomOverlay}
                 onDayChange={this.handleDayPickerChange}
+                classNames={{
+                    container: classNames("dayPickerInput-container", this.props.contentClassName),
+                    wrapper: "dayPickerInput-wrapper",
+                    interactionDisabled: "dayPickerInput-interactionDisabled",
+                    navBar: "dayPickerInput-navBar",
+                    navButtonPrev: "dayPickerInput-navButtonPrev",
+                    navButtonNext: "dayPickerInput-navButtonNext",
+                    navButtonInteractionDisabled: "dayPickerInput-navButtonInteractionDisabled",
+                    months: "dayPickerInput-months",
+                    month: "dayPickerInput-month",
+                    caption: "dayPickerInput-caption",
+                    weekdays: "dayPickerInput-weekdays",
+                    weekdaysRow: "dayPickerInput-weekdaysRow",
+                    weekday: "dayPickerInput-weekday",
+                    body: "dayPickerInput-body",
+                    week: "dayPickerInput-week",
+                    day: "dayPickerInput-day",
+                    today: "dayPickerInput-today",
+                    selected: "dayPickerInput-selected",
+                    disabled: "dayPickerInput-disabled",
+                    outside: "dayPickerInput-outside",
+                }}
                 dayPickerProps={{
                     captionElement: NullComponent,
                     navbarElement: this.CustomNavBar,
@@ -71,7 +94,7 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
                     showOutsideDays: true,
                 }}
                 inputProps={{
-                    className: classNames("inputText", this.props.className, {
+                    className: classNames("inputText", this.props.inputClassName, {
                         isInvalid: this.state.hasBadValue && this.state.wasBlurred,
                     }),
                     "aria-label": t("Date Input ") + "(yyyy-mm-dd)",

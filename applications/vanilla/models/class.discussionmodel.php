@@ -1039,6 +1039,11 @@ class DiscussionModel extends Gdn_Model {
                     $discussion->CountUnreadComments = 0;
                 }
             }
+
+            // Discussions are always unread to guests.
+            if (!Gdn::session()->isValid()) {
+                $discussion->Read = false;
+            }
         }
 
         // Logic for incomplete comment count.

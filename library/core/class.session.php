@@ -413,7 +413,7 @@ class Gdn_Session {
      * @return boolean
      */
     public function isValid() {
-        return $this->UserID > UserModel::GUEST_USER_ID;
+        return $this->UserID > 0;
     }
 
     /**

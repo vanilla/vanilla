@@ -2141,6 +2141,9 @@ abstract class Gdn_SQLDriver {
         if (count($in) > 0) {
             $inExpr = '('.implode(', ', $in).')';
         } else {
+            if ($op == 'not in') {
+                deprecated('Gdn_SQLDriver::whereNotIn() with empty $values array');
+            }
             $inExpr = '(null)';
         }
 

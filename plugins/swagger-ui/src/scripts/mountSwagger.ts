@@ -3,17 +3,18 @@
  * @license GPL-2.0-only
  */
 
-import SwaggerUI from "swagger-ui";
+import { SwaggerUIBundle } from "swagger-ui-dist";
 import { formatUrl, getMeta } from "@library/application";
+import "swagger-ui-dist/swagger-ui.css";
 import "../scss/swagger-ui.scss";
 
 export function mountSwagger() {
-    SwaggerUI({
+    SwaggerUIBundle({
         deepLinking: true,
         dom_id: "#swagger-ui",
         // layout: "DashboardLayout",
-        plugins: [SwaggerUI.plugins.DownloadUrl],
-        presets: [SwaggerUI.presets.apis],
+        plugins: [SwaggerUIBundle.plugins.DownloadUrl],
+        presets: [SwaggerUIBundle.presets.apis],
         requestInterceptor: (request: Request) => {
             request.headers["x-transient-key"] = getMeta("TransientKey");
             return request;

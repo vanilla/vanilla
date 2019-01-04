@@ -2045,7 +2045,7 @@ class CategoryModel extends Gdn_Model {
      * Get list of categories (disregarding user permission for admins).
      *
      * @since 2.0.0
-     * 
+     *
      * @return object SQL results.
      */
     public function getAll() {

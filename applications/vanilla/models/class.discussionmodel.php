@@ -1290,7 +1290,7 @@ class DiscussionModel extends Gdn_Model {
         }
 
         // If no user was provided, view from the perspective of a guest.
-        if (!filter_var($userID, FILTER_VALIDATE_INT)) {
+        if (!filter_var($watchUserID, FILTER_VALIDATE_INT)) {
             $watchUserID = UserModel::GUEST_USER_ID;
         }
 

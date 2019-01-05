@@ -1,12 +1,11 @@
 <?php
-
 /**
  * Hero Image Plugin.
  *
- * @author    Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
- * @license   Proprietary http://vanillaforums.com
- * @since     1.0
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ * @since 2.8
  */
 
 /**

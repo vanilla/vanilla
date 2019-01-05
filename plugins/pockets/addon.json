@@ -11,7 +11,7 @@
     "settingsPermission": "Plugins.Pockets.Manage",
     "mobileFriendly": true,
     "hasLocale": true,
-    "license": "GNU GPLv2",
+    "license": "GPL-2.0-only",
     "icon": "pocket.png",
     "key": "pockets",
     "type": "addon",

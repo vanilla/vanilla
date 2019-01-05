@@ -80,7 +80,8 @@ class Pocket {
      * The Disabled field used to have 3 states: enabled, disabled, or testing. Testing has since branched out
      * into its own field: TestMode. We need to check both places to see if a pocket is in test mode.
      *
-     * @param $pocket
+     * @param Pocket|array $pocket
+     *
      * @return bool
      */
     public static function inTestMode($pocket) {
@@ -129,29 +130,35 @@ class Pocket {
         if ($count) {
             switch ($this->RepeatType) {
                 case Pocket::REPEAT_AFTER:
-                    if (strcasecmp($count, Pocket::REPEAT_AFTER) != 0)
+                    if (strcasecmp($count, Pocket::REPEAT_AFTER) != 0) {
                         return false;
+                    }
                     break;
                 case Pocket::REPEAT_BEFORE:
-                    if (strcasecmp($count, Pocket::REPEAT_BEFORE) != 0)
+                    if (strcasecmp($count, Pocket::REPEAT_BEFORE) != 0) {
                         return false;
+                    }
                     break;
                 case Pocket::REPEAT_ONCE:
-                    if ($count != 1)
+                    if ($count != 1) {
                         return false;
+                    }
                     break;
                 case Pocket::REPEAT_EVERY:
-                    $frequency = (array)$this->RepeatFrequency;
+                    $frequency = (array) $this->RepeatFrequency;
                     $every = val(0, $frequency, 1);
-                    if ($every < 1)
+                    if ($every < 1) {
                         $every = 1;
+                    }
                     $begin = val(1, $frequency, 1);
-                    if (($count % $every) > 0 || ($count < $begin))
+                    if (($count % $every) > 0 || ($count < $begin)) {
                         return false;
+                    }
                     break;
                 case Pocket::REPEAT_INDEX:
-                    if (!in_array($count, (array)$this->RepeatFrequency))
+                    if (!in_array($count, (array)$this->RepeatFrequency)) {
                         return false;
+                    }
                     break;
             }
         }
@@ -194,31 +201,42 @@ class Pocket {
     }
 
     /**
+     * Attempt to determine the name of the page from the passed object.
      *
+     * - Checks `PageName`.
+     * - Checks `ControllerName`.
+     * - Falls back to the class name.
      *
-     * @param null $nameOrObject
-     * @return mixed|null|string
+     * Then transforms and translates the name with {self::$NameTranslations}
+     *
+     * @param string|object|null $nameOrObject The string or object to pull from.
+     *
+     * @return string A page name or empty string if null/no argument was passed.
      */
-    public static function pageName($nameOrObject = null) {
-        if (is_object($nameOrObject))
+    public static function pageName($nameOrObject = null): string {
+        if (is_object($nameOrObject)) {
             $name = val('PageName', $nameOrObject, val('ControllerName', $nameOrObject, get_class($nameOrObject)));
-        else
+        } else {
             $name = $nameOrObject;
+        }
 
         $name = strtolower($name);
-        if (stringEndsWith($name, 'controller', false))
+        if (stringEndsWith($name, 'controller', false)) {
             $name = substr($name, 0, -strlen('controller'));
+        }
 
-        if (array_key_exists($name, self::$NameTranslations))
+        if (array_key_exists($name, self::$NameTranslations)) {
             $name = self::$NameTranslations[$name];
+        }
         return $name;
     }
 
     /**
+     * Normalize the repeat value of a pocket.
      *
+     * @param string $repeat The repeat value.
      *
-     * @param $repeat
-     * @return array
+     * @return [string, string[]] A tuple of the repeat value and frequency.
      */
     public static function parseRepeat($repeat) {
         if (stringBeginsWith($repeat, Pocket::REPEAT_EVERY)) {
@@ -250,16 +268,17 @@ class Pocket {
      *
      *  @param array $data additional data for the pocket.
      */
-    public function render($data = NULL) {
+    public function render($data = null) {
         echo $this->toString($data);
     }
 
-    /** Set the repeat of the pocket.
+    /**
+     * Set the repeat of the pocket.
      *
-     *  @param string $type The repeat type, contained in the various Pocket::REPEAT_* constants.
-     *    - every: Repeats every x times. If $frequency is an array then it will be interpretted as array($frequency, $Begin).
-     *    - indexes: Renders only at the given indexes, starting at 1.
-     *  @param int|array $frequency The frequency of the repeating, see the $type parameter for how this works.
+     * @param string $type The repeat type, contained in the various Pocket::REPEAT_* constants.
+     * - every: Repeats every x times. If $frequency is an array then it will be interpretted as array($frequency, $Begin).
+     * - indexes: Renders only at the given indexes, starting at 1.
+     * @param int|array $frequency The frequency of the repeating, see the $type parameter for how this works.
      */
     public function repeat($type, $frequency) {
         $this->RepeatType = $type;
@@ -267,13 +286,11 @@ class Pocket {
     }
 
     /**
+     * Get a string representation of the Pocket.
      *
-     *
-     * @param null $data
-     * @return mixed|string
-     * @throws Exception
+     * @return mixed|string Either the raw body of the pocket or a formatted version, depending on the Format.
      */
-    public function toString($data = NULL) {
+    public function toString() {
         static $plugin;
         if (!isset($plugin)) {
             $plugin = Gdn::pluginManager()->getPluginInstance('PocketsPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
@@ -290,10 +307,10 @@ class Pocket {
     }
 
     /**
+     * Create a pocket if it doesn't already exist.
      *
-     *
-     * @param $name
-     * @param $value
+     * @param string $name The name of the pocket.
+     * @param string $value The contents of the pocket.
      */
     public static function touch($name, $value) {
         $model = new Gdn_Model('Pocket');

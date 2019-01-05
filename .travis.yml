@@ -2,6 +2,32 @@
 jobs:
   fast_finish: true
   include:
+    # PHP 7.3 Job. This only runs in the daily cron jobs.
+    # Once infrastructure has been updated to 7.3+ this will be run on pull requests.
+    - name: PHP 7.3
+      language: php
+      php: 7.3
+      if: type = cron
+      addons:
+        apt:
+          packages:
+            - nginx
+            - realpath
+        hosts:
+          - vanilla.test
+      before_script:
+        - phpenv config-rm xdebug.ini # Remove xdebug for better performance.
+        - composer self-update
+        - composer install --optimize-autoloader
+        - tests/travis/setup.sh
+      cache:
+        directories:
+          - $HOME/.composer/cache/files
+      script:
+        - tests/travis/main.sh
+        - ls -lah ./conf
+        - cat /tmp/error.log
+        - cat /tmp/access.log
     # PHP 7.2 Job. This should always run.
     - name: PHP 7.2
       language: php
@@ -51,7 +77,7 @@ jobs:
         - ls -lah ./conf
         - cat /tmp/error.log
         - cat /tmp/access.log
-    # PHP 7.1 Job. This only runs in the daily cron jobs.
+    # PHP 7.0 Job. This only runs in the daily cron jobs.
     - name: PHP 7.0
       language: php
       php: 7.0

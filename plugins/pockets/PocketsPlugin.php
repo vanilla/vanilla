@@ -768,11 +768,29 @@ if (!function_exists('renderPocketToggle')) {
      */
     function renderPocketToggle($pocket) {
         $enabled = val('Disabled', $pocket) !== Pocket::DISABLED;
-        $return = '<span id="pockets-toggle-'.val('PocketID', $pocket).'">';
+        $pocketID = val('PocketID', $pocket);
+        $return = "<span id='pockets-toggle-$pocketID'>";
+        $content = '<div class="toggle-well"></div><div class="toggle-slider"></div>';
         if ($enabled) {
-            $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/disable/'.val('PocketID', $pocket), 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
+            $return .= wrap(
+                anchor(
+                    $content,
+                    '/settings/pockets/disable/' . $pocketID,
+                    'Hijack'
+                ),
+                'span',
+                ['class' => "toggle-wrap toggle-wrap-on"]
+            );
         } else {
-            $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/enable/'.val('PocketID', $pocket), 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
+            $return .= wrap(
+                anchor(
+                    $content,
+                    '/settings/pockets/enable/' . $pocketID,
+                    'Hijack'
+                ),
+                'span',
+                ['class' => "toggle-wrap toggle-wrap-off"]
+            );
         }
         $return .= '</span>';
         return $return;

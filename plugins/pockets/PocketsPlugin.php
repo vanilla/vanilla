@@ -8,7 +8,6 @@
  * Class PocketsPlugin
  */
 class PocketsPlugin extends Gdn_Plugin {
-
     /** @var array Counters for the various locations. */
     protected $_Counters = [];
 
@@ -53,7 +52,7 @@ class PocketsPlugin extends Gdn_Plugin {
     /**
      * Add test mode to every page.
      *
-     * @param $sender
+     * @param Gdn_Controller $sender The controller firing the event.
      */
     public function base_render_before($sender) {
         if ($this->ShowPocketLocations === null) {
@@ -68,7 +67,7 @@ class PocketsPlugin extends Gdn_Plugin {
     /**
      * Adds "Media" menu option to the Forum menu on the dashboard.
      *
-     * @param $sender
+     * @param Gdn_Pluggable $sender The firing pluggable instance.
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = $sender->EventArguments['SideMenu'];
@@ -77,9 +76,9 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Render pockets for that are set before a particular asset.
      *
-     *
-     * @param $sender
+     * @param Gdn_Controller $sender The controller rendering the asset.
      */
     public function base_beforeRenderAsset_handler($sender) {
         $assetName = valr('EventArguments.AssetName', $sender);
@@ -87,9 +86,9 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Render pockets for that are set after a particular asset.
      *
-     *
-     * @param $sender
+     * @param Gdn_Controller $sender The controller rendering the asset.
      */
     public function base_afterRenderAsset_handler($sender) {
         $assetName = valr('EventArguments.AssetName', $sender);
@@ -97,9 +96,9 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Render pockets for that are between particular assets.
      *
-     *
-     * @param $sender
+     * @param Gdn_Controller $sender The controller rendering the asset.
      */
     public function base_betweenRenderAsset_handler($sender) {
         $assetName = valr('EventArguments.AssetName', $sender);
@@ -107,18 +106,18 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Render pockets for that are set between discussions.
      *
-     *
-     * @param $sender
+     * @param Gdn_Controller $sender The controller rendering the asset.
      */
     public function base_betweenDiscussion_handler($sender) {
         $this->processPockets($sender, 'BetweenDiscussions');
     }
 
     /**
+     * Render pockets for that are set after comments.
      *
-     *
-     * @param $sender
+     * @param Gdn_Controller $sender The controller rendering the asset.
      */
     public function base_beforeCommentDisplay_handler($sender) {
         // We don't want pockets to display before the first comment because they are only between comments.
@@ -133,7 +132,7 @@ class PocketsPlugin extends Gdn_Plugin {
     /**
      * Main list for a pocket management.
      *
-     * @param Gdn_Controller $sender.
+     * @param Gdn_Controller $sender
      * @param array $args
      * @return mixed
      */
@@ -143,7 +142,7 @@ class PocketsPlugin extends Gdn_Plugin {
         $sender->addJsFile('pockets.js', 'plugins/Pockets');
 
         $page = val(0, $args);
-        switch(strtolower($page)) {
+        switch (strtolower($page)) {
             case 'add':
                 return $this->_add($sender);
                 break;
@@ -165,10 +164,10 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Render the /settings/pockets page.
      *
-     *
-     * @param $sender
-     * @param $args
+     * @param SettingsController $sender The controller instance.
+     * @param array $args Routing arguments.
      */
     protected function _index($sender, $args) {
         $sender->setData('Title', t('Pockets'));
@@ -180,7 +179,6 @@ class PocketsPlugin extends Gdn_Plugin {
 
         // Add notes to the pockets data.
         foreach ($pocketData as $index => &$pocketRow) {
-
             $mobileOnly = $pocketRow['MobileOnly'];
             $mobileNever = $pocketRow['MobileNever'];
             $noAds = $pocketRow['Type'] == Pocket::TYPE_AD;
@@ -208,12 +206,12 @@ class PocketsPlugin extends Gdn_Plugin {
                     'label' => t('Visibility'),
                     'value' => t('Hidden')
                 ];
-            } else if ($mobileOnly) {
+            } elseif ($mobileOnly) {
                 $meta['visibility'] = [
                     'label' => t('Visibility'),
                     'value' => t('Shown only on mobile')
                 ];
-            } else if ($mobileNever) {
+            } elseif ($mobileNever) {
                 $meta['visibility'] = [
                     'label' => t('Visibility'),
                     'value' => t('Hidden for mobile')
@@ -256,10 +254,9 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Render the /settings/pockets/add page.
      *
-     *
-     * @param $sender
-     * @return mixed
+     * @param SettingsController $sender The controller instance.
      */
     protected function _add($sender) {
         $sender->setData('Title', sprintf(t('Add %s'), t('Pocket')));
@@ -273,9 +270,9 @@ class PocketsPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $sender
      * @param string $pocketID The ID of the pocket to modify.
-     * @param $disabledState Either Pocket::ENABLED or Pocket::DISABLED
-     * @throws Exception
-     * @throws Gdn_UserException
+     * @param string $disabledState Either Pocket::ENABLED or Pocket::DISABLED
+     *
+     * @throws Exception If the method is called without proper authentication.
      */
     private function setDisabled($sender, $pocketID, $disabledState) {
         $sender->permission('Plugins.Pockets.Manage');
@@ -323,12 +320,10 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Render the /settings/pockets/add or /settings/pockets/edit page.
      *
-     *
-     * @param SettingsController $sender
-     * @param bool|false $pocketID
-     * @return mixed
-     * @throws Gdn_UserException
+     * @param SettingsController $sender The controller instance.
+     * @param number|bool $pocketID
      */
     protected function _addEdit($sender, $pocketID = false) {
         $form = new Gdn_Form();
@@ -350,11 +345,13 @@ class PocketsPlugin extends Gdn_Plugin {
                     $pocketModel->Validation->applyRule('EveryFrequency', 'Integer');
                     $pocketModel->Validation->applyRule('EveryBegin', 'Integer');
                     $frequency = $form->getFormValue('EveryFrequency', 1);
-                    if (!$frequency || !validateInteger($frequency) || $frequency < 1)
+                    if (!$frequency || !validateInteger($frequency) || $frequency < 1) {
                         $frequency = 1;
+                    }
                     $repeat .= ' '.$frequency;
-                    if ($form->getFormValue('EveryBegin', 1) > 1)
+                    if ($form->getFormValue('EveryBegin', 1) > 1) {
                         $repeat .= ','.$form->getFormValue('EveryBegin');
+                    }
                     break;
                 case Pocket::REPEAT_INDEX:
                     $pocketModel->Validation->addRule('IntegerArray', 'function:ValidateIntegerArray');
@@ -423,30 +420,38 @@ class PocketsPlugin extends Gdn_Plugin {
 
         $sender->setData('Locations', $this->Locations);
         $sender->setData('LocationsArray', $this->getLocationsArray());
-        $sender->setData('Pages', ['' => '('.t('All').')', 'activity' => 'activity', 'comments' => 'comments', 'dashboard' => 'dashboard', 'discussions' => 'discussions', 'inbox' => 'inbox', 'profile' => 'profile']);
+        $sender->setData(
+            'Pages',
+            [
+                '' => '('.t('All').')',
+                'activity' => 'activity',
+                'comments' => 'comments',
+                'dashboard' => 'dashboard',
+                'discussions' => 'discussions',
+                'inbox' => 'inbox',
+                'profile' => 'profile',
+            ]
+        );
 
         return $sender->render('AddEdit', '', 'plugins/Pockets');
     }
 
     /**
+     * Render the /settings/pockets/edit page.
      *
-     *
-     * @param $sender
-     * @param $pocketID
-     * @return mixed
+     * @param SettingsController $sender The controller instance.
+     * @param number $pocketID
      */
-    protected function _Edit($sender, $pocketID) {
+    protected function _edit($sender, $pocketID) {
         $sender->setData('Title', sprintf(t('Edit %s'), t('Pocket')));
         return $this->_AddEdit($sender, $pocketID);
     }
 
     /**
+     * Render the /settings/pockets/delete page.
      *
-     *
-     * @param SettingsController $sender
-     * @param $pocketID
-     * @return bool
-     * @throws Gdn_UserException
+     * @param SettingsController $sender The controller instance.
+     * @param number $pocketID
      */
     protected function _delete($sender, $pocketID) {
         $sender->setData('Title', sprintf(t('Delete %s'), t('Pocket')));
@@ -478,7 +483,7 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Get an array mapping location keys to visual display names.
      *
      * @return array
      */
@@ -491,10 +496,11 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Get all with a particular name.
      *
+     * @param string $name The name of the pocket.
      *
-     * @param $name
-     * @return mixed
+     * @return array
      */
     public function getPockets($name) {
         $this->_loadState();
@@ -502,9 +508,9 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Load all pockets from the database.
      *
-     *
-     * @param bool|false $force
+     * @param bool $force If true, re-load data from DB even if it's loaded.
      */
     protected function _loadState($force = false) {
         if (!$force && $this->StateLoaded) {
@@ -522,11 +528,11 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Gather all of the pockets for a particular page.
      *
-     *
-     * @param $sender
-     * @param $location
-     * @param null $countHint
+     * @param Gdn_Controller $sender The controller instance.
+     * @param string $location The pocket location.
+     * @param number|null $countHint
      */
     public function processPockets($sender, $location, $countHint = null) {
         if (Gdn::controller()->deliveryMethod() != DELIVERY_METHOD_XHTML) {
@@ -584,17 +590,15 @@ class PocketsPlugin extends Gdn_Plugin {
                 }
             }
         }
-
-        $this->_saveState();
     }
 
     /**
+     * Get the contents of the pocket as a string.
      *
+     * @param string $name The name of the pocket.
+     * @param array|null $data
      *
-     * @param $name
-     * @param null $data
-     * @return mixed|string
-     * @throws Exception
+     * @return string
      */
     public static function pocketString($name, $data = null) {
         $inst = Gdn::pluginManager()->getPluginInstance('PocketsPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
@@ -608,7 +612,7 @@ class PocketsPlugin extends Gdn_Plugin {
         $controllerName = Gdn::controller()->ControllerName;
 
         foreach ($pockets as $pocket) {
-            if (val('Location', $pocket) == 'Custom' ) {
+            if (val('Location', $pocket) == 'Custom') {
                 $data['PageName'] = Pocket::pageName($controllerName);
                 if ($pocket->canRender($data)) {
                     $result .= $pocket->toString();
@@ -640,6 +644,7 @@ class PocketsPlugin extends Gdn_Plugin {
      * DEPRECATED - Callback function for preg_replace_callback
      *
      * @deprecated 2.4
+     *
      * @param array|null $match
      * @param bool|false $setArgs
      * @return string
@@ -661,12 +666,6 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * derp?
-     */
-    protected function _saveState() {
-    }
-
-    /**
      * Runs on enable.
      */
     public function setup() {
@@ -675,8 +674,6 @@ class PocketsPlugin extends Gdn_Plugin {
 
     /**
      * Runs on utility/update.
-     *
-     * @throws Exception
      */
     public function structure() {
         // Pocket class isn't autoloaded on Enable.
@@ -710,9 +707,9 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * derp?
+     * Render debugging information for pockets.
      *
-     * @param $sender
+     * @param Gdn_Controller $sender
      */
     public function testData($sender) {
         return;
@@ -727,10 +724,11 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Render a list element of an item and its value.
      *
+     * @param string $name The name of the item.
+     * @param string $value The value to display.
      *
-     * @param $name
-     * @param $value
      * @return string
      */
     protected static function _var($name, $value) {
@@ -740,17 +738,18 @@ class PocketsPlugin extends Gdn_Plugin {
 
 if (!function_exists('ValidateIntegerArray')) {
     /**
+     * Validate that all values in an array are integers.
      *
+     * @param mixed[] $value An array of values to validate.
      *
-     * @param $value
-     * @param $field
      * @return bool
      */
-    function validateIntegerArray($value, $field) {
+    function validateIntegerArray($value) {
         $values = explode(',', $value);
         foreach ($values as $val) {
-            if ($val && !validateInteger(trim($val)))
+            if ($val && !validateInteger(trim($val))) {
                 return false;
+            }
         }
 
         return true;

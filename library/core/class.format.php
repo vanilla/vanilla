@@ -473,17 +473,17 @@ class Gdn_Format {
         'ŷ' => 'y', 'ž' => 'z', 'ż' => 'z', 'ź' => 'z', 'þ' => 't', 'ß' => 'ss',
         'ſ' => 'ss', 'ый' => 'iy', 'А' => 'A', 'Б' => 'B', 'В' => 'V', 'Г' => 'G',
         'Д' => 'D', 'Е' => 'E', 'Ё' => 'YO', 'Ж' => 'ZH', 'З' => 'Z', 'И' => 'I',
-		'И' => 'I', 'І' => 'I', 'Й' => 'Y', 'К' => 'K', 'Л' => 'L', 'М' => 'M',
-		'Н' => 'N', 'О' => 'O', 'П' => 'P', 'Р' => 'R', 'С' => 'S', 'Т' => 'T',
-		'У' => 'U', 'Ф' => 'F', 'Х' => 'H', 'Ц' => 'C', 'Ч' => 'CH', 'Ш' => 'SH',
-		'Щ' => 'SCH', 'Ъ' => '', 'Ы' => 'Y', 'Ь' => '', 'Э' => 'E', 'Ю' => 'YU',
-		'Я' => 'YA', 'Є' => 'YE', 'Ї' => 'YI', 'а' => 'a', 'б' => 'b', 'в' => 'v',
-		'г' => 'g', 'д' => 'd', 'е' => 'e', 'ё' => 'yo', 'ж' => 'zh', 'з' => 'z',
-		'и' => 'i', 'і' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l', 'м' => 'm',
-		'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't',
-		'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh',
-		'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '', 'э' => 'e', 'є' => 'ye',
-		'ю' => 'yu', 'я' => 'ya', 'ї' => 'yi'
+        'И' => 'I', 'І' => 'I', 'Й' => 'Y', 'К' => 'K', 'Л' => 'L', 'М' => 'M',
+        'Н' => 'N', 'О' => 'O', 'П' => 'P', 'Р' => 'R', 'С' => 'S', 'Т' => 'T',
+        'У' => 'U', 'Ф' => 'F', 'Х' => 'H', 'Ц' => 'C', 'Ч' => 'CH', 'Ш' => 'SH',
+        'Щ' => 'SCH', 'Ъ' => '', 'Ы' => 'Y', 'Ь' => '', 'Э' => 'E', 'Ю' => 'YU',
+        'Я' => 'YA', 'Є' => 'YE', 'Ї' => 'YI', 'а' => 'a', 'б' => 'b', 'в' => 'v',
+        'г' => 'g', 'д' => 'd', 'е' => 'e', 'ё' => 'yo', 'ж' => 'zh', 'з' => 'z',
+        'и' => 'i', 'і' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l', 'м' => 'm',
+        'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't',
+        'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh',
+        'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '', 'э' => 'e', 'є' => 'ye',
+        'ю' => 'yu', 'я' => 'ya', 'ї' => 'yi'
     ];
 
     /**
@@ -1232,9 +1232,10 @@ class Gdn_Format {
      * Formats the anchor tags around the links in text.
      *
      * @param mixed $mixed An object, array, or string to be formatted.
+     * @param bool $isHtml Should $mixed be considered to be a valid HTML string?
      * @return string
      */
-    public static function links($mixed) {
+    public static function links($mixed, bool $isHtml = false) {
         if (!c('Garden.Format.Links', true)) {
             return $mixed;
         }
@@ -1243,7 +1244,7 @@ class Gdn_Format {
             return self::to($mixed, 'Links');
         }
 
-        $linksCallback = function($matches) {
+        $linksCallback = function($matches) use ($isHtml) {
             static $inTag = 0;
             static $inAnchor = false;
 
@@ -1269,6 +1270,10 @@ class Gdn_Format {
                 $url = $matches[4];
                 $domain = parse_url($url, PHP_URL_HOST);
                 if (!isTrustedDomain($domain)) {
+                    // If this is valid HTMl, the link text's HTML special characters should be encoded. Decode them to their raw state for URL encoding.
+                    if ($isHtml) {
+                        $url = htmlspecialchars_decode($url);
+                    }
                     return url('/home/leaving?target='.urlencode($url)).'" class="Popup';
                 }
             }
@@ -1321,6 +1326,10 @@ class Gdn_Format {
                 // This is a plaintext url we're converting into an anchor.
                 $domain = parse_url($url, PHP_URL_HOST);
                 if (!isTrustedDomain($domain)) {
+                    // If this is valid HTMl, the link text's HTML special characters should be encoded. Decode them to their raw state for URL encoding.
+                    if ($isHtml) {
+                        $url = htmlspecialchars_decode($url);
+                    }
                     return '<a href="'.url('/home/leaving?target='.urlencode($url)).'" class="Popup">'.$text.'</a>'.$punc;
                 }
             }
@@ -1845,7 +1854,7 @@ EOT;
         $html = self::getEventManager()->fireFilter('format_filterHtml', $html);
 
         // Embed & auto-links.
-        $html = Gdn_Format::links($html);
+        $html = Gdn_Format::links($html, true);
 
         // Mentions.
         if ($mentions) {
@@ -1939,7 +1948,7 @@ EOT;
                 if (self::$DisplayNoFollow) {
                     $attributes['rel'] = 'nofollow';
                 }
-                $parts[$i] = anchor('@'.$mention, url(str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat), true), 'atMention', $attributes).$suffix;
+                $parts[$i] = anchor('@'.$mention, url(str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat), true), '', $attributes).$suffix;
             } else {
                 $parts[$i] = '@' . $parts[$i];
             }
@@ -1992,11 +2001,11 @@ EOT;
         }
     }
 
-   /**
-    * Reduces multiple whitespaces including line breaks and tabs to one single space character.
-    *
-    * @param string $string The string which should be optimized
-    */
+    /**
+     * Reduces multiple whitespaces including line breaks and tabs to one single space character.
+     *
+     * @param string $string The string which should be optimized
+     */
     public static function reduceWhiteSpaces($string) {
         return trim(preg_replace('/\s+/', ' ', $string));
     }

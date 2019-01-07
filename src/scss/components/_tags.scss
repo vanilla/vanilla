@@ -75,14 +75,14 @@ $tag-hover_borderColor:           $global-color_primary !default;
     .IdeationTag {
        @include Tag;
     }
-
+    
+    .RoleTracker,
     .IdeationTag {
-        &:focus,
-        &:hover {
-            background-color: $global-color_primary;
-            border-color: $global-color_primary;
-            color: $global-color_white;
-            text-decoration: none;
+
+        .Tag {
+            background-color: transparent;
+            padding: 0;
+            border-width: 0;
         }
     }
 

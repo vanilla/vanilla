@@ -144,6 +144,8 @@
         font-weight: inherit;
         color: inherit;
         padding: 0;
+        margin-right: $utility-baseUnitHalf;
+        margin-bottom: $utility-baseUnitHalf;
 
         a {
             font-size: inherit;
@@ -163,12 +165,10 @@
         font-size: $component-meta_fontSize;
         line-height: inherit;
         margin-left: 0;
-        margin-right: $utility-small_padding;
     }
 
     .MItem {
         color: $component-meta-link_color;
-        margin-bottom: $utility-small_padding;
 
         &:last-child {
             margin-right: 0;

@@ -153,14 +153,14 @@ a.MoreWrap,
     }
 
     .QuickSearchButton {
-        display: block;
+        display: inline-flex;
+        align-items: center;
         margin: 0 0 0 $utility-medium_padding;
     }
 
     span,
     > a {
         transition: color 0.25s ease-out;
-        display: block;
         font-size: $pager_fontSize;
         font-weight: $pager_fontWeight;
         line-height: $pager_height;
@@ -238,6 +238,7 @@ a.MoreWrap,
 
     .QuickSearchButton.QuickSearchButton span {
         min-width: 0;
+        height: auto;
         width: auto;
         color: inherit;
         margin: 0;

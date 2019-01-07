@@ -80,7 +80,7 @@ $global-default_timing:                 0.35s !default;
 $global_borderRadius:                   3px !default;
 
 $global-color_primary:                  $global-color_vanillaBlue !default;
-$global-color_primaryAlt:               darken($global-color_primary, 10%) !default;
+$global-color_primaryAlt:               darken($global-color_primary, 8%) !default;
 $global-color_secondary:                $global-color_pink !default;
 
 $global-color_bg:                       $global-color_white !default;
@@ -219,7 +219,7 @@ $content_borderRadius:                   0 !default;
 \* -------------------------------------------------------------- */
 
 $panel_toLeft:                           false !default;
-$panel_width:                            256px !default;
+$panel_width:                            220px !default;
 $panel-item_height:                      2.5em !default;
 $panel_bg:                               transparent !default;
 $panel-hover_bg:                         $theme-hover_color !default;

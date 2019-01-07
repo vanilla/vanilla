@@ -55,7 +55,7 @@
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
- */.Aside{margin:0}.Count,.Reactions .Count{background-color:#f5f5f6;border:0;border-radius:3px;color:inherit;display:inline-block;font-size:12px;line-height:1.618;padding:0 3px;text-align:center;white-space:nowrap}a:focus .Count,a:focus .Reactions .Count,a:hover .Count,a:hover .Reactions .Count{background-color:#0291db;border-color:#0291db;color:#fff}
+ */.Aside{margin:0}.Count,.Reactions .Count{background-color:rgba(0,0,0,0);border:0;border-radius:3px;color:inherit;display:inline-block;font-size:12px;line-height:1.618;padding:0 3px;text-align:center;white-space:nowrap}a:focus .Count,a:focus .Reactions .Count,a:hover .Count,a:hover .Reactions .Count{background-color:rgba(0,0,0,0);border-color:rgba(0,0,0,0);color:inherit}
 
 /*!
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>

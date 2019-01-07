@@ -1244,7 +1244,7 @@ class Gdn_Format {
             return self::to($mixed, 'Links');
         }
 
-        $linksCallback = function($matches) use ($isHtml) {
+        $linksCallback = function ($matches) use ($isHtml) {
             static $inTag = 0;
             static $inAnchor = false;
 

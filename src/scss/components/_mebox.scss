@@ -9,8 +9,8 @@
 \* -------------------------------------------------------------- */
 
 $mebox-photo_size:                      24px !default;
-$mebox_color:                           $header_color !default;
-$mebox_hover_color:                     $header-hover_color !default;
+$mebox_color:                           $header_link_color !default;
+$mebox_hover_color:                     $header-link-hover_color !default;
 $mebox_hover_bg:                        rgba(mix($mebox_color, $global-color_fg, 12%), .2) !default;
 
 /* -------------------------------------------------------------- *\

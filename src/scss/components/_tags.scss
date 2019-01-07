@@ -8,7 +8,7 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$tag_borderRadius:                $formButton_borderRadius !default;
+$tag_borderRadius:                $global_borderRadius !default;
 $tag_height:                      $formButton_height !default;
 $tag_bg:                          $theme-hover_color !default;
 $tag_border:                      0 !default;

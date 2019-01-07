@@ -55,6 +55,7 @@ $global-title_mobile_fontSize:          26px !default;
 $global-subTitle_fontSize:              18px !default;
 
 $global-base_lineHeight:                1.618 !default;
+$global-condensed_lineHeight:           1.25 !default;
 $global-lineHeight_offset:              .32 !default; // Offset font to make top of capital letters flush with top of container
 $global-headinglineHeight_offset:       $global-lineHeight_offset !default; // Different if heading has different font than body
 $global-bodylineHeight_offset:          .4 !default; // Different if body has different font than headding
@@ -222,18 +223,26 @@ $panel_toLeft:                           false !default;
 $panel_width:                            220px !default;
 $panel-item_height:                      2.5em !default;
 $panel_bg:                               transparent !default;
-$panel-hover_bg:                         $theme-hover_color !default;
-$panel_color:                            $global-color_fg !default;
-$panel-link_color:                       $global-color_primary !default;
-$panel-link-hover_color:                 $global-color_primaryAlt !default;
+$panel_fg:                               $global-color_fg !default;
 $panel_padding:                          0 !default;
 $panel-border:                           $content_border !default;
 $panel_borderRadius:                     $content_borderRadius !default;
 
-$panel_item-border:                      none !default;
-$panel_item-spacing:                     0 !default;
-$panel_item-borderRadius:                $global_borderRadius !default;
-$panel_item-showIcons:                   false !default;
+
+$panel-item-showIcons:                   true !default;
+$panel-item_height:                      32px !default;
+$panel-item_spacing:                     0 !default;
+$panel-item_sidePadding:                 6px !default;
+$panel-item_borderRadius:                0 !default;
+$panel-item_border:                      none !default;
+
+$panel-item_bg:                          transparent !default;
+$panel-item_fg:                          $link-default_color !default;
+$panel-item_borderColor:                 transparent !default;
+
+$panel-item-hover_bg:                    transparent !default;
+$panel-item-hover_fg:                    $link-default_hover_color !default;
+$panel-item-hover_borderColor:           transparent !default;
 
 /* -------------------------------------------------------------- *\
     Footer

@@ -265,6 +265,17 @@ div.token-input-dropdown {
     }
 }
 
+.NewConversation.NewConversation {
+    @include Button(
+        $button-primary_bg,
+        $button-primary_fg,
+        $button-primary_border,
+        $button-primary-hover_bg,
+        $button-primary-hover_fg,
+        $button-primary-hover_border
+    );
+}
+
 .ButtonGroup.Multi {
 
     @include Button(

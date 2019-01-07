@@ -251,29 +251,8 @@ a.MoreWrap,
         }
     }
 
-    //.QuickSearch .Sprite {
-    //
-    //}
-
-    //.QuickSearch.Open .Sprite,
-    //.QuickSearch .Sprite:hover {
-    //    background: $quickSearch-hover_bg;
-    //    color: $quickSearch_color;
-    //}
-
     .QuickSearchWrap {
         width: 300px;
-
-        //.Button {
-        //    @include Button(
-        //        $button-primary_bg,
-        //        $button-primary_fg,
-        //        $button-primary_border,
-        //        $button-primary-hover_bg,
-        //        $button-primary-hover_fg,
-        //        $button-primary-hover_border
-        //    );
-        //}
     }
 
     .bwrap .Button {

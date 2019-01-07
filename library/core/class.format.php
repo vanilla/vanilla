@@ -1950,10 +1950,11 @@ EOT;
                 }
                 $parts[$i] =
                     anchor(
-                    '@' . $mention,
-                    url(str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat), true),
-                    '',
-                    $attributes
+                        '@' . $mention,
+                        url(str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat),
+                            true),
+                        '', 
+                        $attributes
                     ) . $suffix;
             } else {
                 $parts[$i] = '@' . $parts[$i];

@@ -251,14 +251,13 @@ export function isEmojiSupported() {
         // Test environment
         const canvas = document.createElement("canvas");
         if (canvas.getContext && canvas.getContext("2d")) {
-            const pixelRatio = window.devicePixelRatio || 1;
-            const offset = 12 * pixelRatio;
-            const ctx = canvas.getContext("2d");
-            ctx!.fillStyle = "#f00";
-            ctx!.textBaseline = "top";
-            ctx!.font = "32px Arial";
-            ctx!.fillText(testChar, 0, 0);
-            emojiSupportedCache = ctx!.getImageData(offset, offset, 1, 1).data[0] !== 0;
+            const ctx = document.createElement("canvas").getContext("2d");
+            if (ctx) {
+                ctx.fillText("😗", -2, 4);
+                emojiSupportedCache = ctx.getImageData(0, 0, 1, 1).data[3] > 0;
+            } else {
+                emojiSupportedCache = false;
+            }
         } else {
             emojiSupportedCache = false;
         }

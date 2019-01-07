@@ -24,7 +24,7 @@ export async function makeDevConfig(entryModel: EntryModel, section: string) {
     baseConfig.devtool = "cheap-module-eval-source-map";
     baseConfig.output = {
         filename: `${section}-hot-bundle.js`,
-        chunkFilename: "[name].chunk.js",
+        chunkFilename: `[name]-[chunkhash]-${section}.chunk.js`,
         publicPath: `http://${options.devIp}:3030/`,
     };
     baseConfig.optimization = {

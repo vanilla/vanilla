@@ -294,9 +294,9 @@ $buttonToIconMargin                                  : ($formElement_height - $i
 
 @function getBlackOrWhiteBasedOnColor($color) {
     @if (lightness($color) > 50) {
-        @return white; // Lighter backgorund
+        @return white; // Lighter background
     } @else {
-        @return black; // Darker backgorund
+        @return black; // Darker background
     }
 }
 
@@ -446,14 +446,24 @@ $dropDown-item_mobile_fontSize                      : 16px;
 /* -------------------------------------------------------------- *\
     Header
 \* -------------------------------------------------------------- */
+@function getBgDependingOnContrastColor($fgColor, $colorToModify, $mixAmount) {
+    @if (lightness($fgColor) > 50) {
+        @return mix(#000, $colorToModify, $mixAmount); // Light text, so darken color
+    } @else {
+        @return mix(#fff, $colorToModify, $mixAmount); // Light text, so darken color
+    }
+}
 
-$vanillaHeader_height                               : 50px !default;
+$vanillaHeader_height                               : 48px !default;
 $vanillaHeader_mobile_height                        : 44px !default;
-$vanillaHeader_fg                                   : #fff !default;
+$vanillaHeader_fg                                   : $global-color_bg !default;
 $vanillaHeader_bg                                   : $global-color_primary !default;
 $vanillaHeader-spacer_width                         : 12px;
 $vanillaHeader-button_borderRadius                  : 3px;
 $vanillaHeader-button_size                          : 40px;
+$vanillaMenu-guest_spacer                           : 8px !default;
+$vanillaMenu-signIn_bg                              : getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%) !default;
+$vanillaMenu-signIn_bg                              : getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%) !default;
 
 /* -------------------------------------------------------------- *\
     Compact Me Box

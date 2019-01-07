@@ -75,8 +75,6 @@ $frame-panel_minHeight: 500px;
 }
 
 .frameHeader-heading {
-    display: flex;
-    align-items: center;
     flex-grow: 1;
     text-overflow: ellipsis;
     font-weight: $global-fontWeight_semiBold;

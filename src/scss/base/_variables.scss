@@ -10,6 +10,7 @@
 
 $global-color_vanillaBlue:              #0291DB;
 $global-color_royalBlue:                #0366D6;
+$global-color_pink:                     #F52C6E;
 $global-color_red:                      #D0021B;
 $global-color_grey:                     #555A62;
 $global-color_whitesmoke:               #BCBEC1;
@@ -55,6 +56,7 @@ $global-base_lineHeight:                1.618 !default;
 $global-lineHeight_offset:              .32 !default; // Offset font to make top of capital letters flush with top of container
 $global-headinglineHeight_offset:       $global-lineHeight_offset !default; // Different if heading has different font than body
 $global-bodylineHeight_offset:          .4 !default; // Different if body has different font than headding
+$global-excerpt_lineHeight:             1.45 !default;
 
 $userContent_fontSize:                  $global-medium_fontSize !default; // 14 for forums, but 16 for KB
 
@@ -73,7 +75,7 @@ $global_borderRadius:                   2px !default;
 
 $global-color_primary:                  $global-color_vanillaBlue !default;
 $global-color_primaryAlt:               darken($global-color_primary, 10%) !default;
-$global-color_secondary:                $global-color_red !default;
+$global-color_secondary:                $global-color_pink !default;
 
 $global-color_bg:                       $global-color_white !default;
 $global-color_fg:                       $global-color_grey !default; // text color | should have high contrast between $global-color_bg
@@ -177,7 +179,7 @@ $header_boxShadow:                       none !default;
     Navigation
 \* -------------------------------------------------------------- */
 
-$navigation_bg:                           $global-color_primary !default;
+$navigation_bg:                           lighten($header_bg, 4%) !default;
 $navigation_fg:                           $global-color_white !default;
 $navigation_border:                       darken($navigation_bg, 8%)!default;
 $navigation_fontSize:                     $global-medium_fontSize !default;
@@ -253,10 +255,10 @@ $component-base_fontSize:                $global-medium_fontSize !default;
 $component-base_fontWeight:              $global-normal_fontWeight !default;
 $component-base_lineHeight:              $global-base_lineHeight !default;
 
-$component-title_color:                  $global-color_primary !default;
-$component-title-hover_color:            $global-color_primaryAlt !default;
+$component-title_color:                  $global-color_fg !default;
+$component-title-hover_color:            $global-color_primary !default;
 $component-title_fontSize:               $global-large_fontSize !default;
-$component-title_fontWeight:             $global-bold_fontWeight !default;
+$component-title_fontWeight:             $global-semibold_fontWeight !default;
 $component-title_lineHeight:             $global-base_lineHeight !default;
 
 $component-meta_color:                   $component-base_color !default;
@@ -337,139 +339,3 @@ $theme-breakpoint_tablet:                992px !default;
 $theme-breakpoint_desktop:               1224px !default;
 
 $theme-breakpoint_base:                  $theme-breakpoint_smallTable !default;
-
-
-/* -------------------------------------------------------------- *\
-    Variable Patches
-\* -------------------------------------------------------------- */
-
-/*!
- * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-
-
-/* -------------------------------------------------------------- *\
-    Global Overwrites
-\* -------------------------------------------------------------- */
-
-$global-block_marginx:                  $userContent_fontSize !default;
-
-$global-base_lineHeight:                1.5 !default;
-$global-condensed_lineHeight:           1.25 !default;
-$global-code_lineHeight:                1.45 !default;
-$global-excerpt_lineHeight:             1.45 !default;
-
-$global-heading_fontFamily:             "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
-$global-heading_fontWeight:             $global-bold_fontWeight !default; // Derived
-$global-heading_lineHeightRatio:        .8;
-
-$global-body_fontFamily:                "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
-$global-body_fontWeight:                $global-normal_fontWeight !default; // Derived
-$global-body_lineHeightRatio:           $global-heading_lineHeightRatio;
-
-$global-main_width:                     1224px !default;
-
-$global-default_timing:                 0.35s !default;
-
-$global_borderRadius:                   3px !default;
-
-/* -------------------------------------------------------------- *\
-    Theme Colors
-\* -------------------------------------------------------------- */
-
-/* -------------------------------------------------------------- *\
-    Frame
-\* -------------------------------------------------------------- */
-
-
-/* -------------------------------------------------------------- *\
-    Navigation
-\* -------------------------------------------------------------- */
-
-
-
-/* -------------------------------------------------------------- *\
-    Content
-\* -------------------------------------------------------------- */
-
-$content_bg:                             transparent !default;
-$content_border:                         0 !default;
-$content_padding:                        $utility-baseUnitDouble !default;
-$content-mobile_padding:                 $utility-baseUnitDouble !default;
-$content_borderRadius:                   0 !default;
-
-/* -------------------------------------------------------------- *\
-    Panel
-\* -------------------------------------------------------------- */
-
-$panel_toLeft:                           false !default;
-$panel_width:                            220px !default;
-$panel_bg:                               transparent !default;
-$panel_padding:                          0 !default;
-$panel_border:                           $content_border !default;
-$panel_borderRadius:                     0 !default;
-
-$panel-item-showIcons:                   false !default;
-$panel-item_height:                      32px !default;
-$panel-item_spacing:                     0 !default;
-$panel-item_sidePadding:                 6px !default;
-$panel-item_borderRadius:                0 !default;
-$panel-item_border:                      1px solid !default;
-
-$panel-item_bg:                          transparent !default;
-$panel-item_fg:                          $link-default_color !default;
-$panel-item_borderColor:                 transparent !default;
-
-$panel-item-hover_bg:                    transparent !default;
-$panel-item-hover_fg:                    $link-default_hover_color !default;
-$panel-item-hover_borderColor:           transparent !default;
-
-/* -------------------------------------------------------------- *\
-    Footer
-\* -------------------------------------------------------------- */
-
-$footer_bg:                              $theme-hover_color !default;
-$footer_color:                           $global-color_fg !default;
-$footer-link_color:                      $link-default_color !default;
-$footer-link-hover_color:                $global-color_primary !default;
-$footer-link_fontWeight:                 $global-semibold_fontWeight !default;
-$footer-base_fontSize:                   $global-medium_fontSize !default;
-$footer-base_lineHeight:                 $global-base_lineHeight !default;
-
-/* -------------------------------------------------------------- *\
-    Components
-\* -------------------------------------------------------------- */
-
-$component-item_spacing:                 0 !default;
-$component-horizontal_padding:           8px !default;
-$component-vertical_padding:             16px !default;
-$component-base_padding:                 $component-vertical_padding $component-horizontal_padding !default;
-$component_bg:                           $global-color_bg !default;
-$component_borderWidth:                  1px !default;
-$component_lateral_border:               false !default;
-$component_borderColor:                  $theme-border_color !default;
-$component_border:                       #{$theme-border_color} #{$component_borderWidth} solid !default;
-$component_boxShadow:                    none !default;
-$component_borderRadius:                 $global_borderRadius !default;
-
-$component-header_bg:                    $theme-hover_color !default;
-
-$component-base_color:                   $global-color_fg !default;
-$component-base_fontSize:                $global-medium_fontSize !default;
-$component-base_fontWeight:              $global-normal_fontWeight !default;
-$component-base_lineHeight:              $global-base_lineHeight !default;
-
-$component-title_color:                  $global-color_fg !default;
-$component-title-hover_color:            $global-color_primary !default;
-$component-title_fontSize:               $global-large_fontSize !default;
-$component-title_fontWeight:             $global-bold_fontWeight !default;
-$component-title_lineHeight:             $global-base_lineHeight !default;
-
-$component-meta_color:                   $component-base_color !default;
-$component-meta-link_color:              $link-default_color !default;
-$component-meta-link-hover_color:        $link-default_hover_color !default;
-$component-meta_fontSize:                $global-small_fontSize !default;
-$component-meta_fontWeight:              $global-normal_fontWeight !default;
-$component-meta_lineHeight:              $global-base_lineHeight !default;

@@ -176,6 +176,7 @@ $menuItems_width:                       200px !default;
         min-height: $flyoutMessage_minHeight;
         display: flex;
         align-items: center;
+        width: 100%;
     }
 
     .emoji-wrap.emoji-wrap.emoji-wrap {

@@ -23,6 +23,9 @@ $mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12
 
     .MeButton {
         color: $mebox_fg;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         &:focus,
         &:hover,
@@ -86,16 +89,12 @@ $mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12
     .MeButton.FlyoutButton,
     .WhoIs > .Username {
         transition: transition(color);
-        color: MeButton;
+        color: $mebox_fg;
+
 
         &:hover {
             color: $mebox_hover_color;
         }
-    }
-
-    .ToggleFlyout,
-    .MeButton {
-        border-radius: $formElement_borderRadius;
     }
 
     .ToggleFlyout.Open,
@@ -130,9 +129,10 @@ $mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12
     }
 
     .MeButton {
-        padding: 0 $utility-small_padding;
+        padding: 0;
         font-size: $icon-default_size;
-        line-height: $global-base_lineHeight;
+        min-height: $header_minHeight;
+        min-width: calc(#{$header_minHeight} - #{$utility-baseUnitHalf});
 
         .Alert {
             line-height: 16px;
@@ -176,9 +176,5 @@ $mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12
     .WhoIs > .Username {
         display: flex;
         align-items: center;
-    }
-
-    .MeBox .ToggleFlyout {
-        margin-left: $utility-small_padding;
     }
 }

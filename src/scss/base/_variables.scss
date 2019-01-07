@@ -50,13 +50,19 @@ $global-medium_fontSize:                14px !default;
 $global-small_fontSize:                 12px !default;
 
 $global-title_fontSize:                 32px !default;
-$global-subTitle_fontSize:              24px !default;
+$global-smallTitle_fontSize:            20px !default;
+$global-title_mobile_fontSize:          26px !default;
+$global-subTitle_fontSize:              18px !default;
 
 $global-base_lineHeight:                1.618 !default;
 $global-lineHeight_offset:              .32 !default; // Offset font to make top of capital letters flush with top of container
 $global-headinglineHeight_offset:       $global-lineHeight_offset !default; // Different if heading has different font than body
 $global-bodylineHeight_offset:          .4 !default; // Different if body has different font than headding
 $global-excerpt_lineHeight:             1.45 !default;
+
+/* -------------------------------------------------------------- *\
+    User Content
+\* -------------------------------------------------------------- */
 
 $userContent_fontSize:                  $global-medium_fontSize !default; // 14 for forums, but 16 for KB
 
@@ -71,7 +77,7 @@ $global-main_width:                     1224px !default;
 $global_spacer:                         $userContent_fontSize * $global-base_lineHeight !default;
 $global-default_timing:                 0.35s !default;
 
-$global_borderRadius:                   2px !default;
+$global_borderRadius:                   3px !default;
 
 $global-color_primary:                  $global-color_vanillaBlue !default;
 $global-color_primaryAlt:               darken($global-color_primary, 10%) !default;

@@ -151,13 +151,7 @@
         }
 
         .MeButton .Sprite::before {
-            line-height: 32px;
-            font-size: $global-medium_fontSize;
-
-            @include maxWidth($theme-breakpoint_base){
-                line-height: $global-base_lineHeight;
-                font-size: $global-subTitle_fontSize;
-            }
+            font-size: $icon-default_size;
         }
 
         .MeMenu > * {

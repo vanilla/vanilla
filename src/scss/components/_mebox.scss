@@ -103,24 +103,17 @@ $mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12
     }
 
     .SignInLinks {
+        > a:first-child,
         .SignInPopup,
         .ApplyButton {
-            display: inline-block;
-        }
-
-        .SignInPopup {
             @include Button(
-                    $button-primary_bg,
-                    $button-primary_fg,
-                    $button-primary_border,
-                    $button-primary-hover_bg,
-                    $button-primary-hover_fg,
-                    $button-primary-hover_border
+                $navigation-button_bg,
+                $navigation-button_fg,
+                $navigation-button_border,
+                $navigation-button-hover_bg,
+                $navigation-button-hover_fg,
+                $navigation-button-hover_border
             );
-        }
-
-        .ApplyButton {
-            @include Button;
         }
 
         .Bullet {

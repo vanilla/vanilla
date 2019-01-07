@@ -10,27 +10,35 @@
 
 $tag_borderRadius:                $global_borderRadius !default;
 $tag_height:                      $formButton_height !default;
-$tag_bg:                          $theme-hover_color !default;
-$tag_border:                      0 !default;
-$tag_color:                       inherit !default;
-
-$tag-hover_bg:                    $global-color_primary !default;
+$tag_fontSize:                    $global-small_fontSize !default;
+$tag_bg:                          $button-basic_bg !default;
+$tag_fg:                          $button-basic_fg !default;
+$tag_borderColor:                 $button-basic_border !default;
+$tag-hover_bg:                    $button-basic-hover_bg !default;
+$tag-hover_fg:                    $global-color_primary !default;
 $tag-hover_borderColor:           $global-color_primary !default;
-$tag-hover_color:                 $global-color_white !default;
 
 @mixin Tag() {
-    background-color: $theme-hover_color;
-    border-color: $global-color_primary;
-    border: 0;
-    color: inherit;
+    background-color: $tag_bg;
+    color: $tag_fg;
+    border: 1px solid $tag_borderColor;
     line-height: $global-base_lineHeight;
     height: auto;
-    border-radius: $formButton_borderRadius;
+    border-radius: $tag_borderRadius;
     padding: 0 $utility-small_padding;
     display: inline-block;
     font-weight: inherit;
-    font-size: inherit;
+    font-size: $tag_fontSize;
     white-space: nowrap;
+
+    &:focus,
+    &:hover,
+    &:active {
+        background-color: $tag-hover_bg;
+        border-color: $tag-hover_borderColor;
+        color: $tag-hover_fg;
+        text-decoration: none;
+    }
 }
 
 /* -------------------------------------------------------------- *\
@@ -39,20 +47,20 @@ $tag-hover_color:                 $global-color_white !default;
 
 .Panel .TagCloud a {
     @include Tag;
-    font-size: $global-small_fontSize;
     @include ellipsis;
     max-width: $panel_width;
 
     .Count {
+        padding: 0;
+        color: inherit;
         background-color: transparent;
     }
 
-    &:focus,
-    &:hover {
-        background-color: $global-color_primary;
-        border-color: $global-color_primary;
-        color: $global-color_white;
-        text-decoration: none;
+    &:hover,
+    &:focus {
+        .Count {
+            color: inherit;
+        }
     }
 }
 

@@ -40,6 +40,17 @@
         line-height: $formButton_height;
     }
 
+    .ButtonGroup.Multi {
+        @include Button(
+            $navigation-button_bg,
+            $navigation-button_fg,
+            $navigation-button_border,
+            $navigation-button-hover_bg,
+            $navigation-button-hover_fg,
+            $navigation-button-hover_border
+        );
+    }
+
     .ButtonGroup.NewDiscussion {
         .Primary:first-child {
             width: 100%;
@@ -60,9 +71,6 @@
 
         .ButtonGroup.Action,
         .Button.Action {
-            background: $navigation-button_bg;
-            border-color: $navigation-button_border;
-            color: $navigation-button_fg;
             width: 100%;
 
             .Button {
@@ -101,9 +109,12 @@
 
             a {
                 @include Button(
-                        $navigation-button_bg,
-                        $navigation-button_fg,
-                        $navigation-button_border
+                    $navigation-button_bg,
+                    $navigation-button_fg,
+                    $navigation-button_border,
+                    $navigation-button-hover_bg,
+                    $navigation-button-hover_fg,
+                    $navigation-button-hover_border
                 );
             }
 

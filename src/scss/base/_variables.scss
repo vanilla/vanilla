@@ -196,9 +196,13 @@ $navigation-item_height:                  36px !default;
 $navigation-item_fontWeight:              $global-normal_fontWeight !default;
 $navigation-easing-transition:            cubic-bezier(0, 1, 0, 1) !default;
 
-$navigation-button_bg:                    $global-color_primaryAlt !default;
+$navigation-button_bg:                    transparent !default;
 $navigation-button_fg:                    $global-color_white !default;
-$navigation-button_border:                darken($navigation-button_bg, 8%) !default;
+$navigation-button_border:                $global-color_white !default;
+
+$navigation-button-hover_bg:              $global-color_primaryAlt !default;
+$navigation-button-hover_fg:              $global-color_white !default;
+$navigation-button-hover_border:          $navigation-button-hover_bg !default;
 
 /* -------------------------------------------------------------- *\
     Content

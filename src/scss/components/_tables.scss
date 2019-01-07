@@ -9,10 +9,19 @@
 \* -------------------------------------------------------------- */
 
 .CategoryGroup .Empty {
-    padding: $component-base_padding;
-    border: $component_border;
-    border-radius: $component_borderRadius;
+    padding-top: $component-base_padding;
+    padding-bottom: $component-base_padding;
+    border-top: $component_border;
+    border-bottom: $component_border;
     box-shadow: $component_boxShadow;
+
+    @if $component_lateralBorder == true {
+        padding-left: $component-base_padding;
+        padding-right: $component-base_padding;
+        border-left: $component_border;
+        border-right: $component_border;
+        border-radius: $component_borderRadius;
+    }
 }
 
 .categoryList-heading {

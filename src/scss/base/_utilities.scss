@@ -229,12 +229,15 @@
     @if $component-item_spacing == 0 {
 
         &:first-child {
-            td:first-child {
-                border-top-left-radius: $component_borderRadius;
-            }
 
-            td:last-child {
-                border-top-right-radius: $component_borderRadius;
+            @if $component_lateralBorder == true {
+                td:first-child {
+                    border-top-left-radius: $component_borderRadius;
+                }
+
+                td:last-child {
+                    border-top-right-radius: $component_borderRadius;
+                }
             }
 
             td {
@@ -243,12 +246,15 @@
         }
 
         &:last-child {
-            td:first-child {
-                border-bottom-left-radius: $component_borderRadius;
-            }
 
-            td:last-child {
-                border-bottom-right-radius: $component_borderRadius;
+            @if $component_lateralBorder == true {
+                td:first-child {
+                    border-bottom-left-radius: $component_borderRadius;
+                }
+
+                td:last-child {
+                    border-bottom-right-radius: $component_borderRadius;
+                }
             }
         }
 
@@ -260,13 +266,17 @@
         }
 
         td:first-child {
-            border-left: $component_border;
-            padding-left: $component-base_padding;
+            @if $component_lateralBorder == true {
+                border-left: $component_border;
+                padding-left: $component-base_padding;
+            }
         }
 
         td:last-child {
-            border-right: $component_border;
-            padding-right: $component-base_padding;
+            @if $component_lateralBorder == true {
+                border-right: $component_border;
+                padding-right: $component-base_padding;
+            }
         }
 
     } @else {
@@ -279,20 +289,23 @@
             border-bottom: $component_border;
             padding: $component-base_padding 0;
 
-            &:first-child {
-                border-left: $component_border;
-                border-top-left-radius: $component_borderRadius;
-                border-bottom-left-radius: $component_borderRadius;
-            }
-            &:first-child:not(.CheckBoxColumn) {
-                padding-left: $component-base_padding;
-            }
+            @if $component_lateralBorder == true {
+                &:first-child {
+                    border-left: $component_border;
+                    border-top-left-radius: $component_borderRadius;
+                    border-bottom-left-radius: $component_borderRadius;
+                }
 
-            &:last-child {
-                border-right: $component_border;
-                border-top-right-radius: $component_borderRadius;
-                border-bottom-right-radius: $component_borderRadius;
-                padding-right: $component-base_padding;
+                &:first-child:not(.CheckBoxColumn) {
+                    padding-left: $component-base_padding;
+                }
+
+                &:last-child {
+                    border-right: $component_border;
+                    border-top-right-radius: $component_borderRadius;
+                    border-bottom-right-radius: $component_borderRadius;
+                    padding-right: $component-base_padding;
+                }
             }
 
             .Wrap {
@@ -324,7 +337,7 @@
     tbody tr {
         @include maxWidth($theme-breakpoint_mobile) {
 
-            @if $component-item_spacing == 0 {
+            @if $component-item_spacing == 0 AND $component_lateralBorder == true {
 
                 &:first-child {
                     td {
@@ -340,20 +353,24 @@
 
             } @else {
                 td {
-                    border-top-right-radius: $component_borderRadius;
-                    border-bottom-right-radius: $component_borderRadius;
+                    @if $component_lateralBorder == true {
+                        border-top-right-radius: $component_borderRadius;
+                        border-bottom-right-radius: $component_borderRadius;
+                    }
                 }
             }
 
             td {
-                padding-right: $component-base_padding;
-                border-right:$component_border;
+                @if $component_lateralBorder == true {
+                    padding-right: $component-base_padding;
+                    border-right:$component_border;
+                }
             }
         }
 
         @include maxWidth($theme-breakpoint_desktop) {
 
-            @if $component-item_spacing == 0 {
+            @if $component-item_spacing == 0 AND $component_lateralBorder == true {
                 &:first-child {
                     .CountComments {
                         border-top-right-radius: $component_borderRadius;
@@ -369,20 +386,24 @@
             } @else {
 
                 .CountComments {
-                    border-top-right-radius: $component_borderRadius;
-                    border-bottom-right-radius: $component_borderRadius;
+                    @if $component_lateralBorder == true {
+                        border-top-right-radius: $component_borderRadius;
+                        border-bottom-right-radius: $component_borderRadius;
+                    }
                 }
             }
 
             .CountComments {
-                padding-right: $component-base_padding;
-                border-right:$component_border;
+                @if $component_lateralBorder == true {
+                    padding-right: $component-base_padding;
+                    border-right:$component_border;
+                }
             }
         }
 
         @include maxWidth($theme-breakpoint_smallTable) {
 
-            @if $component-item_spacing == 0 {
+            @if $component-item_spacing == 0 AND $component_lateralBorder == true {
 
                 &:first-child {
                     .CountDiscussions {
@@ -398,14 +419,18 @@
 
             } @else {
                 .CountDiscussions {
-                    border-top-right-radius: $component_borderRadius;
-                    border-bottom-right-radius: $component_borderRadius;
+                    @if $component_lateralBorder == true {
+                        border-top-right-radius: $component_borderRadius;
+                        border-bottom-right-radius: $component_borderRadius;
+                    }
                 }
             }
 
             .CountDiscussions {
-                padding-right: $component-base_padding;
-                border-right:$component_border;
+                @if $component_lateralBorder == true {
+                    padding-right: $component-base_padding;
+                    border-right:$component_border;
+                }
             }
         }
     }
@@ -418,7 +443,7 @@
     tbody tr {
         @include maxWidth($theme-breakpoint_mobile) {
 
-            @if $component-item_spacing == 0 {
+            @if $component-item_spacing == 0 AND $component_lateralBorder == true {
 
                 &:first-child {
                     td {
@@ -434,14 +459,19 @@
 
             } @else {
                 td {
-                    border-top-right-radius: $component_borderRadius;
-                    border-bottom-right-radius: $component_borderRadius;
+                    @if $component_lateralBorder == true {
+                        border-top-right-radius: $component_borderRadius;
+                        border-bottom-right-radius: $component_borderRadius;
+                    }
                 }
             }
 
             td:not(.CheckBoxColumn) {
-                padding-right: $component-base_padding;
-                border-right:$component_border;
+
+                @if $component_lateralBorder == true {
+                    padding-right: $component-base_padding;
+                    border-right:$component_border;
+                }
             }
 
             .CheckBoxColumn.CheckBoxColumn {
@@ -452,7 +482,7 @@
 
         @include maxWidth($theme-breakpoint_desktop) {
 
-            @if $component-item_spacing == 0 {
+            @if $component-item_spacing == 0 ANd $component_lateralBorder == true {
                 &:first-child {
                     .CountViews {
                         border-top-right-radius: $component_borderRadius;
@@ -468,20 +498,24 @@
             } @else {
 
                 .CountViews {
-                    border-top-right-radius: $component_borderRadius;
-                    border-bottom-right-radius: $component_borderRadius;
+                    @if $component_lateralBorder == true {
+                        border-top-right-radius: $component_borderRadius;
+                        border-bottom-right-radius: $component_borderRadius;
+                    }
                 }
             }
 
             .CountViews {
-                padding-right: $component-base_padding;
-                border-right:$component_border;
+                @if $component_lateralBorder == true {
+                    padding-right: $component-base_padding;
+                    border-right:$component_border;
+                }
             }
         }
 
         @include maxWidth($theme-breakpoint_smallTable) {
 
-            @if $component-item_spacing == 0 {
+            @if $component-item_spacing == 0 AND $component_lateralBorder == true {
 
                 &:first-child {
                     .CountComments {
@@ -497,14 +531,18 @@
 
             } @else {
                 .CountComments {
-                    border-top-right-radius: $component_borderRadius;
-                    border-bottom-right-radius: $component_borderRadius;
+                    @if $component_lateralBorder == true {
+                        border-top-right-radius: $component_borderRadius;
+                        border-bottom-right-radius: $component_borderRadius;
+                    }
                 }
             }
 
             .CountComments {
-                padding-right: $component-base_padding;
-                border-right:$component_border;
+                @if $component_lateralBorder == true {
+                    padding-right: $component-base_padding;
+                    border-right:$component_border;
+                }
             }
         }
     }
@@ -515,7 +553,7 @@
     tbody tr {
         @include maxWidth {
 
-            @if $component-item_spacing == 0 {
+            @if $component-item_spacing == 0 AND $component_lateralBorder == true {
 
                 &:first-child {
                     td {
@@ -531,20 +569,24 @@
 
             } @else {
                 td {
-                    border-top-right-radius: $component_borderRadius;
-                    border-bottom-right-radius: $component_borderRadius;
+                    @if $component_lateralBorder == true {
+                        border-top-right-radius: $component_borderRadius;
+                        border-bottom-right-radius: $component_borderRadius;
+                    }
                 }
             }
 
             td {
-                padding-right: $component-base_padding;
-                border-right:$component_border;
+                @if $component_lateralBorder == true {
+                    padding-right: $component-base_padding;
+                    border-right:$component_border;
+                }
             }
         }
 
         @include maxWidth($theme-breakpoint_desktop) {
 
-            @if $component-item_spacing == 0 {
+            @if $component-item_spacing == 0 AND $component_lateralBorder == true {
                 &:first-child {
                     .CountDiscussions {
                         border-top-right-radius: $component_borderRadius;
@@ -560,14 +602,18 @@
             } @else {
 
                 .CountDiscussions {
-                    border-top-right-radius: $component_borderRadius;
-                    border-bottom-right-radius: $component_borderRadius;
+                    @if $component_lateralBorder == true {
+                        border-top-right-radius: $component_borderRadius;
+                        border-bottom-right-radius: $component_borderRadius;
+                    }
                 }
             }
 
             .CountDiscussions {
-                padding-right: $component-base_padding;
-                border-right:$component_border;
+                @if $component_lateralBorder == true {
+                    padding-right: $component-base_padding;
+                    border-right:$component_border;
+                }
             }
         }
 

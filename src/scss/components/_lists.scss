@@ -70,7 +70,7 @@
         font-weight: $component-title_fontWeight;
         line-height: #{$theme-photo_size / 2};
         color: $component-title_color;
-        display: inline-block;
+        display: inline;
 
         &:focus,
         &:hover {

@@ -442,15 +442,22 @@
             }
 
             a {
-                background-color: $theme-hover_color;
-                border-color: $global-color_primary;
+                background-color: $button-basic_bg;
+                color: $button-basic_fg;
+                border: none;
                 line-height: $global-base_lineHeight;
-                border-radius: $formButton_borderRadius;
-                padding: 0 $utility-small_padding;
-                display: inline-block;
-                font-weight: inherit;
+                border-radius: $global_borderRadius;
+                padding: 0 $utility-baseUnitHalf;
+                display: inline;
+                font-weight: $global-semibold_fontWeight;
                 font-size: inherit;
                 white-space: nowrap;
+
+                &:focus,
+                &:hover {
+                    background-color: $button-basic-hover_bg;
+                    color: $button-basic-hover_fg;
+                }
             }
         }
 

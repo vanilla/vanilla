@@ -79,23 +79,31 @@
         line-height:calc(#{$theme-photo_size / 2});
         color: $component-title_color;
 
+        a {
+            color: inherit;
+        }
+
         &:focus,
         &:hover {
             color: $component-title-hover_color;
         }
     }
 
-    .Discussion .Excerpt,
-    .CategoryDescription {
-        margin-top: $component-base_padding;
+    .CategoryDescription,
+    .Discussion .Excerpt {
+        display: block;
+        margin: $component-base_padding 0;
     }
 
+    .Excerpt:empty,
     .CategoryDescription:empty {
         display: none;
     }
 
-    .Excerpt.Excerpt {
-        font-size: $global-medium_fontSize;
+    .Excerpt {
+        font-size: $component-base_fontSize;
+        font-weight: $component-base_fontWeight;
+        color: $component-base_color;
     }
 
     .Options {

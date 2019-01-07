@@ -51,10 +51,14 @@
                 content: "";
                 height: $component_borderRadius;
                 border-bottom: $component_border;
-                border-left: $component_border;
-                border-right: $component_border;
-                border-bottom-left-radius: $component_borderRadius;
-                border-bottom-right-radius: $component_borderRadius;
+
+                @if $component_lateralBorder == true {
+                    border-left: $component_border;
+                    border-right: $component_border;
+                    border-bottom-left-radius: $component_borderRadius;
+                    border-bottom-right-radius: $component_borderRadius;
+                }
+
                 background: transparent;
                 width: calc(100% - (#{$component_borderWidth} * 2));
                 position: absolute;
@@ -90,14 +94,13 @@
         }
     }
 
-    .Title,
     .CategoryDescription,
-    .Discussion .Excerpt{
-        margin-top: 0;
-        display: inline-block;
-        margin-bottom: $component-base_padding;
+    .Discussion .Excerpt {
+        display: block;
+        margin: $component-base_padding 0;
     }
 
+    .Excerpt:empty,
     .CategoryDescription:empty {
         display: none;
     }
@@ -106,10 +109,6 @@
         font-size: $component-base_fontSize;
         font-weight: $component-base_fontWeight;
         color: $component-base_color;
-    }
-
-    .Excerpt:empty {
-        display: none;
     }
 
     .Options {

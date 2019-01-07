@@ -251,9 +251,10 @@ $footer-base_lineHeight:                 $global-base_lineHeight !default;
 \* -------------------------------------------------------------- */
 
 $component-item_spacing:                 0 !default;
-$component-base_padding:                 $utility-medium_padding !default;
+$component-base_padding:                 $global-medium_fontSize !default;
 $component_bg:                           $global-color_bg !default;
 $component_borderWidth:                  1px !default;
+$component_lateralBorder:                false !default;
 $component_borderColor:                  $theme-border_color !default;
 $component_border:                       #{$theme-border_color} #{$component_borderWidth} solid !default;
 $component_boxShadow:                    none !default;

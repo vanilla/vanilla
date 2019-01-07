@@ -492,14 +492,14 @@ body.noGroupIcon {
     }
 
     .Group-RemoveMember {
-        @include Button($button-basic_bg, $button-basic_fg, $button-basic_border);
-
-        &:focus,
-        &:hover {
-            border-color: $button-basic-hover_border;
-            background-color: $button-basic-hover_bg;
-            color: $button-basic-hover_fg;
-        }
+        @include Button(
+                    $button-primary_bg,
+                    $button-primary_fg,
+                    $button-primary_border,
+                    $button-primary-hover_bg,
+                    $button-primary-hover_fg,
+                    $button-primary-hover_border
+            );
     }
 }
 
@@ -614,14 +614,7 @@ body.noGroupIcon {
      }
 
     .Button {
-        @include Button($button-basic_bg, $button-basic_fg, $button-basic_border);
-
-        &:focus,
-        &:hover {
-            border-color: $button-basic-hover_border;
-            background-color: $button-basic-hover_bg;
-            color: $button-basic-hover_fg;
-        }
+        @include Button;
     }
 
     .Button + .Button {
@@ -629,6 +622,13 @@ body.noGroupIcon {
     }
 
     .Button.search {
-        @include Button($button-primary_bg, $button-primary_fg, $button-primary_border);
+        @include Button(
+                    $button-primary_bg,
+                    $button-primary_fg,
+                    $button-primary_border,
+                    $button-primary-hover_bg,
+                    $button-primary-hover_fg,
+                    $button-primary-hover_border
+            );
     }
 }

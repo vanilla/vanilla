@@ -100,7 +100,11 @@
             padding-top: $utility-medium_padding;
 
             a {
-                @include Button($navigation-button_bg, $navigation-button_fg, $navigation-button_border);
+                @include Button(
+                        $navigation-button_bg,
+                        $navigation-button_fg,
+                        $navigation-button_border
+                );
             }
 
             .Bullet {

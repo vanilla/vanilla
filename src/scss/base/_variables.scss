@@ -246,7 +246,7 @@ $footer-base_lineHeight:                 $global-base_lineHeight !default;
     Components
 \* -------------------------------------------------------------- */
 
-$component-item_spacing:                 $utility-medium_padding !default;
+$component-item_spacing:                 0 !default;
 $component-base_padding:                 $utility-medium_padding !default;
 $component_bg:                           $global-color_bg !default;
 $component_borderWidth:                  1px !default;

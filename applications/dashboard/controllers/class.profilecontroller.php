@@ -13,6 +13,8 @@
  */
 class ProfileController extends Gdn_Controller {
 
+    use \Vanilla\FloodControlTrait;
+
     const AVATAR_FOLDER = 'userpics';
 
     /** @var array Models to automatically instantiate. */
@@ -62,6 +64,11 @@ class ProfileController extends Gdn_Controller {
         $this->CurrentTab = 'Activity';
         $this->ProfileTabs = [];
         $this->editMode(true);
+
+        touchConfig('Profile.Password.SpamCount', 2);
+        touchConfig('Profile.Password.SpamTime', 1);
+        touchConfig('Profile.Password.SpamLock', 120);
+
         parent::__construct();
     }
 
@@ -680,6 +687,22 @@ class ProfileController extends Gdn_Controller {
     public function password() {
         $this->permission('Garden.SignIn.Allow');
 
+        $floodGate = FloodControlHelper::configure($this, 'Profile', 'Password');
+
+        $this->setFloodControlEnabled(true);
+
+        if ($this->checkUserSpamming(Gdn::session()->UserID, $floodGate)) {
+            $message = sprintf(
+                t('error.'),
+                $this->postCountThreshold,
+                $this->timeSpan,
+                $this->lockTime
+            );
+            throw new Gdn_UserException($message);
+        }
+
+
+
         // Don't allow password editing if using SSO Connect ONLY.
         // This is for security. We encountered the case where a customer charges
         // for membership using their external application and use SSO to let
@@ -696,6 +719,10 @@ class ProfileController extends Gdn_Controller {
 
         // Get user data and set up form
         $this->getUserInfo();
+
+        // Rate limiting approach
+        // $user =  Gdn::userModel()->getID($this->User->UserID, DATASET_TYPE_OBJECT);
+        // Gdn::userModel()->rateLimit($user, true);
 
         $this->Form->setModel($this->UserModel);
         $this->addDefinition('Username', $this->User->Name);

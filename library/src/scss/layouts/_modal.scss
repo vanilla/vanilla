@@ -82,6 +82,12 @@ $frame-footer_boxShadow: 0 -1px 2px 0 $overlay_bgColor;
             border-top-right-radius: 0;
         }
     }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+
 }
 
 .modal-scroll {

@@ -1855,7 +1855,7 @@ class UserModel extends Gdn_Model {
                     'Photo' => asset('/applications/dashboard/design/images/usericon.png', true),
                     'Password' => randomString('20'),
                     'HashMethod' => 'Random',
-                    'Email' => 'system@example.com',
+                    'Email' => 'system@stub.vanillacommunity.example',
                     'DateInserted' => Gdn_Format::toDateTime(),
                     'Admin' => '2'
                 ];

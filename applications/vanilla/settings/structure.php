@@ -473,12 +473,11 @@ foreach ($users as $user) {
     if ($user) {
         $emailPrefix = explode('@', $user['Email']);
         $SQL->update('User')
-            ->set('Email', $emailPrefix.'@test.com')
+            ->set('Email', $emailPrefix[0].'@vanillacommunity.example')
             ->where('email', $user['Email'])
             ->put();
     }
 }
-
 
 // Set current Vanilla.Version
 $appInfo = json_decode(file_get_contents(PATH_APPLICATIONS.DS.'vanilla'.DS.'addon.json'), true);

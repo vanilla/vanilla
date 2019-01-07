@@ -47,7 +47,7 @@ $global_borderRadius                                 : 6px !default;
 $state-icon_opacity                                  : .6;
 $state-text_opacity                                  : .75;
 
-$state-hover_color                                   : mix($global-color_primary, $global-color_bg, 5.5%) !default; // rgba(174, 228, 255, 0.2);
+$state-hover_color                                   : mix($global-color_primary, $global-color_bg, 10%) !default; // rgba(174, 228, 255, 0.2);
 $state-hover_opacity                                 : 1 !default;
 
 $state-focus_color                                   : mix($global-color_primary, $global-color_bg, 12%) !default; // rgba(174, 228, 255, 0.4);
@@ -302,7 +302,7 @@ $buttonToIconMargin                                  : ($formElement_height - $i
 
 $overlay_bgColor                                        : rgba(getBlackOrWhiteBasedOnColor($global-color_fg), .2)!default;
 $overlay-dropShadow_color                               : $overlay_bgColor !default;
-$overlay-border_color                                   : mix($global-color_fg, $global-color_bg, 5%) !default;
+$overlay-border_color                                   : mix($global-color_fg, $global-color_bg, 15%) !default;
 $overlay-dropShadow                                     : 0 5px 10px $overlay_bgColor !default;
 $overlay-borderRadius                                   : $global_borderRadius !default;
 

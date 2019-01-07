@@ -176,14 +176,13 @@ export function categoryIcon(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             className={classNames("icon", "icon-categoryIcon", className)}
-            viewBox="0 0 14.25 12.75"
+            viewBox="0 0 24 24"
             role="img"
             aria-label={title}
         >
             <title>{title}</title>
             <path
-                d="M9.369,3.164H14.75a.375.375,0,0,1,.375.375V13a.375.375,0,0,1-.375.375H1.25A.375.375,0,0,1,.875,13V1A.375.375,0,0,1,1.25.625H8a.375.375,0,0,1,.343.223ZM1.625,1.375v11.25h12.75V3.914H9.125a.375.375,0,0,1-.343-.223L7.756,1.375Z"
-                transform="translate(-0.875 -0.625)"
+                d="M5.5,19 L18.5,19 C19.3284271,19 20,18.3284271 20,17.5 L20,8.5 C20,7.67157288 19.3284271,7 18.5,7 L12,7 L10.2222222,5 L5.5,5 C4.67157288,5 4,5.67157288 4,6.5 L4,17.5 C4,18.3284271 4.67157288,19 5.5,19 Z"
                 fill="currentColor"
             />
         </svg>

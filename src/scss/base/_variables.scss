@@ -180,7 +180,8 @@ $header_boxShadow:                       none !default;
 \* -------------------------------------------------------------- */
 
 $navigation_bg:                           lighten($header_bg, 4%) !default;
-$navigation_fg:                           $global-color_white !default;
+$navigation_link_color:                   $header-link_color !default;
+$navigation_link-hover_color:             $header-link_color !default;
 $navigation_border:                       darken($navigation_bg, 8%)!default;
 $navigation_fontSize:                     $global-medium_fontSize !default;
 $navigation_paddingSide:                  $utility-medium_padding !default;
@@ -189,7 +190,7 @@ $navigation-item_height:                  36px !default;
 $navigation-item_fontWeight:              $global-normal_fontWeight !default;
 $navigation-easing-transition:            cubic-bezier(0, 1, 0, 1) !default;
 
-$navigation-button_bg:                    $global-color_secondary !default;
+$navigation-button_bg:                    $global-color_primaryAlt !default;
 $navigation-button_fg:                    $global-color_white !default;
 $navigation-button_border:                darken($navigation-button_bg, 8%) !default;
 

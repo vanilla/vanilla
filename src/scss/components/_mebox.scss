@@ -9,9 +9,9 @@
 \* -------------------------------------------------------------- */
 
 $mebox-photo_size:                      24px !default;
-$mebox_color:                           $header_link_color !default;
+$mebox_fg:                              $header_link_color !default;
 $mebox_hover_color:                     $header-link-hover_color !default;
-$mebox_hover_bg:                        rgba(mix($mebox_color, $global-color_fg, 12%), .2) !default;
+$mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12%), .2) !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -22,6 +22,13 @@ $mebox_hover_bg:                        rgba(mix($mebox_color, $global-color_fg,
     display: flex;
 
     .MeButton {
+        color: $mebox_fg;
+
+        &:focus,
+        &:hover,
+        &:active {
+            color: $mebox_hover_color;
+        }
 
         .Alert {
             line-height: 16px;
@@ -79,7 +86,7 @@ $mebox_hover_bg:                        rgba(mix($mebox_color, $global-color_fg,
     .MeButton.FlyoutButton,
     .WhoIs > .Username {
         transition: transition(color);
-        color: $mebox_color;
+        color: MeButton;
 
         &:hover {
             color: $mebox_hover_color;

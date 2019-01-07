@@ -13,7 +13,7 @@
     overflow: hidden;
     position: relative;
     background: $navigation_bg;
-    color: $navigation_fg;
+    color: $navigation_link_color;
     width: 100%;
     height: auto;
     max-height: 0;
@@ -183,6 +183,12 @@
     display: block;
     width: 100%;
     padding: 0 $utility-large_padding;
+    color: $navigation_link_color;
+
+    &:focus,
+    &:hover {
+        color: $navigation_link-hover_color;
+    }
 }
 
 .Navigation-linkContainer {

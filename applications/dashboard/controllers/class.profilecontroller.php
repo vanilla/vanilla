@@ -687,6 +687,7 @@ class ProfileController extends Gdn_Controller {
     public function password() {
         $this->permission('Garden.SignIn.Allow');
 
+        // User FloodControl to prevent too many password reset attempts in a small window of time.
         $floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Password');
         $this->setFloodControlEnabled(true);
         $isSpamming = $this->checkUserSpamming(Gdn::session()->UserID, $floodGate);
@@ -721,7 +722,7 @@ class ProfileController extends Gdn_Controller {
         $this->Form->setModel($this->UserModel);
         $this->addDefinition('Username', $this->User->Name);
 
-        if ($this->Form->authenticatedPostBack() === true) {
+        if ($this->Form->authenticatedPostBack() === true && !$isSpamming) {
             $this->Form->setFormValue('UserID', $this->User->UserID);
             $this->UserModel->defineSchema();
 //         $this->UserModel->Validation->addValidationField('OldPassword', $this->Form->formValues());

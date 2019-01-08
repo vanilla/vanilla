@@ -1,0 +1,124 @@
+/*
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Global Overwrites
+\* -------------------------------------------------------------- */
+
+$global_borderRadius:                   4px !default;
+
+$global-color_black:                    #000;
+$global-color_white:                    #fff;
+$global-color_transparent:              transparent;
+
+$global-color_navy:                     #22252C;
+$global-color_butter:                   #E9B000;
+$global-color_coral:                    #E14658;
+
+$global-color_primary:                  $global-color_coral !default;
+$global-color_primaryAlt:               darken($global-color_primary, 8%) !default;
+$global-color_secondary:                $global-color_navy !default;
+
+$global-color_bg:                       $global-color_white !default;
+$global-color_fg:                       darken(desaturate($global-color_primary, 70%), 12%) !default; // text color | should have high contrast between $global-color_bg
+
+$global-body_bg:                        $global-color_bg !default;
+
+/* -------------------------------------------------------------- *\
+    Theme Colors
+\* -------------------------------------------------------------- */
+
+$theme-border_color:                    rgba(mix($global-color_fg, $global-color_secondary, 34%), .2) !default;
+$theme-hover_color:                     rgba(mix($global-color_fg, $global-color_primary, 12%), .2) !default;
+
+$theme-link-hover_textDecoration:       underline !default;
+
+$theme-heading_color:                   $global-color_primary !default;
+$theme-heading-hover_color:             $global-color_primary !default;
+
+/* -------------------------------------------------------------- *\
+    Header
+\* -------------------------------------------------------------- */
+
+$header_minHeight:                       48px !default;
+$header_bg:                              $global-color_navy !default;
+
+/* -------------------------------------------------------------- *\
+    Navigation
+\* -------------------------------------------------------------- */
+
+$navigation_button-bg:                   $global-color_butter !default;
+
+/* -------------------------------------------------------------- *\
+    Panel
+\* -------------------------------------------------------------- */
+
+$panel-item_height:                      2.5em !default;
+$panel_item-borderRadius:                $panel-item_height !default;
+
+/* -------------------------------------------------------------- *\
+    Footer
+\* -------------------------------------------------------------- */
+
+$footer_bg:                              rgba($global-color_secondary, .2) !default;
+
+/* -------------------------------------------------------------- *\
+    Navigation
+\* -------------------------------------------------------------- */
+
+$navigation_bg:                          lighten($header_bg, 10%) !default;
+
+/* -------------------------------------------------------------- *\
+    Components
+\* -------------------------------------------------------------- */
+
+$component-item_spacing:                 0 !default;
+
+
+$component-title_color:                  $global-color_secondary !default;
+$component-title-hover_color:            darken($global-color_secondary, 8%) !default;
+$component-meta-link-hover_color:        darken($global-color_secondary, 8%) !default;
+
+/* -------------------------------------------------------------- *\
+    Mebox
+\* -------------------------------------------------------------- */
+
+$mebox_hover_bg:                         mix($global-color_black, $header-bg, 12%) !default;
+
+/* -------------------------------------------------------------- *\
+    SearchBox
+\* -------------------------------------------------------------- */
+
+$searchbox-button_borderWidth:           0 !default;
+
+/* -------------------------------------------------------------- *\
+    Form Elements
+\* -------------------------------------------------------------- */
+
+$formElement_height:                     36px !default;
+$formElement_borderRadius:               25px !default;
+
+/* -------------------------------------------------------------- *\
+    Bullets
+\* -------------------------------------------------------------- */
+
+$bullet_borderColor:                     $global-color_butter !default;
+$bullet_bg:                              $global-color_butter !default;
+$bullet_fg:                              $global-color_white !default;
+
+/* -------------------------------------------------------------- *\
+    Count
+\* -------------------------------------------------------------- */
+
+$count-hover_bg:                         $global-color_primary !default;
+$count-hover_borderColor:                $global-color_primary !default;
+
+/* -------------------------------------------------------------- *\
+    Buttons
+\* -------------------------------------------------------------- */
+
+$formButton_height:                      $formElement_height !default;
+$formButton_borderRadius:                #{$formButton_height / 2} !default;

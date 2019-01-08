@@ -1,0 +1,703 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.DataList,
+.MessageList {
+    margin: 0 0 $utility-large_padding;
+
+    .Item.Read,
+    .Item:not(.CategoryHeading),
+    .Item:not(.CategoryHeading){
+        @include listItem;
+    }
+
+    @if $component-item_spacing == 0 {
+        border-radius: $component_borderRadius;
+        box-shadow: $component_boxShadow;
+
+        .Item.CategoryHeading + .Item:not(.CategoryHeading) {
+            border-top-left-radius: $component_borderRadius;
+            border-top-right-radius: $component_borderRadius;
+        }
+    }
+
+    .CategoryHeading {
+        padding: 0 !important;
+        margin-bottom: $component-base_padding;
+        font-size: $global-title_fontSize;
+
+        .OptionsMenu {
+            margin-right: $component-base_padding;
+        }
+
+        @include maxWidth {
+            font-size: $global-subTitle_fontSize;
+        }
+    }
+
+    .Item ~ .CategoryHeading {
+        margin-top: $component-base_padding;
+
+        @if $component-item_spacing == 0 {
+
+            &::before {
+                content: "";
+                height: $component_borderRadius;
+                border-bottom: $component_border;
+
+                @if $component_lateralBorder == true {
+                    border-left: $component_border;
+                    border-right: $component_border;
+                    border-bottom-left-radius: $component_borderRadius;
+                    border-bottom-right-radius: $component_borderRadius;
+                }
+
+                background: transparent;
+                width: calc(100% - (#{$component_borderWidth} * 2));
+                position: absolute;
+                top: calc((#{$component-base_padding} + #{$component_borderRadius}) * -1);
+            }
+        }
+    }
+
+    .Item .Title,
+    .Item.Read .Title,
+    .Item h3 {
+        font-size: $component-title_fontSize;
+        font-weight: $component-title_fontWeight;
+        line-height: #{$theme-photo_size / 2};
+        color: $component-title_color;
+        display: inline;
+
+        &:focus,
+        &:hover {
+            color: $component-title-hover_color;
+        }
+
+        a {
+            font-size: inherit;
+            font-weight: inherit;
+            display: inline;
+            color: inherit;
+
+            &:focus,
+            &:hover {
+                color: inherit;
+            }
+        }
+    }
+
+    .CategoryDescription,
+    .Discussion .Excerpt {
+        display: block;
+        margin: $component-base_padding 0;
+    }
+
+    .Excerpt:empty,
+    .CategoryDescription:empty {
+        display: none;
+    }
+
+    .Excerpt {
+        font-size: $component-base_fontSize;
+        font-weight: $component-base_fontWeight;
+        color: $component-base_color;
+    }
+
+    .Options {
+        display: flex;
+        flex-direction: row-reverse;
+        position: relative;
+    }
+
+    .Bookmark::before,
+    .OptionsMenu .Arrow::before {
+        font-size: $icon-default_size;
+        line-height: $icon-default_size;
+    }
+
+    .AdminCheck {
+        input {
+            margin-left: 0;
+        }
+    }
+
+    .AuthorInfo * {
+        line-height: 1.2em;
+    }
+
+    .MostRecentBy,
+    .LatestPostTitle {
+        @include ellipsis;
+        display: inline-block;
+    }
+
+    .Meta,
+    .AuthorInfo {
+        font-size: $component-meta_fontSize;
+        font-weight: $component-meta_fontWeight;
+        color: $component-meta_color;
+    }
+
+    .Meta {
+        line-height: 1em;
+        margin-bottom: -$utility-small_padding;
+
+        @include maxWidth {
+            margin-top: $utility-medium_padding;
+            line-height: $global-base_lineHeight;
+        }
+    }
+
+    .Author .Username,
+    .Meta > *,
+    .MItem,
+    .AuthorInfo *,
+    .MItem.Category {
+        font-size: inherit;
+        font-weight: inherit;
+        color: inherit;
+        margin-left: 0;
+        margin-right: $utility-baseUnitHalf;
+        margin-bottom: $utility-baseUnitHalf;
+        padding: 0;
+        display: inline-block;
+
+        a {
+            font-size: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+            color: $component-meta-link_color;
+
+            &:focus,
+            &:hover {
+                text-decoration: $theme-link-hover_textDecoration;
+                color: $component-meta-link-hover_color;
+            }
+        }
+    }
+
+    .MItem.Category {
+        display: inline;
+
+        a {
+            @include ellipsis;
+            display: inherit;
+        }
+    }
+
+    .MostRecent,
+    .MostRecentBy {
+
+        > * {
+            white-space: normal;
+        }
+
+        a {
+            display: inline;
+        }
+    }
+
+    .MostRecentBy {
+        display: inherit;
+    }
+
+    .MItem.RSS,
+    .MItem.LastCommentDate {
+        display: none;
+    }
+
+    .ChildCategories {
+        display: flex;
+        flex-wrap: wrap;
+        border-top: 0;
+        margin-bottom: -$utility-small_padding;
+
+        b {
+            margin-right: $utility-small_padding;
+            margin-bottom: $utility-small_padding;
+        }
+
+        a {
+            margin-bottom: $utility-small_padding;
+        }
+
+        .Comma {
+            margin-right: $utility-xSmall_padding;
+        }
+    }
+
+    a.Delete {
+        @include CloseButton;
+    }
+
+    .PhotoWrap {
+        margin: 0 $utility-medium_padding 0 0;
+        @include photoWrap;
+    }
+
+    // overwrite indexphotos plugin styles
+    .indexphoto .Discussion.ItemContent {
+        padding-left: calc(#{$theme-photo_size} + #{$utility-medium_padding}) !important;
+
+        .PhotoWrap {
+            display: inline-block;
+        }
+    }
+
+    .IndexPhoto {
+        margin-right: 0;
+    }
+
+    // overwrite ideation plugin styles
+    .ItemIdea.ItemIdea.ItemIdea {
+        .PhotoWrap.IndexPhoto,
+        .idea-counter-module .idea-counter-box {
+            margin: 0 $utility-small_padding 0 0;
+            width: $theme-photo_size;
+            height: $theme-photo_size;
+        }
+    }
+
+    //Warnings and Notes
+    .Item-Col .Options {
+        visibility: visible;
+
+        .OptionsLink {
+            @include Button(
+                    $button-primary_bg,
+                    $button-primary_fg,
+                    $button-primary_border,
+                    $button-primary-hover_bg,
+                    $button-primary-hover_fg,
+                    $button-primary-hover_border
+            );
+            margin-left: $utility-small_padding;
+        }
+
+        .Bullet {
+            display: none;
+        }
+    }
+
+    .NoteType {
+        @include font-heading;
+    }
+
+    .CategoryPhoto {
+        height: inherit;
+    }
+
+    .MItem.MItem-Resolved {
+        display: inline-block;
+        width: 13px;
+        height: 14px;
+        padding: 0;
+        margin-bottom: 0;
+        line-height: inherit;
+        font-size: inherit;
+        vertical-align: middle;
+    }
+
+    .resolved2-unresolved,
+    .resolved2-resolved {
+        top: initial;
+        display: block;
+    }
+
+    .Hero {
+        padding: 0;
+    }
+
+    mark {
+        background-color: rgba($global-color_warning, .5);
+    }
+
+    .Reactions {
+        margin: 0 -#{$utility-small_padding};
+
+        .Bullet {
+            display: none;
+        }
+
+        .ToggleFlyout {
+            display: inline-block;
+        }
+
+        .ReactButton {
+            // color: $component-meta-link_color;
+            margin: $utility-small_padding $utility-small_padding 0;
+
+            &:focus,
+            &:hover {
+                // color: $component-meta-link-hover_color;
+            }
+
+            @include maxWidth {
+                line-height: 2.5em;
+            }
+        }
+
+        .ReactButton-Flag {
+            margin-left: 0;
+        }
+    }
+}
+
+.DataList.Discussions {
+
+    .Item {
+
+        .Title {
+            display: block;
+        }
+
+        .Options {
+            position: relative;
+        }
+
+        .Excerpt {
+            margin-top: $component-base_padding;
+            display: block;
+            width: 100%;
+        }
+    }
+}
+
+.Activities,
+.Conversations,
+.MessageList {
+    clear: both;
+
+     @if $component-item_spacing == 0 {
+
+         .ItemDiscussion,
+         &.DataList {
+             box-shadow: $component_boxShadow;
+             border-radius: $component_borderRadius;
+         }
+
+         .Item:first-child {
+             border-top-left-radius: $component_borderRadius;
+             border-top-right-radius: $component_borderRadius;
+         }
+
+         .Item:last-child {
+             border-bottom-left-radius: $component_borderRadius;
+             border-bottom-right-radius: $component_borderRadius;
+         }
+     }
+
+    .PageTitle h1{
+        font-size: $global-title_fontSize;
+        line-height: $global-base_lineHeight;
+
+        @include maxWidth {
+            font-size: $global-subTitle_fontSize;
+        }
+    }
+
+    .ItemComment,
+    .ItemDiscussion {
+        padding: $utility-small_padding !important;
+
+        .Options {
+            top: $utility-medium_padding;
+            right: $utility-medium_padding;
+        }
+
+        .Item-Header {
+            background: $component-header_bg;
+            margin: 0;
+            padding: $utility-medium_padding;
+            width: 100%;
+            position: relative;
+            min-height: $theme-photo_size + ($utility-medium_padding * 2);
+            border-top-left-radius: $component_borderRadius;
+            border-top-right-radius: $component_borderRadius;
+
+            .PhotoWrap {
+                margin: 0;
+                position: absolute;
+                top: $utility-medium_padding;
+                left: $utility-medium_padding;
+            }
+
+            .Meta,
+            .AuthorWrap {
+                font-size: $component-meta_fontSize;
+                line-height: $component-meta_lineHeight;
+
+                > * {
+                    display: inline;
+                    font-size: inherit;
+                    line-height: inherit;
+                }
+            }
+
+            .AuthorInfo > * {
+                line-height: $component-meta_lineHeight;
+            }
+
+            .MItem.Category {
+                display: none;
+            }
+
+            .MItem {
+                display: inline;
+            }
+
+            .Meta,
+            .AuthorWrap {
+                padding-left: $theme-photo_size + $utility-medium_padding;
+            }
+
+            .MItem.RoleTitle,
+            .MItem.Rank {
+                display: inline;
+                white-space: normal;
+                font-weight: normal;
+                font-size: 10px;
+                color: $global-color_primary;
+                text-transform: uppercase;
+                border: 1px solid $global-color-primary;
+                padding: $utility-xSmall_padding;
+                display: inline-flex;
+                border-radius: $global_borderRadius;
+            }
+
+            .Meta,
+            .Author {
+                margin: 0;
+            }
+
+            .Username {
+                color: $component-title_color;
+
+                &:hover,
+                &:focus {
+                    color: $component-title-hover_color;
+                }
+            }
+        }
+
+        .PostCount {
+            margin-right: 0;
+            display: block;
+        }
+
+        .flair {
+            display: inline-flex;
+            margin: 0 -#{$utility-xSmall_padding};
+            width: calc(100% + (#{$utility-xSmall_padding} * 2));
+        }
+
+        .flair-item {
+            display: inline-block;
+            margin: 0 $utility-xSmall_padding;
+
+            img {
+                margin: 0;
+            }
+        }
+
+        .Item-BodyWrap {
+            padding: $utility-medium_padding;
+            border-bottom-left-radius: $component_borderRadius;
+            border-bottom-right-radius: $component_borderRadius;
+        }
+
+        .Item-Body > * {
+            margin: 0 0 $utility-medium_padding;
+
+            &:last-child {
+                margin: 0;
+            }
+        }
+
+        .RecordReactions {
+            margin-left: -$utility-xSmall_padding;
+            margin-right: -$utility-xSmall_padding;
+
+            .PhotoWrap {
+                position: relative;
+                width: 24px;
+                height: 24px;
+            }
+
+            .ReactSprite {
+                color: $global-color_white;
+                margin-right: 0;
+            }
+
+            .UserReactionWrap {
+                width: 24px;
+                margin: 0 $utility-xSmall_padding $utility-xSmall_padding;
+            }
+        }
+    }
+
+    .ItemDiscussion.ItemDiscussion.ItemDiscussion {
+        margin-bottom: $utility-large_padding;
+    }
+
+    .ItemDiscussion .Item-Header .AuthorWrap {
+        margin-top: -#{$global-bodylineHeight_offset};
+    }
+
+    .Item.Activity {
+
+        .Title {
+
+            @include maxWidth {
+                padding-right: $utility-medium_padding;
+            }
+        }
+
+        .Author {
+            display: block;
+
+            .PhotoWrap {
+
+                @include maxWidth {
+                    margin-right: 0;
+                }
+            }
+        }
+
+        .Delete {
+            @include maxWidth {
+                position: absolute;
+            }
+        }
+    }
+
+    .ItemComment .CommentHeader {
+        padding: $utility-small_padding $utility-medium_padding;
+        padding-right: 32px;
+    }
+
+    .Comment .Options {
+        position: absolute;
+        right: $utility-medium_padding;
+        top: 0;
+        margin-top: $utility-medium_padding;
+        z-index: 1;
+    }
+}
+
+.DataList-Search {
+    margin-top: $utility-large_padding;
+
+    h3,
+    .Item-Body {
+        padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+    }
+
+    h3 {
+        margin-top: -0.2em;
+    }
+
+    .PhotoWrap {
+        position: absolute;
+        left: $component-base_padding;
+        top: $component-base_padding;
+    }
+}
+
+.DataList.Announcements {
+
+    .ItemContent.Discussion {
+        padding-left: 0;
+    }
+
+    .Title {
+        margin-bottom: 0;
+    }
+
+    .Title a {
+        display: inline-block;
+        padding-right: $icon-default_size;
+        margin-bottom: $utility-medium_padding;
+    }
+    .Item .Excerpt {
+        display: block;
+    }
+
+    .Options {
+        position: absolute;
+        right: $component-base_padding;
+    }
+
+    .Meta {
+
+        @include maxWidth {
+            margin-top: 0;
+        }
+    }
+}
+
+.ApplicantList .DataList {
+
+    .PhotoWrap {
+        margin-right: 0;
+    }
+
+    .Title {
+        margin-bottom: 0;
+    }
+
+    .ItemContent {
+        padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+    }
+}
+
+// Mixed Layout
+.CategoryBox + .CategoryBox {
+    margin-top: $component-base_padding;
+}
+
+.CategoryBox {
+
+    .H {
+        font-family: $global-heading_fontFamily;
+        font-weight: $global-heading_fontWeight;
+        font-size: $global-title_fontSize;
+        line-height: $global-base_lineHeight;
+        margin-bottom: $component-base_padding;
+        color: inherit;
+
+        a {
+            font-size: inherit;
+            font-weight: inherit;
+            color: inherit;
+
+            &:focus,
+            &:hover {
+                color: inherit;
+            }
+        }
+
+        @include maxWidth {
+            font-size: $global-subTitle_fontSize;
+        }
+    }
+
+    > .OptionsMenu {
+        float: right;
+        margin-right: $component-base_padding;
+    }
+
+    .Bookmark::before,
+    .OptionsMenu .Arrow::before {
+        font-size: $icon-default_size;
+        line-height: $icon-default_size;
+    }
+}

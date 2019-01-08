@@ -1,0 +1,173 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Variables
+\* -------------------------------------------------------------- */
+
+$mebox-photo_size:                      24px !default;
+$mebox_fg:                              $header_link_color !default;
+$mebox_hover_color:                     $header-link-hover_color !default;
+$mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12%), .2) !default;
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.MeBox {
+    min-height: initial;
+    display: flex;
+
+    .MeButton {
+        color: $mebox_fg;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:focus,
+        &:hover,
+        &:active {
+            color: $mebox_hover_color;
+        }
+
+        .Alert {
+            line-height: 16px;
+            min-width: 16px;
+            height: 16px;
+            display: flex;
+            border-radius: 16px;
+            align-items: center;
+            justify-content: center;
+            top: 0;
+            right: -3px;
+            border: 1px solid $bullet_borderColor;
+            background: $bullet_bg;
+            color: $bullet_fg;
+        }
+    }
+
+    > .PhotoWrap {
+        float: none;
+    }
+
+    .Flyout {
+        top: 100%;
+    }
+
+    .SignInIcons:empty {
+        display: none;
+    }
+}
+
+.MeBox.FlyoutRight .Flyout {
+    right: 0;
+}
+
+.SignInIcons {
+    margin-left: $utility-large_padding;
+}
+
+// Reset base theme style
+.UserBox .WhoIs, .MeBox .WhoIs {
+    min-height: initial;
+    line-height: inherit;
+}
+
+.MeBox--header {
+
+    @include maxWidth($theme-breakpoint_base) {
+        display: none;
+    }
+
+    .MeBox > .PhotoWrap {
+        margin-right: $utility-small_padding;
+    }
+
+    .MeButton.FlyoutButton,
+    .WhoIs > .Username {
+        transition: transition(color);
+        color: $mebox_fg;
+
+
+        &:hover {
+            color: $mebox_hover_color;
+        }
+    }
+
+    .ToggleFlyout.Open,
+    .MeButton:hover {
+        background-color: $mebox_hover_bg;
+    }
+
+    .SignInLinks {
+        > a:first-child,
+        .SignInPopup,
+        .ApplyButton {
+            @include Button(
+                $navigation-button_bg,
+                $navigation-button_fg,
+                $navigation-button_border,
+                $navigation-button-hover_bg,
+                $navigation-button-hover_fg,
+                $navigation-button-hover_border
+            );
+        }
+
+        .Bullet {
+            display: none;
+        }
+    }
+
+    .MeButton {
+        padding: 0;
+        font-size: $icon-default_size;
+        min-height: $header_minHeight;
+        min-width: calc(#{$header_minHeight} - #{$utility-baseUnitHalf});
+
+        .Alert {
+            line-height: 16px;
+            min-width: 16px;
+            height: 16px;
+            display: flex;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            top: 0;
+            right: -3px;
+            background: $global-color_secondary;
+        }
+    }
+
+    .MeBox,
+    .MeMenu,
+    .WhoIs {
+        display: flex;
+        align-items: center;
+    }
+
+    .MeMenu {
+        margin-left: $utility-large_padding;
+        display: flex;
+        align-items: center;
+
+        .Alert {
+            border: 1px solid $bullet_borderColor;
+            background: $bullet_bg;
+            color: $bullet_fg;
+            white-space: nowrap;
+        }
+    }
+
+    .MeBox > .PhotoWrap {
+        height: $mebox-photo_size;
+        width: $mebox-photo_size;
+    }
+
+    .WhoIs > .Username {
+        display: flex;
+        align-items: center;
+    }
+}

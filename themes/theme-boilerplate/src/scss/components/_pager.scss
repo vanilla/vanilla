@@ -1,0 +1,397 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Variables
+\* -------------------------------------------------------------- */
+
+$pager_height:                           $formButton_height !default;
+$pager_lineHeight:                       $formButton_height !default;
+$pager_fontSize:                         $formButton_fontSize !default;
+$pager_fontWeight:                       $formButton_fontWeight !default;
+$pager_borderRadius:                     $formButton_borderRadius !default;
+$pager_border:                           $component_border !default;
+
+$pager_bg:                               $component_bg !default;
+$pager-hover_bg:                         $theme-hover_color !default;
+$pager_color:                            $global-color_fg !default;
+
+$pager-highlight_bg:                     $pager-hover_bg !default;
+$pager-highlight-border:                 $pager_border !default;
+$pager-highlight_color:                  $global-color_primaryAlt !default;
+
+$quickSearch_bg:                         $global-color_primary !default;
+$quickSearch-hover_bg:                   $global-color_primaryAlt !default;
+$quickSearch_border:                     1px solid $global-color_primaryAlt !default;
+$quickSearch_color:                      $global-color_white !default;
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.PrevNextPager {
+    width: 100%;
+
+    .Previous,
+    .Next {
+        height: auto;
+        min-height: 0;
+    }
+
+    .Next {
+        margin-left: auto;
+    }
+}
+
+.MorePager {
+    margin-top: $component-item_spacing;
+    text-align: center;
+    color: $component-meta-link_color;
+
+    &:focus,
+    &:hover {
+        color: $component-meta-link-hover_color;
+    }
+
+    a {
+        color: inherit;
+
+        &:focus,
+        &:hover {
+            color: inherit;
+        }
+    }
+}
+
+.PrevNextPager .Previous,
+.PrevNextPager .Next {
+    @include Button;
+}
+
+.PagerWrap,
+.CommentsWrap {
+    @include clearfix;
+}
+
+.PagerWrap {
+    margin: 0;
+    float: right;
+}
+
+.PagerNub {
+    display: none;
+}
+
+.CommentHeading {
+    float: left;
+    margin: 0 0 $utility-large_padding;
+}
+
+.DataBox {
+    margin: 0 0 $utility-large_padding;
+}
+
+.PageControls {
+    @include clearfix;
+    min-height: initial;
+    margin: initial;
+}
+
+.QuickSearch .MenuItems {
+
+    @include clearfix;
+
+    right: 0;
+    top: calc(#{$pager_height} + #{$utility-medium_padding});
+
+    .InputBox {
+        margin-right: $utility-medium_padding;
+    }
+
+    .bwrap {
+        position: static;
+        margin-left: $utility-small_padding;
+
+        button {
+            padding: 0;
+        }
+    }
+
+    form > div {
+        display: flex;
+    }
+}
+
+a.MoreWrap,
+.MoreWrap a,
+.more.More {
+    color: $global-color_primary;
+
+    &:focus,
+    &:hover {
+        color: $global-color_primary;
+    }
+}
+
+.Pager {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    @include maxWidth {
+        float: none;
+        width: 100%;
+        justify-content: center;
+        margin-bottom: $utility-medium_padding;
+
+        .QuickSearch {
+            display: none;
+        }
+    }
+
+    .QuickSearchButton {
+        display: inline-flex;
+        align-items: center;
+        margin: 0 0 0 $utility-medium_padding;
+    }
+
+    span,
+    > a {
+        transition: color 0.25s ease-out;
+        font-size: $pager_fontSize;
+        font-weight: $pager_fontWeight;
+        line-height: $pager_height;
+        height: $pager_height;
+        min-width: $pager_height;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $pager_color;
+        padding: 0;
+        margin: 0 0 0 -1px;
+        border: $pager_border;
+        background: $pager_bg;
+
+        &:focus,
+        &:hover {
+            background: $pager-hover_bg;
+            z-index: 1;
+        }
+    }
+
+    > a.Highlight,
+    > a.Highlight:focus,
+    > a.Highlight:hover {
+        position: relative;
+        z-index: 1;
+        background: $pager-highlight_bg;
+        border: 1px solid $pager-highlight-border;
+        color: $pager-highlight_color;
+    }
+
+    > a.Ellipsis {
+        font-size: 0;
+        background: none;
+        padding-bottom: 0;
+
+        &::after {
+            font-size: 11px;
+            font-weight: normal;
+            content: "•••";
+        }
+    }
+
+    .Next,
+    .Previous {
+        padding: 0 $utility-medium_padding;
+     }
+
+    .Previous {
+        border-top-left-radius: $pager_borderRadius;
+        border-bottom-left-radius: $pager_borderRadius;
+    }
+
+    .Next {
+        border-top-right-radius: $pager_borderRadius;
+        border-bottom-right-radius: $pager_borderRadius;
+    }
+
+    .QuickSearchWrap .Button,
+    .QuickSearchButton {
+        @include Button(
+            $button-primary_bg,
+            $button-primary_fg,
+            $button-primary_border,
+            $button-primary-hover_bg,
+            $button-primary-hover_fg,
+            $button-primary-hover_border
+        );
+    }
+
+    .QuickSearchButton {
+        height: $formButton_height;
+        width: $formButton_height;
+    }
+
+    .QuickSearchButton.QuickSearchButton span {
+        min-width: 0;
+        height: auto;
+        width: auto;
+        color: inherit;
+        margin: 0;
+        vertical-align: baseline;
+
+        &:hover,
+        &:focus {
+            color: inherit;
+            background-color: transparent;
+        }
+    }
+
+    .QuickSearchWrap {
+        width: 300px;
+    }
+
+    .bwrap .Button {
+        line-height: $formButton-height;
+        height: $formButton-height;
+    }
+}
+
+.PageControls .Button-Controls,
+.Pager.PrevNextPager,
+.Pager.NumberedPager {
+    margin: 0 0 $utility-large_padding;
+}
+
+.selectBox-toggle {
+    color: $global-color_primary;
+}
+
+//Responsive .NumberedPager
+@include maxWidth(500px) {
+
+    .PagerLinkCount-13 {
+        .Pager-p:not(.Highlight):not(.LastPage) {
+            display: none;
+        }
+    }
+
+    .Pager {
+        display: flex;
+        flex-wrap: nowrap;
+
+        a,
+        span {
+            white-space: nowrap;
+            min-width: 34px;
+            flex: 1;
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
+}
+
+@include maxWidth(470px) {
+
+    .PagerLinkCount-11 {
+        .Pager-p:not(.Highlight):not(.LastPage) {
+            display: none;
+        }
+    }
+}
+
+.PageControls.PageControls {
+
+    .discussion-sorts {
+        margin-right: $utility-medium_padding;
+    }
+
+    @include maxWidth {
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+
+        .selectBox {
+            display: inline-block;
+        }
+    }
+
+    .BoxNewConversation,
+    .BoxNewDiscussion {
+        display: none;
+    }
+
+    .BoxNewDiscussion > .Button,
+    .BoxNewDiscussion {
+
+        @include maxWidth {
+            display: block;
+            width: 100%;
+            margin-right: 0;
+            text-align: center;
+            margin-bottom: $utility-large_padding;
+        }
+    }
+
+    .ButtonGroup.Multi {
+        padding-right: 0;
+    }
+
+    .NewDiscussion {
+
+        .Button.Handle {
+            margin-left: 32px - $utility-medium_padding;
+            position: relative;
+        }
+
+        @include maxWidth {
+            padding: 0;
+
+            .Primary:first-child {
+                width: 100%;
+            }
+
+            .Button.Handle {
+                position: absolute;
+            }
+        }
+    }
+
+    // Reset styles from ideation
+    .discussion-sort-filter-module {
+        float: none !important;
+        display: inline-flex;
+    }
+
+    .selectBox {
+        display: inline-flex;
+        float: none;
+        height: 38px;
+        margin: 0 0 $utility-large_padding;
+
+        @include maxWidth {
+            margin: 0;
+        }
+    }
+}
+
+.PageControls.Top {
+
+    @include maxWidth {
+
+        .NumberedPager {
+            display: none;
+        }
+    }
+}
+
+.PageControls.Bottom {
+
+    .NewDiscussion {
+        display: none;
+    }
+}

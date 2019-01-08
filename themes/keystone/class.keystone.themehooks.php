@@ -1,10 +1,18 @@
-<?php if (!defined('APPLICATION')) {exit();}
+<?php
 /**
+ *
  * @author Isis Graziatto <isis.g@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
+if (!defined('APPLICATION')) {
+    exit();
+}
+
+/**
+ * Class KeystoneThemeHooks
+ */
 class KeystoneThemeHooks extends Gdn_Plugin {
 
     /**
@@ -25,6 +33,7 @@ class KeystoneThemeHooks extends Gdn_Plugin {
         saveToConfig([
             'Garden.MobileTheme' => 'keystone',
             'Badges.BadgesModule.Target' => 'AfterUserInfo',
+            'Feature.NewFlyouts.Enabled' => true,
             'Garden.ThemeOptions.Styles.Key' => 'Default',
             'Garden.ThemeOptions.Styles.Value' => '%s_default',
             'Garden.ThemeOptions.Options.hasHeroBanner' => false,
@@ -35,7 +44,6 @@ class KeystoneThemeHooks extends Gdn_Plugin {
 
     /**
      * Runs every page load
-     *
      *
      * @param Gdn_Controller $sender This could be any controller
      *
@@ -58,7 +66,7 @@ class KeystoneThemeHooks extends Gdn_Plugin {
         $sender->setData('hasAdvancedSearch', $hasAdvancedSearch);
 
         //unset config ThemeOptions.Options.hasFeatureSearchbox if AdvancedSearchPlugin is disabled
-        if(!$hasAdvancedSearch) {
+        if (!$hasAdvancedSearch) {
             saveToConfig([
                 'Garden.ThemeOptions.Options.hasFeatureSearchbox' => false,
             ]);
@@ -75,12 +83,11 @@ class KeystoneThemeHooks extends Gdn_Plugin {
     /**
      * Add custom toggles "hasHeroBanner", "hasFeatureSearchbox", "panelToLeft" to Theme Options
      *
-     *
      * @param settingsController $sender
      *
      * @return void
      */
-    public function settingsController_afterCustomStyles_handler($sender,$args) {
+    public function settingsController_afterCustomStyles_handler($sender) {
         $form = $sender->Form;
         $hasHeroImagePlugin = $sender->Data["hasHeroImagePlugin"];
         $hasAdvancedSearch = $sender->Data["hasAdvancedSearch"];
@@ -88,21 +95,31 @@ class KeystoneThemeHooks extends Gdn_Plugin {
         echo    '<h2 class="subheading">'.t("Options").'</h2>';
 
         //Only render these fields if hasHeroImagePlugin == true
-        if($hasHeroImagePlugin) {
+        if ($hasHeroImagePlugin) {
             echo    '<li class="form-group">';
-            echo        $sender->Form->toggle("ThemeOptions.Options.hasHeroBanner", t("Integrate Hero Image plugin"), [], t("Displays \"Hero Image\" plugin below the header. \"Hero Image\" plugin needs to be enabled for this option to work properly.") );
+            echo        $sender->Form->toggle(
+                "ThemeOptions.Options.hasHeroBanner",
+                t("Integrate Hero Image plugin"),
+                [],
+                t("Displays \"Hero Image\" plugin below the header. \"Hero Image\" plugin needs to be enabled for this option to work properly.")
+            );
             echo    '</li>';
 
             //Only render this field if AdvancedSearchPlugin == true
-            if($hasAdvancedSearch) {
+            if ($hasAdvancedSearch) {
                 echo    '<li class="form-group">';
-                echo        $sender->Form->toggle("ThemeOptions.Options.hasFeatureSearchbox", t("Integrate searchbox with Hero Image plugin"), [], t("Change searchbox's position to display over Hero Banner. \"Hero Image\" plugin needs to be enabled for this option to work properly.") );
+                echo        $sender->Form->toggle(
+                    "ThemeOptions.Options.hasFeatureSearchbox",
+                    t("Integrate searchbox with Hero Image plugin"),
+                    [],
+                    t("Change searchbox's position to display over Hero Banner. \"Hero Image\" plugin needs to be enabled for this option to work properly.")
+                );
                 echo    '</li>';
             }
         }
 
         echo    '<li class="form-group">';
-        echo        $sender->Form->toggle("ThemeOptions.Options.panelToLeft", t("Panel to the left"), [], t("Change the main panel's position to the left side.") );
+        echo        $sender->Form->toggle("ThemeOptions.Options.panelToLeft", t("Panel to the left"), [], t("Change the main panel's position to the left side."));
         echo    '</li>';
         echo '</section>';
         echo '<div class="form-footer js-modal-footer">';
@@ -113,13 +130,13 @@ class KeystoneThemeHooks extends Gdn_Plugin {
     /**
      * Unset ThemeOptions.Options config related to HeroImagePlugin
      *
-     *
      * @param gdn_pluginManager $sender
+     * @param array $args
      *
      * @return void
      */
     public function gdn_pluginManager_addonDisabled_handler($sender, $args) {
-        if($args["AddonName"] === "heroimage") {
+        if ($args["AddonName"] === "heroimage") {
             saveToConfig([
                 'Garden.ThemeOptions.Options.hasHeroBanner' => false,
                 'Garden.ThemeOptions.Options.hasFeatureSearchbox' => false,
@@ -129,11 +146,11 @@ class KeystoneThemeHooks extends Gdn_Plugin {
 
     /**
      * Register {searchbox_advanced} even if AdvancedSearchPlugin is disabled so theme doens't break
+     *
      * @param Smarty $sender
-     * @param $args
      */
-    public function gdn_smarty_init_handler($sender, $args) {
-        if(!class_exists('AdvancedSearchPlugin')) {
+    public function gdn_smarty_init_handler($sender) {
+        if (!class_exists('AdvancedSearchPlugin')) {
             $sender->register_function('searchbox_advanced', 'searchBoxAdvancedMock');
         }
     }
@@ -160,7 +177,7 @@ class KeystoneThemeHooks extends Gdn_Plugin {
         //get toggle values from config
         $checkboxes = c("Garden.ThemeOptions.Options");
 
-        foreach ($checkboxes  as $key => $value) {
+        foreach ($checkboxes as $key => $value) {
             $form->setValue("ThemeOptions.Options.".$key, $value);
         }
 
@@ -173,14 +190,12 @@ class KeystoneThemeHooks extends Gdn_Plugin {
                 'Garden.ThemeOptions.Styles.Value' => $sender->data("ThemeInfo.Options.Styles.$styleKey.Basename")];
 
             // Save the text to the locale.
-            $translations = [];
             foreach ($sender->data('ThemeInfo.Options.Text', []) as $key => $default) {
                 $value = $form->getFormValue($form->escapeFieldName('Text_'.$key));
                 $configSaveData["ThemeOption.{$key}"] = $value;
-                //$form->setFormValue('Text_'.$Key, $Value);
             }
 
-            foreach ($form->_FormValues["Checkboxes"]  as $key => $fieldName) {
+            foreach ($form->_FormValues["Checkboxes"] as $key => $fieldName) {
                 $value = $form->getFormValue($fieldName) === false ? false : true;
                 $configSaveData["Garden.{$fieldName}"] = $value;
             }
@@ -205,7 +220,6 @@ class KeystoneThemeHooks extends Gdn_Plugin {
         }
 
         $sender->setData('ThemeFolder', $themeManager->getEnabledDesktopThemeKey());
-        //$sender->setData('ThemeFolder', $themeKey);
         $sender->title(t('Theme Options'));
         $form->addHidden('StyleKey', $styleKey);
 
@@ -213,8 +227,13 @@ class KeystoneThemeHooks extends Gdn_Plugin {
     }
 }
 
-if (!function_exists('searchBoxAdvancedMock')):
+if (!function_exists('searchBoxAdvancedMock')) :
 
+    /**
+     * Fallback function so theme doesn't break with {searchbox_advanced} declaration
+     *
+     * @param Smarty $params
+     */
     function searchBoxAdvancedMock($params) {
         return "";
     }

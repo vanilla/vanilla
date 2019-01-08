@@ -1,10 +1,17 @@
-<?php if (!defined('APPLICATION')) {exit();}
+<?php
 /**
  * @author Isis Graziatto <isis.g@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
+if (!defined('APPLICATION')) {
+    exit();
+}
+
+/**
+ * Class VanillaThemeBoilerplateThemeHooks
+ */
 class VanillaThemeBoilerplateThemeHooks extends Gdn_Plugin {
 
     /**

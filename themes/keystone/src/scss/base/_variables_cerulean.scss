@@ -5,6 +5,18 @@
  */
 
 /* -------------------------------------------------------------- *\
+    Utility Variables
+\* -------------------------------------------------------------- */
+
+$utility-baseUnit:                      6px;
+$utility-baseUnitHalf:                  $utility-baseUnit / 2; // Derived
+$utility-baseUnitDouble:                $utility-baseUnit * 2; // Derived
+$utility-baseUnitTriple:                $utility-baseUnit * 3; // Derived
+$utility-percentage_third:              (100% / 3);
+$utility-percentage_nineSixteenths:     (9 / 16 * 100%);
+$utility-SVGEncoding:                   "data:image/svg+xml,";
+
+/* -------------------------------------------------------------- *\
     Global Overwrites
 \* -------------------------------------------------------------- */
 
@@ -83,6 +95,8 @@ $hamburger_color:                         $global-color_white !default;
     Components
 \* -------------------------------------------------------------- */
 
+
+$component-item_spacing:                 $utility-baseUnitDouble !default;
 $component_borderWidth:                  0 !default;
 $component_borderColor:                  $theme-border_color !default;
 $component_boxShadow:                    0 1px 4px 0 rgba(0,0,0, .3) !default;

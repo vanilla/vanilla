@@ -65,9 +65,9 @@ class ProfileController extends Gdn_Controller {
         $this->ProfileTabs = [];
         $this->editMode(true);
 
-        touchConfig('Profile.Password.SpamCount', 2);
-        touchConfig('Profile.Password.SpamTime', 1);
-        touchConfig('Profile.Password.SpamLock', 120);
+        touchConfig('Vanilla.Password.SpamCount', 2);
+        touchConfig('Vanilla.Password.SpamTime', 1);
+        touchConfig('Vanilla.Password.SpamLock', 120);
 
         parent::__construct();
     }
@@ -687,21 +687,19 @@ class ProfileController extends Gdn_Controller {
     public function password() {
         $this->permission('Garden.SignIn.Allow');
 
-        $floodGate = FloodControlHelper::configure($this, 'Profile', 'Password');
-
+        $floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Password');
         $this->setFloodControlEnabled(true);
+        $isSpamming = $this->checkUserSpamming(Gdn::session()->UserID, $floodGate);
 
-        if ($this->checkUserSpamming(Gdn::session()->UserID, $floodGate)) {
+        if ($isSpamming) {
             $message = sprintf(
-                t('error.'),
+                t('You have tried to reset your password %1$s times within %2$s seconds. You must wait at least %3$s seconds before attempting again.'),
                 $this->postCountThreshold,
                 $this->timeSpan,
                 $this->lockTime
             );
             throw new Gdn_UserException($message);
         }
-
-
 
         // Don't allow password editing if using SSO Connect ONLY.
         // This is for security. We encountered the case where a customer charges
@@ -720,10 +718,6 @@ class ProfileController extends Gdn_Controller {
         // Get user data and set up form
         $this->getUserInfo();
 
-        // Rate limiting approach
-        // $user =  Gdn::userModel()->getID($this->User->UserID, DATASET_TYPE_OBJECT);
-        // Gdn::userModel()->rateLimit($user, true);
-
         $this->Form->setModel($this->UserModel);
         $this->addDefinition('Username', $this->User->Name);
 
@@ -737,8 +731,6 @@ class ProfileController extends Gdn_Controller {
                 $this->UserModel->Validation->applyRule('OldPassword', 'Required');
                 $this->UserModel->Validation->applyRule('OldPassword', 'OldPassword', 'Your old password was incorrect.');
             }
-
-            $this->UserModel->rateLimit($this->User->UserID, 'true');
 
             $this->UserModel->Validation->applyRule('Password', 'Required');
             $this->UserModel->Validation->applyRule('Password', 'Strength');

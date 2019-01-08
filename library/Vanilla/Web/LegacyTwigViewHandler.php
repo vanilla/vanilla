@@ -15,7 +15,7 @@ class LegacyTwigViewHandler implements LegacyViewHandlerInterface {
     use \Garden\TwigTrait;
 
     /**
-     * @inheritdoc
+     * Render the given view.
      *
      * @param string $path
      * @param \Gdn_Controller $controller

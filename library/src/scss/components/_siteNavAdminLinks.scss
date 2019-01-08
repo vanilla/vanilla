@@ -7,6 +7,10 @@
 .siteNavAdminLinks {
     display: block;
     margin: 25px 0 0;
+
+    @include mediaQuery-panelLayout_oneColumn {
+        margin-bottom: 25px;
+    }
 }
 
 .siteNavAdminLinks-item {

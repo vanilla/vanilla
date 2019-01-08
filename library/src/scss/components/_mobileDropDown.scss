@@ -20,6 +20,11 @@ $mobileDropDown-header_minHeight: 28px;
     .siteNav {
         padding-left: $global-gutter_halfSize;
     }
+
+    &.modal {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
 }
 
 .mobileDropDown-panel,

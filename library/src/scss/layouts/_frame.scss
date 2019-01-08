@@ -105,7 +105,7 @@ $frame-panel_minHeight: 500px;
     justify-content: center;
     flex-shrink: 1;
     height: $formElement-height;
-    transform: translateX(12px); // offset so the side of the icon lines up, not the edge of the button
+    transform: translateX(6px); // offset so the side of the icon lines up, not the edge of the button
 }
 
 .frameHeader-closePosition {

@@ -107,7 +107,8 @@ b {
 .Item .Title,
 .Item.Read .Title,
 .CategoryName h2,
-.Item .TitleWrap {
+.Item .TitleWrap,
+[aria-level="3"] a {
     @include font-heading-link;
 
     a,

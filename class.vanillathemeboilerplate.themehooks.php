@@ -25,9 +25,8 @@ class VanillaThemeBoilerplateThemeHooks extends Gdn_Plugin {
         saveToConfig([
             'Garden.MobileTheme' => 'theme-boilerplate',
             'Routes.DefaultController' => ['categories', 'Internal'],
-            'Vanilla.Categories.Layout' => 'modern',
-            'Vanilla.Discussions.Layout' => 'modern',
             'Badges.BadgesModule.Target' => 'AfterUserInfo',
+            'Feature.NewFlyouts.Enabled' => true
         ]);
     }
 

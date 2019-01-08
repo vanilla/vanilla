@@ -8,9 +8,9 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$searchbox-button_color: $global-color_primary !default;
-$searchbox-button_borderColor: $searchbox-button_color !default;
-$searchbox-button_borderWidth: 1px !default;
+$searchbox-button_color: $global-color_fg !default;
+$searchbox-button_borderColor: transparent !default;
+$searchbox-button_borderWidth: 0 !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -107,7 +107,6 @@ $searchbox-button_borderWidth: 1px !default;
                 content: $icon-caret-down;
                 color: $searchbox-button_color;
             }
-
         }
     }
 }

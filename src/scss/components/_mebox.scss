@@ -9,9 +9,9 @@
 \* -------------------------------------------------------------- */
 
 $mebox-photo_size:                      24px !default;
-$mebox_color:                           $header_color !default;
-$mebox_hover_color:                     $header-hover_color !default;
-$mebox_hover_bg:                        rgba(mix($mebox_color, $global-color_fg, 12%), .2) !default;
+$mebox_fg:                              $header_link_color !default;
+$mebox_hover_color:                     $header-link-hover_color !default;
+$mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12%), .2) !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -22,6 +22,16 @@ $mebox_hover_bg:                        rgba(mix($mebox_color, $global-color_fg,
     display: flex;
 
     .MeButton {
+        color: $mebox_fg;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:focus,
+        &:hover,
+        &:active {
+            color: $mebox_hover_color;
+        }
 
         .Alert {
             line-height: 16px;
@@ -44,7 +54,7 @@ $mebox_hover_bg:                        rgba(mix($mebox_color, $global-color_fg,
     }
 
     .Flyout {
-        top: 120%;
+        top: 100%;
     }
 
     .SignInIcons:empty {
@@ -79,16 +89,12 @@ $mebox_hover_bg:                        rgba(mix($mebox_color, $global-color_fg,
     .MeButton.FlyoutButton,
     .WhoIs > .Username {
         transition: transition(color);
-        color: $mebox_color;
+        color: $mebox_fg;
+
 
         &:hover {
             color: $mebox_hover_color;
         }
-    }
-
-    .ToggleFlyout,
-    .MeButton {
-        border-radius: $formElement_borderRadius;
     }
 
     .ToggleFlyout.Open,
@@ -97,24 +103,17 @@ $mebox_hover_bg:                        rgba(mix($mebox_color, $global-color_fg,
     }
 
     .SignInLinks {
+        > a:first-child,
         .SignInPopup,
         .ApplyButton {
-            display: inline-block;
-        }
-
-        .SignInPopup {
-            @include Button($button-primary_bg, $button-primary_fg, $button-primary_border);
-        }
-
-        .ApplyButton {
-            @include Button($button-basic_bg, $button-basic_fg, $button-basic_border);
-
-            &:focus,
-            &:hover {
-                border-color: $button-basic-hover_border;
-                background-color: $button-basic-hover_bg;
-                color: $button-basic-hover_fg;
-            }
+            @include Button(
+                $navigation-button_bg,
+                $navigation-button_fg,
+                $navigation-button_border,
+                $navigation-button-hover_bg,
+                $navigation-button-hover_fg,
+                $navigation-button-hover_border
+            );
         }
 
         .Bullet {
@@ -123,9 +122,10 @@ $mebox_hover_bg:                        rgba(mix($mebox_color, $global-color_fg,
     }
 
     .MeButton {
-        padding: 0 $utility-small_padding;
+        padding: 0;
         font-size: $icon-default_size;
-        line-height: $global-base_lineHeight;
+        min-height: $header_minHeight;
+        min-width: calc(#{$header_minHeight} - #{$utility-baseUnitHalf});
 
         .Alert {
             line-height: 16px;
@@ -169,9 +169,5 @@ $mebox_hover_bg:                        rgba(mix($mebox_color, $global-color_fg,
     .WhoIs > .Username {
         display: flex;
         align-items: center;
-    }
-
-    .MeBox .ToggleFlyout {
-        margin-left: $utility-small_padding;
     }
 }

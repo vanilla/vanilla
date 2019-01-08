@@ -20,6 +20,7 @@ body.hasRichEditor {
     .richEditor-frame {
         border-radius: $formElement_borderRadius;
         border: $formElement_border;
+        overflow: initial;
     }
 
     .CommentOptions {

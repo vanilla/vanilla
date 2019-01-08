@@ -10,15 +10,15 @@
 
 $count_fontWeight:                  bold !default;
 $count_fontSize:                    $global-small_fontSize !default;
-$count_borderRadius:                $formButton_borderRadius !default;
+$count_borderRadius:                $global_borderRadius !default;
 $count_height:                      $formButton_height !default;
-$count_bg:                          $theme-hover_color !default;
+$count_bg:                          transparent !default;
 $count_border:                      0 !default;
 $count_color:                       inherit !default;
 
-$count-hover_bg:                    $global-color_primary !default;
-$count-hover_borderColor:           $global-color_primary !default;
-$count-hover_color:                 $global-color_white !default;
+$count-hover_bg:                    transparent !default;
+$count-hover_borderColor:           transparent !default;
+$count-hover_color:                 inherit !default;
 
 @mixin Count {
     background-color: $count_bg;

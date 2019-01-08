@@ -108,14 +108,7 @@ select::-ms-expand {
 }
 
 .js-poll-result-btn {
-    @include Button($button-basic_bg, $button-basic_fg, $button-basic_border);
-
-    &:focus,
-    &:hover {
-        border-color: $button-basic-hover_border;
-        background-color: $button-basic-hover_bg;
-        color: $button-basic-hover_fg;
-    }
+    @include Button;
 }
 
 .FormTitleWrapper,
@@ -152,18 +145,18 @@ select::-ms-expand {
     }
 
     .Buttons .Button {
-        @include Button($button-basic_bg, $button-basic_fg, $button-basic_border);
-
-        &:focus,
-        &:hover {
-            border-color: $button-basic-hover_border;
-            background-color: $button-basic-hover_bg;
-            color: $button-basic-hover_fg;
-        }
+        @include Button;
     }
 
     .Buttons .Button.Primary {
-        @include Button($button-primary_bg, $button-primary_fg, $button-primary_border);
+        @include Button(
+            $button-primary_bg,
+            $button-primary_fg,
+            $button-primary_border,
+            $button-primary-hover_bg,
+            $button-primary-hover_fg,
+            $button-primary-hover_border
+        );
     }
 
     .Buttons .Button.Hidden {
@@ -174,19 +167,12 @@ select::-ms-expand {
 #Form_OK,
 .Button:not(.GroupOptionsTitle),
 .Buttons .btn-primary {
-    @include Button($button-primary_bg, $button-primary_fg, $button-primary_border);
+    @include Button;
 }
 
 .Buttons .Close,
 .Button.Danger {
-    @include Button($button-basic_bg, $button-basic_fg, $button-basic_border);
-
-    &:focus,
-    &:hover {
-        border-color: $button-basic-hover_border;
-        background-color: $button-basic-hover_bg;
-        color: $button-basic-hover_fg;
-    }
+    @include Button;
 }
 
 .ActivityFormWrap {
@@ -279,11 +265,28 @@ div.token-input-dropdown {
     }
 }
 
+.NewConversation.NewConversation {
+    @include Button(
+        $button-primary_bg,
+        $button-primary_fg,
+        $button-primary_border,
+        $button-primary-hover_bg,
+        $button-primary-hover_fg,
+        $button-primary-hover_border
+    );
+}
+
 .ButtonGroup.Multi {
 
-    @include Button;
+    @include Button(
+        $button-primary_bg,
+        $button-primary_fg,
+        $button-primary_border,
+        $button-primary-hover_bg,
+        $button-primary-hover_fg,
+        $button-primary-hover_border
+    );
     align-items: center;
-    text-align: center;
     max-width: $formButton_maxWidth;
     padding-right: 32px;
     padding-left: 32px;
@@ -303,6 +306,7 @@ div.token-input-dropdown {
         font-size: inherit;
         line-height: inherit;
         padding: 0;
+        color: inherit;
     }
 
     .Button.Handle,

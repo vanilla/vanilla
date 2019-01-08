@@ -221,16 +221,20 @@ a.ChangePicture {
 }
 
 #Form_Ban {
-    @include Button($button-primary_bg, $button-primary_fg, $button-primary_border);
+    @include Button(
+            $button-primary_bg,
+            $button-primary_fg,
+            $button-primary_border,
+            $button-primary-hover_bg,
+            $button-primary-hover_fg,
+            $button-primary-hover_border
+    );
 }
 
 .Dropdown.MenuItems {
-    min-width: 100%;
 
-    a {
-        line-height: $formElement_height - 8px;
-        padding-top: 4px;
-        padding-bottom: 4px;
+    @include maxWidth {
+        min-width: auto;
     }
 }
 

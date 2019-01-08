@@ -51,10 +51,14 @@
                 content: "";
                 height: $component_borderRadius;
                 border-bottom: $component_border;
-                border-left: $component_border;
-                border-right: $component_border;
-                border-bottom-left-radius: $component_borderRadius;
-                border-bottom-right-radius: $component_borderRadius;
+
+                @if $component_lateralBorder == true {
+                    border-left: $component_border;
+                    border-right: $component_border;
+                    border-bottom-left-radius: $component_borderRadius;
+                    border-bottom-right-radius: $component_borderRadius;
+                }
+
                 background: transparent;
                 width: calc(100% - (#{$component_borderWidth} * 2));
                 position: absolute;
@@ -70,7 +74,7 @@
         font-weight: $component-title_fontWeight;
         line-height: #{$theme-photo_size / 2};
         color: $component-title_color;
-        display: inline-block;
+        display: inline;
 
         &:focus,
         &:hover {
@@ -90,14 +94,13 @@
         }
     }
 
-    .Title,
     .CategoryDescription,
-    .Discussion .Excerpt{
-        margin-top: 0;
-        display: inline-block;
-        margin-bottom: $component-base_padding;
+    .Discussion .Excerpt {
+        display: block;
+        margin: $component-base_padding 0;
     }
 
+    .Excerpt:empty,
     .CategoryDescription:empty {
         display: none;
     }
@@ -106,10 +109,6 @@
         font-size: $component-base_fontSize;
         font-weight: $component-base_fontWeight;
         color: $component-base_color;
-    }
-
-    .Excerpt:empty {
-        display: none;
     }
 
     .Options {
@@ -166,8 +165,8 @@
         font-weight: inherit;
         color: inherit;
         margin-left: 0;
-        margin-right: $utility-small_padding;
-        margin-bottom: $utility-small_padding;
+        margin-right: $utility-baseUnitHalf;
+        margin-bottom: $utility-baseUnitHalf;
         padding: 0;
         display: inline-block;
 
@@ -272,7 +271,14 @@
         visibility: visible;
 
         .OptionsLink {
-            @include Button($button-primary_bg, $button-primary_fg, $button-primary_border);
+            @include Button(
+                    $button-primary_bg,
+                    $button-primary_fg,
+                    $button-primary_border,
+                    $button-primary-hover_bg,
+                    $button-primary-hover_fg,
+                    $button-primary-hover_border
+            );
             margin-left: $utility-small_padding;
         }
 

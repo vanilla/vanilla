@@ -9,6 +9,7 @@
 \* -------------------------------------------------------------- */
 
 .Panel-main {
+    line-height: $global-condensed_lineHeight;
 
     @include maxWidth($theme-breakpoint_tablet) {
 
@@ -34,20 +35,11 @@
         justify-content: center;
     }
 
-    .ApplyButton {
-        background-color: transparent;
-        color: $global-color_primary;
-
-        &:focus,
-        &:hover {
-            color: $global-color_white;
-        }
-    }
-
     .TagCloud {
         background: transparent;
 
         li {
+            margin: 0;
             padding: 0;
             background: transparent;
         }
@@ -118,6 +110,7 @@
 
         > .Primary:first-child {
             width: 100%;
+            color: inherit;
         }
 
         .Button.Handle {
@@ -178,7 +171,7 @@
             padding: 0 $utility-small_padding;
             border-radius: $panel_item-borderRadius;
             width: 100%;
-            color: $panel_color;
+            color: $panel_fg;
             transition: transition(color), transition(background-color);
 
             &:hover {
@@ -267,12 +260,13 @@ body.Section-EditProfile .Box,
         padding: 0 $utility-small_padding;
         border-radius: $panel_item-borderRadius;
         width: 100%;
-        color: $panel_color;
+        color: $panel_fg;
         border: $panel_item-border;
         transition: transition(color), transition(background-color);
 
         &:hover {
-            background: $panel-hover_bg;
+            color: $panel-item-hover_fg;
+            background: $panel-item-hover_bg;
         }
     }
 
@@ -295,18 +289,7 @@ body.Section-EditProfile .Box,
     .Active {
 
         a {
-            background-color: lighten($panel-hover_bg, 3%);
-            color: $panel-link_color;
-
-            &:focus,
-            &:hover {
-                color: $panel-link-hover_color;
-                background-color: $panel-hover_bg;
-
-                .Count {
-                    background-color: $panel-link-hover_color;
-                }
-            }
+            font-weight: $global-semibold_fontWeight;
         }
     }
 

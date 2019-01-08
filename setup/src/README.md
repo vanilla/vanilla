@@ -8,8 +8,7 @@ Custom theme for Vanilla Theme Boilerplate.
 
 ## Notes
 
-- This theme contains javascript to animate the open and close of the mobile navigation menu.
-- This theme sets its own flyout listeners.
+- This theme needs the `Feature.NewFlyouts.Enabled` config set as `true` for the flyouts to work properly. 
 
 ## Building Styles / Javascript / Images
 

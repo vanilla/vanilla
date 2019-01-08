@@ -68,14 +68,7 @@ $quickSearch_color:                      $global-color_white !default;
 
 .PrevNextPager .Previous,
 .PrevNextPager .Next {
-    @include Button($button-basic_bg, $button-basic_fg, $button-basic_border);
-
-    &:focus,
-    &:hover {
-        border-color: $button-basic-hover_border;
-        background-color: $button-basic-hover_bg;
-        color: $button-basic-hover_fg;
-    }
+    @include Button;
 }
 
 .PagerWrap,
@@ -160,15 +153,14 @@ a.MoreWrap,
     }
 
     .QuickSearchButton {
-        display: block;
+        display: inline-flex;
+        align-items: center;
         margin: 0 0 0 $utility-medium_padding;
     }
 
     span,
-    > a,
-    .QuickSearch .Sprite {
+    > a {
         transition: color 0.25s ease-out;
-        display: block;
         font-size: $pager_fontSize;
         font-weight: $pager_fontWeight;
         line-height: $pager_height;
@@ -227,25 +219,36 @@ a.MoreWrap,
         border-bottom-right-radius: $pager_borderRadius;
     }
 
-    .QuickSearch .Sprite {
-        border-radius: $pager_borderRadius;
+    .QuickSearchWrap .Button,
+    .QuickSearchButton {
+        @include Button(
+            $button-primary_bg,
+            $button-primary_fg,
+            $button-primary_border,
+            $button-primary-hover_bg,
+            $button-primary-hover_fg,
+            $button-primary-hover_border
+        );
     }
 
-    .QuickSearch .Sprite {
-        background: $quickSearch_bg;
-        border: $quickSearch_border;
-        color: $quickSearch_color;
+    .QuickSearchButton {
+        height: $formButton_height;
+        width: $formButton_height;
+    }
 
-        &:focus,
-        &:hover {
-            background: $quickSearch-hover_bg;
+    .QuickSearchButton.QuickSearchButton span {
+        min-width: 0;
+        height: auto;
+        width: auto;
+        color: inherit;
+        margin: 0;
+        vertical-align: baseline;
+
+        &:hover,
+        &:focus {
+            color: inherit;
+            background-color: transparent;
         }
-    }
-
-    .QuickSearch.Open .Sprite,
-    .QuickSearch .Sprite:hover {
-        background: $quickSearch-hover_bg;
-        color: $quickSearch_color;
     }
 
     .QuickSearchWrap {

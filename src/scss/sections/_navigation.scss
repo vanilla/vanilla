@@ -13,7 +13,7 @@
     overflow: hidden;
     position: relative;
     background: $navigation_bg;
-    color: $navigation_fg;
+    color: $navigation_link_color;
     width: 100%;
     height: auto;
     max-height: 0;
@@ -40,6 +40,17 @@
         line-height: $formButton_height;
     }
 
+    .ButtonGroup.Multi {
+        @include Button(
+            $navigation-button_bg,
+            $navigation-button_fg,
+            $navigation-button_border,
+            $navigation-button-hover_bg,
+            $navigation-button-hover_fg,
+            $navigation-button-hover_border
+        );
+    }
+
     .ButtonGroup.NewDiscussion {
         .Primary:first-child {
             width: 100%;
@@ -55,19 +66,11 @@
         }
     }
 
-    a {
-        color: $global-color_white;
-        line-height: 24px;
-    }
-
     .NewDiscussion.mobile {
         width: 100%;
 
         .ButtonGroup.Action,
         .Button.Action {
-            background: $navigation-button_bg;
-            border-color: $navigation-button_border;
-            color: $navigation-button_fg;
             width: 100%;
 
             .Button {
@@ -105,7 +108,14 @@
             padding-top: $utility-medium_padding;
 
             a {
-                @include Button($navigation-button_bg, $navigation-button_fg, $navigation-button_border);
+                @include Button(
+                    $navigation-button_bg,
+                    $navigation-button_fg,
+                    $navigation-button_border,
+                    $navigation-button-hover_bg,
+                    $navigation-button-hover_fg,
+                    $navigation-button-hover_border
+                );
             }
 
             .Bullet {
@@ -156,13 +166,7 @@
         }
 
         .MeButton .Sprite::before {
-            line-height: 32px;
-            font-size: $global-medium_fontSize;
-
-            @include maxWidth($theme-breakpoint_base){
-                line-height: $global-base_lineHeight;
-                font-size: $global-subTitle_fontSize;
-            }
+            font-size: $icon-default_size;
         }
 
         .MeMenu > * {
@@ -188,6 +192,12 @@
     display: block;
     width: 100%;
     padding: 0 $utility-large_padding;
+    color: $navigation_link_color;
+
+    &:focus,
+    &:hover {
+        color: $navigation_link-hover_color;
+    }
 }
 
 .Navigation-linkContainer {

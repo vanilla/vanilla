@@ -64,7 +64,7 @@
 .MainContent.Content {
     border-radius: $content_borderRadius;
     border: $content_border;
-    width: calc(100% - #{$panel_width + $utility-xLarge_padding});
+    width: calc(100% - #{$panel_width + $panel_gap});
 
     @if ($panel_toLeft) {
         order: 2;

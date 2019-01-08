@@ -50,6 +50,10 @@ There you can find information about what each variable represents, naming conve
 
 Essentially you can overwrite whatever you like but be careful! Some variables are heavily inherited and not meant to be overwritten. Doing so may break your layout.
 
+### Version
+
+1.1.0 - Updated `default.master.tpl` to solve security vulnerability.
+
 ### Building Styles / Javascript / Images
 
 The boilerplate frontend assets are built with the [Vanilla CLI](https://docs.vanillaforums.com/developer/vanilla-cli/).

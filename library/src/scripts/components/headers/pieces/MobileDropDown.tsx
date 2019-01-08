@@ -23,6 +23,8 @@ export interface IProps {
     buttonClass?: string;
     title: string;
     children?: React.ReactNode;
+    frameClassName?: string;
+    frameBodyClassName?: string;
 }
 
 interface IState {
@@ -65,7 +67,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                     >
                         <div className="mobileDropDown-content">
                             <Panel className="mobileDropDown-panel">
-                                <Frame>
+                                <Frame className={this.props.frameClassName}>
                                     <header className="frameHeader mobileDropDown-header">
                                         <FlexSpacer className="frameHeader-leftSpacer" />
                                         <Heading title={title} className="frameHeader-heading frameHeader-centred">
@@ -79,7 +81,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                                             />
                                         </div>
                                     </header>
-                                    <FrameBody>{children}</FrameBody>
+                                    <FrameBody className={this.props.frameBodyClassName}>{children}</FrameBody>
                                     <FrameFooter>
                                         <Button
                                             onClick={this.close}

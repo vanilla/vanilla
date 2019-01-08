@@ -12,7 +12,7 @@ $frame-border_radius: $global-borderRadius;
 
 $frame_padding: 36px;
 
-$frame-header_minHeight: 36px;
+$frame-header_minHeight: 44px;
 $frame-header_spacing: 12px;
 $frame-header_fontSize: $global-subTitle_fontSize;
 
@@ -63,21 +63,21 @@ $frame-panel_minHeight: 500px;
         display: flex;
         flex-wrap: nowrap;
         justify-content: center;
-        align-items: center;
+        align-items: flex-end;
         flex-shrink: 1;
-        width: $icon_small_size;
-        margin: {
-            right: $utility-baseUnit;
-            left: -10px;
-            top: 4px; // Alignment
-        }
+        min-width: $icon-large_size;
+        width: $icon-large_size;
+        margin-left: -8px;
     }
 }
 
 .frameHeader-heading {
+    display: flex;
+    align-items: center;
     flex-grow: 1;
     text-overflow: ellipsis;
     font-weight: $global-fontWeight_semiBold;
+    font-size: $global-large_fontSize;
 }
 
 .frameHeader-left {
@@ -105,11 +105,17 @@ $frame-panel_minHeight: 500px;
     justify-content: center;
     flex-shrink: 1;
     height: $formElement-height;
-    transform: translateX(12px); // offset so the side of the icon lines up, not the edge of the button
+    transform: translateX(6px); // offset so the side of the icon lines up, not the edge of the button
 }
 
 .frameHeader-closePosition {
     margin-left: auto;
+}
+
+.frameHeader-close {
+    &.buttonIcon {
+        width: 48px;
+    }
 }
 
 .frameBody {

@@ -43,7 +43,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                     onClick={this.props.onBackClick}
                     className="frameHeader-backButton"
                 >
-                    {leftChevron("frameHeader-backIcon isSmall")}
+                    {leftChevron("frameHeader-backIcon isSmall", true)}
                 </Button>
             );
         }

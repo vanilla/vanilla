@@ -26,6 +26,17 @@ trait TwigTrait {
         } else {
             $twigEnv = new \Twig_Environment($loader);
         }
+        self::addAvailableMethods($twigEnv);
         return $twigEnv;
+    }
+
+    /**
+     * Add a few required method into the twig environment.
+     *
+     * @param \Twig_Environment $twig
+     */
+    private static function addAvailableMethods(\Twig_Environment $twig) {
+        $twig->addFunction(new \Twig_Function('t', [\Gdn::class, 'translate']));
+        $twig->addFunction(new \Twig_Function('url', 'url'));
     }
 }

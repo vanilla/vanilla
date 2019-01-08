@@ -761,7 +761,6 @@ class ProfileController extends Gdn_Controller {
         $this->render();
     }
 
-
     /**
      * Set user's photo (avatar).
      *

@@ -1,0 +1,37 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.DismissMessage {
+    margin: 0 0 $utility-medium_padding;
+    @include font-style-base;
+    border-radius: $component_borderRadius;
+}
+
+a.Dismiss.Dismiss {
+    position: static;
+    float: right;
+    @include CloseButton;
+}
+
+.WarningMessage {
+    background-color: mix($global-color_bg, $global-color_warning, 80%);
+    border-color: $global-color_warning;
+}
+
+.CasualMessage,
+.InfoMessage {
+    background-color: mix($global-color_bg, $global-color_primary, 80%);
+    border-color: $global-color_primary;
+}
+
+.AlertMessage {
+    background-color: mix($global-color_bg, $global-error_fg, 80%);
+    border-color: $global-error_fg;
+}

@@ -1,0 +1,26 @@
+/*
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* ------------------ Theme ------------------ */
+
+@import "base/variables_dusk";
+@import "base/variables";
+
+/* --------------- Boilerplate --------------- */
+
+@import "../../../theme-boilerplate/src/scss/custom";
+
+/* --------------- Components --------------- */
+
+@import "components/forms_dusk";
+@import "components/lists_dusk";
+@import "components/herobanner";
+@import "components/searchbox_dusk";
+@import "components/tables_dusk";
+
+/* ------------------ Sections ------------------ */
+
+@import "sections/themeoptions";

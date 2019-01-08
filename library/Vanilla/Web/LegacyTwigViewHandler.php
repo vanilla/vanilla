@@ -9,7 +9,7 @@ namespace Vanilla\Web;
 use Vanilla\Contracts\Web\LegacyViewHandlerInterface;
 
 /**
- * Gdn_Controller view handler for smarty.
+ * Gdn_Controller view handler for twig.
  */
 class LegacyTwigViewHandler implements LegacyViewHandlerInterface {
     use \Garden\TwigTrait;

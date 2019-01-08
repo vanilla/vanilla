@@ -151,6 +151,7 @@ $global-default_easing                               : ease-out !default;
 $icon-large_size                                     : 32px !default;
 $icon-default_size                                   : 24px !default;
 $icon-small_size                                     : 16px !default;
+$icon_color                                          : mix($global-color_bg, $global-color_fg, 18%) !default;
 
 /* -------------------------------------------------------------- *\
     User Photo

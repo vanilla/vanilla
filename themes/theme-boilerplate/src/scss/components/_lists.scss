@@ -701,3 +701,7 @@
         line-height: $icon-default_size;
     }
 }
+
+body.Vanilla.Discussions .Discussion.ItemContent {
+    padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+}

@@ -9,7 +9,6 @@
 \* -------------------------------------------------------------- */
 
 $global-color_vanillaBlue:              #0291DB;
-$global-color_royalBlue:                #0366D6;
 $global-color_pink:                     #F52C6E;
 $global-color_red:                      #D0021B;
 $global-color_grey:                     #555A62;
@@ -90,7 +89,7 @@ $global-color_fg:                       $global-color_grey !default; // text col
 $global-body_bg:                        $global-color_bg !default;
 
 $link-default_color:                    $global-color_fg !default;
-$link-default-hover_color:              $global-color_royalBlue !default;
+$link-default-hover_color:              $global-color_primary !default;
 
 $icon-default_size:                     20px !default;
 

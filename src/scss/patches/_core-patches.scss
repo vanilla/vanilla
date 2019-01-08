@@ -230,17 +230,10 @@ a.ChangePicture {
 }
 
 .Dropdown.MenuItems {
-    //min-width: 100%;
 
     @include maxWidth {
         min-width: auto;
     }
-
-    //a {
-    //    line-height: $formElement_height - 8px;
-    //    padding-top: 4px;
-    //    padding-bottom: 4px;
-    //}
 }
 
 [class*="Status-Tag-"] {

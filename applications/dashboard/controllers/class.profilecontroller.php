@@ -687,20 +687,9 @@ class ProfileController extends Gdn_Controller {
     public function password() {
         $this->permission('Garden.SignIn.Allow');
 
-        // User FloodControl to prevent too many password reset attempts in a small window of time.
+        $isSpamming = false;
         $floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Password');
         $this->setFloodControlEnabled(true);
-        $isSpamming = $this->checkUserSpamming(Gdn::session()->UserID, $floodGate);
-
-        if ($isSpamming) {
-            $message = sprintf(
-                t('You have tried to reset your password %1$s times within %2$s seconds. You must wait at least %3$s seconds before attempting again.'),
-                $this->postCountThreshold,
-                $this->timeSpan,
-                $this->lockTime
-            );
-            throw new Gdn_UserException($message);
-        }
 
         // Don't allow password editing if using SSO Connect ONLY.
         // This is for security. We encountered the case where a customer charges
@@ -722,7 +711,7 @@ class ProfileController extends Gdn_Controller {
         $this->Form->setModel($this->UserModel);
         $this->addDefinition('Username', $this->User->Name);
 
-        if ($this->Form->authenticatedPostBack() === true && !$isSpamming) {
+        if ($this->Form->authenticatedPostBack() === true && !$isSpamming = $this->checkUserSpamming(Gdn::session()->UserID, $floodGate)) {
             $this->Form->setFormValue('UserID', $this->User->UserID);
             $this->UserModel->defineSchema();
 //         $this->UserModel->Validation->addValidationField('OldPassword', $this->Form->formValues());
@@ -756,10 +745,22 @@ class ProfileController extends Gdn_Controller {
                 );
             }
         }
+
+        if ($isSpamming) {
+            $message = sprintf(
+                t('You have tried to reset your password %1$s times within %2$s seconds. You must wait at least %3$s seconds before attempting again.'),
+                $this->postCountThreshold,
+                $this->timeSpan,
+                $this->lockTime
+            );
+            throw new Gdn_UserException($message);
+        }
+
         $this->title(t('Change My Password'));
         $this->_setBreadcrumbs(t('Change My Password'), '/profile/password');
         $this->render();
     }
+
 
     /**
      * Set user's photo (avatar).

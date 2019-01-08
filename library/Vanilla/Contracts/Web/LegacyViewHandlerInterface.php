@@ -8,7 +8,7 @@
 namespace Vanilla\Contracts\Web;
 
 /**
- * A web asset interface.
+ * An interface for a view handler for Gdn_Controller.
  */
 interface LegacyViewHandlerInterface {
     /**

@@ -35,6 +35,6 @@ class LegacyTwigViewHandler implements LegacyViewHandlerInterface {
 
         // We need to echo instead of return returning because \Gdn_Controller::fetchView()
         // uses only ob_start and ob_get_clean to gather the rendered result.
-         echo $this->twig->render($path, $controller->Data);
+        echo $this->twig->render($path, $controller->Data);
     }
 }

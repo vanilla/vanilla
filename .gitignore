@@ -59,6 +59,8 @@
 !/themes/bittersweet/
 !/themes/default/
 !/themes/mobile/
+!/themes/theme-boilerplate/
+!/themes/keystone/
 /uploads/*
 !/uploads/.gitkeep
 *vanillaforums*

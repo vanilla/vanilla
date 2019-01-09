@@ -2495,26 +2495,16 @@ if (!function_exists('touchConfig')) {
     /**
      * Make sure the config has a setting.
      *
-     * This function is useful to call in the setup/structure of plugins to make sure they have some default config set.
+     * This function is useful to call in the setup/structure of plugins to
+     * make sure they have some default config set.
      *
      * @param string|array $name The name of the config key or an array of config key value pairs.
      * @param mixed $default The default value to set in the config.
+     *
+     * @deprecated 2.8 Use Gdn_Configuration::touch()
      */
     function touchConfig($name, $default = null) {
-        if (!is_array($name)) {
-            $name = [$name => $default];
-        }
-
-        $save = [];
-        foreach ($name as $key => $value) {
-            if (!c($key)) {
-                $save[$key] = $value;
-            }
-        }
-
-        if (!empty($save)) {
-            saveToConfig($save);
-        }
+        Gdn::config()->touch($name, $default);
     }
 }
 

@@ -82,6 +82,18 @@ class ParserTest extends SharedBootstrapTestCase {
     /**
      * Test the parsing of normal text.
      */
+    public function testTrailingNewlines() {
+        $ops = [["insert" => "SomeText\n\n\n\n"]];
+        $result = [[
+            ["class" => TextBlot::class, "content" => "SomeText"],
+            $this->makeParagraphLine(),
+        ]];
+        $this->assertParseResults($ops, $result);
+    }
+
+    /**
+     * Test the parsing of normal text.
+     */
     public function testNormalText() {
         $ops = [["insert" => "SomeText\n"]];
         $result = [[

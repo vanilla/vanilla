@@ -2501,10 +2501,9 @@ if (!function_exists('touchConfig')) {
      * @param string|array $name The name of the config key or an array of config key value pairs.
      * @param mixed $default The default value to set in the config.
      *
-     * @deprecated 2.8
+     * @deprecated 2.8 Use Gdn_Configuration::touch()
      */
     function touchConfig($name, $default = null) {
-        deprecated(__FUNCTION__, "Gdn_Configuration::touch()");
         Gdn::config()->touch($name, $default);
     }
 }

@@ -16,6 +16,29 @@ use Gdn_Validation;
  * Class ModelUtils.
  */
 class ModelUtils {
+
+    /**
+     * Convert a Garden Schema validation exception into a Gdn_Validation instance.
+     *
+     * @param ValidationException $exception
+     */
+    public static function validationExceptionToValidationResult(ValidationException $exception): Gdn_Validation {
+        $result = new Gdn_Validation();
+        $validation = $exception->getValidation();
+        $errors = $validation->getErrors();
+
+        foreach ($errors as $error) {
+            $fieldName = $error["field"] ?? null;
+            $message = $error["message"] ?? null;
+            if ($fieldName && $message) {
+                $errorCode = str_replace($fieldName, "%s", $message);
+                $result->addValidationResult($fieldName, $errorCode);
+            }
+        }
+
+        return $result;
+    }
+
     /**
      * Given a model (old Gdn_Model mainly), analyze its validation property and return failures.
      *

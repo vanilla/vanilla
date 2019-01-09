@@ -251,9 +251,9 @@ class Parser {
      */
     private function stripTrailingNewlines(array &$operations) {
         $lastIndex = count($operations) - 1;
-        $lastInsert = &$operations[$lastIndex]["insert"] ?? null;
-        if ($lastInsert !== null && $this->isOperationBareInsert($lastInsert)) {
-            $lastInsert = preg_replace('/\s+$/', "\n", $lastInsert);
+        $lastOp = &$operations[$lastIndex];
+        if ($this->isOperationBareInsert($lastOp)) {
+            $lastOp["insert"] = preg_replace('/\s+$/', "\n", $lastOp["insert"]);
         }
     }
 }

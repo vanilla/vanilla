@@ -115,7 +115,7 @@ class ParserTest extends SharedBootstrapTestCase {
             ],
             [
                 ["class" => TextBlot::class, "content" => "After3lines"],
-                $this->makeParagraphLine(2),
+                $this->makeParagraphLine(1),
             ],
         ];
         $this->assertParseResults($ops, $result);

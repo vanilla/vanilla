@@ -24,8 +24,7 @@ class ModelUtils {
      */
     public static function validationExceptionToValidationResult(ValidationException $exception): Gdn_Validation {
         $result = new Gdn_Validation();
-        $validation = $exception->getValidation();
-        $errors = $validation->getErrors();
+        $errors = $exception->getValidation()->getErrors();
 
         foreach ($errors as $error) {
             $fieldName = $error["field"] ?? null;

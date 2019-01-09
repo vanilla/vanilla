@@ -1,15 +1,15 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React, { MouseEvent, ChangeEvent } from "react";
-import * as Icons from "@rich-editor/components/icons";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { uploadImage } from "@library/apiv2";
 import { isFileImage } from "@library/utility";
+import { image } from "@library/components/icons/editorIcons";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -27,7 +27,7 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
                 disabled={this.props.disabled}
                 onClick={this.onFakeButtonClick}
             >
-                <Icons.image />
+                {image()}
                 <input
                     ref={this.inputRef}
                     onChange={this.onInputChange}

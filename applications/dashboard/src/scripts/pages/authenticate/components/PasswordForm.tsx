@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -7,7 +7,7 @@ import { getFieldErrors, getGlobalErrorMessage } from "@library/apiv2";
 import { t } from "@library/application";
 import React from "react";
 import { withRouter, Link } from "react-router-dom";
-import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
+import InputTextBlock from "@library/components/forms/InputTextBlock";
 import Checkbox from "@library/components/forms/Checkbox";
 import ButtonSubmit from "@library/components/forms/ButtonSubmit";
 import Paragraph from "@library/components/Paragraph";
@@ -73,23 +73,27 @@ export class PasswordForm extends React.Component<IProps, IState> {
                 />
                 <InputTextBlock
                     label={t("Email/Username")}
-                    required={true}
-                    disabled={!this.allowEdit}
                     errors={getFieldErrors(this.props.passwordState, "username")}
-                    defaultValue={this.props.defaultUsername || ""}
                     ref={this.usernameInput}
-                    onChange={this.handleUsernameChange}
-                    value={this.state.username}
+                    inputProps={{
+                        required: true,
+                        disabled: !this.allowEdit,
+                        onChange: this.handleUsernameChange,
+                        defaultValue: this.props.defaultUsername || "",
+                        value: this.state.username,
+                    }}
                 />
                 <InputTextBlock
                     label={t("Password")}
-                    required={true}
-                    disabled={!this.allowEdit}
-                    errors={getFieldErrors(this.props.passwordState, "password")}
-                    type="password"
                     ref={this.passwordInput}
-                    onChange={this.handlePasswordChange}
-                    value={this.state.password}
+                    errors={getFieldErrors(this.props.passwordState, "password")}
+                    inputProps={{
+                        required: true,
+                        disabled: !this.allowEdit,
+                        type: "password",
+                        onChange: this.handlePasswordChange,
+                        value: this.state.password,
+                    }}
                 />
                 <div className="inputBlock inputBlock-tighter">
                     <div className="rememberMeAndForgot">

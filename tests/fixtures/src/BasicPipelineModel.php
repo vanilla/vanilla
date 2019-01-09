@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -26,6 +26,20 @@ class BasicPipelineModel extends PipelineModel {
             return;
         });
         return $databaseOperation;
+    }
+
+    /**
+     * Perform a dummy "select" database operation using the configured pipeline.
+     *
+     * @param Operation $databaseOperation
+     * @param array $dummyResult
+     * @return Operation
+     */
+    public function doSelectOperation(Operation $databaseOperation, array $dummyResult): array {
+        $result = $this->pipeline->process($databaseOperation, function () use ($dummyResult) {
+            return $dummyResult;
+        });
+        return $result;
     }
 
     /**

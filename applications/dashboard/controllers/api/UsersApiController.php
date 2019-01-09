@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -15,11 +15,18 @@ use Vanilla\DateFilterSchema;
 use Vanilla\ImageResizer;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
+use Vanilla\PermissionsTranslationTrait;
+use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\DelimitedScheme;
 
 /**
  * API Controller for the `/users` resource.
  */
 class UsersApiController extends AbstractApiController {
+
+    use PermissionsTranslationTrait;
+
+    const ME_ACTION_CONSTANT = "@@users/GET_ME_RESPONSE";
 
     /** @var Gdn_Configuration */
     private $configuration;
@@ -54,6 +61,7 @@ class UsersApiController extends AbstractApiController {
         $this->configuration = $configuration;
         $this->userModel = $userModel;
         $this->imageResizer = $imageResizer;
+        $this->nameScheme =  new DelimitedScheme('.', new CamelCaseScheme());
     }
 
     /**
@@ -198,6 +206,25 @@ class UsersApiController extends AbstractApiController {
     }
 
     /**
+     * Get global permissions available to the current user.
+     *
+     * @return array
+     */
+    private function globalPermissions(): array {
+        $result = [];
+
+        foreach ($this->getSession()->getPermissionsArray() as $permission) {
+            if (!is_string($permission)) {
+                continue;
+            }
+            $result[] = $this->renamePermission($permission);
+        }
+
+        sort($result);
+        return $result;
+    }
+
+    /**
      * Get a user fragment representing a guest.
      *
      * @return array
@@ -208,7 +235,8 @@ class UsersApiController extends AbstractApiController {
                 "userID" => 0,
                 "name" => t("Guest"),
                 "photoUrl" => UserModel::getDefaultAvatarUrl(),
-                "dateLastActive" => null
+                "dateLastActive" => null,
+                "isAdmin" => false,
             ];
         }
         return $this->guestFragment;
@@ -218,10 +246,10 @@ class UsersApiController extends AbstractApiController {
      * Get a list of users, filtered by username.
      *
      * @param array $query
-     * @return array
+     * @return Data
      */
     public function index_byNames(array $query) {
-        $this->permission('Garden.SignIn.Allow');
+        $this->permission();
 
         $in = $this->schema([
             'name:s' => 'Filter for username. Supports full or partial matching with appended wildcard (e.g. User*).',
@@ -281,16 +309,32 @@ class UsersApiController extends AbstractApiController {
     /**
      * Get a fragment representing the current user.
      *
+     * @param array $query
      * @return array
      * @throws ValidationException If output validation fails.
      * @throws \Garden\Web\Exception\HttpException If a ban has been applied on the permission(s) for this session.
      * @throws \Vanilla\Exception\PermissionException If the user does not have valid permission to access this action.
      */
-    public function index_me() {
+    public function get_me(array $query) {
         $this->permission();
 
-        $this->schema([], "in")->setDescription("Get information about the current user.");
-        $out = $this->schema($this->getUserFragmentSchema(), "out");
+        $in = $this->schema([], "in")->setDescription("Get information about the current user.");
+        $out = $this->schema(Schema::parse([
+            "userID",
+            "name",
+            "photoUrl",
+            "dateLastActive",
+            "isAdmin:b",
+            "permissions" => [
+                "description" => "Global permissions available to the current user.",
+                "items" => [
+                    "type" => "string",
+                ],
+                "type" => "array",
+            ],
+        ])->add($this->getUserFragmentSchema()), "out");
+
+        $query = $in->validate($query);
 
         if (is_object($this->getSession()->User)) {
             $user = (array)$this->getSession()->User;
@@ -298,6 +342,9 @@ class UsersApiController extends AbstractApiController {
         } else {
             $user = $this->getGuestFragment();
         }
+
+        // Expand permissions for the current user.
+        $user["permissions"] = $this->globalPermissions();
 
         $result = $out->validate($user);
         return $result;
@@ -427,6 +474,10 @@ class UsersApiController extends AbstractApiController {
         if (array_key_exists('Confirmed', $dbRecord)) {
             $dbRecord['emailConfirmed'] = $dbRecord['Confirmed'];
             unset($dbRecord['Confirmed']);
+        }
+        if (array_key_exists('Admin', $dbRecord)) {
+            $dbRecord['isAdmin'] = $dbRecord['Admin'];
+            unset($dbRecord['Admin']);
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);

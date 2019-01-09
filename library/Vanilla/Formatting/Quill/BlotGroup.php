@@ -1,16 +1,18 @@
 <?php
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Formatting\Quill;
 
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
+use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\CodeLineBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\CodeLineTerminatorBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\ParagraphLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
@@ -273,5 +275,22 @@ class BlotGroup {
         }
 
         return $blots;
+    }
+
+    /**
+     * Get the text value of a heading. This is not sanitized, so be sure to HTML escape before using.
+     *
+     * @return string
+     */
+    public function getUnsafeText(): string {
+        $text = "";
+        foreach ($this->blots as $blot) {
+            if ($blot instanceof TextBlot
+                || $blot instanceof ExternalBlot) {
+                $text .= $blot->getContent();
+            }
+        }
+
+        return $text;
     }
 }

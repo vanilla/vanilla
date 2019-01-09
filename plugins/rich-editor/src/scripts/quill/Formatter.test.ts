@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,10 +8,16 @@ import Formatter from "@rich-editor/quill/Formatter";
 import Quill, { RangeStatic } from "quill/core";
 import { expect } from "chai";
 import OpUtils, { inlineFormatOps, blockFormatOps } from "@rich-editor/__tests__/OpUtils";
+import registerQuill from "./registerQuill";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 
 describe("Formatter", () => {
     let quill: Quill;
     let formatter: Formatter;
+
+    before(() => {
+        registerQuill();
+    });
 
     beforeEach(() => {
         document.body.innerHTML = `
@@ -24,21 +30,21 @@ describe("Formatter", () => {
     describe("bold()", () => {
         const formattingFunction = () => formatter.bold(getFullRange());
         testBasicInlineFormatting(formattingFunction, OpUtils.bold);
-        testStackedInlineFormatting("bold", formattingFunction, ["italic", "strike", "link", "codeInline"]);
+        testStackedInlineFormatting("bold", formattingFunction, ["italic", "strike", "link", "code"]);
         testInlineAgainstLineFormatting("bold", formattingFunction);
     });
 
     describe("italic()", () => {
         const formattingFunction = () => formatter.italic(getFullRange());
         testBasicInlineFormatting(formattingFunction, OpUtils.italic);
-        testStackedInlineFormatting("italic", formattingFunction, ["bold", "strike", "link", "codeInline"]);
+        testStackedInlineFormatting("italic", formattingFunction, ["bold", "strike", "link", "code"]);
         testInlineAgainstLineFormatting("italic", formattingFunction);
     });
 
     describe("strike()", () => {
         const formattingFunction = () => formatter.strike(getFullRange());
         testBasicInlineFormatting(formattingFunction, OpUtils.strike);
-        testStackedInlineFormatting("strike", formattingFunction, ["bold", "italic", "link", "codeInline"]);
+        testStackedInlineFormatting("strike", formattingFunction, ["bold", "italic", "link", "code"]);
         testInlineAgainstLineFormatting("strike", formattingFunction);
     });
 
@@ -48,7 +54,7 @@ describe("Formatter", () => {
         testStackedInlineFormatting(
             "link",
             formattingFunction,
-            ["bold", "italic", "strike", "codeInline"],
+            ["bold", "italic", "strike", "code"],
             OpUtils.DEFAULT_LINK,
         );
         testInlineAgainstLineFormatting("link", formattingFunction, OpUtils.DEFAULT_LINK);
@@ -56,9 +62,9 @@ describe("Formatter", () => {
 
     describe("codeInline()", () => {
         const formattingFunction = () => formatter.codeInline(getFullRange());
-        testBasicInlineFormatting(formattingFunction, OpUtils.codeInline);
-        testStackedInlineFormatting("codeInline", formattingFunction, ["bold", "italic", "strike", "link"]);
-        testInlineAgainstLineFormatting("codeInline", formattingFunction);
+        testBasicInlineFormatting(formattingFunction, OpUtils.code);
+        testStackedInlineFormatting("code", formattingFunction, ["bold", "italic", "strike", "link"]);
+        testInlineAgainstLineFormatting("code", formattingFunction);
     });
 
     describe("h2()", () => {
@@ -91,15 +97,24 @@ describe("Formatter", () => {
 
     describe("codeBlock()", () => {
         const formattingFunction = (range = getFullRange()) => formatter.codeBlock(range);
-        testNoLineFormatInlinePreservation("codeBlock", formattingFunction, OpUtils.codeBlock());
-        testLineFormatExclusivity("codeBlock", formattingFunction, OpUtils.codeBlock());
+        testNoLineFormatInlinePreservation(CodeBlockBlot.blotName, formattingFunction, OpUtils.codeBlock());
+        testLineFormatExclusivity(CodeBlockBlot.blotName, formattingFunction, OpUtils.codeBlock());
         testCodeBlockFormatStripping(formattingFunction);
     });
 
     function assertQuillInputOutput(input: any[], expectedOutput: any[], formattingFunction: () => void) {
         quill.setContents(input, Quill.sources.USER);
         formattingFunction();
-        const result = quill.getContents().ops;
+
+        const stripRefs = op => {
+            if (op.attributes && op.attributes.header && op.attributes.header.ref) {
+                op.attributes.header.ref = "";
+            }
+            return op;
+        };
+        // Kludge out the dynamically generated refs.
+        const result = quill.getContents().ops!.map(stripRefs);
+        expectedOutput = expectedOutput.map(stripRefs);
         expect(result).deep.equals(expectedOutput);
     }
 
@@ -115,7 +130,7 @@ describe("Formatter", () => {
     function testStackedInlineFormatting(
         formatToTest: string,
         formatterFunction: () => void,
-        testAgainst: Exclude<Array<keyof typeof OpUtils>, "prototype">,
+        testAgainst: string[],
         enableValue: any = true,
     ) {
         describe(`Adding ${formatToTest} to existing inline formats`, () => {
@@ -236,7 +251,7 @@ describe("Formatter", () => {
                 {
                     insert: "asdf asdf @member  asdfasdf asl;dfjadasdf ",
                 },
-                { attributes: { codeBlock: true }, insert: "\n" },
+                { attributes: { [CodeBlockBlot.blotName]: true }, insert: "\n" },
             ];
             assertQuillInputOutput(initial, expected, formatterFunction);
         });

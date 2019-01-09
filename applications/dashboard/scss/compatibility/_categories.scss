@@ -1,3 +1,7 @@
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 // For accessibility, we add a generic heading above a category list. There's no good way to know if it's preceded by a heading, so if there is, we hide the generic heading. Note that it's already "visually hidden", but we hide it to screen readers.
 .categoryList-heading + .DataTableWrap > .categoryList-genericHeading {
     display: none;

@@ -1,0 +1,86 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+// Even columns. If you have uneven columns, make new component
+@mixin mediaQuery-columnsThreeCol_breakToOne {
+    @media (max-width: #{$evenColumns_threeColumns_breakToOne}) {
+        @content;
+    }
+}
+
+.columns {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+}
+
+.column {
+    flex-grow: 1;
+
+    padding: {
+        left: $global-gutter_quarterSize;
+        right: $global-gutter_quarterSize;
+    }
+
+    .widget {
+        display: flex;
+        width: 100%;
+        position: relative;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        min-height: 100%;
+    }
+
+    .widget-contents,
+    .widget-body {
+            display: flex;
+            width: 100%;
+            flex-grow: 1;
+            position: relative;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+    }
+
+    .widgetTitle {
+        @include singleLineEllipsis;
+    }
+
+    @include mediaQuery-columnsThreeCol_breakToOne {
+        + .column {
+            margin-top: $global-gutter_halfSize;
+        }
+    }
+}
+
+.columns-1 {
+    .column {
+        width: 100%;
+    }
+}
+
+.columns-2 {
+    .column {
+        width: 50%;
+    }
+}
+
+.columns-3 {
+    @include mediaQuery-columnsThreeCol_breakToOne {
+        flex-wrap: wrap;
+    }
+
+    .column {
+        width: $utility-percentage_third;
+        @include mediaQuery-columnsThreeCol_breakToOne {
+            width: 100%;
+        }
+    }
+}
+
+
+

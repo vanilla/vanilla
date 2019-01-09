@@ -1,25 +1,46 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 $siteNav-node_fontSize              : $global-medium_fontSize;
 $siteNav-node_color                 : $global-color_fg;
+
 $siteNav-nodeToggle_height          : $siteNav-node_fontSize * $global-condensed_lineHeight;
 $siteNav-nodeToggle_width           : $global-gutter_size;
-$siteNav-node_active_bg             : mix($global-color_fg, $global-color_bg, 10%);
+$siteNav-nodeToggleIcon_width       : 7px;
+
+$siteNav-spacer_width               : 7px;
+
+$siteNav-node_active_color          : $link-default_color;
 $siteNav-node_borderWidth           : 1px;
 $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWidth;
 
 .siteNav {
     position: relative;
     display: block;
+    z-index: 1;
+
+    margin-top: #{$siteNav-nodeToggle_height / 2 - $siteNav-node_fontSize / 2};
+
+    @include mediaQuery-panelLayout_noBleed {
+        margin-left: #{($siteNav-nodeToggle_width - $siteNav-nodeToggleIcon_width) / 2 - $siteNav-spacer_width};
+    }
+}
+
+.siteNav-title {
+    font-size: $global-large_fontSize;
+    font-weight: $global-fontWeight_bold;
 }
 
 .siteNav-children {
     position: relative;
     display: block;
+}
+
+.siteNavNode-children {
+    margin-left: $siteNav-spacer_width;
 }
 
 
@@ -30,22 +51,23 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     justify-content: flex-start;
     flex-wrap: nowrap;
     font-size: $siteNav-node_fontSize;
+    color: $siteNav-node_color;
 
     &.isCurrent {
-        background-color: $siteNav-node_active_bg;
+        color: $siteNav-node_active_color;
+        font-weight: $global-fontWeight_bold;
     }
 }
 
 .siteNavNode-contents {
     display: block;
     width: 100%;
-    max-width: calc(100% - #{$siteNav-nodeToggle_width});
 }
 
 .siteNavNode-link {
     display: block;
     flex-grow: 1;
-    color: $siteNav-node_color;
+    color: inherit;
     line-height: $global-condensed_lineHeight;
     outline: 0;
 
@@ -54,16 +76,21 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
         outline: 0;
         .siteNavNode-label {
             border: {
-                color: $global-color_primary;
+                color: $link-default_color;
             }
         }
     }
 
+    &:hover {
+        color: $link-default_color;
+    }
+
     &.hasChildren {
-        font-weight: $global-semiBold_fontWeight;
+        font-weight: $global-fontWeight_semiBold;
 
         &.isFirstLevel {
-            font-weight: $global-bold_fontWeight;
+            font-size: $global-large_fontSize;
+            font-weight: $global-fontWeight_bold;
         }
     }
 }
@@ -84,12 +111,16 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
         right: $siteNav-node_padding;
         left: $siteNav-nodeToggle_width - $siteNav-node_borderWidth;
     }
+
+    @include mediaQuery-panelLayout_oneColumn {
+        font-size: $global-large_fontSize;
+    }
 }
 
 .siteNavNode-spacer {
     display: block;
     height: $siteNav-nodeToggle_height;
-    width: $siteNav-nodeToggle_width;
+    width: $siteNav-spacer_width;
     margin: $utility-baseUnit 0;
 }
 
@@ -113,3 +144,10 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     width: $siteNav-nodeToggle_width;
 }
 
+
+.siteNavNode-buttonOffset {
+    display: flex;
+    justify-content: flex-end;
+    width: $siteNav-nodeToggle_width;
+    margin-left: -#{$siteNav-nodeToggle_width};
+}

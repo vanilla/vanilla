@@ -1,6 +1,15 @@
 import yargs from "yargs";
 import { getVanillaConfig } from "./utility/configUtils";
 
+export enum BuildMode {
+    DEVELOPMENT = "development",
+    PRODUCTION = "production",
+    ANALYZE = "analyze",
+    TEST = "test",
+    TEST_WATCH = "testwatch",
+    TEST_DEBUG = "testdebug",
+}
+
 yargs
     .option("verbose", {
         alias: "v",
@@ -16,7 +25,7 @@ yargs
         alias: "f",
         default: false,
     })
-    .options("disable-validation", {
+    .options("low-memory", {
         default: false,
     })
     .options("install", {
@@ -24,19 +33,12 @@ yargs
         default: false,
     });
 
-export const enum BuildMode {
-    DEVELOPMENT = "development",
-    PRODUCTION = "production",
-    ANALYZE = "analyze",
-    POLYFILLS = "polyfills",
-}
-
 export interface IBuildOptions {
     mode: BuildMode;
     verbose: boolean;
     fix: boolean;
     install: boolean;
-    disableValidation: boolean;
+    lowMemory: boolean;
     enabledAddonKeys: string[];
     configFile: string;
     phpConfig: any;
@@ -79,7 +81,7 @@ export async function getOptions(): Promise<IBuildOptions> {
         mode: yargs.argv.mode,
         verbose: yargs.argv.verbose,
         enabledAddonKeys,
-        disableValidation: yargs.argv["disable-validation"],
+        lowMemory: yargs.argv["low-memory"],
         configFile: yargs.argv.config,
         fix: yargs.argv.fix,
         phpConfig: config,

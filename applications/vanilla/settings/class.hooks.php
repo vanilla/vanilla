@@ -2,7 +2,7 @@
 /**
  * VanillaHooks Plugin
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @since 2.0
  * @package Vanilla
@@ -16,6 +16,45 @@ use Vanilla\Formatting\Embeds\EmbedManager;
  * Vanilla's event handlers.
  */
 class VanillaHooks implements Gdn_IPlugin {
+
+    /**
+     * Add to valid media attachment types.
+     *
+     * @param \Garden\Schema\Schema $schema
+     */
+    public function articlesPatchAttachmentSchema_init(\Garden\Schema\Schema $schema) {
+        $types = $schema->getField("properties.foreignType.enum");
+        $types[] = "comment";
+        $types[] = "discussion";
+        $schema->setField("properties.foreignType.enum", $types);
+    }
+
+    /**
+     * Verify the current user can attach a media item to a Vanilla post.
+     *
+     * @param bool $canAttach
+     * @param string $foreignType
+     * @param int $foreignID
+     * @return bool
+     */
+    public function canAttachMedia_handler(bool $canAttach, string $foreignType, int $foreignID): bool {
+        switch ($foreignType) {
+            case "comment":
+                $model = new CommentModel();
+                break;
+            case "discussion":
+                $model = new DiscussionModel();
+                break;
+            default:
+                return $canAttach;
+        }
+
+        $row = $model->getID($foreignID, DATASET_TYPE_ARRAY);
+        if (!$row) {
+            return false;
+        }
+        return ($row["InsertUserID"] === Gdn::session()->UserID || Gdn::session()->checkRankedPermission("Garden.Moderation.Manage"));
+    }
 
     /**
      * Counter rebuilding.
@@ -700,9 +739,18 @@ class VanillaHooks implements Gdn_IPlugin {
                 $discussionsCount = getValueR('User.CountDiscussions', $sender, null);
                 $commentsCount = getValueR('User.CountComments', $sender, null);
 
-                $discussionsLabel .= '<span class="Aside">'.countString(bigPlural($discussionsCount, '%s discussion'), "/profile/count/discussions?userid=$userID").'</span>';
-
-                $commentsLabel .= '<span class="Aside">'.countString(bigPlural($commentsCount, '%s comment'), "/profile/count/comments?userid=$userID").'</span>';
+                if (!is_null($discussionsCount) && !empty($discussionsCount)) {
+                    $discussionsLabel .=
+                        '<span class="Aside">' .
+                        countString(bigPlural($discussionsCount, '%s discussion'), "/profile/count/discussions?userid=$userID")
+                        . '</span>';
+                }
+                if (!is_null($commentsCount)  && !empty($commentsCount)) {
+                    $commentsLabel .=
+                        '<span class="Aside">' .
+                        countString(bigPlural($commentsCount, '%s comment'), "/profile/count/comments?userid=$userID") .
+                        '</span>';
+                }
             }
             $sender->addProfileTab(t('Discussions'), userUrl($sender->User, '', 'discussions'), 'Discussions', $discussionsLabel);
             $sender->addProfileTab(t('Comments'), userUrl($sender->User, '', 'comments'), 'Comments', $commentsLabel);

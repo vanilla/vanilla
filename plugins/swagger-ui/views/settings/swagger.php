@@ -55,8 +55,3 @@ helpAsset(t('Need More Help?'), ul([
 </svg>
 
 <div id="swagger-ui"></div>
-
-<?php
-foreach ($this->data('js') as $js) {
-    echo '<script src="'.htmlspecialchars($js).'" type="text/javascript"></script>'."\n";
-}

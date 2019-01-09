@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -15,12 +15,16 @@ interface IProps extends IOptionalComponentID {
     disabled?: boolean;
     prefix?: string;
     legacyMode?: boolean;
-    onClick?: () => void;
+    onClick?: (e) => void;
+    onKeyDown?: (e) => void;
     title?: string;
     ariaLabel?: string;
     baseClass?: ButtonBaseClass;
     ariaHidden?: boolean;
     tabIndex?: number;
+    lang?: string;
+    buttonRef?: React.RefObject<HTMLButtonElement>;
+    role?: string;
 }
 
 interface IState {
@@ -31,6 +35,7 @@ export enum ButtonBaseClass {
     STANDARD = "button",
     ICON = "buttonIcon",
     TEXT = "buttonAsText",
+    TAB = "buttonAsTab",
     CUSTOM = "",
 }
 
@@ -38,8 +43,8 @@ export enum ButtonBaseClass {
  * A stylable, configurable button component.
  */
 export default class Button extends React.Component<IProps, IState> {
-    public static defaultProps = {
-        id: false,
+    public static defaultProps: Partial<IProps> = {
+        id: undefined,
         disabled: false,
         type: "button",
         prefix: "button",
@@ -72,6 +77,10 @@ export default class Button extends React.Component<IProps, IState> {
                 aria-label={this.props.ariaLabel || this.props.title}
                 aria-hidden={this.props.ariaHidden}
                 tabIndex={this.props.tabIndex}
+                ref={this.props.buttonRef}
+                onKeyDown={this.props.onKeyDown}
+                lang={this.props.lang}
+                role={this.props.role}
             >
                 {this.props.children}
             </button>

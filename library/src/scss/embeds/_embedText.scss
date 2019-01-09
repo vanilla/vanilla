@@ -1,8 +1,18 @@
-$embedText-header_fontSize: $userContent_fontSize !default;
-$embedText-title_fontWeight: $global-bold_fontWeight !default;
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$embedText-header_fontSize: $global-medium_fontSize !default;
+$embedText-title_fontWeight: $global-fontWeight_bold !default;
 $embedText-content_boxShadowColor: rgba($global-color_fg, .3) !default;
 $embedText-content_bg: #ffffff !default;
 $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !default;
+
+.embedText {
+    font-size: $global-medium_fontSize;
+}
+
 
 .embedText-content {
     display: block;
@@ -37,20 +47,6 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
     justify-content: flex-start;
     font-size: $embedText-header_fontSize;
     line-height: $global-condensed_lineHeight;
-    //margin-bottom: $utility-baseUnit;
-}
-
-.embedText-titleLink,
-.embedText-title {
-    display: block;
-    width: 100%;
-    padding: 0;
-    font-size: $embedText-header_fontSize;
-    line-height: $global-condensed_lineHeight;
-    font-weight: $embedText-title_fontWeight;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .embedText-titleLink {
@@ -59,18 +55,26 @@ $embedText-content_boxShadow: 0 1px 3px 0 $embedText-content_boxShadowColor !def
 }
 
 .embedText { // for compatibility
+    .embedText-titleLink,
     .embedText-title {
         margin: {
-            top: #{(1 - $global-condensed_lineHeight) * .5em} !important;
-            right: 0;
-            bottom: #{$userContent_fontSize / 2.2};
-            left: 0;
+            top: 0;
+            bottom: $embedded-small_spacing;
         }
+        display: block;
+        width: 100%;
+        padding: 0;
+        font-size: $embedText-header_fontSize;
+        font-weight: $embedText-title_fontWeight;
+        line-height: $global-condensed_lineHeight;
+        color: $global-color_fg;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 
 // Edit Mode
-
 .richEditor {
     .embedText-titleLink {
         pointer-events: none;

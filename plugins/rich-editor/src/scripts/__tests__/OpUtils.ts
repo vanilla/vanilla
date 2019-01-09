@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -46,7 +46,7 @@ export default class OpUtils {
     public static strike(content: string = "TEST") {
         return OpUtils.op(content, { [StrikeBlot.blotName]: true });
     }
-    public static codeInline(content: string = "TEST") {
+    public static code(content: string = "TEST") {
         return OpUtils.op(content, { [CodeBlot.blotName]: true });
     }
     public static link(href: string = OpUtils.DEFAULT_LINK, content: string = "TEST") {
@@ -56,7 +56,7 @@ export default class OpUtils {
         return OpUtils.op(lineContent, { [CodeBlockBlot.blotName]: true });
     }
     public static heading(level: number = 2, lineContent: string = "\n") {
-        return OpUtils.op(lineContent, { [HeadingBlot.blotName]: level });
+        return OpUtils.op(lineContent, { [HeadingBlot.blotName]: { level, ref: "" } });
     }
     public static quoteLine(lineContent: string = "\n") {
         return OpUtils.op(lineContent, { [BlockquoteLineBlot.blotName]: true });
@@ -91,8 +91,8 @@ export const inlineFormatOps = [
         name: "link",
     },
     {
-        op: OpUtils.codeInline(),
-        name: "codeInline",
+        op: OpUtils.code(),
+        name: "code",
     },
 ];
 export const blockFormatOps = [

@@ -1,8 +1,10 @@
 /*!
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+
+$richEditor-scrollContainer_overshoot: 48px;
 
 .richEditor {
     position: relative;
@@ -16,6 +18,9 @@
 
     &.inheritHeight {
         display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+
 
         .richEditor-text,
         .richEditor-textWrap,
@@ -27,26 +32,34 @@
     }
 }
 
+.richEditor-scrollContainer {
+    position: relative;
+    overflow: auto;
+    height: 100%;
+    width: calc(100% + #{$richEditor-scrollContainer_overshoot * 2});
+    margin-left: -$richEditor-scrollContainer_overshoot;
+    padding: {
+        left: $richEditor-scrollContainer_overshoot;
+        right: $richEditor-scrollContainer_overshoot;
+    }
+}
+
 .richEditor-frame {
-    &.InputBox {
+    position: relative;
+    background: $richEditor_bg;
+    height: auto;
+    padding: 0;
+
+
+    &.isMenuInset {
+        overflow: initial;
         position: relative;
-        background: $richEditor_bg;
-        height: auto;
-        padding: 0;
     }
 }
 
 .richEditor-menu {
     display: inline-block;
     position: relative;
-    background-color: $global-color_bg;
-    border: {
-        radius: $global-borderRadius;
-        color: $global-border_color;
-        style: $global-border_style;
-        width: $global-border_width;
-    }
-    box-shadow: $overlay-dropShadow;
 }
 
 .richEditorParagraphMenu {
@@ -55,10 +68,10 @@
     align-items: center;
     justify-content: center;
     top: $richEditor-pilcrow_offset;
-    left: 0;
+    left: $richEditor_horizontalPadding - $icon_default_size + 2px;
     transform: translateX(-100%);
     height: $richEditor-floatingButton_size;
-    width: $richEditor_horizontalPadding;
+    width: $icon_default_size;
     z-index: 1;
     animation: fadein $richEditor-pilcrowAnimation_duration ease;
     animation-iteration-count: 1;
@@ -69,6 +82,10 @@
                 cursor: default;
             }
         }
+    }
+
+    &.isMenuInset {
+        transform: none;
     }
 }
 
@@ -82,28 +99,15 @@
 .richEditor-text {
     position: relative;
     min-height: $richEditor_minHeight;
-    padding: {
-        top: $richEditor_verticalPadding;
-        right: $richEditor_innerPadding;
-        bottom: $richEditor_verticalPadding;
-        left: $richEditor_innerPadding;
-    }
     outline-color: transparent;
     white-space: pre-wrap !important; // Needed for spaces around embed blots to work properly!
-    overflow: auto;
-
-    &:focus {
-        outline: {
-            offset: $richEditor-text_offset;
-            style: solid;
-            width: $formElement_borderWidth;
-            color: $richEditor-outline_color;
-        }
-    }
 }
 
 .ql-clipboard {
     @include sr-only();
+
+    // Fixed https://github.com/quilljs/quill/issues/1374#issuecomment-415333651
+    position: fixed;
 }
 
 .richEditor-menuItems {
@@ -280,7 +284,7 @@
     max-width: $richEditor-insertLink_width;
     width: 100%;
     padding: {
-        left: 5px;
+        left: 9px;
     }
 }
 
@@ -319,6 +323,7 @@
 
 // Insert Media
 .richEditorFlyout {
+    @include shadow-dropDown;
     position: relative;
     overflow: hidden;
     background-color: $global-color_bg;
@@ -328,7 +333,6 @@
         style: $global-border_style;
         width: $global-border_width;
     }
-    box-shadow: $overlay-dropShadow;
     z-index: 6;
 
     .InputBox {
@@ -400,16 +404,15 @@
 }
 
 .insertMedia-insert {
-    margin-bottom: 3px;
+    width: auto;
 }
 
 .richEditorFlyout {
+    @include shadow-dropDown;
     position: absolute;
-    bottom: 100%;
     left: 0;
     width: #{$richEditor-flyout_paddingHorizontal * 2 + 7 * $richEditor-menuButton_size};
     border: $formElement-borderWidth $formElement-borderStyle $formElement_borderColor;
-    box-shadow: $overlay-dropShadow;
     background: $global-color_bg;
     border-radius: $global-borderRadius;
 }
@@ -527,7 +530,6 @@
 }
 
 
-
 // Emoji Groups
 
 .emojiGroups {
@@ -543,4 +545,9 @@
     padding: 0;
     width: $icon-default_size;
     size: $icon-default_size;
+}
+
+
+.richEditor-popoverDescription {
+    margin-bottom: .5em;
 }

@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,7 +9,7 @@
     @include generateStylesFromMap(map-get($buttonMap, "default"));
   }
 
-  &:not([disalbed]) {
+  &:not([disabled]) {
     &:hover {
       @include generateStylesFromMap(map-get($buttonMap, "hover"));
     }
@@ -21,7 +21,7 @@
 }
 
 @function inputLineHeight($height, $paddingTop, $fullBorderWidth) {
-  @return $height - (2 * $paddingTop);
+  @return $height - (2 * $paddingTop + $fullBorderWidth);
 }
 
 @mixin selectBoxSizing($height, $fontSize, $paddingSide) {
@@ -110,4 +110,13 @@
     color: $formElement_borderColor;
     style: solid;
   }
+
+    &.isInvalid {
+        border: {
+            color: $global-error_fg;
+        }
+
+        color: $global-error_fg;
+        background:  $global-error_bg;
+    }
 }

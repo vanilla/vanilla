@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -51,11 +51,14 @@ export default class CollapsableUserContent extends React.PureComponent<IProps, 
      */
     public componentDidMount() {
         this.calcMaxHeight();
-        window.addEventListener("resize", () =>
-            debounce(() => {
-                this.calcMaxHeight();
-            }, 200)(),
-        );
+        window.addEventListener("resize", this.windowResizerHandler);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public componentWillUnmount() {
+        window.removeEventListener("resize", this.windowResizerHandler);
     }
 
     /**
@@ -69,6 +72,14 @@ export default class CollapsableUserContent extends React.PureComponent<IProps, 
             this.calcMaxHeight();
         }
     }
+
+    /**
+     * Handle recalcuating the components max height in a debounced fashion.
+     */
+    private windowResizerHandler = () =>
+        debounce(() => {
+            window.requestAnimationFrame(() => this.calcMaxHeight());
+        }, 200)();
 
     /**
      * Calculate the exact pixel max height of the content around the threshold of preferredMaxHeight.

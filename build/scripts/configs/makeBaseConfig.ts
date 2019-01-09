@@ -5,14 +5,15 @@
  */
 
 import * as path from "path";
-import { VANILLA_ROOT, TS_CONFIG_FILE, TS_LINT_FILE, PRETTIER_FILE } from "../env";
+import webpack from "webpack";
+import { VANILLA_ROOT, PRETTIER_FILE } from "../env";
 import PrettierPlugin from "prettier-webpack-plugin";
-import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import { getOptions, BuildMode } from "../options";
 import chalk from "chalk";
 import { printVerbose } from "../utility/utils";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import EntryModel from "../utility/EntryModel";
+import WebpackBar from "webpackbar";
 
 /**
  * Create the core webpack config.
@@ -33,55 +34,33 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
 ${chalk.green(aliases)}`;
     printVerbose(message);
 
-    const extraTsLoaders =
-        options.mode === BuildMode.DEVELOPMENT
-            ? [
-                  {
-                      loader: "babel-loader",
-                      options: {
-                          babelrc: false,
-                          plugins: [
-                              require.resolve("react-hot-loader/babel"),
-                              require.resolve("babel-plugin-syntax-dynamic-import"),
-                          ],
-                      },
-                  },
-              ]
-            : [];
+    const babelPlugins: string[] = [];
+    if (options.mode === BuildMode.DEVELOPMENT) {
+        babelPlugins.push(require.resolve("react-hot-loader/babel"));
+    }
 
-    const config = {
+    const storybookLoaders = section === "storybook" ? [require.resolve("react-docgen-typescript-loader")] : [];
+
+    const config: any = {
         context: VANILLA_ROOT,
         module: {
             rules: [
                 {
-                    test: /\.jsx?$/,
-                    exclude: ["node_modules"],
-                    include: [
+                    test: /\.(jsx?|tsx?)$/,
+                    exclude: (modulePath: string) => {
                         // We need to transpile quill's ES6 because we are building from source.
-                        /\/node_modules\/quill/,
-                    ],
+                        return /node_modules/.test(modulePath) && !/node_modules\/quill\//.test(modulePath);
+                    },
                     use: [
                         {
                             loader: "babel-loader",
                             options: {
                                 presets: [require.resolve("@vanillaforums/babel-preset")],
+                                plugins: babelPlugins,
                                 cacheDirectory: true,
                             },
                         },
-                    ],
-                },
-                {
-                    test: /\.tsx?$/,
-                    exclude: ["node_modules"],
-                    use: [
-                        ...extraTsLoaders,
-                        {
-                            loader: "ts-loader",
-                            options: {
-                                happyPackMode: true,
-                                configFile: TS_CONFIG_FILE,
-                            },
-                        },
+                        ...storybookLoaders,
                     ],
                 },
                 {
@@ -102,7 +81,11 @@ ${chalk.green(aliases)}`;
                 {
                     test: /\.s?css$/,
                     use: [
-                        options.mode === BuildMode.DEVELOPMENT ? "style-loader" : MiniCssExtractPlugin.loader,
+                        [BuildMode.DEVELOPMENT, BuildMode.TEST, BuildMode.TEST_DEBUG, BuildMode.TEST_WATCH].includes(
+                            options.mode,
+                        )
+                            ? "style-loader"
+                            : MiniCssExtractPlugin.loader,
                         {
                             loader: "css-loader",
                             options: {
@@ -128,7 +111,12 @@ ${chalk.green(aliases)}`;
                 },
             ],
         },
-        plugins: [] as any[],
+        performance: { hints: false },
+        plugins: [
+            new webpack.DefinePlugin({
+                __BUILD__SECTION__: JSON.stringify(section),
+            }),
+        ] as any[],
         resolve: {
             modules: modulePaths,
             alias: {
@@ -153,16 +141,6 @@ ${chalk.green(aliases)}`;
         },
     };
 
-    if (!options.disableValidation) {
-        config.plugins.push(
-            new ForkTsCheckerWebpackPlugin({
-                tsconfig: TS_CONFIG_FILE,
-                tslint: TS_LINT_FILE,
-                checkSyntacticErrors: true,
-            }),
-        );
-    }
-
     if (options.mode === BuildMode.PRODUCTION) {
         config.plugins.push(
             new MiniCssExtractPlugin({
@@ -173,6 +151,15 @@ ${chalk.green(aliases)}`;
 
     if (options.fix) {
         config.plugins.unshift(getPrettierPlugin());
+    }
+
+    // This is the only flag we are given by infrastructure to indicate we are in a lower memory environment.
+    if (!options.lowMemory) {
+        config.plugins.push(
+            new WebpackBar({
+                name: section,
+            }),
+        );
     }
 
     return config;

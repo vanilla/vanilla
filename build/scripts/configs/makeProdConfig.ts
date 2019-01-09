@@ -5,12 +5,12 @@
  */
 
 import path from "path";
-import webpack, { Configuration } from "webpack";
+import { Configuration } from "webpack";
 import { DIST_DIRECTORY } from "../env";
 import { getOptions, BuildMode } from "../options";
 import { makeBaseConfig } from "./makeBaseConfig";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
-import UglifyJsPlugin from "uglifyjs-webpack-plugin";
+import TerserWebpackPlugin from "terser-webpack-plugin";
 import OptimizeCSSAssetsPlugin from "optimize-css-assets-webpack-plugin";
 import EntryModel from "../utility/EntryModel";
 
@@ -37,7 +37,7 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
         path: path.join(DIST_DIRECTORY, section),
         library: `vanilla${section}`,
     };
-    baseConfig.devtool = "source-map";
+    baseConfig.devtool = "cheap-source-map";
     baseConfig.optimization = {
         noEmitOnErrors: true,
         namedModules: false,
@@ -81,28 +81,26 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
             },
         },
         minimizer: [
-            new UglifyJsPlugin({
+            new TerserWebpackPlugin({
                 cache: true,
+                // Exclude swagger-ui from minification which is a large bundle and costly to minify.
+                exclude: /swagger-ui/,
+                terserOptions: {
+                    warnings: false,
+                    ie8: false,
+                },
                 parallel: true,
                 sourceMap: true, // set to true if you want JS source maps
             }),
-            new OptimizeCSSAssetsPlugin({}),
+            new OptimizeCSSAssetsPlugin({ cssProcessorOptions: { map: { inline: false, annotations: true } } }),
         ],
     };
 
-    baseConfig.plugins!.push(
-        new webpack.DefinePlugin({
-            __BUILD__SECTION__: JSON.stringify(section),
-        }),
-    );
-
     // Spawn a bundle size analyzer. This is super usefull if you find a bundle has jumped up in size.
     if (options.mode === BuildMode.ANALYZE) {
-        baseConfig.plugins!.push(
-            new BundleAnalyzerPlugin({
-                analyzerPort: analyzePort,
-            }),
-        );
+        baseConfig.plugins!.push(new BundleAnalyzerPlugin({
+            analyzerPort: analyzePort,
+        }) as any);
         analyzePort++;
     }
 

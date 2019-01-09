@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -49,6 +49,12 @@ export default function instanceReducer(
                 ...state,
                 [action.payload.editorID]: defaultInstance,
             };
+        }
+        case instanceActions.DELETE_INSTANCE: {
+            validateIDExistance(state, action);
+            const newState = { ...state };
+            delete newState[action.payload.editorID];
+            return newState;
         }
         case instanceActions.SET_SELECTION: {
             validateIDExistance(state, action);

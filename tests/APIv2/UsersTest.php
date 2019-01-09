@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -190,7 +190,13 @@ class UsersTest extends AbstractResourceTest {
             "userID" => 0,
             "name" => "Guest",
             "photoUrl" => \UserModel::getDefaultAvatarUrl(),
-            "dateLastActive" => null
+            "dateLastActive" => null,
+            "isAdmin" => false,
+            "permissions" => [
+                "activity.view",
+                "discussions.view",
+                "profiles.view",
+            ],
         ];
         $actual = $response->getBody();
 
@@ -214,7 +220,39 @@ class UsersTest extends AbstractResourceTest {
             "userID" => $userID,
             "name" => $user["Name"],
             "photoUrl" => userPhotoUrl($user),
-            "dateLastActive" => $dateLastActive
+            "dateLastActive" => $dateLastActive,
+            "isAdmin" => true,
+            "permissions" => [
+                "activity.delete",
+                "activity.view",
+                "advancedNotifications.allow",
+                "applicants.manage",
+                "comments.add",
+                "comments.delete",
+                "comments.edit",
+                "community.manage",
+                "community.moderate",
+                "conversations.add",
+                "curation.manage",
+                "discussions.add",
+                "discussions.announce",
+                "discussions.close",
+                "discussions.delete",
+                "discussions.edit",
+                "discussions.sink",
+                "discussions.view",
+                "email.view",
+                "personalInfo.view",
+                "profiles.edit",
+                "profiles.view",
+                "settings.view",
+                "signIn.allow",
+                "site.manage",
+                "uploads.add",
+                "users.add",
+                "users.delete",
+                "users.edit",
+            ],
         ];
         $actual = $response->getBody();
 

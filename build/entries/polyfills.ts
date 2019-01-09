@@ -8,7 +8,7 @@
  * @license GPL-2.0-only
  */
 
-import "babel-polyfill";
+import "@babel/polyfill";
 
 /**
  * Polyfill forEach on NodeList.
@@ -20,7 +20,7 @@ import "babel-polyfill";
  * https://developer.mozilla.org/en-US/docs/Web/API/NodeList/forEach#Polyfill
  */
 function polyfillNodeListForEach() {
-    if (window.NodeList && !NodeList.prototype.forEach) {
+    if (NodeList && !NodeList.prototype.forEach) {
         NodeList.prototype.forEach = function forEach(callback, thisArg) {
             thisArg = thisArg || window;
             for (let i = 0; i < this.length; i++) {
@@ -41,13 +41,14 @@ function polyfillNodeListForEach() {
  */
 export function polyfillClosest() {
     if (!Element.prototype.matches) {
-        Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+        Element.prototype.matches =
+            (Element as any).prototype.msMatchesSelector || (Element as any).prototype.webkitMatchesSelector;
     }
 
     if (!Element.prototype.closest) {
         Element.prototype.closest = function closest(s) {
             let el = this;
-            if (!document.documentElement.contains(el)) {
+            if (document.documentElement && !document.documentElement.contains(el)) {
                 return null;
             }
             do {

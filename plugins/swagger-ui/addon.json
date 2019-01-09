@@ -2,7 +2,7 @@
     "key": "swagger-ui",
     "name": "API v2 Docs",
     "description": "API v2 documentation customized for your community right in your dashboard.",
-    "version": "1.0",
+    "version": "1.1",
     "license": "GPLv2",
     "type": "addon",
     "oldType": "plugin",
@@ -16,8 +16,5 @@
         }
     ],
     "icon": "swagger.png",
-    "build": {
-        "processVersion": "v1"
-    },
     "hidden": true
 }

@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -14,7 +14,7 @@ export default class FullPageLoader extends React.Component {
     public render() {
         return (
             <React.Fragment>
-                <div className="fullPageLoader" aria-hidden="true" />
+                <div className="loader" aria-hidden="true" />
                 <h1 className="sr-only">{t("Loading")}</h1>
             </React.Fragment>
         );

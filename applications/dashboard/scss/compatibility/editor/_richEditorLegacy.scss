@@ -1,5 +1,5 @@
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -7,10 +7,13 @@
     color: $global-color_fg;
     padding-left: $richEditor_horizontalPadding;
 
-
     blockquote {
         display: block;
         margin: 0;
+    }
+
+    .richEditorParagraphMenu {
+        left: 0;
     }
 }
 
@@ -72,6 +75,17 @@
         *:last-child {
             margin-bottom: 0;
         }
+    }
+}
+
+.richEditor-menu {
+    @include shadow-embed;
+    background-color: $global-color_bg;
+    border: {
+        radius: $global-borderRadius;
+        color: $global-border_color;
+        style: $global-border_style;
+        width: $global-border_width;
     }
 }
 
@@ -226,8 +240,21 @@ body.hasRichEditor {
 
 .richEditor-text {
     overflow: visible;
+    padding: {
+        top: $richEditor_verticalPadding;
+        right: $richEditor_innerPadding;
+        bottom: $richEditor_verticalPadding;
+        left: $richEditor_innerPadding;
+    }
+    &:focus {
+        outline: {
+            offset: $richEditor-text_offset;
+            style: solid;
+            width: $formElement_borderWidth;
+            color: $richEditor-outline_color;
+        }
+    }
 }
-
 
 // Mobile
 body.isMobile {
@@ -238,4 +265,6 @@ body.isMobile {
     @include legacyMobileStyles();
 }
 
-
+.richEditorFlyout {
+    bottom: 100%;
+}

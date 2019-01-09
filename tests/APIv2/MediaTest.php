@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -21,6 +21,25 @@ class MediaTest extends AbstractAPIv2Test {
 
     /** @var string */
     private $baseUrl = '/media';
+
+    /**
+     * Test updating a media item's attachment state.
+     */
+    public function testPatchAttachment() {
+        $row = $this->testPost();
+        $mediaID = $row["responseBody"]["mediaID"];
+
+        // Attachments default as "embed" and to the current user. Try attaching to a discussion.
+        $updatedAttachment = [
+            "foreignID" => 1,
+            "foreignType" => "discussion",
+        ];
+        $result = $this->api()->patch(
+            "{$this->baseUrl}/{$mediaID}/attachment",
+            $updatedAttachment
+        );
+        $this->assertArraySubset($updatedAttachment, $result->getBody());
+    }
 
     /**
      * Test posting.

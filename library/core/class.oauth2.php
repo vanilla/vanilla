@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Patrick Kelly <patrick.k@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  * @package Core
  * @since 2.0
@@ -920,7 +920,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
     /**
      * When DB_Logger is turned on, log SSO data.
-     * 
+     *
      * @param $message
      * @param $data
      */

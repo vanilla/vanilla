@@ -1,28 +1,34 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
 import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
-import MenuItem, { IMenuItemData } from "@rich-editor/components/toolbars/pieces/MenuItem";
+import { IMenuItemData } from "@rich-editor/components/toolbars/pieces/MenuItem";
 import { t } from "@library/application";
-import * as icons from "@rich-editor/components/icons";
-
+import * as icons from "@library/components/icons/editorIcons";
 import Formatter from "@rich-editor/quill/Formatter";
 import { IFormats, RangeStatic } from "quill/core";
+import classNames from "classnames";
 
 interface IProps {
     formatter: Formatter;
     activeFormats: IFormats;
     lastGoodSelection: RangeStatic;
     onLinkClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+    className?: string;
 }
 
 export default class InlineToolbarMenuItems extends React.PureComponent<IProps> {
     public render() {
-        return <MenuItems menuItemData={this.menuItemData} menuItemsClass="richEditor-inlineToolbarContainer" />;
+        return (
+            <MenuItems
+                menuItemData={this.menuItemData}
+                className={classNames("richEditor-inlineToolbarContainer", this.props.className)}
+            />
+        );
     }
 
     private get menuItemData(): IMenuItemData[] {
@@ -50,7 +56,7 @@ export default class InlineToolbarMenuItems extends React.PureComponent<IProps> 
             {
                 label: t("Format as Inline Code"),
                 icon: icons.code(),
-                isActive: activeFormats.codeInline === true,
+                isActive: activeFormats.code === true,
                 onClick: this.formatCode,
             },
             {

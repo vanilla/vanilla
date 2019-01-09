@@ -2,7 +2,7 @@
 /**
  * Activity Model.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0
@@ -1618,6 +1618,19 @@ class ActivityModel extends Gdn_Model {
         }
 
         return $activity;
+    }
+
+    /**
+     * Update a single activity's notification fields to reflect a read status.
+     *
+     * @param int $activityID
+     */
+    public function markSingleRead(int $activityID) {
+        $this->SQL->put(
+            "Activity",
+            ["Notified" => self::SENT_OK, "Emailed" => self::SENT_OK],
+            ["ActivityID" => $activityID]
+        );
     }
 
     /**

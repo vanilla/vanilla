@@ -3,7 +3,7 @@
  * Gdn_Model.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0
@@ -960,5 +960,50 @@ class Gdn_Model extends Gdn_Pluggable {
         }
 
         return $canEdit;
+    }
+
+    /**
+     * Locks a resource so that it can only be accessed one at a time.
+     *
+     * @param string $lockKey Cache key to be assigned.
+     * @param int $gracePeriod Period of time the key will stay valid.
+     * @return bool Whether a master key has been assigned.
+     */
+    protected static function buildCacheLock(string $lockKey, int $gracePeriod = 60): bool {
+        // If caching isn't enabled bail out
+        $cacheEnabled = Gdn_Cache::activeEnabled();
+        if (!$cacheEnabled) {
+            return true;
+        }
+
+        /**
+         * Attempt to add lock using our process ID. A failure likely means the
+         * cache key already exists, which would mean the lock is already in place.
+         */
+        $instanceKey = getmypid();
+        $added = Gdn::cache()->add($lockKey, $instanceKey, [
+            Gdn_Cache::FEATURE_EXPIRY => $gracePeriod
+        ]);
+        if ($added) {
+            return true;
+        } else {
+            return ($instanceKey === Gdn::cache()->get($lockKey));
+        }
+    }
+
+    /**
+     * Releases a locked resource so that it can be used again.
+     *
+     * @param string $lockKey Cache key to be assigned.
+     * @return bool Whether a master key has been released.
+     */
+    protected function releaseCacheLock(string $lockKey): bool {
+        // If caching isn't enabled bail out
+        $cacheEnabled = Gdn_Cache::activeEnabled();
+        if (!$cacheEnabled) {
+            return true;
+        }
+        $keyReleased = Gdn::cache()->remove($lockKey);
+        return $keyReleased;
     }
 }

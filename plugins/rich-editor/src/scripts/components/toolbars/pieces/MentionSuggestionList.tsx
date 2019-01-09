@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -48,7 +48,7 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
         const { mentionSelection } = this.props;
 
         const hasResults = mentionProps.length > 0 || showLoader;
-        const classes = classNames("richEditor-menu", "atMentionList-items");
+        const classes = classNames("richEditor-menu", "atMentionList-items", "likeDropDownContent");
         const isVisible = hasResults && (!!mentionSelection || this.hasFocusedElement);
 
         return (

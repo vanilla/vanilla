@@ -1,19 +1,21 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
 import classNames from "classnames";
-import { IOptionalComponentID } from "../../componentIDs";
-import Button from "@library/components/forms/Button";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import { IOptionalComponentID } from "@library/componentIDs";
 
 interface IProps extends IOptionalComponentID {
     children: React.ReactNode;
     className?: string;
     disabled?: boolean;
     legacyMode?: boolean;
+    baseClass?: ButtonBaseClass;
+    tabIndex?: number;
 }
 
 export default class ButtonSubmit extends React.Component<IProps, IOptionalComponentID> {
@@ -43,6 +45,8 @@ export default class ButtonSubmit extends React.Component<IProps, IOptionalCompo
                 className={componentClasses}
                 prefix="submitButton"
                 legacyMode={this.props.legacyMode}
+                baseClass={this.props.baseClass}
+                tabIndex={this.props.tabIndex}
             >
                 {this.props.children}
             </Button>

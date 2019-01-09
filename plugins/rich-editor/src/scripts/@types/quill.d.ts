@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -293,6 +293,8 @@ declare module "quill/modules/clipboard" {
     import { DeltaStatic, Sources } from "quill/core";
     import Module from "quill/core/module";
     export default class ClipboardModule extends Module {
+        public container: HTMLElement;
+
         addMatcher(
             selectorOrNodeType: string | number,
             callback: (node: any, delta: DeltaStatic) => DeltaStatic | undefined,
@@ -373,7 +375,21 @@ declare module "quill/modules/keyboard" {
         addBinding(key: KeyBinding | string | number, context: Context, handler: KeyboardHandler): void;
     }
 }
-declare module "quill/modules/syntax";
+declare module "quill/modules/syntax" {
+    import { DeltaStatic, Sources } from "quill/core";
+    import Module from "quill/core/module";
+    import BaseCodeBlock from "quill/formats/code";
+
+    export class CodeBlock extends BaseCodeBlock {}
+
+    export const CodeToken: any;
+
+    export default class SyntaxModule extends Module {
+        public container: HTMLElement;
+        public static register();
+        public highlight();
+    }
+}
 declare module "quill/modules/toolbar";
 declare module "quill/formats/*";
 declare module "quill-delta";

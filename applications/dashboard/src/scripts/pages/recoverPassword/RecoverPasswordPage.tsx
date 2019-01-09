@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,7 +10,7 @@ import DocumentTitle from "@library/components/DocumentTitle";
 import React from "react";
 import ButtonSubmit from "@library/components/forms/ButtonSubmit";
 import Paragraph from "@library/components/Paragraph";
-import InputTextBlock from "@dashboard/components/forms/InputTextBlock";
+import InputTextBlock from "@library/components/forms/InputTextBlock";
 import uniqueId from "lodash/uniqueId";
 import { IStoreState, IRequestPasswordState } from "@dashboard/@types/state";
 import { IRequestPasswordOptions } from "@dashboard/@types/api";
@@ -81,11 +81,13 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
                         />
                         <InputTextBlock
                             label={t("Email")}
-                            required={true}
-                            disabled={!this.allowEdit}
+                            inputProps={{
+                                required: true,
+                                value: this.state.email,
+                                onChange: this.handleEmailChange,
+                                disabled: !this.allowEdit,
+                            }}
                             errors={getFieldErrors(this.props.requestPasswordState, "email")}
-                            value={this.state.email}
-                            onChange={this.handleEmailChange}
                             ref={this.emainInput}
                         />
                         <ButtonSubmit disabled={!this.allowEdit || this.state.email.length === 0} legacyMode={true}>
@@ -135,9 +137,9 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
     }
 }
 
-function mapStateToProps({ users }: IStoreState) {
+function mapStateToProps({ authenticate }: IStoreState) {
     return {
-        requestPasswordState: users.requestPassword,
+        requestPasswordState: authenticate.password,
     };
 }
 

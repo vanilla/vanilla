@@ -1,12 +1,11 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import TabHandler from "@library/TabHandler";
 import { expect } from "chai";
-import sinon from "sinon";
 
 describe("TabHandler", () => {
     it("can find a tabbable element", () => {

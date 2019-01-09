@@ -1,13 +1,13 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import Quill from "quill/core";
 import Inline from "quill/blots/inline";
 import { t } from "@library/application";
-import { IUserFragment } from "@dashboard/@types/api/user";
+import { IUserFragment } from "@library/@types/api";
 
 /**
  * A Blot to represent text that is being matched for an autocomplete.

@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,6 +8,7 @@ import React from "react";
 import classNames from "classnames";
 import CloseButton from "@library/components/CloseButton";
 import { IWithEditorProps, withEditor } from "@rich-editor/components/context";
+import { flyoutPosition } from "./flyoutPosition";
 
 interface IState {
     id: string;
@@ -30,6 +31,9 @@ interface IProps extends IWithEditorProps {
     className?: string;
     titleRef?: React.Ref<any>;
     onCloseClick(event?: React.MouseEvent<any>);
+    renderAbove?: boolean;
+    renderLeft?: boolean;
+    legacyMode: boolean;
 }
 
 export class Popover extends React.Component<IProps, IState> {
@@ -84,6 +88,7 @@ export class Popover extends React.Component<IProps, IState> {
                 className={classes}
                 role="dialog"
                 aria-hidden={!this.props.isVisible}
+                style={flyoutPosition(!!this.props.renderAbove, !!this.props.renderLeft, this.props.legacyMode)}
             >
                 {alertMessage}
                 <div className={headerClasses}>

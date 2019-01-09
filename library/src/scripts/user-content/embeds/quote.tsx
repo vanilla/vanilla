@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -11,6 +11,7 @@ import CollapsableUserContent from "@library/user-content/CollapsableContent";
 import uniqueId from "lodash/uniqueId";
 import classnames from "classnames";
 import api from "@library/apiv2";
+import DateTime from "@library/components/DateTime";
 
 export function initQuoteEmbeds() {
     registerEmbedComponent("quote", QuoteEmbed as any);
@@ -123,13 +124,7 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
                         <span className="embedQuote-userName">{insertUser.name}</span>
                     </a>
                     <a href={this.quoteData.url} className="embedQuote-metaLink">
-                        <time
-                            className="embedText-dateTime embedQuote-dateTime meta"
-                            dateTime={this.dateTime}
-                            title={this.titleTime}
-                        >
-                            {this.humanTime}
-                        </time>
+                        <DateTime timestamp={this.dateTime} className="embedText-dateTime embedQuote-dateTime meta" />
                     </a>
 
                     {this.state.needsCollapseButton && (
@@ -208,28 +203,5 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
      */
     private get dateTime(): string {
         return this.quoteData.dateUpdated || this.quoteData.dateInserted;
-    }
-
-    /**
-     * Get the title of the time tag (long extended date)
-     */
-    private get titleTime(): string {
-        const date = new Date(this.dateTime);
-        return date.toLocaleString(undefined, {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            weekday: "long",
-            hour: "numeric",
-            minute: "numeric",
-        });
-    }
-
-    /**
-     * Get a shorter human readable time for the time tag.
-     */
-    private get humanTime(): string {
-        const date = new Date(this.dateTime);
-        return date.toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric" });
     }
 }

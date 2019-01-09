@@ -1,11 +1,11 @@
 /**
  * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import * as React from "react";
-import debounce from "lodash/debounce";
+import throttle from "lodash/throttle";
 
 export enum Devices {
     MOBILE = "mobile",
@@ -50,6 +50,8 @@ export default class DeviceChecker extends React.Component<IDeviceCheckerProps> 
                 case "3":
                     device = Devices.NO_BLEED;
                     break;
+                default:
+                    device = Devices.DESKTOP;
             }
             return device;
         } else {
@@ -57,19 +59,38 @@ export default class DeviceChecker extends React.Component<IDeviceCheckerProps> 
         }
     }
 
+    /**
+     * There's a bug in webpack and there's no way to know the styles have loaded from webpack. In debug mode,
+     */
     public componentDidMount() {
-        window.addEventListener("resize", e => {
-            debounce(
-                () => {
-                    window.requestAnimationFrame(data => {
-                        this.props.doUpdate();
-                    });
-                },
-                100,
-                {
-                    leading: true,
-                },
-            )();
-        });
+        window.addEventListener("resize", this.throttledUpdateOnResize);
+        if (module.hot) {
+            setTimeout(() => {
+                window.dispatchEvent(new Event("resize"));
+            }, 1000);
+        }
     }
+
+    /**
+     * @inheritDoc
+     */
+    public componentWillUnmount() {
+        window.removeEventListener("resize", this.throttledUpdateOnResize);
+    }
+
+    /**
+     * Call the props update function when the window resizes.
+     */
+    private updateOnResize = () => {
+        window.requestAnimationFrame(data => {
+            this.props.doUpdate();
+        });
+    };
+
+    /**
+     * A throttled version of updateOnResize.
+     */
+    private throttledUpdateOnResize = throttle(this.updateOnResize, 100, {
+        leading: true,
+    });
 }

@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -47,7 +47,7 @@ export class VideoEmbed extends BaseEmbed<IEmbedProps, IState> {
                     type="button"
                     data-url={embedUrl}
                     aria-label={name || undefined}
-                    className="embedVideo-playButton iconButton"
+                    className="embedVideo-playButton"
                 >
                     <img
                         onClick={this.clickHandler}

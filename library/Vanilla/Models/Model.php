@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -58,6 +58,25 @@ class Model implements InjectableInterface {
     protected function configureWriteSchema(Schema $schema): Schema {
         // Child classes can make adjustments as necessary.
         return $schema;
+    }
+
+    /**
+     * Delete resource rows.
+     *
+     * @param array $where Conditions to restrict the deletion.
+     * @param array $options Options for the delete query.
+     *    - limit (int): Limit on the results to be deleted.
+     * @throws Exception If an error is encountered while performing the query.
+     * @return bool True.
+     */
+    public function delete(array $where, array $options = []): bool {
+        // Lazy load schemas.
+        $this->ensureSchemas();
+        $limit = $options["limit"] ?? false;
+
+        $this->sql()->delete($this->table, $where, $limit);
+        // If fully executed without an exception bubbling up, consider this a success.
+        return true;
     }
 
     /**
@@ -127,7 +146,7 @@ class Model implements InjectableInterface {
      *    - offset (int): Row offset before capturing the result.
      * @return array
      * @throws ValidationException If a row fails to validate against the schema.
-     * @throws Exception If no rows could be found.
+     * @throws NoResultsException If no rows could be found.
      */
     public function selectSingle(array $where = [], array $options = []): array {
         $options["limit"] = 1;

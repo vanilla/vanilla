@@ -9,10 +9,13 @@
         "sourceMap": true,
         "lib": ["es2017"],
         "baseUrl": ".",
+        "isolatedModules": false,
         "paths": {
             "happypack": ["scripts/@types/happypack"],
             "prettier-webpack-plugin": ["scripts/@types/prettier-webpack-plugin"],
-          }
+            "terser-webpack-plugin": ["scripts/@types/terser-webpack-plugin"],
+            "react-docgen-typescript-webpack-plugin": ["scripts/@types/react-docgen-typescript-webpack-plugin"]
+        }
     },
     "include": ["scripts/**/*.ts"],
 }

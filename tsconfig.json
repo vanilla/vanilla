@@ -3,17 +3,17 @@
         "allowJs": true,
         "jsx": "react",
         "lib": [
-            "es2017",
+            "es2018",
             "dom",
             "dom.iterable"
         ],
         "allowSyntheticDefaultImports": true,
         "moduleResolution": "node",
         "strictNullChecks": true,
-        "target": "es5",
+        "target": "esnext",
         "module": "esnext",
+        "isolatedModules": false,
         "baseUrl": ".",
-        "downlevelIteration": true,
         "paths": {
             "@library/*": ["./library/src/scripts/*"],
             "@vanilla/*": ["./applications/vanilla/src/scripts/*"],
@@ -28,7 +28,11 @@
         ],
         "skipLibCheck": true,
         "sourceMap": true,
-        "inlineSourceMap": false,
+        "plugins": [
+            {
+                "name": "typescript-tslint-plugin",
+            }
+        ]
     },
     "include": [
         "**/*.ts",

@@ -1,28 +1,34 @@
-@import "./node_modules/swagger-ui/dist/swagger-ui";
-
 .swagger-ui {
-  .body-param-options { display: none; }
-
-  .opblock {
-    box-shadow: none;
-    border-radius: 3px;
-    margin: 0 0 9px;
-
-    .opblock-section-header {
-      label { display: none; }
+    .body-param-options {
+        display: none;
     }
 
-    .opblock-summary-method {
-      font-size: 13px;
-      border-radius: 2px;
-      font-weight: normal;
+    .info {
+      display: none;
     }
-  }
 
-  .opblock-tag {
-    font-size: 18px;
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-left: 2px;
-  }
+    .opblock {
+        box-shadow: none;
+        border-radius: 3px;
+        margin: 0 0 9px;
+
+        .opblock-section-header {
+            label {
+                display: none;
+            }
+        }
+
+        .opblock-summary-method {
+            font-size: 13px;
+            border-radius: 2px;
+            font-weight: normal;
+        }
+    }
+
+    .opblock-tag {
+        font-size: 18px;
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-left: 2px;
+    }
 }

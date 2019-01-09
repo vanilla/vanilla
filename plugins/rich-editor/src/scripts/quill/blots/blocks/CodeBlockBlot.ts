@@ -1,25 +1,31 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import CodeBlock from "quill/formats/code";
-import Text from "quill/blots/text";
-import Break from "quill/blots/break";
-import Cursor from "quill/blots/cursor";
+import BaseCodeBlock from "quill/formats/code";
+import { CodeBlock } from "quill/modules/syntax";
 
 export default class CodeBlockBlot extends CodeBlock {
-    public static blotName = "codeBlock";
-    public static tagName = "code";
-    public static className = "codeBlock";
-    public static allowedChildren = [Text, Break, Cursor];
-
     public static create(value) {
         const domNode = super.create(value) as HTMLElement;
         domNode.setAttribute("spellcheck", false);
         domNode.classList.add("code");
         domNode.classList.add("codeBlock");
         return domNode;
+    }
+
+    ///
+    /// This is a patch to get the fix actually provided in
+    /// https://github.com/quilljs/quill/commit/ba9f820514ce7c268ce58bbe6d1c4e8f77bf056f
+    ///
+    /// Moving to Quill 2.0 upon release shall render this unnecessary.
+    ///
+    private baseCodeBlockReplace = BaseCodeBlock.prototype.replaceWith.bind(this);
+    public replaceWith(format, value) {
+        this.domNode.innerHTML = this.domNode.textContent || "";
+        this.attach();
+        return this.baseCodeBlockReplace(format, value);
     }
 }

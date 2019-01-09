@@ -1,7 +1,7 @@
 /**
  * Utilities and types for handling unique and/or required HTML ids in react components.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,7 +9,7 @@ import uniqueId from "lodash/uniqueId";
 
 // Optional ID
 export interface IOptionalComponentID {
-    id?: string | boolean;
+    id?: string;
 }
 
 // Requires ID
@@ -18,12 +18,12 @@ export interface IRequiredComponentID {
 }
 
 // Generates unique ID from suffix
-export function uniqueIDFromPrefix(suffix: string) {
-    return (suffix + uniqueId()) as string;
+export function uniqueIDFromPrefix(prefix: string) {
+    return (prefix + uniqueId()) as string;
 }
 
 // Get required ID, will either return ID given through props or generate unique ID from suffix
-export function getRequiredID(props: IRequiredComponentID, suffix: string): string {
+export function getRequiredID(props: IOptionalComponentID, suffix: string): string {
     if (props.id) {
         return props.id;
     } else {

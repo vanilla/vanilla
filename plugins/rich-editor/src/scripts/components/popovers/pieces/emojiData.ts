@@ -9,7 +9,7 @@
  * Transformation applied: Manually copying/pasting out the groups.
  *
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -22,7 +22,7 @@ import {
     emojiGroup_objects,
     emojiGroup_symbols,
     emojiGroup_flags,
-} from "@rich-editor/components/icons";
+} from "@library/components/icons/emojiGroups";
 
 export const EMOJI_GROUPS = [
     {

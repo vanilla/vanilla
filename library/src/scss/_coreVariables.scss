@@ -1,5 +1,5 @@
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -24,7 +24,6 @@ $global-color_transparent                            : transparent;
 $global-color_fg                                     : #555a62 !default;
 $global-color_bg                                     : #fff !default;
 $global-color_primary                                : #0291db !default;
-$global-color_active_primaryBg                       : rgba($global-color_primary, .05) !default; // Derived
 $global-color_secondary                              : darken($global-color_primary, 10%) !default; // Derived
 $global-color_warning                                : #ffce00 !default;
 
@@ -39,7 +38,7 @@ $global-body_bg                                      : $global-color_bg !default
 $global-border_color                                 : mix($global-color_fg, $global-color_bg, 24%) !default; // Note it's off by default due to the border width
 $global-border-width                                 : 1px;
 $global-border-style                                 : solid;
-$global_borderRadius                                 : 2px !default;
+$global_borderRadius                                 : 6px !default;
 
 /* -------------------------------------------------------------- *\
     States
@@ -48,13 +47,14 @@ $global_borderRadius                                 : 2px !default;
 $state-icon_opacity                                  : .6;
 $state-text_opacity                                  : .75;
 
-$state-hover_color                                   : mix($global-color_primary, $global-color_bg, 5.5%) !default; // rgba(174, 228, 255, 0.2);
+$state-hover_color                                   : mix($global-color_primary, $global-color_bg, 10%) !default; // rgba(174, 228, 255, 0.2);
 $state-hover_opacity                                 : 1 !default;
 
 $state-focus_color                                   : mix($global-color_primary, $global-color_bg, 12%) !default; // rgba(174, 228, 255, 0.4);
 $state-focus_opacity                                 : 1 !default;
 $state-focus_outline                                 : none !default;
 
+$global-color_active_primaryBg                       : rgba($global-color_primary, .05) !default; // Derived
 $state-active_color                                  : mix($global-color_primary, $global-color_bg, 95%) !default; // #0075f5
 $state-active_opacity                                : 1 !default;
 
@@ -95,6 +95,8 @@ $global-medium_fontSize                              : 14px !default;
 $global-small_fontSize                               : 12px !default;
 
 $global-title_fontSize                               : 32px !default;
+$global-smallTitle_fontSize                          : 20px !default;
+$global-title_mobile_fontSize                        : 26px !default;
 $global-subTitle_fontSize                            : 18px !default;
 
 $userContent_fontSize                                : $global-medium_fontSize !default; // 14 for forums, but 16 for KB
@@ -108,30 +110,32 @@ $userContent-fontSizeH6                              : .85em !default;
 
 $global-heading_topMargin                            : 1.5 * $global-medium_fontSize;
 
-$global-normal_fontWeight                            : 400 !default;
-$global-semiBold_fontWeight                          : 600 !default;
-$global-bold_fontWeight                              : 700 !default;
+$global-fontWeight_normal                            : 400 !default;
+$global-fontWeight_semiBold                          : 600 !default;
+$global-fontWeight_bold                              : 700 !default;
 
 $global-block_margin                                 : $userContent_fontSize !default;
 
 $global-base_lineHeight                              : 1.5 !default;
 $global-condensed_lineHeight                         : 1.25 !default;
+$global-code_lineHeight                              : 1.45 !default;
+$global-excerpt_lineHeight                           : 1.45 !default;
 
 $global_spacer                                       : $userContent_fontSize * $global-base_lineHeight;
 
 $global-heading_fontFamily                           : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
-$global-heading_fontWeight                           : $global-bold_fontWeight !default; // Derived
-$global-heading_lineHeightRatio                      : .8;
+$global-heading_fontWeight                           : $global-fontWeight_bold !default; // Derived
+$global-heading_lineHeightRatio                      : .91;
+
 
 $global-body_fontFamily                              : "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
-$global-body_fontWeight                              : $global-normal_fontWeight !default; // Derived
+$global-body_fontWeight                              : $global-fontWeight_normal !default; // Derived
 $global-body_lineHeightRatio                         : $global-heading_lineHeightRatio;
 
-$link_default-color                                  : $global-color_primary !default;
-$link_default_hover-color                            : $global-color_secondary !default;
-$link_default_focus-color                            : $global-color_secondary !default;
-$link_default_visited-color                          : mix($global-color_secondary, $global-color_fg, 90%) !default;
-
+$link-default_color                                  : $global-color_primary !default;
+$link-default_hover_color                            : $global-color_secondary !default;
+$link-default_focus_color                            : $global-color_secondary !default;
+$link-default_visited_color                          : mix($global-color_secondary, $global-color_fg, 90%) !default;
 
 /* -------------------------------------------------------------- *\
     Animation
@@ -147,25 +151,35 @@ $global-default_easing                               : ease-out !default;
 $icon-large_size                                     : 32px !default;
 $icon-default_size                                   : 24px !default;
 $icon-small_size                                     : 16px !default;
+$icon_color                                          : mix($global-color_bg, $global-color_fg, 18%) !default;
+
+/* -------------------------------------------------------------- *\
+    User Photo
+\* -------------------------------------------------------------- */
+
+$userPhoto_borderRadius                              : 50%;
+$userPhoto-small_width                               : 28px;
+$userPhoto-medium_width                              : 40px;
+$userPhoto-large_width                               : 100px;
 
 /* -------------------------------------------------------------- *\
     Layout
 \* -------------------------------------------------------------- */
 
-$global-gutter_size                                  : $global_spacer;
+$global-gutter_size                                  : 24px;
 $global-gutter_halfSize                              : $global-gutter_size / 2;
 $global-gutter_quarterSize                           : $global-gutter_size / 4;
 
-$global-panel_spacerOuter                            : 36px !default;
-$global-panel_width                                  : 226px !default;
-$global-panel_paddedWidth                            : $global-panel_width + $global-panel_spacerOuter !default;
+$global-panel_width                                  : 216px !default;
+$global-panel_paddedWidth                            : $global-panel_width + $global-gutter_size * 2 !default;
 
-$global-middleColumn_width                           : 660px;
+$global-middleColumn_width                           : 672px;
+$global-middleColumn_paddedWidth                     : $global-middleColumn_width + $global-gutter_size;
 
-$global-main_width                                   : $global-panel_paddedWidth * 2 + $global-middleColumn_width !default;
-$global-main_paddedWidth                             : $global-main_width + 2 * $global-gutter_size !default;  // Derived
+$global-content_width                                : $global-panel_paddedWidth * 2 + $global-middleColumn_paddedWidth + $global-gutter_size * 3; // *3 from margin between columns and half margin on .container
 
-$global-twoColumn_breakpoint                         : 900px !default; // Generic breakpoint for 2 columns
+$global-twoColumn_breakpoint                         : 1200px !default; // Generic breakpoint for 2 columns
+$global-xs_breakpoint                                : 500px !default;
 
 // Hard coded columns
 $evenColumns_breakpoint                              : $global-twoColumn_breakpoint !default;
@@ -200,7 +214,8 @@ $component-titleBar_viewMoreColor                    : mix($global-color_bg, $gl
 \* -------------------------------------------------------------- */
 
 // Global
-$global-widgetInner_padding                          : $global-gutter_halfSize !default; // sections of widget
+$global-widgetInnerVertical_padding                  : $global-gutter_halfSize !default; // sections of widget
+$global-widgetInnerHorizontal_padding                : $global-gutter_quarterSize !default; // sections of widget
 $global-widgetSection-gap                            : 0 !default; // Between widget sections
 $global-widget_gap                                   : $global-gutter_halfSize !default; // Between widgets
 $global-widget_bg                                    : transparent !default;
@@ -223,41 +238,6 @@ $widget_borderRadius                                 : $global-widgetBorder_radi
 // Widget Contents - no padding on this guy, comes from wrapper or sub sections
 $widget-contents_bg                                  : $global-widget_bg !default;
 
-// Widget Head
-$widget-head_topPadding                              : $global-widgetInner_padding !default;
-$widget-head_rightPadding                            : $global-widgetInner_padding !default;
-$widget-head_bottomPadding                           : $global-widgetInner_padding !default;
-$widget-head_leftPadding                             : $global-widgetInner_padding !default;
-$widget-head_bg                                      : $global-widget_bg !default;
-$widget-head_fg                                      : $global-widget_fg !default;
-$widget-head_gap                                     : $global-widgetSection-gap !default;  // Bottom Margin
-$widget-head_borderColor                             : $global-widgetBorder_color !default;
-$widget-head_borderWidth                             : 0 !default;
-$widget-head_borderRadius                            : $global-widgetBorder_radius !default;
-
-// Widget Body
-$widget-body_topPadding                              : $global-widgetInner_padding !default;
-$widget-body_bottomPadding                           : $global-widgetInner_padding !default;
-$widget-body_leftPadding                             : $global-widgetInner_padding !default;
-$widget-body_rightPadding                            : $global-widgetInner_padding !default;
-$widget-body_bg                                      : transparent !default;
-$widget-body_fg                                      : $global-widget_fg !default;
-$widget-body_borderColor                             : $global-widgetBorder_color !default;
-$widget-body_borderWidth                             : 0 !default;
-$widget-body_borderRadius                            : $global-widgetBorder_radius !default;
-
-// Widget Footer
-$widget-footer_topPadding                            : $global-widgetInner_padding !default;
-$widget-footer_bottomPadding                         : $global-widgetInner_padding !default;
-$widget-footer_leftPadding                           : $global-widgetInner_padding !default;
-$widget-footer_rightPadding                          : $global-widgetInner_padding !default;
-$widget-footer_bg                                    : transparent !default;
-$widget-footer_fg                                    : $global-widget_fg !default;
-$widget-footer_gap                                   : $global-widgetSection-gap !default; // Top Margin
-$widget-footer_borderColor                           : $global-widgetBorder_color !default;
-$widget-footer_borderWidth                           : 0 !default;
-$widget-footer_borderRadius                          : $global-widgetBorder_radius !default;
-
 
 
 /* -------------------------------------------------------------- *\
@@ -267,13 +247,20 @@ $widget-footer_borderRadius                          : $global-widgetBorder_radi
 $formElement_borderWidth                             : 1px !default;
 $formElement_fullBorderWidth                         : $formElement_borderWidth * 2;
 $formElement_height                                  : $utility-baseUnit * 6; // Derived
-$formElement_margin                                  : $utility-baseUnit * 4; // Derived
+$formElement_margin                                  : $utility-baseUnit * 2; // Derived
 $formElement_heightWithBorder                        : $formElement_height + 2 * $formElement_borderWidth; // Derived
 $formElement_borderColor                             : $global-border_color !default; // Derived
 $formElement_borderStyle                             : solid;
 $formElement_borderRadius                            : $global_borderRadius !default;
+
+// For Home Page
 $formElement_giantInput_height                       : 82px !default;
 $formElement_giantInput_fontSize                     : 24px !default;
+
+// For Search
+$formElement_largeInput_height                       : 48px !default;
+$formElement_largeInput_fontSize                     : 16px !default;
+
 $formElement_halfHeight                              : $formElement_height / 2 !default; // Derived
 $formElement-borderWidthFull                         : $formElement_borderWidth * 2 !default; // Derived
 $formElement_horizontalPadding                       : $utility-baseUnit * 2 !default; // Derived
@@ -300,23 +287,27 @@ $formElement-panel_boxShadow                         : 0 1px 3px 0 $formElement-
 
 $formElement-disabled_opacity                        : .5 !default;
 
+$buttonToIconMargin                                  : ($formElement_height - $icon_default_size) / 2; // To align sides of icon with padding of parent
+
 /* -------------------------------------------------------------- *\
     Overlays (Menus, flyouts and Modals)
 \* -------------------------------------------------------------- */
 
 @function getBlackOrWhiteBasedOnColor($color) {
     @if (lightness($color) > 50) {
-        @return white; // Lighter backgorund
+        @return white; // Lighter background
     } @else {
-        @return black; // Darker backgorund
+        @return black; // Darker background
     }
 }
 
 $overlay_bgColor                                        : rgba(getBlackOrWhiteBasedOnColor($global-color_fg), .2)!default;
 $overlay-dropShadow_color                               : $overlay_bgColor !default;
-$overlay-border_color                                   : mix($global-color_fg, $global-color_bg, 5%) !default;
+$overlay-border_color                                   : mix($global-color_fg, $global-color_bg, 15%) !default;
 $overlay-dropShadow                                     : 0 5px 10px $overlay_bgColor !default;
 $overlay-borderRadius                                   : $global_borderRadius !default;
+
+$overlay-fullPageHeading_spacer                         : 32px;
 
 /* -------------------------------------------------------------- *\
     Buttons
@@ -325,6 +316,8 @@ $overlay-borderRadius                                   : $global_borderRadius !
 // Icon Button Size
 
 $buttonIcon_size                                     : 36px !default;
+
+$buttonIcon-iconPadding_offset                       : ($buttonIcon_size - $icon-default_size) / 2;
 
 // Global Button options
 
@@ -406,15 +399,15 @@ $buttonPrimary: (
 \* -------------------------------------------------------------- */
 
 $metaText_fontSize                                   : $global-small_fontSize;
-$metaText_color                                      : mix($global-color_fg, $global-color_bg, 80%) !default;
-$metaText_margin                                     : $utility-baseUnit !default;
+$metaText_color                                      : mix($global-color_fg, $global-color_bg, 85%) !default;
+$metaText_margin                                     : 4px !default;
 
 /* -------------------------------------------------------------- *\
       Thumbnails
 \* -------------------------------------------------------------- */
 
-$thumbnail-border_color: mix($global-color_fg, $global-color_bg, 10%) !default; // Derived
-$thumbnail-border_width: 0;
+$thumbnail-border_color                             : mix($global-color_fg, $global-color_bg, 10%) !default; // Derived
+$thumbnail-border_width                             : 0;
 
 /* -------------------------------------------------------------- *\
     Separators
@@ -436,35 +429,54 @@ $selectBox-separator_color                          : $global-separator_color !d
     DropDown
 \* -------------------------------------------------------------- */
 
-$dropDown_width                                : 250px;
-$dropDown_borderRadius                         : 1px;
-$dropDown_bg                                   : $global-color_bg;
+$dropDown_width                                     : 250px;
+$dropDown_borderRadius                              : 1px;
+$dropDown_bg                                        : $global-color_bg;
 
-$dropDown-metas_verticalPadding                : 6px;
-$dropDown-metas_horizontalPadding              : 18px;
+$dropDown-metas_verticalPadding                     : 6px;
+$dropDown-metas_horizontalPadding                   : 18px;
 
-$dropDown-item_verticalPadding                 : 6px;
-$dropDown-item_horizontalPadding               : 18px;
+$dropDown-item_verticalPadding                      : 6px;
+$dropDown-item_horizontalPadding                    : 18px;
 
-$dropDown-item_minHeight                       : 45px;
+$dropDown-item_minHeight                            : 30px;
+$dropDown-item_mobile_minHeight                     : 32px;
+
+$dropDown-item_mobile_fontSize                      : 16px;
 
 /* -------------------------------------------------------------- *\
     Header
 \* -------------------------------------------------------------- */
+@function getBgDependingOnContrastColor($fgColor, $colorToModify, $mixAmount) {
+    @if (lightness($fgColor) > 50) {
+        @return mix(#000, $colorToModify, $mixAmount); // Light text, so darken color
+    } @else {
+        @return mix(#fff, $colorToModify, $mixAmount); // Light text, so darken color
+    }
+}
 
-$global-header_height                               : 50px !default;
+$vanillaHeader_height                               : 48px !default;
+$vanillaHeader_mobile_height                        : 44px !default;
+$vanillaHeader_fg                                   : $global-color_bg !default;
+$vanillaHeader_bg                                   : $global-color_primary !default;
+$vanillaHeader-spacer_width                         : 12px;
+$vanillaHeader-button_borderRadius                  : 3px;
+$vanillaHeader-button_size                          : 40px;
+$vanillaMenu-guest_spacer                           : 8px !default;
+$vanillaMenu-signIn_bg                              : getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%) !default;
+$vanillaMenu-signIn_bg                              : getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%) !default;
+
+/* -------------------------------------------------------------- *\
+    Compact Me Box
+\* -------------------------------------------------------------- */
+
+$compactMeBox-tab_height                            : 44px !default;
 
 /* -------------------------------------------------------------- *\
     Footer
 \* -------------------------------------------------------------- */
 
 $global-footer_height                               : 50px !default;
-
-/* -------------------------------------------------------------- *\
-    Embedded content
-\* -------------------------------------------------------------- */
-
-$embeddedText_padding                               : $global-medium_fontSize;
 
 /* -------------------------------------------------------------- *\
     user content

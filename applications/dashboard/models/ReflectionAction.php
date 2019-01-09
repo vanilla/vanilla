@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -295,7 +295,7 @@ class ReflectionAction {
             if (empty($summary) && $allIn instanceof Schema) {
                 $summary = $allIn->getDescription();
             }
-            $inArr = $in->jsonSerialize();
+            $inArr = $this->jsonSerializeSchema($in);
             $allInArr = $allIn !== null ? $allIn->jsonSerialize() : [];
             unset($inArr['description']);
 
@@ -355,14 +355,14 @@ class ReflectionAction {
             $status = $this->httpMethod === 'POST' && empty($this->idParam) ? '201' : '200';
 
             $responses[$status]['description'] = $out->getDescription() ?: 'Success';
-            $responses[$status]['schema'] = $out->jsonSerialize();
+            $responses[$status]['schema'] = $this->jsonSerializeSchema($out);
         } else {
             $status = $this->httpMethod === 'POST' && empty($this->idParam) ? '201' : '204';
             $responses[$status]['description'] = 'Success';
         }
 
         $r = [
-            'tags' => [ucfirst($this->resource)],
+            'tags' => [$this->getNiceResourceName()],
             'summary' => $summary,
             'parameters' => array_values($this->params),
             'responses' => $responses
@@ -445,14 +445,11 @@ class ReflectionAction {
                 // Remove the boolean type from expand.
                 if ($key === 'expand' && count($sch['type']) === 2 && in_array('boolean', $sch['type'])) {
                     $sch['type'] = 'array';
-                    if (isset($sch['items']['enum'])) {
-                        $sch['items']['enum'][] = 'all';
-                    }
                     if (isset($sch['default'])) {
                         if ($sch['default'] === false) {
                             unset($sch['default']);
                         } elseif ($sch['default'] === 'true') {
-                            $sch['default'] = ['all'];
+                            $sch['default'] = [\Vanilla\ApiUtils::EXPAND_ALL];
                         }
                     }
                 }
@@ -474,21 +471,64 @@ class ReflectionAction {
      * @param callable $callback The callback to execute on each schema array.
      * @param int $depth The current depth.
      */
-    private function walkSchemas(array &$array, callable $callback, $depth = 0) {
+    private function walkSchemas(array &$array, callable $callback, $depth = 0, array &$seen = null) {
+        if ($seen === null) {
+            $seen = [];
+        }
+
         foreach ($array as $key => &$value) {
             if (is_array($value)) {
                 if (isset($value['type']) && $key !== 'properties') {
                     $callback($value, $key, $array);
                 }
-                $this->walkSchemas($value, $callback, $depth + 1);
+                $this->walkSchemas($value, $callback, $depth + 1, $seen);
             } elseif ($value instanceof Schema) {
-                $arr = $value->getSchemaArray();
-                if (isset($value['type']) && $key !== 'properties') {
-                    $callback($arr, $key, $array);
+                $key = spl_object_hash($value);
+
+                if (!isset($seen[$key])) {
+                    $arr = $value->getSchemaArray();
+                    $seen[$key] = $arr['id'] ?? true;
+                    if (isset($value['type']) && $key !== 'properties') {
+                        $callback($arr, $key, $array);
+                    }
+                    $this->walkSchemas($arr, $callback, $depth + 1, $seen);
+                    $value->setField([], $arr);
+                } else {
+                    $foo = 'bar';
                 }
-                $this->walkSchemas($arr, $callback, $depth + 1);
-                $value->setField([], $arr);
             }
         }
+    }
+
+    /**
+     * Serialize a schema accounting for recursive schemas.
+     *
+     * @param Schema $schema The schema to serialize.
+     * @return mixed Returns a JSON serializable value.
+     */
+    private function jsonSerializeSchema(Schema $schema) {
+        // Fix recursive schemas.
+        $arr = $schema->getSchemaArray();
+
+        array_walk_recursive($arr, function (&$value, $key) use ($schema) {
+            if ($value === $schema) {
+                $value = ['$ref' => '#/definitions/'.$schema->getID()];
+            } elseif ($value instanceof Schema) {
+                $value = $this->jsonSerializeSchema($value);
+            }
+        });
+        $schema2 = new Schema($arr);
+
+        $jsonData = $schema2->jsonSerialize();
+        return $jsonData;
+    }
+
+    /**
+     * Generate  nice resource name from a dash-cased resource name.
+     *
+     * @return string Returns a resource name.
+     */
+    private function getNiceResourceName(): string {
+        return implode(' ', array_map('ucfirst', explode('-', $this->resource)));
     }
 }

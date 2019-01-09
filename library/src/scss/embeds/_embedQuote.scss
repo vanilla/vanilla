@@ -1,3 +1,8 @@
+/*!
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 $embedQuote-userPhoto_size        : 24px !default;
 $embedQuote-toggleButton_padding  : 12px !default;
 
@@ -24,7 +29,7 @@ $embedQuote-toggleButton_padding  : 12px !default;
     margin: 0 0 0 $metaText_margin;
     padding: 0;
     color: $metaText_color;
-    font-weight: $global-bold_fontWeight;
+    font-weight: $global-fontWeight_bold;
     font-size: $metaText_fontSize;
 }
 

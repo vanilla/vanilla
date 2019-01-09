@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -47,8 +47,6 @@ export default class ClipboardModule extends ClipboardBase {
         }
     }
 
-    public container: HTMLElement;
-
     constructor(quill, options) {
         super(quill, options);
         this.addMatcher(Node.TEXT_NODE, this.linkMatcher);
@@ -68,9 +66,11 @@ export default class ClipboardModule extends ClipboardBase {
         }
         const range = this.quill.getSelection();
         let delta = new Delta().retain(range.index);
+        const container = this.options.scrollingContainer;
 
         // THIS IS WHAT IS DIFFERENT
-        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        const scrollTop = document.documentElement!.scrollTop || document.body.scrollTop;
+        const containerTop = container ? container.scrollTop : 0;
         this.container.focus();
         (this.quill as any).selection.update(Quill.sources.SILENT);
         setImmediate(() => {
@@ -80,7 +80,10 @@ export default class ClipboardModule extends ClipboardBase {
             this.quill.setSelection((delta.length() - range.length) as any, Quill.sources.SILENT);
 
             // THIS IS WHAT IS DIFFERENT
-            document.documentElement.scrollTop = document.body.scrollTop = scrollTop;
+            document.documentElement!.scrollTop = document.body.scrollTop = scrollTop;
+            if (container) {
+                container.scrollTop = containerTop;
+            }
             this.quill.focus();
         });
     }

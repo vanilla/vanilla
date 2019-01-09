@@ -1,12 +1,12 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import * as React from "react";
 import className from "classnames";
-import { Link } from "react-router-dom";
+import SmartLink from "@library/components/navigation/SmartLink";
 
 interface IProps {
     className?: string;
@@ -27,7 +27,7 @@ export default class Breadcrumb extends React.Component<IProps> {
 
         return (
             <li className="breadcrumb">
-                <Link
+                <SmartLink
                     to={this.props.url}
                     title={this.props.name}
                     aria-current={ariaCurrent}
@@ -39,7 +39,7 @@ export default class Breadcrumb extends React.Component<IProps> {
                     <span className="breadcrumb-label" itemProp="name">
                         {this.props.name}
                     </span>
-                </Link>
+                </SmartLink>
             </li>
         );
     }

@@ -4,7 +4,7 @@
  *
  * Called by VanillaHooks::setup() to update database upon enabling app.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @since 2.0
  * @package Vanilla
@@ -439,6 +439,12 @@ if (!$captureOnly) {
     if (!$CountAllCommentsExists) {
         CategoryModel::instance()->counts('CountAllComments');
     }
+}
+
+// Override MaxLength settings that are too high for the database
+$maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
+if ($maxCommentLength > DiscussionModel::MAX_POST_LENGTH) {
+    saveToConfig('Vanilla.Comment.MaxLength', DiscussionModel::MAX_POST_LENGTH);
 }
 
 // Add stub content

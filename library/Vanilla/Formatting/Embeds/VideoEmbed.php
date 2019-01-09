@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -95,7 +95,7 @@ SVG;
 <div class="embedExternal embedVideo">
     <div class="embedExternal-content">
         <div class="{$containerAttr['class']}" style="{$containerAttr['style']}">
-            <button type="button" data-url="{$attr['url']}" aria-label="{$attr['name']}" class="embedVideo-playButton iconButton js-playVideo" title="{$attr['name']}">
+            <button type="button" data-url="{$attr['url']}" aria-label="{$attr['name']}" class="embedVideo-playButton js-playVideo" title="{$attr['name']}">
                 <img class="embedVideo-thumbnail" src="{$attr['photoUrl']}" role="presentation" alt="{$imgAlt}"/>
                 <span class="videoEmbed-scrim"/>
                 {$playButtonSVG}

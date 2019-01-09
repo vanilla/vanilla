@@ -2,7 +2,7 @@
 /**
  * OpenID Plugin.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package OpenID
  */
@@ -213,7 +213,6 @@ class OpenIDPlugin extends Gdn_Plugin {
             case 'id_res':
                 if ($OpenID->validate()) {
                     $Attributes = $OpenID->getAttributes();
-                    print_r($_GET);
                 }
 
                 break;

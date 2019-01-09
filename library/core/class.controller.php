@@ -5,12 +5,14 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0
  * @abstract
  */
+
+use \Vanilla\Web\Asset\LegacyAssetModel;
 
 /**
  * Controller base class.
@@ -363,6 +365,17 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
+     * Mapping of how certain legacy javascript files have been split up.
+     *
+     * If you include the key, all of the files in it's value will be included as well.
+     */
+    const SPLIT_JS_MAPPINGS = [
+        'global.js' => [
+            'flyouts.js',
+        ],
+    ];
+
+    /**
      * Adds a JS file to search for in the application or global js folder(s).
      *
      * @param string $fileName The js file to search for.
@@ -382,6 +395,13 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         $this->_JsFiles[] = $jsInfo;
+
+        if ($appFolder === '' && array_key_exists($fileName, self::SPLIT_JS_MAPPINGS)) {
+            $items = self::SPLIT_JS_MAPPINGS[$fileName];
+            foreach ($items as $item) {
+                $this->addJsFile($item, $appFolder, $options);
+            }
+        }
     }
 
     /**
@@ -629,10 +649,12 @@ class Gdn_Controller extends Gdn_Pluggable {
             'context' => [], 'ui' => []
         ];
 
+        $this->_Definitions['useNewFlyouts'] = \Vanilla\FeatureFlagHelper::featureEnabled('NewFlyouts');
+
         $this->_Definitions['context'] += [
             'host' => Gdn::request()->domain(),
             'basePath' => rtrim('/'.trim(Gdn::request()->webRoot(), '/'), '/'),
-            'assetPath' => rtrim('/'.trim(Gdn::request()->assetRoot(), '/'), '/'),
+            'assetPath' => rtrim('/'.trim(Gdn::request()->getAssetRoot(), '/'), '/'),
         ];
         $this->_Definitions['ui'] += [
             'siteName' => c('Garden.Title'),
@@ -1232,8 +1254,10 @@ class Gdn_Controller extends Gdn_Pluggable {
 
     /**
      * Stop the current action and re-authenticate, if necessary.
+     *
+     * @param array $options Setting key 'ForceTimeout' to `true` will ignore the cooldown window between prompts.
      */
-    public function reauth() {
+    public function reauth($options = []) {
         // Make sure we're logged in...
         if (Gdn::session()->UserID == 0) {
             return;
@@ -1252,7 +1276,8 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         // If the user has logged in recently enough, don't make them login again.
         $lastAuthenticated = Gdn::authenticator()->identity()->getAuthTime();
-        if ($lastAuthenticated > 0) {
+        $forceTimeout = $options['ForceTimeout'] ?? false;
+        if ($lastAuthenticated > 0 && !$forceTimeout) {
             $sinceAuth = time() - $lastAuthenticated;
             if ($sinceAuth < self::REAUTH_TIMEOUT) {
                 return;
@@ -1452,6 +1477,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $originHost = parse_url($origin, PHP_URL_HOST);
             if ($originHost && isTrustedDomain($originHost)) {
                 $this->setHeader('Access-Control-Allow-Origin', $origin);
+                $this->setHeader("Access-Control-Allow-Credentials", "true");
             }
         }
     }
@@ -1807,15 +1833,15 @@ class Gdn_Controller extends Gdn_Pluggable {
             // Only get css & ui Components if this is NOT a syndication request
             if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
 
-                $CssAnchors = AssetModel::getAnchors();
+                $CssAnchors = LegacyAssetModel::getAnchors();
 
                 $this->EventArguments['CssFiles'] = &$this->_CssFiles;
                 $this->fireEvent('BeforeAddCss');
 
-                $ETag = AssetModel::eTag();
+                $ETag = LegacyAssetModel::eTag();
                 $ThemeType = isMobile() ? 'mobile' : 'desktop';
-                /* @var \AssetModel $AssetModel */
-                $AssetModel = Gdn::getContainer()->get(\AssetModel::class);
+                /* @var LegacyAssetModel $AssetModel */
+                $AssetModel = Gdn::getContainer()->get(LegacyAssetModel::class);
 
                 // And now search for/add all css files.
                 foreach ($this->_CssFiles as $CssInfo) {
@@ -1837,7 +1863,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                     $AppFolder = $CssInfo['AppFolder'];
                     $LookupFolder = !empty($AppFolder) ? $AppFolder : $this->ApplicationFolder;
-                    $Search = AssetModel::cssPath($CssFile, $LookupFolder, $ThemeType);
+                    $Search = LegacyAssetModel::cssPath($CssFile, $LookupFolder, $ThemeType);
                     if (!$Search) {
                         continue;
                     }
@@ -1876,20 +1902,24 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                 $this->Head->addScript('', 'text/javascript', false, ['content' => $this->definitionList(false)]);
 
-                $busta = $AssetModel->cacheBuster();
+                // Webpack based scripts
+                /** @var \Vanilla\Web\Asset\WebpackAssetProvider $webpackAssetProvider */
+                $webpackAssetProvider = Gdn::getContainer()->get(\Vanilla\Web\Asset\WebpackAssetProvider::class);
 
-                // Add the client-side translations.
-                // This is done in the controller rather than the asset model because the translations are not linked to compiled code.
-                $localePath = $AssetModel->getJSLocalePath(Gdn::locale()->current());
-                $this->Head->addScript($localePath."?h=$busta", 'text/javascript', false, ['defer' => 'true']);
-
-                $polyfillContent = $AssetModel->getInlinePolyfillJSContent();
+                $polyfillContent = $webpackAssetProvider->getInlinePolyfillContents();
                 $this->Head->addScript(null, null, false, ["content" => $polyfillContent]);
 
                 // Add the built webpack javascript files.
-                $webpackJs = $AssetModel->getWebpackJsFiles($this->MasterView === 'admin' ? 'admin' : 'forum');
-                foreach ($webpackJs as $path) {
-                    $this->Head->addScript($path."?h=$busta", 'text/javascript', false, ['defer' => 'true']);
+                $section = $this->MasterView === 'admin' ? 'admin' : 'forum';
+                $jsAssets = $webpackAssetProvider->getScripts($section);
+                foreach ($jsAssets as $asset) {
+                    $this->Head->addScript($asset->getWebPath(), 'text/javascript', false, ['defer' => 'true']);
+                }
+
+                // The the built stylesheets
+                $styleAssets = $webpackAssetProvider->getStylesheets($section);
+                foreach ($styleAssets as $asset) {
+                    $this->Head->addCss($asset->getWebPath(), null, false);
                 }
 
                 foreach ($this->_JsFiles as $Index => $JsInfo) {
@@ -1905,7 +1935,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                     $AppFolder = $JsInfo['AppFolder'];
                     $LookupFolder = !empty($AppFolder) ? $AppFolder : $this->ApplicationFolder;
-                    $Search = AssetModel::jsPath($JsFile, $LookupFolder, $ThemeType);
+                    $Search = LegacyAssetModel::jsPath($JsFile, $LookupFolder, $ThemeType);
                     if (!$Search) {
                         continue;
                     }

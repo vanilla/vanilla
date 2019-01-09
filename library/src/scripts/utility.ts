@@ -2,7 +2,7 @@
  * General utility functions.
  * This file should have NO external dependencies other than javascript.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -122,6 +122,45 @@ export function hashString(str: string): number {
         return (prevHash << 5) - prevHash + currVal.charCodeAt(0);
     }
     return str.split("").reduce(hashReduce, 0);
+}
+
+type CompareReturn = -1 | 0 | 1;
+
+/**
+ * Utility for sorting values. Similar to the <=> operator in PHP.
+ *
+ * @param val1 The first value to compare.
+ * @param val2 The second value to compare.
+ *
+ * @returns -1, 0, or 1
+ */
+export function compare<T extends string | number>(val1: T, val2: T): CompareReturn {
+    if (typeof val1 === "string" && typeof val2 === "string") {
+        return val1.localeCompare(val2) as CompareReturn;
+    } else {
+        if (val1 > val2) {
+            return 1;
+        } else if (val1 < val2) {
+            return -1;
+        }
+        return 0;
+    }
+}
+
+/**
+ * Parse a string into a URL friendly format.
+ *
+ * Eg. Why Uber isn’t spelled Über -> why-uber-isnt-spelled-uber
+ *
+ * @param str The string to parse.
+ */
+export function slugify(str: string): string {
+    return str
+        .normalize("NFD") // Normalize accented characters into ASCII equivalents
+        .replace(/[^\w\s$*_+~.()'"!\-:@]/g, "") // REmove characters that don't URL encode well
+        .trim() // Trim whitespace
+        .replace(/[-\s]+/g, "-") // Normalize whitespace
+        .toLocaleLowerCase(); // Convert to locale aware lowercase.
 }
 
 /**
@@ -324,4 +363,31 @@ export function sanitizeUrl(url: string) {
     } else {
         return "unsafe:" + url;
     }
+}
+
+export enum OS {
+    IOS = "ios",
+    ANDROID = "android",
+    UNKNOWN = "unkwown",
+}
+
+/**
+ * Provide relatively rough detection of mobile OS.
+ *
+ * This is not even close to perfect but can be used to try and offer,
+ * OS specific input elements for things like datetimes.
+ */
+export function guessOperatingSystem(): OS {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+    if (/android/i.test(userAgent)) {
+        return OS.ANDROID;
+    }
+
+    // iOS detection from: http://stackoverflow.com/a/9039885/177710
+    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        return OS.IOS;
+    }
+
+    return OS.UNKNOWN;
 }

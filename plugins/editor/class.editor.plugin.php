@@ -3,7 +3,7 @@
  * Editor Plugin
  *
  * @author Dane MacMillan
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package editor
  */
@@ -544,7 +544,7 @@ class EditorPlugin extends Gdn_Plugin {
 
         // If user wants to modify styling of Wysiwyg content in editor,
         // they can override the styles with this file.
-        $cssInfo = AssetModel::cssPath('wysiwyg.css', 'plugins/editor');
+        $cssInfo = \Vanilla\Web\Asset\LegacyAssetModel::cssPath('wysiwyg.css', 'plugins/editor');
         if ($cssInfo) {
             $cssPath = asset($cssInfo[1]);
         }

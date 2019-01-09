@@ -1,7 +1,7 @@
 /**
  * Utilities that have a hard dependency on the DOM.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -28,7 +28,7 @@ export default class TabHandler {
      * @param excludedRoots - These element's children will be ignored.
      */
     public constructor(
-        root: Element = document.documentElement,
+        root: Element = document.documentElement!,
         private excludedElements: Element[] = [],
         private excludedRoots: Element[] = [],
     ) {
@@ -46,7 +46,7 @@ export default class TabHandler {
      * @param allowLooping - Whether or not the focus should loop around from beginning <-> end.
      */
     public getNext(
-        from: Element = document.activeElement,
+        from: Element | null = document.activeElement,
         reverse: boolean = false,
         allowLooping: boolean = true,
     ): HTMLElement | null {

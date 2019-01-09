@@ -1,20 +1,16 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
 import { t } from "@library/application";
 import getStore from "@library/state/getStore";
-import { log, debug } from "@library/utility";
+import { debug, log } from "@library/utility";
 import { delegateEvent, removeDelegatedEvent } from "@library/dom";
-import EmbedPopover from "@rich-editor/components/popovers/EmbedPopover";
-import EmojiPopover from "@rich-editor/components/popovers/EmojiPopover";
 import MentionToolbar from "@rich-editor/components/toolbars/MentionToolbar";
-import ParagraphToolbar from "@rich-editor/components/toolbars/ParagraphToolbar";
 import InlineToolbar from "@rich-editor/components/toolbars/InlineToolbar";
-import UploadButton from "@rich-editor/components/editor/pieces/EditorUploadButton";
 import { EditorProvider } from "@rich-editor/components/context";
 import EditorDescriptions from "@rich-editor/components/editor/pieces/EditorDescriptions";
 import { Provider as ReduxProvider } from "react-redux";
@@ -22,17 +18,26 @@ import { actions } from "@rich-editor/state/instance/instanceActions";
 import { getIDForQuill, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import { IStoreState } from "@rich-editor/@types/store";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
-import Quill, { Sources, DeltaOperation } from "quill/core";
+import Quill, { DeltaOperation, Sources, QuillOptionsStatic } from "quill/core";
 import { hot } from "react-hot-loader";
 import registerQuill from "@rich-editor/quill/registerQuill";
 import { uniqueId } from "lodash";
 import classNames from "classnames";
+import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
+import { Devices } from "@library/components/DeviceChecker";
+import ParagraphToolbar from "@rich-editor/components/toolbars/ParagraphToolbar";
+import throttle from "lodash/throttle";
+import EmbedBar from "@rich-editor/components/editor/pieces/EmbedBar";
+import hljs from "highlight.js";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
     isLoading?: boolean;
     onChange?: (newContent: DeltaOperation[]) => void;
     allowUpload: boolean;
+    device?: Devices;
+    initialValue?: DeltaOperation[];
+    reinitialize?: boolean;
 }
 
 interface ILegacyProps extends ICommonProps {
@@ -41,8 +46,8 @@ interface ILegacyProps extends ICommonProps {
 }
 
 interface INewProps extends ICommonProps {
-    legacyMode?: false;
     className?: string;
+    legacyMode: boolean;
 }
 
 type IProps = ILegacyProps | INewProps;
@@ -52,13 +57,21 @@ type IProps = ILegacyProps | INewProps;
  */
 export class Editor extends React.Component<IProps> {
     /** Ref for a dom node for quill to mount into. */
-    private quillMountRef: React.RefObject<HTMLDivElement> = React.createRef();
+    private quillMountRef = React.createRef<HTMLDivElement>();
+
+    /** Ref for the embedBar height */
+    private embedBarRef = React.createRef<HTMLDivElement>();
+
+    /** Ref for the scroll container */
+    private scrollContainerRef = React.createRef<HTMLDivElement>();
 
     /** The ID of the root rich editor node. */
     private domID: string = uniqueId("editor-");
 
     /** The redux store. */
     private store = getStore<IStoreState>();
+
+    private skipCallback = false;
 
     /**
      * The ID of our quill instance.
@@ -72,84 +85,149 @@ export class Editor extends React.Component<IProps> {
     /** The hash of our delegated quote event handler. Used to unset the handler on unmount. */
     private quoteHandler: string;
 
+    /**
+     * Render either the legacy or modern view for the editor.
+     */
     public render() {
-        // These items CANNOT be rendered before quill is ready, but the main text area is required for quill to render.
-        // These should all re-render after componentDidMount calls forceUpdate().
-        const quillDependantItems = this.quill && (
-            <React.Fragment>
-                {!this.props.isLoading && (
-                    <React.Fragment>
-                        <InlineToolbar />
-                        <ParagraphToolbar />
-                        <MentionToolbar />
-                    </React.Fragment>
+        return this.props.legacyMode ? this.renderLegacy() : this.renderModern();
+    }
+
+    /**
+     * The modern view is characterized by a contextual menu at the top and it's own scroll container.
+     */
+    private renderModern(): React.ReactNode {
+        const { className } = this.props as INewProps;
+        return (
+            <div
+                className={classNames("richEditor", className, { isDisabled: this.props.isLoading })}
+                aria-label={t("Type your message.")}
+                aria-describedby={this.descriptionID}
+                role="textbox"
+                aria-multiline={true}
+                id={this.domID}
+            >
+                {this.renderContexts(
+                    <>
+                        {this.renderEmbedBar()}
+                        <div className="richEditor-scrollFrame">
+                            <div className="richEditor-scrollContainer" ref={this.scrollContainerRef}>
+                                {/*<div className="richEditor-scrollable">*/}
+                                <div className={classNames("richEditor-frame InputBox isMenuInset")} id="testScroll">
+                                    {this.renderMountPoint()}
+                                    {this.renderInlineToolbars()}
+                                </div>
+                                {this.renderParagraphToolbar()}
+                                {/*</div>*/}
+                            </div>
+                        </div>
+                    </>,
                 )}
-
-                <div className="richEditor-embedBar">
-                    <ul
-                        className="richEditor-menuItems richEditor-inlineMenuItems"
-                        role="menubar"
-                        aria-label={t("Inline Level Formatting Menu")}
-                    >
-                        <li className="richEditor-menuItem u-richEditorHiddenOnMobile" role="menuitem">
-                            <EmojiPopover disabled={this.props.isLoading} />
-                        </li>
-                        {this.props.allowUpload && (
-                            <li className="richEditor-menuItem" role="menuitem">
-                                <UploadButton disabled={this.props.isLoading} />
-                            </li>
-                        )}
-                        <li className="richEditor-menuItem" role="menuitem">
-                            <EmbedPopover disabled={this.props.isLoading} />
-                        </li>
-                    </ul>
-                </div>
-            </React.Fragment>
+            </div>
         );
+    }
 
-        let mainContent = (
+    /**
+     * The legacy rendering mode has everything at the bottom, and uses the document as it's scroll container.
+     */
+    private renderLegacy(): React.ReactNode {
+        return this.renderContexts(
+            <div className={classNames("richEditor-frame", "InputBox")} id="testScroll">
+                {this.renderMountPoint()}
+                {this.renderParagraphToolbar()}
+                {this.renderInlineToolbars()}
+                {this.renderEmbedBar()}
+            </div>,
+        );
+    }
+
+    /**
+     * Render the elements that Quill will mount into.
+     */
+    private renderMountPoint(): React.ReactNode {
+        return (
+            <div className="richEditor-textWrap" ref={this.quillMountRef}>
+                <div
+                    className="ql-editor richEditor-text userContent"
+                    data-gramm="false"
+                    contentEditable={this.props.isLoading}
+                    data-placeholder="Create a new post..."
+                    tabIndex={0}
+                />
+            </div>
+        );
+    }
+
+    /**
+     * Conditionally render the embed bar.
+     */
+    private renderEmbedBar(): React.ReactNode {
+        return (
+            this.quill && (
+                <EmbedBar
+                    isLoading={!!this.props.isLoading}
+                    isMobile={this.isMobile}
+                    legacyMode={this.props.legacyMode}
+                    barRef={this.embedBarRef}
+                />
+            )
+        );
+    }
+
+    /**
+     * Conditionally render the paragraph toolbar.
+     */
+    private renderParagraphToolbar(): React.ReactNode {
+        return this.quill && !this.props.isLoading && !this.isMobile && <ParagraphToolbar />;
+    }
+
+    /**
+     * Conditionally render the inline toolbars.
+     */
+    private renderInlineToolbars(): React.ReactNode {
+        return (
+            this.quill &&
+            !this.props.isLoading && (
+                <>
+                    <InlineToolbar />
+                    <MentionToolbar />
+                </>
+            )
+        );
+    }
+
+    /**
+     * Render the top level contexts for the editor.
+     * @param content The content to nest inside of the contexts.
+     */
+    private renderContexts(content: React.ReactNode): React.ReactNode {
+        const { isLoading, legacyMode } = this.props;
+
+        return (
             <ReduxProvider store={this.store}>
                 <EditorProvider
                     value={{
                         quill: this.quill,
                         editorID: this.quillID,
-                        legacyMode: !!this.props.legacyMode,
-                        isLoading: !!this.props.isLoading,
+                        legacyMode,
+                        isLoading: !!isLoading,
                     }}
                 >
                     <EditorDescriptions id={this.descriptionID} />
-                    <div className="richEditor-frame InputBox">
-                        <div className="richEditor-textWrap" ref={this.quillMountRef}>
-                            <div
-                                className="ql-editor richEditor-text userContent"
-                                data-gramm="false"
-                                contentEditable={true}
-                                data-placeholder="Create a new post..."
-                                tabIndex={0}
-                            />
-                        </div>
-                        {quillDependantItems}
-                    </div>
+                    {content}
                 </EditorProvider>
             </ReduxProvider>
         );
+    }
 
-        if (!this.props.legacyMode) {
-            mainContent = (
-                <div
-                    className={classNames("richEditor", this.props.className, { isDisabled: this.props.isLoading })}
-                    aria-label={t("Type your message.")}
-                    aria-describedby={this.descriptionID}
-                    role="textbox"
-                    aria-multiline={true}
-                    id={this.domID}
-                >
-                    {mainContent}
-                </div>
-            );
+    /**
+     * Determine if we are in mobile view or not. Always false for legacy mode.
+     */
+    private get isMobile(): boolean {
+        let isMobile = false; // fallback for legacy: isMobile is always false
+        if (!this.props.legacyMode && this.props.device) {
+            isMobile = this.props.device === Devices.MOBILE;
         }
-
-        return mainContent;
+        return isMobile;
     }
 
     /**
@@ -160,11 +238,23 @@ export class Editor extends React.Component<IProps> {
 
         // Setup quill
         registerQuill();
-        const options = { theme: "vanilla" };
-        this.quill = new Quill(this.quillMountRef!.current!, options);
+        const options: QuillOptionsStatic = {
+            theme: "vanilla",
+            modules: {
+                syntax: {
+                    highlight: text => hljs.highlightAuto(text).value,
+                },
+            },
+            scrollingContainer: this.scrollContainerRef.current || document.documentElement!,
+        };
+        this.quill = new Quill(this.quillMountRef.current!, options);
+        if (this.props.initialValue) {
+            this.quill.setContents(this.props.initialValue);
+        }
         if (this.props.isLoading) {
             this.quill.disable();
         }
+        window.quill = this.quill;
         this.quillID = getIDForQuill(this.quill);
 
         // Setup syncing
@@ -173,13 +263,7 @@ export class Editor extends React.Component<IProps> {
         this.store.dispatch(actions.createInstance(this.quillID));
         this.quill.on(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
 
-        // Add a listener for a force selection update.
-        document.addEventListener(SELECTION_UPDATE, () =>
-            window.requestAnimationFrame(() => {
-                this.onQuillUpdate(Quill.events.SELECTION_CHANGE, null, null, Quill.sources.USER);
-            }),
-        );
-
+        this.addGlobalSelectionHandler();
         this.addQuoteHandler();
 
         // Once we've created our quill instance we need to force an update to allow all of the quill dependent
@@ -191,7 +275,10 @@ export class Editor extends React.Component<IProps> {
      * Cleanup from componentDidMount.
      */
     public componentWillUnmount() {
+        this.removeGlobalSelectionHandler();
         this.removeQuoteHandler();
+        this.quill.off(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
+        this.store.dispatch(actions.deleteInstance(this.quillID));
     }
 
     public componentDidUpdate(oldProps: IProps) {
@@ -200,13 +287,35 @@ export class Editor extends React.Component<IProps> {
         } else if (!oldProps.isLoading && this.props.isLoading) {
             this.quill.disable();
         }
+
+        if (!oldProps.reinitialize && this.props.reinitialize) {
+            if (this.props.initialValue) {
+                this.skipCallback = true;
+                this.setEditorContent(this.props.initialValue);
+            }
+        }
     }
 
     /**
      * Get the content out of the quill editor.
      */
     public getEditorOperations(): DeltaOperation[] | undefined {
+        this.ensureUniqueHeaderIDs();
         return this.quill.getContents().ops;
+    }
+
+    /**
+     * Loop through the editor document and ensure every header has a unique data-id.
+     */
+    private ensureUniqueHeaderIDs() {
+        HeaderBlot.resetCounters();
+        const headers = (this.quill.scroll.descendants(
+            blot => blot instanceof HeaderBlot,
+            0,
+            this.quill.scroll.length(),
+        ) as any) as HeaderBlot[]; // Explicit mapping of types because the parchments types suck.
+
+        headers.forEach(header => header.setGeneratedID());
     }
 
     /**
@@ -235,7 +344,11 @@ export class Editor extends React.Component<IProps> {
      * - Every non-silent event.
      * - Every selection change event (even the "silent" ones).
      */
-    private onQuillUpdate = (type: string, newValue, oldValue, source: Sources) => {
+    private onQuillUpdate = throttle((type: string, newValue, oldValue, source: Sources) => {
+        if (this.skipCallback) {
+            this.skipCallback = false;
+            return;
+        }
         if (this.props.onChange && type === Quill.events.TEXT_CHANGE && source !== Quill.sources.SILENT) {
             this.props.onChange(this.getEditorOperations()!);
         }
@@ -250,7 +363,7 @@ export class Editor extends React.Component<IProps> {
         if (shouldDispatch) {
             this.store.dispatch(actions.setSelection(this.quillID, this.quill.getSelection(), this.quill));
         }
-    };
+    }, 1000 / 60); // Throttle to 60 FPS.
 
     /**
      * Synchronization from quill's contents to the bodybox for legacy contexts.
@@ -262,7 +375,7 @@ export class Editor extends React.Component<IProps> {
             return;
         }
 
-        const { legacyTextArea } = this.props;
+        const { legacyTextArea } = this.props as ILegacyProps;
         if (!legacyTextArea) {
             return;
         }
@@ -319,6 +432,29 @@ export class Editor extends React.Component<IProps> {
     }
 
     /**
+     * Handle forced selection updates.
+     */
+    private handleGlobalSelectionUpdate = () => {
+        window.requestAnimationFrame(() => {
+            this.onQuillUpdate(Quill.events.SELECTION_CHANGE, null, null, Quill.sources.USER);
+        });
+    };
+
+    /**
+     * Add a handler for forced selection updates.
+     */
+    private addGlobalSelectionHandler() {
+        document.addEventListener(SELECTION_UPDATE, this.handleGlobalSelectionUpdate);
+    }
+
+    /**
+     * Remove the handler for forced selection updates.
+     */
+    private removeGlobalSelectionHandler() {
+        document.removeEventListener(SELECTION_UPDATE, this.handleGlobalSelectionUpdate);
+    }
+
+    /**
      * Adds a paste listener on the old bodybox for debugging purposes.
      *
      * Pasting a valid quill JSON delta into the box will reset the contents of the editor to that delta.
@@ -328,7 +464,7 @@ export class Editor extends React.Component<IProps> {
         if (!this.props.legacyMode) {
             return;
         }
-        const { legacyTextArea } = this.props;
+        const { legacyTextArea } = this.props as ILegacyProps;
 
         if (debug() && legacyTextArea) {
             legacyTextArea.addEventListener("paste", event => {

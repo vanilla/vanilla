@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -7,7 +7,7 @@ import React from "react";
 import { BrowserRouter, Route, RouteProps, Switch } from "react-router-dom";
 import { Provider } from "react-redux";
 import { getRoutes, getMeta } from "@library/application";
-import NotFoundPage from "@library/components/NotFoundPage";
+import NotFoundPage from "@library/components/navigation/NotFoundPage";
 import getStore from "@library/state/getStore";
 
 /**

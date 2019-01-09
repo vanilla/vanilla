@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -11,7 +11,6 @@ import Italic from "quill/formats/italic";
 import Link from "quill/formats/link";
 import Strike from "quill/formats/strike";
 import List, { ListItem } from "quill/formats/list";
-import Header from "quill/formats/header";
 import { IndentClass as Indent } from "quill/formats/indent";
 
 // Custom Inline Blots
@@ -25,8 +24,7 @@ import MentionBlot from "@rich-editor/quill/blots/embeds/MentionBlot";
 import MentionComboBoxBlot from "@rich-editor/quill/blots/embeds/MentionComboBoxBlot";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
 
-// Custom Block Blots
-import BlockBlot from "@rich-editor/quill/blots/blocks/BlockBlot";
+// Custom Block Blot
 import SpoilerLineBlot, { SpoilerWrapperBlot, SpoilerContentBlot } from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import BlockquoteLineBlot, {
     BlockquoteWrapperBlot,
@@ -41,12 +39,13 @@ import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import HistoryModule from "@rich-editor/quill/HistoryModule";
 import ClipboardModule from "@rich-editor/quill/ClipboardModule";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
+import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
+import SyntaxModule from "@rich-editor/quill/SyntaxModule";
 
 export default function registerQuill() {
     Quill.register(
         {
             // Block formats
-            "blots/block": BlockBlot,
             "formats/blockquote/line": BlockquoteLineBlot,
             "formats/blockquote/content": BlockquoteContentBlot,
             "formats/blockquote/wrapper": BlockquoteWrapperBlot,
@@ -54,7 +53,7 @@ export default function registerQuill() {
             "formats/spoiler/content": SpoilerContentBlot,
             "formats/spoiler/wrapper": SpoilerWrapperBlot,
             "formats/codeBlock": CodeBlockBlot,
-            "formats/header": Header,
+            "formats/header": HeaderBlot,
             "formats/list": List,
             "formats/list/item": ListItem,
             "formats/embed-error": EmbedErrorBlot,
@@ -79,6 +78,7 @@ export default function registerQuill() {
             "modules/embed/focus": FocusModule,
             "modules/history": HistoryModule,
             "modules/clipboard": ClipboardModule,
+            "modules/syntax": SyntaxModule,
         },
         true,
     );

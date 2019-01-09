@@ -1,11 +1,11 @@
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
 import classNames from "classnames";
-import { close } from "@library/components/Icons";
+import { close } from "@library/components/icons/common";
 import { t } from "@library/application";
 import { ILegacyProps } from "@library/@types/legacy";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
@@ -20,7 +20,7 @@ interface IProps extends Partial<ILegacyProps> {
 /**
  * A standardized close button.
  */
-export default class CloseButton extends React.Component<IProps> {
+export default class CloseButton extends React.PureComponent<IProps> {
     public static defaultProps = {
         legacyMode: false,
         baseClass: ButtonBaseClass.ICON,
@@ -45,7 +45,6 @@ export default class CloseButton extends React.Component<IProps> {
             );
         } else {
             const componentClasses = classNames("buttonClose", this.props.className);
-            const iconPadding = !this.props.legacyMode;
             return (
                 <Button
                     disabled={this.props.disabled}
@@ -55,7 +54,7 @@ export default class CloseButton extends React.Component<IProps> {
                     onClick={this.props.onClick}
                     baseClass={this.props.baseClass}
                 >
-                    {close("isSmall", iconPadding)}
+                    {close()}
                 </Button>
             );
         }

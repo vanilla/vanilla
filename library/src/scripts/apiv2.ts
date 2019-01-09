@@ -1,7 +1,7 @@
 /**
  * Entrypoint for the APIv2 calls. Prepulates an axios instance with some config settings.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -20,18 +20,18 @@ function fieldErrorTransformer(responseData) {
     return responseData;
 }
 
-const api = axios.create({
+const apiv2 = axios.create({
     baseURL: formatUrl("/api/v2/"),
     headers: {
         common: {
             "X-Requested-With": "vanilla",
         },
     },
-    transformResponse: [...axios.defaults.transformResponse, fieldErrorTransformer],
-    paramsSerializer: params => qs.stringify(params, { indices: false }),
+    transformResponse: [...(axios.defaults.transformResponse as any), fieldErrorTransformer],
+    paramsSerializer: params => qs.stringify(params),
 });
 
-export default api;
+export default apiv2;
 
 /**
  * Upload an image using Vanilla's API v2.
@@ -51,7 +51,7 @@ export async function uploadImage(image: File): Promise<IEmbedData> {
     data.append("file", image, image.name);
     data.append("type", "image");
 
-    const result = await api.post("/media", data);
+    const result = await apiv2.post("/media", data);
     result.data.type = "image";
     return result.data;
 }

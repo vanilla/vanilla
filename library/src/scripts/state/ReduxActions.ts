@@ -1,11 +1,12 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { IApiError, IApiResponse } from "@library/@types/api";
 import { AxiosResponse, AxiosInstance } from "axios";
+import { logError } from "@library/utility";
 
 /**
  * Base class for creating redux actions.
@@ -110,6 +111,7 @@ export default class ReduxActions {
         meta: Meta,
         error: IApiError,
     ): IApiErrorAction<ActionType, Meta> {
+        logError(error);
         return {
             type,
             meta,
@@ -141,8 +143,13 @@ export default class ReduxActions {
      *
      * @param dispatch A redux dispatch function.
      * @param api An API instance.
+     * @param getState Optionally override the getState method. (generally for testin purposes.)
      */
-    constructor(protected dispatch: any, protected api: AxiosInstance) {}
+    constructor(protected dispatch: any, protected api: AxiosInstance, getState?: () => any) {
+        if (getState) {
+            this.getState = getState;
+        }
+    }
 
     /**
      * Bind dispatch to an action creator.
@@ -160,22 +167,38 @@ export default class ReduxActions {
      * @param endpoint The endpoint requested.
      * @param actionCreators Action creators generated from {@link ReduxActions.generateApiActionCreators()}
      * @param params A parameter object for the request. This will be serialized as a JSON body or query string.
+     * @param meta
      */
     protected async dispatchApi<T>(
         requestType: RequestType,
         endpoint: string,
         actionCreators: ReturnType<typeof ReduxActions.generateApiActionCreators>,
         params: any,
+        meta: any = {},
     ): Promise<AxiosResponse<T> | undefined> {
-        this.dispatch(actionCreators.request(params));
+        meta = {
+            ...params,
+            ...meta,
+        };
+        this.dispatch(actionCreators.request(meta));
         try {
-            const response: AxiosResponse<T> = await this.api[requestType as any](endpoint, params);
-            this.dispatch(actionCreators.response(response, params));
+            const requestPromise =
+                requestType === "get"
+                    ? this.api.get(endpoint, { params })
+                    : this.api[requestType as any](endpoint, params);
+            const response: AxiosResponse<T> = await requestPromise;
+            this.dispatch(actionCreators.response(response, meta));
             return response;
         } catch (axiosError) {
             const error = axiosError.response ? axiosError.response.data : (axiosError as any);
-            this.dispatch(actionCreators.error(error));
+            this.dispatch(actionCreators.error(error, meta));
         }
+    }
+
+    protected getState<T>(): T {
+        return this.dispatch((c, getState) => {
+            return getState();
+        });
     }
 }
 
@@ -186,6 +209,7 @@ export interface IAction<T extends string> {
 
 export interface IActionWithPayload<T extends string, P> extends IAction<T> {
     payload: P;
+    meta?: any;
 }
 
 export interface IActionCreator<T extends string> {

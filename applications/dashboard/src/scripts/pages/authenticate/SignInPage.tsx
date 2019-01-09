@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -49,7 +49,7 @@ export class SignInPage extends React.Component<IProps, IRequiredComponentID> {
         }
 
         let showPassword = false;
-        const ssoMethods = authenticatorState.data.filter(a => {
+        const ssoMethods = authenticatorState.data!.filter(a => {
             if (a.type === "password") {
                 showPassword = true;
                 return false;

@@ -6,7 +6,7 @@
 
 import path from "path";
 import del from "del";
-import webpack, { Stats } from "webpack";
+import webpack, { Stats, Configuration } from "webpack";
 import { makeProdConfig } from "./configs/makeProdConfig";
 import { makeDevConfig } from "./configs/makeDevConfig";
 import serve, { InitializedKoa, Options } from "webpack-serve";
@@ -14,7 +14,7 @@ import { getOptions, BuildMode, IBuildOptions } from "./options";
 import chalk from "chalk";
 import { installNodeModulesInDir } from "./utility/moduleUtils";
 import { makePolyfillConfig } from "./configs/makePolyfillConfig";
-import { printError, print, fail } from "./utility/utils";
+import { print, fail } from "./utility/utils";
 import { DIST_DIRECTORY, VANILLA_APPS } from "./env";
 import EntryModel from "./utility/EntryModel";
 
@@ -28,13 +28,7 @@ import EntryModel from "./utility/EntryModel";
  * - A production build that only builds polyfills. (BuildMode.POLYFILLS)
  */
 export default class Builder {
-    private statOptions = {
-        chunks: false, // Makes the build much quieter
-        modules: false,
-        entrypoints: false,
-        warnings: false,
-        colors: true, // Shows colors in the console
-    };
+    private statOptions: any = this.options.verbose ? "normal" : "minimal";
 
     private entryModel: EntryModel;
 
@@ -57,8 +51,6 @@ export default class Builder {
                 return await this.runProd();
             case BuildMode.DEVELOPMENT:
                 return await this.runDev();
-            case BuildMode.POLYFILLS:
-                return await this.runPolyfill();
         }
     }
 
@@ -87,31 +79,39 @@ export default class Builder {
         // Cleanup
         del.sync(path.join(DIST_DIRECTORY, "**"));
         const sections = await this.entryModel.getSections();
-        const config = await Promise.all(sections.map(section => makeProdConfig(this.entryModel, section)));
-        const compiler = webpack(config);
-        compiler.run((err: Error, stats: Stats) => {
-            if (err || stats.hasErrors()) {
-                print(stats.toString(this.statOptions));
-                fail(`\nThe build encountered an error: ${err}`);
-            }
+        const configs = await Promise.all([
+            ...sections.map(section => makeProdConfig(this.entryModel, section)),
+            makePolyfillConfig(this.entryModel),
+        ]);
 
-            print(stats.toString(this.statOptions));
-        });
+        if (this.options.lowMemory) {
+            // In low memory environments we build sequentially instead of in parallel.
+            for (const config of configs) {
+                await this.runBuild(config);
+            }
+        } else {
+            // Otherwise we build all configs at once.
+            await this.runBuild(configs);
+        }
     }
 
     /**
-     * Build the polyfill files. This is entirely independant of any other files.
-     * This should only need to be run if we change browser support.
+     * Build a single webpack config.
+     *
+     * @param config The config to build.
      */
-    private async runPolyfill() {
-        const config = await makePolyfillConfig(this.entryModel);
-        const compiler = webpack(config);
-        compiler.run((err: Error, stats: Stats) => {
-            if (err) {
-                printError("The build encountered an error:" + err);
-            }
+    private async runBuild(config: Configuration | Configuration[]) {
+        return new Promise(resolve => {
+            const compiler = webpack(config as Configuration);
+            compiler.run((err: Error, stats: Stats) => {
+                if (err || stats.hasErrors()) {
+                    print(stats.toString(this.statOptions));
+                    fail(`\nThe build encountered an error: ${err}`);
+                }
 
-            print(stats.toString(this.statOptions));
+                print(stats.toString(this.statOptions));
+                resolve();
+            });
         });
     }
 
@@ -130,7 +130,7 @@ export default class Builder {
         if (buildOptions.mode === BuildMode.DEVELOPMENT && !hotReloadConfigSet) {
             const message = chalk.red(`
 You've enabled a development build without enabling hot reload. Add the following to your config.
-${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = false;")}`);
+${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
             fail(message);
         }
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,7 +9,6 @@ class RichEditorPlugin extends Gdn_Plugin {
 
     const FORMAT_NAME = "Rich";
     const QUOTE_CONFIG_ENABLE = "RichEditor.Quote.Enable";
-    const EDITOR_STYLE_ASSET_PATH = "/dist/forum/addons/rich-editor.min.css";
 
     /** @var integer */
     private static $editorID = 0;
@@ -86,8 +85,6 @@ class RichEditorPlugin extends Gdn_Plugin {
         if ($this->isFormRich($sender)) {
             /** @var Gdn_Controller $controller */
             $controller = Gdn::controller();
-            $styleSheetAsset = asset(self::EDITOR_STYLE_ASSET_PATH, true);
-            $controller->addCssFile($styleSheetAsset);
             $controller->CssClass .= ' hasRichEditor';
             $editorID = $this->getEditorID();
             $controller->setData('editorData', [

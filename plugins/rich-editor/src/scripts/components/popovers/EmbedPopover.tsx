@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,15 +9,19 @@ import KeyboardModule from "quill/modules/keyboard";
 import { isAllowedUrl, t } from "@library/application";
 import { getRequiredID, IRequiredComponentID } from "@library/componentIDs";
 import { IWithEditorProps, withEditor } from "@rich-editor/components/context";
-import * as Icons from "@rich-editor/components/icons";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import Popover from "@rich-editor/components/popovers/pieces/Popover";
 import PopoverController, { IPopoverControllerChildParameters } from "@library/components/PopoverController";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
-import { ButtonBaseClass } from "@library/components/forms/Button";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import { embed } from "@library/components/icons/editorIcons";
+import classNames from "classnames";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
+    renderAbove?: boolean;
+    renderLeft?: boolean;
+    openAsModal?: boolean;
 }
 
 interface IState extends IRequiredComponentID {
@@ -49,12 +53,13 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
 
     public render() {
         const title = t("Insert Media");
-        const Icon = <Icons.embed />;
+        const Icon = embed();
+        const legacyMode = this.props.legacyMode;
 
         return (
             <PopoverController
                 id={this.state.id}
-                classNameRoot="embedDialogue"
+                className="embedDialogue"
                 onClose={this.clearInput}
                 buttonClassName="richEditor-button richEditor-embedButton"
                 onVisibilityChange={forceSelectionUpdate}
@@ -62,16 +67,22 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                 name={t("Embed")}
                 buttonContents={Icon}
                 buttonBaseClass={ButtonBaseClass.CUSTOM}
+                renderAbove={!!this.props.renderAbove}
+                renderLeft={!!this.props.renderLeft}
+                openAsModal={legacyMode ? false : !!this.props.openAsModal}
             >
                 {(params: IPopoverControllerChildParameters) => {
                     const { initialFocusRef, closeMenuHandler, isVisible } = params;
                     const body = (
                         <React.Fragment>
-                            <p id={this.descriptionID} className="insertMedia-description">
+                            <p
+                                id={this.descriptionID}
+                                className="insertMedia-description richEditor-popoverDescription"
+                            >
                                 {t("Paste the URL of the media you want.")}
                             </p>
                             <input
-                                className="InputBox"
+                                className={classNames("InputBox", { inputText: !this.props.legacyMode })}
                                 placeholder={t("http://")}
                                 value={this.state.url}
                                 onChange={this.inputChangeHandler}
@@ -87,14 +98,24 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                     // We want it to be on the last element in the popover.
                     const footer = (
                         <React.Fragment>
-                            <input
-                                type="button"
-                                className="Button Primary insertMedia-insert"
-                                value={"Insert"}
-                                disabled={!this.state.isInputValid}
-                                aria-label={"Insert Media"}
-                                onClick={this.buttonClickHandler}
-                            />
+                            {legacyMode ? (
+                                <input
+                                    type="button"
+                                    className="Button Primary insertMedia-insert"
+                                    value={"Insert"}
+                                    disabled={!this.state.isInputValid}
+                                    aria-label={"Insert Media"}
+                                    onClick={this.buttonClickHandler}
+                                />
+                            ) : (
+                                <Button
+                                    className="insertMedia-insert"
+                                    disabled={!this.state.isInputValid}
+                                    onClick={this.buttonClickHandler}
+                                >
+                                    {t("Insert")}
+                                </Button>
+                            )}
                         </React.Fragment>
                     );
 
@@ -109,6 +130,8 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                             additionalClassRoot="insertMedia"
                             onCloseClick={closeMenuHandler}
                             isVisible={isVisible}
+                            renderAbove={!!this.props.renderAbove}
+                            renderLeft={!!this.props.renderLeft}
                         />
                     );
                 }}

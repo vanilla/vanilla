@@ -2,7 +2,7 @@
 /**
  * GooglePlus Plugin.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package GooglePlus
  */
@@ -300,7 +300,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
         $url = url("post/googleplus/{$args['RecordType']}?id={$args['RecordID']}", true);
         $cssClass = 'ReactButton PopupWindow';
 
-        echo ' '.anchor(sprite('ReactGooglePlus', 'ReactSprite', t('Share on Google+')), $url, $cssClass).' ';
+        echo ' '.anchor(sprite('ReactGooglePlus', 'ReactSprite', t('Share on Google+')), $url, $cssClass, ['rel' => 'nofollow']).' ';
     }
 
     /**

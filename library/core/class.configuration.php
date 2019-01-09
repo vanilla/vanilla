@@ -3,7 +3,7 @@
  * Gdn_Configuration & Gdn_ConfigurationSource
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0
@@ -14,7 +14,7 @@
  * retrieve settings from the arrays, assign new values to the arrays, and save
  * the arrays back to the files.
  */
-class Gdn_Configuration extends Gdn_Pluggable {
+class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\ConfigurationInterface {
 
     /** Cache key format. */
     const CONFIG_FILE_CACHE_KEY = 'garden.config.%s';

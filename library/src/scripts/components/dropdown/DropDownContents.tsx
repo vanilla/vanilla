@@ -1,11 +1,12 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import * as React from "react";
 import classNames from "classnames";
+import { flyoutPosition } from "@rich-editor/components/popovers/pieces/flyoutPosition";
 
 export interface IProps {
     id: string;
@@ -13,9 +14,11 @@ export interface IProps {
     className?: string;
     children: React.ReactNode;
     isVisible?: boolean;
-    isPositionedFromTop: boolean;
-    isPositionedFromRight: boolean;
+    renderAbove: boolean;
+    renderLeft: boolean;
     onClick: (event: React.MouseEvent) => void;
+    legacyMode?: boolean;
+    openAsModal?: boolean;
 }
 /**
  * The contents of the dropdown (not the wrapper and not the button to toggle it).
@@ -28,13 +31,15 @@ export default class DropDownContents extends React.Component<IProps> {
                 <div
                     id={this.props.id}
                     aria-labelledby={this.props.parentID}
-                    className={classNames("dropDown-contents", this.props.className)}
-                    style={{
-                        top: this.props.isPositionedFromTop ? "100%" : undefined,
-                        right: this.props.isPositionedFromRight ? "0" : undefined,
-                        bottom: !this.props.isPositionedFromTop ? "100%" : undefined,
-                        left: !this.props.isPositionedFromRight ? "0" : undefined,
-                    }}
+                    className={classNames(
+                        "hasVerticalPadding",
+                        {
+                            "dropDown-contents": !this.props.openAsModal,
+                            "dropDown-asModal": this.props.openAsModal,
+                        },
+                        this.props.className,
+                    )}
+                    style={flyoutPosition(this.props.renderAbove, this.props.renderLeft, !!this.props.legacyMode)}
                     onClick={this.props.onClick}
                 >
                     {this.props.children}

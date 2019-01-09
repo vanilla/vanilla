@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -326,7 +326,11 @@ class ConversationsApiController extends AbstractApiController {
                 $offset
             )->resultArray();
 
-            $this->conversationModel->joinParticipants($conversations);
+            $this->conversationModel->joinParticipants(
+                $conversations,
+                5,
+                ["Name", "Email", "Photo", "DateLastActive"]
+            );
         } else {
             $participantUserID = isset($query['participantUserID']) ? $query['participantUserID'] : $this->getSession()->UserID;
 
@@ -501,7 +505,7 @@ class ConversationsApiController extends AbstractApiController {
         $dbRecord['body'] = isset($dbRecord['LastBody'])
             ? Gdn_Format::to($dbRecord['LastBody'], $dbRecord['LastFormat'])
             : t('No messages.');
-        $dbRecord['url'] = url("/conversations/{$dbRecord['ConversationID']}", true);
+        $dbRecord['url'] = url("/messages/{$dbRecord['ConversationID']}", true);
 
         if (array_key_exists('CountNewMessages', $dbRecord)) {
             $dbRecord['unread'] = $dbRecord['CountNewMessages'] > 0;
@@ -548,11 +552,19 @@ class ConversationsApiController extends AbstractApiController {
         } else {
             $dbRecord['Status'] = 'deleted';
         }
-        if (isset($row['Name']) && isset($row['Photo'])) {
+
+        // Normalize the user fragment.
+        if (isset($dbRecord["User"]) && is_array($dbRecord["User"])) {
+            $dbRecord["User"] = array_intersect_key(
+                $dbRecord["User"],
+                array_flip(["UserID", "Name", "PhotoUrl", "DateLastActive"])
+            );
+        } elseif (isset($dbRecord["UserID"]) && isset($dbRecord["Name"])) {
             $dbRecord['User'] = [
-                'UserID' => $row['UserID'],
-                'Name' => $row['Name'],
-                'PhotoUrl' => empty($dbRecord['PhotoUrl']) ? UserModel::getDefaultAvatarUrl($dbRecord) : Gdn_Upload::url($dbRecord['PhotoUrl'])
+                'UserID' => $dbRecord['UserID'],
+                'Name' => $dbRecord['Name'],
+                'PhotoUrl' => empty($dbRecord['PhotoUrl']) ? UserModel::getDefaultAvatarUrl($dbRecord) : Gdn_Upload::url($dbRecord['PhotoUrl']),
+                "DateLastActive" => $dbRecord["DateLastActive"] ?? null,
             ];
         }
 

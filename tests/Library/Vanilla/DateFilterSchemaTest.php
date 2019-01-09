@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -60,7 +60,7 @@ class DateFilterSchemaTest extends SharedBootstrapTestCase {
             '>=2017-09-01' => [
                 '>=2017-09-01',
                 '>=',
-                [new DateTimeImmutable('2017-09-01')],
+                [new DateTimeImmutable('2017-09-01 00:00:00')],
             ],
             '<2017-07-01' => [
                 '<2017-07-01',
@@ -199,7 +199,7 @@ class DateFilterSchemaTest extends SharedBootstrapTestCase {
             'Less-Than or Equal (Date)' => [
                 'dateInserted',
                 $schema->validate('<=2017-01-01'),
-                ['dateInserted <=' => new DateTimeImmutable('2017-01-01 00:00:00')]
+                ['dateInserted <=' => new DateTimeImmutable('2017-01-01 23:59:59')]
             ],
             'Less-Than or Equal (DateTime)' => [
                 'dateInserted',

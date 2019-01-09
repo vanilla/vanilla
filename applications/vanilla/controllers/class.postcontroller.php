@@ -2,7 +2,7 @@
 /**
  * Post controller
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Vanilla
  * @since 2.0
@@ -469,6 +469,15 @@ class PostController extends VanillaController {
             $vanilla_identifier = $this->Form->getFormValue('vanilla_identifier', '');
             $isEmbeddedComments = $vanilla_url != '' && $vanilla_identifier != '';
 
+            // If we already have a discussion with this ForeginID, add the discussion id to the form, to avoid duplicate discussions.
+            if ($isEmbeddedComments && !$DiscussionID) {
+                $Discussion = $this->DiscussionModel->getWhere(['ForeignID' => $vanilla_identifier])->firstRow(DATASET_TYPE_OBJECT);
+                if (!empty($Discussion)) {
+                    $DiscussionID =  $this->DiscussionID = $Discussion->DiscussionID;
+                    $this->Discussion = $Discussion;
+                    $this->Form->setFormValue('DiscussionID', $DiscussionID);
+                }
+            }
             // Only allow vanilla identifiers of 32 chars or less - md5 if larger
             if (strlen($vanilla_identifier) > 32) {
                 $Attributes['vanilla_identifier'] = $vanilla_identifier;

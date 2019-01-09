@@ -1,0 +1,59 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+// The "flex" from flex columns comes from using CSS columns instead of hard coding the columns in HTML.
+@mixin mediaQuery-flexColumnsTwoCol_breakToOne {
+    @media (max-width: #{$flexColumns-twoColumns_breakToOne}) {
+        @content;
+    }
+}
+
+@mixin mediaQuery-flexColumnsThreeCol_breakToTwo {
+    @media (max-width: #{$flexColumns-threeColumns_breakToTwo}) {
+        @content;
+    }
+}
+
+@mixin mediaQuery-flexColumnsThreeCol_breakToOne {
+    @media (max-width: #{$flexColumns-threeColumns_breakToOne}) {
+        @content;
+    }
+}
+
+.flexColumns {
+    column-gap: $component-spacing;
+
+    * {
+        break-inside: avoid;
+    }
+
+    @include headings {
+            break-after: avoid;
+    }
+
+    p {
+            break-before: avoid;
+    }
+
+    &.flexColumns-2 {
+        column-count: 2;
+
+        @include mediaQuery-flexColumnsTwoCol_breakToOne {
+            column-count: 1;
+        }
+    }
+
+    &.flexColumns-3 {
+        column-count: 3;
+
+        @include mediaQuery-flexColumnsThreeCol_breakToTwo {
+            column-count: 2;
+        }
+
+        @include mediaQuery-flexColumnsThreeCol_breakToOne {
+            column-count: 1;
+        }
+    }
+}

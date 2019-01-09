@@ -2,7 +2,7 @@
 /**
  * Settings controller
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Vanilla
  * @since 2.0
@@ -83,14 +83,16 @@ class VanillaSettingsController extends Gdn_Controller {
 
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack() === false) {
-
-
             // Apply the config settings to the form.
             $this->Form->setData($configurationModel->Data);
         } else {
             // This is a "reverse" field on the form. Disabling URL embeds is associated with a toggle that enables them.
             $disableUrlEmbeds = $this->Form->getFormValue('Garden.Format.DisableUrlEmbeds', true);
             $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', !$disableUrlEmbeds);
+
+            if ($this->Form->_FormValues['Vanilla.Comment.MaxLength'] > DiscussionModel::MAX_POST_LENGTH) {
+                $this->Form->addError('The highest allowed limit is 50,000 characters');
+            }
 
             // Define some validation rules for the fields being saved
             $configurationModel->Validation->applyRule('Garden.InputFormatter', 'Required');
@@ -926,7 +928,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->title(t('Categories'));
 
         // Get category data
-        $categoryData = $this->CategoryModel->getAll('TreeLeft');
+        $categoryData = $this->CategoryModel->getAll();
 
         // Set CanDelete per-category so we can override later if we want.
         $canDelete = checkPermission(['Garden.Community.Manage', 'Garden.Settings.Manage']);

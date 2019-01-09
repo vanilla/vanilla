@@ -1,0 +1,42 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+.ActivateSlider {
+    border-radius: $formButton_borderRadius;
+    box-shadow: none;
+    background-color: rgba(0, 0, 0, 0.03);
+    border: $component_border;
+}
+
+.DataList-Connections {
+
+    .Button.ActivateSlider-Button {
+        display: inline-block;
+        cursor: pointer;
+        margin: 0;
+        font-size: $global-medium_fontSize;
+        background: $global-color_white;
+        color: $global-color_primary;
+        border-radius: $formButton_borderRadius;
+        border: $formButton_border;
+        border-color: darken($global-color_primary, 5%);
+        line-height: $formButton_height;
+        min-height: $formButton_height;
+        padding: 0 $formButton_padding;
+        white-space: nowrap;
+
+        &:focus,
+        &:hover {
+            text-decoration: none;
+        }
+    }
+
+    .ActivateSlider-Active .Button{
+        background: $global-color_primary;
+        color: $global-color_white;
+        border-color: darken($global-color_primary, 5%);
+    }
+}

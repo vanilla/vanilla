@@ -1,0 +1,159 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Variables
+\* -------------------------------------------------------------- */
+
+$searchbox-button_color: $global-color_fg !default;
+$searchbox-button_borderColor: transparent !default;
+$searchbox-button_borderWidth: 0 !default;
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.InputAndButton .BigInput,
+#Form_Search {
+    font-size: inherit;
+    width: 100%;
+    padding: $formElement_paddingVertical $formElement_paddingHorizontal;
+    border-color: $formElement_borderColor;
+
+    &::placeholder {
+        color: $formElement_borderColor;
+    }
+}
+
+.groupSearch-search {
+    position: relative;
+
+    &::before {
+            @include icon;
+            content: $icon-search;
+            color: $searchbox-button_color;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: $formElement_height;
+            line-height: $formElement_height;
+            pointer-events: none;
+        }
+
+    .groupSearch-button.groupSearch-button {
+        background: none;
+        color: $global-color_primary;
+        border: 1px solid $global-color_primary;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: $formElement_height;
+        line-height: $formElement_height;
+    }
+}
+
+.SearchForm .SiteSearch .Button,
+.AdvancedSearch .bwrap .Button,
+#Form_Go {
+    background: transparent;
+    border-color: $searchbox-button_borderColor;
+    border-width: $searchbox-button_borderWidth;
+    line-height: $formElement_lineHeight;
+    height: $formElement_height;
+    width: $formElement_height;
+    min-width: 0;
+    padding: 0 $utility-small_padding;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.AdvancedSearch .bwrap .Button {
+    color: $searchbox-button_color;
+}
+
+.AdvancedSearch {
+    max-width: 100%;
+    margin: 0;
+    padding-right: 0;
+
+    .bwrap.bwrap {
+        position: static;
+    }
+
+    .Handle.Handle {
+        height: $formElement_height;
+        width: $formElement_height;
+        opacity: 1;
+        right: $formElement_height;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        .Arrow {
+            position: static;
+            width: auto;
+            height: auto;
+            border-color: transparent;
+            font-size: 20px;
+
+            &::after {
+                @include icon;
+                content: $icon-caret-down;
+                color: $searchbox-button_color;
+            }
+        }
+    }
+}
+
+#Form_Go {
+    color: transparent;
+}
+
+.SearchBox {
+    width: 100%;
+    margin-bottom: $utility-large_padding;
+    position: relative;
+    @include clearfix;
+
+        @include maxWidth {
+            max-width: 100%;
+        }
+
+    .Sprite.SpSearch {
+        display: none;
+    }
+
+    // Button Icon
+    form > div::after {
+        @include icon;
+        content: $icon-search;
+        color: $searchbox-button_color;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: $formElement_height;
+        line-height: $formElement_height;
+        pointer-events: none;
+    }
+}
+
+.SearchForm form > div::after,
+.SearchBox form > div::after {
+    @include icon;
+    content: $icon-search;
+    color: $searchbox-button_color;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: $formElement_height;
+    line-height: $formElement_height;
+    pointer-events: none;
+}

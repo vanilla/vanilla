@@ -1,0 +1,110 @@
+/*
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Global Overwrites
+\* -------------------------------------------------------------- */
+
+$global-color_black:                    #000;
+$global-color_white:                    #fff;
+$global-color_transparent:              transparent;
+
+$global-color_dusk: #111423;
+$global-color_evening:                  #192231;
+$global-color_grey:                     #a3a3a3;
+$global-color_cloud:                    #49648b;
+$global-color_sunset:                   #985E6D;
+
+$global-color_primary:                  $global-color_sunset;
+$global-color_primaryAlt:               darken($global-color_primary, 8%);
+$global-color_secondary:                $global-color_cloud !default;
+
+$global-color_bg:                       $global-color_evening !default;
+$global-color_fg:                       $global-color_white !default; // text color | should have high contrast between $global-color_bg
+
+$global-body_bg:                        $global-color_bg !default;
+
+$global_borderRadius:                   4px !default;
+
+/* -------------------------------------------------------------- *\
+    Theme Colors
+\* -------------------------------------------------------------- */
+
+$theme-border_color:                    mix($global-color_fg, $global-color_bg, 14%) !default;
+
+$theme-link-hover_textDecoration:       underline !default;
+
+$theme-heading_color:                   $global-color_fg !default;
+$theme-heading-hover_color:             $global-color_secondary !default;
+
+/* -------------------------------------------------------------- *\
+    Frame
+\* -------------------------------------------------------------- */
+
+$frame_backgroundColor:                  $global-color_dusk !default;
+
+/* -------------------------------------------------------------- *\
+    Content
+\* -------------------------------------------------------------- */
+
+$content_bg:                             $global-color_evening !default;
+
+/* -------------------------------------------------------------- *\
+    Header
+\* -------------------------------------------------------------- */
+
+$header_bg:                              transparent !default;
+$header_minHeight:                       96px !default;
+$header_color:                           $global-color_fg !default;
+$header-hover_color:                     $global-color_fg !default;
+
+/* -------------------------------------------------------------- *\
+    Footer
+\* -------------------------------------------------------------- */
+
+$footer_bg:                              mix($global-color_bg, $global-color_fg, 90%) !default;
+$footer_color:                           $global-color_fg !default;
+$footer-link_color:                      $global-color_primary !default;
+$footer-link-hover_color:                $global-color_primaryAlt !default;
+
+/* -------------------------------------------------------------- *\
+    Navigation
+\* -------------------------------------------------------------- */
+
+$navigation_backgroundColor:              mix($global-color_black, $header-bg, 12%) !default;
+
+/* -------------------------------------------------------------- *\
+    Components
+\* -------------------------------------------------------------- */
+
+$component-item_spacing:                 0 !default;
+$component_bg:                           transparent !default;
+$component-title_color:                  $global-color_fg !default;
+$component-title-hover_color:            $global-color_secondary !default;
+$component-base_color:                   $global-color_fg !default;
+$component-meta-link-hover_color:        $global-color_fg !default;
+$component_borderRadius:                 0 !default;
+
+/* -------------------------------------------------------------- *\
+    Navigation
+\* -------------------------------------------------------------- */
+
+$navigation_bg:                          $global-color_dusk !default;
+$navigation_border:                      $theme-border_color !default;
+
+/* -------------------------------------------------------------- *\
+    Mebox
+\* -------------------------------------------------------------- */
+
+$mebox_hover_bg:                         $content_bg !default;
+
+/* -------------------------------------------------------------- *\
+    Searchbox
+\* -------------------------------------------------------------- */
+
+$searchbox-button_color:                 $global-color_primary !default;
+
+

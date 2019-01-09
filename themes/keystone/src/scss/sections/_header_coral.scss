@@ -1,0 +1,34 @@
+/*
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+.MeBox--header .SignInLinks {
+
+    .SignInPopup {
+        background-color: $global-color_butter;
+        border-color: $global-color_butter;
+        color: $global-color_white;
+
+        &:focus,
+        &:hover {
+            background-color: darken($global-color_butter, 8%);
+            border-color: darken($global-color_butter, 8%);
+            color: $global-color_white;
+        }
+    }
+
+    .ApplyButton {
+        background-color: transparent;
+        border-color: $global-color_butter;
+        color: $global-color_butter;
+
+        &:focus,
+        &:hover {
+            background-color: darken($global-color_butter, 8%);
+            border-color: darken($global-color_butter, 8%);
+            color: $global-color_white;
+        }
+    }
+}

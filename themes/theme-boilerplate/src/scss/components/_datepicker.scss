@@ -1,0 +1,120 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Variables
+\* -------------------------------------------------------------- */
+
+$datepicker_bg:                             $global-color_white !default;
+$datepicker-hover_bg:                       darken($global-color_white, 7%) !default;
+$datepicker_color:                          $global-color_black !default;
+
+$datepicker-link_color:                     $global-color_primary !default;
+$datepicker-link-hover_color:               $global-color_primaryAlt !default;
+
+$datepicker-link-alt_color:                 $global-color_secondary !default;
+$datepicker-link-altHover_color:            darken($global-color_secondary, 8%) !default;
+
+$datepicker_border:                         1px solid $theme-border_color !default;
+$datepicker_borderRadius:                   $global_borderRadius !default;
+$datepicker_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.2) !default;
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+
+.ui-datepicker {
+    border-radius: $datepicker_borderRadius;
+    color: $datepicker_color;
+    background-color: $datepicker_bg;
+
+    td a {
+        text-align: center;
+    }
+
+    a {
+        color: inherit;
+        border-radius: $datepicker_borderRadius;
+        background-color: $datepicker-hover_bg;
+
+        &:focus,
+        &:hover {
+            background-color: $datepicker-link_color;
+            color: $datepicker_bg;
+        }
+    }
+
+    td {
+        width: calc(260px / 7);
+    }
+
+    .ui-datepicker-today a {
+        border: 1px solid $datepicker-link_color;
+        color: $datepicker-link_color;
+    }
+
+    .ui-datepicker-current-day a {
+        background-color: $datepicker-link_color;
+        border: 1px solid $datepicker-link_color;
+        color: $global-color_white;
+    }
+
+    .ui-datepicker-header {
+        background-color: $datepicker-hover_bg;
+        border-radius: $datepicker_borderRadius;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .ui-icon {
+            @include srOnly;
+        }
+    }
+
+    .ui-datepicker-prev,
+    .ui-datepicker-next {
+        position: static;
+        height: auto;
+        white-space: nowrap;
+        color: $component-meta-link_color;
+        width: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        &:focus,
+        &:hover {
+            background-color: transparent;
+            cursor: pointer;
+            color: $component-meta-link-hover_color;
+        }
+    }
+    .ui-datepicker-prev::before,
+    .ui-datepicker-next::before {
+        @include icon;
+        font-size: $icon-default_size;
+    }
+
+    .ui-datepicker-prev::before {
+        content: $icon-chevron-left;
+    }
+
+    .ui-datepicker-next::before {
+        content: $icon-chevron-right;
+    }
+
+    .ui-datepicker-title {
+        order: 2;
+        position: static;
+        margin: 0;
+        line-height: inherit;
+    }
+
+    .ui-datepicker-next {
+        order: 3;
+    }
+}

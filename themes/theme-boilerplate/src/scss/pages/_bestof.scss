@@ -1,0 +1,215 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+body.Section-BestOf {
+
+    @include noPanel;
+
+    .SearchBox {
+        display: none;
+    }
+
+    .Frame-content {
+        > .Container {
+            max-width: $global-main_width;
+        }
+    }
+
+    .FilterMenu {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        margin: $component-item_spacing -#{$utility-xSmall_padding} $component-item_spacing;
+        width: calc(100% + (#{$utility-xSmall_padding} * 2));
+
+        > li {
+            margin: 0 $utility-xSmall_padding $utility-small_padding;
+        }
+
+        a {
+            @include Button;
+
+            &:focus,
+            &:hover {
+                border-color: $button-basic-hover_border;
+                background-color: $button-basic-hover_bg;
+                color: $button-basic-hover_fg;
+            }
+        }
+
+        .ReactSprite {
+            line-height: calc(#{$formButton_height} - 2px);
+            height: inherit;
+        }
+
+        .BestOfEverything {
+
+            .ReactSprite {
+                display: none;
+            }
+        }
+
+        li.Active {
+
+            a {
+                background-color: $global-color_primary;
+                border-color: darken($global-color_primary, 5%);
+                color: $global-color_white;
+            }
+        }
+    }
+
+    .Frame-details {
+        padding-bottom: $utility-small_padding;
+    }
+
+    .MainContent {
+        min-height: 150px;
+        margin: 0;
+        width: 100%;
+    }
+
+    .DismissMessage {
+        margin-left: 0;
+        margin-right: 0;
+        margin-bottom: 24px;
+    }
+
+    .Tiles {
+        @include clearfix;
+        position: relative;
+        margin: 0 #{-$utility-small_padding};
+        width: calc(100% + #{$utility-small_padding * 2});
+
+        @include maxWidth {
+            margin: 0;
+            width: 100%;
+
+            .Tile:first-child {
+                margin-top: 0;
+            }
+        }
+    }
+
+    .Tile {
+        position: relative;
+        display: block;
+        width: calc((100% / 3) - (#{$utility-small_padding} * 2));
+        margin: 0 $utility-small_padding $component-item_spacing;
+        background: $component_bg;
+        border-radius: $component_borderRadius;
+
+        @include maxWidth($theme-breakpoint_tablet) {
+            width: calc((100% / 2) - (#{$utility-small_padding} * 2));
+        }
+
+        .Author {
+            display: block;
+            line-height: calc(#{$theme-photo_size} / 2);
+
+            @include maxWidth {
+                display: inline-flex;
+                align-items: center;
+                min-height: $theme-photo_size;
+                line-height: $global-base_lineHeight;
+
+                a:first-child {
+                    flex: 1 0 $theme-photo_size;
+                }
+            }
+
+            a {
+                line-height: inherit;
+            }
+        }
+
+        .Title,
+        .Title a {
+            width: 100%;
+            display: block;
+            background: none;
+        }
+
+        .Message {
+            $line-height: 20px;
+            $num-lines: 20;
+
+            display: block;
+            line-height: $line-height;
+            max-height: $line-height * $num-lines;
+            overflow: hidden;
+            position: relative;
+            margin: $utility-medium_padding 0;
+        }
+
+        .ReactSprite {
+            margin-right: 0;
+        }
+    }
+
+    .Tile,
+    .Item {
+
+        .Item-Header,
+        .Item-BodyWrap {
+            margin-bottom: $utility-medium_padding;
+        }
+
+        .PhotoWrap {
+            margin: 0 $utility-medium_padding 0 0;
+        }
+
+        .ProfilePhoto.ProfilePhoto {
+            width: 100%;
+            height: auto;
+        }
+
+        .ReactButton {
+            margin: 0 $utility-small_padding;
+            line-height: calc(#{$theme-photo_size} / 2);
+
+            @include maxWidth {
+                min-height: 42px;
+                min-width: 42px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+
+                .ReactSprite::before {
+                    font-size: $icon-default_size;
+                }
+            }
+        }
+    }
+
+    &.UserLoggedOut {
+
+        .Author {
+            display: flex;
+            align-items: center;
+
+            .PhotoWrap {
+                margin: 0;
+                margin-right: $utility-small_padding;
+            }
+        }
+    }
+
+    @include maxWidth {
+
+        .ImageWrap {
+            width: 100%;
+        }
+
+        .Tile {
+            margin: $utility-medium_padding 0;
+        }
+    }
+}

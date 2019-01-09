@@ -1,0 +1,134 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Variables
+\* -------------------------------------------------------------- */
+
+$popup_bg:                             $global-color_white !default;
+$popup_color:                          lighten(desaturate($global-color_primary, 90%), 8%) !default;
+$popup-link_color:                     $global-color_primary !default;
+$popup-link-hover_color:               $global-color_primaryAlt !default;
+$popup_borderColor:                    rgba($popup_color, 0.8) !default;
+$popup_border:                         1px solid $popup_borderColor !default;
+$popup_borderRadius:                   $global_borderRadius !default;
+$popup_boxShadow:                      0 1px 3px 0px rgba($global-color_black, 0.4) !default;
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+div.Popup {
+    top: 50vh !important;
+    left: 50vw !important;
+    position: fixed;
+    transform: translateX(-50%) translateY(-50%);
+
+    .Border {
+        background: none;
+    }
+
+    .Body {
+        padding: 24px 18px;
+        background-color: $popup_bg;
+        box-shadow: 0 1px 3px 0px rgba($global-color_black, 0.4);
+        border-radius: $popup_borderRadius;
+        color: $popup_color;
+
+        .FormWrapper {
+            padding: 0;
+        }
+
+        a {
+            color: $popup-link_color;
+
+            &:focus,
+            &:hover {
+                color: $popup-link-hover_color;
+                text-decoration: $theme-link-hover_textDecoration;
+            }
+        }
+
+        input[type= "text"],
+        textarea,
+        ul.token-input-list,
+        input.InputBox,
+        select {
+            border-color: $popup_borderColor;
+        }
+
+        .WarningMessage {
+            background-color: mix($global-color_warning, $popup_bg, 10%);
+            border-color: $global-color_warning;
+            color: $popup_color;
+        }
+
+        .Buttons .Close,
+        .Button.Danger {
+
+            &:focus,
+            &:hover {
+                color: $global-color_white;
+            }
+        }
+    }
+
+    .Content,
+    .Footer {
+        color: inherit;
+    }
+
+    .Content {
+        float: none;
+        width: auto !important;
+    }
+
+    a.Close {
+        @include CloseButton($popup_color);
+    }
+
+    .Buttons {
+        > *:first-child {
+            margin-right: $utility-small_padding;
+        }
+    }
+}
+
+.InformMessages .InformMessage,
+.InformMessages .InformMessage:hover {
+    background-color: $popup_bg !important;
+    box-shadow: 0 1px 3px 0px rgba($global-color_black, 0.4) !important;
+    border-radius: $popup_borderRadius;
+    color: $popup_color !important;
+    text-shadow: none;
+
+    a {
+        color: $popup-link_color;
+    }
+
+    .Close {
+        @include CloseButton($popup_color);
+        display: flex !important;
+        margin: $utility-xSmall_padding;
+        font-size: $icon-default_size !important;
+    }
+}
+
+#Form_Cancel {
+    background-color: transparent;
+    border-color: $global-color_primary;
+    color: $global-color_primary;
+
+    &:focus,
+    &:hover {
+        background-color: $global-color_primary;
+        color: $global-color_white;
+    }
+}
+
+.Overlay {
+    background: rgba($global-color_black, 0.4);
+}

@@ -330,22 +330,6 @@ $vanillaHeader-buttonContents_active_bg: getBgDependingOnContrastColor($vanillaH
     transform: translateX(-$global-gutter_halfSize); // so the icon is flush with the side margin, but still has the right padding when hovering.
 }
 
-////// Guest Styles
-//.vanillaHeader-signIn,
-//.vanillaHeader-register {
-//    &.vanillaHeader-guestButton {
-//        border: solid $vanillaHeader-fg 1px;
-//        font-weight: $global-fontWeight_semiBold;
-//
-//
-//        &:active,
-//        &:focus {
-//            font-weight: $global-fontWeight_semiBold;
-//        }
-//    }
-//}
-
-
 .vanillaHeader-signIn {
     &:not([disabled]) {
         color: $vanillaHeader-fg;

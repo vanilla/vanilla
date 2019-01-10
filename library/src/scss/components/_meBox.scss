@@ -4,6 +4,8 @@
  * @license GPL-2.0-only
  */
 
+$meBox-buttonContent_size: 32px;
+
 .meBox {
     display: flex;
     align-items: center;
@@ -12,4 +14,10 @@
     @include mediaQuery-panelLayout_oneColumn {
         height: $vanillaHeader_mobile_height;
     }
+}
+
+.meBox-buttonContent {
+    @include flexCenterContent;
+    width: $meBox-buttonContent_size;
+    height: $meBox-buttonContent_size;
 }

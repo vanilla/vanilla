@@ -133,21 +133,19 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                             onSearchButtonClick={this.openSearch}
                                             onCloseSearch={this.closeSearch}
                                             cancelButtonClassName="vanillaHeader-searchCancel"
+                                            cancelContentClassName="meBox-contentHover"
                                             buttonClass="vanillaHeader-button"
                                             showingSuggestions={this.state.showingSuggestions}
                                             onOpenSuggestions={this.setOpenSuggestions}
                                             onCloseSuggestions={this.setCloseSuggestions}
+                                            buttonContentClass="meBox-buttonContent"
                                         />
                                     ) : (
                                         <FlexSpacer className="compactSearch vanillaHeader-compactSearch" />
                                     )}
                                     {isGuest ? (
                                         (!this.state.openSearch || !isMobile) && (
-                                            <VanillaHeaderNav
-                                                linkClassName="vanillaHeader-navLink"
-                                                linkContentClassName="vanillaHeader-navLinkContent"
-                                                className="vanillaHeader-nav vanillaHeader-guestNav"
-                                            >
+                                            <VanillaHeaderNav className="vanillaHeader-nav vanillaHeader-guestNav">
                                                 <VanillaHeaderNavItem
                                                     linkClassName="button vanillaHeader-guestButton vanillaHeader-signIn"
                                                     to={`/entry/signin?target=${window.location.pathname}`}

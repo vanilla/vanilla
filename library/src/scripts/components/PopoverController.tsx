@@ -228,7 +228,10 @@ export default class PopoverController extends React.PureComponent<
         });
 
         if (parentElement && parentElement.contains(activeElement)) {
-            this.buttonRef.current && this.buttonRef.current.focus();
+            if (this.buttonRef.current) {
+                this.buttonRef.current.focus();
+                this.buttonRef.current.classList.add("focus-visible");
+            }
         }
         if (this.props.onVisibilityChange) {
             this.props.onVisibilityChange(false);

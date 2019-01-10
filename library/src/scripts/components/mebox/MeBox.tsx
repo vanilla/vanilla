@@ -11,6 +11,7 @@ import MessagesDropDown from "./pieces/MessagesDropDown";
 import UserDropdown from "./pieces/UserDropdown";
 import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
 import { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
+import MessagesToggle from "@library/components/mebox/pieces/MessagesToggle";
 
 export interface IMeBoxProps {
     className?: string;
@@ -43,6 +44,7 @@ export default class MeBox extends React.Component<IMeBoxProps> {
                     countClass={countClass}
                     buttonClassName={buttonClassName}
                     contentsClassName={contentClassName}
+                    toggleContentsClassName="meBox-buttonContent"
                 />
                 <UserDropdown
                     counts={this.props.counts}
@@ -50,6 +52,7 @@ export default class MeBox extends React.Component<IMeBoxProps> {
                     countsClass={countClass}
                     buttonClassName={buttonClassName}
                     contentsClassName={contentClassName}
+                    toggleContentClassName="meBox-buttonContent"
                 />
             </div>
         );

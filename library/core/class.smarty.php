@@ -12,7 +12,7 @@
 /**
  * Vanilla implementation of Smarty templating engine.
  */
-class Gdn_Smarty {
+class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
 
     /** @var Smarty The smarty object used for the template. */
     protected $_Smarty = null;

@@ -2968,7 +2968,7 @@ PASSWORDMETER;
 
             touchValue('Control', $row, 'TextBox');
 
-            if (strtolower($row['Control']) == 'callback') {
+            if (strtolower($row['Control']) == 'callback' || strtolower($row['Control']) == 'imageuploadpreview') {
                 $itemWrap = '';
             } else {
                 $defaultWrap = ['<li class="'.$this->getStyle('form-group')."\">\n", "\n</li>\n"];
@@ -3033,6 +3033,9 @@ PASSWORDMETER;
                 case 'imageupload':
                     $result .= $labelWrap
                         .$this->imageUploadWrap($row['Name'], $row['Options']);
+                    break;
+                case 'imageuploadpreview':
+                    $result .= $this->imageUploadPreview($row['Name'], $labelCode, $description, $row['RemoveUrl'] ?? '', $row['Options']);
                     break;
                 case 'textbox':
                     $row['Options']['Wrap'] = true;

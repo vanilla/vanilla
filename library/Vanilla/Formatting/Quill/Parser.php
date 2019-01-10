@@ -104,6 +104,7 @@ class Parser {
      * @return BlotGroupCollection
      */
     public function parse(array $operations, string $parseMode = self::PARSE_MODE_NORMAL): BlotGroupCollection {
+        $this->stripTrailingNewlines($operations);
         $operations = $this->splitPlainTextNewlines($operations);
         return new BlotGroupCollection($operations, $this->blotClasses, $parseMode);
     }
@@ -238,5 +239,21 @@ class Parser {
         }
 
         return $newOperations;
+    }
+
+    /**
+     * Strip trailing whitespace off of the end of rich-editor contents.
+     *
+     * The last line is always a line terminator so we know that we can strip strip any whitespace and replace it with
+     * a single line-terminator.
+     *
+     * @param array[] $operations The quill operations to loop through.
+     */
+    private function stripTrailingNewlines(array &$operations) {
+        $lastIndex = count($operations) - 1;
+        $lastOp = &$operations[$lastIndex];
+        if ($this->isOperationBareInsert($lastOp)) {
+            $lastOp["insert"] = preg_replace('/\s+$/', "\n", $lastOp["insert"]);
+        }
     }
 }

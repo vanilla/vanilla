@@ -1095,6 +1095,10 @@ class Gdn_Format {
      * @since 2.1
      */
     public static function plainText($body, $format = 'Html', $collapse = false) {
+        if ($format === \Vanilla\Formatting\Quill\Format::FORMAT_KEY) {
+            return self::getRichFormatter()->renderPlainText($body);
+        }
+
         $result = Gdn_Format::to($body, $format);
         $result = Gdn_Format::replaceSpoilers($result);
         if (strtolower($format) !== 'text') {
@@ -1126,6 +1130,9 @@ class Gdn_Format {
      * @since 2.1
      */
     public static function excerpt($body, $format = 'Html', $collapse = false) {
+        if ($format === \Vanilla\Formatting\Quill\Format::FORMAT_KEY) {
+            return self::getRichFormatter()->renderExcerpt($body);
+        }
         $result = Gdn_Format::to($body, $format);
         $result = Gdn_Format::replaceSpoilers($result);
         $result = Gdn_Format::replaceQuotes($result);
@@ -2473,23 +2480,10 @@ EOT;
      *
      * @param string $deltas A JSON encoded array of Quill deltas.
      *
-     * @throws Exception - When the deltas could not be JSON decoded.
      * @return string - The rendered HTML output.
      */
     public static function rich(string $deltas): string {
-        $operations = json_decode($deltas, true);
-        $title = t("There was an error rendering this rich post");
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            $link = "https://docs.vanillaforums.com/help/addons/rich-editor/#why-is-my-published-post-replaced-with-there-was-an-error-rendering-this-rich-post";
-            return "<div class='DismissMessage Warning userContent-error'>$title <a href='$link' rel='nofollow' title='$title'><span class='icon icon-warning-sign userContent-errorIcon'></span></a></div>";
-        }
-
-        $parser = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Parser::class);
-        $renderer = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Renderer::class);
-
-        $blotGroups = $parser->parse($operations);
-        return $renderer->render($blotGroups);
+        return self::getRichFormatter()->renderHTML($deltas);
     }
 
     /**
@@ -2497,57 +2491,24 @@ EOT;
      *
      * @param string|array $body The string or array body content of the post.
      * @param string $format The initial format of the post.
+     *
      * @return string
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
      */
-    public static function quoteEmbed($body, string $format): string {
-        if ($format === "Rich") {
-            if (is_string($body)) {
-                $body = json_decode($body, true);
-            }
-            return self::richQuote($body);
-        } else {
-            $previousLinksValue = c('Garden.Format.Links');
-            saveToConfig('Garden.Format.Links', false, ['Save' => false]);
-            $value = self::to($body, $format);
-
-            // These breaks make the collapsing behaviour much more difficult in a rich quote.
-            // Replace them with starting and closing p tags.
-            $value = str_replace("<br>", "</p><p>", $value);
-            saveToConfig('Garden.Format.Links', $previousLinksValue, ['Save' => false]);
-            return $value;
+    public static function quoteEmbed(string $body, string $format): string {
+        if ($format === \Vanilla\Formatting\Quill\Format::FORMAT_KEY) {
+            return self::getRichFormatter()->renderQuote($body);
         }
+
+        $previousLinksValue = c('Garden.Format.Links');
+        saveToConfig('Garden.Format.Links', false, ['Save' => false]);
+        $value = self::to($body, $format);
+
+        // These breaks make the collapsing behaviour much more difficult in a rich quote.
+        // Replace them with starting and closing p tags.
+        $value = str_replace("<br>", "</p><p>", $value);
+        saveToConfig('Garden.Format.Links', $previousLinksValue, ['Save' => false]);
+        return $value;
     }
-
-    /**
-     * Render a rich quote of Rich post.
-     *
-     * Use a slightly different parser and render configuration. Namely:
-     * - Quotes, spoilers, embeds have different rendering methods.
-     *
-     * @param array $operations
-     * @return string
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     */
-    public static function richQuote(array $operations): string {
-        $parser = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Parser::class);
-        $renderer = Gdn::getContainer()->get(Vanilla\Formatting\Quill\Renderer::class);
-
-        $blotGroups = $parser->parse($operations, \Vanilla\Formatting\Quill\Parser::PARSE_MODE_QUOTE);
-        $rendered = $renderer->render($blotGroups);
-        $result = str_replace("<p><br></p>", "", $rendered);
-        $result = str_replace("<p></p>", "", $result);
-        return $result;
-    }
-
-    const SAFE_PROTOCOLS = [
-        "http",
-        "https",
-        "tel",
-        "mailto",
-    ];
 
     /**
      * Sanitize a URL to ensure that it matches a whitelist of approved url schemes. If the url does not match one of these schemes, prepend `unsafe:` before it.
@@ -2556,20 +2517,31 @@ EOT;
      * @param string $body The contents of a post body.
      *
      * @return string[]
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
      */
     public static function getRichMentionUsernames(string $body): array {
-        /** @var \Vanilla\Formatting\Quill\Parser $parser */
-        $parser = Gdn::getContainer()->get(\Vanilla\Formatting\Quill\Parser::class);
-        $operations = json_decode($body, true);
-
-        if (json_last_error() === JSON_ERROR_NONE) {
-            return $parser->parseMentionUsernames($operations);
-        } else {
-            return [];
-        }
+        return self::getRichFormatter()->parseMentions($body);
     }
+
+    /**
+     * Get an instance of the rich post formatter.
+     *
+     * @return \Vanilla\Contracts\Formatting\FormatInterface
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     * @throws \Vanilla\Formatting\Exception\FormatterNotFoundException
+     */
+    private static function getRichFormatter(): \Vanilla\Contracts\Formatting\FormatInterface {
+        /** @var \Vanilla\Formatting\FormatFactory $formatter */
+        $formatter = Gdn::getContainer()->get(\Vanilla\Formatting\FormatFactory::class);
+        return $formatter->getFormatter(\Vanilla\Formatting\Quill\Format::FORMAT_KEY);
+    }
+
+    const SAFE_PROTOCOLS = [
+        "http",
+        "https",
+        "tel",
+        "mailto",
+    ];
 
     /**
      * Encode special CSS characters as hex.

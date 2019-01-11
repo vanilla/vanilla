@@ -19,6 +19,8 @@ class Format extends BaseFormat {
     use TwigRenderTrait;
     use StaticCacheTranslationTrait;
 
+    const FORMAT_KEY = "Rich";
+
     /** @var string */
     const RENDER_ERROR_MESSAGE = 'There was an error rendering this rich post.';
 
@@ -82,6 +84,25 @@ class Format extends BaseFormat {
     /**
      * @inheritdoc
      */
+    public function renderQuote(string $content): string {
+        try {
+            $operations = Parser::jsonToOperations($content);
+        } catch (FormattingException $e) {
+            return $this->renderErrorMessage();
+        }
+
+        $blotGroups = $this->parser->parse($operations, Parser::PARSE_MODE_QUOTE);
+        $rendered = $this->renderer->render($blotGroups);
+
+        // Trim out breaks and empty paragraphs.
+        $result = str_replace("<p><br></p>", "", $rendered);
+        $result = str_replace("<p></p>", "", $result);
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function filter(string $content): string {
         return $this->filterer->filter($content);
     }
@@ -91,6 +112,18 @@ class Format extends BaseFormat {
      */
     public function parseAttachments(string $content): array {
         return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function parseMentions(string $content): array {
+        try {
+            $operations = Parser::jsonToOperations($content);
+        } catch (FormattingException $e) {
+            return [];
+        }
+        return $this->parser->parseMentionUsernames($operations);
     }
 
     /**

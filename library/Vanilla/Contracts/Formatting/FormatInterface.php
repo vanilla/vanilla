@@ -45,6 +45,15 @@ interface FormatInterface {
     public function renderPlainText(string $content): string;
 
     /**
+     * Render a version of the content suitable to be quoted in other content.
+     *
+     * @param string $content The raw content to render.
+     *
+     * @return string
+     */
+    public function renderQuote(string $content): string;
+
+    /**
      * Format a particular string.
      *
      * @param string $content The content to render.
@@ -57,7 +66,7 @@ interface FormatInterface {
     /**
      * Parse a list of attachments from some contents.
      *
-     * @param string $content The content to render.
+     * @param string $content The raw content to parse.
      *
      * @return Attachment[]
      */
@@ -66,9 +75,18 @@ interface FormatInterface {
     /**
      * Parse out a list of headings from the post contents.
      *
-     * @param string $content The content to render.
+     * @param string $content The raw content to parse.
      *
      * @return Heading[]
      */
     public function parseHeadings(string $content): array;
+
+    /**
+     * Parse out a list of usernames mentioned in the post contents.
+     *
+     * @param string $content The raw content to parse.
+     *
+     * @return string[] A list of usernames.
+     */
+    public function parseMentions(string $content): array;
 }

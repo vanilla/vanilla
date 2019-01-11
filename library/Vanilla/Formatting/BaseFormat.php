@@ -32,4 +32,11 @@ abstract class BaseFormat implements FormatInterface {
         }
         return $excerpt;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function renderQuote(string $content): string {
+        return $this->renderHTML($content);
+    }
 }

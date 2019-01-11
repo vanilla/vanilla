@@ -17,6 +17,9 @@ $vanillaHeader-endElements_mobile_flexBasis: $vanillaHeader-button_size * 2;
 
 $vanillaHeader-compactSearch_maxWidth: 672px;
 
+$vanillaHeader-buttonContents_hover_bg: getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%) !default;
+$vanillaHeader-buttonContents_active_bg: getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%, true) !default;
+
 
 .vanillaHeader {
     height: $vanillaHeader_height;
@@ -72,6 +75,12 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
     @include mediaQuery-panelLayout_oneColumn {
         flex-shrink: 1;
         flex-basis: auto;
+    }
+
+    &.focus-visible {
+        .headerLogo-logo {
+            outline: solid 1px;
+        }
     }
 }
 
@@ -130,14 +139,6 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
     padding: 0 $vanillaHeader-spacer_width;
     border-radius: $vanillaHeader-button_borderRadius;
 
-    &:active,
-    &:hover,
-    &:focus {
-        color: $vanillaHeader_fg;
-        background-color: rgba(#000, .1);
-        border-radius: $vanillaHeader-button_borderRadius;
-    }
-
     @include mediaQuery-panelLayout_oneColumn {
         font-size: $vanillaHeader-button_mobile_fontSize;
         white-space: nowrap;
@@ -156,7 +157,9 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
     margin-left: auto;
 }
 
+
 .vanillaHeader-button {
+    position: relative;
     color: $vanillaHeader_fg;
     height: $vanillaHeader_height;
     min-width: $vanillaHeader-button_size;
@@ -164,16 +167,42 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 
     &:active,
     &:hover,
-    &:focus {
-        color: $vanillaHeader_fg;
-        background-color: rgba(#000, .1);
-        border-radius: $vanillaHeader-button_borderRadius;
+    &.focus-visible {
+        .meBox-contentHover,
+        .meBox-buttonContent {
+            border-radius: $vanillaHeader-button_borderRadius;
+            background-color: $vanillaHeader-buttonContents_hover_bg;
+        }
+    }
+
+    &.isOpen {
+        .meBox-contentHover,
+        .meBox-buttonContent {
+            background-color: $vanillaHeader-buttonContents_active_bg;
+        }
     }
 
     @include mediaQuery-panelLayout_oneColumn {
         height: $vanillaHeader_mobile_height;
     }
 }
+
+
+.vanillaHeader-searchCancel {
+    &.focus-visible {
+        .meBox-contentHover {
+            border-radius: $vanillaHeader-button_borderRadius;
+            background-color: $vanillaHeader-buttonContents_hover_bg;
+        }
+    }
+}
+
+
+.vanillaHeader-buttonContent {
+    @include flexCenterContent;
+    pointer-events: none;
+}
+
 
 .vanillaHeader-tabButton {
     display: block;
@@ -200,12 +229,6 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 .vanillaHeader-searchCancel {
     height: $formElement_height;
     user-select: none;
-}
-
-.vanillaHeader-buttonContent {
-    @include flexCenterContent;
-    height: $vanillaHeader-button_size;
-    pointer-events: none;
 }
 
 .vanillaHeader-user {
@@ -307,35 +330,56 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
     transform: translateX(-$global-gutter_halfSize); // so the icon is flush with the side margin, but still has the right padding when hovering.
 }
 
-// Guest Styles
-.vanillaHeader-signIn,
-.vanillaHeader-register {
-    border: solid $vanillaHeader_fg 1px;
-    font-weight: $global-fontWeight_semiBold;
-
-    &:hover,
-    &:active,
-    &:focus {
-        border: solid $vanillaHeader_bg 1px;
-        color: $vanillaHeader-bg;
-    }
-}
-
-
 .vanillaHeader-signIn {
-    color: $vanillaHeader-fg;
-    background-color: $vanillaMenu-signIn_bg;
-    margin: {
-        left: $vanillaMenu-guest_spacer * 1.5;
-        right: $vanillaMenu-guest_spacer;
+    &:not([disabled]) {
+        color: $vanillaHeader-fg;
+        background-color: $vanillaMenu-signIn_bg;
+        border: solid $vanillaHeader-fg 1px;
+        margin: {
+            left: $vanillaMenu-guest_spacer * 1.5;
+            right: $vanillaMenu-guest_spacer;
+        }
+
+        &:hover {
+            border: solid $vanillaHeader-fg 1px;
+            background-color: $vanillaMenu-signIn_bg_hover;
+            color: $vanillaHeader-fg;
+        }
+
+
+        &.focus-visible,
+        &:focus {
+            font-weight: $global-fontWeight_semiBold;
+        }
+    }
+
+    .vanillaHeaderNav-linkContent:after {
+        display: none;
     }
 }
 
 .vanillaHeader-register {
-    color: $vanillaHeader-bg;
-    background-color: $vanillaHeader-fg;
-    margin: {
-        left: $vanillaMenu-guest_spacer;
+    &:not([disabled]) {
+        color: $vanillaHeader-bg;
+        background-color: $vanillaHeader-fg;
+        border: solid $vanillaHeader-fg 1px;
+        margin: {
+            left: $vanillaMenu-guest_spacer;
+        }
+
+        &:hover {
+            color: $vanillaHeader-bg;
+            border: solid $vanillaHeader-fg 1px;
+            background-color: $vanillaMenu-register_bg_hover;
+        }
+
+        &.focus-visible,
+        &:focus {
+            font-weight: $global-fontWeight_semiBold;
+        }
+    }
+    .vanillaHeaderNav-linkContent:after {
+        display: none;
     }
 }
 

@@ -7,19 +7,29 @@
 
 namespace Vanilla;
 
+use Vanilla\Formatting\Exception\FormatterNotFoundException;
+use Vanilla\Formatting\Exception\FormattingException;
+use Vanilla\Formatting\FormatFactory;
+
 /**
  * Validates body fields to make sure it complies with its format.
  */
 class BodyFormatValidator {
     private $validators = [];
 
+    /** @var FormatFactory */
+    private $formatFactory;
+
     /**
      * BodyFormatValidator constructor.
+     *
+     * @param FormatFactory $formatFactory
      */
-    public function __construct() {
+    public function __construct(FormatFactory $formatFactory) {
         $this->validators = [
             'rich' => [$this, 'validateRich'],
         ];
+        $this->formatFactory = $formatFactory;
     }
 
     /**
@@ -53,49 +63,16 @@ class BodyFormatValidator {
      * @return string|Invalid Returns the re-encoded string on success or `Invalid` on failure.
      */
     private function validateRich($value, $field, $row = []) {
-        $value = json_decode($value, true);
-        if ($value === null) {
-            $value = new Invalid("%s is not valid rich text.");
-        } else {
-            // Re-encode the value to escape unicode values.
-            $this->stripUselessEmbedData($value);
-            $value = json_encode($value);
+        try {
+            $richFormatter = $this->formatFactory->getFormatter('rich');
+            $result = $richFormatter->filter($value);
+        } catch (FormattingException $e) {
+            $result = new Invalid($e->getMessage());
+        } catch (FormatterNotFoundException $e) {
+            $result = new Invalid($e->getMessage());
         }
 
-        return $value;
-    }
-
-    /**
-     * There is certain embed data from the rich editor that we want to strip out. This includes
-     *
-     * - Malformed partially formed operations (dataPromise).
-     * - Nested embed data.
-     *
-     * @param array[] $operations The quill operations to loop through.
-     */
-    private function stripUselessEmbedData(array &$operations) {
-        foreach($operations as $key => $op) {
-            // If a dataPromise is still stored on the embed, that means it never loaded properly on the client.
-            $dataPromise = $op['insert']['embed-external']['dataPromise'] ?? null;
-            if ($dataPromise !== null) {
-                unset($operations[$key]);
-            }
-
-            // Remove nested external embed data. We don't want it rendered and this will prevent it from being
-            // searched.
-            $format = $op['insert']['embed-external']['data']['format'] ?? null;
-            if ($format === 'Rich') {
-                $bodyRaw = $op['insert']['embed-external']['data']['bodyRaw'] ?? null;
-                if (is_array($bodyRaw)) {
-                    foreach ($bodyRaw as $subInsertIndex => &$subInsertOp) {
-                        $externalEmbed = $operations[$key]['insert']['embed-external']['data']['bodyRaw'][$subInsertIndex]['insert']['embed-external'] ?? null;
-                        if ($externalEmbed !== null)  {
-                            unset($operations[$key]['insert']['embed-external']['data']['bodyRaw'][$subInsertIndex]['insert']['embed-external']['data']);
-                        }
-                    }
-                }
-            }
-        }
+        return $result;
     }
 
     /**

@@ -7,10 +7,14 @@
 
 namespace Vanilla\Formatting\Quill;
 
+use Garden\Schema\ValidationException;
 use Garden\StaticCacheTranslationTrait;
+use Vanilla\Formatting\Attachment;
 use Vanilla\Formatting\BaseFormat;
+use Vanilla\Formatting\Embeds\FileEmbed;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Heading;
+use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Web\Html\TwigRenderTrait;
 
@@ -111,7 +115,34 @@ class Format extends BaseFormat {
      * @inheritdoc
      */
     public function parseAttachments(string $content): array {
-        return [];
+        $outline = [];
+
+        try {
+            $operations = Parser::jsonToOperations($content);
+        } catch (FormattingException $e) {
+            return [];
+        }
+
+        $parser = (new Parser())
+            ->addBlot(ExternalBlot::class);
+        $blotGroups = $parser->parse($operations);
+
+        /** @var BlotGroup $blotGroup */
+        foreach ($blotGroups as $blotGroup) {
+            $blot = $blotGroup->getPrimaryBlot();
+            if (
+                $blot instanceof ExternalBlot &&
+                ($embedData = $blot->getEmbedData()['type'] ?? null) === FileEmbed::EMBED_TYPE
+            ) {
+                try {
+                    $attachment = Attachment::fromArray($embedData);
+                    $outline[] = $attachment;
+                } catch(ValidationException $e) {
+                    continue;
+                }
+            }
+        }
+        return $outline;
     }
 
     /**

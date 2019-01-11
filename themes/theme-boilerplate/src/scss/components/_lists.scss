@@ -406,7 +406,7 @@
 
     .ItemComment,
     .ItemDiscussion {
-        padding: $utility-small_padding !important;
+        padding: 0;
 
         .Options {
             top: $utility-medium_padding;
@@ -428,6 +428,21 @@
                 position: absolute;
                 top: $utility-medium_padding;
                 left: $utility-medium_padding;
+            }
+
+            .MItem.RoleTracker {
+                padding: 0 $utility-small_padding;
+
+                a {
+                    color: inherit;
+                    margin: 0;
+
+                    &:hover,
+                    &:focus,
+                    &:active {
+                        text-decoration: none;
+                    }
+                }
             }
 
             .Meta,
@@ -461,16 +476,8 @@
 
             .MItem.RoleTitle,
             .MItem.Rank {
-                display: inline;
-                white-space: normal;
-                font-weight: normal;
-                font-size: 10px;
-                color: $global-color_primary;
-                text-transform: uppercase;
-                border: 1px solid $global-color-primary;
-                padding: $utility-xSmall_padding;
-                display: inline-flex;
-                border-radius: $global_borderRadius;
+                @include Tag;
+                color: inherit;
             }
 
             .Meta,

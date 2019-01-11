@@ -140,7 +140,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     public function testGetEdit($record = null) {
         if ($record === null) {
             $record = $this->record();
-            $row = $this->testPost();
+            $row = $this->testPost($record);
         } else {
             $row = $record;
         }

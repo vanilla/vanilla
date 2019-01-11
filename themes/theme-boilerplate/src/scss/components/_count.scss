@@ -8,7 +8,7 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$count_fontWeight:                  $global-normal_fontWeight !default;
+$count_fontWeight:                  inherit !default;
 $count_fontSize:                    $global-small_fontSize !default;
 $count_borderRadius:                $global_borderRadius !default;
 $count_height:                      $formButton_height !default;

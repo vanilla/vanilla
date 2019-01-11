@@ -393,10 +393,10 @@ $menuItems_width:                       200px !default;
     }
 }
 
-.OnlineUserWrap .OnlineUserName,
+.OnlineUserWrap .OnlineUserName.OnlineUserName,
 .MenuItems-Reactions {
     @include shadow-dropDown;
-    color: $flyout_bg !important;
+    color: $flyout_fg !important;
     border: $flyout_border;
     border-radius: $flyout_borderRadius;
     background-color: $flyout_bg;

@@ -14,7 +14,7 @@ use Vanilla\Formatting\Heading;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Web\Html\TwigRenderTrait;
 
-class QuillFormat extends BaseFormat {
+class Format extends BaseFormat {
 
     use TwigRenderTrait;
     use StaticCacheTranslationTrait;
@@ -43,10 +43,9 @@ class QuillFormat extends BaseFormat {
      * @inheritdoc
      */
     public function renderHTML(string $content): string {
-        $operations = json_decode($content, true);
-
-        // Early bailout if we couldn't parse out the JSON.
-        if ($this->isValidOperations($operations)) {
+        try {
+            $operations = Parser::jsonToOperations($content);
+        } catch (FormattingException $e) {
             return $this->renderErrorMessage();
         }
 
@@ -59,11 +58,9 @@ class QuillFormat extends BaseFormat {
      */
     public function renderPlainText(string $content): string {
         $text = '';
-        self::t(self::RENDER_ERROR_MESSAGE);
-        $operations = json_decode($content, true);
-
-        // Early bailout if we couldn't parse out the JSON.
-        if ($this->isValidOperations($operations)) {
+        try {
+            $operations = Parser::jsonToOperations($content);
+        } catch (FormattingException $e) {
             return self::t(self::RENDER_ERROR_MESSAGE);
         }
 
@@ -80,15 +77,10 @@ class QuillFormat extends BaseFormat {
      * @inheritdoc
      */
     public function filter(string $content): string {
-        $operations = json_decode($content, true);
-        if ($this->isValidOperations($operations)) {
-            $operations = new FormattingException(sprintf("%s is not valid rich text.", $content));
-        } else {
-            // Re-encode the value to escape unicode values.
-            $this->stripUselessEmbedData($operations);
-            $operations = json_encode($operations);
-        }
-
+        $operations = Parser::jsonToOperations($content);
+        // Re-encode the value to escape unicode values.
+        $this->stripUselessEmbedData($operations);
+        $operations = json_encode($operations);
         return $operations;
     }
 
@@ -104,9 +96,10 @@ class QuillFormat extends BaseFormat {
      */
     public function parseHeadings(string $content): array {
         $outline = [];
-        $operations = json_decode($content, true);
 
-        if (!$this->isValidOperations($operations)) {
+        try {
+            $operations = Parser::jsonToOperations($content);
+        } catch (FormattingException $e) {
             return [];
         }
 
@@ -126,17 +119,6 @@ class QuillFormat extends BaseFormat {
             }
         }
         return $outline;
-    }
-
-    /**
-     * Verify that the JSON decoded string contents are valid quill operations.
-     *
-     * @param mixed $operations
-     *
-     * @return bool
-     */
-    private function isValidOperations($operations): bool {
-        return json_last_error() !== JSON_ERROR_NONE || !is_array($operations);
     }
 
     /**

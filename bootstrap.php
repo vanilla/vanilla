@@ -280,6 +280,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
     ->setShared(true)
+
+    ->rule(Vanilla\Formatting\FormatFactory::class)
+    ->addCall('registerFormat', [\Vanilla\Formatting\Quill\Format::class])
+    ->setShared(true)
 ;
 
 // Run through the bootstrap with dependencies.

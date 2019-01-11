@@ -8,7 +8,8 @@
 namespace Vanilla\Formatting;
 
 use Psr\Container\ContainerInterface;
-use Vanilla\Formatting\Exception\FormattingException;
+use Vanilla\Contracts\Formatting\FormatInterface;
+use Vanilla\Formatting\Exception\FormatterNotFoundException;
 
 class FormatFactory {
     /** @var [] */
@@ -38,15 +39,15 @@ class FormatFactory {
      * Get an instance of a formatter.
      *
      * @param string $formatKey
-     * @return AbstractFormat
-     * @throws FormattingException()
+     * @return FormatInterface
+     * @throws FormatterNotFoundException
      */
-    public function getFormatter(string $formatKey): AbstractFormat {
+    public function getFormatter(string $formatKey): FormatInterface {
         $formatClass = $this->formats[$formatKey];
         $formatter = $this->container->get($formatClass);
 
-        if (!($formatter instanceof AbstractFormat)) {
-            throw new FormattingException("Unable to find a formatter for the formatKey $formatKey.");
+        if (!($formatter instanceof FormatInterface)) {
+            throw new FormatterNotFoundException("Unable to find a formatter for the formatKey $formatKey.");
         }
 
         return $formatter;

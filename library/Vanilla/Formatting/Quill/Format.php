@@ -28,16 +28,22 @@ class Format extends BaseFormat {
     /** @var Renderer */
     private $renderer;
 
+    /** @var Filterer */
+    private $filterer;
+
     /**
      * Constructor for DI.
      *
      * @param Parser $parser
      * @param Renderer $renderer
+     * @param Filterer $filterer
      */
-    public function __construct(Parser $parser, Renderer $renderer) {
+    public function __construct(Parser $parser, Renderer $renderer, Filterer $filterer) {
         $this->parser = $parser;
         $this->renderer = $renderer;
+        $this->filterer = $filterer;
     }
+
 
     /**
      * @inheritdoc
@@ -77,11 +83,7 @@ class Format extends BaseFormat {
      * @inheritdoc
      */
     public function filter(string $content): string {
-        $operations = Parser::jsonToOperations($content);
-        // Re-encode the value to escape unicode values.
-        $this->stripUselessEmbedData($operations);
-        $operations = json_encode($operations);
-        return $operations;
+        return $this->filterer->filter($content);
     }
 
     /**
@@ -133,38 +135,5 @@ class Format extends BaseFormat {
         ];
 
         return $this->renderTwig('resources/userContentError', $data);
-    }
-
-    /**
-     * There is certain embed data from the rich editor that we want to strip out. This includes
-     *
-     * - Malformed partially formed operations (dataPromise).
-     * - Nested embed data.
-     *
-     * @param array[] $operations The quill operations to loop through.
-     */
-    private function stripUselessEmbedData(array &$operations) {
-        foreach($operations as $key => $op) {
-            // If a dataPromise is still stored on the embed, that means it never loaded properly on the client.
-            $dataPromise = $op['insert']['embed-external']['dataPromise'] ?? null;
-            if ($dataPromise !== null) {
-                unset($operations[$key]);
-            }
-
-            // Remove nested external embed data. We don't want it rendered and this will prevent it from being
-            // searched.
-            $format = $op['insert']['embed-external']['data']['format'] ?? null;
-            if ($format === 'Rich') {
-                $bodyRaw = $op['insert']['embed-external']['data']['bodyRaw'] ?? null;
-                if (is_array($bodyRaw)) {
-                    foreach ($bodyRaw as $subInsertIndex => &$subInsertOp) {
-                        $externalEmbed = $operations[$key]['insert']['embed-external']['data']['bodyRaw'][$subInsertIndex]['insert']['embed-external'] ?? null;
-                        if ($externalEmbed !== null)  {
-                            unset($operations[$key]['insert']['embed-external']['data']['bodyRaw'][$subInsertIndex]['insert']['embed-external']['data']);
-                        }
-                    }
-                }
-            }
-        }
     }
 }

@@ -139,8 +139,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      */
     public function testGetEdit($record = null) {
         if ($record === null) {
-            $record = $this->record();
-            $row = $this->testPost($record);
+            $row = $this->testPost();
         } else {
             $row = $record;
         }
@@ -150,7 +149,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         );
 
         $this->assertEquals(200, $r->getStatusCode());
-        $this->assertRowsEqual(arrayTranslate($record, $this->editFields), $r->getBody());
+        $this->assertRowsEqual(arrayTranslate($row, $this->editFields), $r->getBody());
         $this->assertCamelCase($r->getBody());
 
         return $r->getBody();

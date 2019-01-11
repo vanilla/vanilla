@@ -266,7 +266,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
 
     ->rule('ViewHandler.twig')
-    ->setClass(\Vanilla\Web\LegacyTwigViewHandler::class)
+    ->setClass(\Vanilla\Web\Html\LegacyTwigViewHandler::class)
     ->setShared(true)
 
     ->rule('Gdn_Form')

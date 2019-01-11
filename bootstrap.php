@@ -282,7 +282,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
 
     ->rule(Vanilla\Formatting\FormatFactory::class)
-    ->addCall('registerFormat', [\Vanilla\Formatting\Quill\Format::class])
+    ->addCall('registerFormat', [\Vanilla\Formatting\Quill\Format::FORMAT_KEY, \Vanilla\Formatting\Quill\Format::class])
     ->setShared(true)
 ;
 

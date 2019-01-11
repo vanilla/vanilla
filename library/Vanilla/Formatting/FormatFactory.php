@@ -7,7 +7,7 @@
 
 namespace Vanilla\Formatting;
 
-use Psr\Container\ContainerInterface;
+use Garden\Container\Container;
 use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\Formatting\Exception\FormatterNotFoundException;
 
@@ -15,15 +15,15 @@ class FormatFactory {
     /** @var [] */
     private $formats = [];
 
-    /** @var ContainerInterface */
+    /** @var Container */
     private $container;
 
     /**
      * Format Factory constructor
      *
-     * @param ContainerInterface $container The container instance so we can create Format instances.
+     * @param Container $container The container instance so we can create Format instances.
      */
-    public function __construct(ContainerInterface $container) {
+    public function __construct(Container $container) {
         $this->container = $container;
     }
 
@@ -33,7 +33,9 @@ class FormatFactory {
      * @param string $formatKey
      * @param string $formatClass
      */
-    public function registerFormat(string $formatKey, string $formatClass) {}
+    public function registerFormat(string $formatKey, string $formatClass) {
+        $this->formats[$formatKey] = $formatClass;
+    }
 
     /**
      * Get an instance of a formatter.

@@ -7,6 +7,7 @@
 
 namespace Vanilla\Formatting\Quill;
 
+use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Quill\Blots;
 use Vanilla\Formatting\Quill\Formats;
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
@@ -127,6 +128,23 @@ class Parser {
         }
 
         return $mentionUsernames;
+    }
+
+    /**
+     * Attempt to convert a JSON string into an array of operations.
+     *
+     * @param string $json
+     *
+     * @return array
+     * @throws FormattingException If valid operations could not be produced.
+     */
+    public static function jsonToOperations(string $json): array {
+        $operations = json_decode($json, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($operations)) {
+            throw new FormattingException("JSON could not be converted into quill operations.\n $json");
+        }
+        return $operations;
     }
 
     /**

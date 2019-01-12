@@ -8,6 +8,8 @@
 namespace Vanilla\Formatting;
 
 use Garden\Container\Container;
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\Formatting\Exception\FormatterNotFoundException;
 
@@ -46,10 +48,15 @@ class FormatFactory {
      */
     public function getFormatter(string $formatKey): FormatInterface {
         $formatClass = $this->formats[$formatKey];
-        $formatter = $this->container->get($formatClass);
+        $errorMessage = "Unable to find a formatter for the formatKey $formatKey.";
+        if (!$formatClass) {
+            throw new FormatterNotFoundException($errorMessage);
+        }
 
-        if (!($formatter instanceof FormatInterface)) {
-            throw new FormatterNotFoundException("Unable to find a formatter for the formatKey $formatKey.");
+        try {
+            $formatter = $this->container->get($formatClass);
+        } catch (ContainerException $e) {
+            throw new FormatterNotFoundException($errorMessage);
         }
 
         return $formatter;

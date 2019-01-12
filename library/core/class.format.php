@@ -1095,7 +1095,7 @@ class Gdn_Format {
      * @since 2.1
      */
     public static function plainText($body, $format = 'Html', $collapse = false) {
-        if ($format === \Vanilla\Formatting\Quill\Format::FORMAT_KEY) {
+        if ($format === \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) {
             return self::getRichFormatter()->renderPlainText($body);
         }
 
@@ -1130,7 +1130,7 @@ class Gdn_Format {
      * @since 2.1
      */
     public static function excerpt($body, $format = 'Html', $collapse = false) {
-        if ($format === \Vanilla\Formatting\Quill\Format::FORMAT_KEY) {
+        if ($format === \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) {
             return self::getRichFormatter()->renderExcerpt($body);
         }
         $result = Gdn_Format::to($body, $format);
@@ -2495,7 +2495,7 @@ EOT;
      * @return string
      */
     public static function quoteEmbed(string $body, string $format): string {
-        if ($format === \Vanilla\Formatting\Quill\Format::FORMAT_KEY) {
+        if ($format === \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) {
             return self::getRichFormatter()->renderQuote($body);
         }
 
@@ -2533,7 +2533,7 @@ EOT;
     private static function getRichFormatter(): \Vanilla\Contracts\Formatting\FormatInterface {
         /** @var \Vanilla\Formatting\FormatFactory $formatter */
         $formatter = Gdn::getContainer()->get(\Vanilla\Formatting\FormatFactory::class);
-        return $formatter->getFormatter(\Vanilla\Formatting\Quill\Format::FORMAT_KEY);
+        return $formatter->getFormatter(\Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY);
     }
 
     const SAFE_PROTOCOLS = [

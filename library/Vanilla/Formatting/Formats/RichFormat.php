@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Formatting\Quill;
+namespace Vanilla\Formatting\Formats;
 
 use Garden\Schema\ValidationException;
 use Garden\StaticCacheTranslationTrait;
@@ -17,8 +17,9 @@ use Vanilla\Formatting\Heading;
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Web\Html\TwigRenderTrait;
+use Vanilla\Formatting\Quill;
 
-class Format extends BaseFormat {
+class RichFormat extends BaseFormat {
 
     use TwigRenderTrait;
     use StaticCacheTranslationTrait;
@@ -28,23 +29,23 @@ class Format extends BaseFormat {
     /** @var string */
     const RENDER_ERROR_MESSAGE = 'There was an error rendering this rich post.';
 
-    /** @var Parser */
+    /** @var Quill\Parser */
     private $parser;
 
-    /** @var Renderer */
+    /** @var Quill\Renderer */
     private $renderer;
 
-    /** @var Filterer */
+    /** @var Quill\Filterer */
     private $filterer;
 
     /**
      * Constructor for DI.
      *
-     * @param Parser $parser
-     * @param Renderer $renderer
-     * @param Filterer $filterer
+     * @param Quill\Parser $parser
+     * @param Quill\Renderer $renderer
+     * @param Quill\Filterer $filterer
      */
-    public function __construct(Parser $parser, Renderer $renderer, Filterer $filterer) {
+    public function __construct(Quill\Parser $parser, Quill\Renderer $renderer, Quill\Filterer $filterer) {
         $this->parser = $parser;
         $this->renderer = $renderer;
         $this->filterer = $filterer;
@@ -56,7 +57,7 @@ class Format extends BaseFormat {
      */
     public function renderHTML(string $content): string {
         try {
-            $operations = Parser::jsonToOperations($content);
+            $operations = Quill\Parser::jsonToOperations($content);
         } catch (FormattingException $e) {
             return $this->renderErrorMessage();
         }
@@ -71,14 +72,14 @@ class Format extends BaseFormat {
     public function renderPlainText(string $content): string {
         $text = '';
         try {
-            $operations = Parser::jsonToOperations($content);
+            $operations = Quill\Parser::jsonToOperations($content);
         } catch (FormattingException $e) {
             return self::t(self::RENDER_ERROR_MESSAGE);
         }
 
         $blotGroups = $this->parser->parse($operations);
 
-        /** @var BlotGroup $blotGroup */
+        /** @var Quill\BlotGroup $blotGroup */
         foreach ($blotGroups as $blotGroup) {
             $text .= $blotGroup->getUnsafeText();
         }
@@ -90,12 +91,12 @@ class Format extends BaseFormat {
      */
     public function renderQuote(string $content): string {
         try {
-            $operations = Parser::jsonToOperations($content);
+            $operations = Quill\Parser::jsonToOperations($content);
         } catch (FormattingException $e) {
             return $this->renderErrorMessage();
         }
 
-        $blotGroups = $this->parser->parse($operations, Parser::PARSE_MODE_QUOTE);
+        $blotGroups = $this->parser->parse($operations, Quill\Parser::PARSE_MODE_QUOTE);
         $rendered = $this->renderer->render($blotGroups);
 
         // Trim out breaks and empty paragraphs.
@@ -118,16 +119,16 @@ class Format extends BaseFormat {
         $outline = [];
 
         try {
-            $operations = Parser::jsonToOperations($content);
+            $operations = Quill\Parser::jsonToOperations($content);
         } catch (FormattingException $e) {
             return [];
         }
 
-        $parser = (new Parser())
+        $parser = (new Quill\Parser())
             ->addBlot(ExternalBlot::class);
         $blotGroups = $parser->parse($operations);
 
-        /** @var BlotGroup $blotGroup */
+        /** @var Quill\BlotGroup $blotGroup */
         foreach ($blotGroups as $blotGroup) {
             $blot = $blotGroup->getPrimaryBlot();
             if (
@@ -150,7 +151,7 @@ class Format extends BaseFormat {
      */
     public function parseMentions(string $content): array {
         try {
-            $operations = Parser::jsonToOperations($content);
+            $operations = Quill\Parser::jsonToOperations($content);
         } catch (FormattingException $e) {
             return [];
         }
@@ -164,16 +165,16 @@ class Format extends BaseFormat {
         $outline = [];
 
         try {
-            $operations = Parser::jsonToOperations($content);
+            $operations = Quill\Parser::jsonToOperations($content);
         } catch (FormattingException $e) {
             return [];
         }
 
-        $parser = (new Parser())
+        $parser = (new Quill\Parser())
             ->addBlot(HeadingTerminatorBlot::class);
         $blotGroups = $parser->parse($operations);
 
-        /** @var BlotGroup $blotGroup */
+        /** @var Quill\BlotGroup $blotGroup */
         foreach ($blotGroups as $blotGroup) {
             $blot = $blotGroup->getPrimaryBlot();
             if ($blot instanceof HeadingTerminatorBlot && $blot->getReference()) {

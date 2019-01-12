@@ -2503,7 +2503,8 @@ if (!function_exists('\Gdn::config()->touch')) {
      *
      * @deprecated 2.8 Use Gdn_Configuration::touch()
      */
-    function \Gdn::config()->touch($name, $default = null) {
+    function touchConfig($name, $default = null) {
+        deprecated(__FUNCTION__, 'Gdn_Configuration::touch()');
         Gdn::config()->touch($name, $default);
     }
 }

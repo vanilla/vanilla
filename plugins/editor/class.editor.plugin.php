@@ -1465,7 +1465,7 @@ class EditorPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function structure() {
-         $pluginEditors = [
+        $pluginEditors = [
             'cleditor',
             'ButtonBar',
             'Emotify',

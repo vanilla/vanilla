@@ -2491,7 +2491,7 @@ if (!function_exists('recordType')) {
     }
 }
 
-if (!function_exists('touchConfig')) {
+if (!function_exists('\Gdn::config()->touch')) {
     /**
      * Make sure the config has a setting.
      *
@@ -2503,7 +2503,7 @@ if (!function_exists('touchConfig')) {
      *
      * @deprecated 2.8 Use Gdn_Configuration::touch()
      */
-    function touchConfig($name, $default = null) {
+    function \Gdn::config()->touch($name, $default = null) {
         Gdn::config()->touch($name, $default);
     }
 }

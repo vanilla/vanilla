@@ -246,6 +246,14 @@ class Bootstrap {
 
             ->rule(\Vanilla\Formatting\Quill\Renderer::class)
             ->setShared(true)
+
+            ->rule('BBCodeFormatter')
+            ->setClass(\BBCode::class)
+            ->setShared(true)
+
+            ->rule('HtmlFormatter')
+            ->setClass(\VanillaHtmlFormatter::class)
+            ->setShared(true)
         ;
     }
 

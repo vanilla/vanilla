@@ -8,10 +8,8 @@
 namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
 use VanillaTests\Library\Vanilla\Formatting\FixtureRenderingTest;
-use Vanilla\Formatting\Quill\Parser;
-use Vanilla\Formatting\Quill\Renderer;
 
-class LegacyFormatterTest extends FixtureRenderingTest {
+class GdnFormatTest extends FixtureRenderingTest {
 
     const FIXTURE_DIR = self::FIXTURE_ROOT . '/formats';
 
@@ -24,8 +22,8 @@ class LegacyFormatterTest extends FixtureRenderingTest {
         list($input, $expectedOutput) = $this->getFixture(self::FIXTURE_DIR . '/bbcode/html/' . $fixtureDir);
         $output = \Gdn_Format::to($input, "bbcode");
         $this->assertHtmlStringEqualsHtmlString(
-            htmlspecialchars($expectedOutput), // Gdn_Format does htmlspecialchars
-            $output,
+            $expectedOutput, // Needed so code blocks are equivalently decoded
+            $output, // Gdn_Format does htmlspecialchars
             "Expected html outputs for fixture $fixtureDir did not match."
         );
     }

@@ -7,11 +7,14 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
-use VanillaTests\Library\Vanilla\Formatting\FixtureRenderingTest;
+use VanillaTests\Library\Vanilla\Formatting\FixtureRenderingTestCase;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Formatting\Quill\Renderer;
 
-class RendererTest extends FixtureRenderingTest {
+/**
+ * Tests for the Quill Renderer.
+ */
+class RendererTest extends FixtureRenderingTestCase {
 
     const FIXTURE_DIR = self::FIXTURE_ROOT . '/formats/rich';
 
@@ -52,6 +55,11 @@ class RendererTest extends FixtureRenderingTest {
         );
     }
 
+    /**
+     * Provide inputs and expected HTML outputs.
+     *
+     * @return array
+     */
     public function provideHtml() {
         $res = $this->createFixtureDataProvider('/formats/rich/html');
         return $res;

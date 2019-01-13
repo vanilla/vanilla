@@ -9,11 +9,21 @@ namespace VanillaTests\Library\Vanilla\Formatting;
 
 use voku\helper\HtmlMin;
 
+/**
+ * Trait for normalizing some HTML to make test assertions easier.
+ */
 trait HtmlNormalizeTrait {
     /** @var HtmlMin */
-    protected $minifier;
+    private $minifier;
 
-    protected function minifyHTML(string $html): string {
+    /**
+     * Minify some HTML to help normalize it's shape.
+     *
+     * @param string $html
+     *
+     * @return string
+     */
+    private function minifyHTML(string $html): string {
         if ($this->minifier === null) {
             $this->minifier = new HtmlMin();
             $this->minifier->doRemoveSpacesBetweenTags()

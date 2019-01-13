@@ -9,21 +9,30 @@ namespace VanillaTests\Library\Vanilla\Formatting;
 
 use VanillaTests\SharedBootstrapTestCase;
 
-class FixtureRenderingTest extends SharedBootstrapTestCase {
+/**
+ * Base test case for rendering some input/output from a fixture.
+ */
+class FixtureRenderingTestCase extends SharedBootstrapTestCase {
 
     use HtmlNormalizeTrait;
 
     const FIXTURE_ROOT = PATH_ROOT . '/tests/fixtures';
 
     /**
+     * Get the expected in and out contents from a directory.
+     *
+     * Directory should contain:
+     * - input.*
+     * - output.*
+     *
      * @param string $fixtureDir
      *
      * @return string[] A tuple of the input and expected output.
      * @throws \Exception When a fixture doesn't have the exactly 1 input & output.
      */
     public function getFixture(string $fixtureDir): array {
-        $inputs = glob( $fixtureDir . '/input.*');
-        $outputs = glob( $fixtureDir . '/output.*');
+        $inputs = glob($fixtureDir . '/input.*');
+        $outputs = glob($fixtureDir . '/output.*');
 
         if (count($inputs) !== 1) {
             throw new \Exception("There must be exactly 1 input when fetching a fixture.");
@@ -51,6 +60,13 @@ class FixtureRenderingTest extends SharedBootstrapTestCase {
         $this->assertEquals($expected, $actual, $message);
     }
 
+    /**
+     * Create a PHPUnit data provider value for a fixture.
+     *
+     * @param string $fixtureDir
+     *
+     * @return array
+     */
     protected function createFixtureDataProvider(string $fixtureDir) {
         $paramSets = [];
 

@@ -22,8 +22,8 @@ class FixtureRenderingTest extends SharedBootstrapTestCase {
      * @throws \Exception When a fixture doesn't have the exactly 1 input & output.
      */
     public function getFixture(string $fixtureDir): array {
-        $inputs = glob(self::FIXTURE_ROOT . $fixtureDir . '/input.*');
-        $outputs = glob(self::FIXTURE_ROOT . $fixtureDir . '/output.*');
+        $inputs = glob( $fixtureDir . '/input.*');
+        $outputs = glob( $fixtureDir . '/output.*');
 
         if (count($inputs) !== 1) {
             throw new \Exception("There must be exactly 1 input when fetching a fixture.");
@@ -49,5 +49,16 @@ class FixtureRenderingTest extends SharedBootstrapTestCase {
         $expected = $this->normalizeHtml($expected);
         $actual = $this->normalizeHtml($actual);
         $this->assertEquals($expected, $actual, $message);
+    }
+
+    protected function createFixtureDataProvider(string $fixtureDir) {
+        $paramSets = [];
+
+        $files = glob(self::FIXTURE_ROOT . "$fixtureDir/*", GLOB_ONLYDIR);
+        foreach ($files as $file) {
+            $paramSets[] = [basename($file)];
+        }
+
+        return $paramSets;
     }
 }

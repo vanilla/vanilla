@@ -38,18 +38,24 @@ class RendererTest extends FixtureRenderingTest {
      *
      * @throws \Garden\Container\ContainerException
      * @throws \Garden\Container\NotFoundException
-     * @dataProvider provideHtml
+     * @dataProvider dataProvider
      */
     public function testRender(string $dirname) {
-        list($input, $expectedOutput) = $this->getFixture(self::FIXTURE_DIR . '/html/' . $dirname);
+        list($input, $expectedOutput) = $this->getFixture(self::FIXTURE_DIR . '/' . $dirname);
         $json = \json_decode($input, true);
 
         $output = $this->render($json);
         $this->assertHtmlStringEqualsHtmlString($expectedOutput, $output, "Expected html outputs for fixture $dirname did not match.");
     }
 
-    public function provideHtml() {
-        $res = $this->createFixtureDataProvider('/formats/rich/html');
-        return $res;
+    public function dataProvider() {
+        $paramSets = [];
+
+        $files = glob(self::FIXTURE_ROOT . '/formats/rich/*', GLOB_ONLYDIR);
+        foreach ($files as $file) {
+            $paramSets[] = [basename($file)];
+        }
+
+        return $paramSets;
     }
 }

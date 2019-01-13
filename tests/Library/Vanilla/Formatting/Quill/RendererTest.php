@@ -45,7 +45,11 @@ class RendererTest extends FixtureRenderingTest {
         $json = \json_decode($input, true);
 
         $output = $this->render($json);
-        $this->assertHtmlStringEqualsHtmlString($expectedOutput, $output, "Expected html outputs for fixture $dirname did not match.");
+        $this->assertHtmlStringEqualsHtmlString(
+            $expectedOutput,
+            $output,
+            "Expected html outputs for fixture $dirname did not match."
+        );
     }
 
     public function provideHtml() {

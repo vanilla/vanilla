@@ -11,51 +11,26 @@ use VanillaTests\Library\Vanilla\Formatting\FixtureRenderingTest;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Formatting\Quill\Renderer;
 
-class RendererTest extends FixtureRenderingTest {
+class LegacyFormatterTest extends FixtureRenderingTest {
 
-    const FIXTURE_DIR = self::FIXTURE_ROOT . '/formats/rich';
-
-    /**
-     * Render a given set of operations.
-     *
-     * @param array $ops The operations to render.
-     *
-     * @return string
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     */
-    protected function render(array $ops): string {
-        $renderer = \Gdn::getContainer()->get(Renderer::class);
-        $parser = \Gdn::getContainer()->get(Parser::class);
-
-        return $renderer->render($parser->parse($ops));
-    }
+    const FIXTURE_DIR = self::FIXTURE_ROOT . '/formats';
 
     /**
-     * Full E2E tests for the Quill rendering.
-     *
-     * @param string $dirname The directory name to get fixtures from.
-     *
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     * @dataProvider dataProvider
+     * @param string $fixtureDir
+     * @throws \Exception
+     * @dataProvider provideBBCode
      */
-    public function testRender(string $dirname) {
-        list($input, $expectedOutput) = $this->getFixture(self::FIXTURE_DIR . '/' . $dirname);
-        $json = \json_decode($input, true);
-
-        $output = $this->render($json);
-        $this->assertHtmlStringEqualsHtmlString($expectedOutput, $output, "Expected html outputs for fixture $dirname did not match.");
+    public function testToBBCode(string $fixtureDir) {
+        list($input, $expectedOutput) = $this->getFixture(self::FIXTURE_DIR . '/bbcode/html/' . $fixtureDir);
+        $output = \Gdn_Format::to($input, "bbcode");
+        $this->assertHtmlStringEqualsHtmlString(
+            htmlspecialchars($expectedOutput), // Gdn_Format does htmlspecialchars
+            $output,
+            "Expected html outputs for fixture $fixtureDir did not match."
+        );
     }
 
-    public function dataProvider() {
-        $paramSets = [];
-
-        $files = glob(self::FIXTURE_ROOT . '/formats/rich/*', GLOB_ONLYDIR);
-        foreach ($files as $file) {
-            $paramSets[] = [basename($file)];
-        }
-
-        return $paramSets;
+    public function provideBBCode() {
+        return $this->createFixtureDataProvider('/formats/bbcode/html');
     }
 }

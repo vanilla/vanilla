@@ -6,6 +6,7 @@ use Vanilla\Addon;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Utility\ContainerUtils;
+use \Vanilla\Formatting\Formats;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -282,7 +283,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
 
     ->rule(Vanilla\Formatting\FormatFactory::class)
-    ->addCall('registerFormat', [\Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY, \Vanilla\Formatting\Formats\RichFormat::class])
+    ->addCall('registerFormat', [Formats\RichFormat::FORMAT_KEY, Formats\RichFormat::class])
     ->setShared(true)
 ;
 

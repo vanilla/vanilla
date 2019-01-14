@@ -67,12 +67,12 @@ $tag-hover_borderColor:           $global-color_primary !default;
 .DataList,
 .MessageList,
 .DataTableWrap {
-    .Tag,
+    .Tag.Tag,
     .NewCommentCount,
     .HasNew,
     .Tag-Poll,
     .RoleTracker,
-    .IdeationTag {
+    .IdeationTag.IdeationTag {
        @include Tag;
     }
 

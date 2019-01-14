@@ -176,15 +176,6 @@ class CategoriesTest extends AbstractResourceTest {
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function testGetEdit($record = null) {
-        $row = $this->testPost();
-        $result = parent::testGetEdit($row);
-        return $result;
-    }
-
-    /**
      * Test getting a list of followed categories.
      */
     public function testIndexFollowed() {

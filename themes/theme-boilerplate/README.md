@@ -52,6 +52,7 @@ Essentially you can overwrite whatever you like but be careful! Some variables a
 
 ### Version
 
+1.1.1 - Updates `_variables.scss`, make sure you update together with your variable sheet otherwise the build will not run.
 1.1.0 - Updated `default.master.tpl` to solve security vulnerability.
 
 ### Building Styles / Javascript / Images

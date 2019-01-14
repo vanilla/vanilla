@@ -19,7 +19,7 @@ export function fileGeneric(className?: string, fileType?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames("icon", "icon-fileGeneric", "attachmentIcon", className)}
+            className={classNames("attachmentIcon-fileGeneric", "attachmentIcon", className)}
             role="img"
             aria-label={title}
         >
@@ -40,7 +40,7 @@ export function fileWord(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames("icon", "icon-fileWord", "attachmentIcon", className)}
+            className={classNames("attachmentIcon-fileWord", "attachmentIcon", className)}
             role="img"
             aria-label={getUnabbreviatedAttachmentType(AttachmentType.WORD)}
         >
@@ -61,7 +61,7 @@ export function fileExcel(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames("icon", "icon-fileExcel", "attachmentIcon", className)}
+            className={classNames("attachmentIcon-fileExcel", "attachmentIcon", className)}
             role="img"
             aria-label={getUnabbreviatedAttachmentType(AttachmentType.EXCEL)}
         >
@@ -83,7 +83,7 @@ export function filePDF(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames("icon", "icon-filePDF", "attachmentIcon", className)}
+            className={classNames("attachmentIcon-filePDF", "attachmentIcon", className)}
             role="img"
             aria-label={getUnabbreviatedAttachmentType(AttachmentType.PDF)}
         >
@@ -109,7 +109,7 @@ export function fileImage(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames("icon", "icon-fileImage", "attachmentIcon", className)}
+            className={classNames("attachmentIcon-fileImage", "attachmentIcon", className)}
             role="img"
             aria-label={getUnabbreviatedAttachmentType(AttachmentType.IMAGE)}
         >
@@ -132,7 +132,7 @@ export function filePowerPoint(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames("icon", "icon-filePowerPoint", "attachmentIcon", className)}
+            className={classNames("attachmentIcon-filePowerPoint", "attachmentIcon", className)}
             role="img"
             aria-label={getUnabbreviatedAttachmentType(AttachmentType.IMAGE)}
         >
@@ -155,7 +155,7 @@ export function fileZip(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
-            className={classNames("icon", "icon-fileZip", "attachmentIcon", className)}
+            className={classNames("attachmentIcon-fileZip", "attachmentIcon", className)}
             role="img"
             aria-label={getUnabbreviatedAttachmentType(AttachmentType.IMAGE)}
         >
@@ -184,7 +184,7 @@ export function fileUploadError(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 18"
-            className={classNames("icon", "icon-error", "attachmentIcon", className)}
+            className={classNames("attachmentIcon-error", "attachmentIcon", className)}
             role="img"
             aria-label={title}
         >

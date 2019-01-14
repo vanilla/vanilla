@@ -65,9 +65,9 @@ export default class Attachment extends React.Component<IProps> {
 
         return (
             <div className={classNames("attachment", className)}>
-                <a href={url} className="attachment-link" type={mimeType} download={name} tabIndex={1}>
+                <a href={url} className="attachment-link attachment-box" type={mimeType} download={name} tabIndex={1}>
+                    {type && <div className="attachment-format">{getAttachmentIcon(type)}</div>}
                     <div className="attachment-main">
-                        {type && <div className="attachment-format">{getAttachmentIcon(type)}</div>}
                         <div className="attachment-title">{label}</div>
                         <div className="attachment-metas metas">
                             {dateUploaded && (

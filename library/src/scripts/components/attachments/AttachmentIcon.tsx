@@ -21,7 +21,7 @@ import Translate from "@library/components/translation/Translate";
 
 export enum AttachmentType {
     FILE = "file",
-    PPT = "power point",
+    PPT = "ppt",
     PDF = "pdf",
     EXCEL = "excel",
     WORD = "word",

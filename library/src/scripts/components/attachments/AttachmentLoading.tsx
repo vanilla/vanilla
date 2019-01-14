@@ -15,7 +15,7 @@ import { AttachmentType } from "@library/components/attachments/AttachmentIcon";
 import { getAttachmentIcon } from "@library/components/attachments";
 
 interface IProps extends IFileAttachment {
-    progress: number;
+    progress: number; // 0 to 100
     type: AttachmentType;
     size: number; // bytes
 }
@@ -29,7 +29,7 @@ export default class AttachmentLoading extends React.Component<IProps> {
         const label = title || name;
         return (
             <div className={classNames("attachment", "hasError", this.props.className)}>
-                <div className="attachment-box">
+                <div className="attachment-box attachment-loadingContent">
                     <div className="attachment-format">{getAttachmentIcon(type)}</div>
                     <div className="attachment-main">
                         <div className="attachment-title">{label}</div>
@@ -45,6 +45,10 @@ export default class AttachmentLoading extends React.Component<IProps> {
                         />
                     </Permission>
                 </div>
+                <div
+                    className="attachment-loadingProgress"
+                    style={{ width: `${Math.min(this.props.progress, 100)}%` }}
+                />
             </div>
         );
     }

@@ -10,6 +10,7 @@ namespace Vanilla;
 use Vanilla\Formatting\Exception\FormatterNotFoundException;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\FormatFactory;
+use Vanilla\Formatting\Formats;
 
 /**
  * Validates body fields to make sure it complies with its format.
@@ -64,7 +65,7 @@ class BodyFormatValidator {
      */
     private function validateRich($value, $field, $row = []) {
         try {
-            $richFormatter = $this->formatFactory->getFormatter('rich');
+            $richFormatter = $this->formatFactory->getFormatter(Formats\RichFormat::FORMAT_KEY);
             $result = $richFormatter->filter($value);
         } catch (FormattingException $e) {
             $result = new Invalid($e->getMessage());

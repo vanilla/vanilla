@@ -7,6 +7,7 @@
 namespace Vanilla\Formatting\Embeds;
 
 use Exception;
+
 /**
  * Getty Embed.
  */
@@ -25,8 +26,7 @@ class GettyEmbed extends Embed {
     /**
      * @inheritdoc
      */
-    public function matchUrl(string $url)
-    {
+    public function matchUrl(string $url) {
         $data = [];
 
         if ($this->isNetworkEnabled()) {
@@ -96,7 +96,7 @@ class GettyEmbed extends Embed {
     </div>
 </div>
 HTML;
-       return $result;
+        return $result;
     }
 
     /**
@@ -133,5 +133,4 @@ HTML;
         }
         return $data;
     }
-
 }

@@ -35,7 +35,7 @@ class FileEmbed extends Embed {
      *
      * @inheritdoc
      */
-    function matchUrl(string $url): array {
+    public function matchUrl(string $url): array {
         return [];
     }
 
@@ -46,7 +46,7 @@ class FileEmbed extends Embed {
      *
      * @return string
      */
-    function renderData(array $data): string {
+    public function renderData(array $data): string {
         $attributes = $data['attributes'] ?? null;
         $url = $attributes['url'] ?? null;
         $sanitizedUrl = htmlspecialchars(\Gdn_Format::sanitizeUrl($url));

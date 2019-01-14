@@ -37,34 +37,10 @@ export default apiv2;
  * Upload an image using Vanilla's API v2.
  *
  * @param file - The file to upload.
- *
- * @throws If the file given is not an image. You must check yourself first.
- */
-export async function uploadImage(image: File): Promise<IEmbedData> {
-    if (!isFileImage(image)) {
-        throw new Error(
-            `Unable to upload an image of type ${image.type}. Supported formats included .gif, .jpg and .png`,
-        );
-    }
-
-    const data = new FormData();
-    data.append("file", image, image.name);
-    data.append("type", "image");
-
-    const result = await apiv2.post("/media", data);
-    result.data.type = "image";
-    return result.data;
-}
-
-/**
- * Upload an image using Vanilla's API v2.
- *
- * @param file - The file to upload.
  */
 export async function uploadFile(file: File): Promise<IFileEmbed> {
     const data = new FormData();
     data.append("file", file, file.name);
-    data.append("type", "file");
 
     const result = await apiv2.post("/media", data);
     return result.data;

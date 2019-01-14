@@ -28,7 +28,7 @@ export default class AttachmentLoading extends React.Component<IProps> {
         const { title, name, type } = this.props;
         const label = title || name;
         return (
-            <div className={classNames("attachment", "hasError", this.props.className)}>
+            <div className={classNames("attachment", "isLoading", this.props.className)}>
                 <div className="attachment-box attachment-loadingContent">
                     <div className="attachment-format">{getAttachmentIcon(type)}</div>
                     <div className="attachment-main">

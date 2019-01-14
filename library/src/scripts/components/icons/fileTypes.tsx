@@ -184,7 +184,7 @@ export function fileUploadError(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 18"
-            className={classNames("attachmentIcon-error", "attachmentIcon", className)}
+            className={classNames("attachmentIcon-error", className)}
             role="img"
             aria-label={title}
         >

@@ -9,7 +9,7 @@ import { formatUrl, t } from "@library/application";
 import { isFileImage, indexArrayByKey } from "@library/utility";
 import axios from "axios";
 import qs from "qs";
-import { IEmbedData } from "@library/embeds";
+import { IEmbedData, IFileEmbed } from "@library/embeds";
 import { IFieldError, LoadStatus, ILoadable } from "@library/@types/api";
 
 function fieldErrorTransformer(responseData) {
@@ -53,6 +53,20 @@ export async function uploadImage(image: File): Promise<IEmbedData> {
 
     const result = await apiv2.post("/media", data);
     result.data.type = "image";
+    return result.data;
+}
+
+/**
+ * Upload an image using Vanilla's API v2.
+ *
+ * @param file - The file to upload.
+ */
+export async function uploadFile(file: File): Promise<IFileEmbed> {
+    const data = new FormData();
+    data.append("file", file, file.name);
+    data.append("type", "file");
+
+    const result = await apiv2.post("/media", data);
     return result.data;
 }
 

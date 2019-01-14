@@ -13,7 +13,16 @@ import { IDiscussionEmbed, ICommentEmbed, IScrapeData } from "@dashboard/@types/
 export const FOCUS_CLASS = "embed-focusableElement";
 
 export type IQuoteEmbedData = IDiscussionEmbed | ICommentEmbed;
-export type IEmbedData = IScrapeData;
+export type IEmbedData = IScrapeData | IFileEmbed;
+
+export interface IFileEmbed {
+    mediaID: number;
+    url: string;
+    name: string;
+    type: string;
+    size: number;
+    dateInserted: string;
+}
 
 export interface IEmbedElements {
     root: HTMLElement;
@@ -52,7 +61,7 @@ export function registerEmbedRenderer(type: string, renderer: EmbedRenderer) {
 /**
  * Register an embed rendering function.
  */
-export function registerEmbedComponent(type: string, component: React.ComponentClass<IEmbedProps>) {
+export function registerEmbedComponent(type: string, component: React.ComponentClass<IEmbedProps<any>>) {
     embedComponents[type] = component;
 }
 

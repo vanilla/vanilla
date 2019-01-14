@@ -3006,7 +3006,9 @@ class CategoryModel extends Gdn_Model {
                         $permissions = $permissionModel->pivotPermissions(val('Permission', $FormPostValues, []), ['JunctionID' => $CategoryID]);
                     }
 
-                    if ($Settings['overWrite'] === true) {
+                    $overWrite = (array_key_exists('overWrite', $Settings)) ? $Settings['overWrite'] : false;
+
+                    if ($overWrite || is_null($Settings)) {
                         $permissionModel->saveAll($permissions, ['JunctionID' => $CategoryID, 'JunctionTable' => 'Category']);
                     } else {
                         foreach ($permissions as $perm) {

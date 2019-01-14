@@ -271,6 +271,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Gdn_Form')
     ->addAlias('Form')
 
+    ->rule(\Emoji::class)
+    ->setShared(true)
+
     ->rule(Vanilla\Formatting\Embeds\EmbedManager::class)
     ->addCall('addCoreEmbeds')
     ->setShared(true)

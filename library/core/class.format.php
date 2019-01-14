@@ -12,7 +12,8 @@
  */
 
 use Garden\EventManager;
-use Vanilla\Renderer;
+use Vanilla\Formatting\Formats;
+use Vanilla\Formatting\Html;
 
 /**
  * Output formatter.
@@ -21,6 +22,7 @@ use Vanilla\Renderer;
  */
 class Gdn_Format {
     use \Garden\StaticCacheTranslationTrait;
+    use \Garden\StaticCacheConfigTrait;
 
     /**
      * @var bool Flag which allows plugins to decide if the output should include rel="nofollow" on any <a> links.
@@ -865,22 +867,15 @@ class Gdn_Format {
     public static function html($mixed) {
         if (!is_string($mixed)) {
             return self::to($mixed, 'Html');
-        } else {
-
-            // Always filter - in this case, no basic parsing is needed because we're already in HTML.
-            $sanitized = Gdn_Format::htmlFilter($mixed);
-
-            // Fix newlines in code blocks.
-            if (c('Garden.Format.ReplaceNewlines', true)) {
-                $sanitized = preg_replace("/(?!<code[^>]*?>)(\015\012|\012|\015)(?![^<]*?<\/code>)/", "<br />", $sanitized);
-                $sanitized = fixNl2Br($sanitized);
-            }
-
-            // Vanilla magic parsing.
-            $sanitized = Gdn_Format::processHTML($sanitized);
-
-            return $sanitized;
         }
+
+        /** @var Formats\HtmlFormat $htmlFormat */
+        $htmlFormat = self::getCachedInstance(Formats\HtmlFormat::class);
+        return $htmlFormat->renderHtml($mixed);
+    }
+
+    protected static function getCachedInstance($val) {
+
     }
 
     /**
@@ -1021,24 +1016,6 @@ class Gdn_Format {
      */
     public static function spoilerHtml($spoilerText) {
         return "<div class=\"Spoiler\">{$spoilerText}</div>";
-    }
-
-    /**
-     * Spoilers with backwards compatibility.
-     *
-     * In the Spoilers plugin, we would render BBCode-style spoilers in any format post and allow a title.
-     *
-     * @param string $html
-     * @return string
-     */
-    protected static function legacySpoilers($html) {
-        if (strpos($html, '[/spoiler]') !== false) {
-            $count = 0;
-            do {
-                $html = preg_replace('`\[spoiler(?:=(?:&quot;)?[\d\w_\',.? ]+(?:&quot;)?)?\](.*?)\[\/spoiler\]`usi', '<div class="Spoiler">$1</div>', $html, -1, $count);
-            } while ($count > 0);
-        }
-        return $html;
     }
 
     /**
@@ -1730,22 +1707,6 @@ EOT;
     }
 
     /**
-     * Get the event manager.
-     *
-     * The event manager should only be used by the formatter itself so leave this private.
-     *
-     * @return EventManager Returns the eventManager.
-     */
-    private static function getEventManager() {
-        if (self::$eventManager === null) {
-            global $dic;
-            static::$eventManager = $dic->get(EventManager::class);
-        }
-
-        return self::$eventManager;
-    }
-
-    /**
      * Formats BBCode list items.
      *
      * @param array $matches
@@ -1850,24 +1811,9 @@ EOT;
      * @return string The formatted HTML string.
      */
     protected static function processHTML($html, $mentions = true) {
-        // Do event first so it doesn't have to deal with the other formatters.
-        $html = self::getEventManager()->fireFilter('format_filterHtml', $html);
-
-        // Embed & auto-links.
-        $html = Gdn_Format::links($html, true);
-
-        // Mentions.
-        if ($mentions) {
-            $html = Gdn_Format::mentions($html);
-        }
-
-        // Emoji.
-        $html = Emoji::instance()->translateToHtml($html);
-
-        // Old Spoiler plugin markup handling.
-        $html = Gdn_Format::legacySpoilers($html);
-
-        return $html;
+        /** @var Html\HtmlEnhancer $htmlEnhancer */
+        $htmlEnhancer = self::getCachedInstance(Html\HtmlEnhancer::class);
+        return $htmlEnhancer->enhance((string) $html, (bool) $mentions);
     }
 
     /**

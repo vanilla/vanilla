@@ -95,7 +95,7 @@ class Emoji {
     /**
      *
      */
-    protected function __construct() {
+    public function __construct() {
         $this->assetPath = asset('/resources/emoji', true);
 
         // Initialize the canonical list. (emoji)

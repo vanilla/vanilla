@@ -14,11 +14,6 @@ use Gdn;
  *
  */
 trait StaticCacheTranslationTrait {
-    use StaticCacheTrait {
-        sc as t;
-        scInit as tInit;
-    }
-
     /**
      * Calculates value for particular key (overwrite f() of StaticCache trait)
      *
@@ -27,7 +22,7 @@ trait StaticCacheTranslationTrait {
      *
      * @return array
      */
-    protected static function f(string $key, $default) {
+    protected static function lookupTranslationKey(string $key, $default) {
         return Gdn::translate($key, $default);
     }
 }

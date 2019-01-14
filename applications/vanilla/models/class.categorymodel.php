@@ -3005,10 +3005,8 @@ class CategoryModel extends Gdn_Model {
                         // The permissions were posted in the web format provided by settings/addcategory and settings/editcategory
                         $permissions = $permissionModel->pivotPermissions(val('Permission', $FormPostValues, []), ['JunctionID' => $CategoryID]);
                     }
-
-                    $overWrite = (array_key_exists('overWrite', $Settings)) ? $Settings['overWrite'] : false;
-
-                    if ($overWrite || is_null($Settings)) {
+                    
+                    if ($Settings['overWrite'] ?? empty($Settings) ) {
                         $permissionModel->saveAll($permissions, ['JunctionID' => $CategoryID, 'JunctionTable' => 'Category']);
                     } else {
                         foreach ($permissions as $perm) {

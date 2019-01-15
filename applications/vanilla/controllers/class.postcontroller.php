@@ -660,7 +660,12 @@ class PostController extends VanillaController {
             $filters = ['Score'];
             $FormValues = $this->filterFormValues($FormValues, $filters);
             $FormValues = $this->CommentModel->filterForm($FormValues);
+            $formDiscussion = $this->DiscussionModel->getID($this->Form->_FormValues['DiscussionID']);
 
+            if ($formDiscussion && $formDiscussion->Closed === 1 && !CategoryModel::checkPermission($formDiscussion->CategoryID, 'Vanilla.Discussions.Close')) {
+                throw new Exception(t('You cannot comment in a closed discussion.'));
+            }
+            
             if (!$Editing) {
                 unset($FormValues['CommentID']);
             }

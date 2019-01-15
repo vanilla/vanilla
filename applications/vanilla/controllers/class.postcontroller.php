@@ -661,9 +661,11 @@ class PostController extends VanillaController {
             $FormValues = $this->filterFormValues($FormValues, $filters);
             $FormValues = $this->CommentModel->filterForm($FormValues);
             $formDiscussion = $this->DiscussionModel->getID($this->Form->_FormValues['DiscussionID']);
-            if ($formDiscussion && $formDiscussion->Closed === 1 && !checkPermission('Garden.Community.Manage')) {
+
+            if ($formDiscussion && $formDiscussion->Closed === 1 && !checkPermission('Vanilla.Discussions.Close')) {
                 throw new Exception(t('You cannot comment in a closed discussion.'));
             }
+            
             if (!$Editing) {
                 unset($FormValues['CommentID']);
             }

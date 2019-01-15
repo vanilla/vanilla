@@ -13,12 +13,15 @@ import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbed
 import ErrorBlot from "@rich-editor/quill/blots/embeds/ErrorBlot";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
+import ProgressEventEmitter from "@library/ProgressEventEmitter";
 
 const DATA_KEY = "__embed-data__";
 
 interface ILoaderData {
     type: "image" | "link" | "file";
+    file?: File;
     link?: string;
+    progressEventEmitter?: ProgressEventEmitter;
 }
 
 interface IEmbedUnloadedValue {

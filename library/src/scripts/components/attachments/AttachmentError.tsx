@@ -33,13 +33,11 @@ export default class AttachmentError extends React.Component<IProps> {
                             </div>
                         )}
                     </div>
-                    <Permission permission="articles.add">
-                        <CloseButton
-                            title={t("Cancel")}
-                            className="attachment-close"
-                            onClick={this.props.deleteAttachment}
-                        />
-                    </Permission>
+                    <CloseButton
+                        title={t("Cancel")}
+                        className="attachment-close"
+                        onClick={this.props.deleteAttachment}
+                    />
                 </div>
             </div>
         );

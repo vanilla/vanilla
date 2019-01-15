@@ -7,7 +7,7 @@
 
 import { formatUrl, t } from "@library/application";
 import { indexArrayByKey } from "@library/utility";
-import axios from "axios";
+import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 import qs from "qs";
 import { IFieldError, LoadStatus, ILoadable } from "@library/@types/api";
 
@@ -32,16 +32,25 @@ const apiv2 = axios.create({
 
 export default apiv2;
 
+export type ProgressHandler = (progressEvent: any) => void;
+
+export function createTrackableRequest(
+    requestFunction: (progressHandler: ProgressHandler) => () => Promise<AxiosResponse>,
+) {
+    return (onUploadProgress: ProgressHandler) => {
+        return requestFunction(onUploadProgress);
+    };
+}
 /**
  * Upload an image using Vanilla's API v2.
  *
  * @param file - The file to upload.
  */
-export async function uploadFile(file: File) {
+export async function uploadFile(file: File, requestConfig: AxiosRequestConfig = {}) {
     const data = new FormData();
     data.append("file", file, file.name);
 
-    const result = await apiv2.post("/media", data);
+    const result = await apiv2.post("/media", data, requestConfig);
     return result.data;
 }
 

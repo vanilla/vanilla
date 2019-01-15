@@ -46,7 +46,7 @@ export class FileEmbed extends React.Component<IEmbedProps<IFileUploadData>> {
     public render() {
         const { url, attributes } = this.props.data;
         const { type, size, dateInserted, name } = attributes;
-        const attachmentType = type ? mimeTypeToAttachmentType(type) : null;
+        const attachmentType = mimeTypeToAttachmentType(type);
         return (
             <Attachment
                 type={attachmentType}

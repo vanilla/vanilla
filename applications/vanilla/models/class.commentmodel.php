@@ -8,7 +8,7 @@
  * @since 2.0
  */
 
- use Vanilla\Formatting\FormatterService;
+ use Vanilla\Formatting\FormatService;
  use Vanilla\Formatting\UpdateMediaTrait;
 
  /**
@@ -43,7 +43,7 @@ class CommentModel extends Gdn_Model {
      */
     protected $floodGate;
 
-    /** @var FormatterService */
+    /** @var FormatService */
     private $formatterService;
 
     /**
@@ -62,7 +62,7 @@ class CommentModel extends Gdn_Model {
         $this->floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Comment');
         $this->pageCache = Gdn::cache()->activeEnabled() && c('Properties.CommentModel.pageCache', false);
 
-        $this->setFormatterService(Gdn::getContainer()->get(FormatterService::class));
+        $this->setFormatterService(Gdn::getContainer()->get(FormatService::class));
         $this->setMediaForeignTable($this->Name);
         $this->setMediaModel(Gdn::getContainer()->get(MediaModel::class));
         $this->setSessionInterface(Gdn::getContainer()->get("Session"));
@@ -1128,7 +1128,6 @@ class CommentModel extends Gdn_Model {
                     // IsNewDiscussion is passed when the first comment for new discussions are created.
                     $this->EventArguments['IsNewDiscussion'] = val('IsNewDiscussion', $formPostValues);
                     $this->fireEvent('AfterSaveComment');
-
                 }
             }
         }

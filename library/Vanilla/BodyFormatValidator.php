@@ -9,7 +9,7 @@ namespace Vanilla;
 
 use Vanilla\Formatting\Exception\FormatterNotFoundException;
 use Vanilla\Formatting\Exception\FormattingException;
-use Vanilla\Formatting\FormatFactory;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\Formats;
 
 /**
@@ -18,19 +18,19 @@ use Vanilla\Formatting\Formats;
 class BodyFormatValidator {
     private $validators = [];
 
-    /** @var FormatFactory */
-    private $formatFactory;
+    /** @var FormatService */
+    private $formatService;
 
     /**
      * BodyFormatValidator constructor.
      *
-     * @param FormatFactory $formatFactory
+     * @param FormatService $formatService
      */
-    public function __construct(FormatFactory $formatFactory) {
+    public function __construct(FormatService $formatService) {
         $this->validators = [
             'rich' => [$this, 'validateRich'],
         ];
-        $this->formatFactory = $formatFactory;
+        $this->formatService = $formatService;
     }
 
     /**
@@ -65,7 +65,7 @@ class BodyFormatValidator {
      */
     private function validateRich($value, $field, $row = []) {
         try {
-            $richFormatter = $this->formatFactory->getFormatter(Formats\RichFormat::FORMAT_KEY);
+            $richFormatter = $this->formatService->getFormatter(Formats\RichFormat::FORMAT_KEY);
             $result = $richFormatter->filter($value);
         } catch (FormattingException $e) {
             $result = new Invalid($e->getMessage());

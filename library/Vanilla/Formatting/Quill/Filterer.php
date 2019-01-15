@@ -9,10 +9,17 @@ namespace Vanilla\Formatting\Quill;
 
 use Vanilla\Formatting\Exception\FormattingException;
 
+/**
+ * Undocumented class
+ */
 class Filterer {
-
     /**
-     * @inheritdoc
+     * Filter the contents of a quill post.
+     *
+     * - Validates content.
+     * - Strips useless embed data.
+     *
+     * @param string $content The content to filter.
      *
      * @throws FormattingException If the JSON could not be converted to operations.
      */
@@ -34,7 +41,7 @@ class Filterer {
      * @param array[] $operations The quill operations to loop through.
      */
     private function stripUselessEmbedData(array &$operations) {
-        foreach($operations as $key => $op) {
+        foreach ($operations as $key => $op) {
             // If a dataPromise is still stored on the embed, that means it never loaded properly on the client.
             $dataPromise = $op['insert']['embed-external']['dataPromise'] ?? null;
             if ($dataPromise !== null) {
@@ -45,12 +52,12 @@ class Filterer {
             // searched.
             $format = $op['insert']['embed-external']['data']['format'] ?? null;
             if ($format === 'Rich') {
-                $bodyRaw = $op['insert']['embed-external']['data']['bodyRaw'] ?? null;
+                $bodyRaw = &$op['insert']['embed-external']['data']['bodyRaw'] ?? null;
                 if (is_array($bodyRaw)) {
                     foreach ($bodyRaw as $subInsertIndex => &$subInsertOp) {
-                        $externalEmbed = $operations[$key]['insert']['embed-external']['data']['bodyRaw'][$subInsertIndex]['insert']['embed-external'] ?? null;
-                        if ($externalEmbed !== null)  {
-                            unset($operations[$key]['insert']['embed-external']['data']['bodyRaw'][$subInsertIndex]['insert']['embed-external']['data']);
+                        $externalEmbed = &$bodyRaw[$subInsertIndex]['insert']['embed-external'] ?? null;
+                        if ($externalEmbed !== null) {
+                            unset($externalEmbed['data']);
                         }
                     }
                 }

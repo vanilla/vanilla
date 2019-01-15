@@ -7,4 +7,8 @@
 
 namespace Vanilla\Formatting\Exception;
 
-class FormattingException extends \Garden\Web\Exception\ServerException {}
+/**
+ * Exception to be thrown if an error is encountered while formatting.
+ */
+class FormattingException extends \Garden\Web\Exception\ServerException {
+}

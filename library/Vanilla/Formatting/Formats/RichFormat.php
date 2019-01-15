@@ -16,9 +16,12 @@ use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Heading;
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
-use Vanilla\Web\Html\TwigRenderTrait;
+use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Formatting\Quill;
 
+/**
+ * Format service for the rich editor format. Rendered and parsed using Quill.
+ */
 class RichFormat extends BaseFormat {
 
     use TwigRenderTrait;
@@ -131,8 +134,7 @@ class RichFormat extends BaseFormat {
         /** @var Quill\BlotGroup $blotGroup */
         foreach ($blotGroups as $blotGroup) {
             $blot = $blotGroup->getBlotForSurroundingTags();
-            if (
-                $blot instanceof ExternalBlot &&
+            if ($blot instanceof ExternalBlot &&
                 ($blot->getEmbedData()['type'] ?? null) === FileEmbed::EMBED_TYPE
             ) {
                 try {

@@ -11,7 +11,7 @@ use Gdn_Session as SessionInterface;
 
 trait UpdateMediaTrait {
 
-    /** @var FormatterService */
+    /** @var FormatService */
     private $formatterService;
 
     /** @var string */
@@ -52,14 +52,14 @@ trait UpdateMediaTrait {
     }
 
     /**
-     * Get the currently-configured FormatterService instance.
+     * Get the currently-configured FormatService instance.
      *
-     * @return FormatterService
-     * @throws \Exception If no FormatterService instance has been configured.
+     * @return FormatService
+     * @throws \Exception If no FormatService instance has been configured.
      */
-    private function getFormatterService(): FormatterService {
-        if (!isset($this->formatterService) || !($this->formatterService instanceof FormatterService)) {
-            throw new \Exception("FormatterService has not been configured.");
+    private function getFormatterService(): FormatService {
+        if (!isset($this->formatterService) || !($this->formatterService instanceof FormatService)) {
+            throw new \Exception("FormatService has not been configured.");
         }
 
         return $this->formatterService;
@@ -135,11 +135,11 @@ trait UpdateMediaTrait {
     }
 
     /**
-     * Set the FormatterService instance.
+     * Set the FormatService instance.
      *
-     * @param FormatterService $formatterService
+     * @param FormatService $formatterService
      */
-    private function setFormatterService(FormatterService $formatterService) {
+    private function setFormatterService(FormatService $formatterService) {
         $this->formatterService = $formatterService;
     }
 

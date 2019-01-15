@@ -9,6 +9,9 @@ namespace Vanilla\Formatting;
 
 use Vanilla\Contracts\Formatting\FormatInterface;
 
+/**
+ * Base format with simple simple implementations.
+ */
 abstract class BaseFormat implements FormatInterface {
     /** @var int */
     const EXCERPT_MAX_LENGTH = 325;

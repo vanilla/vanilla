@@ -2526,13 +2526,10 @@ EOT;
      * Get an instance of the rich post formatter.
      *
      * @return \Vanilla\Contracts\Formatting\FormatInterface
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     * @throws \Vanilla\Formatting\Exception\FormatterNotFoundException
      */
     private static function getRichFormatter(): \Vanilla\Contracts\Formatting\FormatInterface {
-        /** @var \Vanilla\Formatting\FormatFactory $formatter */
-        $formatter = Gdn::getContainer()->get(\Vanilla\Formatting\FormatFactory::class);
+        /** @var \Vanilla\Formatting\FormatService $formatter */
+        $formatter = Gdn::getContainer()->get(\Vanilla\Formatting\FormatService::class);
         return $formatter->getFormatter(\Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY);
     }
 

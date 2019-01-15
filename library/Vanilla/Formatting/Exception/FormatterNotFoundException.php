@@ -7,4 +7,8 @@
 
 namespace Vanilla\Formatting\Exception;
 
-class FormatterNotFoundException extends \Garden\Web\Exception\ServerException {}
+/**
+ * Exception thrown when looking up a format that has not been registered.
+ */
+class FormatterNotFoundException extends \Garden\Web\Exception\ServerException {
+}

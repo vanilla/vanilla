@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Web\Html;
+namespace Vanilla\Web;
 
 use Vanilla\Contracts\Web\LegacyViewHandlerInterface;
 

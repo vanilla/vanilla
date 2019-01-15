@@ -7,7 +7,7 @@
 import * as React from "react";
 import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
-import { getAttachmentIcon, AttachmentType } from "@library/components/attachments";
+import { getAttachmentIcon, AttachmentType, mimeTypeToAttachmentType } from "@library/components/attachments";
 import classNames from "classnames";
 import { t } from "@library/application";
 
@@ -60,7 +60,7 @@ export function humanFileSize(size: number) {
 
 export default class Attachment extends React.Component<IProps> {
     public render() {
-        const { title, name, type, url, dateUploaded, mimeType, size, deleteAttachment, className } = this.props;
+        const { title, name, url, dateUploaded, type, mimeType, size, className } = this.props;
         const label = title || name;
 
         return (

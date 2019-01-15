@@ -246,7 +246,11 @@ class Bootstrap {
 
             ->rule(\Vanilla\Formatting\Quill\Renderer::class)
             ->setShared(true)
-        ;
+
+            ->rule(Vanilla\Formatting\FormatService::class)
+            ->addCall('registerFormat', [Formats\RichFormat::FORMAT_KEY, Formats\RichFormat::class])
+            ->setShared(true)
+            ;
     }
 
     private function initializeAddons(Container $dic) {

@@ -285,6 +285,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule(Vanilla\Formatting\FormatFactory::class)
     ->addCall('registerFormat', [Formats\RichFormat::FORMAT_KEY, Formats\RichFormat::class])
     ->setShared(true)
+
+    ->rule(Vanilla\Formatting\FormatterService::class)
+    ->setShared(true)
 ;
 
 // Run through the bootstrap with dependencies.

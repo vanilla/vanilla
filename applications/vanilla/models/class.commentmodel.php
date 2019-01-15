@@ -8,12 +8,17 @@
  * @since 2.0
  */
 
-/**
+ use Vanilla\Formatting\FormatterService;
+ use Vanilla\Formatting\UpdateMediaTrait;
+
+ /**
  * Manages discussion comments data.
  */
 class CommentModel extends Gdn_Model {
 
     use \Vanilla\FloodControlTrait;
+
+    use UpdateMediaTrait;
 
     /** Threshold. */
     const COMMENT_THRESHOLD_SMALL = 1000;
@@ -38,6 +43,9 @@ class CommentModel extends Gdn_Model {
      */
     protected $floodGate;
 
+    /** @var FormatterService */
+    private $formatterService;
+
     /**
      * @var CommentModel $instance;
      */
@@ -50,8 +58,15 @@ class CommentModel extends Gdn_Model {
      */
     public function __construct(Gdn_Validation $validation = null) {
         parent::__construct('Comment', $validation);
+
         $this->floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Comment');
         $this->pageCache = Gdn::cache()->activeEnabled() && c('Properties.CommentModel.pageCache', false);
+
+        $this->setFormatterService(Gdn::getContainer()->get(FormatterService::class));
+        $this->setMediaForeignTable($this->Name);
+        $this->setMediaModel(Gdn::getContainer()->get(MediaModel::class));
+        $this->setSessionInterface(Gdn::getContainer()->get("Session"));
+
         $this->fireEvent('AfterConstruct');
     }
 
@@ -1104,6 +1119,17 @@ class CommentModel extends Gdn_Model {
                 if ($commentID) {
                     $this->EventArguments['CommentID'] = $commentID;
                     $this->EventArguments['Insert'] = $insert;
+
+                    $bodyValue = $fields["Body"] ?? null;
+                    if ($bodyValue) {
+                        $commentRow = $this->getID($commentID, DATASET_TYPE_ARRAY);
+                        if ($commentRow) {
+                            if (!$insert) {
+                                $this->flagInactiveMedia($commentID, $commentRow["Body"], $commentRow["Format"]);
+                            }
+                            $this->refreshMediaAttachments($commentID, $commentRow["Body"], $commentRow["Format"]);
+                        }
+                    }
 
                     // IsNewDiscussion is passed when the first comment for new discussions are created.
                     $this->EventArguments['IsNewDiscussion'] = val('IsNewDiscussion', $formPostValues);

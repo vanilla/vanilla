@@ -64,8 +64,9 @@ class FormatService {
      * Get an instance of a formatter.
      *
      * @param string $formatKey
+     *
      * @return FormatInterface
-     * @throws FormatterNotFoundException
+     * @throws FormatterNotFoundException If the formatter that was request could not be found.
      */
     public function getFormatter(string $formatKey): FormatInterface {
         $formatKey = strtolower($formatKey);

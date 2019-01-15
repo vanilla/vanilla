@@ -2526,9 +2526,6 @@ EOT;
      * Get an instance of the rich post formatter.
      *
      * @return \Vanilla\Contracts\Formatting\FormatInterface
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
-     * @throws \Vanilla\Formatting\Exception\FormatterNotFoundException
      */
     private static function getRichFormatter(): \Vanilla\Contracts\Formatting\FormatInterface {
         /** @var \Vanilla\Formatting\FormatService $formatter */

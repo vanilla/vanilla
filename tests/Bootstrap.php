@@ -248,6 +248,7 @@ class Bootstrap {
             ->setShared(true)
 
             ->rule(Vanilla\Formatting\FormatService::class)
+
             ->addCall('registerFormat', [Vanilla\Formatting\Formats::FORMAT_KEY, Vanilla\Formatting\Formats::class])
             ->setShared(true)
             ;

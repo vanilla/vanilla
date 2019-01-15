@@ -1119,13 +1119,7 @@ class CommentModel extends Gdn_Model {
                 if ($commentID) {
                     $bodyValue = $fields["Body"] ?? null;
                     if ($bodyValue) {
-                        $commentRow = $this->getID($commentID, DATASET_TYPE_ARRAY);
-                        if ($commentRow) {
-                            if (!$insert) {
-                                $this->flagInactiveMedia($commentID, $commentRow["Body"], $commentRow["Format"]);
-                            }
-                            $this->refreshMediaAttachments($commentID, $commentRow["Body"], $commentRow["Format"]);
-                        }
+                        $this->calculateMediaAttachments($commentID, !$insert);
                     }
 
                     $this->EventArguments['CommentID'] = $commentID;
@@ -1144,6 +1138,22 @@ class CommentModel extends Gdn_Model {
         $this->updateCommentCount($discussionID, ['Slave' => false]);
 
         return $commentID;
+    }
+
+    /**
+     * Update the attachment status of attachemnts in particular comment.
+     *
+     * @param int $commentID The ID of the comment.
+     * @param bool $isUpdate Whether or not we are updating an existing comment.
+     */
+    private function calculateMediaAttachments(int $commentID, bool $isUpdate) {
+        $commentRow = $this->getID($commentID, DATASET_TYPE_ARRAY);
+        if ($commentRow) {
+            if ($isUpdate) {
+                $this->flagInactiveMedia($commentID, $commentRow["Body"], $commentRow["Format"]);
+            }
+            $this->refreshMediaAttachments($commentID, $commentRow["Body"], $commentRow["Format"]);
+        }
     }
 
     /**

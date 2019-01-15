@@ -402,6 +402,12 @@ $metaText_fontSize                                   : $global-small_fontSize;
 $metaText_color                                      : mix($global-color_fg, $global-color_bg, 85%) !default;
 $metaText_margin                                     : 4px !default;
 
+$metas_verticalMargin                                : $utility-baseUnit * 2;
+$metas_color                                         : $metaText_color !default;
+$meta_spacing                                        : $global-gutter_quarterSize;
+$meta_lineHeight                                     : $global-base_lineHeight;
+$meta-deleted_color                                  : #D0021B;
+
 /* -------------------------------------------------------------- *\
       Thumbnails
 \* -------------------------------------------------------------- */
@@ -440,15 +446,15 @@ $dropDown-item_verticalPadding                      : 6px;
 $dropDown-item_horizontalPadding                    : 18px;
 
 $dropDown-item_minHeight                            : 30px;
-$dropDown-item_mobile_minHeight                     : 32px;
+$dropDown-item_mobile_minHeight                     : 44px;
 
 $dropDown-item_mobile_fontSize                      : 16px;
 
 /* -------------------------------------------------------------- *\
     Header
 \* -------------------------------------------------------------- */
-@function getBgDependingOnContrastColor($fgColor, $colorToModify, $mixAmount) {
-    @if (lightness($fgColor) > 50) {
+@function getBgDependingOnContrastColor($fgColor, $colorToModify, $mixAmount, $flip: false) {
+    @if (lightness($fgColor) > 50 and not $flip) {
         @return mix(#000, $colorToModify, $mixAmount); // Light text, so darken color
     } @else {
         @return mix(#fff, $colorToModify, $mixAmount); // Light text, so darken color
@@ -464,7 +470,9 @@ $vanillaHeader-button_borderRadius                  : 3px;
 $vanillaHeader-button_size                          : 40px;
 $vanillaMenu-guest_spacer                           : 8px !default;
 $vanillaMenu-signIn_bg                              : getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%) !default;
-$vanillaMenu-signIn_bg                              : getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%) !default;
+$vanillaMenu-signIn_bg_hover                        : getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 20%) !default;
+$vanillaMenu-register_bg                            : $global-color_bg !default;
+$vanillaMenu-register_bg_hover                      : rgba($global-color_bg, .9) !default;
 
 /* -------------------------------------------------------------- *\
     Compact Me Box

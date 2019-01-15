@@ -4,8 +4,6 @@
  * @license GPL-2.0-only
  */
 
-
-
 .compactSearch {
     .searchBar{
         flex-grow: 1;
@@ -57,4 +55,8 @@
             bottom-right-radius: $global-borderRadius;
         }
     }
+}
+
+.compactSearch-cancelContents {
+    padding: 4px;
 }

@@ -267,25 +267,6 @@ export function compose(className?: string) {
     );
 }
 
-export function download(className?: string) {
-    const title = t("Download");
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            className={classNames("icon", "icon-compose", className)}
-            role="img"
-            aria-label={title}
-        >
-            <title>{title}</title>
-            <path
-                d="M6.483,10.462h.005a.5.5,0,0,1,.707.01l3.954,4.066V3.887a.5.5,0,0,1,.5-.5h.621a.5.5,0,0,1,.5.5V14.533l4.035-4.073h0a.5.5,0,0,1,.707,0l.437.437a.5.5,0,0,1,0,.707h0l-5.6,5.6a.5.5,0,0,1-.707,0h0l-5.6-5.6a.5.5,0,0,1,0-.707h0ZM20.25,19.5V17.25a.75.75,0,0,1,1.5,0v3A.75.75,0,0,1,21,21H3a.75.75,0,0,1-.75-.75v-3a.75.75,0,0,1,1.5,0V19.5Z"
-                fill="currentColor"
-            />
-        </svg>
-    );
-}
-
 export function plusCircle(className?: string) {
     const title = `+`;
     return (

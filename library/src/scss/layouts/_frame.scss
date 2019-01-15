@@ -112,12 +112,6 @@ $frame-panel_minHeight: 500px;
     margin-left: auto;
 }
 
-.frameHeader-close {
-    &.buttonIcon {
-        width: 48px;
-    }
-}
-
 .frameBody {
     position: relative;
     flex-grow: 1;

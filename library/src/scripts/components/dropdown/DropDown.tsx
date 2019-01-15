@@ -13,6 +13,9 @@ import { ButtonBaseClass } from "@library/components/forms/Button";
 import Heading from "@library/components/Heading";
 import SmartAlign from "@library/components/SmartAlign";
 import classNames from "classnames";
+import FlexSpacer from "@library/components/FlexSpacer";
+import CloseButton from "@library/components/CloseButton";
+import { Frame } from "@library/components/frame";
 
 export interface IProps {
     id?: string;
@@ -94,9 +97,19 @@ export default class DropDown extends React.Component<IProps, IState> {
                             openAsModal={this.props.openAsModal}
                         >
                             {title ? (
-                                <SmartAlign>
-                                    <Heading title={title} className="dropDown-title" />
-                                </SmartAlign>
+                                <header className="frameHeader">
+                                    <FlexSpacer className="frameHeader-leftSpacer" />
+                                    <SmartAlign>
+                                        <Heading title={title} className="dropDown-title" />
+                                    </SmartAlign>
+                                    <div className="frameHeader-closePosition">
+                                        <CloseButton
+                                            className="frameHeader-close"
+                                            onClick={params.closeMenuHandler}
+                                            baseClass={ButtonBaseClass.CUSTOM}
+                                        />
+                                    </div>
+                                </header>
                             ) : null}
                             <ul className="dropDownItems">{this.props.children}</ul>
                         </DropDownContents>

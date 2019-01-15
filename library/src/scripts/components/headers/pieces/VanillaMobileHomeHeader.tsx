@@ -72,11 +72,7 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                                 logoClassName="vanillaHeader-logo isCentred"
                             />
                             {isGuest ? (
-                                <VanillaHeaderNav
-                                    linkClassName="vanillaHeader-navLink"
-                                    linkContentClassName="vanillaHeader-navLinkContent"
-                                    className="vanillaHeader-nav vanillaHeader-guestNav"
-                                >
+                                <VanillaHeaderNav className="vanillaHeader-nav vanillaHeader-guestNav">
                                     <VanillaHeaderNavItem to={`/entry/signin?target=${window.location.pathname}`}>
                                         {signIn("vanillaHeader-signInIcon")}
                                     </VanillaHeaderNavItem>

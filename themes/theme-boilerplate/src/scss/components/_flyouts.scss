@@ -13,7 +13,7 @@ $flyout-hover_bg:                       $global-color_active_primaryBg !default;
 $flyout_fg:                             $global-color_grey !default;
 $flyout_borderColor:                    mix($flyout_fg, $flyout_bg, 24%) !default;
 $flyout_border:                         $global-border-width $global-border-style $flyout_borderColor !default;
-$flyoutOverlay-border_color:            mix($flyout_fg, $flyout_bg, 5%) !default;
+$flyoutOverlay-border_color:            mix($flyout_fg, $flyout_bg, 10%) !default;
 $flyout_borderRadius:                   $formButton_borderRadius !default;
 
 $flyout-link_color:                     $flyout_fg !default;
@@ -23,7 +23,7 @@ $flyoutHeader_fontSize:                 $global-subTitle_fontSize;
 $flyoutHeader_minHeight:                44px;
 $flyoutHeader_spacing:                  12px;
 
-$flyoutMessage_padding:                 4px 8px;
+$flyoutMessage_padding:                 4px 18px;
 $flyoutMessage-unreadDot_width:         12px;
 
 $flyoutFooter_spacing:                  $flyoutHeader_spacing;
@@ -34,7 +34,7 @@ $flyout_meta_fg:                        mix($flyout_fg, $flyout_bg, 85%) !defaul
 $flyoutModal-large_width:               375px;
 
 $dropDown_width:                        350px !default;
-$menuItems_width:                       200px !default;
+$menuItems_width:                       250px !default;
 
 $dropDown-item_verticalPadding:         6px;
 $dropDown-item_horizontalPadding:       18px;
@@ -100,12 +100,14 @@ $dropDown-item_mobile_minHeight:        44px;
     }
 
     hr,
+    .menu-separator,
     .editor-action-separator.editor-action-separator {
-        min-height: 0;
         height: 1px;
-        background-color: $flyout_borderColor;
+        width: 100%;
+        background-color: $flyoutOverlay-border_color;
         margin-top: $utility-baseUnit;
         margin-bottom: $utility-baseUnit;
+        display: block;
 
         &:active,
         &:focus,
@@ -175,7 +177,8 @@ $dropDown-item_mobile_minHeight:        44px;
     }
 }
 
-.MenuItems {
+.MenuItems.MenuItems {
+    padding: 8px 0;
 
     li > a,
     .dropdown-menu-link.dropdown-menu-link,
@@ -306,8 +309,8 @@ $dropDown-item_mobile_minHeight:        44px;
         line-height: inherit;
         flex-grow: 1;
         padding: {
-            left: $flyoutMessage_padding;
-            right: $flyoutMessage_padding;
+            left: 10px;
+            right: 18px;
         }
         max-width: calc(100% - #{$flyoutMessage-unreadDot_width + $theme-photo_size});
 
@@ -452,7 +455,7 @@ $dropDown-item_mobile_minHeight:        44px;
 }
 
 .selectBox-item .dropdown-menu-link.selectBox-link {
-    padding-left: 30px;
+    padding-left: 30px !important;
     position: static;
 }
 

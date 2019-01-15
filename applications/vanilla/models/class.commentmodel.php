@@ -1117,9 +1117,6 @@ class CommentModel extends Gdn_Model {
                     $commentID = $this->SQL->insert($this->Name, $fields);
                 }
                 if ($commentID) {
-                    $this->EventArguments['CommentID'] = $commentID;
-                    $this->EventArguments['Insert'] = $insert;
-
                     $bodyValue = $fields["Body"] ?? null;
                     if ($bodyValue) {
                         $commentRow = $this->getID($commentID, DATASET_TYPE_ARRAY);
@@ -1131,9 +1128,13 @@ class CommentModel extends Gdn_Model {
                         }
                     }
 
+                    $this->EventArguments['CommentID'] = $commentID;
+                    $this->EventArguments['Insert'] = $insert;
+
                     // IsNewDiscussion is passed when the first comment for new discussions are created.
                     $this->EventArguments['IsNewDiscussion'] = val('IsNewDiscussion', $formPostValues);
                     $this->fireEvent('AfterSaveComment');
+
                 }
             }
         }

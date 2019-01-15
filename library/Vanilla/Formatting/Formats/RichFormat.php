@@ -116,7 +116,7 @@ class RichFormat extends BaseFormat {
      * @inheritdoc
      */
     public function parseAttachments(string $content): array {
-        $outline = [];
+        $attachments = [];
 
         try {
             $operations = Quill\Parser::jsonToOperations($content);
@@ -130,20 +130,21 @@ class RichFormat extends BaseFormat {
 
         /** @var Quill\BlotGroup $blotGroup */
         foreach ($blotGroups as $blotGroup) {
-            $blot = $blotGroup->getPrimaryBlot();
+            $blot = $blotGroup->getBlotForSurroundingTags();
             if (
                 $blot instanceof ExternalBlot &&
-                ($embedData = $blot->getEmbedData()['type'] ?? null) === FileEmbed::EMBED_TYPE
+                ($blot->getEmbedData()['type'] ?? null) === FileEmbed::EMBED_TYPE
             ) {
                 try {
+                    $embedData = $blot->getEmbedData()['attributes'] ?? [];
                     $attachment = Attachment::fromArray($embedData);
-                    $outline[] = $attachment;
+                    $attachments[] = $attachment;
                 } catch (ValidationException $e) {
                     continue;
                 }
             }
         }
-        return $outline;
+        return $attachments;
     }
 
     /**
@@ -176,7 +177,7 @@ class RichFormat extends BaseFormat {
 
         /** @var Quill\BlotGroup $blotGroup */
         foreach ($blotGroups as $blotGroup) {
-            $blot = $blotGroup->getPrimaryBlot();
+            $blot = $blotGroup->getBlotForSurroundingTags();
             if ($blot instanceof HeadingTerminatorBlot && $blot->getReference()) {
                 $outline[] = new Heading(
                     $blotGroup->getUnsafeText(),

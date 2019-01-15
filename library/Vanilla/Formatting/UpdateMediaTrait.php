@@ -114,7 +114,6 @@ trait UpdateMediaTrait {
     private function refreshMediaAttachments(int $foreignID, string $rawBody, string $bodyFormat) {
         $attachments = $this->getFormatterService()->parseAttachments($rawBody, $bodyFormat);
         $currentMediaIDs = array_column($attachments, "mediaID");
-        $foreignTable = $this->getMediaForeignTable();
         $mediaModel = $this->getMediaModel();
 
         if (!empty($currentMediaIDs)) {

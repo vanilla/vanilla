@@ -13,15 +13,19 @@ import { IDiscussionEmbed, ICommentEmbed, IScrapeData } from "@dashboard/@types/
 export const FOCUS_CLASS = "embed-focusableElement";
 
 export type IQuoteEmbedData = IDiscussionEmbed | ICommentEmbed;
-export type IEmbedData = IScrapeData | IFileEmbed;
+export type IEmbedData = IScrapeData | IFileUploadData;
 
-export interface IFileEmbed {
-    mediaID: number;
+export interface IFileUploadData {
+    type: "file";
     url: string;
-    name: string;
-    type: string;
-    size: number;
-    dateInserted: string;
+    attributes: {
+        mediaID: number;
+        url: string;
+        name: string;
+        type: string;
+        size: number;
+        dateInserted: string;
+    };
 }
 
 export interface IEmbedElements {

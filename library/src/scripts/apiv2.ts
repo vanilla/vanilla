@@ -6,10 +6,9 @@
  */
 
 import { formatUrl, t } from "@library/application";
-import { isFileImage, indexArrayByKey } from "@library/utility";
+import { indexArrayByKey } from "@library/utility";
 import axios from "axios";
 import qs from "qs";
-import { IEmbedData, IFileEmbed } from "@library/embeds";
 import { IFieldError, LoadStatus, ILoadable } from "@library/@types/api";
 
 function fieldErrorTransformer(responseData) {
@@ -38,7 +37,7 @@ export default apiv2;
  *
  * @param file - The file to upload.
  */
-export async function uploadFile(file: File): Promise<IFileEmbed> {
+export async function uploadFile(file: File) {
     const data = new FormData();
     data.append("file", file, file.name);
 

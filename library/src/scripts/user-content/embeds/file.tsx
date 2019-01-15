@@ -5,7 +5,7 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
-import { registerEmbedComponent, IEmbedProps, IFileEmbed } from "@library/embeds";
+import { registerEmbedComponent, IEmbedProps, IFileUploadData } from "@library/embeds";
 import { onContent } from "@library/application";
 
 export function initFileEmbeds() {
@@ -23,7 +23,7 @@ export function mountFileEmbeds() {
     for (const embed of embeds) {
         const data = embed.getAttribute("data-json");
         if (data) {
-            const fileData = JSON.parse(data) as IFileEmbed;
+            const fileData = JSON.parse(data) as IFileUploadData;
             const onRenderComplete = () => {
                 embed.removeAttribute("data-json");
                 embed.classList.remove("embedResponsive-initialLink");
@@ -40,9 +40,10 @@ export function mountFileEmbeds() {
  *
  * This can either recieve the post format and body (when created directly in the editor) or be given the fully rendered content (when mounting on top of existing server rendered DOM stuff).
  */
-export class FileEmbed extends React.Component<IEmbedProps<IFileEmbed>> {
+export class FileEmbed extends React.Component<IEmbedProps<IFileUploadData>> {
     public render() {
-        const { url, name, type, size, dateInserted } = this.props.data;
+        const { url, attributes } = this.props.data;
+        const { type, size, dateInserted, name } = attributes;
         return (
             <p className="tempFile">
                 <a href={url} download>

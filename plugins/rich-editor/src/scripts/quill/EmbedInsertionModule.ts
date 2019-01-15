@@ -7,7 +7,7 @@
 import Module from "quill/core/module";
 import Parchment from "parchment";
 import Quill from "quill/core";
-import api, { uploadImage, uploadFile } from "@library/apiv2";
+import api, { uploadFile } from "@library/apiv2";
 import { getPastedFile, getDraggedFile } from "@library/dom";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 import getStore from "@library/state/getStore";
@@ -65,7 +65,7 @@ export default class EmbedInsertionModule extends Module {
     private pasteHandler = (event: ClipboardEvent) => {
         const image = getPastedFile(event);
         if (image) {
-            const imagePromise = uploadImage(image);
+            const imagePromise = uploadFile(image).then();
             this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });
         }
     };
@@ -85,12 +85,21 @@ export default class EmbedInsertionModule extends Module {
     };
 
     private createImageEmbed(file: File) {
-        const imagePromise = uploadImage(file);
+        const imagePromise = uploadFile(file).then(data => {
+            data.type = "image";
+            return data;
+        });
         this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });
     }
 
     private createFileEmbed(file: File) {
-        const filePromise = uploadFile(file);
+        const filePromise = uploadFile(file).then(data => {
+            return {
+                url: data.url,
+                type: "file",
+                attributes: data,
+            };
+        });
         this.createEmbed({ loaderData: { type: "image" }, dataPromise: filePromise });
     }
 

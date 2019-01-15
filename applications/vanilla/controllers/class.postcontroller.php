@@ -189,9 +189,10 @@ class PostController extends VanillaController {
         }
 
         touchValue('Type', $this->Data, 'Discussion');
-        // Remove Announce parameter if it was injected into the form.
-        $this->Form->removeFormValue('Announce');
-        
+
+        if (!checkPermission('Vanilla.Discussions.Announce')) {
+            $this->Form->removeFormValue('Announce');
+        }
         if (!$useCategories || $this->ShowCategorySelector) {
             // See if we should fill the CategoryID value.
             $allowedCategories = CategoryModel::getByPermission(

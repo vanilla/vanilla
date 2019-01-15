@@ -16,15 +16,15 @@ trait TwigTrait {
     /**
      * Twig templating environment initialize
      *
-     * @return \Twig_Environment
+     * @return \Twig\Environment
      */
     protected static function twigInit() {
         $loader = new \Twig_Loader_Filesystem(self::$twigDefaultFolder);
         if (\Gdn::config('Debug') === true) {
-            $twigEnv = new \Twig_Environment($loader, ['debug' => true]);
-            $twigEnv->addExtension(new \Twig_Extension_Debug());
+            $twigEnv = new \Twig\Environment($loader, ['debug' => true]);
+            $twigEnv->addExtension(new \Twig\Extension\DebugExtension());
         } else {
-            $twigEnv = new \Twig_Environment($loader);
+            $twigEnv = new \Twig\Environment($loader);
         }
         return $twigEnv;
     }

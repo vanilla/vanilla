@@ -18,16 +18,7 @@ import {
 } from "@library/components/icons/fileTypes";
 import Paragraph from "@library/components/Paragraph";
 import Translate from "@library/components/translation/Translate";
-
-export enum AttachmentType {
-    FILE = "file",
-    PPT = "ppt",
-    PDF = "pdf",
-    EXCEL = "excel",
-    WORD = "word",
-    IMAGE = "image",
-    ZIP = "zip",
-}
+import { AttachmentType } from "@library/components/attachments";
 
 // Common to both attachment types
 export interface IAttachmentIcon {
@@ -58,24 +49,5 @@ export default class AttachmentIcon extends React.Component<IProps> {
                 </div>
             </li>
         );
-    }
-
-    private getAttachmentIcon(type: AttachmentType, className?: string) {
-        switch (type) {
-            case AttachmentType.EXCEL:
-                return fileExcel(className);
-            case AttachmentType.PDF:
-                return filePDF(className);
-            case AttachmentType.WORD:
-                return fileWord(className);
-            case AttachmentType.PPT:
-                return filePowerPoint(className);
-            case AttachmentType.ZIP:
-                return fileZip(className);
-            case AttachmentType.IMAGE:
-                return fileImage(className);
-            default:
-                return fileGeneric(className);
-        }
     }
 }

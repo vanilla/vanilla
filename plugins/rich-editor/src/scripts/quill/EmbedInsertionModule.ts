@@ -84,7 +84,7 @@ export default class EmbedInsertionModule extends Module {
         }
     };
 
-    private createImageEmbed(file: File) {
+    public createImageEmbed(file: File) {
         const imagePromise = uploadFile(file).then(data => {
             data.type = "image";
             return data;
@@ -92,7 +92,7 @@ export default class EmbedInsertionModule extends Module {
         this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });
     }
 
-    private createFileEmbed(file: File) {
+    public createFileEmbed(file: File) {
         const filePromise = uploadFile(file).then(data => {
             return {
                 url: data.url,

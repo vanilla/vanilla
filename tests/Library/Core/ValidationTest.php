@@ -28,7 +28,7 @@ class ValidationTest extends SharedBootstrapTestCase {
             'Body' => (object)['AllowNull' => false, 'Default' => '', 'Type' => 'string'],
             'Format' => (object)['AllowNull' => false, 'Default' => '', 'Type' => 'string'],
         ], true);
-        $validation->addRule('BodyFormat', static::container()->get(\Vanilla\BodyFormatValidator::class));
+        $validation->addRule('BodyFormat', \Gdn::getContainer()->get(\Vanilla\BodyFormatValidator::class));
 
         $result = $validation->validate($row);
         $this->assertSame($isValid, $result);

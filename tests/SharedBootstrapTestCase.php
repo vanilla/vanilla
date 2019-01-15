@@ -35,7 +35,7 @@ class SharedBootstrapTestCase extends TestCase {
             if (!self::containerIsNull($currentContainer)) {
                 $containerCorruption = true;
             } else {
-                static::bootstrapTraitSetupBeforeClass();
+                BootstrapTrait::setUpBeforeClass();
             }
         } else {
             if (!self::containerIsNull($currentContainer) && $currentContainer !== self::$container) {

@@ -69,7 +69,7 @@ class FormatService {
      */
     public function getFormatter(string $formatKey): FormatInterface {
         $formatKey = strtolower($formatKey);
-        $formatClass = $this->formats[$formatKey];
+        $formatClass = $this->formats[$formatKey] ?? null;
         $errorMessage = "Unable to find a formatter for the formatKey $formatKey.";
         if (!$formatClass) {
             throw new FormatterNotFoundException($errorMessage);

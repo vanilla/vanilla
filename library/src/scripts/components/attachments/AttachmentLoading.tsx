@@ -11,8 +11,7 @@ import classNames from "classnames";
 import CloseButton from "@library/components/CloseButton";
 import { IFileAttachment } from "@library/components/attachments/Attachment";
 import Permission from "@library/users/Permission";
-import { AttachmentType } from "@library/components/attachments/AttachmentIcon";
-import { getAttachmentIcon } from "@library/components/attachments";
+import { getAttachmentIcon, AttachmentType } from "@library/components/attachments";
 
 interface IProps extends IFileAttachment {
     progress: number; // 0 to 100

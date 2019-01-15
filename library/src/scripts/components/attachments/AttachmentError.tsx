@@ -8,16 +8,16 @@ import * as React from "react";
 import classNames from "classnames";
 import CloseButton from "@library/components/CloseButton";
 import { IFileAttachment } from "@library/components/attachments/Attachment";
-import { fileUploadError } from "@library/components/icons";
 import Permission from "@library/users/Permission";
 import { t } from "@library/application";
+import { fileUploadError } from "@library/components/icons/fileTypes";
 
 interface IProps extends IFileAttachment {}
 
 /**
  * Implements file attachment with error
  */
-export default class AttachmentError extends React.Component<IFileAttachment> {
+export default class AttachmentError extends React.Component<IProps> {
     public render() {
         const { title, name } = this.props;
         const label = title || name;

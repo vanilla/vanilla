@@ -1,24 +1,15 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPL-2.0-only
  */
 
 import * as React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
-import {
-    fileExcel,
-    fileWord,
-    filePDF,
-    fileGeneric,
-    filePowerPoint,
-    fileImage,
-    fileZip,
-} from "@library/components/icons/fileTypes";
 import Paragraph from "@library/components/Paragraph";
 import Translate from "@library/components/translation/Translate";
-import { AttachmentType } from "@library/components/attachments";
+import { AttachmentType, getAttachmentIcon } from "@library/components/attachments";
 
 // Common to both attachment types
 export interface IAttachmentIcon {
@@ -45,7 +36,7 @@ export default class AttachmentIcon extends React.Component<IProps> {
                             <Translate source="<0/> (Type: <1/>)" c0={this.props.name} c1={this.props.type} />
                         </Paragraph>
                     </span>
-                    {this.getAttachmentIcon(this.props.type)}
+                    {getAttachmentIcon(this.props.type)}
                 </div>
             </li>
         );

@@ -47,8 +47,7 @@ class FileEmbed extends Embed {
      * @return string
      */
     public function renderData(array $data): string {
-        $attributes = $data['attributes'] ?? null;
-        $url = $attributes['url'] ?? null;
+        $url = $data['url'] ?? "";
         $sanitizedUrl = htmlspecialchars(\Gdn_Format::sanitizeUrl($url));
 
         // JSON and HTML encode the data so that the react component can mount on this.

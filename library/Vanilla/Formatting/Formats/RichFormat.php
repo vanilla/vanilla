@@ -24,7 +24,7 @@ class RichFormat extends BaseFormat {
     use TwigRenderTrait;
     use StaticCacheTranslationTrait;
 
-    const FORMAT_KEY = "Rich";
+    const FORMAT_KEY = "rich";
 
     /** @var string */
     const RENDER_ERROR_MESSAGE = 'There was an error rendering this rich post.';
@@ -138,7 +138,7 @@ class RichFormat extends BaseFormat {
                 try {
                     $attachment = Attachment::fromArray($embedData);
                     $outline[] = $attachment;
-                } catch(ValidationException $e) {
+                } catch (ValidationException $e) {
                     continue;
                 }
             }

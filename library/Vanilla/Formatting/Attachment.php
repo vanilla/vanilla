@@ -38,6 +38,7 @@ class Attachment implements \JsonSerializable {
         static $schema;
         if ($schema === null) {
             $schema = Schema::parse([
+                'mediaID:i',
                 'name:s',
                 'dateInserted:dt',
                 'size:i',
@@ -59,6 +60,7 @@ class Attachment implements \JsonSerializable {
     public static function fromArray(array $data): Attachment {
         $validated = self::getSchema()->validate($data);
         $attachment = new Attachment();
+        $attachment->mediaID = $validated['mediaID'];
         $attachment->url = $validated['url'];
         $attachment->dateInserted = $validated['dateInserted'];
         $attachment->name = $validated['name'];

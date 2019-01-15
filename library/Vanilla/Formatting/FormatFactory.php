@@ -36,6 +36,7 @@ class FormatFactory {
      * @param string $formatClass
      */
     public function registerFormat(string $formatKey, string $formatClass) {
+        $formatKey = strtolower($formatKey);
         $this->formats[$formatKey] = $formatClass;
     }
 
@@ -47,6 +48,7 @@ class FormatFactory {
      * @throws FormatterNotFoundException
      */
     public function getFormatter(string $formatKey): FormatInterface {
+        $formatKey = strtolower($formatKey);
         $formatClass = $this->formats[$formatKey];
         $errorMessage = "Unable to find a formatter for the formatKey $formatKey.";
         if (!$formatClass) {

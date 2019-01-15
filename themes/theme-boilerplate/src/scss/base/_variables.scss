@@ -77,14 +77,17 @@ $global-main_width:                     1224px !default;
 $global_spacer:                         $userContent_fontSize * $global-base_lineHeight !default;
 $global-default_timing:                 0.35s !default;
 
-$global_borderRadius:                   3px !default;
-
 $global-color_primary:                  $global-color_vanillaBlue !default;
 $global-color_primaryAlt:               darken($global-color_primary, 8%) !default;
 $global-color_secondary:                $global-color_pink !default;
 
 $global-color_bg:                       $global-color_white !default;
 $global-color_fg:                       $global-color_grey !default; // text color | should have high contrast between $global-color_bg
+
+$global-border_color:                   mix($global-color_fg, $global-color_bg, 24%) !default; // Note it's off by default due to the border width
+$global-border-width:                   1px;
+$global-border-style:                   solid;
+$global_borderRadius:                   3px !default;
 
 $global-body_bg:                        $global-color_bg !default;
 
@@ -282,7 +285,7 @@ $component-title_fontSize:               $global-large_fontSize !default;
 $component-title_fontWeight:             $global-semibold_fontWeight !default;
 $component-title_lineHeight:             $global-base_lineHeight !default;
 
-$component-meta_color:                   mix($global-color_fg, $global-color_bg, 50%) !default;
+$component-meta_color:                   mix($global-color_fg, $global-color_bg, 85%) !default;
 $component-meta-link_color:              $component-meta_color !default;
 $component-meta-link-hover_color:        $theme-heading-hover_color !default;
 $component-meta_fontSize:                $global-small_fontSize !default;

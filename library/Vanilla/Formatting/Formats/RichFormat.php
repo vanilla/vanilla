@@ -16,7 +16,7 @@ use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Heading;
 use Vanilla\Formatting\Quill\Blots\Embeds\ExternalBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
-use Vanilla\Web\Html\TwigRenderTrait;
+use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Formatting\Quill;
 
 class RichFormat extends BaseFormat {

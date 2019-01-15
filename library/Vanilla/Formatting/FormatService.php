@@ -1,6 +1,5 @@
 <?php
 /**
- * @author Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
@@ -9,12 +8,15 @@ namespace Vanilla\Formatting;
 
 use Garden\Container\Container;
 use Garden\Container\ContainerException;
-use Garden\Container\NotFoundException;
 use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\Formatting\Exception\FormatterNotFoundException;
 
-class FormatFactory {
-    /** @var [] */
+/**
+ * Simple service for calling out to formatters registered in FormatFactory.
+ */
+class FormatService {
+
+    /** @var array */
     private $formats = [];
 
     /** @var Container */
@@ -27,6 +29,24 @@ class FormatFactory {
      */
     public function __construct(Container $container) {
         $this->container = $container;
+    }
+
+    /**
+     * Parse attachment data from a message.
+     *
+     * @param string $content
+     * @param string $format
+     * @return Attachment[]
+     */
+    public function parseAttachments(string $content, string $format): array {
+        try {
+            $formatter = $this->getFormatter($format);
+        } catch (FormatterNotFoundException $e) {
+            return [];
+        }
+
+        $result = $formatter->parseAttachments($content);
+        return $result;
     }
 
     /**

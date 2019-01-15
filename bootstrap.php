@@ -267,7 +267,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
 
     ->rule('ViewHandler.twig')
-    ->setClass(\Vanilla\Web\Html\LegacyTwigViewHandler::class)
+    ->setClass(\Vanilla\Web\LegacyTwigViewHandler::class)
     ->setShared(true)
 
     ->rule('Gdn_Form')
@@ -282,11 +282,8 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
     ->setShared(true)
 
-    ->rule(Vanilla\Formatting\FormatFactory::class)
+    ->rule(Vanilla\Formatting\FormatService::class)
     ->addCall('registerFormat', [Formats\RichFormat::FORMAT_KEY, Formats\RichFormat::class])
-    ->setShared(true)
-
-    ->rule(Vanilla\Formatting\FormatterService::class)
     ->setShared(true)
 ;
 

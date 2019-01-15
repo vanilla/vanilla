@@ -55,7 +55,7 @@ class Attachment implements \JsonSerializable {
      * @param array $data The data to validate and convert.
      *
      * @return Attachment
-     * @throws \Garden\Schema\ValidationException
+     * @throws \Garden\Schema\ValidationException If the schema validation fails.
      */
     public static function fromArray(array $data): Attachment {
         $validated = self::getSchema()->validate($data);

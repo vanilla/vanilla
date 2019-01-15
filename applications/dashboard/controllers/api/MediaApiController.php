@@ -18,13 +18,7 @@ use Vanilla\UploadedFileSchema;
  */
 class MediaApiController extends AbstractApiController {
     const TYPE_IMAGE = 'image';
-    const TYPE_TEXT = 'text';
-    const TYPE_ARCHIVE = 'archive';
-    const TYPE_BINARY = 'binary';
-
-    const EXTENSIONS_TEXT = ['txt', 'csv', 'doc', 'docx', 'pdf', 'md', 'rtf'];
-    const EXTENSIONS_BINARY = ['xls', 'xlsx', 'ppt'];
-    const EXTENSIONS_ARCHIVE = ['zip', 'tar', 'gzip', '7z', 'arj', 'deb', 'pkg', 'gz', 'z', 'rpm', 'iso', 'cab'];
+    const TYPE_FILE = 'file';
 
     /** @var Schema */
     private $idParamSchema;
@@ -374,47 +368,30 @@ class MediaApiController extends AbstractApiController {
      * Return information from the media row along with a full URL to the file.
      *
      * @param array $body The request body.
-     * @return array
+     * @return arrayx
      */
     public function post(array $body) {
         $this->permission('Garden.Uploads.Add');
-        switch ($body['type']) {
-            case self::TYPE_TEXT:
-                $typeExtensions = self::EXTENSIONS_TEXT;
-                break;
-            case self::TYPE_BINARY:
-                $typeExtensions = self::EXTENSIONS_BINARY;
-                break;
-            case self::TYPE_ARCHIVE:
-                $typeExtensions = self::EXTENSIONS_ARCHIVE;
-                break;
-            case self::TYPE_IMAGE:
-            default:
-                $typeExtensions = array_keys(ImageResizer::getExtType());
-        }
+
         $allowedExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
-        $uploadExtensions = array_intersect($allowedExtensions, $typeExtensions);
         $uploadSchema = new UploadedFileSchema([
-            'allowedExtensions' => $uploadExtensions
+            'allowedExtensions' => $allowedExtensions,
         ]);
 
         $in = $this->schema([
             'file' => $uploadSchema,
-            'type:s' => [
-                'description' => 'The upload type.',
-                'enum' => [
-                    self::TYPE_IMAGE,
-                    self::TYPE_TEXT,
-                    self::TYPE_ARCHIVE,
-                    self::TYPE_BINARY,
-                ]
-            ]
         ],'in')->setDescription('Add a media item.');
         $out = $this->schema($this->fullSchema(), 'out');
 
         $body = $in->validate($body);
 
-        $row = $this->doUpload($body['file'], $body['type']);
+        $imageExtensions = array_keys(ImageResizer::getExtType());
+        /** @var UploadedFile $file */
+        $file = $body['file'];
+        $extension = pathinfo($file->getClientFilename(), PATHINFO_EXTENSION) ?? '';
+        $type = in_array($extension, $imageExtensions) ? self::TYPE_IMAGE : self::TYPE_FILE;
+
+        $row = $this->doUpload($body['file'], $type);
 
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);

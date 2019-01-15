@@ -15,6 +15,7 @@ interface IProps extends Partial<ILegacyProps> {
     disabled?: boolean;
     onClick: any;
     baseClass?: ButtonBaseClass;
+    title?: string;
 }
 
 /**
@@ -30,7 +31,7 @@ export default class CloseButton extends React.PureComponent<IProps> {
      * There are 2 rendering modes. 1 with w real icon, and one using text in place of an icon.
      */
     public render() {
-        const closeLabel = t("Close");
+        const closeLabel = this.props.title ? this.props.title : t("Close");
 
         if (this.props.legacyMode) {
             const componentClasses = classNames("Close", this.props.className);

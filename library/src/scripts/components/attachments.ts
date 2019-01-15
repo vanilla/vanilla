@@ -4,7 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import { fileExcel, fileGeneric, filePDF, fileWord } from "@library/components/icons/fileTypes";
+import {
+    fileExcel,
+    fileGeneric,
+    fileImage,
+    filePDF,
+    filePowerPoint,
+    fileWord,
+    fileZip,
+} from "@library/components/icons/fileTypes";
 import { t } from "@library/application";
 
 export enum AttachmentType {
@@ -12,16 +20,25 @@ export enum AttachmentType {
     PDF = "PDF",
     EXCEL = "excel",
     WORD = "word",
+    PPT = "power point",
+    ZIP = "zip",
+    IMAGE = "image",
 }
 
 export function getAttachmentIcon(type: AttachmentType, className?: string) {
     switch (type) {
-        case AttachmentType.EXCEL:
-            return fileExcel(className);
         case AttachmentType.PDF:
             return filePDF(className);
+        case AttachmentType.EXCEL:
+            return fileExcel(className);
         case AttachmentType.WORD:
             return fileWord(className);
+        case AttachmentType.PPT:
+            return filePowerPoint(className);
+        case AttachmentType.ZIP:
+            return fileZip(className);
+        case AttachmentType.IMAGE:
+            return fileImage(className);
         default:
             return fileGeneric(className);
     }
@@ -35,6 +52,8 @@ export function getUnabbreviatedAttachmentType(type: AttachmentType): string | n
             return t("Adobe Portable Document Format");
         case AttachmentType.WORD:
             return t("Microsoft Word Document");
+        case AttachmentType.PPT:
+            return t("Microsoft PowerPoint Document");
         default:
             return null;
     }

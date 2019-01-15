@@ -60,8 +60,7 @@ class InstagramEmbed extends Embed {
     </div>
 </div>
 HTML;
-
-       return $result;
+        return $result;
     }
 
     /**
@@ -82,12 +81,12 @@ HTML;
             $data['attributes']['permaLink'] = $permalink['permalink'];
         }
 
-        preg_match( '/(?<isCaptioned>data-instgrm-captioned)/i', $html,$isCaptioned);
+        preg_match('/(?<isCaptioned>data-instgrm-captioned)/i', $html, $isCaptioned);
         if ($isCaptioned) {
             $data['attributes']['isCaptioned'] = true;
         }
 
-        preg_match( '/data-instgrm-version="(?<versionNumber>\d+)"/i', $html,$versionNumber);
+        preg_match('/data-instgrm-version="(?<versionNumber>\d+)"/i', $html, $versionNumber);
         if ($versionNumber) {
             $data['attributes']['versionNumber'] = $versionNumber['versionNumber'];
         }

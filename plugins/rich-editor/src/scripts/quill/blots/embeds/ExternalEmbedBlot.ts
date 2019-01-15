@@ -17,7 +17,7 @@ import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 const DATA_KEY = "__embed-data__";
 
 interface ILoaderData {
-    type: "image" | "link";
+    type: "image" | "link" | "file";
     link?: string;
 }
 

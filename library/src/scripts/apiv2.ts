@@ -6,10 +6,9 @@
  */
 
 import { formatUrl, t } from "@library/application";
-import { isFileImage, indexArrayByKey } from "@library/utility";
+import { indexArrayByKey } from "@library/utility";
 import axios from "axios";
 import qs from "qs";
-import { IEmbedData } from "@library/embeds";
 import { IFieldError, LoadStatus, ILoadable } from "@library/@types/api";
 
 function fieldErrorTransformer(responseData) {
@@ -37,22 +36,12 @@ export default apiv2;
  * Upload an image using Vanilla's API v2.
  *
  * @param file - The file to upload.
- *
- * @throws If the file given is not an image. You must check yourself first.
  */
-export async function uploadImage(image: File): Promise<IEmbedData> {
-    if (!isFileImage(image)) {
-        throw new Error(
-            `Unable to upload an image of type ${image.type}. Supported formats included .gif, .jpg and .png`,
-        );
-    }
-
+export async function uploadFile(file: File) {
     const data = new FormData();
-    data.append("file", image, image.name);
-    data.append("type", "image");
+    data.append("file", file, file.name);
 
     const result = await apiv2.post("/media", data);
-    result.data.type = "image";
     return result.data;
 }
 

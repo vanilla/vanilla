@@ -447,6 +447,15 @@ $dropDown-item_mobile_minHeight:        44px;
     }
 }
 
+.selectBox-content {
+    margin-top: 0;
+}
+
+.selectBox-item .dropdown-menu-link.selectBox-link {
+    padding-left: 30px;
+    position: static;
+}
+
 .richEditorFlyout {
 
     .richEditorFlyout-header {

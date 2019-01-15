@@ -18,9 +18,7 @@ use Garden\Container\Container;
  */
 class SharedBootstrapTestCase extends TestCase {
 
-    use BootstrapTrait {
-        setupBeforeClass as bootstrapTraitSetupBeforeClass;
-    }
+    use BootstrapTrait;
 
     /**
      * Bootstrap the first test cases and reuse the same container/bootstrap for subsequent test cases.

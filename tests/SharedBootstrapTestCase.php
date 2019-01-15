@@ -17,7 +17,10 @@ use Garden\Container\Container;
  * Class SharedBootstrapTestCase.
  */
 class SharedBootstrapTestCase extends TestCase {
-    use BootstrapTrait;
+
+    use BootstrapTrait {
+        setupBeforeClass as bootstrapTraitSetupBeforeClass;
+    }
 
     /**
      * Bootstrap the first test cases and reuse the same container/bootstrap for subsequent test cases.
@@ -32,9 +35,8 @@ class SharedBootstrapTestCase extends TestCase {
             if (!self::containerIsNull($currentContainer)) {
                 $containerCorruption = true;
             } else {
-                BootstrapTrait::setUpBeforeClass();
+                static::bootstrapTraitSetupBeforeClass();
             }
-
         } else {
             if (!self::containerIsNull($currentContainer) && $currentContainer !== self::$container) {
                 $containerCorruption = true;

@@ -178,7 +178,15 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     public replaceLoaderWithFinalForm(value: IEmbedValue) {
         let finalBlot: ExternalEmbedBlot | ErrorBlot;
 
-        this.resolveDataFromValue(value)
+        const resolvedPromise = this.resolveDataFromValue(value);
+        if (!(resolvedPromise instanceof Promise)) {
+            const quill = this.quill;
+            this.remove();
+            quill && quill.update();
+            return;
+        }
+
+        resolvedPromise
             .then(data => {
                 const newValue: IEmbedValue = {
                     data,

@@ -12,7 +12,6 @@ use Vanilla\Formatting\Embeds\EmbedManager;
 use Vanilla\ImageResizer;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
-use Vanilla\Models\SiteMeta;
 
 /**
  * API Controller for `/media`.
@@ -30,20 +29,19 @@ class MediaApiController extends AbstractApiController {
     /** @var EmbedManager */
     private $embedManager;
 
-    /** @var SiteMeta */
-    private $siteMeta;
+    /** @var Config */
+    private $config;
 
     /**
      * MediaApiController constructor.
      *
      * @param MediaModel $mediaModel
      * @param EmbedManager $embedManager
-     * @param SiteMeta $siteMeta
      */
-    public function __construct(MediaModel $mediaModel, EmbedManager $embedManager, SiteMeta $siteMeta) {
+    public function __construct(MediaModel $mediaModel, EmbedManager $embedManager, Gdn_Configuration $config) {
         $this->mediaModel = $mediaModel;
         $this->embedManager = $embedManager;
-        $this->siteMeta = $siteMeta;
+        $this->config =  $config;
     }
 
     /**
@@ -375,7 +373,7 @@ class MediaApiController extends AbstractApiController {
     public function post(array $body) {
         $this->permission('Garden.Uploads.Add');
 
-        $allowedExtensions = $this->siteMeta->getAllowedExtensions();
+        $allowedExtensions = $this->config->get('Garden.Upload.AllowedFileExtensions', []);
         $uploadSchema = new UploadedFileSchema([
             'allowedExtensions' => $allowedExtensions,
         ]);

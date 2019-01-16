@@ -43,6 +43,7 @@ export default class ErrorBlot extends FocusableEmbedBlot {
 
         if (!data.error) {
             this.remove();
+            this.quill!.update();
             return;
         }
 

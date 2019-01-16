@@ -9,9 +9,7 @@
 \* -------------------------------------------------------------- */
 
 $mebox-photo_size:                      24px !default;
-$mebox_fg:                              $header_link_color !default;
-$mebox_hover_color:                     $header-link-hover_color !default;
-$mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12%), .2) !default;
+$mebox-button_borderRadius:             3px !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -22,16 +20,9 @@ $mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12
     display: flex;
 
     .MeButton {
-        color: $mebox_fg;
         display: flex;
         align-items: center;
         justify-content: center;
-
-        &:focus,
-        &:hover,
-        &:active {
-            color: $mebox_hover_color;
-        }
 
         .Alert {
             line-height: 16px;
@@ -86,22 +77,6 @@ $mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12
         margin-right: $utility-small_padding;
     }
 
-    .MeButton.FlyoutButton,
-    .WhoIs > .Username {
-        transition: transition(color);
-        color: $mebox_fg;
-
-
-        &:hover {
-            color: $mebox_hover_color;
-        }
-    }
-
-    .ToggleFlyout.Open,
-    .MeButton:hover {
-        background-color: $mebox_hover_bg;
-    }
-
     .SignInLinks {
         > a:first-child,
         .SignInPopup,
@@ -124,8 +99,9 @@ $mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12
     .MeButton {
         padding: 0;
         font-size: $icon-default_size;
-        min-height: $header_minHeight;
-        min-width: calc(#{$header_minHeight} - #{$utility-baseUnitHalf});
+        height: 32px;
+        width: 32px;
+        border-radius: $mebox-button_borderRadius;
 
         .Alert {
             line-height: 16px;
@@ -152,6 +128,10 @@ $mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12
         margin-left: $utility-large_padding;
         display: flex;
         align-items: center;
+
+        .ToggleFlyout + .ToggleFlyout {
+            margin-left: 8px;
+        }
 
         .Alert {
             border: 1px solid $bullet_borderColor;

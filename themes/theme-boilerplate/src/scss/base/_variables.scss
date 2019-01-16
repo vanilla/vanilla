@@ -94,8 +94,6 @@ $global-body_bg:                        $global-color_bg !default;
 $link-default_color:                    $global-color_fg !default;
 $link-default-hover_color:              $global-color_primary !default;
 
-$icon-default_size:                     20px !default;
-
 
 /* -------------------------------------------------------------- *\
     Theme Colors
@@ -114,7 +112,7 @@ $theme-heading-hover_color:             $global-color_primary !default;
 \* -------------------------------------------------------------- */
 
 $icon-large_size:                        32px !default;
-$icon-default_size:                      24px !default;
+$icon-default_size:                      20px !default;
 $icon-small_size:                        16px !default;
 
 /* -------------------------------------------------------------- *\
@@ -184,6 +182,12 @@ $header-link-hover_color:                $global-color_white !default;
 $header_border:                          0 !default;
 $header_boxShadow:                       none !default;
 
+$headerMebutton_bg:                      transparent !default;
+$headerMebutton_fg:                      $header-link_color !default;
+$headerMebutton-hover_fg:                $header-link_color !default;
+$headerMebutton-hover_bg:                mix($global-color_fg, $header_bg, 26%) !default;
+$headerMebutton-active_bg:               mix($headerMebutton_fg, $header_bg, 12%) !default;
+
 /* -------------------------------------------------------------- *\
     Navigation
 \* -------------------------------------------------------------- */
@@ -206,6 +210,12 @@ $navigation-button_border:                $global-color_white !default;
 $navigation-button-hover_bg:              $global-color_primaryAlt !default;
 $navigation-button-hover_fg:              $global-color_white !default;
 $navigation-button-hover_border:          $navigation-button-hover_bg !default;
+
+$navigationMebutton_bg:                      transparent !default;
+$navigationMebutton_fg:                      $navigation-link_color !default;
+$navigationMebutton-hover_fg:                $navigation-link_color !default;
+$navigationMebutton-hover_bg:                mix($global-color_fg, $navigation_bg, 26%) !default;
+$navigationMebutton-active_bg:               mix($navigationMebutton_fg, $navigation_bg, 12%) !default;
 
 /* -------------------------------------------------------------- *\
     Content

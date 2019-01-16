@@ -125,15 +125,13 @@
         }
 
         & > .PhotoWrap.PhotoWrap {
+            height: 42px;
+            width: 25%;
             display: inline-flex;
-            float: left;
-            height: 32px;
-            margin: $utility-small_padding 0 0 0;
-            padding-left: 10px;
             justify-content: flex-start;
-            width: calc((100% / 5) + 10px);
             box-shadow: none;
             border-radius: 0;
+            margin-right: 0;
 
             img {
                 border-radius: $theme-photo_borderRadius;
@@ -160,22 +158,36 @@
             justify-content: space-between;
             padding: 0;
         }
+    }
 
-        .MeButton:hover {
-            background-color: transparent;
-        }
+    // Mebox component
+    .MeButton {
+        padding: 0;
+        height: 42px;
+        width: 42px;
+        color: $navigationMebutton_fg;
+        background-color: $navigationMebutton_bg;
+        display: flex;
+        justify-content: center;
 
-        .MeButton .Sprite::before {
+        .Sprite::before {
             font-size: $icon-default_size;
         }
 
-        .MeMenu > * {
-            margin: 0;
-            height: 42px;
-            width: 42px;
-            display: flex;
-            justify-content: center;
+        &:focus,
+        &:hover,
+        &:active {
+            color: $navigationMebutton-hover_fg;
+            background-color: $navigationMebutton-hover_bg;
         }
+    }
+
+    .ToggleFlyout.Open .MeButton {
+        background-color: $navigationMebutton-active_bg;
+    }
+
+    .WhoIs > .Username {
+        color: $navigationMebutton_fg;
     }
 }
 

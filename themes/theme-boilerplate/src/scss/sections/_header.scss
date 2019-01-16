@@ -27,6 +27,27 @@
             display: flex;
         }
     }
+
+    // Mebox component
+    .MeButton {
+        color: $headerMebutton_fg;
+        background-color: $headerMebutton_bg;
+
+        &:focus,
+        &:hover,
+        &:active {
+            color: $headerMebutton-hover_fg;
+            background-color: $headerMebutton-hover_bg;
+        }
+    }
+
+    .ToggleFlyout.Open .MeButton {
+        background-color: $headerMebutton-active_bg;
+    }
+
+    .WhoIs > .Username {
+        color: $headerMebutton_fg;
+    }
 }
 
 .Header-logo {

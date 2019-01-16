@@ -57,6 +57,9 @@
                                 </div>
                                 <div class="Frame-row">
                                     <main class="Content MainContent">
+
+                                        {module name="ThreadFinderModule"}
+
                                         {if inSection("Profile")}
                                             <div class="Profile-header">
                                                 <div class="Profile-photo">

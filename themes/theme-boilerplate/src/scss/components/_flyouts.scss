@@ -19,15 +19,16 @@ $flyout_borderRadius:                   $formButton_borderRadius !default;
 $flyout-link_color:                     $flyout_fg !default;
 $flyout-link-hover_color:               $link-default-hover_color !default;
 
-$flyoutHeader_fontSize:                 $global-subTitle_fontSize;
-$flyoutHeader_minHeight:                44px;
-$flyoutHeader_spacing:                  12px;
+$flyoutHeader_fontSize:                 $global-subTitle_fontSize !default;
+$flyoutHeader_minHeight:                44px !default;
+$flyoutHeader_spacing:                  12px !default;
 
-$flyoutMessage_padding:                 4px 18px;
-$flyoutMessage-unreadDot_width:         12px;
+$flyoutMenuItems_padding:               8px !default;
+$flyoutMessage_padding:                 4px 18px !default;
+$flyoutMessage-unreadDot_width:         12px !default;
 
-$flyoutFooter_spacing:                  $flyoutHeader_spacing;
-$flyoutFooter_minHeight:                $flyoutHeader_minHeight;
+$flyoutFooter_spacing:                  $flyoutHeader_spacing !default;
+$flyoutFooter_minHeight:                $flyoutHeader_minHeight !default;
 
 $flyout_meta_fg:                        mix($flyout_fg, $flyout_bg, 85%) !default;
 
@@ -36,22 +37,22 @@ $flyoutModal-large_width:               375px;
 $dropDown_width:                        350px !default;
 $menuItems_width:                       250px !default;
 
-$dropDown-item_verticalPadding:         6px;
-$dropDown-item_horizontalPadding:       18px;
+$dropDown-item_verticalPadding:         6px !default;
+$dropDown-item_horizontalPadding:       18px !default;
 
-$dropDown-item_minHeight:               30px;
-$dropDown-item_mobile_minHeight:        44px;
+$dropDown-item_minHeight:               30px !default;
+$dropDown-item_mobile_minHeight:        44px !default;
 
 /* -------------------------------------------------------------- *\
     Styles
 \* -------------------------------------------------------------- */
 
-.Flyout.MenuItems {
-    min-width: $menuItems_width;
+.FlyoutMenu.FlyoutMenu {
+    min-width: $dropDown_width;
 }
 
-.Flyout.FlyoutMenu {
-    min-width: $dropDown_width;
+.MenuItems.MenuItems {
+    min-width: $menuItems_width;
 }
 
 .Dropdown.MenuItems {
@@ -101,12 +102,15 @@ $dropDown-item_mobile_minHeight:        44px;
 
     hr,
     .menu-separator,
-    .editor-action-separator.editor-action-separator {
+    .dd-separator,
+    .editor-action-separator {
         height: 1px;
+        min-height: 0;
         width: 100%;
         background-color: $flyoutOverlay-border_color;
         margin-top: $utility-baseUnit;
         margin-bottom: $utility-baseUnit;
+        padding: 0 !important;
         display: block;
 
         &:active,
@@ -117,7 +121,6 @@ $dropDown-item_mobile_minHeight:        44px;
     }
 
     .Item,
-    li:not([role="presentation"]),
     .editor-action {
         padding: $flyoutMessage_padding;
     }
@@ -130,7 +133,6 @@ $dropDown-item_mobile_minHeight:        44px;
         &:hover {
             color: inherit !important;
             background-color: $global-color_active_primaryBg !important;
-            padding: $flyoutMessage_padding;
         }
     }
 
@@ -151,6 +153,19 @@ $dropDown-item_mobile_minHeight:        44px;
                 color: inherit !important;
                 background-color: $global-color_active_primaryBg !important;
                 text-decoration: none;
+            }
+        }
+    }
+
+    .Item.Title,
+    .Item.Center {
+
+        a {
+
+            &:active,
+            &:focus,
+            &:hover {
+                background-color: transparent !important;
             }
         }
     }
@@ -177,32 +192,37 @@ $dropDown-item_mobile_minHeight:        44px;
     }
 }
 
-.MenuItems.MenuItems {
-    padding: 8px 0;
+.MenuItems {
+    padding: $flyoutMenuItems_padding 0;
 
     li > a,
-    .dropdown-menu-link.dropdown-menu-link,
+    a,
+    a:link,
     .editor-action {
         padding: $flyoutMessage_padding;
         min-height: $dropDown-item_minHeight;
+        line-height: $global-condensed_lineHeight;
         display: flex;
         align-items: center;
         width: 100%;
 
         @include maxWidth {
+            font-size: $global-large_fontSize;
+            font-weight: $global-semibold_fontWeight;
             min-height: $dropDown-item_mobile_minHeight;
         }
     }
+}
 
-    .emoji-wrap.emoji-wrap.emoji-wrap {
-        display: inline-flex;
+.emoji-wrap.emoji-wrap.emoji-wrap {
+    display: inline-flex;
+    padding: $flyoutFooter_spacing;
+    width: auto;
+
+    &:active,
+    &:focus,
+    &:hover {
         padding: $flyoutFooter_spacing;
-
-        &:active,
-        &:focus,
-        &:hover {
-            padding: $flyoutFooter_spacing;
-        }
     }
 }
 
@@ -363,8 +383,17 @@ $dropDown-item_mobile_minHeight:        44px;
     }
 }
 
-.PopList {
+.PopList.PopList {
     font-size: $global-medium_fontSize;
+
+    .Item {
+        padding: $flyoutMenuItems_padding;
+    }
+
+    .PhotoWrap {
+        height: $theme-photo-small_size;
+        width: $theme-photo-small_size;
+    }
 }
 
 .PopList.Activities {
@@ -381,12 +410,6 @@ $dropDown-item_mobile_minHeight:        44px;
     }
 }
 
-.OptionsMenu.OptionsMenu li a {
-    padding: 0;
-    display: flex;
-    align-items: center;
-}
-
 .editor-action-emoji {
 
     .MenuItems {
@@ -397,14 +420,13 @@ $dropDown-item_mobile_minHeight:        44px;
 .editor-dd-link + .mobileFlyoutOverlay {
 
     input.InputBox {
-        width: 100%;
-        margin: $flyoutMessage_padding;
+        width: calc(100% - (#{$flyoutMenuItems_padding} * 2));
+        margin: $flyoutMenuItems_padding;
     }
-
 
     .MenuButtons {
         border-top: solid $flyoutOverlay-border_color 1px;
-        padding: $flyoutMessage_padding;
+        padding: $flyoutMenuItems_padding;
         min-height: $dropDown-item_minHeight;
     }
 }
@@ -433,20 +455,38 @@ $dropDown-item_mobile_minHeight:        44px;
 }
 
 .MenuItems-Reactions.MenuItems-Reactions {
+    padding: 0;
+    min-width: 0;
+
+    li {
+        padding: $flyoutMenuItems_padding;
+    }
 
     a,
     .PhotoWrap {
         padding: 0 !important;
     }
 
-    a {
-        line-height: $theme-photo-small_size;
+    .PhotoWrap + a {
+        align-items: center;
+        min-height: 20px;
+        line-height: 20px;
+        max-width: calc(100% - 20px - (#{$flyoutMenuItems_padding} * 2));
+
+        &:hover,
+        &:focus,
+        &:active {
+            background-color: transparent !important;
+            color: $flyout-link-hover_color !important;
+        }
     }
 
-    .PhotoWrap {
-        height: $theme-photo-small_size;
-        width: $theme-photo-small_size !important;
-        margin-right: $flyoutMessage_padding !important;
+    .PhotoWrap.PhotoWrap {
+        width: 20px;
+        height: 20px;
+        min-height: 0;
+        max-width: 100%;
+        margin-right: $flyoutMenuItems_padding;
     }
 }
 
@@ -527,6 +567,7 @@ $dropDown-item_mobile_minHeight:        44px;
             top: initial;
             right: initial;
             left: initial;
+            max-width: calc(100% - 24px);
         }
     }
 

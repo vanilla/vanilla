@@ -33,8 +33,8 @@
         margin-bottom: $component-base_padding;
         font-size: $global-title_fontSize;
 
-        .OptionsMenu {
-            margin-right: $component-base_padding;
+        .Options {
+            display: none;
         }
 
         @include maxWidth {

@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { formatUrl, t } from "@library/application";
+import { formatUrl, t, getMeta } from "@library/application";
 import { indexArrayByKey } from "@library/utility";
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 import qs from "qs";
@@ -47,6 +47,17 @@ export function createTrackableRequest(
  * @param file - The file to upload.
  */
 export async function uploadFile(file: File, requestConfig: AxiosRequestConfig = {}) {
+    const allowedAttachments = getMeta("upload.allowedExtensions", []) as string[];
+    const maxSize = getMeta("upload.maxSize", 0);
+    const filePieces = file.name.split(".");
+    const extension = filePieces[filePieces.length - 1] || "";
+
+    if (file.size > maxSize) {
+        throw new Error(t("File exceeds maximum size."));
+    } else if (!allowedAttachments.includes(extension)) {
+        throw new Error("File extension not allowed.");
+    }
+
     const data = new FormData();
     data.append("file", file, file.name);
 

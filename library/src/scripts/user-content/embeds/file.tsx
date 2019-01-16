@@ -6,12 +6,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { registerEmbedComponent, IEmbedProps, IFileUploadData } from "@library/embeds";
-import { onContent } from "@library/application";
+import { onContent, onReady } from "@library/application";
 import Attachment from "@library/components/attachments/Attachment";
 import { AttachmentType, mimeTypeToAttachmentType } from "@library/components/attachments";
 
 export function initFileEmbeds() {
     registerEmbedComponent("file", FileEmbed);
+    mountFileEmbeds();
     onContent(mountFileEmbeds);
 }
 

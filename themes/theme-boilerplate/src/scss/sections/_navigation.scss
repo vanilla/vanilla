@@ -42,12 +42,12 @@
 
     .ButtonGroup.Multi {
         @include Button(
-            $navigation-button_bg,
-            $navigation-button_fg,
-            $navigation-button_border,
-            $navigation-button-hover_bg,
-            $navigation-button-hover_fg,
-            $navigation-button-hover_border
+            $navigationButton_bg,
+            $navigationButton_fg,
+            $navigationButton_border,
+            $navigationButton-hover_bg,
+            $navigationButton-hover_fg,
+            $navigationButton-hover_border
         );
     }
 
@@ -101,28 +101,6 @@
 
     .MeBox.mobile .MeBox {
         width: 100%;
-
-        .SignInLinks {
-            width: 100%;
-            text-align: center;
-            padding-top: $utility-medium_padding;
-
-            a {
-                @include Button(
-                    $navigation-button_bg,
-                    $navigation-button_fg,
-                    $navigation-button_border,
-                    $navigation-button-hover_bg,
-                    $navigation-button-hover_fg,
-                    $navigation-button-hover_border
-                );
-            }
-
-            .Bullet {
-                font-size: 0;
-                width: 20px;
-            }
-        }
 
         & > .PhotoWrap.PhotoWrap {
             height: 42px;
@@ -188,6 +166,28 @@
 
     .WhoIs > .Username {
         color: $navigationMebutton_fg;
+    }
+
+    .SignInLinks.SignInLinks {
+        width: 100%;
+        text-align: center;
+        padding-top: $utility-medium_padding;
+
+        a {
+            @include Button(
+                $navigationButton_bg,
+                $navigationButton_fg,
+                $navigationButton_border,
+                $navigationButton-hover_bg,
+                $navigationButton-hover_fg,
+                $navigationButton-hover_border
+            );
+        }
+
+        .Bullet {
+            font-size: 0;
+            width: 20px;
+        }
     }
 }
 

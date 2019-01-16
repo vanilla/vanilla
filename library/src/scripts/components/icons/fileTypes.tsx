@@ -6,8 +6,8 @@
 
 import React from "react";
 import classNames from "classnames";
-import { t } from "../../application";
-import { AttachmentType, getUnabbreviatedAttachmentType } from "../attachments";
+import { t } from "@library/application";
+import { AttachmentType } from "@library/components/attachments";
 
 const currentColorFill = {
     fill: "currentColor",
@@ -42,7 +42,7 @@ export function fileWord(className?: string) {
             viewBox="0 0 16 16"
             className={classNames("attachmentIcon-fileWord", "attachmentIcon", className)}
             role="img"
-            aria-label={getUnabbreviatedAttachmentType(AttachmentType.WORD)}
+            aria-label={t(AttachmentType.WORD)}
         >
             <title>{title}</title>
             <rect width="16" height="16" rx="1" style={{ fill: "#0175fc" }} />
@@ -63,7 +63,7 @@ export function fileExcel(className?: string) {
             viewBox="0 0 16 16"
             className={classNames("attachmentIcon-fileExcel", "attachmentIcon", className)}
             role="img"
-            aria-label={getUnabbreviatedAttachmentType(AttachmentType.EXCEL)}
+            aria-label={t(AttachmentType.EXCEL)}
         >
             <title>{title}</title>
             <rect width="16" height="16" fill="#2f7d32" />
@@ -78,14 +78,14 @@ export function fileExcel(className?: string) {
 export function filePDF(className?: string) {
     const textFill = "#fff";
     const title = t("PDF");
-    const unabbreviatedType = getUnabbreviatedAttachmentType(AttachmentType.PDF);
+    const unabbreviatedType = t(AttachmentType.PDF);
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
             className={classNames("attachmentIcon-filePDF", "attachmentIcon", className)}
             role="img"
-            aria-label={getUnabbreviatedAttachmentType(AttachmentType.PDF)}
+            aria-label={t(AttachmentType.PDF)}
         >
             <title>
                 <abbr title={unabbreviatedType || undefined}>{AttachmentType.PDF}</abbr>
@@ -111,7 +111,7 @@ export function fileImage(className?: string) {
             viewBox="0 0 16 16"
             className={classNames("attachmentIcon-fileImage", "attachmentIcon", className)}
             role="img"
-            aria-label={getUnabbreviatedAttachmentType(AttachmentType.IMAGE)}
+            aria-label={t(AttachmentType.IMAGE)}
         >
             <title>{title}</title>
 
@@ -127,14 +127,14 @@ export function fileImage(className?: string) {
 export function filePowerPoint(className?: string) {
     const textFill = "#fff";
     const title = t("PPT");
-    const unabbreviatedType = getUnabbreviatedAttachmentType(AttachmentType.PPT);
+    const unabbreviatedType = t(AttachmentType.PPT);
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
             className={classNames("attachmentIcon-filePowerPoint", "attachmentIcon", className)}
             role="img"
-            aria-label={getUnabbreviatedAttachmentType(AttachmentType.IMAGE)}
+            aria-label={t(AttachmentType.IMAGE)}
         >
             <title>
                 {unabbreviatedType ? <abbr title={unabbreviatedType}>{AttachmentType.PDF}</abbr> : AttachmentType.PDF}
@@ -149,7 +149,7 @@ export function filePowerPoint(className?: string) {
 
 export function fileZip(className?: string) {
     const title = t("Zip");
-    const unabbreviatedType = getUnabbreviatedAttachmentType(AttachmentType.ZIP);
+    const unabbreviatedType = t(AttachmentType.ARCHIVE);
     const barStyle = { fill: "#fff", fillOpacity: 0.9 };
     return (
         <svg
@@ -157,7 +157,7 @@ export function fileZip(className?: string) {
             viewBox="0 0 16 16"
             className={classNames("attachmentIcon-fileZip", "attachmentIcon", className)}
             role="img"
-            aria-label={getUnabbreviatedAttachmentType(AttachmentType.IMAGE)}
+            aria-label={t(AttachmentType.IMAGE)}
         >
             <title>
                 {unabbreviatedType ? <abbr title={unabbreviatedType}>{AttachmentType.PDF}</abbr> : AttachmentType.PDF}

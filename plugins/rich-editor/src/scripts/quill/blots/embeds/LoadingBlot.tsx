@@ -3,11 +3,15 @@
  * @license GPL-2.0-only
  */
 
+import React from "react";
+import ReactDOM from "react-dom";
 import { t } from "@library/application";
 import { FOCUS_CLASS } from "@library/embeds";
 import { escapeHTML, setData, getData } from "@library/dom";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
+import AttachmentLoading from "@library/components/attachments/AttachmentLoading";
+import { mimeTypeToAttachmentType } from "@library/components/attachments";
 
 const LOADER_DATA_KEY = "loadingDataKey";
 
@@ -31,6 +35,9 @@ export default class LoadingBlot extends FocusableEmbedBlot {
             case "image":
                 node = this.createImageLoader();
                 break;
+            case "file":
+                node = this.createFileLoader(value);
+                break;
             default:
                 throw new Error("Could not determine loader type for embed blot.");
         }
@@ -50,6 +57,25 @@ export default class LoadingBlot extends FocusableEmbedBlot {
         }
 
         return storedValue;
+    }
+
+    private static createFileLoader(value: IEmbedValue) {
+        const div = super.create();
+        const file = value.loaderData.file!;
+        const attachmentType = mimeTypeToAttachmentType(file.type);
+        const now = new Date();
+
+        ReactDOM.render(
+            <AttachmentLoading
+                type={attachmentType}
+                size={file.size}
+                dateUploaded={now.toISOString()}
+                name={file.name}
+                progressEventEmitter={value.loaderData.progressEventEmitter}
+            />,
+            div,
+        );
+        return div;
     }
 
     /**

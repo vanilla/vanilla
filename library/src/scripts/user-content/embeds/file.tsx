@@ -6,10 +6,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { registerEmbedComponent, IEmbedProps, IFileUploadData } from "@library/embeds";
-import { onContent } from "@library/application";
+import { onContent, onReady } from "@library/application";
+import Attachment from "@library/components/attachments/Attachment";
+import { AttachmentType, mimeTypeToAttachmentType } from "@library/components/attachments";
 
 export function initFileEmbeds() {
     registerEmbedComponent("file", FileEmbed);
+    mountFileEmbeds();
     onContent(mountFileEmbeds);
 }
 
@@ -44,12 +47,16 @@ export class FileEmbed extends React.Component<IEmbedProps<IFileUploadData>> {
     public render() {
         const { url, attributes } = this.props.data;
         const { type, size, dateInserted, name } = attributes;
+        const attachmentType = mimeTypeToAttachmentType(type);
         return (
-            <p className="tempFile">
-                <a href={url} download>
-                    {name}
-                </a>
-            </p>
+            <Attachment
+                type={attachmentType}
+                size={size}
+                name={name}
+                url={url}
+                dateUploaded={dateInserted}
+                mimeType={type}
+            />
         );
     }
 }

@@ -54,6 +54,7 @@ $mebox-button_borderRadius:             $global_borderRadius !default;
         outline: none;
         font-size: 24px;
         color: rgba($global-color_white, 0.7);
+        display: none;
 
         @include minWidth() {
             display: none;

@@ -126,11 +126,6 @@
     }
 
     .Options {
-        //position: absolute;
-        //right: $utility-small_padding;
-        //top: 0;
-        //bottom: 0;
-        //margin: auto;
         display: flex;
         align-items: center;
 
@@ -171,8 +166,6 @@
         font-weight: inherit;
         color: inherit;
         padding: 0;
-        //margin-right: $utility-baseUnitHalf;
-        //margin-bottom: $utility-baseUnitHalf;
         margin: 0;
 
         a {
@@ -482,14 +475,6 @@
 
         td.DiscussionName {
             width: 100%;
-        }
-
-        td.DiscussionName .Wrap {
-            //display: flex;
-            //flex-wrap: wrap;
-            //align-items: flex-start;
-            //justify-content: flex-start;
-            //padding-left: 0;
         }
 
         //ideation styles

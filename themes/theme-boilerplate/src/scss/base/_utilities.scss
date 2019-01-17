@@ -171,13 +171,12 @@
     @if $component_lateralBorder == true {
         padding-left: $component-base_padding;
         padding-right: $component-base_padding;
+    } @else {
+        padding-left: 0;
+        padding-right: 0;
     }
 
     background: $component_bg;
-
-    &[class*="Depth"] {
-        padding-left: $component-base_padding !important;
-    }
 
     @if $component-item_spacing == 0 {
         border-top: $component_border;

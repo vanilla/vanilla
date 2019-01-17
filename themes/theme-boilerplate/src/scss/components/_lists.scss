@@ -167,9 +167,6 @@
         font-size: inherit;
         font-weight: inherit;
         color: inherit;
-        //margin-left: 0;
-        //margin-right: $utility-baseUnitHalf;
-        //margin-bottom: $utility-baseUnitHalf;
         margin: 0;
         padding: 0;
         display: inline-block;
@@ -359,6 +356,17 @@
     }
 }
 
+.DataList.CategoryList {
+    .Item[class*="Depth"] {
+
+        @if $component_lateralBorder == true {
+            padding-left: $component-base_padding !important;
+        } @else {
+            padding-left: 0 !important;
+        }
+    }
+}
+
 .DataList.Discussions {
 
     .Item {
@@ -378,24 +386,24 @@
 .MessageList {
     clear: both;
 
-     @if $component-item_spacing == 0 {
-
-         .ItemDiscussion,
-         &.DataList {
-             box-shadow: $component_boxShadow;
-             border-radius: $component_borderRadius;
-         }
-
-         .Item:first-child {
-             border-top-left-radius: $component_borderRadius;
-             border-top-right-radius: $component_borderRadius;
-         }
-
-         .Item:last-child {
-             border-bottom-left-radius: $component_borderRadius;
-             border-bottom-right-radius: $component_borderRadius;
-         }
-     }
+     //@if $component-item_spacing == 0 {
+     //
+     //    .ItemDiscussion,
+     //    &.DataList {
+     //        box-shadow: $component_boxShadow;
+     //        border-radius: $component_borderRadius;
+     //    }
+     //
+     //    .Item:first-child {
+     //        border-top-left-radius: $component_borderRadius;
+     //        border-top-right-radius: $component_borderRadius;
+     //    }
+     //
+     //    .Item:last-child {
+     //        border-bottom-left-radius: $component_borderRadius;
+     //        border-bottom-right-radius: $component_borderRadius;
+     //    }
+     //}
 
     .PageTitle h1{
         font-size: $global-title_fontSize;
@@ -626,14 +634,6 @@
     .ItemContent.Discussion {
         padding-left: 0;
     }
-
-    //.Title {
-    //
-    //    a {
-    //        display: inline-block;
-    //        padding-right: $icon-default_size;
-    //    }
-    //}
 
     .Options {
         position: absolute;

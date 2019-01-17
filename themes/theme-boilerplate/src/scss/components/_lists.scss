@@ -414,9 +414,13 @@
         }
     }
 
+    .ItemComment.ItemComment,
+    .ItemDiscussion.ItemDiscussion {
+        padding: 0;
+    }
+
     .ItemComment,
     .ItemDiscussion {
-        padding: 0;
 
         .Options {
             top: $utility-medium_padding;
@@ -442,6 +446,7 @@
 
             .MItem.RoleTracker {
                 padding: 0 $utility-small_padding;
+                margin: 0 2px;
 
                 a {
                     color: inherit;
@@ -459,6 +464,8 @@
             .AuthorWrap {
                 font-size: $component-meta_fontSize;
                 line-height: $component-meta_lineHeight;
+                display: inline-block;
+                width: 100%;
 
                 > * {
                     display: inline;
@@ -490,13 +497,9 @@
                 color: inherit;
             }
 
-            .Meta,
-            .Author {
-                margin: 0;
-            }
-
             .Username {
                 color: $component-title_color;
+                font-weight: $component-title_fontWeight;
 
                 &:hover,
                 &:focus {
@@ -561,12 +564,8 @@
         }
     }
 
-    .ItemDiscussion.ItemDiscussion.ItemDiscussion {
+    .ItemDiscussion {
         margin-bottom: $utility-large_padding;
-    }
-
-    .ItemDiscussion .Item-Header .AuthorWrap {
-        margin-top: -#{$global-bodylineHeight_offset};
     }
 
     .Item.Activity {

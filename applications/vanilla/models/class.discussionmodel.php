@@ -1005,6 +1005,9 @@ class DiscussionModel extends Gdn_Model {
 
         // Fix up output
         $discussion->Name = Gdn_Format::text($discussion->Name);
+        if ($discussion && empty($discussion->Name)) {
+            $discussion->Name = '<!-- empty -->';
+        }
         $discussion->Attributes = dbdecode($discussion->Attributes);
         $discussion->Url = discussionUrl($discussion);
         $discussion->Tags = $this->formatTags($discussion->Tags);

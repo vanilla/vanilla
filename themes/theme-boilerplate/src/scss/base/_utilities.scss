@@ -34,7 +34,7 @@
     font-family: $global-heading_fontFamily;
     font-weight: $global-heading_fontWeight;
     font-size: $global-large_fontSize;
-    line-height: $global-base_lineHeight;
+    line-height: $global-condensed_lineHeight;
 }
 
 @mixin font-heading-link() {

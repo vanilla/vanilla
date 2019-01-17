@@ -74,7 +74,8 @@
         font-weight: $component-title_fontWeight;
         line-height: #{$theme-photo_size / 2};
         color: $component-title_color;
-        display: inline;
+        display: block;
+        margin-bottom: $component-base_padding;
 
         &:focus,
         &:hover {
@@ -94,10 +95,15 @@
         }
     }
 
-    .CategoryDescription,
-    .Discussion .Excerpt {
+    .Excerpt,
+    .CategoryDescription {
         display: block;
-        margin: $component-base_padding 0;
+        width: 100%;
+        font-size: $component-base_fontSize;
+        font-weight: $component-base_fontWeight;
+        line-height: $component-base_lineHeight;
+        color: $component-base_color;
+        margin: 0 0 $component-base_padding;
     }
 
     .Excerpt:empty,
@@ -105,10 +111,8 @@
         display: none;
     }
 
-    .Excerpt {
-        font-size: $component-base_fontSize;
-        font-weight: $component-base_fontWeight;
-        color: $component-base_color;
+    .ItemContent.Discussion .Excerpt {
+        margin-top: $component-base_padding;
     }
 
     .Options {
@@ -147,12 +151,11 @@
     }
 
     .Meta {
-        line-height: 1em;
-        margin-bottom: -$utility-small_padding;
+        line-height: $component-meta_lineHeight;
 
         @include maxWidth {
             margin-top: $utility-medium_padding;
-            line-height: $global-base_lineHeight;
+            line-height: $component-meta_lineHeight;
         }
     }
 
@@ -164,9 +167,10 @@
         font-size: inherit;
         font-weight: inherit;
         color: inherit;
-        margin-left: 0;
-        margin-right: $utility-baseUnitHalf;
-        margin-bottom: $utility-baseUnitHalf;
+        //margin-left: 0;
+        //margin-right: $utility-baseUnitHalf;
+        //margin-bottom: $utility-baseUnitHalf;
+        margin: 0;
         padding: 0;
         display: inline-block;
 
@@ -182,6 +186,10 @@
                 color: $component-meta-link-hover_color;
             }
         }
+    }
+
+    .MItem.DiscussionAuthor {
+        display: none;
     }
 
     .MItem.Category {
@@ -361,12 +369,6 @@
 
         .Options {
             position: relative;
-        }
-
-        .Excerpt {
-            margin-top: $component-base_padding;
-            display: block;
-            width: 100%;
         }
     }
 }
@@ -625,18 +627,13 @@
         padding-left: 0;
     }
 
-    .Title {
-        margin-bottom: 0;
-    }
-
-    .Title a {
-        display: inline-block;
-        padding-right: $icon-default_size;
-        margin-bottom: $utility-medium_padding;
-    }
-    .Item .Excerpt {
-        display: block;
-    }
+    //.Title {
+    //
+    //    a {
+    //        display: inline-block;
+    //        padding-right: $icon-default_size;
+    //    }
+    //}
 
     .Options {
         position: absolute;
@@ -655,10 +652,6 @@
 
     .PhotoWrap {
         margin-right: 0;
-    }
-
-    .Title {
-        margin-bottom: 0;
     }
 
     .ItemContent {
@@ -707,8 +700,4 @@
         font-size: $icon-default_size;
         line-height: $icon-default_size;
     }
-}
-
-body.Vanilla.Discussions .Discussion.ItemContent {
-    padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
 }

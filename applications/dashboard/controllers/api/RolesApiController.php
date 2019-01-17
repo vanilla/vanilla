@@ -524,7 +524,7 @@ class RolesApiController extends AbstractApiController {
                     'CategoryID' => $perm['JunctionID'],
                     'CustomPermissions' => true,
                     'Permissions' => [$perm]
-                ]);
+                ], ['overWrite' => $overwrite]);
             } else {
                 $this->permissionModel->save($perm);
             }

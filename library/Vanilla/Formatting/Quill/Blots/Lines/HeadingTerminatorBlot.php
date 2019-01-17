@@ -86,7 +86,6 @@ class HeadingTerminatorBlot extends AbstractLineTerminatorBlot {
      * Get the heading level for the blot.
      *
      * @return int
-     * @throws \Exception if the level is not a valid integer.
      */
     public function getHeadingLevel(): int {
         // Heading attributes generally live in the next operation.

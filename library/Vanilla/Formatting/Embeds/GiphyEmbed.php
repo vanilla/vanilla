@@ -17,7 +17,7 @@ class GiphyEmbed extends Embed {
     protected $domains = ['giphy.com','gph.is'];
 
     /**
-     * giphyEmbed constructor.
+     * GiphyEmbed constructor.
      */
     public function __construct() {
         parent::__construct('giphy', 'image');
@@ -88,7 +88,7 @@ HTML;
      *
      * @param string $url
      * @return string $postID
-     * @throws Exception if post id is not found.
+     * @throws Exception If post id is not found.
      */
     private function parseURL($url): string {
         preg_match(

@@ -19,6 +19,7 @@ import { initEmojiSupport } from "@library/user-content/emoji";
 import { initSpoilers } from "@library/user-content/spoilers";
 import { initQuoteEmbeds, mountQuoteEmbeds } from "@library/user-content/embeds/quote";
 import { initCodeHighlighting } from "@library/user-content/code";
+import { initFileEmbeds, mountFileEmbeds } from "@library/user-content/embeds/file";
 
 export function initAllUserContent() {
     // User content
@@ -36,6 +37,7 @@ export function initAllUserContent() {
     initVideoEmbeds();
     initQuoteEmbeds();
     initCodeHighlighting();
+    initFileEmbeds();
 }
 
 /**
@@ -48,4 +50,5 @@ export function convertAllUserContent() {
     void convertInstagramEmbeds();
     void convertTwitterEmbeds();
     void mountQuoteEmbeds();
+    void mountFileEmbeds();
 }

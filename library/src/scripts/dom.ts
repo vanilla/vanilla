@@ -414,7 +414,7 @@ export function stickyHeader() {
  *
  * @param event - https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
  */
-export function getDraggedImage(event: DragEvent): File | undefined {
+export function getDraggedFile(event: DragEvent): File | undefined {
     if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length) {
         event.preventDefault();
         const files = Array.from(event.dataTransfer.files);
@@ -430,7 +430,7 @@ export function getDraggedImage(event: DragEvent): File | undefined {
  *
  * @param event - https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
  */
-export function getPastedImage(event: ClipboardEvent): File | undefined | null {
+export function getPastedFile(event: ClipboardEvent): File | undefined | null {
     if (event.clipboardData && event.clipboardData.items && event.clipboardData.items.length) {
         const files = Array.from(event.clipboardData.items)
             .map((item: any) => (item.getAsFile ? item.getAsFile() : null))

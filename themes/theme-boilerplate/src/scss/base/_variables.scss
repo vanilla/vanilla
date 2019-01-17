@@ -269,7 +269,7 @@ $component_border:                       #{$theme-border_color} #{$component_bor
 $component_boxShadow:                    none !default;
 $component_borderRadius:                 $global_borderRadius !default;
 
-$component-header_bg:                    $theme-hover_color !default;
+$component-header_bg:                    transparent !default;
 
 $component-base_color:                   $global-color_fg !default;
 $component-base_fontSize:                $global-medium_fontSize !default;

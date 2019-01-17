@@ -40,8 +40,9 @@ $menuItems_width:                       250px !default;
 $dropDown-item_verticalPadding:         6px !default;
 $dropDown-item_horizontalPadding:       18px !default;
 
-$dropDown-item_minHeight:               30px !default;
 $dropDown-item_mobile_minHeight:        44px !default;
+
+$flyout-progress_size:                  24px !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -49,6 +50,22 @@ $dropDown-item_mobile_minHeight:        44px !default;
 
 .FlyoutMenu.FlyoutMenu {
     min-width: $dropDown_width;
+
+    .InProgress {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: $flyout-progress_size * 2;
+        width: 100%;
+        padding-top: $flyout-progress_size;
+        padding-bottom: $flyout-progress_size;
+
+        &::after {
+            @include spinnerLoader($flyout-progress_size, 4px);
+            content: '';
+        }
+    }
 }
 
 .MenuItems.MenuItems {
@@ -83,7 +100,7 @@ $dropDown-item_mobile_minHeight:        44px !default;
 .richEditorFlyout {
 
     @include shadow-dropDown;
-    padding: 0;
+    padding: $dropDown-item_verticalPadding 0;
     position: absolute;
     background-color: $flyout_bg;
     color: $flyout_fg;
@@ -108,8 +125,8 @@ $dropDown-item_mobile_minHeight:        44px !default;
         min-height: 0;
         width: 100%;
         background-color: $flyoutOverlay-border_color;
-        margin-top: $utility-baseUnit;
-        margin-bottom: $utility-baseUnit;
+        margin-top: $dropDown-item_verticalPadding;
+        margin-bottom: $dropDown-item_verticalPadding;
         padding: 0 !important;
         display: block;
 
@@ -190,6 +207,10 @@ $dropDown-item_mobile_minHeight:        44px !default;
     .Meta {
         color: $flyout_meta_fg;
     }
+}
+
+.Flyout.Flyout-withFrame {
+    padding: 0;
 }
 
 .MenuItems {

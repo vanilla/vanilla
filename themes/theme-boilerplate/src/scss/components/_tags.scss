@@ -91,7 +91,7 @@ $tag-hover_borderColor:           $global-color_primary !default;
     }
 
     .NewCommentCount,
-    .HasNew {
+    .HasNew.HasNew {
         border: 1px solid $bullet_borderColor;
         background: $bullet_bg;
         color: $bullet_fg;

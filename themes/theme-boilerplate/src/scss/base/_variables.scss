@@ -369,9 +369,9 @@ $formButton_border:                      1px solid !default;
     Bullets
 \* -------------------------------------------------------------- */
 
-$bullet_borderColor:                     $global-color_secondary !default;
-$bullet_bg:                              $global-color_secondary !default;
-$bullet_fg:                              $global-color_white !default;
+$bullet_bg:                              transparent !default;
+$bullet_fg:                              $global-color_primary !default;
+$bullet_borderColor:                     $global-color_primary !default;
 
 /* -------------------------------------------------------------- *\
     Breakpoints

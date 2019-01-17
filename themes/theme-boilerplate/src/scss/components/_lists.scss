@@ -162,13 +162,12 @@
     .Author .Username,
     .Meta > *,
     .MItem,
-    .AuthorInfo *,
+    .AuthorInfo > *,
     .MItem.Category {
         font-size: inherit;
         font-weight: inherit;
         color: inherit;
         margin: 0;
-        padding: 0;
         display: inline-block;
 
         a {
@@ -183,6 +182,11 @@
                 color: $component-meta-link-hover_color;
             }
         }
+    }
+
+    .Tag,
+    .HasNew {
+        margin-bottom: $utility-baseUnitHalf;
     }
 
     .MItem.DiscussionAuthor {

@@ -165,7 +165,7 @@
         font-size: inherit;
         font-weight: inherit;
         color: inherit;
-        padding: 0;
+
         margin: 0;
 
         a {
@@ -179,6 +179,11 @@
                 color: $component-meta-link-hover_color;
             }
         }
+    }
+
+    .Tag,
+    .HasNew {
+        margin-bottom: $utility-baseUnitHalf;
     }
 
     .NewCommentCount.NewCommentCount,

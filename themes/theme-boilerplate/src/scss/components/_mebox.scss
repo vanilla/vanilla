@@ -9,7 +9,7 @@
 \* -------------------------------------------------------------- */
 
 $mebox-photo_size:                      24px !default;
-$mebox-button_borderRadius:             3px !default;
+$mebox-button_borderRadius:             $global_borderRadius !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -47,8 +47,23 @@ $mebox-button_borderRadius:             3px !default;
         }
     }
 
-    > .PhotoWrap {
-        float: none;
+    .MeBox-mobileClose {
+        appearance: none;
+        background: none;
+        border: none;
+        outline: none;
+        font-size: 24px;
+        color: rgba($global-color_white, 0.7);
+
+        @include minWidth() {
+            display: none;
+        }
+    }
+
+    .MeButton-user .ProfilePhoto {
+        width: $mebox-photo_size;
+        height: $mebox-photo_size;
+        border-radius: $mebox-photo_size;
     }
 
     .Flyout {
@@ -80,10 +95,6 @@ $mebox-button_borderRadius:             3px !default;
         display: none;
     }
 
-    .MeBox > .PhotoWrap {
-        margin-right: $utility-small_padding;
-    }
-
     .SignInLinks {
 
         .Bullet {
@@ -113,15 +124,5 @@ $mebox-button_borderRadius:             3px !default;
             color: $bullet_fg;
             white-space: nowrap;
         }
-    }
-
-    .MeBox > .PhotoWrap {
-        height: $mebox-photo_size;
-        width: $mebox-photo_size;
-    }
-
-    .WhoIs > .Username {
-        display: flex;
-        align-items: center;
     }
 }

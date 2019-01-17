@@ -2494,8 +2494,11 @@ EOT;
      *
      * @return string
      */
-    public static function quoteEmbed(string $body, string $format): string {
+    public static function quoteEmbed($body, string $format): string {
         if ($format === \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) {
+            if (is_array($body)) {
+                $body = json_encode($body);
+            }
             return self::getRichFormatter()->renderQuote($body);
         }
 

@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php 
+use Vanilla\FeatureFlagHelper;
+if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 $User = $Session->User;
 $CssClass = '';
@@ -25,14 +27,20 @@ if ($Session->checkPermission('Garden.Users.Approve')) {
     $ApplicantCount = null;
 }
 
+$useNewFlyouts = FeatureFlagHelper::featureEnabled('NewFlyouts');
+
 $this->EventArguments['DashboardCount'] = &$DashboardCount;
 $this->fireEvent('BeforeFlyoutMenu');
 
 if ($Session->isValid()):
     echo '<div class="MeBox'.$CssClass.'">';
-    echo userPhoto($User);
+    if (!$useNewFlyouts) {
+        echo userPhoto($User);
+    }
     echo '<div class="WhoIs">';
-    echo userAnchor($User, 'Username');
+    if (!$useNewFlyouts) {
+        echo userAnchor($User, 'Username');
+    }
     echo '<div class="MeMenu">';
     // Notifications
     $CountNotifications = $User->CountNotifications;
@@ -41,7 +49,7 @@ if ($Session->isValid()):
     echo '<span class="ToggleFlyout" rel="/profile/notificationspopin?TransientKey='.htmlspecialchars(urlencode($transientKey)).'">';
     echo anchor(sprite('SpNotifications', 'Sprite Sprite16', t('Notifications')).$CNotifications, userUrl($User), 'MeButton FlyoutButton js-clear-notifications', ['title' => t('Notifications'), 'tabindex' => '0', "role" => "button", "aria-haspopup" => "true"]);
     echo sprite('SpFlyoutHandle', 'Arrow');
-    echo '<div class="Flyout FlyoutMenu"></div></span>';
+    echo '<div class="Flyout FlyoutMenu Flyout-withFrame"></div></span>';
 
     // Inbox
     if (Gdn::addonManager()->lookupAddon('conversations')) {
@@ -50,7 +58,7 @@ if ($Session->isValid()):
         echo '<span class="ToggleFlyout" rel="/messages/popin">';
         echo anchor(sprite('SpInbox', 'Sprite Sprite16', t('Inbox')).$CInbox, '/messages/all', 'MeButton FlyoutButton', ['title' => t('Inbox'), 'tabindex' => '0', "role" => "button", "aria-haspopup" => "true"]);
         echo sprite('SpFlyoutHandle', 'Arrow');
-        echo '<div class="Flyout FlyoutMenu"></div></span>';
+        echo '<div class="Flyout FlyoutMenu Flyout-withFrame"></div></span>';
     }
 
     // Bookmarks
@@ -58,18 +66,26 @@ if ($Session->isValid()):
         echo '<span class="ToggleFlyout" rel="/discussions/bookmarkedpopin">';
         echo anchor(sprite('SpBookmarks', 'Sprite Sprite16', t('Bookmarks')), '/discussions/bookmarked', 'MeButton FlyoutButton', ['title' => t('Bookmarks'), 'tabindex' => '0', "role" => "button", "aria-haspopup" => "true"]);
         echo sprite('SpFlyoutHandle', 'Arrow');
-        echo '<div class="Flyout FlyoutMenu"></div></span>';
+        echo '<div class="Flyout FlyoutMenu Flyout-withFrame"></div></span>';
     }
 
     // Profile Settings & Logout
     $dropdown = new DropdownModule();
     $dropdown->setData('DashboardCount', $DashboardCount);
     $triggerTitle = t('Account Options');
-    $triggerIcon = sprite('SpOptions', 'Sprite Sprite16', $triggerTitle);
-    $dropdown->setTrigger('', 'anchor', 'MeButton FlyoutButton', $triggerIcon, '/profile/edit', ['title' => $triggerTitle, 'tabindex' => '0', "role" => "button", "aria-haspopup" => "true"]);
+
+    if ($useNewFlyouts) {
+        $imgUrl = userPhotoUrl($User);
+        $triggerIcon = "<img class='ProfilePhoto ProfilePhotoSmall' src='$imgUrl'/>";
+    } else {
+        $triggerIcon = sprite('SpOptions', 'Sprite Sprite16', $triggerTitle);
+    }
+
+    $dropdown->setTrigger('', 'anchor', 'MeButton FlyoutButton MeButton-user', $triggerIcon, '/profile/edit', ['title' => $triggerTitle, 'tabindex' => '0', "role" => "button", "aria-haspopup" => "true"]);
     $editModifiers['listItemCssClasses'] = ['EditProfileWrap', 'link-editprofile'];
     $preferencesModifiers['listItemCssClasses'] = ['EditProfileWrap', 'link-preferences'];
 
+    $dropdown->addLinkIf(hasEditProfile(Gdn::session()->UserID), t('View Profile'), '/profile', 'profile.view', '', [], $editModifiers);
     $dropdown->addLinkIf(hasEditProfile(Gdn::session()->UserID), t('Edit Profile'), '/profile/edit', 'profile.edit', '', [], $editModifiers);
     $dropdown->addLinkIf(!hasEditProfile(Gdn::session()->UserID), t('Preferences'), '/profile/preferences', 'profile.preferences', '', [], $preferencesModifiers);
 
@@ -95,7 +111,9 @@ if ($Session->isValid()):
     $this->EventArguments['Dropdown'] = &$dropdown;
     $this->fireEvent('FlyoutMenu');
     echo $dropdown;
-
+    if ($useNewFlyouts) {
+        echo "<button class='MeBox-mobileClose'>×</button>";
+    }
     echo '</div>';
     echo '</div>';
     echo '</div>';

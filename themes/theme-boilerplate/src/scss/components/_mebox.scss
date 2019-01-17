@@ -9,9 +9,7 @@
 \* -------------------------------------------------------------- */
 
 $mebox-photo_size:                      24px !default;
-$mebox_fg:                              $header_link_color !default;
-$mebox_hover_color:                     $header-link-hover_color !default;
-$mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12%), .2) !default;
+$mebox-button_borderRadius:             $global_borderRadius !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -22,35 +20,51 @@ $mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12
     display: flex;
 
     .MeButton {
-        color: $mebox_fg;
         display: flex;
         align-items: center;
         justify-content: center;
-
-        &:focus,
-        &:hover,
-        &:active {
-            color: $mebox_hover_color;
-        }
+        padding: 0;
+        font-size: $icon-default_size;
+        height: 32px;
+        width: 32px;
+        border-radius: $mebox-button_borderRadius;
 
         .Alert {
-            line-height: 16px;
-            min-width: 16px;
-            height: 16px;
+            line-height: 18px;
+            min-width: 18px;
+            height: 18px;
             display: flex;
-            border-radius: 16px;
+            border-radius: 18px;
             align-items: center;
             justify-content: center;
-            top: 0;
-            right: -3px;
-            border: 1px solid $bullet_borderColor;
-            background: $bullet_bg;
-            color: $bullet_fg;
+            right: -8px;
+            top: -9px;
+            border: 1px solid;
+
+            @include maxWidth {
+                top: 0;
+            }
         }
     }
 
-    > .PhotoWrap {
-        float: none;
+    .MeBox-mobileClose {
+        appearance: none;
+        background: none;
+        border: none;
+        outline: none;
+        font-size: 24px;
+        color: rgba($global-color_white, 0.7);
+        display: none;
+
+        @include minWidth() {
+            display: none;
+        }
+    }
+
+    .MeButton-user .ProfilePhoto {
+        width: $mebox-photo_size;
+        height: $mebox-photo_size;
+        border-radius: $mebox-photo_size;
     }
 
     .Flyout {
@@ -82,62 +96,10 @@ $mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12
         display: none;
     }
 
-    .MeBox > .PhotoWrap {
-        margin-right: $utility-small_padding;
-    }
-
-    .MeButton.FlyoutButton,
-    .WhoIs > .Username {
-        transition: transition(color);
-        color: $mebox_fg;
-
-
-        &:hover {
-            color: $mebox_hover_color;
-        }
-    }
-
-    .ToggleFlyout.Open,
-    .MeButton:hover {
-        background-color: $mebox_hover_bg;
-    }
-
     .SignInLinks {
-        > a:first-child,
-        .SignInPopup,
-        .ApplyButton {
-            @include Button(
-                $navigation-button_bg,
-                $navigation-button_fg,
-                $navigation-button_border,
-                $navigation-button-hover_bg,
-                $navigation-button-hover_fg,
-                $navigation-button-hover_border
-            );
-        }
 
         .Bullet {
             display: none;
-        }
-    }
-
-    .MeButton {
-        padding: 0;
-        font-size: $icon-default_size;
-        min-height: $header_minHeight;
-        min-width: calc(#{$header_minHeight} - #{$utility-baseUnitHalf});
-
-        .Alert {
-            line-height: 16px;
-            min-width: 16px;
-            height: 16px;
-            display: flex;
-            border-radius: 50%;
-            align-items: center;
-            justify-content: center;
-            top: 0;
-            right: -3px;
-            background: $global-color_secondary;
         }
     }
 
@@ -153,21 +115,15 @@ $mebox_hover_bg:                        rgba(mix($mebox_fg, $global-color_fg, 12
         display: flex;
         align-items: center;
 
+        .ToggleFlyout + .ToggleFlyout {
+            margin-left: 8px;
+        }
+
         .Alert {
             border: 1px solid $bullet_borderColor;
             background: $bullet_bg;
             color: $bullet_fg;
             white-space: nowrap;
         }
-    }
-
-    .MeBox > .PhotoWrap {
-        height: $mebox-photo_size;
-        width: $mebox-photo_size;
-    }
-
-    .WhoIs > .Username {
-        display: flex;
-        align-items: center;
     }
 }

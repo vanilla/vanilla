@@ -215,7 +215,6 @@ a.ChangePicture {
     a {
         font-size: $global-small_fontSize;
         @include ellipsis;
-        max-width: calc(100% - 44px);
     }
 
 }

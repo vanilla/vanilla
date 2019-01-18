@@ -19,6 +19,8 @@
 @import "base/utilities";
 @import "base/typography";
 @import "sections/frame";
+@import "mixins/mixin.text";
+@import "mixins/mixin.listStyles";
 
 /* -------------------------------------------------------------- *\
     Patches
@@ -57,6 +59,7 @@
 @import "components/searchbox";
 @import "components/swtichslider";
 @import "components/tables";
+@import "components/userContent";
 
 /* -------------------------------------------------------------- *\
     Sections

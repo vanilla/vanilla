@@ -12,6 +12,7 @@
     margin: 0 0 $utility-medium_padding;
     @include font-style-base;
     border-radius: $component_borderRadius;
+    padding: $utility-baseUnit $utility-medium_padding;
 }
 
 a.Dismiss.Dismiss {

@@ -86,7 +86,7 @@ $global-color_fg:                       $global-color_grey !default; // text col
 $global-border_color:                   mix($global-color_fg, $global-color_bg, 24%) !default; // Note it's off by default due to the border width
 $global-border-width:                   1px;
 $global-border-style:                   solid;
-$global_borderRadius:                   3px !default;
+$global_borderRadius:                   6px !default;
 
 $global-body_bg:                        $global-color_bg !default;
 
@@ -266,7 +266,7 @@ $panel-item_fg:                          $link-default_color !default;
 $panel-item_borderColor:                 transparent !default;
 
 $panel-item-hover_bg:                    transparent !default;
-$panel-item-hover_fg:                    $global-color_royalBlue !default;
+$panel-item-hover_fg:                    $global-color_primary !default;
 $panel-item-hover_borderColor:           transparent !default;
 
 /* -------------------------------------------------------------- *\

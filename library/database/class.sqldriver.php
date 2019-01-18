@@ -2141,6 +2141,10 @@ abstract class Gdn_SQLDriver {
         if (count($in) > 0) {
             $inExpr = '('.implode(', ', $in).')';
         } else {
+            if ($op == 'not in') {
+                deprecated('Gdn_SQLDriver::whereNotIn() was called with empty $values array. This will no longer be supported in a future release.');
+                \Vanilla\Utility\Deprecation::log();
+            }
             $inExpr = '(null)';
         }
 

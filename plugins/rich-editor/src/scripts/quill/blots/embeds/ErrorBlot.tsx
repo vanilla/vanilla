@@ -37,6 +37,9 @@ export default class ErrorBlot extends FocusableEmbedBlot {
         return node;
     }
 
+    /**
+     * Extend the base attach to remove ourselves if we are missing some particular data.
+     */
     public attach() {
         super.attach();
         if (!this.data.error) {

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { MouseEvent, ChangeEvent } from "react";
+import React, { MouseEvent } from "react";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { isFileImage } from "@library/utility";
@@ -40,8 +40,14 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
         );
     }
 
+    /**
+     * Determine if a particular mime type is an image mimeType.
+     */
     private isMimeTypeImage = (mimeType: string) => mimeType.startsWith("image/");
 
+    /**
+     * Get the icon to display for the input.
+     */
     private get icon(): React.ReactNode {
         switch (this.props.type) {
             case "file":
@@ -51,6 +57,9 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
         }
     }
 
+    /**
+     * Get an "accepts" mimeTypes string for the file upload input.
+     */
     private get inputAccepts(): string {
         switch (this.props.type) {
             case "file": {
@@ -64,12 +73,18 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
         }
     }
 
+    /**
+     * Pass through our fake button to be a click on the file upload (which can't be styled).
+     */
     private onFakeButtonClick = (event: MouseEvent<any>) => {
         if (this.inputRef && this.inputRef.current) {
             this.inputRef.current.click();
         }
     };
 
+    /**
+     * Handle the change of the file upload input.
+     */
     private onInputChange = () => {
         // Grab the first file.
         const file =

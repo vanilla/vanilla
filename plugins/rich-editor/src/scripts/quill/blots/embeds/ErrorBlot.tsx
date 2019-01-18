@@ -37,13 +37,22 @@ export default class ErrorBlot extends FocusableEmbedBlot {
         return node;
     }
 
+    public attach() {
+        super.attach();
+        if (!this.data.error) {
+            this.remove();
+            this.quill && this.quill.update();
+        }
+    }
+
+    private data: IErrorData;
+
     constructor(domNode: HTMLElement, data: IErrorData) {
         super(domNode);
+        this.data = data;
         const id = uniqueId("embedLoader");
 
         if (!data.error) {
-            this.remove();
-            this.quill!.update();
             return;
         }
 

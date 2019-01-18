@@ -90,7 +90,7 @@ $flyout-progress_size:                  24px !default;
     min-width: $dropDown_width;
 
     // Flyouts will acclimate to the width of their ButtonGroup.
-    .ButtonGroup & {
+    .ButtonGroup.Big & {
         min-width: initial;
     }
 

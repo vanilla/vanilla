@@ -26,6 +26,11 @@ export default class AttachmentError extends React.Component<IProps> {
     public render() {
         const { title, name } = this.props;
         const label = title || name;
+        const messages = this.props.message.split("\n");
+
+        const [errorTitle, ...errorBodyMessages] = messages;
+        const showFileName = label && errorBodyMessages.length === 0;
+
         return (
             <div
                 className={classNames("attachment", "hasError", this.props.className, FOCUS_CLASS)}
@@ -39,9 +44,19 @@ export default class AttachmentError extends React.Component<IProps> {
                     <div className="attachment-format">{fileUploadError()}</div>
                     <div className="attachment-main">
                         <div id={this.descrID} className="attachment-title">
-                            {this.props.message}
+                            {errorTitle}
                         </div>
-                        {label && (
+                        <div className="attachment-body">
+                            {errorBodyMessages.map((message, index) => {
+                                return (
+                                    <>
+                                        {message}
+                                        {index !== errorBodyMessages.length - 1 ? <br /> : null}
+                                    </>
+                                );
+                            })}
+                        </div>
+                        {showFileName && (
                             <div className="attachment-metas metas">
                                 <span className="meta">{label}</span>
                             </div>

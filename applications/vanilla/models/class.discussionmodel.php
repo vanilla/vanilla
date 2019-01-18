@@ -1000,6 +1000,12 @@ class DiscussionModel extends Gdn_Model {
         }
     }
 
+    /**
+     * Modifies and formats discussion data.
+     *
+     * 
+     * @param object $discussion
+     */
     public function calculate(&$discussion) {
         $archiveTimestamp = Gdn_Format::toTimestamp(Gdn::config('Vanilla.Archive.Date', 0));
 

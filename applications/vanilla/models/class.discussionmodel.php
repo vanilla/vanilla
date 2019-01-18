@@ -1003,7 +1003,6 @@ class DiscussionModel extends Gdn_Model {
     /**
      * Modifies and formats discussion data.
      *
-     * 
      * @param object $discussion
      */
     public function calculate(&$discussion) {

@@ -3,5 +3,9 @@
  * @license GPL-2.0-only
  */
 em {
-  font-style: italic;
+    font-style: italic;
+}
+
+.js-focus-visible :focus:not(.focus-visible) {
+    outline: none;
 }

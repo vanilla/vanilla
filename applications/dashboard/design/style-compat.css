@@ -178,6 +178,10 @@ em {
   font-style: italic;
 }
 
+.js-focus-visible :focus:not(.focus-visible) {
+  outline: none;
+}
+
 /*!
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -240,6 +244,55 @@ button.Close {
   font-size: 22px;
   font-weight: bold;
   padding: 0;
+}
+
+.buttonIcon {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  background: none;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  height: 36px;
+  width: 36px;
+  min-width: 36px;
+  padding: 0;
+  color: #74787e;
+}
+
+.buttonIcon:visited {
+  color: #74787e;
+}
+
+.buttonIcon .icon {
+  display: block;
+}
+
+.buttonIcon.isOpen {
+  color: #0291db;
+}
+
+.buttonIcon:focus, .buttonIcon:hover {
+  color: #0291db;
+}
+
+.icon-close {
+  display: block;
+  margin: auto;
+  width: 12px;
+  height: 12px;
 }
 
 /*!
@@ -1422,6 +1475,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 .embedImage .embedExternal-content {
   width: auto;
   max-width: 640px;
+  display: inline-block;
 }
 
 @media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
@@ -2517,6 +2571,18 @@ body.isMobile .Popup.hasRichEditor .Border {
   background: #FFF3D4;
 }
 
+.attachment.hasError, .attachment.isLoading {
+  cursor: pointer;
+}
+
+.attachment.hasError:hover, .attachment.isLoading:hover {
+  box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5) inset;
+}
+
+.attachment.hasError:focus, .attachment.isLoading:focus {
+  box-shadow: 0 0 0 2px #0291db inset;
+}
+
 .attachment-link, .attachment-link:hover, .attachment-link:active, .attachment-link:visited {
   text-decoration: none;
 }
@@ -2593,6 +2659,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 .attachment-close {
   margin-top: -10px;
   margin-right: -10px;
+  pointer-events: all;
 }
 
 .attachment-loadingProgress {

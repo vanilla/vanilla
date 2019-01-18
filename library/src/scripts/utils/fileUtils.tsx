@@ -3,6 +3,7 @@
  * @license GPL-2.0-only
  */
 
+import React from "react";
 import { t } from "@library/application";
 
 interface IHumanFileSize {

@@ -969,8 +969,13 @@ class ActivityModel extends Gdn_Model {
             $message = $prefix;
         }
 
-        if ($story = val('Story', $activity)) {
-            $message .= $story;
+        $isArray = is_array($activity);
+
+        $story = $isArray ? $activity['Story'] ?? null : $activity->Story ?? null;
+        $format = $isArray ? $activity['Format'] ?? null : $activity->Format ?? null;
+
+        if ($story && $format) {
+            $message .= Gdn_Format::to($story, $format);
         }
 
         return $message;

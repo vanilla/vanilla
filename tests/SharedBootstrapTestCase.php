@@ -17,6 +17,7 @@ use Garden\Container\Container;
  * Class SharedBootstrapTestCase.
  */
 class SharedBootstrapTestCase extends TestCase {
+
     use BootstrapTrait;
 
     /**
@@ -34,7 +35,6 @@ class SharedBootstrapTestCase extends TestCase {
             } else {
                 BootstrapTrait::setUpBeforeClass();
             }
-
         } else {
             if (!self::containerIsNull($currentContainer) && $currentContainer !== self::$container) {
                 $containerCorruption = true;

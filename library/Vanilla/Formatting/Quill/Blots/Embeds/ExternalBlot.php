@@ -47,6 +47,15 @@ class ExternalBlot extends AbstractBlot {
     }
 
     /**
+     * Get the embed data.
+     *
+     * @return array
+     */
+    public function getEmbedData(): array {
+        return $this->currentOperation["insert"]["embed-external"]["data"] ?? [];
+    }
+
+    /**
      * Render out the content of the blot using the EmbedManager.
      * @see EmbedManager
      * @inheritDoc

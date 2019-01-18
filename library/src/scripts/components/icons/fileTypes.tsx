@@ -6,8 +6,8 @@
 
 import React from "react";
 import classNames from "classnames";
-import { t } from "../../application";
-import { AttachmentType, getUnabbreviatedAttachmentType } from "../attachments";
+import { t } from "@library/application";
+import { AttachmentType } from "@library/components/attachments";
 
 const currentColorFill = {
     fill: "currentColor",
@@ -18,16 +18,16 @@ export function fileGeneric(className?: string, fileType?: string) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 18 18"
-            className={classNames("icon", "icon-fileGeneric", "attachmentIcon", className)}
+            viewBox="0 0 16 16"
+            className={classNames("attachmentIcon-fileGeneric", "attachmentIcon", className)}
             role="img"
             aria-label={title}
         >
             <title>{title}</title>
-            <rect width="18" height="18" style={{ fill: "#4c4c4c" }} />
+            <rect width="16" height="16" rx="1" style={{ fill: "#777b81" }} />
             <path
-                d="M9.616,6.558,13.1,10.045a1.869,1.869,0,0,1,.093,2.688,1.849,1.849,0,0,1-2.688-.094L4.764,6.9c-.1-.1-.99-1.05-.186-1.854s1.749.083,1.854.186l5.189,5.189a.483.483,0,0,1,.01.732.5.5,0,0,1-.754.007L7.948,8.226l-.556.556,2.931,2.931A1.311,1.311,0,1,0,12.177,9.86L6.987,4.67a2.054,2.054,0,0,0-2.965-.185A2.054,2.054,0,0,0,4.207,7.45L9.953,13.2a2.624,2.624,0,1,0,3.706-3.707L10.172,6Z"
-                style={{ fill: "#fff" }}
+                d="M11.5,6v4a3.418,3.418,0,0,1-3.334,3.5H8a3.418,3.418,0,0,1-3.5-3.334c0-.055,0-.111,0-.166V5A2.362,2.362,0,0,1,6.715,2.5,2.259,2.259,0,0,1,7,2.5,2.362,2.362,0,0,1,9.5,4.715,2.258,2.258,0,0,1,9.5,5V9.5c0,1-.5,2-1.5,2s-1.5-1-1.5-2V6"
+                style={{ fill: "none", stroke: "#f1f2f2", strokeLinecap: "round" }}
             />
         </svg>
     );
@@ -39,17 +39,18 @@ export function fileWord(className?: string) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 18 18"
-            className={classNames("icon", "icon-fileWord", "attachmentIcon", className)}
+            viewBox="0 0 16 16"
+            className={classNames("attachmentIcon-fileWord", "attachmentIcon", className)}
             role="img"
-            aria-label={getUnabbreviatedAttachmentType(AttachmentType.WORD)}
+            aria-label={t(AttachmentType.WORD)}
         >
             <title>{title}</title>
-            <rect width="18" height="18" fill="#2b5599" />
-            <polygon
-                style={{ fill: "#fff" }}
-                points="6.133 13.543 4 5 5.365 5 6.707 11.07 6.73 11.07 8.389 5 9.326 5 10.979 11.07 11.002 11.07 12.35 5 13.715 5 11.582 13.543 10.498 13.543 8.869 7.385 8.846 7.385 7.211 13.543 6.133 13.543"
-            />
+            <rect width="16" height="16" rx="1" style={{ fill: "#0175fc" }} />
+            <rect x="3" y="3" width="10" height="1" style={{ fill: "#cce3fe" }} />
+            <rect x="3" y="5" width="10" height="1" style={{ fill: "#cce3fe" }} />
+            <rect x="3" y="12" width="10" height="1" style={{ fill: "#cce3fe" }} />
+            <rect x="3" y="10" width="10" height="1" style={{ fill: "#cce3fe" }} />
+            <rect x="3" y="7" width="6" height="1" style={{ fill: "#cce3fe" }} />
         </svg>
     );
 }
@@ -59,14 +60,13 @@ export function fileExcel(className?: string) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 18 18"
-            className={classNames("icon", "icon-fileExcel", "attachmentIcon", className)}
+            viewBox="0 0 16 16"
+            className={classNames("attachmentIcon-fileExcel", "attachmentIcon", className)}
             role="img"
-            aria-label={getUnabbreviatedAttachmentType(AttachmentType.EXCEL)}
+            aria-label={t(AttachmentType.EXCEL)}
         >
             <title>{title}</title>
-            <title>{t("Excel Document")}</title>
-            <rect width="18" height="18" fill="#2f7d32" />
+            <rect width="16" height="16" fill="#2f7d32" />
             <polygon
                 style={{ fill: "#fff" }}
                 points="9.334 10.361 7.459 13.543 6 13.543 8.613 9.166 6.164 5 7.629 5 9.334 7.965 11.039 5 12.498 5 10.055 9.166 12.668 13.543 11.203 13.543 9.334 10.361"
@@ -78,23 +78,122 @@ export function fileExcel(className?: string) {
 export function filePDF(className?: string) {
     const textFill = "#fff";
     const title = t("PDF");
-    const unabbreviatedType = getUnabbreviatedAttachmentType(AttachmentType.PDF);
+    const unabbreviatedType = t(AttachmentType.PDF);
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 18 18"
-            className={classNames("icon", "icon-filePDF", "attachmentIcon", className)}
+            viewBox="0 0 16 16"
+            className={classNames("attachmentIcon-filePDF", "attachmentIcon", className)}
             role="img"
-            aria-label={getUnabbreviatedAttachmentType(AttachmentType.PDF)}
+            aria-label={t(AttachmentType.PDF)}
         >
             <title>
                 <abbr title={unabbreviatedType || undefined}>{AttachmentType.PDF}</abbr>
             </title>
-            <rect width="18" height="18" style={{ fill: "#ff3934" }} />
+            <rect width="16" height="16" rx="1" style={{ fill: "#c80000" }} />
             <path
-                style={{ fill: "#fff" }}
-                d="M2,13.767V5H3.884a2.815,2.815,0,0,1,.911.135,1.75,1.75,0,0,1,.714.481,1.889,1.889,0,0,1,.444.806,5.053,5.053,0,0,1,.123,1.25,6.2,6.2,0,0,1-.068,1,2.1,2.1,0,0,1-.289.764,1.851,1.851,0,0,1-.69.671,2.325,2.325,0,0,1-1.133.24h-.64V13.77ZM3.256,6.182v2.98h.6a1.29,1.29,0,0,0,.591-.111.7.7,0,0,0,.308-.308,1.112,1.112,0,0,0,.117-.455c.012-.181.019-.382.019-.6s0-.4-.013-.585a1.254,1.254,0,0,0-.111-.486.7.7,0,0,0-.295-.32,1.163,1.163,0,0,0-.566-.111Zm3.755,7.585V5h1.86a2.159,2.159,0,0,1,1.644.591,2.343,2.343,0,0,1,.56,1.675v4.1a2.446,2.446,0,0,1-.6,1.816,2.356,2.356,0,0,1-1.718.585ZM8.267,6.182v6.4h.579a.931.931,0,0,0,.751-.265,1.279,1.279,0,0,0,.222-.831V7.266a1.323,1.323,0,0,0-.21-.8.891.891,0,0,0-.763-.283Zm3.99,7.585V5H16V6.182H13.513v2.66H15.68v1.182H13.513v3.743Z"
+                d="M2.5,11V8.5m4.5,2v-5H8q1.5,0,1.5,2.143v.714Q9.5,10.5,8,10.5Zm-4.5-2v-3h1Q5,5.5,5,6.786v.428Q5,8.5,3.5,8.5Z"
+                style={{ stroke: "#fff", fill: "none" }}
             />
+            <polygon
+                points="11 11 11 5 14 5 14 6 12.007 6 12 7.5 13.493 7.5 13.493 8.5 12 8.5 12 11 11 11"
+                style={{ fill: "#fff" }}
+            />
+        </svg>
+    );
+}
+
+export function fileImage(className?: string) {
+    const title = t("Image");
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            className={classNames("attachmentIcon-fileImage", "attachmentIcon", className)}
+            role="img"
+            aria-label={t(AttachmentType.IMAGE)}
+        >
+            <title>{title}</title>
+
+            <rect width="16" height="16" rx="1" style={{ fill: "#c80090" }} />
+            <path
+                d="M3,12.5a1,1,0,0,1-1-1V6A1,1,0,0,1,3,5h.5V4.75a.25.25,0,0,1,.25-.25h.5a.25.25,0,0,1,.25.25V5a.81.81,0,0,0,.724-.447l.5-1A1,1,0,0,1,6.618,3H9.382a1,1,0,0,1,.894.553l.448.894A1,1,0,0,0,11.618,5H13a1,1,0,0,1,1,1v5.5a1,1,0,0,1-1,1Zm5-2a2,2,0,1,1,2-2A2,2,0,0,1,8,10.5Zm0,1a3,3,0,1,0-3-3A3,3,0,0,0,8,11.5ZM11.5,6V7H13V6Z"
+                style={{ fill: "#fff", fillOpacity: 0.97 }}
+            />
+        </svg>
+    );
+}
+
+export function filePowerPoint(className?: string) {
+    const textFill = "#fff";
+    const title = t("PPT");
+    const unabbreviatedType = t(AttachmentType.PPT);
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            className={classNames("attachmentIcon-filePowerPoint", "attachmentIcon", className)}
+            role="img"
+            aria-label={t(AttachmentType.IMAGE)}
+        >
+            <title>
+                {unabbreviatedType ? <abbr title={unabbreviatedType}>{AttachmentType.PDF}</abbr> : AttachmentType.PDF}
+            </title>
+            <rect width="16" height="16" rx="1" style={{ fill: "#ee6a01" }} />
+            <path d="M8,4V7.5h3.55A3.5,3.5,0,1,1,8,4Z" style={{ fill: "#fbe1cc" }} />
+            <path d="M9,3h.05a3.5,3.5,0,0,1,3.5,3.5H9Z" style={{ fill: "#fbe1cc" }} />
+            <rect x="3" y="12" width="10" height="1" style={{ fill: "#fbe1cc" }} />
+        </svg>
+    );
+}
+
+export function fileZip(className?: string) {
+    const title = t("Zip");
+    const unabbreviatedType = t(AttachmentType.ARCHIVE);
+    const barStyle = { fill: "#fff", fillOpacity: 0.9 };
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            className={classNames("attachmentIcon-fileZip", "attachmentIcon", className)}
+            role="img"
+            aria-label={t(AttachmentType.IMAGE)}
+        >
+            <title>
+                {unabbreviatedType ? <abbr title={unabbreviatedType}>{AttachmentType.PDF}</abbr> : AttachmentType.PDF}
+            </title>
+            <rect width="16" height="16" rx="1" style={{ fill: "#eeb601" }} />
+            <path
+                d="M6,7.5h4l.45,4.955A.5.5,0,0,1,10,13H6.054a.5.5,0,0,1-.5-.5.338.338,0,0,1,0-.045Zm.99,3a.149.149,0,0,0-.149.14l-.08,1.2v.01a.15.15,0,0,0,.15.15H9.1a.149.149,0,0,0,.139-.16l-.08-1.2a.149.149,0,0,0-.149-.14Z"
+                style={{ fill: "#fdf7e6" }}
+            />
+            <rect x="6" y="6" width="2" height="1" style={barStyle} />
+            <rect x="8" y="5" width="2" height="1" style={barStyle} />
+            <rect x="6" y="4" width="2" height="1" style={barStyle} />
+            <rect x="8" y="3" width="2" height="1" style={barStyle} />
+            <rect x="6" y="2" width="2" height="1" style={barStyle} />
+            <rect x="8" y="1" width="2" height="1" style={barStyle} />
+            <rect x="6" width="2" height="1" style={barStyle} />
+        </svg>
+    );
+}
+
+export function fileUploadError(className?: string) {
+    const title = t("Error");
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 18"
+            className={classNames("attachmentIcon-error", className)}
+            role="img"
+            aria-label={title}
+        >
+            <title>{title}</title>
+            <path
+                d="M.9,18a.917.917,0,0,1-.9-.86.9.9,0,0,1,.107-.449L9.17.474A.976.976,0,0,1,10.445.107a.906.906,0,0,1,.381.36V.474l9.061,16.215a.889.889,0,0,1-.378,1.2l-.036.018a.951.951,0,0,1-.416.093Zm.021-1ZM9.985,1.012,1.081,17H18.919Z"
+                fill="currentColor"
+            />
+            <path d="M9,8.4V6h2V8.4L10.8,12H9.3ZM9,13h2v2H9Z" fill="currentColor" />
         </svg>
     );
 }

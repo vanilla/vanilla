@@ -402,6 +402,12 @@ $metaText_fontSize                                   : $global-small_fontSize;
 $metaText_color                                      : mix($global-color_fg, $global-color_bg, 85%) !default;
 $metaText_margin                                     : 4px !default;
 
+$metas_verticalMargin                                : $utility-baseUnit * 2;
+$metas_color                                         : $metaText_color !default;
+$meta_spacing                                        : $global-gutter_quarterSize;
+$meta_lineHeight                                     : $global-base_lineHeight;
+$meta-deleted_color                                  : #D0021B;
+
 /* -------------------------------------------------------------- *\
       Thumbnails
 \* -------------------------------------------------------------- */

@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
+use Vanilla\Formatting\Formats\RichFormat;
 use VanillaTests\Library\Vanilla\Formatting\FixtureRenderingTestCase;
 
 /**
@@ -134,6 +135,70 @@ class GdnFormatTest extends FixtureRenderingTestCase {
      */
     public function provideHtmlToHtml(): array {
         return $this->createFixtureDataProvider('/formats/html/html');
+    }
+
+    /**
+     * Test results of Gdn_Format::excerpt with rich-formatted content.
+     *
+     * @param string $fixtureDir The directory of the fixture to use for the testCase.
+     * @dataProvider provideRichExcerpts
+     */
+    public function testRichExcerpt(string $fixtureDir) {
+        list($body, $expected) = $this->getFixture(self::FIXTURE_DIR . "/rich/excerpt/" . $fixtureDir);
+        $actual = \Gdn_Format::excerpt($body, RichFormat::FORMAT_KEY);
+        $this->assertEquals(
+            $expected,
+            $actual,
+            "Expected excerpt outputs for fixture $fixtureDir did not match."
+        );
+    }
+
+    /**
+     * Provide data for testing the excerpt method with the rich format.
+     *
+     * @return array
+     */
+    public function provideRichExcerpts(): array {
+        return $this->createFixtureDataProvider("/formats/rich/excerpt");
+    }
+
+    /**
+     * Test results of Gdn_Format::plainText with rich-formatted content.
+     *
+     * @param string $fixtureDir The directory of the fixture to use for the testCase.
+     * @dataProvider provideRichPlainText
+     */
+    public function testRichPlainText(string $fixtureDir) {
+        list($body, $expected) = $this->getFixture(self::FIXTURE_DIR . "/rich/plain-text/" . $fixtureDir);
+        $actual = \Gdn_Format::plainText($body, RichFormat::FORMAT_KEY);
+        $this->assertEquals(
+            $expected,
+            $actual,
+            "Expected excerpt outputs for fixture $fixtureDir did not match."
+        );
+    }
+
+    /**
+     * Provide data for testing the plainText method.
+     *
+     * @return array
+     */
+    public function provideRichPlainText(): array {
+        return $this->createFixtureDataProvider("/formats/rich/plain-text");
+    }
+
+    /**
+     * Test using a rich-format array of operations with the quoteEmbed method.
+     */
+    public function testRichQuoteEmbedAsArray() {
+        $richEmbed = [
+            ["insert" => "Hello world."]
+        ];
+
+        $this->assertEquals(
+            "<p>Hello world.</p>",
+            \Gdn_Format::quoteEmbed($richEmbed, RichFormat::FORMAT_KEY)
+        );
     }
 
     /**

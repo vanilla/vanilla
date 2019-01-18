@@ -117,20 +117,13 @@
 
     .Options {
         display: flex;
-        flex-direction: row-reverse;
-        position: relative;
+        //position: relative;
     }
 
     .Bookmark::before,
     .OptionsMenu .Arrow::before {
         font-size: $icon-default_size;
         line-height: $icon-default_size;
-    }
-
-    .AdminCheck {
-        input {
-            margin-left: 0;
-        }
     }
 
     .AuthorInfo * {
@@ -160,9 +153,9 @@
     }
 
     .Author .Username,
-    .Meta > *,
+    //.Meta > *,
     .MItem,
-    .AuthorInfo > *,
+    //.AuthorInfo > *,
     .MItem.Category {
         font-size: inherit;
         font-weight: inherit;
@@ -184,7 +177,7 @@
         }
     }
 
-    .Tag,
+    .Tag:not([class*="Status-Tag"]),
     .HasNew {
         margin-bottom: $utility-baseUnitHalf;
     }
@@ -373,8 +366,8 @@
             display: block;
         }
 
-        .Options {
-            position: relative;
+        .Options .ToggleFlyout {
+            order: 2;
         }
     }
 }
@@ -384,12 +377,30 @@
 .MessageList {
     clear: both;
 
-    .PageTitle h1{
-        font-size: $global-title_fontSize;
-        line-height: $global-base_lineHeight;
+    .PageTitle,
+    .ItemComment {
 
-        @include maxWidth {
-            font-size: $global-subTitle_fontSize;
+        .Options {
+
+            .ToggleFlyout {
+                order: 2;
+            }
+        }
+    }
+
+    .PageTitle {
+
+        h1{
+            font-size: $global-title_fontSize;
+            line-height: $global-base_lineHeight;
+
+            @include maxWidth {
+                font-size: $global-subTitle_fontSize;
+            }
+        }
+
+        .Options .Bookmark {
+            order: 2;
         }
     }
 
@@ -400,11 +411,6 @@
 
     .ItemComment,
     .ItemDiscussion {
-
-        .Options {
-            top: $utility-medium_padding;
-            right: $utility-medium_padding;
-        }
 
         .Item-Header {
             background: $component-header_bg;
@@ -456,7 +462,7 @@
                 font-size: $component-meta_fontSize;
                 line-height: $component-meta_lineHeight;
                 display: inline-block;
-                width: 100%;
+                padding-left: $theme-photo_size + $utility-medium_padding;
 
                 > * {
                     display: inline;
@@ -465,8 +471,16 @@
                 }
             }
 
-            .AuthorInfo > * {
-                line-height: $component-meta_lineHeight;
+            .Meta {
+                width: 100%;
+
+                @include maxWidth {
+                    margin-top: 0;
+                }
+            }
+
+            .AuthorWrap {
+                max-width: calc(100% - 45px);
             }
 
             .MItem.Category {
@@ -475,11 +489,6 @@
 
             .MItem {
                 display: inline;
-            }
-
-            .Meta,
-            .AuthorWrap {
-                padding-left: $theme-photo_size + $utility-medium_padding;
             }
 
             .MItem.RoleTitle,
@@ -593,18 +602,25 @@
         }
     }
 
-    .ItemComment .CommentHeader {
-        padding: $utility-small_padding $utility-medium_padding;
-        padding-right: 32px;
+    //.ItemComment .CommentHeader {
+    //    padding: $utility-small_padding $utility-medium_padding;
+    //}
+
+    .ItemComment .Options {
+        margin-top: $component-base_padding;
+
+        @if $component_lateralBorder == true {
+            margin-right: $component-base_padding;
+        }
     }
 
-    .Comment .Options {
-        position: absolute;
-        right: $utility-medium_padding;
-        top: 0;
-        margin-top: $utility-medium_padding;
-        z-index: 1;
-    }
+   // .Comment .Options {
+        //position: absolute;
+        //right: $utility-medium_padding;
+        //top: 0;
+        //margin-top: $utility-medium_padding;
+        //z-index: 1;
+    //}
 }
 
 .DataList-Search {

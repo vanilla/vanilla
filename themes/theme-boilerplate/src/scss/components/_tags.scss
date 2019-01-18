@@ -18,10 +18,10 @@ $tag-hover_bg:                    $button-basic-hover_bg !default;
 $tag-hover_fg:                    $global-color_primary !default;
 $tag-hover_borderColor:           $global-color_primary !default;
 
-@mixin Tag() {
-    background-color: $tag_bg;
-    color: $tag_fg;
-    border: 1px solid $tag_borderColor;
+@mixin Tag($color_fg: $tag_fg, $color_bg: $tag_bg, $borderColor: $tag_borderColor) {
+    background-color: $color_bg;
+    color: $color_fg;
+    border: 1px solid $borderColor;
     line-height: $global-base_lineHeight;
     height: auto;
     border-radius: $tag_borderRadius;
@@ -34,9 +34,6 @@ $tag-hover_borderColor:           $global-color_primary !default;
     &:focus,
     &:hover,
     &:active {
-        background-color: $tag-hover_bg;
-        border-color: $tag-hover_borderColor;
-        color: $tag-hover_fg;
         text-decoration: none;
     }
 }
@@ -67,9 +64,8 @@ $tag-hover_borderColor:           $global-color_primary !default;
 .DataList,
 .MessageList,
 .DataTableWrap {
-    .Tag.Tag,
-    .NewCommentCount,
-    .HasNew,
+
+    .Tag,
     .Tag-Poll,
     .RoleTracker,
     .IdeationTag.IdeationTag {
@@ -90,12 +86,27 @@ $tag-hover_borderColor:           $global-color_primary !default;
         background-color: transparent;
     }
 
+    .Tag-Announcement,
     .NewCommentCount,
     .HasNew.HasNew {
-        border: 1px solid $bullet_borderColor;
-        background: $bullet_bg;
-        color: $bullet_fg;
+        @include Tag($bullet_fg, $bullet_bg, $bullet_borderColor);
     }
+
+    //Tags that are links get hover state
+    .TagCloud a,
+    .IdeationTag,
+    .tag-tracker,
+    .MItem.RoleTracker {
+
+        &:focus,
+        &:hover,
+        &:active {
+            background-color: $tag-hover_bg;
+            border-color: $tag-hover_borderColor;
+            color: $tag-hover_fg;
+        }
+    }
+
 }
 
 .Form-Tags .AvailableTag {

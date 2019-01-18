@@ -76,6 +76,38 @@
             margin-bottom: 0;
         }
     }
+
+    .metas {
+        display: block;
+        line-height: $meta_lineHeight;
+        color: $metas_color;
+        width: calc(100% + #{$meta_spacing * 2});
+        overflow: hidden;
+        text-align: left;
+    
+        margin: {
+            left: -#{$meta_spacing};
+            right: $meta_spacing;
+        }
+    
+        &.isFlexed {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            align-items: center;
+        }
+    }
+
+    .meta {
+        display: inline-block;
+        margin: 0 $meta_spacing;
+        font-size: $metaText_fontSize;
+        color: $metas_color;
+    
+        .meta {
+            margin: 0;
+        }
+    }    
 }
 
 .richEditor-menu {

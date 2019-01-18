@@ -97,16 +97,6 @@ $spolier_lineHeight:                    $global-base_lineHeight !default;
         height: auto;
     }
 
-    a {
-        color: $component-meta-link_color;
-
-        &:focus,
-        &:hover {
-            text-decoration: $theme-link-hover_textDecoration;
-            color: $component-meta-link-hover_color;
-        }
-    }
-
     blockquote.Quote, blockquote.UserQuote {
         @include clearfix;
         padding: $utility-medium_padding $utility-large_padding;
@@ -114,16 +104,6 @@ $spolier_lineHeight:                    $global-base_lineHeight !default;
         background: lighten($theme-hover_color, 3%);
         border-left: 4px solid $theme-hover_color;
         width: 100%;
-    }
-
-    a[href*="/profile/"] {
-        color: $component-meta-link_color;
-
-        &:focus,
-        &:hover {
-            color: $component-meta-link-hover_color;
-            text-decoration: $theme-link-hover_textDecoration;
-        }
     }
 
     //fix title offset

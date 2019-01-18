@@ -90,8 +90,9 @@ $global_borderRadius:                   3px !default;
 
 $global-body_bg:                        $global-color_bg !default;
 
-$link-default_color:                    $global-color_fg !default;
+$link-default_color:                    $global-color_primary !default;
 $link-default-hover_color:              $global-color_primary !default;
+$link-default_visited_color:            $global-color_primary !default;
 
 
 /* -------------------------------------------------------------- *\
@@ -265,7 +266,7 @@ $panel-item_fg:                          $link-default_color !default;
 $panel-item_borderColor:                 transparent !default;
 
 $panel-item-hover_bg:                    transparent !default;
-$panel-item-hover_fg:                    $link-default_hover_color !default;
+$panel-item-hover_fg:                    $global-color_royalBlue !default;
 $panel-item-hover_borderColor:           transparent !default;
 
 /* -------------------------------------------------------------- *\

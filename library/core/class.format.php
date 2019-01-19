@@ -277,28 +277,26 @@ class Gdn_Format {
             return self::to($mixed, 'BBCode');
         } else {
             // See if there is a custom BBCode formatter.
-            $bBCodeFormatter = Gdn::factory('BBCodeFormatter');
-            if (is_object($bBCodeFormatter)) {
-                // Standard BBCode parsing.
-                $mixed = $bBCodeFormatter->format($mixed);
+            $bBCodeFormatter = Gdn::getContainer()->get('BBCodeFormatter');
+            // Standard BBCode parsing.
+            $mixed = $bBCodeFormatter->format($mixed);
 
-                // Always filter after basic parsing.
-                // Add htmLawed-compatible specification updates.
-                $options = [
-                    'codeBlockEntities' => false,
-                    'spec' => [
-                        'span' => [
-                            'style' => ['match' => '/^(color:(#[a-f\d]{3}[a-f\d]{3}?|[a-z]+))?;?$/i']
-                        ]
+            // Always filter after basic parsing.
+            // Add htmLawed-compatible specification updates.
+            $options = [
+                'codeBlockEntities' => false,
+                'spec' => [
+                    'span' => [
+                        'style' => ['match' => '/^(color:(#[a-f\d]{3}[a-f\d]{3}?|[a-z]+))?;?$/i']
                     ]
-                ];
-                $sanitized = Gdn_Format::htmlFilter($mixed, $options);
+                ]
+            ];
+            $sanitized = Gdn_Format::htmlFilter($mixed, $options);
 
-                // Vanilla magic parsing.
-                $sanitized = Gdn_Format::processHTML($sanitized);
+            // Vanilla magic parsing.
+            $sanitized = Gdn_Format::processHTML($sanitized);
 
-                return $sanitized;
-            }
+            return $sanitized;
         }
     }
 

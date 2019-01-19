@@ -21,6 +21,9 @@ use Gdn;
  * at every usage site.
  */
 trait StaticCacheContainerTrait {
+
+    private static $cachedIntances = [];
+
     /**
      * Calculates value for particular key (overwrite f() of StaticCache trait)
      *
@@ -29,6 +32,12 @@ trait StaticCacheContainerTrait {
      * @return mixed An instance of the selected class.
      */
     protected static function getCachedInstance(string $className) {
-        return Gdn::getContainer()->get($className);
+        $cachedInstance = self::$cachedIntances[$className] ?? null;
+        if (!$cachedInstance) {
+            $cachedInstance = Gdn::getContainer()->get($className);
+            self::$cachedIntances[$className] = $cachedInstance;
+        }
+
+        return $cachedInstance;
     }
 }

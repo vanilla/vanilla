@@ -22,7 +22,7 @@ use Vanilla\Formatting\Html;
  */
 class Gdn_Format {
     use \Garden\StaticCacheTranslationTrait;
-    use \Garden\StaticCacheConfigTrait;
+    use \Garden\StaticCacheContainerTrait;
 
     /**
      * @var bool Flag which allows plugins to decide if the output should include rel="nofollow" on any <a> links.
@@ -804,10 +804,6 @@ class Gdn_Format {
         /** @var Formats\HtmlFormat $htmlFormat */
         $htmlFormat = self::getCachedInstance(Formats\HtmlFormat::class);
         return $htmlFormat->renderHtml($mixed);
-    }
-
-    protected static function getCachedInstance($val) {
-
     }
 
     /**

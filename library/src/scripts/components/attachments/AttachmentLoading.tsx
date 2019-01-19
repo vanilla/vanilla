@@ -12,6 +12,7 @@ import CloseButton from "@library/components/CloseButton";
 import { IFileAttachment } from "@library/components/attachments/Attachment";
 import { getAttachmentIcon, AttachmentType } from "@library/components/attachments";
 import ProgressEventEmitter from "@library/ProgressEventEmitter";
+import { FOCUS_CLASS } from "@library/embeds";
 
 interface IProps extends IFileAttachment {
     type: AttachmentType;
@@ -35,7 +36,11 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
         const { title, name, type } = this.props;
         const label = title || name;
         return (
-            <div className={classNames("attachment", "isLoading", this.props.className)}>
+            <div
+                className={classNames("attachment", "isLoading", this.props.className, FOCUS_CLASS)}
+                tabIndex={0}
+                aria-label={t("Uploading...")}
+            >
                 <div className="attachment-box attachment-loadingContent">
                     <div className="attachment-format">{getAttachmentIcon(type)}</div>
                     <div className="attachment-main">

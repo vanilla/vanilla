@@ -1072,7 +1072,7 @@ class Gdn_Format {
      * @since 2.1
      */
     public static function plainText($body, $format = 'Html', $collapse = false) {
-        if ($format === \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) {
+        if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
             return self::getRichFormatter()->renderPlainText($body);
         }
 
@@ -1107,7 +1107,7 @@ class Gdn_Format {
      * @since 2.1
      */
     public static function excerpt($body, $format = 'Html', $collapse = false) {
-        if ($format === \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) {
+        if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
             return self::getRichFormatter()->renderExcerpt($body);
         }
         $result = Gdn_Format::to($body, $format);
@@ -2441,7 +2441,7 @@ EOT;
      * @return string
      */
     public static function quoteEmbed($body, string $format): string {
-        if ($format === \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) {
+        if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
             if (is_array($body)) {
                 $body = json_encode($body);
             }

@@ -258,6 +258,10 @@ class Bootstrap {
             ->rule(\Vanilla\Formatting\FormatService::class)
             ->addCall('registerFormat', [\Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY, \Vanilla\Formatting\Formats\RichFormat::class])
             ->setShared(true)
+
+            ->rule('HtmlFormatter')
+            ->setClass(\VanillaHtmlFormatter::class)
+            ->setShared(true)
             ;
     }
 

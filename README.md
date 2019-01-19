@@ -1,4 +1,4 @@
-![Vanilla Repo Logo](https://user-images.githubusercontent.com/1770056/51423965-4e585680-1b95-11e9-8e5b-f822b90cdfe4.png)
+<img src="https://user-images.githubusercontent.com/1770056/51423965-4e585680-1b95-11e9-8e5b-f822b90cdfe4.png" alt="Vanilla Repo Logo" width=500/>
 
 ## Howdy, Stranger!
 

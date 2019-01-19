@@ -7,6 +7,9 @@ class HtmlSanitizer {
     /** @var \VanillaHtmlFormatter */
     private $htmlFilterer;
 
+    /** @var bool */
+    private $shouldEncodeCodeBlocks = true;
+
     /**
      *
      * @param \VanillaHtmlFormatter $htmlFilterer
@@ -15,15 +18,34 @@ class HtmlSanitizer {
         $this->htmlFilterer = $htmlFilterer;
     }
 
-    public function filter(string $content, array $options = []): string {
+    public function filter(string $content): string {
         if (!self::containsHtmlTags($content)) {
             return $content;
         }
 
         $encodedCodeBlocks = $this->encodeCodeBlocks($content);
+
+        $options = [
+            'codeBlockEntities' => false,
+            'spec' => [
+                'span' => [
+                    'style' => ['match' => '/^(color:(#[a-f\d]{3}[a-f\d]{3}?|[a-z]+))?;?$/i']
+                ]
+            ]
+        ];
         return $this->htmlFilterer->format($encodedCodeBlocks, $options);
     }
 
+    /**
+     * Set whether or not the sanitizer should encode the contents of code blocks.
+     *
+     * Set this to false if the input to sanitizer has already encoded them.
+     *
+     * @param bool $shouldEncodeCodeBlocks
+     */
+    public function setShouldEncodeCodeBlocks(bool $shouldEncodeCodeBlocks) {
+        $this->shouldEncodeCodeBlocks = $shouldEncodeCodeBlocks;
+    }
 
     /**
      * Quickly determine if a string contains any HTML content that would need to be purified.
@@ -46,6 +68,9 @@ class HtmlSanitizer {
      * @return string
      */
     private function encodeCodeBlocks(string $value): string {
+        if (!$this->shouldEncodeCodeBlocks) {
+            return $value;
+        }
         return preg_replace_callback('`<code([^>]*)>(.+?)<\/code>`si', function ($matches) {
             $result = "<code{$matches[1]}>" .
                 htmlspecialchars($matches[2]) .

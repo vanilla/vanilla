@@ -276,27 +276,9 @@ class Gdn_Format {
         if (!is_string($mixed)) {
             return self::to($mixed, 'BBCode');
         } else {
-            // See if there is a custom BBCode formatter.
-            $bBCodeFormatter = Gdn::getContainer()->get('BBCodeFormatter');
-            // Standard BBCode parsing.
-            $mixed = $bBCodeFormatter->format($mixed);
-
-            // Always filter after basic parsing.
-            // Add htmLawed-compatible specification updates.
-            $options = [
-                'codeBlockEntities' => false,
-                'spec' => [
-                    'span' => [
-                        'style' => ['match' => '/^(color:(#[a-f\d]{3}[a-f\d]{3}?|[a-z]+))?;?$/i']
-                    ]
-                ]
-            ];
-            $sanitized = Gdn_Format::htmlFilter($mixed, $options);
-
-            // Vanilla magic parsing.
-            $sanitized = Gdn_Format::processHTML($sanitized);
-
-            return $sanitized;
+            /** @var Formats\BBCodeFormat $bbcodeFormat */
+            $bbcodeFormat = self::getCachedInstance(Formats\BBCodeFormat::class);
+            return $bbcodeFormat->renderHtml($mixed);
         }
     }
 
@@ -1001,7 +983,7 @@ class Gdn_Format {
      */
     public static function plainText($body, $format = 'Html', $collapse = false) {
         if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
-            return self::getRichFormatter()->renderPlainText($body);
+            return self::getCachedInstance(Formats\RichFormat::class)->renderPlainText($body);
         }
 
         $result = Gdn_Format::to($body, $format);
@@ -1036,7 +1018,7 @@ class Gdn_Format {
      */
     public static function excerpt($body, $format = 'Html', $collapse = false) {
         if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
-            return self::getRichFormatter()->renderExcerpt($body);
+            return self::getCachedInstance(Formats\RichFormat::class)->renderExcerpt($body);
         }
         $result = Gdn_Format::to($body, $format);
         $result = Gdn_Format::replaceSpoilers($result);
@@ -2357,7 +2339,7 @@ EOT;
      * @return string - The rendered HTML output.
      */
     public static function rich(string $deltas): string {
-        return self::getRichFormatter()->renderHTML($deltas);
+        return self::getCachedInstance(Formats\RichFormat::class)->renderHTML($deltas);
     }
 
     /**
@@ -2373,7 +2355,7 @@ EOT;
             if (is_array($body)) {
                 $body = json_encode($body);
             }
-            return self::getRichFormatter()->renderQuote($body);
+            return self::getCachedInstance(Formats\RichFormat::class)->renderQuote($body);
         }
 
         $previousLinksValue = c('Garden.Format.Links');
@@ -2396,18 +2378,7 @@ EOT;
      * @return string[]
      */
     public static function getRichMentionUsernames(string $body): array {
-        return self::getRichFormatter()->parseMentions($body);
-    }
-
-    /**
-     * Get an instance of the rich post formatter.
-     *
-     * @return \Vanilla\Contracts\Formatting\FormatInterface
-     */
-    private static function getRichFormatter(): \Vanilla\Contracts\Formatting\FormatInterface {
-        /** @var \Vanilla\Formatting\FormatService $formatter */
-        $formatter = Gdn::getContainer()->get(\Vanilla\Formatting\FormatService::class);
-        return $formatter->getFormatter(\Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY);
+        return self::getCachedInstance(Formats\RichFormat::class)->parseMentions($body);
     }
 
     const SAFE_PROTOCOLS = [

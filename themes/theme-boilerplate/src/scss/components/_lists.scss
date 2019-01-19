@@ -22,9 +22,11 @@
         border-radius: $component_borderRadius;
         box-shadow: $component_boxShadow;
 
-        .Item.CategoryHeading + .Item:not(.CategoryHeading) {
-            border-top-left-radius: $component_borderRadius;
-            border-top-right-radius: $component_borderRadius;
+        @if $component_lateralBorder == true {
+            .Item.CategoryHeading + .Item:not(.CategoryHeading) {
+                border-top-left-radius: $component_borderRadius;
+                border-top-right-radius: $component_borderRadius;
+            }
         }
     }
 

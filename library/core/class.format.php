@@ -1687,32 +1687,9 @@ EOT;
         if (!is_string($mixed)) {
             return self::to($mixed, 'Markdown');
         } else {
-            $markdown = new MarkdownVanilla();
-
-            /**
-             * By default, code blocks have their contents run through htmlspecialchars. Gdn_Format::htmlFilter
-             * also runs code blocks through htmlspecialchars. Here, the callback is modified to only return the block
-             * contents. The block will still be passed through htmlspecialchars, further down in Gdn_Format::htmlFilter.
-             */
-            $codeCallback = function($block) { return $block; };
-            $markdown->code_block_content_func = $codeCallback;
-            $markdown->code_span_content_func = $codeCallback;
-
-            // Vanilla-flavored Markdown.
-            if ($flavored) {
-                $markdown->addAllFlavor();
-            }
-
-            // Markdown parsing.
-            $mixed = $markdown->transform($mixed);
-
-            // Always filter after basic parsing.
-            $sanitized = Gdn_Format::htmlFilter($mixed);
-
-            // Vanilla magic parsing.
-            $sanitized = Gdn_Format::processHTML($sanitized);
-
-            return $sanitized;
+            /** @var Formats\MarkdownFormat $markdownFormat */
+            $markdownFormat = self::getCachedInstance(Formats\MarkdownFormat::class);
+            return $markdownFormat->renderHtml($mixed);
         }
     }
 

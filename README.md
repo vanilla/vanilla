@@ -1,4 +1,4 @@
-![Vanilla OSS](https://user-images.githubusercontent.com/1770056/51418028-175f5200-1b4f-11e9-9de9-d646e3c70a89.png)
+![Vanilla Repo](https://user-images.githubusercontent.com/1770056/51423951-29fc7a00-1b95-11e9-8d7c-7f7690bfc4c8.png)
 
 ## Howdy, Stranger!
 

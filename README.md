@@ -1,4 +1,4 @@
-![Vanilla Repo](https://user-images.githubusercontent.com/1770056/51423951-29fc7a00-1b95-11e9-8d7c-7f7690bfc4c8.png)
+![Vanilla Repo Logo](https://user-images.githubusercontent.com/1770056/51423965-4e585680-1b95-11e9-8e5b-f822b90cdfe4.png)
 
 ## Howdy, Stranger!
 

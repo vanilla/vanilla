@@ -48,26 +48,6 @@ $flyout-progress_size:                  24px !default;
     Styles
 \* -------------------------------------------------------------- */
 
-.FlyoutMenu.FlyoutMenu {
-    min-width: $dropDown_width;
-
-    .InProgress {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: $flyout-progress_size * 2;
-        width: 100%;
-        padding-top: $flyout-progress_size;
-        padding-bottom: $flyout-progress_size;
-
-        &::after {
-            @include spinnerLoader($flyout-progress_size, 4px);
-            content: '';
-        }
-    }
-}
-
 .Dropdown.MenuItems {
     width: 100%;
 }
@@ -103,9 +83,31 @@ $flyout-progress_size:                  24px !default;
     border: $flyout_border;
     border-radius: $flyout_borderRadius;
     z-index: 1;
-
     @include maxWidth {
         z-index: 1;
+    }
+
+    min-width: $dropDown_width;
+
+    // Flyouts will acclimate to the width of their ButtonGroup.
+    .ButtonGroup & {
+        min-width: initial;
+    }
+
+    .InProgress {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: $flyout-progress_size * 2;
+        width: 100%;
+        padding-top: $flyout-progress_size;
+        padding-bottom: $flyout-progress_size;
+
+        &::after {
+            @include spinnerLoader($flyout-progress_size, 4px);
+            content: '';
+        }
     }
 
     &::before,

@@ -46,7 +46,7 @@ class RendererTest extends SharedBootstrapTestCase {
      */
     public function testRender(string $dirname) {
         list($input, $expectedOutput) = $this->getFixture(
-            self::$fixtureRoot . '/formats/rich' . '/html/' . $dirname
+            $dirname
         );
         $json = \json_decode($input, true);
 

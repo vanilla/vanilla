@@ -12,6 +12,7 @@
  */
 
 use Garden\EventManager;
+use Vanilla\Renderer;
 
 /**
  * Output formatter.
@@ -260,7 +261,7 @@ class Gdn_Format {
             return $mixed;
         }
 
-        return static::$formatter($mixed);
+        return Gdn_Format::$formatter($mixed);
     }
 
     /**
@@ -289,10 +290,10 @@ class Gdn_Format {
                         ]
                     ]
                 ];
-                $sanitized = static::htmlFilter($mixed, $options);
+                $sanitized = Gdn_Format::htmlFilter($mixed, $options);
 
                 // Vanilla magic parsing.
-                $sanitized = static::processHTML($sanitized);
+                $sanitized = Gdn_Format::processHTML($sanitized);
 
                 return $sanitized;
             }
@@ -352,10 +353,10 @@ class Gdn_Format {
                 $mixed2 = preg_replace_callback("#\[list\](.*?)\[/list\]#si", ['Gdn_Format', 'ListCallback'], $mixed2);
 
                 // Always filter after basic parsing.
-                $sanitized = static::htmlFilter($mixed2);
+                $sanitized = Gdn_Format::htmlFilter($mixed2);
 
                 // Vanilla magic parsing.
-                $sanitized = static::processHTML($sanitized);
+                $sanitized = Gdn_Format::processHTML($sanitized);
 
                 return $sanitized;
 
@@ -653,7 +654,7 @@ class Gdn_Format {
         } else {
             $formatter = Gdn::factory('HtmlFormatter');
             if (is_null($formatter)) {
-                return static::display($mixed);
+                return Gdn_Format::display($mixed);
             } else {
                 return $formatter->format(wrap($mixed, 'div', ' class="Deleted"'));
             }
@@ -686,7 +687,7 @@ class Gdn_Format {
         } else {
             $mixed = htmlspecialchars($mixed, ENT_QUOTES, 'UTF-8');
             $mixed = str_replace(["&quot;", "&amp;"], ['"', '&'], $mixed);
-            $mixed = static::processHTML($mixed);
+            $mixed = Gdn_Format::processHTML($mixed);
 
 
             return $mixed;
@@ -867,7 +868,7 @@ class Gdn_Format {
         } else {
 
             // Always filter - in this case, no basic parsing is needed because we're already in HTML.
-            $sanitized = static::htmlFilter($mixed);
+            $sanitized = Gdn_Format::htmlFilter($mixed);
 
             // Fix newlines in code blocks.
             if (c('Garden.Format.ReplaceNewlines', true)) {
@@ -876,7 +877,7 @@ class Gdn_Format {
             }
 
             // Vanilla magic parsing.
-            $sanitized = static::processHTML($sanitized);
+            $sanitized = Gdn_Format::processHTML($sanitized);
 
             return $sanitized;
         }
@@ -885,7 +886,7 @@ class Gdn_Format {
     /**
      * Takes a mixed variable, filters unsafe HTML and returns it.
      *
-     * Use this instead of static::html() when you do not want magic formatting.
+     * Use this instead of Gdn_Format::html() when you do not want magic formatting.
      *
      * @param mixed $mixed An object, array, or string to be formatted.
      * @param array $options An array of filter options. These will also be passed through to the formatter.
@@ -938,12 +939,12 @@ class Gdn_Format {
             $image = dbdecode($body);
 
             if (!$image) {
-                return static::html($body);
+                return Gdn_Format::html($body);
             }
         }
 
         $url = val('Image', $image);
-        $caption = static::plainText(val('Caption', $image));
+        $caption = Gdn_Format::plainText(val('Caption', $image));
         return '<div class="ImageWrap">'
             .'<div class="Image">'
             .img($url, ['alt' => $caption, 'title' => $caption])
@@ -1069,7 +1070,7 @@ class Gdn_Format {
         $result = preg_replace('`<br\s*/?>`', "\n", $result);
 
         // Fix lists.
-        $result = static::replaceListItems($result);
+        $result = Gdn_Format::replaceListItems($result);
 
         $allBlocks = '(?:div|table|dl|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
         $pattern = "</{$allBlocks}>";
@@ -1098,15 +1099,15 @@ class Gdn_Format {
             return self::getRichFormatter()->renderPlainText($body);
         }
 
-        $result = static::to($body, $format);
-        $result = static::replaceSpoilers($result);
+        $result = Gdn_Format::to($body, $format);
+        $result = Gdn_Format::replaceSpoilers($result);
         if (strtolower($format) !== 'text') {
-            $result = static::convertCommonHTMLTagsToPlainText($result, $collapse);
+            $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $collapse);
         }
         $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
 
         // Always filter after basic parsing.
-        $sanitized = static::htmlFilter($result);
+        $sanitized = Gdn_Format::htmlFilter($result);
 
         // No magic `processHTML()` for plain text.
 
@@ -1132,16 +1133,16 @@ class Gdn_Format {
         if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
             return self::getRichFormatter()->renderExcerpt($body);
         }
-        $result = static::to($body, $format);
-        $result = static::replaceSpoilers($result);
-        $result = static::replaceQuotes($result);
+        $result = Gdn_Format::to($body, $format);
+        $result = Gdn_Format::replaceSpoilers($result);
+        $result = Gdn_Format::replaceQuotes($result);
         if (strtolower($format) !== 'text') {
-            $result = static::convertCommonHTMLTagsToPlainText($result, $collapse);
+            $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $collapse);
         }
         $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
 
         // Always filter after basic parsing.
-        $sanitized = static::htmlFilter($result);
+        $sanitized = Gdn_Format::htmlFilter($result);
 
         // No magic `processHTML()` for plain text.
 
@@ -1158,13 +1159,13 @@ class Gdn_Format {
      */
     public static function rssHtml($text, $format = 'Html') {
         if (!in_array($format, ['Html', 'Raw'])) {
-            $text = static::to($text, $format);
+            $text = Gdn_Format::to($text, $format);
         }
 
         if (function_exists('FormatRssHtmlCustom')) {
             return formatRssHtmlCustom($text);
         } else {
-            return static::html($text);
+            return Gdn_Format::html($text);
         }
     }
 
@@ -1349,7 +1350,7 @@ class Gdn_Format {
             $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`i";
         }
 
-        $mixed = static::replaceButProtectCodeBlocks(
+        $mixed = Gdn_Format::replaceButProtectCodeBlocks(
             $regex,
             $linksCallback,
             $mixed,
@@ -1409,7 +1410,7 @@ class Gdn_Format {
         }
 
         if (!isset($width)) {
-            list($width, $height) = static::getEmbedSize();
+            list($width, $height) = Gdn_Format::getEmbedSize();
         }
 
         $urlParts = parse_url($url);
@@ -1654,7 +1655,7 @@ EOT;
      * @return string|void The anchor or embed code for the url.
      */
     public static function linksCallback($matches) {
-        deprecated('static::linksCallback');
+        deprecated('Gdn_Format::linksCallback');
         static $inTag = 0;
         static $inAnchor = false;
 
@@ -1818,9 +1819,9 @@ EOT;
             $markdown = new MarkdownVanilla();
 
             /**
-             * By default, code blocks have their contents run through htmlspecialchars. static::htmlFilter
+             * By default, code blocks have their contents run through htmlspecialchars. Gdn_Format::htmlFilter
              * also runs code blocks through htmlspecialchars. Here, the callback is modified to only return the block
-             * contents. The block will still be passed through htmlspecialchars, further down in static::htmlFilter.
+             * contents. The block will still be passed through htmlspecialchars, further down in Gdn_Format::htmlFilter.
              */
             $codeCallback = function($block) { return $block; };
             $markdown->code_block_content_func = $codeCallback;
@@ -1835,10 +1836,10 @@ EOT;
             $mixed = $markdown->transform($mixed);
 
             // Always filter after basic parsing.
-            $sanitized = static::htmlFilter($mixed);
+            $sanitized = Gdn_Format::htmlFilter($mixed);
 
             // Vanilla magic parsing.
-            $sanitized = static::processHTML($sanitized);
+            $sanitized = Gdn_Format::processHTML($sanitized);
 
             return $sanitized;
         }
@@ -1860,18 +1861,18 @@ EOT;
         $html = self::getEventManager()->fireFilter('format_filterHtml', $html);
 
         // Embed & auto-links.
-        $html = static::links($html, true);
+        $html = Gdn_Format::links($html, true);
 
         // Mentions.
         if ($mentions) {
-            $html = static::mentions($html);
+            $html = Gdn_Format::mentions($html);
         }
 
         // Emoji.
         $html = Emoji::instance()->translateToHtml($html);
 
         // Old Spoiler plugin markup handling.
-        $html = static::legacySpoilers($html);
+        $html = Gdn_Format::legacySpoilers($html);
 
         return $html;
     }
@@ -1988,12 +1989,12 @@ EOT;
             // Handle @mentions.
             if (c('Garden.Format.Mentions')) {
                 // Only format mentions that are not already in anchor tags or code tags.
-                $mixed = self::tagContent($mixed, 'static::formatMentionsCallback');
+                $mixed = self::tagContent($mixed, 'Gdn_Format::formatMentionsCallback');
             }
 
             // Handle #hashtag searches
             if (c('Garden.Format.Hashtags')) {
-                $mixed = static::replaceButProtectCodeBlocks(
+                $mixed = Gdn_Format::replaceButProtectCodeBlocks(
                     '/(^|[\s,\.>])\#([\w\-]+)(?=[\s,\.!?<]|$)/i',
                     '\1'.anchor('#\2', url('/search?Search=%23\2&Mode=like', true)).'\3',
                     $mixed
@@ -2002,7 +2003,7 @@ EOT;
 
             // Handle "/me does x" action statements
             if (c('Garden.Format.MeActions')) {
-                $mixed = static::replaceButProtectCodeBlocks(
+                $mixed = Gdn_Format::replaceButProtectCodeBlocks(
                     '/(^|[\n])(\/me)(\s[^(\n)]+)/i',
                     '\1'.wrap(wrap('\2', 'span', ['class' => 'MeActionName']).'\3', 'span', ['class' => 'AuthorAction']),
                     $mixed
@@ -2201,10 +2202,10 @@ EOT;
         $str = self::text($str);
 
         // Always filter after basic parsing.
-        $sanitized = static::htmlFilter($str);
+        $sanitized = Gdn_Format::htmlFilter($str);
 
         // Vanilla magic parsing. (this is the "Ex"tra)
-        $sanitized = static::processHTML($sanitized);
+        $sanitized = Gdn_Format::processHTML($sanitized);
 
         return $sanitized;
     }
@@ -2231,7 +2232,7 @@ EOT;
             } elseif ($formatter = Gdn::factory($formatMethod.'Formatter')) {
                 $mixed = $formatter->format($mixed);
             } else {
-                $mixed = static::text($mixed);
+                $mixed = Gdn_Format::text($mixed);
             }
         } elseif (is_array($mixed)) {
             foreach ($mixed as $key => $val) {
@@ -2401,12 +2402,12 @@ EOT;
      */
     public static function vanillaSprintf($placeholderString, $replaceWith) {
         // Set replacement array inside callback
-        static::vanillaSprintfCallback(null, $replaceWith);
+        Gdn_Format::vanillaSprintfCallback(null, $replaceWith);
 
         $finalString = preg_replace_callback('/({([a-z0-9_:]+)})/i', ['Gdn_Format', 'VanillaSprintfCallback'], $placeholderString);
 
         // Cleanup replacement list
-        static::vanillaSprintfCallback(null, []);
+        Gdn_Format::vanillaSprintfCallback(null, []);
 
         return $finalString;
     }
@@ -2465,10 +2466,10 @@ EOT;
             // Always filter after basic parsing.
             // Wysiwyg is already formatted HTML. Don't try to doubly encode its code blocks.
             $filterOptions = ['codeBlockEntities' => false];
-            $sanitized = static::htmlFilter($mixed, $filterOptions);
+            $sanitized = Gdn_Format::htmlFilter($mixed, $filterOptions);
 
             // Vanilla magic formatting.
-            $sanitized = static::processHTML($sanitized);
+            $sanitized = Gdn_Format::processHTML($sanitized);
 
             return $sanitized;
         }

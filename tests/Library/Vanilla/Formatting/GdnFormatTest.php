@@ -257,6 +257,12 @@ class GdnFormatTest extends SharedBootstrapTestCase {
         return $this->createFixtureDataProvider('/formats/wysiwyg/html');
     }
 
+    /**
+     * Assert that the given callable implements Gdn_Format::to's array input/output method.
+     *
+     * @param array $fixtureDirs
+     * @param callable $formatMethod
+     */
     private function assertAllFixturesAsArray(array $fixtureDirs, callable $formatMethod) {
         $allInputs = [];
         $expectedOutputs = [];
@@ -274,6 +280,12 @@ class GdnFormatTest extends SharedBootstrapTestCase {
         }
     }
 
+    /**
+     * Assert that the given callable implements Gdn_Format::to's array input/output method.
+     *
+     * @param array $fixtureDirs
+     * @param callable $formatMethod
+     */
     private function assertAllFixturesAsObject(array $fixtureDirs, callable $formatMethod) {
         $allInputs = new \stdClass();
         $expectedOutputs = [];

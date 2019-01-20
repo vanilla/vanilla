@@ -8,13 +8,20 @@
 namespace Vanilla\Formatting\Formats;
 
 use Garden\EventManager;
+use Garden\StaticCacheTranslationTrait;
+use Vanilla\Contracts\Formatting\FormatInterface;
+use Vanilla\Formatting\Attachment;
+use Vanilla\Formatting\Exception\FormattingException;
+use Vanilla\Formatting\Heading;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 
 /**
  * Format definition for HTML based formats.
  */
-class HtmlFormat {
+class HtmlFormat implements FormatInterface {
+
+    use StaticCacheTranslationTrait;
 
     /** @var HtmlSanitizer */
     private $htmlSanitizer;
@@ -41,7 +48,6 @@ class HtmlFormat {
         $this->shouldCleanupLineBreaks = $shouldCleanupLineBreaks;
     }
 
-
     public function renderHtml(string $value): string {
         $sanitized = $this->htmlSanitizer->filter($value);
 
@@ -51,6 +57,66 @@ class HtmlFormat {
 
         $enhanced = $this->htmlEnhancer->enhance($sanitized);
         return $enhanced;
+    }
+
+    public function renderExcerpt(string $content, string $query = null): string {
+        // TODO: Implement renderExcerpt() method.
+    }
+
+    public function renderPlainText(string $content): string {
+        // TODO: Implement renderPlainText() method.
+    }
+
+    public function renderQuote(string $content): string {
+        // TODO: Implement renderQuote() method.
+    }
+
+    public function filter(string $content): string {
+        try {
+            $this->renderHtml($content);
+        } catch (\Exception $e) {
+            // Rethrow as a formatting exception with exception chaining.
+            throw new FormattingException($e->getMessage(), 500, $e);
+        }
+        return $content;
+    }
+
+    public function parseAttachments(string $content): array {
+        return [];
+    }
+
+    public function parseHeadings(string $content): array {
+        $rendered = $this->renderHtml($content);
+        $dom = new \DOMDocument();
+        $dom->loadHTML($rendered);
+
+        $xpath = new \DOMXPath($dom);
+        $domHeadings = $xpath->query('.//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]');
+
+        /** @var Heading[] $headings */
+        $headings = [];
+
+        /** @var \DOMNode $domHeading */
+        foreach ($domHeadings as $domHeading) {
+            $level = str_replace('h', 0, $domHeading->nodeValue);
+            $level = filter_var($level, FILTER_VALIDATE_INT);
+
+            if (!$level) {
+                continue;
+            }
+
+            $headings[] = new Heading(
+                $domHeading->textContent,
+                $level,
+                'no_id_found'
+            );
+        }
+
+        return $headings;
+    }
+
+    public function parseMentions(string $content): array {
+        return [];
     }
 
     const BLOCK_WITH_OWN_WHITESPACE =
@@ -84,5 +150,32 @@ class HtmlFormat {
             $breakBeforeReplaced
         );
         return $breakAfterReplaced;
+    }
+
+    /**
+     * Check to see if a string has spoilers and replace them with an innocuous string.
+     *
+     * Good for displaying excerpts from discussions and without showing the spoiler text.
+     *
+     * @param string $html An HTML-formatted string.
+     * @param string $replaceWith The translation code to replace spoilers with.
+     *
+     * @return string Returns the html with spoilers removed.
+     * @internal Marked public for internal backwards compatibility only.
+     */
+    public function replaceSpoilersWithPlaintext(string $html, string $replaceWith = "(Spoiler)") {
+        $dom = new \DOMDocument();
+        $dom->loadHTML($html);
+        $xpath = new \DOMXPath($dom);
+        $spoilers = $xpath->query(".//*[contains(@class, 'Spoiler') or contains(@class, 'UserSpoiler')]");
+
+        /** @var \DOMNode $spoiler */
+        foreach ($spoilers as $spoiler) {
+            $replacement = new \DOMNode();
+            $replacement->textContent = self::t($replaceWith);
+            $spoiler->parentNode->replaceChild($replacement, $spoiler);
+        }
+
+        return $dom->saveHTML();
     }
 }

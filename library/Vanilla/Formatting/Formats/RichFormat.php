@@ -61,7 +61,8 @@ class RichFormat extends BaseFormat {
     public function renderHTML(string $content): string {
         try {
             $operations = Quill\Parser::jsonToOperations($content);
-        } catch (FormattingException $e) {
+        } catch (\Exception $e) {
+            // Catching all possible exceptions so a single bad post doesn't take down page.
             return $this->renderErrorMessage();
         }
 

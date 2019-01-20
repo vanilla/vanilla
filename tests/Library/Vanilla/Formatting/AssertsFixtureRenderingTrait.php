@@ -7,16 +7,14 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting;
 
-use VanillaTests\SharedBootstrapTestCase;
-
 /**
  * Base test case for rendering some input/output from a fixture.
  */
-class FixtureRenderingTestCase extends SharedBootstrapTestCase {
+trait AssertsFixtureRenderingTrait {
 
     use HtmlNormalizeTrait;
 
-    const FIXTURE_ROOT = PATH_ROOT . '/tests/fixtures';
+    private static $fixtureRoot = PATH_ROOT . '/tests/fixtures';
 
     /**
      * Get the expected in and out contents from a directory.
@@ -70,7 +68,7 @@ class FixtureRenderingTestCase extends SharedBootstrapTestCase {
     protected function createFixtureDataProvider(string $fixtureDir) {
         $paramSets = [];
 
-        $files = glob(self::FIXTURE_ROOT . "$fixtureDir/*", GLOB_ONLYDIR);
+        $files = glob(self::$fixtureRoot . "$fixtureDir/*", GLOB_ONLYDIR);
         foreach ($files as $file) {
             $paramSets[] = [basename($file)];
         }

@@ -7,16 +7,17 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
-use VanillaTests\Library\Vanilla\Formatting\FixtureRenderingTestCase;
+use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Formatting\Quill\Renderer;
+use VanillaTests\SharedBootstrapTestCase;
 
 /**
  * Tests for the Quill Renderer.
  */
-class RendererTest extends FixtureRenderingTestCase {
+class RendererTest extends SharedBootstrapTestCase {
 
-    const FIXTURE_DIR = self::FIXTURE_ROOT . '/formats/rich';
+    use AssertsFixtureRenderingTrait;
 
     /**
      * Render a given set of operations.
@@ -44,7 +45,9 @@ class RendererTest extends FixtureRenderingTestCase {
      * @dataProvider provideHtml
      */
     public function testRender(string $dirname) {
-        list($input, $expectedOutput) = $this->getFixture(self::FIXTURE_DIR . '/html/' . $dirname);
+        list($input, $expectedOutput) = $this->getFixture(
+            self::$fixtureRoot . '/formats/rich' . '/html/' . $dirname
+        );
         $json = \json_decode($input, true);
 
         $output = $this->render($json);

@@ -10,6 +10,7 @@ use Garden\Container\Container;
 use Garden\Container\ContainerException;
 use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\Formatting\Exception\FormatterNotFoundException;
+use Vanilla\Formatting\Formats\NotFoundFormat;
 
 /**
  * Simple service for calling out to formatters registered in FormatFactory.
@@ -39,11 +40,7 @@ class FormatService {
      * @return Attachment[]
      */
     public function parseAttachments(string $content, string $format): array {
-        try {
-            $formatter = $this->getFormatter($format);
-        } catch (FormatterNotFoundException $e) {
-            return [];
-        }
+        $formatter = $this->getFormatter($format);
 
         $result = $formatter->parseAttachments($content);
         return $result;
@@ -63,12 +60,13 @@ class FormatService {
     /**
      * Get an instance of a formatter.
      *
-     * @param string $formatKey
+     * @param string $formatKey The key of the format to fetch.
+     * @param bool $throw Whether or not to throw an exception if the format couldn't be found.
      *
      * @return FormatInterface
-     * @throws FormatterNotFoundException If the formatter that was request could not be found.
+     * @throws FormatterNotFoundException If $throw === true &&  the formatter that was requested could not be found.
      */
-    public function getFormatter(string $formatKey): FormatInterface {
+    public function getFormatter(string $formatKey, $throw = false): FormatInterface {
         $formatKey = strtolower($formatKey);
         $formatClass = $this->formats[$formatKey] ?? null;
         $errorMessage = "Unable to find a formatter for the formatKey $formatKey.";
@@ -79,7 +77,11 @@ class FormatService {
         try {
             $formatter = $this->container->get($formatClass);
         } catch (ContainerException $e) {
-            throw new FormatterNotFoundException($errorMessage);
+            if ($throw) {
+                throw new FormatterNotFoundException($errorMessage);
+            } else {
+                return new NotFoundFormat($formatKey);
+            }
         }
 
         return $formatter;

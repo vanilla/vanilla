@@ -2198,6 +2198,10 @@ EOT;
      * @since 2.1
      */
     public static function textEx($str) {
+        if (!is_string($str)) {
+            return self::to($str, 'TextEx');
+        }
+
         // Basic text parsing.
         $str = self::text($str);
 

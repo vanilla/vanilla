@@ -15,7 +15,20 @@ use Vanilla\Contracts;
 class MockConfig implements Contracts\ConfigurationInterface {
 
     /** @var array A mapping of config key to value */
-    private $data = [];
+    private $data = [
+        'Garden.RewriteUrls' => true,
+        'Garden.AllowSSL' => true,
+    ];
+
+    /**
+     * Construct a mock configuration with some default values.
+     *
+     * @param array $data
+     */
+    public function __construct(array $data = []) {
+        $this->data += $this->flattenArray($data);
+    }
+
 
     /**
      * @inheritdoc
@@ -34,6 +47,37 @@ class MockConfig implements Contracts\ConfigurationInterface {
      */
     public function set(string $key, $value) {
         $this->data[$key] = $value;
+
         return $this;
+    }
+
+    public function loadData(array $data) {
+        $data = $this->flattenArray($data);
+        $this->data += $data;
+    }
+
+    /**
+     * Flatten an array by concating it's strings.
+     *
+     * @example
+     * $before = ['Top' => ['Middle' => true]]
+     * $after = flattenArray($before);
+     * // ['Top.Middle' => true]
+     *
+     * @param $array
+     * @param string $prefix
+     * @return array
+     */
+    private function flattenArray($array, $prefix = '') {
+        $result = [];
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $result = $result + $this->flattenArray($value, $prefix . $key . '.');
+            } else {
+                $result[$prefix . $key] = $value;
+            }
+        }
+
+        return $result;
     }
 }

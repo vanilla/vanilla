@@ -138,13 +138,12 @@ class GdnFormatTest extends SharedBootstrapTestCase {
     }
 
 
-
     /**
      * Test using a rich-format array of operations with the quoteEmbed method.
      */
     public function testRichQuoteEmbedAsArray() {
         $richEmbed = [
-            ["insert" => "Hello world."]
+            ["insert" => "Hello world."],
         ];
 
         $this->assertEquals(
@@ -275,7 +274,7 @@ class GdnFormatTest extends SharedBootstrapTestCase {
 
         $allOutputs = $formatMethod($allInputs);
 
-        foreach ($expectedOutputs as $i => $expectedOutput){
+        foreach ($expectedOutputs as $i => $expectedOutput) {
             $this->assertHtmlStringEqualsHtmlString($expectedOutput, $allOutputs[$i]);
         }
     }
@@ -298,7 +297,7 @@ class GdnFormatTest extends SharedBootstrapTestCase {
 
         $allOutputs = $formatMethod($allInputs);
 
-        foreach ($expectedOutputs as $i => $expectedOutput){
+        foreach ($expectedOutputs as $i => $expectedOutput) {
             $this->assertHtmlStringEqualsHtmlString($expectedOutput, $allOutputs->$i);
         }
     }

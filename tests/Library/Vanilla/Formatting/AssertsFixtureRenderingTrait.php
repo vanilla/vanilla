@@ -14,8 +14,6 @@ trait AssertsFixtureRenderingTrait {
 
     use HtmlNormalizeTrait;
 
-    private static $fixtureRoot = PATH_ROOT . '/tests/fixtures';
-
     /**
      * Get the expected in and out contents from a directory.
      *
@@ -68,9 +66,9 @@ trait AssertsFixtureRenderingTrait {
     protected function createFixtureDataProvider(string $fixtureDir) {
         $paramSets = [];
 
-        $files = glob(self::$fixtureRoot . "$fixtureDir/*", GLOB_ONLYDIR);
+        $files = glob(PATH_ROOT . '/tests/fixtures/' . "$fixtureDir/*", GLOB_ONLYDIR);
         foreach ($files as $file) {
-            $paramSets[] = [basename($file)];
+            $paramSets[] = [$file];
         }
 
         return $paramSets;

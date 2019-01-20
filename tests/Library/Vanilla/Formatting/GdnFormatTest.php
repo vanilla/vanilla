@@ -8,7 +8,6 @@
 namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
 use Vanilla\Formatting\Formats\RichFormat;
-use VanillaTests\AssertsStaticCallsTrait;
 use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
 use VanillaTests\SharedBootstrapTestCase;
 
@@ -17,7 +16,6 @@ use VanillaTests\SharedBootstrapTestCase;
  */
 class GdnFormatTest extends SharedBootstrapTestCase {
 
-    use AssertsStaticCallsTrait;
     use AssertsFixtureRenderingTrait;
 
     /**
@@ -28,20 +26,13 @@ class GdnFormatTest extends SharedBootstrapTestCase {
      * @dataProvider provideBBCode
      */
     public function testBBCodeToHtml(string $fixtureDir) {
-        list($input, $expectedOutput) = $this->getFixture($this->getFixtureDir() . '/bbcode/html/' . $fixtureDir);
+        list($input, $expectedOutput) = $this->getFixture($fixtureDir);
         $output = \Gdn_Format::bbCode($input);
         $this->assertHtmlStringEqualsHtmlString(
             $expectedOutput, // Needed so code blocks are equivalently decoded
             $output, // Gdn_Format does htmlspecialchars
             "Expected html outputs for fixture $fixtureDir did not match."
         );
-    }
-
-    /**
-     * @return array
-     */
-    public function provideBBCode(): array {
-        return $this->createFixtureDataProvider('/formats/bbcode/html');
     }
 
     /**
@@ -52,20 +43,13 @@ class GdnFormatTest extends SharedBootstrapTestCase {
      * @dataProvider provideMarkdown
      */
     public function testMarkdownToHtml(string $fixtureDir) {
-        list($input, $expectedOutput) = $this->getFixture($this->getFixtureDir() . '/markdown/html/' . $fixtureDir);
+        list($input, $expectedOutput) = $this->getFixture($fixtureDir);
         $output = \Gdn_Format::markdown($input);
         $this->assertHtmlStringEqualsHtmlString(
             $expectedOutput, // Needed so code blocks are equivalently decoded
             $output, // Gdn_Format does htmlspecialchars
             "Expected html outputs for fixture $fixtureDir did not match."
         );
-    }
-
-    /**
-     * @return array
-     */
-    public function provideMarkdown(): array {
-        return $this->createFixtureDataProvider('/formats/markdown/html');
     }
 
     /**
@@ -76,20 +60,13 @@ class GdnFormatTest extends SharedBootstrapTestCase {
      * @dataProvider provideText
      */
     public function testTextToHtml(string $fixtureDir) {
-        list($input, $expectedOutput) = $this->getFixture($this->getFixtureDir() . '/text/html/' . $fixtureDir);
+        list($input, $expectedOutput) = $this->getFixture($fixtureDir);
         $output = \Gdn_Format::text($input);
         $this->assertHtmlStringEqualsHtmlString(
             $expectedOutput, // Needed so code blocks are equivalently decoded
             $output, // Gdn_Format does htmlspecialchars
             "Expected html outputs for fixture $fixtureDir did not match."
         );
-    }
-
-    /**
-     * @return array
-     */
-    public function provideText(): array {
-        return $this->createFixtureDataProvider('/formats/text/html');
     }
 
     /**
@@ -100,20 +77,13 @@ class GdnFormatTest extends SharedBootstrapTestCase {
      * @dataProvider provideTextEx
      */
     public function testTextExToHtml(string $fixtureDir) {
-        list($input, $expectedOutput) = $this->getFixture($this->getFixtureDir() . '/textex/html/' . $fixtureDir);
+        list($input, $expectedOutput) = $this->getFixture($fixtureDir);
         $output = \Gdn_Format::textEx($input);
         $this->assertHtmlStringEqualsHtmlString(
             $expectedOutput, // Needed so code blocks are equivalently decoded
             $output, // Gdn_Format does htmlspecialchars
             "Expected html outputs for fixture $fixtureDir did not match."
         );
-    }
-
-    /**
-     * @return array
-     */
-    public function provideTextEx(): array {
-        return $this->createFixtureDataProvider('/formats/textex/html');
     }
 
     /**
@@ -124,7 +94,7 @@ class GdnFormatTest extends SharedBootstrapTestCase {
      * @dataProvider provideHtmlToHtml
      */
     public function testHtmlToHtml(string $fixtureDir) {
-        list($input, $expectedOutput) = $this->getFixture($this->getFixtureDir() . '/html/html/' . $fixtureDir);
+        list($input, $expectedOutput) = $this->getFixture($fixtureDir);
         $output = \Gdn_Format::html($input);
         $this->assertHtmlStringEqualsHtmlString(
             $expectedOutput, // Needed so code blocks are equivalently decoded
@@ -133,12 +103,6 @@ class GdnFormatTest extends SharedBootstrapTestCase {
         );
     }
 
-    /**
-     * @return array
-     */
-    public function provideHtmlToHtml(): array {
-        return $this->createFixtureDataProvider('/formats/html/html');
-    }
 
     /**
      * Test results of Gdn_Format::excerpt with rich-formatted content.
@@ -147,7 +111,7 @@ class GdnFormatTest extends SharedBootstrapTestCase {
      * @dataProvider provideRichExcerpts
      */
     public function testRichExcerpt(string $fixtureDir) {
-        list($body, $expected) = $this->getFixture($this->getFixtureDir() . "/rich/excerpt/" . $fixtureDir);
+        list($body, $expected) = $this->getFixture($fixtureDir);
         $actual = \Gdn_Format::excerpt($body, RichFormat::FORMAT_KEY);
         $this->assertEquals(
             $expected,
@@ -156,14 +120,6 @@ class GdnFormatTest extends SharedBootstrapTestCase {
         );
     }
 
-    /**
-     * Provide data for testing the excerpt method with the rich format.
-     *
-     * @return array
-     */
-    public function provideRichExcerpts(): array {
-        return $this->createFixtureDataProvider("/formats/rich/excerpt");
-    }
 
     /**
      * Test results of Gdn_Format::plainText with rich-formatted content.
@@ -172,7 +128,7 @@ class GdnFormatTest extends SharedBootstrapTestCase {
      * @dataProvider provideRichPlainText
      */
     public function testRichPlainText(string $fixtureDir) {
-        list($body, $expected) = $this->getFixture($this->getFixtureDir() . "/rich/plain-text/" . $fixtureDir);
+        list($body, $expected) = $this->getFixture($fixtureDir);
         $actual = \Gdn_Format::plainText($body, RichFormat::FORMAT_KEY);
         $this->assertEquals(
             $expected,
@@ -181,14 +137,7 @@ class GdnFormatTest extends SharedBootstrapTestCase {
         );
     }
 
-    /**
-     * Provide data for testing the plainText method.
-     *
-     * @return array
-     */
-    public function provideRichPlainText(): array {
-        return $this->createFixtureDataProvider("/formats/rich/plain-text");
-    }
+
 
     /**
      * Test using a rich-format array of operations with the quoteEmbed method.
@@ -212,7 +161,7 @@ class GdnFormatTest extends SharedBootstrapTestCase {
      * @dataProvider provideWysiwyg
      */
     public function testWysiwygToHtml(string $fixtureDir) {
-        list($input, $expectedOutput) = $this->getFixture($this->getFixtureDir() . '/wysiwyg/html/' . $fixtureDir);
+        list($input, $expectedOutput) = $this->getFixture($fixtureDir);
         $output = \Gdn_Format::wysiwyg($input);
         $this->assertHtmlStringEqualsHtmlString(
             $expectedOutput, // Needed so code blocks are equivalently decoded
@@ -222,13 +171,123 @@ class GdnFormatTest extends SharedBootstrapTestCase {
     }
 
     /**
+     * Test the format with an array of all fixture inputs.
+     *
+     * @param array $fixtureDirs
+     * @param callable $formatMethod
+     *
+     * @dataProvider groupInputModesProvider
+     */
+    public function testGroupInputModes(array $fixtureDirs, callable $formatMethod) {
+        $this->assertAllFixturesAsArray($fixtureDirs, $formatMethod);
+        $this->assertAllFixturesAsObject($fixtureDirs, $formatMethod);
+    }
+
+    /**
+     * @return array
+     */
+    public function groupInputModesProvider(): array {
+        return [
+            [$this->provideHtmlToHtml(), [\Gdn_Format::class, 'html']],
+            [$this->provideWysiwyg(), [\Gdn_Format::class, 'wysiwyg']],
+            [$this->provideText(), [\Gdn_Format::class, 'text']],
+            [$this->provideMarkdown(), [\Gdn_Format::class, 'markdown']],
+            [$this->provideBBCode(), [\Gdn_Format::class, 'bbcode']],
+            [$this->provideTextEx(), [\Gdn_Format::class, 'textex']],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function provideHtmlToHtml(): array {
+        return $this->createFixtureDataProvider('/formats/html/html');
+    }
+
+    /**
+     * @return array
+     */
+    public function provideBBCode(): array {
+        return $this->createFixtureDataProvider('/formats/bbcode/html');
+    }
+
+    /**
+     * @return array
+     */
+    public function provideMarkdown(): array {
+        return $this->createFixtureDataProvider('/formats/markdown/html');
+    }
+
+    /**
+     * @return array
+     */
+    public function provideText(): array {
+        return $this->createFixtureDataProvider('/formats/text/html');
+    }
+
+    /**
+     * @return array
+     */
+    public function provideTextEx(): array {
+        return $this->createFixtureDataProvider('/formats/textex/html');
+    }
+
+    /**
+     * Provide data for testing the excerpt method with the rich format.
+     *
+     * @return array
+     */
+    public function provideRichExcerpts(): array {
+        return $this->createFixtureDataProvider("/formats/rich/excerpt");
+    }
+
+    /**
+     * Provide data for testing the plainText method.
+     *
+     * @return array
+     */
+    public function provideRichPlainText(): array {
+        return $this->createFixtureDataProvider("/formats/rich/plain-text");
+    }
+
+    /**
      * @return array
      */
     public function provideWysiwyg(): array {
         return $this->createFixtureDataProvider('/formats/wysiwyg/html');
     }
 
-    private function getFixtureDir() {
-        return self::$fixtureRoot . '/formats';
+    private function assertAllFixturesAsArray(array $fixtureDirs, callable $formatMethod) {
+        $allInputs = [];
+        $expectedOutputs = [];
+
+        foreach ($fixtureDirs as $fixtureDir) {
+            list($input, $expectedOutput) = $this->getFixture($fixtureDir[0]);
+            $allInputs[] = $input;
+            $expectedOutputs[] = $expectedOutput;
+        }
+
+        $allOutputs = $formatMethod($allInputs);
+
+        foreach ($expectedOutputs as $i => $expectedOutput){
+            $this->assertHtmlStringEqualsHtmlString($expectedOutput, $allOutputs[$i]);
+        }
+    }
+
+    private function assertAllFixturesAsObject(array $fixtureDirs, callable $formatMethod) {
+        $allInputs = new \stdClass();
+        $expectedOutputs = [];
+
+        foreach ($fixtureDirs as $i => $fixtureDir) {
+            list($input, $expectedOutput) = $this->getFixture($fixtureDir[0]);
+            $allInputs->$i = $input;
+            $expectedOutputs[] = $expectedOutput;
+        }
+
+        $allOutputs = $formatMethod($allInputs);
+
+        foreach ($expectedOutputs as $i => $expectedOutput){
+            $this->assertHtmlStringEqualsHtmlString($expectedOutput, $allOutputs->$i);
+        }
     }
 }

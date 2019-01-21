@@ -19,27 +19,27 @@ trait AssertsFixtureRenderingTrait {
      *
      * Directory should contain:
      * - input.*
-     * - output.*
+     * - output.html
+     * - output.txt
      *
      * @param string $fixtureDir
      *
-     * @return string[] A tuple of the input and expected output.
+     * @return string[] A tuple of the input and expected output for html and txt.
      * @throws \Exception When a fixture doesn't have the exactly 1 input & output.
      */
     public function getFixture(string $fixtureDir): array {
         $inputs = glob($fixtureDir . '/input.*');
-        $outputs = glob($fixtureDir . '/output.*');
+        $outputHtml = glob($fixtureDir . '/output.html')[0] ?? null;
+        $outputText = glob($fixtureDir . '/output.txt')[0] ?? null;
 
         if (count($inputs) !== 1) {
             throw new \Exception("There must be exactly 1 input when fetching a fixture.");
         }
 
-        if (count($outputs) !== 1) {
-            throw new \Exception("There must be exactly 1 output when fetching a fixture.");
-        }
         return [
             file_get_contents($inputs[0]),
-            file_get_contents($outputs[0]),
+            $outputHtml ? file_get_contents($outputHtml) : 'no output.html fixture provided',
+            $outputText ? file_get_contents($outputText) : 'no output.txt fixture provided',
         ];
     }
 

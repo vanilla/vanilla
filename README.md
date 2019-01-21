@@ -59,16 +59,7 @@ Please disclose security issues responsibly by emailing support@vanillaforums.co
 We'll work on releasing an updated version as quickly as possible.
 Please do not email non-security issues; use the [issue tracker](https://github.com/vanilla/vanilla/issues) instead.
 
-## Open Source Releases & Branches
-
-Vanilla is free, open source software distributed under the GNU GPL2.
-We accept and encourage contributions from our community and sometimes give hugs in return.
-
-The latest stable release is always [listed here](https://open.vanillaforums.com/addon/vanilla-core). Currently, it is the `release/2.6` branch.
-
-Refer to [changelog](https://docs.vanillaforums.com/developer/changelog/) to track active changes between releases.
-
-## Version Control Strategy
+## Releases & Branches
 
 The `master` branch is considered a stable branch capable of being released at any time. Reviewed, stable changes land against `master` via pull-request.
 
@@ -86,7 +77,12 @@ All open source releases (included pre-releases) are tagged.
 | **Last Updated**    | Oct 28, 2018       | Aug 17, 2018    | Jan 18, 2019         | Dec 12, 2018      |
 | **EOL**             | Undecided          | With 2.8 final  | With 2.8 final       | With 2.8 final    |
 
-## Legal Stuff
+Refer to [OSS changelog](https://docs.vanillaforums.com/developer/changelog/) and the [Vanilla Cloud changelog](https://docs.vanillaforums.com/help/releases/) to track active changes between releases.
+
+## License & Legal Stuff
+
+Vanilla is free, open source software distributed under the license `gpl-2.0-only`.
+We accept and encourage contributions from our community and sometimes give hugs in return.
 
 Copyright © 2009-2019 Vanilla Forums Inc.
 

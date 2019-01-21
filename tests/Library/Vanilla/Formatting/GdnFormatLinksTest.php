@@ -7,22 +7,43 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Quill;
 
+use PHPUnit\Framework\TestCase;
 use Vanilla\Contracts\ConfigurationInterface;
 use VanillaTests\BootstrapTrait;
 use VanillaTests\Fixtures\MockConfig;
-use VanillaTests\IsolatedTestCase;
 use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
 use Gdn_Format;
 
 /**
  * Unit tests for Gdn_Format::links().
- *
- * Isolated test case is being used here because of the static nature of some config options.
  */
-class GdnFormatLinksTest extends IsolatedTestCase {
+class GdnFormatLinksTest extends TestCase {
 
     use AssertsFixtureRenderingTrait;
-    use BootstrapTrait;
+    use BootstrapTrait {
+        setUpBeforeClass as bootstrapSetupBefore;
+    }
+
+    /** @var MockConfig */
+    private static $config;
+
+    /**
+     * Initialize configuration.
+     */
+    public static function setUpBeforeClass() {
+        self::bootstrapSetupBefore();
+        self::$config = new MockConfig();
+        self::$container
+            ->setInstance(ConfigurationInterface::class, self::$config);
+    }
+
+    /**
+     * Reset config before every test.
+     */
+    protected function setUp() {
+        parent::setUp();
+        self::$config->reset();
+    }
 
     /**
      * Testing a simple link conversion.
@@ -35,7 +56,43 @@ class GdnFormatLinksTest extends IsolatedTestCase {
     }
 
     /**
+     * Test that autolinking ignore various puncation marks at the end of them.
+     *
+     * @param string $punc The puncuation marks to check.
+     *
+     * @dataProvider providePuncuation
+     */
+    public function testPunctuation(string $punc) {
+        $input = "https://test.com{$punc} Other text";
+        $expected = <<<HTML
+<a href='https://test.com' rel='nofollow'>https://test.com</a>{$punc} Other text
+HTML;
+        $output = Gdn_Format::links($input);
+        $this->assertHtmlStringEqualsHtmlString($expected, $output);
+    }
+
+    /**
+     * @return array
+     */
+    public function providePuncuation(): array {
+        return [
+            ['.'],
+            ['?'],
+            ['!'],
+            [','],
+            [':'],
+            [';'],
+            ['&nbsp;'],
+        ];
+    }
+
+    /**
      * Test link formatting when nofollow is disabled.
+     *
+     * The following flags are set so that the static values are restored properly.
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState
      */
     public function testNoFollowDisabled() {
         Gdn_Format::$DisplayNoFollow = false;
@@ -54,7 +111,7 @@ class GdnFormatLinksTest extends IsolatedTestCase {
      * @dataProvider warnLeavingProvider
      */
     public function testWarnLeaving(string $url, string $target) {
-        $this->useConfig(['Garden.Format.WarnLeaving' => true]);
+        self::$config->loadData(['Garden.Format.WarnLeaving' => true]);
         $body = htmlspecialchars(rawurldecode($url), ENT_QUOTES, 'UTF-8');
         $expected = <<<HTML
 <a class=Popup href="$target">$body</a>
@@ -76,7 +133,7 @@ HTML;
      * @dataProvider warnLeavingProvider
      */
     public function testAlreadyFormattedWarnLeaving(string $url, string $target) {
-        $this->useConfig(['Garden.Format.WarnLeaving' => true]);
+        self::$config->loadData(['Garden.Format.WarnLeaving' => true]);
         $input = <<<HTML
 <a href="$target">CustomSetBody</a>
 HTML;
@@ -90,9 +147,21 @@ HTML;
 
     /**
      * Assert that content is passed through unmodified when disabled in the config.
+     *
+     * The following flags are set so that the static values are restored properly.
+     *
+     * @runInSeparateProcess
+     * @preserveGlobalState
      */
     public function testLinkFormattingDisabled() {
-        $this->useConfig(['Garden.Format.Links' => false]);
+        self::$config->loadData(['Garden.Format.Links' => false]);
+        $inputOutput = 'https://test.com';
+        $output = Gdn_Format::links($inputOutput);
+        $this->assertSame($inputOutput, $output);
+
+        // The other mode of warn leaving is done by settings a static value.
+        Gdn_Format::$FormatLinks = false;
+        self::$config->loadData(['Garden.Format.Links' => true]);
         $inputOutput = 'https://test.com';
         $output = Gdn_Format::links($inputOutput);
         $this->assertSame($inputOutput, $output);
@@ -121,23 +190,28 @@ HTML;
      * to the Gdn_Format::htmlfilter or enforces it consistently should be allowed to modify this test.
      */
     public function testTrustedDomains() {
-        $this->useConfig(['Garden.TrustedDomains' => ['https://trusted.com', 'https://trusted2.com']]);
+        self::$config->loadData([
+            'Garden.TrustedDomains' => ['trusted.com', 'trusted2.com'],
+            'Garden.Format.WarnLeaving' => true,
+        ]);
         $input = <<<HTML
 https://trusted.com/someLink
 <a href="https://trusted2.com/otherLink">SomeLink</a>
 https://evil.com
-<a href="https://evenEviler.com">Super Evil</a>
+<p><a href="https://evenEviler.com">Super Evil</a></p>
 <a href="/gdnformatlinkstest/discussions/1">Self Link</a>
 http://vanilla.test/gdnformatlinkstest/discussions/1
 HTML;
 
         $expected = <<<HTML
-<a href="https://trusted.com/someLink" rel="nofollow">https://trusted.com/someLink</a>
-<a href="https://trusted2.com/otherLink">SomeLink</a>
-<a href="https://evil.com" rel="nofollow">https://evil.com</a>
-<a href="https://evenEviler.com">Super Evil</a>
-<a href="/gdnformatlinkstest/discussions/1">Self Link</a>
-<a href="http://vanilla.test/gdnformatlinkstest/discussions/1" rel="nofollow">http://vanilla.test/gdnformatlinkstest/discussions/1</a>
+<a href=https://trusted.com/someLink rel=nofollow>https://trusted.com/someLink</a>
+<a href=https://trusted2.com/otherLink>SomeLink</a>
+<a class=Popup href="/gdnformatlinkstest/home/leaving?target=https%3A%2F%2Fevil.com">https://evil.com</a>
+<p>
+<a class=Popup href="/gdnformatlinkstest/home/leaving?target=https%3A%2F%2FevenEviler.com">Super Evil</a>
+</p>
+<a href=/gdnformatlinkstest/discussions/1>Self Link</a>
+<a href=http://vanilla.test/gdnformatlinkstest/discussions/1 rel=nofollow>http://vanilla.test/gdnformatlinkstest/discussions/1</a>
 HTML;
 
         $output = Gdn_Format::links($input);
@@ -158,16 +232,5 @@ HTML;
 
         $output = Gdn_Format::links($input);
         $this->assertHtmlStringEqualsHtmlString($expected, $output);
-    }
-
-    /**
-     * Setup the container to use a mock configuration object with the provided configuration values.
-     *
-     * @param array $config
-     */
-    private function useConfig(array $config) {
-        $config = new MockConfig($config);
-        self::$container
-            ->setInstance(ConfigurationInterface::class, $config);
     }
 }

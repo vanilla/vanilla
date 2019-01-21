@@ -46,6 +46,15 @@ class GdnFormatLinksTest extends TestCase {
     }
 
     /**
+     * Restore various static Gdn_Format values.
+     */
+    protected function tearDown() {
+        parent::tearDown();
+        Gdn_Format::$FormatLinks = true;
+        Gdn_Format::$DisplayNoFollow = true;
+    }
+
+    /**
      * Testing a simple link conversion.
      */
     public function testSimpleLink() {
@@ -90,9 +99,6 @@ HTML;
      * Test link formatting when nofollow is disabled.
      *
      * The following flags are set so that the static values are restored properly.
-     *
-     * @runInSeparateProcess
-     * @preserveGlobalState
      */
     public function testNoFollowDisabled() {
         Gdn_Format::$DisplayNoFollow = false;
@@ -149,9 +155,6 @@ HTML;
      * Assert that content is passed through unmodified when disabled in the config.
      *
      * The following flags are set so that the static values are restored properly.
-     *
-     * @runInSeparateProcess
-     * @preserveGlobalState
      */
     public function testLinkFormattingDisabled() {
         self::$config->loadData(['Garden.Format.Links' => false]);
@@ -214,10 +217,13 @@ HTML;
 <a href=http://vanilla.test/gdnformatlinkstest/discussions/1 rel=nofollow>http://vanilla.test/gdnformatlinkstest/discussions/1</a>
 HTML;
 
-        $output = Gdn_Format::links($input);
+        $output = Gdn_Format::links($input, true);
         $this->assertHtmlStringEqualsHtmlString($expected, $output);
     }
 
+    /**
+     * Test link structures that are nested inside of other HTML.
+     */
     public function testNestedLinks() {
         $input = <<<HTML
 <div><div>https://test.com</div></div>

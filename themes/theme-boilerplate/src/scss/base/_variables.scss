@@ -291,9 +291,9 @@ $component_lateralBorder:                false !default;
 $component_borderColor:                  $theme-border_color !default;
 $component_border:                       #{$theme-border_color} #{$component_borderWidth} solid !default;
 $component_boxShadow:                    none !default;
-$component_borderRadius:                 $global_borderRadius !default;
+$component_borderRadius:                 0 !default;
 
-$component-header_bg:                    transparent !default;
+$component-header_bg:                    #ccc !default;
 
 $component-base_color:                   $global-color_fg !default;
 $component-base_fontSize:                $global-medium_fontSize !default;

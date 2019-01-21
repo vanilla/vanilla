@@ -18,17 +18,24 @@
         @include listItem;
     }
 
-    @if $component-item_spacing == 0 {
-        border-radius: $component_borderRadius;
-        box-shadow: $component_boxShadow;
-
-        @if $component_lateralBorder == true {
-            .Item.CategoryHeading + .Item:not(.CategoryHeading) {
-                border-top-left-radius: $component_borderRadius;
-                border-top-right-radius: $component_borderRadius;
-            }
+    @if $component-item_spacing == 0 AND $component_lateralBorder == true {
+        .Item.CategoryHeading + .Item:not(.CategoryHeading) {
+            border-top-left-radius: $component_borderRadius;
+            border-top-right-radius: $component_borderRadius;
         }
     }
+
+    //@if $component-item_spacing == 0 {
+    //    border-radius: $component_borderRadius;
+    //    box-shadow: $component_boxShadow;
+    //
+    //    @if $component_lateralBorder == true {
+    //        .Item.CategoryHeading + .Item:not(.CategoryHeading) {
+    //            border-top-left-radius: $component_borderRadius;
+    //            border-top-right-radius: $component_borderRadius;
+    //        }
+    //    }
+    //}
 
     .CategoryHeading {
         padding: 0 !important;
@@ -128,9 +135,9 @@
         line-height: $icon-default_size;
     }
 
-    .AuthorInfo * {
-        line-height: 1.2em;
-    }
+    //.AuthorInfo * {
+    //    line-height: 1.2em;
+    //}
 
     .MostRecentBy,
     .LatestPostTitle {
@@ -162,7 +169,7 @@
         font-size: inherit;
         font-weight: inherit;
         color: inherit;
-        margin: 0;
+        margin: 0 2px 3px;
         display: inline-block;
 
         a {
@@ -349,6 +356,15 @@
     }
 }
 
+.DataList,
+.PageTitle + .ItemDiscussion {
+
+    @if $component-item_spacing == 0 {
+        border-radius: $component_borderRadius;
+        box-shadow: $component_boxShadow;
+    }
+}
+
 .DataList.CategoryList {
     .Item[class*="Depth"] {
 
@@ -413,17 +429,21 @@
 
     .ItemComment,
     .ItemDiscussion {
+        position: relative;
 
         .Item-Header {
             background: $component-header_bg;
             margin: 0;
             width: 100%;
-            position: relative;
+            //position: relative;
             min-height: $theme-photo_size + ($utility-medium_padding * 2);
-            border-top-left-radius: $component_borderRadius;
-            border-top-right-radius: $component_borderRadius;
             padding-top: $utility-medium_padding;
             padding-bottom: $utility-medium_padding;
+
+            @if $component-item_spacing != 0 {
+                border-top-left-radius: $component_borderRadius;
+                border-top-right-radius: $component_borderRadius;
+            }
 
             @if $component_lateralBorder == true {
                 padding-left: $utility-medium_padding;
@@ -445,7 +465,6 @@
 
             .MItem.RoleTracker {
                 padding: 0 $utility-small_padding;
-                margin: 0 2px;
 
                 a {
                     color: inherit;
@@ -482,6 +501,7 @@
             }
 
             .AuthorWrap {
+                //position: relative;
                 max-width: calc(100% - 45px);
             }
 
@@ -489,9 +509,9 @@
                 display: none;
             }
 
-            .MItem {
-                display: inline;
-            }
+            //.MItem {
+            //    display: inline;
+            //}
 
             .MItem.RoleTitle,
             .MItem.Rank {
@@ -508,11 +528,6 @@
                     color: $component-title-hover_color;
                 }
             }
-        }
-
-        .PostCount {
-            margin-right: 0;
-            display: block;
         }
 
         .flair {
@@ -614,6 +629,11 @@
         @if $component_lateralBorder == true {
             margin-right: $component-base_padding;
         }
+
+        @include maxWidth {
+            position: absolute;
+            right: 0;
+        }
     }
 
    // .Comment .Options {
@@ -631,10 +651,6 @@
     h3,
     .Item-Body {
         padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
-    }
-
-    h3 {
-        margin-top: -0.2em;
     }
 
     .PhotoWrap {

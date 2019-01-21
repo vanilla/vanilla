@@ -164,7 +164,7 @@
     .AuthorInfo * {
         font-size: inherit;
         font-weight: inherit;
-        color: inherit;
+        //color: inherit;
 
         margin: 0;
 
@@ -181,7 +181,7 @@
         }
     }
 
-    .Tag,
+    .Tag:not([class*="Status-Tag"]),
     .HasNew {
         margin-bottom: $utility-baseUnitHalf;
     }

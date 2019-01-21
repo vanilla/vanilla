@@ -73,7 +73,7 @@ $tag-hover_borderColor:           $global-color_primary !default;
     .Tag,
     .Tag-Poll,
     .RoleTracker,
-    .IdeationTag.IdeationTag {
+    .IdeationTag {
        @include Tag;
     }
 
@@ -84,6 +84,13 @@ $tag-hover_borderColor:           $global-color_primary !default;
             background-color: transparent;
             padding: 0;
             border-width: 0;
+            color: inherit;
+        }
+
+        &:hover,
+        &:focus,
+        &:active {
+            color: inherit;
         }
     }
 

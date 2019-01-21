@@ -361,16 +361,7 @@ div.token-input-dropdown {
 .FormWrapper-Condensed,
 .CommentForm.CommentForm {
     padding: $component-base_padding;
-    background: $component_bg;
-    box-shadow: $component_boxShadow;
-    border-radius: $component_borderRadius;
-    border: $component_border;
     margin: 0 0 $utility-large_padding;
-
-    @if $component-item_spacing == 0 {
-        box-shadow: $component_boxShadow;
-        border-radius: $component_borderRadius;
-    }
 
     .FormWrapper {
         border-width: 0;

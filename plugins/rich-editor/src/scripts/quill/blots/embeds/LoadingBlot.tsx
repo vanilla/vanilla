@@ -64,7 +64,6 @@ export default class LoadingBlot extends FocusableEmbedBlot {
         const file = value.loaderData.file!;
         const attachmentType = mimeTypeToAttachmentType(file.type);
         const now = new Date();
-        div.classList.remove(FOCUS_CLASS);
 
         ReactDOM.render(
             <AttachmentLoading
@@ -75,6 +74,7 @@ export default class LoadingBlot extends FocusableEmbedBlot {
                 progressEventEmitter={value.loaderData.progressEventEmitter}
             />,
             div,
+            () => div.classList.remove(FOCUS_CLASS),
         );
         return div;
     }

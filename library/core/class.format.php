@@ -1100,9 +1100,7 @@ class Gdn_Format {
 
         $result = Gdn_Format::to($body, $format);
         $result = Gdn_Format::replaceSpoilers($result);
-        if (strtolower($format) !== 'text') {
-            $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $collapse);
-        }
+        $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $collapse);
         $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
 
         // Always filter after basic parsing.

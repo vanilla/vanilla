@@ -3860,6 +3860,10 @@ if (!function_exists('isTrustedDomain')) {
     function isTrustedDomain($url) {
         static $trusted = null;
 
+        if (defined('TESTMODE_ENABLED') && constant('TESTMODE_ENABLED')) {
+            $trusted = null;
+        }
+
         if (empty($url)) {
             return false;
         }

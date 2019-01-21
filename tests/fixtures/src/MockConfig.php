@@ -14,11 +14,13 @@ use Vanilla\Contracts;
  */
 class MockConfig implements Contracts\ConfigurationInterface {
 
-    /** @var array A mapping of config key to value */
-    private $data = [
+    const DEFAULT_CONFIG = [
         'Garden.RewriteUrls' => true,
         'Garden.AllowSSL' => true,
     ];
+
+    /** @var array A mapping of config key to value */
+    private $data = self::DEFAULT_CONFIG;
 
     /**
      * Construct a mock configuration with some default values.
@@ -51,9 +53,21 @@ class MockConfig implements Contracts\ConfigurationInterface {
         return $this;
     }
 
+    /**
+     * Flatten and set the data into configuration.
+     *
+     * @param array $data
+     */
     public function loadData(array $data) {
         $data = $this->flattenArray($data);
         $this->data += $data;
+    }
+
+    /**
+     * Clear all config data.
+     */
+    public function reset() {
+        $this->data = self::DEFAULT_CONFIG;
     }
 
     /**
@@ -64,14 +78,14 @@ class MockConfig implements Contracts\ConfigurationInterface {
      * $after = flattenArray($before);
      * // ['Top.Middle' => true]
      *
-     * @param $array
+     * @param array $array
      * @param string $prefix
      * @return array
      */
-    private function flattenArray($array, $prefix = '') {
+    private function flattenArray(array $array, string $prefix = '') {
         $result = [];
         foreach ($array as $key => $value) {
-            if (is_array($value)) {
+            if (is_array($value) && $this->isAssosciativeArray($value)) {
                 $result = $result + $this->flattenArray($value, $prefix . $key . '.');
             } else {
                 $result[$prefix . $key] = $value;
@@ -79,5 +93,16 @@ class MockConfig implements Contracts\ConfigurationInterface {
         }
 
         return $result;
+    }
+
+    /**
+     * Quickly check if we have an indexed or sequential array.
+     *
+     * @param array $arr
+     *
+     * @return bool
+     */
+    private function isAssosciativeArray(array $arr): bool {
+        return count(array_filter(array_keys($arr), 'is_string')) > 0;
     }
 }

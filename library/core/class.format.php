@@ -12,7 +12,6 @@
  */
 
 use Garden\EventManager;
-use Vanilla\Renderer;
 
 /**
  * Output formatter.
@@ -1315,7 +1314,7 @@ class Gdn_Format {
                 $punc .= '&nbsp;';
             }
 
-            if (preg_match('`^(.+)([.?,;:])$`', $url, $matches)) {
+            if (preg_match('`^(.+)([.?,;!:])$`', $url, $matches)) {
                 $url = $matches[1];
                 $punc = $matches[2].$punc;
             }

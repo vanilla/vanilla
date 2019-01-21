@@ -25,18 +25,6 @@
         }
     }
 
-    //@if $component-item_spacing == 0 {
-    //    border-radius: $component_borderRadius;
-    //    box-shadow: $component_boxShadow;
-    //
-    //    @if $component_lateralBorder == true {
-    //        .Item.CategoryHeading + .Item:not(.CategoryHeading) {
-    //            border-top-left-radius: $component_borderRadius;
-    //            border-top-right-radius: $component_borderRadius;
-    //        }
-    //    }
-    //}
-
     .CategoryHeading {
         padding: 0 !important;
         margin-bottom: $component-base_padding;
@@ -126,7 +114,6 @@
 
     .Options {
         display: flex;
-        //position: relative;
     }
 
     .Bookmark::before,
@@ -134,10 +121,6 @@
         font-size: $icon-default_size;
         line-height: $icon-default_size;
     }
-
-    //.AuthorInfo * {
-    //    line-height: 1.2em;
-    //}
 
     .MostRecentBy,
     .LatestPostTitle {
@@ -162,9 +145,7 @@
     }
 
     .Author .Username,
-    //.Meta > *,
     .MItem,
-    //.AuthorInfo > *,
     .MItem.Category {
         font-size: inherit;
         font-weight: inherit;
@@ -435,7 +416,6 @@
             background: $component-header_bg;
             margin: 0;
             width: 100%;
-            //position: relative;
             min-height: $theme-photo_size + ($utility-medium_padding * 2);
             padding-top: $utility-medium_padding;
             padding-bottom: $utility-medium_padding;
@@ -501,17 +481,12 @@
             }
 
             .AuthorWrap {
-                //position: relative;
                 max-width: calc(100% - 45px);
             }
 
             .MItem.Category {
                 display: none;
             }
-
-            //.MItem {
-            //    display: inline;
-            //}
 
             .MItem.RoleTitle,
             .MItem.Rank {
@@ -619,10 +594,6 @@
         }
     }
 
-    //.ItemComment .CommentHeader {
-    //    padding: $utility-small_padding $utility-medium_padding;
-    //}
-
     .ItemComment .Options {
         margin-top: $component-base_padding;
 
@@ -635,14 +606,6 @@
             right: 0;
         }
     }
-
-   // .Comment .Options {
-        //position: absolute;
-        //right: $utility-medium_padding;
-        //top: 0;
-        //margin-top: $utility-medium_padding;
-        //z-index: 1;
-    //}
 }
 
 .DataList-Search {

@@ -1098,10 +1098,16 @@ class Gdn_Format {
             return self::getRichFormatter()->renderPlainText($body);
         }
 
-        $result = Gdn_Format::to($body, $format);
-        $result = Gdn_Format::replaceSpoilers($result);
-        $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $collapse);
-        $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
+        if (strcasecmp($format, 'text') === 0) {
+            // for content that is initially content, we can skip a lot of processing.
+            // We still need to filter/sanitize afterwards though.
+            $result = $body;
+        } else {
+            $result = Gdn_Format::to($body, $format);
+            $result = Gdn_Format::replaceSpoilers($result);
+            $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $collapse);
+            $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
+        }
 
         // Always filter after basic parsing.
         $sanitized = Gdn_Format::htmlFilter($result);

@@ -291,14 +291,14 @@ $component_lateralBorder:                false !default;
 $component_borderColor:                  $theme-border_color !default;
 $component_border:                       #{$theme-border_color} #{$component_borderWidth} solid !default;
 $component_boxShadow:                    none !default;
-$component_borderRadius:                 $global_borderRadius !default;
+$component_borderRadius:                 0 !default;
 
-$component-header_bg:                    $theme-hover_color !default;
+$component-header_bg:                    transparent !default;
 
 $component-base_color:                   $global-color_fg !default;
 $component-base_fontSize:                $global-medium_fontSize !default;
 $component-base_fontWeight:              $global-normal_fontWeight !default;
-$component-base_lineHeight:              $global-base_lineHeight !default;
+$component-base_lineHeight:              $global-excerpt_lineHeight !default;
 
 $component-title_color:                  $global-color_fg !default;
 $component-title-hover_color:            $global-color_primary !default;
@@ -306,12 +306,12 @@ $component-title_fontSize:               $global-large_fontSize !default;
 $component-title_fontWeight:             $global-semibold_fontWeight !default;
 $component-title_lineHeight:             $global-base_lineHeight !default;
 
-$component-meta_color:                   mix($global-color_fg, $global-color_bg, 85%) !default;
+$component-meta_color:                   mix($global-color_bg, $global-color_fg, 20%) !default;
 $component-meta-link_color:              $component-meta_color !default;
 $component-meta-link-hover_color:        $theme-heading-hover_color !default;
 $component-meta_fontSize:                $global-small_fontSize !default;
 $component-meta_fontWeight:              $global-normal_fontWeight !default;
-$component-meta_lineHeight:              $global-base_lineHeight !default;
+$component-meta_lineHeight:              $global-condensed_lineHeight !default;
 
 /* -------------------------------------------------------------- *\
     Form Elements
@@ -369,9 +369,9 @@ $formButton_border:                      1px solid !default;
     Bullets
 \* -------------------------------------------------------------- */
 
-$bullet_borderColor:                     $global-color_secondary !default;
-$bullet_bg:                              $global-color_secondary !default;
-$bullet_fg:                              $global-color_white !default;
+$bullet_bg:                              transparent !default;
+$bullet_fg:                              $global-color_primary !default;
+$bullet_borderColor:                     $global-color_primary !default;
 
 /* -------------------------------------------------------------- *\
     Breakpoints

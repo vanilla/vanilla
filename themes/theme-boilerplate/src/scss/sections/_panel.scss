@@ -188,9 +188,10 @@
 
         .Username {
             @include ellipsis;
-            max-width: 75%;
+            max-width: 70%;
             display: inline-block;
             margin-left: $utility-small_padding;
+            line-height: $theme-photo-small_size;
         }
 
         .Conversation-User {

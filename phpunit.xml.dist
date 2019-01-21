@@ -27,6 +27,9 @@
         <testsuite name="Library">
             <directory suffix="Test.php">./tests/Library/</directory>
         </testsuite>
+        <testsuite name="Formatting">
+            <directory suffix="Test.php">./tests/Library/Vanilla/Formatting</directory>
+        </testsuite>
         <testsuite name="Models">
             <directory suffix="Test.php">./tests/Models</directory>
             <directory suffix="Test.php">./applications/*/tests/Models</directory>

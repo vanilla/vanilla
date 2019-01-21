@@ -60,7 +60,7 @@ class MockConfig implements Contracts\ConfigurationInterface {
      */
     public function loadData(array $data) {
         $data = $this->flattenArray($data);
-        $this->data += $data;
+        $this->data = array_merge($this->data, $data);
     }
 
     /**

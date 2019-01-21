@@ -1,4 +1,4 @@
-<img src="https://user-images.githubusercontent.com/1770056/51423965-4e585680-1b95-11e9-8e5b-f822b90cdfe4.png" alt="Vanilla Repo Logo" width=500/>
+<img src="https://user-images.githubusercontent.com/1770056/51494323-414e8980-1d86-11e9-933c-e647b5ea49f4.png" alt="Vanilla Repo Logo" width=500/>
 
 [![](https://img.shields.io/github/license/vanilla/vanilla.svg)](https://github.com/vanilla/vanilla/blob/docs/new-readme/LICENSE.md)
 [![Build Status](https://travis-ci.org/vanilla/vanilla.svg?branch=master)](https://travis-ci.org/vanilla/vanilla)

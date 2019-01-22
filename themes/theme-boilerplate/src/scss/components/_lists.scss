@@ -72,7 +72,7 @@
         line-height: #{$theme-photo_size / 2};
         color: $component-title_color;
         display: block;
-        margin-bottom: $component-base_padding;
+        margin-bottom: $utility-baseUnit;
 
         &:focus,
         &:hover {
@@ -100,7 +100,7 @@
         font-weight: $component-base_fontWeight;
         line-height: $component-base_lineHeight;
         color: $component-base_color;
-        margin: 0 0 $component-base_padding;
+        margin: 0 0 $utility-baseUnit;
     }
 
     .Excerpt:empty,
@@ -109,7 +109,7 @@
     }
 
     .ItemContent.Discussion .Excerpt {
-        margin-top: $component-base_padding;
+        margin-top: $utility-baseUnit;
     }
 
     .Options {
@@ -136,6 +136,8 @@
     }
 
     .Meta {
+        margin-left: -$utility-baseUnit;
+        margin-right: -$utility-baseUnit;
         line-height: $component-meta_lineHeight;
 
         @include maxWidth {
@@ -150,7 +152,7 @@
         font-size: inherit;
         font-weight: inherit;
         color: inherit;
-        margin: 0 2px 3px;
+        margin: 0 $utility-baseUnit $utility-baseUnitHalf;
         display: inline-block;
 
         a {

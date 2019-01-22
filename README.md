@@ -77,7 +77,7 @@ All open source releases (included pre-releases) are tagged.
 | **Last Updated**    | Oct 28, 2018       | Aug 17, 2018    | Jan 18, 2019         | Dec 12, 2018      |
 | **EOL**             | Undecided          | With 2.8 final  | With 2.8 final       | With 2.8 final    |
 
-Refer to [OSS changelog](https://docs.vanillaforums.com/developer/changelog/) and the [Vanilla Cloud changelog](https://docs.vanillaforums.com/help/releases/) to track active changes between releases.
+Refer to the [OSS changelog](https://docs.vanillaforums.com/developer/changelog/) and the [Vanilla Cloud changelog](https://docs.vanillaforums.com/help/releases/) to track active changes between releases.
 
 ## License & Legal Stuff
 

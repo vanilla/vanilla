@@ -726,7 +726,7 @@ if ($Construct->columnExists('Plugins.Tagging.Add')) {
     ];
     foreach ($configs as $newConfig => $oldConfig) {
         if (Gdn::config()->find($oldConfig, false) !== $configNotFound) {
-            touchConfig($newConfig, c($oldConfig));
+            \Gdn::config()->touch($newConfig, c($oldConfig));
         }
     }
 } else if (!$Construct->columnExists('Vanilla.Tagging.Add')) {
@@ -932,7 +932,7 @@ if (!$captureOnly && $AllIPAddressesExists) {
 // This will allow us to change the default later and grandfather existing forums in.
 saveToConfig('Garden.InputFormatter', c('Garden.InputFormatter'));
 
-touchConfig('Garden.Email.Format', 'text');
+\Gdn::config()->touch('Garden.Email.Format', 'text');
 
 // Make sure the default locale is in its canonical form.
 $currentLocale = c('Garden.Locale');
@@ -943,17 +943,17 @@ if ($currentLocale !== $canonicalLocale) {
 
 // We need to ensure that recaptcha is enabled if this site is upgrading from
 // 2.2 and has never had a captcha plugin
-touchConfig('EnabledPlugins.recaptcha', true);
+\Gdn::config()->touch('EnabledPlugins.recaptcha', true);
 
 // Move recaptcha private key to plugin namespace.
 if (c('Garden.Registration.CaptchaPrivateKey')) {
-    touchConfig('Recaptcha.PrivateKey', c('Garden.Registration.CaptchaPrivateKey'));
+    \Gdn::config()->touch('Recaptcha.PrivateKey', c('Garden.Registration.CaptchaPrivateKey'));
     removeFromConfig('Garden.Registration.CaptchaPrivateKey');
 }
 
 // Move recaptcha public key to plugin namespace.
 if (c('Garden.Registration.CaptchaPublicKey')) {
-    touchConfig('Recaptcha.PublicKey', c('Garden.Registration.CaptchaPublicKey'));
+    \Gdn::config()->touch('Recaptcha.PublicKey', c('Garden.Registration.CaptchaPublicKey'));
     removeFromConfig('Garden.Registration.CaptchaPublicKey');
 }
 

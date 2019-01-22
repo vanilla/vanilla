@@ -493,13 +493,13 @@ body.noGroupIcon {
 
     .Group-RemoveMember {
         @include Button(
-                    $button-primary_bg,
-                    $button-primary_fg,
-                    $button-primary_border,
-                    $button-primary-hover_bg,
-                    $button-primary-hover_fg,
-                    $button-primary-hover_border
-            );
+            $button-primary_bg,
+            $button-primary_fg,
+            $button-primary_border,
+            $button-primary-hover_bg,
+            $button-primary-hover_fg,
+            $button-primary-hover_border
+        );
     }
 }
 
@@ -592,8 +592,6 @@ body.noGroupIcon {
     }
 }
 
-
-
 #Form_memberFilter {
     height: calc(#{$formButton_height} + 2px);
 
@@ -623,12 +621,12 @@ body.noGroupIcon {
 
     .Button.search {
         @include Button(
-                    $button-primary_bg,
-                    $button-primary_fg,
-                    $button-primary_border,
-                    $button-primary-hover_bg,
-                    $button-primary-hover_fg,
-                    $button-primary-hover_border
-            );
+            $button-primary_bg,
+            $button-primary_fg,
+            $button-primary_border,
+            $button-primary-hover_bg,
+            $button-primary-hover_fg,
+            $button-primary-hover_border
+        );
     }
 }

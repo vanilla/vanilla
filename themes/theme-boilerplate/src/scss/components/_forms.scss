@@ -13,9 +13,9 @@ textarea,
 ul.token-input-list,
 input.InputBox,
 .AdvancedSearch .InputBox,
-select,
-.AdvancedSearch select {
-    line-height: $formElement_lineHeight;
+.AdvancedSearch select,
+select {
+    line-height: $formElement_height;
     height: $formElement_height;
     border: $formElement_border;
     border-radius: $formElement_borderRadius;
@@ -41,27 +41,22 @@ select,
 }
 
 textarea {
-    padding-top: 3px;
-    padding-bottom: 3px;
     overflow: auto;
 
-    @if ($formElement_borderRadius == $formElement_height) {
-        border-radius: #{$formElement_borderRadius / 2}
+    @if ($formElement_borderRadius >= 16px) {
+        border-radius: 16px;
     }
 }
 
 select,
 .AdvancedSearch select {
-    line-height: initial;
     -moz-appearance: none;
-    height: $formElement_height;
 
     font-family: "system-ui", -apple-system, BlinkMacSystemFont, "Segoe UI",
         "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
         "Helvetica Neue", sans-serif;
     padding-top: 0;
     padding-bottom: 0;
-    line-height: 24px;
 
     &:focus {
         -moz-appearance: none;
@@ -194,7 +189,7 @@ ul.token-input-list {
     li input {
         margin: 0 !important;
         padding: 0;
-        height: $formElement_lineHeight - 2px;
+        height: $formElement_height - 2px;
         line-height: initial;
         font-size: $global-medium_fontSize;
         font-weight: $global-normal_fontWeight !important;
@@ -209,12 +204,7 @@ ul.token-input-list {
 }
 
 li.token-input-token {
-    background: $global-color_primary;
-    color: $global-color_white;
-    border: darken($global-color_primary, 0.03);
-    border-radius: $formElement_borderRadius;
-    font-size: $global-medium_fontSize;
-    margin-right: 3px;
+    @include Tag;
 }
 
 div.token-input-dropdown {

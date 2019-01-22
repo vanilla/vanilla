@@ -86,7 +86,7 @@ $global-color_fg:                       $global-color_grey !default; // text col
 $global-border_color:                   mix($global-color_fg, $global-color_bg, 24%) !default; // Note it's off by default due to the border width
 $global-border-width:                   1px;
 $global-border-style:                   solid;
-$global_borderRadius:                   3px !default;
+$global_borderRadius:                   6px !default;
 
 $global-body_bg:                        $global-color_bg !default;
 
@@ -325,17 +325,16 @@ $component-meta_lineHeight:              $global-condensed_lineHeight !default;
     Form Elements
 \* -------------------------------------------------------------- */
 
-$formElement_height:                     36px !default;
+$formElement_height:                     $utility-baseUnit * 6;
 $formElement_paddingVertical:            $utility-baseUnitHalf !default;
 $formElement_paddingHorizontal:          $utility-baseUnitDouble !default;
-$formElement_lineHeight:                 $formElement_height - (#{$formElement_paddingVertical} * 2) !default;
 $formElement_color:                      $global-color_black !default;
 $formElement_borderColor:                lighten($global-color_black, 60%) !default;
 $formElement_placeholderColor:           $formElement_borderColor !default;
 $formElement_border:                     1px solid $formElement_borderColor !default;
 $formElement_fontSize:                   $global-medium_fontSize !default;
 $formElement_fontWeight:                 $global-medium_fontSize !default;
-$formElement_borderRadius:               6px !default;
+$formElement_borderRadius:               $global_borderRadius !default;
 
 /* -------------------------------------------------------------- *\
     Buttons

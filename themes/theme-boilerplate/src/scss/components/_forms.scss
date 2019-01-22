@@ -265,7 +265,9 @@ div.token-input-dropdown {
     }
 }
 
+.BigButton:not(.Danger),
 .NewConversation.NewConversation {
+
     @include Button(
         $button-primary_bg,
         $button-primary_fg,
@@ -276,8 +278,7 @@ div.token-input-dropdown {
     );
 }
 
-.ButtonGroup.Multi {
-
+.BoxButtons .Button.Primary {
     @include Button(
         $button-primary_bg,
         $button-primary_fg,
@@ -286,47 +287,63 @@ div.token-input-dropdown {
         $button-primary-hover_fg,
         $button-primary-hover_border
     );
+}
+
+.BigButton,
+.ButtonGroup.Multi {
+    display: flex;
+    justify-content: center;
     align-items: center;
+    width: 100%;
     max-width: $formButton_maxWidth;
-    padding-right: 32px;
-    padding-left: 32px;
-    margin: 0;
-    width: initial;
-    display: inline-flex;
 
     @include maxWidth {
         width: 100%;
         display: flex;
         margin: 0 auto;
     }
+}
 
-    .Button {
-        background: none;
-        border: none;
-        font-size: inherit;
-        line-height: inherit;
-        padding: 0;
-        color: inherit;
+.ButtonGroup.Multi {
+
+    > .Button:first-child {
+        border-top-right-radius: $formButton_borderRadius;
+        border-bottom-right-radius: $formButton_borderRadius;
     }
 
     .Button.Handle,
     &.Open .Button.Handle {
+        padding: 0;
         position: absolute;
         right: 0;
         top: 0;
-        bottom: 0;
-        background: none;
-        color: $global-color_white;
+        border-color: $button-primary_border;
+        background-color: $button-primary_bg;
+        color: $button-primary_fg;
 
         .SpDropdownHandle::before {
+            height: 100%;
             padding: 0 $utility-medium_padding;
         }
 
         &:hover,
         &:focus,
         &:active {
-            background: rgba($global-color_black, 0.05);
-            color: $global-color_white;
+            background-color: rgba($button-primary-hover_bg, 0.05);
+            color: $button-primary-hover_fg;
+        }
+    }
+}
+
+.ButtonGroup.Multi {
+
+    &:focus,
+    &:hover,
+    &:active {
+
+        .Button.Handle {
+            background-color: rgba($button-primary-hover_bg, 0.3);
+            color: $button-primary-hover_fg;
         }
     }
 }

@@ -33,14 +33,9 @@
         }
     }
 
-    .Button.NewDiscussion {
-        margin: 0 auto;
-        display: block;
-        max-width: 280px;
-        line-height: $formButton_height;
-    }
+    .BoxButtons .Button:not(.Handle) {
+        width: 100%;
 
-    .ButtonGroup.Multi {
         @include Button(
             $navigationButton_bg,
             $navigationButton_fg,
@@ -51,9 +46,33 @@
         );
     }
 
-    .ButtonGroup.NewDiscussion {
-        .Primary:first-child {
-            width: 100%;
+    .ButtonGroup.Multi {
+
+        &:focus,
+        &:hover,
+        &:active {
+
+            .Button.Handle,
+            &.Open .Button.Handle {
+                border-color: $navigationButton-hover_border;
+                background-color: $navigationButton-hover_bg;
+                color: $navigationButton-hover_fg;
+            }
+        }
+
+        .Button.Handle,
+        &.Open .Button.Handle {
+            border-color: $navigationButton_border;
+            background-color: $navigationButton_bg;
+            color: $navigationButton_fg;
+
+            &:focus,
+            &:hover,
+            &:active {
+                border-color: $navigationButton_border;
+                background: rgba($navigationButton_bg, 0.05);
+                color: $navigationButton_fg;
+            }
         }
     }
 
@@ -68,15 +87,6 @@
 
     .NewDiscussion.mobile {
         width: 100%;
-
-        .ButtonGroup.Action,
-        .Button.Action {
-            width: 100%;
-
-            .Button {
-                color: inherit;
-            }
-        }
     }
 
     .MeBox-SignIn {

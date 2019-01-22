@@ -16,8 +16,13 @@
 
         .PhotoWrap {
             position: absolute;
-            left: $component-base_padding;
             top: $component-base_padding;
+
+            @if $component_lateralBorder == true {
+                left: $component-base_padding;
+            } @else {
+                left: 0;
+            }
         }
 
         h3,

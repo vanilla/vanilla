@@ -80,28 +80,40 @@
     h2,
     h3,
     .Title.Title {
-        //100% - .Options width
-        width: 100%;
-        padding-right: calc(44px + #{$utility-small_padding});
-        display: block;
         font-size: $component-title_fontSize;
-        line-height:calc(#{$theme-photo_size / 2});
+        font-weight: $component-title_fontWeight;
+        line-height: #{$theme-photo_size / 2};
         color: $component-title_color;
-
-        a {
-            color: inherit;
-        }
+        display: block;
+        margin-bottom: $component-base_padding;
 
         &:focus,
         &:hover {
             color: $component-title-hover_color;
         }
+
+        a {
+            font-size: inherit;
+            font-weight: inherit;
+            display: inline;
+            color: inherit;
+
+            &:focus,
+            &:hover {
+                color: inherit;
+            }
+        }
     }
 
-    .CategoryDescription,
-    .Discussion .Excerpt {
+    .Excerpt,
+    .CategoryDescription {
         display: block;
-        margin: $component-base_padding 0;
+        width: 100%;
+        font-size: $component-base_fontSize;
+        font-weight: $component-base_fontWeight;
+        line-height: $component-base_lineHeight;
+        color: $component-base_color;
+        margin: 0 0 $component-base_padding;
     }
 
     .Excerpt:empty,
@@ -109,18 +121,11 @@
         display: none;
     }
 
-    .Excerpt {
-        font-size: $component-base_fontSize;
-        font-weight: $component-base_fontWeight;
-        color: $component-base_color;
+    .ItemContent.Discussion .Excerpt {
+        margin-top: $component-base_padding;
     }
 
     .Options {
-        position: absolute;
-        right: $utility-small_padding;
-        top: 0;
-        bottom: 0;
-        margin: auto;
         display: flex;
         align-items: center;
 
@@ -159,10 +164,8 @@
     .AuthorInfo * {
         font-size: inherit;
         font-weight: inherit;
-        color: inherit;
-        padding: 0;
-        margin-right: $utility-baseUnitHalf;
-        margin-bottom: $utility-baseUnitHalf;
+
+        margin: 0;
 
         a {
             font-size: inherit;
@@ -175,6 +178,11 @@
                 color: $component-meta-link-hover_color;
             }
         }
+    }
+
+    .Tag:not([class*="Status-Tag"]),
+    .HasNew {
+        margin-bottom: $utility-baseUnitHalf;
     }
 
     .NewCommentCount.NewCommentCount,
@@ -473,14 +481,6 @@
             width: 100%;
         }
 
-        td.DiscussionName .Wrap {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: flex-start;
-            justify-content: flex-start;
-            padding-left: 0;
-        }
-
         //ideation styles
         .ItemIdea {
             td.DiscussionName {
@@ -545,7 +545,6 @@ body.UserLoggedOut .DiscussionsTable tbody td.DiscussionName .Wrap {
     @include clearfix;
 }
 
-//tables are weird...
 body.Section-DiscussionList.mine,
 body.Categories.Section-DiscussionList,
 body.Section-Group {

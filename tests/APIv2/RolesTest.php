@@ -187,6 +187,53 @@ class RolesTest extends AbstractResourceTest {
         $this->assertFalse($this->hasPermission('site.manage', 'global', $permissions));
         $this->assertFalse($this->hasPermission('comments.add', 'category', $permissions, 1));
     }
+    /**
+     * Test updating permissions with PATCH /roles/:id/permissions
+     */
+    public function testPatchPermissionOverWrite() {
+        $role = $this->getPermissionsRole([[
+            'type' => 'category',
+            'id' =>  1,
+            'permissions' => [
+                'discussions.view' => true,
+                'discussions.add' => true,
+                'comments.add' => true
+            ]
+           ]]);
+
+        $role2 = $this->getPermissionsRole([[
+            'type' => 'category',
+            'id' => 1,
+            'permissions' => [
+                'discussions.view' => true,
+                'discussions.add' => true,
+                'comments.add' => true
+            ]
+        ]]);
+
+        $this->api()->patch(
+            "{$this->baseUrl}/{$role['roleID']}/permissions",
+            [
+                [
+                    'type' => 'category',
+                    'id' => 1,
+                    'permissions' => [
+                        'discussions.add' => true,
+                        'comments.add' => false
+                    ]
+                ]
+            ]
+        );
+
+        $permissions1 = $this->getPermissions($role['roleID']);
+        $permissions2 = $this->getPermissions($role2['roleID']);
+
+        $this->assertTrue($this->hasPermission('discussions.add', 'category', $permissions1, 1));
+        $this->assertFalse($this->hasPermission('comments.add', 'category', $permissions1, 1));
+
+        $this->assertTrue($this->hasPermission('discussions.add', 'category', $permissions2, 1));
+        $this->assertTrue($this->hasPermission('comments.add', 'category', $permissions2, 1));
+    }
 
     public function testPutPermissionsEndpoint() {
         $role = $this->getPermissionsRole();

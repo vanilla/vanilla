@@ -6,6 +6,7 @@ use Vanilla\Addon;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Utility\ContainerUtils;
+use \Vanilla\Formatting\Formats;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -244,7 +245,6 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
     ->rule('HtmlFormatter')
     ->setClass(VanillaHtmlFormatter::class)
-    ->addAlias(VanillaHtmlFormatter::class)
     ->setShared(true)
 
     ->rule(\Vanilla\Formatting\Quill\Renderer::class)
@@ -279,6 +279,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule(Vanilla\PageScraper::class)
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
+    ->setShared(true)
+
+    ->rule(Vanilla\Formatting\FormatService::class)
+    ->addCall('registerFormat', [Formats\RichFormat::FORMAT_KEY, Formats\RichFormat::class])
     ->setShared(true)
 ;
 

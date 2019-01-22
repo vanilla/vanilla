@@ -178,6 +178,10 @@ em {
   font-style: italic;
 }
 
+.js-focus-visible :focus:not(.focus-visible) {
+  outline: none;
+}
+
 /*!
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -240,6 +244,55 @@ button.Close {
   font-size: 22px;
   font-weight: bold;
   padding: 0;
+}
+
+.buttonIcon {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  background: none;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  height: 36px;
+  width: 36px;
+  min-width: 36px;
+  padding: 0;
+  color: #74787e;
+}
+
+.buttonIcon:visited {
+  color: #74787e;
+}
+
+.buttonIcon .icon {
+  display: block;
+}
+
+.buttonIcon.isOpen {
+  color: #0291db;
+}
+
+.buttonIcon:focus, .buttonIcon:hover {
+  color: #0291db;
+}
+
+.icon-close {
+  display: block;
+  margin: auto;
+  width: 12px;
+  height: 12px;
 }
 
 /*!
@@ -939,6 +992,47 @@ label.checkbox input.checkbox-input {
   margin-bottom: 0;
 }
 
+.userContent .metas {
+  display: block;
+  line-height: 1.5;
+  color: #6f737a;
+  width: -webkit-calc(100% + 12px);
+  width: calc(100% + 12px);
+  overflow: hidden;
+  text-align: left;
+  margin-left: -6px;
+  margin-right: 6px;
+}
+
+.userContent .metas.isFlexed {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.userContent .meta {
+  display: inline-block;
+  margin: 0 6px;
+  font-size: 12px;
+  color: #6f737a;
+}
+
+.userContent .meta .meta {
+  margin: 0;
+}
+
 .richEditor-menu {
   box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
   background-color: #fff;
@@ -1422,6 +1516,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 .embedImage .embedExternal-content {
   width: auto;
   max-width: 640px;
+  display: inline-block;
 }
 
 @media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
@@ -2436,5 +2531,193 @@ body.isMobile .Popup.hasRichEditor .Border {
   white-space: pre;
   padding: 14px;
   border-radius: 0;
+}
+
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.attachmentsIcons {
+  display: block;
+  position: relative;
+}
+
+.attachmentsIcons-items {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  -webkit-box-pack: end;
+  -webkit-justify-content: flex-end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  width: -webkit-calc(100% + 6px);
+  width: calc(100% + 6px);
+  margin-top: -3px;
+  margin-left: -3px;
+  margin-right: 6px;
+  overflow: hidden;
+}
+
+.attachmentsIcons-item {
+  margin: 3px;
+}
+
+.attachmentIcon {
+  display: block;
+  width: 16px;
+  height: 16px;
+  box-shadow: 0 0 0 1px #eeefef;
+}
+
+.attachmentIcon-error {
+  width: 16px;
+  height: 14.39px;
+}
+
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+.attachment {
+  display: block;
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 1px 3px 0 rgba(85, 90, 98, 0.3);
+  width: 640px;
+  max-width: 100%;
+  margin: auto;
+  overflow: hidden;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  border-color: #dddee0;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 2px;
+}
+
+.attachment.hasError {
+  background: #FFF3D4;
+}
+
+.attachment.hasError, .attachment.isLoading {
+  cursor: pointer;
+}
+
+.attachment.hasError:hover, .attachment.isLoading:hover {
+  box-shadow: 0 0 0 2px rgba(2, 145, 219, 0.5) inset;
+}
+
+.attachment.hasError:focus, .attachment.isLoading:focus {
+  box-shadow: 0 0 0 2px #0291db inset;
+}
+
+.attachment-link, .attachment-link:hover, .attachment-link:active, .attachment-link:visited {
+  text-decoration: none;
+}
+
+.attachment-box {
+  position: relative;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: nowrap;
+      -ms-flex-wrap: nowrap;
+          flex-wrap: nowrap;
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  padding: 12px;
+  border: solid transparent 2px;
+  width: 100%;
+}
+
+.attachment-format {
+  -webkit-flex-basis: 28px;
+      -ms-flex-preferred-size: 28px;
+          flex-basis: 28px;
+  height: 16px;
+  padding-right: 12px;
+  -webkit-flex-shrink: 1;
+      -ms-flex-negative: 1;
+          flex-shrink: 1;
+}
+
+.attachment-main {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+}
+
+.attachment-title {
+  font-size: 14px;
+  color: #666b72;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+.attachment-metas {
+  margin-bottom: 0;
+  line-height: 1.25;
+}
+
+.attachment-close {
+  margin-top: -10px;
+  margin-right: -10px;
+  pointer-events: all;
+}
+
+.attachment-loadingProgress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  -webkit-transition: width ease-out .2s;
+          transition: width ease-out .2s;
+  height: 3px;
+  margin-bottom: -1px;
+  width: 0;
+  max-width: 100%;
+  background-color: #0291db;
+}
+
+.attachment-loadingContent .attachment-format,
+.attachment-loadingContent .attachment-main {
+  opacity: .5;
 }
 /*# sourceMappingURL=style-compat.css.map */

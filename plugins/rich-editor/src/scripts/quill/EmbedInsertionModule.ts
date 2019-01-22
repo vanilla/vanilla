@@ -7,12 +7,14 @@
 import Module from "quill/core/module";
 import Parchment from "parchment";
 import Quill from "quill/core";
-import api, { uploadImage } from "@library/apiv2";
-import { getPastedImage, getDraggedImage } from "@library/dom";
+import api, { uploadFile } from "@library/apiv2";
+import { getPastedFile, getDraggedFile } from "@library/dom";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 import getStore from "@library/state/getStore";
 import { getIDForQuill, insertBlockBlotAt } from "@rich-editor/quill/utility";
 import { IStoreState } from "@rich-editor/@types/store";
+import { isFileImage } from "@library/utility";
+import ProgressEventEmitter from "@library/ProgressEventEmitter";
 
 /**
  * A Quill module for managing insertion of embeds/loading/error states.
@@ -62,20 +64,52 @@ export default class EmbedInsertionModule extends Module {
     };
 
     private pasteHandler = (event: ClipboardEvent) => {
-        const image = getPastedImage(event);
-        if (image) {
-            const imagePromise = uploadImage(image);
-            this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });
+        const file = getPastedFile(event);
+        if (!file) {
+            return;
+        }
+
+        if (isFileImage(file)) {
+            this.createImageEmbed(file);
+        } else {
+            this.createFileEmbed(file);
         }
     };
 
     private dragHandler = (event: DragEvent) => {
-        const image = getDraggedImage(event);
-        if (image) {
-            const imagePromise = uploadImage(image);
-            this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });
+        const file = getDraggedFile(event);
+
+        if (!file) {
+            return;
+        }
+
+        if (isFileImage(file)) {
+            this.createImageEmbed(file);
+        } else {
+            this.createFileEmbed(file);
         }
     };
+
+    public createImageEmbed(file: File) {
+        const imagePromise = uploadFile(file).then(data => {
+            data.type = "image";
+            return data;
+        });
+        this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });
+    }
+
+    public createFileEmbed(file: File) {
+        const progressEventEmitter = new ProgressEventEmitter();
+
+        const filePromise = uploadFile(file, { onUploadProgress: progressEventEmitter.emit }).then(data => {
+            return {
+                url: data.url,
+                type: "file",
+                attributes: data,
+            };
+        });
+        this.createEmbed({ loaderData: { type: "file", file, progressEventEmitter }, dataPromise: filePromise });
+    }
 
     /**
      * Setup image upload listeners and handlers.

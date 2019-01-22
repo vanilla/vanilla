@@ -44,6 +44,10 @@ body.Section-Profile {
     .User .H {
         display: flex;
         align-items: center;
+
+        @include maxWidth($theme-breakpoint_tablet) {
+            display: none;
+        }
     }
 
     .Gloss,
@@ -99,12 +103,7 @@ body.Section-Profile {
 
         @include maxWidth($theme-breakpoint_tablet) {
             width: 100%;
-
-            .Profile-row {
-                display: block;
-                width: inherit;
-                text-align: center;
-            }
+            text-align: center;
         }
     }
 
@@ -132,10 +131,7 @@ body.Section-Profile {
             position: absolute;
             height: 145px;
             width: 145px;
-
-            img {
-                display: none;
-            }
+            display: block;
         }
     }
 

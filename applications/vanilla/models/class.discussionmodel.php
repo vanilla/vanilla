@@ -9,6 +9,8 @@
  */
 
 use Vanilla\Exception\PermissionException;
+use Vanilla\Formatting\FormatService;
+use Vanilla\Formatting\UpdateMediaTrait;
 
 /**
  * Manages discussions data.
@@ -17,6 +19,8 @@ class DiscussionModel extends Gdn_Model {
 
     use StaticInitializer;
     use \Vanilla\FloodControlTrait;
+
+    use UpdateMediaTrait;
 
     /** Cache key. */
     const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
@@ -109,6 +113,11 @@ class DiscussionModel extends Gdn_Model {
     public function __construct(Gdn_Validation $validation = null) {
         parent::__construct('Discussion', $validation);
         $this->floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Discussion');
+
+        $this->setFormatterService(Gdn::getContainer()->get(FormatService::class));
+        $this->setMediaForeignTable($this->Name);
+        $this->setMediaModel(Gdn::getContainer()->get(MediaModel::class));
+        $this->setSessionInterface(Gdn::getContainer()->get("Session"));
     }
 
     /**
@@ -221,6 +230,22 @@ class DiscussionModel extends Gdn_Model {
             }
         }
         return '';
+    }
+
+    /**
+     * Update the attachment status of attachemnts in particular discussion.
+     *
+     * @param int $discussionID The ID of the discussion.
+     * @param bool $isUpdate Whether or not we are updating an existing discussion.
+     */
+    private function calculateMediaAttachments(int $discussionID, bool $isUpdate) {
+        $discussionRow = $this->getID($discussionID, DATASET_TYPE_ARRAY);
+        if ($discussionRow) {
+            if ($isUpdate) {
+                $this->flagInactiveMedia($discussionID, $discussionRow["Body"], $discussionRow["Format"]);
+            }
+            $this->refreshMediaAttachments($discussionID, $discussionRow["Body"], $discussionRow["Format"]);
+        }
     }
 
     /**
@@ -979,7 +1004,7 @@ class DiscussionModel extends Gdn_Model {
         $archiveTimestamp = Gdn_Format::toTimestamp(Gdn::config('Vanilla.Archive.Date', 0));
 
         // Fix up output
-        $discussion->Name = Gdn_Format::text($discussion->Name);
+        $discussion->Name = htmlspecialchars($discussion->Name);
         $discussion->Attributes = dbdecode($discussion->Attributes);
         $discussion->Url = discussionUrl($discussion);
         $discussion->Tags = $this->formatTags($discussion->Tags);
@@ -2254,6 +2279,8 @@ class DiscussionModel extends Gdn_Model {
                 if ($storedCategoryID) {
                     $this->updateDiscussionCount($storedCategoryID);
                 }
+
+                $this->calculateMediaAttachments($discussionID, !$insert);
 
                 // Fire an event that the discussion was saved.
                 $this->EventArguments['FormPostValues'] = $formPostValues;

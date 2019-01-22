@@ -67,10 +67,15 @@
             var wrap = document.createElement("span");
             wrap.classList.add("mobileFlyoutOverlay");
 
-            $contents.each(function() {
+            $contents.each(function () {
+                var $item = $(this);
                 if (!this.parentElement.classList.contains("mobileFlyoutOverlay")) {
-                    $(this).wrap(wrap);
+                    $item.wrap(wrap);
                 }
+
+                // Some flyouts had conflicting inline display: none directly in the view.
+                // We don't change that on open/close with the new style anymore so let's clean it up here.
+                $item.removeAttr("style");
             });
         }
 
@@ -196,8 +201,9 @@
      */
     function handleButtonHandleClick() {
         var $buttonGroup = $(this).closest(".ButtonGroup");
+        var $isOpen = $buttonGroup.hasClass(OPEN_CLASS);
         closeAllFlyouts();
-        if (!$buttonGroup.hasClass(OPEN_CLASS)) {
+        if (!$isOpen) {
             // Open this one
             $buttonGroup.addClass(OPEN_CLASS).setFlyoutAttributes();
         }

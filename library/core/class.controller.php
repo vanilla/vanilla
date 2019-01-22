@@ -24,7 +24,6 @@ use \Vanilla\Web\Asset\LegacyAssetModel;
 class Gdn_Controller extends Gdn_Pluggable {
     use \Garden\MetaTrait, \Vanilla\Browser\ReduxTrait;
 
-
     /** Seconds before reauthentication is required for protected operations. */
     const REAUTH_TIMEOUT = 1200; // 20 minutes
 
@@ -646,16 +645,15 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         // These items are added in a controlled matter for newer client-side apps so are nested.
         $this->_Definitions += [
-            'context' => [], 'ui' => []
+            'ui' => []
         ];
+
+        /** @var \Vanilla\Models\SiteMeta $siteMeta */
+        $siteMeta = Gdn::getContainer()->get(\Vanilla\Models\SiteMeta::class);
+        $this->_Definitions += $siteMeta->value();
 
         $this->_Definitions['useNewFlyouts'] = \Vanilla\FeatureFlagHelper::featureEnabled('NewFlyouts');
 
-        $this->_Definitions['context'] += [
-            'host' => Gdn::request()->domain(),
-            'basePath' => rtrim('/'.trim(Gdn::request()->webRoot(), '/'), '/'),
-            'assetPath' => rtrim('/'.trim(Gdn::request()->getAssetRoot(), '/'), '/'),
-        ];
         $this->_Definitions['ui'] += [
             'siteName' => c('Garden.Title'),
             'siteTitle' => c('Garden.HomepageTitle', c('Garden.Title')),

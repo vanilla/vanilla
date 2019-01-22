@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { t } from "@library/application";
+import { t, getMeta } from "@library/application";
 import ParagraphDropDown from "@rich-editor/components/toolbars/ParagraphDropDown";
 import EmojiPopover from "@rich-editor/components/popovers/EmojiPopover";
 import Permission from "@library/users/Permission";
@@ -21,6 +21,8 @@ interface IProps {
 
 export default function EmbedBar(props: IProps) {
     const { isMobile, isLoading, legacyMode } = props;
+    const mimeTypes = getMeta("upload.allowedExtensions");
+
     return (
         <div className="richEditor-embedBar" ref={props.barRef}>
             <ul
@@ -40,13 +42,19 @@ export default function EmbedBar(props: IProps) {
                 )}
                 <Permission permission="uploads.add">
                     <li className="richEditor-menuItem" role="menuitem">
-                        <EditorUploadButton disabled={isLoading} />
+                        <EditorUploadButton disabled={isLoading} type="image" allowedMimeTypes={mimeTypes} />
                     </li>
                 </Permission>
 
                 <li className="richEditor-menuItem" role="menuitem">
                     <EmbedPopover disabled={isLoading} />
                 </li>
+
+                <Permission permission="uploads.add">
+                    <li className="richEditor-menuItem" role="menuitem">
+                        <EditorUploadButton disabled={isLoading} type="file" allowedMimeTypes={mimeTypes} />
+                    </li>
+                </Permission>
             </ul>
         </div>
     );

@@ -145,12 +145,29 @@ body {
     max-width: 100%;
 }
 
-.PageTitle .Options {
+.Options {
     height: initial;
 
-    .Bookmark {
-        margin-left: $utility-small_padding;
+    > span,
+    > a {
+        margin-left: $utility-baseUnitHalf;
     }
+}
+
+.AdminCheck {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: $icon-default_size;
+    width: $icon-default_size;
+
+    input {
+        margin: 0;
+    }
+}
+
+.PageTitle .Options {
+    height: auto;
 }
 
 .ItemDiscussion {
@@ -215,7 +232,6 @@ a.ChangePicture {
     a {
         font-size: $global-small_fontSize;
         @include ellipsis;
-        max-width: calc(100% - 44px);
     }
 
 }

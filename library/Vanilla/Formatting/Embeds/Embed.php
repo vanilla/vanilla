@@ -170,7 +170,7 @@ abstract class Embed implements InjectableInterface {
      * @param string $url Target URL.
      * @return array|null An array of data if successful. Otherwise, null.
      */
-    abstract function matchUrl(string $url);
+    abstract public function matchUrl(string $url);
 
     /**
      * Normalize oEmbed fields.
@@ -258,7 +258,7 @@ abstract class Embed implements InjectableInterface {
      * @param array $data Structured data for this embed type.
      * @return string Embed code.
      */
-    abstract function renderData(array $data): string;
+    abstract public function renderData(array $data): string;
 
     /**
      * Set whether or not access is allowed to local resources.

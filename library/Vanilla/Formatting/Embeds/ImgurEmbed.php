@@ -45,15 +45,15 @@ class ImgurEmbed extends Embed {
                 $data['attributes']['isAlbum'] = true;
             }
 
-        if (!$data['attributes']['isAlbum']) {
-            // Get the json for th imgur post
-            $jsonResponse = $this->httpRequest($url . ".json");
-            if ($jsonResponse->getStatusCode() == 200) {
-                $decodedResponse = json_decode($jsonResponse, true);
-                $isAlbum = $decodedResponse['data']['image']['is_album'] ?? null;
-                if ($isAlbum === null) {
-                    throw new Exception('Unable to get album.', 400);
-                }
+            if (!$data['attributes']['isAlbum']) {
+                // Get the json for th imgur post
+                $jsonResponse = $this->httpRequest($url . ".json");
+                if ($jsonResponse->getStatusCode() == 200) {
+                    $decodedResponse = json_decode($jsonResponse, true);
+                    $isAlbum = $decodedResponse['data']['image']['is_album'] ?? null;
+                    if ($isAlbum === null) {
+                        throw new Exception('Unable to get album.', 400);
+                    }
                     $data['attributes']['isAlbum'] = $isAlbum;
                 }
             }
@@ -66,9 +66,9 @@ class ImgurEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
-       $postID = htmlspecialchars($data['attributes']['postID']);
-       $dataID = ($data['attributes']['isAlbum']) ? "a/".$postID : $postID;
-       $url = htmlspecialchars("https://imgur.com/");
+        $postID = htmlspecialchars($data['attributes']['postID']);
+        $dataID = ($data['attributes']['isAlbum']) ? "a/".$postID : $postID;
+        $url = htmlspecialchars("https://imgur.com/");
 
         $result = <<<HTML
 <div class="embedExternal embedImgur">
@@ -77,6 +77,6 @@ class ImgurEmbed extends Embed {
     </div>
 </div>
 HTML;
-       return $result;
+        return $result;
     }
 }

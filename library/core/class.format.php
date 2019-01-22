@@ -2200,10 +2200,6 @@ EOT;
         if (is_string($mixed)) {
             if (in_array(strtolower($formatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $formatMethod)) {
                 $mixed = self::$formatMethod($mixed);
-            } elseif (function_exists('format'.$formatMethod)) {
-                deprecated('format'.$formatMethod, 'gdn_formatter_'.$formatMethod, '2015-10-26');
-                $formatMethod = 'format'.$formatMethod;
-                $mixed = $formatMethod($mixed);
             } elseif (function_exists('gdn_formatter_'.$formatMethod)) {
                 $formatMethod = 'gdn_formatter_'.$formatMethod;
                 $mixed = $formatMethod($mixed);

@@ -9,9 +9,7 @@
 \* -------------------------------------------------------------- */
 
 $global-color_vanillaBlue:              #0291DB;
-$global-color_royalBlue:                #0366D6;
-$global-color_pink:                     #F52C6E;
-$global-color_red:                      #D0021B;
+$global-color_pink:                     #D0021B;
 $global-color_grey:                     #555A62;
 $global-color_whitesmoke:               #BCBEC1;
 
@@ -78,8 +76,6 @@ $global-main_width:                     1224px !default;
 $global_spacer:                         $userContent_fontSize * $global-base_lineHeight !default;
 $global-default_timing:                 0.35s !default;
 
-$global_borderRadius:                   3px !default;
-
 $global-color_primary:                  $global-color_vanillaBlue !default;
 $global-color_primaryAlt:               darken($global-color_primary, 8%) !default;
 $global-color_secondary:                $global-color_pink !default;
@@ -87,12 +83,15 @@ $global-color_secondary:                $global-color_pink !default;
 $global-color_bg:                       $global-color_white !default;
 $global-color_fg:                       $global-color_grey !default; // text color | should have high contrast between $global-color_bg
 
+$global-border_color:                   mix($global-color_fg, $global-color_bg, 24%) !default; // Note it's off by default due to the border width
+$global-border-width:                   1px;
+$global-border-style:                   solid;
+$global_borderRadius:                   3px !default;
+
 $global-body_bg:                        $global-color_bg !default;
 
 $link-default_color:                    $global-color_fg !default;
-$link-default-hover_color:              $global-color_royalBlue !default;
-
-$icon-default_size:                     20px !default;
+$link-default-hover_color:              $global-color_primary !default;
 
 
 /* -------------------------------------------------------------- *\
@@ -112,7 +111,7 @@ $theme-heading-hover_color:             $global-color_primary !default;
 \* -------------------------------------------------------------- */
 
 $icon-large_size:                        32px !default;
-$icon-default_size:                      24px !default;
+$icon-default_size:                      20px !default;
 $icon-small_size:                        16px !default;
 
 /* -------------------------------------------------------------- *\
@@ -120,7 +119,7 @@ $icon-small_size:                        16px !default;
 \* -------------------------------------------------------------- */
 
 $theme-photo_size:                       42px !default;
-$theme-photo-small_size:                 28px !default;
+$theme-photo-small_size:                 38px !default;
 $theme-photo_round:                      true !default;
 $theme-photo_borderRadius:               $global_borderRadius !default;
 
@@ -182,6 +181,30 @@ $header-link-hover_color:                $global-color_white !default;
 $header_border:                          0 !default;
 $header_boxShadow:                       none !default;
 
+$headerButton_bg:                        transparent !default;
+$headerButton_fg:                        $header-link_color !default;
+$headerButton_borderColor:               $header-link_color !default;
+
+$headerButton-hover_bg:                  mix($header-link_color, $header_bg, 12%) !default;
+$headerButton-hover_fg:                  $header-link_color !default;
+$headerButton-hover_borderColor:         $header-link_color !default;
+
+$headerMebutton_bg:                      transparent !default;
+$headerMebutton_fg:                      $header-link_color !default;
+$headerMebutton-hover_fg:                $header-link_color !default;
+$headerMebutton-hover_bg:                mix($global-color_fg, $header_bg, 26%) !default;
+$headerMebutton-active_bg:               mix($headerMebutton_fg, $header_bg, 12%) !default;
+
+$headerMeBoxAlert_bg:                    $global-color_secondary !default;
+
+/* -------------------------------------------------------------- *\
+    Mebox Count
+\* -------------------------------------------------------------- */
+
+$meboxCount_bg:                              $global-color_secondary !default;
+$meboxCount_fg:                              $global-color_white !default;
+$meboxCount_borderColor:                     $global-color_secondary !default;
+
 /* -------------------------------------------------------------- *\
     Navigation
 \* -------------------------------------------------------------- */
@@ -197,13 +220,21 @@ $navigation-item_height:                  36px !default;
 $navigation-item_fontWeight:              $global-normal_fontWeight !default;
 $navigation-easing-transition:            cubic-bezier(0, 1, 0, 1) !default;
 
-$navigation-button_bg:                    transparent !default;
-$navigation-button_fg:                    $global-color_white !default;
-$navigation-button_border:                $global-color_white !default;
+$navigationButton_bg:                    transparent !default;
+$navigationButton_fg:                    $global-color_white !default;
+$navigationButton_border:                $global-color_white !default;
 
-$navigation-button-hover_bg:              $global-color_primaryAlt !default;
-$navigation-button-hover_fg:              $global-color_white !default;
-$navigation-button-hover_border:          $navigation-button-hover_bg !default;
+$navigationButton-hover_bg:              $global-color_primaryAlt !default;
+$navigationButton-hover_fg:              $global-color_white !default;
+$navigationButton-hover_border:          $navigationButton-hover_bg !default;
+
+$navigationMeBoxAlert_bg:                 $global-color_secondary !default;
+
+$navigationMebutton_bg:                   transparent !default;
+$navigationMebutton_fg:                   $navigation-link_color !default;
+$navigationMebutton-hover_fg:             $navigation-link_color !default;
+$navigationMebutton-hover_bg:             mix($global-color_fg, $navigation_bg, 26%) !default;
+$navigationMebutton-active_bg:            mix($navigationMebutton_fg, $navigation_bg, 12%) !default;
 
 /* -------------------------------------------------------------- *\
     Content
@@ -289,6 +320,7 @@ $component-meta-link-hover_color:        $theme-heading-hover_color !default;
 $component-meta_fontSize:                $global-small_fontSize !default;
 $component-meta_fontWeight:              $global-normal_fontWeight !default;
 $component-meta_lineHeight:              $global-condensed_lineHeight !default;
+
 /* -------------------------------------------------------------- *\
     Searchbox Featured
 \* -------------------------------------------------------------- */
@@ -346,14 +378,6 @@ $formButton_padding:                     $utility-medium_padding !default;
 $formButton_height:                      $formElement_height !default;
 $formButton_borderRadius:                $formElement_borderRadius !default;
 $formButton_border:                      1px solid !default;
-
-/* -------------------------------------------------------------- *\
-    Bullets
-\* -------------------------------------------------------------- */
-
-$bullet_borderColor:                     $global-color_secondary !default;
-$bullet_bg:                              $global-color_secondary !default;
-$bullet_fg:                              $global-color_white !default;
 
 /* -------------------------------------------------------------- *\
     Breakpoints

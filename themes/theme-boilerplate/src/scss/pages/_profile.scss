@@ -67,6 +67,10 @@ body.Section-Profile {
         margin-top: 0.5em;
     }
 
+    .Gloss:empty {
+        display: none;
+    }
+
     .MainContent {
 
         > .FormTitleWrapper {

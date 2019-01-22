@@ -218,7 +218,17 @@
         }
 
         a {
+            color: $component-meta-link_color;
+            font-weight: inherit;
+            font-size: inherit;
+            line-height: inherit;
             margin-bottom: $utility-small_padding;
+
+            &:focus,
+            &:hover,
+            &:active {
+                color: $component-meta-link-hover_color;
+            }
         }
 
         .Comma {

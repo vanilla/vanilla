@@ -40,6 +40,18 @@ $attachment-title_color              : mix($global-color_fg, $global-color_bg, 9
     &.hasError {
         background: #FFF3D4;
     }
+    &.hasError,
+    &.isLoading {
+        cursor: pointer;
+
+        &:hover {
+            box-shadow: 0 0 0 $embedded-select_borderWidth rgba($embed-focus-color, 0.5) inset;
+        }
+    
+        &:focus {
+            box-shadow: 0 0 0 $embedded-select_borderWidth $embed-focus-color inset;
+        }
+    }
 }
 
 .attachment-link {
@@ -94,6 +106,7 @@ $attachment-title_color              : mix($global-color_fg, $global-color_bg, 9
         top: -#{($formElement_height - $icon-small_size) / 2};
         right: -#{($formElement_height - $icon-small_size) / 2};
     }
+    pointer-events: all;
 }
 
 .attachment-loadingProgress {

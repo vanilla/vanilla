@@ -201,21 +201,6 @@ class Gdn_Format {
     }
 
     /**
-     *
-     * @deprecated 9 Nov 2016
-     * @param array $array
-     * @return string
-     */
-    public static function arrayAsAttributes($array) {
-        deprecated('arrayAsAttributes');
-        $return = '';
-        foreach ($array as $property => $value) {
-            $return .= ' '.$property.'="'.$value.'"';
-        }
-        return $return;
-    }
-
-    /**
      * Takes an object and convert's it's properties => values to an associative
      * array of $array[Property] => Value sets.
      *
@@ -1095,7 +1080,7 @@ class Gdn_Format {
      * @since 2.1
      */
     public static function plainText($body, $format = 'Html', $collapse = false) {
-        if ($format === \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) {
+        if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
             return self::getRichFormatter()->renderPlainText($body);
         }
 
@@ -1130,7 +1115,7 @@ class Gdn_Format {
      * @since 2.1
      */
     public static function excerpt($body, $format = 'Html', $collapse = false) {
-        if ($format === \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) {
+        if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
             return self::getRichFormatter()->renderExcerpt($body);
         }
         $result = Gdn_Format::to($body, $format);
@@ -1445,7 +1430,10 @@ class Gdn_Format {
                 'regex' => ['/https?:\/\/(?:www\.)?instagr(?:\.am|am\.com)\/p\/([\w-]+)/i']
             ],
             'Pinterest' => [
-                'regex' => ['/https?:\/\/(?:www\.)?pinterest\.com\/pin\/([\d]+)/i']
+                'regex' => [
+                    '/https?:\/\/(?:www\.)?pinterest\.com\/pin\/([\d]+)/i',
+                    '/https?:\/\/(?:www\.)?pinterest\.ca\/pin\/([\d]+)/i'
+                ]
             ],
             'Getty' => [
                 'regex' => ['/https?:\/\/embed.gettyimages\.com\/([\w=?&;+-_]*)\/([\d]*)\/([\d]*)/i']
@@ -2494,8 +2482,11 @@ EOT;
      *
      * @return string
      */
-    public static function quoteEmbed(string $body, string $format): string {
-        if ($format === \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) {
+    public static function quoteEmbed($body, string $format): string {
+        if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
+            if (is_array($body)) {
+                $body = json_encode($body);
+            }
             return self::getRichFormatter()->renderQuote($body);
         }
 

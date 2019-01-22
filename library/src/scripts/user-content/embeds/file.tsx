@@ -6,10 +6,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { registerEmbedComponent, IEmbedProps, IFileUploadData } from "@library/embeds";
-import { onContent } from "@library/application";
+import { onContent, onReady } from "@library/application";
+import Attachment from "@library/components/attachments/Attachment";
+import { AttachmentType, mimeTypeToAttachmentType } from "@library/components/attachments";
+import BaseEmbed from "@library/user-content/embeds/BaseEmbed";
 
 export function initFileEmbeds() {
     registerEmbedComponent("file", FileEmbed);
+    mountFileEmbeds();
     onContent(mountFileEmbeds);
 }
 
@@ -40,16 +44,20 @@ export function mountFileEmbeds() {
  *
  * This can either recieve the post format and body (when created directly in the editor) or be given the fully rendered content (when mounting on top of existing server rendered DOM stuff).
  */
-export class FileEmbed extends React.Component<IEmbedProps<IFileUploadData>> {
+export class FileEmbed extends BaseEmbed<IEmbedProps<IFileUploadData>> {
     public render() {
         const { url, attributes } = this.props.data;
         const { type, size, dateInserted, name } = attributes;
+        const attachmentType = mimeTypeToAttachmentType(type);
         return (
-            <p className="tempFile">
-                <a href={url} download>
-                    {name}
-                </a>
-            </p>
+            <Attachment
+                type={attachmentType}
+                size={size}
+                name={name}
+                url={url}
+                dateUploaded={dateInserted}
+                mimeType={type}
+            />
         );
     }
 }

@@ -104,8 +104,8 @@ $quickSearch_color:                      $global-color_white !default;
 
     @include clearfix;
 
-    right: 0;
-    top: calc(#{$pager_height} + #{$utility-medium_padding});
+    right: -2px;
+    top: 100%;
 
     .InputBox {
         margin-right: $utility-medium_padding;

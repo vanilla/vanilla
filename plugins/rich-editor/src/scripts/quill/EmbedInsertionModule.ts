@@ -14,6 +14,7 @@ import getStore from "@library/state/getStore";
 import { getIDForQuill, insertBlockBlotAt } from "@rich-editor/quill/utility";
 import { IStoreState } from "@rich-editor/@types/store";
 import { isFileImage } from "@library/utility";
+import ProgressEventEmitter from "@library/ProgressEventEmitter";
 
 /**
  * A Quill module for managing insertion of embeds/loading/error states.
@@ -63,10 +64,15 @@ export default class EmbedInsertionModule extends Module {
     };
 
     private pasteHandler = (event: ClipboardEvent) => {
-        const image = getPastedFile(event);
-        if (image) {
-            const imagePromise = uploadFile(image).then();
-            this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });
+        const file = getPastedFile(event);
+        if (!file) {
+            return;
+        }
+
+        if (isFileImage(file)) {
+            this.createImageEmbed(file);
+        } else {
+            this.createFileEmbed(file);
         }
     };
 
@@ -93,14 +99,16 @@ export default class EmbedInsertionModule extends Module {
     }
 
     public createFileEmbed(file: File) {
-        const filePromise = uploadFile(file).then(data => {
+        const progressEventEmitter = new ProgressEventEmitter();
+
+        const filePromise = uploadFile(file, { onUploadProgress: progressEventEmitter.emit }).then(data => {
             return {
                 url: data.url,
                 type: "file",
                 attributes: data,
             };
         });
-        this.createEmbed({ loaderData: { type: "image" }, dataPromise: filePromise });
+        this.createEmbed({ loaderData: { type: "file", file, progressEventEmitter }, dataPromise: filePromise });
     }
 
     /**

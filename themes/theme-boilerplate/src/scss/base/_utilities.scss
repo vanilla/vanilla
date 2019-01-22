@@ -34,7 +34,7 @@
     font-family: $global-heading_fontFamily;
     font-weight: $global-heading_fontWeight;
     font-size: $global-large_fontSize;
-    line-height: $global-base_lineHeight;
+    line-height: $global-condensed_lineHeight;
 }
 
 @mixin font-heading-link() {
@@ -167,16 +167,14 @@
 @mixin listItem {
     padding-top: $component-base_padding;
     padding-bottom: $component-base_padding;
+    background: $component_bg;
 
     @if $component_lateralBorder == true {
         padding-left: $component-base_padding;
         padding-right: $component-base_padding;
-    }
-
-    background: $component_bg;
-
-    &[class*="Depth"] {
-        padding-left: $component-base_padding !important;
+    } @else {
+        padding-left: 0;
+        padding-right: 0;
     }
 
     @if $component-item_spacing == 0 {
@@ -191,15 +189,19 @@
             @if $component_lateralBorder == true {
                 border-top-left-radius: $component_borderRadius;
                 border-top-right-radius: $component_borderRadius;
+            } @else {
+                border-top-width: 0;
+                padding-top: 0;
             }
         }
 
         &:last-child {
+            border-bottom: $component_border;
+
             @if $component_lateralBorder == true {
                 border-bottom-left-radius: $component_borderRadius;
                 border-bottom-right-radius: $component_borderRadius;
             }
-            border-bottom: $component_border;
         }
 
     } @else {

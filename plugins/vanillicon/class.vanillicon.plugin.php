@@ -24,7 +24,7 @@ class VanilliconPlugin extends Gdn_Plugin {
      * Perform any necessary database or configuration updates.
      */
     public function structure() {
-        touchConfig('Plugins.Vanillicon.Type', 'v2');
+        \Gdn::config()->touch('Plugins.Vanillicon.Type', 'v2');
     }
 
     /**

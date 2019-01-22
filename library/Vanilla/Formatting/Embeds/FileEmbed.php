@@ -54,8 +54,8 @@ class FileEmbed extends Embed {
         $jsonData = htmlspecialchars(json_encode($data), ENT_QUOTES, 'UTF-8');
 
         return <<<HTML
-<div class="embedExternal embedText embedQuote">
-    <div class="embedExternal-content embedText-content embedQuote-content">
+<div class="embedExternal">
+    <div class="embedExternal-content">
         <div class="js-fileEmbed embedResponsive-initialLink" data-json='$jsonData'><a href="$sanitizedUrl" download>$sanitizedUrl</a></div>
     </div>
 </div>

@@ -96,7 +96,8 @@
     }
 
     .PageDescription {
-        margin: 0 0 $utility-large_padding;
+        line-height: $global-excerpt_lineHeight;
+        margin: $utility-large_padding 0;
     }
 
     .PageDescription:empty {

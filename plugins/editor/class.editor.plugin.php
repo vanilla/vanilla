@@ -1452,7 +1452,7 @@ class EditorPlugin extends Gdn_Plugin {
      * This way, the editor plugin always takes precedence.
      */
     public function setup() {
-        touchConfig([
+        \Gdn::config()->touch([
             'Garden.MobileInputFormatter' => 'TextEx',
             'Plugins.editor.ForceWysiwyg' => false
         ]);
@@ -1465,7 +1465,7 @@ class EditorPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function structure() {
-         $pluginEditors = [
+        $pluginEditors = [
             'cleditor',
             'ButtonBar',
             'Emotify',
@@ -1477,7 +1477,7 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         // Set to false by default, so change in config if uploads allowed.
-        touchConfig('Garden.AllowFileUploads', true);
+        \Gdn::config()->touch('Garden.AllowFileUploads', true);
 
         $structure = Gdn::structure();
         $structure

@@ -198,6 +198,14 @@ $headerMebutton-active_bg:               mix($headerMebutton_fg, $header_bg, 12%
 $headerMeBoxAlert_bg:                    $global-color_secondary !default;
 
 /* -------------------------------------------------------------- *\
+    Mebox Count
+\* -------------------------------------------------------------- */
+
+$meboxCount_bg:                              $global-color_secondary !default;
+$meboxCount_fg:                              $global-color_white !default;
+$meboxCount_borderColor:                     $global-color_secondary !default;
+
+/* -------------------------------------------------------------- *\
     Navigation
 \* -------------------------------------------------------------- */
 
@@ -364,14 +372,6 @@ $formButton_padding:                     $utility-medium_padding !default;
 $formButton_height:                      $formElement_height !default;
 $formButton_borderRadius:                $formElement_borderRadius !default;
 $formButton_border:                      1px solid !default;
-
-/* -------------------------------------------------------------- *\
-    Bullets
-\* -------------------------------------------------------------- */
-
-$bullet_bg:                              transparent !default;
-$bullet_fg:                              $global-color_primary !default;
-$bullet_borderColor:                     $global-color_primary !default;
 
 /* -------------------------------------------------------------- *\
     Breakpoints

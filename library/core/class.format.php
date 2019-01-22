@@ -201,21 +201,6 @@ class Gdn_Format {
     }
 
     /**
-     *
-     * @deprecated 9 Nov 2016
-     * @param array $array
-     * @return string
-     */
-    public static function arrayAsAttributes($array) {
-        deprecated('arrayAsAttributes');
-        $return = '';
-        foreach ($array as $property => $value) {
-            $return .= ' '.$property.'="'.$value.'"';
-        }
-        return $return;
-    }
-
-    /**
      * Takes an object and convert's it's properties => values to an associative
      * array of $array[Property] => Value sets.
      *

@@ -1430,7 +1430,10 @@ class Gdn_Format {
                 'regex' => ['/https?:\/\/(?:www\.)?instagr(?:\.am|am\.com)\/p\/([\w-]+)/i']
             ],
             'Pinterest' => [
-                'regex' => ['/https?:\/\/(?:www\.)?pinterest\.com\/pin\/([\d]+)/i']
+                'regex' => [
+                    '/https?:\/\/(?:www\.)?pinterest\.com\/pin\/([\d]+)/i',
+                    '/https?:\/\/(?:www\.)?pinterest\.ca\/pin\/([\d]+)/i'
+                ]
             ],
             'Getty' => [
                 'regex' => ['/https?:\/\/embed.gettyimages\.com\/([\w=?&;+-_]*)\/([\d]*)\/([\d]*)/i']

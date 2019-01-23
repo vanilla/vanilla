@@ -13,7 +13,7 @@ and we couldn't be happier if you've decided to use Vanilla to grow yours.
 
 | Forum                                                                                                         | Rich Editor                                                                                                   | Dashboard                                                                                                     |
 | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| ![image](https://user-images.githubusercontent.com/1770056/51422490-412f6d80-1b7d-11e9-929a-42f59e4d1913.png) | ![image](https://user-images.githubusercontent.com/1770056/51422531-345f4980-1b7e-11e9-9a7e-9038394f6786.png) | ![image](https://user-images.githubusercontent.com/1770056/51422470-00cfef80-1b7d-11e9-9d3f-25ada61cecea.png) |
+| ![image](https://user-images.githubusercontent.com/1770056/51584623-2a9e5480-1ea4-11e9-9650-b37b0d6da609.png) | ![image](https://user-images.githubusercontent.com/1770056/51584799-e19ad000-1ea4-11e9-9d48-58c673f61076.png) | ![image](https://user-images.githubusercontent.com/1770056/51422470-00cfef80-1b7d-11e9-9d3f-25ada61cecea.png) |
 
 Every community is unique. Vanilla is a finely-crafted platform on which designers and developers
 can build a custom-tailored environment that meets your community's particular needs.

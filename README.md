@@ -75,7 +75,7 @@ All open source releases (included pre-releases) are tagged.
 | **Version**         | `2.6.x`            | `2.5.x`         | `2.8.dev.6`          | `2.7`             |
 | **Initial Release** | Aug 17, 2018       | Dec 23, 2017    | Jan 18, 2019         | Oct 28, 2018      |
 | **Last Updated**    | Oct 28, 2018       | Aug 17, 2018    | Jan 18, 2019         | Dec 12, 2018      |
-| **EOL**             | Undecided          | With 2.8 final  | With 2.8 final       | With 2.8 final    |
+| **EOL**             | With 2.9 final     | With 2.8 final  | With 2.8 final       | With 2.8 final    |
 
 Refer to the [OSS changelog](https://docs.vanillaforums.com/developer/changelog/) and the [Vanilla Cloud changelog](https://docs.vanillaforums.com/help/releases/) to track active changes between releases.
 

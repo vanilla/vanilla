@@ -1007,13 +1007,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $this->$Property = Gdn::factory($Class);
             } elseif (class_exists($Class)) {
                 // Instantiate as an object.
-                $ReflectionClass = new ReflectionClass($Class);
-                // Is this class a singleton?
-                if ($ReflectionClass->implementsInterface("ISingleton")) {
-                    eval('$this->'.$Property.' = '.$Class.'::GetInstance();');
-                } else {
-                    $this->$Property = new $Class();
-                }
+                $this->$Property = new $Class();
             } else {
                 trigger_error(errorMessage('The "'.$Class.'" class could not be found.', $this->ClassName, '__construct'), E_USER_ERROR);
             }

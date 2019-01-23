@@ -190,6 +190,11 @@ class PostController extends VanillaController {
 
         touchValue('Type', $this->Data, 'Discussion');
 
+        // Remove Announce parameter if it was injected into the form.
+        if (!CategoryModel::checkPermission($category['CategoryID'], 'Vanilla.Discussions.Announce')) {
+            $this->Form->removeFormValue('Announce');
+        }
+
         if (!$useCategories || $this->ShowCategorySelector) {
             // See if we should fill the CategoryID value.
             $allowedCategories = CategoryModel::getByPermission(
@@ -660,7 +665,12 @@ class PostController extends VanillaController {
             $filters = ['Score'];
             $FormValues = $this->filterFormValues($FormValues, $filters);
             $FormValues = $this->CommentModel->filterForm($FormValues);
+            $formDiscussion = $this->DiscussionModel->getID($this->Form->_FormValues['DiscussionID']);
 
+            if ($formDiscussion && $formDiscussion->Closed === 1 && !CategoryModel::checkPermission($formDiscussion->CategoryID, 'Vanilla.Discussions.Close')) {
+                throw new Exception(t('You cannot comment in a closed discussion.'));
+            }
+            
             if (!$Editing) {
                 unset($FormValues['CommentID']);
             }

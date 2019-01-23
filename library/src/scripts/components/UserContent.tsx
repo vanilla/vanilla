@@ -1,12 +1,12 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import * as React from "react";
 import className from "classnames";
-import { initAllUserContent } from "../user-content/index";
+import { initAllUserContent } from "@library/user-content";
 
 interface IProps {
     className?: string;

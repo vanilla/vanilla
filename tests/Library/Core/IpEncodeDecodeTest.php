@@ -1,18 +1,16 @@
 <?php
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Library\Core;
-
-use VanillaTests\SharedBootstrapTestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Test some of the global functions that operate (or mostly operate) on arrays.
  */
-class IpEncodeDecodeTest extends SharedBootstrapTestCase {
+class IpEncodeDecodeTest extends TestCase {
     /**
      * Test encoding/decoding IPs in array.
      *

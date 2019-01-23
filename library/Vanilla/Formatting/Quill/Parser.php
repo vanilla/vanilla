@@ -1,12 +1,13 @@
 <?php
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Formatting\Quill;
 
+use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Quill\Blots;
 use Vanilla\Formatting\Quill\Formats;
 use Vanilla\Formatting\Quill\Blots\AbstractBlot;
@@ -104,6 +105,7 @@ class Parser {
      * @return BlotGroupCollection
      */
     public function parse(array $operations, string $parseMode = self::PARSE_MODE_NORMAL): BlotGroupCollection {
+        $this->stripTrailingNewlines($operations);
         $operations = $this->splitPlainTextNewlines($operations);
         return new BlotGroupCollection($operations, $this->blotClasses, $parseMode);
     }
@@ -126,6 +128,23 @@ class Parser {
         }
 
         return $mentionUsernames;
+    }
+
+    /**
+     * Attempt to convert a JSON string into an array of operations.
+     *
+     * @param string $json
+     *
+     * @return array
+     * @throws FormattingException If valid operations could not be produced.
+     */
+    public static function jsonToOperations(string $json): array {
+        $operations = json_decode($json, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($operations)) {
+            throw new FormattingException("JSON could not be converted into quill operations.\n $json");
+        }
+        return $operations;
     }
 
     /**
@@ -238,5 +257,21 @@ class Parser {
         }
 
         return $newOperations;
+    }
+
+    /**
+     * Strip trailing whitespace off of the end of rich-editor contents.
+     *
+     * The last line is always a line terminator so we know that we can strip strip any whitespace and replace it with
+     * a single line-terminator.
+     *
+     * @param array[] $operations The quill operations to loop through.
+     */
+    private function stripTrailingNewlines(array &$operations) {
+        $lastIndex = count($operations) - 1;
+        $lastOp = &$operations[$lastIndex];
+        if ($lastOp && $this->isOperationBareInsert($lastOp)) {
+            $lastOp["insert"] = preg_replace('/\s+$/', "\n", $lastOp["insert"]);
+        }
     }
 }

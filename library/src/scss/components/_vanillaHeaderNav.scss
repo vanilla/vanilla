@@ -1,16 +1,19 @@
 /*!
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-$vanillaHeaderNav-vertical_borderWidth: 2px;
+$vanillaHeaderNav-vertical_borderWidth: 3px;
 $vanillaHeaderNav-active_borderColor: rgba($global-color_bg, .9);
-$vanillaHeaderNav-active_bottomOffset: 2px;
+$vanillaHeaderNav-active_bottomOffset: 5px;
+$vanillaHeaderNav-item_size: $formElement_height;
+
 
 
 .headerNavigation-items {
     display: flex;
+    align-items: center;
     flex-wrap: nowrap;
     height: 100%;
     color: inherit;
@@ -25,7 +28,7 @@ $vanillaHeaderNav-active_bottomOffset: 2px;
 
 .vanillaHeaderNav-item {
     @include flexCenterContent;
-    height: $vanillaHeader_height;
+    height: $vanillaHeaderNav-item_size;
 
     @include mediaQuery-panelLayout_oneColumn {
         height: $vanillaHeader_mobile_height;
@@ -36,13 +39,27 @@ $vanillaHeaderNav-active_bottomOffset: 2px;
     display: flex;
     justify-content: center;
     align-items: stretch;
-    color: inherit;
-    height: $vanillaHeader_height;
+    height: $vanillaHeaderNav-item_size;
 
     @include mediaQuery-panelLayout_oneColumn {
         height: $vanillaHeader_mobile_height;
     }
+
+    &.isCurrent {
+        font-weight: $global-fontWeight_semiBold;
+    }
+
+    &:hover,
+    &.focus-visible {
+        .vanillaHeaderNav-linkContent {
+            &::after {
+                border-bottom-color: $vanillaHeaderNav-active_borderColor;
+            }
+        }
+    }
 }
+
+
 
 .vanillaHeaderNav-linkContent {
     @include flexCenterContent;
@@ -57,18 +74,10 @@ $vanillaHeaderNav-active_bottomOffset: 2px;
         left: 0;
         width: 100%;
         margin-bottom: -$vanillaHeaderNav-active_bottomOffset;
-
-
         border: {
             style: solid;
             color: transparent;
             width: $vanillaHeaderNav-vertical_borderWidth 0;
-        }
-    }
-
-    &.isCurrent {
-        &::after {
-            border-bottom-color: $vanillaHeaderNav-active_borderColor;
         }
     }
 }

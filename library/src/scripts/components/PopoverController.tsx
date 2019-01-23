@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -228,7 +228,10 @@ export default class PopoverController extends React.PureComponent<
         });
 
         if (parentElement && parentElement.contains(activeElement)) {
-            this.buttonRef.current && this.buttonRef.current.focus();
+            if (this.buttonRef.current) {
+                this.buttonRef.current.focus();
+                this.buttonRef.current.classList.add("focus-visible");
+            }
         }
         if (this.props.onVisibilityChange) {
             this.props.onVisibilityChange(false);

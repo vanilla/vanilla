@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -17,6 +17,7 @@ use Garden\Container\Container;
  * Class SharedBootstrapTestCase.
  */
 class SharedBootstrapTestCase extends TestCase {
+
     use BootstrapTrait;
 
     /**
@@ -34,7 +35,6 @@ class SharedBootstrapTestCase extends TestCase {
             } else {
                 BootstrapTrait::setUpBeforeClass();
             }
-
         } else {
             if (!self::containerIsNull($currentContainer) && $currentContainer !== self::$container) {
                 $containerCorruption = true;

@@ -1,9 +1,9 @@
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import BlockBlot from "@rich-editor/quill/blots/blocks/BlockBlot";
+import BlockBlot from "quill/blots/block";
 
 /**
  * A Block Blot implementing class matching functionality and representation in the outputted delta.

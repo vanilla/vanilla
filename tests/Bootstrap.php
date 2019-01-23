@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -246,7 +246,23 @@ class Bootstrap {
 
             ->rule(\Vanilla\Formatting\Quill\Renderer::class)
             ->setShared(true)
-        ;
+
+            ->rule('BBCodeFormatter')
+            ->setClass(\BBCode::class)
+            ->setShared(true)
+
+            ->rule('HtmlFormatter')
+            ->setClass(\VanillaHtmlFormatter::class)
+            ->setShared(true)
+
+            ->rule(\Vanilla\Formatting\FormatService::class)
+            ->addCall('registerFormat', [\Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY, \Vanilla\Formatting\Formats\RichFormat::class])
+            ->setShared(true)
+
+            ->rule('HtmlFormatter')
+            ->setClass(\VanillaHtmlFormatter::class)
+            ->setShared(true)
+            ;
     }
 
     private function initializeAddons(Container $dic) {

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -92,6 +92,7 @@ class EmbedManager {
             ->addEmbed($dic->get(GiphyEmbed::class))
             ->addEmbed($dic->get(WistiaEmbed::class))
             ->addEmbed($dic->get(CodePenEmbed::class))
+            ->addEmbed($dic->get(FileEmbed::class))
             ->addEmbed($dic->get(ImageEmbed::class), self::PRIORITY_LOW);
     }
 

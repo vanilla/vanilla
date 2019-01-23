@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -72,11 +72,7 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                                 logoClassName="vanillaHeader-logo isCentred"
                             />
                             {isGuest ? (
-                                <VanillaHeaderNav
-                                    linkClassName="vanillaHeader-navLink"
-                                    linkContentClassName="vanillaHeader-navLinkContent"
-                                    className="vanillaHeader-nav vanillaHeader-guestNav"
-                                >
+                                <VanillaHeaderNav className="vanillaHeader-nav vanillaHeader-guestNav">
                                     <VanillaHeaderNavItem to={`/entry/signin?target=${window.location.pathname}`}>
                                         {signIn("vanillaHeader-signInIcon")}
                                     </VanillaHeaderNavItem>

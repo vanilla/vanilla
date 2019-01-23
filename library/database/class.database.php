@@ -3,7 +3,7 @@
  * Database manager
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0
@@ -596,7 +596,7 @@ class Gdn_Database {
             $name = $this->Engine.'Driver';
             $this->_SQL = Gdn::factory($name);
             if (!$this->_SQL) {
-                $this->_SQL = new stdClass();
+                throw new Exception("Could not instantiate database driver '$name'.");
             }
             $this->_SQL->Database = $this;
         }

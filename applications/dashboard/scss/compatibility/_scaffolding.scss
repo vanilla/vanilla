@@ -1,7 +1,11 @@
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 em {
-  font-style: italic;
+    font-style: italic;
+}
+
+.js-focus-visible :focus:not(.focus-visible) {
+    outline: none;
 }

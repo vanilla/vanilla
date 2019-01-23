@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -55,7 +55,6 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                 exitHandler={onCancel}
                 titleID={this.titleID}
                 elementToFocusOnExit={this.props.elementToFocusOnExit}
-                className="isCompact"
             >
                 <Frame>
                     <FrameHeader

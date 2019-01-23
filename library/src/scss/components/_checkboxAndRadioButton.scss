@@ -1,13 +1,13 @@
 /*!
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 $checkRadio-border_width                    : $formElement_borderWidth !default;
 $checkRadio-check_color                     : $global-color_bg !default;
 $checkRadio-bg                              : $global-color_bg !default;
-$checkRadio-border_radius                   : $global_borderRadius;
+$checkRadio-border_radius                   : 2px;
 
 $checkRadio-borderColor                     : mixContentBgAndFg(80%) !default;
 $checkRadio-width                           : 16px;

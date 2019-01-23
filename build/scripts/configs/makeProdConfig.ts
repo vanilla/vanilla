@@ -37,7 +37,7 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
         path: path.join(DIST_DIRECTORY, section),
         library: `vanilla${section}`,
     };
-    baseConfig.devtool = "source-map";
+    baseConfig.devtool = "cheap-source-map";
     baseConfig.optimization = {
         noEmitOnErrors: true,
         namedModules: false,
@@ -83,6 +83,12 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
         minimizer: [
             new TerserWebpackPlugin({
                 cache: true,
+                // Exclude swagger-ui from minification which is a large bundle and costly to minify.
+                exclude: /swagger-ui/,
+                terserOptions: {
+                    warnings: false,
+                    ie8: false,
+                },
                 parallel: true,
                 sourceMap: true, // set to true if you want JS source maps
             }),

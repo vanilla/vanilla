@@ -1,11 +1,12 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { IApiError, IApiResponse } from "@library/@types/api";
 import { AxiosResponse, AxiosInstance } from "axios";
+import { logError } from "@library/utility";
 
 /**
  * Base class for creating redux actions.
@@ -110,6 +111,7 @@ export default class ReduxActions {
         meta: Meta,
         error: IApiError,
     ): IApiErrorAction<ActionType, Meta> {
+        logError(error);
         return {
             type,
             meta,

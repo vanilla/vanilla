@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -105,7 +105,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                 blurInputOnSelect={false}
                 allowCreateWhileLoading={true}
                 controlShouldRenderValue={false}
-                isDisabled={disabled || isLoading}
+                isDisabled={disabled}
                 loadOptions={this.props.loadOptions}
                 menuIsOpen={this.isMenuVisible}
                 classNamePrefix={this.prefix}
@@ -211,7 +211,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
             <div className="searchBar">
                 <form className="searchBar-form" onSubmit={this.onFormSubmit}>
                     {!this.props.noHeading && (
-                        <Heading depth={1} className="searchBar-heading" title={this.props.title}>
+                        <Heading depth={1} className="searchBar-heading pageSmallTitle" title={this.props.title}>
                             <label className="searchBar-label" htmlFor={this.searchInputID}>
                                 {this.props.titleAsComponent ? this.props.titleAsComponent : this.props.title}
                             </label>

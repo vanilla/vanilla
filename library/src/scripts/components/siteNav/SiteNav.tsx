@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -12,6 +12,8 @@ import classNames from "classnames";
 import * as React from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { t } from "@library/application";
+import { PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
+import Heading from "@library/components/Heading";
 
 interface IProps extends RouteComponentProps<{}> {
     activeRecord: IActiveRecord;
@@ -20,6 +22,8 @@ interface IProps extends RouteComponentProps<{}> {
     children: INavigationTreeItem[];
     collapsible: boolean;
     bottomCTA: React.ReactNode;
+    onItemHover?(item: INavigationTreeItem);
+    title?: string;
 }
 
 export interface IState {
@@ -31,32 +35,44 @@ export interface IState {
  */
 export class SiteNav extends React.Component<IProps, IState> {
     public render() {
-        const content =
-            this.props.children && this.props.children.length > 0
-                ? this.props.children.map((child, i) => {
-                      return (
-                          <SiteNavNode
-                              {...child}
-                              activeRecord={this.props.activeRecord}
-                              key={`navNode-${i}`}
-                              titleID={this.titleID}
-                              depth={0}
-                              collapsible={this.props.collapsible}
-                          />
-                      );
-                  })
-                : null;
-        return (
-            <nav onKeyDownCapture={this.handleKeyDown} className={classNames("siteNav", this.props.className)}>
-                <h2 id={this.titleID} className="sr-only">
-                    {t("Site Navigation")}
-                </h2>
-                <ul className="siteNav-children hasDepth-0" role="tree" aria-labelledby={this.titleID}>
-                    {content}
-                </ul>
-                {this.props.bottomCTA && this.props.bottomCTA}
-            </nav>
-        );
+        const hasChildren = this.props.children && this.props.children.length > 0;
+        const content = hasChildren
+            ? this.props.children.map((child, i) => {
+                  return (
+                      <SiteNavNode
+                          {...child}
+                          activeRecord={this.props.activeRecord}
+                          key={`navNode-${i}`}
+                          titleID={this.titleID}
+                          depth={0}
+                          collapsible={this.props.collapsible}
+                          onItemHover={this.props.onItemHover}
+                      />
+                  );
+              })
+            : null;
+
+        if (hasChildren || this.props.bottomCTA) {
+            return (
+                <nav onKeyDownCapture={this.handleKeyDown} className={classNames("siteNav", this.props.className)}>
+                    {this.props.title ? (
+                        <PanelWidgetVerticalPadding>
+                            <Heading title={this.props.title} className="siteNav-title" />
+                        </PanelWidgetVerticalPadding>
+                    ) : (
+                        <h2 id={this.titleID} className="sr-only">
+                            {t("Navigation")}
+                        </h2>
+                    )}
+                    <ul className="siteNav-children hasDepth-0" role="tree" aria-labelledby={this.titleID}>
+                        {content}
+                    </ul>
+                    {this.props.bottomCTA}
+                </nav>
+            );
+        } else {
+            return null;
+        }
     }
 
     private id = getRequiredID(this.props, "siteNav");

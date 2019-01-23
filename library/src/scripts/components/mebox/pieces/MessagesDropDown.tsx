@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -25,6 +25,7 @@ interface IProps extends IMessagesContentsProps {
     className?: string;
     contentsClassName?: string;
     countUnread: number;
+    toggleContentsClassName?: string;
 }
 
 interface IState {
@@ -60,6 +61,7 @@ export class MessagesDropDown extends React.Component<IProps, IState> {
                         open={this.state.open}
                         count={this.props.countUnread}
                         countClass={this.props.countClass}
+                        className={this.props.toggleContentsClassName}
                     />
                 }
                 onVisibilityChange={this.setOpen}

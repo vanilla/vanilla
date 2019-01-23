@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -41,6 +41,7 @@ $datePicker-padding: $utility-baseUnit * 1.5;
 .DayPicker-Day {
     border-radius: $global_borderRadius;
     padding: $datePicker-padding;
+    white-space: nowrap;
 
     &:hover {
         background-color: $state-hover_color;
@@ -59,40 +60,3 @@ $datePicker-padding: $utility-baseUnit * 1.5;
     color: $global-color-primary;
 }
 
-// Date range
-
-.dateRange-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: flex-start;
-}
-
-.dateRange-column {
-    width: calc(50% - #{$utility-baseUnit});
-}
-
-.inputBlock-labelText {
-    &.dateRangeOfLabel {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        .icon-help {
-            display: block;
-            opacity: .5;
-        }
-    }
-}
-
-.dateRangeOfLabel-help {
-    display: block;
-    margin-left: auto;
-    width: $icon-small_size;
-    height: $icon-small_size;
-}
-
-.DayPicker-Day,
-.DayPicker-Weekday {
-    white-space: nowrap;
-}

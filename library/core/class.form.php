@@ -4,7 +4,7 @@
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Lincoln Russell <lincoln@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0
@@ -2968,7 +2968,7 @@ PASSWORDMETER;
 
             touchValue('Control', $row, 'TextBox');
 
-            if (strtolower($row['Control']) == 'callback') {
+            if (strtolower($row['Control']) == 'callback' || strtolower($row['Control']) == 'imageuploadpreview') {
                 $itemWrap = '';
             } else {
                 $defaultWrap = ['<li class="'.$this->getStyle('form-group')."\">\n", "\n</li>\n"];
@@ -3033,6 +3033,9 @@ PASSWORDMETER;
                 case 'imageupload':
                     $result .= $labelWrap
                         .$this->imageUploadWrap($row['Name'], $row['Options']);
+                    break;
+                case 'imageuploadpreview':
+                    $result .= $this->imageUploadPreview($row['Name'], $labelCode, $description, $row['RemoveUrl'] ?? '', $row['Options']);
                     break;
                 case 'textbox':
                     $row['Options']['Wrap'] = true;

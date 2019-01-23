@@ -1,10 +1,10 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-use Vanilla\Web\Assets\LegacyAssetModel;
+use Vanilla\Web\Asset\LegacyAssetModel;
 
 /**
  * Class EmailTemplate

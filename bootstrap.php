@@ -4,12 +4,15 @@ use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
 use Vanilla\InjectableInterface;
+use Vanilla\Contracts;
+use Vanilla\Utility\ContainerUtils;
+use \Vanilla\Formatting\Formats;
 
 if (!defined('APPLICATION')) exit();
 /**
  * Bootstrap.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0
@@ -33,6 +36,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule(InjectableInterface::class)
     ->addCall('setDependencies')
 
+    ->rule(DateTimeInterface::class)
+    ->setAliasOf(DateTimeImmutable::class)
+    ->setConstructorArgs([null, null])
+
     // Cache
     ->rule('Gdn_Cache')
     ->setShared(true)
@@ -43,6 +50,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Gdn_Configuration')
     ->setShared(true)
     ->addAlias('Config')
+    ->addAlias(Contracts\ConfigurationInterface::class)
 
     // AddonManager
     ->rule(Vanilla\AddonManager::class)
@@ -56,6 +64,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
         PATH_CACHE
     ])
     ->addAlias('AddonManager')
+    ->addAlias(Contracts\AddonProviderInterface::class)
     ->addCall('registerAutoloader')
 
     // ApplicationManager
@@ -144,6 +153,22 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addAlias(Gdn::AliasDispatcher)
 
+    ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
+    ->setConstructorArgs([
+        'deploymentTime' => ContainerUtils::config('Garden.Deployed')
+    ])
+
+    ->rule(\Vanilla\Web\Asset\WebpackAssetProvider::class)
+    ->addCall('setHotReloadEnabled', [
+        ContainerUtils::config('HotReload.Enabled'),
+        ContainerUtils::config('HotReload.IP'),
+    ])
+    ->addCall('setLocaleKey', [ContainerUtils::currentLocale()])
+    ->addCall('setCacheBusterKey', [ContainerUtils::cacheBuster()])
+
+    ->rule(\Vanilla\Web\Asset\LegacyAssetModel::class)
+    ->setConstructorArgs([ContainerUtils::cacheBuster()])
+
     ->rule(\Garden\Web\Dispatcher::class)
     ->setShared(true)
     ->addCall('addRoute', ['route' => new Reference('@api-v2-route'), 'api-v2'])
@@ -220,7 +245,6 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
     ->rule('HtmlFormatter')
     ->setClass(VanillaHtmlFormatter::class)
-    ->addAlias(VanillaHtmlFormatter::class)
     ->setShared(true)
 
     ->rule(\Vanilla\Formatting\Quill\Renderer::class)
@@ -241,6 +265,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setClass('Gdn_Smarty')
     ->setShared(true)
 
+    ->rule('ViewHandler.twig')
+    ->setClass(\Vanilla\Web\LegacyTwigViewHandler::class)
+    ->setShared(true)
+
     ->rule('Gdn_Form')
     ->addAlias('Form')
 
@@ -251,6 +279,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule(Vanilla\PageScraper::class)
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
     ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
+    ->setShared(true)
+
+    ->rule(Vanilla\Formatting\FormatService::class)
+    ->addCall('registerFormat', [Formats\RichFormat::FORMAT_KEY, Formats\RichFormat::class])
     ->setShared(true)
 ;
 
@@ -368,7 +400,7 @@ $dic->call(function (
 });
 
 // Send out cookie headers.
-register_shutdown_function(function() use ($dic) {
+register_shutdown_function(function () use ($dic) {
     $dic->call(function(Garden\Web\Cookie $cookie) {
         $cookie->flush();
     });

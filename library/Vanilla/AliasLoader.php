@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -24,7 +24,7 @@ class AliasLoader {
      */
     protected static function provideAliases(): array {
         return [
-            \Vanilla\Web\Assets\LegacyAssetModel::class => ['AssetModel'],
+            \Vanilla\Web\Asset\LegacyAssetModel::class => ['AssetModel'],
         ];
     }
 }

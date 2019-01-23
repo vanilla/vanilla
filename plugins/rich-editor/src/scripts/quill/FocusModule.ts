@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -47,14 +47,17 @@ export default class EmbedFocusModule extends Module {
         super(quill, options);
 
         this.editorRoot = this.quill.root.closest(".richEditor") as HTMLElement;
-        this.formWrapper = this.editorRoot.closest(".FormWrapper") as HTMLElement;
+        this.formWrapper = (this.editorRoot.closest(".FormWrapper") ||
+            this.editorRoot.closest(".FormTitleWrapper")) as HTMLElement;
 
         if (!this.editorRoot) {
             throw new Error("Cannot initialize the EmbedFocusModule without an editorRoot (.richEditor class)");
         }
 
         if (!this.formWrapper) {
-            throw new Error("Cannot initialize the EmbedFocusModule without an FormWrapper (.FormWrapper class)");
+            throw new Error(
+                "Cannot initialize the EmbedFocusModule without a FormWrapper (.FormWrapper or .FormTitleWrapper class)",
+            );
         }
 
         // Add a tabindex onto the contenteditable so that our utilities know it is focusable.

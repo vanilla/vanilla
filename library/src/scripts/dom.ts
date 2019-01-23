@@ -1,7 +1,7 @@
 /**
  * Utilities that have a hard dependency on the DOM.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -251,14 +251,13 @@ export function isEmojiSupported() {
         // Test environment
         const canvas = document.createElement("canvas");
         if (canvas.getContext && canvas.getContext("2d")) {
-            const pixelRatio = window.devicePixelRatio || 1;
-            const offset = 12 * pixelRatio;
-            const ctx = canvas.getContext("2d");
-            ctx!.fillStyle = "#f00";
-            ctx!.textBaseline = "top";
-            ctx!.font = "32px Arial";
-            ctx!.fillText(testChar, 0, 0);
-            emojiSupportedCache = ctx!.getImageData(offset, offset, 1, 1).data[0] !== 0;
+            const ctx = document.createElement("canvas").getContext("2d");
+            if (ctx) {
+                ctx.fillText("😗", -2, 4);
+                emojiSupportedCache = ctx.getImageData(0, 0, 1, 1).data[3] > 0;
+            } else {
+                emojiSupportedCache = false;
+            }
         } else {
             emojiSupportedCache = false;
         }
@@ -415,7 +414,7 @@ export function stickyHeader() {
  *
  * @param event - https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
  */
-export function getDraggedImage(event: DragEvent): File | undefined {
+export function getDraggedFile(event: DragEvent): File | undefined {
     if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length) {
         event.preventDefault();
         const files = Array.from(event.dataTransfer.files);
@@ -431,7 +430,7 @@ export function getDraggedImage(event: DragEvent): File | undefined {
  *
  * @param event - https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
  */
-export function getPastedImage(event: ClipboardEvent): File | undefined | null {
+export function getPastedFile(event: ClipboardEvent): File | undefined | null {
     if (event.clipboardData && event.clipboardData.items && event.clipboardData.items.length) {
         const files = Array.from(event.clipboardData.items)
             .map((item: any) => (item.getAsFile ? item.getAsFile() : null))

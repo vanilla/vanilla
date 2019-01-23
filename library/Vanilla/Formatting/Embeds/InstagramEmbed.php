@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -60,8 +60,7 @@ class InstagramEmbed extends Embed {
     </div>
 </div>
 HTML;
-
-       return $result;
+        return $result;
     }
 
     /**
@@ -82,12 +81,12 @@ HTML;
             $data['attributes']['permaLink'] = $permalink['permalink'];
         }
 
-        preg_match( '/(?<isCaptioned>data-instgrm-captioned)/i', $html,$isCaptioned);
+        preg_match('/(?<isCaptioned>data-instgrm-captioned)/i', $html, $isCaptioned);
         if ($isCaptioned) {
             $data['attributes']['isCaptioned'] = true;
         }
 
-        preg_match( '/data-instgrm-version="(?<versionNumber>\d+)"/i', $html,$versionNumber);
+        preg_match('/data-instgrm-version="(?<versionNumber>\d+)"/i', $html, $versionNumber);
         if ($versionNumber) {
             $data['attributes']['versionNumber'] = $versionNumber['versionNumber'];
         }

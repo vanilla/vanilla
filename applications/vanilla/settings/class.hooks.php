@@ -2,7 +2,7 @@
 /**
  * VanillaHooks Plugin
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @since 2.0
  * @package Vanilla
@@ -739,9 +739,18 @@ class VanillaHooks implements Gdn_IPlugin {
                 $discussionsCount = getValueR('User.CountDiscussions', $sender, null);
                 $commentsCount = getValueR('User.CountComments', $sender, null);
 
-                $discussionsLabel .= '<span class="Aside">'.countString(bigPlural($discussionsCount, '%s discussion'), "/profile/count/discussions?userid=$userID").'</span>';
-
-                $commentsLabel .= '<span class="Aside">'.countString(bigPlural($commentsCount, '%s comment'), "/profile/count/comments?userid=$userID").'</span>';
+                if (!is_null($discussionsCount) && !empty($discussionsCount)) {
+                    $discussionsLabel .=
+                        '<span class="Aside">' .
+                        countString(bigPlural($discussionsCount, '%s discussion'), "/profile/count/discussions?userid=$userID")
+                        . '</span>';
+                }
+                if (!is_null($commentsCount)  && !empty($commentsCount)) {
+                    $commentsLabel .=
+                        '<span class="Aside">' .
+                        countString(bigPlural($commentsCount, '%s comment'), "/profile/count/comments?userid=$userID") .
+                        '</span>';
+                }
             }
             $sender->addProfileTab(t('Discussions'), userUrl($sender->User, '', 'discussions'), 'Discussions', $discussionsLabel);
             $sender->addProfileTab(t('Comments'), userUrl($sender->User, '', 'comments'), 'Comments', $commentsLabel);

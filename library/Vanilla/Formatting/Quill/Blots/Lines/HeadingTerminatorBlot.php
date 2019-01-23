@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -86,7 +86,6 @@ class HeadingTerminatorBlot extends AbstractLineTerminatorBlot {
      * Get the heading level for the blot.
      *
      * @return int
-     * @throws \Exception if the level is not a valid integer.
      */
     public function getHeadingLevel(): int {
         // Heading attributes generally live in the next operation.

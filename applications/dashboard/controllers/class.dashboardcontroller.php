@@ -2,7 +2,7 @@
 /**
  * Master application controller for Dashboard, extended by most others.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0

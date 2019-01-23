@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -82,6 +82,18 @@ class ParserTest extends SharedBootstrapTestCase {
     /**
      * Test the parsing of normal text.
      */
+    public function testTrailingNewlines() {
+        $ops = [["insert" => "SomeText\n\n\n\n"]];
+        $result = [[
+            ["class" => TextBlot::class, "content" => "SomeText"],
+            $this->makeParagraphLine(),
+        ]];
+        $this->assertParseResults($ops, $result);
+    }
+
+    /**
+     * Test the parsing of normal text.
+     */
     public function testNormalText() {
         $ops = [["insert" => "SomeText\n"]];
         $result = [[
@@ -103,7 +115,7 @@ class ParserTest extends SharedBootstrapTestCase {
             ],
             [
                 ["class" => TextBlot::class, "content" => "After3lines"],
-                $this->makeParagraphLine(2),
+                $this->makeParagraphLine(1),
             ],
         ];
         $this->assertParseResults($ops, $result);

@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -43,7 +43,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                     onClick={this.props.onBackClick}
                     className="frameHeader-backButton"
                 >
-                    {leftChevron("frameHeader-backIcon")}
+                    {leftChevron("frameHeader-backIcon isSmall", true)}
                 </Button>
             );
         }
@@ -67,6 +67,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                         "sr-only": this.props.srOnlyTitle,
                     })}
                 >
+                    {backLink}
                     {this.props.title}
                 </Heading>
                 {this.props.children}

@@ -2,7 +2,7 @@
 /**
  * Manages installation of Dashboard.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0
@@ -303,13 +303,23 @@ class SetupController extends DashboardController {
             $this->Form->addError(sprintf(t('You are running PHP version %1$s. Vanilla requires PHP %2$s or greater. You must upgrade PHP before you can continue.'), phpversion(), ENVIRONMENT_PHP_VERSION));
         }
 
-        // Make sure PDO is available
-        if (!class_exists('PDO')) {
-            $this->Form->addError(t('You must have the PDO module enabled in PHP in order for Vanilla to connect to your database.'));
-        }
+        // Check for required PHP extensions:
+        // - PDO & MySQL driver for PDO
+        // - cURL
+        // - GD
+        // - Multibyte String
+        $requiredPHPModules = [
+            'pdo' => 'You must have the <a href="http://php.net/manual/en/pdo.installation.php">PDO module</a> enabled in PHP in order for Vanilla to connect to your database.',
+            'pdo_mysql' => 'You must have the <a href="http://php.net/manual/en/ref.pdo-mysql.php">MySQL driver for PDO</a> enabled in order for Vanilla to connect to your database.',
+            'curl' => 'You must have the <a href="http://php.net/manual/en/curl.installation.php">cURL module</a> enabled in PHP.',
+            'gd' => 'You must have the <a href="http://php.net/manual/en/image.installation.php">gd module</a> enabled in PHP for processing images.',
+            'mbstring' => 'You must have the <a href="http://php.net/manual/en/mbstring.installation.php">mbstring module</a> enabled in PHP.',
+        ];
 
-        if (!defined('PDO::MYSQL_ATTR_USE_BUFFERED_QUERY')) {
-            $this->Form->addError(t('You must have the MySQL driver for PDO enabled in order for Vanilla to connect to your database.'));
+        foreach ($requiredPHPModules as $module => $errorMessage) {
+            if (!extension_loaded($module)) {
+                $this->Form->addError($errorMessage);
+            }
         }
 
         // Make sure that the correct filesystem permissions are in place.

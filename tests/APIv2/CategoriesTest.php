@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Ryan Perry <ryan.p@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -173,15 +173,6 @@ class CategoriesTest extends AbstractResourceTest {
         $index = $this->api()->get($this->baseUrl, ['parentCategoryID' => self::PARENT_CATEGORY_ID])->getBody();
         $categories = array_column($index, null, 'categoryID');
         $this->assertFalse($categories[$row['categoryID']]['followed']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function testGetEdit($record = null) {
-        $row = $this->testPost();
-        $result = parent::testGetEdit($row);
-        return $result;
     }
 
     /**

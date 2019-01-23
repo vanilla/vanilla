@@ -2,7 +2,7 @@
 /**
  * General functions
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0
@@ -326,7 +326,7 @@ if (!function_exists('asset')) {
         if (isUrl($destination)) {
             $result = $destination;
         } else {
-            $result = Gdn::request()->urlDomain($withDomain).Gdn::request()->assetRoot().'/'.ltrim($destination, '/');
+            $result = Gdn::request()->urlDomain($withDomain).Gdn::request()->getAssetRoot().'/'.ltrim($destination, '/');
         }
 
         if ($addVersion) {
@@ -2491,33 +2491,6 @@ if (!function_exists('recordType')) {
     }
 }
 
-if (!function_exists('touchConfig')) {
-    /**
-     * Make sure the config has a setting.
-     *
-     * This function is useful to call in the setup/structure of plugins to make sure they have some default config set.
-     *
-     * @param string|array $name The name of the config key or an array of config key value pairs.
-     * @param mixed $default The default value to set in the config.
-     */
-    function touchConfig($name, $default = null) {
-        if (!is_array($name)) {
-            $name = [$name => $default];
-        }
-
-        $save = [];
-        foreach ($name as $key => $value) {
-            if (!c($key)) {
-                $save[$key] = $value;
-            }
-        }
-
-        if (!empty($save)) {
-            saveToConfig($save);
-        }
-    }
-}
-
 if (!function_exists('write_ini_string')) {
     /**
      * Formats an array in INI format.
@@ -3448,7 +3421,7 @@ if (!function_exists('smartAsset')) {
         if (isUrl($destination)) {
             $result = $destination;
         } else {
-            $result = Gdn::request()->urlDomain($withDomain).Gdn::request()->assetRoot().'/'.ltrim($destination, '/');
+            $result = Gdn::request()->urlDomain($withDomain).Gdn::request()->getAssetRoot().'/'.ltrim($destination, '/');
         }
 
         if ($addVersion) {

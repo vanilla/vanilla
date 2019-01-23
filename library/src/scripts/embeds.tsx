@@ -2,7 +2,7 @@
  * Embed utility functions and types.
  * This file should have NO external dependencies other than javascript.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -13,7 +13,20 @@ import { IDiscussionEmbed, ICommentEmbed, IScrapeData } from "@dashboard/@types/
 export const FOCUS_CLASS = "embed-focusableElement";
 
 export type IQuoteEmbedData = IDiscussionEmbed | ICommentEmbed;
-export type IEmbedData = IScrapeData;
+export type IEmbedData = IScrapeData | IFileUploadData;
+
+export interface IFileUploadData {
+    type: "file";
+    url: string;
+    attributes: {
+        mediaID: number;
+        url: string;
+        name: string;
+        type: string;
+        size: number;
+        dateInserted: string;
+    };
+}
 
 export interface IEmbedElements {
     root: HTMLElement;
@@ -52,7 +65,7 @@ export function registerEmbedRenderer(type: string, renderer: EmbedRenderer) {
 /**
  * Register an embed rendering function.
  */
-export function registerEmbedComponent(type: string, component: React.ComponentClass<IEmbedProps>) {
+export function registerEmbedComponent(type: string, component: React.ComponentClass<IEmbedProps<any>>) {
     embedComponents[type] = component;
 }
 

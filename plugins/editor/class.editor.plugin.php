@@ -3,7 +3,7 @@
  * Editor Plugin
  *
  * @author Dane MacMillan
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package editor
  */
@@ -544,7 +544,7 @@ class EditorPlugin extends Gdn_Plugin {
 
         // If user wants to modify styling of Wysiwyg content in editor,
         // they can override the styles with this file.
-        $cssInfo = \Vanilla\Web\Assets\LegacyAssetModel::cssPath('wysiwyg.css', 'plugins/editor');
+        $cssInfo = \Vanilla\Web\Asset\LegacyAssetModel::cssPath('wysiwyg.css', 'plugins/editor');
         if ($cssInfo) {
             $cssPath = asset($cssInfo[1]);
         }
@@ -1452,7 +1452,7 @@ class EditorPlugin extends Gdn_Plugin {
      * This way, the editor plugin always takes precedence.
      */
     public function setup() {
-        touchConfig([
+        \Gdn::config()->touch([
             'Garden.MobileInputFormatter' => 'TextEx',
             'Plugins.editor.ForceWysiwyg' => false
         ]);
@@ -1465,7 +1465,7 @@ class EditorPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function structure() {
-         $pluginEditors = [
+        $pluginEditors = [
             'cleditor',
             'ButtonBar',
             'Emotify',
@@ -1477,7 +1477,7 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         // Set to false by default, so change in config if uploads allowed.
-        touchConfig('Garden.AllowFileUploads', true);
+        \Gdn::config()->touch('Garden.AllowFileUploads', true);
 
         $structure = Gdn::structure();
         $structure

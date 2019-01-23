@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -140,7 +140,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     public function testGetEdit($record = null) {
         if ($record === null) {
             $record = $this->record();
-            $row = $this->testPost();
+            $row = $this->testPost($record);
         } else {
             $row = $record;
         }

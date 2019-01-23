@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -18,7 +18,8 @@ import moment, { Moment } from "moment";
 interface IProps {
     value: string; // ISO formatted date
     onChange: (value: string) => void;
-    className?: string;
+    contentClassName?: string;
+    inputClassName?: string;
     alignment: "left" | "right";
     disabledDays?: any; // See http://react-day-picker.js.org/examples/disabled
 }
@@ -64,6 +65,12 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
                 value={value}
                 overlayComponent={this.CustomOverlay}
                 onDayChange={this.handleDayPickerChange}
+                classNames={
+                    {
+                        container: classNames("dayPickerInput-container", this.props.contentClassName),
+                        overlay: "dayPickerInput-overlay",
+                    } as any
+                }
                 dayPickerProps={{
                     captionElement: NullComponent,
                     navbarElement: this.CustomNavBar,
@@ -71,7 +78,7 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
                     showOutsideDays: true,
                 }}
                 inputProps={{
-                    className: classNames("inputText", this.props.className, {
+                    className: classNames("inputText", this.props.inputClassName, {
                         isInvalid: this.state.hasBadValue && this.state.wasBlurred,
                     }),
                     "aria-label": t("Date Input ") + "(yyyy-mm-dd)",
@@ -186,10 +193,10 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
                 <h3 className="datePicker-title">{title}</h3>
                 <span className={classNames("datePicker-navigation", className)}>
                     <Button baseClass={ButtonBaseClass.ICON} onClick={prev}>
-                        {leftChevron()}
+                        {leftChevron("", true)}
                     </Button>
                     <Button baseClass={ButtonBaseClass.ICON} onClick={next}>
-                        {rightChevron()}
+                        {rightChevron("", true)}
                     </Button>
                 </span>
             </div>

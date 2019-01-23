@@ -1,12 +1,12 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import * as React from "react";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import { Omit } from "@library/@types/utils";
+import { Optionalize } from "@library/@types/utils";
 const DeviceContext = React.createContext<Devices>(Devices.DESKTOP);
 export default DeviceContext;
 
@@ -17,7 +17,7 @@ export default DeviceContext;
  */
 export function withDevice<T extends IDeviceProps = IDeviceProps>(WrappedComponent: React.ComponentType<T>) {
     const displayName = WrappedComponent.displayName || WrappedComponent.name || "Component";
-    class ComponentWithDevice extends React.Component<Omit<T, keyof IDeviceProps>> {
+    class ComponentWithDevice extends React.Component<Optionalize<T, IDeviceProps>> {
         public static displayName = `withDevice(${displayName})`;
         public render() {
             return (

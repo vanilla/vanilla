@@ -1,0 +1,9 @@
+[
+    { "attributes": { "italic": true }, "insert": "italic " },
+    { "attributes": { "bold": true }, "insert": "bold " },
+    { "attributes": { "italic": true, "bold": true }, "insert": "italic-bold " },
+    { "attributes": { "code": true }, "insert": "code inline new format" },
+    { "attributes": { "strike": true }, "insert": "strike" },
+    { "attributes": { "codeInline": true }, "insert": "code inline" },
+    { "insert": "\n" }
+]

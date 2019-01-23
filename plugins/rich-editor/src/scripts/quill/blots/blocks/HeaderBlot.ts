@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -29,7 +29,7 @@ export default class HeaderBlot extends Header {
      * @param value - Either the basic header blot format (just the number of the level), or an expanded one with a ref.
      */
     public static create(value: IValue | number) {
-        let level;
+        let level: number;
         if (typeof value === "number") {
             level = value;
         } else {

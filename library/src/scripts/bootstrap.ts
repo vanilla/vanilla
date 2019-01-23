@@ -1,7 +1,7 @@
 /**
  * Primary bootstrapping of the frontend JS. This entrypoint should be the last once executed.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 

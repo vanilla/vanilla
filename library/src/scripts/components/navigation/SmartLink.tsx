@@ -1,13 +1,13 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
 import { formatUrl } from "@library/application";
 import { NavLinkProps, NavLink } from "react-router-dom";
-import { LocationDescriptor, createPath } from "history";
+import { LocationDescriptor, createPath, createLocation } from "history";
 
 export const LinkContext = React.createContext("https://changeme.dev.localhost");
 
@@ -20,6 +20,7 @@ interface IProps extends NavLinkProps {
  * or a partial refresh of the page.
  *
  * If the passed `to` is a subset of the context then a partial navigation will be completed.
+ * If the resulting URL has the same pathname as the current page we will do a full refresh.
  *
  * Eg.
  * Context = https://test.com/root
@@ -35,11 +36,14 @@ export default function SmartLink(props: IProps) {
     const finalUrlFormatter = urlFormatter ? urlFormatter : formatUrl;
     const stringUrl = typeof props.to === "string" ? props.to : createPath(props.to);
     const href = finalUrlFormatter(stringUrl, true);
+    const link = document.createElement("a");
+    link.href = href;
+    const isCurrentPage = link.pathname === window.location.pathname;
 
     return (
         <LinkContext.Consumer>
             {contextRoot => {
-                if (href.startsWith(contextRoot)) {
+                if (href.startsWith(contextRoot) && !isCurrentPage) {
                     return <NavLink {...passthru} to={makeDynamicHref(props.to, href)} activeClassName="isCurrent" />;
                 } else {
                     return <a {...passthru} href={href} />;

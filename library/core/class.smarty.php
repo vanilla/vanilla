@@ -3,7 +3,7 @@
  * Smart abstraction layer.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0
@@ -12,7 +12,7 @@
 /**
  * Vanilla implementation of Smarty templating engine.
  */
-class Gdn_Smarty {
+class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface {
 
     /** @var Smarty The smarty object used for the template. */
     protected $_Smarty = null;

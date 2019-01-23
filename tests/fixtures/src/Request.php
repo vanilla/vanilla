@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -15,6 +15,7 @@ use Garden\Web\RequestInterface;
 class Request implements RequestInterface {
     private $scheme = 'http';
     private $host = 'example.com';
+    private $assetRoot = '';
     private $method;
     private $root;
     private $path;
@@ -182,6 +183,21 @@ class Request implements RequestInterface {
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getAssetRoot() {
+        return $this->assetRoot;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAssetRoot(string $assetRoot) {
+        $this->assetRoot = rtrim('/'.trim($assetRoot, '/'), '/');
+        return $this;
+    }
+
+    /**
      * Set a header on the request.
      *
      * @param string $header The header to set.
@@ -219,5 +235,15 @@ class Request implements RequestInterface {
      */
     public function hasHeader($header) {
         return !empty($this->headers[$header]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function urlDomain($withDomain = true): string {
+        if (!$withDomain) {
+            return "";
+        }
+        return $this->scheme . "://" . $this->host;
     }
 }

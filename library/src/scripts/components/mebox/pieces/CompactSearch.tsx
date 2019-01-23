@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -28,6 +28,8 @@ export interface ICompactSearchProps extends IWithSearchProps, RouteComponentPro
     onOpenSuggestions?: () => void;
     onCloseSuggestions?: () => void;
     focusOnMount?: boolean;
+    buttonContentClass?: string;
+    cancelContentClassName?: string;
 }
 
 interface IState {
@@ -64,7 +66,9 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                         aria-controls={this.id}
                         buttonRef={this.openSearchButton}
                     >
-                        <div className="compactSearch-buttonContent">{search()}</div>
+                        <div className={classNames("compactSearch-buttonContent", this.props.buttonContentClass)}>
+                            {search()}
+                        </div>
                     </Button>
                 )}
                 {this.props.open && (
@@ -87,6 +91,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                             handleOnKeyDown={this.handleKeyDown}
                             onOpenSuggestions={this.props.onOpenSuggestions}
                             onCloseSuggestions={this.props.onCloseSuggestions}
+                            className={"compactSearch-searchBar"}
                         />
                         <Button
                             onClick={this.props.onCloseSearch}
@@ -97,7 +102,14 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                             aria-controls={this.id}
                             baseClass={ButtonBaseClass.CUSTOM}
                         >
-                            {t("Cancel")}
+                            <div
+                                className={classNames(
+                                    "compactSearch-cancelContents",
+                                    this.props.cancelContentClassName,
+                                )}
+                            >
+                                {t("Cancel")}
+                            </div>
                         </Button>
                     </div>
                 )}

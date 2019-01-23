@@ -1,5 +1,5 @@
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -38,7 +38,7 @@ $global-body_bg                                      : $global-color_bg !default
 $global-border_color                                 : mix($global-color_fg, $global-color_bg, 24%) !default; // Note it's off by default due to the border width
 $global-border-width                                 : 1px;
 $global-border-style                                 : solid;
-$global_borderRadius                                 : 2px !default;
+$global_borderRadius                                 : 6px !default;
 
 /* -------------------------------------------------------------- *\
     States
@@ -47,7 +47,7 @@ $global_borderRadius                                 : 2px !default;
 $state-icon_opacity                                  : .6;
 $state-text_opacity                                  : .75;
 
-$state-hover_color                                   : mix($global-color_primary, $global-color_bg, 5.5%) !default; // rgba(174, 228, 255, 0.2);
+$state-hover_color                                   : mix($global-color_primary, $global-color_bg, 10%) !default; // rgba(174, 228, 255, 0.2);
 $state-hover_opacity                                 : 1 !default;
 
 $state-focus_color                                   : mix($global-color_primary, $global-color_bg, 12%) !default; // rgba(174, 228, 255, 0.4);
@@ -95,6 +95,8 @@ $global-medium_fontSize                              : 14px !default;
 $global-small_fontSize                               : 12px !default;
 
 $global-title_fontSize                               : 32px !default;
+$global-smallTitle_fontSize                          : 20px !default;
+$global-title_mobile_fontSize                        : 26px !default;
 $global-subTitle_fontSize                            : 18px !default;
 
 $userContent_fontSize                                : $global-medium_fontSize !default; // 14 for forums, but 16 for KB
@@ -123,7 +125,8 @@ $global_spacer                                       : $userContent_fontSize * $
 
 $global-heading_fontFamily                           : "Open Sans", HelveticaNeue-Light, "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 $global-heading_fontWeight                           : $global-fontWeight_bold !default; // Derived
-$global-heading_lineHeightRatio                      : .8;
+$global-heading_lineHeightRatio                      : .91;
+
 
 $global-body_fontFamily                              : "Open Sans", "Segoe UI", "Helvetica Neue", Helvetica, Raleway, Arial, sans-serif !default;
 $global-body_fontWeight                              : $global-fontWeight_normal !default; // Derived
@@ -148,24 +151,34 @@ $global-default_easing                               : ease-out !default;
 $icon-large_size                                     : 32px !default;
 $icon-default_size                                   : 24px !default;
 $icon-small_size                                     : 16px !default;
+$icon_color                                          : mix($global-color_bg, $global-color_fg, 18%) !default;
+
+/* -------------------------------------------------------------- *\
+    User Photo
+\* -------------------------------------------------------------- */
+
+$userPhoto_borderRadius                              : 50%;
+$userPhoto-small_width                               : 28px;
+$userPhoto-medium_width                              : 40px;
+$userPhoto-large_width                               : 100px;
 
 /* -------------------------------------------------------------- *\
     Layout
 \* -------------------------------------------------------------- */
 
-$global-gutter_size                                  : $global_spacer;
+$global-gutter_size                                  : 24px;
 $global-gutter_halfSize                              : $global-gutter_size / 2;
 $global-gutter_quarterSize                           : $global-gutter_size / 4;
 
-$global-panel_width                                  : 250px !default;
-$global-panel_paddedWidth                            : $global-panel_width + $global_gutter_size !default;
+$global-panel_width                                  : 216px !default;
+$global-panel_paddedWidth                            : $global-panel_width + $global-gutter_size * 2 !default;
 
-$global-middleColumn_width                           : 660px;
+$global-middleColumn_width                           : 672px;
+$global-middleColumn_paddedWidth                     : $global-middleColumn_width + $global-gutter_size;
 
-$global-main_width                                   : $global-panel_paddedWidth * 2 + $global-middleColumn_width !default;
-$global-main_paddedWidth                             : $global-main_width + 2 * $global-gutter_size !default;  // Derived
+$global-content_width                                : $global-panel_paddedWidth * 2 + $global-middleColumn_paddedWidth + $global-gutter_size * 3; // *3 from margin between columns and half margin on .container
 
-$global-twoColumn_breakpoint                         : 900px !default; // Generic breakpoint for 2 columns
+$global-twoColumn_breakpoint                         : 1200px !default; // Generic breakpoint for 2 columns
 $global-xs_breakpoint                                : 500px !default;
 
 // Hard coded columns
@@ -234,7 +247,7 @@ $widget-contents_bg                                  : $global-widget_bg !defaul
 $formElement_borderWidth                             : 1px !default;
 $formElement_fullBorderWidth                         : $formElement_borderWidth * 2;
 $formElement_height                                  : $utility-baseUnit * 6; // Derived
-$formElement_margin                                  : $utility-baseUnit * 4; // Derived
+$formElement_margin                                  : $utility-baseUnit * 2; // Derived
 $formElement_heightWithBorder                        : $formElement_height + 2 * $formElement_borderWidth; // Derived
 $formElement_borderColor                             : $global-border_color !default; // Derived
 $formElement_borderStyle                             : solid;
@@ -282,15 +295,15 @@ $buttonToIconMargin                                  : ($formElement_height - $i
 
 @function getBlackOrWhiteBasedOnColor($color) {
     @if (lightness($color) > 50) {
-        @return white; // Lighter backgorund
+        @return white; // Lighter background
     } @else {
-        @return black; // Darker backgorund
+        @return black; // Darker background
     }
 }
 
 $overlay_bgColor                                        : rgba(getBlackOrWhiteBasedOnColor($global-color_fg), .2)!default;
 $overlay-dropShadow_color                               : $overlay_bgColor !default;
-$overlay-border_color                                   : mix($global-color_fg, $global-color_bg, 5%) !default;
+$overlay-border_color                                   : mix($global-color_fg, $global-color_bg, 15%) !default;
 $overlay-dropShadow                                     : 0 5px 10px $overlay_bgColor !default;
 $overlay-borderRadius                                   : $global_borderRadius !default;
 
@@ -389,6 +402,12 @@ $metaText_fontSize                                   : $global-small_fontSize;
 $metaText_color                                      : mix($global-color_fg, $global-color_bg, 85%) !default;
 $metaText_margin                                     : 4px !default;
 
+$metas_verticalMargin                                : $utility-baseUnit * 2;
+$metas_color                                         : $metaText_color !default;
+$meta_spacing                                        : $global-gutter_quarterSize;
+$meta_lineHeight                                     : $global-base_lineHeight;
+$meta-deleted_color                                  : #D0021B;
+
 /* -------------------------------------------------------------- *\
       Thumbnails
 \* -------------------------------------------------------------- */
@@ -429,19 +448,31 @@ $dropDown-item_horizontalPadding                    : 18px;
 $dropDown-item_minHeight                            : 30px;
 $dropDown-item_mobile_minHeight                     : 44px;
 
-$dropDown-item_mobile_fontSize                      : 18px;
+$dropDown-item_mobile_fontSize                      : 16px;
 
 /* -------------------------------------------------------------- *\
     Header
 \* -------------------------------------------------------------- */
+@function getBgDependingOnContrastColor($fgColor, $colorToModify, $mixAmount, $flip: false) {
+    @if (lightness($fgColor) > 50 and not $flip) {
+        @return mix(#000, $colorToModify, $mixAmount); // Light text, so darken color
+    } @else {
+        @return mix(#fff, $colorToModify, $mixAmount); // Light text, so darken color
+    }
+}
 
-$vanillaHeader_height                               : 50px !default;
+$vanillaHeader_height                               : 48px !default;
 $vanillaHeader_mobile_height                        : 44px !default;
-$vanillaHeader_fg                                   : #fff !default;
+$vanillaHeader_fg                                   : $global-color_bg !default;
 $vanillaHeader_bg                                   : $global-color_primary !default;
 $vanillaHeader-spacer_width                         : 12px;
 $vanillaHeader-button_borderRadius                  : 3px;
 $vanillaHeader-button_size                          : 40px;
+$vanillaMenu-guest_spacer                           : 8px !default;
+$vanillaMenu-signIn_bg                              : getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%) !default;
+$vanillaMenu-signIn_bg_hover                        : getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 20%) !default;
+$vanillaMenu-register_bg                            : $global-color_bg !default;
+$vanillaMenu-register_bg_hover                      : rgba($global-color_bg, .9) !default;
 
 /* -------------------------------------------------------------- *\
     Compact Me Box

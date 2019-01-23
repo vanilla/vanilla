@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -93,7 +93,7 @@ export function MultiValueRemove(props: MultiValueRemoveProps<any>) {
                 title={t("Clear")}
                 aria-label={t("Clear")}
             >
-                {close("suggestedTextInput-tokenRemoveIcon", true)}
+                {close("suggestedTextInput-tokenRemoveIcon")}
             </button>
         </components.MultiValueRemove>
     );

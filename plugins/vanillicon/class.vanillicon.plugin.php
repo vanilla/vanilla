@@ -3,7 +3,7 @@
  * Vanillicon plugin.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package vanillicon
  */
@@ -24,7 +24,7 @@ class VanilliconPlugin extends Gdn_Plugin {
      * Perform any necessary database or configuration updates.
      */
     public function structure() {
-        touchConfig('Plugins.Vanillicon.Type', 'v2');
+        \Gdn::config()->touch('Plugins.Vanillicon.Type', 'v2');
     }
 
     /**
@@ -64,7 +64,7 @@ class VanilliconPlugin extends Gdn_Plugin {
             ]
         ]);
 
-        
+
         $sender->setData('Title', sprintf(t('%s Settings'), 'Vanillicon'));
         $cf->renderAll();
     }

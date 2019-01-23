@@ -2,7 +2,7 @@
 /**
  * Category model
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Vanilla
  * @since 2.0
@@ -2045,12 +2045,7 @@ class CategoryModel extends Gdn_Model {
      * Get list of categories (disregarding user permission for admins).
      *
      * @since 2.0.0
-     * @access public
      *
-     * @param string $OrderFields Ignored.
-     * @param string $OrderDirection Ignored.
-     * @param int $Limit Ignored.
-     * @param int $Offset Ignored.
      * @return object SQL results.
      */
     public function getAll() {
@@ -3010,7 +3005,14 @@ class CategoryModel extends Gdn_Model {
                         // The permissions were posted in the web format provided by settings/addcategory and settings/editcategory
                         $permissions = $permissionModel->pivotPermissions(val('Permission', $FormPostValues, []), ['JunctionID' => $CategoryID]);
                     }
-                    $permissionModel->saveAll($permissions, ['JunctionID' => $CategoryID, 'JunctionTable' => 'Category']);
+
+                    if ($Settings['overWrite'] ?? empty($Settings)) {
+                        $permissionModel->saveAll($permissions, ['JunctionID' => $CategoryID, 'JunctionTable' => 'Category']);
+                    } else {
+                        foreach ($permissions as $perm) {
+                            $permissionModel->save($perm);
+                        }
+                    }
 
                     if (!$Insert) {
                         // Figure out my last permission and tree info.

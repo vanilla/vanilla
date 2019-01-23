@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -11,7 +11,7 @@ use AssetModel;
 use Gdn_Plugin;
 use SettingsController;
 use Vanilla\Addon;
-use Vanilla\Web\Assets\LegacyAssetModel;
+use Vanilla\Web\Asset\LegacyAssetModel;
 
 /**
  * Handles the swagger UI menu options.
@@ -44,20 +44,6 @@ class SwaggerUIPlugin extends Gdn_Plugin {
         $sender->permission('Garden.Settings.Manage');
 
         $folder = 'plugins/'.$this->getAddon()->getKey();
-
-        $relScripts = ['js/custom.js'];
-        $js = [];
-        foreach ($relScripts as $path) {
-            $search = LegacyAssetModel::jsPath($path, $folder);
-            if (!$search) {
-                continue;
-            }
-            list($path, $url) = $search;
-            $js[] = asset($url, false, true);
-        }
-        $sender->setData('js', $js);
-
-        $sender->addCssFile('swagger-ui.css', $folder);
 
         $sender->title(t('Vanilla API v2'));
         $sender->render('swagger', 'settings', $folder);

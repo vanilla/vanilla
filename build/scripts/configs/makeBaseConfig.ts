@@ -81,7 +81,11 @@ ${chalk.green(aliases)}`;
                 {
                     test: /\.s?css$/,
                     use: [
-                        options.mode === BuildMode.DEVELOPMENT ? "style-loader" : MiniCssExtractPlugin.loader,
+                        [BuildMode.DEVELOPMENT, BuildMode.TEST, BuildMode.TEST_DEBUG, BuildMode.TEST_WATCH].includes(
+                            options.mode,
+                        )
+                            ? "style-loader"
+                            : MiniCssExtractPlugin.loader,
                         {
                             loader: "css-loader",
                             options: {
@@ -111,9 +115,6 @@ ${chalk.green(aliases)}`;
         plugins: [
             new webpack.DefinePlugin({
                 __BUILD__SECTION__: JSON.stringify(section),
-            }),
-            new WebpackBar({
-                name: section,
             }),
         ] as any[],
         resolve: {
@@ -150,6 +151,15 @@ ${chalk.green(aliases)}`;
 
     if (options.fix) {
         config.plugins.unshift(getPrettierPlugin());
+    }
+
+    // This is the only flag we are given by infrastructure to indicate we are in a lower memory environment.
+    if (!options.lowMemory) {
+        config.plugins.push(
+            new WebpackBar({
+                name: section,
+            }),
+        );
     }
 
     return config;

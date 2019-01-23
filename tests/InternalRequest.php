@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -214,6 +214,27 @@ class InternalRequest extends HttpRequest implements RequestInterface {
         $url = static::buildUrl(array_replace(parse_url($this->getUrl()), ['scheme' => strtoupper($scheme)]));
         $this->setUrl($url);
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAssetRoot() {
+        return $this->getRoot();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAssetRoot(string $root) {
+        $this->setRoot($root);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function urlDomain($withDomain = true): string {
+        return "";
     }
 
     /**

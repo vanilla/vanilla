@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -27,9 +27,9 @@ import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
 import ConditionalWrap from "@library/components/ConditionalWrap";
 import FlexSpacer from "@library/components/FlexSpacer";
 import BackLink from "@library/components/navigation/BackLink";
-import { signIn } from "@library/components/icons";
 import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
 import { withPages, IWithPagesProps } from "@library/contexts/PagesContext";
+import { t } from "@library/application";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -133,26 +133,30 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                             onSearchButtonClick={this.openSearch}
                                             onCloseSearch={this.closeSearch}
                                             cancelButtonClassName="vanillaHeader-searchCancel"
+                                            cancelContentClassName="meBox-contentHover"
                                             buttonClass="vanillaHeader-button"
                                             showingSuggestions={this.state.showingSuggestions}
                                             onOpenSuggestions={this.setOpenSuggestions}
                                             onCloseSuggestions={this.setCloseSuggestions}
+                                            buttonContentClass="meBox-buttonContent"
                                         />
                                     ) : (
                                         <FlexSpacer className="compactSearch vanillaHeader-compactSearch" />
                                     )}
                                     {isGuest ? (
                                         (!this.state.openSearch || !isMobile) && (
-                                            <VanillaHeaderNav
-                                                linkClassName="vanillaHeader-navLink"
-                                                linkContentClassName="vanillaHeader-navLinkContent"
-                                                className="vanillaHeader-nav vanillaHeader-guestNav"
-                                            >
+                                            <VanillaHeaderNav className="vanillaHeader-nav vanillaHeader-guestNav">
                                                 <VanillaHeaderNavItem
-                                                    className="vanillaHeader-button"
+                                                    linkClassName="button vanillaHeader-guestButton vanillaHeader-signIn"
                                                     to={`/entry/signin?target=${window.location.pathname}`}
                                                 >
-                                                    {signIn("vanillaHeader-signInIcon")}
+                                                    {t("Sign in")}
+                                                </VanillaHeaderNavItem>
+                                                <VanillaHeaderNavItem
+                                                    linkClassName="button vanillaHeader-guestButton vanillaHeader-register"
+                                                    to={`/entry/register?target=${window.location.pathname}`}
+                                                >
+                                                    {t("Register")}
                                                 </VanillaHeaderNavItem>
                                             </VanillaHeaderNav>
                                         )

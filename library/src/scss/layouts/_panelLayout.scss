@@ -1,17 +1,19 @@
 /*!
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 $panelLayout_topMargin                                                : 0;
 $panelLayout_bottomMargin                                             : 48px;
 
-$panelLayout-noBleed_breakpoint                                       : $global-main_paddedWidth !default;
-$panelLayout-twoColumn_breakpoint                                     : $global-main_width !default;
-$panelLayout-oneColumn_breakpoint                                     : $global-twoColumn_breakpoint !default;
+$panelLayout-noBleed_breakpoint                                       : $global-content_width !default;
+$panelLayout-twoColumn_breakpoint                                     : $global-twoColumn_breakpoint !default;
+$panelLayout-oneColumn_breakpoint                                     : $panelLayout-twoColumn_breakpoint - $global-panel_paddedWidth !default;
 
 $panelLayout-border_color                                             : rgba($global-border_color, .4) !default;
+
+$panelLayout-panelAndSpacingWidth                                     : $global-panel_paddedWidth + $global-gutter_size;
 
 @mixin mediaQuery-panelLayout_noBleed {
     @media (max-width: #{$panelLayout-noBleed_breakpoint}) {
@@ -46,7 +48,29 @@ $panelLayout-border_color                                             : rgba($gl
     &.noBreadcrumbs {
         > .panelLayout-main {
             padding-top: $global-gutter_size;
+
+            @include mediaQuery-panelLayout_oneColumn {
+                padding-top: 0;
+            }
         }
+    }
+
+    &.isOneCol {
+        width: $global-middleColumn_width;
+        max-width: 100%;
+        margin: auto;
+
+        @include mediaQuery-panelLayout_oneColumn {
+            width: 100%;
+        }
+    }
+
+    &.hasTopPadding {
+        padding-top: $global_gutter_halfSize * 1.5;
+    }
+
+    &.hasLargePadding {
+        padding-top: 64px;
     }
 }
 
@@ -69,21 +93,10 @@ $panelLayout-border_color                                             : rgba($gl
     }
 }
 
-.panelLayout {
-    &.isOneCol {
-        width: $global-middleColumn_width;
-        max-width: 100%;
-        margin: auto;
-
-        @include mediaQuery-panelLayout_oneColumn {
-            width: 100%;
-        }
-    }
-}
-
 .panelLayout-container {
     display: flex;
     flex-wrap: nowrap;
+    justify-content: space-between;
 }
 
 .panelLayout-top {
@@ -93,6 +106,7 @@ $panelLayout-border_color                                             : rgba($gl
 
 .panelLayout-fullWidth {
     position: relative;
+    padding: 0;
 }
 
 // Left Section
@@ -105,17 +119,17 @@ $panelLayout-border_color                                             : rgba($gl
 .panelLayout-right {
     width: $global-panel_paddedWidth;
     flex-basis: $global-panel_paddedWidth;
-
 }
 
 // Middle Column
 .panelLayout-middle {
+    justify-content: space-between;
     flex-grow: 1;
     width: 100%;
 
     &.hasAdjacentPanel {
-        flex-basis: calc(100% - #{$global-panel_paddedWidth});
-        max-width: calc(100% - #{$global-panel_paddedWidth});
+        flex-basis: calc(100% - #{$panelLayout-panelAndSpacingWidth});
+        max-width: calc(100% - #{$panelLayout-panelAndSpacingWidth});
 
         @include mediaQuery-panelLayout_oneColumn {
             width: 100%;
@@ -140,8 +154,8 @@ $panelLayout-border_color                                             : rgba($gl
     }
 
     &.hasAdjacentPanel {
-        flex-basis: calc(100% - #{$global-panel_paddedWidth});
-        max-width: calc(100% - #{$global-panel_paddedWidth});
+        flex-basis: calc(100% - #{$panelLayout-panelAndSpacingWidth});
+        max-width: calc(100% - #{$panelLayout-panelAndSpacingWidth});
 
         @include mediaQuery-panelLayout_oneColumn {
             flex-basis: 100%;
@@ -155,10 +169,11 @@ $panelLayout-border_color                                             : rgba($gl
     display: flex;
     flex-grow: 1;
     width: 100%;
+    justify-content: space-between;
 
     &.hasAdjacentPanel {
-        flex-basis: calc(100% - #{$global-panel_paddedWidth});
-        max-width: calc(100% - #{$global-panel_paddedWidth});
+        flex-basis: calc(100% - #{$panelLayout-panelAndSpacingWidth});
+        max-width: calc(100% - #{$panelLayout-panelAndSpacingWidth});
 
         @include mediaQuery-panelLayout_oneColumn {
             @include backLinkNoBleedStyles;
@@ -169,7 +184,7 @@ $panelLayout-border_color                                             : rgba($gl
 }
 
 .panelLayout-main {
-    min-height: 50vh;
+    min-height: 20vh;
 }
 
 
@@ -179,5 +194,14 @@ $panelLayout-border_color                                             : rgba($gl
         top: auto;
         left: auto;
         bottom: auto;
+    }
+}
+
+
+.panelLayout-panel {
+    > .panelArea:first-child {
+        .panelList {
+            margin-top: #{$global-title_fontSize * $global-condensed_lineHeight / 2 - $global-medium_fontSize/2};
+        }
     }
 }

@@ -1,0 +1,252 @@
+/*
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.Navigation {
+    display: none;
+    overflow: hidden;
+    position: relative;
+    background: $navigation_bg;
+    color: $navigation_link_color;
+    width: 100%;
+    height: auto;
+    max-height: 0;
+    transition: max-height .3s ease;
+
+    @include maxWidth {
+        display: block;
+    }
+
+    &.isOpen {
+        max-height: 450px;
+    }
+
+    .Container {
+        @include maxWidth {
+            padding: 0;
+        }
+    }
+
+    .Button.NewDiscussion {
+        margin: 0 auto;
+        display: block;
+        max-width: 280px;
+        line-height: $formButton_height;
+    }
+
+    .ButtonGroup.Multi {
+        @include Button(
+            $navigationButton_bg,
+            $navigationButton_fg,
+            $navigationButton_border,
+            $navigationButton-hover_bg,
+            $navigationButton-hover_fg,
+            $navigationButton-hover_border
+        );
+    }
+
+    .ButtonGroup.NewDiscussion {
+        .Primary:first-child {
+            width: 100%;
+        }
+    }
+
+    &.isReadyToTransition {
+        will-change: max-height;
+        transition: max-height $global-default_easing $global-default_timing * 2;
+
+        &[data-state= 'CLOSED'] {
+            transition-timing-function: $navigation-easing-transition;
+        }
+    }
+
+    .NewDiscussion.mobile {
+        width: 100%;
+
+        .ButtonGroup.Action,
+        .Button.Action {
+            width: 100%;
+
+            .Button {
+                color: inherit;
+            }
+        }
+    }
+
+    .MeBox-SignIn {
+        flex-wrap: wrap;
+    }
+
+    .SignInIcons.SignInIcons {
+        margin-left: 0;
+        margin-top: $utility-large_padding;
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+
+    .SocialIcon {
+        margin: 0 $utility-xSmall_padding;
+    }
+
+    .MeBox.mobile {
+        width: 100%;
+    }
+
+    .MeBox.mobile .MeBox {
+        width: 100%;
+
+        & > .PhotoWrap.PhotoWrap {
+            height: 42px;
+            width: 25%;
+            display: inline-flex;
+            justify-content: flex-start;
+            box-shadow: none;
+            border-radius: 0;
+            margin-right: 0;
+
+            img {
+                border-radius: $theme-photo_borderRadius;
+                overflow: hidden;
+
+                @if ($theme-photo_round) {
+                    border-radius: 50%;
+                }
+                width: 32px;
+            }
+        }
+
+        & > .PhotoWrap,
+        .WhoIs > .Username {
+            display: none;
+        }
+
+        .WhoIs {
+            width: 100%;
+        }
+
+        .MeMenu {
+            display: flex;
+            justify-content: space-between;
+            padding: 0;
+        }
+    }
+
+    // Mebox component
+    .MeButton {
+        padding: 0;
+        height: 42px;
+        width: 42px;
+        color: $navigationMebutton_fg;
+        background-color: $navigationMebutton_bg;
+        display: flex;
+        justify-content: center;
+
+        .Sprite::before {
+            font-size: $icon-default_size;
+        }
+
+        &:focus,
+        &:hover,
+        &:active {
+            color: $navigationMebutton-hover_fg;
+            background-color: $navigationMebutton-hover_bg;
+        }
+    }
+
+    .ToggleFlyout.Open .MeButton {
+        background-color: $navigationMebutton-active_bg;
+    }
+
+    .WhoIs > .Username {
+        color: $navigationMebutton_fg;
+    }
+
+    .SignInLinks.SignInLinks {
+        width: 100%;
+        text-align: center;
+        padding-top: $utility-medium_padding;
+
+        a {
+            @include Button(
+                $navigationButton_bg,
+                $navigationButton_fg,
+                $navigationButton_border,
+                $navigationButton-hover_bg,
+                $navigationButton-hover_fg,
+                $navigationButton-hover_border
+            );
+        }
+
+        .Bullet {
+            font-size: 0;
+            width: 20px;
+        }
+    }
+}
+
+.Navigation-row {
+    padding: 0 $utility-large_padding $utility-large_padding;
+    display: flex;
+    align-items: center;
+}
+
+.Navigation-link {
+    font-size: $navigation_fontSize;
+    font-weight: $navigation-item_fontWeight;
+    line-height: $navigation-item_height;
+    display: block;
+    width: 100%;
+    padding: 0 $utility-large_padding;
+    color: $navigation_link_color;
+
+    &:focus,
+    &:hover {
+        color: $navigation_link-hover_color;
+    }
+}
+
+.Navigation-linkContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    height: $panel-item_height;
+
+    a {
+        margin: 0;
+        line-height: $panel-item_height;
+
+        &:hover {
+            background: none;
+        }
+    }
+
+    &::after {
+        content: "";
+        width: 100%;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: $navigation_border;
+    }
+}
+
+.Navigation-linkContainer:last-child::after {
+    content: none;
+}
+
+.UserLoggedOut {
+
+    .Navigation-row.NewDiscussion {
+        display: none;
+    }
+}

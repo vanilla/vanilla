@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -12,39 +12,40 @@ const currentColorFill = {
     fill: "currentColor",
 };
 
-export function rightChevron(className?: string) {
+const leftChevronPath =
+    "M3.621,10.5l7.94-7.939A1.5,1.5,0,0,0,9.439.439h0l-9,9a1.5,1.5,0,0,0,0,2.121h0l9,9a1.5,1.5,0,0,0,2.122-2.122Z";
+
+const horizontalChevronViewBox = (centred: boolean) => {
+    return centred ? "-8 -4 30 30" : "0 0 24 24";
+};
+
+export function rightChevron(className?: string, centred: boolean = false) {
     const title = `>`;
     return (
         <svg
             className={classNames("icon", "icon-chevronRight", className)}
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
+            viewBox={horizontalChevronViewBox(centred)}
             aria-hidden="true"
+            style={{ transform: "scaleX(-1)", transformOrigin: "50% 50%" }}
         >
             <title>{title}</title>
-            <path
-                fill="currentColor"
-                d="M15.4955435,6.92634039 C15.4955435,6.82589384 15.4509005,6.73660802 15.3839362,6.66964366 L14.8258998,6.11160728 C14.7589354,6.04464291 14.6584889,6 14.5692031,6 C14.4799172,6 14.3794707,6.04464291 14.3125063,6.11160728 L9.11160728,11.3125063 C9.04464291,11.3794707 9,11.4799172 9,11.5692031 C9,11.6584889 9.04464291,11.7589354 9.11160728,11.8258998 L14.3125063,17.0267989 C14.3794707,17.0937632 14.4799172,17.1384061 14.5692031,17.1384061 C14.6584889,17.1384061 14.7589354,17.0937632 14.8258998,17.0267989 L15.3839362,16.4687625 C15.4509005,16.4017981 15.4955435,16.3013516 15.4955435,16.2120657 C15.4955435,16.1227799 15.4509005,16.0223334 15.3839362,15.955369 L10.9977702,11.5692031 L15.3839362,7.18303712 C15.4509005,7.11607276 15.4955435,7.01562621 15.4955435,6.92634039 Z"
-                transform="matrix(-1 0 0 1 25 .5)"
-            />
+            <path className="icon-chevronRightPath" d={leftChevronPath} style={currentColorFill} />
         </svg>
     );
 }
 
-const leftChefronPath =
-    "M14.9,7.7l-4.4,4.4,4.4,4.4a.5.5,0,0,1,0,.6l-.6.6a.5.5,0,0,1-.6,0L8.5,12.5a.5.5,0,0,1,0-.6l5.2-5.2a.5.5,0,0,1,.6,0s.676.543.7.7A.325.325,0,0,1,14.9,7.7Z";
-
-export function leftChevron(className?: string) {
+export function leftChevron(className?: string, centred: boolean = false) {
     const title = `<`;
     return (
         <svg
             className={classNames("icon", "icon-chevronLeft", className)}
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
+            viewBox={horizontalChevronViewBox(centred)}
             aria-hidden="true"
         >
             <title>{title}</title>
-            <path d={leftChefronPath} style={currentColorFill} />
+            <path className="icon-chevronLeftPath" d={leftChevronPath} style={currentColorFill} />
         </svg>
     );
 }
@@ -55,11 +56,11 @@ export function leftChevronCompact(className?: string) {
         <svg
             className={classNames("icon-chevronLeftCompact", className)}
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 6.606 11.2"
+            viewBox="0 0 12 21"
             aria-hidden="true"
         >
             <title>{title}</title>
-            <path d={leftChefronPath} transform="translate(-8.4 -6.6)" style={currentColorFill} />
+            <path d={leftChevronPath} style={currentColorFill} />
         </svg>
     );
 }
@@ -74,27 +75,25 @@ export function bottomChevron(className?: string) {
             aria-hidden="true"
         >
             <title>{title}</title>
-            <path d={leftChefronPath} transform="translate(-8.4 -6.6)" style={currentColorFill} />
+            <path d={leftChevronPath} transform="translate(-8.4 -6.6)" style={currentColorFill} />
         </svg>
     );
 }
 
-export function close(className?: string, noPadding: boolean = false) {
+export function close(className?: string) {
     const title = t("Close");
-    const viewBox = noPadding ? "0 0 16 16" : "0 0 24 24";
-    const transform = noPadding ? "translate(-4 -4)" : "";
     return (
         <svg
             className={classNames("icon", "icon-close", className)}
             xmlns="http://www.w3.org/2000/svg"
-            viewBox={viewBox}
+            viewBox="0 0 9.5 9.5"
             aria-hidden="true"
         >
             <title>{title}</title>
             <path
-                transform={transform}
                 fill="currentColor"
-                d="M12,10.6293581 L5.49002397,4.11938207 C5.30046135,3.92981944 4.95620859,3.96673045 4.69799105,4.22494799 L4.22494799,4.69799105 C3.97708292,4.94585613 3.92537154,5.29601344 4.11938207,5.49002397 L10.6293581,12 L4.11938207,18.509976 C3.92981944,18.6995387 3.96673045,19.0437914 4.22494799,19.3020089 L4.69799105,19.775052 C4.94585613,20.0229171 5.29601344,20.0746285 5.49002397,19.8806179 L12,13.3706419 L18.509976,19.8806179 C18.6995387,20.0701806 19.0437914,20.0332695 19.3020089,19.775052 L19.775052,19.3020089 C20.0229171,19.0541439 20.0746285,18.7039866 19.8806179,18.509976 L13.3706419,12 L19.8806179,5.49002397 C20.0701806,5.30046135 20.0332695,4.95620859 19.775052,4.69799105 L19.3020089,4.22494799 C19.0541439,3.97708292 18.7039866,3.92537154 18.509976,4.11938207 L12,10.6293581 Z"
+                d="M3.38,4.75l-3-3A1,1,0,0,1,.26.33s0,0,0,0a1.05,1.05,0,0,1,1.45,0h0l3,3,3-3A1,1,0,0,1,9.18.3h0a1,1,0,0,1,0,1.4h0l-3,3,3,3a1,1,0,0,1,.06,1.41,1,1,0,0,1-1.38.09l-3-3-3,3a1.05,1.05,0,0,1-1.47.07A1,1,0,0,1,.29,7.8h0Z"
+                transform="translate(-0.01 -0.01)"
             />
         </svg>
     );
@@ -177,14 +176,13 @@ export function categoryIcon(className?: string) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             className={classNames("icon", "icon-categoryIcon", className)}
-            viewBox="0 0 14.25 12.75"
+            viewBox="0 0 24 24"
             role="img"
             aria-label={title}
         >
             <title>{title}</title>
             <path
-                d="M9.369,3.164H14.75a.375.375,0,0,1,.375.375V13a.375.375,0,0,1-.375.375H1.25A.375.375,0,0,1,.875,13V1A.375.375,0,0,1,1.25.625H8a.375.375,0,0,1,.343.223ZM1.625,1.375v11.25h12.75V3.914H9.125a.375.375,0,0,1-.343-.223L7.756,1.375Z"
-                transform="translate(-0.875 -0.625)"
+                d="M5.5,19 L18.5,19 C19.3284271,19 20,18.3284271 20,17.5 L20,8.5 C20,7.67157288 19.3284271,7 18.5,7 L12,7 L10.2222222,5 L5.5,5 C4.67157288,5 4,5.67157288 4,6.5 L4,17.5 C4,18.3284271 4.67157288,19 5.5,19 Z"
                 fill="currentColor"
             />
         </svg>
@@ -229,7 +227,7 @@ export function downTriangle(className?: string, title: string = "▾", deg?: nu
     );
 }
 
-export function rightTriangle(title: string = `▶`, className?: string) {
+export function rightTriangle(className?: string, title: string = `▶`) {
     return downTriangle(className, title, -90);
 }
 
@@ -264,25 +262,6 @@ export function compose(className?: string) {
             <path
                 fill="currentColor"
                 d="M23.591,1.27l-.9-.9a1.289,1.289,0,0,0-1.807,0l-.762.863,2.6,2.587.868-.751a1.24,1.24,0,0,0,.248-.373,1.255,1.255,0,0,0,0-1.052A1.232,1.232,0,0,0,23.591,1.27ZM19.5,20.5H3.5V4.5H15.4l1.4-1.431H2.751A1,1,0,0,0,2,4.07V20.939a1,1,0,0,0,1,1H20.011a1,1,0,0,0,1-1V7L19.5,8.445ZM21.364,3.449l-9.875,9.8-.867-.861,9.874-9.8-.867-.863-4.938,4.9-4.938,4.9L8.74,15.167l3.617-1.055,9.875-9.8Z"
-            />
-        </svg>
-    );
-}
-
-export function download(className?: string) {
-    const title = t("Download");
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            className={classNames("icon", "icon-compose", className)}
-            role="img"
-            aria-label={title}
-        >
-            <title>{title}</title>
-            <path
-                d="M6.483,10.462h.005a.5.5,0,0,1,.707.01l3.954,4.066V3.887a.5.5,0,0,1,.5-.5h.621a.5.5,0,0,1,.5.5V14.533l4.035-4.073h0a.5.5,0,0,1,.707,0l.437.437a.5.5,0,0,1,0,.707h0l-5.6,5.6a.5.5,0,0,1-.707,0h0l-5.6-5.6a.5.5,0,0,1,0-.707h0ZM20.25,19.5V17.25a.75.75,0,0,1,1.5,0v3A.75.75,0,0,1,21,21H3a.75.75,0,0,1-.75-.75v-3a.75.75,0,0,1,1.5,0V19.5Z"
-                fill="currentColor"
             />
         </svg>
     );

@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -15,6 +15,7 @@ interface IPanelLayoutProps extends IDeviceProps {
     toggleMobileMenu?: (isOpen: boolean) => void;
     contentTag?: string;
     growMiddleBottom?: boolean;
+    topPadding?: boolean;
 }
 
 /**
@@ -76,6 +77,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
     public static defaultProps = {
         contentTag: "div",
         growMiddleBottom: false,
+        topPadding: true,
     };
 
     public render() {
@@ -98,6 +100,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
             { noBreadcrumbs: !children.breadcrumbs },
             this.props.className,
             { inheritHeight: this.props.growMiddleBottom },
+            { hasTopPadding: this.props.topPadding },
         );
 
         // If applicable, set semantic tag, like "article"
@@ -107,7 +110,9 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
             <div className={panelClasses}>
                 {children.breadcrumbs && (
                     <div className="panelLayout-container">
-                        <Panel className={classNames("panelLayout-left")} ariaHidden={true} />
+                        {shouldRenderLeftPanel && (
+                            <Panel className={classNames("panelLayout-left")} ariaHidden={true} />
+                        )}
                         <Panel
                             className={classNames("panelLayout-content", "panel-breadcrumbs", {
                                 hasAdjacentPanel: shouldRenderLeftPanel,

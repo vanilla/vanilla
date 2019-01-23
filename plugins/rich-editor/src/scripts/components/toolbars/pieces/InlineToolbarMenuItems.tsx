@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -56,7 +56,7 @@ export default class InlineToolbarMenuItems extends React.PureComponent<IProps> 
             {
                 label: t("Format as Inline Code"),
                 icon: icons.code(),
-                isActive: activeFormats.codeInline === true,
+                isActive: activeFormats.code === true,
                 onClick: this.formatCode,
             },
             {

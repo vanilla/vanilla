@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -28,7 +28,7 @@ class ValidationTest extends SharedBootstrapTestCase {
             'Body' => (object)['AllowNull' => false, 'Default' => '', 'Type' => 'string'],
             'Format' => (object)['AllowNull' => false, 'Default' => '', 'Type' => 'string'],
         ], true);
-        $validation->addRule('BodyFormat', new \Vanilla\BodyFormatValidator());
+        $validation->addRule('BodyFormat', \Gdn::getContainer()->get(\Vanilla\BodyFormatValidator::class));
 
         $result = $validation->validate($row);
         $this->assertSame($isValid, $result);

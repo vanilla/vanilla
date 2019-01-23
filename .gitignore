@@ -38,6 +38,7 @@
 !/plugins/HtmLawed/
 !/plugins/OpenID/
 !/plugins/oauth2/
+!/plugins/pockets/
 !/plugins/PrivateCommunity/
 !/plugins/ProfileExtender/
 !/plugins/Quotes/
@@ -59,6 +60,8 @@
 !/themes/bittersweet/
 !/themes/default/
 !/themes/mobile/
+!/themes/theme-boilerplate/
+!/themes/keystone/
 /uploads/*
 !/uploads/.gitkeep
 *vanillaforums*

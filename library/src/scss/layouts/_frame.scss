@@ -1,6 +1,6 @@
 /*!
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -28,12 +28,6 @@ $frame-panel_minHeight: 500px;
     position: relative;
     background-color: $frame-bgColor;
     max-height: 100vh;
-    border: {
-        style: solid;
-        width: 1px;
-        color: $overlay-border_color;
-        radius: $frame-border_radius;
-    }
 }
 
 .frameHeader {
@@ -69,20 +63,21 @@ $frame-panel_minHeight: 500px;
         display: flex;
         flex-wrap: nowrap;
         justify-content: center;
-        align-items: center;
+        align-items: flex-end;
         flex-shrink: 1;
-        height: #{($global-large_fontSize * $global-condensed_lineHeight) - (2 * $frame-header_spacing)};
-        width: $icon_small_size;
-        margin: {
-            right: $utility-baseUnit;
-            left: -10px;
-        }
+        min-width: $icon-large_size;
+        width: $icon-large_size;
+        margin-left: -8px;
     }
 }
 
 .frameHeader-heading {
+    display: flex;
+    align-items: center;
     flex-grow: 1;
     text-overflow: ellipsis;
+    font-weight: $global-fontWeight_semiBold;
+    font-size: $global-large_fontSize;
 }
 
 .frameHeader-left {
@@ -101,10 +96,6 @@ $frame-panel_minHeight: 500px;
     height: $formElement_height;
     flex-basis: $formElement_height;
     width: $formElement_height;
-
-    @include mediaQuery-panelLayout_xs {
-        display: none;
-    }
 }
 
 .frameHeaderWithAction-action,
@@ -114,11 +105,16 @@ $frame-panel_minHeight: 500px;
     justify-content: center;
     flex-shrink: 1;
     height: $formElement-height;
-    transform: translateX(#{($formElement_height - $icon-small_size) / 2}); // offset so the side of the icon lines up, not the edge of the button
+    transform: translateX(6px); // offset so the side of the icon lines up, not the edge of the button
+}
+
+.frameHeader-closePosition {
+    margin-left: auto;
 }
 
 .frameBody {
     position: relative;
+    flex-grow: 1;
     max-height: 100%;
     overflow: auto;
     padding: {
@@ -151,14 +147,26 @@ $frame-panel_minHeight: 500px;
 
 .framePanel {
     position: relative;
+    flex-grow: 1;
     height: 100%;
     background-color: $frame-bgColor;
     overflow: auto;
     max-height: calc(100vh - #{$frame-header_minHeight + $frame-footer_minHeight + $frame_padding * 2});
 
+
+    > .inputBlock {
+        &.isFirst {
+            margin-top: $global_gutter_halfSize;
+        }
+        &.isLast {
+            margin-bottom: $global_gutter_halfSize;
+        }
+    }
 }
 
 .frameFooter-markRead.buttonAsText {
     font-weight: $global-fontWeight_semiBold;
     color: $global-color_primary;
 }
+
+

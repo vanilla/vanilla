@@ -1,0 +1,86 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+.Section-ConversationList,
+.Section-Conversation {
+
+    .Conversation,
+    .DataList.Conversations {
+
+        .PhotoWrap {
+            position: absolute;
+            top: $component-base_padding;
+
+            @if $component_lateralBorder == true {
+                left: $component-base_padding;
+            } @else {
+                left: 0;
+            }
+        }
+
+        h3,
+        .Excerpt,
+        .Meta {
+            display: block;
+            padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+        }
+    }
+}
+
+.Section-ConversationList {
+
+    @include noPanel;
+}
+
+.Section-Conversation {
+
+    .SearchBox {
+        display: none;
+    }
+
+    .Conversation-User img {
+        overflow: hidden;
+        border-radius: $theme-photo_borderRadius;
+
+        @if ($theme-photo_round) {
+            border-radius: 50%;
+        }
+    }
+
+    .DataListWrap {
+        margin: 0;
+    }
+
+    .MessageList .Message {
+        line-height: #{$theme-photo_size / 2};
+        padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+    }
+}
+
+.ConversationMessage {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    min-height: $theme-photo_size;
+
+    > * {
+        flex: 1;
+    }
+
+    .Message {
+        margin-top: 0;
+    }
+
+    .Meta {
+        line-height: #{$theme-photo_size / 2};
+        order: 2;
+    }
+}
+

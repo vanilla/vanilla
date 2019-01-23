@@ -1,5 +1,5 @@
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -13,4 +13,42 @@ button.Close {
     font-size: 22px;
     font-weight: bold;
     padding: 0;
+}
+
+.buttonIcon {
+    @include resetButton;
+    cursor: pointer;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    width: 36px;
+    min-width: 36px;
+    padding: 0;
+    color: $icon_color;
+
+    &:visited {
+        color: $icon_color;
+    }
+
+    .icon {
+        display: block;
+    }
+
+    &.isOpen {
+        color: $global-color_primary;
+    }
+
+    &:focus,
+    &:hover {
+        color: $global-color_primary;
+    }
+}
+
+.icon-close {
+    display: block;
+    margin: auto;
+    width: 12px;
+    height: 12px;
 }

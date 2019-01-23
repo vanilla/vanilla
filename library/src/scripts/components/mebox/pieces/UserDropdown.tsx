@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -30,6 +30,7 @@ export interface IUserDropDownProps extends IInjectableUserState, IUserDropDownC
     countsClass?: string;
     buttonClassName?: string;
     contentsClassName?: string;
+    toggleContentClassName?: string;
 }
 
 interface IState {
@@ -64,7 +65,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                 contentsClassName={classNames("userDropDown-contents", this.props.contentsClassName)}
                 renderLeft={true}
                 buttonContents={
-                    <div className="meBox-buttonContent">
+                    <div className={classNames("meBox-buttonContent", this.props.toggleContentClassName)}>
                         <UserPhoto
                             userInfo={userInfo}
                             open={this.state.open}

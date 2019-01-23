@@ -2,7 +2,7 @@
 /**
  * Activity Model.
  *
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0
@@ -969,8 +969,13 @@ class ActivityModel extends Gdn_Model {
             $message = $prefix;
         }
 
-        if ($story = val('Story', $activity)) {
-            $message .= $story;
+        $isArray = is_array($activity);
+
+        $story = $isArray ? $activity['Story'] ?? null : $activity->Story ?? null;
+        $format = $isArray ? $activity['Format'] ?? null : $activity->Format ?? null;
+
+        if ($story && $format) {
+            $message .= Gdn_Format::to($story, $format);
         }
 
         return $message;

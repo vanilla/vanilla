@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,15 +10,18 @@ import { IEmbedData, renderEmbed, FOCUS_CLASS } from "@library/embeds";
 import { t } from "@library/application";
 import { logError, capitalizeFirstLetter } from "@library/utility";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
-import ErrorBlot from "@rich-editor/quill/blots/embeds/ErrorBlot";
+import ErrorBlot, { IErrorData, ErrorBlotType } from "@rich-editor/quill/blots/embeds/ErrorBlot";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
+import ProgressEventEmitter from "@library/ProgressEventEmitter";
 
 const DATA_KEY = "__embed-data__";
 
 interface ILoaderData {
-    type: "image" | "link";
+    type: "image" | "link" | "file";
+    file?: File;
     link?: string;
+    progressEventEmitter?: ProgressEventEmitter;
 }
 
 interface IEmbedUnloadedValue {
@@ -175,7 +178,15 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
     public replaceLoaderWithFinalForm(value: IEmbedValue) {
         let finalBlot: ExternalEmbedBlot | ErrorBlot;
 
-        this.resolveDataFromValue(value)
+        const resolvedPromise = this.resolveDataFromValue(value);
+        if (!(resolvedPromise instanceof Promise)) {
+            const quill = this.quill;
+            this.remove();
+            quill && quill.update();
+            return;
+        }
+
+        resolvedPromise
             .then(data => {
                 const newValue: IEmbedValue = {
                     data,
@@ -190,7 +201,12 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             })
             .catch(e => {
                 logError(e);
-                this.replaceWith(new ErrorBlot(ErrorBlot.create(e)));
+                const errorData: IErrorData = {
+                    error: e,
+                    type: value.loaderData.type === "file" ? ErrorBlotType.FILE : ErrorBlotType.STANDARD,
+                    file: value.loaderData.file,
+                };
+                this.replaceWith(new ErrorBlot(ErrorBlot.create(errorData), errorData));
             });
     }
 

@@ -1,0 +1,25 @@
+/*
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* ------------------ Theme ------------------ */
+
+@import "base/variables_dark";
+@import "base/variables";
+
+/* --------------- Boilerplate --------------- */
+
+@import "../../../theme-boilerplate/src/scss/custom";
+
+/* --------------- Components --------------- */
+
+@import "components/herobanner";
+@import "components/searchbox_dark";
+@import "components/forms_dark";
+
+/* ------------------ Sections ------------------ */
+
+@import "sections/navigation_dark";
+@import "sections/themeoptions";

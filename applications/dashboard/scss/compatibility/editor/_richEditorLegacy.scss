@@ -1,5 +1,5 @@
 /*!
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,6 +10,10 @@
     blockquote {
         display: block;
         margin: 0;
+    }
+
+    .richEditorParagraphMenu {
+        left: 0;
     }
 }
 
@@ -72,6 +76,38 @@
             margin-bottom: 0;
         }
     }
+
+    .metas {
+        display: block;
+        line-height: $meta_lineHeight;
+        color: $metas_color;
+        width: calc(100% + #{$meta_spacing * 2});
+        overflow: hidden;
+        text-align: left;
+    
+        margin: {
+            left: -#{$meta_spacing};
+            right: $meta_spacing;
+        }
+    
+        &.isFlexed {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            align-items: center;
+        }
+    }
+
+    .meta {
+        display: inline-block;
+        margin: 0 $meta_spacing;
+        font-size: $metaText_fontSize;
+        color: $metas_color;
+    
+        .meta {
+            margin: 0;
+        }
+    }    
 }
 
 .richEditor-menu {
@@ -237,19 +273,19 @@ body.hasRichEditor {
 .richEditor-text {
     overflow: visible;
     padding: {
+        top: $richEditor_verticalPadding;
         right: $richEditor_innerPadding;
+        bottom: $richEditor_verticalPadding;
         left: $richEditor_innerPadding;
     }
+    border-radius: $formElement_borderRadius;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
     &:focus {
-        outline: {
-            offset: $richEditor-text_offset;
-            style: solid;
-            width: $formElement_borderWidth;
-            color: $richEditor-outline_color;
-        }
+        // Use a box shadow so border-radiuses work
+        box-shadow: 0 0 0 $formElement-borderWidth $richEditor-outline_color;
     }
 }
-
 
 // Mobile
 body.isMobile {

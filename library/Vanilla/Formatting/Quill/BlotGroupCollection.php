@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -50,10 +50,8 @@ class BlotGroupCollection implements \IteratorAggregate {
         return new \ArrayIterator($this->groups);
     }
 
-    // PRIVATE IMPLEMENTATION DETAILS
-
     /**
-     * BlotGroupFactory constructor.
+     * BlotGroupCollection constructor.
      *
      * @param array[] $operations The operations to generate groups for.
      * @param string[] $allowedBlotClasses The class names of the blots we are allowed to create in the groups.

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -26,7 +26,8 @@ class CodeLineTerminatorBlot extends AbstractLineTerminatorBlot {
      * @inheritdoc
      */
     public static function matches(array $operation): bool {
-        return static::opAttrsContainKeyWithValue($operation, "codeBlock");
+        return static::opAttrsContainKeyWithValue($operation, "codeBlock")
+            || static::opAttrsContainKeyWithValue($operation, "code-block");
     }
 
     public function renderLineStart(): string {
@@ -41,13 +42,13 @@ class CodeLineTerminatorBlot extends AbstractLineTerminatorBlot {
      * @inheritDoc
      */
     public function getGroupOpeningTag(): string {
-        return '<code class="code codeBlock" spellcheck="false">';
+        return '<pre class="code codeBlock" spellcheck="false">';
     }
 
     /**
      * @inheritDoc
      */
     public function getGroupClosingTag(): string {
-        return "</code>";
+        return "</pre>";
     }
 }

@@ -101,7 +101,7 @@ $tag-hover_borderColor:           $global-color_primary !default;
     .Tag-Announcement,
     .NewCommentCount,
     .HasNew.HasNew {
-        @include Tag($bullet_fg, $bullet_bg, $bullet_borderColor);
+        @include Tag($global-color_primary, transparent, $global-color_primary);
     }
 
     //Tags that are links get hover state

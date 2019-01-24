@@ -45,15 +45,18 @@ $searchbox-button_borderWidth: 0 !default;
         }
 
     .groupSearch-button.groupSearch-button {
-        background: none;
-        color: $global-color_primary;
-        border: 1px solid $global-color_primary;
         position: absolute;
         top: 0;
         right: 0;
         bottom: 0;
-        width: $formElement_height;
+        background: transparent;
+        border-color: $searchbox-button_borderColor;
+        border-width: $searchbox-button_borderWidth;
         line-height: $formElement_height;
+        height: $formElement_height;
+        width: $formElement_height;
+        min-width: 0;
+        padding: 0 $utility-small_padding;
     }
 }
 
@@ -63,7 +66,7 @@ $searchbox-button_borderWidth: 0 !default;
     background: transparent;
     border-color: $searchbox-button_borderColor;
     border-width: $searchbox-button_borderWidth;
-    line-height: $formElement_lineHeight;
+    line-height: $formElement_height;
     height: $formElement_height;
     width: $formElement_height;
     min-width: 0;

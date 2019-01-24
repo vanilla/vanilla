@@ -86,7 +86,7 @@ $global-color_fg:                       $global-color_grey !default; // text col
 $global-border_color:                   mix($global-color_fg, $global-color_bg, 24%) !default; // Note it's off by default due to the border width
 $global-border-width:                   1px;
 $global-border-style:                   solid;
-$global_borderRadius:                   3px !default;
+$global_borderRadius:                   6px !default;
 
 $global-body_bg:                        $global-color_bg !default;
 
@@ -198,6 +198,14 @@ $headerMebutton-active_bg:               mix($headerMebutton_fg, $header_bg, 12%
 $headerMeBoxAlert_bg:                    $global-color_secondary !default;
 
 /* -------------------------------------------------------------- *\
+    Mebox Count
+\* -------------------------------------------------------------- */
+
+$meboxCount_bg:                              $global-color_secondary !default;
+$meboxCount_fg:                              $global-color_white !default;
+$meboxCount_borderColor:                     $global-color_secondary !default;
+
+/* -------------------------------------------------------------- *\
     Navigation
 \* -------------------------------------------------------------- */
 
@@ -306,28 +314,27 @@ $component-title_fontSize:               $global-large_fontSize !default;
 $component-title_fontWeight:             $global-semibold_fontWeight !default;
 $component-title_lineHeight:             $global-base_lineHeight !default;
 
-$component-meta_color:                   mix($global-color_bg, $global-color_fg, 20%) !default;
+$component-meta_color:                   mix($global-color_bg, $global-color_fg, 12%) !default;
 $component-meta-link_color:              $component-meta_color !default;
 $component-meta-link-hover_color:        $theme-heading-hover_color !default;
 $component-meta_fontSize:                $global-small_fontSize !default;
 $component-meta_fontWeight:              $global-normal_fontWeight !default;
-$component-meta_lineHeight:              $global-condensed_lineHeight !default;
+$component-meta_lineHeight:              $global-base_lineHeight !default;
 
 /* -------------------------------------------------------------- *\
     Form Elements
 \* -------------------------------------------------------------- */
 
-$formElement_height:                     36px !default;
+$formElement_height:                     $utility-baseUnit * 6;
 $formElement_paddingVertical:            $utility-baseUnitHalf !default;
 $formElement_paddingHorizontal:          $utility-baseUnitDouble !default;
-$formElement_lineHeight:                 $formElement_height - (#{$formElement_paddingVertical} * 2) !default;
 $formElement_color:                      $global-color_black !default;
 $formElement_borderColor:                lighten($global-color_black, 60%) !default;
 $formElement_placeholderColor:           $formElement_borderColor !default;
 $formElement_border:                     1px solid $formElement_borderColor !default;
 $formElement_fontSize:                   $global-medium_fontSize !default;
 $formElement_fontWeight:                 $global-medium_fontSize !default;
-$formElement_borderRadius:               6px !default;
+$formElement_borderRadius:               $global_borderRadius !default;
 
 /* -------------------------------------------------------------- *\
     Buttons
@@ -364,14 +371,6 @@ $formButton_padding:                     $utility-medium_padding !default;
 $formButton_height:                      $formElement_height !default;
 $formButton_borderRadius:                $formElement_borderRadius !default;
 $formButton_border:                      1px solid !default;
-
-/* -------------------------------------------------------------- *\
-    Bullets
-\* -------------------------------------------------------------- */
-
-$bullet_bg:                              transparent !default;
-$bullet_fg:                              $global-color_primary !default;
-$bullet_borderColor:                     $global-color_primary !default;
 
 /* -------------------------------------------------------------- *\
     Breakpoints

@@ -120,9 +120,9 @@ $mebox-button_borderRadius:             $global_borderRadius !default;
         }
 
         .Alert {
-            border: 1px solid $bullet_borderColor;
-            background: $bullet_bg;
-            color: $bullet_fg;
+            border: 1px solid $meboxCount_borderColor;
+            background: $meboxCount_bg;
+            color: $meboxCount_fg;
             white-space: nowrap;
         }
     }

@@ -234,15 +234,14 @@ a.MoreWrap,
     .QuickSearchButton {
         height: $formButton_height;
         width: $formButton_height;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .QuickSearchButton.QuickSearchButton span {
-        min-width: 0;
-        height: auto;
-        width: auto;
+        display: inherit;
         color: inherit;
-        margin: 0;
-        vertical-align: baseline;
 
         &:hover,
         &:focus {
@@ -325,42 +324,6 @@ a.MoreWrap,
         display: none;
     }
 
-    .BoxNewDiscussion > .Button,
-    .BoxNewDiscussion {
-
-        @include maxWidth {
-            display: block;
-            width: 100%;
-            margin-right: 0;
-            text-align: center;
-            margin-bottom: $utility-large_padding;
-        }
-    }
-
-    .ButtonGroup.Multi {
-        padding-right: 0;
-    }
-
-    .NewDiscussion {
-
-        .Button.Handle {
-            margin-left: 32px - $utility-medium_padding;
-            position: relative;
-        }
-
-        @include maxWidth {
-            padding: 0;
-
-            .Primary:first-child {
-                width: 100%;
-            }
-
-            .Button.Handle {
-                position: absolute;
-            }
-        }
-    }
-
     // Reset styles from ideation
     .discussion-sort-filter-module {
         float: none !important;
@@ -376,6 +339,18 @@ a.MoreWrap,
         @include maxWidth {
             margin: 0;
         }
+    }
+}
+
+.Button-Controls.Button-Controls {
+
+    .BigButton,
+    .ButtonGroup.Multi {
+        min-width: 200px;
+    }
+
+    .BoxNewDiscussion {
+        display: block;
     }
 }
 

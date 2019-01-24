@@ -97,6 +97,7 @@ body.Section-BestOf {
         width: calc((100% / 3) - (#{$utility-baseUnit} * 2));
         margin: 0 $utility-baseUnit $utility-baseUnitDouble;
         background: $component_bg;
+        padding: $component-base_padding;
 
         @if ($component_borderRadius == 0) {
             border-radius: $global_borderRadius;
@@ -109,7 +110,20 @@ body.Section-BestOf {
         }
 
         .AuthorWrap {
+            margin-left: -#{$component-base_padding};
+            margin-right: -#{$component-base_padding};
+            margin-bottom: -#{$component-base_padding};
+            padding: $component-base_padding;
+            min-height: calc(#{$theme-photo_size} + #{$component-base_padding} * 2);
             background-color: $component-header_bg;
+
+            @if ($component_borderRadius == 0) {
+                border-bottom-left-radius: $global_borderRadius;
+                border-bottom-right-radius: $global_borderRadius;
+            } @else {
+                border-bottom-left-radius: $component_borderRadius;
+                border-bottom-right-radius: $component_borderRadius;
+            }
         }
 
         .Title,

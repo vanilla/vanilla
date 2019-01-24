@@ -149,7 +149,7 @@ body.Section-BestOf {
             max-height: $line-height * $num-lines;
             overflow: hidden;
             position: relative;
-            margin: $utility-medium_padding 0;
+            margin: 0 0 $utility-baseUnit;
         }
 
         .Reactions {
@@ -171,12 +171,16 @@ body.Section-BestOf {
 
         .Item-Header,
         .Item-BodyWrap {
-            margin-bottom: $utility-medium_padding;
+            margin-bottom: $utility-baseUnit;
+        }
+
+        .Author,
+        .Meta {
+            line-height: $component-meta_lineHeight;
         }
 
         .Author {
             display: block;
-            line-height: calc(#{$theme-photo_size} / 2);
 
             a {
                 line-height: inherit;
@@ -195,16 +199,11 @@ body.Section-BestOf {
                 margin-left: $utility-baseUnitDouble;
             }
 
-            @include maxWidth {
-                display: inline-flex;
-                align-items: center;
-                min-height: $theme-photo_size;
-                line-height: $global-base_lineHeight;
-
-                a:first-child {
-                    flex: 1 0 $theme-photo_size;
-                }
-            }
+            //@include maxWidth {
+            //    display: inline-flex;
+            //    align-items: center;
+            //    line-height: $global-base_lineHeight;
+            //}
         }
 
         .PhotoWrap {
@@ -236,6 +235,10 @@ body.Section-BestOf {
     .Item {
         .Meta {
             padding-left: calc(#{$theme-photo_size} + #{$utility-baseUnitDouble});
+
+            @include maxWidth {
+                margin-top: 0;
+            }
         }
     }
 

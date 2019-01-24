@@ -278,13 +278,12 @@ body.hasRichEditor {
         bottom: $richEditor_verticalPadding;
         left: $richEditor_innerPadding;
     }
+    border-radius: $formElement_borderRadius;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
     &:focus {
-        outline: {
-            offset: $richEditor-text_offset;
-            style: solid;
-            width: $formElement_borderWidth;
-            color: $richEditor-outline_color;
-        }
+        // Use a box shadow so border-radiuses work
+        box-shadow: 0 0 0 $formElement-borderWidth $richEditor-outline_color;
     }
 }
 

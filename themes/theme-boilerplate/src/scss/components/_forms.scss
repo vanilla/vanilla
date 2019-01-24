@@ -255,6 +255,10 @@ div.token-input-dropdown {
     }
 }
 
+.DraftButton {
+    display: none !important;
+}
+
 .Button-Controls .Button.Primary,
 .BigButton:not(.Danger),
 .NewConversation.NewConversation {

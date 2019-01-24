@@ -1143,13 +1143,13 @@ body.hasRichEditor #Form_Preview {
   padding-right: 12px;
   padding-bottom: 12px;
   padding-left: 12px;
+  border-radius: 6px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .richEditor-text:focus {
-  outline-offset: 0;
-  outline-style: solid;
-  outline-width: 1px;
-  outline-color: rgba(2, 145, 219, 0.6);
+  box-shadow: 0 0 0 1px rgba(2, 145, 219, 0.6);
 }
 
 body.isMobile .embedDialogue {

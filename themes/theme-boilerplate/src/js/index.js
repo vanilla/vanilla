@@ -5,8 +5,10 @@
  */
 
 import { setupMobileNavigation } from "./mobileNavigation";
+import { setupHeader } from "./header";
 
 $(() => {
+    setupHeader();
     setupMobileNavigation();
 
     $("select").wrap('<div class="SelectWrapper"></div>');

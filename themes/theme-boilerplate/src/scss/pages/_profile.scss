@@ -57,7 +57,7 @@ body.Section-Profile {
         color: $global-color_primary;
         text-transform: uppercase;
         border: 1px solid $global-color-primary;
-        padding: $utility-xSmall_padding;
+        padding: $utility-baseUnitHalf;
         display: inline-flex;
         border-radius: $global_borderRadius;
     }
@@ -150,7 +150,7 @@ body.Section-Profile {
 
         .MemberButtons {
             @include Button;
-            margin-right: $utility-small_padding;
+            margin-right: $utility-baseUnitHalf;
 
             @include maxWidth {
                 margin-right: 0;
@@ -231,7 +231,7 @@ body.Section-Profile {
     }
 
     .User .DismissMessage {
-        margin-top: $utility-medium_padding;
+        margin-top: $utility-baseUnitDouble;
     }
 
     .Box li {
@@ -242,7 +242,7 @@ body.Section-Profile {
     .FormTitleWrapper,
     .change-picture,
     &.quotes .Frame-content form {
-        padding: $utility-medium_padding;
+        padding: $utility-baseUnitDouble;
         margin-bottom: $utility-large_padding;
 
         @include maxWidth {
@@ -326,7 +326,7 @@ body.Section-Profile {
         dl {
             @include clearfix;
             width: 100%;
-            padding: $utility-small_padding 0;
+            padding: $utility-baseUnitHalf 0;
         }
 
         dd,
@@ -337,7 +337,7 @@ body.Section-Profile {
             padding: 0;
             font-size: $formButton_fontSize;
             line-height: inherit;
-            margin-bottom: $utility-small_padding;
+            margin-bottom: $utility-baseUnitHalf;
             color: inherit;
         }
 
@@ -355,13 +355,13 @@ body.Section-Profile {
         dd {
             width: 75%;
             display: inline-block;
-            padding-left: $utility-small_padding;
+            padding-left: $utility-baseUnitHalf;
 
             @include maxWidth {
                 padding-left: 0;
                 width: 100%;
                 display: block;
-                margin-bottom: $utility-medium_padding;
+                margin-bottom: $utility-baseUnitDouble;
             }
         }
     }
@@ -390,7 +390,7 @@ body.Section-EditProfile {
             font-size: $global-large_fontSize;
             font-weight: $global-heading_fontWeight;
             margin-top: $component-item_spacing;
-            margin-bottom: $utility-small_padding;
+            margin-bottom: $utility-baseUnitHalf;
             border-bottom: $component_border;
 
             @include maxWidth {
@@ -427,7 +427,7 @@ body.Section-EditProfile {
         .CustomProfileFieldValue {
             max-width: calc(50% - 9px);
             margin-right: 18px;
-            margin-top: $utility-medium_padding;
+            margin-top: $utility-baseUnitDouble;
             float: left;
 
             &:nth-child(2n) {
@@ -446,7 +446,7 @@ body.Section-EditProfile {
         }
 
         .Button {
-            margin-top: $utility-medium_padding;
+            margin-top: $utility-baseUnitDouble;
         }
     }
 

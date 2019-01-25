@@ -195,7 +195,7 @@ body {
 }
 
 .CreateAccount {
-    margin-top: $utility-medium_padding;
+    margin-top: $utility-baseUnitDouble;
 }
 
 .idea-counter-box,
@@ -300,14 +300,14 @@ table.PreferenceGroup th {
 .Popup #UserBadgeForm {
     p,
     h1 {
-        margin-bottom: $utility-medium_padding;
+        margin-bottom: $utility-baseUnitDouble;
         display: block;
     }
 
     textarea {
         display: block;
         width: 100%;
-        margin-top: $utility-small_padding;
+        margin-top: $utility-baseUnitHalf;
     }
 
     button {
@@ -353,7 +353,7 @@ table.PreferenceGroup th {
 }
 
 .SocialIcon .Text {
-    padding: 0 0 0 $utility-small_padding;
+    padding: 0 0 0 $utility-baseUnitHalf;
     font-weight: $formButton_fontWeight;
     font-size: $formButton_fontSize;
     line-height: $formButton_height;
@@ -384,7 +384,7 @@ table.PreferenceGroup th {
     .Connection-Name {
         flex: 1;
         min-width: 200px;
-        margin: $utility-medium_padding 0;
+        margin: $utility-baseUnitDouble 0;
 
         @include maxWidth {
             flex: initial;
@@ -406,7 +406,7 @@ table.PreferenceGroup th {
         .ProfilePhoto {
             height: 30px;
             width: 30px;
-            margin-right: $utility-medium_padding;
+            margin-right: $utility-baseUnitDouble;
         }
     }
 }

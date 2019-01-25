@@ -54,7 +54,7 @@ $spolier_lineHeight:                    $global-base_lineHeight !default;
         border: $code_border;
         background-color: $code_bg;
         color: $code_color;
-        padding: $utility-medium_padding;
+        padding: $utility-baseUnitDouble;
         max-width: 100%;
         max-height: 600px;
         overflow: auto;
@@ -109,7 +109,7 @@ $spolier_lineHeight:                    $global-base_lineHeight !default;
 
     blockquote.Quote, blockquote.UserQuote {
         @include clearfix;
-        padding: $utility-medium_padding $utility-large_padding;
+        padding: $utility-baseUnitDouble $utility-large_padding;
         margin: $utility-large_padding 0;
         background: lighten($theme-hover_color, 3%);
         border-left: 4px solid $theme-hover_color;
@@ -138,7 +138,7 @@ $spolier_lineHeight:                    $global-base_lineHeight !default;
         @include icon;
         content: $icon-eye-close;
         font-size: $icon-default_size;
-        margin-right: $utility-small_padding;
+        margin-right: $utility-baseUnitHalf;
     }
 
     .Spoiler.Spoiler {
@@ -147,7 +147,7 @@ $spolier_lineHeight:                    $global-base_lineHeight !default;
         border-radius: $component_borderRadius;
         background: $spolier_bg;
         color: $spolier_color;
-        padding: $utility-medium_padding;
+        padding: $utility-baseUnitDouble;
         font-size: $spolier_fontSize;
         line-height: $spolier_lineHeight;
     }

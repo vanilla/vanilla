@@ -116,12 +116,12 @@ $quickSearch_color:                      $global-color_white !default;
     top: 100%;
 
     .InputBox {
-        margin-right: $utility-medium_padding;
+        margin-right: $utility-baseUnitDouble;
     }
 
     .bwrap {
         position: static;
-        margin-left: $utility-small_padding;
+        margin-left: $utility-baseUnitHalf;
 
         button {
             padding: 0;
@@ -153,7 +153,7 @@ a.MoreWrap,
         float: none;
         width: 100%;
         justify-content: center;
-        margin-bottom: $utility-medium_padding;
+        margin-bottom: $utility-baseUnitDouble;
 
         .QuickSearch {
             display: none;
@@ -163,7 +163,7 @@ a.MoreWrap,
     .QuickSearchButton {
         display: inline-flex;
         align-items: center;
-        margin: 0 0 0 $utility-medium_padding;
+        margin: 0 0 0 $utility-baseUnitDouble;
     }
 
     span,
@@ -214,7 +214,7 @@ a.MoreWrap,
 
     .Next,
     .Previous {
-        padding: 0 $utility-medium_padding;
+        padding: 0 $utility-baseUnitDouble;
      }
 
     .Previous {
@@ -314,7 +314,7 @@ a.MoreWrap,
 .PageControls.PageControls {
 
     .discussion-sorts {
-        margin-right: $utility-medium_padding;
+        margin-right: $utility-baseUnitDouble;
     }
 
     @include maxWidth {

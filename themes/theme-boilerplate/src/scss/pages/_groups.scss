@@ -15,7 +15,7 @@ $GroupIcon-overlap: #{50px + $utility-large_padding};
 .Section-Group {
 
     .Excerpt + .HasNew {
-        margin-left: $utility-small_padding;
+        margin-left: $utility-baseUnitHalf;
     }
 
     .H {
@@ -147,7 +147,7 @@ $GroupIcon-overlap: #{50px + $utility-large_padding};
     }
 
     .Item-Icon {
-        margin: 0 0 $utility-medium_padding;
+        margin: 0 0 $utility-baseUnitDouble;
     }
 
     .DataList .Item {
@@ -165,7 +165,7 @@ $GroupIcon-overlap: #{50px + $utility-large_padding};
             flex-direction: row;
 
             .Buttons {
-                margin-left: $utility-small_padding;
+                margin-left: $utility-baseUnitHalf;
             }
         }
 
@@ -178,13 +178,13 @@ $GroupIcon-overlap: #{50px + $utility-large_padding};
             }
 
             .Options {
-                margin-top: $utility-medium_padding;
+                margin-top: $utility-baseUnitDouble;
                 justify-content: flex-end;
                 order: 2;
             }
 
             .Excerpt {
-                margin-top: $utility-medium_padding;
+                margin-top: $utility-baseUnitDouble;
             }
 
             .Title {
@@ -261,7 +261,7 @@ $GroupIcon-overlap: #{50px + $utility-large_padding};
     }
 
     .Button:nth-child(2) {
-        margin-left: $utility-small_padding;
+        margin-left: $utility-baseUnitHalf;
         background-color: transparent;
         border-color: $global-color_primary;
         color: $global-color_primary;
@@ -312,7 +312,7 @@ $GroupIcon-overlap: #{50px + $utility-large_padding};
 }
 
 .Group-Title {
-    margin: 0 0 $utility-medium_padding;
+    margin: 0 0 $utility-baseUnitDouble;
     font-size: $global-subTitle_fontSize;
     padding-right: 20px;
 
@@ -355,7 +355,7 @@ body.noGroupIcon {
 }
 
 .Group-Meta.Group-Meta {
-    margin: 0 -#{$utility-xSmall_padding};
+    margin: 0 -#{$utility-baseUnitHalf};
     font-size: $global-small_fontSize;
 
     a {
@@ -370,7 +370,7 @@ body.noGroupIcon {
     }
 
     .MItem {
-        margin: 0 $utility-xSmall_padding;
+        margin: 0 $utility-baseUnitHalf;
     }
 
     .MItem:nth-child(-n+2) .label {
@@ -506,13 +506,13 @@ body.noGroupIcon {
 .Group-MembersPreview {
 
     .PhotoGrid {
-        margin: 0 -#{$utility-xSmall_padding};
+        margin: 0 -#{$utility-baseUnitHalf};
     }
 
     .PhotoWrap.PhotoWrap.PhotoWrap {
         display: inline-block;
         @include photoWrap;
-        margin: 0 $utility-xSmall_padding;
+        margin: 0 $utility-baseUnitHalf;
     }
 
     .PhotoGridSmall img {
@@ -525,7 +525,7 @@ body.noGroupIcon {
     .AttendeeList.AttendeeList h3 {
         font-size: $global-large_fontSize;
         font-weight: $global-heading_fontWeight;
-        margin-bottom: $utility-small_padding;
+        margin-bottom: $utility-baseUnitHalf;
         border-bottom: $component_border;
         display: flex;
         align-items: center;
@@ -537,13 +537,13 @@ body.noGroupIcon {
     }
 
     .FormWrapper.Attending {
-        margin: $utility-medium_padding 0;
+        margin: $utility-baseUnitDouble 0;
     }
 
     .YesAttending,
     .NotAttending,
     .MaybeAttending {
-        margin-bottom: $utility-medium_padding;
+        margin-bottom: $utility-baseUnitDouble;
     }
 
     .FormTitleWrapper h2 {
@@ -570,7 +570,7 @@ body.noGroupIcon {
         justify-content: flex-end;
 
         .Primary {
-            margin-left: $utility-small_padding;
+            margin-left: $utility-baseUnitHalf;
             order: 2;
         }
     }
@@ -587,7 +587,7 @@ body.noGroupIcon {
         .FieldInfo {
             display: block;
             width: 100%;
-            margin-bottom: $utility_medium_padding;
+            margin-bottom: $utility-baseUnitDouble;
         }
     }
 }
@@ -598,7 +598,7 @@ body.noGroupIcon {
     @include maxWidth {
         width: 100%;
         margin-right: 0;
-        margin-bottom: $utility-small_padding;
+        margin-bottom: $utility-baseUnitHalf;
      }
 }
 
@@ -616,7 +616,7 @@ body.noGroupIcon {
     }
 
     .Button + .Button {
-        margin-left: $utility-small_padding;
+        margin-left: $utility-baseUnitHalf;
     }
 
     .Button.search {

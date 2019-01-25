@@ -507,12 +507,12 @@
             }
 
             .Username {
-                color: $component-title_color;
-                font-weight: $component-title_fontWeight;
+                color: $component-meta-link_color;
+                font-weight: $component-meta_fontWeight;
 
                 &:hover,
                 &:focus {
-                    color: $component-title-hover_color;
+                    color: $component-meta-link-hover_color;
                 }
             }
         }

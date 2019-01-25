@@ -87,7 +87,14 @@ $quickSearch_color:                      $global-color_white !default;
 
 .CommentHeading {
     float: left;
+    min-height: $pager_height;
+    display: flex;
+    align-items: center;
     margin: 0 0 $global-block_margin;
+}
+
+.BeforeCommentHeading {
+    margin-bottom: $global-block_margin;
 }
 
 //.DataBox {

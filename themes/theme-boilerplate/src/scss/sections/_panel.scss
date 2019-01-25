@@ -199,9 +199,9 @@
 
         .Username {
             @include ellipsis;
-            max-width: calc(#{$panel_width} - #{$theme-photo-small_size} - (#{$panel-item_padding} * 2) - 75px);
+            max-width: calc(#{$panel_width} - #{$theme-photo-small_size} - (#{$panel-item_padding} * 2) - 80px);
             display: inline-block;
-            margin-left: $utility-baseUnitHalf;
+            margin-left: 10px;
             line-height: $theme-photo-small_size;
 
             &:focus,
@@ -327,8 +327,7 @@ body.Section-EditProfile .Box,
 
     .PhotoWrap.PhotoWrap {
         display: inline-block;
-        margin-left: 2px;
-        margin-right: 2px;
+        margin: 0 2px 2px 2px;
         @include photoWrap;
         min-height: 0;
         width: $theme-photo-small_size;

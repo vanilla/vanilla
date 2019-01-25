@@ -53,29 +53,26 @@ h6 {
     @include font-heading;
     margin: 0;
 
-    a.TextColor,
-    a {
-        color: $theme-heading_color;
-
-        &:focus,
-        &:hover {
-           color: $theme-heading-hover_color;
-        }
-    }
+    //a.TextColor,
+    //a {
+    //    color: $theme-heading_color;
+    //
+    //    &:focus,
+    //    &:hover {
+    //       color: $theme-heading-hover_color;
+    //    }
+    //}
 }
 
 h1 {
     font-size: $global-title_fontSize;
     font-weight: $global-heading_fontWeight;
 
-    .Gloss,
-    a {
-        font-size: inherit;
-        font-weight: inherit;
-    }
-
+    a,
     .Gloss {
         color: inherit;
+        font-size: inherit;
+        font-weight: inherit;
     }
 
     @include maxWidth {

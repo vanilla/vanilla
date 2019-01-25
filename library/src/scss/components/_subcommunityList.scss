@@ -1,0 +1,43 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$subcommunityList_spacing    : 24px;
+$subcommunityList_width      : 384px;
+
+.subcommunityList {
+
+    padding: $subcommunityList_spacing;
+
+    &.isEmpty {
+
+    }
+
+
+    background: rgba(255, 192, 203, 0.5);
+}
+
+.subcommunityList-emptyMessage {
+
+}
+
+.subcommunityList-items {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: flex-start;
+
+
+    background: rgba(175, 255, 143, 0.5);
+}
+
+.subcommunityList-item {
+    display: block;
+    width: $subcommunityList_width;
+    max-width: 100%;
+
+
+    background: rgba(255, 38, 0, 0.5);
+}

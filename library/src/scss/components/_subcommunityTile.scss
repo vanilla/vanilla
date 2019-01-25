@@ -1,0 +1,72 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+
+$subcommunityTile_topPadding              : 38px;
+$subcommunityTile_horizontalPadding       : 24px;
+$subcommunityTile_bottomPadding           : 24px;
+
+$subcommunityTile-imageFrame_height       : 86px;
+$subcommunityTile-imageFrame_bottomMargin : 16px;
+
+$subcommunityTile-title_fontSize          : $global-large_fontSize;
+
+$subcommunityTile-description_fontSize    : $global-medium_fontSize;
+
+$subcommunityTile_spacing                 : 24px;
+
+
+
+.subcommunityTile {
+    @include shadow-embed;
+    margin: $subcommunityTile_spacing;
+}
+
+.subcommunityTile-link {
+    display: block;
+    position: relative;
+    color: $global-color_fg;
+    padding: {
+        top: $subcommunityTile_topPadding;
+        right: $subcommunityTile_horizontalPadding;
+        bottom: $subcommunityTile_bottomPadding;
+        left: $subcommunityTile_horizontalPadding;
+    }
+}
+
+.subcommunityTitle-main {
+    position: relative;
+}
+
+.subcommunityTile-iconFrame {
+    position: relative;
+    height: $subcommunityTile-imageFrame_height;
+    width: 100%;
+    margin-bottom: $subcommunityTile-imageFrame_bottomMargin;
+}
+
+.subcommunityTile-icon {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    height: auto;
+    width: 100%;
+}
+
+.subcommunityTile-title {
+    @include singleLineEllipsis;
+    font-size: $subcommunityTile-title_fontSize;
+    line-height: $global-condensed_lineHeight;
+}
+
+.subcommunityTile-description {
+    font-size: $subcommunityTile-description_fontSize;
+    line-height: $global-excerpt_lineHeight;
+}

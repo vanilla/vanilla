@@ -674,6 +674,11 @@ class PostController extends VanillaController {
         if ($this->Form->authenticatedPostBack()) {
             // Save as a draft?
             $FormValues = $this->Form->formValues();
+
+            if ($FormValues['DiscussionID'] !== $DiscussionID) {
+                throw permissionException('Vanilla.Comments.Edit');
+            }
+
             $filters = ['Score'];
             $FormValues = $this->filterFormValues($FormValues, $filters);
             $FormValues = $this->CommentModel->filterForm($FormValues);

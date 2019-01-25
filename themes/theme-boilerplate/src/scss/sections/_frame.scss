@@ -83,6 +83,11 @@
 
 .Frame-content {
 
+    .HomepageTitle,
+    .PageDescription {
+        margin-bottom: $global-block_margin;
+    }
+
     .HomepageTitle {
 
         .AdminCheck {
@@ -97,7 +102,6 @@
 
     .PageDescription {
         line-height: $global-excerpt_lineHeight;
-        margin: $utility-large_padding 0;
     }
 
     .PageDescription:empty {

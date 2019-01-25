@@ -10,11 +10,15 @@
 
 .DataList,
 .MessageList {
-    margin: 0 0 $utility-large_padding;
+    margin: 0 0 $global-block_margin;
 
-    .Item.Read,
-    .Item:not(.CategoryHeading),
-    .Item:not(.CategoryHeading){
+    //.Item.Read,
+    //.Item:not(.CategoryHeading),
+    //.Item:not(.CategoryHeading){
+    //    @include listItem;
+    //}
+
+    .Item {
         @include listItem;
     }
 
@@ -135,10 +139,11 @@
         color: $component-meta_color;
     }
 
-    .Meta {
+    .Meta,
+    .AuthorWrap {
         margin-left: -$utility-baseUnit;
         margin-right: -$utility-baseUnit;
-        line-height: $component-meta_lineHeight;
+        //line-height: $component-meta_lineHeight;
 
         @include maxWidth {
             margin-top: $utility-medium_padding;
@@ -351,6 +356,7 @@
 
 .DataList,
 .PageTitle + .ItemDiscussion {
+    border-top-width: 0;
 
     @if $component-item_spacing == 0 {
         border-radius: $component_borderRadius;
@@ -359,6 +365,7 @@
 }
 
 .DataList.CategoryList {
+
     .Item[class*="Depth"] {
 
         @if $component_lateralBorder == true {
@@ -383,10 +390,7 @@
     }
 }
 
-.Activities,
-.Conversations,
 .MessageList {
-    clear: both;
 
     .PageTitle,
     .ItemComment {
@@ -400,10 +404,11 @@
     }
 
     .PageTitle {
+        margin-bottom: $global-block_margin;
 
         h1{
             font-size: $global-title_fontSize;
-            line-height: $global-base_lineHeight;
+            line-height: $global-condensed_lineHeight;
 
             @include maxWidth {
                 font-size: $global-subTitle_fontSize;
@@ -508,7 +513,6 @@
 
             .Username {
                 color: $component-title_color;
-                font-weight: $component-title_fontWeight;
 
                 &:hover,
                 &:focus {
@@ -574,10 +578,12 @@
             }
         }
     }
+}
 
-    .ItemDiscussion {
-        margin-bottom: $utility-large_padding;
-    }
+.Activities,
+.Conversations,
+.MessageList {
+    clear: both;
 
     .Item.Activity {
 

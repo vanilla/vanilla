@@ -30,7 +30,7 @@ $utility-percentage_nineSixteenths:     (9 / 16 * 100%);
 $utility-SVGEncoding:                   "data:image/svg+xml,";
 
 /* -------------------------------------------------------------- *\
-    Global Overwrites
+    Global Font
 \* -------------------------------------------------------------- */
 
 $global-normal_fontWeight:              400 !default;
@@ -52,7 +52,7 @@ $global-smallTitle_fontSize:            20px !default;
 $global-title_mobile_fontSize:          26px !default;
 $global-subTitle_fontSize:              18px !default;
 
-$global-base_lineHeight:                1.618 !default;
+$global-base_lineHeight:                1.5 !default;
 $global-condensed_lineHeight:           1.25 !default;
 $global-lineHeight_offset:              .32 !default; // Offset font to make top of capital letters flush with top of container
 $global-headinglineHeight_offset:       $global-lineHeight_offset !default; // Different if heading has different font than body
@@ -71,6 +71,13 @@ $userContent-fontSizeH3:                1.25em !default;
 $userContent-fontSizeH4:                1em !default;
 $userContent-fontSizeH5:                .875em !default;
 $userContent-fontSizeH6:                .85em !default;
+
+/* -------------------------------------------------------------- *\
+    Global Overwrites
+\* -------------------------------------------------------------- */
+
+$global-heading_topMargin:              1.5 * $global-medium_fontSize;
+$global-block_margin:                   $userContent_fontSize !default;
 
 $global-main_width:                     1224px !default;
 $global_spacer:                         $userContent_fontSize * $global-base_lineHeight !default;

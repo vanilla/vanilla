@@ -87,17 +87,18 @@ $quickSearch_color:                      $global-color_white !default;
 
 .CommentHeading {
     float: left;
-    margin: 0 0 $utility-large_padding;
+    margin: 0 0 $global-block_margin;
 }
 
-.DataBox {
-    margin: 0 0 $utility-large_padding;
-}
+//.DataBox {
+//    margin: 0 0 $utility-large_padding;
+//}
 
 .PageControls {
     @include clearfix;
     min-height: initial;
     margin: initial;
+    margin-bottom: $global-block_margin;
 }
 
 .QuickSearch .MenuItems {
@@ -260,11 +261,11 @@ a.MoreWrap,
     }
 }
 
-.PageControls .Button-Controls,
-.Pager.PrevNextPager,
-.Pager.NumberedPager {
-    margin: 0 0 $utility-large_padding;
-}
+//.PageControls .Button-Controls,
+//.Pager.PrevNextPager,
+//.Pager.NumberedPager {
+//    margin: 0 0 $utility-large_padding;
+//}
 
 .selectBox-toggle {
     color: $global-color_primary;
@@ -333,8 +334,8 @@ a.MoreWrap,
     .selectBox {
         display: inline-flex;
         float: none;
-        height: 38px;
-        margin: 0 0 $utility-large_padding;
+        height: #{$pager_height + 2px};
+        //margin: 0 0 $utility-large_padding;
 
         @include maxWidth {
             margin: 0;

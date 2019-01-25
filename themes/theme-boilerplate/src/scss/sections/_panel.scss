@@ -292,7 +292,7 @@ body.Section-EditProfile .Box,
         &:hover,
         &:focus,
         &:active {
-            color: $panel-item_fg;
+            color: $panel-item-hover_fg;
             background-color: $panel-item-hover_bg;
             border-color: $panel-item-hover_borderColor;
         }
@@ -301,7 +301,7 @@ body.Section-EditProfile .Box,
     li:not(.Heading) + li:not(.Heading) {
 
         @if($panel_item-spacing == 0) {
-            
+
             a {
                 border-top-width: 0;
             }

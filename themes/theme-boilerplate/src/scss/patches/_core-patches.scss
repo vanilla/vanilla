@@ -41,16 +41,22 @@ body {
     }
 }
 
-.DataList,
-.MessageList {
-    .Item,
-    .Item.Read {
-        background-color: transparent;
-        border: 0;
-    }
+.DataList .Item {
+    border-bottom-width: 0;
 }
 
+//.DataList,
+//.MessageList {
+//
+//    .Item,
+//    .Item.Read {
+//        background-color: transparent;
+//        border: 0;
+//    }
+//}
+
 .Item {
+
     .BlockTitle {
         font-size: inherit;
     }
@@ -347,6 +353,10 @@ table.PreferenceGroup th {
     font-size: $formButton_fontSize;
     line-height: $formButton_height;
     min-height: $formButton_height;
+}
+
+.PageDescription {
+    margin: 0;
 }
 
 // Fix connection page of profile

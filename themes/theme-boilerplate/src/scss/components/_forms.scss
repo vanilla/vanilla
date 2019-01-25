@@ -373,10 +373,14 @@ div.token-input-dropdown {
     display: none;
 }
 
+.FormTitleWrapper {
+    margin-bottom: $global-block_margin;
+}
+
 .FormWrapper-Condensed,
 .CommentForm.CommentForm {
-    padding: $component-base_padding;
-    margin: 0 0 $utility-large_padding;
+    //padding: $component-base_padding;
+    //margin: 0 0 $utility-large_padding;
 
     .FormWrapper {
         border-width: 0;

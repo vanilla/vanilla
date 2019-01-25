@@ -190,8 +190,8 @@
                 border-top-left-radius: $component_borderRadius;
                 border-top-right-radius: $component_borderRadius;
             } @else {
-                border-top-width: 0;
-                padding-top: 0;
+                //border-top-width: 0;
+                //padding-top: 0;
             }
         }
 
@@ -766,9 +766,9 @@
     }
 }
 
-.PageTitle {
-    margin-bottom: $utility-large_padding;
-}
+//.PageTitle {
+//    margin-bottom: $utility-large_padding;
+//}
 
 @mixin defaultTransition($properties...) {
     transition-property: $properties;

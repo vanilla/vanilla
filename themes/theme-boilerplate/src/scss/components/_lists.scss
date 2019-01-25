@@ -356,7 +356,10 @@
 
 .DataList,
 .PageTitle + .ItemDiscussion {
-    border-top-width: 0;
+
+    @if $component_lateralBorder == false {
+        border-top-width: 0;
+    }
 
     @if $component-item_spacing == 0 {
         border-radius: $component_borderRadius;

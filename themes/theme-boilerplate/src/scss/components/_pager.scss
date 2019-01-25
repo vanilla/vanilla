@@ -106,6 +106,10 @@ $quickSearch_color:                      $global-color_white !default;
     min-height: initial;
     margin: initial;
     margin-bottom: $global-block_margin;
+
+    .H {
+        margin-bottom: $global-block_margin;
+    }
 }
 
 .QuickSearch .MenuItems {

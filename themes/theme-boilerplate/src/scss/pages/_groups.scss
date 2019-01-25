@@ -129,6 +129,7 @@ $GroupIcon-overlap: #{50px + $utility-large_padding};
             float: none;
             text-align: center;
             font-size: $global-title_fontSize;
+            margin-bottom: $global-block_margin;
         }
 
         > .Button.Primary {
@@ -319,7 +320,6 @@ $GroupIcon-overlap: #{50px + $utility-large_padding};
     a {
         @include font-heading-link;
         font-size: inherit;
-        color: $theme-heading_color;
         text-shadow: none;
 
         &:focus,

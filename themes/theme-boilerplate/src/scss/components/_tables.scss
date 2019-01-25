@@ -33,7 +33,7 @@
     }
 }
 
-.DataTable {
+.Groups .DataTable {
     margin: 0 0 $utility-large_padding;
     table-layout: fixed;
     width: 100%;
@@ -148,6 +148,7 @@
     .AuthorInfo {
         font-size: $component-meta_fontSize;
         font-weight: $component-meta_fontWeight;
+        line-height: $component-meta_lineHeight;
         color: $component-meta_color;
     }
 
@@ -217,6 +218,12 @@
         }
     }
 
+    .LatestPostTitle,
+    .UserLink.BlockTitle,
+    .BigCount .Meta,
+    .Block.Wrap .Meta {
+         margin-left: $utility-baseUnitDouble;
+    }
 
     .LatestPostTitle,
     .UserLink {
@@ -288,7 +295,7 @@
             }
 
             .Wrap {
-                padding-left: calc(#{$theme-photo_size} + #{$utility-baseUnitHalf});
+                padding-left: $theme-photo_size;
             }
 
             .PhotoWrap {
@@ -479,6 +486,8 @@
 
         td.DiscussionName {
             width: 100%;
+            padding-left: $utility-baseUnit;
+            padding-right: $utility-baseUnit;
         }
 
         //ideation styles
@@ -493,7 +502,7 @@
                 }
 
                 .Wrap {
-                    padding-left: calc(#{$theme-photo_size} + #{$utility-baseUnitHalf});
+                    padding-left: $theme-photo_size;
                 }
             }
         }
@@ -564,6 +573,10 @@ body.Section-Group {
         padding-right: 0;
     }
 
+    .EventTitle .Title {
+        display: inline;
+    }
+
     .Title-Icon {
         color: $global-color_fg;
     }
@@ -573,7 +586,14 @@ body.Section-Group {
         margin-left: $utility-baseUnitHalf;
     }
 
+    .Title-Wrapper,
+    .Excerpt {
+        margin: 0 0 $utility-baseUnit;
+    }
+
     .Meta {
+        margin-left: -$utility-baseUnit;
+        margin-right: -$utility-baseUnit;
 
         @include maxWidth {
             margin-top: 0;

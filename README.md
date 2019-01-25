@@ -54,7 +54,7 @@ _Upgrading from an earlier version of Vanilla? See [our upgrade notes](https://d
 
 ## Reporting Security Issues
 
-Please disclose security issues responsibly by emailing support@vanillaforums.com with a full description or joing our [bug bounty program](https://hackerone.com/vanilla).
+Please disclose security issues responsibly by emailing support@vanillaforums.com with a full description or join our [bug bounty program](https://hackerone.com/vanilla). We cannot award bounties outside that program.
 
 We'll work on releasing an updated version as quickly as possible.
 Please do not email non-security issues; use the [issue tracker](https://github.com/vanilla/vanilla/issues) instead.

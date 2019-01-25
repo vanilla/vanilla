@@ -10,7 +10,7 @@
 
 $count_fontWeight:                  inherit !default;
 $count_fontSize:                    $global-small_fontSize !default;
-$count_borderRadius:                $global_borderRadius !default;
+$count_borderRadius:                3px !default;
 $count_height:                      $formButton_height !default;
 $count_bg:                          transparent !default;
 $count_border:                      0 !default;
@@ -36,9 +36,9 @@ $count-hover_color:                 inherit !default;
     justify-content: center;
 
     @if $count_bg == transparent {
-        padding: 0 $utility-small_padding;
-    } @else {
         padding: 0;
+    } @else {
+        padding: 0 $utility-baseUnit;
     }
 
     @if ($count_borderRadius == $count_height) {

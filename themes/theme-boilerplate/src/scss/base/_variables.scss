@@ -253,7 +253,6 @@ $content_borderRadius:                   0 !default;
 $panel_toLeft:                           false !default;
 $panel_width:                            220px !default;
 $panel_gap:                              40px !default;
-$panel-item_height:                      2.5em !default;
 $panel_bg:                               transparent !default;
 $panel_fg:                               $global-color_fg !default;
 $panel_padding:                          0 !default;
@@ -262,15 +261,14 @@ $panel_borderRadius:                     $content_borderRadius !default;
 
 
 $panel-item-showIcons:                   false !default;
-$panel-item_height:                      32px !default;
-$panel-item_spacing:                     0 !default;
-$panel-item_sidePadding:                 6px !default;
+$panel-item_spacing:                     12px !default;
 $panel-item_borderRadius:                0 !default;
 $panel-item_border:                      none !default;
+$panel-item_padding:                     5px !default;
 
 $panel-item_bg:                          transparent !default;
 $panel-item_fg:                          $link-default_color !default;
-$panel-item_borderColor:                 transparent !default;
+$panel-item_border:                      none !default;
 
 $panel-item-hover_bg:                    transparent !default;
 $panel-item-hover_fg:                    $link-default_hover_color !default;

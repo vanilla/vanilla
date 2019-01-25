@@ -328,6 +328,19 @@ table.PreferenceGroup th {
     font-weight: inherit;
 }
 
+.PanelInfo li {
+    border-bottom-width: 0;
+}
+
+.Box {
+    margin: $utility-baseUnitDouble 0;
+}
+
+#Panel .FilterMenu li:first-child,
+.PanelInfo li:first-child {
+  border-top-width: 0;
+}
+
 .SocialIcon .Text {
     padding: 0 0 0 $utility-small_padding;
     font-weight: $formButton_fontWeight;

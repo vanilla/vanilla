@@ -290,11 +290,6 @@ class PanelLayout extends React.Component<IProps> {
         if (rightPanelEl) {
             const rightPanelRect = this.getCachedBoundingRect(rightPanelEl);
             const bodyRect = this.getCachedBoundingRect(document.body);
-            console.log("calculate", {
-                windowWidth: bodyRect.width,
-                right: rightPanelRect.right,
-                selfWidth: rightPanelRect.width,
-            });
             right = style({
                 ...base,
                 top: rightPanelRect.top + "px",

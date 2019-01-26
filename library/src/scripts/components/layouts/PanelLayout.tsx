@@ -1,5 +1,4 @@
-/*
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+/**
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
@@ -226,39 +225,56 @@ class PanelLayout extends React.Component<IProps> {
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public componentDidMount() {
         window.addEventListener("resize", this.recalcSizes);
+
+        // We always need a second layout pass to display calculated values.
         this.recalcSizes();
     }
 
+    /**
+     * Any time we gain/lose a left/right panel we need a second layout pass.
+     * This way calculate values can be declared.
+     */
     public componentDidUpdate(prevProps: IProps) {
         const hadRight = prevProps.rightTop || prevProps.rightBottom;
         const hasRight = this.props.rightTop || this.props.rightBottom;
         if (!hadRight && hasRight) {
             this.recalcSizes();
         }
+
+        const hadLeft = prevProps.leftTop || prevProps.leftBottom;
+        const hasLeft = this.props.leftTop || this.props.leftBottom;
+        if (!hadLeft && hasLeft) {
+            this.recalcSizes();
+        }
     }
 
+    /**
+     * @inheritdoc
+     */
     public componentWillUnmount() {
         window.removeEventListener("resize", this.recalcSizes);
     }
 
-    private recalcSizes = throttle(
-        () => {
-            this.clearBoundingRectCache();
-            this.forceUpdate();
-        },
-        150,
-        { leading: false },
-    );
-
-    private hasbeenCalcedOnce = false;
+    /**
+     * Recalculate the values on the only at the end of any 150ms interval.
+     */
+    private recalcSizes = throttle(() => {
+        this.clearBoundingRectCache();
+        this.forceUpdate();
+    }, 150);
 
     private calcFixedPanelClasses(): { left: string; right: string } {
         const { isFixed } = this.props;
         const leftPanelEl = this.leftPanelRef.current;
         const rightPanelEl = this.rightPanelRef.current;
 
+        // The classes default to visually hidden (but still visible to screen readers) until fully calced.
+        // The content may already be rendered, but we need a second layout pass for computed values.
         let left = "sr-only";
         let right = "sr-only";
 
@@ -283,7 +299,6 @@ class PanelLayout extends React.Component<IProps> {
 
         if (rightPanelEl) {
             const rightPanelRect = this.getCachedBoundingRect(rightPanelEl);
-            const bodyRect = this.getCachedBoundingRect(document.body);
             right = style({
                 ...base,
                 top: rightPanelRect.top + "px",
@@ -294,8 +309,12 @@ class PanelLayout extends React.Component<IProps> {
         return { left, right };
     }
 
+    /** A cached of calculated client rects. */
     private boundingRectCaches: WeakMap<HTMLElement, ClientRect> = new WeakMap();
 
+    /**
+     * Get a calculated client rect using our local cache.
+     */
     private getCachedBoundingRect(element: HTMLElement): ClientRect {
         const cachedRect = this.boundingRectCaches.get(element);
         if (cachedRect) {
@@ -307,6 +326,9 @@ class PanelLayout extends React.Component<IProps> {
         return boundingRect;
     }
 
+    /**
+     * Clear the cached client rects. Be sure to call this after any resize.
+     */
     private clearBoundingRectCache() {
         this.boundingRectCaches = new WeakMap();
     }

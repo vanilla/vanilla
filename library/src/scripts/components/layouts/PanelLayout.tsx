@@ -11,16 +11,22 @@ import CompoundComponent from "./CompoundComponent";
 import { ScrollOffsetContext } from "@library/contexts/ScrollOffsetContext";
 import { style } from "typestyle";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import debounce from "lodash/debounce";
+import throttle from "lodash/throttle";
 
 interface IPanelLayoutProps extends IDeviceProps {
-    children: React.ReactNode;
     className?: string;
     toggleMobileMenu?: (isOpen: boolean) => void;
     contentTag?: string;
     growMiddleBottom?: boolean;
     topPadding?: boolean;
     isFixed?: boolean;
+    leftTop?: React.ReactNode;
+    leftBottom?: React.ReactNode;
+    middleTop?: React.ReactNode;
+    middleBottom?: React.ReactNode;
+    rightTop?: React.ReactNode;
+    rightBottom?: React.ReactNode;
+    breadcrumbs?: React.ReactNode;
 }
 
 /**
@@ -52,33 +58,8 @@ interface IPanelLayoutProps extends IDeviceProps {
  * | MiddleTop    |
  * | MiddleBottom |
  * | RightBottom  |
- *
- *
- * @example
- *  <PanelLayout>
- *      <PanelLayout.BreadCrumbs>
- *          <p>Put any component here</p>
- *      </PanelLayout.BreadCrumbs>
- *      <PanelLayout.LeftTop>
- *          <p>Put any component here</p>
- *      </PanelLayout.LeftTop>
- *      <PanelLayout.LeftBottom>
- *          <p>Put any component here</p>
- *      </PanelLayout.LeftBottom>
- *      <PanelLayout.MiddleBottom>
- *          <p>Put any component here</p>
- *      </PanelLayout.MiddleBottom>
- * </PanelLayout>
  */
-export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
-    public static LeftTop = LeftTop;
-    public static LeftBottom = LeftBottom;
-    public static MiddleTop = MiddleTop;
-    public static MiddleBottom = MiddleBottom;
-    public static RightTop = RightTop;
-    public static RightBottom = RightBottom;
-    public static Breadcrumbs = Breadcrumbs;
-
+export default class PanelLayout extends React.Component<IPanelLayoutProps> {
     public static contextType = ScrollOffsetContext;
     public context!: React.ContextType<typeof ScrollOffsetContext>;
 
@@ -93,26 +74,26 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
     private rightPanelRef = React.createRef<HTMLElement>();
 
     public render() {
-        const { device, isFixed } = this.props;
-        const children = this.getParsedChildren();
+        const { topPadding, className, growMiddleBottom, device, isFixed, ...childComponents } = this.props;
 
         // Calculate some rendering variables.
         const isMobile = device === Devices.MOBILE;
         const isTablet = device === Devices.TABLET;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-        const shouldRenderLeftPanel: boolean = !isMobile && !!(children.leftTop || children.leftBottom);
+        const shouldRenderLeftPanel: boolean = !isMobile && !!(childComponents.leftTop || childComponents.leftBottom);
         const shouldRenderRightPanel: boolean =
-            (isFullWidth || (isTablet && !shouldRenderLeftPanel)) && !!(children.rightTop || children.rightBottom);
+            (isFullWidth || (isTablet && !shouldRenderLeftPanel)) &&
+            !!(childComponents.rightTop || childComponents.rightBottom);
 
         // Determine the classes we want to display.
         const panelClasses = classNames(
             "panelLayout",
             { noLeftPanel: !shouldRenderLeftPanel },
             { noRightPanel: !shouldRenderRightPanel },
-            { noBreadcrumbs: !children.breadcrumbs },
-            this.props.className,
-            { inheritHeight: this.props.growMiddleBottom },
-            { hasTopPadding: this.props.topPadding },
+            { noBreadcrumbs: !childComponents.breadcrumbs },
+            className,
+            { inheritHeight: growMiddleBottom },
+            { hasTopPadding: topPadding },
         );
 
         const fixedPanelClasses = this.calcFixedPanelClasses();
@@ -122,7 +103,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
 
         return (
             <div className={panelClasses}>
-                {children.breadcrumbs && (
+                {childComponents.breadcrumbs && (
                     <div className="panelLayout-container">
                         {shouldRenderLeftPanel && (
                             <Panel className={classNames("panelLayout-left")} ariaHidden={true} />
@@ -132,7 +113,7 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                                 hasAdjacentPanel: shouldRenderLeftPanel,
                             })}
                         >
-                            <PanelArea className="panelArea-breadcrumbs">{children.breadcrumbs}</PanelArea>
+                            <PanelArea className="panelArea-breadcrumbs">{childComponents.breadcrumbs}</PanelArea>
                         </Panel>
                     </div>
                 )}
@@ -160,12 +141,14 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                                         )}
                                         tag="aside"
                                     >
-                                        {children.leftTop && (
-                                            <PanelArea className="panelArea-leftTop">{children.leftTop}</PanelArea>
+                                        {childComponents.leftTop && (
+                                            <PanelArea className="panelArea-leftTop">
+                                                {childComponents.leftTop}
+                                            </PanelArea>
                                         )}
-                                        {children.leftBottom && (
+                                        {childComponents.leftBottom && (
                                             <PanelArea className="panelArea-leftBottom">
-                                                {children.leftBottom}
+                                                {childComponents.leftBottom}
                                             </PanelArea>
                                         )}
                                     </Panel>
@@ -183,19 +166,19 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                                     inheritHeight: this.props.growMiddleBottom,
                                 })}
                             >
-                                {children.middleTop && (
-                                    <PanelArea className="panelAndNav-middleTop">{children.middleTop}</PanelArea>
+                                {childComponents.middleTop && (
+                                    <PanelArea className="panelAndNav-middleTop">{childComponents.middleTop}</PanelArea>
                                 )}
                                 {!shouldRenderLeftPanel &&
-                                    children.leftTop && (
+                                    childComponents.leftTop && (
                                         <PanelArea className="panelAndNav-mobileMiddle" tag="aside">
-                                            {children.leftTop}
+                                            {childComponents.leftTop}
                                         </PanelArea>
                                     )}
                                 {!shouldRenderRightPanel &&
-                                    children.rightTop && (
+                                    childComponents.rightTop && (
                                         <PanelArea className="panelAndNav-tabletMiddle" tag="aside">
-                                            {children.rightTop}
+                                            {childComponents.rightTop}
                                         </PanelArea>
                                     )}
                                 <PanelArea
@@ -203,12 +186,12 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                                         inheritHeight: this.props.growMiddleBottom,
                                     })}
                                 >
-                                    {children.middleBottom}
+                                    {childComponents.middleBottom}
                                 </PanelArea>
                                 {!shouldRenderRightPanel &&
-                                    children.rightBottom && (
+                                    childComponents.rightBottom && (
                                         <PanelArea className="panelAndNav-tabletBottom" tag="aside">
-                                            {children.rightBottom}
+                                            {childComponents.rightBottom}
                                         </PanelArea>
                                     )}
                             </Panel>
@@ -223,14 +206,14 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                                             this.context.offsetClass,
                                         )}
                                     >
-                                        {children.rightTop && (
+                                        {childComponents.rightTop && (
                                             <PanelArea className="panelArea-rightTop" tag="aside">
-                                                {children.rightTop}
+                                                {childComponents.rightTop}
                                             </PanelArea>
                                         )}
-                                        {children.rightBottom && (
+                                        {childComponents.rightBottom && (
                                             <PanelArea className="panelArea-rightBottom" tag="aside">
-                                                {children.rightBottom}
+                                                {childComponents.rightBottom}
                                             </PanelArea>
                                         )}
                                     </Panel>
@@ -244,31 +227,46 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
     }
 
     public componentDidMount() {
-        window.addEventListener("resize", this.resizeHandler);
+        window.addEventListener("resize", this.recalcSizes);
+    }
+
+    public componentDidUpdate() {
+        if (this.props.children) {
+        }
     }
 
     public componentWillUnmount() {
-        window.removeEventListener("resize", this.resizeHandler);
+        window.removeEventListener("resize", this.recalcSizes);
     }
 
-    private resizeHandler = debounce(() => {
-        this.clearBoundingRectCache();
-    }, 150);
+    private recalcSizes = throttle(
+        () => {
+            this.clearBoundingRectCache();
+            this.forceUpdate();
+        },
+        150,
+        { leading: false },
+    );
+
+    private hasbeenCalcedOnce = false;
 
     private calcFixedPanelClasses(): { left: string; right: string } {
         const { isFixed } = this.props;
         const leftPanelEl = this.leftPanelRef.current;
         const rightPanelEl = this.rightPanelRef.current;
 
-        if (!isFixed || !leftPanelEl || !rightPanelEl) {
-            return {
-                left: "",
-                right: "",
-            };
-        }
+        const noWidthStyle = style({
+            width: 0,
+            flexBasis: 0,
+            margin: 0,
+            padding: 0,
+        });
+        let left = noWidthStyle;
+        let right = noWidthStyle;
 
-        const rightPanelRect = this.getCachedBoundingRect(rightPanelEl);
-        const leftPanelRect = this.getCachedBoundingRect(leftPanelEl);
+        if (!isFixed) {
+            return { left, right };
+        }
 
         const base: NestedCSSProperties = {
             position: "fixed",
@@ -276,18 +274,31 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
             overflow: "auto",
         };
 
-        return {
-            left: style({
+        if (leftPanelEl) {
+            const leftPanelRect = this.getCachedBoundingRect(leftPanelEl);
+            left = style({
                 ...base,
-                top: leftPanelRect.top,
+                top: leftPanelRect.top + "px",
                 left: leftPanelRect.left + "px",
-            }),
-            right: style({
+            });
+        }
+
+        if (rightPanelEl) {
+            const rightPanelRect = this.getCachedBoundingRect(rightPanelEl);
+            const bodyRect = this.getCachedBoundingRect(document.body);
+            console.log("calculate", {
+                windowWidth: bodyRect.width,
+                right: rightPanelRect.right,
+                selfWidth: rightPanelRect.width,
+            });
+            right = style({
                 ...base,
-                top: rightPanelRect.top,
-                right: window.innerWidth - rightPanelRect.right - rightPanelRect.width + "px",
-            }),
-        };
+                top: rightPanelRect.top + "px",
+                left: rightPanelRect.left + "px",
+            });
+        }
+
+        return { left, right };
     }
 
     private boundingRectCaches: WeakMap<HTMLElement, ClientRect> = new WeakMap();
@@ -305,56 +316,6 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
 
     private clearBoundingRectCache() {
         this.boundingRectCaches = new WeakMap();
-    }
-
-    /**
-     * Parse out a specific subset of children. This is fast enough,
-     * but should not be called more than once per render.
-     */
-    private getParsedChildren() {
-        let leftTop: React.ReactNode = null;
-        let leftBottom: React.ReactNode = null;
-        let middleTop: React.ReactNode = null;
-        let middleBottom: React.ReactNode = null;
-        let rightTop: React.ReactNode = null;
-        let rightBottom: React.ReactNode = null;
-        let breadcrumbs: React.ReactNode = null;
-
-        React.Children.forEach(this.props.children, child => {
-            switch (true) {
-                case this.childIsOfType(child, PanelLayout.LeftTop):
-                    leftTop = child;
-                    break;
-                case this.childIsOfType(child, PanelLayout.LeftBottom):
-                    leftBottom = child;
-                    break;
-                case this.childIsOfType(child, PanelLayout.MiddleTop):
-                    middleTop = child;
-                    break;
-                case this.childIsOfType(child, PanelLayout.MiddleBottom):
-                    middleBottom = child;
-                    break;
-                case this.childIsOfType(child, PanelLayout.RightTop):
-                    rightTop = child;
-                    break;
-                case this.childIsOfType(child, PanelLayout.RightBottom):
-                    rightBottom = child;
-                    break;
-                case this.childIsOfType(child, PanelLayout.Breadcrumbs):
-                    breadcrumbs = child;
-                    break;
-            }
-        });
-
-        return {
-            leftTop,
-            leftBottom,
-            middleTop,
-            middleBottom,
-            rightTop,
-            rightBottom,
-            breadcrumbs,
-        };
     }
 }
 
@@ -396,43 +357,3 @@ export function PanelWidgetVerticalPadding(props: IContainerProps) {
 export function PanelWidgetHorizontalPadding(props: IContainerProps) {
     return <div className={classNames("panelWidget", "hasNoVerticalPadding", props.className)}>{props.children}</div>;
 }
-
-// The components that make up the Layout itself.
-interface IPanelItemProps {
-    children?: React.ReactNode;
-}
-
-function LeftTop(props: IPanelItemProps) {
-    return <React.Fragment>{props.children}</React.Fragment>;
-}
-LeftTop.type = "LeftTop";
-
-function LeftBottom(props: IPanelItemProps) {
-    return <React.Fragment>{props.children}</React.Fragment>;
-}
-LeftBottom.type = "LeftBottom";
-
-function MiddleTop(props: IPanelItemProps) {
-    return <React.Fragment>{props.children}</React.Fragment>;
-}
-MiddleTop.type = "MiddleTop";
-
-function MiddleBottom(props: IPanelItemProps) {
-    return <React.Fragment>{props.children}</React.Fragment>;
-}
-MiddleBottom.type = "MiddleBottom";
-
-function RightTop(props: IPanelItemProps) {
-    return <React.Fragment>{props.children}</React.Fragment>;
-}
-RightTop.type = "RightTop";
-
-function RightBottom(props: IPanelItemProps) {
-    return <React.Fragment>{props.children}</React.Fragment>;
-}
-RightBottom.type = "RightBottom";
-
-function Breadcrumbs(props: IPanelItemProps) {
-    return <React.Fragment>{props.children}</React.Fragment>;
-}
-Breadcrumbs.type = "Breadcrumbs";

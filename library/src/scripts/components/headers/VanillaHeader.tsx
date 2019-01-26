@@ -30,6 +30,7 @@ import BackLink from "@library/components/navigation/BackLink";
 import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
 import { withPages, IWithPagesProps } from "@library/contexts/PagesContext";
 import { t } from "@library/application";
+import { ScrollOffsetContext } from "@library/contexts/ScrollOffsetContext";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -37,11 +38,13 @@ interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     title?: string; // Needed for mobile dropdown
     mobileDropDownContent?: React.ReactNode; // Needed for mobile dropdown
     showSearchIcon?: boolean;
+    isFixed?: boolean;
 }
 
 interface IState {
     openSearch: boolean;
     showingSuggestions: boolean;
+    isScrolledOff: boolean;
 }
 
 /**
@@ -50,16 +53,23 @@ interface IState {
  * render in a specific div in the default-master.
  */
 export class VanillaHeader extends React.Component<IProps, IState> {
+    public static contextType = ScrollOffsetContext;
+    public context!: React.ContextType<typeof ScrollOffsetContext>;
+
     public static defaultProps: Partial<IProps> = {
         showSearchIcon: true,
         mobileDropDownContent: null,
+        isFixed: true,
     };
 
     public state = {
         openSearch: false,
         showingSuggestions: false,
+        isScrolledOff: false,
     };
     public render() {
+        const { isFixed } = this.props;
+        const { isScrolledOff } = this.state;
         const currentUser = this.props.currentUser.data;
         const isMobile = this.props.device === Devices.MOBILE;
         const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
@@ -80,117 +90,130 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         };
 
         return ReactDOM.createPortal(
-            <header className={classNames("vanillaHeader", this.props.className)}>
-                <Container>
-                    <Panel className="panelLayout-fullWidth">
-                        <PanelWidgetHorizontalPadding>
-                            <div className="vanillaHeader-bar">
-                                {!this.state.openSearch &&
-                                    isMobile && (
-                                        <BackLink
-                                            className="vanillaHeader-leftFlexBasis vanillaHeader-backLink"
-                                            linkClassName="vanillaHeader-button"
-                                            fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
+            <>
+                {isFixed && <div className={classNames("vanillaHeader-spacer")} />}
+                <header
+                    className={classNames("vanillaHeader", this.props.className, { isFixed }, this.context.offsetClass)}
+                >
+                    <Container>
+                        <Panel className="panelLayout-fullWidth">
+                            <PanelWidgetHorizontalPadding>
+                                <div className="vanillaHeader-bar">
+                                    {!this.state.openSearch &&
+                                        isMobile && (
+                                            <BackLink
+                                                className="vanillaHeader-leftFlexBasis vanillaHeader-backLink"
+                                                linkClassName="vanillaHeader-button"
+                                                fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
+                                            />
+                                        )}
+
+                                    {!isMobile && (
+                                        <HeaderLogo
+                                            {...dummyLogoData}
+                                            className="vanillaHeader-logoContainer"
+                                            logoClassName="vanillaHeader-logo"
                                         />
+                                    )}
+                                    {!this.state.openSearch &&
+                                        !isMobile && (
+                                            <VanillaHeaderNav
+                                                {...dummyNavigationData}
+                                                className="vanillaHeader-nav"
+                                                linkClassName="vanillaHeader-navLink"
+                                                linkContentClassName="vanillaHeader-navLinkContent"
+                                            />
+                                        )}
+                                    {showMobileDropDown && (
+                                        <MobileDropDown
+                                            title={this.props.title!}
+                                            buttonClass="vanillaHeader-mobileDropDown"
+                                        >
+                                            {this.props.mobileDropDownContent}
+                                        </MobileDropDown>
                                     )}
 
-                                {!isMobile && (
-                                    <HeaderLogo
-                                        {...dummyLogoData}
-                                        className="vanillaHeader-logoContainer"
-                                        logoClassName="vanillaHeader-logo"
-                                    />
-                                )}
-                                {!this.state.openSearch &&
-                                    !isMobile && (
-                                        <VanillaHeaderNav
-                                            {...dummyNavigationData}
-                                            className="vanillaHeader-nav"
-                                            linkClassName="vanillaHeader-navLink"
-                                            linkContentClassName="vanillaHeader-navLinkContent"
-                                        />
-                                    )}
-                                {showMobileDropDown && (
-                                    <MobileDropDown
-                                        title={this.props.title!}
-                                        buttonClass="vanillaHeader-mobileDropDown"
+                                    <ConditionalWrap
+                                        className="vanillaHeader-rightFlexBasis"
+                                        condition={!!showMobileDropDown}
                                     >
-                                        {this.props.mobileDropDownContent}
-                                    </MobileDropDown>
-                                )}
-
-                                <ConditionalWrap
-                                    className="vanillaHeader-rightFlexBasis"
-                                    condition={!!showMobileDropDown}
-                                >
-                                    {this.props.showSearchIcon ? (
-                                        <CompactSearch
-                                            className={classNames("vanillaHeader-compactSearch", {
-                                                isCentered: this.state.openSearch,
-                                            })}
-                                            focusOnMount
-                                            open={this.state.openSearch}
-                                            onSearchButtonClick={this.openSearch}
-                                            onCloseSearch={this.closeSearch}
-                                            cancelButtonClassName="vanillaHeader-searchCancel"
-                                            cancelContentClassName="meBox-contentHover"
-                                            buttonClass="vanillaHeader-button"
-                                            showingSuggestions={this.state.showingSuggestions}
-                                            onOpenSuggestions={this.setOpenSuggestions}
-                                            onCloseSuggestions={this.setCloseSuggestions}
-                                            buttonContentClass="meBox-buttonContent"
-                                        />
-                                    ) : (
-                                        <FlexSpacer className="compactSearch vanillaHeader-compactSearch" />
-                                    )}
-                                    {isGuest ? (
-                                        (!this.state.openSearch || !isMobile) && (
-                                            <VanillaHeaderNav className="vanillaHeader-nav vanillaHeader-guestNav">
-                                                <VanillaHeaderNavItem
-                                                    linkClassName="button vanillaHeader-guestButton vanillaHeader-signIn"
-                                                    to={`/entry/signin?target=${window.location.pathname}`}
-                                                >
-                                                    {t("Sign in")}
-                                                </VanillaHeaderNavItem>
-                                                <VanillaHeaderNavItem
-                                                    linkClassName="button vanillaHeader-guestButton vanillaHeader-register"
-                                                    to={`/entry/register?target=${window.location.pathname}`}
-                                                >
-                                                    {t("Register")}
-                                                </VanillaHeaderNavItem>
-                                            </VanillaHeaderNav>
-                                        )
-                                    ) : (
-                                        <React.Fragment>
-                                            {!isMobile && (
-                                                <MeBox
-                                                    className="vanillaHeader-meBox"
-                                                    notificationsProps={notificationProps}
-                                                    messagesProps={messagesProps as any}
-                                                    counts={dummyUserDropDownData}
-                                                    buttonClassName="vanillaHeader-button"
-                                                    contentClassName="vanillaHeader-dropDownContents"
-                                                />
-                                            )}
-                                            {isMobile &&
-                                                !this.state.openSearch && (
-                                                    <CompactMeBox
-                                                        className={"vanillaHeader-button"}
+                                        {this.props.showSearchIcon ? (
+                                            <CompactSearch
+                                                className={classNames("vanillaHeader-compactSearch", {
+                                                    isCentered: this.state.openSearch,
+                                                })}
+                                                focusOnMount
+                                                open={this.state.openSearch}
+                                                onSearchButtonClick={this.openSearch}
+                                                onCloseSearch={this.closeSearch}
+                                                cancelButtonClassName="vanillaHeader-searchCancel"
+                                                cancelContentClassName="meBox-contentHover"
+                                                buttonClass="vanillaHeader-button"
+                                                showingSuggestions={this.state.showingSuggestions}
+                                                onOpenSuggestions={this.setOpenSuggestions}
+                                                onCloseSuggestions={this.setCloseSuggestions}
+                                                buttonContentClass="meBox-buttonContent"
+                                            />
+                                        ) : (
+                                            <FlexSpacer className="compactSearch vanillaHeader-compactSearch" />
+                                        )}
+                                        {isGuest ? (
+                                            (!this.state.openSearch || !isMobile) && (
+                                                <VanillaHeaderNav className="vanillaHeader-nav vanillaHeader-guestNav">
+                                                    <VanillaHeaderNavItem
+                                                        linkClassName="button vanillaHeader-guestButton vanillaHeader-signIn"
+                                                        to={`/entry/signin?target=${window.location.pathname}`}
+                                                    >
+                                                        {t("Sign in")}
+                                                    </VanillaHeaderNavItem>
+                                                    <VanillaHeaderNavItem
+                                                        linkClassName="button vanillaHeader-guestButton vanillaHeader-register"
+                                                        to={`/entry/register?target=${window.location.pathname}`}
+                                                    >
+                                                        {t("Register")}
+                                                    </VanillaHeaderNavItem>
+                                                </VanillaHeaderNav>
+                                            )
+                                        ) : (
+                                            <React.Fragment>
+                                                {!isMobile && (
+                                                    <MeBox
+                                                        className="vanillaHeader-meBox"
+                                                        notificationsProps={notificationProps}
+                                                        messagesProps={messagesProps as any}
                                                         counts={dummyUserDropDownData}
-                                                        buttonClass="vanillaHeader-tabButton"
-                                                        userPhotoClass="headerDropDown-user"
+                                                        buttonClassName="vanillaHeader-button"
+                                                        contentClassName="vanillaHeader-dropDownContents"
                                                     />
                                                 )}
-                                        </React.Fragment>
-                                    )}
-                                </ConditionalWrap>
-                            </div>
-                        </PanelWidgetHorizontalPadding>
-                    </Panel>
-                </Container>
-            </header>,
+                                                {isMobile &&
+                                                    !this.state.openSearch && (
+                                                        <CompactMeBox
+                                                            className={"vanillaHeader-button"}
+                                                            counts={dummyUserDropDownData}
+                                                            buttonClass="vanillaHeader-tabButton"
+                                                            userPhotoClass="headerDropDown-user"
+                                                        />
+                                                    )}
+                                            </React.Fragment>
+                                        )}
+                                    </ConditionalWrap>
+                                </div>
+                            </PanelWidgetHorizontalPadding>
+                        </Panel>
+                    </Container>
+                </header>
+            </>,
             this.props.container || document.getElementById("vanillaHeader")!,
         );
+    }
+
+    public componentDidMount() {
+        this.context.setScrollOffset(48);
+    }
+
+    public componentWillUnmount() {
+        this.context.resetScrollOffset();
     }
 
     public openSearch = () => {

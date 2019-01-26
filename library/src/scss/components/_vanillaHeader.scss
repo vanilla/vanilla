@@ -20,11 +20,21 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 $vanillaHeader-buttonContents_hover_bg: getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%) !default;
 $vanillaHeader-buttonContents_active_bg: getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%, true) !default;
 
+.vanillaHeader-spacer {
+    height: $vanillaHeader_height;
+}
 
 .vanillaHeader {
-    height: $vanillaHeader_height;
     background-color: $vanillaHeader_bg;
     color: $vanillaHeader_fg;
+
+    &.isFixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1;
+    }
 
     .searchBar__control {
         color: $vanillaHeader-fg;

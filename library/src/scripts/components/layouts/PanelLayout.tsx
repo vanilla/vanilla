@@ -8,6 +8,10 @@ import * as React from "react";
 import { Devices, IDeviceProps } from "../DeviceChecker";
 import classNames from "classnames";
 import CompoundComponent from "./CompoundComponent";
+import { ScrollOffsetContext } from "@library/contexts/ScrollOffsetContext";
+import { style } from "typestyle";
+import { NestedCSSProperties } from "typestyle/lib/types";
+import debounce from "lodash/debounce";
 
 interface IPanelLayoutProps extends IDeviceProps {
     children: React.ReactNode;
@@ -16,6 +20,7 @@ interface IPanelLayoutProps extends IDeviceProps {
     contentTag?: string;
     growMiddleBottom?: boolean;
     topPadding?: boolean;
+    isFixed?: boolean;
 }
 
 /**
@@ -74,14 +79,21 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
     public static RightBottom = RightBottom;
     public static Breadcrumbs = Breadcrumbs;
 
+    public static contextType = ScrollOffsetContext;
+    public context!: React.ContextType<typeof ScrollOffsetContext>;
+
     public static defaultProps = {
         contentTag: "div",
         growMiddleBottom: false,
         topPadding: true,
+        isFixed: true,
     };
 
+    private leftPanelRef = React.createRef<HTMLElement>();
+    private rightPanelRef = React.createRef<HTMLElement>();
+
     public render() {
-        const { device } = this.props;
+        const { device, isFixed } = this.props;
         const children = this.getParsedChildren();
 
         // Calculate some rendering variables.
@@ -102,6 +114,8 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
             { inheritHeight: this.props.growMiddleBottom },
             { hasTopPadding: this.props.topPadding },
         );
+
+        const fixedPanelClasses = this.calcFixedPanelClasses();
 
         // If applicable, set semantic tag, like "article"
         const ContentTag = `${this.props.contentTag}`;
@@ -129,14 +143,33 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                     >
                         {!isMobile &&
                             shouldRenderLeftPanel && (
-                                <Panel className={classNames("panelLayout-left")} tag="aside">
-                                    {children.leftTop && (
-                                        <PanelArea className="panelArea-leftTop">{children.leftTop}</PanelArea>
+                                <>
+                                    {isFixed && (
+                                        <Panel
+                                            className={classNames("panelLayout-left")}
+                                            tag="aside"
+                                            innerRef={this.leftPanelRef}
+                                        />
                                     )}
-                                    {children.leftBottom && (
-                                        <PanelArea className="panelArea-leftBottom">{children.leftBottom}</PanelArea>
-                                    )}
-                                </Panel>
+                                    <Panel
+                                        className={classNames(
+                                            "panelLayout-left",
+                                            { isFixed },
+                                            fixedPanelClasses.left,
+                                            this.context.offsetClass,
+                                        )}
+                                        tag="aside"
+                                    >
+                                        {children.leftTop && (
+                                            <PanelArea className="panelArea-leftTop">{children.leftTop}</PanelArea>
+                                        )}
+                                        {children.leftBottom && (
+                                            <PanelArea className="panelArea-leftBottom">
+                                                {children.leftBottom}
+                                            </PanelArea>
+                                        )}
+                                    </Panel>
+                                </>
                             )}
 
                         <ContentTag
@@ -180,24 +213,98 @@ export default class PanelLayout extends CompoundComponent<IPanelLayoutProps> {
                                     )}
                             </Panel>
                             {shouldRenderRightPanel && (
-                                <Panel className="panelLayout-right">
-                                    {children.rightTop && (
-                                        <PanelArea className="panelArea-rightTop" tag="aside">
-                                            {children.rightTop}
-                                        </PanelArea>
-                                    )}
-                                    {children.rightBottom && (
-                                        <PanelArea className="panelArea-rightBottom" tag="aside">
-                                            {children.rightBottom}
-                                        </PanelArea>
-                                    )}
-                                </Panel>
+                                <>
+                                    {isFixed && <Panel className="panelLayout-right" innerRef={this.rightPanelRef} />}
+                                    <Panel
+                                        className={classNames(
+                                            "panelLayout-right",
+                                            { isFixed },
+                                            fixedPanelClasses.right,
+                                            this.context.offsetClass,
+                                        )}
+                                    >
+                                        {children.rightTop && (
+                                            <PanelArea className="panelArea-rightTop" tag="aside">
+                                                {children.rightTop}
+                                            </PanelArea>
+                                        )}
+                                        {children.rightBottom && (
+                                            <PanelArea className="panelArea-rightBottom" tag="aside">
+                                                {children.rightBottom}
+                                            </PanelArea>
+                                        )}
+                                    </Panel>
+                                </>
                             )}
                         </ContentTag>
                     </div>
                 </main>
             </div>
         );
+    }
+
+    public componentDidMount() {
+        window.addEventListener("resize", this.resizeHandler);
+    }
+
+    public componentWillUnmount() {
+        window.removeEventListener("resize", this.resizeHandler);
+    }
+
+    private resizeHandler = debounce(() => {
+        this.clearBoundingRectCache();
+    }, 150);
+
+    private calcFixedPanelClasses(): { left: string; right: string } {
+        const { isFixed } = this.props;
+        const leftPanelEl = this.leftPanelRef.current;
+        const rightPanelEl = this.rightPanelRef.current;
+
+        if (!isFixed || !leftPanelEl || !rightPanelEl) {
+            return {
+                left: "",
+                right: "",
+            };
+        }
+
+        const rightPanelRect = this.getCachedBoundingRect(rightPanelEl);
+        const leftPanelRect = this.getCachedBoundingRect(leftPanelEl);
+
+        const base: NestedCSSProperties = {
+            position: "fixed",
+            bottom: 0,
+            overflow: "auto",
+        };
+
+        return {
+            left: style({
+                ...base,
+                top: leftPanelRect.top,
+                left: leftPanelRect.left + "px",
+            }),
+            right: style({
+                ...base,
+                top: rightPanelRect.top,
+                right: window.innerWidth - rightPanelRect.right - rightPanelRect.width + "px",
+            }),
+        };
+    }
+
+    private boundingRectCaches: WeakMap<HTMLElement, ClientRect> = new WeakMap();
+
+    private getCachedBoundingRect(element: HTMLElement): ClientRect {
+        const cachedRect = this.boundingRectCaches.get(element);
+        if (cachedRect) {
+            return cachedRect;
+        }
+
+        const boundingRect = element.getBoundingClientRect();
+        this.boundingRectCaches.set(element, boundingRect);
+        return boundingRect;
+    }
+
+    private clearBoundingRectCache() {
+        this.boundingRectCaches = new WeakMap();
     }
 
     /**
@@ -257,12 +364,17 @@ interface IContainerProps {
     children?: React.ReactNode;
     tag?: string;
     ariaHidden?: boolean;
+    innerRef?: React.RefObject<HTMLElement>;
 }
 
 export function Panel(props: IContainerProps) {
     const Tag = `${props.tag ? props.tag : "div"}`;
     return (
-        <Tag className={classNames("panelLayout-panel", props.className)} aria-hidden={props.ariaHidden}>
+        <Tag
+            className={classNames("panelLayout-panel", props.className)}
+            aria-hidden={props.ariaHidden}
+            ref={props.innerRef}
+        >
             {props.children}
         </Tag>
     );

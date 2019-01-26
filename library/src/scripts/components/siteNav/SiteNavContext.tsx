@@ -40,11 +40,20 @@ interface IState {
     };
 }
 
-export default class SiteNavProvider extends React.Component<{}, IState> {
+/**
+ * Context provider that tracks the open/closed states of site nav menus.
+ * This wraps `SiteNavContext.Provider` with some nice defaults.
+ *
+ * This helps to keep nav toggles consistent across page navigations.
+ */
+export default class SiteNavProvider extends React.Component<IProps, IState> {
     public state: IState = {
         openRecords: {},
     };
 
+    /**
+     * @inheritdoc
+     */
     public render() {
         return (
             <SiteNavContext.Provider
@@ -60,6 +69,9 @@ export default class SiteNavProvider extends React.Component<{}, IState> {
         );
     }
 
+    /**
+     * Open an item in the nav.
+     */
     private openItem = (recordType: string, recordID: number) => {
         const records = this.state.openRecords[recordType] || new Set();
         records.add(recordID);
@@ -71,6 +83,9 @@ export default class SiteNavProvider extends React.Component<{}, IState> {
         });
     };
 
+    /**
+     * Close an item in the nav.
+     */
     private closeItem = (recordType: string, recordID: number) => {
         const records = this.state.openRecords[recordType];
         if (!records) {
@@ -87,6 +102,9 @@ export default class SiteNavProvider extends React.Component<{}, IState> {
         });
     };
 
+    /**
+     * Toggle an item in the nav.
+     */
     private toggleItem = (recordType: string, recordID: number) => {
         const records = this.state.openRecords[recordType];
         if (records && records.has(recordID)) {

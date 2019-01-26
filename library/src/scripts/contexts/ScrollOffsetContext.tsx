@@ -41,17 +41,33 @@ interface IState {
     isScrolledOff: boolean;
 }
 
+/**
+ * Provider for handling a global scroll offset.
+ * This wraps `ScrollOffset.Provider` with some good default behaviour.
+ *
+ * Using this, you can have one component declare an offset value.
+ * Other components can then recieve this value through context.
+ * The context itself handles watching the scroll position and provides a CSS Class styling for the offset.
+ *
+ * Using the CSS class provided out of this context will translate the set value into translateY value.
+ * @see setScrollOffset
+ */
 export class ScrollOffsetProvider extends React.Component<IProps, IState> {
     public state: IState = {
         scrollOffset: 0,
         isScrolledOff: false,
     };
 
+    /**
+     * @inheritdoc
+     */
     public render() {
+        // Early bailout if we aren't watching the scrolling.
         if (!this.props.scrollWatchingEnabled) {
             return this.props.children;
         }
 
+        // Generate a CSS based on our calculated values.
         const { scrollOffset, isScrolledOff } = this.state;
         const offsetClass = style({
             transition: "transform 0.3s ease",
@@ -59,6 +75,7 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
             transform: isScrolledOff ? `translateY(-${scrollOffset}px)` : "none",
         });
 
+        // Render out the context with all values and methods.
         return (
             <ScrollOffsetContext.Provider
                 value={{
@@ -73,21 +90,30 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public componentDidMount() {
         window.addEventListener("scroll", this.scrollHandler);
     }
 
+    /**
+     * @inheritdoc
+     */
     public componentWillUnmount() {
         window.removeEventListener("scroll", this.scrollHandler);
     }
 
+    /** Keep a local copy of our previous window scroll value. */
     private previousScrollValue = 0;
 
     private scrollHandler = () => {
+        // Early bailout if we aren't watching scroll position.
         if (!this.props.scrollWatchingEnabled) {
             return;
         }
 
+        // Trigger the scrolled state if we've moved up or down by a certain number of pixels.
         requestAnimationFrame(() => {
             const wiggleRoom = 10;
             const newScrolledValue = window.scrollY;
@@ -95,15 +121,16 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
             const isScrollingUp = newScrolledValue < this.previousScrollValue - wiggleRoom;
             this.previousScrollValue = window.scrollY;
             if (isScrollingDown) {
-                document.body.classList.toggle("vanillaHeaderIsScolledOff", true);
                 this.setState({ isScrolledOff: true });
             } else if (isScrollingUp) {
-                document.body.classList.toggle("vanillaHeaderIsScolledOff", false);
                 this.setState({ isScrolledOff: false });
             }
         });
     };
 
+    /**
+     * Reset the context state.
+     */
     private resetScrollOffset = () => {
         this.setState({
             scrollOffset: 0,
@@ -111,6 +138,9 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
         });
     };
 
+    /**
+     * Set the value items will be translated by.
+     */
     private setScrollOffset: ScollOffsetSetter = offset => {
         this.setState({ scrollOffset: offset });
     };

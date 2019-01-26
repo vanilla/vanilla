@@ -5,9 +5,8 @@
  */
 
 import * as React from "react";
-import { Devices, IDeviceProps } from "../DeviceChecker";
+import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import classNames from "classnames";
-import CompoundComponent from "./CompoundComponent";
 import { ScrollOffsetContext } from "@library/contexts/ScrollOffsetContext";
 import { style } from "typestyle";
 import { NestedCSSProperties } from "typestyle/lib/types";
@@ -229,13 +228,14 @@ class PanelLayout extends React.Component<IProps> {
 
     public componentDidMount() {
         window.addEventListener("resize", this.recalcSizes);
+        this.recalcSizes();
     }
 
     public componentDidUpdate(prevProps: IProps) {
         const hadRight = prevProps.rightTop || prevProps.rightBottom;
         const hasRight = this.props.rightTop || this.props.rightBottom;
         if (!hadRight && hasRight) {
-            this.forceUpdate();
+            this.recalcSizes();
         }
     }
 
@@ -259,14 +259,8 @@ class PanelLayout extends React.Component<IProps> {
         const leftPanelEl = this.leftPanelRef.current;
         const rightPanelEl = this.rightPanelRef.current;
 
-        const noWidthStyle = style({
-            width: 0,
-            flexBasis: 0,
-            margin: 0,
-            padding: 0,
-        });
-        let left = noWidthStyle;
-        let right = noWidthStyle;
+        let left = "sr-only";
+        let right = "sr-only";
 
         if (!isFixed) {
             return { left, right };

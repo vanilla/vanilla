@@ -37,7 +37,7 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
         path: path.join(DIST_DIRECTORY, section),
         library: `vanilla${section}`,
     };
-    baseConfig.devtool = "cheap-source-map";
+    baseConfig.devtool = "source-map";
     baseConfig.optimization = {
         noEmitOnErrors: true,
         namedModules: false,

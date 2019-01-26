@@ -28,7 +28,7 @@ export class DeviceProvider extends React.Component<IProps, IState> {
     public render() {
         return (
             <>
-                <div ref={this.deviceChecker} className="deviceChecker" />;
+                <div ref={this.deviceChecker} className="deviceChecker" />
                 <DeviceContext.Provider value={this.state.device}>{this.props.children}</DeviceContext.Provider>
             </>
         );

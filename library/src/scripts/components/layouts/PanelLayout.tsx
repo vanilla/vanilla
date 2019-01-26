@@ -12,8 +12,9 @@ import { ScrollOffsetContext } from "@library/contexts/ScrollOffsetContext";
 import { style } from "typestyle";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import throttle from "lodash/throttle";
+import { withDevice } from "@library/contexts/DeviceContext";
 
-interface IPanelLayoutProps extends IDeviceProps {
+interface IProps extends IDeviceProps {
     className?: string;
     toggleMobileMenu?: (isOpen: boolean) => void;
     contentTag?: string;
@@ -59,7 +60,7 @@ interface IPanelLayoutProps extends IDeviceProps {
  * | MiddleBottom |
  * | RightBottom  |
  */
-export default class PanelLayout extends React.Component<IPanelLayoutProps> {
+class PanelLayout extends React.Component<IProps> {
     public static contextType = ScrollOffsetContext;
     public context!: React.ContextType<typeof ScrollOffsetContext>;
 
@@ -80,7 +81,7 @@ export default class PanelLayout extends React.Component<IPanelLayoutProps> {
         const isMobile = device === Devices.MOBILE;
         const isTablet = device === Devices.TABLET;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-        const shouldRenderLeftPanel: boolean = !isMobile && !!(childComponents.leftTop || childComponents.leftBottom);
+        const shouldRenderLeftPanel: boolean = !isMobile && (!!childComponents.leftTop || !!childComponents.leftBottom);
         const shouldRenderRightPanel: boolean =
             (isFullWidth || (isTablet && !shouldRenderLeftPanel)) &&
             !!(childComponents.rightTop || childComponents.rightBottom);
@@ -230,8 +231,11 @@ export default class PanelLayout extends React.Component<IPanelLayoutProps> {
         window.addEventListener("resize", this.recalcSizes);
     }
 
-    public componentDidUpdate() {
-        if (this.props.children) {
+    public componentDidUpdate(prevProps: IProps) {
+        const hadRight = prevProps.rightTop || prevProps.rightBottom;
+        const hasRight = this.props.rightTop || this.props.rightBottom;
+        if (!hadRight && hasRight) {
+            this.forceUpdate();
         }
     }
 
@@ -357,3 +361,5 @@ export function PanelWidgetVerticalPadding(props: IContainerProps) {
 export function PanelWidgetHorizontalPadding(props: IContainerProps) {
     return <div className={classNames("panelWidget", "hasNoVerticalPadding", props.className)}>{props.children}</div>;
 }
+
+export default withDevice(PanelLayout);

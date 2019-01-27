@@ -1434,7 +1434,7 @@ class CommentModel extends Gdn_Model {
         $this->fireEvent('BeforeUpdateCommentCount');
 
         if ($discussion) {
-            if ($data) {
+            if ($data && $data['CountComments'] !== 0) {
                 $this->SQL->update('Discussion');
                 if (!$discussion['Sink'] && $data['DateLastComment']) {
                     $this->SQL->set('DateLastComment', $data['DateLastComment']);
@@ -1465,7 +1465,9 @@ class CommentModel extends Gdn_Model {
                     ->set('LastCommentID', null)
                     ->set('DateLastComment', 'DateInserted', false, false)
                     ->set('LastCommentUserID', null)
-                    ->where('DiscussionID', $discussionID);
+                    ->where('DiscussionID', $discussionID)
+                    ->put();
+
             }
         }
     }

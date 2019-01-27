@@ -1467,7 +1467,6 @@ class CommentModel extends Gdn_Model {
                     ->set('LastCommentUserID', null)
                     ->where('DiscussionID', $discussionID)
                     ->put();
-
             }
         }
     }

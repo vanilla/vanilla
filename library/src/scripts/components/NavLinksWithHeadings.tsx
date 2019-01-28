@@ -28,9 +28,9 @@ export default class NavLinksWithHeadings extends Component<IProps> {
         const grouped = this.props.data.groups || [];
 
         if (ungrouped.length !== 0 || grouped.length !== 0) {
-            const ungroupedContent = <NavLinks articles={ungrouped} title={t("Overview")} />;
+            const ungroupedContent = <NavLinks title={t("Overview")} items={ungrouped} />;
             const groupedContent = grouped.map(group => {
-                return <NavLinks articles={group.articles} title={group.category.name} />;
+                return <NavLinks items={group.items} title={group.category.name} />;
             });
 
             return (

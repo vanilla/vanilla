@@ -17,7 +17,7 @@
 }
 
 .Navigation,
-.MobileMebox {
+.mobileMebox {
     display: none;
     overflow: hidden;
     position: relative;
@@ -25,18 +25,13 @@
     height: auto;
     max-height: 0;
     transition: max-height .3s ease;
+
     @include maxWidth {
         display: block;
     }
 
     &.isOpen {
         max-height: 450px;
-    }
-
-    .Container {
-        @include maxWidth {
-            padding: 0;
-        }
     }
 
     &.isReadyToTransition {
@@ -55,6 +50,13 @@
     box-shadow: $navigation-boxShadow;
     border-bottom-left-radius: $navigation_borderRadius;
     border-bottom-right-radius: $navigation_borderRadius;
+
+    .Container {
+
+        @include maxWidth {
+            padding: 0;
+        }
+    }
 
     .BoxButtons .Button:not(.Handle) {
         width: 100%;
@@ -162,36 +164,6 @@
         }
     }
 
-    // Mebox component
-    //.MeButton {
-    //    padding: 0;
-    //    height: 42px;
-    //    width: 42px;
-    //    color: $navigationMebutton_fg;
-    //    background-color: $navigationMebutton_bg;
-    //    display: flex;
-    //    justify-content: center;
-    //
-    //    .Sprite::before {
-    //        font-size: $icon-default_size;
-    //    }
-    //
-    //    &:focus,
-    //    &:hover,
-    //    &:active {
-    //        color: $navigationMebutton-hover_fg;
-    //        background-color: $navigationMebutton-hover_bg;
-    //    }
-    //}
-    //
-    //.ToggleFlyout.Open .MeButton {
-    //    background-color: $navigationMebutton-active_bg;
-    //}
-    //
-    //.WhoIs > .Username {
-    //    color: $navigationMebutton_fg;
-    //}
-
     .SignInLinks.SignInLinks {
         width: 100%;
         text-align: center;
@@ -273,15 +245,41 @@
     }
 }
 
-.mobileMeBox-button {
+.mobileMeBox-button,
+.mobileMebox-buttonClose {
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: $hamburger_transition;
     user-select: none;
     background: transparent;
+    padding: 0;
+    border-width: 0;
     outline: none;
+}
+
+.mobileMebox-buttonClose {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: $icon-default_size;
+    line-height: 32px;
+    height: 32px;
+    width: 32px;
+    border-radius: $mebox-button_borderRadius;
+    color: $MobileMeBox_fg;
+    margin-left: auto;
+    opacity: 0.6;
+
+    span {
+        font-size: inherit;
+    }
+}
+
+.mobileMeBox-button {
+    transition: $hamburger_transition;
+    user-select: none;
     height: 28px;
     width: 28px;
     right: $content_padding;
@@ -294,14 +292,24 @@
         height: 28px;
         width: 28px;
     }
+
+    .PhotoWrap:hover a.ChangePicture {
+        display: none;
+    }
 }
 
 .mobileMebox {
     background-color: $MobileMeBox_bg;
 
+    .Container {
+        display: flex;
+        align-items: center;
+    }
+
     .MeBox {
         display: block;
         padding: $utility-baseUnit 0;
+        width: 80%;
     }
 
     .MeMenu {
@@ -333,6 +341,13 @@
         &:hover,
         &:active {
             background-color: transparent;
+        }
+
+        .Alert {
+
+            @include maxWidth {
+                top: -6px;
+            }
         }
     }
 }

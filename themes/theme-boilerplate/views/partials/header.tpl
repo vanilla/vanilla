@@ -23,9 +23,9 @@
                 <div class="MeBox-header">
                     {module name="MeModule" CssClass="FlyoutRight"}
                 </div>
-                <div class="mobileMeBox-button">
+                <button class="mobileMeBox-button">
                     {module name="UserPhotoModule"}
-                </div>
+                </button>
             </div>
         </div>
     </div>
@@ -42,9 +42,12 @@
             {custom_menu format=$linkFormat}
         </div>
     </nav>
-    <nav class="mobileMebox js-mobileMebox isOpen">
+    <nav class="mobileMebox js-mobileMebox">
         <div class="Container">
             {module name="MeModule"}
+            <button class="mobileMebox-buttonClose Close">
+                <span>×</span>
+            </button>
         </div>
     </nav>
 </header>

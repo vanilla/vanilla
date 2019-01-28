@@ -757,6 +757,7 @@
 
 .flyoutIsOpen,
 .NoScroll {
+
     @include maxWidth {
         height: 100vh;
         overflow: hidden;

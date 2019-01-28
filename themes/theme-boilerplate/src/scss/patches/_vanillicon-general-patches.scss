@@ -78,7 +78,8 @@
 }
 
 .SpFlyoutHandle::before {
-    content: $icon-cog;
+    @include kbicon;
+    content: $kbicon-gear;
 }
 
 .SpOptions::before {

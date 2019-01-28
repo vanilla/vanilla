@@ -29,8 +29,11 @@ $utility-percentage_third:              (100% / 3);
 $utility-percentage_nineSixteenths:     (9 / 16 * 100%);
 $utility-SVGEncoding:                   "data:image/svg+xml,";
 
+$utility-large_padding:                  18px !default;
+$utility-xLarge_padding:                 $utility-large_padding * 2 !default;
+
 /* -------------------------------------------------------------- *\
-    Global Overwrites
+    Global Font
 \* -------------------------------------------------------------- */
 
 $global-normal_fontWeight:              400 !default;
@@ -52,12 +55,8 @@ $global-smallTitle_fontSize:            20px !default;
 $global-title_mobile_fontSize:          26px !default;
 $global-subTitle_fontSize:              18px !default;
 
-$global-base_lineHeight:                1.618 !default;
+$global-base_lineHeight:                1.5 !default;
 $global-condensed_lineHeight:           1.25 !default;
-$global-lineHeight_offset:              .32 !default; // Offset font to make top of capital letters flush with top of container
-$global-headinglineHeight_offset:       $global-lineHeight_offset !default; // Different if heading has different font than body
-$global-bodylineHeight_offset:          .4 !default; // Different if body has different font than headding
-$global-excerpt_lineHeight:             1.45 !default;
 
 /* -------------------------------------------------------------- *\
     User Content
@@ -71,6 +70,13 @@ $userContent-fontSizeH3:                1.25em !default;
 $userContent-fontSizeH4:                1em !default;
 $userContent-fontSizeH5:                .875em !default;
 $userContent-fontSizeH6:                .85em !default;
+
+/* -------------------------------------------------------------- *\
+    Global Overwrites
+\* -------------------------------------------------------------- */
+
+$global-heading_topMargin:              1.5 * $global-medium_fontSize;
+$global-block_margin:                   $userContent_fontSize !default;
 
 $global-main_width:                     1224px !default;
 $global_spacer:                         $userContent_fontSize * $global-base_lineHeight !default;
@@ -124,16 +130,6 @@ $theme-photo_round:                      true !default;
 $theme-photo_borderRadius:               $global_borderRadius !default;
 
 $theme_stickFooter:                      true !default;
-
-/* -------------------------------------------------------------- *\
-    Utilities
-\* -------------------------------------------------------------- */
-
-$utility-medium_padding:                 $utility-baseUnit * 2 !default;
-$utility-xSmall_padding:                 $utility-medium_padding / 4 !default;
-$utility-small_padding:                  $utility-medium_padding / 2 !default;
-$utility-large_padding:                  18px !default;
-$utility-xLarge_padding:                 $utility-large_padding * 2 !default;
 
 /* -------------------------------------------------------------- *\
     Links
@@ -214,7 +210,7 @@ $navigation_link_color:                   $header-link_color !default;
 $navigation_link-hover_color:             $header-link_color !default;
 $navigation_border:                       darken($navigation_bg, 8%)!default;
 $navigation_fontSize:                     $global-medium_fontSize !default;
-$navigation_paddingSide:                  $utility-medium_padding !default;
+$navigation_paddingSide:                  $utility-baseUnitDouble !default;
 $navigation_vertical_paddingSide:         0 !default;
 $navigation-item_height:                  36px !default;
 $navigation-item_fontWeight:              $global-normal_fontWeight !default;
@@ -243,7 +239,7 @@ $navigationMebutton-active_bg:            mix($navigationMebutton_fg, $navigatio
 $content_bg:                             transparent !default;
 $content_border:                         0 !default;
 $content_padding:                        $utility-large_padding !default;
-$content-mobile_padding:                 $utility-medium_padding !default;
+$content-mobile_padding:                 $utility-baseUnitDouble !default;
 $content_borderRadius:                   0 !default;
 
 /* -------------------------------------------------------------- *\
@@ -253,7 +249,6 @@ $content_borderRadius:                   0 !default;
 $panel_toLeft:                           false !default;
 $panel_width:                            220px !default;
 $panel_gap:                              40px !default;
-$panel-item_height:                      2.5em !default;
 $panel_bg:                               transparent !default;
 $panel_fg:                               $global-color_fg !default;
 $panel_padding:                          0 !default;
@@ -262,15 +257,14 @@ $panel_borderRadius:                     $content_borderRadius !default;
 
 
 $panel-item-showIcons:                   false !default;
-$panel-item_height:                      32px !default;
-$panel-item_spacing:                     0 !default;
-$panel-item_sidePadding:                 6px !default;
+$panel-item_spacing:                     12px !default;
 $panel-item_borderRadius:                0 !default;
 $panel-item_border:                      none !default;
+$panel-item_padding:                     5px !default;
 
 $panel-item_bg:                          transparent !default;
 $panel-item_fg:                          $link-default_color !default;
-$panel-item_borderColor:                 transparent !default;
+$panel-item_border:                      none !default;
 
 $panel-item-hover_bg:                    transparent !default;
 $panel-item-hover_fg:                    $link-default_hover_color !default;
@@ -306,7 +300,7 @@ $component-header_bg:                    transparent !default;
 $component-base_color:                   $global-color_fg !default;
 $component-base_fontSize:                $global-medium_fontSize !default;
 $component-base_fontWeight:              $global-normal_fontWeight !default;
-$component-base_lineHeight:              $global-excerpt_lineHeight !default;
+$component-base_lineHeight:              $global-base_lineHeight !default;
 
 $component-title_color:                  $global-color_fg !default;
 $component-title-hover_color:            $global-color_primary !default;
@@ -319,13 +313,7 @@ $component-meta-link_color:              $component-meta_color !default;
 $component-meta-link-hover_color:        $theme-heading-hover_color !default;
 $component-meta_fontSize:                $global-small_fontSize !default;
 $component-meta_fontWeight:              $global-normal_fontWeight !default;
-$component-meta_lineHeight:              $global-condensed_lineHeight !default;
-
-/* -------------------------------------------------------------- *\
-    Searchbox Featured
-\* -------------------------------------------------------------- */
-
-$SearchboxFeatured_size:                 48px !default;
+$component-meta_lineHeight:              $global-base_lineHeight !default;
 
 /* -------------------------------------------------------------- *\
     Form Elements
@@ -373,10 +361,16 @@ $formButton_fontFamily:                  $global-body_fontFamily !default;
 $formButton_fontWeight:                  $global-normal_fontWeight !default;
 $formButton_fontSize:                    $global-medium_fontSize !default;
 $formButton_maxWidth:                    360px !default;
-$formButton_padding:                     $utility-medium_padding !default;
+$formButton_padding:                     $utility-baseUnitDouble !default;
 $formButton_height:                      $formElement_height !default;
 $formButton_borderRadius:                $formElement_borderRadius !default;
 $formButton_border:                      1px solid !default;
+
+/* -------------------------------------------------------------- *\
+    Searchbox Featured
+\* -------------------------------------------------------------- */
+
+$SearchboxFeatured_size:                 48px !default;
 
 /* -------------------------------------------------------------- *\
     Breakpoints

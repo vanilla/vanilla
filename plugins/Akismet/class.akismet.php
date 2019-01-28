@@ -25,7 +25,8 @@
 /**
  *    The Akismet PHP5 Class
  *
- *  This class takes the functionality from the Akismet WordPress plugin written by {@link http://photomatt.net/ Matt Mullenweg} and allows it to be integrated into any PHP5 application or website.
+ *  This class takes the functionality from the Akismet WordPress plugin written by {@link http://photomatt.net/ Matt Mullenweg}
+ *  and allows it to be integrated into any PHP5 application or website.
  *
  *  The original plugin is {@link http://akismet.com/download/ available on the Akismet website}.
  *
@@ -85,8 +86,10 @@ class Akismet {
         'PHP_SELF'];
 
     /**
-     * @param    string $blogURL The URL of your blog.
-     * @param    string $wordPressAPIKey WordPress API key.
+     * Constructor.
+     *
+     * @param String $blogURL The URL of your blog.
+     * @param String $wordPressAPIKey WordPress APTI key.
      */
     public function __construct($blogURL, $wordPressAPIKey) {
         $this->blogURL = $blogURL;
@@ -121,16 +124,28 @@ class Akismet {
      *
      * Use this method if you suspect your API key is invalid.
      *
-     * @return bool    True is if the key is valid, false if not.
+     * @return bool True is if the key is valid, false if not.
      */
     public function isKeyValid() {
         // Check to see if the key is valid
-        $response = $this->sendRequest('key=' . $this->wordPressAPIKey . '&blog=' . $this->blogURL, $this->akismetServer, '/' . $this->akismetVersion . '/verify-key');
+        $response = $this->sendRequest(
+            'key=' . $this->wordPressAPIKey . '&blog=' . $this->blogURL,
+            $this->akismetServer,
+            '/' . $this->akismetVersion . '/verify-key'
+        );
 
         return $response[1] == 'valid';
     }
 
-    // makes a request to the Akismet service
+    /**
+     * Makes a request to the Akismet service.
+     *
+     * @param string $request Http request.
+     * @param string $host The HostName.
+     * @param string $path The Path.
+     *
+     * @return array
+     */
     private function sendRequest($request, $host, $path) {
         $http_request = "POST " . $path . " HTTP/1.0\r\n";
         $http_request .= "Host: " . $host . "\r\n";
@@ -146,7 +161,11 @@ class Akismet {
         return explode("\r\n\r\n", $socketWriteRead->getResponse(), 2);
     }
 
-    // Formats the data for transmission
+    /**
+     * Formats the data for transmission.
+     *
+     * @return string
+     */
     private function getQueryString() {
         foreach ($_SERVER as $key => $value) {
             if (!in_array($key, $this->ignore)) {
@@ -170,12 +189,13 @@ class Akismet {
     }
 
     /**
-     *    Tests for spam.
+     * Test for spam.
      *
-     *    Uses the web service provided by {@link http://www.akismet.com Akismet} to see whether or not the submitted comment is spam.  Returns a boolean value.
+     * Uses the web service provided by {@link http://www.akismet.com Akismet} to see whether
+     * or not the submitted comment is spam.  Returns a boolean value.
      *
-     * @return        bool    True if the comment is spam, false if not
-     * @throws        Will throw an exception if the API key passed to the constructor is invalid.
+     * @return bool True if the comment is spam, false if not.
+     * @throws exception Will throw an exception if the API key passed to the constructor is invalid.
      */
     public function isCommentSpam() {
         $response = $this->sendRequest($this->getQueryString(), $this->wordPressAPIKey . '.' . $this->akismetServer, '/' . $this->akismetVersion . '/comment-check');
@@ -188,34 +208,48 @@ class Akismet {
     }
 
     /**
-     *    Submit spam that is incorrectly tagged as ham.
+     * Submit spam that is incorrectly tagged as ham.
      *
-     *    Using this function will make you a good citizen as it helps Akismet to learn from its mistakes.  This will improve the service for everybody.
+     * Using this function will make you a good citizen as it helps Akismet to learn from its mistakes.
+     * This will improve the service for everybody.
+     *
+     * @return string.
      */
     public function submitSpam() {
-        $this->sendRequest($this->getQueryString(), $this->wordPressAPIKey . '.' . $this->akismetServer, '/' . $this->akismetVersion . '/submit-spam');
+        $this->sendRequest(
+            $this->getQueryString(),
+            $this->wordPressAPIKey . '.' . $this->akismetServer,
+            '/' . $this->akismetVersion . '/submit-spam'
+        );
     }
 
     /**
-     *    Submit ham that is incorrectly tagged as spam.
+     * Submit ham that is incorrectly tagged as spam.
      *
-     *    Using this function will make you a good citizen as it helps Akismet to learn from its mistakes.  This will improve the service for everybody.
+     * Using this function will make you a good citizen as it helps Akismet to learn from its mistakes.
+     * This will improve the service for everybody.
+     *
+     * @return string.
      */
     public function submitHam() {
-        $this->sendRequest($this->getQueryString(), $this->wordPressAPIKey . '.' . $this->akismetServer, '/' . $this->akismetVersion . '/submit-ham');
+        $this->sendRequest(
+            $this->getQueryString(),
+            $this->wordPressAPIKey . '.' . $this->akismetServer,
+            '/' . $this->akismetVersion . '/submit-ham'
+        );
     }
 
     /**
-     *    To override the user IP address when submitting spam/ham later on
+     * To override the user IP address when submitting spam/ham later on.
      *
-     * @param string $userip An IP address.  Optional.
+     * @param string $userip An IP address  Optional.
      */
     public function setUserIP($userip) {
         $this->comment['user_ip'] = $userip;
     }
 
     /**
-     *    To override the referring page when submitting spam/ham later on
+     * To override the referring page when submitting spam/ham later on
      *
      * @param string $referrer The referring page.  Optional.
      */
@@ -224,7 +258,7 @@ class Akismet {
     }
 
     /**
-     *    A permanent URL referencing the blog post the comment was submitted to.
+     * A permanent URL referencing the blog post the comment was submitted to.
      *
      * @param string $permalink The URL.  Optional.
      */
@@ -233,32 +267,38 @@ class Akismet {
     }
 
     /**
-     *    The type of comment being submitted.
+     * The type of comment being submitted.
      *
-     *    May be blank, comment, trackback, pingback, or a made up value like "registration" or "wiki".
+     * May be blank, comment, trackback, pingback, or a made up value like "registration" or "wiki".
+     *
+     * @param string $commentType The comment type.
      */
     public function setCommentType($commentType) {
         $this->comment['comment_type'] = $commentType;
     }
 
     /**
-     *    The name that the author submitted with the comment.
+     * The name that the author submitted with the comment.
+     *
+     * @param string $commentAuthor The comment author.
      */
     public function setCommentAuthor($commentAuthor) {
         $this->comment['comment_author'] = $commentAuthor;
     }
 
     /**
-     *    The email address that the author submitted with the comment.
+     * The email address that the author submitted with the comment.  The address is assumed to be valid.
      *
-     *    The address is assumed to be valid.
+     * @param string $authorEmail The email author.
      */
     public function setCommentAuthorEmail($authorEmail) {
         $this->comment['comment_author_email'] = $authorEmail;
     }
 
     /**
-     *    The URL that the author submitted with the comment.
+     * The URL that the author submitted with the comment.
+     *
+     * @param string $authorURL The author URL.
      */
     public function setCommentAuthorURL($authorURL) {
         $this->comment['comment_author_url'] = $authorURL;
@@ -388,5 +428,3 @@ class SocketWriteRead {
         return $this->errorString;
     }
 }
-
-?>

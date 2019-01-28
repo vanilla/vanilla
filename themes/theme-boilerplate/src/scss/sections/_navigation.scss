@@ -8,17 +8,23 @@
     Styles
 \* -------------------------------------------------------------- */
 
-.Navigation {
+.Header.hasOpenNavigation {
+
+    @include maxWidth {
+        border-bottom-left-radius: $navigation_borderRadius;
+        border-bottom-right-radius: $navigation_borderRadius;
+    }
+}
+
+.Navigation,
+.MobileMebox {
     display: none;
     overflow: hidden;
     position: relative;
-    background: $navigation_bg;
-    color: $navigation_link_color;
     width: 100%;
     height: auto;
     max-height: 0;
     transition: max-height .3s ease;
-
     @include maxWidth {
         display: block;
     }
@@ -32,6 +38,23 @@
             padding: 0;
         }
     }
+
+    &.isReadyToTransition {
+        will-change: max-height;
+        transition: max-height $global-default_easing $global-default_timing * 2;
+
+        &[data-state= 'CLOSED'] {
+            transition-timing-function: $navigation-easing-transition;
+        }
+    }
+}
+
+.Navigation {
+    background: $navigation_bg;
+    color: $navigation_fg;
+    box-shadow: $navigation-boxShadow;
+    border-bottom-left-radius: $navigation_borderRadius;
+    border-bottom-right-radius: $navigation_borderRadius;
 
     .BoxButtons .Button:not(.Handle) {
         width: 100%;
@@ -73,15 +96,6 @@
                 background: rgba($navigationButton_bg, 0.05);
                 color: $navigationButton_fg;
             }
-        }
-    }
-
-    &.isReadyToTransition {
-        will-change: max-height;
-        transition: max-height $global-default_easing $global-default_timing * 2;
-
-        &[data-state= 'CLOSED'] {
-            transition-timing-function: $navigation-easing-transition;
         }
     }
 
@@ -149,34 +163,34 @@
     }
 
     // Mebox component
-    .MeButton {
-        padding: 0;
-        height: 42px;
-        width: 42px;
-        color: $navigationMebutton_fg;
-        background-color: $navigationMebutton_bg;
-        display: flex;
-        justify-content: center;
-
-        .Sprite::before {
-            font-size: $icon-default_size;
-        }
-
-        &:focus,
-        &:hover,
-        &:active {
-            color: $navigationMebutton-hover_fg;
-            background-color: $navigationMebutton-hover_bg;
-        }
-    }
-
-    .ToggleFlyout.Open .MeButton {
-        background-color: $navigationMebutton-active_bg;
-    }
-
-    .WhoIs > .Username {
-        color: $navigationMebutton_fg;
-    }
+    //.MeButton {
+    //    padding: 0;
+    //    height: 42px;
+    //    width: 42px;
+    //    color: $navigationMebutton_fg;
+    //    background-color: $navigationMebutton_bg;
+    //    display: flex;
+    //    justify-content: center;
+    //
+    //    .Sprite::before {
+    //        font-size: $icon-default_size;
+    //    }
+    //
+    //    &:focus,
+    //    &:hover,
+    //    &:active {
+    //        color: $navigationMebutton-hover_fg;
+    //        background-color: $navigationMebutton-hover_bg;
+    //    }
+    //}
+    //
+    //.ToggleFlyout.Open .MeButton {
+    //    background-color: $navigationMebutton-active_bg;
+    //}
+    //
+    //.WhoIs > .Username {
+    //    color: $navigationMebutton_fg;
+    //}
 
     .SignInLinks.SignInLinks {
         width: 100%;
@@ -202,7 +216,7 @@
 }
 
 .Navigation-row {
-    padding: 0 $utility-large_padding $utility-large_padding;
+    padding: $utility-large_padding;
     display: flex;
     align-items: center;
 }
@@ -214,11 +228,11 @@
     display: block;
     width: 100%;
     padding: 0 $utility-large_padding;
-    color: $navigation_link_color;
+    color: $navigation_fg;
 
     &:focus,
     &:hover {
-        color: $navigation_link-hover_color;
+        color: $navigation-hover_fg;
     }
 }
 
@@ -256,5 +270,69 @@
 
     .Navigation-row.NewDiscussion {
         display: none;
+    }
+}
+
+.mobileMeBox-button {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: $hamburger_transition;
+    user-select: none;
+    background: transparent;
+    outline: none;
+    height: 28px;
+    width: 28px;
+    right: $content_padding;
+
+    @include maxWidth {
+        position: absolute;
+    }
+
+    .PhotoWrap {
+        height: 28px;
+        width: 28px;
+    }
+}
+
+.mobileMebox {
+    background-color: $MobileMeBox_bg;
+
+    .MeBox {
+        display: block;
+        padding: $utility-baseUnit 0;
+    }
+
+    .MeMenu {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .MeButton-user {
+
+        &::before {
+            @include kbicon();
+            font-size: 26px;
+            content: $kbicon-user-empty;
+        }
+
+        .ProfilePhoto {
+            display: none;
+        }
+    }
+
+    .Open .MeButton-user::before {
+        content: $kbicon-user;
+    }
+
+    .MeButton {
+
+        &:focus,
+        &:hover,
+        &:active {
+            background-color: transparent;
+        }
     }
 }

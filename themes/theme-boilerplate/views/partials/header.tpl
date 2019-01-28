@@ -7,7 +7,7 @@
     </div>"
 }
 
-<header class="Header">
+<header id="MainHeader" class="Header">
     <div class="Container">
         <div class="row">
             <div class="Hamburger">
@@ -20,19 +20,17 @@
                 {mobile_logo}
             </a>
             <div class="Header-right">
-                <div class="MeBox--header">
+                <div class="MeBox-header">
                     {module name="MeModule" CssClass="FlyoutRight"}
+                </div>
+                <div class="mobileMeBox-button">
+                    {module name="UserPhotoModule"}
                 </div>
             </div>
         </div>
     </div>
     <nav id="navdrawer" class="Navigation">
         <div class="Container">
-            <div class="Navigation-row">
-                <div class="MeBox MeBox mobile">
-                    {module name="MeModule"}
-                </div>
-            </div>
             <div class="Navigation-row NewDiscussion">
                 <div class="NewDiscussion mobile">
                     {module name="NewDiscussionModule"}
@@ -42,6 +40,11 @@
             {discussions_link format=$linkFormat}
             {activity_link format=$linkFormat}
             {custom_menu format=$linkFormat}
+        </div>
+    </nav>
+    <nav class="mobileMebox js-mobileMebox isOpen">
+        <div class="Container">
+            {module name="MeModule"}
         </div>
     </nav>
 </header>

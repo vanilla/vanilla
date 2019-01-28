@@ -129,7 +129,7 @@ $mebox-button_borderRadius:             3px !default;
     line-height: inherit;
 }
 
-.MeBox--header {
+.MeBox-header {
 
     @include maxWidth($theme-breakpoint_base) {
         display: none;

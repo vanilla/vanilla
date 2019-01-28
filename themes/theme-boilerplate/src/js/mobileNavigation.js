@@ -7,10 +7,12 @@
 export function setupMobileNavigation() {
 
     var $menuButton = $("#menu-button"),
-        $navdrawer = $("#navdrawer");
+        $navdrawer = $("#navdrawer"),
+        $mainHeader = $("#MainHeader");
 
     $menuButton.on("click", () => {
         $menuButton.toggleClass("isToggled");
         $navdrawer.toggleClass("isOpen");
+        $mainHeader.toggleClass("hasOpenNavigation");
     });
 }

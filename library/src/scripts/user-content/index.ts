@@ -38,6 +38,11 @@ export function initAllUserContent() {
     initQuoteEmbeds();
     initCodeHighlighting();
     initFileEmbeds();
+
+    // This can be pretty heavily so initialize it dynamically. There are no gaurentees this will have run by the time the method returns.
+    void import("@library/user-content/code" /* webpackChunkName: "codeBlockHighlighting" */).then(module => {
+        module.initCodeHighlighting();
+    });
 }
 
 /**

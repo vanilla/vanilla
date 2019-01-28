@@ -6,7 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { getOptionalID, IOptionalComponentID } from "../../componentIDs";
+import { getOptionalID, IOptionalComponentID } from "@library/componentIDs";
 
 interface IProps extends IOptionalComponentID {
     children: React.ReactNode;

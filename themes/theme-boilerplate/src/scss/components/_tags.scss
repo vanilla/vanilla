@@ -25,7 +25,7 @@ $tag-hover_borderColor:           $global-color_primary !default;
     line-height: $global-base_lineHeight;
     height: auto;
     border-radius: $tag_borderRadius;
-    padding: 0 $utility-small_padding;
+    padding: 0 $utility-baseUnitHalf;
     display: inline-block;
     font-weight: inherit;
     font-size: $tag_fontSize;

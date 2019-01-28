@@ -289,15 +289,15 @@ $footer-base_lineHeight:                 $global-base_lineHeight !default;
     Components
 \* -------------------------------------------------------------- */
 
-$component-item_spacing:                 12px !default;//0 !default;
+$component-item_spacing:                 0 !default;
 $component-base_padding:                 $global-medium_fontSize !default;
 $component_bg:                           $global-color_bg !default;
 $component_borderWidth:                  1px !default;
-$component_lateralBorder:                true !default;
+$component_lateralBorder:                false !default;
 $component_borderColor:                  $theme-border_color !default;
 $component_border:                       #{$theme-border_color} #{$component_borderWidth} solid !default;
-$component_boxShadow:                    3px 3px 3px red !default;
-$component_borderRadius:                 6px !default;
+$component_boxShadow:                    none !default;
+$component_borderRadius:                 0 !default;
 
 $component-header_bg:                    transparent !default;
 

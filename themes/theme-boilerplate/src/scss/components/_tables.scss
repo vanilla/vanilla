@@ -33,7 +33,8 @@
     }
 }
 
-.Groups .DataTable {
+.Groups .DataTable,
+.DataTable {
     margin: 0 0 $utility-large_padding;
     table-layout: fixed;
     width: 100%;
@@ -321,13 +322,13 @@
     &.CategoryTable {
         @include categoriesTableItem;
 
-        .NoPhoto ~ {
-            h2,
-            h3,
-            .CategoryDescription {
-                padding-left: 0;
-            }
-        }
+        //.NoPhoto ~ {
+        //    h2,
+        //    h3,
+        //    .CategoryDescription {
+        //        padding-left: 0;
+        //    }
+        //}
 
         thead .CategoryName {
             padding-left: $component-base_padding;

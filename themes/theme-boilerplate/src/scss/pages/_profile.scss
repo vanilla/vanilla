@@ -12,10 +12,10 @@ body.Section-Profile {
 
     .Profile h2,
     .BadgeGrid h4 {
-        font-size: $global-large_fontSize;
+        font-size: $global-subTitle_fontSize;
         font-weight: $global-heading_fontWeight;
         margin-bottom: $utility-large_padding;
-        border-bottom: $component_border;
+        //border-bottom: $component_border;
         display: flex;
         align-items: center;
         justify-content: space-between;

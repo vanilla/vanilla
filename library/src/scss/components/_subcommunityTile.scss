@@ -9,7 +9,7 @@ $subcommunityTile_topPadding              : 38px;
 $subcommunityTile_horizontalPadding       : 24px;
 $subcommunityTile_bottomPadding           : 24px;
 
-$subcommunityTile-imageFrame_height       : 86px;
+$subcommunityTile-imageFrame_height       : 90px;
 $subcommunityTile-imageFrame_bottomMargin : 16px;
 
 $subcommunityTile-title_fontSize          : $global-large_fontSize;
@@ -18,17 +18,22 @@ $subcommunityTile-description_fontSize    : $global-medium_fontSize;
 
 $subcommunityTile_spacing                 : 24px;
 
+//$subcommunityTile_width                   : 384px;
 
 
 .subcommunityTile {
     @include shadow-embed;
-    margin: $subcommunityTile_spacing;
+    display: block;
+    width: 100%;
+    padding: $subcommunityTile_spacing;
+    cursor: pointer;
 }
 
 .subcommunityTile-link {
     display: block;
     position: relative;
     color: $global-color_fg;
+    //width: $subcommunityTile_width;
     padding: {
         top: $subcommunityTile_topPadding;
         right: $subcommunityTile_horizontalPadding;
@@ -42,6 +47,7 @@ $subcommunityTile_spacing                 : 24px;
 }
 
 .subcommunityTile-iconFrame {
+    display: block;
     position: relative;
     height: $subcommunityTile-imageFrame_height;
     width: 100%;
@@ -57,16 +63,20 @@ $subcommunityTile_spacing                 : 24px;
     left: 0;
     margin: auto;
     height: auto;
-    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .subcommunityTile-title {
     @include singleLineEllipsis;
     font-size: $subcommunityTile-title_fontSize;
     line-height: $global-condensed_lineHeight;
+    text-align: center;
 }
 
 .subcommunityTile-description {
+    margin-top: 6px;
     font-size: $subcommunityTile-description_fontSize;
     line-height: $global-excerpt_lineHeight;
+    text-align: center;
 }

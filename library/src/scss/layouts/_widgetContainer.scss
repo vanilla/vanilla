@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-$widgetContainer_width      : 864px;
+$widgetContainer_width      : #{384px * 2 + 24px * 4};
 $widgetContainer_bg         : $global-color_bg;
 
 .widgetContainer {

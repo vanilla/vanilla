@@ -7,6 +7,7 @@
 $subcommunityList_spacing    : 24px;
 $subcommunityList_width      : 384px;
 
+
 .subcommunityList {
 
     padding: $subcommunityList_spacing;
@@ -24,20 +25,26 @@ $subcommunityList_width      : 384px;
 }
 
 .subcommunityList-items {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     align-items: stretch;
-    justify-content: flex-start;
+    justify-content: space-between;
+    overflow: hidden;
+    //padding: $subcommunityList_spacing;
 
 
     background: rgba(175, 255, 143, 0.5);
 }
 
 .subcommunityList-item {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: stretch;
     width: $subcommunityList_width;
-    max-width: 100%;
 
 
-    background: rgba(255, 38, 0, 0.5);
+    //border: solid white 1px;
+    //background: rgba(255, 38, 0, 0.5);
 }

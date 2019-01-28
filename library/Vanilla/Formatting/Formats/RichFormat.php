@@ -62,7 +62,6 @@ class RichFormat extends BaseFormat {
         try {
             $operations = Quill\Parser::jsonToOperations($content);
         } catch (FormattingException $e) {
-            trigger_error($e->getMessage(), E_USER_WARNING);
             return $this->renderErrorMessage();
         }
 

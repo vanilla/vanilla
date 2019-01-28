@@ -16,5 +16,5 @@ plugins/**
 README.md
 resources/**
 themes/**
-uploads/**
+uploads/
 vendor/**

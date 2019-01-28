@@ -10,6 +10,7 @@
 !/build/build.xml
 !/build/package-include.txt
 !/build/package-exclude.txt
+!/build/README.md
 !/build/webpack.aliases.js
 /cache/*
 .cache

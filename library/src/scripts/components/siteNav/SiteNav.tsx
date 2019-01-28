@@ -26,27 +26,24 @@ interface IProps extends RouteComponentProps<{}> {
     title?: string;
 }
 
-export interface IState {
-    id: string;
-}
-
 /**
  * Implementation of SiteNav component
  */
-export class SiteNav extends React.Component<IProps, IState> {
+export class SiteNav extends React.Component<IProps> {
     public render() {
-        const hasChildren = this.props.children && this.props.children.length > 0;
+        const { activeRecord, collapsible, onItemHover, children } = this.props;
+        const hasChildren = children && children.length > 0;
         const content = hasChildren
-            ? this.props.children.map((child, i) => {
+            ? children.map((child, i) => {
                   return (
                       <SiteNavNode
                           {...child}
-                          activeRecord={this.props.activeRecord}
-                          key={`navNode-${i}`}
+                          activeRecord={activeRecord}
+                          key={child.recordType + child.recordID}
                           titleID={this.titleID}
                           depth={0}
-                          collapsible={this.props.collapsible}
-                          onItemHover={this.props.onItemHover}
+                          collapsible={collapsible}
+                          onItemHover={onItemHover}
                       />
                   );
               })

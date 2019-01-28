@@ -10,12 +10,6 @@ import classNames from "classnames";
 import { NavArticle } from "@knowledge/modules/navigation/NavigationSelector";
 import SmartLink from "@library/components/navigation/SmartLink";
 
-// export interface NavLink {
-//     to: string;
-//     name: string;
-// }
-// links: NavLink[];
-
 interface IProps {
     classNames?: string;
     title: string;

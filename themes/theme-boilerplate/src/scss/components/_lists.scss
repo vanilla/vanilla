@@ -174,10 +174,6 @@
         }
     }
 
-    .Author .Username {
-        margin-bottom: 0;
-    }
-
     .Tag:not([class*="Status-Tag"]),
     .HasNew {
         margin-bottom: $utility-baseUnitHalf;
@@ -470,8 +466,9 @@
                 }
 
             }
+        }
 
-            .MItem.RoleTracker {
+        .MItem.RoleTracker {
                 padding: 0 $utility-baseUnitHalf;
 
                 a {
@@ -508,6 +505,14 @@
                 }
             }
 
+        .MItem {
+            margin-bottom: 0;
+
+            @include maxWidth {
+                margin-bottom: $utility-baseUnitHalf;
+            }
+        }
+
             .AuthorWrap {
                 max-width: calc(100% - 45px);
             }
@@ -523,14 +528,14 @@
             }
 
             .Username {
-                color: $component-title_color;
+                color: $component-meta-link_color;
+                font-weight: $component-meta_fontWeight;
 
                 &:hover,
                 &:focus {
-                    color: $component-title-hover_color;
+                    color: $component-meta-link-hover_color;
                 }
             }
-        }
 
         .flair {
             display: inline-flex;

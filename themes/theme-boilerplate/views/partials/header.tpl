@@ -10,6 +10,9 @@
 <header class="Header">
     <div class="Container">
         <div class="row">
+            <div class="Hamburger">
+                {include file="partials/hamburger.html"}
+            </div>
             <a href="{home_link format="%url"}" class="Header-logo">
                 {logo}
             </a>
@@ -19,9 +22,6 @@
             <div class="Header-right">
                 <div class="MeBox--header">
                     {module name="MeModule" CssClass="FlyoutRight"}
-                </div>
-                <div class="Hamburger">
-                    {include file="partials/hamburger.html"}
                 </div>
             </div>
         </div>

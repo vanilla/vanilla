@@ -5,7 +5,7 @@
  */
 
 $subcommunityList_spacing    : 24px;
-$subcommunityList_width      : 384px;
+$subcommunityList_width      : 384px + $subcommunityList_spacing;
 
 
 .subcommunityList {
@@ -16,8 +16,9 @@ $subcommunityList_width      : 384px;
 
     }
 
-
-    background: rgba(255, 192, 203, 0.5);
+    @include mediaQuery-panelLayout_oneColumn {
+        padding: 0;
+    }
 }
 
 .subcommunityList-emptyMessage {
@@ -30,11 +31,11 @@ $subcommunityList_width      : 384px;
     flex-wrap: wrap;
     align-items: stretch;
     justify-content: space-between;
-    overflow: hidden;
-    //padding: $subcommunityList_spacing;
 
 
-    background: rgba(175, 255, 143, 0.5);
+    @include mediaQuery-panelLayout_oneColumn {
+        display: block;
+    }
 }
 
 .subcommunityList-item {
@@ -44,7 +45,8 @@ $subcommunityList_width      : 384px;
     justify-content: stretch;
     width: $subcommunityList_width;
 
-
-    //border: solid white 1px;
-    //background: rgba(255, 38, 0, 0.5);
+    @include mediaQuery-panelLayout_oneColumn {
+        display: block;
+        width: 100%;
+    }
 }

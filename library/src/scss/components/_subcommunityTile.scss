@@ -22,24 +22,30 @@ $subcommunityTile_spacing                 : 24px;
 
 
 .subcommunityTile {
-    @include shadow-embed;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     width: 100%;
     padding: $subcommunityTile_spacing;
-    cursor: pointer;
+    user-select: none;
+    flex-grow: 1;
 }
 
 .subcommunityTile-link {
+    @include shadow-embed;
     display: block;
     position: relative;
+    cursor: pointer;
     color: $global-color_fg;
-    //width: $subcommunityTile_width;
+    background-color: $global-color_bg;
+    flex-grow: 1;
     padding: {
         top: $subcommunityTile_topPadding;
         right: $subcommunityTile_horizontalPadding;
         bottom: $subcommunityTile_bottomPadding;
         left: $subcommunityTile_horizontalPadding;
     }
+
 }
 
 .subcommunityTitle-main {
@@ -50,8 +56,13 @@ $subcommunityTile_spacing                 : 24px;
     display: block;
     position: relative;
     height: $subcommunityTile-imageFrame_height;
-    width: 100%;
-    margin-bottom: $subcommunityTile-imageFrame_bottomMargin;
+    width: $subcommunityTile-imageFrame_height;
+    margin: {
+        top: auto;
+        right: auto;
+        bottom: $subcommunityTile-imageFrame_bottomMargin;
+        left: auto;
+    }
 }
 
 .subcommunityTile-icon {

@@ -34,7 +34,7 @@ export default class SubcommunityTile extends React.Component<IProps> {
         return (
             <div className={classNames("subcommunityTile", className)}>
                 <SmartLink className="subcommunityTile-link" to={url}>
-                    <div className="subcommunityTitle-main">
+                    <div className="subcommunityTile">
                         <div className="subcommunityTile-iconFrame">
                             {icon && <img className="subcommunityTile-icon" src={icon} alt={alt} />}
                         </div>

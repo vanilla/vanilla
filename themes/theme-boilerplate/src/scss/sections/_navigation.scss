@@ -111,7 +111,7 @@
 
     .SignInIcons.SignInIcons {
         margin-left: 0;
-        margin-top: $utility-large_padding;
+        margin-top: $utility-baseUnitDouble;
         display: block;
         width: 100%;
         text-align: center;
@@ -167,7 +167,6 @@
     .SignInLinks.SignInLinks {
         width: 100%;
         text-align: center;
-        padding-top: $utility-baseUnitDouble;
 
         a {
             @include Button(
@@ -184,6 +183,10 @@
             font-size: 0;
             width: 20px;
         }
+    }
+
+    .SignIn.mobile {
+        width: 100%;
     }
 }
 

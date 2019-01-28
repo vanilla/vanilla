@@ -23,19 +23,29 @@
                 <div class="MeBox-header">
                     {module name="MeModule" CssClass="FlyoutRight"}
                 </div>
-                <button class="mobileMeBox-button">
-                    {module name="UserPhotoModule"}
-                </button>
+                {if $User.SignedIn}
+                    <button class="mobileMeBox-button">
+                        {module name="UserPhotoModule"}
+                    </button>
+                {/if}
             </div>
         </div>
     </div>
     <nav id="navdrawer" class="Navigation">
         <div class="Container">
-            <div class="Navigation-row NewDiscussion">
-                <div class="NewDiscussion mobile">
-                    {module name="NewDiscussionModule"}
+            {if $User.SignedIn}
+                <div class="Navigation-row NewDiscussion">
+                    <div class="NewDiscussion mobile">
+                        {module name="NewDiscussionModule"}
+                    </div>
                 </div>
-            </div>
+            {else}
+                <div class="Navigation-row">
+                    <div class="SignIn mobile">
+                        {module name="MeModule"}
+                    </div>
+                </div>
+            {/if}
             {categories_link format=$linkFormat}
             {discussions_link format=$linkFormat}
             {activity_link format=$linkFormat}

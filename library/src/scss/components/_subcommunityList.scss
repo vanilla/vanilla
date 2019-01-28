@@ -9,20 +9,11 @@ $subcommunityList_width      : 384px + $subcommunityList_spacing;
 
 
 .subcommunityList {
-
     padding: $subcommunityList_spacing;
-
-    &.isEmpty {
-
-    }
 
     @include mediaQuery-panelLayout_oneColumn {
         padding: 0;
     }
-}
-
-.subcommunityList-emptyMessage {
-
 }
 
 .subcommunityList-items {

@@ -10,9 +10,16 @@ import { t } from "@library/application";
 import Paragraph from "@library/components/Paragraph";
 import SubcommunityTile from "@library/components/subcommunities/SubcommunityTile";
 
+interface ISubcommunity {
+    icon: string;
+    name: string;
+    description: string;
+    url: string;
+}
+
 interface IProps {
     className?: string;
-    items: any[];
+    items: ISubcommunity[];
     title: string;
     titleLevel?: 1 | 2 | 3 | 4 | 5 | 6;
     hiddenTitle?: boolean;
@@ -35,13 +42,13 @@ export default class SubcommunityList extends React.Component<IProps> {
             return (
                 <div className={classNames("subcommunityList", className)}>
                     <ul className="subcommunityList-items">
-                        {items.map(kb => (
-                            <li key={kb.knowledgeBaseID} className="subcommunityList-item">
+                        {items.map((subcommunity, i) => (
+                            <li key={i} className="subcommunityList-item">
                                 <SubcommunityTile
-                                    icon={kb.icon}
-                                    title={kb.name}
-                                    description={kb.description}
-                                    url={kb.url}
+                                    icon={subcommunity.icon}
+                                    title={subcommunity.name}
+                                    description={subcommunity.description}
+                                    url={subcommunity.url}
                                 />
                             </li>
                         ))}

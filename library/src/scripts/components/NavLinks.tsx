@@ -7,13 +7,13 @@
 import React, { Component } from "react";
 import Heading from "@library/components/Heading";
 import classNames from "classnames";
-import { NavArticle } from "@knowledge/modules/navigation/NavigationSelector";
 import SmartLink from "@library/components/navigation/SmartLink";
+import { INavigationItem } from "@library/@types/api";
 
 interface IProps {
     classNames?: string;
     title: string;
-    articles: NavArticle[];
+    articles: INavigationItem[];
 }
 
 /**

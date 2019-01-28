@@ -9,14 +9,14 @@ import React, { Component } from "react";
 import { t } from "@library/application";
 import Heading from "@library/components/Heading";
 import classNames from "classnames";
-import { IHelpData } from "@knowledge/modules/navigation/NavigationSelector";
 import NavLinks from "@library/components/NavLinks";
 import ScreenReaderContent from "@library/components/ScreenReaderContent";
+import { ILinkListData } from "@library/@types/api";
 
 interface IProps {
     title: string; // For accessibility, title of group
     classNames?: string;
-    linkGroups: IHelpData;
+    data: ILinkListData;
 }
 
 /**
@@ -24,8 +24,8 @@ interface IProps {
  */
 export default class NavLinksWithHeadings extends Component<IProps> {
     public render() {
-        const ungrouped = this.props.linkGroups.ungroupedArticles || [];
-        const grouped = this.props.linkGroups.groups || [];
+        const ungrouped = this.props.data.ungroupedItems || [];
+        const grouped = this.props.data.groups || [];
 
         if (ungrouped.length !== 0 || grouped.length !== 0) {
             const ungroupedContent = <NavLinks articles={ungrouped} title={t("Overview")} />;

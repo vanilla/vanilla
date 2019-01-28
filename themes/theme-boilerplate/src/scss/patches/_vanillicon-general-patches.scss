@@ -73,10 +73,6 @@
     content: $icon-time;
 }
 
-.SpNotifications::before {
-    content: $icon-globe;
-}
-
 .SpDelete::before {
     content: $icon-remove;
 }
@@ -93,20 +89,12 @@
     content: $icon-cog;
 }
 
-.SpBookmarks::before {
-    content: $icon-star;
-}
-
 .SpPassword::before {
     content: $icon-lock;
 }
 
 .SpSearch::before {
     content: $icon-search;
-}
-
-.SpInbox::before {
-    content: $icon-inbox;
 }
 
 .RSS a::before {

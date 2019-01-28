@@ -8,12 +8,51 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$mebox-photo_size:                      24px !default;
-$mebox-button_borderRadius:             $global_borderRadius !default;
+$mebox-photo_size:                      28px !default;
+$mebox-button_borderRadius:             3px !default;
 
 /* -------------------------------------------------------------- *\
     Styles
 \* -------------------------------------------------------------- */
+
+.SpNotifications,
+.SpInbox,
+.SpBookmarks {
+
+    &::before {
+        @include kbicon();
+    }
+}
+
+.SpNotifications::before {
+    font-size: 24px;
+    content: $kbicon-notifications-empty;
+}
+
+.SpInbox::before {
+    font-size: 24px;
+    content: $kbicon-message-empty;
+}
+
+.SpBookmarks::before {
+    font-size: 22px;
+    content: $kbicon-star-empty;
+}
+
+.Open {
+
+    .SpNotifications::before {
+        content: $kbicon-notifications;
+    }
+
+    .SpInbox::before {
+        content: $kbicon-message;
+    }
+
+    .SpBookmarks::before {
+        content: $kbicon-star;
+    }
+}
 
 .MeBox {
     min-height: initial;

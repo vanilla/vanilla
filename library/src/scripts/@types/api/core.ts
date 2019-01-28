@@ -4,7 +4,6 @@
  */
 
 import { Omit } from "@library/@types/utils";
-import { NavArticle } from "@knowledge/modules/navigation/NavigationSelector";
 
 export enum LoadStatus {
     PENDING = "PENDING",
@@ -63,7 +62,7 @@ export interface INavigationTreeItem extends INavigationItem {
 
 export interface ILinkGroup {
     category: INavigationItem;
-    articles: INavigationItem[];
+    items: INavigationItem[];
 }
 
 export interface ILinkListData {

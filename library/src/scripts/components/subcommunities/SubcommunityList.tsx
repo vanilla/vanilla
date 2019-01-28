@@ -6,7 +6,6 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { t } from "@library/application";
 import Paragraph from "@library/components/Paragraph";
 import SubcommunityTile from "@library/components/subcommunities/SubcommunityTile";
 
@@ -23,6 +22,7 @@ interface IProps {
     title: string;
     titleLevel?: 1 | 2 | 3 | 4 | 5 | 6;
     hiddenTitle?: boolean;
+    emptyMessage: string;
 }
 
 /**
@@ -35,7 +35,7 @@ export default class SubcommunityList extends React.Component<IProps> {
         if (items.length === 0) {
             return (
                 <div className={classNames("subcommunityList", className, "isEmpty")}>
-                    <Paragraph className="subcommunityList-emptyMessage">{t("No knowledge bases found.")}</Paragraph>
+                    <Paragraph className="subcommunityList-emptyMessage">{this.props.emptyMessage}</Paragraph>
                 </div>
             );
         } else {

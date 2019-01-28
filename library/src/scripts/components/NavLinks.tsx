@@ -13,7 +13,7 @@ import { INavigationItem } from "@library/@types/api";
 interface IProps {
     classNames?: string;
     title: string;
-    articles: INavigationItem[];
+    items: INavigationItem[];
 }
 
 /**
@@ -21,10 +21,10 @@ interface IProps {
  */
 export default class NavLinks extends Component<IProps> {
     public render() {
-        if (this.props.articles.length !== 0) {
-            const contents = this.props.articles.map(item => {
+        if (this.props.items.length !== 0) {
+            const contents = this.props.items.map((item, i) => {
                 return (
-                    <li>
+                    <li key={i}>
                         <SmartLink to={item.url} className="navLinks-link" title={item.name} />
                     </li>
                 );

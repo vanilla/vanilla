@@ -212,12 +212,6 @@ body.Section-BestOf {
             a:not(.PhotoWrap) {
                 margin-left: $utility-baseUnitDouble;
             }
-
-            //@include maxWidth {
-            //    display: inline-flex;
-            //    align-items: center;
-            //    line-height: $global-base_lineHeight;
-            //}
         }
 
         .PhotoWrap {

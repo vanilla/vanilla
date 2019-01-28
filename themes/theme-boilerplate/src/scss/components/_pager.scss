@@ -97,10 +97,6 @@ $quickSearch_color:                      $global-color_white !default;
     margin-bottom: $global-block_margin;
 }
 
-//.DataBox {
-//    margin: 0 0 $utility-large_padding;
-//}
-
 .PageControls {
     @include clearfix;
     min-height: initial;
@@ -272,12 +268,6 @@ a.MoreWrap,
     }
 }
 
-//.PageControls .Button-Controls,
-//.Pager.PrevNextPager,
-//.Pager.NumberedPager {
-//    margin: 0 0 $utility-large_padding;
-//}
-
 .selectBox-toggle {
     color: $global-color_primary;
 }
@@ -346,7 +336,6 @@ a.MoreWrap,
         display: inline-flex;
         float: none;
         height: #{$pager_height + 2px};
-        //margin: 0 0 $utility-large_padding;
 
         @include maxWidth {
             margin: 0;

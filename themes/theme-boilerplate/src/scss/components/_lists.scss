@@ -12,12 +12,6 @@
 .MessageList {
     margin: 0 0 $global-block_margin;
 
-    //.Item.Read,
-    //.Item:not(.CategoryHeading),
-    //.Item:not(.CategoryHeading){
-    //    @include listItem;
-    //}
-
     .Item {
         @include listItem;
     }
@@ -143,7 +137,6 @@
     .AuthorWrap {
         margin-left: -$utility-baseUnit;
         margin-right: -$utility-baseUnit;
-        //line-height: $component-meta_lineHeight;
 
         @include maxWidth {
             margin-top: $utility-baseUnitDouble;
@@ -251,15 +244,6 @@
     .PhotoWrap {
         margin: 0 $utility-baseUnitDouble 0 0;
         @include photoWrap;
-    }
-
-    // overwrite indexphotos plugin styles
-    .indexphoto .Discussion.ItemContent {
-        padding-left: calc(#{$theme-photo_size} + #{$utility-baseUnitDouble}) !important;
-
-        .PhotoWrap {
-            display: inline-block;
-        }
     }
 
     .IndexPhoto {

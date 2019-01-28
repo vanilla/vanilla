@@ -322,14 +322,6 @@
     &.CategoryTable {
         @include categoriesTableItem;
 
-        //.NoPhoto ~ {
-        //    h2,
-        //    h3,
-        //    .CategoryDescription {
-        //        padding-left: 0;
-        //    }
-        //}
-
         thead .CategoryName {
             padding-left: $component-base_padding;
         }

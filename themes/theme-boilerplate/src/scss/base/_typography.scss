@@ -52,16 +52,6 @@ h5,
 h6 {
     @include font-heading;
     margin: 0;
-
-    //a.TextColor,
-    //a {
-    //    color: $theme-heading_color;
-    //
-    //    &:focus,
-    //    &:hover {
-    //       color: $theme-heading-hover_color;
-    //    }
-    //}
 }
 
 h1 {

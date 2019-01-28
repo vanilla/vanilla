@@ -153,11 +153,12 @@
 
     .Author .Username,
     .MItem,
-    .MItem.Category {
+    .MItem.Category,
+    .ChildCategories {
         font-size: inherit;
         font-weight: inherit;
         color: inherit;
-        margin: 0 $utility-baseUnit $utility-baseUnitHalf;
+        margin: 0 $utility-baseUnit;
         display: inline-block;
 
         a {

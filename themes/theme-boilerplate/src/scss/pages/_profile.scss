@@ -15,7 +15,6 @@ body.Section-Profile {
         font-size: $global-subTitle_fontSize;
         font-weight: $global-heading_fontWeight;
         margin-bottom: $utility-large_padding;
-        //border-bottom: $component_border;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -34,11 +33,6 @@ body.Section-Profile {
         > * + * {
             margin-top: $utility-large_padding;
         }
-    }
-
-    .User .H,
-    .Profile-username {
-        margin-top: -$global-bodylineHeight_offset;
     }
 
     .User .H {

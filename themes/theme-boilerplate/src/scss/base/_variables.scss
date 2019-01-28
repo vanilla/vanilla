@@ -57,10 +57,6 @@ $global-subTitle_fontSize:              18px !default;
 
 $global-base_lineHeight:                1.5 !default;
 $global-condensed_lineHeight:           1.25 !default;
-$global-lineHeight_offset:              .32 !default; // Offset font to make top of capital letters flush with top of container
-$global-headinglineHeight_offset:       $global-lineHeight_offset !default; // Different if heading has different font than body
-$global-bodylineHeight_offset:          .4 !default; // Different if body has different font than headding
-$global-excerpt_lineHeight:             1.45 !default;
 
 /* -------------------------------------------------------------- *\
     User Content
@@ -304,7 +300,7 @@ $component-header_bg:                    transparent !default;
 $component-base_color:                   $global-color_fg !default;
 $component-base_fontSize:                $global-medium_fontSize !default;
 $component-base_fontWeight:              $global-normal_fontWeight !default;
-$component-base_lineHeight:              $global-excerpt_lineHeight !default;
+$component-base_lineHeight:              $global-base_lineHeight !default;
 
 $component-title_color:                  $global-color_fg !default;
 $component-title-hover_color:            $global-color_primary !default;

@@ -467,10 +467,6 @@ body.noGroupIcon {
 
         .Title {
             margin-bottom: 0;
-
-            a {
-                margin-top: -#{$global-bodylineHeight_offset};
-            }
         }
 
         .Excerpt:empty {
@@ -523,13 +519,12 @@ body.noGroupIcon {
 .Section-Event.Section-Event {
 
     .AttendeeList.AttendeeList h3 {
-        font-size: $global-large_fontSize;
+        font-size: $global-subTitle_fontSize;
         font-weight: $global-heading_fontWeight;
-        margin-bottom: $utility-baseUnitHalf;
-        border-bottom: $component_border;
+        margin-bottom: $utility-large_padding;
         display: flex;
         align-items: center;
-        text-transform: none;
+        justify-content: space-between;
 
         @include maxWidth {
             font-size: $global-subTitle_fontSize;

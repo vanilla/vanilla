@@ -78,10 +78,15 @@
 }
 
 .Crumbs {
-    margin: $utility-small_padding 0;
+    margin: $utility-baseUnitHalf 0;
 }
 
 .Frame-content {
+
+    .HomepageTitle,
+    .PageDescription {
+        margin-bottom: $global-block_margin;
+    }
 
     .HomepageTitle {
 
@@ -96,8 +101,7 @@
     }
 
     .PageDescription {
-        line-height: $global-excerpt_lineHeight;
-        margin: $utility-large_padding 0;
+        line-height: $global-base_lineHeight;
     }
 
     .PageDescription:empty {

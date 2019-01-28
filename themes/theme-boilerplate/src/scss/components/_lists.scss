@@ -10,11 +10,9 @@
 
 .DataList,
 .MessageList {
-    margin: 0 0 $utility-large_padding;
+    margin: 0 0 $global-block_margin;
 
-    .Item.Read,
-    .Item:not(.CategoryHeading),
-    .Item:not(.CategoryHeading){
+    .Item {
         @include listItem;
     }
 
@@ -135,24 +133,25 @@
         color: $component-meta_color;
     }
 
-    .Meta {
+    .Meta,
+    .AuthorWrap {
         margin-left: -$utility-baseUnit;
         margin-right: -$utility-baseUnit;
-        line-height: $component-meta_lineHeight;
 
         @include maxWidth {
-            margin-top: $utility-medium_padding;
+            margin-top: $utility-baseUnitDouble;
             line-height: $component-meta_lineHeight;
         }
     }
 
     .Author .Username,
     .MItem,
-    .MItem.Category {
+    .MItem.Category,
+    .ChildCategories {
         font-size: inherit;
         font-weight: inherit;
         color: inherit;
-        margin: 0 $utility-baseUnit $utility-baseUnitHalf;
+        margin: 0 $utility-baseUnit;
         display: inline-block;
 
         a {
@@ -212,11 +211,11 @@
         display: flex;
         flex-wrap: wrap;
         border-top: 0;
-        margin-bottom: -$utility-small_padding;
+        margin-bottom: -$utility-baseUnitHalf;
 
         b {
-            margin-right: $utility-small_padding;
-            margin-bottom: $utility-small_padding;
+            margin-right: $utility-baseUnitHalf;
+            margin-bottom: $utility-baseUnitHalf;
         }
 
         a {
@@ -224,7 +223,7 @@
             font-weight: inherit;
             font-size: inherit;
             line-height: inherit;
-            margin-bottom: $utility-small_padding;
+            margin-bottom: $utility-baseUnitHalf;
 
             &:focus,
             &:hover,
@@ -234,7 +233,7 @@
         }
 
         .Comma {
-            margin-right: $utility-xSmall_padding;
+            margin-right: $utility-baseUnitHalf;
         }
     }
 
@@ -243,17 +242,8 @@
     }
 
     .PhotoWrap {
-        margin: 0 $utility-medium_padding 0 0;
+        margin: 0 $utility-baseUnitDouble 0 0;
         @include photoWrap;
-    }
-
-    // overwrite indexphotos plugin styles
-    .indexphoto .Discussion.ItemContent {
-        padding-left: calc(#{$theme-photo_size} + #{$utility-medium_padding}) !important;
-
-        .PhotoWrap {
-            display: inline-block;
-        }
     }
 
     .IndexPhoto {
@@ -264,7 +254,7 @@
     .ItemIdea.ItemIdea.ItemIdea {
         .PhotoWrap.IndexPhoto,
         .idea-counter-module .idea-counter-box {
-            margin: 0 $utility-small_padding 0 0;
+            margin: 0 $utility-baseUnitHalf 0 0;
             width: $theme-photo_size;
             height: $theme-photo_size;
         }
@@ -276,14 +266,14 @@
 
         .OptionsLink {
             @include Button(
-                    $button-primary_bg,
-                    $button-primary_fg,
-                    $button-primary_border,
-                    $button-primary-hover_bg,
-                    $button-primary-hover_fg,
-                    $button-primary-hover_border
+                    $button-basic_bg,
+                    $button-basic_fg,
+                    $button-basic_border,
+                    $button-basic-hover_bg,
+                    $button-basic-hover_fg,
+                    $button-basic-hover_border
             );
-            margin-left: $utility-small_padding;
+            margin-left: $utility-baseUnitHalf;
         }
 
         .Bullet {
@@ -325,7 +315,7 @@
     }
 
     .Reactions {
-        margin: 0 -#{$utility-small_padding};
+        margin: 0 -#{$utility-baseUnitHalf};
 
         .Bullet {
             display: none;
@@ -336,7 +326,7 @@
         }
 
         .ReactButton {
-            margin: $utility-small_padding $utility-small_padding 0;
+            margin: $utility-baseUnitHalf $utility-baseUnitHalf 0;
 
             @include maxWidth {
                 line-height: 2.5em;
@@ -352,6 +342,10 @@
 .DataList,
 .PageTitle + .ItemDiscussion {
 
+    @if $component_lateralBorder == false {
+        border-top-width: 0;
+    }
+
     @if $component-item_spacing == 0 {
         border-radius: $component_borderRadius;
         box-shadow: $component_boxShadow;
@@ -359,6 +353,11 @@
 }
 
 .DataList.CategoryList {
+
+    .CategoryHeading {
+        border-top-width: 0;
+    }
+
     .Item[class*="Depth"] {
 
         @if $component_lateralBorder == true {
@@ -383,10 +382,7 @@
     }
 }
 
-.Activities,
-.Conversations,
 .MessageList {
-    clear: both;
 
     .PageTitle,
     .ItemComment {
@@ -400,10 +396,11 @@
     }
 
     .PageTitle {
+        margin-bottom: $global-block_margin;
 
         h1{
             font-size: $global-title_fontSize;
-            line-height: $global-base_lineHeight;
+            line-height: $global-condensed_lineHeight;
 
             @include maxWidth {
                 font-size: $global-subTitle_fontSize;
@@ -428,9 +425,9 @@
             background: $component-header_bg;
             margin: 0;
             width: 100%;
-            min-height: $theme-photo_size + ($utility-medium_padding * 2);
-            padding-top: $utility-medium_padding;
-            padding-bottom: $utility-medium_padding;
+            min-height: $theme-photo_size + ($utility-baseUnitDouble * 2);
+            padding-top: $utility-baseUnitDouble;
+            padding-bottom: $utility-baseUnitDouble;
 
             @if $component-item_spacing != 0 {
                 border-top-left-radius: $component_borderRadius;
@@ -438,25 +435,26 @@
             }
 
             @if $component_lateralBorder == true {
-                padding-left: $utility-medium_padding;
-                padding-right: $utility-medium_padding;
+                padding-left: $utility-baseUnitDouble;
+                padding-right: $utility-baseUnitDouble;
             }
 
             .PhotoWrap {
                 margin: 0;
                 position: absolute;
-                top: $utility-medium_padding;
+                top: $utility-baseUnitDouble;
 
                 @if $component_lateralBorder == true {
-                    left: $utility-medium_padding;
+                    left: $utility-baseUnitDouble;
                 } @else {
                     left: 0;
                 }
 
             }
+        }
 
-            .MItem.RoleTracker {
-                padding: 0 $utility-small_padding;
+        .MItem.RoleTracker {
+                padding: 0 $utility-baseUnitHalf;
 
                 a {
                     color: inherit;
@@ -475,7 +473,7 @@
                 font-size: $component-meta_fontSize;
                 line-height: $component-meta_lineHeight;
                 display: inline-block;
-                padding-left: $theme-photo_size + $utility-medium_padding;
+                padding-left: $theme-photo_size + $utility-baseUnitDouble;
 
                 > * {
                     display: inline;
@@ -491,6 +489,14 @@
                     margin-top: 0;
                 }
             }
+
+        .MItem {
+            margin-bottom: 0;
+
+            @include maxWidth {
+                margin-bottom: $utility-baseUnitHalf;
+            }
+        }
 
             .AuthorWrap {
                 max-width: calc(100% - 45px);
@@ -515,17 +521,16 @@
                     color: $component-meta-link-hover_color;
                 }
             }
-        }
 
         .flair {
             display: inline-flex;
-            margin: 0 -#{$utility-xSmall_padding};
-            width: calc(100% + (#{$utility-xSmall_padding} * 2));
+            margin: 0 -#{$utility-baseUnitHalf};
+            width: calc(100% + (#{$utility-baseUnitHalf} * 2));
         }
 
         .flair-item {
             display: inline-block;
-            margin: 0 $utility-xSmall_padding;
+            margin: 0 $utility-baseUnitHalf;
 
             img {
                 margin: 0;
@@ -536,17 +541,17 @@
             border-bottom-left-radius: $component_borderRadius;
             border-bottom-right-radius: $component_borderRadius;
 
-            padding-top: $utility-medium_padding;
-            padding-bottom: $utility-medium_padding;
+            padding-top: $utility-baseUnitDouble;
+            padding-bottom: $utility-baseUnitDouble;
 
             @if $component_lateralBorder == true {
-                padding-left: $utility-medium_padding;
-                padding-right: $utility-medium_padding;
+                padding-left: $utility-baseUnitDouble;
+                padding-right: $utility-baseUnitDouble;
             }
         }
 
         .Item-Body > * {
-            margin: 0 0 $utility-medium_padding;
+            margin: 0 0 $utility-baseUnitDouble;
 
             &:last-child {
                 margin: 0;
@@ -554,8 +559,8 @@
         }
 
         .RecordReactions {
-            margin-left: -$utility-xSmall_padding;
-            margin-right: -$utility-xSmall_padding;
+            margin-left: -$utility-baseUnitHalf;
+            margin-right: -$utility-baseUnitHalf;
 
             .PhotoWrap {
                 position: relative;
@@ -570,21 +575,23 @@
 
             .UserReactionWrap {
                 width: 24px;
-                margin: 0 $utility-xSmall_padding $utility-xSmall_padding;
+                margin: 0 $utility-baseUnitHalf $utility-baseUnitHalf;
             }
         }
     }
+}
 
-    .ItemDiscussion {
-        margin-bottom: $utility-large_padding;
-    }
+.Activities,
+.Conversations,
+.MessageList {
+    clear: both;
 
     .Item.Activity {
 
         .Title {
 
             @include maxWidth {
-                padding-right: $utility-medium_padding;
+                padding-right: $utility-baseUnitDouble;
             }
         }
 
@@ -662,6 +669,26 @@
 
     .ItemContent {
         padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+    }
+}
+
+.DataList-Notes  {
+
+    .Item-Col {
+        padding-left: 0;
+    }
+
+    .Meta {
+        margin: 0 0 $utility-baseUnit;
+    }
+
+    .NoteType {
+        font-size: $component-title_fontSize;
+        font-weight: $component-title_fontWeight;
+        line-height: #{$theme-photo_size / 2};
+        color: $component-title_color;
+        display: block;
+        margin-bottom: $utility-baseUnit;
     }
 }
 

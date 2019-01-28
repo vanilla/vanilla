@@ -102,7 +102,7 @@
     }
 
     .SocialIcon {
-        margin: 0 $utility-xSmall_padding;
+        margin: 0 $utility-baseUnitHalf;
     }
 
     .MeBox.mobile {
@@ -181,7 +181,7 @@
     .SignInLinks.SignInLinks {
         width: 100%;
         text-align: center;
-        padding-top: $utility-medium_padding;
+        padding-top: $utility-baseUnitDouble;
 
         a {
             @include Button(
@@ -227,11 +227,9 @@
     display: flex;
     align-items: center;
     padding: 0;
-    height: $panel-item_height;
 
     a {
         margin: 0;
-        line-height: $panel-item_height;
 
         &:hover {
             background: none;

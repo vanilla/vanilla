@@ -26,11 +26,11 @@ body.Section-BestOf {
         display: flex;
         align-items: center;
         flex-wrap: wrap;
-        margin: $utility-baseUnitTriple -#{$utility-xSmall_padding} $utility-baseUnitTriple;
-        width: calc(100% + (#{$utility-xSmall_padding} * 2));
+        margin: $utility-baseUnitTriple -#{$utility-baseUnitHalf} $utility-baseUnitTriple;
+        width: calc(100% + (#{$utility-baseUnitHalf} * 2));
 
         > li {
-            margin: 0 $utility-xSmall_padding $utility-small_padding;
+            margin: 0 $utility-baseUnitHalf $utility-baseUnit;
         }
 
         a {
@@ -60,7 +60,7 @@ body.Section-BestOf {
     }
 
     .Frame-details {
-        padding-bottom: $utility-small_padding;
+        padding-bottom: $utility-baseUnit;
     }
 
     .MainContent {
@@ -78,8 +78,8 @@ body.Section-BestOf {
     .Tiles {
         @include clearfix;
         position: relative;
-        margin: 0 #{-$utility-small_padding};
-        width: calc(100% + #{$utility-small_padding * 2});
+        margin: 0 #{-$utility-baseUnit};
+        width: calc(100% + #{$utility-baseUnit});
 
         @include maxWidth {
             margin: 0;
@@ -212,12 +212,6 @@ body.Section-BestOf {
             a:not(.PhotoWrap) {
                 margin-left: $utility-baseUnitDouble;
             }
-
-            //@include maxWidth {
-            //    display: inline-flex;
-            //    align-items: center;
-            //    line-height: $global-base_lineHeight;
-            //}
         }
 
         .PhotoWrap {
@@ -264,7 +258,7 @@ body.Section-BestOf {
 
             .PhotoWrap {
                 margin: 0;
-                margin-right: $utility-small_padding;
+                margin-right: $utility-baseUnitHalf;
             }
         }
     }
@@ -276,7 +270,7 @@ body.Section-BestOf {
         }
 
         .Tile {
-            margin: $utility-medium_padding 0;
+            margin: $utility-baseUnitDouble 0;
         }
     }
 }

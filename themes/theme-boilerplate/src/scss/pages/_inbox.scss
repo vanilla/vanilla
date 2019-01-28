@@ -11,12 +11,17 @@
 .Section-ConversationList,
 .Section-Conversation {
 
+    .H {
+        margin-bottom: $global-block_margin;
+    }
+
     .Conversation,
     .DataList.Conversations {
 
         .PhotoWrap {
             position: absolute;
             top: $component-base_padding;
+            margin-right: 0;
 
             @if $component_lateralBorder == true {
                 left: $component-base_padding;
@@ -25,11 +30,14 @@
             }
         }
 
-        h3,
         .Excerpt,
         .Meta {
             display: block;
             padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+        }
+
+        .Meta {
+            margin: 0;
         }
     }
 }
@@ -59,28 +67,7 @@
     }
 
     .MessageList .Message {
-        line-height: #{$theme-photo_size / 2};
         padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
-    }
-}
-
-.ConversationMessage {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    min-height: $theme-photo_size;
-
-    > * {
-        flex: 1;
-    }
-
-    .Message {
-        margin-top: 0;
-    }
-
-    .Meta {
-        line-height: #{$theme-photo_size / 2};
-        order: 2;
     }
 }
 

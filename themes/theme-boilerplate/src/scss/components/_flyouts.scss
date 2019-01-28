@@ -366,7 +366,7 @@ $flyout-progress_size:                  24px !default;
     .Subject,
     .Excerpt,
     .ItemContent {
-        line-height: $global-excerpt_lineHeight;
+        line-height: $global-base_lineHeight;
     }
 
     .Meta {

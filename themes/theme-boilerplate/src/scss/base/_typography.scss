@@ -36,7 +36,7 @@ a {
 }
 
 p {
-    margin: $utility-xSmall_padding 0;
+    margin: $utility-baseUnitHalf 0;
 
     .emoji {
         width: $global-medium_fontSize;
@@ -52,30 +52,17 @@ h5,
 h6 {
     @include font-heading;
     margin: 0;
-
-    a.TextColor,
-    a {
-        color: $theme-heading_color;
-
-        &:focus,
-        &:hover {
-           color: $theme-heading-hover_color;
-        }
-    }
 }
 
 h1 {
     font-size: $global-title_fontSize;
     font-weight: $global-heading_fontWeight;
 
-    .Gloss,
-    a {
-        font-size: inherit;
-        font-weight: inherit;
-    }
-
+    a,
     .Gloss {
         color: inherit;
+        font-size: inherit;
+        font-weight: inherit;
     }
 
     @include maxWidth {

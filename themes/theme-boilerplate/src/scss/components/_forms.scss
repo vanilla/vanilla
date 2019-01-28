@@ -82,7 +82,7 @@ select::-ms-expand {
     }
 
     .Buttons .Back {
-        padding-right: $utility-medium_padding;
+        padding-right: $utility-baseUnitDouble;
     }
 }
 
@@ -117,8 +117,8 @@ select::-ms-expand {
     .Buttons .Back {
         margin-right: 0;
         padding-right: 0;
-        margin-bottom: $utility-small_padding;
-        margin-left: $utility-xSmall_padding;
+        margin-bottom: $utility-baseUnitHalf;
+        margin-left: $utility-baseUnitHalf;
     }
 
     .Buttons .Back {
@@ -135,7 +135,7 @@ select::-ms-expand {
             margin-left: 0;
             text-align: left;
             line-height: $global-base_lineHeight;
-            margin-bottom: $utility-medium_padding;
+            margin-bottom: $utility-baseUnitDouble;
         }
     }
 
@@ -171,7 +171,7 @@ select::-ms-expand {
 }
 
 .ActivityFormWrap {
-    margin-bottom: $utility-medium_padding;
+    margin-bottom: $utility-baseUnitDouble;
 }
 
 label {
@@ -321,7 +321,7 @@ div.token-input-dropdown {
 
         .SpDropdownHandle::before {
             height: 100%;
-            padding: 0 $utility-medium_padding;
+            padding: 0 $utility-baseUnitDouble;
         }
 
         &:hover,
@@ -349,7 +349,7 @@ div.token-input-dropdown {
 .change-picture {
 
     .WarningMessage {
-        margin: $utility-medium_padding 0;
+        margin: $utility-baseUnitDouble 0;
     }
 
     @include maxWidth {
@@ -359,7 +359,7 @@ div.token-input-dropdown {
         }
 
         .change-picture-new {
-           margin: 0 0 $utility-small_padding;
+           margin: 0 0 $utility-baseUnitHalf;
        }
     }
 }
@@ -373,10 +373,12 @@ div.token-input-dropdown {
     display: none;
 }
 
+.FormTitleWrapper {
+    margin-bottom: $global-block_margin;
+}
+
 .FormWrapper-Condensed,
 .CommentForm.CommentForm {
-    padding: $component-base_padding;
-    margin: 0 0 $utility-large_padding;
 
     .FormWrapper {
         border-width: 0;

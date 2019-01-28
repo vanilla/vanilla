@@ -130,7 +130,7 @@
     @return $property $global-default_easing $duration;
 }
 
-@mixin tilesContainer($colNum: 6, $margin: $utility-medium_padding) {
+@mixin tilesContainer($colNum: 6, $margin: $utility-baseUnitDouble) {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
@@ -138,7 +138,7 @@
     margin-left: -#{$margin / 2};
 }
 
-@mixin tilesColumns($colNum: 6, $margin: $utility-medium_padding) {
+@mixin tilesColumns($colNum: 6, $margin: $utility-baseUnitDouble) {
     width: calc(#{100% / $colNum} - #{$margin});
     margin-left: #{$margin / 2};
     margin-right: #{$margin / 2};
@@ -189,9 +189,6 @@
             @if $component_lateralBorder == true {
                 border-top-left-radius: $component_borderRadius;
                 border-top-right-radius: $component_borderRadius;
-            } @else {
-                border-top-width: 0;
-                padding-top: 0;
             }
         }
 
@@ -311,7 +308,7 @@
             }
 
             .Wrap {
-                padding: 0 $utility-small_padding;
+                padding: 0 $utility-baseUnitHalf;
 
                 @include maxWidth {
                     padding: 0;
@@ -764,10 +761,6 @@
         height: 100vh;
         overflow: hidden;
     }
-}
-
-.PageTitle {
-    margin-bottom: $utility-large_padding;
 }
 
 @mixin defaultTransition($properties...) {

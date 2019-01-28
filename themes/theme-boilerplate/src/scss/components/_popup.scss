@@ -91,7 +91,7 @@ div.Popup {
 
     .Buttons {
         > *:first-child {
-            margin-right: $utility-small_padding;
+            margin-right: $utility-baseUnitHalf;
         }
     }
 
@@ -126,7 +126,7 @@ div.Popup {
     .Close {
         @include CloseButton($popup_fg);
         display: flex !important;
-        margin: $utility-xSmall_padding;
+        margin: $utility-baseUnitHalf;
         font-size: $icon-default_size !important;
     }
 }

@@ -15,7 +15,7 @@ body.Badges {
     }
 
     .CellWrap {
-        margin-top: $utility-medium_padding;
+        margin-top: $utility-baseUnitDouble;
     }
 
     .Content {
@@ -40,7 +40,7 @@ body.Badges {
                 @include photoWrap;
                 width: $theme-photo-small_size;
                 height: $theme-photo-small_size;
-                margin-right: $utility-medium_padding;
+                margin-right: $utility-baseUnitDouble;
             }
         }
     }

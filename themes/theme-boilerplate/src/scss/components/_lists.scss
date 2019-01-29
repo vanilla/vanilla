@@ -652,8 +652,29 @@
 
     .PhotoWrap {
         position: absolute;
-        left: $component-base_padding;
         top: $component-base_padding;
+
+        @if $component_lateralBorder == true {
+            left: $component-base_padding;
+        }
+    }
+
+    .Meta {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .MItem-Author a {
+        font-size: inherit;
+        font-weight: inherit;
+        line-height: inherit;
+        color: $component-meta-link_color;
+
+        &:focus,
+        &:hover {
+            text-decoration: $theme-link-hover_textDecoration;
+            color: $component-meta-link-hover_color;
+        }
     }
 }
 

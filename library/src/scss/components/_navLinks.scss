@@ -76,7 +76,7 @@ $navLinks-link_fontSize             : 22px;
     }
 
     &:visited {
-        color: $link-default_visited_color;
+        color: $global-color_fg;
     }
 }
 
@@ -93,6 +93,6 @@ $navLinks-link_fontSize             : 22px;
         color: $link-default_focus_color;
     }
     &:visited {
-        color: $link-default_visited_color;
+        color: $global-color_fg;
     }
 }

@@ -24,30 +24,28 @@ export default class SimplePager extends React.Component<IProps> {
         const buttons = [] as JSX.Element[];
         const isSingle = (prev && !next) || (!prev && next);
 
-        if (prev) {
-            buttons.push(
-                <LinkAsButton
-                    className={classNames(["simplePager-button", "simplePager-prev", { isSingle }])}
-                    key="simplePagerPrev"
-                    to={this.makeUrl(prev)}
-                >
-                    {t("Previous")}
-                </LinkAsButton>,
-            );
-        }
-        if (next) {
-            buttons.push(
-                <LinkAsButton
-                    className={classNames(["simplePager-button", "simplePager-next", { isSingle }])}
-                    key="simplePagerNext"
-                    to={this.makeUrl(next)}
-                >
-                    {t("Next")}
-                </LinkAsButton>,
-            );
-        }
-
-        return <div className="simplePager">{buttons}</div>;
+        return (
+            <div className="simplePager">
+                {prev && (
+                    <LinkAsButton
+                        className={classNames(["simplePager-button", "simplePager-prev", { isSingle }])}
+                        key="simplePagerPrev"
+                        to={this.makeUrl(prev)}
+                    >
+                        {t("Previous")}
+                    </LinkAsButton>
+                )}
+                {next && (
+                    <LinkAsButton
+                        className={classNames(["simplePager-button", "simplePager-next", { isSingle }])}
+                        key="simplePagerNext"
+                        to={this.makeUrl(next)}
+                    >
+                        {t("Next")}
+                    </LinkAsButton>
+                )}
+            </div>
+        );
     }
 
     private makeUrl(page: number): string {

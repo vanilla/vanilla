@@ -13,6 +13,10 @@ $navLinks-link_fontSize             : 22px;
     align-items: stretch;
     justify-content: space-between;
 
+    @include mediaQuery-panelLayout_xs {
+        padding: 0;
+    }
+
 }
 
 .navLinks {
@@ -20,6 +24,11 @@ $navLinks-link_fontSize             : 22px;
     flex-direction: column;
     padding: 24px;
     width: 250px;
+
+
+    @include mediaQuery-panelLayout_xs {
+        width: 100%;
+    }
 }
 
 .navLinks-items {

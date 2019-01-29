@@ -48,6 +48,13 @@ body {
 .Item .Author a {
     font-size: inherit;
     font-weight: inherit;
+    color: $component-meta_color;
+
+    &:focus,
+    &:hover {
+        text-decoration: $theme-link-hover_textDecoration;
+        color: $component-meta-link-hover_color;
+    }
 }
 
 .Item {

@@ -479,8 +479,14 @@
 
         td.DiscussionName {
             width: 100%;
-            padding-left: $utility-baseUnit;
             padding-right: $utility-baseUnit;
+
+            @if $component_lateralBorder == true {
+                padding-left: $component-base_padding;
+            } @else {
+                padding-left: 0;
+            }
+
         }
 
         //ideation styles

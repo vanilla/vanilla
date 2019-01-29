@@ -37,7 +37,7 @@ export default class NavLinksWithHeadings extends Component<IProps> {
                         items={group.items}
                         title={group.category.name}
                         url={group.category.url}
-                        depth={groupLevel}
+                        depth={groupLevel as 1 | 2 | 3 | 4 | 5 | 6}
                     />
                 );
             });

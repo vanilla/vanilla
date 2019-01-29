@@ -9,7 +9,6 @@
 \* -------------------------------------------------------------- */
 
 .Header.hasOpenNavigation {
-
     @include maxWidth {
         border-bottom-left-radius: $navigation_borderRadius;
         border-bottom-right-radius: $navigation_borderRadius;
@@ -30,6 +29,13 @@
     // Available on mobile
     @include maxWidth {
         display: block;
+    }
+
+    &.needsInitialization {
+        position: fixed;
+        top: -100%;
+        left: -100%;
+        visibility: hidden;
     }
 }
 

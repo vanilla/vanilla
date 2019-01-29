@@ -92,7 +92,7 @@
                     </div>
 
                     <!---------- Mobile Navigation ---------->
-                    <nav id="navdrawer" class="Navigation">
+                    <nav class="Navigation js-nav needsInitialization">
                         <div class="Container">
                             {if $User.SignedIn}
                                 <div class="Navigation-row NewDiscussion">
@@ -113,7 +113,7 @@
                             {custom_menu format=$linkFormat}
                         </div>
                     </nav>
-                    <nav class="mobileMebox js-mobileMebox">
+                    <nav class="mobileMebox js-mobileMebox needsInitialization">
                         <div class="Container">
                             {module name="MeModule"}
                             <button class="mobileMebox-buttonClose Close">
@@ -131,7 +131,10 @@
 
                 <!---------- Hero Banner ---------->
                 {if $ThemeOptions.Options.hasHeroBanner && inSection(["CategoryList", "DiscussionList"])}
-                    <div class="Herobanner" {if $heroImageUrl} style="background-image:url('{$heroImageUrl}')"{/if}>
+                    <div class="Herobanner">
+                        {if $heroImageUrl}
+                            <div class="Herobanner-bgImage" style="background-image:url('{$heroImageUrl}')"></div>
+                        {/if}
                         <div class="Container">
                             {if $ThemeOptions.Options.hasFeatureSearchbox}
                                 <div class="SearchBox js-sphinxAutoComplete" role="search">
@@ -242,7 +245,7 @@
                 <div class="Container">
                     <div class="row">
                         <div class="col">
-                            <p class="Footer-copyright">{t c="© Vanilla Theme Boilerplate"} {$smarty.now|date_format:"%Y"}</p>
+                            <p class="Footer-copyright">{t c="© Vanilla Keystone Theme"} {$smarty.now|date_format:"%Y"}</p>
                         </div>
                         <div class="col">
                             <div class="Vanilla-logo">

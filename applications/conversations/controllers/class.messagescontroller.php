@@ -176,7 +176,8 @@ class MessagesController extends ConversationsController {
                 $userID = Gdn::session()->UserID;
                 $validConversationMember = $this->ConversationModel->validConversationMember($conversationID, $userID);
                 if (!$validConversationMember) {
-                    throw permissionException();
+                    if (!checkPermission('Conversations.Moderation.Manage') || c('Conversations.Moderation.Allow') !== true)
+                        throw permissionException();
                 }
             }
 

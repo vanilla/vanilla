@@ -44,9 +44,16 @@ export default function SmartLink(props: IProps) {
         <LinkContext.Consumer>
             {contextRoot => {
                 if (href.startsWith(contextRoot) && !isCurrentPage) {
-                    return <NavLink {...passthru} to={makeDynamicHref(props.to, href)} activeClassName="isCurrent" />;
+                    return (
+                        <NavLink
+                            {...passthru}
+                            to={makeDynamicHref(props.to, href)}
+                            activeClassName="isCurrent"
+                            tabIndex={props.tabIndex}
+                        />
+                    );
                 } else {
-                    return <a {...passthru} href={href} />;
+                    return <a {...passthru} href={href} tabIndex={props.tabIndex} />;
                 }
             }}
         </LinkContext.Consumer>

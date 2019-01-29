@@ -74,10 +74,6 @@ $navLinks-link_fontSize             : 22px;
     &:focus {
         color: $link-default_focus_color;
     }
-
-    &:visited {
-        color: $global-color_fg;
-    }
 }
 
 .navLinks-viewAll {
@@ -88,11 +84,9 @@ $navLinks-link_fontSize             : 22px;
     &:hover {
         color: $link-default_hover_color;
     }
+
     &:active,
     &:focus {
         color: $link-default_focus_color;
-    }
-    &:visited {
-        color: $link-default_color;
     }
 }

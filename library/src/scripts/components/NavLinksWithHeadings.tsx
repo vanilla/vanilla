@@ -32,7 +32,7 @@ export default class NavLinksWithHeadings extends Component<IProps> {
 
         if (ungrouped.length !== 0 || grouped.length !== 0) {
             const ungroupedContent = <NavLinks title={t("Overview")} items={ungrouped} />;
-            const groupedContent = grouped.map(group => {
+            const groupedContent = grouped.map((group, i) => {
                 return (
                     <NavLinks
                         items={group.items}
@@ -40,6 +40,7 @@ export default class NavLinksWithHeadings extends Component<IProps> {
                         url={group.category.url}
                         depth={groupLevel as 1 | 2 | 3 | 4 | 5 | 6}
                         accessibleViewAllMessage={this.props.accessibleViewAllMessage}
+                        key={i}
                     />
                 );
             });

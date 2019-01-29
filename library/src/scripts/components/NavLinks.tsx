@@ -32,7 +32,7 @@ export default class NavLinks extends Component<IProps> {
             const contents = this.props.items.map((item, i) => {
                 return (
                     <li className="navLinks-item" key={i}>
-                        <SmartLink to={item.url} className="navLinks-link" title={item.name}>
+                        <SmartLink to={item.url} className="navLinks-link" title={item.name} tabIndex={0}>
                             {item.name}
                         </SmartLink>
                     </li>
@@ -46,7 +46,7 @@ export default class NavLinks extends Component<IProps> {
                         {this.props.url &&
                             this.props.accessibleViewAllMessage && (
                                 <li className="navLinks-item isViewAll" key={this.props.items.length}>
-                                    <SmartLink to={this.props.url} className="navLinks-viewAll">
+                                    <SmartLink to={this.props.url} className="navLinks-viewAll" tabIndex={0}>
                                         <span aria-hidden={true}>{viewAll}</span>
                                         <ScreenReaderContent>
                                             <Translate

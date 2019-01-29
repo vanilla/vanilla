@@ -34,7 +34,7 @@ class AkismetPlugin extends Gdn_Plugin {
      *
      * @param string $key Authentication key.
      * @param string $server Remote URL.
-     * @return Akismet
+     * @return Aksimet
      */
     private static function buildAkismet($key, $server = false) {
         $akismet = new Akismet(Gdn::request()->url('/', true), $key);

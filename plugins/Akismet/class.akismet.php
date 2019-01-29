@@ -1,5 +1,6 @@
 <?php
 
+require 'class.socketwriteread.php';
 /**
  * Akismet anti-comment spam service
  *
@@ -7,7 +8,8 @@
  *
  * This service performs a number of checks on submitted data and returns whether or not the data is likely to be spam.
  *
- * Please note that in order to use this class, you must have a vaild {@link http://wordpress.com/api-keys/ WordPress API key}.  They are free for non/small-profit types and getting one will only take a couple of minutes.
+ * Please note that in order to use this class, you must have a vaild {@link http://wordpress.com/api-keys/ WordPress API key}.
+ * They are free for non/small-profit types and getting one will only take a couple of minutes.
  *
  * For commercial use, please {@link http://akismet.com/commercial/ visit the Akismet commercial licensing page}.
  *
@@ -62,6 +64,7 @@
  * @author        Alex Potsides
  * @link        http://www.achingbrain.net/
  */
+
 class Akismet {
     private $version = '0.4';
     private $wordPressAPIKey;
@@ -305,7 +308,9 @@ class Akismet {
     }
 
     /**
-     *    The comment's body text.
+     * The comment's body text.
+     *
+     * @param string $commentBody The comment body.
      */
     public function setCommentContent($commentBody) {
         $this->comment['comment_content'] = $commentBody;
@@ -336,108 +341,5 @@ class Akismet {
      */
     public function setAkismetVersion($akismetVersion) {
         $this->akismetVersion = $akismetVersion;
-    }
-}
-
-/**
- * Utility class used by Akismet
- *
- * This class is used by Akismet to do the actual sending and receiving of data.
- * It opens a connection to a remote host, sends some data and the reads the response and makes it available to the calling program.
- *
- * The code that makes up this class originates in the Akismet WordPress plugin,
- * which is {@link http://akismet.com/download/ available on the Akismet website}.
- *
- * N.B. It is not necessary to call this class directly to use the Akismet class.
- * This is included here mainly out of a sense of completeness.
- *
- * @package    akismet
- * @name        SocketWriteRead
- * @version    0.1
- * @author        Alex Potsides
- * @link        http://www.achingbrain.net/
- */
-class SocketWriteRead {
-    private $host;
-    private $port;
-    private $request;
-    private $response;
-    private $responseLength;
-    private $errorNumber;
-    private $errorString;
-
-    /**
-     * Constructor
-     *
-     * @param string $host The host to send/receive data.
-     * @param int $port The port on the remote host.
-     * @param string $request The data to send.
-     * @param int $responseLength The amount of data to read.  Defaults to 1160 bytes.
-     */
-    public function __construct($host, $port, $request, $responseLength = 1160) {
-        $this->host = $host;
-        $this->port = $port;
-        $this->request = $request;
-        $this->responseLength = $responseLength;
-        $this->errorNumber = 0;
-        $this->errorString = '';
-    }
-
-    /**
-     * Send
-     *
-     * Sends the data to the remote host.
-     *
-     * @throws Exception Exception is thrown if a connection cannot be made to the remote host.
-     */
-    public function send() {
-        $this->response = '';
-
-        $fs = fsockopen($this->host, $this->port, $this->errorNumber, $this->errorString, 3);
-
-        if ($this->errorNumber != 0) {
-            throw new Exception('Error connecting to host: ' . $this->host . ' Error number: ' . $this->errorNumber . ' Error message: ' . $this->errorString);
-        }
-
-        if ($fs !== false) {
-            @fwrite($fs, $this->request);
-
-            while (!feof($fs)) {
-                $this->response .= fgets($fs, $this->responseLength);
-            }
-
-            fclose($fs);
-        }
-    }
-
-    /**
-     *  Returns the server response text
-     *
-     * @return string
-     */
-    public function getResponse() {
-        return $this->response;
-    }
-
-    /**
-     * Returns the error number
-     *
-     * If there was no error, 0 will be returned.
-     *
-     * @return int
-     */
-    public function getErrorNumner() {
-        return $this->errorNumber;
-    }
-
-    /**
-     * Returns the error string
-     *
-     * If there was no error, an empty string will be returned.
-     *
-     * @return string
-     */
-    public function getErrorString() {
-        return $this->errorString;
     }
 }

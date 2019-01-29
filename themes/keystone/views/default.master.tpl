@@ -131,7 +131,10 @@
 
                 <!---------- Hero Banner ---------->
                 {if $ThemeOptions.Options.hasHeroBanner && inSection(["CategoryList", "DiscussionList"])}
-                    <div class="Herobanner" {if $heroImageUrl} style="background-image:url('{$heroImageUrl}')"{/if}>
+                    <div class="Herobanner">
+                        {if $heroImageUrl}
+                            <div class="Herobanner-bgImage" style="background-image:url('{$heroImageUrl}')"></div>
+                        {/if}
                         <div class="Container">
                             {if $ThemeOptions.Options.hasFeatureSearchbox}
                                 <div class="SearchBox js-sphinxAutoComplete" role="search">

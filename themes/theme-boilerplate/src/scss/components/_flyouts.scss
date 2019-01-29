@@ -537,6 +537,46 @@ $flyout-progress_size:                  24px !default;
     }
 }
 
+.MenuItems.ui-autocomplete {
+    color: $flyout_fg;
+
+    .ui-menu-item,
+    .ui-menu-item > a {
+        display: block;
+    }
+
+    a {
+        &:hover,
+        &:focus,
+        &:active {
+            color: $flyout_fg;
+
+            .Gloss {
+                color: inherit;
+            }
+        }
+    }
+
+    .Title {
+        display: block;
+        width: 100%;
+        font-weight: $global-semibold_fontWeight;
+        font-size: $global-large_fontSize;
+        margin-bottom: $utility-baseUnit;
+    }
+
+    .Aside {
+        float: left;
+        font-size: $global-small_fontSize;
+    }
+
+    .Gloss {
+        width: auto;
+        padding-left: $utility-baseUnit;
+        font-size: $global-small_fontSize;
+    }
+}
+
 // ---------- click event for iOS <=9.3 ---------- //
 @include maxWidth($theme-breakpoint_tablet) {
 

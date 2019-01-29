@@ -29,7 +29,6 @@ export default class SimplePager extends React.Component<IProps> {
                 {prev && (
                     <LinkAsButton
                         className={classNames(["simplePager-button", "simplePager-prev", { isSingle }])}
-                        key="simplePagerPrev"
                         to={this.makeUrl(prev)}
                     >
                         {t("Previous")}
@@ -38,7 +37,6 @@ export default class SimplePager extends React.Component<IProps> {
                 {next && (
                     <LinkAsButton
                         className={classNames(["simplePager-button", "simplePager-next", { isSingle }])}
-                        key="simplePagerNext"
                         to={this.makeUrl(next)}
                     >
                         {t("Next")}

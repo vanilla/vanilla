@@ -6,11 +6,15 @@
 
 .siteNavAdminLinks {
     display: block;
-    margin: 25px 0 0;
+    margin: 0;
 
     @include mediaQuery-panelLayout_oneColumn {
         margin-bottom: 25px;
     }
+}
+
+.siteNav-children + .siteNavAdminLinks {
+    margin: 25px 0 0;
 }
 
 .siteNavAdminLinks-item {

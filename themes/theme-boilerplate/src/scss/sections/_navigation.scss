@@ -18,29 +18,18 @@
 
 .Navigation,
 .mobileMebox {
-    display: none;
     overflow: hidden;
     position: relative;
     width: 100%;
-    height: auto;
-    max-height: 0;
-    transition: max-height .3s ease;
+    transition: height 0.3s ease;
+    will-change: height;
 
+    // Hidden on desktop
+    display: none;
+
+    // Available on mobile
     @include maxWidth {
         display: block;
-    }
-
-    &.isOpen {
-        max-height: 450px;
-    }
-
-    &.isReadyToTransition {
-        will-change: max-height;
-        transition: max-height $global-default_easing $global-default_timing * 2;
-
-        &[data-state= 'CLOSED'] {
-            transition-timing-function: $navigation-easing-transition;
-        }
     }
 }
 

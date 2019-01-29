@@ -31,7 +31,7 @@
             </div>
         </div>
     </div>
-    <nav id="navdrawer" class="Navigation">
+    <nav class="Navigation needsInitialization js-nav">
         <div class="Container">
             {if $User.SignedIn}
                 <div class="Navigation-row NewDiscussion">
@@ -52,7 +52,7 @@
             {custom_menu format=$linkFormat}
         </div>
     </nav>
-    <nav class="mobileMebox js-mobileMebox">
+    <nav class="mobileMebox js-mobileMebox needsInitialization">
         <div class="Container">
             {module name="MeModule"}
             <button class="mobileMebox-buttonClose Close">

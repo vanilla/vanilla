@@ -1,0 +1,82 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+@mixin singleLineEllipsis {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+@mixin longWordEllipsis {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+@mixin headings($from: 1, $to: 6) {
+    @for $i from $from through $to {
+        h#{$i} {
+            @content;
+        }
+    }
+}
+
+@mixin headingFontStyle() {
+    display: block;
+    font-family: $global-heading_fontFamily;
+    font-weight: $global-heading_fontWeight;
+    font-size: $global-medium_fontSize;
+    line-height: $global-condensed_lineHeight;
+    margin: 0;
+}
+
+@mixin bodyFontStyle() {
+    font-family: $global-body_fontFamily;
+    font-weight: $global-body_fontWeight;
+}
+
+@mixin allLinkStates {
+    &,
+    &:hover,
+    &:active,
+    &:visited {
+        @content;
+    }
+}
+
+@function lineHeightAdjustment($lineHeight, $capitalLetterRatio: 1, $baseLineOffset: 0.5, $bottom: false) {
+    $topOffset: $baseLineOffset * 1em;
+    @if ($bottom) {
+        @return #{($capitalLetterRatio - $lineHeight) * $topOffset};
+    } @else {
+        @return #{$capitalLetterRatio - $lineHeight * (1 - $topOffset)};
+    }
+}
+
+// Many fonts don't set the capital letter to take the whole line height. This mixin is used to line up the top of the Text with the top of the container.
+// $capitalLetterRatio: The ratio is a value from 0 to 1 to set how much of the line height the capital takes. Example, if it takes 3/4 of the line height, set .75
+// $baseLineOffset: Sometimes the base line isn't centered, 0 remove from top, .5 use font default, 1 remove from bottom
+// $bottomOffset: Also adjust bottom margin
+@mixin lineHeightAdjustment($lineHeight, $capitalLetterRatio: 1, $baseLineOffset: 0.5, $bottomOffset: false) {
+    &::before,
+    &::after {
+        content: "";
+        display: block;
+        height: 0;
+        width: 0;
+    }
+
+    &::before {
+        margin-top: -#{lineHeightAdjustment($lineHeight, $capitalLetterRatio, $baseLineOffset, false)};
+    }
+
+    @if ($bottomOffset) {
+        &::after {
+            margin-bottom: -#{lineHeightAdjustment($lineHeight, $capitalLetterRatio, $baseLineOffset, true)};
+        }
+    }
+}

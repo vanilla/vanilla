@@ -482,6 +482,21 @@
                 }
             }
 
+            .InlineTags {
+                padding-left: 0;
+
+                a {
+                    font-size: inherit;
+                    color: $component-meta-link_color;
+
+                    &:hover,
+                    &:focus,
+                    &:active {
+                        color: $component-meta-link-hover_color;
+                    }
+                }
+            }
+
             .Meta {
                 width: 100%;
 

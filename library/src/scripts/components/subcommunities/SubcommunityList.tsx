@@ -23,6 +23,7 @@ interface IProps {
     titleLevel?: 1 | 2 | 3 | 4 | 5 | 6;
     hiddenTitle?: boolean;
     emptyMessage: string;
+    fallbackIcon: string;
 }
 
 /**
@@ -45,7 +46,7 @@ export default class SubcommunityList extends React.Component<IProps> {
                         {items.map((subcommunity, i) => (
                             <li key={i} className="subcommunityList-item">
                                 <SubcommunityTile
-                                    icon={subcommunity.icon}
+                                    icon={subcommunity.icon || this.props.fallbackIcon}
                                     title={subcommunity.name}
                                     description={subcommunity.description}
                                     url={subcommunity.url}

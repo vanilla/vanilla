@@ -1,0 +1,15 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$widgetContainer_width      : #{384px * 2 + 24px * 4};
+$widgetContainer_bg         : $global-color_bg;
+
+.widgetContainer {
+    position: relative;
+    max-width: 100%;
+    width: $widgetContainer_width;
+    margin: auto;
+}

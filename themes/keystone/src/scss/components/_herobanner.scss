@@ -91,6 +91,7 @@ $herobanner_fg:                                   $global-color_white !default;
             line-height: $SearchboxFeatured_height;
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
+            border-right-width: 0;
 
             &:focus,
             &:active {

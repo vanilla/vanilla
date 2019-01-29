@@ -241,6 +241,10 @@ a.ChangePicture {
 
 }
 
+.MenuItems a:hover .Gloss {
+    color: inherit !important;
+}
+
 #Form_Ban {
     @include Button(
             $button-primary_bg,

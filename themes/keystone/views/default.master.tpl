@@ -60,9 +60,18 @@
             <div class="Frame-header">
 
                 <!---------- Main Header ---------->
-                <header class="Header">
+                <header id="MainHeader" class="Header">
                     <div class="Container">
                         <div class="row">
+                            <div class="Hamburger">
+                                <button class="Hamburger Hamburger-menuXcross" id="menu-button" aria-label="toggle menu">
+                                    <span class="Hamburger-menuLines" aria-hidden="true">
+                                    </span>
+                                    <span class="Hamburger-visuallyHidden sr-only">
+                                        toggle menu
+                                    </span>
+                                </button>
+                            </div>
                             <a href="{home_link format="%url"}" class="Header-logo">
                                 {logo}
                             </a>
@@ -70,18 +79,14 @@
                                 {mobile_logo}
                             </a>
                             <div class="Header-right">
-                                <div class="MeBox--header">
+                                <div class="MeBox-header">
                                     {module name="MeModule" CssClass="FlyoutRight"}
                                 </div>
-                                <div class="Hamburger">
-                                    <button class="Hamburger Hamburger-menuXcross" id="menu-button" aria-label="toggle menu">
-                                        <span class="Hamburger-menuLines" aria-hidden="true">
-                                        </span>
-                                        <span class="Hamburger-visuallyHidden sr-only">
-                                            toggle menu
-                                        </span>
+                                {if $User.SignedIn}
+                                    <button class="mobileMeBox-button">
+                                        {module name="UserPhotoModule"}
                                     </button>
-                                </div>
+                                {/if}
                             </div>
                         </div>
                     </div>
@@ -89,23 +94,35 @@
                     <!---------- Mobile Navigation ---------->
                     <nav id="navdrawer" class="Navigation">
                         <div class="Container">
-                            <div class="Navigation-row">
-                                <div class="MeBox MeBox mobile">
-                                    {module name="MeModule"}
+                            {if $User.SignedIn}
+                                <div class="Navigation-row NewDiscussion">
+                                    <div class="NewDiscussion mobile">
+                                        {module name="NewDiscussionModule"}
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="Navigation-row NewDiscussion">
-                                <div class="NewDiscussion mobile">
-                                    {module name="NewDiscussionModule"}
+                            {else}
+                                <div class="Navigation-row">
+                                    <div class="SignIn mobile">
+                                        {module name="MeModule"}
+                                    </div>
                                 </div>
-                            </div>
+                            {/if}
                             {categories_link format=$linkFormat}
                             {discussions_link format=$linkFormat}
                             {activity_link format=$linkFormat}
                             {custom_menu format=$linkFormat}
                         </div>
                     </nav>
+                    <nav class="mobileMebox js-mobileMebox">
+                        <div class="Container">
+                            {module name="MeModule"}
+                            <button class="mobileMebox-buttonClose Close">
+                                <span>×</span>
+                            </button>
+                        </div>
+                    </nav>
                     <!---------- Mobile Navigation END ---------->
+
                 </header>
                 <!---------- Main Header END ---------->
 

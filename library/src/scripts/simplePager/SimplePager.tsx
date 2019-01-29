@@ -3,15 +3,15 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
 import { t } from "@library/application";
-import SimplePagerModel, { LinkPages } from "@library/simplePager/SimplePagerModel";
 import LinkAsButton from "@library/components/LinkAsButton";
+import { ILinkPages } from "@library/simplePager/SimplePagerModel";
 import classNames from "classnames";
+import * as React from "react";
 
 interface IProps {
     url: string;
-    pages: LinkPages;
+    pages: ILinkPages;
 }
 
 /**

@@ -231,10 +231,10 @@ $navigation-boxShadow:                    0 5px 10px 0 rgba(0,0,0,0.30);
 $navigation-hover_fg:                     $global-color_primary !default;
 $navigation_border:                       darken($navigation_bg, 8%)!default;
 $navigation_borderRadius:                 $global_borderRadius !default;
-$navigation_fontSize:                     $global-medium_fontSize !default;
+$navigation_fontSize:                     $global-large_fontSize !default;
 $navigation_paddingSide:                  $utility-baseUnitDouble !default;
 $navigation_vertical_paddingSide:         0 !default;
-$navigation-item_height:                  36px !default;
+$navigation-item_height:                  32px !default;
 $navigation-item_fontWeight:              $global-normal_fontWeight !default;
 $navigation-easing-transition:            cubic-bezier(0, 1, 0, 1) !default;
 

@@ -49,10 +49,11 @@ class AkismetPlugin extends Gdn_Plugin {
     /**
      * Query the Akismet service.
      *
-     * @param $recordType
-     * @param $data
+     * @param array $recordType The recordType.
+     * @param string $data The data being passed.
+     *
      * @return bool
-     * @throws exception
+     * @throws Exception Throws exception.
      */
     public function checkAkismet($recordType, $data) {
         $userID = $this->userID();
@@ -79,7 +80,9 @@ class AkismetPlugin extends Gdn_Plugin {
     /**
      * Do we have a valid key?
      *
-     * @return bool
+     * @param string $key The config key.
+     *
+     * @return bool If config key is valid.
      */
     protected function validateKey($key) {
         $server = c('Plugins.Akismet.Server');
@@ -126,8 +129,8 @@ class AkismetPlugin extends Gdn_Plugin {
     /**
      * Hook into Vanilla to run checks.
      *
-     * @param $sender
-     * @param $args
+     * @param Controller $sender The controller firing the event.
+     * @param array $args The arguments sent by the event.
      */
     public function base_checkSpam_handler($sender, $args) {
         // Don't check for spam if another plugin has already determined it is.
@@ -171,7 +174,7 @@ class AkismetPlugin extends Gdn_Plugin {
     /**
      * Settings page.
      *
-     * @param SettingsController $sender
+     * @param SettingsController $sender SettingsController firing the event.
      */
     public function settingsController_akismet_create($sender) {
         // Allow for master hosted key

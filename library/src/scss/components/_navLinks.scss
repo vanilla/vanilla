@@ -55,7 +55,20 @@ $navLinks-link_fontSize             : 22px;
     display: block;
     color: $global-color_fg;
     font-size: $global-large_fontSize;
-    line-height: $global-condensed_lineHeight
+    line-height: $global-condensed_lineHeight;
+
+    &:hover {
+        color: $link-default_hover_color;
+    }
+
+    &:active,
+    &:focus {
+        color: $link-default_focus_color;
+    }
+
+    &:visited {
+        color: $link-default_visited_color;
+    }
 }
 
 .navLinks-viewAll {

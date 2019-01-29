@@ -4,21 +4,32 @@
  * @license GPL-2.0-only
  */
 
+const INIT_CLASS = "needsInitialization";
+const CALC_HEIGHT_ATTR = "data-height";
+const COLLAPSED_HEIGHT = "0px";
+
 export function setupMobileNavigation() {
-    const CALC_HEIGHT_ATTR = "data-height";
-    const COLLAPSED_HEIGHT = "0px";
 
     const menuButton = document.querySelector("#menu-button");
     /** @type {HTMLElement} */
-    const navdrawer = document.querySelector("#navdrawer");
+    const navdrawer = document.querySelector(".js-nav");
     /** @type {HTMLElement} */
     const mobileMebox = document.querySelector(".js-mobileMebox");
     const mobileMeBoxBtn = document.querySelector(".mobileMeBox-button");
     const mobileMeboxBtnClose = document.querySelector(".mobileMebox-buttonClose");
     const mainHeader = document.querySelector("#MainHeader");
 
+    // Calculate the values initially.
     prepareElement(mobileMebox);
     prepareElement(navdrawer);
+
+    // Update the calculated values on resize.
+    window.addEventListener("resize", () => {
+        requestAnimationFrame(() => {
+            prepareElement(mobileMebox);
+            prepareElement(navdrawer);
+        })
+    })
 
     menuButton.addEventListener("click", () => {
         menuButton.classList.toggle("isToggled");
@@ -71,13 +82,13 @@ export function setupMobileNavigation() {
      * @param {HTMLElement} element
      */
     function prepareElement(element) {
-        element.style.visibility = "hidden";
+        element.classList.add(INIT_CLASS);
         element.style.height = "auto";
         const calcedHeight = element.getBoundingClientRect().height;
 
         // Visual hide the element.
         element.setAttribute(CALC_HEIGHT_ATTR, calcedHeight.toString());
         collapseElement(element);
-        element.style.visibility = "initial";
+        element.classList.remove(INIT_CLASS);
     }
 }

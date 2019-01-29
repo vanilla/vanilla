@@ -18,6 +18,7 @@ interface IProps {
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
     classNames?: string;
     data: ILinkListData;
+    accessibleViewAllMessage?: string;
 }
 
 /**
@@ -38,6 +39,7 @@ export default class NavLinksWithHeadings extends Component<IProps> {
                         title={group.category.name}
                         url={group.category.url}
                         depth={groupLevel as 1 | 2 | 3 | 4 | 5 | 6}
+                        accessibleViewAllMessage={this.props.accessibleViewAllMessage}
                     />
                 );
             });
@@ -47,8 +49,8 @@ export default class NavLinksWithHeadings extends Component<IProps> {
                     <ScreenReaderContent>
                         <Heading title={this.props.title} depth={this.props.depth} />
                     </ScreenReaderContent>
-                    {ungroupedContent}
                     {groupedContent}
+                    {ungroupedContent}
                 </nav>
             );
         } else {

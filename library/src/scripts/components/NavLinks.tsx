@@ -10,6 +10,8 @@ import classNames from "classnames";
 import SmartLink from "@library/components/navigation/SmartLink";
 import { INavigationItem } from "@library/@types/api";
 import { t } from "@library/application";
+import ScreenReaderContent from "@library/components/ScreenReaderContent";
+import Translate from "@library/components/translation/Translate";
 
 interface IProps {
     classNames?: string;
@@ -17,6 +19,7 @@ interface IProps {
     items: INavigationItem[];
     url?: string;
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
+    accessibleViewAllMessage?: string;
 }
 
 /**
@@ -40,13 +43,20 @@ export default class NavLinks extends Component<IProps> {
                     <Heading title={this.props.title} className="navLinks-title" depth={this.props.depth} />
                     <ul className="navLinks-items">
                         {contents}
-                        {this.props.url && (
-                            <li className="navLinks-item" key={this.props.items.length}>
-                                <SmartLink to={this.props.url} className="navLinks-viewAll">
-                                    {viewAll}
-                                </SmartLink>
-                            </li>
-                        )}
+                        {this.props.url &&
+                            this.props.accessibleViewAllMessage && (
+                                <li className="navLinks-item isViewAll" key={this.props.items.length}>
+                                    <SmartLink to={this.props.url} className="navLinks-viewAll">
+                                        <span aria-hidden={true}>{viewAll}</span>
+                                        <ScreenReaderContent>
+                                            <Translate
+                                                source={this.props.accessibleViewAllMessage}
+                                                c0={this.props.title}
+                                            />
+                                        </ScreenReaderContent>
+                                    </SmartLink>
+                                </li>
+                            )}
                     </ul>
                 </article>
             );

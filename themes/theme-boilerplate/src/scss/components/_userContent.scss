@@ -52,14 +52,9 @@ $code-block_padding:                    $userContent_fontSize !default;
         a {
             color: $link_default-color;
 
-
+            &:focus,
             &:hover {
-                color: $link_default_hover-color;
-                text-decoration: underline;
-            }
-
-            &:focus {
-                color: $link_default_focus-color;
+                color: $link-default-hover_color;
                 text-decoration: underline;
             }
 
@@ -125,16 +120,15 @@ $code-block_padding:                    $userContent_fontSize !default;
     .codeBlock,
     code,
     pre {
-        padding: $code-block_padding;
         vertical-align: middle;
-        line-height: inherit;
         font-size: $code_fontSize;
         font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
         margin: 0;
         border: 0;
     }
 
-    pre {
+    pre,
+    pre.codeBlock {
         max-width: 100%;
         overflow-x: auto;
         display: block;
@@ -142,13 +136,15 @@ $code-block_padding:                    $userContent_fontSize !default;
         flex-shrink: 0;
         color: $code_fg;
         background-color: $code_bg;
+        padding: $code-block_padding;
     }
 
     .codeBlock,
     code {
+        padding: 0;
         color: inherit;
-        background-color: transparent;
         display: inline;
+        background-color: transparent;
     }
 
     p .codeBlock,
@@ -156,7 +152,6 @@ $code-block_padding:                    $userContent_fontSize !default;
         display: inline;
         white-space: normal;
         background-color: $code_bg;
-        padding-top: $utility-baseUnitHalf;
-        padding-bottom: $utility-baseUnitHalf;
+        padding: $code-inline_padding;
     }
 }

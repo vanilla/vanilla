@@ -656,6 +656,8 @@
 
         @if $component_lateralBorder == true {
             left: $component-base_padding;
+        } @else {
+            left: 0;
         }
     }
 

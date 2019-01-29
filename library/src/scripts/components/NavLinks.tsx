@@ -16,6 +16,7 @@ interface IProps {
     title: string;
     items: INavigationItem[];
     url?: string;
+    depth?: 1 | 2 | 3 | 4 | 5 | 6;
 }
 
 /**
@@ -35,8 +36,8 @@ export default class NavLinks extends Component<IProps> {
                 );
             });
             return (
-                <section className={classNames("navLinks", this.props.classNames)}>
-                    <Heading title={this.props.title} className="navLinks-title" />
+                <article className={classNames("navLinks", this.props.classNames)}>
+                    <Heading title={this.props.title} className="navLinks-title" depth={this.props.depth} />
                     <ul className="navLinks-items">
                         {contents}
                         {this.props.url && (
@@ -47,7 +48,7 @@ export default class NavLinks extends Component<IProps> {
                             </li>
                         )}
                     </ul>
-                </section>
+                </article>
             );
         } else {
             return null;

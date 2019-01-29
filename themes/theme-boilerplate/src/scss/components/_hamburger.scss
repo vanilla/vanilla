@@ -8,10 +8,10 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$hamburger-size:                         24px !default;
+$hamburger-size:                         22px !default;
 $hamburger_padding:                      0 !default;
 $hamburger_bg:                           transparent !default;
-$hamburger_color:                        $header_fg !default;
+$hamburger_fg:                           $header_fg !default;
 $hamburger-stroke_height:                2px !default;
 $hamburger_borderRadius:                 $component_borderRadius !default;
 $hamburger-stroke_borderRadius:          $hamburger-stroke_height !default;
@@ -62,6 +62,9 @@ $hamburger_jstransform:                  "isToggled" !default;
     background: $hamburger_bg;
     border-radius: $hamburger_borderRadius;
 
+    @include maxWidth {
+        position: absolute;
+    }
 }
 
 @mixin hamburger-menuLines {
@@ -70,7 +73,7 @@ $hamburger_jstransform:                  "isToggled" !default;
     width: #{$hamburger_size - $hamburger_padding};
     border-radius: $hamburger-stroke_borderRadius;
     transition: $hamburger_transition;
-    background: $hamburger_color;
+    background-color: $hamburger_fg;
 }
 
 .Hamburger-menuLines {
@@ -84,7 +87,6 @@ $hamburger_jstransform:                  "isToggled" !default;
         position: absolute;
         left: 0;
         transform-origin: ($hamburger-size / 4) center;
-        width: 100%;
     }
 
     &::before {
@@ -92,7 +94,7 @@ $hamburger_jstransform:                  "isToggled" !default;
     }
 
     &::after {
-        top: -($hamburger-size / 4);
+        top: -($hamburger-size / 3.5);
     }
 
     .#{$hamburger_jstransform} & {
@@ -115,6 +117,7 @@ $hamburger_jstransform:                  "isToggled" !default;
                 top: 0;
                 left: 0;
                 width: #{$hamburger_size - $hamburger_padding};
+                background-color: mix($hamburger_fg, $hamburger_bg, 60%);
             }
 
             &::before {

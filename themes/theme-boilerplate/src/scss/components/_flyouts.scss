@@ -471,6 +471,10 @@ $flyout-progress_size:                  24px !default;
 
 .OnlineUserWrap .OnlineUserName {
     padding: $flyoutMessage_padding !important;
+
+    @include maxWidth {
+        display: none;
+    }
 }
 
 .MenuItems-Reactions.MenuItems-Reactions {

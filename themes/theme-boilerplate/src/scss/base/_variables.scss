@@ -114,6 +114,26 @@ $theme-heading_color:                   $global-color_primary !default;
 $theme-heading-hover_color:             $global-color_primary !default;
 
 /* -------------------------------------------------------------- *\
+    Buttons Colors
+\* -------------------------------------------------------------- */
+
+$button-basic_fg:                        $global-color_grey !default;
+$button-basic_bg:                        transparent !default;
+$button-basic_border:                    $global-color_whitesmoke !default;
+
+$button-basic-hover_fg:                  $global-color_primary !default;
+$button-basic-hover_bg:                  transparent !default;
+$button-basic-hover_border:              $global-color_primary !default;
+
+$button-primary_fg:                      $global-color_white !default;
+$button-primary_bg:                      $global-color_primary !default;
+$button-primary_border:                  $global-color_primary !default;
+
+$button-primary-hover_fg:                $global-color_white !default;
+$button-primary-hover_bg:                $global-color_primaryAlt !default;
+$button-primary-hover_border:            $global-color_primaryAlt !default;
+
+/* -------------------------------------------------------------- *\
     Icons
 \* -------------------------------------------------------------- */
 
@@ -206,32 +226,37 @@ $meboxCount_borderColor:                     $global-color_secondary !default;
     Navigation
 \* -------------------------------------------------------------- */
 
-$navigation_bg:                           lighten($header_bg, 4%) !default;
-$navigation_link_color:                   $header-link_color !default;
-$navigation_link-hover_color:             $header-link_color !default;
+$navigation_bg:                           $global-color_bg !default;
+$navigation_fg:                           $global-color_fg !default;
+$navigation-boxShadow:                    0 5px 10px 0 rgba(0,0,0,0.30);
+$navigation-hover_fg:                     $global-color_primary !default;
 $navigation_border:                       darken($navigation_bg, 8%)!default;
-$navigation_fontSize:                     $global-medium_fontSize !default;
+$navigation_borderRadius:                 $global_borderRadius !default;
+$navigation_fontSize:                     $global-large_fontSize !default;
 $navigation_paddingSide:                  $utility-baseUnitDouble !default;
 $navigation_vertical_paddingSide:         0 !default;
-$navigation-item_height:                  36px !default;
+$navigation-item_height:                  32px !default;
 $navigation-item_fontWeight:              $global-normal_fontWeight !default;
 $navigation-easing-transition:            cubic-bezier(0, 1, 0, 1) !default;
 
-$navigationButton_bg:                    transparent !default;
-$navigationButton_fg:                    $global-color_white !default;
-$navigationButton_border:                $global-color_white !default;
+$navigationButton_bg:                     $button-primary_bg !default;
+$navigationButton_fg:                     $button-primary_fg !default;
+$navigationButton_border:                 $button-primary_border !default;
 
-$navigationButton-hover_bg:              $global-color_primaryAlt !default;
-$navigationButton-hover_fg:              $global-color_white !default;
-$navigationButton-hover_border:          $navigationButton-hover_bg !default;
+$navigationButton-hover_bg:               $button-primary-hover_bg !default;
+$navigationButton-hover_fg:               $button-primary-hover_fg !default;
+$navigationButton-hover_border:           $button-primary-hover_border !default;
 
-$navigationMeBoxAlert_bg:                 $global-color_secondary !default;
+/* -------------------------------------------------------------- *\
+    Mobile Mebox
+\* -------------------------------------------------------------- */
 
-$navigationMebutton_bg:                   transparent !default;
-$navigationMebutton_fg:                   $navigation-link_color !default;
-$navigationMebutton-hover_fg:             $navigation-link_color !default;
-$navigationMebutton-hover_bg:             mix($global-color_fg, $navigation_bg, 26%) !default;
-$navigationMebutton-active_bg:            mix($navigationMebutton_fg, $navigation_bg, 12%) !default;
+$MobileMeBoxAlert_bg:                      $global-color_secondary !default;
+
+$MobileMeBox_bg:                           mix($global-color_white, $header_bg, 12%) !default;
+$MobileMeBox_fg:                           $header-link_color !default;
+$MobileMeBox-hover_fg:                     $header-link-hover_color !default;
+$MobileMeBox-hover_fg:                     mix($navigationMebutton_fg, $navigation_bg, 12%) !default;
 
 /* -------------------------------------------------------------- *\
     Content
@@ -330,26 +355,6 @@ $formElement_border:                     1px solid $formElement_borderColor !def
 $formElement_fontSize:                   $global-medium_fontSize !default;
 $formElement_fontWeight:                 $global-medium_fontSize !default;
 $formElement_borderRadius:               $global_borderRadius !default;
-
-/* -------------------------------------------------------------- *\
-    Buttons
-\* -------------------------------------------------------------- */
-
-$button-basic_fg:                        $global-color_grey !default;
-$button-basic_bg:                        transparent !default;
-$button-basic_border:                    $global-color_whitesmoke !default;
-
-$button-basic-hover_fg:                  $global-color_primary !default;
-$button-basic-hover_bg:                  transparent !default;
-$button-basic-hover_border:              $global-color_primary !default;
-
-$button-primary_fg:                      $global-color_white !default;
-$button-primary_bg:                      $global-color_primary !default;
-$button-primary_border:                  $global-color_primary !default;
-
-$button-primary-hover_fg:                $global-color_white !default;
-$button-primary-hover_bg:                $global-color_primaryAlt !default;
-$button-primary-hover_border:            $global-color_primaryAlt !default;
 
 /* -------------------------------------------------------------- *\
     Form Buttons

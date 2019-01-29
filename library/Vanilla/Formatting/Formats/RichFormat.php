@@ -202,6 +202,6 @@ class RichFormat extends BaseFormat {
             'errorUrl' => 'https://docs.vanillaforums.com/help/addons/rich-editor/#why-is-my-published-post-replaced-with-there-was-an-error-rendering-this-rich-post',
         ];
 
-        return $this->renderTwig('resources/userContentError', $data);
+        return $this->renderTwig('resources/views/userContentError.twig', $data);
     }
 }

@@ -130,7 +130,7 @@
     @return $property $global-default_easing $duration;
 }
 
-@mixin tilesContainer($colNum: 6, $margin: $utility-medium_padding) {
+@mixin tilesContainer($colNum: 6, $margin: $utility-baseUnitDouble) {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
@@ -138,7 +138,7 @@
     margin-left: -#{$margin / 2};
 }
 
-@mixin tilesColumns($colNum: 6, $margin: $utility-medium_padding) {
+@mixin tilesColumns($colNum: 6, $margin: $utility-baseUnitDouble) {
     width: calc(#{100% / $colNum} - #{$margin});
     margin-left: #{$margin / 2};
     margin-right: #{$margin / 2};
@@ -167,6 +167,7 @@
 @mixin listItem {
     padding-top: $component-base_padding;
     padding-bottom: $component-base_padding;
+    background: $component_bg;
 
     @if $component_lateralBorder == true {
         padding-left: $component-base_padding;
@@ -175,8 +176,6 @@
         padding-left: 0;
         padding-right: 0;
     }
-
-    background: $component_bg;
 
     @if $component-item_spacing == 0 {
         border-top: $component_border;
@@ -194,11 +193,12 @@
         }
 
         &:last-child {
+            border-bottom: $component_border;
+
             @if $component_lateralBorder == true {
                 border-bottom-left-radius: $component_borderRadius;
                 border-bottom-right-radius: $component_borderRadius;
             }
-            border-bottom: $component_border;
         }
 
     } @else {
@@ -308,7 +308,7 @@
             }
 
             .Wrap {
-                padding: 0 $utility-small_padding;
+                padding: 0 $utility-baseUnitHalf;
 
                 @include maxWidth {
                     padding: 0;
@@ -761,10 +761,6 @@
         height: 100vh;
         overflow: hidden;
     }
-}
-
-.PageTitle {
-    margin-bottom: $utility-large_padding;
 }
 
 @mixin defaultTransition($properties...) {

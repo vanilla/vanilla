@@ -6,6 +6,7 @@
 
 import React from "react";
 import { Switch, RouteComponentProps, withRouter } from "react-router-dom";
+import { Location, Action } from "history";
 
 interface IProps extends RouteComponentProps<{}> {
     modalRoutes: React.ReactNode[];
@@ -26,6 +27,16 @@ class ModalRouter extends React.Component<IProps> {
             </React.Fragment>
         );
     }
+
+    public componentDidMount() {
+        this.props.history.listen(this.onHistoryUpdate);
+    }
+
+    private onHistoryUpdate = (location: Location, action: Action) => {
+        if (action === "PUSH") {
+            window.scrollTo(0, 0);
+        }
+    };
 
     private get lastLocation() {
         return this.props.location.state.lastLocation;

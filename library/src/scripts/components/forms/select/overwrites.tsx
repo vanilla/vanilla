@@ -125,7 +125,7 @@ export function SelectOption(props: OptionProps<any>) {
     return (
         <li className="suggestedTextInput-item">
             <button
-                {...props.innerProps}
+                {...props.innerProps as any}
                 type="button"
                 className={classNames("suggestedTextInput-option", {
                     isSelected,

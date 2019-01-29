@@ -27,7 +27,7 @@ class RichFormat extends BaseFormat {
     use TwigRenderTrait;
     use StaticCacheTranslationTrait;
 
-    const FORMAT_KEY = "rich";
+    const FORMAT_KEY = "Rich";
 
     /** @var string */
     const RENDER_ERROR_MESSAGE = 'There was an error rendering this rich post.';
@@ -202,6 +202,6 @@ class RichFormat extends BaseFormat {
             'errorUrl' => 'https://docs.vanillaforums.com/help/addons/rich-editor/#why-is-my-published-post-replaced-with-there-was-an-error-rendering-this-rich-post',
         ];
 
-        return $this->renderTwig('resources/userContentError', $data);
+        return $this->renderTwig('resources/views/userContentError.twig', $data);
     }
 }

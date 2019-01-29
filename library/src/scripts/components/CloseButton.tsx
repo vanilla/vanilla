@@ -32,32 +32,18 @@ export default class CloseButton extends React.PureComponent<IProps> {
      */
     public render() {
         const closeLabel = this.props.title ? this.props.title : t("Close");
-
-        if (this.props.legacyMode) {
-            const componentClasses = classNames("Close", this.props.className);
-            const closeChar = `×`;
-            return (
-                <button type="button" title={closeLabel} onClick={this.props.onClick} className={componentClasses}>
-                    <span className="Close-x" aria-hidden="true">
-                        {closeChar}
-                    </span>
-                    <span className="sr-only">{closeLabel}</span>
-                </button>
-            );
-        } else {
-            const componentClasses = classNames("buttonClose", this.props.className);
-            return (
-                <Button
-                    disabled={this.props.disabled}
-                    type="button"
-                    className={componentClasses}
-                    title={closeLabel}
-                    onClick={this.props.onClick}
-                    baseClass={this.props.baseClass}
-                >
-                    {close()}
-                </Button>
-            );
-        }
+        const componentClasses = classNames("buttonClose", this.props.className);
+        return (
+            <Button
+                disabled={this.props.disabled}
+                type="button"
+                className={componentClasses}
+                title={closeLabel}
+                onClick={this.props.onClick}
+                baseClass={this.props.baseClass}
+            >
+                {close()}
+            </Button>
+        );
     }
 }

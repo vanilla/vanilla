@@ -14,7 +14,7 @@ $flyout_fg:                             $global-color_grey !default;
 $flyout_borderColor:                    mix($flyout_fg, $flyout_bg, 24%) !default;
 $flyout_border:                         $global-border-width $global-border-style $flyout_borderColor !default;
 $flyoutOverlay-border_color:            mix($flyout_fg, $flyout_bg, 10%) !default;
-$flyout_borderRadius:                   $formButton_borderRadius !default;
+$flyout_borderRadius:                   $global_borderRadius !default;
 
 $flyout-link_color:                     $flyout_fg !default;
 $flyout-link-hover_color:               $link-default-hover_color !default;
@@ -366,7 +366,7 @@ $flyout-progress_size:                  24px !default;
     .Subject,
     .Excerpt,
     .ItemContent {
-        line-height: $global-excerpt_lineHeight;
+        line-height: $global-base_lineHeight;
     }
 
     .Meta {

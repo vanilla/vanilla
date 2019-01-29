@@ -74,6 +74,7 @@ export default class LoadingBlot extends FocusableEmbedBlot {
                 progressEventEmitter={value.loaderData.progressEventEmitter}
             />,
             div,
+            () => div.classList.remove(FOCUS_CLASS),
         );
         return div;
     }

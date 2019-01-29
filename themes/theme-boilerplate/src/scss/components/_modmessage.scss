@@ -9,10 +9,10 @@
 \* -------------------------------------------------------------- */
 
 .DismissMessage {
-    margin: 0 0 $utility-medium_padding;
+    margin: 0 0 $utility-baseUnitDouble;
     @include font-style-base;
     border-radius: $component_borderRadius;
-    padding: $utility-baseUnit $utility-medium_padding;
+    padding: $utility-baseUnit $utility-baseUnitDouble;
 }
 
 a.Dismiss.Dismiss {

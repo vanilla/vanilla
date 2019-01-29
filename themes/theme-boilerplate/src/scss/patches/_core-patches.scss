@@ -41,16 +41,17 @@ body {
     }
 }
 
-.DataList,
-.MessageList {
-    .Item,
-    .Item.Read {
-        background-color: transparent;
-        border: 0;
-    }
+.DataList .Item {
+    border-bottom-width: 0;
+}
+
+.Item .Author a {
+    font-size: inherit;
+    font-weight: inherit;
 }
 
 .Item {
+
     .BlockTitle {
         font-size: inherit;
     }
@@ -145,12 +146,33 @@ body {
     max-width: 100%;
 }
 
-.PageTitle .Options {
+.Options {
     height: initial;
 
-    .Bookmark {
-        margin-left: $utility-small_padding;
+    > span,
+    > a {
+        margin-left: $utility-baseUnitHalf;
     }
+}
+
+.BlockTitle {
+    padding: 0;
+}
+
+.AdminCheck {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: $icon-default_size;
+    width: $icon-default_size;
+
+    input {
+        margin: 0;
+    }
+}
+
+.PageTitle .Options {
+    height: auto;
 }
 
 .ItemDiscussion {
@@ -167,7 +189,7 @@ body {
 }
 
 .CreateAccount {
-    margin-top: $utility-medium_padding;
+    margin-top: $utility-baseUnitDouble;
 }
 
 .idea-counter-box,
@@ -272,14 +294,14 @@ table.PreferenceGroup th {
 .Popup #UserBadgeForm {
     p,
     h1 {
-        margin-bottom: $utility-medium_padding;
+        margin-bottom: $utility-baseUnitDouble;
         display: block;
     }
 
     textarea {
         display: block;
         width: 100%;
-        margin-top: $utility-small_padding;
+        margin-top: $utility-baseUnitHalf;
     }
 
     button {
@@ -311,12 +333,29 @@ table.PreferenceGroup th {
     font-weight: inherit;
 }
 
+.PanelInfo li {
+    border-bottom-width: 0;
+}
+
+.Box {
+    margin: $utility-baseUnitDouble 0;
+}
+
+#Panel .FilterMenu li:first-child,
+.PanelInfo li:first-child {
+  border-top-width: 0;
+}
+
 .SocialIcon .Text {
-    padding: 0 0 0 $utility-small_padding;
+    padding: 0 0 0 $utility-baseUnitHalf;
     font-weight: $formButton_fontWeight;
     font-size: $formButton_fontSize;
     line-height: $formButton_height;
     min-height: $formButton_height;
+}
+
+.PageDescription {
+    margin: 0;
 }
 
 // Fix connection page of profile
@@ -339,7 +378,7 @@ table.PreferenceGroup th {
     .Connection-Name {
         flex: 1;
         min-width: 200px;
-        margin: $utility-medium_padding 0;
+        margin: $utility-baseUnitDouble 0;
 
         @include maxWidth {
             flex: initial;
@@ -361,7 +400,7 @@ table.PreferenceGroup th {
         .ProfilePhoto {
             height: 30px;
             width: 30px;
-            margin-right: $utility-medium_padding;
+            margin-right: $utility-baseUnitDouble;
         }
     }
 }

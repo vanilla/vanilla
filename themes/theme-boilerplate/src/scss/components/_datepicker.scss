@@ -10,16 +10,21 @@
 
 $datepicker_bg:                             $global-color_white !default;
 $datepicker-hover_bg:                       darken($global-color_white, 7%) !default;
-$datepicker_color:                          $global-color_black !default;
+$datepicker_fg:                             $global-color_grey !default;
 
-$datepicker-link_color:                     $global-color_primary !default;
-$datepicker-link-hover_color:               $global-color_primaryAlt !default;
+$datepicker-date_fg:                        $button-basic_fg !default;
+$datepicker-date_bg:                        $button-basic_bg !default;
+$datepicker-date_borderColor:               $button-basic_border !default;
+
+$datepicker-date-hover_fg:                  $button-basic-hover_fg !default;
+$datepicker-date-hover_bg:                  $button-basic-hover_bg !default;
+$datepicker-date-hover_borderColor:         $button-basic-hover_border !default;
 
 $datepicker-link-alt_color:                 $global-color_secondary !default;
 $datepicker-link-altHover_color:            darken($global-color_secondary, 8%) !default;
 
 $datepicker_border:                         1px solid $theme-border_color !default;
-$datepicker_borderRadius:                   $global_borderRadius !default;
+$datepicker_borderRadius:                   3px !default;
 $datepicker_boxShadow:                      1px 1px 4px rgba($global-color_black, 0.2) !default;
 
 /* -------------------------------------------------------------- *\
@@ -29,7 +34,7 @@ $datepicker_boxShadow:                      1px 1px 4px rgba($global-color_black
 
 .ui-datepicker {
     border-radius: $datepicker_borderRadius;
-    color: $datepicker_color;
+    color: $datepicker_fg;
     background-color: $datepicker_bg;
 
     td a {
@@ -37,14 +42,17 @@ $datepicker_boxShadow:                      1px 1px 4px rgba($global-color_black
     }
 
     a {
-        color: inherit;
         border-radius: $datepicker_borderRadius;
-        background-color: $datepicker-hover_bg;
+        color: $datepicker-date_fg;
+        background-color: $datepicker-date_bg;
+        border: 1px solid $datepicker-date_borderColor;
 
         &:focus,
-        &:hover {
-            background-color: $datepicker-link_color;
-            color: $datepicker_bg;
+        &:hover,
+        &:active {
+            color: $datepicker-date-hover_fg;
+            background-color: $datepicker-date-hover_bg;
+            border: 1px solid $datepicker-date-hover_borderColor;
         }
     }
 
@@ -53,14 +61,13 @@ $datepicker_boxShadow:                      1px 1px 4px rgba($global-color_black
     }
 
     .ui-datepicker-today a {
-        border: 1px solid $datepicker-link_color;
-        color: $datepicker-link_color;
+        background-color: rgba(0,0,0, 0.03);
     }
 
     .ui-datepicker-current-day a {
-        background-color: $datepicker-link_color;
-        border: 1px solid $datepicker-link_color;
-        color: $global-color_white;
+        color: $datepicker-date-hover_fg;
+        background-color: $datepicker-date-hover_bg;
+        border-color: $datepicker-date-hover_borderColor;
     }
 
     .ui-datepicker-header {
@@ -81,6 +88,7 @@ $datepicker_boxShadow:                      1px 1px 4px rgba($global-color_black
         height: auto;
         white-space: nowrap;
         color: $component-meta-link_color;
+        border-width: 0;
         width: 24px;
         display: flex;
         justify-content: center;
@@ -88,6 +96,7 @@ $datepicker_boxShadow:                      1px 1px 4px rgba($global-color_black
 
         &:focus,
         &:hover {
+            border-width: 0;
             background-color: transparent;
             cursor: pointer;
             color: $component-meta-link-hover_color;

@@ -12,6 +12,7 @@ $panelLayout-twoColumn_breakpoint                                     : $global-
 $panelLayout-oneColumn_breakpoint                                     : $panelLayout-twoColumn_breakpoint - $global-panel_paddedWidth !default;
 
 $panelLayout-border_color                                             : rgba($global-border_color, .4) !default;
+$panelLayout-topPadding                                               : $global_gutter_halfSize * 1.5;
 
 $panelLayout-panelAndSpacingWidth                                     : $global-panel_paddedWidth + $global-gutter_size;
 

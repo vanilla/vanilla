@@ -59,3 +59,13 @@ export interface INavigationItem {
 export interface INavigationTreeItem extends INavigationItem {
     children: INavigationTreeItem[];
 }
+
+export interface ILinkGroup {
+    category: INavigationItem;
+    items: INavigationItem[];
+}
+
+export interface ILinkListData {
+    groups: ILinkGroup[];
+    ungroupedItems: INavigationItem[];
+}

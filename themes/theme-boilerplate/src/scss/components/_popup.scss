@@ -9,10 +9,10 @@
 \* -------------------------------------------------------------- */
 
 $popup_bg:                             $global-color_white !default;
-$popup_color:                          lighten(desaturate($global-color_primary, 90%), 8%) !default;
+$popup_fg:                             $global-color_grey !default;
 $popup-link_color:                     $global-color_primary !default;
 $popup-link-hover_color:               $global-color_primaryAlt !default;
-$popup_borderColor:                    rgba($popup_color, 0.8) !default;
+$popup_borderColor:                    rgba($popup_fg, 0.8) !default;
 $popup_border:                         1px solid $popup_borderColor !default;
 $popup_borderRadius:                   $global_borderRadius !default;
 $popup_boxShadow:                      0 1px 3px 0px rgba($global-color_black, 0.4) !default;
@@ -36,7 +36,7 @@ div.Popup {
         background-color: $popup_bg;
         box-shadow: 0 1px 3px 0px rgba($global-color_black, 0.4);
         border-radius: $popup_borderRadius;
-        color: $popup_color;
+        color: $popup_fg;
 
         .FormWrapper {
             padding: 0;
@@ -63,11 +63,10 @@ div.Popup {
         .WarningMessage {
             background-color: mix($global-color_warning, $popup_bg, 10%);
             border-color: $global-color_warning;
-            color: $popup_color;
+            color: $popup_fg;
         }
 
-        .Buttons .Close,
-        .Button.Danger {
+        .Buttons .Close {
 
             &:focus,
             &:hover {
@@ -87,13 +86,28 @@ div.Popup {
     }
 
     a.Close {
-        @include CloseButton($popup_color);
+        @include CloseButton($popup_fg);
     }
 
     .Buttons {
         > *:first-child {
-            margin-right: $utility-small_padding;
+            margin-right: $utility-baseUnitHalf;
         }
+    }
+
+    .Button.change-picture-new {
+        @include Button(
+            $button-primary_bg,
+            $button-primary_fg,
+            $button-primary_border,
+            $button-primary-hover_bg,
+            $button-primary-hover_fg,
+            $button-primary-hover_border
+        );
+    }
+
+    .Button.change-picture-remove {
+        @include Button;
     }
 }
 
@@ -102,7 +116,7 @@ div.Popup {
     background-color: $popup_bg !important;
     box-shadow: 0 1px 3px 0px rgba($global-color_black, 0.4) !important;
     border-radius: $popup_borderRadius;
-    color: $popup_color !important;
+    color: $popup_fg !important;
     text-shadow: none;
 
     a {
@@ -110,9 +124,9 @@ div.Popup {
     }
 
     .Close {
-        @include CloseButton($popup_color);
+        @include CloseButton($popup_fg);
         display: flex !important;
-        margin: $utility-xSmall_padding;
+        margin: $utility-baseUnitHalf;
         font-size: $icon-default_size !important;
     }
 }

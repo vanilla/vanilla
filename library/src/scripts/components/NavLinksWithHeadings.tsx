@@ -30,7 +30,7 @@ export default class NavLinksWithHeadings extends Component<IProps> {
         if (ungrouped.length !== 0 || grouped.length !== 0) {
             const ungroupedContent = <NavLinks title={t("Overview")} items={ungrouped} />;
             const groupedContent = grouped.map(group => {
-                return <NavLinks items={group.items} title={group.category.name} />;
+                return <NavLinks items={group.items} title={group.category.name} url={group.category.url} />;
             });
 
             return (

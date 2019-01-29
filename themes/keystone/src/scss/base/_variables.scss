@@ -376,7 +376,11 @@ $formButton_border:                      1px solid !default;
     Searchbox Featured
 \* -------------------------------------------------------------- */
 
-$SearchboxFeatured_size:                 48px !default;
+$SearchboxFeaturedBtn_fg:                 $global-color_white !default;
+$SearchboxFeaturedBtn_bg:                 transparent !default;
+$SearchboxFeatured_height:                40px !default;
+$SearchboxFeatured_width:                 673px !default;
+$SearchboxFeatured_border:                1px solid $global-color_white !default;
 
 /* -------------------------------------------------------------- *\
     Breakpoints

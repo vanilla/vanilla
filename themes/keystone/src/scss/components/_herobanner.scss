@@ -56,40 +56,65 @@ $herobanner_fg:                                   $global-color_white !default;
     }
 
     .SearchBox {
-
-        max-width: 700px;
-        margin: 0 auto;
+        max-width: $SearchboxFeatured_width;
 
         .Handle {
             display: none;
         }
 
         @include minWidth {
-
-            .AdvancedSearch .BigInput,
-            #Form_Search {
-                height: $SearchboxFeatured_size;
-                padding-left: $global-subTitle_fontSize;
-                font-size: $global-subTitle_fontSize;
-            }
-
-            .bwrap > .Button,
-            #Form_Go {
-                border-width: 0;
-                height: $SearchboxFeatured_size;
-                width: $SearchboxFeatured_size;
-            }
+            margin: 0 auto;
+            font-size: $global-large_fontSize;
 
             form > div::after {
-                font-size: $global-subTitle_fontSize;
-                height: $SearchboxFeatured_size;
-                width: $SearchboxFeatured_size;
-                line-height: $SearchboxFeatured_size;
+                display: none;
             }
         }
 
         @include maxWidth {
             margin-top: $utility-large_padding;
+            margin-bottom: 0;
+        }
+    }
+
+    @include minWidth {
+
+        .InputAndButton {
+            display: flex;
+        }
+
+        .AdvancedSearch .BigInput,
+        #Form_Search {
+            border: $SearchboxFeatured_border;
+            padding: $formElement_paddingVertical $formElement_paddingHorizontal;
+            height: $SearchboxFeatured_height;
+            line-height: $SearchboxFeatured_height;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+
+            &:focus,
+            &:active {
+                border: $SearchboxFeatured_border;
+            }
+        }
+
+        .bwrap > .Button,
+        #Form_Go {
+            border: $SearchboxFeatured_border;
+            background-color: $SearchboxFeaturedBtn_bg;
+            color: $SearchboxFeaturedBtn_fg;
+            height: $SearchboxFeatured_height;
+            line-height: $SearchboxFeatured_height;
+            padding: 0 $utility-baseUnitDouble;
+            min-width: 110px;
+            width: auto;
+            position: static;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+
+            &::before {
+                content: attr(title);
+            }
         }
     }
 }

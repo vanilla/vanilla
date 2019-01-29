@@ -118,6 +118,20 @@ $searchbox-button_borderWidth: 0 !default;
     color: transparent;
 }
 
+.SearchForm .InputBox {
+    border-radius: $formElement_borderRadius;
+}
+
+.SiteSearch .Button {
+    color: transparent;
+
+    &:hover,
+    &:focus,
+    &:active {
+        color: transparent;
+    }
+}
+
 .SearchBox {
     width: 100%;
     margin-bottom: $utility-large_padding;

@@ -66,11 +66,11 @@ class KeystoneThemeHooks extends Gdn_Plugin {
         $sender->setData('hasAdvancedSearch', $hasAdvancedSearch);
 
         //unset config ThemeOptions.Options.hasFeatureSearchbox if AdvancedSearchPlugin is disabled
-        if (!$hasAdvancedSearch) {
-            saveToConfig([
-                'Garden.ThemeOptions.Options.hasFeatureSearchbox' => false,
-            ]);
-        }
+//        if (!$hasAdvancedSearch) {
+//            saveToConfig([
+//                'Garden.ThemeOptions.Options.hasFeatureSearchbox' => false,
+//            ]);
+//        }
 
         //set ThemeOptions to smarty
         $themeOptions = c("Garden.ThemeOptions");
@@ -106,7 +106,7 @@ class KeystoneThemeHooks extends Gdn_Plugin {
             echo    '</li>';
 
             //Only render this field if AdvancedSearchPlugin == true
-            if ($hasAdvancedSearch) {
+            //if ($hasAdvancedSearch) {
                 echo    '<li class="form-group">';
                 echo        $sender->Form->toggle(
                     "ThemeOptions.Options.hasFeatureSearchbox",
@@ -115,7 +115,7 @@ class KeystoneThemeHooks extends Gdn_Plugin {
                     t("Change searchbox's position to display over Hero Banner. \"Hero Image\" plugin needs to be enabled for this option to work properly.")
                 );
                 echo    '</li>';
-            }
+            //}
         }
 
         echo    '<li class="form-group">';

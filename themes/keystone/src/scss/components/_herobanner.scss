@@ -66,8 +66,12 @@ $herobanner_fg:                                   $global-color_white !default;
             margin: 0 auto;
             font-size: $global-large_fontSize;
 
-            form > div::after {
-                display: none;
+            form > div {
+                display: flex;
+
+                &::after {
+                    display: none;
+                }
             }
         }
 

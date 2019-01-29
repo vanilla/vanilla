@@ -96,8 +96,9 @@ $global_borderRadius:                   6px !default;
 
 $global-body_bg:                        $global-color_bg !default;
 
-$link-default_color:                    $global-color_fg !default;
-$link-default-hover_color:              $global-color_primary !default;
+$link-default_color:                    $global-color_primary !default;
+$link-default-hover_color:              $global-color_primaryAlt !default;
+$link-default_visited_color:            $global-color_primary !default;
 
 
 /* -------------------------------------------------------------- *\
@@ -292,7 +293,7 @@ $panel-item_fg:                          $link-default_color !default;
 $panel-item_border:                      none !default;
 
 $panel-item-hover_bg:                    transparent !default;
-$panel-item-hover_fg:                    $link-default_hover_color !default;
+$panel-item-hover_fg:                    $global-color_primary !default;
 $panel-item-hover_borderColor:           transparent !default;
 
 /* -------------------------------------------------------------- *\
@@ -372,10 +373,24 @@ $formButton_borderRadius:                $formElement_borderRadius !default;
 $formButton_border:                      1px solid !default;
 
 /* -------------------------------------------------------------- *\
+    HeroBanner
+\* -------------------------------------------------------------- */
+
+$herobanner_height:                       370px !default;
+$herobanner_bg:                           #3F3E46 !default;
+$herobanner_fg:                           $global-color_white !default;
+$herobanner_dropShadow:                   0 0 1px $global-color_fg !default;
+$herobanner_bgFilter:                     0.75 !default;
+
+/* -------------------------------------------------------------- *\
     Searchbox Featured
 \* -------------------------------------------------------------- */
 
-$SearchboxFeatured_size:                 48px !default;
+$SearchboxFeaturedBtn_fg:                 $global-color_white !default;
+$SearchboxFeaturedBtn_bg:                 transparent !default;
+$SearchboxFeatured_height:                40px !default;
+$SearchboxFeatured_width:                 673px !default;
+$SearchboxFeatured_border:                1px solid $global-color_white !default;
 
 /* -------------------------------------------------------------- *\
     Breakpoints

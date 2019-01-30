@@ -50,7 +50,9 @@ $subcommunityTile_spacing                 : 24px;
 }
 
 .subcommunityTile-iconFrame {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     height: $subcommunityTile-imageFrame_height;
     width: $subcommunityTile-imageFrame_height;

@@ -327,7 +327,7 @@ export function knowledgeBaseNoIcon(className?: string) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 51 17"
+            viewBox="0 0 50 69"
             className={classNames("icon", "icon-knowledgeBase", className)}
             aria-hidden="true"
         >

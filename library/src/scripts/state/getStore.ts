@@ -22,7 +22,9 @@ const actionSanitizer = (action: AnyAction) =>
           }
         : action;
 // Browser may have redux dev tools installed, if so integrate with it.
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({ actionSanitizer }) || compose;
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({ actionSanitizer })
+    : compose;
 const enhancer = composeEnhancers(applyMiddleware(...middleware));
 
 // Build the store, add devtools extension support if it's available.

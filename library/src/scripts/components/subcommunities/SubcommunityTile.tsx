@@ -17,6 +17,7 @@ interface IProps {
     url: string;
     className?: string;
     headingLevel?: 2 | 3 | 4 | 5 | 6;
+    fallbackIcon: React.ReactNode;
 }
 
 /**
@@ -37,6 +38,7 @@ export default class SubcommunityTile extends React.Component<IProps> {
                     <div className="subcommunityTile">
                         <div className="subcommunityTile-iconFrame">
                             {icon && <img className="subcommunityTile-icon" src={icon} alt={alt} />}
+                            {!icon && this.props.fallbackIcon}
                         </div>
                         <H className="subcommunityTile-title">{title}</H>
                         {description && <Paragraph className="subcommunityTile-description">{description}</Paragraph>}

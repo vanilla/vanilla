@@ -38,7 +38,7 @@ export default class HeaderLogo extends React.Component<IHeaderLogo> {
         }
         return (
             <SmartLink to={this.props.to || "/kb"} className={classNames("headerLogo", this.props.className)}>
-                {contents}
+                <span className="headerLogo-logoFrame">{contents}</span>
             </SmartLink>
         );
     }

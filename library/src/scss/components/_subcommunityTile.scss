@@ -43,6 +43,10 @@ $subcommunityTile_spacing                 : 24px;
         left: $subcommunityTile_horizontalPadding;
     }
 
+    &:hover {
+        @include shadow-embed-hover;
+    }
+
 }
 
 .subcommunityTitle-main {

@@ -676,7 +676,7 @@ class PostController extends VanillaController {
             $FormValues = $this->Form->formValues();
 
             if ($FormValues['DiscussionID'] !== $DiscussionID) {
-                throw new Exception('PostID mismatch.');
+                throw new Exception('DiscussionID mismatch.');
             }
 
             $filters = ['Score'];

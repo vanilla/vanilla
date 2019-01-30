@@ -677,7 +677,7 @@ class PocketsPlugin extends Gdn_Plugin {
      */
     public function structure() {
         // Pocket class isn't autoloaded on Enable.
-        require_once('library/class.pocket.php');
+        require_once('library/Pocket.php');
 
         $St = Gdn::structure();
         $St->table('Pocket')

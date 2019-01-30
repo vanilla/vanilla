@@ -11,3 +11,5 @@ Normal
 ```
 
 >! Spoiler
+
+[spoiler]Legacy Spoiler[/spoiler]

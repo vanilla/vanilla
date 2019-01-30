@@ -13,7 +13,7 @@ const SearchContext = React.createContext<IWithSearchProps>({} as any);
 export default SearchContext;
 
 export interface ISearchOptionProvider {
-    autocomplete(query: string): Promise<Array<IComboBoxOption<ISearchOptionData>>>;
+    autocomplete(query: string, options?: { [key: string]: any }): Promise<Array<IComboBoxOption<ISearchOptionData>>>;
     makeSearchUrl(query: string): string;
 }
 

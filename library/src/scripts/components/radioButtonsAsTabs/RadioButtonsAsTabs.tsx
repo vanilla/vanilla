@@ -15,7 +15,7 @@ interface IProps {
     className?: string;
     setData: (data: any) => void;
     children: React.ReactNode;
-    defaultTab: any;
+    activeTab: string | number;
     childClass?: string;
 }
 
@@ -36,7 +36,7 @@ export default class RadioButtonsAsTabs extends React.Component<IProps> {
                 value={{
                     groupID: this.groupID,
                     setData: this.props.setData,
-                    defaultTab: this.props.defaultTab,
+                    activeTab: this.props.activeTab,
                     childClass: this.props.childClass || "",
                 }}
             >

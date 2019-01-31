@@ -5,4 +5,6 @@
  */
 
 import { IHeaderLogo } from "../pieces/HeaderLogo";
-export const dummyLogoData: IHeaderLogo = {}; // We don't yet have the ability to customize the logo
+export const dummyLogoData: IHeaderLogo = {
+    to: "/kb",
+}; // We don't yet have the ability to customize the logo

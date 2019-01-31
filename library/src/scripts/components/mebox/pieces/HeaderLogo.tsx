@@ -11,7 +11,7 @@ import SmartLink from "@library/components/navigation/SmartLink";
 
 export interface IHeaderLogo {
     className?: string;
-    to?: string;
+    to: string;
     logoUrl?: string;
     logoClassName?: string;
     alt?: string;
@@ -37,7 +37,7 @@ export default class HeaderLogo extends React.Component<IHeaderLogo> {
             contents = vanillaLogo(logoClassName, this.props.color);
         }
         return (
-            <SmartLink to={this.props.to || "/kb"} className={classNames("headerLogo", this.props.className)}>
+            <SmartLink to={this.props.to} className={classNames("headerLogo", this.props.className)}>
                 <span className="headerLogo-logoFrame">{contents}</span>
             </SmartLink>
         );

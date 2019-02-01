@@ -28,6 +28,10 @@ import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeader
 import { signIn } from "@library/components/icons";
 import VanillaHeaderListItem from "@library/components/mebox/pieces/VanillaHeaderListItem";
 import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
+import vanillaHeaderStyles from "@library/components/headers/VanillaHeaderStyles";
+import { style } from "typestyle";
+import { percent, px } from "csx";
+import { layoutStyles } from "@library/styles/layoutStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -60,11 +64,42 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
             countClass: classNames(countClass, "vanillaHeader-messagesCount"),
         };
 
+        const headerStyles = vanillaHeaderStyles();
+        const mediaQueries = layoutStyles().mediaQueries();
+
         return ReactDOM.createPortal(
-            <header className={classNames("vanillaHeader", "vanillaHeaderHome", this.props.className)}>
+            <header
+                className={classNames(
+                    "vanillaHeader",
+                    "vanillaHeaderHome",
+                    style({ minHeight: px(parseInt(headerStyles.sizing.mobile.height.toString(), 10) * 2) }),
+                    this.props.className,
+                )}
+            >
                 <Container className="vanillaHeaderHome-top">
                     <PanelWidgetHorizontalPadding>
-                        <div className="vanillaHeader-bar isHome">
+                        <div
+                            className={classNames(
+                                "vanillaHeader-bar",
+                                "isHome",
+                                style(
+                                    {
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        flexWrap: "nowrap",
+                                        alignItems: "center",
+                                        height: headerStyles.sizing.height,
+                                        width: percent(100),
+                                        $nest: {
+                                            "&.isHome": {
+                                                justifyContent: "space-between",
+                                            },
+                                        },
+                                    },
+                                    mediaQueries.oneColumn({ height: headerStyles.sizing.mobile.height }),
+                                ),
+                            )}
+                        >
                             <FlexSpacer className="vanillaHeaderHome-left" />
                             <HeaderLogo
                                 {...dummyLogoData}

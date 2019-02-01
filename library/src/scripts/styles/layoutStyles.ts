@@ -6,7 +6,7 @@
 import { px } from "csx";
 import { media } from "typestyle";
 
-export const layout = () => {
+export const layoutStyles = () => {
     const gutterSize = 24;
     const gutter = {
         size: px(gutterSize),

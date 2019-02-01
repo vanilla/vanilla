@@ -52,30 +52,30 @@
         }
     }
 
-    @include mediaQuery-panelLayout_oneColumn {
-        height: $vanillaHeader_mobile_height;
-    }
+    //@include mediaQuery-panelLayout_oneColumn {
+    //    height: $vanillaHeader_mobile_height;
+    //}
 }
 
-.vanillaHeaderHome {
-    min-height: $vanillaHeader_mobile_height * 2;
-}
+//.vanillaHeaderHome {
+//    min-height: $vanillaHeader_mobile_height * 2;
+//}
 
 .vanillaHeader-bar {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: nowrap;
-    align-items: center;
-    height: $vanillaHeader_height;
-    width: 100%;
+    //display: flex;
+    //justify-content: space-between;
+    //flex-wrap: nowrap;
+    //align-items: center;
+    //height: $vanillaHeader_height;
+    //width: 100%;
 
-    &.isHome {
-        justify-content: space-between;
-    }
+    //&.isHome {
+    //    justify-content: space-between;
+    //}
 
-    @include mediaQuery-panelLayout_oneColumn {
-        height: $vanillaHeader_mobile_height;
-    }
+    //@include mediaQuery-panelLayout_oneColumn {
+    //    height: $vanillaHeader_mobile_height;
+    //}
 }
 
 .vanillaHeader-logoContainer {

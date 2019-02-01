@@ -33,7 +33,7 @@ import { t } from "@library/application";
 import { ScrollOffsetContext } from "@library/contexts/ScrollOffsetContext";
 import { style } from "typestyle";
 import vanillaHeaderStyles from "@library/components/headers/VanillaHeaderStyles";
-import { layout } from "@library/styles/layout";
+import { layoutStyles } from "@library/styles/layoutStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -93,7 +93,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         };
         const headerStyles = vanillaHeaderStyles();
         const headerColors = headerStyles.colors;
-        const mediaQueries = layout().mediaQueries();
+        const mediaQueries = layoutStyles().mediaQueries();
 
         return ReactDOM.createPortal(
             <>

@@ -466,9 +466,14 @@ $vanillaHeader_mobile_height                        : 44px !default;
 $vanillaHeader_fg                                   : $global-color_bg !default;
 $vanillaHeader_bg                                   : $global-color_primary !default;
 $vanillaHeader-spacer_width                         : 12px;
+
 $vanillaHeader-button_borderRadius                  : 3px;
 $vanillaHeader-button_size                          : 40px;
+
 $vanillaMenu-guest_spacer                           : 8px !default;
+
+
+
 $vanillaMenu-signIn_bg                              : getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%) !default;
 $vanillaMenu-signIn_bg_hover                        : getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 20%) !default;
 $vanillaMenu-register_bg                            : $global-color_bg !default;

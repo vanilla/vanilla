@@ -4,21 +4,26 @@
  * @license GPL-2.0-only
  */
 
-$vanillaHeader-count_size: 18px;
-$vanillaHeader-count_fontSize: 10px;
-$vanillaHeader-count_bg: #D0021B;
-$vanillaHeader-count_fg: $vanillaHeader_fg;
+//$vanillaHeader-count_size: 18px;
+//$vanillaHeader-count_fontSize: 10px;
+//$vanillaHeader-count_bg: #D0021B;
+//$vanillaHeader-count_fg: $vanillaHeader_fg;
 
-$vanillaHeader-dropDownContents_minWidth: 350px;
-$vanillaHeader-button_mobile_fontSize: 16px;
+//$vanillaHeader-dropDownContents_minWidth: 350px;
 
-$vanillaHeader-endElements_flexBasis: $vanillaHeader-button_size * 4;
-$vanillaHeader-endElements_mobile_flexBasis: $vanillaHeader-button_size * 2;
+//$vanillaHeader-button_mobile_fontSize: 16px;
 
-$vanillaHeader-compactSearch_maxWidth: 672px;
+//$vanillaHeader-endElements_flexBasis: $vanillaHeader-button_size * 4;
+//$vanillaHeader-endElements_mobile_flexBasis: $vanillaHeader-button_size * 2;
 
-$vanillaHeader-buttonContents_hover_bg: getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%) !default;
-$vanillaHeader-buttonContents_active_bg: getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%, true) !default;
+//$vanillaHeader-compactSearch_maxWidth: 672px;
+//
+//$vanillaHeader-buttonContents_hover_bg: getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%) !default;
+//$vanillaHeader-buttonContents_active_bg: getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%, true) !default;
+
+
+
+
 
 .vanillaHeader-spacer {
     height: $vanillaHeader_height;

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 import get from "lodash/get";
-import { color } from "csx";
+import { color, ColorHelper } from "csx";
 import { globals } from "@library/styles/globals";
 
 /*
@@ -21,8 +21,8 @@ export const getVar = (haystack: {}, key: string, fallback: string | number) => 
  * @param flip - By default we darken light colours and lighten darks, but if you want to get the opposite result, use this param
  */
 export const getColorDependantOnLightness = (
-    referenceColor: string,
-    colorToModify: string,
+    referenceColor: ColorHelper,
+    colorToModify: ColorHelper,
     percentage: number,
     flip: boolean = false,
 ) => {
@@ -33,13 +33,12 @@ export const getColorDependantOnLightness = (
     const black = core.elementaryColors.black;
     const white = core.elementaryColors.white;
     const mixAmount = percentage / 10;
-    const initialColor = color(colorToModify);
 
-    if (initialColor.lightness() >= 0.5 && !flip) {
+    if (colorToModify.lightness() >= 0.5 && !flip) {
         // Lighten color
-        return initialColor.mix(black, mixAmount);
+        return colorToModify.mix(black, mixAmount);
     } else {
         // Darken color
-        return initialColor.mix(white, mixAmount);
+        return colorToModify.mix(white, mixAmount);
     }
 };

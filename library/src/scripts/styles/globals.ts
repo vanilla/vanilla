@@ -30,12 +30,16 @@ export const globals = (globalColorsOverwrite = {}, bodyOverwrite = {}, borderOv
 
     const errorFg = color("#ff3933");
     const warning = color("#ffce00");
+    const deleted = color("#D0021B");
     const feedbackColors = {
         warning,
-        "error.fg": errorFg,
-        "error.bg": errorFg.mix(mainColors.bg, 10),
+        error: {
+            fg: errorFg,
+            bg: errorFg.mix(mainColors.bg, 10),
+        },
         confirm: color("#60bd68"),
         unresolved: warning.mix(mainColors.fg, 10),
+        deleted,
     };
 
     const body = {

@@ -37,7 +37,7 @@ class InstanceValidatorSchema extends Schema {
      */
     public function validator($value, ValidationField $field) {
         if (!($value instanceof $this->className)) {
-            $field->addTypeError($this->className);
+            $field->addError(get_class($value) . ' is not an instanceof ' . $this->className);
 
             return false;
         }

@@ -117,6 +117,8 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->inlineScripts[] = new PhpAsJsVariable('__ACTIONS__', $this->reduxActions);
         $this->addMetaTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
         $viewData = [
+            'title' => $this->seoTitle,
+            'description' => $this->seoDescription,
             'canonicalUrl' => $this->canonicalUrl,
             'locale' => $this->siteMeta->getLocaleKey(),
             'debug' => $this->siteMeta->getDebugModeEnabled(),
@@ -255,13 +257,19 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /**
      * Render and set the SEO page content.
      *
-     * @param string $viewPath The path to the view to render.
-     * @param array $viewData The data to render the view with.
+     * @param string $viewPathOrView The path to the view to render or the rendered view.
+     * @param array $viewData The data to render the view if we gave a path.
      *
      * @return self Own instance for chaining.
      */
-    protected function setSeoContent(string $viewPath, array $viewData): self {
-        $this->seoContent = $this->renderTwig($viewPath, $viewData);
+    protected function setSeoContent(string $viewPathOrView, array $viewData = null): self {
+        // No view data so assume the view is rendered already.
+        if ($viewData === null) {
+            $this->seoContent = $viewPathOrView;
+            return $this;
+        }
+
+        $this->seoContent = $this->renderTwig($viewPathOrView, $viewData);
 
         return $this;
     }

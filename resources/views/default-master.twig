@@ -43,13 +43,18 @@
             <div id="app" class="page-minHeight">
             {%- if seoContent -%}
                 <noscript>
-
-                    <h1>
-                        {{- title -}}
-                    </h1>
-
-                    {{- seoContent }}
-
+                    <style>
+                        body.isLoading {
+                            max-height: initial;
+                            height: initial;
+                        }
+                    </style>
+                    <div class="noScriptContainer">
+                        <h1 class="heading heading-1 pageTitle">
+                            {{- title -}}
+                        </h1>
+                        {{- seoContent|raw }}
+                    </div>
                 </noscript>
             {%- endif -%}
 

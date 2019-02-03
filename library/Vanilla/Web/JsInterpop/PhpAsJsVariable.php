@@ -10,7 +10,7 @@ namespace Vanilla\Web\JsInterpop;
 /**
  * Class that handles rendering an PHP object or array in a javascript context.
  */
-class PHPAsJsVariable {
+class PhpAsJsVariable {
 
     /** @var string */
     private $variableName;

@@ -12,10 +12,9 @@ use Garden\Web\Data;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Contracts\Web\AssetInterface;
 use Vanilla\InjectableInterface;
-use Vanilla\Knowledge\Models\Breadcrumb;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Web\Asset\WebpackAssetProvider;
-use Vanilla\Web\JsInterpop\PHPAsJsVariable;
+use Vanilla\Web\JsInterpop\PhpAsJsVariable;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\JsInterpop\ReduxErrorAction;
 
@@ -35,7 +34,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /** @var string */
     private $seoDescription;
 
-    /** @var Breadcrumb[]|null */
+    /** @var array|null */
     private $seoBreadcrumbs;
 
     /** @var string|null */
@@ -112,10 +111,10 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     public function render(): Data {
         $this->validateSeo();
 
-        $this->inlineScripts[] = new PHPAsJsVariable('gdn', [
+        $this->inlineScripts[] = new PhpAsJsVariable('gdn', [
             'meta' => $this->siteMeta,
         ]);
-        $this->inlineScripts[] = new PHPAsJsVariable('__ACTIONS__', $this->reduxActions);
+        $this->inlineScripts[] = new PhpAsJsVariable('__ACTIONS__', $this->reduxActions);
         $this->addMetaTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
         $viewData = [
             'canonicalUrl' => $this->canonicalUrl,

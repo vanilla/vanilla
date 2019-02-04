@@ -126,21 +126,21 @@ class AddonsTest extends AbstractAPIv2Test {
      */
     public function testAddonModelPluginManagerInterop() {
         // Enable via the API.
-        $this->api()->patch('/addons/buttonbar', ['enabled' => true]);
-        $this->assertPluginEnabled('buttonbar', true);
+        $this->api()->patch('/addons/profileextender', ['enabled' => true]);
+        $this->assertPluginEnabled('profileextender', true);
 
         // Disable via plugin manager.
         $pm = \Gdn::pluginManager();
-        $pm->disablePlugin('buttonbar');
-        $this->assertPluginEnabled('buttonbar', false);
+        $pm->disablePlugin('profileextender');
+        $this->assertPluginEnabled('profileextender', false);
 
         // Enable via plugin manager.
-        $pm->enablePlugin('buttonbar', new \Gdn_Validation());
-        $this->assertPluginEnabled('buttonbar', true);
+        $pm->enablePlugin('profileextender', new \Gdn_Validation());
+        $this->assertPluginEnabled('profileextender', true);
 
         // Disable via API.
-        $this->api()->patch('/addons/buttonbar', ['enabled' => false]);
-        $this->assertPluginEnabled('buttonbar', false);
+        $this->api()->patch('/addons/profileextender', ['enabled' => false]);
+        $this->assertPluginEnabled('profileextender', false);
     }
 
     /**

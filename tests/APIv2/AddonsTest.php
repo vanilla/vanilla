@@ -20,7 +20,7 @@ class AddonsTest extends AbstractAPIv2Test {
     ];
 
     private $coreThemes = [
-        'EmbedFriendly', 'bittersweet', 'default', 'mobile', // themes
+        'EmbedFriendly', 'bittersweet', 'default', 'mobile', 'keystone',  // themes
     ];
 
     private $hiddenAddons = [
@@ -105,10 +105,10 @@ class AddonsTest extends AbstractAPIv2Test {
      */
     public function testChangeTheme() {
         $desktop = $this->api()->get('/addons', ['type' => 'theme', 'enabled' => true, 'themeType' => 'desktop'])[0];
-        $this->assertEquals('default-theme', $desktop['addonID']);
+        $this->assertEquals('keystone-theme', $desktop['addonID']);
 
         $mobile = $this->api()->get('/addons', ['type' => 'theme', 'enabled' => true, 'themeType' => 'mobile'])[0];
-        $this->assertEquals('mobile-theme', $mobile['addonID']);
+        $this->assertEquals('keystone-theme', $mobile['addonID']);
 
         // Set the desktop and mobile theme.
         $this->api()->patch('/addons/bittersweet-theme', ['enabled' => true, 'themeType' => 'desktop']);

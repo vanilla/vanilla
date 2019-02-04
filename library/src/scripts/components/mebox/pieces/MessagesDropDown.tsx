@@ -18,7 +18,7 @@ import get from "lodash/get";
 import { IConversation, IUserFragment, GetConversationsExpand } from "@library/@types/api";
 import ConversationsActions from "@library/conversations/ConversationsActions";
 import apiv2 from "@library/apiv2";
-import VanillaHeaderStyles from "@library/components/headers/VanillaHeaderStyles";
+import VanillaHeaderStyles from "@library/components/headers/vanillaHeaderStyles";
 
 interface IProps extends IMessagesContentsProps {
     actions: ConversationsActions;
@@ -57,7 +57,7 @@ export class MessagesDropDown extends React.Component<IProps, IState> {
                 buttonClassName={classNames("vanillaHeader-messages", classes.messages, this.props.buttonClassName)}
                 renderLeft={true}
                 contentsClassName={this.props.contentsClassName}
-                toggleButtonClassName="vanillaHeader-button"
+                toggleButtonClassName={classNames("vanillaHeader-button", classes.button)}
                 buttonContents={
                     <MessagesToggle
                         open={this.state.open}

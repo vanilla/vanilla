@@ -160,114 +160,113 @@
     //    white-space: nowrap;
     //}
 //}
-
-.vanillaHeader-localeToggle {
-    height: $vanillaHeader_height;
-
-    @include mediaQuery-panelLayout_oneColumn {
-        height: $vanillaHeader_mobile_height;
-    }
-}
-
-.vanillaHeader-languages {
-    margin-left: auto;
-}
-
-
-.vanillaHeader-button {
-    position: relative;
-    color: $vanillaHeader_fg;
-    height: $vanillaHeader_height;
-    min-width: $vanillaHeader-button_size;
-    padding: 0;
-
-    &:active,
-    &:hover,
-    &.focus-visible {
-        .meBox-contentHover,
-        .meBox-buttonContent {
-            border-radius: $vanillaHeader-button_borderRadius;
-            background-color: $vanillaHeader-buttonContents_hover_bg;
-        }
-    }
-
-    &.isOpen {
-        .meBox-contentHover,
-        .meBox-buttonContent {
-            background-color: $vanillaHeader-buttonContents_active_bg;
-        }
-    }
-
-    @include mediaQuery-panelLayout_oneColumn {
-        height: $vanillaHeader_mobile_height;
-    }
-}
+//
+//.vanillaHeader-localeToggle {
+//    height: $vanillaHeader_height;
+//
+//    @include mediaQuery-panelLayout_oneColumn {
+//        height: $vanillaHeader_mobile_height;
+//    }
+//}
+//
+//.vanillaHeader-languages {
+//    margin-left: auto;
+//}
 
 
-.vanillaHeader-searchCancel {
-    &.focus-visible {
-        .meBox-contentHover {
-            border-radius: $vanillaHeader-button_borderRadius;
-            background-color: $vanillaHeader-buttonContents_hover_bg;
-        }
-    }
-}
+//.vanillaHeader-button {
+    //position: relative;
+    //color: $vanillaHeader_fg;
+    //height: $vanillaHeader_height;
+    //min-width: $vanillaHeader-button_size;
+    //padding: 0;
+
+    //&:active,
+    //&:hover,
+    //&.focus-visible {
+    //    .meBox-contentHover,
+    //    .meBox-buttonContent {
+    //        border-radius: $vanillaHeader-button_borderRadius;
+    //        background-color: $vanillaHeader-buttonContents_hover_bg;
+    //    }
+    //}
+
+    //&.isOpen {
+    //    .meBox-contentHover,
+    //    .meBox-buttonContent {
+    //        background-color: $vanillaHeader-buttonContents_active_bg;
+    //    }
+    //}
+
+    //@include mediaQuery-panelLayout_oneColumn {
+    //    height: $vanillaHeader_mobile_height;
+    //}
+//}
 
 
-.vanillaHeader-buttonContent {
-    @include flexCenterContent;
-    pointer-events: none;
-}
+//.vanillaHeader-searchCancel {
+//    &.focus-visible {
+//        .meBox-contentHover {
+//            border-radius: $vanillaHeader-button_borderRadius;
+//            background-color: $vanillaHeader-buttonContents_hover_bg;
+//        }
+//    }
+//}
+//
+// MISSING?
+//.vanillaHeader-buttonContent {
+//    @include flexCenterContent;
+//    pointer-events: none;
+//}
+//.vanillaHeader-tabButton {
+    //display: block;
+    //height: 100%;
+    //padding: 0;
+//    &:active,
+//    &:hover,
+//    &:focus {
+//        color: $global-color_primary;
+//        .vanillaHeader-tabButtonContent {
+//            color: $vanillaHeader_fg;
+//            background-color: rgba(#000, .1);
+//            border-radius: $vanillaHeader-button_borderRadius;
+//        }
+//    }
+//}
 
+//.vanillaHeader-tabButtonContent {
+//    height: $vanillaHeader_mobile_height;
+//    width: $vanillaHeader_mobile_height;
+//}
 
-.vanillaHeader-tabButton {
-    display: block;
-    height: 100%;
-    padding: 0;
+// MISSING?
+//.vanillaHeader-searchCancel {
+    //height: $formElement_height;
+    //user-select: none;
+//}
 
-    &:active,
-    &:hover,
-    &:focus {
-        color: $global-color_primary;
-        .vanillaHeader-tabButtonContent {
-            color: $vanillaHeader_fg;
-            background-color: rgba(#000, .1);
-            border-radius: $vanillaHeader-button_borderRadius;
-        }
-    }
-}
+// MISSING?
+//.vanillaHeader-user {
+//    position: relative;
+//    height: $vanillaHeader-button_size;
+//    width: $vanillaHeader-button_size;
+//    overflow: hidden;
+//}
 
-.vanillaHeader-tabButtonContent {
-    height: $vanillaHeader_mobile_height;
-    width: $vanillaHeader_mobile_height;
-}
+//.dropDown-contents.vanillaHeader-dropDownContents {
+//    min-width: $vanillaHeader-dropDownContents_minWidth;
+//}
 
-.vanillaHeader-searchCancel {
-    height: $formElement_height;
-    user-select: none;
-}
+//.vanillaHeader-button {
+//    @include flexCenterContent;
+//}
 
-.vanillaHeader-user {
-    position: relative;
-    height: $vanillaHeader-button_size;
-    width: $vanillaHeader-button_size;
-    overflow: hidden;
-}
-
-.dropDown-contents.vanillaHeader-dropDownContents {
-    min-width: $vanillaHeader-dropDownContents_minWidth;
-}
-
-.vanillaHeader-button {
-    @include flexCenterContent;
-}
-
-.vanillaHeader-count {
-    height: $vanillaHeader-count_size;
-    font-size: $vanillaHeader-count_fontSize;
-    background-color: $vanillaHeader-count_bg;
-    color: $vanillaHeader-count_fg;
-}
+//.vanillaHeader-count {
+//    height: $vanillaHeader-count_size;
+//    font-size: $vanillaHeader-count_fontSize;
+//    background-color: $vanillaHeader-count_bg;
+//    color: $vanillaHeader-count_fg;
+//}
 
 // Home - Mobile
 

@@ -5,13 +5,14 @@
  */
 
 import { color, percent, px } from "csx";
-import { globals } from "@library/styles/globals";
+import { globalVariables } from "@library/styles/globals";
 import { getColorDependantOnLightness } from "@library/styles/styleHelpers";
 import { layoutStyles } from "@library/styles/layoutStyles";
 import { style } from "typestyle";
+import { formElementsVariables } from "@library/components/forms/formElementStyles";
 
 export function vanillaHeaderVariables() {
-    const globalVars = globals();
+    const globalVars = globalVariables();
 
     const sizing = {
         height: 48,
@@ -33,7 +34,7 @@ export function vanillaHeaderVariables() {
     const buttonSize = 40;
     const button = {
         borderRadius: 3,
-        size: px(buttonSize),
+        size: buttonSize,
         mobile: {
             fontSize: 16,
         },
@@ -47,18 +48,18 @@ export function vanillaHeaderVariables() {
     };
 
     const dropDownContents = {
-        minWidth: px(350),
+        minWidth: 350,
     };
 
     const endElements = {
-        flexBasis: px(buttonSize * 4),
+        flexBasis: buttonSize * 4,
         mobile: {
-            flexBasis: px(buttonSize * 2),
+            flexBasis: buttonSize * 2,
         },
     };
 
     const compactSearch = {
-        maxWidth: px(672),
+        maxWidth: 672,
     };
 
     const buttonContents = {
@@ -99,7 +100,9 @@ export function vanillaHeaderVariables() {
 }
 
 export default function vanillaHeaderClasses() {
+    const globalVars = globalVariables();
     const vars = vanillaHeaderVariables();
+    const formElementVars = formElementsVariables();
     const headerColors = vars.colors;
     const mediaQueries = layoutStyles().mediaQueries();
 
@@ -118,11 +121,11 @@ export default function vanillaHeaderClasses() {
             },
         },
         mediaQueries.oneColumn({
-            height: vars.sizing.height.toString(),
+            height: px(vars.sizing.height),
         }),
     );
 
-    const spacer = style({ height: vars.sizing.height });
+    const spacer = style({ height: px(vars.sizing.height) });
 
     const bar = style(
         {
@@ -130,7 +133,7 @@ export default function vanillaHeaderClasses() {
             justifyContent: "space-between",
             flexWrap: "nowrap",
             alignItems: "center",
-            height: vars.sizing.height,
+            height: px(vars.sizing.height),
             width: percent(100),
             $nest: {
                 "&.isHome": {
@@ -138,7 +141,7 @@ export default function vanillaHeaderClasses() {
                 },
             },
         },
-        mediaQueries.oneColumn({ height: vars.sizing.mobile.height }),
+        mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }),
     );
 
     const logoContainer = style(
@@ -159,7 +162,7 @@ export default function vanillaHeaderClasses() {
                 },
             },
         },
-        mediaQueries.oneColumn({ height: vars.sizing.mobile.height }),
+        mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }),
     );
 
     const meBox = style({
@@ -175,7 +178,7 @@ export default function vanillaHeaderClasses() {
 
     const locales = style(
         {
-            height: vars.sizing.height,
+            height: px(vars.sizing.height),
             $nest: {
                 "&.buttonAsText": {
                     $nest: {
@@ -189,7 +192,7 @@ export default function vanillaHeaderClasses() {
                 },
             },
         },
-        mediaQueries.oneColumn({ height: vars.sizing.mobile.height }),
+        mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }),
     );
 
     const messages = style({
@@ -217,6 +220,117 @@ export default function vanillaHeaderClasses() {
         }),
     );
 
+    const localeToggle = style(
+        {
+            height: px(vars.sizing.height),
+        },
+        mediaQueries.oneColumn({
+            height: px(vars.sizing.mobile.height),
+        }),
+    );
+
+    const languages = style({
+        marginLeft: "auto",
+    });
+
+    const meBoxStateStyles = {
+        borderRadius: px(vars.button.borderRadius),
+    };
+
+    const button = style(
+        {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexWrap: "nowrap",
+            color: vars.colors.fg.toString(),
+            height: px(vars.sizing.height),
+            minWidth: px(vars.button.size),
+            padding: 0,
+            $nest: {
+                "&:active": {
+                    $nest: {
+                        ".meBox-contentHover": meBoxStateStyles,
+                        ".meBox-buttonContent": meBoxStateStyles,
+                    },
+                },
+                "&:hover": {
+                    $nest: {
+                        ".meBox-contentHover": meBoxStateStyles,
+                        ".meBox-buttonContent": meBoxStateStyles,
+                    },
+                },
+                "&.focus-visible": {
+                    $nest: {
+                        ".meBox-contentHover": meBoxStateStyles,
+                        ".meBox-buttonContent": meBoxStateStyles,
+                    },
+                },
+                "&.isOpen": {
+                    $nest: {
+                        ".meBox-contentHover": {
+                            backgroundColor: vars.buttonContents.active.bg.toString(),
+                        },
+                        ".meBox-buttonContent": {
+                            backgroundColor: vars.buttonContents.active.bg.toString(),
+                        },
+                    },
+                },
+            },
+        },
+        mediaQueries.oneColumn({
+            height: px(vars.sizing.mobile.height),
+        }),
+    );
+
+    const searchCancel = style({
+        height: px(formElementVars.sizing.height),
+        userSelect: "none",
+        $nest: {
+            "&.focus-visible": {
+                $nest: {
+                    "&.meBox-contentHover": {
+                        borderRadius: px(vars.button.borderRadius),
+                        backgroundColor: vars.buttonContents.hover.bg.toString(),
+                    },
+                },
+            },
+        },
+    });
+
+    const tabButtonActive = {
+        color: globalVars.mainColors.primary.toString(),
+        $nest: {
+            ".vanillaHeader-tabButtonContent": {
+                color: vars.colors.fg.toString(),
+                backgroundColor: getColorDependantOnLightness(vars.colors.fg, vars.colors.bg, 1).toString(),
+                borderRadius: px(vars.button.borderRadius),
+            },
+        },
+    };
+
+    const tabButton = style({
+        display: "block",
+        height: percent(100),
+        padding: 0,
+        $nest: {
+            "&:active": tabButtonActive,
+            "&:hover": tabButtonActive,
+            "&:focus": tabButtonActive,
+        },
+    });
+
+    const dropDownContents = style({
+        minWidth: px(vars.dropDownContents.minWidth),
+    });
+
+    const count = {
+        height: px(vars.count.size),
+        fontSize: px(vars.count.fontSize),
+        backgroundColor: vars.count.bg.toString(),
+        color: vars.count.fg.toString(),
+    };
+
     return {
         root,
         spacer,
@@ -229,6 +343,13 @@ export default function vanillaHeaderClasses() {
         notifications,
         compactSearch,
         topElement,
+        localeToggle,
+        languages,
+        button,
+        searchCancel,
+        tabButton,
+        dropDownContents,
+        count,
     };
 }
 
@@ -237,7 +358,7 @@ export function vanillaHeaderLogoClasses() {
     const logoFrame = style({ display: "inline-flex" });
     const logo = style({
         display: "block",
-        height: `calc(${vars.sizing.height} - 18px}`,
+        height: px(vars.sizing.height - 18),
         width: "auto",
         $nest: {
             "&.isCentred": {

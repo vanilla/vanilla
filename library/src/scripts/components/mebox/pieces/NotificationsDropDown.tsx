@@ -19,7 +19,7 @@ import NotificationsActions from "@library/notifications/NotificationsActions";
 import { INotificationsStoreState } from "@library/notifications/NotificationsModel";
 import get from "lodash/get";
 import { INotification } from "@library/@types/api";
-import vanillaHeaderClasses from "@library/components/headers/VanillaHeaderStyles";
+import vanillaHeaderClasses from "@library/components/headers/vanillaHeaderStyles";
 
 interface IProps extends INotificationsProps {
     buttonClassName?: string;

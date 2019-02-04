@@ -9,6 +9,7 @@ import { t } from "@library/application";
 import { notifications } from "@library/components/icons/header";
 import Count from "@library/components/mebox/pieces/Count";
 import classNames from "classnames";
+import vanillaHeaderClasses from "@library/components/headers/vanillaHeaderStyles";
 
 interface IProps {
     count?: number;
@@ -23,12 +24,13 @@ interface IProps {
 export default class NotificationsToggle extends React.PureComponent<IProps> {
     public render() {
         const count = this.props.count ? this.props.count : 0;
+        const classes = vanillaHeaderClasses();
         return (
             <div className={classNames("meBox-buttonContent", this.props.className)}>
                 {notifications(!!this.props.open)}
                 {count > 0 && (
                     <Count
-                        className={classNames("vanillaHeader-count", this.props.countClass)}
+                        className={classNames("vanillaHeader-count", this.props.countClass, classes.count)}
                         label={t("Notifications: ")}
                         count={this.props.count}
                     />

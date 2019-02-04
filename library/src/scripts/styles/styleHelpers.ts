@@ -4,7 +4,7 @@
  */
 import get from "lodash/get";
 import { color, ColorHelper } from "csx";
-import { globals } from "@library/styles/globals";
+import { globalVariables } from "@library/styles/globals";
 
 /*
  * Helper function to get variable with fallback
@@ -26,7 +26,7 @@ export const getColorDependantOnLightness = (
     percentage: number,
     flip: boolean = false,
 ) => {
-    const core = globals();
+    const core = globalVariables();
     if (percentage > 100 || percentage < 0) {
         throw new Error("mixAmount must be a value between 0 and 100 inclusively.");
     }

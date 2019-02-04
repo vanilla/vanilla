@@ -5,7 +5,7 @@
 
 import { color, percent, px } from "csx";
 
-export const globals = (globalColorsOverwrite = {}, bodyOverwrite = {}, borderOverwrite = {}) => {
+export const globalVariables = (globalColorsOverwrite = {}, bodyOverwrite = {}, borderOverwrite = {}) => {
     const colorPrimary = color("#0291db");
 
     const utility = {
@@ -55,5 +55,9 @@ export const globals = (globalColorsOverwrite = {}, bodyOverwrite = {}, borderOv
         ...borderOverwrite,
     };
 
-    return { utility, elementaryColors, mainColors, feedbackColors, body, border };
+    const mixBgAndFg = weight => {
+        return mainColors.fg.mix(mainColors.bg, weight);
+    };
+
+    return { utility, elementaryColors, mainColors, feedbackColors, body, border, mixBgAndFg };
 };

@@ -31,7 +31,7 @@ import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeader
 import { withPages, IWithPagesProps } from "@library/contexts/PagesContext";
 import { t } from "@library/application";
 import { ScrollOffsetContext } from "@library/contexts/ScrollOffsetContext";
-import vanillaHeaderClasses from "@library/components/headers/VanillaHeaderStyles";
+import vanillaHeaderClasses from "@library/components/headers/vanillaHeaderStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -75,20 +75,20 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const isMobile = this.props.device === Devices.MOBILE;
         const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
         const countClass = "vanillaHeader-count";
-        const buttonClass = "vanillaHeader-button";
-        const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
         const classes = vanillaHeaderClasses();
+        const buttonClass = `vanillaHeader-button ${classes.button}`;
+        const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
 
         const notificationProps: INotificationsProps = {
             data: [],
             userSlug: currentUser!.name,
-            countClass: classNames(countClass, "vanillaHeader-notificationsCount"),
+            countClass: classNames(countClass, classes.count, "vanillaHeader-notificationsCount"),
         };
 
         const messagesProps = {
             ...dummyMessagesData,
             buttonClass,
-            countClass: classNames(countClass, "vanillaHeader-messagesCount"),
+            countClass: classNames(countClass, classes.count, "vanillaHeader-messagesCount"),
         };
 
         return ReactDOM.createPortal(
@@ -111,7 +111,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                         isMobile && (
                                             <BackLink
                                                 className="vanillaHeader-leftFlexBasis vanillaHeader-backLink"
-                                                linkClassName="vanillaHeader-button"
+                                                linkClassName={classes.button}
                                                 fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
                                             />
                                         )}
@@ -161,9 +161,10 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                 cancelButtonClassName={classNames(
                                                     "vanillaHeader-searchCancel",
                                                     classes.topElement,
+                                                    classes.searchCancel,
                                                 )}
                                                 cancelContentClassName="meBox-contentHover"
-                                                buttonClass="vanillaHeader-button"
+                                                buttonClass={classes.button}
                                                 showingSuggestions={this.state.showingSuggestions}
                                                 onOpenSuggestions={this.setOpenSuggestions}
                                                 onCloseSuggestions={this.setCloseSuggestions}
@@ -208,16 +209,25 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                         notificationsProps={notificationProps}
                                                         messagesProps={messagesProps as any}
                                                         counts={dummyUserDropDownData}
-                                                        buttonClassName="vanillaHeader-button"
-                                                        contentClassName="vanillaHeader-dropDownContents"
+                                                        buttonClassName={classes.button}
+                                                        contentClassName={classNames(
+                                                            "vanillaHeader-dropDownContents",
+                                                            classes.dropDownContents,
+                                                        )}
                                                     />
                                                 )}
                                                 {isMobile &&
                                                     !this.state.openSearch && (
                                                         <CompactMeBox
-                                                            className={"vanillaHeader-button"}
+                                                            className={classNames(
+                                                                "vanillaHeader-button",
+                                                                classes.button,
+                                                            )}
                                                             counts={dummyUserDropDownData}
-                                                            buttonClass="vanillaHeader-tabButton"
+                                                            buttonClass={classNames(
+                                                                "vanillaHeader-tabButton",
+                                                                classes.tabButton,
+                                                            )}
                                                             userPhotoClass="headerDropDown-user"
                                                         />
                                                     )}

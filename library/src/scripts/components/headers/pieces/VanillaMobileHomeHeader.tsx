@@ -29,7 +29,7 @@ import { signIn } from "@library/components/icons";
 import VanillaHeaderListItem from "@library/components/mebox/pieces/VanillaHeaderListItem";
 import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
 import { style } from "typestyle";
-import vanillaHeaderClasses from "@library/components/headers/VanillaHeaderStyles";
+import vanillaHeaderClasses from "@library/components/headers/vanillaHeaderStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -89,7 +89,7 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                             ) : (
                                 <CompactMeBox
                                     counts={dummyUserDropDownData}
-                                    buttonClass="vanillaHeader-button"
+                                    buttonClass={classNames("vanillaHeader-button", classes.button)}
                                     userPhotoClass="headerDropDown-user"
                                 />
                             )}
@@ -109,7 +109,11 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                                     {...dummyOtherLanguagesData}
                                     renderLeft={true}
                                     className={classNames("vanillaHeader-locales", classes.locales)}
-                                    buttonClassName={classNames("vanillaHeader-localeToggle", classes.topElement)}
+                                    buttonClassName={classNames(
+                                        "vanillaHeader-localeToggle",
+                                        classes.topElement,
+                                        classes.localeToggle,
+                                    )}
                                     buttonBaseClass={ButtonBaseClass.CUSTOM}
                                     widthOfParent={false}
                                     openAsModal={isMobile}

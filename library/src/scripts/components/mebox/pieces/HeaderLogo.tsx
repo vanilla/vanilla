@@ -8,7 +8,7 @@ import * as React from "react";
 import classNames from "classnames";
 import { vanillaLogo } from "@library/components/icons/header";
 import SmartLink from "@library/components/navigation/SmartLink";
-import vanillaHeaderLogoClasses from "@library/components/headers/VanillaHeaderStyles";
+import vanillaHeaderLogoClasses from "@library/components/headers/vanillaHeaderStyles";
 
 export interface IHeaderLogo {
     className?: string;

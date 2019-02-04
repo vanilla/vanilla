@@ -29,7 +29,7 @@ import { signIn } from "@library/components/icons";
 import VanillaHeaderListItem from "@library/components/mebox/pieces/VanillaHeaderListItem";
 import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
 import { style } from "typestyle";
-import vanillaHeaderClasses from "@library/components/headers/vanillaHeaderStyles";
+import vanillaHeaderClasses, { vanillaHeaderHomeClasses } from "@library/components/headers/vanillaHeaderStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -44,6 +44,7 @@ interface IProps extends IDeviceProps, IInjectableUserState {
 export class VanillaMobileHomeHeader extends React.Component<IProps> {
     private resultsRef: React.RefObject<HTMLDivElement> = React.createRef();
     public render() {
+        const headerHomeClasses = vanillaHeaderHomeClasses();
         const currentUser = this.props.currentUser.data;
         const isMobile = this.props.device === Devices.MOBILE;
         const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
@@ -63,13 +64,22 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
         };
 
         const classes = vanillaHeaderClasses();
+        const classesHome = vanillaHeaderHomeClasses();
 
         return ReactDOM.createPortal(
-            <header className={classNames("vanillaHeader", "vanillaHeaderHome", classes.root, this.props.className)}>
+            <header
+                className={classNames(
+                    "vanillaHeader",
+                    "vanillaHeaderHome",
+                    classes.root,
+                    classesHome.root,
+                    this.props.className,
+                )}
+            >
                 <Container className="vanillaHeaderHome-top">
                     <PanelWidgetHorizontalPadding>
                         <div className={classNames("vanillaHeader-bar", "isHome", classes.bar)}>
-                            <FlexSpacer className="vanillaHeaderHome-left" />
+                            <FlexSpacer className={classNames("vanillaHeaderHome-left", classesHome.left)} />
                             <HeaderLogo
                                 {...dummyLogoData}
                                 className={classNames(
@@ -96,8 +106,8 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                         </div>
                     </PanelWidgetHorizontalPadding>
                 </Container>
-                <div className="vanillaHeaderHome-bottom">
-                    <div className="vanillaHeader-horizontalScroll">
+                <div className={classNames("vanillaHeaderHome-bottom", headerHomeClasses.bottom)}>
+                    <div className={classNames("vanillaHeader-horizontalScroll", classes.horizontalScroll)}>
                         <VanillaHeaderNav
                             {...dummyNavigationData}
                             linkClassName={classNames("vanillaHeader-navLink", classes.topElement)}

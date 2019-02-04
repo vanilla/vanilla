@@ -5,6 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globals";
+import { mixBgAndFg } from "@library/styles/styleHelpers";
 
 export function formElementsVariables() {
     const vars = globalVariables();
@@ -44,12 +45,12 @@ export function formElementsVariables() {
     };
 
     const colors = {
-        fg: vars.mixBgAndFg(0.8),
+        fg: mixBgAndFg(0.8),
         bg: vars.mainColors.bg,
     };
 
     const placeholder = {
-        color: vars.mixBgAndFg(0.5),
+        color: mixBgAndFg(0.5),
     };
 
     return { sizing, spacing, border, giantInput, largeInput, miniInput, colors, placeholder };

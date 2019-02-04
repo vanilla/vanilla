@@ -13,6 +13,8 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 
 export function vanillaHeaderVariables() {
     const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const mediaQueries = layoutStyles().mediaQueries();
 
     const sizing = {
         height: 48,
@@ -62,6 +64,19 @@ export function vanillaHeaderVariables() {
         maxWidth: 672,
     };
 
+    const compactSearchResults = style(
+        {
+            top: (sizing.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
+            display: "block",
+            position: "relative",
+            margin: "auto",
+            maxWidth: px(compactSearch.maxWidth),
+        },
+        mediaQueries.oneColumn({
+            top: (sizing.mobile.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
+        }),
+    );
+
     const buttonContents = {
         hover: {
             bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 10),
@@ -84,6 +99,10 @@ export function vanillaHeaderVariables() {
         },
     };
 
+    const mobileDropDown = {
+        height: px(sizing.mobile.height),
+    };
+
     return {
         sizing,
         colors,
@@ -96,6 +115,7 @@ export function vanillaHeaderVariables() {
         endElements,
         compactSearch,
         buttonContents,
+        mobileDropDown,
     };
 }
 
@@ -331,6 +351,10 @@ export default function vanillaHeaderClasses() {
         color: vars.count.fg.toString(),
     };
 
+    const horizontalScroll = {
+        overflowX: "auto",
+    };
+
     return {
         root,
         spacer,
@@ -350,6 +374,7 @@ export default function vanillaHeaderClasses() {
         tabButton,
         dropDownContents,
         count,
+        horizontalScroll,
     };
 }
 
@@ -368,4 +393,24 @@ export function vanillaHeaderLogoClasses() {
     });
 
     return { logoFrame, logo };
+}
+
+export function vanillaHeaderHomeClasses() {
+    const vars = vanillaHeaderVariables();
+    const globalVars = globalVariables();
+
+    const root = {
+        minHeight: vars.sizing.mobile.height * 2,
+    };
+
+    const bottom = {
+        backgroundColor: globalVars.mainColors.fg.fade(1).toString(),
+    };
+    const left = {
+        height: px(1),
+        width: px(vars.button.size),
+        flexBasis: vars.button.size,
+    };
+
+    return { root, bottom, left };
 }

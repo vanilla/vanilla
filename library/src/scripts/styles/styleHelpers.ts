@@ -42,3 +42,8 @@ export const getColorDependantOnLightness = (
         return colorToModify.mix(white, mixAmount);
     }
 };
+
+export const mixBgAndFg = weight => {
+    const coreVars = globalVariables();
+    return coreVars.mainColors.fg.mix(coreVars.mainColors.bg, weight);
+};

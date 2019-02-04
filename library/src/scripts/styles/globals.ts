@@ -55,9 +55,5 @@ export const globalVariables = (globalColorsOverwrite = {}, bodyOverwrite = {}, 
         ...borderOverwrite,
     };
 
-    const mixBgAndFg = weight => {
-        return mainColors.fg.mix(mainColors.bg, weight);
-    };
-
-    return { utility, elementaryColors, mainColors, feedbackColors, body, border, mixBgAndFg };
+    return { utility, elementaryColors, mainColors, feedbackColors, body, border };
 };

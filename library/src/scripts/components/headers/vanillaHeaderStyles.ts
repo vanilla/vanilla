@@ -5,11 +5,12 @@
  */
 
 import { color, percent, px } from "csx";
-import { globalVariables } from "@library/styles/globals";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import { getColorDependantOnLightness } from "@library/styles/styleHelpers";
 import { layoutStyles } from "@library/styles/layoutStyles";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { userPhotoVariables } from "@library/styles/userPhotoStyles";
 
 export function vanillaHeaderVariables() {
     const globalVars = globalVariables();
@@ -99,9 +100,9 @@ export function vanillaHeaderVariables() {
         },
     };
 
-    const mobileDropDown = {
+    const mobileDropDown = style({
         height: px(sizing.mobile.height),
-    };
+    });
 
     return {
         sizing,
@@ -123,6 +124,7 @@ export default function vanillaHeaderClasses() {
     const globalVars = globalVariables();
     const vars = vanillaHeaderVariables();
     const formElementVars = formElementsVariables();
+    const userPhotoVars = userPhotoVariables();
     const headerColors = vars.colors;
     const mediaQueries = layoutStyles().mediaQueries();
 
@@ -354,6 +356,23 @@ export default function vanillaHeaderClasses() {
     const horizontalScroll = {
         overflowX: "auto",
     };
+
+    const rightFlexBasis = style(
+        {
+            display: "flex",
+            height: px(vars.sizing.height),
+            flexWrap: "nowrap",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            flexBasis: vars.endElements.flexBasis,
+        },
+        mediaQueries.oneColumn({
+            flexShrink: 1,
+            flexBasis: px(vars.endElements.mobile.flexBasis),
+            height: px(vars.sizing.mobile.height),
+            transform: `translateX(${px(vars.button.size - userPhotoVars.sizing.small / 2)})`, // so the icon is flush with the side margin, but still has the right padding when hovering.
+        }),
+    );
 
     return {
         root,

@@ -4,7 +4,7 @@
  */
 import get from "lodash/get";
 import { color, ColorHelper } from "csx";
-import { globalVariables } from "@library/styles/globals";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
 /*
  * Helper function to get variable with fallback

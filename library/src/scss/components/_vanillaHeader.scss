@@ -308,12 +308,12 @@
 //}
 
 .vanillaHeader-rightFlexBasis {
-    display: flex;
-    height: $vanillaHeader_height;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    align-items: center;
-    flex-basis: $vanillaHeader-endElements_flexBasis;
+    //display: flex;
+    //height: $vanillaHeader_height;
+    //flex-wrap: nowrap;
+    //justify-content: flex-end;
+    //align-items: center;
+    //flex-basis: $vanillaHeader-endElements_flexBasis;
 
     @include mediaQuery-panelLayout_oneColumn {
         flex-shrink: 1;

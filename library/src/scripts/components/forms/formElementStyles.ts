@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globals";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import { mixBgAndFg } from "@library/styles/styleHelpers";
 
 export function formElementsVariables() {

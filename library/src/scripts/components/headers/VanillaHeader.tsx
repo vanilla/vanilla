@@ -142,7 +142,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                     )}
 
                                     <ConditionalWrap
-                                        className="vanillaHeader-rightFlexBasis"
+                                        className={classNames("vanillaHeader-rightFlexBasis", classes.rightFlexBasis)}
                                         condition={!!showMobileDropDown}
                                     >
                                         {this.props.showSearchIcon ? (

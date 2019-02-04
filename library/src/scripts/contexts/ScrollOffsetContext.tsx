@@ -117,6 +117,13 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
         requestAnimationFrame(() => {
             const wiggleRoom = 10;
             const newScrolledValue = window.scrollY;
+
+            // Always show if we are within the initial scrolloffset.
+            if (newScrolledValue < this.state.scrollOffset) {
+                this.setState({ isScrolledOff: false });
+                return;
+            }
+
             const isScrollingDown = newScrolledValue > this.previousScrollValue + wiggleRoom;
             const isScrollingUp = newScrolledValue < this.previousScrollValue - wiggleRoom;
             this.previousScrollValue = window.scrollY;

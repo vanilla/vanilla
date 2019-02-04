@@ -14,7 +14,7 @@ use Garden\Web\Data;
  */
 class ReduxErrorAction extends ReduxAction {
 
-    private const ACTION_TYPE = "@@kbPage/ERROR";
+    private const ACTION_TYPE = "@@serverPage/ERROR";
 
     /**
      * @param \Throwable $throwable The exception to create the error for.

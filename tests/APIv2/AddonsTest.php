@@ -140,7 +140,7 @@ class AddonsTest extends AbstractAPIv2Test {
 
         // Disable via API.
         $this->api()->patch('/addons/profileextender', ['enabled' => false]);
-        $this->assertPluginEnabled('stubcontent', false);
+        $this->assertPluginEnabled('profileextender', false);
     }
 
     /**

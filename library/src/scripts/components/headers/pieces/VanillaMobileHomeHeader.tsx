@@ -79,7 +79,9 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                                 logoClassName="vanillaHeader-logo isCentred"
                             />
                             {isGuest ? (
-                                <VanillaHeaderNav className="vanillaHeader-nav vanillaHeader-guestNav">
+                                <VanillaHeaderNav
+                                    className={classNames("vanillaHeader-nav vanillaHeader-guestNav", classes.nav)}
+                                >
                                     <VanillaHeaderNavItem to={`/entry/signin?target=${window.location.pathname}`}>
                                         {signIn("vanillaHeader-signInIcon")}
                                     </VanillaHeaderNavItem>
@@ -98,16 +100,16 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                     <div className="vanillaHeader-horizontalScroll">
                         <VanillaHeaderNav
                             {...dummyNavigationData}
-                            linkClassName="vanillaHeader-navLink"
+                            linkClassName={classNames("vanillaHeader-navLink", classes.topElement)}
                             linkContentClassName="vanillaHeader-navLinkContent"
-                            className={classNames("vanillaHeader-nav", "isScrolled")}
+                            className={classNames("vanillaHeader-nav", "isScrolled", classes.nav)}
                         >
                             <VanillaHeaderListItem>
                                 <LanguagesDropDown
                                     {...dummyOtherLanguagesData}
                                     renderLeft={true}
-                                    className="vanillaHeader-locales"
-                                    buttonClassName="vanillaHeader-localeToggle"
+                                    className={classNames("vanillaHeader-locales", classes.locales)}
+                                    buttonClassName={classNames("vanillaHeader-localeToggle", classes.topElement)}
                                     buttonBaseClass={ButtonBaseClass.CUSTOM}
                                     widthOfParent={false}
                                     openAsModal={isMobile}

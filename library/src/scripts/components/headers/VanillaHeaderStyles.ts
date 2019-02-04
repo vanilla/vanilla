@@ -14,10 +14,10 @@ export function vanillaHeaderVariables() {
     const globalVars = globals();
 
     const sizing = {
-        height: px(48),
-        spacer: px(12),
+        height: 48,
+        spacer: 12,
         mobile: {
-            height: px(44),
+            height: 44,
         },
     };
 
@@ -62,8 +62,12 @@ export function vanillaHeaderVariables() {
     };
 
     const buttonContents = {
-        hover: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 10),
-        active: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 10, true),
+        hover: {
+            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 10),
+        },
+        active: {
+            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 10, true),
+        },
     };
 
     const signIn = {
@@ -95,8 +99,8 @@ export function vanillaHeaderVariables() {
 }
 
 export default function vanillaHeaderClasses() {
-    const headerStyles = vanillaHeaderVariables();
-    const headerColors = headerStyles.colors;
+    const vars = vanillaHeaderVariables();
+    const headerColors = vars.colors;
     const mediaQueries = layoutStyles().mediaQueries();
 
     const root = style(
@@ -114,11 +118,11 @@ export default function vanillaHeaderClasses() {
             },
         },
         mediaQueries.oneColumn({
-            height: headerStyles.sizing.height.toString(),
+            height: vars.sizing.height.toString(),
         }),
     );
 
-    const spacer = style({ height: headerStyles.sizing.height });
+    const spacer = style({ height: vars.sizing.height });
 
     const bar = style(
         {
@@ -126,7 +130,7 @@ export default function vanillaHeaderClasses() {
             justifyContent: "space-between",
             flexWrap: "nowrap",
             alignItems: "center",
-            height: headerStyles.sizing.height,
+            height: vars.sizing.height,
             width: percent(100),
             $nest: {
                 "&.isHome": {
@@ -134,8 +138,113 @@ export default function vanillaHeaderClasses() {
                 },
             },
         },
-        mediaQueries.oneColumn({ height: headerStyles.sizing.mobile.height }),
+        mediaQueries.oneColumn({ height: vars.sizing.mobile.height }),
     );
 
-    return { root, spacer, bar };
+    const logoContainer = style(
+        {
+            display: "inline-flex",
+            alignSelf: "center",
+            flexBasis: vars.endElements.flexBasis,
+            color: vars.colors.fg.toString(),
+            $nest: {
+                "&.focus-visible": {
+                    $nest: {
+                        "&.headerLogo-logoFrame": {
+                            outline: `5px solid ${vars.buttonContents.hover.bg}`,
+                            background: vars.buttonContents.hover.bg.toString(),
+                            borderRadius: vars.button.borderRadius,
+                        },
+                    },
+                },
+            },
+        },
+        mediaQueries.oneColumn({ height: vars.sizing.mobile.height }),
+    );
+
+    const meBox = style({
+        justifyContent: "flex-end",
+    });
+
+    const nav = style({
+        display: "flex",
+        flexWrap: "wrap",
+        height: percent(100),
+        color: "inherit",
+    });
+
+    const locales = style(
+        {
+            height: vars.sizing.height,
+            $nest: {
+                "&.buttonAsText": {
+                    $nest: {
+                        "&:hover": {
+                            color: "inherit",
+                        },
+                        "&:focus": {
+                            color: "inherit",
+                        },
+                    },
+                },
+            },
+        },
+        mediaQueries.oneColumn({ height: vars.sizing.mobile.height }),
+    );
+
+    const messages = style({
+        color: vars.colors.bg.toString(),
+    });
+
+    const notifications = style({
+        color: "inherit",
+    });
+
+    const compactSearch = style({
+        marginLeft: "auto",
+    });
+
+    const topElement = style(
+        {
+            color: vars.colors.fg.toString(),
+            padding: `0 ${px(vars.sizing.spacer / 2)}`,
+            margin: `0 ${px(vars.sizing.spacer / 2)}`,
+            borderRadius: px(vars.button.borderRadius),
+        },
+        mediaQueries.oneColumn({
+            fontSize: px(vars.button.mobile.fontSize),
+            whiteSpace: "nowrap",
+        }),
+    );
+
+    return {
+        root,
+        spacer,
+        bar,
+        logoContainer,
+        meBox,
+        nav,
+        locales,
+        messages,
+        notifications,
+        compactSearch,
+        topElement,
+    };
+}
+
+export function vanillaHeaderLogoClasses() {
+    const vars = vanillaHeaderVariables();
+    const logoFrame = style({ display: "inline-flex" });
+    const logo = style({
+        display: "block",
+        height: `calc(${vars.sizing.height} - 18px}`,
+        width: "auto",
+        $nest: {
+            "&.isCentred": {
+                margin: "auto",
+            },
+        },
+    });
+
+    return { logoFrame, logo };
 }

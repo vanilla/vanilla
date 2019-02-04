@@ -19,6 +19,7 @@ import NotificationsActions from "@library/notifications/NotificationsActions";
 import { INotificationsStoreState } from "@library/notifications/NotificationsModel";
 import get from "lodash/get";
 import { INotification } from "@library/@types/api";
+import vanillaHeaderClasses from "@library/components/headers/VanillaHeaderStyles";
 
 interface IProps extends INotificationsProps {
     buttonClassName?: string;
@@ -48,11 +49,16 @@ export class NotificationsDropDown extends React.Component<IProps, IState> {
      * @returns A DropDown component, configured to display notifications.
      */
     public render() {
+        const classes = vanillaHeaderClasses();
         return (
             <DropDown
                 id={this.id}
                 name={t("Notifications")}
-                buttonClassName={classNames("vanillaHeader-notifications", this.props.buttonClassName)}
+                buttonClassName={classNames(
+                    "vanillaHeader-notifications",
+                    classes.notifications,
+                    this.props.buttonClassName,
+                )}
                 buttonBaseClass={ButtonBaseClass.CUSTOM}
                 renderLeft={true}
                 contentsClassName={this.props.contentsClassName}

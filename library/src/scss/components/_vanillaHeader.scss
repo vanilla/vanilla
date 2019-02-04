@@ -78,91 +78,88 @@
     //}
 }
 
-.vanillaHeader-logoContainer {
-    display: inline-flex;
-    align-self: center;
-    color: $vanillaHeader_fg;
-    flex-basis: $vanillaHeader-endElements_flexBasis;
+//.vanillaHeader-logoContainer {
+    //display: inline-flex;
+    //align-self: center;
+    //color: $vanillaHeader_fg;
+    //flex-basis: $vanillaHeader-endElements_flexBasis;
 
-    @include mediaQuery-panelLayout_oneColumn {
-        flex-shrink: 1;
-        flex-basis: auto;
-    }
+    //@include mediaQuery-panelLayout_oneColumn {
+    //    flex-shrink: 1;
+    //    flex-basis: auto;
+    //}
+    //
+    //&.focus-visible {
+    //    .headerLogo-logoFrame {
+    //        outline: 5px solid $vanillaHeader-buttonContents_hover_bg;
+    //        background: $vanillaHeader-buttonContents_hover_bg;
+    //        border-radius: $vanillaHeader-button_borderRadius;
+    //    }
+    //}
+//}
 
-    &.focus-visible {
-        .headerLogo-logoFrame {
-            outline: 5px solid $vanillaHeader-buttonContents_hover_bg;
-            background: $vanillaHeader-buttonContents_hover_bg;
-            border-radius: $vanillaHeader-button_borderRadius;
-        }
-    }
-}
+//.headerLogo-logoFrame {
+//    display: inline-flex;
+//}
 
-.headerLogo-logoFrame {
-    display: inline-flex;
-}
+//.headerLogo-logo {
+//    &.isCentred {
+//        margin: auto;
+//    }
+//}
+//
+//.vanillaHeader-meBox {
+//    justify-content: flex-end;
+//}
+//
+//.vanillaHeader-nav {
+//    display: flex;
+//    flex-wrap: wrap;
+//    height: 100%;
+//    color: inherit;
+//}
 
-.headerLogo-logo {
-    &.isCentred {
-        margin: auto;
-    }
-}
+//.vanillaHeader-locales {
+//    height: $vanillaHeader_height;
+//
+//    &.buttonAsText {
+//        &:hover,
+//        &:focus {
+//            color: inherit;
+//        }
+//    }
+//
+//    @include mediaQuery-panelLayout_oneColumn {
+//        height: $vanillaHeader_mobile_height;
+//    }
+//}
+//.vanillaHeader-messages {
+//    color: $global-color_bg;
+//}
 
-.vanillaHeader-meBox {
-    justify-content: flex-end;
-}
-
-.vanillaHeader-nav {
-    display: flex;
-    flex-wrap: wrap;
-    height: 100%;
-    color: inherit;
-}
-
-.vanillaHeader-locales {
-    height: $vanillaHeader_height;
-
-    &.buttonAsText {
-        &:hover,
-        &:focus {
-            color: inherit;
-        }
-    }
-
-    @include mediaQuery-panelLayout_oneColumn {
-        height: $vanillaHeader_mobile_height;
-    }
-}
-
-
-.vanillaHeader-messages {
-    color: $global-color_bg;
-}
-
-.vanillaHeader-notifications {
-    color: inherit;
-}
-
-.vanillaHeader-compactSearch {
-    margin-left: auto;
-}
+//.vanillaHeader-notifications {
+//    color: inherit;
+//}
+//.vanillaHeader-compactSearch {
+//    margin-left: auto;
+//}
 
 
 
-.vanillaHeader-mobileDropDown,
-.vanillaHeader-searchCancel,
-.vanillaHeader-localeToggle,
-.vanillaHeader-navLink {
-    color: $vanillaHeader_fg;
-    padding: 0 $vanillaHeader-spacer_width / 2;
-    margin: 0 $vanillaHeader-spacer_width / 2;
-    border-radius: $vanillaHeader-button_borderRadius;
-
-    @include mediaQuery-panelLayout_oneColumn {
-        font-size: $vanillaHeader-button_mobile_fontSize;
-        white-space: nowrap;
-    }
-}
+//.vanillaHeader-mobileDropDown,
+//.vanillaHeader-searchCancel,
+//.vanillaHeader-localeToggle,
+//.vanillaHeader-navLink {
+    //color: $vanillaHeader_fg;
+    //padding: 0 $vanillaHeader-spacer_width / 2;
+    //margin: 0 $vanillaHeader-spacer_width / 2;
+    //border-radius: $vanillaHeader-button_borderRadius;
+    //
+    //@include mediaQuery-panelLayout_oneColumn {
+    //    font-size: $vanillaHeader-button_mobile_fontSize;
+    //    white-space: nowrap;
+    //}
+//}
 
 .vanillaHeader-localeToggle {
     height: $vanillaHeader_height;

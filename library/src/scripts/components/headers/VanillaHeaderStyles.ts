@@ -4,11 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import { color, px } from "csx";
+import { color, percent, px } from "csx";
 import { globals } from "@library/styles/globals";
 import { getColorDependantOnLightness } from "@library/styles/styleHelpers";
+import { layoutStyles } from "@library/styles/layoutStyles";
+import { style } from "typestyle";
 
-export default function vanillaHeaderStyles() {
+export function vanillaHeaderVariables() {
     const globalVars = globals();
 
     const sizing = {
@@ -90,4 +92,50 @@ export default function vanillaHeaderStyles() {
         compactSearch,
         buttonContents,
     };
+}
+
+export default function vanillaHeaderClasses() {
+    const headerStyles = vanillaHeaderVariables();
+    const headerColors = headerStyles.colors;
+    const mediaQueries = layoutStyles().mediaQueries();
+
+    const root = style(
+        {
+            backgroundColor: headerColors.bg.toString(),
+            color: headerColors.fg.toString(),
+            $nest: {
+                "&isFixed": {
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    zIndex: 1,
+                },
+            },
+        },
+        mediaQueries.oneColumn({
+            height: headerStyles.sizing.height.toString(),
+        }),
+    );
+
+    const spacer = style({ height: headerStyles.sizing.height });
+
+    const bar = style(
+        {
+            display: "flex",
+            justifyContent: "space-between",
+            flexWrap: "nowrap",
+            alignItems: "center",
+            height: headerStyles.sizing.height,
+            width: percent(100),
+            $nest: {
+                "&.isHome": {
+                    justifyContent: "space-between",
+                },
+            },
+        },
+        mediaQueries.oneColumn({ height: headerStyles.sizing.mobile.height }),
+    );
+
+    return { root, spacer, bar };
 }

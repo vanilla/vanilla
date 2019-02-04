@@ -31,9 +31,7 @@ import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeader
 import { withPages, IWithPagesProps } from "@library/contexts/PagesContext";
 import { t } from "@library/application";
 import { ScrollOffsetContext } from "@library/contexts/ScrollOffsetContext";
-import { style } from "typestyle";
-import vanillaHeaderStyles from "@library/components/headers/VanillaHeaderStyles";
-import { layoutStyles } from "@library/styles/layoutStyles";
+import vanillaHeaderClasses from "@library/components/headers/VanillaHeaderStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -79,6 +77,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const countClass = "vanillaHeader-count";
         const buttonClass = "vanillaHeader-button";
         const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
+        const classes = vanillaHeaderClasses();
 
         const notificationProps: INotificationsProps = {
             data: [],
@@ -91,38 +90,14 @@ export class VanillaHeader extends React.Component<IProps, IState> {
             buttonClass,
             countClass: classNames(countClass, "vanillaHeader-messagesCount"),
         };
-        const headerStyles = vanillaHeaderStyles();
-        const headerColors = headerStyles.colors;
-        const mediaQueries = layoutStyles().mediaQueries();
 
         return ReactDOM.createPortal(
             <>
-                {isFixed && (
-                    <div
-                        className={classNames("vanillaHeader-spacer", style({ height: headerStyles.sizing.height }))}
-                    />
-                )}
+                {isFixed && <div className={classNames("vanillaHeader-spacer", classes.spacer)} />}
                 <header
                     className={classNames(
                         "vanillaHeader",
-                        style(
-                            {
-                                backgroundColor: headerColors.bg.toString(),
-                                color: headerColors.fg.toString(),
-                                $nest: {
-                                    "&isFixed": {
-                                        position: "fixed",
-                                        top: 0,
-                                        left: 0,
-                                        right: 0,
-                                        zIndex: 1,
-                                    },
-                                },
-                            },
-                            mediaQueries.oneColumn({
-                                height: headerStyles.sizing.height.toString(),
-                            }),
-                        ),
+                        classes.root,
                         this.props.className,
                         { isFixed },
                         this.context.offsetClass,

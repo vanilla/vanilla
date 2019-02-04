@@ -14,7 +14,7 @@ class AddonsTest extends AbstractAPIv2Test {
     private $coreAddons = [
         'conversations', // applications
         'allviewed', 'buttonbar', 'debugger', 'emojiextender', 'facebook', 'flagging',
-        'googleplus', 'googleprettify', 'gravatar', 'indexphotos', 'openid', 'profileextender', 'quotes',
+        'googleplus', 'googleprettify', 'gravatar', 'indexphotos', 'profileextender', 'quotes',
         'splitmerge', 'stopforumspam', 'twitter', 'vanillainthisdiscussion', 'vanillastats', 'editor', 'oauth2',
         'recaptcha', 'stubcontent', 'vanillicon', // plugins
     ];

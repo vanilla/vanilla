@@ -433,8 +433,8 @@ class PostController extends VanillaController {
             $this->CategoryID = $this->Discussion->CategoryID;
         }
 
-        // Verify we can view the category content
-        $this->categoryPermission($this->CategoryID, 'Vanilla.Discussions.View');
+        // Verify we can add to the category content
+        $this->categoryPermission($this->CategoryID, 'Vanilla.Discussions.Add');
 
         if (c('Garden.ForceInputFormatter')) {
             $this->Form->removeFormValue('Format');

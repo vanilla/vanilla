@@ -55,5 +55,54 @@ export const globalVariables = (globalColorsOverwrite = {}, bodyOverwrite = {}, 
         ...borderOverwrite,
     };
 
-    return { utility, elementaryColors, mainColors, feedbackColors, body, border };
+    const gutterSize = 24;
+    const gutter = {
+        size: gutterSize,
+        half: gutterSize / 2,
+        quarter: gutterSize / 4,
+    };
+
+    const panelWidth = 216;
+    const panel = {
+        width: panelWidth,
+        paddedWidth: panelWidth + gutter.size,
+    };
+
+    const middleColumnWidth = 672;
+    const middleColumn = {
+        width: middleColumnWidth,
+        paddedWidth: middleColumnWidth + gutter.size,
+    };
+
+    const content = {
+        width:
+            panel.paddedWidth * 2 +
+            middleColumn.paddedWidth +
+            gutter.size * 3 /* *3 from margin between columns and half margin on .container*/,
+    };
+
+    const fonts = {
+        size: {
+            large: 16,
+            medium: 14,
+            small: 12,
+            title: 32,
+            smallTitle: 20,
+            subTitle: 18,
+        },
+
+        mobile: {
+            size: {
+                title: 26,
+            },
+        },
+
+        weights: {
+            normal: 400,
+            semiBold: 600,
+            bold: 700,
+        },
+    };
+
+    return { utility, elementaryColors, mainColors, feedbackColors, body, border, gutter, panel, content, fonts };
 };

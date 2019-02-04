@@ -11,6 +11,7 @@ import { layoutStyles } from "@library/styles/layoutStyles";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { userPhotoVariables } from "@library/styles/userPhotoStyles";
+import { vanillaMenuVariables } from "@library/styles/vanillaMenu";
 
 export function vanillaHeaderVariables() {
     const globalVars = globalVariables();
@@ -117,6 +118,7 @@ export function vanillaHeaderVariables() {
         compactSearch,
         buttonContents,
         mobileDropDown,
+        compactSearchResults,
     };
 }
 
@@ -126,6 +128,7 @@ export default function vanillaHeaderClasses() {
     const formElementVars = formElementsVariables();
     const userPhotoVars = userPhotoVariables();
     const headerColors = vars.colors;
+    const vanillaMenuVars = vanillaMenuVariables();
     const mediaQueries = layoutStyles().mediaQueries();
 
     const root = style(
@@ -139,6 +142,23 @@ export default function vanillaHeaderClasses() {
                     left: 0,
                     right: 0,
                     zIndex: 1,
+                },
+                ".searchBar__control": {
+                    color: vars.colors.fg.toString(),
+                },
+                ".suggestedTextInput-clear.searchBar-clear": {
+                    color: vars.colors.fg.toString(),
+                    $nest: {
+                        "&:hover": {
+                            color: vars.colors.fg.toString(),
+                        },
+                        "&:active": {
+                            color: vars.colors.fg.toString(),
+                        },
+                        "&:focus": {
+                            color: vars.colors.fg.toString(),
+                        },
+                    },
                 },
             },
         },
@@ -374,6 +394,89 @@ export default function vanillaHeaderClasses() {
         }),
     );
 
+    const leftFlexBasis = style(
+        {
+            display: "flex",
+            flexWrap: "nowrap",
+            alignItems: "center",
+            flexBasis: vars.endElements.flexBasis,
+        },
+        mediaQueries.oneColumn({
+            flexShrink: 1,
+            flexBasis: px(vars.endElements.mobile.flexBasis),
+        }),
+        mediaQueries.xs({
+            flexBasis: px(formElementVars.sizing.height),
+        }),
+    );
+
+    const backLink = style({
+        transform: `translateX(${-globalVars.gutter.half})`,
+    });
+
+    const signIn = style({
+        $nest: {
+            "&:not([disabled])": {
+                color: vars.colors.fg.toString(),
+                backgroundColor: vanillaMenuVars.signIn.bg.toString(),
+                border: `solid ${vars.colors.fg.toString()} 1px`,
+                marginLeft: px(vanillaMenuVars.guest.spacer * 1.5),
+                marginRight: px(vanillaMenuVars.guest.spacer),
+                $nest: {
+                    "&:hover": {
+                        border: `solid ${vars.colors.fg} 1px`,
+                        backgroundColor: vanillaMenuVars.signIn.hover.bg.toString(),
+                        color: vars.colors.fg.toString(),
+                    },
+                    "&.focus-visible": {
+                        fontWeight: globalVars.fonts.weights.semiBold,
+                    },
+                    "&:focus": {
+                        fontWeight: globalVars.fonts.weights.semiBold,
+                    },
+                },
+            },
+            ".vanillaHeaderNav-linkContent": {
+                $nest: {
+                    "&:after": {
+                        fontWeight: globalVars.fonts.weights.semiBold,
+                    },
+                },
+            },
+        },
+    });
+
+    const register = style({
+        $nest: {
+            "&:not([disabled])": {
+                color: vars.colors.bg.toString(),
+                backgroundColor: vars.colors.fg.toString(),
+                border: `solid ${vars.colors.fg} 1px;`,
+                marginLeft: vanillaMenuVars.guest.spacer.toString(),
+                $nest: {
+                    "&:hover": {
+                        color: vars.colors.bg.toString(),
+                        border: `solid ${vars.colors.fg} 1px;`,
+                        backgroundColor: vars.resister.hover.bg.toString(),
+                    },
+                    "&.focus-visible": {
+                        fontWeight: globalVars.fonts.weights.semiBold,
+                    },
+                    "&:focus": {
+                        fontWeight: globalVars.fonts.weights.semiBold,
+                    },
+                },
+            },
+            ".vanillaHeaderNav-linkContent": {
+                $nest: {
+                    "&:after": {
+                        display: "none",
+                    },
+                },
+            },
+        },
+    });
+
     return {
         root,
         spacer,
@@ -394,6 +497,11 @@ export default function vanillaHeaderClasses() {
         dropDownContents,
         count,
         horizontalScroll,
+        rightFlexBasis,
+        leftFlexBasis,
+        backLink,
+        signIn,
+        register,
     };
 }
 

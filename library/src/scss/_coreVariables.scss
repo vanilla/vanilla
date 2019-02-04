@@ -176,6 +176,9 @@ $global-panel_paddedWidth                            : $global-panel_width + $gl
 $global-middleColumn_width                           : 672px;
 $global-middleColumn_paddedWidth                     : $global-middleColumn_width + $global-gutter_size;
 
+
+
+
 $global-content_width                                : $global-panel_paddedWidth * 2 + $global-middleColumn_paddedWidth + $global-gutter_size * 3; // *3 from margin between columns and half margin on .container
 
 $global-twoColumn_breakpoint                         : 1200px !default; // Generic breakpoint for 2 columns
@@ -476,9 +479,6 @@ $vanillaHeader-button_borderRadius                  : 3px;
 $vanillaHeader-button_size                          : 40px;
 
 $vanillaMenu-guest_spacer                           : 8px !default;
-
-
-
 $vanillaMenu-signIn_bg                              : getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%) !default;
 $vanillaMenu-signIn_bg_hover                        : getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 20%) !default;
 $vanillaMenu-register_bg                            : $global-color_bg !default;

@@ -307,7 +307,7 @@
 //    height: $vanillaHeader_mobile_height;
 //}
 
-.vanillaHeader-rightFlexBasis {
+//.vanillaHeader-rightFlexBasis {
     //display: flex;
     //height: $vanillaHeader_height;
     //flex-wrap: nowrap;
@@ -315,85 +315,85 @@
     //align-items: center;
     //flex-basis: $vanillaHeader-endElements_flexBasis;
 
-    @include mediaQuery-panelLayout_oneColumn {
-        flex-shrink: 1;
-        flex-basis: $vanillaHeader-endElements_mobile_flexBasis;
-        height: $vanillaHeader_mobile_height;
+//    @include mediaQuery-panelLayout_oneColumn {
+//        flex-shrink: 1;
+//        flex-basis: $vanillaHeader-endElements_mobile_flexBasis;
+//        height: $vanillaHeader_mobile_height;
+//
+//        transform: translateX(($vanillaHeader-button_size - $userPhoto-small_width)/2); // so the icon is flush with the side margin, but still has the right padding when hovering.
+//    }
+//}
 
-        transform: translateX(($vanillaHeader-button_size - $userPhoto-small_width)/2); // so the icon is flush with the side margin, but still has the right padding when hovering.
-    }
-}
+//.vanillaHeader-leftFlexBasis {
+//    display: flex;
+//    flex-wrap: nowrap;
+//    align-items: center;
+//    flex-basis: $vanillaHeader-endElements_flexBasis;
+//
+//    @include mediaQuery-panelLayout_oneColumn {
+//        flex-basis: $vanillaHeader-endElements_mobile_flexBasis;
+//        flex-shrink: 1;
+//    }
+//
+//    @include mediaQuery-panelLayout_xs {
+//        flex-basis: $formElement_height;
+//    }
+//}
 
-.vanillaHeader-leftFlexBasis {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    flex-basis: $vanillaHeader-endElements_flexBasis;
+//.vanillaHeader-backLink {
+//    transform: translateX(-$global-gutter_halfSize); // so the icon is flush with the side margin, but still has the right padding when hovering.
+//}
 
-    @include mediaQuery-panelLayout_oneColumn {
-        flex-basis: $vanillaHeader-endElements_mobile_flexBasis;
-        flex-shrink: 1;
-    }
-
-    @include mediaQuery-panelLayout_xs {
-        flex-basis: $formElement_height;
-    }
-}
-
-.vanillaHeader-backLink {
-    transform: translateX(-$global-gutter_halfSize); // so the icon is flush with the side margin, but still has the right padding when hovering.
-}
-
-.vanillaHeader-signIn {
-    &:not([disabled]) {
-        color: $vanillaHeader-fg;
-        background-color: $vanillaMenu-signIn_bg;
-        border: solid $vanillaHeader-fg 1px;
-        margin: {
-            left: $vanillaMenu-guest_spacer * 1.5;
-            right: $vanillaMenu-guest_spacer;
-        }
-
-        &:hover {
-            border: solid $vanillaHeader-fg 1px;
-            background-color: $vanillaMenu-signIn_bg_hover;
-            color: $vanillaHeader-fg;
-        }
-
-
-        &.focus-visible,
-        &:focus {
-            font-weight: $global-fontWeight_semiBold;
-        }
-    }
-
-    .vanillaHeaderNav-linkContent:after {
-        display: none;
-    }
-}
-
-.vanillaHeader-register {
-    &:not([disabled]) {
-        color: $vanillaHeader-bg;
-        background-color: $vanillaHeader-fg;
-        border: solid $vanillaHeader-fg 1px;
-        margin: {
-            left: $vanillaMenu-guest_spacer;
-        }
-
-        &:hover {
-            color: $vanillaHeader-bg;
-            border: solid $vanillaHeader-fg 1px;
-            background-color: $vanillaMenu-register_bg_hover;
-        }
-
-        &.focus-visible,
-        &:focus {
-            font-weight: $global-fontWeight_semiBold;
-        }
-    }
-    .vanillaHeaderNav-linkContent:after {
-        display: none;
-    }
-}
+//.vanillaHeader-signIn {
+//    &:not([disabled]) {
+//        color: $vanillaHeader-fg;
+//        background-color: $vanillaMenu-signIn_bg;
+//        border: solid $vanillaHeader-fg 1px;
+//        margin: {
+//            left: $vanillaMenu-guest_spacer * 1.5;
+//            right: $vanillaMenu-guest_spacer;
+//        }
+//
+//        &:hover {
+//            border: solid $vanillaHeader-fg 1px;
+//            background-color: $vanillaMenu-signIn_bg_hover;
+//            color: $vanillaHeader-fg;
+//        }
+//
+//
+//        &.focus-visible,
+//        &:focus {
+//            font-weight: $global-fontWeight_semiBold;
+//        }
+//    }
+//
+//    .vanillaHeaderNav-linkContent:after {
+//        display: none;
+//    }
+//}
+//
+//.vanillaHeader-register {
+//    &:not([disabled]) {
+//        color: $vanillaHeader-bg;
+//        background-color: $vanillaHeader-fg;
+//        border: solid $vanillaHeader-fg 1px;
+//        margin: {
+//            left: $vanillaMenu-guest_spacer;
+//        }
+//
+//        &:hover {
+//            color: $vanillaHeader-bg;
+//            border: solid $vanillaHeader-fg 1px;
+//            background-color: $vanillaMenu-register_bg_hover;
+//        }
+//
+//        &.focus-visible,
+//        &:focus {
+//            font-weight: $global-fontWeight_semiBold;
+//        }
+//    }
+//    .vanillaHeaderNav-linkContent:after {
+//        display: none;
+//    }
+//}
 

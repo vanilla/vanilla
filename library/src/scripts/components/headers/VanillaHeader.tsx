@@ -110,7 +110,12 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                     {!this.state.openSearch &&
                                         isMobile && (
                                             <BackLink
-                                                className="vanillaHeader-leftFlexBasis vanillaHeader-backLink"
+                                                className={classNames(
+                                                    "vanillaHeader-leftFlexBasis",
+                                                    "vanillaHeader-backLink",
+                                                    classes.leftFlexBasis,
+                                                    classes.backLink,
+                                                )}
                                                 linkClassName={classes.button}
                                                 fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
                                             />
@@ -188,13 +193,23 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                     )}
                                                 >
                                                     <VanillaHeaderNavItem
-                                                        linkClassName="button vanillaHeader-guestButton vanillaHeader-signIn"
+                                                        linkClassName={classNames(
+                                                            "button",
+                                                            "vanillaHeader-guestButton",
+                                                            "vanillaHeader-signIn",
+                                                            classes.signIn,
+                                                        )}
                                                         to={`/entry/signin?target=${window.location.pathname}`}
                                                     >
                                                         {t("Sign in")}
                                                     </VanillaHeaderNavItem>
                                                     <VanillaHeaderNavItem
-                                                        linkClassName="button vanillaHeader-guestButton vanillaHeader-register"
+                                                        linkClassName={classNames(
+                                                            "button",
+                                                            "vanillaHeader-guestButton",
+                                                            "vanillaHeader-register",
+                                                            classes.register,
+                                                        )}
                                                         to={`/entry/register?target=${window.location.pathname}`}
                                                     >
                                                         {t("Register")}

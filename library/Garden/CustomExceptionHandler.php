@@ -20,7 +20,7 @@ interface CustomExceptionHandler {
      * @param \Throwable $e
      * @return bool
      */
-    public function hasHandler(\Throwable $e): bool;
+    public function hasExceptionHandler(\Throwable $e): bool;
 
     /**
      * Exception handler method
@@ -28,5 +28,5 @@ interface CustomExceptionHandler {
      * @param \Throwable $e
      * @return Data Returns Garden\Web\Data object
      */
-    public function handle(\Throwable $e): Data;
+    public function handleException(\Throwable $e): Data;
 }

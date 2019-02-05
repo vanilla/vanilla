@@ -679,7 +679,7 @@ class PostController extends VanillaController {
             $FormValues = $this->Form->formValues();
 
             if ($FormValues['DiscussionID'] !== $DiscussionID) {
-                throw permissionException('Vanilla.Comments.Edit');
+                throw new Exception('DiscussionID mismatch.');
             }
 
             $filters = ['Score'];

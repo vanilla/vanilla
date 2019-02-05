@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { color, percent, px } from "csx";
+import {color, percent, px, quote} from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutStyles } from "@library/styles/layoutStyles";
 import { style } from "typestyle";
@@ -114,7 +114,7 @@ export default function vanillaHeaderNavClasses() {
         flexWrap: "nowrap",
         $nest: {
             "&:after": {
-                content: `${""}`,
+                content: quote(''),
                 position: "absolute",
                 top: 0,
                 right: 0,

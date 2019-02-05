@@ -24,7 +24,7 @@ export default class NotificationsToggle extends React.PureComponent<IProps> {
     public render() {
         const count = this.props.count ? this.props.count : 0;
         return (
-            <div className={classNames("meBox-buttonContent", this.props.className)}>
+            <div className={classNames("notifactionsToggle", this.props.className)}>
                 {notifications(!!this.props.open)}
                 {count > 0 && (
                     <Count

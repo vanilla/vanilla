@@ -23,6 +23,8 @@ import classNames from "classnames";
 import * as React from "react";
 import { connect } from "react-redux";
 import MeBoxDropDownItemList from "./MeBoxDropDownItemList";
+import { withDevice } from "@library/contexts/DeviceContext";
+import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 
 export interface INotificationsProps {
     countClass?: string;
@@ -31,7 +33,7 @@ export interface INotificationsProps {
 }
 
 // For clarity, I'm adding className separately because both the container and the content have className, but it's not applied to the same element.
-interface IProps extends INotificationsProps {
+interface IProps extends INotificationsProps, IDeviceProps {
     notificationsActions: NotificationsActions;
     className?: string;
     userSlug: string;
@@ -88,9 +90,10 @@ export class NotificationsContents extends React.Component<IProps> {
         const { notifications } = this.props;
 
         if (notifications.status !== LoadStatus.SUCCESS || !notifications.data) {
-            // This 69 is the height that it happens to be right now.
+            // This is the height that it happens to be right now.
             // This will be calculated better once we finish the CSS in JS transition.
-            return <FullPageLoader loaderStyle={LoaderStyle.FIXED_SIZE} height={69} minimumTime={0} />;
+            const height = this.props.device === Devices.MOBILE ? 80 : 69;
+            return <FullPageLoader loaderStyle={LoaderStyle.FIXED_SIZE} height={height} minimumTime={0} />;
         }
 
         return (
@@ -163,7 +166,9 @@ function mapStateToProps(state: INotificationsStoreState) {
 }
 
 // Connect Redux to the React component.
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps,
-)(NotificationsContents);
+export default withDevice(
+    connect(
+        mapStateToProps,
+        mapDispatchToProps,
+    )(NotificationsContents),
+);

@@ -41,16 +41,24 @@ body {
     }
 }
 
-.DataList,
-.MessageList {
-    .Item,
-    .Item.Read {
-        background-color: transparent;
-        border: 0;
+.DataList .Item {
+    border-bottom-width: 0;
+}
+
+.Item .Author a {
+    font-size: inherit;
+    font-weight: inherit;
+    color: $component-meta_color;
+
+    &:focus,
+    &:hover {
+        text-decoration: $theme-link-hover_textDecoration;
+        color: $component-meta-link-hover_color;
     }
 }
 
 .Item {
+
     .BlockTitle {
         font-size: inherit;
     }
@@ -154,6 +162,10 @@ body {
     }
 }
 
+.BlockTitle {
+    padding: 0;
+}
+
 .AdminCheck {
     display: inline-flex;
     align-items: center;
@@ -184,7 +196,7 @@ body {
 }
 
 .CreateAccount {
-    margin-top: $utility-medium_padding;
+    margin-top: $utility-baseUnitDouble;
 }
 
 .idea-counter-box,
@@ -234,6 +246,10 @@ a.ChangePicture {
         @include ellipsis;
     }
 
+}
+
+.MenuItems a:hover .Gloss {
+    color: inherit !important;
 }
 
 #Form_Ban {
@@ -289,14 +305,14 @@ table.PreferenceGroup th {
 .Popup #UserBadgeForm {
     p,
     h1 {
-        margin-bottom: $utility-medium_padding;
+        margin-bottom: $utility-baseUnitDouble;
         display: block;
     }
 
     textarea {
         display: block;
         width: 100%;
-        margin-top: $utility-small_padding;
+        margin-top: $utility-baseUnitHalf;
     }
 
     button {
@@ -328,12 +344,30 @@ table.PreferenceGroup th {
     font-weight: inherit;
 }
 
+.PanelInfo li {
+    border-bottom-width: 0;
+}
+
+.Box {
+    margin: $utility-baseUnitDouble 0;
+}
+
+#Panel .FilterMenu li:first-child,
+.PanelInfo li:first-child {
+  border-top-width: 0;
+}
+
 .SocialIcon .Text {
-    padding: 0 0 0 $utility-small_padding;
+    padding: 0 0 0 $utility-baseUnitHalf;
     font-weight: $formButton_fontWeight;
     font-size: $formButton_fontSize;
     line-height: $formButton_height;
     min-height: $formButton_height;
+    min-width: 170px;
+}
+
+.PageDescription {
+    margin: 0;
 }
 
 // Fix connection page of profile
@@ -356,7 +390,7 @@ table.PreferenceGroup th {
     .Connection-Name {
         flex: 1;
         min-width: 200px;
-        margin: $utility-medium_padding 0;
+        margin: $utility-baseUnitDouble 0;
 
         @include maxWidth {
             flex: initial;
@@ -378,7 +412,7 @@ table.PreferenceGroup th {
         .ProfilePhoto {
             height: 30px;
             width: 30px;
-            margin-right: $utility-medium_padding;
+            margin-right: $utility-baseUnitDouble;
         }
     }
 }

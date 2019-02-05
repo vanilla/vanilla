@@ -67,15 +67,12 @@
 
     h4 {
         font-weight: bold;
-        margin-bottom: $utility-small_padding;
         display: flex;
         align-items: center;
         justify-content: space-between;
-
-        @if($panel_item-border == 0) {
-            padding-bottom: $utility-small_padding;
-            border-bottom: $component_border;
-        }
+        padding: $panel-item_padding;
+        margin-bottom: 0;
+        border: $panel-item_border;
 
         .Count {
             margin-right: 6px;
@@ -88,6 +85,7 @@
     }
 
     .vanilla-connect {
+
         a {
             display: inline-flex;
         }
@@ -97,27 +95,13 @@
         }
     }
 
-    .ButtonGroup.Multi,
-    .Button.BigButton {
+    .BoxButtons .Button:not(.Handle) {
         width: 100%;
         padding: 0;
-        margin: 0 0 $utility-large_padding;
     }
 
-    .NewDiscussion.Big {
-        padding-right: 0;
-        position: relative;
-
-        > .Primary:first-child {
-            width: 100%;
-            color: inherit;
-        }
-
-        .Button.Handle {
-            margin-left: 32px - $utility-medium_padding;
-            position: absolute;
-            right: 0;
-        }
+    .BoxButtons {
+        margin: 0 0 $utility-large_padding;
     }
 
     .PhotoWrap {
@@ -151,6 +135,28 @@
         }
     }
 
+    .PanelInThisDiscussion {
+
+        a {
+            padding: $panel-item_padding;
+            border: $panel-item_border;
+            border-radius: $panel_item-borderRadius;
+            width: 100%;
+            color: $panel_fg;
+            background-color: $panel-item_bg;
+            display: block;
+            border: $panel-item_border;
+            transition: transition(color), transition(background-color);
+
+            &:hover,
+            &:focus,
+            &:active {
+                color: $panel-item-hover_fg;
+                background-color: $panel-item-hover_bg;
+                border-color: $panel-item-hover_borderColor;
+            }
+        }
+    }
 
     .Leaderboard,
     .InThisConversation {
@@ -166,16 +172,21 @@
         }
 
         a {
-            min-height: $panel-item_height;
-            border: $panel_item-border;
-            padding: 0 $utility-small_padding;
+            padding: $panel-item_padding;
+            border: $panel-item_border;
             border-radius: $panel_item-borderRadius;
             width: 100%;
             color: $panel_fg;
+            background-color: $panel-item_bg;
+            border: $panel-item_border;
             transition: transition(color), transition(background-color);
 
-            &:hover {
-                background: rgba($global-color_black, 0.08);
+            &:hover,
+            &:focus,
+            &:active {
+                color: $panel-item_fg;
+                background-color: $panel-item-hover_bg;
+                border-color: $panel-item-hover_borderColor;
             }
         }
 
@@ -188,10 +199,17 @@
 
         .Username {
             @include ellipsis;
-            max-width: 70%;
+            max-width: calc(#{$panel_width} - #{$theme-photo-small_size} - (#{$panel-item_padding} * 2) - 80px);
             display: inline-block;
-            margin-left: $utility-small_padding;
+            margin-left: 10px;
             line-height: $theme-photo-small_size;
+
+            &:focus,
+            &:hover,
+            &:active {
+                color: $panel-item-hover_fg;
+            }
+
         }
 
         .Conversation-User {
@@ -245,10 +263,13 @@ body.Section-EditProfile .Box,
     }
 
     li.Heading {
-        min-height: $panel-item_height;
-        padding: 0 $utility-small_padding;
         display: flex;
         align-items: center;
+        padding: $panel-item_padding;
+        border: $panel-item_border;
+        border-radius: $panel_item-borderRadius;
+        color: $panel_fg;
+        font-weight: $global-semibold_fontWeight;
 
         .Aside {
             order: 2;
@@ -257,24 +278,30 @@ body.Section-EditProfile .Box,
     }
 
     a {
-        min-height: $panel-item_height;
-        padding: 0 $utility-small_padding;
+        display: flex;
+        align-items: center;
+        padding: $panel-item_padding;
+        border: $panel-item_border;
         border-radius: $panel_item-borderRadius;
         width: 100%;
         color: $panel_fg;
-        border: $panel_item-border;
+        background-color: $panel-item_bg;
+        border: $panel-item_border;
         transition: transition(color), transition(background-color);
 
-        &:hover {
+        &:hover,
+        &:focus,
+        &:active {
             color: $panel-item-hover_fg;
-            background: $panel-item-hover_bg;
+            background-color: $panel-item-hover_bg;
+            border-color: $panel-item-hover_borderColor;
         }
     }
 
     li:not(.Heading) + li:not(.Heading) {
-        margin-top: $panel_item-spacing;
 
         @if($panel_item-spacing == 0) {
+
             a {
                 border-top-width: 0;
             }
@@ -300,8 +327,7 @@ body.Section-EditProfile .Box,
 
     .PhotoWrap.PhotoWrap {
         display: inline-block;
-        margin-left: 2px;
-        margin-right: 2px;
+        margin: 0 2px 2px 2px;
         @include photoWrap;
         min-height: 0;
         width: $theme-photo-small_size;

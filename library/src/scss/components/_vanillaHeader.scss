@@ -20,11 +20,21 @@ $vanillaHeader-compactSearch_maxWidth: 672px;
 $vanillaHeader-buttonContents_hover_bg: getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%) !default;
 $vanillaHeader-buttonContents_active_bg: getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%, true) !default;
 
+.vanillaHeader-spacer {
+    height: $vanillaHeader_height;
+}
 
 .vanillaHeader {
-    height: $vanillaHeader_height;
     background-color: $vanillaHeader_bg;
     color: $vanillaHeader_fg;
+
+    &.isFixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1;
+    }
 
     .searchBar__control {
         color: $vanillaHeader-fg;
@@ -78,10 +88,16 @@ $vanillaHeader-buttonContents_active_bg: getBgDependingOnContrastColor($vanillaH
     }
 
     &.focus-visible {
-        .headerLogo-logo {
-            outline: solid 1px;
+        .headerLogo-logoFrame {
+            outline: 5px solid $vanillaHeader-buttonContents_hover_bg;
+            background: $vanillaHeader-buttonContents_hover_bg;
+            border-radius: $vanillaHeader-button_borderRadius;
         }
     }
+}
+
+.headerLogo-logoFrame {
+    display: inline-flex;
 }
 
 .headerLogo-logo {
@@ -136,7 +152,8 @@ $vanillaHeader-buttonContents_active_bg: getBgDependingOnContrastColor($vanillaH
 .vanillaHeader-localeToggle,
 .vanillaHeader-navLink {
     color: $vanillaHeader_fg;
-    padding: 0 $vanillaHeader-spacer_width;
+    padding: 0 $vanillaHeader-spacer_width / 2;
+    margin: 0 $vanillaHeader-spacer_width / 2;
     border-radius: $vanillaHeader-button_borderRadius;
 
     @include mediaQuery-panelLayout_oneColumn {

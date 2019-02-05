@@ -28,11 +28,11 @@
         flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
-        margin: 0 -$utility-small_padding;
+        margin: 0 -$utility-baseUnitHalf;
     }
 
     .col {
-        padding: 0 $utility-small_padding;
+        padding: 0 $utility-baseUnitHalf;
 
         @include maxWidth($theme-breakpoint_base) {
             width: 100%;

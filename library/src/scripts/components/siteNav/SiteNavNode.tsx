@@ -13,6 +13,9 @@ import TabHandler from "@library/TabHandler";
 import classNames from "classnames";
 import * as React from "react";
 import Hoverable from "@library/utils/Hoverable";
+import { SiteNavContext } from "@library/components/siteNav/SiteNavContext";
+
+type RecordToggle = (recordType: string, recordID: number) => void;
 
 interface IProps extends INavigationTreeItem {
     activeRecord: IActiveRecord;
@@ -24,10 +27,6 @@ interface IProps extends INavigationTreeItem {
     onItemHover?(item: INavigationTreeItem);
 }
 
-interface IState {
-    open: boolean;
-}
-
 export interface IActiveRecord {
     recordID: number;
     recordType: string;
@@ -36,10 +35,9 @@ export interface IActiveRecord {
 /**
  * Recursive component to generate site nav item
  */
-export default class SiteNavNode extends React.Component<IProps, IState> {
-    public state: IState = {
-        open: false,
-    };
+export default class SiteNavNode extends React.Component<IProps> {
+    public static contextType = SiteNavContext;
+    public context!: React.ContextType<typeof SiteNavContext>;
 
     public render() {
         const hasChildren = !!this.props.children && this.props.children.length > 0;
@@ -69,7 +67,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                     isCurrent: this.isActiveRecord(),
                 })}
                 role="treeitem"
-                aria-expanded={this.state.open}
+                aria-expanded={this.isOpen}
             >
                 {hasChildren && collapsible ? (
                     <div className={classNames("siteNavNode-buttonOffset", { hasNoOffset: this.props.depth === 1 })}>
@@ -82,7 +80,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                             baseClass={ButtonBaseClass.CUSTOM}
                             className="siteNavNode-toggle"
                         >
-                            {this.state.open ? downTriangle("", t("Expand")) : rightTriangle("", t("Collapse"))}
+                            {this.isOpen ? downTriangle("", t("Expand")) : rightTriangle("", t("Collapse"))}
                         </Button>
                     </div>
                 ) : (
@@ -112,7 +110,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
                     {hasChildren && (
                         <ul
                             className={classNames("siteNavNode-children", depthClass, {
-                                isHidden: collapsible ? !this.state.open : false,
+                                isHidden: collapsible ? !this.isOpen : false,
                             })}
                             role="group"
                         >
@@ -133,15 +131,22 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
         }
     };
 
+    private get isOpen(): boolean {
+        const records = this.context.openRecords[this.props.recordType];
+        if (!records) {
+            return false;
+        }
+
+        return records.has(this.props.recordID);
+    }
+
     /**
      * Opens node. Optional callback if it's already open.
      * @param callbackIfAlreadyOpen
      */
     private open = (callbackIfAlreadyOpen?: any) => {
-        if (!this.state.open) {
-            this.setState({
-                open: true,
-            });
+        if (!this.isOpen) {
+            this.context.openItem(this.props.recordType, this.props.recordID);
         } else {
             if (callbackIfAlreadyOpen) {
                 callbackIfAlreadyOpen();
@@ -153,10 +158,8 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
      * Closes node. Optional callback if already closed.
      */
     private close = (callbackIfAlreadyClosed?: any) => {
-        if (this.state.open) {
-            this.setState({
-                open: false,
-            });
+        if (this.isOpen) {
+            this.context.closeItem(this.props.recordType, this.props.recordID);
         } else {
             if (callbackIfAlreadyClosed) {
                 callbackIfAlreadyClosed();
@@ -178,9 +181,7 @@ export default class SiteNavNode extends React.Component<IProps, IState> {
      * Toggle node
      */
     private toggle = () => {
-        this.setState({
-            open: !this.state.open,
-        });
+        this.context.toggleItem(this.props.recordType, this.props.recordID);
     };
 
     /**

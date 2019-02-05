@@ -63,9 +63,9 @@
     }
 
     .PollOption {
-        margin: $utility-medium_padding 0;
+        margin: $utility-baseUnitDouble 0;
         position: relative;
-        padding: 6px 50px 6px $utility-medium_padding;
+        padding: 6px 50px 6px $utility-baseUnitDouble;
         min-height: 32px;
         background-color: $theme-hover_color;
         border-radius: $formElement_borderRadius;
@@ -87,7 +87,7 @@
     .VotePercent {
         line-height: 32px;
         position: absolute;
-        right: $utility-medium_padding;
+        right: $utility-baseUnitDouble;
         top: 50%;
         transform: translateY(-50%);
     }

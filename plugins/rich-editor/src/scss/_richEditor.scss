@@ -120,6 +120,7 @@ $richEditor-scrollContainer_overshoot: 48px;
     padding: 0;
     -ms-overflow-style: -ms-autohiding-scrollbar;
     margin: 0;
+    z-index: 1;
 
     .richEditor-menuItem {
         display: block;

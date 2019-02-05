@@ -32,7 +32,7 @@ interface IProps extends NavLinkProps {
  * Result = https://test.com/root/someUrl/deeper/nested (full refresh)
  */
 export default function SmartLink(props: IProps) {
-    const { urlFormatter, ...passthru } = props;
+    const { replace, urlFormatter, ...passthru } = props;
     const finalUrlFormatter = urlFormatter ? urlFormatter : formatUrl;
     const stringUrl = typeof props.to === "string" ? props.to : createPath(props.to);
     const href = finalUrlFormatter(stringUrl, true);
@@ -44,9 +44,17 @@ export default function SmartLink(props: IProps) {
         <LinkContext.Consumer>
             {contextRoot => {
                 if (href.startsWith(contextRoot) && !isCurrentPage) {
-                    return <NavLink {...passthru} to={makeDynamicHref(props.to, href)} activeClassName="isCurrent" />;
+                    return (
+                        <NavLink
+                            {...passthru}
+                            to={makeDynamicHref(props.to, href)}
+                            activeClassName="isCurrent"
+                            tabIndex={props.tabIndex}
+                            replace={replace}
+                        />
+                    );
                 } else {
-                    return <a {...passthru} href={href} />;
+                    return <a {...passthru} href={href} tabIndex={props.tabIndex} />;
                 }
             }}
         </LinkContext.Consumer>

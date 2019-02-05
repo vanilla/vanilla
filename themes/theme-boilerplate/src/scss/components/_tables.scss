@@ -33,6 +33,7 @@
     }
 }
 
+.Groups .DataTable,
 .DataTable {
     margin: 0 0 $utility-large_padding;
     table-layout: fixed;
@@ -85,7 +86,7 @@
         line-height: #{$theme-photo_size / 2};
         color: $component-title_color;
         display: block;
-        margin-bottom: $component-base_padding;
+        margin-bottom: $utility-baseUnit;
 
         &:focus,
         &:hover {
@@ -113,7 +114,7 @@
         font-weight: $component-base_fontWeight;
         line-height: $component-base_lineHeight;
         color: $component-base_color;
-        margin: 0 0 $component-base_padding;
+        margin: 0 0 $utility-baseUnit;
     }
 
     .Excerpt:empty,
@@ -122,7 +123,7 @@
     }
 
     .ItemContent.Discussion .Excerpt {
-        margin-top: $component-base_padding;
+        margin-top: $utility-baseUnit;
     }
 
     .Options {
@@ -134,7 +135,7 @@
         }
 
         .Bookmark {
-            margin-left: $utility-xSmall_padding;
+            margin-left: $utility-baseUnitHalf;
         }
     }
 
@@ -148,6 +149,7 @@
     .AuthorInfo {
         font-size: $component-meta_fontSize;
         font-weight: $component-meta_fontWeight;
+        line-height: $component-meta_lineHeight;
         color: $component-meta_color;
     }
 
@@ -217,6 +219,12 @@
         }
     }
 
+    .LatestPostTitle,
+    .UserLink.BlockTitle,
+    .BigCount .Meta,
+    .Block.Wrap .Meta {
+         margin-left: $utility-baseUnitDouble;
+    }
 
     .LatestPostTitle,
     .UserLink {
@@ -232,7 +240,7 @@
     .MItem.Category {
 
         @include maxWidth {
-            margin-top: $utility-medium_padding;
+            margin-top: $utility-baseUnitDouble;
         }
     }
 
@@ -255,7 +263,7 @@
         max-width: 170px;
 
         .MItem {
-            margin-bottom: $utility-xSmall_padding;
+            margin-bottom: $utility-baseUnitHalf;
         }
     }
 
@@ -288,7 +296,7 @@
             }
 
             .Wrap {
-                padding-left: calc(#{$theme-photo_size} + #{$utility-small_padding});
+                padding-left: $theme-photo_size;
             }
 
             .PhotoWrap {
@@ -314,14 +322,6 @@
     &.CategoryTable {
         @include categoriesTableItem;
 
-        .NoPhoto ~ {
-            h2,
-            h3,
-            .CategoryDescription {
-                padding-left: 0;
-            }
-        }
-
         thead .CategoryName {
             padding-left: $component-base_padding;
         }
@@ -340,7 +340,7 @@
                 }
 
                 .PhotoWrap {
-                    margin: 0 $utility-medium_padding 0 0;
+                    margin: 0 $utility-baseUnitDouble 0 0;
                     @include photoWrap;
                     position: relative;
 
@@ -380,10 +380,10 @@
             border-top: 0;
             font-size: $component-meta_fontSize;
             font-weight: $component-meta_fontWeight;
-            margin-bottom: -$utility-small_padding;
+            margin-bottom: -$utility-baseUnitHalf;
 
             b {
-                margin-right: $utility-small_padding;
+                margin-right: $utility-baseUnitHalf;
             }
 
             a {
@@ -399,7 +399,7 @@
             }
 
             .Comma {
-                margin-right: $utility-xSmall_padding;
+                margin-right: $utility-baseUnitHalf;
             }
         }
 
@@ -473,12 +473,20 @@
             width: 35px;
 
             .Wrap {
-                padding: $utility-xSmall_padding 0;
+                padding: $utility-baseUnitHalf 0;
             }
         }
 
         td.DiscussionName {
             width: 100%;
+            padding-right: $utility-baseUnit;
+
+            @if $component_lateralBorder == true {
+                padding-left: $component-base_padding;
+            } @else {
+                padding-left: 0;
+            }
+
         }
 
         //ideation styles
@@ -493,7 +501,7 @@
                 }
 
                 .Wrap {
-                    padding-left: calc(#{$theme-photo_size} + #{$utility-small_padding});
+                    padding-left: $theme-photo_size;
                 }
             }
         }
@@ -564,16 +572,27 @@ body.Section-Group {
         padding-right: 0;
     }
 
+    .EventTitle .Title {
+        display: inline;
+    }
+
     .Title-Icon {
         color: $global-color_fg;
     }
 
     .Buttons {
         margin-right: 0;
-        margin-left: $utility-small_padding;
+        margin-left: $utility-baseUnitHalf;
+    }
+
+    .Title-Wrapper,
+    .Excerpt {
+        margin: 0 0 $utility-baseUnit;
     }
 
     .Meta {
+        margin-left: -$utility-baseUnit;
+        margin-right: -$utility-baseUnit;
 
         @include maxWidth {
             margin-top: 0;
@@ -637,7 +656,7 @@ body.Section-Group {
 
                 .Title,
                 .Description {
-                    padding-left: calc(#{$theme-photo_size} + #{$utility-medium_padding});
+                    padding-left: calc(#{$theme-photo_size} + #{$utility-baseUnitDouble});
                 }
 
                 .Title-Wrapper {
@@ -651,7 +670,7 @@ body.Section-Group {
                 }
 
                 .Options {
-                    margin-top: $utility-medium_padding;
+                    margin-top: $utility-baseUnitDouble;
                     order: 2;
                 }
 
@@ -662,7 +681,7 @@ body.Section-Group {
         }
 
         .OptionsMenu {
-            margin-right: $utility-small_padding;
+            margin-right: $utility-baseUnitHalf;
         }
     }
 
@@ -681,7 +700,7 @@ body.Section-Group {
         }
 
         .PhotoWrap {
-            margin-right: $utility-medium_padding;
+            margin-right: $utility-baseUnitDouble;
 
             @include maxWidth {
                 display: none;
@@ -716,7 +735,7 @@ body.Section-Group {
 
             .GroupDescription,
             .Options {
-                margin-top: $utility-medium_padding;
+                margin-top: $utility-baseUnitDouble;
             }
 
             .OptionsMenu {
@@ -817,7 +836,7 @@ body.Section-Group {
             }
 
             .Button + .Button {
-                margin-top: $utility-small_padding;
+                margin-top: $utility-baseUnitHalf;
             }
         }
     }
@@ -834,7 +853,7 @@ body.Section-Group {
         height: $theme-photo_size;
         display: inline-flex;
         align-items: center;
-        width: calc(100% - (#{$theme-photo_size} + #{$utility-medium_padding}));
+        width: calc(100% - (#{$theme-photo_size} + #{$utility-baseUnitDouble}));
     }
 
     .PhotoWrap {
@@ -863,7 +882,7 @@ body.Section-Group {
             padding-right: 0;
 
             @include maxWidth {
-                margin-bottom: $utility-medium_padding;
+                margin-bottom: $utility-baseUnitDouble;
             }
         }
     }

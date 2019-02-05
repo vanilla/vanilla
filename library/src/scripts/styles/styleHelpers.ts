@@ -23,23 +23,20 @@ export const getVar = (haystack: {}, key: string, fallback: string | number) => 
 export const getColorDependantOnLightness = (
     referenceColor: ColorHelper,
     colorToModify: ColorHelper,
-    percentage: number,
+    weight: number,
     flip: boolean = false,
 ) => {
     const core = globalVariables();
-    if (percentage > 100 || percentage < 0) {
-        throw new Error("mixAmount must be a value between 0 and 100 inclusively.");
+    if (weight > 1 || weight < 0) {
+        throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
     }
-    const black = core.elementaryColors.black;
-    const white = core.elementaryColors.white;
-    const mixAmount = percentage / 10;
 
-    if (colorToModify.lightness() >= 0.5 && !flip) {
+    if (referenceColor.lightness() >= 0.5 && flip) {
         // Lighten color
-        return colorToModify.mix(black, mixAmount);
+        return colorToModify.mix(core.elementaryColors.white, 1 - weight);
     } else {
         // Darken color
-        return colorToModify.mix(white, mixAmount);
+        return colorToModify.mix(core.elementaryColors.black, 1 - weight);
     }
 };
 

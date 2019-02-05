@@ -37,7 +37,7 @@ export const layoutStyles = () => {
         noBleed: globalContentWidth,
         twoColumn: twoColumnBreak,
         oneColumn: twoColumnBreak - panelPaddedWidth,
-        xs: px(500),
+        xs: 500,
     };
 
     const globalBreakPoints = {
@@ -47,19 +47,19 @@ export const layoutStyles = () => {
 
     const mediaQueries = () => {
         const noBleed = styles => {
-            return media({ maxWidth: panelLayoutBreakPoints.noBleed }, styles);
+            return media({ maxWidth: px(panelLayoutBreakPoints.noBleed) }, styles);
         };
 
         const twoColumns = styles => {
-            return media({ maxWidth: panelLayoutBreakPoints.twoColumn }, styles);
+            return media({ maxWidth: px(panelLayoutBreakPoints.twoColumn) }, styles);
         };
 
         const oneColumn = styles => {
-            return media({ maxWidth: panelLayoutBreakPoints.oneColumn }, styles);
+            return media({ maxWidth: px(panelLayoutBreakPoints.oneColumn) }, styles);
         };
 
         const xs = styles => {
-            return media({ maxWidth: panelLayoutBreakPoints.xs }, styles);
+            return media({ maxWidth: px(panelLayoutBreakPoints.xs) }, styles);
         };
 
         return { noBleed, twoColumns, oneColumn, xs };

@@ -6,12 +6,8 @@
 
 import { color, percent, px } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { getColorDependantOnLightness } from "@library/styles/styleHelpers";
 import { layoutStyles } from "@library/styles/layoutStyles";
 import { style } from "typestyle";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { userPhotoVariables } from "@library/styles/userPhotoStyles";
-import { vanillaMenuVariables } from "@library/styles/vanillaMenu";
 import { vanillaHeaderVariables } from "@library/components/headers/vanillaHeaderStyles";
 
 export function vanillaHeaderNavigation() {
@@ -21,7 +17,7 @@ export function vanillaHeaderNavigation() {
         verticalWidth: 3,
         active: {
             border: {
-                color: globalVars.mainColors.bg.fade(90),
+                color: globalVars.mainColors.bg.fade(0.9),
             },
         },
     };
@@ -81,8 +77,8 @@ export default function vanillaHeaderNavClasses() {
                             $nest: {
                                 "&:after": {
                                     marginLeft: -2,
-                                    width: `calc(100% + 4px})`,
-                                    borderBottomColor: vars.border.active.border.toString(),
+                                    width: `calc(100% + 4px)`,
+                                    borderBottomColor: vars.border.active.border.color.toString(),
                                 },
                             },
                         },
@@ -101,7 +97,7 @@ export default function vanillaHeaderNavClasses() {
         alignItems: "stretch",
         height: px(vars.item.size),
         $nest: {
-            "&.focusVisible": {
+            "&.focus-visible": {
                 backgroundColor: headerVars.buttonContents.hover.bg.toString(),
             },
             "&:hover": {
@@ -118,7 +114,7 @@ export default function vanillaHeaderNavClasses() {
         flexWrap: "nowrap",
         $nest: {
             "&:after": {
-                content: "",
+                content: ` `,
                 position: "absolute",
                 top: 0,
                 right: 0,

@@ -64,19 +64,20 @@ export function vanillaHeaderVariables() {
         maxWidth: 672,
     };
 
+    // here
     const buttonContents = {
         hover: {
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 10),
+            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1, true),
         },
         active: {
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 10, true),
+            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2, true),
         },
     };
 
     const signIn = {
-        bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 10),
+        bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1),
         hover: {
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 20),
+            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2),
         },
     };
     const resister = {
@@ -534,7 +535,7 @@ export function vanillaHeaderHomeClasses() {
     };
 
     const bottom = {
-        backgroundColor: globalVars.mainColors.fg.fade(1).toString(),
+        backgroundColor: globalVars.mainColors.fg.fade(0.1).toString(),
     };
     const left = {
         height: px(1),

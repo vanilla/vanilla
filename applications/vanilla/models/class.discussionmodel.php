@@ -714,7 +714,15 @@ class DiscussionModel extends Gdn_Model {
         $sql->select('d2.*')
             ->from('Discussion d')
             ->join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
+            ->join('TagDiscussion td', "td.CategoryID = d.CategoryID and td.DiscussionID = d.DiscussionID", 'inner')
             ->limit($limit, $offset);
+
+        if (isset($where['d.Tags'])) {
+            $tagID = $where['d.Tags'];
+            unset($where['d.Tags']);
+            //$where['td.DiscussionID'] = 'd2.DiscussionID';
+            $where['td.TagID'] = $tagID;
+        }
 
         foreach ($orderBy as $field => $direction) {
             $sql->orderBy($this->addFieldPrefix($field), $direction);

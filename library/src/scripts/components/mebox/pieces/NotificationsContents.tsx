@@ -4,8 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { LoadStatus, ILoadable } from "@library/@types/api/core";
-import { INotification } from "@library/@types/api/notifications";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import { t } from "@library/application";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
@@ -14,16 +13,16 @@ import FrameBody from "@library/components/frame/FrameBody";
 import FrameFooter from "@library/components/frame/FrameFooter";
 import FrameHeaderWithAction from "@library/components/frame/FrameHeaderWithAction";
 import FramePanel from "@library/components/frame/FramePanel";
+import FullPageLoader from "@library/components/FullPageLoader";
 import { settings } from "@library/components/icons/header";
 import LinkAsButton from "@library/components/LinkAsButton";
 import { IMeBoxNotificationItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
 import NotificationsActions from "@library/notifications/NotificationsActions";
-import { INotificationsStoreState, IWithNotifications } from "@library/notifications/NotificationsModel";
+import { INotificationsStoreState } from "@library/notifications/NotificationsModel";
 import classNames from "classnames";
 import * as React from "react";
 import { connect } from "react-redux";
 import MeBoxDropDownItemList from "./MeBoxDropDownItemList";
-import FullPageLoader from "@library/components/FullPageLoader";
 
 export interface INotificationsProps {
     countClass?: string;
@@ -35,7 +34,7 @@ export interface INotificationsProps {
 interface IProps extends INotificationsProps {
     notificationsActions: NotificationsActions;
     className?: string;
-    preferencesUrl: string;
+    userSlug: string;
     notifications: ILoadable<IMeBoxNotificationItem[]>;
 }
 
@@ -44,7 +43,7 @@ interface IProps extends INotificationsProps {
  */
 export class NotificationsContents extends React.Component<IProps> {
     public render() {
-        const { preferencesUrl } = this.props;
+        const { userSlug } = this.props;
         const title = t("Notifications");
 
         return (
@@ -53,7 +52,7 @@ export class NotificationsContents extends React.Component<IProps> {
                     <LinkAsButton
                         title={t("Notification Preferences")}
                         className="headerDropDown-headerButton headerDropDown-notifications button-pushRight"
-                        to={preferencesUrl}
+                        to={`/profile/preferences/${userSlug}`}
                         baseClass={ButtonBaseClass.ICON}
                     >
                         {settings()}

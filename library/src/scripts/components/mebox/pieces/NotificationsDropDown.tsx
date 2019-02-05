@@ -60,10 +60,7 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
                 }
                 onVisibilityChange={this.setOpen}
             >
-                <NotificationsContents
-                    countClass={this.props.countClass}
-                    preferencesUrl={`/profile/preferences/${userSlug}`}
-                />
+                <NotificationsContents countClass={this.props.countClass} userSlug={userSlug} />
             </DropDown>
         );
     }

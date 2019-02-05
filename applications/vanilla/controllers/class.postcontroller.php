@@ -433,6 +433,9 @@ class PostController extends VanillaController {
             $this->CategoryID = $this->Discussion->CategoryID;
         }
 
+        // Verify we can add to the category content
+        $this->categoryPermission($this->CategoryID, 'Vanilla.Discussions.Add');
+
         if (c('Garden.ForceInputFormatter')) {
             $this->Form->removeFormValue('Format');
         }
@@ -674,6 +677,11 @@ class PostController extends VanillaController {
         if ($this->Form->authenticatedPostBack()) {
             // Save as a draft?
             $FormValues = $this->Form->formValues();
+
+            if ($FormValues['DiscussionID'] !== $DiscussionID) {
+                throw new Exception('DiscussionID mismatch.');
+            }
+
             $filters = ['Score'];
             $FormValues = $this->filterFormValues($FormValues, $filters);
             $FormValues = $this->CommentModel->filterForm($FormValues);

@@ -361,7 +361,7 @@ class ProfileController extends Gdn_Controller {
      * @param mixed $userReference Username or User ID.
      */
     public function edit($userReference = '', $username = '', $userID = '') {
-        $this->permission('Garden.SignIn.Allow');
+        $this->permission(['Garden.SignIn.Allow', 'Garden.Profiles.Edit'], true);
 
         $this->getUserInfo($userReference, $username, $userID, true);
         $userID = valr('User.UserID', $this);

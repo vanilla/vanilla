@@ -132,14 +132,12 @@ div.Popup {
 }
 
 #Form_Cancel {
-    background-color: transparent;
-    border-color: $global-color_primary;
-    color: $global-color_primary;
 
     &:focus,
     &:hover {
-        background-color: $global-color_primary;
-        color: $global-color_white;
+        background-color: $button-basic-hover_bg;
+        color: $button-basic-hover_fg;
+        border-color: $button-basic-hover_border;
     }
 }
 

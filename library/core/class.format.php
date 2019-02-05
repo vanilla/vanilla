@@ -12,7 +12,6 @@
  */
 
 use Garden\EventManager;
-use Vanilla\Renderer;
 
 /**
  * Output formatter.
@@ -1016,12 +1015,16 @@ class Gdn_Format {
             return self::getRichFormatter()->renderPlainText($body);
         }
 
-        $result = Gdn_Format::to($body, $format);
-        $result = Gdn_Format::replaceSpoilers($result);
-        if (strtolower($format) !== 'text') {
+        if (strcasecmp($format, 'text') === 0) {
+            // for content that is initially content, we can skip a lot of processing.
+            // We still need to filter/sanitize afterwards though.
+            $result = $body;
+        } else {
+            $result = Gdn_Format::to($body, $format);
+            $result = Gdn_Format::replaceSpoilers($result);
             $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $collapse);
+            $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
         }
-        $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
 
         // Always filter after basic parsing.
         $sanitized = Gdn_Format::htmlFilter($result);
@@ -1232,7 +1235,7 @@ class Gdn_Format {
                 $punc .= '&nbsp;';
             }
 
-            if (preg_match('`^(.+)([.?,;:])$`', $url, $matches)) {
+            if (preg_match('`^(.+)([.?,;!:])$`', $url, $matches)) {
                 $url = $matches[1];
                 $punc = $matches[2].$punc;
             }
@@ -2029,6 +2032,10 @@ EOT;
      * @since 2.1
      */
     public static function textEx($str) {
+        if (!is_string($str)) {
+            return self::to($str, 'TextEx');
+        }
+
         // Basic text parsing.
         $str = self::text($str);
 

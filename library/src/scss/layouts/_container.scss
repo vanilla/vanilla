@@ -4,7 +4,8 @@
  * @license GPL-2.0-only
  */
 
-.container {
+.container,
+.noScriptContainer {
     display: flex;
     flex-direction: column;
     position: relative;
@@ -27,4 +28,9 @@
             right: $global-gutter_quarterSize;
         }
     }
+}
+
+.noScriptContainer {
+    max-width: $global-middleColumn_width;
+    padding-top: 24px;
 }

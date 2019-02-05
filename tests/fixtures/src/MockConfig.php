@@ -14,8 +14,23 @@ use Vanilla\Contracts;
  */
 class MockConfig implements Contracts\ConfigurationInterface {
 
+    const DEFAULT_CONFIG = [
+        'Garden.RewriteUrls' => true,
+        'Garden.AllowSSL' => true,
+    ];
+
     /** @var array A mapping of config key to value */
-    private $data = [];
+    private $data = self::DEFAULT_CONFIG;
+
+    /**
+     * Construct a mock configuration with some default values.
+     *
+     * @param array $data
+     */
+    public function __construct(array $data = []) {
+        $this->data += $this->flattenArray($data);
+    }
+
 
     /**
      * @inheritdoc
@@ -34,6 +49,60 @@ class MockConfig implements Contracts\ConfigurationInterface {
      */
     public function set(string $key, $value) {
         $this->data[$key] = $value;
+
         return $this;
+    }
+
+    /**
+     * Flatten and set the data into configuration.
+     *
+     * @param array $data
+     */
+    public function loadData(array $data) {
+        $data = $this->flattenArray($data);
+        $this->data = array_merge($this->data, $data);
+    }
+
+    /**
+     * Clear all config data.
+     */
+    public function reset() {
+        $this->data = self::DEFAULT_CONFIG;
+    }
+
+    /**
+     * Flatten an array by concating it's strings.
+     *
+     * @example
+     * $before = ['Top' => ['Middle' => true]]
+     * $after = flattenArray($before);
+     * // ['Top.Middle' => true]
+     *
+     * @param array $array
+     * @param string $prefix
+     * @return array
+     */
+    private function flattenArray(array $array, string $prefix = '') {
+        $result = [];
+        foreach ($array as $key => $value) {
+            if (is_array($value) && $this->isAssosciativeArray($value)) {
+                $result = $result + $this->flattenArray($value, $prefix . $key . '.');
+            } else {
+                $result[$prefix . $key] = $value;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Quickly check if we have an indexed or sequential array.
+     *
+     * @param array $arr
+     *
+     * @return bool
+     */
+    private function isAssosciativeArray(array $arr): bool {
+        return count(array_filter(array_keys($arr), 'is_string')) > 0;
     }
 }

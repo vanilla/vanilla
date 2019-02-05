@@ -1,0 +1,7 @@
+.Reactions .ReactButton {
+    color: $component-meta_color;
+
+    &:hover {
+        color: $component-meta-link-hover_color;
+    }
+}

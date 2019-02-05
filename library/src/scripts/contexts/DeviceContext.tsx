@@ -60,10 +60,18 @@ export class DeviceProvider extends React.Component<IProps, IState> {
     }
 
     /**
-     * There's a bug in webpack and there's no way to know the styles have loaded from webpack. In debug mode,
+     * @inheritdoc
      */
     public componentDidMount() {
+        // Force at least one setting of the device.
+        this.setState({ device: this.device });
+
+        // Add a listener to update the device when window size changes.
         window.addEventListener("resize", this.throttledUpdateOnResize);
+
+        // When the webpack hot reload is on, styles are mounted after the javascript.
+        // As a result the measurement here is incorrect and there is no event fired when the CSS finishes.
+        // Here we fake it with a delayed fake resize event.
         if (module.hot) {
             setTimeout(() => {
                 window.dispatchEvent(new Event("resize"));
@@ -81,15 +89,9 @@ export class DeviceProvider extends React.Component<IProps, IState> {
     /**
      * A throttled version of updateOnResize.
      */
-    private throttledUpdateOnResize = throttle(
-        () => {
-            this.setState({ device: this.device });
-        },
-        100,
-        {
-            leading: false,
-        },
-    );
+    private throttledUpdateOnResize = throttle(() => {
+        this.setState({ device: this.device });
+    }, 100);
 }
 
 /**

@@ -24,8 +24,13 @@ export default class CodeBlockBlot extends CodeBlock {
     ///
     private baseCodeBlockReplace = BaseCodeBlock.prototype.replaceWith.bind(this);
     public replaceWith(format, value) {
-        this.domNode.innerHTML = this.domNode.textContent || "";
-        this.attach();
-        return this.baseCodeBlockReplace(format, value);
+        const replacement = this.baseCodeBlockReplace(format, value);
+        replacement.attach();
+        const element = replacement.domNode as HTMLElement;
+        const innerSpans = element.querySelectorAll("*");
+        innerSpans.forEach(span => {
+            span.setAttribute("class", "");
+        });
+        return replacement;
     }
 }

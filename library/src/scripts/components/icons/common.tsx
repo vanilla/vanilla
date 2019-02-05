@@ -303,6 +303,7 @@ export function signIn(className?: string) {
         </svg>
     );
 }
+
 export function chevronUp(className?: string) {
     const title = t("Close");
     return (

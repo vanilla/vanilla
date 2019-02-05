@@ -8,28 +8,48 @@
     Styles
 \* -------------------------------------------------------------- */
 
-.Navigation {
-    display: none;
+.Header.hasOpenNavigation {
+    @include maxWidth {
+        border-bottom-left-radius: $navigation_borderRadius;
+        border-bottom-right-radius: $navigation_borderRadius;
+    }
+}
+
+.Navigation,
+.mobileMebox {
     overflow: hidden;
     position: relative;
-    background: $navigation_bg;
-    color: $navigation_link_color;
     width: 100%;
-    height: auto;
-    max-height: 0;
-    transition: max-height .3s ease;
+    transition: height 0.3s ease;
+    will-change: height;
 
+    // Hidden on desktop
+    display: none;
+
+    // Available on mobile
     @include maxWidth {
         display: block;
     }
 
-    &.isOpen {
-        max-height: 450px;
+    &.needsInitialization {
+        position: fixed;
+        top: -100%;
+        left: -100%;
+        visibility: hidden;
     }
+}
+
+.Navigation {
+    background: $navigation_bg;
+    color: $navigation_fg;
+    box-shadow: $navigation-boxShadow;
+    border-bottom-left-radius: $navigation_borderRadius;
+    border-bottom-right-radius: $navigation_borderRadius;
 
     .Container {
         @include maxWidth {
             padding: 0;
+            padding-bottom: $utility-baseUnit;
         }
     }
 
@@ -76,15 +96,6 @@
         }
     }
 
-    &.isReadyToTransition {
-        will-change: max-height;
-        transition: max-height $global-default_easing $global-default_timing * 2;
-
-        &[data-state= 'CLOSED'] {
-            transition-timing-function: $navigation-easing-transition;
-        }
-    }
-
     .NewDiscussion.mobile {
         width: 100%;
     }
@@ -95,7 +106,7 @@
 
     .SignInIcons.SignInIcons {
         margin-left: 0;
-        margin-top: $utility-large_padding;
+        margin-top: $utility-baseUnitDouble;
         display: block;
         width: 100%;
         text-align: center;
@@ -148,40 +159,9 @@
         }
     }
 
-    // Mebox component
-    .MeButton {
-        padding: 0;
-        height: 42px;
-        width: 42px;
-        color: $navigationMebutton_fg;
-        background-color: $navigationMebutton_bg;
-        display: flex;
-        justify-content: center;
-
-        .Sprite::before {
-            font-size: $icon-default_size;
-        }
-
-        &:focus,
-        &:hover,
-        &:active {
-            color: $navigationMebutton-hover_fg;
-            background-color: $navigationMebutton-hover_bg;
-        }
-    }
-
-    .ToggleFlyout.Open .MeButton {
-        background-color: $navigationMebutton-active_bg;
-    }
-
-    .WhoIs > .Username {
-        color: $navigationMebutton_fg;
-    }
-
     .SignInLinks.SignInLinks {
         width: 100%;
         text-align: center;
-        padding-top: $utility-baseUnitDouble;
 
         a {
             @include Button(
@@ -199,10 +179,14 @@
             width: 20px;
         }
     }
+
+    .SignIn.mobile {
+        width: 100%;
+    }
 }
 
 .Navigation-row {
-    padding: 0 $utility-large_padding $utility-large_padding;
+    padding: $utility-large_padding;
     display: flex;
     align-items: center;
 }
@@ -210,21 +194,24 @@
 .Navigation-link {
     font-size: $navigation_fontSize;
     font-weight: $navigation-item_fontWeight;
-    line-height: $navigation-item_height;
+    min-height: $navigation-item_height;
     display: block;
     width: 100%;
     padding: 0 $utility-large_padding;
-    color: $navigation_link_color;
+    color: $navigation_fg;
+    display: flex;
+    align-items: center;
 
     &:focus,
     &:hover {
-        color: $navigation_link-hover_color;
+        color: $navigation-hover_fg;
     }
 }
 
 .Navigation-linkContainer {
     position: relative;
     display: flex;
+    flex-direction: column;
     align-items: center;
     padding: 0;
 
@@ -238,13 +225,11 @@
 
     &::after {
         content: "";
+        display: block;
         width: 100%;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
         height: 1px;
         background: $navigation_border;
+        margin: $utility-baseUnit 0;
     }
 }
 
@@ -256,5 +241,112 @@
 
     .Navigation-row.NewDiscussion {
         display: none;
+    }
+}
+
+.mobileMeBox-button,
+.mobileMebox-buttonClose {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    background: transparent;
+    padding: 0;
+    border-width: 0;
+    outline: none;
+}
+
+.mobileMebox-buttonClose {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: $icon-default_size;
+    line-height: 32px;
+    height: 32px;
+    width: 32px;
+    border-radius: $mebox-button_borderRadius;
+    color: $MobileMeBox_fg;
+    margin-left: auto;
+    opacity: 0.6;
+
+    span {
+        font-size: inherit;
+    }
+}
+
+.mobileMeBox-button {
+    transition: $hamburger_transition;
+    user-select: none;
+    height: 28px;
+    width: 28px;
+    right: $content_padding;
+
+    @include maxWidth {
+        position: absolute;
+    }
+
+    .PhotoWrap {
+        height: 28px;
+        width: 28px;
+    }
+
+    .PhotoWrap:hover a.ChangePicture {
+        display: none;
+    }
+}
+
+.mobileMebox {
+    background-color: $MobileMeBox_bg;
+
+    .Container {
+        display: flex;
+        align-items: center;
+    }
+
+    .MeBox {
+        display: block;
+        padding: $utility-baseUnit 0;
+        width: 80%;
+    }
+
+    .MeMenu {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .MeButton-user {
+
+        &::before {
+            @include kbicon();
+            font-size: 26px;
+            content: $kbicon-user-empty;
+        }
+
+        .ProfilePhoto {
+            display: none;
+        }
+    }
+
+    .Open .MeButton-user::before {
+        content: $kbicon-user;
+    }
+
+    .MeButton {
+
+        &:focus,
+        &:hover,
+        &:active {
+            background-color: transparent;
+        }
+
+        .Alert {
+
+            @include maxWidth {
+                top: -6px;
+            }
+        }
     }
 }

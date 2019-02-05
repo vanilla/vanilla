@@ -11,15 +11,15 @@ import * as React from "react";
 import MessagesDropDown from "./pieces/MessagesDropDown";
 import NotificationsDropdown from "./pieces/NotificationsDropDown";
 import UserDropdown from "./pieces/UserDropdown";
+import { IInjectableUserState } from "@library/users/UsersModel";
 
-export interface IMeBoxProps {
+export interface IMeBoxProps extends IInjectableUserState {
     className?: string;
     messagesProps: IMessagesContentsProps;
     counts: any;
     countsClass?: string;
     buttonClassName?: string;
     contentClassName?: string;
-    currentUser: IMe;
 }
 
 /**
@@ -31,7 +31,7 @@ export default class MeBox extends React.Component<IMeBoxProps> {
         return (
             <div className={classNames("meBox", this.props.className)}>
                 <NotificationsDropdown
-                    userSlug={currentUser.name}
+                    userSlug={currentUser.data!.name}
                     countClass={countsClass}
                     buttonClassName={buttonClassName}
                     contentsClassName={contentClassName}

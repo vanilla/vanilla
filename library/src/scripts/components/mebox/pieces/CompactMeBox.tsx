@@ -136,7 +136,7 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                                 open={false}
                                                 className="compactMeBox-tabButtonContent"
                                                 count={this.props.countUnreadNotifications}
-                                                countClass={this.props.notificationsProps.countClass}
+                                                countClass="vanillaHeader-count vanillaHeader-notificationsCount"
                                             />
                                         ),
                                         openButtonContent: (
@@ -144,15 +144,15 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                                 open={true}
                                                 className="compactMeBox-tabButtonContent"
                                                 count={this.props.countUnreadNotifications}
-                                                countClass={this.props.notificationsProps.countClass}
+                                                countClass="vanillaHeader-count vanillaHeader-notificationsCount"
                                             />
                                         ),
                                         panelContent: (
                                             <NotificationsContents
-                                                {...this.props.notificationsProps}
                                                 countClass={countClass}
                                                 className={panelContentClass}
                                                 panelBodyClass={panelBodyClass}
+                                                userSlug={userInfo.name}
                                             />
                                         ),
                                     },
@@ -224,33 +224,10 @@ function mapDispatchToProps(dispatch) {
 function mapStateToProps(state) {
     let countUnreadMessages: number = 0;
     let countUnreadNotifications: number = 0;
-    const notificationsProps: INotificationsProps = {
-        data: [],
-        userSlug: "",
-    };
     const messagesProps: IMessagesContentsProps = {
         data: [],
     };
     const conversationsByID = get(state, "conversations.conversationsByID.data", false);
-    const notificationsByID = get(state, "notifications.notificationsByID.data", false);
-
-    if (notificationsByID) {
-        // Tally the total unread notifications. Massage rows into something that will fit into IMeBoxNotificationItem.
-        for (const notification of Object.values(notificationsByID) as INotification[]) {
-            if (notification.read === false) {
-                countUnreadNotifications++;
-            }
-            notificationsProps.data.push({
-                message: notification.body,
-                photo: notification.photoUrl || null,
-                to: notification.url,
-                recordID: notification.notificationID,
-                timestamp: notification.dateUpdated,
-                unread: !notification.read,
-                type: MeBoxItemType.NOTIFICATION,
-            });
-        }
-    }
 
     if (conversationsByID) {
         // Tally the total unread messages. Massage rows into something that will fit into IMeBoxMessageItem.
@@ -290,7 +267,6 @@ function mapStateToProps(state) {
         }
     };
 
-    notificationsProps.data.sort(sortByTimestamp);
     messagesProps.data.sort(sortByTimestamp);
 
     const userProps = UsersModel.mapStateToProps(state);
@@ -299,7 +275,6 @@ function mapStateToProps(state) {
         countUnreadMessages,
         countUnreadNotifications,
         messagesProps,
-        notificationsProps,
     };
     return props;
 }

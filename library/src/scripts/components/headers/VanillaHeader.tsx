@@ -176,7 +176,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                         counts={dummyUserDropDownData}
                                                         buttonClassName="vanillaHeader-button"
                                                         contentClassName="vanillaHeader-dropDownContents"
-                                                        currentUser={currentUser}
+                                                        currentUser={this.props.currentUser}
                                                     />
                                                 )}
                                                 {isMobile &&

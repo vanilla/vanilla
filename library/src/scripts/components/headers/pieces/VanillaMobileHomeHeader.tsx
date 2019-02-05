@@ -45,20 +45,6 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
         const currentUser = this.props.currentUser.data;
         const isMobile = this.props.device === Devices.MOBILE;
         const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
-        const countClass = "vanillaHeader-count";
-        const buttonClass = "vanillaHeader-button";
-
-        const notificationProps: INotificationsProps = {
-            data: [],
-            userSlug: currentUser!.name,
-            countClass: classNames(countClass, "vanillaHeader-notificationsCount"),
-        };
-
-        const messagesProps = {
-            ...dummyMessagesData,
-            buttonClass,
-            countClass: classNames(countClass, "vanillaHeader-messagesCount"),
-        };
 
         return ReactDOM.createPortal(
             <header className={classNames("vanillaHeader", "vanillaHeaderHome", this.props.className)}>

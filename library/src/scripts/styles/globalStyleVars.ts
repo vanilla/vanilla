@@ -5,7 +5,7 @@
 
 import { color, percent, px } from "csx";
 
-export const globalVariables = (globalColorsOverwrite = {}, bodyOverwrite = {}, borderOverwrite = {}) => {
+export const globalVariables = (mainColorsOverwrite = {}) => {
     const colorPrimary = color("#0291db");
 
     const utility = {
@@ -25,7 +25,7 @@ export const globalVariables = (globalColorsOverwrite = {}, bodyOverwrite = {}, 
         bg: color("#fff"),
         primary: colorPrimary,
         secondary: colorPrimary.darken(10),
-        ...globalColorsOverwrite,
+        ...mainColorsOverwrite,
     };
 
     const errorFg = color("#ff3933");
@@ -44,7 +44,6 @@ export const globalVariables = (globalColorsOverwrite = {}, bodyOverwrite = {}, 
 
     const body = {
         bg: mainColors.bg,
-        ...bodyOverwrite,
     };
 
     const border = {
@@ -52,7 +51,6 @@ export const globalVariables = (globalColorsOverwrite = {}, bodyOverwrite = {}, 
         width: px(1),
         style: "solid",
         radius: px(6),
-        ...borderOverwrite,
     };
 
     const gutterSize = 24;

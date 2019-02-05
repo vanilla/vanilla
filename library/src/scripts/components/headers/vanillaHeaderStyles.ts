@@ -13,8 +13,17 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 import { userPhotoVariables } from "@library/styles/userPhotoStyles";
 import { vanillaMenuVariables } from "@library/styles/vanillaMenu";
 
+// const sampleThemeOverwrite = {
+//     fg: color("#fff"),
+//     bg: color("#2a2c32"),
+//     primary: color("#ff31cb"),
+//     secondary: color("#9c4e0a"),
+// };
+
+const sampleThemeOverwrite = {};
+
 export function vanillaHeaderVariables() {
-    const globalVars = globalVariables();
+    const globalVars = globalVariables(sampleThemeOverwrite);
 
     const sizing = {
         height: 48,
@@ -83,7 +92,7 @@ export function vanillaHeaderVariables() {
     const resister = {
         bg: globalVars.mainColors.bg,
         hover: {
-            bg: globalVars.mainColors.bg.fade(0.9),
+            bg: globalVars.mainColors.bg.fade(0.9).toString(),
         },
     };
 
@@ -108,7 +117,7 @@ export function vanillaHeaderVariables() {
 }
 
 export default function vanillaHeaderClasses() {
-    const globalVars = globalVariables();
+    const globalVars = globalVariables(sampleThemeOverwrite);
     const vars = vanillaHeaderVariables();
     const formElementVars = formElementsVariables();
     const userPhotoVars = userPhotoVariables();
@@ -144,6 +153,9 @@ export default function vanillaHeaderClasses() {
                             color: vars.colors.fg.toString(),
                         },
                     },
+                },
+                ".searchBar__placeholder": {
+                    color: vars.colors.fg.fade(0.8).toString(),
                 },
             },
         },
@@ -273,7 +285,7 @@ export default function vanillaHeaderClasses() {
             color: vars.colors.fg.toString(),
             height: px(vars.sizing.height),
             minWidth: px(vars.button.size),
-            padding: 0,
+            padding: px(0),
             $nest: {
                 "&:active": {
                     $nest: {
@@ -339,7 +351,7 @@ export default function vanillaHeaderClasses() {
     const tabButton = style({
         display: "block",
         height: percent(100),
-        padding: 0,
+        padding: px(0),
         $nest: {
             "&:active": tabButtonActive,
             "&:hover": tabButtonActive,

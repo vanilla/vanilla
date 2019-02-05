@@ -54,7 +54,7 @@ export const mobileDropDownClasses = () => {
     const panel = style({
         position: "relative",
         maxHeight: percent(100),
-        padding: 0,
+        padding: px(0),
     });
 
     const content = style({
@@ -78,7 +78,7 @@ export const mobileDropDownClasses = () => {
         mediaQueries.xs({
             maxWidth: percent(100),
             margin: 0,
-            padding: 0,
+            padding: px(0),
         }),
     );
 
@@ -117,7 +117,7 @@ export const mobileDropDownClasses = () => {
     });
 
     const closeModalIcon = style({
-        padding: 0,
+        padding: px(0),
         margin: "auto",
         color: vars.chevron.color.toString(),
         $nest: {

@@ -114,7 +114,7 @@ export default function vanillaHeaderNavClasses() {
         flexWrap: "nowrap",
         $nest: {
             "&:after": {
-                content: ` `,
+                content: `${""}`,
                 position: "absolute",
                 top: 0,
                 right: 0,

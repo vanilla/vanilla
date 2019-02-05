@@ -13,6 +13,7 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\Contracts\Web\AssetInterface;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\SiteMeta;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\JsInterpop\PhpAsJsVariable;
 use Vanilla\Web\JsInterpop\ReduxAction;
@@ -83,24 +84,30 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /** @var WebpackAssetProvider */
     protected $assetProvider;
 
+    /** @var BreadcrumbModel */
+    protected $breadcrumbModel;
+
     /**
-     * Dependendency Injecvtion.
+     * Dependendency Injection.
      *
      * @param SiteMeta $siteMeta
      * @param \Gdn_Request $request
      * @param \Gdn_Session $session
      * @param WebpackAssetProvider $assetProvider
+     * @param BreadcrumbModel $breadcrumbModel
      */
     public function setDependencies(
         SiteMeta $siteMeta,
         \Gdn_Request $request,
         \Gdn_Session $session,
-        WebpackAssetProvider $assetProvider
+        WebpackAssetProvider $assetProvider,
+        BreadcrumbModel $breadcrumbModel
     ) {
         $this->siteMeta = $siteMeta;
         $this->request = $request;
         $this->session = $session;
         $this->assetProvider = $assetProvider;
+        $this->breadcrumbModel = $breadcrumbModel;
     }
 
     /**

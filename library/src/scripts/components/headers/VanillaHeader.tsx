@@ -4,33 +4,32 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import ReactDOM from "react-dom";
+import { t } from "@library/application";
+import ConditionalWrap from "@library/components/ConditionalWrap";
+import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
+import FlexSpacer from "@library/components/FlexSpacer";
+import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
+import Container from "@library/components/layouts/components/Container";
+import { Panel, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 import MeBox from "@library/components/mebox/MeBox";
+import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
+import CompactSearch from "@library/components/mebox/pieces/CompactSearch";
+import HeaderLogo from "@library/components/mebox/pieces/HeaderLogo";
+import VanillaHeaderNav from "@library/components/mebox/pieces/VanillaHeaderNav";
+import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
 import { dummyLogoData } from "@library/components/mebox/state/dummyLogoData";
 import { dummyMessagesData } from "@library/components/mebox/state/dummyMessagesData";
 import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
-import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import { withDevice } from "@library/contexts/DeviceContext";
 import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
-import classNames from "classnames";
-import Container from "@library/components/layouts/components/Container";
-import { Panel, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
-import HeaderLogo from "@library/components/mebox/pieces/HeaderLogo";
-import VanillaHeaderNav from "@library/components/mebox/pieces/VanillaHeaderNav";
-import CompactSearch from "@library/components/mebox/pieces/CompactSearch";
-import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
-import { connect } from "react-redux";
-import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
-import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
-import ConditionalWrap from "@library/components/ConditionalWrap";
-import FlexSpacer from "@library/components/FlexSpacer";
 import BackLink from "@library/components/navigation/BackLink";
-import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
-import { withPages, IWithPagesProps } from "@library/contexts/PagesContext";
-import { t } from "@library/application";
+import { withDevice } from "@library/contexts/DeviceContext";
+import { IWithPagesProps, withPages } from "@library/contexts/PagesContext";
 import { ScrollOffsetContext } from "@library/contexts/ScrollOffsetContext";
-import { INotificationsProps } from "../mebox/pieces/NotificationsContents";
+import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
+import classNames from "classnames";
+import * as React from "react";
+import ReactDOM from "react-dom";
+import { connect } from "react-redux";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.

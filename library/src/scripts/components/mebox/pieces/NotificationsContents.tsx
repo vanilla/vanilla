@@ -13,7 +13,7 @@ import FrameBody from "@library/components/frame/FrameBody";
 import FrameFooter from "@library/components/frame/FrameFooter";
 import FrameHeaderWithAction from "@library/components/frame/FrameHeaderWithAction";
 import FramePanel from "@library/components/frame/FramePanel";
-import FullPageLoader from "@library/components/FullPageLoader";
+import FullPageLoader, { LoaderStyle } from "@library/components/FullPageLoader";
 import { settings } from "@library/components/icons/header";
 import LinkAsButton from "@library/components/LinkAsButton";
 import { IMeBoxNotificationItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
@@ -88,7 +88,9 @@ export class NotificationsContents extends React.Component<IProps> {
         const { notifications } = this.props;
 
         if (notifications.status !== LoadStatus.SUCCESS || !notifications.data) {
-            return <FullPageLoader />;
+            // This 69 is the height that it happens to be right now.
+            // This will be calculated better once we finish the CSS in JS transition.
+            return <FullPageLoader loaderStyle={LoaderStyle.FIXED_SIZE} height={69} minimumTime={0} />;
         }
 
         return (

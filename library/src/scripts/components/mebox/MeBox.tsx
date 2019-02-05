@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { IMe } from "@library/@types/api/users";
+import { IMe, IUserFragment } from "@library/@types/api/users";
 import { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
 import classNames from "classnames";
 import * as React from "react";
@@ -12,6 +12,7 @@ import MessagesDropDown from "./pieces/MessagesDropDown";
 import NotificationsDropdown from "./pieces/NotificationsDropDown";
 import UserDropdown from "./pieces/UserDropdown";
 import { IInjectableUserState } from "@library/users/UsersModel";
+import get from "lodash/get";
 
 export interface IMeBoxProps extends IInjectableUserState {
     className?: string;
@@ -27,15 +28,22 @@ export interface IMeBoxProps extends IInjectableUserState {
  */
 export default class MeBox extends React.Component<IMeBoxProps> {
     public render() {
-        const { buttonClassName, contentClassName, countsClass, currentUser } = this.props;
+        const { buttonClassName, contentClassName, countsClass } = this.props;
+        const userInfo: IMe = get(this.props, "currentUser.data", {
+            countUnreadNotifications: 0,
+            name: null,
+            userID: null,
+            photoUrl: null,
+        });
+
         return (
             <div className={classNames("meBox", this.props.className)}>
                 <NotificationsDropdown
-                    userSlug={currentUser.data!.name}
+                    userSlug={userInfo.name}
                     countClass={countsClass}
                     buttonClassName={buttonClassName}
                     contentsClassName={contentClassName}
-                    countUnread={0}
+                    countUnread={userInfo.countUnreadNotifications}
                 />
                 <MessagesDropDown
                     {...this.props.messagesProps}

@@ -4,36 +4,35 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
+import { IConversation } from "@library/@types/api";
+import { IMe, IUserFragment } from "@library/@types/api/users";
+import apiv2 from "@library/apiv2";
 import { t } from "@library/application";
-import { IUserFragment } from "@library/@types/api/users";
+import CloseButton from "@library/components/CloseButton";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import { IMeBoxProps } from "@library/components/mebox/MeBox";
+import { IMeBoxItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
+import MessagesContents, { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
+import MessagesToggle from "@library/components/mebox/pieces/MessagesToggle";
+import NotificationsContents from "@library/components/mebox/pieces/NotificationsContents";
+import NotificationsToggle from "@library/components/mebox/pieces/NotificationsToggle";
+import UserDropdownContents from "@library/components/mebox/pieces/UserDropdownContents";
 import { UserPhoto, UserPhotoSize } from "@library/components/mebox/pieces/UserPhoto";
-import { connect } from "react-redux";
-import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
-import get from "lodash/get";
-import classNames from "classnames";
-import Tabs from "@library/components/tabs/Tabs";
 import Modal from "@library/components/modal/Modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import CloseButton from "@library/components/CloseButton";
-import UserDropdownContents from "@library/components/mebox/pieces/UserDropdownContents";
-import NotificationsToggle from "@library/components/mebox/pieces/NotificationsToggle";
-import MessagesToggle from "@library/components/mebox/pieces/MessagesToggle";
-import { IMeBoxProps } from "@library/components/mebox/MeBox";
-import NotificationsContents, { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
-import MessagesContents, { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
-import { IMeBoxItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
-import { IConversation, INotification } from "@library/@types/api";
-import NotificationsActions from "@library/notifications/NotificationsActions";
-import apiv2 from "@library/apiv2";
+import Tabs from "@library/components/tabs/Tabs";
 import ConversationsActions from "@library/conversations/ConversationsActions";
+import NotificationsActions from "@library/notifications/NotificationsActions";
+import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
+import classNames from "classnames";
+import get from "lodash/get";
+import * as React from "react";
+import { connect } from "react-redux";
 
 export interface IUserDropDownProps extends IInjectableUserState, IMeBoxProps {
     buttonClass?: string;
     userPhotoClass?: string;
     countUnreadMessages: number;
-    countUnreadNotifications: number;
 }
 
 interface IState {
@@ -51,10 +50,11 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
     };
 
     public render() {
-        const userInfo: IUserFragment = get(this.props, "currentUser.data", {
+        const userInfo: IMe = get(this.props, "currentUser.data", {
             name: null,
             userID: null,
             photoUrl: null,
+            countUnreadNotifications: 0,
         });
 
         const { counts } = this.props;
@@ -135,7 +135,7 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                             <NotificationsToggle
                                                 open={false}
                                                 className="compactMeBox-tabButtonContent"
-                                                count={this.props.countUnreadNotifications}
+                                                count={userInfo.countUnreadNotifications}
                                                 countClass="vanillaHeader-count vanillaHeader-notificationsCount"
                                             />
                                         ),
@@ -143,7 +143,7 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                             <NotificationsToggle
                                                 open={true}
                                                 className="compactMeBox-tabButtonContent"
-                                                count={this.props.countUnreadNotifications}
+                                                count={userInfo.countUnreadNotifications}
                                                 countClass="vanillaHeader-count vanillaHeader-notificationsCount"
                                             />
                                         ),
@@ -223,7 +223,6 @@ function mapDispatchToProps(dispatch) {
  */
 function mapStateToProps(state) {
     let countUnreadMessages: number = 0;
-    let countUnreadNotifications: number = 0;
     const messagesProps: IMessagesContentsProps = {
         data: [],
     };
@@ -273,7 +272,6 @@ function mapStateToProps(state) {
     const props = {
         ...userProps,
         countUnreadMessages,
-        countUnreadNotifications,
         messagesProps,
     };
     return props;

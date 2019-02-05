@@ -62,6 +62,13 @@ export const globalVariables = (globalColorsOverwrite = {}, bodyOverwrite = {}, 
         quarter: gutterSize / 4,
     };
 
+    const lineHeights = {
+        base: 1.5,
+        condensed: 1.25,
+        code: 1.45,
+        excerpt: 1.45,
+    };
+
     const panelWidth = 216;
     const panel = {
         width: panelWidth,
@@ -104,5 +111,20 @@ export const globalVariables = (globalColorsOverwrite = {}, bodyOverwrite = {}, 
         },
     };
 
-    return { utility, elementaryColors, mainColors, feedbackColors, body, border, gutter, panel, content, fonts };
+    const spacer = fonts.size.medium * lineHeights.base;
+
+    return {
+        utility,
+        elementaryColors,
+        mainColors,
+        feedbackColors,
+        body,
+        border,
+        gutter,
+        panel,
+        content,
+        fonts,
+        spacer,
+        lineHeights,
+    };
 };

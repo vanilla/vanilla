@@ -13,7 +13,7 @@ namespace VanillaTests\APIv2;
 class AddonsTest extends AbstractAPIv2Test {
     private $coreAddons = [
         'conversations', // applications
-        'allviewed', 'buttonbar', 'emojiextender', 'facebook', 'flagging',
+        'allviewed', 'emojiextender', 'facebook', 'flagging',
         'googleplus', 'googleprettify', 'gravatar', 'indexphotos', 'openid', 'profileextender', 'quotes',
         'splitmerge', 'stopforumspam', 'twitter', 'vanillainthisdiscussion', 'vanillastats', 'editor', 'oauth2',
         'recaptcha', 'stubcontent', 'vanillicon', // plugins

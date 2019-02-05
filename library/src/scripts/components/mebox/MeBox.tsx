@@ -35,6 +35,7 @@ export default class MeBox extends React.Component<IMeBoxProps> {
                     countClass={countsClass}
                     buttonClassName={buttonClassName}
                     contentsClassName={contentClassName}
+                    countUnread={0}
                 />
                 <MessagesDropDown
                     {...this.props.messagesProps}

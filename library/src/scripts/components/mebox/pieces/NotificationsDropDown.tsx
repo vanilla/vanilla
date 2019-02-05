@@ -4,21 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
+import { t } from "@library/application";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DropDown from "@library/components/dropdown/DropDown";
-import { t } from "@library/application";
 import { ButtonBaseClass } from "@library/components/forms/Button";
-import classNames from "classnames";
 import NotificationsContents, { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
 import NotificationsToggle from "@library/components/mebox/pieces/NotificationsToggle";
-import { connect } from "react-redux";
-import { IMeBoxNotificationItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
-import apiv2 from "@library/apiv2";
-import NotificationsActions from "@library/notifications/NotificationsActions";
-import { INotificationsStoreState } from "@library/notifications/NotificationsModel";
-import get from "lodash/get";
-import { INotification } from "@library/@types/api";
+import classNames from "classnames";
+import * as React from "react";
 
 interface IProps extends INotificationsProps {
     buttonClassName?: string;

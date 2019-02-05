@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { LoadStatus } from "@library/@types/api/core";
+import { LoadStatus, ILoadable } from "@library/@types/api/core";
 import { INotification } from "@library/@types/api/notifications";
 import apiv2 from "@library/apiv2";
 import { t } from "@library/application";
@@ -23,6 +23,7 @@ import classNames from "classnames";
 import * as React from "react";
 import { connect } from "react-redux";
 import MeBoxDropDownItemList from "./MeBoxDropDownItemList";
+import FullPageLoader from "@library/components/FullPageLoader";
 
 export interface INotificationsProps {
     countClass?: string;
@@ -31,10 +32,11 @@ export interface INotificationsProps {
 }
 
 // For clarity, I'm adding className separately because both the container and the content have className, but it's not applied to the same element.
-interface IProps extends INotificationsProps, IWithNotifications {
+interface IProps extends INotificationsProps {
     notificationsActions: NotificationsActions;
     className?: string;
     preferencesUrl: string;
+    notifications: ILoadable<IMeBoxNotificationItem[]>;
 }
 
 /**
@@ -42,23 +44,8 @@ interface IProps extends INotificationsProps, IWithNotifications {
  */
 export class NotificationsContents extends React.Component<IProps> {
     public render() {
-        const { notificationsByID, preferencesUrl } = this.props;
+        const { preferencesUrl } = this.props;
         const title = t("Notifications");
-        const data: IMeBoxNotificationItem[] = [];
-
-        if (notificationsByID.status === LoadStatus.SUCCESS && notificationsByID.data) {
-            for (const notification of Object.values(notificationsByID.data) as INotification[]) {
-                data.push({
-                    message: notification.body,
-                    photo: notification.photoUrl || null,
-                    to: notification.url,
-                    recordID: notification.notificationID,
-                    timestamp: notification.dateUpdated,
-                    unread: !notification.read,
-                    type: MeBoxItemType.NOTIFICATION,
-                });
-            }
-        }
 
         return (
             <Frame className={this.props.className}>
@@ -73,14 +60,7 @@ export class NotificationsContents extends React.Component<IProps> {
                     </LinkAsButton>
                 </FrameHeaderWithAction>
                 <FrameBody className={classNames("isSelfPadded", this.props.panelBodyClass)}>
-                    <FramePanel>
-                        <MeBoxDropDownItemList
-                            emptyMessage={t("You do not have any notifications yet.")}
-                            className="headerDropDown-notifications"
-                            type={MeBoxItemType.NOTIFICATION}
-                            data={data}
-                        />
-                    </FramePanel>
+                    <FramePanel>{this.bodyContent()}</FramePanel>
                 </FrameBody>
                 <FrameFooter>
                     <LinkAsButton
@@ -102,10 +82,30 @@ export class NotificationsContents extends React.Component<IProps> {
         );
     }
 
-    public componentDidMount() {
-        const { notificationsActions, notificationsByID } = this.props;
+    /**
+     * Get content for the main body panel.
+     */
+    private bodyContent(): JSX.Element {
+        const { notifications } = this.props;
 
-        if (notificationsByID.status === LoadStatus.PENDING) {
+        if (notifications.status !== LoadStatus.SUCCESS || !notifications.data) {
+            return <FullPageLoader />;
+        }
+
+        return (
+            <MeBoxDropDownItemList
+                emptyMessage={t("You do not have any notifications yet.")}
+                className="headerDropDown-notifications"
+                type={MeBoxItemType.NOTIFICATION}
+                data={Object.values(notifications.data)}
+            />
+        );
+    }
+
+    public componentDidMount() {
+        const { notificationsActions, notifications } = this.props;
+
+        if (notifications.status === LoadStatus.PENDING) {
             void notificationsActions.getNotifications();
         }
     }
@@ -138,8 +138,26 @@ function mapDispatchToProps(dispatch) {
  */
 function mapStateToProps(state: INotificationsStoreState) {
     const { notificationsByID } = state.notifications;
+    const notifications: ILoadable<IMeBoxNotificationItem[]> = {
+        ...notificationsByID,
+        data:
+            notificationsByID.status === LoadStatus.SUCCESS && notificationsByID.data
+                ? Object.values(notificationsByID.data).map(notification => {
+                      return {
+                          message: notification.body,
+                          photo: notification.photoUrl || null,
+                          to: notification.url,
+                          recordID: notification.notificationID,
+                          timestamp: notification.dateUpdated,
+                          unread: !notification.read,
+                          type: MeBoxItemType.NOTIFICATION,
+                      } as IMeBoxNotificationItem;
+                  })
+                : undefined,
+    };
+
     return {
-        notificationsByID,
+        notifications,
     };
 }
 

@@ -21,7 +21,6 @@ import VanillaHeaderNav from "@library/components/mebox/pieces/VanillaHeaderNav"
 import CompactSearch from "@library/components/mebox/pieces/CompactSearch";
 import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
 import { connect } from "react-redux";
-import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
 import ConditionalWrap from "@library/components/ConditionalWrap";
@@ -31,6 +30,7 @@ import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeader
 import { withPages, IWithPagesProps } from "@library/contexts/PagesContext";
 import { t } from "@library/application";
 import { ScrollOffsetContext } from "@library/contexts/ScrollOffsetContext";
+import { INotificationsProps } from "../mebox/pieces/NotificationsContents";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -76,12 +76,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const countClass = "vanillaHeader-count";
         const buttonClass = "vanillaHeader-button";
         const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
-
-        const notificationProps: INotificationsProps = {
-            data: [],
-            userSlug: currentUser!.name,
-            countClass: classNames(countClass, "vanillaHeader-notificationsCount"),
-        };
 
         const messagesProps = {
             ...dummyMessagesData,
@@ -179,11 +173,11 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                 {!isMobile && (
                                                     <MeBox
                                                         className="vanillaHeader-meBox"
-                                                        notificationsProps={notificationProps}
                                                         messagesProps={messagesProps as any}
                                                         counts={dummyUserDropDownData}
                                                         buttonClassName="vanillaHeader-button"
                                                         contentClassName="vanillaHeader-dropDownContents"
+                                                        currentUser={currentUser}
                                                     />
                                                 )}
                                                 {isMobile &&

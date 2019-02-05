@@ -16,6 +16,8 @@ export interface INotificationsStoreState {
     notifications: INotificationsState;
 }
 
+export interface IWithNotifications extends INotificationsState {}
+
 /**
  * Manage notification state in Redux.
  */

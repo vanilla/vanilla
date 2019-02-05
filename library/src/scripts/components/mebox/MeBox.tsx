@@ -4,23 +4,22 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import classNames from "classnames";
-import NotificationsDropdown from "./pieces/NotificationsDropDown";
-import MessagesDropDown from "./pieces/MessagesDropDown";
-import UserDropdown from "./pieces/UserDropdown";
-import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
+import { IMe } from "@library/@types/api/users";
 import { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
-import MessagesToggle from "@library/components/mebox/pieces/MessagesToggle";
+import classNames from "classnames";
+import * as React from "react";
+import MessagesDropDown from "./pieces/MessagesDropDown";
+import NotificationsDropdown from "./pieces/NotificationsDropDown";
+import UserDropdown from "./pieces/UserDropdown";
 
 export interface IMeBoxProps {
     className?: string;
-    notificationsProps: INotificationsProps;
     messagesProps: IMessagesContentsProps;
     counts: any;
     countsClass?: string;
     buttonClassName?: string;
     contentClassName?: string;
+    currentUser: IMe;
 }
 
 /**
@@ -28,20 +27,18 @@ export interface IMeBoxProps {
  */
 export default class MeBox extends React.Component<IMeBoxProps> {
     public render() {
-        const countClass = this.props.countsClass;
-        const buttonClassName = this.props.buttonClassName;
-        const contentClassName = this.props.contentClassName;
+        const { buttonClassName, contentClassName, countsClass, currentUser } = this.props;
         return (
             <div className={classNames("meBox", this.props.className)}>
                 <NotificationsDropdown
-                    {...this.props.notificationsProps}
-                    countClass={countClass}
+                    userSlug={currentUser.name}
+                    countClass={countsClass}
                     buttonClassName={buttonClassName}
                     contentsClassName={contentClassName}
                 />
                 <MessagesDropDown
                     {...this.props.messagesProps}
-                    countClass={countClass}
+                    countClass={countsClass}
                     buttonClassName={buttonClassName}
                     contentsClassName={contentClassName}
                     toggleContentsClassName="meBox-buttonContent"
@@ -49,7 +46,7 @@ export default class MeBox extends React.Component<IMeBoxProps> {
                 <UserDropdown
                     counts={this.props.counts}
                     className="meBox-userDropdown"
-                    countsClass={countClass}
+                    countsClass={countsClass}
                     buttonClassName={buttonClassName}
                     contentsClassName={contentClassName}
                     toggleContentClassName="meBox-buttonContent"

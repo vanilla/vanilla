@@ -8,7 +8,7 @@ import * as React from "react";
 import classNames from "classnames";
 import { vanillaLogo } from "@library/components/icons/header";
 import SmartLink from "@library/components/navigation/SmartLink";
-import vanillaHeaderLogoClasses from "@library/components/headers/vanillaHeaderStyles";
+import { vanillaHeaderLogoClasses } from "@library/components/headers/vanillaHeaderStyles";
 
 export interface IHeaderLogo {
     className?: string;
@@ -31,15 +31,15 @@ export default class HeaderLogo extends React.Component<IHeaderLogo> {
     }
     public render() {
         let contents;
-        const logoClassName = classNames("headerLogo-logo", this.props.logoClassName);
         const classes = vanillaHeaderLogoClasses();
+        const logoClassName = classNames("headerLogo-logo", this.props.logoClassName, classes.logo);
         if (this.props.logoUrl) {
             contents = <img src={this.props.logoUrl} alt={this.props.alt} className={logoClassName} />;
         } else {
             contents = vanillaLogo(logoClassName, this.props.color);
         }
         return (
-            <SmartLink to={this.props.to} className={classNames("headerLogo", classes.logo, this.props.className)}>
+            <SmartLink to={this.props.to} className={classNames("headerLogo", classes.link, this.props.className)}>
                 <span className={classNames("headerLogo-logoFrame", classes.logoFrame)}>{contents}</span>
             </SmartLink>
         );

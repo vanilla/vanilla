@@ -15,8 +15,6 @@ import { vanillaMenuVariables } from "@library/styles/vanillaMenu";
 
 export function vanillaHeaderVariables() {
     const globalVars = globalVariables();
-    const formElementVars = formElementsVariables();
-    const mediaQueries = layoutStyles().mediaQueries();
 
     const sizing = {
         height: 48,
@@ -66,19 +64,6 @@ export function vanillaHeaderVariables() {
         maxWidth: 672,
     };
 
-    const compactSearchResults = style(
-        {
-            top: (sizing.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
-            display: "block",
-            position: "relative",
-            margin: "auto",
-            maxWidth: px(compactSearch.maxWidth),
-        },
-        mediaQueries.oneColumn({
-            top: (sizing.mobile.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
-        }),
-    );
-
     const buttonContents = {
         hover: {
             bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 10),
@@ -118,7 +103,6 @@ export function vanillaHeaderVariables() {
         compactSearch,
         buttonContents,
         mobileDropDown,
-        compactSearchResults,
     };
 }
 
@@ -136,7 +120,7 @@ export default function vanillaHeaderClasses() {
             backgroundColor: headerColors.bg.toString(),
             color: headerColors.fg.toString(),
             $nest: {
-                "&isFixed": {
+                "&.isFixed": {
                     position: "fixed",
                     top: 0,
                     left: 0,
@@ -238,7 +222,7 @@ export default function vanillaHeaderClasses() {
     );
 
     const messages = style({
-        color: vars.colors.bg.toString(),
+        color: vars.colors.fg.toString(),
     });
 
     const notifications = style({
@@ -477,6 +461,19 @@ export default function vanillaHeaderClasses() {
         },
     });
 
+    const compactSearchResults = style(
+        {
+            top: (vars.sizing.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
+            display: "block",
+            position: "relative",
+            margin: "auto",
+            maxWidth: px(vars.compactSearch.maxWidth),
+        },
+        mediaQueries.oneColumn({
+            top: (vars.sizing.mobile.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
+        }),
+    );
+
     return {
         root,
         spacer,
@@ -502,12 +499,14 @@ export default function vanillaHeaderClasses() {
         backLink,
         signIn,
         register,
+        compactSearchResults,
     };
 }
 
 export function vanillaHeaderLogoClasses() {
     const vars = vanillaHeaderVariables();
     const logoFrame = style({ display: "inline-flex" });
+
     const logo = style({
         display: "block",
         height: px(vars.sizing.height - 18),
@@ -519,7 +518,11 @@ export function vanillaHeaderLogoClasses() {
         },
     });
 
-    return { logoFrame, logo };
+    const link = style({
+        textDecoration: "none",
+    });
+
+    return { logoFrame, logo, link };
 }
 
 export function vanillaHeaderHomeClasses() {

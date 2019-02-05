@@ -26,7 +26,7 @@
 //    height: $vanillaHeader_height;
 //}
 
-.vanillaHeader {
+//.vanillaHeader {
     //background-color: $vanillaHeader_bg;
     //color: $vanillaHeader_fg;
     //
@@ -38,24 +38,24 @@
     //    z-index: 1;
     //}
 
-    .searchBar__control {
-        color: $vanillaHeader-fg;
-    }
-
-    .suggestedTextInput-clear.searchBar-clear {
-        color: $vanillaHeader-fg;
-
-        &:hover,
-        &:active,
-        &:focus {
-            color: $vanillaHeader-fg;
-        }
-    }
+    //.searchBar__control {
+    //    color: $vanillaHeader-fg;
+    //}
+    //
+    //.suggestedTextInput-clear.searchBar-clear {
+    //    color: $vanillaHeader-fg;
+    //
+    //    &:hover,
+    //    &:active,
+    //    &:focus {
+    //        color: $vanillaHeader-fg;
+    //    }
+    //}
 
     //@include mediaQuery-panelLayout_oneColumn {
     //    height: $vanillaHeader_mobile_height;
     //}
-}
+//}
 
 //.vanillaHeaderHome {
 //    min-height: $vanillaHeader_mobile_height * 2;

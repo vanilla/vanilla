@@ -82,10 +82,7 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                             <FlexSpacer className={classNames("vanillaHeaderHome-left", classesHome.left)} />
                             <HeaderLogo
                                 {...dummyLogoData}
-                                className={classNames(
-                                    "vanillaHeader-logoContainer",
-                                    style({ display: "inline-flex", alignSelf: "center" }),
-                                )}
+                                className={classNames("vanillaHeader-logoContainer", classes.logoContainer)}
                                 logoClassName="vanillaHeader-logo isCentred"
                             />
                             {isGuest ? (

@@ -9,6 +9,7 @@ import classNames from "classnames";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import SmartLink from "@library/components/navigation/SmartLink";
 import VanillaHeaderListItem from "@library/components/mebox/pieces/VanillaHeaderListItem";
+import vanillaHeaderNavClasses from "@library/components/headers/VanillaHeaderNav";
 
 export interface IHeaderNav {
     className?: string;
@@ -26,13 +27,22 @@ interface IProps extends IHeaderNav, RouteComponentProps<{}> {}
 export class VanillaHeaderNavItem extends React.Component<IProps> {
     public render() {
         const isCurrent = this.currentPage();
+        const classes = vanillaHeaderNavClasses();
         return (
-            <VanillaHeaderListItem className={classNames(this.props.className, { isCurrent })}>
-                <SmartLink to={this.props.to} className={classNames("vanillaHeaderNav-link", this.props.linkClassName)}>
+            <VanillaHeaderListItem className={classNames(this.props.className, classes.root, { isCurrent })}>
+                <SmartLink
+                    to={this.props.to}
+                    className={classNames("vanillaHeaderNav-link", this.props.linkClassName, classes.link)}
+                >
                     <div
-                        className={classNames("vanillaHeaderNav-linkContent", this.props.linkContentClassName, {
-                            isCurrent,
-                        })}
+                        className={classNames(
+                            "vanillaHeaderNav-linkContent",
+                            this.props.linkContentClassName,
+                            classes.linkContent,
+                            {
+                                isCurrent,
+                            },
+                        )}
                     >
                         {this.props.children}
                     </div>

@@ -106,7 +106,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                     <Container>
                         <Panel className="panelLayout-fullWidth">
                             <PanelWidgetHorizontalPadding>
-                                <div className="vanillaHeader-bar">
+                                <div className={classNames("vanillaHeader-bar", classes.bar)}>
                                     {!this.state.openSearch &&
                                         isMobile && (
                                             <BackLink

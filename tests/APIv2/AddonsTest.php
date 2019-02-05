@@ -158,19 +158,7 @@ class AddonsTest extends AbstractAPIv2Test {
             }
         }
     }
-
-    /**
-     * You shouldn't be able to enable two conflicting plugins at the same time.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionCode 409
-     * @expectedExceptionMessage Advanced Editor conflicts with: Button Bar.
-     */
-    public function testConflictingAddons() {
-        $this->api()->patch('/addons/buttonbar', ['enabled' => true]);
-        $this->api()->patch('/addons/editor', ['enabled' => true]);
-    }
-
+    
     /**
      * Provide a list of hidden addons.
      *

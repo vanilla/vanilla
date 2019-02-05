@@ -25,7 +25,7 @@ interface BreadcrumbProviderInterface {
     /**
      * Get the record type that the provider works for.
      *
-     * @return string
+     * @return string[]
      */
-    public static function getRecordType(): string;
+    public static function getValidRecordTypes(): array;
 }

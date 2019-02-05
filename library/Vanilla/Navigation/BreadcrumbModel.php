@@ -21,7 +21,10 @@ class BreadcrumbModel {
      * @param BreadcrumbProviderInterface $provider
      */
     public function addProvider(BreadcrumbProviderInterface $provider) {
-        $this->providers[$provider::getRecordType()] = $provider;
+        $types = $provider::getValidRecordTypes();
+        foreach ($types as $type) {
+            $this->providers[$type] = $provider;
+        }
     }
 
     /**

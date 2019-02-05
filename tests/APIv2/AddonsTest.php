@@ -13,7 +13,7 @@ namespace VanillaTests\APIv2;
 class AddonsTest extends AbstractAPIv2Test {
     private $coreAddons = [
         'conversations', // applications
-        'allviewed', 'buttonbar', 'debugger', 'emojiextender', 'facebook', 'flagging',
+        'allviewed', 'debugger', 'emojiextender', 'facebook', 'flagging',
         'googleplus', 'googleprettify', 'gravatar', 'indexphotos', 'openid', 'profileextender', 'quotes',
         'splitmerge', 'stopforumspam', 'twitter', 'vanillainthisdiscussion', 'vanillastats', 'editor', 'oauth2',
         'recaptcha', 'stubcontent', 'vanillicon', // plugins
@@ -126,21 +126,21 @@ class AddonsTest extends AbstractAPIv2Test {
      */
     public function testAddonModelPluginManagerInterop() {
         // Enable via the API.
-        $this->api()->patch('/addons/buttonbar', ['enabled' => true]);
-        $this->assertPluginEnabled('buttonbar', true);
+        $this->api()->patch('/addons/profileextender', ['enabled' => true]);
+        $this->assertPluginEnabled('profileextender', true);
 
         // Disable via plugin manager.
         $pm = \Gdn::pluginManager();
-        $pm->disablePlugin('buttonbar');
-        $this->assertPluginEnabled('buttonbar', false);
+        $pm->disablePlugin('profileextender');
+        $this->assertPluginEnabled('profileextender', false);
 
         // Enable via plugin manager.
-        $pm->enablePlugin('buttonbar', new \Gdn_Validation());
-        $this->assertPluginEnabled('buttonbar', true);
+        $pm->enablePlugin('profileextender', new \Gdn_Validation());
+        $this->assertPluginEnabled('profileextender', true);
 
         // Disable via API.
-        $this->api()->patch('/addons/buttonbar', ['enabled' => false]);
-        $this->assertPluginEnabled('buttonbar', false);
+        $this->api()->patch('/addons/profileextender', ['enabled' => false]);
+        $this->assertPluginEnabled('profileextender', false);
     }
 
     /**
@@ -157,18 +157,6 @@ class AddonsTest extends AbstractAPIv2Test {
                 $this->assertSame($pluginEnabled, $enabled, "The plugin with key $key has the wrong enabled value.");
             }
         }
-    }
-
-    /**
-     * You shouldn't be able to enable two conflicting plugins at the same time.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionCode 409
-     * @expectedExceptionMessage Advanced Editor conflicts with: Button Bar.
-     */
-    public function testConflictingAddons() {
-        $this->api()->patch('/addons/buttonbar', ['enabled' => true]);
-        $this->api()->patch('/addons/editor', ['enabled' => true]);
     }
 
     /**

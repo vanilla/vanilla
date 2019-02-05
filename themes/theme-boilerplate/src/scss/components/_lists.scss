@@ -120,6 +120,11 @@
         line-height: $icon-default_size;
     }
 
+    .OptionsMenu .Arrow::before {
+        font-size: #{$icon-default_size - 2px};
+        margin-top: -1px;
+    }
+
     .MostRecentBy,
     .LatestPostTitle {
         @include ellipsis;
@@ -380,6 +385,11 @@
             order: 2;
         }
     }
+
+    //overwrite indexphoto plugin styles
+    .ItemDiscussion-withPhoto.ItemDiscussion-withPhoto .Discussion.ItemContent {
+        padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
+    }
 }
 
 .MessageList {
@@ -473,12 +483,27 @@
                 font-size: $component-meta_fontSize;
                 line-height: $component-meta_lineHeight;
                 display: inline-block;
-                padding-left: $theme-photo_size + $utility-baseUnitDouble;
+                padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
 
                 > * {
                     display: inline;
                     font-size: inherit;
                     line-height: inherit;
+                }
+            }
+
+            .InlineTags {
+                padding-left: 0;
+
+                a {
+                    font-size: inherit;
+                    color: $component-meta-link_color;
+
+                    &:hover,
+                    &:focus,
+                    &:active {
+                        color: $component-meta-link-hover_color;
+                    }
                 }
             }
 
@@ -637,8 +662,31 @@
 
     .PhotoWrap {
         position: absolute;
-        left: $component-base_padding;
         top: $component-base_padding;
+
+        @if $component_lateralBorder == true {
+            left: $component-base_padding;
+        } @else {
+            left: 0;
+        }
+    }
+
+    .Meta {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .MItem-Author a {
+        font-size: inherit;
+        font-weight: inherit;
+        line-height: inherit;
+        color: $component-meta-link_color;
+
+        &:focus,
+        &:hover {
+            text-decoration: $theme-link-hover_textDecoration;
+            color: $component-meta-link-hover_color;
+        }
     }
 }
 
@@ -732,5 +780,10 @@
     .OptionsMenu .Arrow::before {
         font-size: $icon-default_size;
         line-height: $icon-default_size;
+    }
+
+    .OptionsMenu .Arrow::before {
+        font-size: #{$icon-default_size - 2px};
+        margin-top: -1px;
     }
 }

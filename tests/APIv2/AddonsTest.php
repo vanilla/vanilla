@@ -20,7 +20,7 @@ class AddonsTest extends AbstractAPIv2Test {
     ];
 
     private $coreThemes = [
-        'EmbedFriendly', 'bittersweet', 'default', 'mobile', // themes
+        'EmbedFriendly', 'bittersweet', 'default', 'mobile', 'keystone',  // themes
     ];
 
     private $hiddenAddons = [
@@ -105,10 +105,10 @@ class AddonsTest extends AbstractAPIv2Test {
      */
     public function testChangeTheme() {
         $desktop = $this->api()->get('/addons', ['type' => 'theme', 'enabled' => true, 'themeType' => 'desktop'])[0];
-        $this->assertEquals('default-theme', $desktop['addonID']);
+        $this->assertEquals('keystone-theme', $desktop['addonID']);
 
         $mobile = $this->api()->get('/addons', ['type' => 'theme', 'enabled' => true, 'themeType' => 'mobile'])[0];
-        $this->assertEquals('mobile-theme', $mobile['addonID']);
+        $this->assertEquals('keystone-theme', $mobile['addonID']);
 
         // Set the desktop and mobile theme.
         $this->api()->patch('/addons/bittersweet-theme', ['enabled' => true, 'themeType' => 'desktop']);
@@ -126,21 +126,21 @@ class AddonsTest extends AbstractAPIv2Test {
      */
     public function testAddonModelPluginManagerInterop() {
         // Enable via the API.
-        $this->api()->patch('/addons/buttonbar', ['enabled' => true]);
-        $this->assertPluginEnabled('buttonbar', true);
+        $this->api()->patch('/addons/profileextender', ['enabled' => true]);
+        $this->assertPluginEnabled('profileextender', true);
 
         // Disable via plugin manager.
         $pm = \Gdn::pluginManager();
-        $pm->disablePlugin('buttonbar');
-        $this->assertPluginEnabled('buttonbar', false);
+        $pm->disablePlugin('profileextender');
+        $this->assertPluginEnabled('profileextender', false);
 
         // Enable via plugin manager.
-        $pm->enablePlugin('buttonbar', new \Gdn_Validation());
-        $this->assertPluginEnabled('buttonbar', true);
+        $pm->enablePlugin('profileextender', new \Gdn_Validation());
+        $this->assertPluginEnabled('profileextender', true);
 
         // Disable via API.
-        $this->api()->patch('/addons/buttonbar', ['enabled' => false]);
-        $this->assertPluginEnabled('buttonbar', false);
+        $this->api()->patch('/addons/profileextender', ['enabled' => false]);
+        $this->assertPluginEnabled('profileextender', false);
     }
 
     /**
@@ -157,18 +157,6 @@ class AddonsTest extends AbstractAPIv2Test {
                 $this->assertSame($pluginEnabled, $enabled, "The plugin with key $key has the wrong enabled value.");
             }
         }
-    }
-
-    /**
-     * You shouldn't be able to enable two conflicting plugins at the same time.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionCode 409
-     * @expectedExceptionMessage Advanced Editor conflicts with: Button Bar.
-     */
-    public function testConflictingAddons() {
-        $this->api()->patch('/addons/buttonbar', ['enabled' => true]);
-        $this->api()->patch('/addons/editor', ['enabled' => true]);
     }
 
     /**

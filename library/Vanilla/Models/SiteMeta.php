@@ -37,13 +37,17 @@ class SiteMeta implements \JsonSerializable {
     /** @var int */
     private $maxUploadSize;
 
+    /** @var string */
+    private $localeKey;
+
     /**
      * SiteMeta constructor.
      *
      * @param RequestInterface $request The request to gather data from.
      * @param Contracts\ConfigurationInterface $config The configuration object.
+     * @param \Gdn_Locale $locale
      */
-    public function __construct(RequestInterface $request, Contracts\ConfigurationInterface $config) {
+    public function __construct(RequestInterface $request, Contracts\ConfigurationInterface $config, \Gdn_Locale $locale) {
         $this->host = $request->getHost();
 
         // We the roots from the request in the form of "" or "/asd" or "/asdf/asdf"
@@ -61,6 +65,9 @@ class SiteMeta implements \JsonSerializable {
         $this->allowedExtensions = $config->get('Garden.Upload.AllowedFileExtensions', []);
         $maxSize = $config->get('Garden.Upload.MaxFileSize', ini_get('upload_max_filesize'));
         $this->maxUploadSize = \Gdn_Upload::unformatFileSize($maxSize);
+
+        // localization
+        $this->localeKey = $locale->current();
     }
 
     /**
@@ -83,6 +90,7 @@ class SiteMeta implements \JsonSerializable {
             ],
             'ui' => [
                 'siteName' => $this->siteTitle,
+                'localeKey' => $this->localeKey,
             ],
             'upload' => [
                 'maxSize' => $this->maxUploadSize,
@@ -138,5 +146,12 @@ class SiteMeta implements \JsonSerializable {
      */
     public function getMaxUploadSize(): int {
         return $this->maxUploadSize;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLocaleKey(): string {
+        return $this->localeKey;
     }
 }

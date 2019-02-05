@@ -1,0 +1,20 @@
+{
+    "name": "Akismet",
+    "description": "Adds Akismet spam filtering to all posts by unverified users and applicant registrations.",
+    "version": "1.2",
+    "settingsUrl": "/settings/akismet",
+    "settingsPermission": "Garden.Settings.Manage",
+    "icon": "akismet.png",
+    "key": "akismet",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

@@ -90,7 +90,7 @@ $flyout-progress_size:                  24px !default;
     min-width: $dropDown_width;
 
     // Flyouts will acclimate to the width of their ButtonGroup.
-    .ButtonGroup & {
+    .ButtonGroup.Big & {
         min-width: initial;
     }
 
@@ -471,6 +471,10 @@ $flyout-progress_size:                  24px !default;
 
 .OnlineUserWrap .OnlineUserName {
     padding: $flyoutMessage_padding !important;
+
+    @include maxWidth {
+        display: none;
+    }
 }
 
 .MenuItems-Reactions.MenuItems-Reactions {
@@ -530,6 +534,47 @@ $flyout-progress_size:                  24px !default;
         &:hover {
             background-color: $global-color_active_primaryBg;
         }
+    }
+}
+
+.MenuItems.ui-autocomplete {
+    color: $flyout_fg;
+
+    .ui-menu-item,
+    .ui-menu-item > a {
+        display: block;
+    }
+
+    a {
+        &:hover,
+        &:focus,
+        &:active {
+            color: $flyout_fg;
+
+            .Gloss {
+                color: inherit;
+            }
+        }
+    }
+
+    .Title {
+        display: block;
+        width: 100%;
+        font-weight: $global-semibold_fontWeight;
+        font-size: $global-large_fontSize;
+        margin-bottom: $utility-baseUnit;
+    }
+
+    .Aside {
+        float: left;
+        font-size: $global-small_fontSize;
+        opacity: 1;
+    }
+
+    .Gloss {
+        width: auto;
+        padding-left: $utility-baseUnit;
+        font-size: $global-small_fontSize;
     }
 }
 

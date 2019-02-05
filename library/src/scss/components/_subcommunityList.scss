@@ -5,7 +5,7 @@
  */
 
 $subcommunityList_spacing    : 24px;
-$subcommunityList_width      : 384px + $subcommunityList_spacing;
+$subcommunityList_width      : 432px;
 
 
 .subcommunityList {
@@ -40,4 +40,12 @@ $subcommunityList_width      : 384px + $subcommunityList_spacing;
         display: block;
         width: 100%;
     }
+}
+
+.icon.subcommunityList-fallbackIcon {
+    @include absolute-fullSizeOfParent;
+    display: block;
+    width: 90px;
+    height: 90px;
+    color: $global-color_primary;
 }

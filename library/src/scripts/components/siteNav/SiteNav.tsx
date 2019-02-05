@@ -49,7 +49,7 @@ export class SiteNav extends React.Component<IProps> {
               })
             : null;
 
-        if (hasChildren || this.props.bottomCTA) {
+        if (hasChildren) {
             return (
                 <nav onKeyDownCapture={this.handleKeyDown} className={classNames("siteNav", this.props.className)}>
                     {this.props.title ? (
@@ -68,7 +68,7 @@ export class SiteNav extends React.Component<IProps> {
                 </nav>
             );
         } else {
-            return null;
+            return this.props.bottomCTA;
         }
     }
 

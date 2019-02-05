@@ -24,6 +24,7 @@ $richEditorForm-placeholder_color: mixContentBgAndFg(50%);
     @include textInputSizing($global-title_fontSize + 2 * $utility-baseUnit, $global-title_fontSize, $utility-baseUnit);
     position: relative;
     font-weight: $global-fontWeight_semiBold;
+    color: $global-color-fg;
     border: 0;
     border-radius: 0;
     margin-bottom: $global_spacer;

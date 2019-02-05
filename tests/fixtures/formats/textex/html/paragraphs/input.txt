@@ -6,3 +6,5 @@ Line 5
 
 
 Line 8
+
+[spoiler]Legacy Spoiler[/spoiler]

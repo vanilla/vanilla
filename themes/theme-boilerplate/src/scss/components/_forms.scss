@@ -255,10 +255,6 @@ div.token-input-dropdown {
     }
 }
 
-.DraftButton {
-    display: none !important;
-}
-
 .Button-Controls .Button.Primary,
 .BigButton:not(.Danger),
 .NewConversation.NewConversation {
@@ -391,5 +387,9 @@ div.token-input-dropdown {
             padding: 0;
         }
     }
+}
+
+.CommentForm .DraftButton {
+    display: none !important;
 }
 

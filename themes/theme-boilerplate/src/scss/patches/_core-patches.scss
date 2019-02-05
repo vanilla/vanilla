@@ -48,6 +48,13 @@ body {
 .Item .Author a {
     font-size: inherit;
     font-weight: inherit;
+    color: $component-meta_color;
+
+    &:focus,
+    &:hover {
+        text-decoration: $theme-link-hover_textDecoration;
+        color: $component-meta-link-hover_color;
+    }
 }
 
 .Item {
@@ -241,6 +248,10 @@ a.ChangePicture {
 
 }
 
+.MenuItems a:hover .Gloss {
+    color: inherit !important;
+}
+
 #Form_Ban {
     @include Button(
             $button-primary_bg,
@@ -352,6 +363,7 @@ table.PreferenceGroup th {
     font-size: $formButton_fontSize;
     line-height: $formButton_height;
     min-height: $formButton_height;
+    min-width: 170px;
 }
 
 .PageDescription {

@@ -87,7 +87,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                                 name={t("Bookmarks")}
                                 count={counts.bookmarkCount}
                             />
-                            <DropDownItemLinkWithCount to="/drafts" name={t("Drafts")} count={counts.draftsCount} />
+                            <DropDownItemLinkWithCount to="/kb/drafts" name={t("Drafts")} count={counts.draftsCount} />
                             <DropDownItemLink to="/discussions/mine" name={t("My Discussions")} />
                             <DropDownItemLink to="/activity" name={t("Participated")} />
                         </DropDownSection>

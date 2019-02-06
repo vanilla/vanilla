@@ -244,7 +244,7 @@ module.exports = function (grunt) {
           'scss/maps/_vanillicon.scss': 'scss/vanillicon/*.scss',
           'scss/maps/_extensions.scss': 'scss/extensions/*.scss',
           'scss/maps/_bootstrapVariables.scss': 'scss/vendors/bootstrap/scss/_variables.scss',
-          'scss/maps/_bootstrapMixins.scss': 'scss/vendors/bootstrap/scss/styleUtilities/*.scss',
+          'scss/maps/_bootstrapMixins.scss': 'scss/vendors/bootstrap/scss/mixins/*.scss',
           'scss/maps/_bootstrapAnimation.scss': 'scss/vendors/bootstrap/scss/_animation.scss',
           'scss/maps/_vendorSubset.scss': [
             'scss/vendors/bootstrap/scss/_normalize.scss',

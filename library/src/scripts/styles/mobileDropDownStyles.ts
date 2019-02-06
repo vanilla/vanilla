@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import {calc, percent, px} from "csx";
+import { calc, percent, px } from "csx";
 import { flexHelper, mixBgAndFg } from "@library/styles/styleHelpers";
 import { vanillaHeaderVariables } from "@library/components/headers/vanillaHeaderStyles";
 import { style } from "typestyle";
@@ -66,14 +66,10 @@ export const mobileDropDownClasses = () => {
 
     const toggleButton = style(
         {
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            flexWrap: "nowrap",
+            ...flex.middle(),
             userSelect: "none",
-            width: percent(100),
-            maxWidth: calc(`100% - ${px(globalVars.spacer})`),
+            flexGrow: 1,
+            maxWidth: calc(`100% - ${px(globalVars.spacer)}`),
             marginLeft: globalVars.spacer / 2,
             marginRight: globalVars.spacer / 2,
         },

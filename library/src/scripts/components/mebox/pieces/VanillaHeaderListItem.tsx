@@ -17,6 +17,6 @@ export interface IProps {
  */
 export default class VanillaHeaderListItem extends React.Component<IProps> {
     public render() {
-        return <li className={classNames("vanillaHeaderNav-item", this.props.className)}>{this.props.children}</li>;
+        return <li className={classNames(this.props.className)}>{this.props.children}</li>;
     }
 }

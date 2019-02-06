@@ -486,7 +486,8 @@ class UsersApiController extends AbstractApiController {
             unset($dbRecord['Confirmed']);
         }
         if (array_key_exists('Admin', $dbRecord)) {
-            $dbRecord['isAdmin'] = $dbRecord['Admin'];
+            // The site creator is 1, System is 2.
+            $dbRecord['isAdmin'] = in_array($dbRecord['Admin'], [1, 2]);
             unset($dbRecord['Admin']);
         }
 

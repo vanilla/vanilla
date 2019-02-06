@@ -176,9 +176,6 @@ $global-panel_paddedWidth                            : $global-panel_width + $gl
 $global-middleColumn_width                           : 672px;
 $global-middleColumn_paddedWidth                     : $global-middleColumn_width + $global-gutter_size;
 
-
-
-
 $global-content_width                                : $global-panel_paddedWidth * 2 + $global-middleColumn_paddedWidth + $global-gutter_size * 3; // *3 from margin between columns and half margin on .container
 
 $global-twoColumn_breakpoint                         : 1200px !default; // Generic breakpoint for 2 columns
@@ -273,10 +270,6 @@ $formElement_maxWidth                                : 528px !default;
 $formElement_fg                                      : mix($global-color_fg, $global-color_bg, 80%) !default; // Derived
 $formElement_bg                                      : $global-color_bg !default;
 $formElement_miniInput_width                         : 100px !default;
-
-
-
-
 
 $global-formNote_fg                                  : mix($global-color_fg, $global-color_bg, 72%) !default; // Derived
 $global-formNoteLink_fg                              : $global-color_primary !default; // Derived

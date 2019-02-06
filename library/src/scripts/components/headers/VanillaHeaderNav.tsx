@@ -4,11 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import {color, percent, px, quote} from "csx";
+import { color, percent, px, quote, calc } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutStyles } from "@library/styles/layoutStyles";
 import { style } from "typestyle";
 import { vanillaHeaderVariables } from "@library/components/headers/vanillaHeaderStyles";
+import { flexHelper } from "@library/styles/styleHelpers";
 
 export function vanillaHeaderNavigation() {
     const globalVars = globalVariables();
@@ -42,15 +43,14 @@ export default function vanillaHeaderNavClasses() {
     const headerVars = vanillaHeaderVariables();
     const vars = vanillaHeaderNavigation();
     const mediaQueries = layoutStyles().mediaQueries();
+    const flex = flexHelper();
 
     const root = style({
         position: "relative",
     });
 
     const navigation = style({
-        display: "flex",
-        alignItems: "center",
-        flexWrap: "nowrap",
+        ...flex.middle(),
         height: percent(100),
         color: "inherit",
         $nest: {
@@ -65,10 +65,7 @@ export default function vanillaHeaderNavClasses() {
 
     const items = style(
         {
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexWrap: "nowrap",
+            ...flex.middle(),
             height: px(vars.item.size),
             $nest: {
                 "&.isCurrent": {
@@ -77,7 +74,7 @@ export default function vanillaHeaderNavClasses() {
                             $nest: {
                                 "&:after": {
                                     marginLeft: -2,
-                                    width: `calc(100% + 4px)`,
+                                    width: calc(`100% + 4px`),
                                     borderBottomColor: vars.border.active.border.color.toString(),
                                 },
                             },
@@ -107,14 +104,11 @@ export default function vanillaHeaderNavClasses() {
     });
 
     const linkContent = style({
+        ...flex.middleLeft(),
         position: "relative",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexWrap: "nowrap",
         $nest: {
             "&:after": {
-                content: quote(''),
+                content: quote(""),
                 position: "absolute",
                 top: 0,
                 right: 0,

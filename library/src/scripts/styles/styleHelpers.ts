@@ -5,6 +5,7 @@
 
 import { color, ColorHelper } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { FlexWrapProperty } from "csstype";
 
 /*
  * Helper function to get variable with fallback
@@ -44,3 +45,25 @@ export const mixBgAndFg = weight => {
     const coreVars = globalVariables();
     return coreVars.mainColors.fg.mix(coreVars.mainColors.bg, weight);
 };
+
+export function flexHelper() {
+    const middle = (wrap = false) => {
+        return {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexWrap: wrap ? "wrap" : ("nowrap" as FlexWrapProperty),
+        };
+    };
+
+    const middleLeft = (wrap = false) => {
+        return {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            flexWrap: wrap ? "wrap" : ("nowrap" as FlexWrapProperty),
+        };
+    };
+
+    return { middle, middleLeft };
+}

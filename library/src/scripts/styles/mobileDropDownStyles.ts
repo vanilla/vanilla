@@ -3,10 +3,10 @@
  * @license GPL-2.0-only
  */
 
-import { color, percent, px } from "csx";
-import { mixBgAndFg } from "@library/styles/styleHelpers";
+import {calc, percent, px} from "csx";
+import { flexHelper, mixBgAndFg } from "@library/styles/styleHelpers";
 import { vanillaHeaderVariables } from "@library/components/headers/vanillaHeaderStyles";
-import { media, style } from "typestyle";
+import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutStyles } from "@library/styles/layoutStyles";
 
@@ -15,7 +15,7 @@ export const mobileDropDownVariables = () => {
 
     const title = {
         letterSpacing: -0.26,
-        maxWidth: `calc(100% - ${px(vanillaHeaderVars.endElements.flexBasis * 2)}`,
+        maxWidth: calc(`100% - ${px(vanillaHeaderVars.endElements.flexBasis * 2)}`),
     };
     const chevron = {
         width: 8,
@@ -32,8 +32,10 @@ export const mobileDropDownClasses = () => {
     const vars = mobileDropDownVariables();
     const globalVars = globalVariables();
     const mediaQueries = layoutStyles().mediaQueries();
+    const flex = flexHelper();
 
     const root = style({
+        ...flex.middle(),
         position: "relative",
         flexGrow: 1,
         overflow: "hidden",
@@ -71,7 +73,7 @@ export const mobileDropDownClasses = () => {
             flexWrap: "nowrap",
             userSelect: "none",
             width: percent(100),
-            maxWidth: `calc(100% - ${globalVars.spacer}`,
+            maxWidth: calc(`100% - ${px(globalVars.spacer})`),
             marginLeft: globalVars.spacer / 2,
             marginRight: globalVars.spacer / 2,
         },

@@ -6,7 +6,7 @@
 
 import { color, percent, px } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { getColorDependantOnLightness } from "@library/styles/styleHelpers";
+import { flexHelper, getColorDependantOnLightness } from "@library/styles/styleHelpers";
 import { layoutStyles } from "@library/styles/layoutStyles";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
@@ -124,6 +124,7 @@ export default function vanillaHeaderClasses() {
     const headerColors = vars.colors;
     const vanillaMenuVars = vanillaMenuVariables();
     const mediaQueries = layoutStyles().mediaQueries();
+    const flex = flexHelper();
 
     const root = style(
         {
@@ -278,10 +279,7 @@ export default function vanillaHeaderClasses() {
 
     const button = style(
         {
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexWrap: "nowrap",
+            ...flex.middle(),
             color: vars.colors.fg.toString(),
             height: px(vars.sizing.height),
             minWidth: px(vars.button.size),
@@ -393,9 +391,7 @@ export default function vanillaHeaderClasses() {
 
     const leftFlexBasis = style(
         {
-            display: "flex",
-            flexWrap: "nowrap",
-            alignItems: "center",
+            ...flex.middle(),
             flexBasis: vars.endElements.flexBasis,
         },
         mediaQueries.oneColumn({
@@ -408,7 +404,7 @@ export default function vanillaHeaderClasses() {
     );
 
     const backLink = style({
-        transform: `translateX(${-globalVars.gutter.half})`,
+        transform: `translateX(${-px(globalVars.gutter.half)})`,
     });
 
     const signIn = style({

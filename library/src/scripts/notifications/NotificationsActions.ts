@@ -84,34 +84,34 @@ export default class NotificationsActions extends ReduxActions {
      *
      * @param id Unique ID of the notification.
      */
-    public getNotification(id: number) {
+    public getNotification = (id: number) => {
         return this.dispatchApi("get", `/notifications/${id}`, NotificationsActions.getNotificationACs, {});
-    }
+    };
 
     /**
      * Get a paginated list of notifications for the current user.
      */
-    public getNotifications() {
+    public getNotifications = () => {
         return this.dispatchApi("get", "/notifications", NotificationsActions.getNotificationsACs, {});
-    }
+    };
 
     /**
      * Mark a single notification as read.
      *
      * @param id Unique ID of the notification.
      */
-    public markRead(id: number) {
+    public markRead = (id: number) => {
         return this.dispatchApi("patch", `/notifications/${id}`, NotificationsActions.markReadACs, {
             read: true,
         });
-    }
+    };
 
     /**
      * Mark all notifications for the current user as read.
      */
-    public markAllRead() {
+    public markAllRead = () => {
         return this.dispatchApi("patch", "/notifications", NotificationsActions.markAllReadACs, {
             read: true,
         });
-    }
+    };
 }

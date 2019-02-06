@@ -28,6 +28,9 @@ class UsersApiController extends AbstractApiController {
 
     const ME_ACTION_CONSTANT = "@@users/GET_ME_RESPONSE";
 
+    /** @var ActivityModel */
+    private $activityModel;
+
     /** @var Gdn_Configuration */
     private $configuration;
 
@@ -56,12 +59,14 @@ class UsersApiController extends AbstractApiController {
     public function __construct(
         UserModel $userModel,
         Gdn_Configuration $configuration,
-        ImageResizer $imageResizer
+        ImageResizer $imageResizer,
+        ActivityModel $activityModel
     ) {
         $this->configuration = $configuration;
         $this->userModel = $userModel;
         $this->imageResizer = $imageResizer;
         $this->nameScheme =  new DelimitedScheme('.', new CamelCaseScheme());
+        $this->activityModel = $activityModel;
     }
 
     /**
@@ -325,6 +330,10 @@ class UsersApiController extends AbstractApiController {
             "photoUrl",
             "dateLastActive",
             "isAdmin:b",
+            "countUnreadNotifications" => [
+                "description" => "Total number of unread notifications for the current user.",
+                "type" => "integer",
+            ],
             "permissions" => [
                 "description" => "Global permissions available to the current user.",
                 "items" => [
@@ -345,6 +354,7 @@ class UsersApiController extends AbstractApiController {
 
         // Expand permissions for the current user.
         $user["permissions"] = $this->globalPermissions();
+        $user["countUnreadNotifications"] = $this->activityModel->getUserTotalUnread($this->getSession()->UserID);
 
         $result = $out->validate($user);
         return $result;

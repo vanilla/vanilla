@@ -18,9 +18,7 @@ import HeaderLogo from "@library/components/mebox/pieces/HeaderLogo";
 import VanillaHeaderNav from "@library/components/mebox/pieces/VanillaHeaderNav";
 import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
 import { dummyLogoData } from "@library/components/mebox/state/dummyLogoData";
-import { dummyMessagesData } from "@library/components/mebox/state/dummyMessagesData";
 import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
-import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
 import BackLink from "@library/components/navigation/BackLink";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { IWithPagesProps, withPages } from "@library/contexts/PagesContext";
@@ -31,7 +29,6 @@ import * as React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import vanillaHeaderClasses from "@library/components/headers/vanillaHeaderStyles";
-import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -210,7 +207,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                     <MeBox
                                                         currentUser={this.props.currentUser}
                                                         className={classNames("vanillaHeader-meBox", classes.meBox)}
-                                                        counts={dummyUserDropDownData}
                                                         buttonClassName={classes.button}
                                                         contentClassName={classNames(
                                                             "vanillaHeader-dropDownContents",

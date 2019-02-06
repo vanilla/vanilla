@@ -1,7 +1,7 @@
 {
-    "name": "Rich Editor (Beta)",
+    "name": "Rich Editor",
     "description": "The new WYSIWYG editor for Vanilla. Easy to use, with support for rich content embedding. Also supports a more minimal text mode, Markdown, and BBCode.",
-    "version": "0.9",
+    "version": "1.0.1",
     "mobileFriendly": true,
     "hasLocale": true,
     "icon": "rich_editor.png",

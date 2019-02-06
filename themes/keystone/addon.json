@@ -3,6 +3,7 @@
     "name": "Keystone",
     "description": "A responsive Vanilla theme with customization options.",
     "version": "1.0.0",
+    "hidden": false,
      "authors": [
         {
             "name": "Isis Graziatto",

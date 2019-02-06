@@ -4,33 +4,32 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import ReactDOM from "react-dom";
+import { t } from "@library/application";
+import ConditionalWrap from "@library/components/ConditionalWrap";
+import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
+import FlexSpacer from "@library/components/FlexSpacer";
+import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
+import Container from "@library/components/layouts/components/Container";
+import { Panel, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 import MeBox from "@library/components/mebox/MeBox";
+import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
+import CompactSearch from "@library/components/mebox/pieces/CompactSearch";
+import HeaderLogo from "@library/components/mebox/pieces/HeaderLogo";
+import VanillaHeaderNav from "@library/components/mebox/pieces/VanillaHeaderNav";
+import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
 import { dummyLogoData } from "@library/components/mebox/state/dummyLogoData";
 import { dummyMessagesData } from "@library/components/mebox/state/dummyMessagesData";
 import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
-import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import { withDevice } from "@library/contexts/DeviceContext";
 import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
-import classNames from "classnames";
-import Container from "@library/components/layouts/components/Container";
-import { Panel, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
-import HeaderLogo from "@library/components/mebox/pieces/HeaderLogo";
-import VanillaHeaderNav from "@library/components/mebox/pieces/VanillaHeaderNav";
-import CompactSearch from "@library/components/mebox/pieces/CompactSearch";
-import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
-import { connect } from "react-redux";
-import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
-import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
-import MobileDropDown from "@library/components/headers/pieces/MobileDropDown";
-import ConditionalWrap from "@library/components/ConditionalWrap";
-import FlexSpacer from "@library/components/FlexSpacer";
 import BackLink from "@library/components/navigation/BackLink";
-import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
-import { withPages, IWithPagesProps } from "@library/contexts/PagesContext";
-import { t } from "@library/application";
+import { withDevice } from "@library/contexts/DeviceContext";
+import { IWithPagesProps, withPages } from "@library/contexts/PagesContext";
 import { ScrollOffsetContext } from "@library/contexts/ScrollOffsetContext";
+import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
+import classNames from "classnames";
+import * as React from "react";
+import ReactDOM from "react-dom";
+import { connect } from "react-redux";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -76,18 +75,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const countClass = "vanillaHeader-count";
         const buttonClass = "vanillaHeader-button";
         const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
-
-        const notificationProps: INotificationsProps = {
-            data: [],
-            userSlug: currentUser!.name,
-            countClass: classNames(countClass, "vanillaHeader-notificationsCount"),
-        };
-
-        const messagesProps = {
-            ...dummyMessagesData,
-            buttonClass,
-            countClass: classNames(countClass, "vanillaHeader-messagesCount"),
-        };
 
         return ReactDOM.createPortal(
             <>
@@ -179,20 +166,18 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                 {!isMobile && (
                                                     <MeBox
                                                         className="vanillaHeader-meBox"
-                                                        notificationsProps={notificationProps}
-                                                        messagesProps={messagesProps as any}
-                                                        counts={dummyUserDropDownData}
                                                         buttonClassName="vanillaHeader-button"
                                                         contentClassName="vanillaHeader-dropDownContents"
+                                                        currentUser={this.props.currentUser}
                                                     />
                                                 )}
                                                 {isMobile &&
                                                     !this.state.openSearch && (
                                                         <CompactMeBox
                                                             className={"vanillaHeader-button"}
-                                                            counts={dummyUserDropDownData}
                                                             buttonClass="vanillaHeader-tabButton"
                                                             userPhotoClass="headerDropDown-user"
+                                                            currentUser={this.props.currentUser}
                                                         />
                                                     )}
                                             </React.Fragment>

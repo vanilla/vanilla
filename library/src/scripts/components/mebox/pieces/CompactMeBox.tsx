@@ -4,36 +4,28 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
+import { IMe } from "@library/@types/api/users";
 import { t } from "@library/application";
-import { IUserFragment } from "@library/@types/api/users";
+import CloseButton from "@library/components/CloseButton";
+import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import { IMeBoxProps } from "@library/components/mebox/MeBox";
+import MessagesContents from "@library/components/mebox/pieces/MessagesContents";
+import MessagesCount from "@library/components/mebox/pieces/MessagesCount";
+import NotificationsContents from "@library/components/mebox/pieces/NotificationsContents";
+import NotificationsCounter from "@library/components/mebox/pieces/NotificationsCounter";
+import UserDropdownContents from "@library/components/mebox/pieces/UserDropdownContents";
 import { UserPhoto, UserPhotoSize } from "@library/components/mebox/pieces/UserPhoto";
-import { connect } from "react-redux";
-import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
-import get from "lodash/get";
-import classNames from "classnames";
-import Tabs from "@library/components/tabs/Tabs";
 import Modal from "@library/components/modal/Modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
-import CloseButton from "@library/components/CloseButton";
-import UserDropdownContents from "@library/components/mebox/pieces/UserDropdownContents";
-import NotificationsToggle from "@library/components/mebox/pieces/NotificationsToggle";
-import MessagesToggle from "@library/components/mebox/pieces/MessagesToggle";
-import { IMeBoxProps } from "@library/components/mebox/MeBox";
-import NotificationsContents, { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
-import MessagesContents, { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
-import { IMeBoxItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
-import { IConversation, INotification } from "@library/@types/api";
-import NotificationsActions from "@library/notifications/NotificationsActions";
-import apiv2 from "@library/apiv2";
-import ConversationsActions from "@library/conversations/ConversationsActions";
+import Tabs from "@library/components/tabs/Tabs";
+import { IInjectableUserState } from "@library/users/UsersModel";
+import classNames from "classnames";
+import get from "lodash/get";
+import * as React from "react";
 
 export interface IUserDropDownProps extends IInjectableUserState, IMeBoxProps {
     buttonClass?: string;
     userPhotoClass?: string;
-    countUnreadMessages: number;
-    countUnreadNotifications: number;
 }
 
 interface IState {
@@ -43,7 +35,7 @@ interface IState {
 /**
  * Implements User Drop down for header
  */
-export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
+export default class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
 
     public state = {
@@ -51,13 +43,13 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
     };
 
     public render() {
-        const userInfo: IUserFragment = get(this.props, "currentUser.data", {
+        const userInfo: IMe = get(this.props, "currentUser.data", {
             name: null,
             userID: null,
             photoUrl: null,
+            countUnreadNotifications: 0,
         });
 
-        const { counts } = this.props;
         const countClass = this.props.countsClass;
         const buttonClass = this.props.buttonClass;
         const panelContentClass = "compactMeBox-panel";
@@ -124,7 +116,6 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                         ),
                                         panelContent: (
                                             <UserDropdownContents
-                                                counts={counts}
                                                 className={panelContentClass}
                                                 panelBodyClass={panelBodyClass}
                                             />
@@ -132,52 +123,46 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                     },
                                     {
                                         buttonContent: (
-                                            <NotificationsToggle
+                                            <NotificationsCounter
                                                 open={false}
                                                 className="compactMeBox-tabButtonContent"
-                                                count={this.props.countUnreadNotifications}
-                                                countClass={this.props.notificationsProps.countClass}
+                                                countClass="vanillaHeader-count vanillaHeader-notificationsCount"
                                             />
                                         ),
                                         openButtonContent: (
-                                            <NotificationsToggle
+                                            <NotificationsCounter
                                                 open={true}
                                                 className="compactMeBox-tabButtonContent"
-                                                count={this.props.countUnreadNotifications}
-                                                countClass={this.props.notificationsProps.countClass}
+                                                countClass="vanillaHeader-count vanillaHeader-notificationsCount"
                                             />
                                         ),
                                         panelContent: (
                                             <NotificationsContents
-                                                {...this.props.notificationsProps}
                                                 countClass={countClass}
                                                 className={panelContentClass}
                                                 panelBodyClass={panelBodyClass}
+                                                userSlug={userInfo.name}
                                             />
                                         ),
                                     },
                                     {
                                         buttonContent: (
-                                            <MessagesToggle
+                                            <MessagesCount
                                                 open={false}
                                                 className="compactMeBox-tabButtonContent"
-                                                count={this.props.countUnreadMessages}
-                                                countClass={this.props.messagesProps.countClass}
+                                                countClass={this.props.countClass}
                                             />
                                         ),
                                         openButtonContent: (
-                                            <MessagesToggle
+                                            <MessagesCount
                                                 open={true}
                                                 className="compactMeBox-tabButtonContent"
-                                                count={this.props.countUnreadMessages}
-                                                countClass={this.props.messagesProps.countClass}
+                                                countClass={this.props.countClass}
                                             />
                                         ),
                                         panelContent: (
                                             <MessagesContents
-                                                count={this.props.messagesProps.data.length}
                                                 countClass={this.props.countsClass}
-                                                data={this.props.messagesProps.data}
                                                 className={panelContentClass}
                                                 panelBodyClass={panelBodyClass}
                                             />
@@ -203,106 +188,3 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
         });
     };
 }
-
-/**
- * Create action creators on the component, bound to a Redux dispatch function.
- *
- * @param dispatch Redux dispatch function.
- */
-function mapDispatchToProps(dispatch) {
-    return {
-        notificationsActions: new NotificationsActions(dispatch, apiv2),
-        conversationsActions: new ConversationsActions(dispatch, apiv2),
-    };
-}
-
-/**
- * Update the component state, based on changes to the Redux store.
- *
- * @param state Current Redux store state.
- */
-function mapStateToProps(state) {
-    let countUnreadMessages: number = 0;
-    let countUnreadNotifications: number = 0;
-    const notificationsProps: INotificationsProps = {
-        data: [],
-        userSlug: "",
-    };
-    const messagesProps: IMessagesContentsProps = {
-        data: [],
-    };
-    const conversationsByID = get(state, "conversations.conversationsByID.data", false);
-    const notificationsByID = get(state, "notifications.notificationsByID.data", false);
-
-    if (notificationsByID) {
-        // Tally the total unread notifications. Massage rows into something that will fit into IMeBoxNotificationItem.
-        for (const notification of Object.values(notificationsByID) as INotification[]) {
-            if (notification.read === false) {
-                countUnreadNotifications++;
-            }
-            notificationsProps.data.push({
-                message: notification.body,
-                photo: notification.photoUrl || null,
-                to: notification.url,
-                recordID: notification.notificationID,
-                timestamp: notification.dateUpdated,
-                unread: !notification.read,
-                type: MeBoxItemType.NOTIFICATION,
-            });
-        }
-    }
-
-    if (conversationsByID) {
-        // Tally the total unread messages. Massage rows into something that will fit into IMeBoxMessageItem.
-        for (const conversation of Object.values(conversationsByID) as IConversation[]) {
-            const authors: IUserFragment[] = [];
-            const messageDoc = new DOMParser().parseFromString(conversation.body, "text/html");
-            if (conversation.unread === true) {
-                countUnreadMessages++;
-            }
-            conversation.participants.forEach(participant => {
-                authors.push(participant.user);
-            });
-            messagesProps.data.push({
-                authors,
-                countMessages: conversation.countMessages,
-                message: messageDoc.body.textContent || "",
-                photo: conversation.lastMessage!.insertUser.photoUrl || null,
-                to: conversation.url,
-                recordID: conversation.conversationID,
-                timestamp: conversation.lastMessage!.dateInserted,
-                type: MeBoxItemType.MESSAGE,
-                unread: conversation.unread,
-            });
-        }
-    }
-
-    const sortByTimestamp = (itemA: IMeBoxItem, itemB: IMeBoxItem) => {
-        const timeA = new Date(itemA.timestamp).getTime();
-        const timeB = new Date(itemB.timestamp).getTime();
-
-        if (timeA < timeB) {
-            return 1;
-        } else if (timeA > timeB) {
-            return -1;
-        } else {
-            return 0;
-        }
-    };
-
-    notificationsProps.data.sort(sortByTimestamp);
-    messagesProps.data.sort(sortByTimestamp);
-
-    const userProps = UsersModel.mapStateToProps(state);
-    const props = {
-        ...userProps,
-        countUnreadMessages,
-        countUnreadNotifications,
-        messagesProps,
-        notificationsProps,
-    };
-    return props;
-}
-
-const withRedux = connect(mapStateToProps);
-export default withRedux(CompactMeBox);

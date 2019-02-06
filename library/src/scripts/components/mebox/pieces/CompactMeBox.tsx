@@ -15,7 +15,7 @@ import { IMeBoxItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBo
 import MessagesContents, { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
 import MessagesToggle from "@library/components/mebox/pieces/MessagesToggle";
 import NotificationsContents from "@library/components/mebox/pieces/NotificationsContents";
-import NotificationsToggle from "@library/components/mebox/pieces/NotificationsToggle";
+import NotificationsCounter from "@library/components/mebox/pieces/NotificationsCounter";
 import UserDropdownContents from "@library/components/mebox/pieces/UserDropdownContents";
 import { UserPhoto, UserPhotoSize } from "@library/components/mebox/pieces/UserPhoto";
 import Modal from "@library/components/modal/Modal";
@@ -132,18 +132,16 @@ export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
                                     },
                                     {
                                         buttonContent: (
-                                            <NotificationsToggle
+                                            <NotificationsCounter
                                                 open={false}
                                                 className="compactMeBox-tabButtonContent"
-                                                count={userInfo.countUnreadNotifications}
                                                 countClass="vanillaHeader-count vanillaHeader-notificationsCount"
                                             />
                                         ),
                                         openButtonContent: (
-                                            <NotificationsToggle
+                                            <NotificationsCounter
                                                 open={true}
                                                 className="compactMeBox-tabButtonContent"
-                                                count={userInfo.countUnreadNotifications}
                                                 countClass="vanillaHeader-count vanillaHeader-notificationsCount"
                                             />
                                         ),

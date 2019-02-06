@@ -9,7 +9,7 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DropDown from "@library/components/dropdown/DropDown";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import NotificationsContents, { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
-import NotificationsToggle from "@library/components/mebox/pieces/NotificationsToggle";
+import NotificationsCounter from "@library/components/mebox/pieces/NotificationsCounter";
 import classNames from "classnames";
 import * as React from "react";
 
@@ -51,13 +51,7 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
                 buttonBaseClass={ButtonBaseClass.CUSTOM}
                 renderLeft={true}
                 contentsClassName={this.props.contentsClassName}
-                buttonContents={
-                    <NotificationsToggle
-                        count={this.props.countUnread}
-                        open={this.state.open}
-                        countClass={this.props.countClass}
-                    />
-                }
+                buttonContents={<NotificationsCounter open={this.state.open} countClass={this.props.countClass} />}
                 onVisibilityChange={this.setOpen}
             >
                 <NotificationsContents countClass={this.props.countClass} userSlug={userSlug} />

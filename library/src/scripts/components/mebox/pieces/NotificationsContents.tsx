@@ -32,14 +32,6 @@ export interface INotificationsProps {
     markAllRead?: () => void;
 }
 
-// For clarity, I'm adding className separately because both the container and the content have className, but it's not applied to the same element.
-interface IProps extends INotificationsProps, IDeviceProps {
-    notificationsActions: NotificationsActions;
-    className?: string;
-    userSlug: string;
-    notifications: ILoadable<IMeBoxNotificationItem[]>;
-}
-
 /**
  * Implements Notifications Contents to be included in drop down or tabs
  */
@@ -107,22 +99,28 @@ export class NotificationsContents extends React.Component<IProps> {
     }
 
     public componentDidMount() {
-        const { notificationsActions, notifications } = this.props;
+        const { requestData, notifications } = this.props;
 
         if (notifications.status === LoadStatus.PENDING) {
-            void notificationsActions.getNotifications();
+            void requestData();
         }
     }
 
     /**
      * Mark all of the current user's notifications as read, then refresh the store of notifications.
      */
-    private markAllRead = async () => {
-        const { notificationsActions } = this.props;
-        await notificationsActions.markAllRead();
-        void notificationsActions.getNotifications();
+    private markAllRead = () => {
+        void this.props.markAllRead();
     };
 }
+
+// For clarity, I'm adding className separately because both the container and the content have className, but it's not applied to the same element.
+interface IOwnProps extends INotificationsProps, IDeviceProps {
+    className?: string;
+    userSlug: string;
+}
+
+type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
 /**
  * Create action creators on the component, bound to a Redux dispatch function.
@@ -130,8 +128,10 @@ export class NotificationsContents extends React.Component<IProps> {
  * @param dispatch Redux dispatch function.
  */
 function mapDispatchToProps(dispatch) {
+    const notificationActions = new NotificationsActions(dispatch, apiv2);
     return {
-        notificationsActions: new NotificationsActions(dispatch, apiv2),
+        markAllRead: notificationActions.markAllRead,
+        requestData: notificationActions.getNotifications,
     };
 }
 

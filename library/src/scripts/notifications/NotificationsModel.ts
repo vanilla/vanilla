@@ -56,6 +56,14 @@ export default class NotificationsModel implements ReduxReducer<INotificationsSt
                     nextState.notificationsByID.status = LoadStatus.ERROR;
                     nextState.notificationsByID.error = action.payload;
                     break;
+                case NotificationsActions.MARK_ALL_READ_RESPONSE:
+                    const { data } = nextState.notificationsByID;
+                    if (data) {
+                        for (const id of Object.keys(data)) {
+                            (data[id] as INotification).read = true;
+                        }
+                    }
+                    break;
             }
         });
     };

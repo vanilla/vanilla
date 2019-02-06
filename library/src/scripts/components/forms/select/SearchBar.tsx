@@ -32,7 +32,7 @@ export interface IComboBoxOption<T = any> {
 interface IProps extends IOptionalComponentID {
     disabled?: boolean;
     className?: string;
-    placeholder: string;
+    placeholder?: string;
     options?: any[];
     loadOptions?: (inputValue: string) => Promise<any>;
     value: string;
@@ -70,6 +70,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
         isLoading: false,
         optionComponent: selectOverrides.SelectOption,
         triggerSearchOnClear: false,
+        placeholder: t("Search"),
     };
 
     public state: IState = {

@@ -10,8 +10,20 @@ import splashStyles from "@library/components/splash/splashStyles";
 import Heading from "@library/components/Heading";
 import { color, ColorHelper } from "csx";
 import { BackgroundImageProperty } from "csstype";
-import ConditionalWrap from "@library/components/ConditionalWrap";
 import { style } from "typestyle";
+import Container from "@library/components/layouts/components/Container";
+import { PanelWidget } from "@library/components/layouts/PanelLayout";
+import SearchBar from "@library/components/forms/select/SearchBar";
+import SearchOption from "@library/components/search/SearchOption";
+import { t } from "@library/application";
+import SearchPageActions,
+
+SearchPageActions, {ISearchFormActionProps} from "@knowledge/modules/search/SearchPageActions";
+import {IWithSearchProps, withSearch} from "@library/contexts/SearchContext";
+import {connect} from "react-redux";
+import {withDevice} from "@library/contexts/DeviceContext";
+import SearchPageModel from "@knowledge/modules/search/SearchPageModel";
+import SearchPageModel from "@knowledge/modules/search/SearchPageModel";
 
 interface ISplashStyles {
     colors?: {
@@ -24,7 +36,7 @@ interface ISplashStyles {
     transparentButton?: boolean;
 }
 
-interface IProps {
+interface IProps extends ISearchFormActionProps, IWithSearchProps {
     title: string; // Often the message to display isn't the real H1
     className?: string;
     styles: ISplashStyles;
@@ -48,12 +60,33 @@ export default class Splash extends React.Component<IProps> {
             backgroundColor: "orange",
         });
         return (
-            <div className={classNames("splash", className, classes.root)}>
-                {title && <Heading title={title} />}
-                <ConditionalWrap condition={styles.fullWidth!} className="container">
-                    <div>t</div>
-                </ConditionalWrap>
+            <div className={classNames("splash", className, classes.root, { backgroundStyles: !style.fullWidth! })}>
+                <Container className="splash-container">
+                    <PanelWidget>
+                        {title && <Heading title={title} />}
+                        <SearchBar
+                            placeholder={this.props.placeholder || t("Help")}
+                            onChange={this.handleSearchChange}
+                            loadOptions={this.autocomplete}
+                            value={this.props.form.query}
+                            isBigInput={true}
+                            onSearch={this.props.searchActions.search}
+                            optionComponent={SearchOption}
+                            triggerSearchOnClear={true}
+                            title={t("Search")}
+                            titleAsComponent={<>{t("Search")}</>}
+                        />
+                    </PanelWidget>
+                </Container>
             </div>
         );
     }
 }
+
+
+const withRedux = connect(
+    SearchPageModel.mapStateToProps,
+    SearchPageActions.mapDispatchToProps,
+);
+
+export default withRedux(withSearch(withDevice(Splash)));

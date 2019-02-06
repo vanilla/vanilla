@@ -19,7 +19,7 @@ export class NotificationsCounter extends React.PureComponent<IProps> {
     public render() {
         const { count, open, className, countClass } = this.props;
         return (
-            <div className={classNames("meBox-buttonContent", className)}>
+            <div className={classNames("notificationsToggle", className)}>
                 {notifications(!!open)}
                 {count > 0 && (
                     <Count

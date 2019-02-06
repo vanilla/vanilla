@@ -5,7 +5,6 @@
  */
 
 import { IMe, IUserFragment } from "@library/@types/api/users";
-import { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
 import classNames from "classnames";
 import * as React from "react";
 import MessagesDropDown from "./pieces/MessagesDropDown";
@@ -15,9 +14,8 @@ import { IInjectableUserState } from "@library/users/UsersModel";
 import get from "lodash/get";
 
 export interface IMeBoxProps extends IInjectableUserState {
+    countClass?: string;
     className?: string;
-    messagesProps: IMessagesContentsProps;
-    counts: any;
     countsClass?: string;
     buttonClassName?: string;
     contentClassName?: string;
@@ -46,14 +44,12 @@ export default class MeBox extends React.Component<IMeBoxProps> {
                     countUnread={userInfo.countUnreadNotifications}
                 />
                 <MessagesDropDown
-                    {...this.props.messagesProps}
                     countClass={countsClass}
                     buttonClassName={buttonClassName}
                     contentsClassName={contentClassName}
                     toggleContentsClassName="meBox-buttonContent"
                 />
                 <UserDropdown
-                    counts={this.props.counts}
                     className="meBox-userDropdown"
                     countsClass={countsClass}
                     buttonClassName={buttonClassName}

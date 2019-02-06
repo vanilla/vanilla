@@ -4,15 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import classNames from "classnames";
-import { uniqueIDFromPrefix } from "@library/componentIDs";
 import { t } from "@library/application";
 import { messages } from "@library/components/icons/header";
 import Count from "@library/components/mebox/pieces/Count";
+import classNames from "classnames";
+import * as React from "react";
 
 interface IProps {
-    count?: number;
     countClass?: string;
     open: boolean;
     className?: string;
@@ -21,15 +19,13 @@ interface IProps {
 /**
  * Implements Messages Drop down for header
  */
-export default class MessagesToggle extends React.PureComponent<IProps> {
-    private id = uniqueIDFromPrefix("messagesDropDown");
-
+export default class MessagesCount extends React.PureComponent<IProps> {
     public state = {
         open: false,
     };
 
     public render() {
-        const count = this.props.count ? this.props.count : 0;
+        const count = 0;
         return (
             <div className={classNames(this.props.className, "messagesToggle")}>
                 {messages(this.props.open)}
@@ -37,16 +33,10 @@ export default class MessagesToggle extends React.PureComponent<IProps> {
                     <Count
                         className={classNames("vanillaHeader-count", this.props.countClass)}
                         label={t("Messages: ")}
-                        count={this.props.count}
+                        count={count}
                     />
                 )}
             </div>
         );
     }
-
-    private setOpen = open => {
-        this.setState({
-            open,
-        });
-    };
 }

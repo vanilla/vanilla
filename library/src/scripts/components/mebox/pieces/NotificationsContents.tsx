@@ -29,7 +29,6 @@ import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 export interface INotificationsProps {
     countClass?: string;
     panelBodyClass?: string;
-    markAllRead?: () => void;
 }
 
 /**

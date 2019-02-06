@@ -18,9 +18,9 @@ import { IInjectableUserState } from "@library/users/UsersModel";
 import { connect } from "react-redux";
 import UsersModel from "@library/users/UsersModel";
 import classNames from "classnames";
+import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
 
 export interface IUserDropDownContentsProps extends IInjectableUserState {
-    counts: any;
     countsClass?: string;
     panelBodyClass?: string;
     className?: string;
@@ -31,7 +31,7 @@ export interface IUserDropDownContentsProps extends IInjectableUserState {
  */
 export class UserDropdownContents extends React.Component<IUserDropDownContentsProps> {
     public render() {
-        const counts = this.props.counts;
+        const counts = dummyUserDropDownData;
         return (
             <Frame className={this.props.className}>
                 <FrameBody className={classNames("dropDownItem-verticalPadding", this.props.panelBodyClass)}>

@@ -585,6 +585,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
 
         if ($oldTheme !== $themeName) {
             $this->themeHook($themeName, self::ACTION_ENABLE, true);
+            $this->themeHook($oldTheme, self::ACTION_DISABLE, true);
             Logger::event(
                 'theme_changed',
                 Logger::NOTICE,

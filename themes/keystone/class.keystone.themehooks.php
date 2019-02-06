@@ -43,6 +43,15 @@ class KeystoneThemeHooks extends Gdn_Plugin {
     }
 
     /**
+     * Cleanup when the theme is turned off.
+     */
+    public function onDisable() {
+        saveToConfig([
+            'Feature.NewFlyouts.Enabled' => false,
+        ]);
+    }
+
+    /**
      * Runs every page load
      *
      * @param Gdn_Controller $sender This could be any controller

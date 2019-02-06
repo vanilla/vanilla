@@ -161,7 +161,7 @@ export default function vanillaHeaderClasses() {
             },
         },
         mediaQueries.oneColumn({
-            height: px(vars.sizing.height),
+            height: px(vars.sizing.mobile.height),
         }),
     );
 
@@ -385,13 +385,13 @@ export default function vanillaHeaderClasses() {
             flexShrink: 1,
             flexBasis: px(vars.endElements.mobile.flexBasis),
             height: px(vars.sizing.mobile.height),
-            transform: `translateX(${px(vars.button.size - userPhotoVars.sizing.small / 2)})`, // so the icon is flush with the side margin, but still has the right padding when hovering.
+            // transform: `translateX(${px(vars.button.size - userPhotoVars.sizing.small / 2)})`, // so the icon is flush with the side margin, but still has the right padding when hovering.
         }),
     );
 
     const leftFlexBasis = style(
         {
-            ...flex.middle(),
+            ...flex.middleLeft(),
             flexBasis: vars.endElements.flexBasis,
         },
         mediaQueries.oneColumn({

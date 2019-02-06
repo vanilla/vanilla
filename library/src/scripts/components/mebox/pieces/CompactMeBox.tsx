@@ -26,7 +26,6 @@ import * as React from "react";
 export interface IUserDropDownProps extends IInjectableUserState, IMeBoxProps {
     buttonClass?: string;
     userPhotoClass?: string;
-    countUnreadMessages: number;
 }
 
 interface IState {
@@ -36,7 +35,7 @@ interface IState {
 /**
  * Implements User Drop down for header
  */
-export class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
+export default class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
 
     public state = {

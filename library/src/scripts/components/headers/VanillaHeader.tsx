@@ -76,12 +76,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const buttonClass = "vanillaHeader-button";
         const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
 
-        const messagesProps = {
-            ...dummyMessagesData,
-            buttonClass,
-            countClass: classNames(countClass, "vanillaHeader-messagesCount"),
-        };
-
         return ReactDOM.createPortal(
             <>
                 {isFixed && <div className={classNames("vanillaHeader-spacer")} />}
@@ -172,8 +166,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                 {!isMobile && (
                                                     <MeBox
                                                         className="vanillaHeader-meBox"
-                                                        messagesProps={messagesProps as any}
-                                                        counts={dummyUserDropDownData}
                                                         buttonClassName="vanillaHeader-button"
                                                         contentClassName="vanillaHeader-dropDownContents"
                                                         currentUser={this.props.currentUser}
@@ -183,9 +175,9 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                     !this.state.openSearch && (
                                                         <CompactMeBox
                                                             className={"vanillaHeader-button"}
-                                                            counts={dummyUserDropDownData}
                                                             buttonClass="vanillaHeader-tabButton"
                                                             userPhotoClass="headerDropDown-user"
+                                                            currentUser={this.props.currentUser}
                                                         />
                                                     )}
                                             </React.Fragment>

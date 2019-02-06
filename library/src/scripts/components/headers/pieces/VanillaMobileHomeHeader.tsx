@@ -65,9 +65,9 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                                 </VanillaHeaderNav>
                             ) : (
                                 <CompactMeBox
-                                    counts={dummyUserDropDownData}
                                     buttonClass="vanillaHeader-button"
                                     userPhotoClass="headerDropDown-user"
+                                    currentUser={this.props.currentUser}
                                 />
                             )}
                         </div>

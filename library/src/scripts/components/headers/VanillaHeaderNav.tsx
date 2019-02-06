@@ -9,7 +9,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutStyles } from "@library/styles/layoutStyles";
 import { style } from "typestyle";
 import { vanillaHeaderVariables } from "@library/components/headers/vanillaHeaderStyles";
-import { flexHelper } from "@library/styles/styleHelpers";
+import { debugHelper, flexHelper } from "@library/styles/styleHelpers";
 
 export function vanillaHeaderNavigation() {
     const globalVars = globalVariables();
@@ -39,17 +39,18 @@ export function vanillaHeaderNavigation() {
 }
 
 export default function vanillaHeaderNavClasses() {
-    const globalVars = globalVariables();
     const headerVars = vanillaHeaderVariables();
     const vars = vanillaHeaderNavigation();
     const mediaQueries = layoutStyles().mediaQueries();
     const flex = flexHelper();
+    const debug = debugHelper("vanillaHeaderNav");
 
     const root = style({
         position: "relative",
     });
 
     const navigation = style({
+        ...debug.name(),
         ...flex.middle(),
         height: percent(100),
         color: "inherit",
@@ -65,6 +66,7 @@ export default function vanillaHeaderNavClasses() {
 
     const items = style(
         {
+            ...debug.name("items"),
             ...flex.middle(),
             height: px(vars.item.size),
             $nest: {
@@ -89,6 +91,7 @@ export default function vanillaHeaderNavClasses() {
     );
 
     const link = style({
+        ...debug.name("link"),
         display: "flex",
         justifyContent: "center",
         alignItems: "stretch",
@@ -104,6 +107,7 @@ export default function vanillaHeaderNavClasses() {
     });
 
     const linkContent = style({
+        ...debug.name("linkContent"),
         ...flex.middleLeft(),
         position: "relative",
         $nest: {

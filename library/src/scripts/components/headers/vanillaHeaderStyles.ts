@@ -6,19 +6,12 @@
 
 import { color, percent, px } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { flexHelper, getColorDependantOnLightness } from "@library/styles/styleHelpers";
+import { debugHelper, flexHelper, getColorDependantOnLightness } from "@library/styles/styleHelpers";
 import { layoutStyles } from "@library/styles/layoutStyles";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { userPhotoVariables } from "@library/styles/userPhotoStyles";
 import { vanillaMenuVariables } from "@library/styles/vanillaMenu";
-
-// const sampleThemeOverwrite = {
-//     fg: color("#fff"),
-//     bg: color("#2a2c32"),
-//     primary: color("#ff31cb"),
-//     secondary: color("#9c4e0a"),
-// };
 
 const sampleThemeOverwrite = {};
 
@@ -120,14 +113,15 @@ export default function vanillaHeaderClasses() {
     const globalVars = globalVariables(sampleThemeOverwrite);
     const vars = vanillaHeaderVariables();
     const formElementVars = formElementsVariables();
-    const userPhotoVars = userPhotoVariables();
     const headerColors = vars.colors;
     const vanillaMenuVars = vanillaMenuVariables();
     const mediaQueries = layoutStyles().mediaQueries();
     const flex = flexHelper();
+    const debug = debugHelper("vanillaHeader");
 
     const root = style(
         {
+            ...debug.name(),
             backgroundColor: headerColors.bg.toString(),
             color: headerColors.fg.toString(),
             $nest: {
@@ -165,10 +159,14 @@ export default function vanillaHeaderClasses() {
         }),
     );
 
-    const spacer = style({ height: px(vars.sizing.height) });
+    const spacer = style({
+        ...debug.name("spacer"),
+        height: px(vars.sizing.height),
+    });
 
     const bar = style(
         {
+            ...debug.name("bar"),
             display: "flex",
             justifyContent: "space-between",
             flexWrap: "nowrap",
@@ -186,6 +184,7 @@ export default function vanillaHeaderClasses() {
 
     const logoContainer = style(
         {
+            ...debug.name("logoContainer"),
             display: "inline-flex",
             alignSelf: "center",
             flexBasis: vars.endElements.flexBasis,
@@ -206,10 +205,12 @@ export default function vanillaHeaderClasses() {
     );
 
     const meBox = style({
+        ...debug.name("meBox"),
         justifyContent: "flex-end",
     });
 
     const nav = style({
+        ...debug.name("nav"),
         display: "flex",
         flexWrap: "wrap",
         height: percent(100),
@@ -218,6 +219,7 @@ export default function vanillaHeaderClasses() {
 
     const locales = style(
         {
+            ...debug.name("locales"),
             height: px(vars.sizing.height),
             $nest: {
                 "&.buttonAsText": {
@@ -236,19 +238,23 @@ export default function vanillaHeaderClasses() {
     );
 
     const messages = style({
+        ...debug.name("messages"),
         color: vars.colors.fg.toString(),
     });
 
     const notifications = style({
+        ...debug.name("notifications"),
         color: "inherit",
     });
 
     const compactSearch = style({
+        ...debug.name("compactSearch"),
         marginLeft: "auto",
     });
 
     const topElement = style(
         {
+            ...debug.name("topElement"),
             color: vars.colors.fg.toString(),
             padding: `0 ${px(vars.sizing.spacer / 2)}`,
             margin: `0 ${px(vars.sizing.spacer / 2)}`,
@@ -262,6 +268,7 @@ export default function vanillaHeaderClasses() {
 
     const localeToggle = style(
         {
+            ...debug.name("localeToggle"),
             height: px(vars.sizing.height),
         },
         mediaQueries.oneColumn({
@@ -270,15 +277,18 @@ export default function vanillaHeaderClasses() {
     );
 
     const languages = style({
+        ...debug.name("languages"),
         marginLeft: "auto",
     });
 
     const meBoxStateStyles = {
+        ...debug.name("meBoxStateStyles"),
         borderRadius: px(vars.button.borderRadius),
     };
 
     const button = style(
         {
+            ...debug.name("bottom"),
             ...flex.middle(),
             color: vars.colors.fg.toString(),
             height: px(vars.sizing.height),
@@ -321,6 +331,7 @@ export default function vanillaHeaderClasses() {
     );
 
     const searchCancel = style({
+        ...debug.name("searchCancel"),
         height: px(formElementVars.sizing.height),
         userSelect: "none",
         $nest: {
@@ -336,6 +347,7 @@ export default function vanillaHeaderClasses() {
     });
 
     const tabButtonActive = {
+        ...debug.name("tabButtonActive"),
         color: globalVars.mainColors.primary.toString(),
         $nest: {
             ".vanillaHeader-tabButtonContent": {
@@ -347,6 +359,7 @@ export default function vanillaHeaderClasses() {
     };
 
     const tabButton = style({
+        ...debug.name("tabButton"),
         display: "block",
         height: percent(100),
         padding: px(0),
@@ -358,6 +371,7 @@ export default function vanillaHeaderClasses() {
     });
 
     const dropDownContents = style({
+        ...debug.name("dropDownContents"),
         minWidth: px(vars.dropDownContents.minWidth),
     });
 
@@ -374,6 +388,7 @@ export default function vanillaHeaderClasses() {
 
     const rightFlexBasis = style(
         {
+            ...debug.name("rightFlexBasis"),
             display: "flex",
             height: px(vars.sizing.height),
             flexWrap: "nowrap",
@@ -391,6 +406,7 @@ export default function vanillaHeaderClasses() {
 
     const leftFlexBasis = style(
         {
+            ...debug.name("leftFlexBasis"),
             ...flex.middleLeft(),
             flexBasis: vars.endElements.flexBasis,
         },
@@ -404,10 +420,12 @@ export default function vanillaHeaderClasses() {
     );
 
     const backLink = style({
+        ...debug.name("backLink"),
         transform: `translateX(${-px(globalVars.gutter.half)})`,
     });
 
     const signIn = style({
+        ...debug.name("signIn"),
         $nest: {
             "&:not([disabled])": {
                 color: vars.colors.fg.toString(),
@@ -440,6 +458,7 @@ export default function vanillaHeaderClasses() {
     });
 
     const register = style({
+        ...debug.name("register"),
         $nest: {
             "&:not([disabled])": {
                 color: vars.colors.bg.toString(),
@@ -472,6 +491,7 @@ export default function vanillaHeaderClasses() {
 
     const compactSearchResults = style(
         {
+            ...debug.name("compactSearchResults"),
             top: (vars.sizing.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
             display: "block",
             position: "relative",
@@ -515,8 +535,10 @@ export default function vanillaHeaderClasses() {
 export function vanillaHeaderLogoClasses() {
     const vars = vanillaHeaderVariables();
     const logoFrame = style({ display: "inline-flex" });
+    const debug = debugHelper("vanillaHeaderLogo");
 
     const logo = style({
+        ...debug.name("logo"),
         display: "block",
         height: px(vars.sizing.height - 18),
         width: "auto",
@@ -528,6 +550,7 @@ export function vanillaHeaderLogoClasses() {
     });
 
     const link = style({
+        ...debug.name("link"),
         textDecoration: "none",
     });
 
@@ -537,19 +560,24 @@ export function vanillaHeaderLogoClasses() {
 export function vanillaHeaderHomeClasses() {
     const vars = vanillaHeaderVariables();
     const globalVars = globalVariables();
+    const debug = debugHelper("vanillaHeaderHome");
 
-    const root = {
+    const root = style({
+        ...debug.name(),
         minHeight: vars.sizing.mobile.height * 2,
-    };
+    });
 
-    const bottom = {
+    const bottom = style({
+        ...debug.name("bottom"),
         backgroundColor: globalVars.mainColors.fg.fade(0.1).toString(),
-    };
-    const left = {
+    });
+
+    const left = style({
+        ...debug.name("left"),
         height: px(1),
         width: px(vars.button.size),
         flexBasis: vars.button.size,
-    };
+    });
 
     return { root, bottom, left };
 }

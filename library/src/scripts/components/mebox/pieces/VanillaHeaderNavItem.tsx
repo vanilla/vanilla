@@ -30,19 +30,11 @@ export class VanillaHeaderNavItem extends React.Component<IProps> {
         const classes = vanillaHeaderNavClasses();
         return (
             <VanillaHeaderListItem className={classNames(this.props.className, classes.root, { isCurrent })}>
-                <SmartLink
-                    to={this.props.to}
-                    className={classNames("vanillaHeaderNav-link", this.props.linkClassName, classes.link)}
-                >
+                <SmartLink to={this.props.to} className={classNames(this.props.linkClassName, classes.link)}>
                     <div
-                        className={classNames(
-                            "vanillaHeaderNav-linkContent",
-                            this.props.linkContentClassName,
-                            classes.linkContent,
-                            {
-                                isCurrent,
-                            },
-                        )}
+                        className={classNames(this.props.linkContentClassName, classes.linkContent, {
+                            isCurrent,
+                        })}
                     >
                         {this.props.children}
                     </div>

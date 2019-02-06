@@ -4,7 +4,7 @@
  */
 
 import { calc, percent, px } from "csx";
-import { flexHelper, mixBgAndFg } from "@library/styles/styleHelpers";
+import { debugHelper, flexHelper, mixBgAndFg } from "@library/styles/styleHelpers";
 import { vanillaHeaderVariables } from "@library/components/headers/vanillaHeaderStyles";
 import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -33,8 +33,10 @@ export const mobileDropDownClasses = () => {
     const globalVars = globalVariables();
     const mediaQueries = layoutStyles().mediaQueries();
     const flex = flexHelper();
+    const debug = debugHelper("mobileDropDown");
 
     const root = style({
+        ...debug.name(),
         ...flex.middle(),
         position: "relative",
         flexGrow: 1,
@@ -42,6 +44,7 @@ export const mobileDropDownClasses = () => {
     });
 
     const modal = style({
+        ...debug.name("modal"),
         $nest: {
             ".siteNav": {
                 paddingLeft: px(globalVars.gutter.half),
@@ -54,18 +57,21 @@ export const mobileDropDownClasses = () => {
     });
 
     const panel = style({
+        ...debug.name("panel"),
         position: "relative",
         maxHeight: percent(100),
         padding: px(0),
     });
 
     const content = style({
+        ...debug.name("content"),
         position: "relative",
         maxHeight: percent(100),
     });
 
     const toggleButton = style(
         {
+            ...debug.name("toggleButton"),
             ...flex.middle(),
             userSelect: "none",
             flexGrow: 1,
@@ -74,6 +80,7 @@ export const mobileDropDownClasses = () => {
             marginRight: globalVars.spacer / 2,
         },
         mediaQueries.xs({
+            ...debug.name("toggleButton-xs"),
             maxWidth: percent(100),
             margin: 0,
             padding: px(0),
@@ -81,6 +88,7 @@ export const mobileDropDownClasses = () => {
     );
 
     const buttonContents = style({
+        ...debug.name("buttonContents"),
         display: "inline-block",
         position: "relative",
         paddingRight: vars.chevron.width * 2,
@@ -91,6 +99,7 @@ export const mobileDropDownClasses = () => {
 
     const title = style(
         {
+            ...debug.name("title"),
             display: "inline",
             letterSpacing: vars.title.letterSpacing,
             fontWeight: globalVars.fonts.weights.semiBold,
@@ -102,6 +111,7 @@ export const mobileDropDownClasses = () => {
     );
 
     const icon = style({
+        ...debug.name("icon"),
         position: "absolute",
         display: "block",
         top: 0,
@@ -115,6 +125,7 @@ export const mobileDropDownClasses = () => {
     });
 
     const closeModalIcon = style({
+        ...debug.name("closeModalIcon"),
         padding: px(0),
         margin: "auto",
         color: vars.chevron.color.toString(),
@@ -136,6 +147,7 @@ export const mobileDropDownClasses = () => {
     };
 
     const header = style({
+        ...debug.name("header"),
         $nest: {
             ".frameHeaderWithAction-action": headerElementDimensions,
             ".frameHeader-closePosition": headerElementDimensions,

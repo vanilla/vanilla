@@ -124,7 +124,7 @@ module.exports = function (grunt) {
             src: [
               'bootstrap/LICENSE'
               , 'bootstrap/scss/*.scss'
-              , 'bootstrap/scss/styleUtilities/*.scss'
+              , 'bootstrap/scss/mixins/*.scss'
             ],
             dest: 'scss/vendors'
           }

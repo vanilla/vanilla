@@ -67,3 +67,15 @@ export function flexHelper() {
 
     return { middle, middleLeft };
 }
+
+export function debugHelper(componentName: string) {
+    return {
+        name: (subElementName?: string) => {
+            if (subElementName) {
+                return { $debugName: `${componentName}-${subElementName}` };
+            } else {
+                return { $debugName: componentName };
+            }
+        },
+    };
+}

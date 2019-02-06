@@ -27,6 +27,7 @@ describe("<Permission />", () => {
             isAdmin,
             photoUrl: "",
             dateLastActive: "",
+            countUnreadNotifications: 1,
         };
     };
 

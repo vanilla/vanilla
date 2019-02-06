@@ -28,8 +28,6 @@ import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeader
 import { signIn } from "@library/components/icons";
 import VanillaHeaderListItem from "@library/components/mebox/pieces/VanillaHeaderListItem";
 import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
-import { style } from "typestyle";
-import vanillaHeaderClasses, { vanillaHeaderHomeClasses } from "@library/components/headers/vanillaHeaderStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -44,83 +42,51 @@ interface IProps extends IDeviceProps, IInjectableUserState {
 export class VanillaMobileHomeHeader extends React.Component<IProps> {
     private resultsRef: React.RefObject<HTMLDivElement> = React.createRef();
     public render() {
-        const headerHomeClasses = vanillaHeaderHomeClasses();
         const currentUser = this.props.currentUser.data;
         const isMobile = this.props.device === Devices.MOBILE;
         const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
-        const countClass = "vanillaHeader-count";
-        const buttonClass = "vanillaHeader-button";
-
-        const notificationProps: INotificationsProps = {
-            data: [],
-            userSlug: currentUser!.name,
-            countClass: classNames(countClass, "vanillaHeader-notificationsCount"),
-        };
-
-        const messagesProps = {
-            ...dummyMessagesData,
-            buttonClass,
-            countClass: classNames(countClass, "vanillaHeader-messagesCount"),
-        };
-
-        const classes = vanillaHeaderClasses();
-        const classesHome = vanillaHeaderHomeClasses();
 
         return ReactDOM.createPortal(
-            <header
-                className={classNames(
-                    "vanillaHeader",
-                    "vanillaHeaderHome",
-                    classes.root,
-                    classesHome.root,
-                    this.props.className,
-                )}
-            >
+            <header className={classNames("vanillaHeader", "vanillaHeaderHome", this.props.className)}>
                 <Container className="vanillaHeaderHome-top">
                     <PanelWidgetHorizontalPadding>
-                        <div className={classNames("vanillaHeader-bar", "isHome", classes.bar)}>
-                            <FlexSpacer className={classNames("vanillaHeaderHome-left", classesHome.left)} />
+                        <div className="vanillaHeader-bar isHome">
+                            <FlexSpacer className="vanillaHeaderHome-left" />
                             <HeaderLogo
                                 {...dummyLogoData}
-                                className={classNames("vanillaHeader-logoContainer", classes.logoContainer)}
+                                className="vanillaHeader-logoContainer"
                                 logoClassName="vanillaHeader-logo isCentred"
                             />
                             {isGuest ? (
-                                <VanillaHeaderNav
-                                    className={classNames("vanillaHeader-nav vanillaHeader-guestNav", classes.nav)}
-                                >
+                                <VanillaHeaderNav className="vanillaHeader-nav vanillaHeader-guestNav">
                                     <VanillaHeaderNavItem to={`/entry/signin?target=${window.location.pathname}`}>
                                         {signIn("vanillaHeader-signInIcon")}
                                     </VanillaHeaderNavItem>
                                 </VanillaHeaderNav>
                             ) : (
                                 <CompactMeBox
-                                    counts={dummyUserDropDownData}
-                                    buttonClass={classNames("vanillaHeader-button", classes.button)}
+                                    buttonClass="vanillaHeader-button"
                                     userPhotoClass="headerDropDown-user"
+                                    currentUser={this.props.currentUser}
                                 />
                             )}
                         </div>
                     </PanelWidgetHorizontalPadding>
                 </Container>
-                <div className={classNames("vanillaHeaderHome-bottom", headerHomeClasses.bottom)}>
-                    <div className={classNames("vanillaHeader-horizontalScroll", classes.horizontalScroll)}>
+                <div className="vanillaHeaderHome-bottom">
+                    <div className="vanillaHeader-horizontalScroll">
                         <VanillaHeaderNav
                             {...dummyNavigationData}
-                            linkClassName={classNames("vanillaHeader-navLink", classes.topElement)}
+                            linkClassName="vanillaHeader-navLink"
                             linkContentClassName="vanillaHeader-navLinkContent"
-                            className={classNames("vanillaHeader-nav", "isScrolled", classes.nav)}
+                            className={classNames("vanillaHeader-nav", "isScrolled")}
                         >
                             <VanillaHeaderListItem>
                                 <LanguagesDropDown
                                     {...dummyOtherLanguagesData}
                                     renderLeft={true}
-                                    className={classNames("vanillaHeader-locales", classes.locales)}
-                                    buttonClassName={classNames(
-                                        "vanillaHeader-localeToggle",
-                                        classes.topElement,
-                                        classes.localeToggle,
-                                    )}
+                                    className="vanillaHeader-locales"
+                                    buttonClassName="vanillaHeader-localeToggle"
                                     buttonBaseClass={ButtonBaseClass.CUSTOM}
                                     widthOfParent={false}
                                     openAsModal={isMobile}

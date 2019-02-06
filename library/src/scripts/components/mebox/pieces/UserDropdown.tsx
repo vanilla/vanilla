@@ -23,9 +23,9 @@ import DropDownSection from "@library/components/dropdown/items/DropDownSection"
 import DropDownItemLinkWithCount from "@library/components/dropdown/items/DropDownItemLinkWithCount";
 import Permission from "@library/users/Permission";
 import classNames from "classnames";
-import { IUserDropDownContentsProps } from "@library/components/mebox/pieces/UserDropdownContents";
+import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
 
-export interface IUserDropDownProps extends IInjectableUserState, IUserDropDownContentsProps {
+export interface IUserDropDownProps extends IInjectableUserState {
     className?: string;
     countsClass?: string;
     buttonClassName?: string;
@@ -54,7 +54,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
             photoUrl: null,
         });
 
-        const counts = this.props.counts;
+        const counts = dummyUserDropDownData;
 
         return (
             <DropDown
@@ -87,7 +87,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                                 name={t("Bookmarks")}
                                 count={counts.bookmarkCount}
                             />
-                            <DropDownItemLinkWithCount to="/drafts" name={t("Drafts")} count={counts.draftsCount} />
+                            <DropDownItemLinkWithCount to="/kb/drafts" name={t("Drafts")} count={counts.draftsCount} />
                             <DropDownItemLink to="/discussions/mine" name={t("My Discussions")} />
                             <DropDownItemLink to="/activity" name={t("Participated")} />
                         </DropDownSection>

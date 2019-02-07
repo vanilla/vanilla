@@ -1,0 +1,40 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+/* -------------------------------------------------------------- *\
+    Variables
+\* -------------------------------------------------------------- */
+
+$catalogue-photoSize:                         100px !default;
+$catalogue-mobileHeight:                      100px !default;
+
+/* -------------------------------------------------------------- *\
+    Styles
+\* -------------------------------------------------------------- */
+
+// Prevent indexphoto styles
+.CatalogueRow.ItemDiscussion-withPhoto {
+    padding-left: 0;
+}
+
+.catalogue-image-wrapper {
+    height: $catalogue-photoSize;
+    width: $catalogue-photoSize;
+    margin-right: $utility-baseUnitDouble;
+    position: relative;
+    overflow: hidden;
+
+    a {
+        display: block;
+    }
+
+    img {
+        position: absolute;
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+}

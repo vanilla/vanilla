@@ -13,6 +13,8 @@
  */
 class ProfileController extends Gdn_Controller {
 
+    use \Vanilla\FloodControlTrait;
+
     const AVATAR_FOLDER = 'userpics';
 
     /** @var array Models to automatically instantiate. */
@@ -62,6 +64,11 @@ class ProfileController extends Gdn_Controller {
         $this->CurrentTab = 'Activity';
         $this->ProfileTabs = [];
         $this->editMode(true);
+
+        touchConfig('Vanilla.Password.SpamCount', 2);
+        touchConfig('Vanilla.Password.SpamTime', 1);
+        touchConfig('Vanilla.Password.SpamLock', 120);
+
         parent::__construct();
     }
 
@@ -354,7 +361,7 @@ class ProfileController extends Gdn_Controller {
      * @param mixed $userReference Username or User ID.
      */
     public function edit($userReference = '', $username = '', $userID = '') {
-        $this->permission('Garden.SignIn.Allow');
+        $this->permission(['Garden.SignIn.Allow', 'Garden.Profiles.Edit'], true);
 
         $this->getUserInfo($userReference, $username, $userID, true);
         $userID = valr('User.UserID', $this);
@@ -696,6 +703,10 @@ class ProfileController extends Gdn_Controller {
     public function password() {
         $this->permission('Garden.SignIn.Allow');
 
+        $isSpamming = false;
+        $floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Password');
+        $this->setFloodControlEnabled(true);
+
         // Don't allow password editing if using SSO Connect ONLY.
         // This is for security. We encountered the case where a customer charges
         // for membership using their external application and use SSO to let
@@ -716,7 +727,7 @@ class ProfileController extends Gdn_Controller {
         $this->Form->setModel($this->UserModel);
         $this->addDefinition('Username', $this->User->Name);
 
-        if ($this->Form->authenticatedPostBack() === true) {
+        if ($this->Form->authenticatedPostBack() === true && !$isSpamming = $this->checkUserSpamming(Gdn::session()->UserID, $floodGate)) {
             $this->Form->setFormValue('UserID', $this->User->UserID);
             $this->UserModel->defineSchema();
 //         $this->UserModel->Validation->addValidationField('OldPassword', $this->Form->formValues());
@@ -750,6 +761,17 @@ class ProfileController extends Gdn_Controller {
                 );
             }
         }
+
+        if ($isSpamming) {
+            $message = sprintf(
+                t('You have tried to reset your password %1$s times within %2$s seconds. You must wait at least %3$s seconds before attempting again.'),
+                $this->postCountThreshold,
+                $this->timeSpan,
+                $this->lockTime
+            );
+            throw new Gdn_UserException($message);
+        }
+
         $this->title(t('Change My Password'));
         $this->_setBreadcrumbs(t('Change My Password'), '/profile/password');
         $this->render();

@@ -678,8 +678,12 @@ class PostController extends VanillaController {
             // Save as a draft?
             $FormValues = $this->Form->formValues();
 
-            if ($FormValues['DiscussionID'] !== $DiscussionID) {
-                throw new Exception('DiscussionID mismatch.');
+            if (isset($FormValues['DiscussionID'])) {
+                $formID = (int)$FormValues['DiscussionID'];
+                $DiscussionID = (int)$DiscussionID;
+                if ($formID !== $DiscussionID) {
+                    throw new Exception('DiscussionID mismatch.');
+                }
             }
 
             $filters = ['Score'];

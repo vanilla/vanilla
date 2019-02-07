@@ -17,14 +17,10 @@ import { searchClasses } from "@library/styles/searchStyles";
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
     placeholder?: string;
-    onSearchButtonClick: () => void;
-    onCloseSearch: () => void;
-    cancelButtonClassName?: string;
     buttonClass?: string;
     showingSuggestions?: boolean;
     onOpenSuggestions?: () => void;
     onCloseSuggestions?: () => void;
-    focusOnMount?: boolean;
     buttonContentClass?: string;
     cancelContentClassName?: string;
 }
@@ -65,7 +61,6 @@ export class Search extends React.Component<ICompactSearchProps, IState> {
                             ref={this.searchInputRef}
                             triggerSearchOnClear={false}
                             resultsRef={this.resultsRef}
-                            handleOnKeyDown={this.handleKeyDown}
                             onOpenSuggestions={this.props.onOpenSuggestions}
                             onCloseSuggestions={this.props.onCloseSuggestions}
                             className={"compactSearch-searchBar"}
@@ -88,20 +83,6 @@ export class Search extends React.Component<ICompactSearchProps, IState> {
         const { searchOptionProvider, history } = this.props;
         const { query } = this.state;
         this.props.history.push(searchOptionProvider.makeSearchUrl(query));
-    };
-
-    /**
-     * Keyboard handler
-     * @param event
-     */
-    private handleKeyDown = (event: React.KeyboardEvent) => {
-        if (!this.props.showingSuggestions) {
-            switch (event.key) {
-                case "Escape":
-                    this.props.onCloseSearch();
-                    break;
-            }
-        }
     };
 }
 

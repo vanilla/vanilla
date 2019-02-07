@@ -218,7 +218,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                             </label>
                         </Heading>
                     )}
-                    <div className="searchBar-content">
+                    <div onClick={this.focus} className="searchBar-content">
                         <div
                             className={classNames(
                                 `${this.prefix}-valueContainer`,
@@ -247,7 +247,9 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 {this.props.isLoading ? <ButtonLoader /> : t("Search")}
                             </Button>
                         </ConditionalWrap>
-                        <div className="searchBar-iconContainer">{search("searchBar-icon")}</div>
+                        <div onClick={this.focus} className="searchBar-iconContainer">
+                            {search("searchBar-icon")}
+                        </div>
                     </div>
                 </form>
             </div>
@@ -301,7 +303,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
         LoadingMessage: selectOverrides.OptionLoader,
     };
 
-    public focus() {
+    public focus = () => {
         this.inputRef.current!.focus();
-    }
+    };
 }

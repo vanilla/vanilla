@@ -144,6 +144,7 @@ export default function vanillaHeaderClasses(theme?: object) {
                 },
                 ".searchBar__control": {
                     color: vars.colors.fg.toString(),
+                    cursor: "pointer",
                 },
                 ".suggestedTextInput-clear.searchBar-clear": {
                     color: vars.colors.fg.toString(),
@@ -161,6 +162,7 @@ export default function vanillaHeaderClasses(theme?: object) {
                 },
                 ".searchBar__placeholder": {
                     color: vars.colors.fg.fade(0.8).toString(),
+                    cursor: "pointer",
                 },
                 ".backLink-link": {
                     $nest: {

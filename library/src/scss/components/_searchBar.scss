@@ -8,6 +8,7 @@ $searchBar-search_minWidth: 109px;
 $searchBar-searchIcon_space: 32px;
 
 .searchBar {
+    cursor: pointer;
     .suggestedTextInput-inputText {
         border: {
             top-right-radius: 0;

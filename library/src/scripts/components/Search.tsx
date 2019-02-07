@@ -47,27 +47,23 @@ export class Search extends React.Component<ICompactSearchProps, IState> {
         const classes = searchClasses(this.props.theme);
         return (
             <div ref={this.selfRef} className={classNames(classes.root, this.props.className)}>
-                <>
-                    <div className={classNames("compactSearch-contents")}>
-                        <SearchBar
-                            id={this.id}
-                            placeholder={this.props.placeholder}
-                            optionComponent={SearchOption}
-                            noHeading={true}
-                            title={t("Search")}
-                            value={this.state.query}
-                            onChange={this.handleSearchChange}
-                            onSearch={this.handleSubmit}
-                            loadOptions={this.props.searchOptionProvider.autocomplete}
-                            ref={this.searchInputRef}
-                            triggerSearchOnClear={false}
-                            resultsRef={this.resultsRef}
-                            onOpenSuggestions={this.props.onOpenSuggestions}
-                            onCloseSuggestions={this.props.onCloseSuggestions}
-                            className={"compactSearch-searchBar"}
-                        />
-                    </div>
-                </>
+                <SearchBar
+                    id={this.id}
+                    placeholder={this.props.placeholder}
+                    optionComponent={SearchOption}
+                    noHeading={true}
+                    title={t("Search")}
+                    value={this.state.query}
+                    onChange={this.handleSearchChange}
+                    onSearch={this.handleSubmit}
+                    loadOptions={this.props.searchOptionProvider.autocomplete}
+                    ref={this.searchInputRef}
+                    triggerSearchOnClear={false}
+                    resultsRef={this.resultsRef}
+                    onOpenSuggestions={this.props.onOpenSuggestions}
+                    onCloseSuggestions={this.props.onCloseSuggestions}
+                    className={classes.bar}
+                />
                 <div
                     ref={this.resultsRef}
                     className={classNames("vanillaHeader-compactSearchResults", classes.results)}

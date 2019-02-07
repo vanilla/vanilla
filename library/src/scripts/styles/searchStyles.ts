@@ -38,6 +38,14 @@ export const searchClasses = (theme?: object) => {
 
     const root = style({
         ...debug.name(),
+        $nest: {
+            ".searchBar-valueContainer": {
+                cursor: "pointer",
+            },
+            ".searchBar__control": {
+                cursor: "pointer",
+            },
+        },
     });
 
     const button = style({
@@ -48,5 +56,9 @@ export const searchClasses = (theme?: object) => {
         ...debug.name("results"),
     });
 
-    return { root, button, results };
+    const bar = style({
+        ...debug.name("bar"),
+    });
+
+    return { root, button, results, bar };
 };

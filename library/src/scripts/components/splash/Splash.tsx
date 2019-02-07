@@ -35,8 +35,10 @@ export class Splash extends React.Component<IProps> {
                 <Container className={classes.container}>
                     <div className={classes.innerContainer}>
                         <PanelWidgetHorizontalPadding>
-                            <PanelWidget>{title && <Heading title={title} className={classes.title} />}</PanelWidget>
-                            <Search className={classes.search} theme={vars.search} />
+                            {title && <Heading title={title} className={classes.title} />}
+                            <div className={classes.searchContainer}>
+                                <Search className={classes.search} theme={vars.search} />
+                            </div>
                         </PanelWidgetHorizontalPadding>
                     </div>
                 </Container>

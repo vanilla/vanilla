@@ -7,12 +7,7 @@
 import { style } from "typestyle";
 import { px, quote, viewWidth, viewHeight, url, percent } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    centeredBackgroundProps,
-    componentThemeVariables,
-    debugHelper,
-    fullSizeOfParent,
-} from "@library/styles/styleHelpers";
+import { centeredBackgroundProps, componentThemeVariables, debugHelper } from "@library/styles/styleHelpers";
 import { searchVariables } from "@library/styles/searchStyles";
 import { assetUrl } from "@library/application";
 
@@ -28,17 +23,18 @@ export function splashVariables(theme?: object) {
     };
 
     const title = {
-        fg: elementaryColor.white,
-        fontSize: globalVars.fonts.title,
+        fg: elementaryColor.white.toString(),
+        fontSize: globalVars.fonts.size.title,
         textAlign: "center",
         fontWeight: globalVars.fonts.weights.semiBold,
         textShadow: `0 1px 25px rgba(27,31,35,0.01)`,
+        marginTop: 28,
         marginBottom: 40,
         ...themeVars.subComponentStyles("title"),
     };
 
     const spacing = {
-        top: 76,
+        top: 48,
         bottom: 48,
         ...themeVars.subComponentStyles("spacing"),
     };
@@ -52,7 +48,11 @@ export function splashVariables(theme?: object) {
         ...themeVars.subComponentStyles("search"),
     });
 
-    return { fullBackground, title, spacing, border, search };
+    const searchContainer = {
+        width: 670,
+    };
+
+    return { fullBackground, title, spacing, border, search, searchContainer };
 }
 
 export function splashStyles(theme?: object) {
@@ -88,6 +88,8 @@ export function splashStyles(theme?: object) {
     });
 
     const innerContainer = style({
+        paddingTop: vars.spacing.top,
+        paddingBottom: vars.spacing.bottom,
         ...debug.name("innerContainer"),
     });
 
@@ -97,6 +99,7 @@ export function splashStyles(theme?: object) {
         fontWeight: vars.title.fontWeight,
         textShadow: vars.title.textShadow,
         color: vars.title.fg,
+        paddingTop: px(vars.title.marginTop),
         marginBottom: px(vars.title.marginBottom),
         ...debug.name("title"),
     });
@@ -105,5 +108,12 @@ export function splashStyles(theme?: object) {
         ...debug.name("search"),
     });
 
-    return { root, container, innerContainer, title, search, fullBackground };
+    const searchContainer = style({
+        ...debug.name("searchContainer"),
+        maxWidth: percent(100),
+        width: px(vars.searchContainer.width),
+        margin: "auto",
+    });
+
+    return { root, container, innerContainer, title, search, fullBackground, searchContainer };
 }

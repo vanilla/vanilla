@@ -7,7 +7,7 @@
 import { color, percent, px, quote, calc } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { style } from "typestyle";
-import { vanillaHeaderVariables } from "@library/components/headers/vanillaHeaderStyles";
+import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { debugHelper, flexHelper } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/styles/layoutStyles";
 

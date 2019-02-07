@@ -28,7 +28,7 @@ import classNames from "classnames";
 import * as React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
-import vanillaHeaderClasses from "@library/components/headers/vanillaHeaderStyles";
+import vanillaHeaderClasses from "@library/styles/vanillaHeaderStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.

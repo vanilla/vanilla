@@ -6,22 +6,17 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import splashStyles from "@library/components/splash/splashStyles";
+import splashStyles from "@library/styles/splashStyles";
 import Heading from "@library/components/Heading";
-import { color, ColorHelper } from "csx";
+import { ColorHelper } from "csx";
 import { BackgroundImageProperty } from "csstype";
-import { style } from "typestyle";
 import Container from "@library/components/layouts/components/Container";
 import { PanelWidget } from "@library/components/layouts/PanelLayout";
-import SearchBar from "@library/components/forms/select/SearchBar";
-import SearchPageActions, { ISearchFormActionProps } from "@knowledge/modules/search/SearchPageActions";
-import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
-import { connect } from "react-redux";
 import { withDevice } from "@library/contexts/DeviceContext";
-import SearchPageModel from "@knowledge/modules/search/SearchPageModel";
 import { IDeviceProps } from "@library/components/DeviceChecker";
+import Search from "@library/components/Search";
 
-interface ISplashStyles extends IDeviceProps, IWithSearchProps {
+interface ISplashStyles {
     colors?: {
         fg?: ColorHelper;
         bg?: ColorHelper;
@@ -32,46 +27,31 @@ interface ISplashStyles extends IDeviceProps, IWithSearchProps {
     transparentButton?: boolean;
 }
 
-interface IProps extends ISearchFormActionProps, IWithSearchProps {
+interface IProps extends IDeviceProps {
     title: string; // Often the message to display isn't the real H1
     className?: string;
-    styles: ISplashStyles;
+    styles?: ISplashStyles;
 }
 
 /**
  * A component representing a single crumb in a breadcrumb component.
  */
 export class Splash extends React.Component<IProps> {
+    public static defaultProps = {
+        styles: {},
+    };
     public render() {
         const classes = splashStyles();
         const { title, className, styles } = this.props;
         return (
-            <div className={classNames("splash", className, classes.root, { backgroundStyles: !styles.fullWidth! })}>
+            <div className={classNames("splash", className, classes.root)}>
                 <Container className="splash-container">
-                    <PanelWidget>
-                        {title && <Heading title={title} />}
-                        <SearchBar
-                        // placeholder={this.props.placeholder || t("Help")}
-                        // onChange={this.handleSearchChange}
-                        // loadOptions={this.autocomplete}
-                        // value={this.props.form.query}
-                        // isBigInput={true}
-                        // onSearch={this.props.searchActions.search}
-                        // optionComponent={SearchOption}
-                        // triggerSearchOnClear={true}
-                        // title={t("Search")}
-                        // titleAsComponent={<>{t("Search")}</>}
-                        />
-                    </PanelWidget>
+                    <PanelWidget>{title && <Heading title={title} />}</PanelWidget>
+                    <Search />
                 </Container>
             </div>
         );
     }
 }
 
-const withRedux = connect(
-    SearchPageModel.mapStateToProps,
-    SearchPageActions.mapDispatchToProps,
-);
-
-export default withRedux(withSearch(Splash));
+export default withDevice(Splash);

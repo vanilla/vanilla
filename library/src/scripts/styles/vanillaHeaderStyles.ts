@@ -5,17 +5,12 @@
  */
 
 import { percent, px } from "csx";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    componentThemeVariables,
-    debugHelper,
-    flexHelper,
-    getColorDependantOnLightness,
-} from "@library/styles/styleHelpers";
+import { globalVariables } from "./globalStyleVars";
+import { componentThemeVariables, debugHelper, flexHelper, getColorDependantOnLightness } from "./styleHelpers";
 import { style } from "typestyle";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { vanillaMenuVariables } from "@library/styles/vanillaMenu";
-import { layoutVariables } from "@library/styles/layoutStyles";
+import { formElementsVariables } from "../components/forms/formElementStyles";
+import { vanillaMenuVariables } from "./vanillaMenu";
+import { layoutVariables } from "./layoutStyles";
 
 export function vanillaHeaderVariables(theme?: object) {
     const globalVars = globalVariables(theme);

@@ -4,9 +4,11 @@
  */
 
 import { color, percent, px } from "csx";
+import { componentThemeVariables, mixBgAndFg } from "@library/styles/styleHelpers";
 
-export const globalVariables = (mainColorsOverwrite = {}) => {
+export const globalVariables = (theme?: object) => {
     const colorPrimary = color("#0291db");
+    const themeVars = componentThemeVariables(theme, "globalVariables");
 
     const utility = {
         "percentage.third": percent(100 / 3),
@@ -17,7 +19,7 @@ export const globalVariables = (mainColorsOverwrite = {}) => {
     const elementaryColors = {
         black: color("#000"),
         white: color("#fff"),
-        transparent: color("transparent"),
+        transparent: `transparent`,
     };
 
     const mainColors = {
@@ -25,7 +27,7 @@ export const globalVariables = (mainColorsOverwrite = {}) => {
         bg: color("#fff"),
         primary: colorPrimary,
         secondary: colorPrimary.darken(10),
-        ...mainColorsOverwrite,
+        ...themeVars.subComponentStyles("mainColors"),
     };
 
     const errorFg = color("#ff3933");
@@ -40,10 +42,12 @@ export const globalVariables = (mainColorsOverwrite = {}) => {
         confirm: color("#60bd68"),
         unresolved: warning.mix(mainColors.fg, 10),
         deleted,
+        ...themeVars.subComponentStyles("feedbackColors"),
     };
 
     const body = {
         bg: mainColors.bg,
+        ...themeVars.subComponentStyles("body"),
     };
 
     const border = {
@@ -51,6 +55,7 @@ export const globalVariables = (mainColorsOverwrite = {}) => {
         width: px(1),
         style: "solid",
         radius: px(6),
+        ...themeVars.subComponentStyles("border"),
     };
 
     const gutterSize = 24;
@@ -58,6 +63,7 @@ export const globalVariables = (mainColorsOverwrite = {}) => {
         size: gutterSize,
         half: gutterSize / 2,
         quarter: gutterSize / 4,
+        ...themeVars.subComponentStyles("gutter"),
     };
 
     const lineHeights = {
@@ -65,18 +71,21 @@ export const globalVariables = (mainColorsOverwrite = {}) => {
         condensed: 1.25,
         code: 1.45,
         excerpt: 1.45,
+        ...themeVars.subComponentStyles("lineHeight"),
     };
 
     const panelWidth = 216;
     const panel = {
         width: panelWidth,
         paddedWidth: panelWidth + gutter.size,
+        ...themeVars.subComponentStyles("panelWidth"),
     };
 
     const middleColumnWidth = 672;
     const middleColumn = {
         width: middleColumnWidth,
         paddedWidth: middleColumnWidth + gutter.size,
+        ...themeVars.subComponentStyles("middleColumn"),
     };
 
     const content = {
@@ -107,6 +116,17 @@ export const globalVariables = (mainColorsOverwrite = {}) => {
             semiBold: 600,
             bold: 700,
         },
+        ...themeVars.subComponentStyles("fonts"),
+    };
+
+    const icon = {
+        sizes: {
+            large: 32,
+            default: 24,
+            small: 16,
+        },
+        color: mixBgAndFg(0.18),
+        ...themeVars.subComponentStyles("icon"),
     };
 
     const spacer = fonts.size.medium * lineHeights.base;
@@ -124,5 +144,6 @@ export const globalVariables = (mainColorsOverwrite = {}) => {
         fonts,
         spacer,
         lineHeights,
+        icon,
     };
 };

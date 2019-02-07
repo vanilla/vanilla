@@ -4,10 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import className from "classnames";
 import { style } from "typestyle";
-import { px, q, pxuote, quote, quote, viewWidth, viewHeight } from "csx";
+import { px, quote, viewWidth, viewHeight } from "csx";
 import { BackgroundImageProperty } from "csstype";
 
 export default function splashStyles() {

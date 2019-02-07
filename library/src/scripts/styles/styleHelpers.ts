@@ -3,9 +3,10 @@
  * @license GPL-2.0-only
  */
 
-import { color, ColorHelper } from "csx";
+import { ColorHelper, important, px } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { FlexWrapProperty } from "csstype";
+import get from "lodash/get";
 
 /*
  * Helper function to get variable with fallback
@@ -68,6 +69,10 @@ export function flexHelper() {
     return { middle, middleLeft };
 }
 
+/*
+ * Helper to generate human readable classes generated from TypeStyle
+ * @param componentName - The component's name.
+ */
 export function debugHelper(componentName: string) {
     return {
         name: (subElementName?: string) => {
@@ -77,5 +82,38 @@ export function debugHelper(componentName: string) {
                 return { $debugName: componentName };
             }
         },
+    };
+}
+
+/*
+ * Helper to overwrite styles
+ * @param theme - The theme overwrites.
+ * @param componentName - The name of the component to overwrite
+ */
+export const componentThemeVariables = (theme: any | undefined, componentName: string) => {
+    // const themeVars = get(theme, componentName, {});
+    const themeVars = (theme && theme[componentName]) || {};
+
+    const subComponentStyles = (subElementName: string) => {
+        return (themeVars && themeVars[subElementName]) || {};
+        // return get(themeVars, subElementName, {});
+    };
+
+    return {
+        subComponentStyles,
+    };
+};
+
+export function srOnly() {
+    return {
+        position: important("absolute"),
+        display: important("block"),
+        width: important(px(1).toString()),
+        height: important(px(1).toString()),
+        padding: important(px(0).toString()),
+        margin: important(px(-1).toString()),
+        overflow: important("hidden"),
+        clip: important(`rect(0, 0, 0, 0)`),
+        border: important(px(0).toString()),
     };
 }

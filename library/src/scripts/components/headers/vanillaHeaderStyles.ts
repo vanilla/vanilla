@@ -4,19 +4,22 @@
  * @license GPL-2.0-only
  */
 
-import { color, percent, px } from "csx";
+import { percent, px } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, flexHelper, getColorDependantOnLightness } from "@library/styles/styleHelpers";
-import { layoutStyles } from "@library/styles/layoutStyles";
+import {
+    componentThemeVariables,
+    debugHelper,
+    flexHelper,
+    getColorDependantOnLightness,
+} from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { userPhotoVariables } from "@library/styles/userPhotoStyles";
 import { vanillaMenuVariables } from "@library/styles/vanillaMenu";
+import { layoutVariables } from "@library/styles/layoutStyles";
 
-const sampleThemeOverwrite = {};
-
-export function vanillaHeaderVariables() {
-    const globalVars = globalVariables(sampleThemeOverwrite);
+export function vanillaHeaderVariables(theme?: object) {
+    const globalVars = globalVariables(theme);
+    const themeVars = componentThemeVariables(theme, "vanillaHeader");
 
     const sizing = {
         height: 48,
@@ -24,15 +27,18 @@ export function vanillaHeaderVariables() {
         mobile: {
             height: 44,
         },
+        ...themeVars.subComponentStyles("sizing"),
     };
 
     const colors = {
         fg: globalVars.mainColors.bg,
         bg: globalVars.mainColors.primary,
+        ...themeVars.subComponentStyles("colors"),
     };
 
     const guest = {
         spacer: px(8),
+        ...themeVars.subComponentStyles("guest"),
     };
 
     const buttonSize = 40;
@@ -42,6 +48,7 @@ export function vanillaHeaderVariables() {
         mobile: {
             fontSize: 16,
         },
+        ...themeVars.subComponentStyles("button"),
     };
 
     const count = {
@@ -49,10 +56,12 @@ export function vanillaHeaderVariables() {
         fontSize: 10,
         fg: globalVars.mainColors.bg,
         bg: globalVars.mainColors.primary,
+        ...themeVars.subComponentStyles("count"),
     };
 
     const dropDownContents = {
         minWidth: 350,
+        ...themeVars.subComponentStyles("dropDownContents"),
     };
 
     const endElements = {
@@ -60,10 +69,12 @@ export function vanillaHeaderVariables() {
         mobile: {
             flexBasis: buttonSize * 2,
         },
+        ...themeVars.subComponentStyles("endElements"),
     };
 
     const compactSearch = {
         maxWidth: 672,
+        ...themeVars.subComponentStyles("compactSearch"),
     };
 
     // here
@@ -74,6 +85,7 @@ export function vanillaHeaderVariables() {
         active: {
             bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2, true),
         },
+        ...themeVars.subComponentStyles("buttonContents"),
     };
 
     const signIn = {
@@ -81,16 +93,20 @@ export function vanillaHeaderVariables() {
         hover: {
             bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2),
         },
+        ...themeVars.subComponentStyles("signIn"),
     };
+
     const resister = {
         bg: globalVars.mainColors.bg,
         hover: {
             bg: globalVars.mainColors.bg.fade(0.9).toString(),
         },
+        ...themeVars.subComponentStyles("register"),
     };
 
     const mobileDropDown = style({
         height: px(sizing.mobile.height),
+        ...themeVars.subComponentStyles("mobileDropDown"),
     });
 
     return {
@@ -109,13 +125,13 @@ export function vanillaHeaderVariables() {
     };
 }
 
-export default function vanillaHeaderClasses() {
-    const globalVars = globalVariables(sampleThemeOverwrite);
-    const vars = vanillaHeaderVariables();
-    const formElementVars = formElementsVariables();
+export default function vanillaHeaderClasses(theme?: object) {
+    const globalVars = globalVariables(theme);
+    const vars = vanillaHeaderVariables(theme);
+    const formElementVars = formElementsVariables(theme);
     const headerColors = vars.colors;
-    const vanillaMenuVars = vanillaMenuVariables();
-    const mediaQueries = layoutStyles().mediaQueries();
+    const vanillaMenuVars = vanillaMenuVariables(theme);
+    const mediaQueries = layoutVariables(theme).mediaQueries();
     const flex = flexHelper();
     const debug = debugHelper("vanillaHeader");
 
@@ -151,6 +167,13 @@ export default function vanillaHeaderClasses() {
                 },
                 ".searchBar__placeholder": {
                     color: vars.colors.fg.fade(0.8).toString(),
+                },
+                ".backLink-link": {
+                    $nest: {
+                        "&:hover": {
+                            color: vars.colors.fg.toString(),
+                        },
+                    },
                 },
             },
         },
@@ -532,8 +555,8 @@ export default function vanillaHeaderClasses() {
     };
 }
 
-export function vanillaHeaderLogoClasses() {
-    const vars = vanillaHeaderVariables();
+export function vanillaHeaderLogoClasses(theme?: object) {
+    const vars = vanillaHeaderVariables(theme);
     const logoFrame = style({ display: "inline-flex" });
     const debug = debugHelper("vanillaHeaderLogo");
 
@@ -557,9 +580,9 @@ export function vanillaHeaderLogoClasses() {
     return { logoFrame, logo, link };
 }
 
-export function vanillaHeaderHomeClasses() {
-    const vars = vanillaHeaderVariables();
-    const globalVars = globalVariables();
+export function vanillaHeaderHomeClasses(theme?: object) {
+    const vars = vanillaHeaderVariables(theme);
+    const globalVars = globalVariables(theme);
     const debug = debugHelper("vanillaHeaderHome");
 
     const root = style({

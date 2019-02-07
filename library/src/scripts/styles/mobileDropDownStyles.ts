@@ -8,7 +8,7 @@ import { debugHelper, flexHelper, mixBgAndFg } from "@library/styles/styleHelper
 import { vanillaHeaderVariables } from "@library/components/headers/vanillaHeaderStyles";
 import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutStyles } from "@library/styles/layoutStyles";
+import { layoutVariables } from "@library/styles/layoutStyles";
 
 export const mobileDropDownVariables = () => {
     const vanillaHeaderVars = vanillaHeaderVariables();
@@ -31,7 +31,7 @@ export const mobileDropDownVariables = () => {
 export const mobileDropDownClasses = () => {
     const vars = mobileDropDownVariables();
     const globalVars = globalVariables();
-    const mediaQueries = layoutStyles().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
     const debug = debugHelper("mobileDropDown");
 

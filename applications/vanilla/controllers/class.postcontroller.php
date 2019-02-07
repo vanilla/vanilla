@@ -679,7 +679,8 @@ class PostController extends VanillaController {
             $FormValues = $this->Form->formValues();
 
             if (isset($FormValues['DiscussionID'])) {
-                if ($FormValues['DiscussionID'] !== $DiscussionID) {
+                $formID = int($FormValues['DiscussionID']);
+                if ($formID !== $DiscussionID) {
                     throw new Exception('DiscussionID mismatch.');
                 }
             }

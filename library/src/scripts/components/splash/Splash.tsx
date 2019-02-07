@@ -14,7 +14,7 @@ import { PanelWidget, PanelWidgetHorizontalPadding } from "@library/components/l
 import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import Search from "@library/components/Search";
-import { splashStyles } from "@library/styles/splashStyles";
+import { splashStyles, splashVariables } from "@library/styles/splashStyles";
 
 interface IProps extends IDeviceProps {
     title: string; // Often the message to display isn't the real H1
@@ -26,16 +26,17 @@ interface IProps extends IDeviceProps {
  */
 export class Splash extends React.Component<IProps> {
     public render() {
+        const vars = splashVariables();
         const classes = splashStyles();
         const { title, className } = this.props;
-        const styles = splashStyles();
         return (
-            <div className={classNames("splash", className, classes.root)}>
+            <div className={classNames(className, classes.root)}>
+                <div className={classes.fullBackground} />
                 <Container className={classes.container}>
                     <div className={classes.innerContainer}>
                         <PanelWidgetHorizontalPadding>
                             <PanelWidget>{title && <Heading title={title} className={classes.title} />}</PanelWidget>
-                            <Search className={classes.search} theme={styles.search} />
+                            <Search className={classes.search} theme={vars.search} />
                         </PanelWidgetHorizontalPadding>
                     </div>
                 </Container>

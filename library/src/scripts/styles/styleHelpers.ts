@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { ColorHelper, important, px, quote, viewHeight, viewWidth } from "csx";
+import { ColorHelper, important, percent, px, quote, viewHeight, viewWidth } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { BackgroundImageProperty, FlexWrapProperty } from "csstype";
 import get from "lodash/get";
@@ -115,7 +115,7 @@ export function srOnly() {
 }
 
 export function fakeBackgroundFixed() {
-    return style({
+    return {
         content: quote(""),
         display: "block",
         position: "fixed",
@@ -123,23 +123,34 @@ export function fakeBackgroundFixed() {
         left: px(0),
         width: viewWidth(100),
         height: viewHeight(100),
-    });
+    };
 }
 
-const centeredBackground = () => {
+export function fullSizeOfParent() {
+    return {
+        display: "block",
+        position: "absolute",
+        top: px(0),
+        left: px(0),
+        width: percent(100),
+        height: percent(100),
+    };
+}
+
+export function centeredBackgroundProps() {
     return {
         backgroundPosition: `50% 50%`,
         backgroundRepeat: "no-repeat",
     };
-};
+}
 
-export function centreBackground() {
-    return style(centeredBackground());
+export function centeredBackground() {
+    return style(centeredBackgroundProps());
 }
 
 export function backgroundCover(backgroundImage: BackgroundImageProperty) {
     return style({
-        ...centeredBackground(),
+        ...centeredBackgroundProps(),
         backgroundSize: "cover",
         backgroundImage: backgroundImage.toString(),
     });

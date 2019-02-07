@@ -6,44 +6,65 @@
 
 import { style } from "typestyle";
 import { px, quote, viewWidth, viewHeight } from "csx";
-import { BackgroundImageProperty } from "csstype";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { componentThemeVariables, debugHelper } from "@library/styles/styleHelpers";
+import { searchVariables } from "@library/styles/searchStyles";
 
-export default function splashStyles() {
-    const root = style({});
-    return { root };
-}
+export function splashVariables(theme?: object) {
+    const globalVars = globalVariables(theme);
+    const elementaryColor = globalVars.elementaryColors;
+    const themeVars = componentThemeVariables(theme, "splash");
 
-// To be moved
-export function fakeBackgroundFixed() {
-    return style({
-        content: quote(""),
-        display: "block",
-        position: "fixed",
-        top: px(0),
-        left: px(0),
-        width: viewWidth(100),
-        height: viewHeight(100),
-    });
-}
-
-// To be moved
-const centeredBackground = () => {
-    return {
-        backgroundPosition: `50% 50%`,
-        backgroundRepeat: "no-repeat",
+    const fullBackground = {
+        bg: globalVars.mainColors.primary,
+        image: "https://vanillaforums.com/images/backgrounds/header_blue.jpg",
+        ...themeVars.subComponentStyles("fullBackground"),
     };
-};
 
-// To be moved
-export function centreBackground() {
-    return style(centeredBackground());
+    const title = {
+        fg: elementaryColor.white,
+        fontSize: globalVars.fonts.title,
+        textAlign: "center",
+        fontWeight: globalVars.fonts.weights.semiBold,
+        textShadow: `0 1px 25px rgba(27,31,35,0.01)`,
+        marginBottom: 40,
+        ...themeVars.subComponentStyles("title"),
+    };
+
+    const spacing = {
+        top: 76,
+        bottom: 48,
+        ...themeVars.subComponentStyles("spacing"),
+    };
+
+    const border = {
+        color: globalVars.mainColors.fg,
+        ...themeVars.subComponentStyles("border"),
+    };
+
+    const search = searchVariables({
+        ...themeVars.subComponentStyles("search"),
+    });
+
+    return { fullBackground, title, spacing, border, search };
 }
 
-// To be moved
-export function backgroundCover(backgroundImage: BackgroundImageProperty) {
-    return style({
-        ...centeredBackground(),
-        backgroundSize: "cover",
-        backgroundImage: backgroundImage.toString(),
+export function splashStyles() {
+    const debug = debugHelper("search");
+    const root = style({
+        ...debug.name(),
     });
+    const container = style({
+        ...debug.name("container"),
+    });
+    const innerContainer = style({
+        ...debug.name("innerContainer"),
+    });
+    const title = style({
+        ...debug.name("title"),
+    });
+    const search = style({
+        ...debug.name("search"),
+    });
+    return { root, container, innerContainer, title, search };
 }

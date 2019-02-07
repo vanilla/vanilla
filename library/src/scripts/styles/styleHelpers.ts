@@ -3,10 +3,11 @@
  * @license GPL-2.0-only
  */
 
-import { ColorHelper, important, px } from "csx";
+import { ColorHelper, important, px, quote, viewHeight, viewWidth } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { FlexWrapProperty } from "csstype";
+import { BackgroundImageProperty, FlexWrapProperty } from "csstype";
 import get from "lodash/get";
+import { style } from "typestyle";
 
 /*
  * Helper function to get variable with fallback
@@ -111,4 +112,35 @@ export function srOnly() {
         clip: important(`rect(0, 0, 0, 0)`),
         border: important(px(0).toString()),
     };
+}
+
+export function fakeBackgroundFixed() {
+    return style({
+        content: quote(""),
+        display: "block",
+        position: "fixed",
+        top: px(0),
+        left: px(0),
+        width: viewWidth(100),
+        height: viewHeight(100),
+    });
+}
+
+const centeredBackground = () => {
+    return {
+        backgroundPosition: `50% 50%`,
+        backgroundRepeat: "no-repeat",
+    };
+};
+
+export function centreBackground() {
+    return style(centeredBackground());
+}
+
+export function backgroundCover(backgroundImage: BackgroundImageProperty) {
+    return style({
+        ...centeredBackground(),
+        backgroundSize: "cover",
+        backgroundImage: backgroundImage.toString(),
+    });
 }

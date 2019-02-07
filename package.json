@@ -130,7 +130,7 @@
         "react-hot-loader": "4.6.3",
         "redux-test-utils": "0.3.0",
         "sass-loader": "7.1.0",
-        "sinon": "6.3.5",
+        "sinon": "7.2.3",
         "style-loader": "0.23.1",
         "terser-webpack-plugin": "1.1.0",
         "ts-lint": "4.5.1",

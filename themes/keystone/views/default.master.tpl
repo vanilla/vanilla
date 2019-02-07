@@ -174,7 +174,7 @@
                                         {if !$SectionGroups}
                                             <div class="SearchBox js-sphinxAutoComplete" role="search">
                                                 {if $hasAdvancedSearch === true}
-                                                    {searchbox_advanced}
+                                                    {module name="AdvancedSearchModule"}
                                                 {else}
                                                     {searchbox}
                                                 {/if}

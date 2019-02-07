@@ -12,7 +12,7 @@ import classNames from "classnames";
 import { t } from "@library/application";
 import Button from "@library/components/forms/Button";
 import Heading from "@library/components/Heading";
-import { InputActionMeta } from "react-select/lib/types";
+import { InputActionMeta, ActionMeta as SelectActionMeta } from "react-select/lib/types";
 import * as selectOverrides from "./overwrites";
 import ButtonLoader from "@library/components/ButtonLoader";
 import { OptionProps } from "react-select/lib/components/Option";
@@ -102,7 +102,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                 onInputChange={this.handleInputChange}
                 components={this.componentOverwrites}
                 isClearable={false}
-                blurInputOnSelect={false}
+                blurInputOnSelect={true}
                 allowCreateWhileLoading={true}
                 controlShouldRenderValue={false}
                 isDisabled={disabled}
@@ -145,10 +145,18 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * - Force the menu closed.
      * - Trigger a search.
      */
-    private handleOptionChange = (option: IComboBoxOption) => {
+    private handleOptionChange = (option: IComboBoxOption, actionMeta: SelectActionMeta) => {
         if (option) {
+            const data = option.data || {};
+            const { url } = option.data;
+
             this.props.onChange(option.label);
-            this.setState({ forceMenuClosed: true }, this.props.onSearch);
+
+            if (actionMeta.action === "select-option" && url) {
+                console.log(url);
+            } else {
+                this.setState({ forceMenuClosed: true }, this.props.onSearch);
+            }
         }
     };
 

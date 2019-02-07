@@ -144,17 +144,6 @@ class KeystoneThemeHooks extends Gdn_Plugin {
     }
 
     /**
-     * Register {searchbox_advanced} even if AdvancedSearchPlugin is disabled so theme doens't break
-     *
-     * @param Smarty $sender
-     */
-    public function gdn_smarty_init_handler($sender) {
-        if (!class_exists('AdvancedSearchPlugin')) {
-            $sender->register_function('searchbox_advanced', 'searchBoxAdvancedMock');
-        }
-    }
-
-    /**
      * Add support to `hasHeroBanner`, `hasFeatureSearchbox` and `panelToLeft` custom fields
      *
      * @param SettingsController $sender
@@ -225,16 +214,3 @@ class KeystoneThemeHooks extends Gdn_Plugin {
         $sender->render();
     }
 }
-
-if (!function_exists('searchBoxAdvancedMock')) :
-
-    /**
-     * Fallback function so theme doesn't break with {searchbox_advanced} declaration
-     *
-     * @param Smarty $params
-     */
-    function searchBoxAdvancedMock($params) {
-        return "";
-    }
-
-endif;

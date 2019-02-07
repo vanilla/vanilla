@@ -16,6 +16,8 @@ export interface INotificationsStoreState {
     notifications: INotificationsState;
 }
 
+export interface IWithNotifications extends INotificationsState {}
+
 /**
  * Manage notification state in Redux.
  */
@@ -53,6 +55,14 @@ export default class NotificationsModel implements ReduxReducer<INotificationsSt
                 case NotificationsActions.GET_NOTIFICATIONS_ERROR:
                     nextState.notificationsByID.status = LoadStatus.ERROR;
                     nextState.notificationsByID.error = action.payload;
+                    break;
+                case NotificationsActions.MARK_ALL_READ_RESPONSE:
+                    const { data } = nextState.notificationsByID;
+                    if (data) {
+                        for (const id of Object.keys(data)) {
+                            (data[id] as INotification).read = true;
+                        }
+                    }
                     break;
             }
         });

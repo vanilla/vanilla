@@ -4,33 +4,36 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
 import { t } from "@library/application";
-import { notifications } from "@library/components/icons/header";
+import { messages } from "@library/components/icons/header";
 import Count from "@library/components/mebox/pieces/Count";
 import classNames from "classnames";
+import * as React from "react";
 
 interface IProps {
-    count?: number;
-    open?: boolean;
     countClass?: string;
+    open: boolean;
     className?: string;
 }
 
 /**
- * Implements Notifications toggle contents
+ * Implements Messages Drop down for header
  */
-export default class NotificationsToggle extends React.PureComponent<IProps> {
+export default class MessagesCount extends React.PureComponent<IProps> {
+    public state = {
+        open: false,
+    };
+
     public render() {
-        const count = this.props.count ? this.props.count : 0;
+        const count = 0;
         return (
-            <div className={classNames("meBox-buttonContent", this.props.className)}>
-                {notifications(!!this.props.open)}
+            <div className={classNames(this.props.className, "messagesToggle")}>
+                {messages(this.props.open)}
                 {count > 0 && (
                     <Count
                         className={classNames("vanillaHeader-count", this.props.countClass)}
-                        label={t("Notifications: ")}
-                        count={this.props.count}
+                        label={t("Messages: ")}
+                        count={count}
                     />
                 )}
             </div>

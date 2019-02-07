@@ -6,28 +6,26 @@
 
 import * as React from "react";
 import ReactDOM from "react-dom";
-import { dummyLogoData } from "../../mebox/state/dummyLogoData";
-import { dummyMessagesData } from "../../mebox/state/dummyMessagesData";
-import { Devices, IDeviceProps } from "../../DeviceChecker";
-import { withDevice } from "../../../contexts/DeviceContext";
-import { dummyUserDropDownData } from "../../mebox/state/dummyUserDropDownData";
-import UsersModel, { IInjectableUserState } from "../../../users/UsersModel";
 import classNames from "classnames";
-import Container from "../../layouts/components/Container";
-import { PanelWidgetHorizontalPadding } from "../../layouts/PanelLayout";
-import HeaderLogo from "../../mebox/pieces/HeaderLogo";
-import VanillaHeaderNav from "../../mebox/pieces/VanillaHeaderNav";
-import CompactMeBox from "../../mebox/pieces/CompactMeBox";
 import { connect } from "react-redux";
-import { INotificationsProps } from "../../mebox/pieces/NotificationsContents";
-import LanguagesDropDown from "../../LanguagesDropDown";
-import { dummyOtherLanguagesData } from "../../../state/dummyOtherLanguages";
-import { ButtonBaseClass } from "../../forms/Button";
-import FlexSpacer from "../../FlexSpacer";
 import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
 import { signIn } from "@library/components/icons";
 import VanillaHeaderListItem from "@library/components/mebox/pieces/VanillaHeaderListItem";
 import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
+import vanillaHeaderClasses, { vanillaHeaderHomeClasses } from "@library/components/headers/vanillaHeaderStyles";
+import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
+import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
+import Container from "@library/components/layouts/components/Container";
+import FlexSpacer from "@library/components/FlexSpacer";
+import HeaderLogo from "@library/components/mebox/pieces/HeaderLogo";
+import { PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
+import { dummyLogoData } from "@library/components/mebox/state/dummyLogoData";
+import VanillaHeaderNav from "@library/components/mebox/pieces/VanillaHeaderNav";
+import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
+import LanguagesDropDown from "@library/components/LanguagesDropDown";
+import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
+import { ButtonBaseClass } from "@library/components/forms/Button";
+import { withDevice } from "@library/contexts/DeviceContext";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -45,55 +43,43 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
         const currentUser = this.props.currentUser.data;
         const isMobile = this.props.device === Devices.MOBILE;
         const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
-        const countClass = "vanillaHeader-count";
-        const buttonClass = "vanillaHeader-button";
-
-        const notificationProps: INotificationsProps = {
-            data: [],
-            userSlug: currentUser!.name,
-            countClass: classNames(countClass, "vanillaHeader-notificationsCount"),
-        };
-
-        const messagesProps = {
-            ...dummyMessagesData,
-            buttonClass,
-            countClass: classNames(countClass, "vanillaHeader-messagesCount"),
-        };
+        const headerClasses = vanillaHeaderClasses();
+        const classes = vanillaHeaderHomeClasses();
 
         return ReactDOM.createPortal(
-            <header className={classNames("vanillaHeader", "vanillaHeaderHome", this.props.className)}>
+            <header className={classNames(headerClasses.root, classes.root, this.props.className)}>
                 <Container className="vanillaHeaderHome-top">
                     <PanelWidgetHorizontalPadding>
-                        <div className="vanillaHeader-bar isHome">
-                            <FlexSpacer className="vanillaHeaderHome-left" />
+                        <div className={classNames(headerClasses.bar, "isHome")}>
+                            <FlexSpacer className={classes.left} />
                             <HeaderLogo
                                 {...dummyLogoData}
                                 className="vanillaHeader-logoContainer"
                                 logoClassName="vanillaHeader-logo isCentred"
                             />
                             {isGuest ? (
-                                <VanillaHeaderNav className="vanillaHeader-nav vanillaHeader-guestNav">
+                                <VanillaHeaderNav className={classNames(headerClasses.nav, "vanillaHeader-guest")}>
                                     <VanillaHeaderNavItem to={`/entry/signin?target=${window.location.pathname}`}>
                                         {signIn("vanillaHeader-signInIcon")}
                                     </VanillaHeaderNavItem>
                                 </VanillaHeaderNav>
                             ) : (
                                 <CompactMeBox
-                                    counts={dummyUserDropDownData}
-                                    buttonClass="vanillaHeader-button"
+                                    buttonClass={headerClasses.button}
                                     userPhotoClass="headerDropDown-user"
+                                    currentUser={this.props.currentUser}
                                 />
                             )}
                         </div>
                     </PanelWidgetHorizontalPadding>
                 </Container>
-                <div className="vanillaHeaderHome-bottom">
+                <div className={classes.bottom}>
                     <div className="vanillaHeader-horizontalScroll">
                         <VanillaHeaderNav
                             {...dummyNavigationData}
                             linkClassName="vanillaHeader-navLink"
                             linkContentClassName="vanillaHeader-navLinkContent"
-                            className={classNames("vanillaHeader-nav", "isScrolled")}
+                            className={classNames(headerClasses.nav, "isScrolled")}
                         >
                             <VanillaHeaderListItem>
                                 <LanguagesDropDown

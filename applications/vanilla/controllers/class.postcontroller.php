@@ -680,6 +680,7 @@ class PostController extends VanillaController {
 
             if (isset($FormValues['DiscussionID'])) {
                 $formID = (int)$FormValues['DiscussionID'];
+                $DiscussionID = (int)$DiscussionID;
                 if ($formID !== $DiscussionID) {
                     throw new Exception('DiscussionID mismatch.');
                 }

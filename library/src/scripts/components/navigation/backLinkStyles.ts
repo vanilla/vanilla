@@ -29,7 +29,7 @@ export default function backLinkClasses(theme?: object) {
         alignItems: "center",
         justifyContent: "flex-start",
         color: "inherit",
-        minWidth: globalVars.icon.size.default,
+        minWidth: globalVars.icon.sizes.default,
         $nest: {
             "&:hover": {
                 color: globalVars.mainColors.primary.toString(),
@@ -40,7 +40,7 @@ export default function backLinkClasses(theme?: object) {
     const label = style(
         {
             ...debug.name("label"),
-            lineHeight: globalVars.icon.size.default,
+            lineHeight: globalVars.icon.sizes.default,
             fontWeight: globalVars.fonts.weights.semiBold,
             whiteSpace: "nowrap",
             paddingLeft: px(12),

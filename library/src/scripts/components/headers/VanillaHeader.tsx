@@ -67,13 +67,10 @@ export class VanillaHeader extends React.Component<IProps, IState> {
     };
     public render() {
         const { isFixed } = this.props;
-        const { isScrolledOff } = this.state;
         const currentUser = this.props.currentUser.data;
         const isMobile = this.props.device === Devices.MOBILE;
         const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
-        const countClass = "vanillaHeader-count";
         const classes = vanillaHeaderClasses();
-        const buttonClass = `vanillaHeader-button ${classes.button}`;
         const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
 
         return ReactDOM.createPortal(

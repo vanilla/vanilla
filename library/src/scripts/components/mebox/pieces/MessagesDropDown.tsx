@@ -9,7 +9,6 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DropDown from "@library/components/dropdown/DropDown";
 import MessagesContents from "@library/components/mebox/pieces/MessagesContents";
 import MessagesCount from "@library/components/mebox/pieces/MessagesCount";
-import ConversationsActions from "@library/conversations/ConversationsActions";
 import classNames from "classnames";
 import * as React from "react";
 

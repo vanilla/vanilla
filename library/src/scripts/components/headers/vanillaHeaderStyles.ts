@@ -77,7 +77,6 @@ export function vanillaHeaderVariables(theme?: object) {
         ...themeVars.subComponentStyles("compactSearch"),
     };
 
-    // here
     const buttonContents = {
         hover: {
             bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1, true),
@@ -307,6 +306,7 @@ export default function vanillaHeaderClasses(theme?: object) {
     const meBoxStateStyles = {
         ...debug.name("meBoxStateStyles"),
         borderRadius: px(vars.button.borderRadius),
+        backgroundColor: vars.buttonContents.hover.bg.toString(),
     };
 
     const button = style(

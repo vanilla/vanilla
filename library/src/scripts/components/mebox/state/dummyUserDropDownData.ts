@@ -5,10 +5,10 @@
  */
 
 export const dummyUserDropDownData = {
-    bookmarkCount: 3,
-    draftsCount: 3000,
-    applicantsCount: 593,
-    spamQueueCount: 70959933,
-    moderationQueueCount: 50340055,
-    badgeRequestCount: 6069943544,
+    bookmarkCount: 0,
+    draftsCount: 0,
+    applicantsCount: 0,
+    spamQueueCount: 0,
+    moderationQueueCount: 0,
+    badgeRequestCount: 0,
 };

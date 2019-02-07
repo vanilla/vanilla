@@ -4,14 +4,16 @@
  */
 
 import { calc, percent, px } from "csx";
-import { debugHelper, flexHelper, mixBgAndFg } from "@library/styles/styleHelpers";
+import { debugHelper, flexHelper } from "@library/styles/styleHelpers";
 import { vanillaHeaderVariables } from "@library/components/headers/vanillaHeaderStyles";
 import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
 
-export const mobileDropDownVariables = () => {
+export const mobileDropDownVariables = (theme?: object) => {
+    const globalVars = globalVariables(theme);
     const vanillaHeaderVars = vanillaHeaderVariables();
+    const mixBgAndFg = globalVars.mixBgAndFg;
 
     const title = {
         letterSpacing: -0.26,

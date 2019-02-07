@@ -4,7 +4,7 @@
  */
 
 import { color, percent, px } from "csx";
-import { componentThemeVariables, mixBgAndFg } from "@library/styles/styleHelpers";
+import { componentThemeVariables } from "@library/styles/styleHelpers";
 
 export const globalVariables = (theme?: object) => {
     const colorPrimary = color("#0291db");
@@ -28,6 +28,10 @@ export const globalVariables = (theme?: object) => {
         primary: colorPrimary,
         secondary: colorPrimary.darken(10),
         ...themeVars.subComponentStyles("mainColors"),
+    };
+
+    const mixBgAndFg = weight => {
+        return mainColors.fg.mix(mainColors.bg, weight);
     };
 
     const errorFg = color("#ff3933");
@@ -145,5 +149,6 @@ export const globalVariables = (theme?: object) => {
         spacer,
         lineHeights,
         icon,
+        mixBgAndFg,
     };
 };

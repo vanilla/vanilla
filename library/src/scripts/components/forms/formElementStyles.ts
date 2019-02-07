@@ -5,10 +5,11 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, mixBgAndFg } from "@library/styles/styleHelpers";
+import { componentThemeVariables } from "@library/styles/styleHelpers";
 
 export function formElementsVariables(theme?: object) {
     const vars = globalVariables(theme);
+    const mixBgAndFg = vars.mixBgAndFg;
     const themeVars = componentThemeVariables(theme, "formElements");
 
     const sizing = {

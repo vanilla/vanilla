@@ -42,11 +42,6 @@ export const getColorDependantOnLightness = (
     }
 };
 
-export const mixBgAndFg = weight => {
-    const coreVars = globalVariables();
-    return coreVars.mainColors.fg.mix(coreVars.mainColors.bg, weight);
-};
-
 export function flexHelper() {
     const middle = (wrap = false) => {
         return {

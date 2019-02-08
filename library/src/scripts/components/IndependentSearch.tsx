@@ -36,8 +36,6 @@ interface IState {
  */
 export class IndependentSearch extends React.Component<ICompactSearchProps, IState> {
     private id = uniqueIDFromPrefix("search");
-    private selfRef = React.createRef<HTMLDivElement>();
-    private searchInputRef = React.createRef<SearchBar>();
     private resultsRef = React.createRef<HTMLDivElement>();
 
     public state: IState = {
@@ -48,7 +46,7 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
         const classes = searchClasses(this.props.theme);
         const buttons = buttonClasses(this.props.theme);
         return (
-            <div ref={this.selfRef} className={classNames(classes.root, this.props.className)}>
+            <div className={classNames(classes.root, this.props.className)}>
                 <SearchBar
                     id={this.id}
                     placeholder={this.props.placeholder}
@@ -59,7 +57,6 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
                     onChange={this.handleSearchChange}
                     onSearch={this.handleSubmit}
                     loadOptions={this.props.searchOptionProvider.autocomplete}
-                    ref={this.searchInputRef}
                     triggerSearchOnClear={false}
                     resultsRef={this.resultsRef}
                     onOpenSuggestions={this.props.onOpenSuggestions}

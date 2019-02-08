@@ -873,7 +873,7 @@ $Construct
     ->column("recordType", "varchar(64)", false, ["index", "index.record"])
     ->column("recordID", "int", false, "index.record")
     ->column("reactionValue", "int", false)
-    ->column("insertUserID", "int", false, ["index", "index.record"])
+    ->column("insertUserID", "int", false, ["index"])
     ->column("dateInserted", "datetime")
     ->set($Explicit, $Drop);
 

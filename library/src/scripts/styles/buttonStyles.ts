@@ -254,36 +254,7 @@ export enum ButtonTypes {
 }
 
 export function buttonClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const debug = debugHelper("button");
-
-    // const primary = style({
-    //     color: globalVars.mainColors.bg.toString(),
-    //     backgroundColor: globalVars.mainColors.primary.toString(),
-    //     borderColor: globalVars.mainColors.primary.toString(),
-    //     $nest: {
-    //         ".buttonLoader::after": {
-    //             $nest: {},
-    //         },
-    //     },
-    //     ...debug.name("primary"),
-    // });
-    //
-    // const standard = style({
-    //     color: globalVars.mainColors.bg.toString(),
-    //     backgroundColor: globalVars.mainColors.primary.toString(),
-    //     borderColor: globalVars.mainColors.primary.toString(),
-    //     ...debug.name("primary"),
-    // });
-    //
-    // const transparent = style({
-    //     color: globalVars.mainColors.bg.toString(),
-    //     backgroundColor: globalVars.mainColors.primary.toString(),
-    //     borderColor: globalVars.mainColors.primary.toString(),
-    //     ...debug.name("primary"),
-    // });
-
-    return (type: ButtonTypes, overwrite?: object) => {
+    return (type: ButtonTypes) => {
         const vars = buttonVars(theme);
         switch (type) {
             case ButtonTypes.PRIMARY:

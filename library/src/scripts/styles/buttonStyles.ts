@@ -231,5 +231,19 @@ export function buttonClasses(theme?: object) {
         ...debug.name("primary"),
     });
 
-    return { primary };
+    const standard = style({
+        color: globalVars.mainColors.bg.toString(),
+        backgroundColor: globalVars.mainColors.primary.toString(),
+        borderColor: globalVars.mainColors.primary.toString(),
+        ...debug.name("primary"),
+    });
+
+    const transparent = style({
+        color: globalVars.mainColors.bg.toString(),
+        backgroundColor: globalVars.mainColors.primary.toString(),
+        borderColor: globalVars.mainColors.primary.toString(),
+        ...debug.name("primary"),
+    });
+
+    return { standard, primary, transparent };
 }

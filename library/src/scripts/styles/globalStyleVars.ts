@@ -26,7 +26,7 @@ export const globalVariables = (theme?: object) => {
         fg: color("#555a62"),
         bg: color("#fff"),
         primary: colorPrimary,
-        secondary: getColorDependantOnLightness(theme, colorPrimary, colorPrimary, 0.1),
+        secondary: getColorDependantOnLightness(colorPrimary, colorPrimary, 0.1),
         ...themeVars.subComponentStyles("mainColors"),
     };
 

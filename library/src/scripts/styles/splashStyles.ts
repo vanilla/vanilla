@@ -7,7 +7,7 @@
 import { style } from "typestyle";
 import { px, quote, viewWidth, viewHeight, url, percent } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, componentThemeVariables } from "@library/styles/styleHelpers";
+import { debugHelper, componentThemeVariables, getColorDependantOnLightness } from "@library/styles/styleHelpers";
 import { centeredBackgroundProps } from "@library/styles/styleHelpers";
 import { searchVariables } from "@library/styles/searchStyles";
 import { assetUrl } from "@library/application";
@@ -23,12 +23,12 @@ export function splashVariables(theme?: object) {
         ...themeVars.subComponentStyles("fullBackground"),
     };
 
+    // Optional textShadow available
     const title = {
-        fg: elementaryColor.white.toString(),
+        fg: elementaryColor.white,
         fontSize: globalVars.fonts.size.title,
         textAlign: "center",
         fontWeight: globalVars.fonts.weights.semiBold,
-        textShadow: `0 1px 25px rgba(27,31,35,0.01)`,
         marginTop: 28,
         marginBottom: 40,
         ...themeVars.subComponentStyles("title"),
@@ -57,6 +57,7 @@ export function splashVariables(theme?: object) {
 }
 
 export function splashStyles(theme?: object) {
+    const globalVars = globalVariables(theme);
     const vars = splashVariables(theme);
     const debug = debugHelper("splash");
 
@@ -98,10 +99,12 @@ export function splashStyles(theme?: object) {
         fontSize: px(vars.title.fontSize),
         textAlign: "center",
         fontWeight: vars.title.fontWeight,
-        textShadow: vars.title.textShadow,
-        color: vars.title.fg,
+        color: vars.title.fg.toString(),
         paddingTop: px(vars.title.marginTop),
         marginBottom: px(vars.title.marginBottom),
+        textShadow: vars.title.textShadow
+            ? vars.title.textShadow
+            : `0 1px 25px ${getColorDependantOnLightness(vars.title.fg, vars.title.fg, 0.9).fade(0.4)}`,
         ...debug.name("title"),
     });
 

@@ -14,19 +14,9 @@ export const vanillaMenuVariables = (theme?: object) => {
         ...themeVars.subComponentStyles("guest"),
     };
     const signIn = {
-        bg: getColorDependantOnLightness(
-            globalVars,
-            globalVars.mainColors.fg,
-            globalVars.mainColors.primary,
-            0.1,
-        ).toString(),
+        bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1).toString(),
         hover: {
-            bg: getColorDependantOnLightness(
-                globalVars,
-                globalVars.mainColors.fg,
-                globalVars.mainColors.primary,
-                0.2,
-            ).toString(),
+            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2).toString(),
         },
         ...themeVars.subComponentStyles("signIn"),
     };

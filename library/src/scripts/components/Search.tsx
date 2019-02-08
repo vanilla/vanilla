@@ -13,6 +13,7 @@ import SearchBar from "@library/components/forms/select/SearchBar";
 import { t } from "@library/application";
 import SearchOption from "@library/components/search/SearchOption";
 import { searchClasses } from "@library/styles/searchStyles";
+import { buttonClasses } from "@library/styles/buttonStyles";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
@@ -45,6 +46,7 @@ export class Search extends React.Component<ICompactSearchProps, IState> {
 
     public render() {
         const classes = searchClasses(this.props.theme);
+        const buttons = buttonClasses(this.props.theme);
         return (
             <div ref={this.selfRef} className={classNames(classes.root, this.props.className)}>
                 <SearchBar
@@ -63,6 +65,7 @@ export class Search extends React.Component<ICompactSearchProps, IState> {
                     onOpenSuggestions={this.props.onOpenSuggestions}
                     onCloseSuggestions={this.props.onCloseSuggestions}
                     className={classes.bar}
+                    buttonClassName={buttons.transparent}
                 />
                 <div
                     ref={this.resultsRef}

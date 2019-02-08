@@ -209,7 +209,6 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * @param props
      */
     private SearchControl = (props, theme?: object) => {
-        const buttons = buttonClasses(theme);
         return (
             <div className="searchBar">
                 <form className="searchBar-form" onSubmit={this.onFormSubmit}>
@@ -239,11 +238,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                             <Button
                                 type="submit"
                                 id={this.searchButtonID}
-                                className={classNames(
-                                    "searchBar-submitButton",
-                                    buttons.primary,
-                                    this.props.buttonClassName,
-                                )}
+                                className={classNames("searchBar-submitButton", this.props.buttonClassName)}
                                 tabIndex={!!this.props.hideSearchButton ? -1 : 0}
                             >
                                 {this.props.isLoading ? <ButtonLoader /> : t("Search")}

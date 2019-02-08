@@ -109,7 +109,6 @@ export const debugHelper = (componentName: string) => {
  * @param flip - By default we darken light colours and lighten darks, but if you want to get the opposite result, use this param
  */
 export const getColorDependantOnLightness = (
-    globalVars,
     referenceColor: ColorHelper,
     colorToModify: ColorHelper,
     weight: number,
@@ -119,12 +118,12 @@ export const getColorDependantOnLightness = (
         throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
     }
 
-    if (referenceColor.lightness() >= 0.5 && flip) {
+    if (referenceColor.lightness() >= 0.5 && !flip) {
         // Lighten color
-        return colorToModify.mix(color("#fff"), 1 - weight);
+        return colorToModify.mix(color("#000"), 1 - weight);
     } else {
         // Darken color
-        return colorToModify.mix(color("#000"), 1 - weight);
+        return colorToModify.mix(color("#fff"), 1 - weight);
     }
 };
 

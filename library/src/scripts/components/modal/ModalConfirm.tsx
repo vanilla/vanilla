@@ -13,6 +13,7 @@ import ModalSizes from "@library/components/modal/ModalSizes";
 import { getRequiredID } from "@library/componentIDs";
 import Modal from "@library/components/modal/Modal";
 import ButtonLoader from "@library/components/ButtonLoader";
+import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps {
     title: string; // required for accessibility
@@ -48,6 +49,7 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
 
     public render() {
         const { onCancel, onConfirm, srOnlyTitle, isConfirmLoading, title, children } = this.props;
+        const buttons = buttonClasses();
         return (
             <Modal
                 size={ModalSizes.SMALL}
@@ -72,7 +74,11 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                         <Button buttonRef={this.cancelRef} onClick={onCancel}>
                             {t("Cancel")}
                         </Button>
-                        <Button onClick={onConfirm} className="buttonPrimary" disabled={isConfirmLoading}>
+                        <Button
+                            onClick={onConfirm}
+                            className={buttons(ButtonTypes.PRIMARY)}
+                            disabled={isConfirmLoading}
+                        >
                             {isConfirmLoading ? <ButtonLoader /> : t("Ok")}
                         </Button>
                     </FrameFooter>

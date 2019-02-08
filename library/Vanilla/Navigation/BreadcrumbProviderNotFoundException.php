@@ -20,4 +20,4 @@ class BreadcrumbProviderNotFoundException extends \Exception {
     public function __construct(string $recordType, int $code = 0, Throwable $previous = null) {
         parent::__construct("$recordType breadcrumb provider could not be found.", $code, $previous);
     }
-};
+}

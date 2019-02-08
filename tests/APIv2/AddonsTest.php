@@ -108,7 +108,7 @@ class AddonsTest extends AbstractAPIv2Test {
         $this->assertEquals('keystone-theme', $desktop['addonID']);
 
         $mobile = $this->api()->get('/addons', ['type' => 'theme', 'enabled' => true, 'themeType' => 'mobile'])[0];
-        $this->assertEquals('keystone-theme', $mobile['addonID']);
+        $this->assertEquals('mobile-theme', $mobile['addonID']);
 
         // Set the desktop and mobile theme.
         $this->api()->patch('/addons/bittersweet-theme', ['enabled' => true, 'themeType' => 'desktop']);

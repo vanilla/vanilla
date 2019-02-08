@@ -99,7 +99,7 @@ $Configuration['Garden']['Thumbnail']['Size'] = 200;
 
 // Appearance.
 $Configuration['Garden']['Theme'] = 'keystone';
-$Configuration['Garden']['MobileTheme'] = 'keystone';
+$Configuration['Garden']['MobileTheme'] = 'mobile';
 $Configuration['Garden']['Menu']['Sort'] = ['Dashboard', 'Discussions', 'Questions', 'Activity', 'Applicants', 'Conversations', 'User'];
 $Configuration['Garden']['ThemeOptions']['Styles']['Key'] = 'Default';
 $Configuration['Garden']['ThemeOptions']['Styles']['Value'] = '%s_default';

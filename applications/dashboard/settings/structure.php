@@ -972,4 +972,11 @@ if (c('Garden.AllowJSONP')) {
     removeFromConfig('Garden.AllowJSONP');
 }
 
+// Avoid the mobile posts having the rich format fall through as the default when the addon is not enabled.
+$mobileInputFormatter = Gdn::config()->get("Garden.MobileInputFormatter");
+$richEditorEnabled = Gdn::addonManager()->isEnabled("rich-editor", \Vanilla\Addon::TYPE_ADDON);
+if ($mobileInputFormatter === "Rich" && $richEditorEnabled === false) {
+    Gdn::config()->set("Garden.MobileInputFormatter", Gdn::config()->get("Garden.InputFormatter"));
+}
+
 Gdn::router()->setRoute('apple-touch-icon.png', 'utility/showtouchicon', 'Internal');

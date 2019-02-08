@@ -4,13 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import { LinkContextProvider } from "@library/components/navigation/LinkContextProvider";
 import { expect } from "chai";
 import { mount } from "enzyme";
-import SmartLink, { LinkContext } from "./SmartLink";
 import { LocationDescriptor } from "history";
+import React from "react";
 import { MemoryRouter, Route } from "react-router";
 import { Link } from "react-router-dom";
+import SmartLink from "./SmartLink";
 
 const DOMAIN = "https://mysite.com";
 const SUBPATH = "/test";
@@ -19,13 +20,13 @@ const CONTEXT_BASE = DOMAIN + SUBPATH;
 function renderLocation(loc: LocationDescriptor, formatter: any) {
     return mount(
         <div>
-            <LinkContext.Provider value={CONTEXT_BASE}>
-                <MemoryRouter>
+            <MemoryRouter>
+                <LinkContextProvider linkContext={CONTEXT_BASE} urlFormatter={formatter}>
                     <Route>
-                        <SmartLink urlFormatter={formatter} to={loc} />
+                        <SmartLink to={loc} />
                     </Route>
-                </MemoryRouter>
-            </LinkContext.Provider>
+                </LinkContextProvider>
+            </MemoryRouter>
         </div>,
     );
 }

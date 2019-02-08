@@ -13,6 +13,7 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\Contracts\Web\AssetInterface;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\SiteMeta;
+use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\JsInterpop\PhpAsJsVariable;
@@ -35,7 +36,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /** @var string */
     private $seoDescription;
 
-    /** @var array|null */
+    /** @var Breadcrumb[]|null */
     private $seoBreadcrumbs;
 
     /** @var string|null */
@@ -136,6 +137,9 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             'seoContent' => $this->seoContent,
             'metaTags' => $this->metaTags,
             'cssClasses' => ['isLoading'],
+            'breadcrumbsJson' => $this->seoBreadcrumbs ?
+                $this->breadcrumbModel->crumbsAsJsonLD($this->seoBreadcrumbs) :
+                null,
         ];
         $viewContent = $this->renderTwig('resources/views/default-master.twig', $viewData);
 
@@ -166,7 +170,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /**
      * Indicate to crawlers that they should not index this page.
      *
-     * @return self Own instance for chaining.
+     * @return $this Own instance for chaining.
      */
     public function blockRobots(): self {
         header('X-Robots-Tag: noindex', true);
@@ -180,7 +184,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      *
      * @param ReduxAction $action The action to add.
      *
-     * @return self Own instance for chaining.
+     * @return $this Own instance for chaining.
      */
     protected function addReduxAction(ReduxAction $action): self {
         $this->reduxActions[] = $action;
@@ -193,7 +197,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      *
      * @param bool $required
      *
-     * @return self Own instance for chaining.
+     * @return $this Own instance for chaining.
      */
     protected function setSeoRequired(bool $required = true): self {
         $this->requiresSeo = $required;
@@ -207,7 +211,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @param string $title The title to set.
      * @param bool $withSiteTitle Whether or not to append the global site title.
      *
-     * @return self Own instance for chaining.
+     * @return $this Own instance for chaining.
      */
     protected function setSeoTitle(string $title, bool $withSiteTitle = true): self {
         if ($withSiteTitle) {
@@ -227,7 +231,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      *
      * @param string $description
      *
-     * @return self Own instance for chaining.
+     * @return $this Own instance for chaining.
      */
     protected function setSeoDescription(string $description): self {
         $this->seoDescription = $description;
@@ -240,7 +244,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      *
      * @param string $path Either a partial path or a full URL.
      *
-     * @return self Own instance for chaining.
+     * @return $this Own instance for chaining.
      */
     protected function setCanonicalUrl(string $path): self {
         $this->canonicalUrl = $this->request->url($path, true);
@@ -251,13 +255,12 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /**
      * Set an array of breadcrumbs.
      *
-     * @param array $crumbs
+     * @param Breadcrumb[] $crumbs
      *
-     * @return self Own instance for chaining.
+     * @return $this Own instance for chaining.
      */
     protected function setSeoBreadcrumbs(array $crumbs): self {
         $this->seoBreadcrumbs = $crumbs;
-
         return $this;
     }
 
@@ -267,7 +270,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @param string $viewPathOrView The path to the view to render or the rendered view.
      * @param array $viewData The data to render the view if we gave a path.
      *
-     * @return self Own instance for chaining.
+     * @return $this Own instance for chaining.
      */
     protected function setSeoContent(string $viewPathOrView, array $viewData = null): self {
         // No view data so assume the view is rendered already.
@@ -287,7 +290,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @param string $tag Tag name.
      * @param array $attributes Array of attributes to set for tag.
      *
-     * @return self Own instance for chaining.
+     * @return $this Own instance for chaining.
      */
     protected function addMetaTag(string $tag, array $attributes): self {
         $this->metaTags[$tag] = $attributes;

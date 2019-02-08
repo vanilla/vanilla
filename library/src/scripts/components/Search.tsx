@@ -66,7 +66,7 @@ export class Search extends React.Component<ICompactSearchProps, IState> {
                     onCloseSuggestions={this.props.onCloseSuggestions}
                     buttonClassName={buttons(ButtonTypes.TRANSPARENT)}
                 />
-                <div ref={this.resultsRef} className={classNames("search-results", classes.results)} />
+                <div ref={this.resultsRef} className="search-results" />
             </div>
         );
     }

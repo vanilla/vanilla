@@ -21,7 +21,7 @@ export function buttonStyles(theme?: object) {
     };
 
     const sizing = {
-        minWidth: 464,
+        minWidth: 96,
         ...themeVars.subComponentStyles("sizing"),
     };
 
@@ -112,7 +112,7 @@ export function buttonVars(theme?: object) {
             color: colors.primary.toString(),
             width: px(1),
             style: "solid",
-            radius: px(globalVars.border.radius),
+            radius: globalVars.border.radius,
         },
         hover: {
             color: globalVars.elementaryColors.white.toString(),
@@ -196,12 +196,19 @@ export function generateButtonStateStyles(buttonType: IButtonType, key: ButtonSt
     };
 }
 
-export function generateButtonClass(buttonType: IButtonType, theme?: object, setZIndexOnHover = false) {
+export function generateButtonClass(
+    buttonType: IButtonType,
+    buttonName: string,
+    theme?: object,
+    setZIndexOnHover = false,
+) {
     const globalVars = globalVariables(theme);
     const formElVars = formElementsVariables(theme);
     const vars = buttonStyles(theme);
+    const debug = debugHelper("button");
 
     return style({
+        ...debug.name(buttonName),
         textOverflow: "ellipsis",
         overflow: "hidden",
         maxWidth: percent(100),
@@ -258,11 +265,11 @@ export function buttonClasses(theme?: object) {
         const vars = buttonVars(theme);
         switch (type) {
             case ButtonTypes.PRIMARY:
-                return generateButtonClass(vars.primary);
+                return generateButtonClass(vars.primary, "primary");
             case ButtonTypes.TRANSPARENT:
-                return generateButtonClass(vars.transparent);
+                return generateButtonClass(vars.transparent, "transparent");
             default:
-                return generateButtonClass(vars.standard);
+                return generateButtonClass(vars.standard, "standard");
         }
     };
 }

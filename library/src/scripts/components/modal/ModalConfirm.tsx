@@ -13,7 +13,7 @@ import ModalSizes from "@library/components/modal/ModalSizes";
 import { getRequiredID } from "@library/componentIDs";
 import Modal from "@library/components/modal/Modal";
 import ButtonLoader from "@library/components/ButtonLoader";
-import { buttonClasses } from "@library/styles/buttonStyles";
+import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps {
     title: string; // required for accessibility
@@ -74,7 +74,11 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                         <Button buttonRef={this.cancelRef} onClick={onCancel}>
                             {t("Cancel")}
                         </Button>
-                        <Button onClick={onConfirm} className={buttons.primary} disabled={isConfirmLoading}>
+                        <Button
+                            onClick={onConfirm}
+                            className={buttons(ButtonTypes.PRIMARY)}
+                            disabled={isConfirmLoading}
+                        >
                             {isConfirmLoading ? <ButtonLoader /> : t("Ok")}
                         </Button>
                     </FrameFooter>

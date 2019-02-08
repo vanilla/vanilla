@@ -7,7 +7,8 @@
 import { style } from "typestyle";
 import { px, quote, viewWidth, viewHeight, url, percent } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { centeredBackgroundProps, componentThemeVariables, debugHelper } from "@library/styles/styleHelpers";
+import { debugHelper, componentThemeVariables } from "@library/styles/styleHelpers";
+import { centeredBackgroundProps } from "@library/styles/styleHelpers";
 import { searchVariables } from "@library/styles/searchStyles";
 import { assetUrl } from "@library/application";
 

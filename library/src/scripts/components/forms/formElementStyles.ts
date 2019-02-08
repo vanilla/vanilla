@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables } from "@library/styles/styleHelpers";
+import { componentThemeVariables, debugHelper } from "@library/styles/styleHelpers";
 
 export function formElementsVariables(theme?: object) {
     const vars = globalVariables(theme);

@@ -3,9 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { color, percent, px } from "csx";
-import { componentThemeVariables, debugHelper } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { debugHelper, componentThemeVariables } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 
 export const searchVariables = (theme?: object) => {

@@ -22,6 +22,7 @@ import ConditionalWrap from "@library/components/ConditionalWrap";
 import { search } from "@library/components/icons/header";
 import { MenuProps } from "react-select/lib/components/Menu";
 import ReactDOM from "react-dom";
+import { buttonClasses } from "@library/styles/buttonStyles";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;
@@ -207,7 +208,8 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * Overwrite for the Control component in react select
      * @param props
      */
-    private SearchControl = props => {
+    private SearchControl = (props, theme?: object) => {
+        const buttons = buttonClasses(theme);
         return (
             <div className="searchBar">
                 <form className="searchBar-form" onSubmit={this.onFormSubmit}>
@@ -238,8 +240,8 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 type="submit"
                                 id={this.searchButtonID}
                                 className={classNames(
-                                    "buttonPrimary",
                                     "searchBar-submitButton",
+                                    buttons.primary,
                                     this.props.buttonClassName,
                                 )}
                                 tabIndex={!!this.props.hideSearchButton ? -1 : 0}

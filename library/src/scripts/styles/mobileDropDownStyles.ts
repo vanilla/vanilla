@@ -4,10 +4,11 @@
  */
 
 import { calc, percent, px } from "csx";
-import { debugHelper, flexHelper } from "@library/styles/styleHelpers";
+import { flexHelper } from "@library/styles/styleHelpers";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { debugHelper } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/styles/layoutStyles";
 
 export const mobileDropDownVariables = (theme?: object) => {

@@ -3,8 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { color, percent, px } from "csx";
-import { componentThemeVariables } from "@library/styles/styleHelpers";
+import { color, ColorHelper, percent, px } from "csx";
+import { componentThemeVariables, getColorDependantOnLightness } from "@library/styles/styleHelpers";
 
 export const globalVariables = (theme?: object) => {
     const colorPrimary = color("#0291db");
@@ -26,7 +26,7 @@ export const globalVariables = (theme?: object) => {
         fg: color("#555a62"),
         bg: color("#fff"),
         primary: colorPrimary,
-        secondary: colorPrimary.darken(10),
+        secondary: getColorDependantOnLightness(theme, colorPrimary, colorPrimary, 0.1),
         ...themeVars.subComponentStyles("mainColors"),
     };
 

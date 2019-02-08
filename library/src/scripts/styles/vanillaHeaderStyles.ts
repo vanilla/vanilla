@@ -5,12 +5,18 @@
  */
 
 import { percent, px } from "csx";
-import { globalVariables } from "./globalStyleVars";
-import { componentThemeVariables, debugHelper, flexHelper, getColorDependantOnLightness } from "./styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
+
+import {
+    componentThemeVariables,
+    debugHelper,
+    flexHelper,
+    getColorDependantOnLightness,
+} from "@library/styles/styleHelpers";
 import { style } from "typestyle";
-import { formElementsVariables } from "../components/forms/formElementStyles";
-import { vanillaMenuVariables } from "./vanillaMenu";
-import { layoutVariables } from "./layoutStyles";
+import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { layoutVariables } from "@library/styles/layoutStyles";
+import { vanillaMenuVariables } from "@library/styles/vanillaMenu";
 
 export function vanillaHeaderVariables(theme?: object) {
     const globalVars = globalVariables(theme);
@@ -74,18 +80,30 @@ export function vanillaHeaderVariables(theme?: object) {
 
     const buttonContents = {
         hover: {
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1, true),
+            bg: getColorDependantOnLightness(
+                globalVars,
+                globalVars.mainColors.fg,
+                globalVars.mainColors.primary,
+                0.1,
+                true,
+            ),
         },
         active: {
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2, true),
+            bg: getColorDependantOnLightness(
+                globalVars,
+                globalVars.mainColors.fg,
+                globalVars.mainColors.primary,
+                0.2,
+                true,
+            ),
         },
         ...themeVars.subComponentStyles("buttonContents"),
     };
 
     const signIn = {
-        bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1),
+        bg: getColorDependantOnLightness(globalVars, globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1),
         hover: {
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2),
+            bg: getColorDependantOnLightness(globalVars, globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2),
         },
         ...themeVars.subComponentStyles("signIn"),
     };
@@ -372,7 +390,7 @@ export default function vanillaHeaderClasses(theme?: object) {
         $nest: {
             ".vanillaHeader-tabButtonContent": {
                 color: vars.colors.fg.toString(),
-                backgroundColor: getColorDependantOnLightness(vars.colors.fg, vars.colors.bg, 1).toString(),
+                backgroundColor: getColorDependantOnLightness(globalVars, vars.colors.fg, vars.colors.bg, 1).toString(),
                 borderRadius: px(vars.button.borderRadius),
             },
         },

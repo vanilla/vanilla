@@ -1,6 +1,5 @@
-import { componentThemeVariables, getColorDependantOnLightness } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-
+import { componentThemeVariables, getColorDependantOnLightness } from "@library/styles/styleHelpers";
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -15,9 +14,19 @@ export const vanillaMenuVariables = (theme?: object) => {
         ...themeVars.subComponentStyles("guest"),
     };
     const signIn = {
-        bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1).toString(),
+        bg: getColorDependantOnLightness(
+            globalVars,
+            globalVars.mainColors.fg,
+            globalVars.mainColors.primary,
+            0.1,
+        ).toString(),
         hover: {
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2).toString(),
+            bg: getColorDependantOnLightness(
+                globalVars,
+                globalVars.mainColors.fg,
+                globalVars.mainColors.primary,
+                0.2,
+            ).toString(),
         },
         ...themeVars.subComponentStyles("signIn"),
     };

@@ -184,10 +184,15 @@ export default function vanillaHeaderClasses(theme?: object) {
         }),
     );
 
-    const spacer = style({
-        ...debug.name("spacer"),
-        height: px(vars.sizing.height),
-    });
+    const spacer = style(
+        {
+            ...debug.name("spacer"),
+            height: px(vars.sizing.height),
+        },
+        mediaQueries.oneColumn({
+            height: px(vars.sizing.mobile.height),
+        }),
+    );
 
     const bar = style(
         {

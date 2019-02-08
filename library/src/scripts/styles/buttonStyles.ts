@@ -33,10 +33,9 @@ export function buttonStyles(theme?: object) {
     return { padding, sizing, border };
 }
 
-interface IButtonType {
+export interface IButtonType {
     fg: string;
     bg: string;
-    borderColor: string;
     border: {
         color: string;
         width: string;
@@ -60,19 +59,19 @@ interface IButtonType {
     };
 }
 
-export function buttonTypes(theme: object) {
+export function buttonVars(theme?: object) {
     const globalVars = globalVariables(theme);
     const themeVars = componentThemeVariables(theme, "button");
     const colors = globalVars.mainColors;
 
-    const basic: IButtonType = {
+    const standard: IButtonType = {
         fg: colors.fg.toString(),
         bg: colors.bg.toString(),
         border: {
             color: globalVars.mixBgAndFg(0.24).toString(),
             width: px(1),
             style: "solid",
-            radius: px(globalVars.border.radius),
+            radius: globalVars.border.radius,
         },
         hover: {
             color: colors.fg.toString(),
@@ -138,15 +137,48 @@ export function buttonTypes(theme: object) {
         ...themeVars.subComponentStyles("primary"),
     };
 
-    return { basic, primary };
+    const white = globalVars.elementaryColors.white.toString();
+    const transparent: IButtonType = {
+        fg: white,
+        bg: "transparent",
+        border: {
+            color: white,
+            width: px(1),
+            style: "solid",
+            radius: globalVars.border.radius,
+        },
+        hover: {
+            color: white,
+            backgroundColor: globalVars.elementaryColors.white.fade(0.1).toString(),
+            borderColor: white,
+        },
+        select: {
+            color: white,
+            backgroundColor: globalVars.elementaryColors.white.fade(0.1).toString(),
+            borderColor: white,
+        },
+        focus: {
+            color: white,
+            backgroundColor: globalVars.elementaryColors.white.fade(0.1).toString(),
+            borderColor: white,
+        },
+        focusAccessible: {
+            color: white,
+            backgroundColor: globalVars.elementaryColors.white.fade(0.5).toString(),
+            borderColor: white,
+        },
+        ...themeVars.subComponentStyles("transparent"),
+    };
+
+    return { standard, primary, transparent };
 }
 
 export function buttonSizing(height, minWidth, fontSize, paddingHorizontal, globalVars) {
     return {
-        minHeight: height,
-        fontSize,
-        padding: `${0} ${paddingHorizontal}`,
-        lineHeight: globalVars.icon.sizes.default,
+        minHeight: px(height),
+        fontSize: px(fontSize),
+        padding: `${px(0)} ${px(paddingHorizontal)}`,
+        lineHeight: px(globalVars.icon.sizes.default),
     };
 }
 
@@ -180,7 +212,7 @@ export function generateButtonClass(buttonType: IButtonType, theme?: object, set
             vars.padding.side,
             globalVars,
         ),
-        display: "inline-flex",
+        display: "inline-block",
         position: "relative",
         textAlign: "center",
         whiteSpace: "nowrap",
@@ -215,35 +247,51 @@ export function generateButtonClass(buttonType: IButtonType, theme?: object, set
     });
 }
 
+export enum ButtonTypes {
+    STANDARD = "standard",
+    PRIMARY = "primary",
+    TRANSPARENT = "transparent",
+}
+
 export function buttonClasses(theme?: object) {
     const globalVars = globalVariables(theme);
     const debug = debugHelper("button");
 
-    const primary = style({
-        color: globalVars.mainColors.bg.toString(),
-        backgroundColor: globalVars.mainColors.primary.toString(),
-        borderColor: globalVars.mainColors.primary.toString(),
-        $nest: {
-            ".buttonLoader::after": {
-                $nest: {},
-            },
-        },
-        ...debug.name("primary"),
-    });
+    // const primary = style({
+    //     color: globalVars.mainColors.bg.toString(),
+    //     backgroundColor: globalVars.mainColors.primary.toString(),
+    //     borderColor: globalVars.mainColors.primary.toString(),
+    //     $nest: {
+    //         ".buttonLoader::after": {
+    //             $nest: {},
+    //         },
+    //     },
+    //     ...debug.name("primary"),
+    // });
+    //
+    // const standard = style({
+    //     color: globalVars.mainColors.bg.toString(),
+    //     backgroundColor: globalVars.mainColors.primary.toString(),
+    //     borderColor: globalVars.mainColors.primary.toString(),
+    //     ...debug.name("primary"),
+    // });
+    //
+    // const transparent = style({
+    //     color: globalVars.mainColors.bg.toString(),
+    //     backgroundColor: globalVars.mainColors.primary.toString(),
+    //     borderColor: globalVars.mainColors.primary.toString(),
+    //     ...debug.name("primary"),
+    // });
 
-    const standard = style({
-        color: globalVars.mainColors.bg.toString(),
-        backgroundColor: globalVars.mainColors.primary.toString(),
-        borderColor: globalVars.mainColors.primary.toString(),
-        ...debug.name("primary"),
-    });
-
-    const transparent = style({
-        color: globalVars.mainColors.bg.toString(),
-        backgroundColor: globalVars.mainColors.primary.toString(),
-        borderColor: globalVars.mainColors.primary.toString(),
-        ...debug.name("primary"),
-    });
-
-    return { standard, primary, transparent };
+    return (type: ButtonTypes, overwrite?: object) => {
+        const vars = buttonVars(theme);
+        switch (type) {
+            case ButtonTypes.PRIMARY:
+                return generateButtonClass(vars.primary);
+            case ButtonTypes.TRANSPARENT:
+                return generateButtonClass(vars.transparent);
+            default:
+                return generateButtonClass(vars.standard);
+        }
+    };
 }

@@ -6,6 +6,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, componentThemeVariables } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
+import { IButtonType } from "@library/styles/buttonStyles";
 
 export const searchVariables = (theme?: object) => {
     const globalVars = globalVariables(theme);
@@ -47,17 +48,5 @@ export const searchClasses = (theme?: object) => {
         },
     });
 
-    const button = style({
-        ...debug.name("button"),
-    });
-
-    const results = style({
-        ...debug.name("results"),
-    });
-
-    const bar = style({
-        ...debug.name("bar"),
-    });
-
-    return { root, button, results, bar };
+    return { root };
 };

@@ -6,14 +6,14 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { withRouter, RouteComponentProps } from "react-router-dom";
+import { RouteComponentProps, withRouter } from "react-router-dom";
 import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import SearchBar from "@library/components/forms/select/SearchBar";
 import { t } from "@library/application";
 import SearchOption from "@library/components/search/SearchOption";
 import { searchClasses } from "@library/styles/searchStyles";
-import { buttonClasses } from "@library/styles/buttonStyles";
+import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
@@ -64,13 +64,9 @@ export class Search extends React.Component<ICompactSearchProps, IState> {
                     resultsRef={this.resultsRef}
                     onOpenSuggestions={this.props.onOpenSuggestions}
                     onCloseSuggestions={this.props.onCloseSuggestions}
-                    className={classes.bar}
-                    buttonClassName={buttons.transparent}
+                    buttonClassName={buttons(ButtonTypes.TRANSPARENT)}
                 />
-                <div
-                    ref={this.resultsRef}
-                    className={classNames("vanillaHeader-compactSearchResults", classes.results)}
-                />
+                <div ref={this.resultsRef} className={classNames("search-results", classes.results)} />
             </div>
         );
     }

@@ -11,6 +11,7 @@ import { debugHelper, componentThemeVariables, getColorDependantOnLightness } fr
 import { centeredBackgroundProps } from "@library/styles/styleHelpers";
 import { searchVariables } from "@library/styles/searchStyles";
 import { assetUrl } from "@library/application";
+import { IButtonType } from "@library/styles/buttonStyles";
 
 export function splashVariables(theme?: object) {
     const globalVars = globalVariables(theme);
@@ -46,6 +47,9 @@ export function splashVariables(theme?: object) {
     };
 
     const search = searchVariables({
+        button: {
+            type: "transparent",
+        },
         ...themeVars.subComponentStyles("search"),
     });
 
@@ -114,9 +118,17 @@ export function splashStyles(theme?: object) {
 
     const searchContainer = style({
         ...debug.name("searchContainer"),
+        position: "relative",
         maxWidth: percent(100),
         width: px(vars.searchContainer.width),
         margin: "auto",
+        $nest: {
+            ".search-results": {
+                maxWidth: percent(100),
+                width: px(vars.searchContainer.width),
+                margin: "auto",
+            },
+        },
     });
 
     return { root, container, innerContainer, title, search, fullBackground, searchContainer };

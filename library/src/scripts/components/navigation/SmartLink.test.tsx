@@ -20,13 +20,13 @@ const CONTEXT_BASE = DOMAIN + SUBPATH;
 function renderLocation(loc: LocationDescriptor, formatter: any) {
     return mount(
         <div>
-            <LinkContextProvider linkContext={CONTEXT_BASE}>
-                <MemoryRouter>
+            <MemoryRouter>
+                <LinkContextProvider linkContext={CONTEXT_BASE} urlFormatter={formatter}>
                     <Route>
                         <SmartLink to={loc} />
                     </Route>
-                </MemoryRouter>
-            </LinkContextProvider>
+                </LinkContextProvider>
+            </MemoryRouter>
         </div>,
     );
 }

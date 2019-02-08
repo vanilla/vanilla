@@ -12,7 +12,7 @@ import classNames from "classnames";
 import { t } from "@library/application";
 import Button from "@library/components/forms/Button";
 import Heading from "@library/components/Heading";
-import { InputActionMeta } from "react-select/lib/types";
+import { InputActionMeta, ActionMeta as SelectActionMeta } from "react-select/lib/types";
 import * as selectOverrides from "./overwrites";
 import ButtonLoader from "@library/components/ButtonLoader";
 import { OptionProps } from "react-select/lib/components/Option";
@@ -22,6 +22,8 @@ import ConditionalWrap from "@library/components/ConditionalWrap";
 import { search } from "@library/components/icons/header";
 import { MenuProps } from "react-select/lib/components/Menu";
 import ReactDOM from "react-dom";
+import { LinkContext } from "@library/components/navigation/LinkContextProvider";
+import { RouteComponentProps, withRouter } from "react-router";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;
@@ -29,7 +31,7 @@ export interface IComboBoxOption<T = any> {
     data?: T;
 }
 
-interface IProps extends IOptionalComponentID {
+interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     disabled?: boolean;
     className?: string;
     placeholder: string;
@@ -62,6 +64,9 @@ interface IState {
  * Implements the search bar component
  */
 export default class SearchBar extends React.Component<IProps, IState> {
+    public static contextType = LinkContext;
+    public context!: React.ContextType<typeof LinkContext>;
+
     public static defaultProps: Partial<IProps> = {
         disabled: false,
         isBigInput: false,
@@ -145,10 +150,17 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * - Force the menu closed.
      * - Trigger a search.
      */
-    private handleOptionChange = (option: IComboBoxOption) => {
+    private handleOptionChange = (option: IComboBoxOption, actionMeta: SelectActionMeta) => {
         if (option) {
-            this.props.onChange(option.label);
-            this.setState({ forceMenuClosed: true }, this.props.onSearch);
+            const data = option.data || {};
+            const { url } = data;
+
+            if (actionMeta.action === "select-option" && url) {
+                this.context.pushSmartLocation(url);
+            } else {
+                this.props.onChange(option.label);
+                this.setState({ forceMenuClosed: true }, this.props.onSearch);
+            }
         }
     };
 

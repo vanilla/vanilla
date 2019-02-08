@@ -32,9 +32,9 @@ interface IState {
 }
 
 /**
- * Implements Compact Search component for header
+ * Implements independent search component. All wired up, just drop it where you need it.
  */
-export class Search extends React.Component<ICompactSearchProps, IState> {
+export class IndependentSearch extends React.Component<ICompactSearchProps, IState> {
     private id = uniqueIDFromPrefix("search");
     private selfRef = React.createRef<HTMLDivElement>();
     private searchInputRef = React.createRef<SearchBar>();
@@ -82,4 +82,4 @@ export class Search extends React.Component<ICompactSearchProps, IState> {
     };
 }
 
-export default withSearch(withRouter(Search));
+export default withSearch(withRouter(IndependentSearch));

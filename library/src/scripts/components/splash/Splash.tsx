@@ -13,7 +13,7 @@ import Container from "@library/components/layouts/components/Container";
 import { PanelWidget, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps } from "@library/components/DeviceChecker";
-import Search from "@library/components/Search";
+import IndependentSearch from "@library/components/IndependentSearch";
 import { splashStyles, splashVariables } from "@library/styles/splashStyles";
 
 interface IProps extends IDeviceProps {
@@ -37,7 +37,7 @@ export class Splash extends React.Component<IProps> {
                         <PanelWidgetHorizontalPadding>
                             {title && <Heading title={title} className={classes.title} />}
                             <div className={classes.searchContainer}>
-                                <Search className={classes.search} theme={vars.search} />
+                                <IndependentSearch className={classes.search} theme={vars.search} />
                             </div>
                         </PanelWidgetHorizontalPadding>
                     </div>

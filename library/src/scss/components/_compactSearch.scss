@@ -10,6 +10,7 @@
     }
 
     .searchBar-valueContainer.suggestedTextInput-inputText {
+        height: $formElement_height;
         background-color: rgba(#000, .15);
         border: 0;
     }

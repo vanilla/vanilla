@@ -16,6 +16,7 @@ import * as React from "react";
 interface IProps extends INotificationsProps {
     buttonClassName?: string;
     className?: string;
+    toggleContentsClassName?: string;
     contentsClassName?: string;
     countUnread: number;
     userSlug: string;
@@ -50,8 +51,15 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
                 buttonClassName={classNames("vanillaHeader-notifications", this.props.buttonClassName)}
                 buttonBaseClass={ButtonBaseClass.CUSTOM}
                 renderLeft={true}
+                toggleButtonClassName="vanillaHeader-button"
                 contentsClassName={this.props.contentsClassName}
-                buttonContents={<NotificationsCounter open={this.state.open} countClass={this.props.countClass} />}
+                buttonContents={
+                    <NotificationsCounter
+                        open={this.state.open}
+                        className={this.props.toggleContentsClassName}
+                        countClass={this.props.countClass}
+                    />
+                }
                 onVisibilityChange={this.setOpen}
             >
                 <NotificationsContents countClass={this.props.countClass} userSlug={userSlug} />

@@ -12,7 +12,7 @@ import classNames from "classnames";
 import { t } from "@library/application";
 import Button from "@library/components/forms/Button";
 import Heading from "@library/components/Heading";
-import { InputActionMeta } from "react-select/lib/types";
+import { InputActionMeta, ActionMeta as SelectActionMeta } from "react-select/lib/types";
 import * as selectOverrides from "./overwrites";
 import ButtonLoader from "@library/components/ButtonLoader";
 import { OptionProps } from "react-select/lib/components/Option";
@@ -22,6 +22,8 @@ import ConditionalWrap from "@library/components/ConditionalWrap";
 import { search } from "@library/components/icons/header";
 import { MenuProps } from "react-select/lib/components/Menu";
 import ReactDOM from "react-dom";
+import { LinkContext } from "@library/components/navigation/LinkContextProvider";
+import { RouteComponentProps } from "react-router";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;
@@ -29,10 +31,10 @@ export interface IComboBoxOption<T = any> {
     data?: T;
 }
 
-interface IProps extends IOptionalComponentID {
+interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     disabled?: boolean;
     className?: string;
-    placeholder: string;
+    placeholder?: string;
     options?: any[];
     loadOptions?: (inputValue: string) => Promise<any>;
     value: string;
@@ -62,6 +64,9 @@ interface IState {
  * Implements the search bar component
  */
 export default class SearchBar extends React.Component<IProps, IState> {
+    public static contextType = LinkContext;
+    public context!: React.ContextType<typeof LinkContext>;
+
     public static defaultProps: Partial<IProps> = {
         disabled: false,
         isBigInput: false,
@@ -70,6 +75,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
         isLoading: false,
         optionComponent: selectOverrides.SelectOption,
         triggerSearchOnClear: false,
+        placeholder: t("Search"),
     };
 
     public state: IState = {
@@ -145,10 +151,17 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * - Force the menu closed.
      * - Trigger a search.
      */
-    private handleOptionChange = (option: IComboBoxOption) => {
+    private handleOptionChange = (option: IComboBoxOption, actionMeta: SelectActionMeta) => {
         if (option) {
-            this.props.onChange(option.label);
-            this.setState({ forceMenuClosed: true }, this.props.onSearch);
+            const data = option.data || {};
+            const { url } = data;
+
+            if (actionMeta.action === "select-option" && url) {
+                this.context.pushSmartLocation(url);
+            } else {
+                this.props.onChange(option.label);
+                this.setState({ forceMenuClosed: true }, this.props.onSearch);
+            }
         }
     };
 
@@ -206,7 +219,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * Overwrite for the Control component in react select
      * @param props
      */
-    private SearchControl = props => {
+    private SearchControl = (props, theme?: object) => {
         return (
             <div className="searchBar">
                 <form className="searchBar-form" onSubmit={this.onFormSubmit}>
@@ -217,7 +230,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                             </label>
                         </Heading>
                     )}
-                    <div className="searchBar-content">
+                    <div onClick={this.focus} className="searchBar-content">
                         <div
                             className={classNames(
                                 `${this.prefix}-valueContainer`,
@@ -236,17 +249,15 @@ export default class SearchBar extends React.Component<IProps, IState> {
                             <Button
                                 type="submit"
                                 id={this.searchButtonID}
-                                className={classNames(
-                                    "buttonPrimary",
-                                    "searchBar-submitButton",
-                                    this.props.buttonClassName,
-                                )}
+                                className={classNames("searchBar-submitButton", this.props.buttonClassName)}
                                 tabIndex={!!this.props.hideSearchButton ? -1 : 0}
                             >
                                 {this.props.isLoading ? <ButtonLoader /> : t("Search")}
                             </Button>
                         </ConditionalWrap>
-                        <div className="searchBar-iconContainer">{search("searchBar-icon")}</div>
+                        <div onClick={this.focus} className="searchBar-iconContainer">
+                            {search("searchBar-icon")}
+                        </div>
                     </div>
                 </form>
             </div>
@@ -300,7 +311,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
         LoadingMessage: selectOverrides.OptionLoader,
     };
 
-    public focus() {
+    public focus = () => {
         this.inputRef.current!.focus();
-    }
+    };
 }

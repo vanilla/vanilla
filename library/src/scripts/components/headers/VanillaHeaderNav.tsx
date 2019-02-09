@@ -4,12 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import { color, percent, px, quote, calc } from "csx";
+import { percent, px, quote, calc } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutStyles } from "@library/styles/layoutStyles";
+import { debugHelper } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
-import { vanillaHeaderVariables } from "@library/components/headers/vanillaHeaderStyles";
-import { debugHelper, flexHelper } from "@library/styles/styleHelpers";
+import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import { flexHelper } from "@library/styles/styleHelpers";
+import { layoutVariables } from "@library/styles/layoutStyles";
 
 export function vanillaHeaderNavigation() {
     const globalVars = globalVariables();
@@ -41,7 +42,7 @@ export function vanillaHeaderNavigation() {
 export default function vanillaHeaderNavClasses() {
     const headerVars = vanillaHeaderVariables();
     const vars = vanillaHeaderNavigation();
-    const mediaQueries = layoutStyles().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
     const debug = debugHelper("vanillaHeaderNav");
 

@@ -45,7 +45,7 @@ $tag-hover_borderColor:           $global-color_primary !default;
 .TagCloud a {
     @include Tag;
     @include ellipsis;
-    max-width: $panel_width;
+    max-width: calc(#{$panel_width} - #{$panel_padding} * 2);
 
     .Count {
         padding: 0;

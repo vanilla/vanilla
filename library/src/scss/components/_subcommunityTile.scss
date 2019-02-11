@@ -43,6 +43,10 @@ $subcommunityTile_spacing                 : 24px;
         left: $subcommunityTile_horizontalPadding;
     }
 
+    &:hover {
+        @include shadow-embed-hover;
+    }
+
 }
 
 .subcommunityTitle-main {
@@ -50,7 +54,9 @@ $subcommunityTile_spacing                 : 24px;
 }
 
 .subcommunityTile-iconFrame {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     height: $subcommunityTile-imageFrame_height;
     width: $subcommunityTile-imageFrame_height;
@@ -76,7 +82,6 @@ $subcommunityTile_spacing                 : 24px;
 }
 
 .subcommunityTile-title {
-    @include singleLineEllipsis;
     font-size: $subcommunityTile-title_fontSize;
     line-height: $global-condensed_lineHeight;
     text-align: center;

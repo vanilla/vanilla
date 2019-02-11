@@ -173,18 +173,24 @@ $global-gutter_halfSize:                 $global-gutter_size / 2;
 $global-gutter_quarterSize:              $global-gutter_size / 4;
 
 /* -------------------------------------------------------------- *\
+    Body
+\* -------------------------------------------------------------- */
+
+$body_bg:                               $global-body_bg !default;
+$body_backgroundImage:                  "" !default;
+$body_backgroundRepeat:                 no-repeat !default;
+$body_backgroundSize:                   cover !default;
+$body_backgroundPosition:               center center !default;
+
+/* -------------------------------------------------------------- *\
     Frame
 \* -------------------------------------------------------------- */
 
-$frame_backgroundColor:                  $global-body_bg !default;
-$frame_backgroundImage:                  "" !default;
-$frame_backgroundRepeat:                 no-repeat !default;
-$frame_backgroundSize:                   cover !default;
-$frame_backgroundPosition:               center center !default;
+$frame_bg:                               transparent !default;
 $frame_border:                           none !default;
-$frame_padding:                          $utility-baseUnitDouble !default;
 $frame_boxShadow:                        none !default;
-$frame_borderRadius:                     0 !default;
+$frame_padding:                          $utility-baseUnitTriple !default;
+$frame-mobile_padding:                   $utility-baseUnitDouble !default;
 
 /* -------------------------------------------------------------- *\
     Header
@@ -263,9 +269,8 @@ $MobileMeBox-hover_fg:                     mix($navigationMebutton_fg, $navigati
 \* -------------------------------------------------------------- */
 
 $content_bg:                             transparent !default;
-$content_border:                         0 !default;
-$content_padding:                        $utility-large_padding !default;
-$content-mobile_padding:                 $utility-baseUnitDouble !default;
+$content_border:                         none !default;
+$content_padding:                        0 !default;
 $content_borderRadius:                   0 !default;
 
 /* -------------------------------------------------------------- *\
@@ -275,12 +280,11 @@ $content_borderRadius:                   0 !default;
 $panel_toLeft:                           false !default;
 $panel_width:                            220px !default;
 $panel_gap:                              40px !default;
-$panel_bg:                               transparent !default;
+$panel_bg:                               $content_bg !default;
 $panel_fg:                               $global-color_fg !default;
-$panel_padding:                          0 !default;
+$panel_padding:                          $content_padding !default;
 $panel-border:                           $content_border !default;
 $panel_borderRadius:                     $content_borderRadius !default;
-
 
 $panel-item-showIcons:                   false !default;
 $panel-item_spacing:                     12px !default;

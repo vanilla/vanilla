@@ -676,9 +676,6 @@ class PocketsPlugin extends Gdn_Plugin {
      * Runs on utility/update.
      */
     public function structure() {
-        // Pocket class isn't autoloaded on Enable.
-        require_once('library/class.pocket.php');
-
         $St = Gdn::structure();
         $St->table('Pocket')
             ->primaryKey('PocketID')

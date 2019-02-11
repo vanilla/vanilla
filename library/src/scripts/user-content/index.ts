@@ -21,6 +21,8 @@ import { initQuoteEmbeds, mountQuoteEmbeds } from "@library/user-content/embeds/
 import { initCodeHighlighting } from "@library/user-content/code";
 import { initFileEmbeds, mountFileEmbeds } from "@library/user-content/embeds/file";
 
+let codeInitFunction: (() => void) | null = null;
+
 export function initAllUserContent() {
     // User content
     initEmojiSupport();
@@ -39,10 +41,15 @@ export function initAllUserContent() {
     initCodeHighlighting();
     initFileEmbeds();
 
-    // This can be pretty heavily so initialize it dynamically. There are no gaurentees this will have run by the time the method returns.
-    void import("@library/user-content/code" /* webpackChunkName: "codeBlockHighlighting" */).then(module => {
-        module.initCodeHighlighting();
-    });
+    if (codeInitFunction === null) {
+        // Lazily initialize this because it can be rather heavy.
+        void import("@library/user-content/code" /* webpackChunkName: "codeBlockHighlighting" */).then(module => {
+            codeInitFunction = module.initCodeHighlighting;
+            codeInitFunction();
+        });
+    } else {
+        codeInitFunction();
+    }
 }
 
 /**

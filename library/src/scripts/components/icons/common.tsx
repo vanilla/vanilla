@@ -303,6 +303,7 @@ export function signIn(className?: string) {
         </svg>
     );
 }
+
 export function chevronUp(className?: string) {
     const title = t("Close");
     return (
@@ -316,6 +317,24 @@ export function chevronUp(className?: string) {
             <path
                 fill="currentColor"
                 d="M4.9,16.752A3.552,3.552,0,0,1,.329,14.668c-.039-.106-.074-.214-.1-.323A4.185,4.185,0,0,1,2.39,9.152L24.246.252a3.31,3.31,0,0,1,2.508,0l21.856,8.9a4.184,4.184,0,0,1,2.166,5.193,3.552,3.552,0,0,1-4.351,2.511,3.41,3.41,0,0,1-.325-.1L25.5,8.358Z"
+            />
+        </svg>
+    );
+}
+
+export function searchError(message?: string, className?: string) {
+    const title = message ? message : t("Page Not Found");
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            className={classNames("icon", "icon-notFound", className)}
+            aria-hidden="true"
+        >
+            <title>{title}</title>
+            <path
+                d="M16.178,14.358l4.628,4.616c.633.631,1.2,1.417.354,2.261s-1.647.286-2.285-.336q-.627-.612-4.7-4.688a7.7,7.7,0,1,1,2.005-1.853ZM9.984,9.214,11.563,7.64a.418.418,0,0,1,.591.59L10.576,9.8l1.578,1.574a.418.418,0,0,1-.591.59L9.984,10.394,8.4,11.968a.418.418,0,0,1-.591-.59L9.392,9.8,7.814,8.23A.418.418,0,0,1,8.4,7.64Zm.063,7.545a7.044,7.044,0,1,0-7.03-7.043A7.037,7.037,0,0,0,10.047,16.759Z"
+                fill="currentColor"
             />
         </svg>
     );

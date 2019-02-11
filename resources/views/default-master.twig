@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="{{ locale }}">
+    <head>
+        <title>{{ title }}</title>
+        <meta name="description" content="{{ description }}">
+
+        {% for meta in metaTags -%}
+            <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
+        {% endfor %}
+
+        {% for script in inlineScripts -%}
+            <script>
+                {{- script|raw -}}
+            </script>
+        {% endfor %}
+
+        {% for script in scripts -%}
+            <script defer src="{{ script.getWebPath() }}"></script>
+        {% endfor %}
+
+        {%- if breadcrumbsJson -%}
+            <script type="application/ld+json">
+                {{- breadcrumbsJson|raw -}}
+            </script>
+        {%- endif -%}
+
+        {% for stylesheet in styles -%}
+            <link href="{{ stylesheet.getWebPath() }}" rel="stylesheet" type="text/css" />
+        {% endfor -%}
+
+        {%- if canonicalUrl -%}
+            <link rel="canonical" href="{{ canonicalUrl }}"/>
+        {%- endif -%}
+
+        <noscript>
+            <style>
+                .fullPageLoader { display: none }
+            </style>
+        </noscript>
+
+    </head>
+    <body class="{{ cssClasses|join(' ') }}">
+        <div id="page" class="page">
+            <div id="vanillaHeader"></div>
+            <div id="app" class="page-minHeight">
+            {%- if seoContent -%}
+                <noscript>
+                    <style>
+                        body.isLoading .page {
+                            max-height: initial;
+                            height: initial;
+                        }
+                    </style>
+                    <div class="noScriptContainer">
+                        <h1 class="heading heading-1 pageTitle">
+                            {{- title -}}
+                        </h1>
+                        {{- seoContent|raw }}
+                    </div>
+                </noscript>
+            {%- endif -%}
+
+                <div class="fullPageLoader"></div>
+            </div>
+            <div id="footerContainer">
+                {#{{ include('partials/footer.twig') }}#}
+            </div>
+        </div>
+        <div id="modals"></div>
+        <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+        <script>
+            WebFont.load({
+                google: {
+                    families: ['Open Sans:400,400italic,600,700'] // Will be dynamic at some point
+                }
+            });
+        </script>
+    </body>
+</html>

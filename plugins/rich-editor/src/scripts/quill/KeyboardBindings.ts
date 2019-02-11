@@ -260,8 +260,8 @@ export default class KeyboardBindings {
     private resetDefaultBindings() {
         // Nullify the tab key.
         (this.bindings as any).tab = false;
-        this.bindings["indent codeBlock"] = false;
-        this.bindings["outdent codeBlock"] = false;
+        this.bindings["indent code-block"] = false;
+        this.bindings["outdent code-block"] = false;
         this.bindings["remove tab"] = false;
         this.bindings["code exit"] = false;
     }

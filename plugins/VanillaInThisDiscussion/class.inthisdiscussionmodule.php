@@ -77,7 +77,7 @@ class InThisDiscussionModule extends Gdn_Module {
                         <?php
                         echo anchor(
                             wrap(wrap(Gdn_Format::date($user->DateLastActive, 'html')), 'span', ['class' => 'Aside']).' '.
-                            wrap(wrap(val('Name', $user), 'span', ['class' => 'Username']), 'span'),
+                            wrap(wrap(htmlspecialchars(val('Name', $user)), 'span', ['class' => 'Username']), 'span'),
                             userUrl($user)
                         )
                         ?>

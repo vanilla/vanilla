@@ -476,7 +476,8 @@ class DashboardHooks extends Gdn_Plugin {
                     $sQL = Gdn::sql();
                     $sQL->delete('TagDiscussion', ['TagID' => $tagID]);
                     $sQL->delete('Tag', ['TagID' => $tagID]);
-
+                    $tag['Name'] = htmlspecialchars($tag['Name']);
+                    $tag['FullName'] = htmlspecialchars($tag['FullName']);
                     $sender->informMessage(formatString(t('<b>{Name}</b> deleted.'), $tag));
                     $sender->jsonTarget("#Tag_{$tag['TagID']}", null, 'Remove');
                 }

@@ -218,15 +218,9 @@ $headerMebutton-hover_fg:                $header-link_color !default;
 $headerMebutton-hover_bg:                mix($global-color_fg, $header_bg, 26%) !default;
 $headerMebutton-active_bg:               mix($headerMebutton_fg, $header_bg, 12%) !default;
 
-$headerMeBoxAlert_bg:                    $global-color_secondary !default;
-
-/* -------------------------------------------------------------- *\
-    Mebox Count
-\* -------------------------------------------------------------- */
-
-$meboxCount_bg:                              $global-color_secondary !default;
-$meboxCount_fg:                              $global-color_white !default;
-$meboxCount_borderColor:                     $global-color_secondary !default;
+$headerMeBoxAlert_fg:                      $headerMebutton_fg !default;
+$headerMeBoxAlert_bg:                      $global-color_secondary !default;
+$headerMeBoxAlert_borderColor:             $global-color_secondary !default;
 
 /* -------------------------------------------------------------- *\
     Navigation
@@ -257,12 +251,13 @@ $navigationButton-hover_border:           $button-primary-hover_border !default;
     Mobile Mebox
 \* -------------------------------------------------------------- */
 
-$MobileMeBoxAlert_bg:                      $global-color_secondary !default;
-
 $MobileMeBox_bg:                           mix($global-color_white, $header_bg, 12%) !default;
 $MobileMeBox_fg:                           $header-link_color !default;
 $MobileMeBox-hover_fg:                     $header-link-hover_color !default;
-$MobileMeBox-hover_fg:                     mix($navigationMebutton_fg, $navigation_bg, 12%) !default;
+
+$MobileMeBoxAlert_fg:                      $MobileMeBox_fg !default;
+$MobileMeBoxAlert_bg:                      $global-color_secondary !default;
+$MobileMeBoxAlert_borderColor:             $global-color_secondary !default;
 
 /* -------------------------------------------------------------- *\
     Content

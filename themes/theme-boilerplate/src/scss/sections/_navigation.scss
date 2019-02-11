@@ -345,6 +345,9 @@
         }
 
         .Alert {
+            color: $MobileMeBox_fg;
+            background-color: $MobileMeBoxAlert_bg;
+            border-color: $MobileMeBoxAlert_borderColor;
 
             @include maxWidth {
                 top: -6px;

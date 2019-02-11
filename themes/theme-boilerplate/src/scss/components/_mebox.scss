@@ -157,12 +157,5 @@ $mebox-button_borderRadius:             3px !default;
         .ToggleFlyout + .ToggleFlyout {
             margin-left: 8px;
         }
-
-        .Alert {
-            border: 1px solid $meboxCount_borderColor;
-            background: $meboxCount_bg;
-            color: $meboxCount_fg;
-            white-space: nowrap;
-        }
     }
 }

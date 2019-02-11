@@ -145,3 +145,11 @@ export const componentThemeVariables = (theme: any | undefined, componentName: s
         subComponentStyles,
     };
 };
+
+export const inheritHeightClass = () => {
+    return style({
+        display: "flex",
+        flexDirection: "column",
+        flexGrow: 1,
+    });
+};

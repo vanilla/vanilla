@@ -105,7 +105,7 @@ export const globalVariables = (theme?: object) => {
             medium: 14,
             small: 12,
             title: 32,
-            smallTitle: 20,
+            smallTitle: 22,
             subTitle: 18,
         },
 

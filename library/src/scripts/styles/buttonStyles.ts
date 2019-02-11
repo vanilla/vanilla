@@ -16,7 +16,7 @@ export function buttonStyles(theme?: object) {
     const padding = {
         top: 2,
         bottom: 3,
-        side: 6,
+        side: 12,
         ...themeVars.subComponentStyles("padding"),
     };
 
@@ -173,12 +173,12 @@ export function buttonVars(theme?: object) {
     return { standard, primary, transparent };
 }
 
-export function buttonSizing(height, minWidth, fontSize, paddingHorizontal, globalVars) {
+export function buttonSizing(height, minWidth, fontSize, paddingHorizontal, formElementVars) {
     return {
-        minHeight: px(height),
+        minHeight: px(formElementVars.sizing.height),
         fontSize: px(fontSize),
         padding: `${px(0)} ${px(paddingHorizontal)}`,
-        lineHeight: px(globalVars.icon.sizes.default),
+        lineHeight: px(formElementVars.sizing.height),
     };
 }
 
@@ -217,7 +217,7 @@ export function generateButtonClass(
             vars.sizing.minWidth,
             globalVars.fonts.size.medium,
             vars.padding.side,
-            globalVars,
+            formElVars,
         ),
         display: "inline-block",
         position: "relative",

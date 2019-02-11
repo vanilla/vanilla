@@ -111,6 +111,16 @@
         padding-top: $frame_padding;
         padding-bottom: $frame_padding;
     }
+
+    @include maxWidth {
+        padding-left: $frame-mobile_padding;
+        padding-right: $frame-mobile_padding;
+
+        @if ($includeVertical) {
+            padding-top: $frame-mobile_padding;
+            padding-bottom: $frame-mobile_padding;
+        }
+    }
 }
 
 @mixin framePaddingReverse($includeVertical: false) {
@@ -123,6 +133,19 @@
     @if ($includeVertical) {
         margin-top: -#{$frame_padding};
         margin-bottom: -#{$frame_padding};
+    }
+
+    @include maxWidth {
+        margin-left: -#{$frame-mobile_padding};
+        margin-right: -#{$frame-mobile_padding};
+        padding-left: $frame-mobile_padding;
+        padding-right: $frame-mobile_padding;
+        width: calc(100% + (#{$frame-mobile_padding} * 2));
+
+        @if ($includeVertical) {
+            margin-top: -#{$frame-mobile_padding};
+            margin-bottom: -#{$frame-mobile_padding};
+        }
     }
 }
 

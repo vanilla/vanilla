@@ -9,9 +9,11 @@
 \* -------------------------------------------------------------- */
 
 .Header.hasOpenNavigation {
+
     @include maxWidth {
         border-bottom-left-radius: $navigation_borderRadius;
         border-bottom-right-radius: $navigation_borderRadius;
+        border-bottom-width: 0;
     }
 }
 
@@ -281,7 +283,7 @@
     user-select: none;
     height: 28px;
     width: 28px;
-    right: $content_padding;
+    right: $frame-mobile_padding;
 
     @include maxWidth {
         position: absolute;

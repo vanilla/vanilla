@@ -50,6 +50,14 @@
 
 .Frame-details {
     @include clearfix;
+
+    .SearchBoxMobile {
+        display: none;
+
+        @include maxWidth {
+            display: block;
+        }
+    }
 }
 
 .Container {
@@ -79,8 +87,8 @@
     }
 
     @include maxWidth($theme-breakpoint_tablet) {
-            width: 100%;
-            order: 0;
+        width: 100%;
+        order: 0;
     }
 }
 

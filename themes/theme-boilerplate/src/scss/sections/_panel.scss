@@ -13,6 +13,7 @@
 
     @include maxWidth($theme-breakpoint_tablet) {
 
+        .SearchBox,
         .BoxNewDiscussion,
         .BoxCategories {
             display: none;

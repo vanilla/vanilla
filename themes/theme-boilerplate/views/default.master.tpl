@@ -45,15 +45,20 @@
                     <div class="Container">
                         <div class="Frame-contentWrap">
                             <div class="Frame-details">
-                                {if !$isHomepage}
-                                    <div class="Frame-row">
-                                        <nav class="BreadcrumbsBox">
-                                            {breadcrumbs}
-                                        </nav>
-                                    </div>
-                                {/if}
+                                <div class="Frame-row SearchBoxMobile">
+                                    {if !$SectionGroups}
+                                        <div class="SearchBox js-sphinxAutoComplete" role="search">
+                                            {searchbox}
+                                        </div>
+                                    {/if}
+                                </div>
                                 <div class="Frame-row">
                                     <main class="Content MainContent">
+                                        {if !$isHomepage}
+                                            <nav class="BreadcrumbsBox">
+                                                {breadcrumbs}
+                                            </nav>
+                                        {/if}
                                         {if inSection("Profile")}
                                             <div class="Profile-header">
                                                 <div class="Profile-photo">

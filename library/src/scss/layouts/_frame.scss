@@ -79,6 +79,10 @@ $frame-panel_minHeight: 500px;
     text-overflow: ellipsis;
     font-weight: $global-fontWeight_semiBold;
     font-size: $global-large_fontSize;
+    padding: {
+        top: 4px;
+        bottom: 4px;
+    }
 }
 
 .frameHeader-left {

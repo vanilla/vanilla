@@ -18,6 +18,7 @@ interface IProps extends IOptionalComponentID, LinkProps {
     title?: string;
     ariaLabel?: string;
     baseClass?: ButtonBaseClass;
+    tabIndex?: number;
 }
 
 /**
@@ -26,17 +27,18 @@ interface IProps extends IOptionalComponentID, LinkProps {
 export default class LinkAsButton extends React.Component<IProps> {
     public static defaultProps: Partial<IProps> = {
         baseClass: ButtonBaseClass.STANDARD,
+        tabIndex: 0,
     };
 
     public render() {
-        const { baseClass, className, title, ariaLabel, to, children, ...restProps } = this.props;
+        const { baseClass, className, title, ariaLabel, to, children, tabIndex, ...restProps } = this.props;
         const componentClasses = classNames(baseClass, className);
         return (
             <SmartLink
                 className={componentClasses}
                 title={title}
                 aria-label={ariaLabel || title}
-                tabIndex={-1}
+                tabIndex={tabIndex}
                 to={to}
                 {...restProps}
             >

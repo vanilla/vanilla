@@ -39,18 +39,3 @@
         }
     }
 }
-
-.BreadcrumbsBox + .SearchBox {
-    margin-left: auto;
-    max-width: $panel_width;
-
-    .Handle.Handle {
-        display: none;
-    }
-
-    @include maxWidth {
-        margin-left: 0;
-        max-width: 100%;
-    }
-}
-

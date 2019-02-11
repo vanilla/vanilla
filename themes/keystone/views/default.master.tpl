@@ -166,27 +166,20 @@
                     <div class="Container">
                         <div class="Frame-contentWrap">
                             <div class="Frame-details">
-                                {if !$ThemeOptions.Options.hasFeatureSearchbox || !inSection(["CategoryList", "DiscussionList"])}
-                                    <div class="Frame-row">
-                                        <nav class="BreadcrumbsBox">
-                                            {breadcrumbs}
-                                        </nav>
-                                        {if !$SectionGroups}
-                                            <div class="SearchBox js-sphinxAutoComplete" role="search">
-                                                {if $hasAdvancedSearch === true}
-                                                    {module name="AdvancedSearchModule"}
-                                                {else}
-                                                    {searchbox}
-                                                {/if}
-                                            </div>
+                                <div class="Frame-row SearchBoxMobile">
+                                    <div class="SearchBox js-sphinxAutoComplete" role="search">
+                                        {if $hasAdvancedSearch === true}
+                                            {module name="AdvancedSearchModule"}
+                                        {else}
+                                            {searchbox}
                                         {/if}
                                     </div>
-                                {/if}
+                                </div>
                                 <div class="Frame-row">
 
                                     <!---------- Main Content ---------->
                                     <main class="Content MainContent">
-                                        {if $ThemeOptions.Options.hasFeatureSearchbox && inSection(["CategoryList", "DiscussionList"])}
+                                        {if !$isHomepage}
                                             <nav class="BreadcrumbsBox">
                                                 {breadcrumbs}
                                             </nav>
@@ -227,6 +220,11 @@
 
                                     <!---------- Main Panel ---------->
                                     <aside class="Panel Panel-main">
+                                        {if !$SectionGroups}
+                                            <div class="SearchBox js-sphinxAutoComplete" role="search">
+                                                {searchbox}
+                                            </div>
+                                        {/if}
                                         {asset name="Panel"}
                                     </aside>
                                     <!---------- Main Panel END ---------->

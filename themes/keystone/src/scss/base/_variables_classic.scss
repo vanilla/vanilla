@@ -107,18 +107,16 @@ $meboxCount_borderColor:                 $global-color_primary !default;
 \* -------------------------------------------------------------- */
 
 $panel-item-showIcons:                   false !default;
-$panel-item_spacing:                     12px !default;
-$panel-item_borderRadius:                $global_borderRadius !default;
+$panel-item_spacing:                     0 !default;
+$panel-item_borderRadius:                0 !default;
 $panel-item_border:                      1px solid $theme-border_color !default;
 
 $panel-item_bg:                          transparent !default;
 $panel-item_fg:                          $link-default_color !default;
 $panel-item_border:                      none !default;
 
-$panel-item-hover_bg:                    transparent !default;
-$panel-item-hover_fg:                    $global-color_primary !default;
-$panel-item-hover_borderColor:           $theme-border_color !default;
-
+$panel-item-hover_bg:                    $theme-hover_color !default;
+$panel-item-hover_fg:                    $link-default_color !default;
 
 /* -------------------------------------------------------------- *\
     Tags

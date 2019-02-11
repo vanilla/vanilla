@@ -56,3 +56,10 @@
         }
     }
 }
+
+.ThemeOptions-hasHeroBanner.ThemeOptions-hasFeatureSearchbox .Panel {
+
+    .SearchBox {
+        display: none;
+    }
+}

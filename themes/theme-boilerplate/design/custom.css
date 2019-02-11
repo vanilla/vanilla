@@ -49,7 +49,7 @@
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPL-2.0-only
- */.Breadcrumbs,.BreadcrumbsBox{display:block}.Breadcrumbs{line-height:1.5;margin-bottom:18px}.Breadcrumbs a{color:#555a62;font-size:12px;font-weight:400}.Breadcrumbs a:focus,.Breadcrumbs a:hover{text-decoration:none}.Breadcrumbs .Crumb,.Breadcrumbs .Last a{color:#696e75}.Breadcrumbs .Crumb:focus,.Breadcrumbs .Crumb:hover,.Breadcrumbs .Last a:focus,.Breadcrumbs .Last a:hover{color:#0291db;text-decoration:none}.BreadcrumbsBox+.SearchBox{margin-left:auto;max-width:220px}.BreadcrumbsBox+.SearchBox .Handle.Handle{display:none}@media screen and (max-width:768px){.BreadcrumbsBox+.SearchBox{margin-left:0;max-width:100%}}
+ */.Breadcrumbs,.BreadcrumbsBox{display:block}.Breadcrumbs{line-height:1.5;margin-bottom:18px}.Breadcrumbs a{color:#555a62;font-size:12px;font-weight:400}.Breadcrumbs a:focus,.Breadcrumbs a:hover{text-decoration:none}.Breadcrumbs .Crumb,.Breadcrumbs .Last a{color:#696e75}.Breadcrumbs .Crumb:focus,.Breadcrumbs .Crumb:hover,.Breadcrumbs .Last a:focus,.Breadcrumbs .Last a:hover{color:#0291db;text-decoration:none}
 
 /*!
  * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>

@@ -27,6 +27,7 @@ interface IProps extends IOptionalComponentID, LinkProps {
 export default class LinkAsButton extends React.Component<IProps> {
     public static defaultProps: Partial<IProps> = {
         baseClass: ButtonBaseClass.STANDARD,
+        tabIndex: 0,
     };
 
     public render() {
@@ -37,7 +38,7 @@ export default class LinkAsButton extends React.Component<IProps> {
                 className={componentClasses}
                 title={title}
                 aria-label={ariaLabel || title}
-                tabIndex={tabIndex ? tabIndex : 1}
+                tabIndex={tabIndex}
                 to={to}
                 {...restProps}
             >

@@ -322,8 +322,8 @@ export function chevronUp(className?: string) {
     );
 }
 
-export function searchError(className?: string) {
-    const title = t("Page Not Found");
+export function searchError(message?: string, className?: string) {
+    const title = message ? message : t("Page Not Found");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -334,7 +334,7 @@ export function searchError(className?: string) {
             <title>{title}</title>
             <path
                 d="M16.178,14.358l4.628,4.616c.633.631,1.2,1.417.354,2.261s-1.647.286-2.285-.336q-.627-.612-4.7-4.688a7.7,7.7,0,1,1,2.005-1.853ZM9.984,9.214,11.563,7.64a.418.418,0,0,1,.591.59L10.576,9.8l1.578,1.574a.418.418,0,0,1-.591.59L9.984,10.394,8.4,11.968a.418.418,0,0,1-.591-.59L9.392,9.8,7.814,8.23A.418.418,0,0,1,8.4,7.64Zm.063,7.545a7.044,7.044,0,1,0-7.03-7.043A7.037,7.037,0,0,0,10.047,16.759Z"
-                style={{ fill: currentColor }}
+                fill="currentColor"
             />
         </svg>
     );

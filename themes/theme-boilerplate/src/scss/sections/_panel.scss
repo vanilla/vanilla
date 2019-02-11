@@ -72,7 +72,6 @@
         justify-content: space-between;
         padding: $panel-item_padding;
         margin-bottom: 0;
-        border: $panel-item_border;
 
         .Count {
             margin-right: 6px;
@@ -153,7 +152,7 @@
             &:active {
                 color: $panel-item-hover_fg;
                 background-color: $panel-item-hover_bg;
-                border-color: $panel-item-hover_borderColor;
+                border-color: $panel-item-hover_border;
             }
         }
     }
@@ -164,9 +163,9 @@
         li:not(.Heading) + li:not(.Heading) {
             margin-top: $panel_item-spacing;
 
-            @if($panel_item-spacing == 0) {
+            @if($panel-item_spacing == 0) {
                 a {
-                    border-top-width: 0;
+                    margin-top: -1px;
                 }
             }
         }
@@ -186,7 +185,7 @@
             &:active {
                 color: $panel-item_fg;
                 background-color: $panel-item-hover_bg;
-                border-color: $panel-item-hover_borderColor;
+                border-color: $panel-item-hover_border;
             }
         }
 
@@ -262,6 +261,16 @@ body.Section-EditProfile .Box,
         border-radius: $formElement_borderRadius;
     }
 
+    li:not(.Heading) + li:not(.Heading) {
+        margin-top: $panel_item-spacing;
+
+        @if($panel-item_spacing == 0) {
+             a {
+                 margin-top: -1px;
+             }
+        }
+    }
+
     li.Heading {
         display: flex;
         align-items: center;
@@ -294,18 +303,17 @@ body.Section-EditProfile .Box,
         &:active {
             color: $panel-item-hover_fg;
             background-color: $panel-item-hover_bg;
-            border-color: $panel-item-hover_borderColor;
+            border-color: $panel-item-hover_border;
         }
     }
 
     li:not(.Heading) + li:not(.Heading) {
 
-        @if($panel_item-spacing == 0) {
-
-            a {
-                border-top-width: 0;
-            }
-        }
+         @if($panel-item_spacing == 0) {
+             a {
+                 margin-top: -1px;
+             }
+         }
     }
 
     &.BadgeGrid a {

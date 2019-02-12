@@ -588,10 +588,9 @@ class DashboardHooks extends Gdn_Plugin {
             throw notFoundException('Discussion');
         }
 
-        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
-            if ($discussion['InsertUserID'] !== GDN::session()->UserID) {
-                throw permissionException('Garden.Moderation.Manage');
-            }
+        $hasPermission = Gdn::session()->checkPermission('Garden.Moderation.Manage');
+        if (!$hasPermission && $discussion['InsertUserID'] !== GDN::session()->UserID) {
+            throw permissionException('Garden.Moderation.Manage');
         }
         $sender->title('Add Tags');
 

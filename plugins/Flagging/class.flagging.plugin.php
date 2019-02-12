@@ -220,7 +220,6 @@ class FlaggingPlugin extends Gdn_Plugin {
             throw permissionException('Vanilla.Discussions.View');
         }
 
-
         $sender->setData('Plugin.Flagging.Data', [
             'Context' => $context,
             'ElementID' => $elementID,

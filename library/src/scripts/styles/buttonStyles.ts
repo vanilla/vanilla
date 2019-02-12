@@ -178,7 +178,7 @@ export function buttonSizing(height, minWidth, fontSize, paddingHorizontal, form
         minHeight: px(formElementVars.sizing.height),
         fontSize: px(fontSize),
         padding: `${px(0)} ${px(paddingHorizontal)}`,
-        lineHeight: px(formElementVars.sizing.height),
+        lineHeight: px(formElementVars.sizing.height - formElementVars.border.width * 2),
     };
 }
 

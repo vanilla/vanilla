@@ -214,6 +214,13 @@ class FlaggingPlugin extends Gdn_Plugin {
         list($context, $elementID, $elementAuthorID, $elementAuthor, $encodedURL) = $arguments;
         $uRL = htmlspecialchars(base64_decode(str_replace('-', '=', $encodedURL)));
 
+        // Verify user has permission on that discussion
+        $discussionModel = new DiscussionModel();
+        if (!$discussionModel->canView($elementID, $userID)) {
+            throw permissionException('Vanilla.Discussions.Edit');
+        }
+
+
         $sender->setData('Plugin.Flagging.Data', [
             'Context' => $context,
             'ElementID' => $elementID,

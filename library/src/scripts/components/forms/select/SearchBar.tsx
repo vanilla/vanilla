@@ -54,6 +54,7 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     handleOnKeyDown?: (event: React.KeyboardEvent) => void;
     onOpenSuggestions?: () => void;
     onCloseSuggestions?: () => void;
+    buttonText?: string;
 }
 
 interface IState {
@@ -75,7 +76,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
         isLoading: false,
         optionComponent: selectOverrides.SelectOption,
         triggerSearchOnClear: false,
-        placeholder: t("Search"),
+        buttonText: t("Search"),
     };
 
     public state: IState = {
@@ -249,10 +250,12 @@ export default class SearchBar extends React.Component<IProps, IState> {
                             <Button
                                 type="submit"
                                 id={this.searchButtonID}
-                                className={classNames("searchBar-submitButton", this.props.buttonClassName)}
+                                className={classNames("searchBar-submitButton", this.props.buttonClassName, {
+                                    isLarge: this.props.isBigInput,
+                                })}
                                 tabIndex={!!this.props.hideSearchButton ? -1 : 0}
                             >
-                                {this.props.isLoading ? <ButtonLoader /> : t("Search")}
+                                {this.props.isLoading ? <ButtonLoader /> : this.props.buttonText}
                             </Button>
                         </ConditionalWrap>
                         <div onClick={this.focus} className="searchBar-iconContainer">

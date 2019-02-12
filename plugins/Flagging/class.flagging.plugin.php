@@ -216,8 +216,8 @@ class FlaggingPlugin extends Gdn_Plugin {
 
         // Verify user has permission on that discussion
         $discussionModel = new DiscussionModel();
-        if (!$discussionModel->canView($elementID, $userID)) {
-            throw permissionException('Vanilla.Discussions.Edit');
+        if ($elementID && !$discussionModel->canView($elementID, $userID)) {
+            throw permissionException('Vanilla.Discussions.View');
         }
 
 

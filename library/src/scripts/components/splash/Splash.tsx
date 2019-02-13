@@ -15,6 +15,7 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps } from "@library/components/DeviceChecker";
 import IndependentSearch from "@library/components/IndependentSearch";
 import { splashStyles, splashVariables } from "@library/styles/splashStyles";
+import { buttonClasses } from "@library/styles/buttonStyles";
 
 interface IProps extends IDeviceProps {
     title: string; // Often the message to display isn't the real H1
@@ -28,6 +29,7 @@ export class Splash extends React.Component<IProps> {
     public render() {
         const vars = splashVariables();
         const classes = splashStyles();
+        const buttons = buttonClasses();
         const { title, className } = this.props;
         return (
             <div className={classNames(className, classes.root)}>
@@ -37,7 +39,12 @@ export class Splash extends React.Component<IProps> {
                         <PanelWidgetHorizontalPadding>
                             {title && <Heading title={title} className={classes.title} />}
                             <div className={classes.searchContainer}>
-                                <IndependentSearch className={classes.search} theme={vars.search} isLarge={true} />
+                                <IndependentSearch
+                                    className={classes.search}
+                                    buttonClass={buttons.transparent}
+                                    theme={vars.search}
+                                    isLarge={true}
+                                />
                             </div>
                         </PanelWidgetHorizontalPadding>
                     </div>

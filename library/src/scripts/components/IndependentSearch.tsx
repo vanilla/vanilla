@@ -62,7 +62,7 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
                     resultsRef={this.resultsRef}
                     onOpenSuggestions={this.props.onOpenSuggestions}
                     onCloseSuggestions={this.props.onCloseSuggestions}
-                    buttonClassName={buttons(ButtonTypes.TRANSPARENT)}
+                    buttonClassName={this.props.buttonClass}
                     className={classes.root}
                     isBigInput={this.props.isLarge}
                 />

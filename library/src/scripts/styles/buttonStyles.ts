@@ -7,8 +7,14 @@
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { style } from "typestyle";
-import { percent, px } from "csx";
-import { componentThemeVariables, debugHelper } from "@library/styles/styleHelpers";
+import { color, deg, percent, px, quote } from "csx";
+import {
+    componentThemeVariables,
+    debugHelper,
+    flexHelper,
+    getColorDependantOnLightness,
+    spinnerLoader,
+} from "@library/styles/styleHelpers";
 
 export function buttonStyles(theme?: object) {
     const globalVars = globalVariables(theme);
@@ -57,16 +63,20 @@ export interface IButtonType {
         bg: string;
         borderColor: string;
     };
+    focusAccessible: {
+        fg: string;
+        bg: string;
+        borderColor: string;
+    };
 }
 
 export function buttonVars(theme?: object) {
     const globalVars = globalVariables(theme);
     const themeVars = componentThemeVariables(theme, "button");
-    const colors = globalVars.mainColors;
 
     const standard: IButtonType = {
-        fg: colors.fg.toString(),
-        bg: colors.bg.toString(),
+        fg: globalVars.mainColors.fg.toString(),
+        bg: globalVars.mainColors.bg.toString(),
         border: {
             color: globalVars.mixBgAndFg(0.24).toString(),
             width: px(1),
@@ -74,98 +84,98 @@ export function buttonVars(theme?: object) {
             radius: globalVars.border.radius,
         },
         hover: {
-            color: colors.fg.toString(),
-            backgroundColor: colors.bg.darken(0.1).toString(),
+            color: globalVars.mainColors.fg.toString(),
+            backgroundColor: globalVars.mainColors.bg.darken(0.1).toString(),
             borderColor: globalVars
                 .mixBgAndFg(0.4)
                 .darken(0.1)
                 .toString(),
         },
-        select: {
-            color: colors.fg.toString(),
-            backgroundColor: colors.bg.darken(0.1).toString(),
+        active: {
+            color: globalVars.mainColors.fg.toString(),
+            backgroundColor: globalVars.mainColors.bg.darken(0.1).toString(),
             borderColor: globalVars
                 .mixBgAndFg(0.4)
                 .darken(0.1)
                 .toString(),
         },
         focus: {
-            color: colors.fg.toString(),
-            backgroundColor: colors.bg.darken(0.1).toString(),
+            color: globalVars.mainColors.fg.toString(),
+            backgroundColor: globalVars.mainColors.bg.darken(0.1).toString(),
             borderColor: globalVars
                 .mixBgAndFg(0.8)
                 .darken(0.1)
                 .toString(),
         },
         focusAccessible: {
-            color: colors.fg.toString(),
-            backgroundColor: colors.bg.darken(0.3).toString(),
-            borderColor: colors.bg.darken(1).toString(),
+            color: globalVars.mainColors.fg.toString(),
+            backgroundColor: globalVars.mainColors.bg.darken(0.3).toString(),
+            borderColor: globalVars.mainColors.bg.darken(1).toString(),
         },
         ...themeVars.subComponentStyles("basic"),
     };
 
     const primary: IButtonType = {
         fg: globalVars.elementaryColors.white.toString(),
-        bg: colors.primary.toString(),
+        bg: globalVars.mainColors.primary.toString(),
         border: {
-            color: colors.primary.toString(),
+            color: globalVars.mainColors.primary.toString(),
             width: px(1),
             style: "solid",
             radius: globalVars.border.radius,
         },
         hover: {
             color: globalVars.elementaryColors.white.toString(),
-            backgroundColor: colors.secondary.toString(),
-            borderColor: colors.primary.toString(),
+            backgroundColor: globalVars.mainColors.secondary.toString(),
+            borderColor: globalVars.mainColors.primary.toString(),
         },
-        select: {
+        active: {
             color: globalVars.elementaryColors.white.toString(),
-            backgroundColor: colors.secondary.toString(),
-            borderColor: colors.primary.toString(),
+            backgroundColor: globalVars.mainColors.secondary.toString(),
+            borderColor: globalVars.mainColors.primary.toString(),
         },
         focus: {
             color: globalVars.elementaryColors.white.toString(),
-            backgroundColor: colors.secondary.toString(),
-            borderColor: colors.primary.toString(),
+            backgroundColor: globalVars.mainColors.secondary.toString(),
+            borderColor: globalVars.mainColors.primary.toString(),
         },
         focusAccessible: {
             color: globalVars.elementaryColors.white.toString(),
-            backgroundColor: colors.secondary.toString(),
-            borderColor: colors.primary.toString(),
+            backgroundColor: globalVars.mainColors.secondary.toString(),
+            borderColor: globalVars.mainColors.primary.toString(),
         },
         ...themeVars.subComponentStyles("primary"),
     };
 
-    const white = globalVars.elementaryColors.white.toString();
+    const transparentButtonColor = globalVars.mainColors.bg;
     const transparent: IButtonType = {
-        fg: white,
+        fg: transparentButtonColor.toString(),
         bg: "transparent",
         border: {
-            color: white,
+            color: transparentButtonColor.toString(),
             width: px(1),
             style: "solid",
             radius: globalVars.border.radius,
         },
         hover: {
-            color: white,
+            color: transparentButtonColor.toString(),
             backgroundColor: globalVars.elementaryColors.white.fade(0.1).toString(),
-            borderColor: white,
+            borderColor: transparentButtonColor.toString(),
         },
         active: {
-            color: white,
+            color: transparentButtonColor.toString(),
             backgroundColor: globalVars.elementaryColors.white.fade(0.1).toString(),
-            borderColor: white,
+            borderColor: transparentButtonColor.toString(),
         },
         focus: {
-            color: white,
+            color: transparentButtonColor.toString(),
             backgroundColor: globalVars.elementaryColors.white.fade(0.1).toString(),
-            borderColor: white,
+            borderColor: transparentButtonColor.toString(),
         },
         focusAccessible: {
-            color: white,
+            color: transparentButtonColor.toString(),
             backgroundColor: globalVars.elementaryColors.white.fade(0.5).toString(),
-            borderColor: white,
+            borderColor: transparentButtonColor.toString(),
         },
         ...themeVars.subComponentStyles("transparent"),
     };
@@ -182,30 +192,17 @@ export function buttonSizing(height, minWidth, fontSize, paddingHorizontal, form
     };
 }
 
-export enum ButtonStates {
-    HOVER = "hover",
-    ACTIVE = "focus",
-    FOCUS = "active",
-    FOCUS_ACCESSIBLE = "focusAccessible",
-}
-
-export function generateButtonStateStyles(buttonType: IButtonType, key: ButtonStates, setZIndexOnHover = false) {
-    return {
-        zIndex: setZIndexOnHover ? setZIndexOnHover : undefined,
-        ...buttonType[key],
-    };
-}
-
 export function generateButtonClass(
     buttonType: IButtonType,
     buttonName: string,
     theme?: object,
-    setZIndexOnHover = false,
+    setZIndexOnState = false,
 ) {
     const globalVars = globalVariables(theme);
     const formElVars = formElementsVariables(theme);
     const vars = buttonStyles(theme);
     const debug = debugHelper("button");
+    const zIndex = setZIndexOnState ? 1 : undefined;
 
     return style({
         ...debug.name(buttonName),
@@ -237,17 +234,33 @@ export function generateButtonClass(
         $nest: {
             "&:not([disabled])": {
                 $nest: {
-                    ":not(.focus-visible)": {
+                    "&:not(.focus-visible)": {
                         outline: 0,
                     },
-                    "&:hover": generateButtonStateStyles(buttonType, ButtonStates.HOVER, setZIndexOnHover),
-                    "&:focus": generateButtonStateStyles(buttonType, ButtonStates.FOCUS, setZIndexOnHover),
-                    "&:active": generateButtonStateStyles(buttonType, ButtonStates.ACTIVE, setZIndexOnHover),
-                    "&&:.focus-visible": generateButtonStateStyles(
-                        buttonType,
-                        ButtonStates.FOCUS_ACCESSIBLE,
-                        setZIndexOnHover,
-                    ),
+                    "&:hover": {
+                        zIndex,
+                        backgroundColor: buttonType.hover.bg,
+                        borderColor: buttonType.hover.borderColor,
+                        color: buttonType.hover.fg,
+                    },
+                    "&:focus": {
+                        zIndex,
+                        backgroundColor: buttonType.focus.bg,
+                        borderColor: buttonType.focus.borderColor,
+                        color: buttonType.focus.fg,
+                    },
+                    "&:active": {
+                        zIndex,
+                        backgroundColor: buttonType.active.bg,
+                        borderColor: buttonType.active.borderColor,
+                        color: buttonType.active.fg,
+                    },
+                    "&.focus-visible": {
+                        zIndex,
+                        backgroundColor: buttonType.focus.bg,
+                        borderColor: buttonType.focus.borderColor,
+                        color: buttonType.focus.fg,
+                    },
                 },
             },
         },
@@ -261,15 +274,30 @@ export enum ButtonTypes {
 }
 
 export function buttonClasses(theme?: object) {
-    return (type: ButtonTypes) => {
-        const vars = buttonVars(theme);
-        switch (type) {
-            case ButtonTypes.PRIMARY:
-                return generateButtonClass(vars.primary, "primary");
-            case ButtonTypes.TRANSPARENT:
-                return generateButtonClass(vars.transparent, "transparent");
-            default:
-                return generateButtonClass(vars.standard, "standard");
-        }
+    const vars = buttonVars(theme);
+    return {
+        primary: generateButtonClass(vars.primary, "primary"),
+        standard: generateButtonClass(vars.standard, "standard"),
+        transparent: generateButtonClass(vars.transparent, "transparent"),
     };
+}
+
+export function buttonLoaderClasses(spinnerColor: string, theme?: object) {
+    const globalVars = globalVariables(theme);
+    const themeVars = componentThemeVariables(theme, "buttonLoader");
+    const flexUtils = flexHelper();
+    const debug = debugHelper("buttonLoader");
+    const root = style({
+        ...debug.name(),
+        ...flexUtils.middle(),
+        padding: px(4),
+        height: percent(100),
+        width: percent(100),
+        $nest: {
+            "&::after": spinnerLoader(globalVars.mainColors.primary, px(20)),
+        },
+        ...themeVars.subComponentStyles(""),
+    });
+
+    return { root };
 }

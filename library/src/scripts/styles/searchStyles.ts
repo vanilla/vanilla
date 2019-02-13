@@ -40,9 +40,11 @@ export const searchClasses = (theme?: object) => {
         ...debug.name(),
         $nest: {
             ".searchBar-valueContainer": {
+                ...debug.name("valueContainer"),
                 cursor: "text",
             },
             ".searchBar__control": {
+                ...debug.name("control"),
                 cursor: "text",
             },
         },

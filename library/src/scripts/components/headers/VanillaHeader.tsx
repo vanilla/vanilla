@@ -35,7 +35,6 @@ interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     className?: string;
     title?: string; // Needed for mobile dropdown
     mobileDropDownContent?: React.ReactNode; // Needed for mobile dropdown
-    showSearchIcon?: boolean;
     isFixed?: boolean;
 }
 
@@ -55,7 +54,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
     public context!: React.ContextType<typeof ScrollOffsetContext>;
 
     public static defaultProps: Partial<IProps> = {
-        showSearchIcon: true,
         mobileDropDownContent: null,
         isFixed: true,
     };
@@ -132,40 +130,31 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                         className={classNames("vanillaHeader-rightFlexBasis", classes.rightFlexBasis)}
                                         condition={!!showMobileDropDown}
                                     >
-                                        {this.props.showSearchIcon ? (
-                                            <CompactSearch
-                                                className={classNames(
-                                                    "vanillaHeader-compactSearch",
-                                                    classes.compactSearch,
-                                                    {
-                                                        isCentered: this.state.openSearch,
-                                                    },
-                                                )}
-                                                focusOnMount
-                                                open={this.state.openSearch}
-                                                onSearchButtonClick={this.openSearch}
-                                                onCloseSearch={this.closeSearch}
-                                                cancelButtonClassName={classNames(
-                                                    "vanillaHeader-searchCancel",
-                                                    classes.topElement,
-                                                    classes.searchCancel,
-                                                )}
-                                                cancelContentClassName="meBox-contentHover"
-                                                buttonClass={classes.button}
-                                                showingSuggestions={this.state.showingSuggestions}
-                                                onOpenSuggestions={this.setOpenSuggestions}
-                                                onCloseSuggestions={this.setCloseSuggestions}
-                                                buttonContentClass="meBox-buttonContent"
-                                            />
-                                        ) : (
-                                            <FlexSpacer
-                                                className={classNames(
-                                                    "compactSearch",
-                                                    "vanillaHeader-compactSearch",
-                                                    classes.compactSearch,
-                                                )}
-                                            />
-                                        )}
+                                        <CompactSearch
+                                            className={classNames(
+                                                "vanillaHeader-compactSearch",
+                                                classes.compactSearch,
+                                                {
+                                                    isCentered: this.state.openSearch,
+                                                },
+                                            )}
+                                            focusOnMount
+                                            open={this.state.openSearch}
+                                            onSearchButtonClick={this.openSearch}
+                                            onCloseSearch={this.closeSearch}
+                                            cancelButtonClassName={classNames(
+                                                "vanillaHeader-searchCancel",
+                                                classes.topElement,
+                                                classes.searchCancel,
+                                            )}
+                                            cancelContentClassName="meBox-contentHover"
+                                            buttonClass={classes.button}
+                                            showingSuggestions={this.state.showingSuggestions}
+                                            onOpenSuggestions={this.setOpenSuggestions}
+                                            onCloseSuggestions={this.setCloseSuggestions}
+                                            buttonContentClass="meBox-buttonContent"
+                                        />
+
                                         {isGuest ? (
                                             (!this.state.openSearch || !isMobile) && (
                                                 <VanillaHeaderNav

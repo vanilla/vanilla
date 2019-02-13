@@ -142,6 +142,7 @@ export default function vanillaHeaderClasses(theme?: object) {
             color: headerColors.fg.toString(),
             $nest: {
                 "&.isFixed": {
+                    ...debug.name("fixed"),
                     position: "fixed",
                     top: 0,
                     left: 0,
@@ -149,10 +150,12 @@ export default function vanillaHeaderClasses(theme?: object) {
                     zIndex: 1,
                 },
                 ".searchBar__control": {
+                    ...debug.name("control"),
                     color: vars.colors.fg.toString(),
                     cursor: "pointer",
                 },
                 ".suggestedTextInput-clear.searchBar-clear": {
+                    ...debug.name("clear"),
                     color: vars.colors.fg.toString(),
                     $nest: {
                         "&:hover": {
@@ -167,10 +170,12 @@ export default function vanillaHeaderClasses(theme?: object) {
                     },
                 },
                 ".searchBar__placeholder": {
+                    ...debug.name("placeholder"),
                     color: vars.colors.fg.fade(0.8).toString(),
                     cursor: "pointer",
                 },
                 ".backLink-link": {
+                    ...debug.name("backLink-link"),
                     $nest: {
                         "&:hover": {
                             color: vars.colors.fg.toString(),

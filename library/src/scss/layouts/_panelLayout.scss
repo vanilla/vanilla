@@ -148,12 +148,7 @@ $panelLayout-panelAndSpacingWidth                                     : $global-
 }
 
 
-.panelLayout-breadcrumbs {
-    padding: {
-        top: $global-gutter_halfSize;
-        bottom: $global-gutter_halfSize;
-    }
-
+.panelArea-breadcrumbs {
     &.hasAdjacentPanel {
         flex-basis: calc(100% - #{$panelLayout-panelAndSpacingWidth});
         max-width: calc(100% - #{$panelLayout-panelAndSpacingWidth});

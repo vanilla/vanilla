@@ -152,7 +152,7 @@ export function buttonVars(theme?: object) {
             backgroundColor: globalVars.elementaryColors.white.fade(0.1).toString(),
             borderColor: white,
         },
-        select: {
+        active: {
             color: white,
             backgroundColor: globalVars.elementaryColors.white.fade(0.1).toString(),
             borderColor: white,
@@ -186,7 +186,7 @@ export enum ButtonStates {
     HOVER = "hover",
     ACTIVE = "focus",
     FOCUS = "active",
-    FOCUS_ACCESSIBLE = "focus accessible",
+    FOCUS_ACCESSIBLE = "focusAccessible",
 }
 
 export function generateButtonStateStyles(buttonType: IButtonType, key: ButtonStates, setZIndexOnHover = false) {

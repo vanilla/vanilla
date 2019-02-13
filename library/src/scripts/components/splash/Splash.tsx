@@ -37,7 +37,7 @@ export class Splash extends React.Component<IProps> {
                         <PanelWidgetHorizontalPadding>
                             {title && <Heading title={title} className={classes.title} />}
                             <div className={classes.searchContainer}>
-                                <IndependentSearch className={classes.search} theme={vars.search} />
+                                <IndependentSearch className={classes.search} theme={vars.search} isLarge={true} />
                             </div>
                         </PanelWidgetHorizontalPadding>
                     </div>

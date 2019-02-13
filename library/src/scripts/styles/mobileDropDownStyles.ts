@@ -79,8 +79,8 @@ export const mobileDropDownClasses = () => {
             userSelect: "none",
             flexGrow: 1,
             maxWidth: calc(`100% - ${px(globalVars.spacer)}`),
-            marginLeft: globalVars.spacer / 2,
-            marginRight: globalVars.spacer / 2,
+            marginLeft: px(globalVars.spacer / 2),
+            marginRight: px(globalVars.spacer / 2),
         },
         mediaQueries.xs({
             ...debug.name("toggleButton-xs"),

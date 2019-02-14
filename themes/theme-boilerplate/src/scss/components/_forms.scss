@@ -269,6 +269,7 @@ div.token-input-dropdown {
     );
 }
 
+.groupToolbar .Button.Primary,
 .BoxButtons .Button.Primary {
     @include Button(
         $button-primary_bg,

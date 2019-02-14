@@ -91,16 +91,29 @@ $headerMebutton-hover_bg:                mix($global-color_white, $header_bg, 12
 $headerMebutton-active_bg:               mix($headerMebutton_fg, $header_bg, 12%) !default;
 
 $headerMeBoxAlert_bg:                    $global-color_primary !default;
-
-$navigation_borderRadius:                0 !default;
+$headerMeBoxAlert_borderColor:           $global-color_primary !default;
 
 /* -------------------------------------------------------------- *\
-    Mebox Count
+    Navigation
+\* -------------------------------------------------------------- */
+
+$navigation_borderRadius:                  0 !default;
+$navigation_bg:                           $header_bg !default;
+$navigation_fg:                           $global-color_white !default;
+$navigation_border:                       mix($global-color_white, $header_bg, 8%) !default;
+
+/* -------------------------------------------------------------- *\
+    Mebox
 \* -------------------------------------------------------------- */
 
 $meboxCount_bg:                          $global-color_primary !default;
 $meboxCount_fg:                          $global-color_white !default;
 $meboxCount_borderColor:                 $global-color_primary !default;
+
+$MobileMeBox_bg:                         mix($global-color_black, $header_bg, 10%) !default;
+
+$MobileMeBoxAlert_bg:                    $global-color_primary !default;
+$MobileMeBoxAlert_borderColor:           $global-color_primary !default;
 
 /* -------------------------------------------------------------- *\
     Panel
@@ -112,11 +125,11 @@ $panel-item_borderRadius:                0 !default;
 $panel-item_border:                      1px solid $theme-border_color !default;
 
 $panel-item_bg:                          transparent !default;
-$panel-item_fg:                          $link-default_color !default;
+$panel-item_fg:                          $global-color_fg !default;
 $panel-item_border:                      none !default;
 
 $panel-item-hover_bg:                    $theme-hover_color !default;
-$panel-item-hover_fg:                    $link-default_color !default;
+$panel-item-hover_fg:                    $panel-item_fg !default;
 
 /* -------------------------------------------------------------- *\
     Tags

@@ -188,7 +188,7 @@
 }
 
 .Navigation-row {
-    padding: $utility-large_padding;
+    padding: $utility-baseUnitTriple;
     display: flex;
     align-items: center;
 }
@@ -199,7 +199,7 @@
     min-height: $navigation-item_height;
     display: block;
     width: 100%;
-    padding: 0 $utility-large_padding;
+    padding: 0 $utility-baseUnitTriple;
     color: $navigation_fg;
     display: flex;
     align-items: center;

@@ -120,7 +120,7 @@ $mebox-button_borderRadius:             3px !default;
 }
 
 .SignInIcons {
-    margin-left: $utility-large_padding;
+    margin-left: $utility-baseUnitTriple;
 }
 
 // Reset base theme style
@@ -150,7 +150,7 @@ $mebox-button_borderRadius:             3px !default;
     }
 
     .MeMenu {
-        margin-left: $utility-large_padding;
+        margin-left: $utility-baseUnitTriple;
         display: flex;
         align-items: center;
 

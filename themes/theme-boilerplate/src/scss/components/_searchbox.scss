@@ -142,7 +142,7 @@ $searchbox-button_borderWidth: 0 !default;
 
 .SearchBox {
     width: 100%;
-    margin-bottom: $utility-large_padding;
+    margin-bottom: $utility-baseUnitTriple;
     position: relative;
     @include clearfix;
 
@@ -181,4 +181,8 @@ $searchbox-button_borderWidth: 0 !default;
     width: $formElement_height;
     line-height: $formElement_height;
     pointer-events: none;
+}
+
+.SearchBoxMobile .Handle.Handle {
+    display: none;
 }

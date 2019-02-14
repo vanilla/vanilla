@@ -166,24 +166,24 @@
                     <div class="Container">
                         <div class="Frame-contentWrap">
                             <div class="Frame-details">
-                                <div class="Frame-row SearchBoxMobile">
-                                    <div class="SearchBox js-sphinxAutoComplete" role="search">
-                                        {if $hasAdvancedSearch === true}
-                                            {module name="AdvancedSearchModule"}
-                                        {else}
-                                            {searchbox}
-                                        {/if}
+                                {if !$isHomepage}
+                                    <div class="Frame-row">
+                                        <nav class="BreadcrumbsBox">
+                                            {breadcrumbs}
+                                        </nav>
                                     </div>
+                                {/if}
+                                <div class="Frame-row SearchBoxMobile">
+                                    {if !$SectionGroups && !inSection(["SearchResults"])}
+                                        <div class="SearchBox js-sphinxAutoComplete" role="search">
+                                            {module name="AdvancedSearchModule"}
+                                        </div>
+                                    {/if}
                                 </div>
                                 <div class="Frame-row">
 
                                     <!---------- Main Content ---------->
                                     <main class="Content MainContent">
-                                        {if !$isHomepage}
-                                            <nav class="BreadcrumbsBox">
-                                                {breadcrumbs}
-                                            </nav>
-                                        {/if}
                                         <!---------- Profile Page Header ---------->
                                         {if inSection("Profile")}
                                             <div class="Profile-header">

@@ -69,6 +69,10 @@ $quickSearch_color:                      $global-color_white !default;
 .PrevNextPager .Previous,
 .PrevNextPager .Next {
     @include Button;
+
+    flex: initial;
+    min-width: 120px;
+    text-align: center;
 }
 
 .PagerWrap,
@@ -215,6 +219,7 @@ a.MoreWrap,
     .Next,
     .Previous {
         padding: 0 $utility-baseUnitDouble;
+        text-align: center;
      }
 
     .Previous {

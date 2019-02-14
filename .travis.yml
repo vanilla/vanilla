@@ -120,10 +120,10 @@ jobs:
           sources:
             - google-chrome
         chrome: stable
-      before_script:
-        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3 # Ensure a consistent yarn version
-        - export PATH=$HOME/.yarn/bin:$PATH
-        - yarn install --pure-lockfile
+#      before_script:
+#        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3 # Ensure a consistent yarn version
+#        - export PATH=$HOME/.yarn/bin:$PATH
+#        - yarn install --pure-lockfile
       cache:
         directories:
           - $TRAVIS_BUILD_DIR/node_modules
@@ -135,8 +135,10 @@ jobs:
         - yarn test
         - yarn check-types
 
-# No additional system dependencies to install. Skip the install step.
-install: true
+install:
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3 # Ensure a consistent yarn version
+  - export PATH=$HOME/.yarn/bin:$PATH
+  - yarn install --pure-lockfile
 
 env:
   - VANILLA_BUILD_DISABLE_AUTO_BUILD=true

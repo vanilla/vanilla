@@ -62,6 +62,10 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
 .siteNavNode-contents {
     display: block;
     width: 100%;
+
+    .siteNavNode-buttonOffset {
+        top: 15.5px;
+    }
 }
 
 .siteNavNode-link {
@@ -141,8 +145,11 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
 
 
 .siteNavNode-buttonOffset {
+    position: relative;
     display: flex;
     justify-content: flex-end;
     width: $siteNav-nodeToggle_width;
     margin-left: -#{$siteNav-nodeToggle_width};
+    top: #{(37 / 2)}px;
+    transform: translateY(-50%);
 }

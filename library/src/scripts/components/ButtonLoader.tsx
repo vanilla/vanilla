@@ -6,14 +6,13 @@
 
 import * as React from "react";
 import { t } from "@library/application";
-import { buttonLoaderClasses } from "@library/styles/buttonStyles";
-import { ColorHelper } from "csx";
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { buttonClasses, buttonLoaderClasses, buttonVariables, IButtonType } from "@library/styles/buttonStyles";
 import classNames from "classnames";
 
 interface IProps {
-    spinnerColor?: ColorHelper;
     className?: string;
+    buttonType?: IButtonType;
+    theme?: object;
 }
 
 /**
@@ -21,10 +20,7 @@ interface IProps {
  */
 export default class ButtonLoader extends React.Component<IProps> {
     public render() {
-        const globalVars = globalVariables();
-        const classes = buttonLoaderClasses(
-            this.props.spinnerColor ? this.props.spinnerColor : globalVars.mainColors.primary,
-        );
+        const classes = buttonLoaderClasses(this.props.buttonType || buttonVariables(this.props.theme).primary);
         return (
             <React.Fragment>
                 <div className={classNames(classes.root, this.props.className)} aria-hidden="true" />

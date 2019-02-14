@@ -173,7 +173,7 @@ const spinnerLoaderAnimation = keyframes({
 });
 
 export const spinnerLoader = (
-    spinnerColor = vars.mainColors.primary,
+    spinnerColor: ColorHelper = vars.mainColors.primary,
     dimensions = px(18),
     thicknesss = px(3),
     speed = "0.7s",

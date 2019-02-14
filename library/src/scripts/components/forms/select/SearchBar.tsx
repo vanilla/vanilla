@@ -24,6 +24,7 @@ import { MenuProps } from "react-select/lib/components/Menu";
 import ReactDOM from "react-dom";
 import { LinkContext } from "@library/components/navigation/LinkContextProvider";
 import { RouteComponentProps } from "react-router";
+import { buttonVariables } from "@library/styles/buttonStyles";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;
@@ -48,6 +49,7 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     optionComponent?: React.ComponentType<OptionProps<any>>;
     getRef?: any;
     buttonClassName?: string;
+    buttonLoaderClassName?: string;
     hideSearchButton?: boolean;
     triggerSearchOnClear?: boolean;
     resultsRef?: React.RefObject<HTMLDivElement>;
@@ -119,7 +121,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                 menuIsOpen={this.isMenuVisible}
                 classNamePrefix={this.prefix}
                 className={classNames(this.prefix, className)}
-                placeholder={this.props.placeholder}
+                placeholder={this.props.placeholder || ""}
                 aria-label={t("Search")}
                 escapeClearsValue={true}
                 pageSize={20}
@@ -234,6 +236,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * @param props
      */
     private SearchControl = (props, theme?: object) => {
+        const buttonVars = buttonVariables(theme);
         return (
             <div className="searchBar">
                 <form className="searchBar-form" onSubmit={this.onFormSubmit}>
@@ -268,7 +271,14 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 })}
                                 tabIndex={!!this.props.hideSearchButton ? -1 : 0}
                             >
-                                {this.props.isLoading ? <ButtonLoader /> : this.props.buttonText}
+                                {this.props.isLoading ? (
+                                    <ButtonLoader
+                                        buttonType={buttonVars.primary}
+                                        className={this.props.buttonLoaderClassName}
+                                    />
+                                ) : (
+                                    this.props.buttonText
+                                )}
                             </Button>
                         </ConditionalWrap>
                         <div onClick={this.focus} className="searchBar-iconContainer">

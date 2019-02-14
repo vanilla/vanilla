@@ -25,6 +25,7 @@ interface IProps extends INavigationTreeItem {
     depth: number;
     collapsible?: boolean;
     onItemHover?(item: INavigationTreeItem);
+    clickableCategoryLabels?: boolean;
 }
 
 export interface IActiveRecord {

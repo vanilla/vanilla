@@ -30,14 +30,11 @@
             }
         }
 
+        .Author + a,
         .Excerpt,
         .Meta {
             display: block;
             padding-left: calc(#{$theme-photo_size} + #{$component-base_padding});
-        }
-
-        .Meta {
-            margin: 0;
         }
     }
 }

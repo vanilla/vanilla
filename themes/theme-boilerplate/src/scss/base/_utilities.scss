@@ -104,25 +104,48 @@
 }
 
 @mixin framePadding($includeVertical: false) {
-    padding-left: $content_padding;
-    padding-right: $content_padding;
+    padding-left: $frame_padding;
+    padding-right: $frame_padding;
 
     @if ($includeVertical) {
-        padding-top: $content_padding;
-        padding-bottom: $content_padding;
+        padding-top: $frame_padding;
+        padding-bottom: $frame_padding;
+    }
+
+    @include maxWidth {
+        padding-left: $frame-mobile_padding;
+        padding-right: $frame-mobile_padding;
+
+        @if ($includeVertical) {
+            padding-top: $frame-mobile_padding;
+            padding-bottom: $frame-mobile_padding;
+        }
     }
 }
 
 @mixin framePaddingReverse($includeVertical: false) {
-    margin-left: -#{$content_padding};
-    margin-right: -#{$content_padding};
-    padding-left: $content_padding;
-    padding-right: $content_padding;
-    width: calc(100% + (#{$content_padding} * 2));
+    margin-left: -#{$frame_padding};
+    margin-right: -#{$frame_padding};
+    padding-left: $frame_padding;
+    padding-right: $frame_padding;
+    width: calc(100% + (#{$frame_padding} * 2));
 
     @if ($includeVertical) {
-        margin-top: -#{$content_padding};
-        margin-bottom: -#{$content_padding};
+        margin-top: -#{$frame_padding};
+        margin-bottom: -#{$frame_padding};
+    }
+
+    @include maxWidth {
+        margin-left: -#{$frame-mobile_padding};
+        margin-right: -#{$frame-mobile_padding};
+        padding-left: $frame-mobile_padding;
+        padding-right: $frame-mobile_padding;
+        width: calc(100% + (#{$frame-mobile_padding} * 2));
+
+        @if ($includeVertical) {
+            margin-top: -#{$frame-mobile_padding};
+            margin-bottom: -#{$frame-mobile_padding};
+        }
     }
 }
 
@@ -186,6 +209,7 @@
         }
 
         &:first-child {
+
             @if $component_lateralBorder == true {
                 border-top-left-radius: $component_borderRadius;
                 border-top-right-radius: $component_borderRadius;

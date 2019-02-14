@@ -209,6 +209,7 @@
         }
 
         &:first-child {
+
             @if $component_lateralBorder == true {
                 border-top-left-radius: $component_borderRadius;
                 border-top-right-radius: $component_borderRadius;

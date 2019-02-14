@@ -94,7 +94,7 @@ $quickSearch_color:                      $global-color_white !default;
     min-height: $pager_height;
     display: flex;
     align-items: center;
-    margin: 0 0 $global-block_margin;
+    margin: 0 0 $utility-baseUnit;
 }
 
 .BeforeCommentHeading {

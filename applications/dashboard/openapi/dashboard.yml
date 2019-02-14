@@ -1,0 +1,109 @@
+openapi: 3.0.2
+info:
+paths:
+  /dashboard/menus:
+    get:
+      summary: List the dashboard menus.
+      description: |
+        This endpoint returns the entire navigation structure of the dashboard. It has three levels:
+
+        1. The first level represents main menu sections.
+        2. Each section can be seperated into groups.
+        3. Groups contain the actual menu links.
+      tags:
+      - Dashboard
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  description: Represents a main menu item.
+                  type: object
+                  properties:
+                    description:
+                      description: The menu description.
+                      minLength: 1
+                      type: string
+                    groups:
+                      items:
+                        properties:
+                          key:
+                            description: The key of the group.
+                            minLength: 1
+                            type: string
+                          links:
+                            items:
+                              properties:
+                                badge:
+                                  description: >-
+                                    Information about a badge to display beside
+                                    the link.
+                                  properties:
+                                    text:
+                                      description: Literal text for the badge.
+                                      minLength: 1
+                                      type: string
+                                    type:
+                                      description: The type of badge.
+                                      enum:
+                                      - view
+                                      - text
+                                      minLength: 1
+                                      type: string
+                                    url:
+                                      description: The URL of a view.
+                                      type: string
+                                  type: object
+                                key:
+                                  description: The key of the link.
+                                  minLength: 1
+                                  type: string
+                                name:
+                                  description: The title of the link.
+                                  minLength: 1
+                                  type: string
+                                react:
+                                  description: >-
+                                    Whether or not the link represents a React
+                                    component.
+                                  type: boolean
+                                url:
+                                  description: The URL of the link.
+                                  minLength: 1
+                                  type: string
+                              required:
+                              - name
+                              - key
+                              - url
+                              - react
+                              type: object
+                            type: array
+                          name:
+                            description: The title of the group.
+                            minLength: 1
+                            type: string
+                        required:
+                        - name
+                        - key
+                        - links
+                        type: object
+                      type: array
+                    key:
+                      description: The ID of the menu.
+                      minLength: 1
+                      type: string
+                    name:
+                      description: The title of the menu.
+                      minLength: 1
+                      type: string
+                    url:
+                      description: The URL to the menu if it doesn't have a submenu.
+                      type: string
+                  required:
+                  - name
+                  - key
+                  - description
+                  - groups
+                type: array
+          description: Success

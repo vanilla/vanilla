@@ -1,0 +1,239 @@
+openapi: 3.0.2
+info:
+  description: API access to your community.
+  title: Vanilla API
+  version: 2.0-alpha
+servers:
+- url: /api/v2
+paths:
+  /addons:
+    get:
+      parameters:
+      - description: The type of addon.
+        in: query
+        name: type
+        schema:
+          enum:
+          - addon
+          - theme
+          - locale
+          type: string
+      - description: |
+          Filter enabled or disabled addons.
+        in: query
+        name: enabled
+        schema:
+          type: boolean
+      - description: |
+          Which theme to show the enabled status for.
+        in: query
+        name: themeType
+        schema:
+          type: string
+          default: desktop
+          enum:
+          - desktop
+          - mobile
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/Addon'
+                type: array
+          description: Success
+      tags:
+      - Addons
+      summary: List addons.
+  '/addons/{addonID}':
+    get:
+      parameters:
+      - description: |
+          The ID of the addon.
+        in: path
+        name: addonID
+        required: true
+        schema:
+          minLength: 1
+          type: string
+      - description: |
+          Which theme to show the enabled status for.
+        in: query
+        name: themeType
+        schema:
+          type: string
+          default: desktop
+          enum:
+          - desktop
+          - mobile
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Addon'
+          description: Success
+      tags:
+      - Addons
+      summary: Get an addon.
+    patch:
+      parameters:
+      - description: The ID of the addon.
+        in: path
+        name: addonID
+        required: true
+        schema:
+          minLength: 1
+          type: string
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/Addon'
+                type: array
+          description: Success
+      tags:
+      - Addons
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                enabled:
+                  description: Enable or disable the addon.
+                  type: boolean
+                themeType:
+                  type: string
+                  default: desktop
+                  description: Which theme type to set.
+                  enum:
+                  - desktop
+                  - mobile
+              required:
+              - enabled
+              type: object
+        required: true
+      summary: Enable or disable an addon.
+components:
+  schemas:
+    Addon:
+      properties:
+        addonID:
+          description: The ID of the addon used for API calls.
+          minLength: 1
+          type: string
+        conflict:
+          description: An array of addons that conflict with this addon.
+          items:
+            properties:
+              addonID:
+                description: The ID of the addon used for API calls.
+                minLength: 1
+                type: string
+              constraint:
+                description: The version requirement.
+                minLength: 1
+                type: string
+              key:
+                description: The unique key that identifies the addon
+                minLength: 1
+                type: string
+              name:
+                description: The name of the addon.
+                minLength: 1
+                type: string
+              type:
+                description: The type of addon.
+                enum:
+                - addon
+                - theme
+                - locale
+                minLength: 1
+                type: string
+            required:
+            - addonID
+            - name
+            - key
+            - type
+            - constraint
+            type: object
+          type: array
+        description:
+          description: The addon's description
+          type: string
+        enabled:
+          description: Whether or not the addon is enabled.
+          type: boolean
+        iconUrl:
+          description: The addon's icon.
+          format: uri
+          minLength: 1
+          type: string
+        key:
+          description: The unique key that identifies the addon
+          minLength: 1
+          type: string
+        name:
+          description: The name of the addon.
+          minLength: 1
+          type: string
+        require:
+          description: An array of addons that are required to enable the addon.
+          items:
+            properties:
+              addonID:
+                description: The ID of the addon used for API calls.
+                minLength: 1
+                type: string
+              constraint:
+                description: The version requirement.
+                minLength: 1
+                type: string
+              key:
+                description: The unique key that identifies the addon
+                minLength: 1
+                type: string
+              name:
+                description: The name of the addon.
+                minLength: 1
+                type: string
+              type:
+                description: The type of addon.
+                enum:
+                - addon
+                - theme
+                - locale
+                minLength: 1
+                type: string
+            required:
+            - addonID
+            - name
+            - key
+            - type
+            - constraint
+            type: object
+          type: array
+        type:
+          description: The type of addon.
+          enum:
+          - addon
+          - theme
+          - locale
+          minLength: 1
+          type: string
+        version:
+          description: The addon's version.
+          minLength: 1
+          type: string
+      required:
+      - addonID
+      - name
+      - key
+      - type
+      - iconUrl
+      - version
+      - enabled
+      type: object

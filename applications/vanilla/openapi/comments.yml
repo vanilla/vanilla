@@ -1,0 +1,690 @@
+openapi: 3.0.2
+info:
+paths:
+  /comments:
+    get:
+      parameters:
+      - description: |
+          When the comment was created. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).
+        in: query
+        name: dateInserted
+        schema:
+          format: date-filter
+          type: string
+      - description: >
+          When the comment was updated. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).
+        in: query
+        name: dateUpdated
+        schema:
+          format: date-filter
+          type: string
+      - description: |
+          The discussion ID.
+        in: query
+        name: discussionID
+        schema:
+          type: integer
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          maximum: 100
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: '30'
+          maximum: 100
+          minimum: 1
+      - description: |
+          Filter by author.
+        in: query
+        name: insertUserID
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - insertUser
+            - all
+            - reactions
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/Comment'
+                type: array
+          description: Success
+      tags:
+      - Comments
+      summary: List comments.
+    post:
+      responses:
+        '201':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: Success
+      tags:
+      - Comments
+      requestBody:
+        $ref: '#/components/requestBodies/CommentPost'
+      summary: Add a comment.
+  /comments/search:
+    get:
+      parameters:
+      - description: |
+          The numeric ID of a category.
+        in: query
+        name: categoryID
+        schema:
+          type: integer
+      - description: |
+          Search terms.
+        in: query
+        name: query
+        required: true
+        schema:
+          minLength: 1
+          type: string
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          maximum: 100
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      - description: |
+          Expand associated records.
+        in: query
+        name: expand
+        schema:
+          default: false
+          type: boolean
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/Comment'
+                type: array
+          description: Success
+      tags:
+      - Comments
+      summary: Search comments.
+  '/comments/{id}':
+    delete:
+      parameters:
+      - description: |
+          The comment ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - reactions
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Comments
+      summary: Delete a comment.
+    get:
+      parameters:
+      - description: |
+          The comment ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - reactions
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: Success
+      tags:
+      - Comments
+      summary: Get a comment.
+    patch:
+      parameters:
+      - description: The comment ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: Success
+      tags:
+      - Comments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentPost'
+        required: true
+      summary: Update a comment.
+  '/comments/{id}/answer':
+    patch:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: Success
+      tags:
+      - Comments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentGet'
+        required: true
+  '/comments/{id}/edit':
+    get:
+      parameters:
+      - description: |
+          The comment ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - reactions
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                properties:
+                  body:
+                    description: The body of the comment.
+                    minLength: 1
+                    type: string
+                  commentID:
+                    description: The ID of the comment.
+                    type: integer
+                  discussionID:
+                    description: The ID of the discussion.
+                    type: integer
+                  format:
+                    description: The input format of the comment.
+                    minLength: 1
+                    type: string
+                required:
+                - commentID
+                - discussionID
+                - body
+                - format
+                type: object
+          description: Success
+      tags:
+      - Comments
+      summary: Get a comment for editing.
+  '/comments/{id}/quote':
+    get:
+      parameters:
+      - description: |
+          The comment ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - reactions
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                properties:
+                  bodyRaw:
+                    description: >-
+                      The raw body of the comment. This can be an array of rich
+                      operations or a string for other formats
+                    minLength: 1
+                    type: string
+                  commentID:
+                    description: The ID of the comment.
+                    type: integer
+                  dateInserted:
+                    description: When the comment was created.
+                    format: date-time
+                    type: string
+                  dateUpdated:
+                    description: When the comment was last updated.
+                    format: date-time
+                    nullable: true
+                    type: string
+                  format:
+                    description: The original format of the comment
+                    minLength: 1
+                    type: string
+                  insertUser:
+                    $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment'
+                  url:
+                    description: The full URL to the comment.
+                    minLength: 1
+                    type: string
+                required:
+                - commentID
+                - bodyRaw
+                - dateInserted
+                - dateUpdated
+                - insertUser
+                - url
+                - format
+                type: object
+          description: Success
+      tags:
+      - Comments
+  '/comments/{id}/reactions':
+    x-addon: reactions
+    get:
+      parameters:
+      - description: |
+          The comment ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - reactions
+            - all
+            type: string
+          type: array
+        style: form
+      - description: |
+          Filter to a specific reaction type by using its URL code.
+        in: query
+        name: type
+        required: true
+        schema:
+          minLength: 1
+          type: string
+        allowEmptyValue: true
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          maximum: 100
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  properties:
+                    dateInserted:
+                      format: date-time
+                      type: string
+                    reactionType:
+                      properties:
+                        class:
+                          minLength: 1
+                          type: string
+                        name:
+                          minLength: 1
+                          type: string
+                        tagID:
+                          type: integer
+                        urlcode:
+                          minLength: 1
+                          type: string
+                      required:
+                      - tagID
+                      - urlcode
+                      - name
+                      - class
+                      type: object
+                    recordID:
+                      type: integer
+                    recordType:
+                      minLength: 1
+                      type: string
+                    tagID:
+                      type: integer
+                    user:
+                      $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment'
+                    userID:
+                      type: integer
+                  required:
+                  - recordType
+                  - recordID
+                  - tagID
+                  - userID
+                  - dateInserted
+                  - user
+                  - reactionType
+                  type: object
+                type: array
+          description: Success
+      tags:
+      - Comments
+      summary: Get reactions to a comment.
+    post:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  properties:
+                    class:
+                      minLength: 1
+                      type: string
+                    count:
+                      type: integer
+                    name:
+                      minLength: 1
+                      type: string
+                    tagID:
+                      type: integer
+                    urlcode:
+                      minLength: 1
+                      type: string
+                  required:
+                  - tagID
+                  - urlcode
+                  - name
+                  - class
+                  - count
+                  type: object
+                type: array
+          description: Success
+      tags:
+      - Comments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                reactionType:
+                  description: URL code of a reaction type.
+                  minLength: 1
+                  type: string
+              required:
+              - reactionType
+              type: object
+        required: true
+      summary: React to a comment.
+  '/comments/{id}/reactions/{userID}':
+    x-addon: reactions
+    delete:
+      parameters:
+      - description: |
+          The comment ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: |
+          The target user ID.
+        in: path
+        name: userID
+        required: true
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - reactions
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Comments
+      summary: Remove a user's reaction.
+components:
+  requestBodies:
+    CommentPost:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CommentPost'
+      required: true
+  schemas:
+    Comment:
+      properties:
+        attributes:
+          nullable: true
+          properties:
+            hootsuite:
+              description: Hootsuite metadata.
+              type: object
+              x-addon: hootsuite
+          type: object
+        body:
+          description: The body of the comment.
+          minLength: 1
+          type: string
+        commentID:
+          description: The ID of the comment.
+          type: integer
+        dateInserted:
+          description: When the comment was created.
+          format: date-time
+          type: string
+        dateUpdated:
+          description: When the comment was last updated.
+          format: date-time
+          nullable: true
+          type: string
+        discussionID:
+          description: The ID of the discussion.
+          type: integer
+        insertUser:
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment'
+        insertUserID:
+          description: The user that created the comment.
+          type: integer
+        reactions:
+          x-addon: reactions
+          type: array
+          items:
+            properties:
+              class:
+                minLength: 1
+                type: string
+              count:
+                type: integer
+              name:
+                minLength: 1
+                type: string
+              tagID:
+                type: integer
+              urlcode:
+                minLength: 1
+                type: string
+            required:
+            - tagID
+            - urlcode
+            - name
+            - class
+            - count
+            type: object
+          x-addon: reactions
+        score:
+          description: Total points associated with this post.
+          nullable: true
+          type: integer
+        url:
+          description: The full URL to the comment.
+          type: string
+      required:
+      - commentID
+      - discussionID
+      - body
+      - dateInserted
+      - dateUpdated
+      - insertUserID
+      - score
+      - attributes
+      type: object
+    CommentGet:
+      properties:
+        expand:
+          description: >-
+            Expand associated records using one or more valid field names. A
+            value of "all" will expand all expandable fields.
+          items:
+            enum:
+            - reactions
+            - all
+            type: string
+          type: array
+          x-collectionFormat: csv
+        id:
+          description: The comment ID.
+          type: integer
+      required:
+      - id
+      type: object
+    CommentPost:
+      properties:
+        body:
+          description: The body of the comment.
+          minLength: 1
+          type: string
+        discussionID:
+          description: The ID of the discussion.
+          type: integer
+        format:
+          description: The input format of the comment.
+          minLength: 1
+          type: string
+      required:
+      - body
+      - format
+      - discussionID
+      type: object

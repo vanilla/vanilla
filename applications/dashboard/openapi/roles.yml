@@ -1,0 +1,332 @@
+openapi: 3.0.2
+info:
+paths:
+  /roles:
+    get:
+      parameters:
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - permissions
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Role'
+                type: array
+          description: Success
+      tags:
+      - Roles
+      summary: List roles.
+    post:
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+          description: Success
+      tags:
+      - Roles
+      requestBody:
+        $ref: '#/components/requestBodies/RolePost'
+      summary: Add a role.
+  '/roles/{id}':
+    delete:
+      parameters:
+      - description: |
+          The role ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Roles
+      summary: Delete a role.
+    get:
+      parameters:
+      - description: |
+          The role ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - permissions
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+          description: Success
+      tags:
+      - Roles
+      summary: Get a role.
+    patch:
+      parameters:
+      - description: The role ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+          description: Success
+      tags:
+      - Roles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RolePost'
+        required: true
+      summary: Update a role.
+  '/roles/{id}/edit':
+    get:
+      parameters:
+      - description: |
+          The role ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                properties:
+                  canSession:
+                    description: Can users in this role start a session?
+                    type: boolean
+                  deletable:
+                    description: Is the role deletable?
+                    type: boolean
+                  description:
+                    description: Description of the role.
+                    minLength: 0
+                    nullable: true
+                    type: string
+                  name:
+                    description: Name of the role.
+                    minLength: 1
+                    type: string
+                  personalInfo:
+                    description: Is membership in this role personal information?
+                    type: boolean
+                  roleID:
+                    description: ID of the role.
+                    type: integer
+                  type:
+                    description: Default type of this role.
+                    minLength: 0
+                    nullable: true
+                    type: string
+                required:
+                - roleID
+                - name
+                - description
+                - type
+                - deletable
+                - canSession
+                - personalInfo
+                type: object
+          description: Success
+      tags:
+      - Roles
+      summary: Get a role for editing.
+  '/roles/{id}/permissions':
+    patch:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/PermissionFragment'
+                type: array
+          description: Success
+      tags:
+      - Roles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/PermissionFragment'
+              type: array
+        required: true
+      summary: Update permissions on a role
+    put:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/PermissionFragment'
+                type: array
+          description: Success
+      tags:
+      - Roles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/PermissionFragment'
+              type: array
+        required: true
+      summary: Overwrite all permissions for a role.
+components:
+  requestBodies:
+    RolePost:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RolePost'
+      required: true
+    PermissionFragmentArray:
+      content:
+        application/json:
+          schema:
+            items:
+              $ref: '#/components/schemas/PermissionFragment'
+            type: array
+      required: true
+  schemas:
+    PermissionFragment:
+      properties:
+        id:
+          type: integer
+        permissions:
+          type: object
+        type:
+          enum:
+          - global
+          - category
+          minLength: 1
+          type: string
+      required:
+      - type
+      - permissions
+      type: object
+    Role:
+      properties:
+        canSession:
+          description: Can users in this role start a session?
+          type: boolean
+        deletable:
+          description: Is the role deletable?
+          type: boolean
+        description:
+          description: Description of the role.
+          minLength: 0
+          nullable: true
+          type: string
+        name:
+          description: Name of the role.
+          minLength: 1
+          type: string
+        permissions:
+          items:
+            $ref: '#/components/schemas/PermissionFragment'
+          type: array
+        personalInfo:
+          description: Is membership in this role personal information?
+          type: boolean
+        roleID:
+          description: ID of the role.
+          type: integer
+        type:
+          description: Default type of this role.
+          minLength: 0
+          nullable: true
+          type: string
+      required:
+      - roleID
+      - name
+      - description
+      - type
+      - deletable
+      - canSession
+      - personalInfo
+      type: object
+    RolePost:
+      properties:
+        canSession:
+          description: Can users in this role start a session?
+          type: boolean
+        deletable:
+          description: Is the role deletable?
+          type: boolean
+        description:
+          description: Description of the role.
+          minLength: 0
+          nullable: true
+          type: string
+        name:
+          description: Name of the role.
+          minLength: 1
+          type: string
+        permissions:
+          items:
+            $ref: '#/components/schemas/PermissionFragment'
+          type: array
+        personalInfo:
+          description: Is membership in this role personal information?
+          type: boolean
+        type:
+          description: Default type of this role.
+          minLength: 0
+          nullable: true
+          type: string
+      required:
+      - name
+      type: object

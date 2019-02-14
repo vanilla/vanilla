@@ -1670,7 +1670,12 @@ class CommentModel extends Gdn_Model {
 
         // Can the current user edit all comments in this category?
         $category = CategoryModel::categories(val('CategoryID', $discussion));
-        if (!CategoryModel::checkPermission($category, 'Vanilla.Comments.Edit')) {
+        if (CategoryModel::checkPermission($category, 'Vanilla.Comments.Edit')) {
+            return true;
+        }
+
+        //
+        if (CategoryModel::checkPermission($category, 'Vanilla.Comments.View')) {
             return false;
         }
 

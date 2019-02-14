@@ -865,6 +865,18 @@ $Construct
     ->column("dateUpdated", "datetime")
     ->set($Explicit, $Drop);
 
+$Construct
+    ->table("reaction")
+    ->primaryKey("reactionID")
+    ->column("ownerType", "varchar(64)", false, ["index", "index.record"])
+    ->column("reactionType", "varchar(64)", false, ["index", "index.record"])
+    ->column("recordType", "varchar(64)", false, ["index", "index.record"])
+    ->column("recordID", "int", false, "index.record")
+    ->column("reactionValue", "int", false)
+    ->column("insertUserID", "int", false, ["index"])
+    ->column("dateInserted", "datetime")
+    ->set($Explicit, $Drop);
+
 // If the AllIPAddresses column exists, attempt to migrate legacy IP data to the UserIP table.
 if (!$captureOnly && $AllIPAddressesExists) {
     $limit = 10000;

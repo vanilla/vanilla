@@ -26,7 +26,7 @@ export const globalVariables = (theme?: object) => {
         fg: color("#555a62"),
         bg: color("#fff"),
         primary: colorPrimary,
-        secondary: getColorDependantOnLightness(colorPrimary, colorPrimary, 0.1),
+        secondary: getColorDependantOnLightness(colorPrimary, colorPrimary, 0.1, true),
         ...themeVars.subComponentStyles("mainColors"),
     };
 
@@ -135,6 +135,12 @@ export const globalVariables = (theme?: object) => {
 
     const spacer = fonts.size.medium * lineHeights.base;
 
+    const animation = {
+        defaultTiming: ".15s",
+        defaultEasing: "ease-out",
+        ...themeVars.subComponentStyles("animation"),
+    };
+
     return {
         utility,
         elementaryColors,
@@ -150,5 +156,6 @@ export const globalVariables = (theme?: object) => {
         lineHeights,
         icon,
         mixBgAndFg,
+        animation,
     };
 };

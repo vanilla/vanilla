@@ -35,7 +35,7 @@ $searchBar-searchIcon_space: 32px;
     align-items: flex-start;
     justify-content: flex-start;
     position: relative;
-    height: $formElement-height;
+    min-height: $formElement-height;
 }
 
 .searchBar-inputWrap {

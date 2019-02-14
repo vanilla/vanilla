@@ -76,7 +76,7 @@ export default function vanillaHeaderNavClasses() {
                         "&.vanillaHeaderNav-linkContent": {
                             $nest: {
                                 "&:after": {
-                                    marginLeft: -2,
+                                    marginLeft: px(-2),
                                     width: calc(`100% + 4px`),
                                     borderBottomColor: vars.border.active.border.color.toString(),
                                 },

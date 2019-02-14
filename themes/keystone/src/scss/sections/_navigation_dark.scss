@@ -7,7 +7,7 @@
 .Navigation-linkContainer {
 
     &::after {
-        width: calc(100% - (#{$utility-large_padding} * 2));
+        width: calc(100% - (#{$utility-baseUnitTriple} * 2));
         margin: 0 auto;
     }
 }

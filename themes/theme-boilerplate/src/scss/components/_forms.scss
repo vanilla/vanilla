@@ -269,6 +269,7 @@ div.token-input-dropdown {
     );
 }
 
+.groupToolbar .Button.Primary,
 .BoxButtons .Button.Primary {
     @include Button(
         $button-primary_bg,
@@ -363,6 +364,10 @@ div.token-input-dropdown {
 .CommentForm textarea.TextBox,
 .DiscussionForm textarea.TextBox {
     min-height: 100px;
+}
+
+.FormTitleWrapper .H {
+    margin-bottom: $utility-baseUnit;
 }
 
 .Form-HeaderWrap .Author {

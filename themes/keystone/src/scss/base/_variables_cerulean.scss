@@ -37,8 +37,6 @@ $global-color_secondary:                $global-color_apricot !default;
 $global-color_bg:                       $global-color_white !default;
 $global-color_fg:                       darken(desaturate($global-color_cerulean, 1%), 10%) !default; // text color | should have high contrast between $global-color_bg
 
-$global-body_bg:                        $global-color_bg !default;
-
 /* -------------------------------------------------------------- *\
     Theme
 \* -------------------------------------------------------------- */
@@ -59,12 +57,19 @@ $header-hover_color:                     $global-color_white !default;
 $header_border:                          1px solid rgba($header_bg, .3) !default;
 
 /* -------------------------------------------------------------- *\
+    Navigation
+\* -------------------------------------------------------------- */
+
+$navigation_fg:                          $global-color_white !default;
+
+/* -------------------------------------------------------------- *\
     Panel
 \* -------------------------------------------------------------- */
 
 $panel-hover_bg:                         transparent  !default;
 
-$panel_item-spacing:                     6px !default;
+$panel_item-spacing:                     $utility-baseUnit !default;
+$panel-item_padding:                     $utility-baseUnit !default;
 $panel_item-borderRadius:                $global_borderRadius !default;
 
 /* -------------------------------------------------------------- *\
@@ -95,9 +100,10 @@ $hamburger_color:                         $global-color_white !default;
     Components
 \* -------------------------------------------------------------- */
 
-
+$component_lateralBorder:                true !default;
 $component-item_spacing:                 $utility-baseUnitDouble !default;
 $component_borderWidth:                  0 !default;
+$component_borderRadius:                 $global_borderRadius !default;
 $component_borderColor:                  $theme-border_color !default;
 $component_boxShadow:                    0 1px 4px 0 rgba(0,0,0, .3) !default;
 
@@ -106,17 +112,3 @@ $component_boxShadow:                    0 1px 4px 0 rgba(0,0,0, .3) !default;
 \* -------------------------------------------------------------- */
 
 $pager_border:                           1px solid $component_borderColor !default;
-
-/* -------------------------------------------------------------- *\
-    Bullet
-\* -------------------------------------------------------------- */
-
-$bullet_bg:                              $global-color_secondary !default;
-$bullet_borderColor:                     $global-color_secondary !default;
-
-/* -------------------------------------------------------------- *\
-    Count
-\* -------------------------------------------------------------- */
-
-$count-hover_bg:                         $global-color_secondary !default;
-$count-hover_borderColor:                $global-color_secondary !default;

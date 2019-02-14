@@ -21,11 +21,11 @@
             overflow: visible;
         }
     }
-    background-color: $frame_backgroundColor;
-    background-image: $frame_backgroundImage;
-    background-size: $frame_backgroundSize;
-    background-position: $frame_backgroundPosition;
-    background-repeat: $frame_backgroundRepeat;
+    background-color: $body_bg;
+    background-image: $body_backgroundImage;
+    background-size: $body_backgroundSize;
+    background-position: $body_backgroundPosition;
+    background-repeat: $body_backgroundRepeat;
 }
 
 .Frame-top {
@@ -35,17 +35,29 @@
 }
 
 .Frame-contentWrap {
-    background-color: $content_bg;
+    background-color: $frame_bg;
     border: $frame_border;
     box-shadow: $frame_boxShadow;
-    border-radius: $frame_borderRadius;
-    padding-top: $content_padding;
-    padding-bottom: $content_padding;
+    padding-top: $frame_padding;
+    padding-bottom: 48px;
     @include framePaddingReverse();
+
+    @include maxWidth {
+        padding-top: $frame-mobile_padding;
+        padding-bottom: $frame-mobile_padding;
+    }
 }
 
 .Frame-details {
     @include clearfix;
+
+    .SearchBoxMobile {
+        display: none;
+
+        @include maxWidth {
+            display: block;
+        }
+    }
 }
 
 .Container {
@@ -62,6 +74,9 @@
 }
 
 .MainContent.Content {
+    background-color: $content_bg;
+    border: $frame_border;
+    padding: $content_padding;
     border-radius: $content_borderRadius;
     border: $content_border;
     width: calc(100% - #{$panel_width + $panel_gap});
@@ -72,8 +87,8 @@
     }
 
     @include maxWidth($theme-breakpoint_tablet) {
-            width: 100%;
-            order: 0;
+        width: 100%;
+        order: 0;
     }
 }
 

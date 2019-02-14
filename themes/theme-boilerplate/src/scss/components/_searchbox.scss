@@ -17,11 +17,12 @@ $searchbox-button_borderWidth: 0 !default;
 \* -------------------------------------------------------------- */
 
 .InputAndButton .BigInput,
-#Form_Search {
+.InputBox.js-search {
     font-size: inherit;
     width: 100%;
     padding: $formElement_paddingVertical $formElement_paddingHorizontal;
     border-color: $formElement_borderColor;
+    padding-right: $formElement_height;
 
     &::placeholder {
         color: $formElement_borderColor;
@@ -62,7 +63,7 @@ $searchbox-button_borderWidth: 0 !default;
 
 .SearchForm .SiteSearch .Button,
 .AdvancedSearch .bwrap .Button,
-#Form_Go {
+.InputBox.js-search + input {
     background: transparent;
     border-color: $searchbox-button_borderColor;
     border-width: $searchbox-button_borderWidth;
@@ -114,8 +115,15 @@ $searchbox-button_borderWidth: 0 !default;
     }
 }
 
-#Form_Go {
+.InputBox.js-search + input {
     color: transparent;
+
+    &:focus,
+    &:hover,
+    &:active {
+        color: transparent;
+    }
+
 }
 
 .SearchForm .InputBox {
@@ -134,7 +142,7 @@ $searchbox-button_borderWidth: 0 !default;
 
 .SearchBox {
     width: 100%;
-    margin-bottom: $utility-large_padding;
+    margin-bottom: $utility-baseUnitTriple;
     position: relative;
     @include clearfix;
 
@@ -173,4 +181,8 @@ $searchbox-button_borderWidth: 0 !default;
     width: $formElement_height;
     line-height: $formElement_height;
     pointer-events: none;
+}
+
+.SearchBoxMobile .Handle.Handle {
+    display: none;
 }

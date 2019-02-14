@@ -42,9 +42,9 @@
         }
 
         .Alert {
-            color: $headerMebutton_fg;
+            color: $headerMeBoxAlert_fg;
             background-color: $headerMeBoxAlert_bg;
-            border-color: $headerMeBoxAlert_bg;
+            border-color: $headerMeBoxAlert_borderColor;
         }
     }
 

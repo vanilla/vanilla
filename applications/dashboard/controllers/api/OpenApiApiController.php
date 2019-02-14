@@ -60,8 +60,6 @@ class OpenApiApiController extends Controller {
      *
      * @param array $query The querystring.
      * @return array Returns the OpenAPI object as an array.
-     * @throws \Garden\Schema\ValidationException
-     * @throws \Garden\Web\Exception\HttpException
      */
     public function get_v3(array $query = []) {
         $this->permission('Garden.Settings.Manage');

@@ -1,1 +1,5 @@
-<?php return false;
+<?php
+/**
+ * Test file.
+ */
+return false;

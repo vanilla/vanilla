@@ -30,6 +30,7 @@ class OpenAPIBuilder {
      * OpenAPIBuilder constructor.
      *
      * @param AddonManager $addonManager The addon manager used to get a list of addons to combine.
+     * @param string $cachePath The path to cache the built OpenAPI spec.
      */
     public function __construct(AddonManager $addonManager, string $cachePath = '') {
         $this->addonManager = $addonManager;

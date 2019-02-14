@@ -27,7 +27,7 @@ $global-color_fg:                       $global-color_white !default; // text co
 
 $global-body_bg:                        $global-color_bg !default;
 
-$global_borderRadius:                   4px !default;
+$global_borderRadius:                   6px !default;
 
 /* -------------------------------------------------------------- *\
     Theme Colors
@@ -36,6 +36,7 @@ $global_borderRadius:                   4px !default;
 $theme-border_color:                    mix($global-color_fg, $global-color_bg, 14%) !default;
 
 $theme-link-hover_textDecoration:       none !default;
+$theme-photo_round:                     false !default;
 
 $theme-heading_color:                   $global-color_secondary !default;
 $theme-heading-hover_color:             $global-color_primaryAlt !default;
@@ -114,32 +115,32 @@ $component_lateralBorder:                true !default;
     Tags
 \* -------------------------------------------------------------- */
 
-$tag_borderColor:                 $button-basic_border !default;
-$tag_fg:                          $button-basic_fg !default;
-$tag-hover_bg:                    $button-basic-hover_bg !default;
-$tag-hover_fg:                    $global-color_primary !default;
-$tag-hover_borderColor:           $global-color_primary !default;
+$tag_borderColor:                        $button-basic_border !default;
+$tag_fg:                                 $button-basic_fg !default;
+$tag-hover_bg:                           $button-basic-hover_bg !default;
+$tag-hover_fg:                           $global-color_primary !default;
+$tag-hover_borderColor:                  $global-color_primary !default;
 
 /* -------------------------------------------------------------- *\
     Form Elements
 \* -------------------------------------------------------------- */
 
 $formElement_height:                     36px !default;
-$formElement_borderRadius:               25px !default;
+$formElement_borderRadius:               $global_borderRadius !default;
 
 /* -------------------------------------------------------------- *\
     Buttons
 \* -------------------------------------------------------------- */
 
 $formButton_height:                      $formElement_height !default;
-$formButton_borderRadius:                #{$formButton_height / 2} !default;
+$formButton_borderRadius:                $global_borderRadius !default;
 
 /* -------------------------------------------------------------- *\
     Navigation
 \* -------------------------------------------------------------- */
 
-$navigation_bg:                          mix($global-color_bg, $global-color_black, 80%) !default;
-$navigation_border:                      $theme-border_color !default;
+$navigation_bg:                          $header_bg !default;
+$navigation_border:                      mix($header_bg, $global-color_black, 12%) !default;
 
 /* -------------------------------------------------------------- *\
     Mebox

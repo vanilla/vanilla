@@ -10,7 +10,7 @@
 
 $GroupBanner-height: 230px;
 $GroupIcon-size: 140px;
-$GroupIcon-overlap: #{50px + $utility-large_padding};
+$GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
 
 .Section-Group {
 
@@ -158,7 +158,7 @@ $GroupIcon-overlap: #{50px + $utility-large_padding};
             margin: 0;
         }
 
-        .ItemContent {
+        .ItemContent.ItemContent {
             padding-left: 0;
         }
 
@@ -239,7 +239,7 @@ $GroupIcon-overlap: #{50px + $utility-large_padding};
     background-size: cover;
     background-position: 50% 50%;
     background-repeat: no-repeat;
-    margin-bottom: $utility-large_padding;
+    margin-bottom: $utility-baseUnitTriple;
     box-shadow: inset 0 0 3px 1px rgba($global-color_black, 0.4);
 
     @include maxWidth($theme-breakpoint_tablet) {
@@ -257,7 +257,7 @@ $GroupIcon-overlap: #{50px + $utility-large_padding};
         flex-wrap: wrap;
 
         .Button + .Button {
-            margin-top: $utility-large_padding;
+            margin-top: $utility-baseUnitTriple;
         }
     }
 
@@ -282,11 +282,11 @@ $GroupIcon-overlap: #{50px + $utility-large_padding};
 
 .GroupOptions {
     position: absolute;
-    top: calc(#{$GroupBanner-height} + #{$utility-large_padding});
+    top: calc(#{$GroupBanner-height} + #{$utility-baseUnitTriple});
     right: 0;
 
     @include maxWidth($theme-breakpoint_tablet) {
-        top: calc((#{$GroupBanner-height} - 50px) + #{$utility-large_padding});
+        top: calc((#{$GroupBanner-height} - 50px) + #{$utility-baseUnitTriple});
     }
 }
 
@@ -296,7 +296,7 @@ $GroupIcon-overlap: #{50px + $utility-large_padding};
     height: $GroupIcon-size;
     width: $GroupIcon-size;
     background-color: $global-color_white;
-    margin: -$GroupIcon-overlap $utility-large_padding $utility-large_padding $utility-large_padding;
+    margin: -$GroupIcon-overlap $utility-baseUnitTriple $utility-baseUnitTriple $utility-baseUnitTriple;
     border-radius: $component_borderRadius;
     box-shadow: 0 0 0 1px rgba($global-color_black, 0.2);
 
@@ -330,7 +330,7 @@ $GroupIcon-overlap: #{50px + $utility-large_padding};
 }
 
 .Group-Description {
-    margin-bottom: $utility_large_padding;
+    margin-bottom: $utility-baseUnitTriple;
 
     @include maxWidth {
         display: none;
@@ -338,11 +338,11 @@ $GroupIcon-overlap: #{50px + $utility-large_padding};
 }
 
 .Group-Header-Info {
-    padding-left: calc(#{$GroupIcon-size} + (#{$utility-large_padding} * 2));
+    padding-left: calc(#{$GroupIcon-size} + (#{$utility-baseUnitTriple} * 2));
 
     @include maxWidth {
         padding-left: 0;
-        margin-bottom: $utility-large_padding;
+        margin-bottom: $utility-baseUnitTriple;
     }
 }
 
@@ -401,7 +401,7 @@ body.noGroupIcon {
 
 // Over selected on core...
 .Group-Header.Group-Header.Group-Header.NoBanner {
-    margin-bottom: $utility-large_padding;
+    margin-bottom: $utility-baseUnitTriple;
 }
 
 .Group-Header.NoBanner {
@@ -417,7 +417,7 @@ body.noGroupIcon {
     }
 
     .Group-Header-Info {
-        padding-left: calc(#{$GroupIcon-size} + #{$utility-large_padding});
+        padding-left: calc(#{$GroupIcon-size} + #{$utility-baseUnitTriple});
 
         @include maxWidth {
             padding-left: 0;
@@ -426,7 +426,7 @@ body.noGroupIcon {
 
     .Group-Icon-Big-Wrap {
         position: absolute;
-        margin: 0 $utility-large_padding 0 0;
+        margin: 0 $utility-baseUnitTriple 0 0;
         z-index: 1;
         flex: 1 0 $GroupIcon-size;
     }
@@ -484,7 +484,7 @@ body.noGroupIcon {
 
     .Group-Header + form,
     .Group-Box {
-        margin-bottom: $utility-large_padding;
+        margin-bottom: $utility-baseUnitTriple;
     }
 
     .Group-RemoveMember {
@@ -521,7 +521,7 @@ body.noGroupIcon {
     .AttendeeList.AttendeeList h3 {
         font-size: $global-subTitle_fontSize;
         font-weight: $global-heading_fontWeight;
-        margin-bottom: $utility-large_padding;
+        margin-bottom: $utility-baseUnitTriple;
         display: flex;
         align-items: center;
         justify-content: space-between;

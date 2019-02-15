@@ -32,5 +32,35 @@
             "Coral": "%s_coral",
             "Dusk": "%s_dusk"
         }
+    },
+    "assets": {
+        "header": {
+            "type": "html",
+            "file": "header.html"
+        },
+        "footer": {
+            "type": "html",
+            "file": "footer.html"
+        },
+        "variables": {
+            "type": "json",
+            "file": "variables.json"
+        },
+        "fonts": {
+            "type": "json",
+            "file": "fonts.json"
+        },
+        "scripts": {
+            "type": "json",
+            "file": "scripts.json"
+        },
+        "styles": {
+            "type": "css",
+            "file": "styles.css"
+        },
+        "inlineJs": {
+            "type": "js",
+            "file": "inlineJs.js"
+        }
     }
 }

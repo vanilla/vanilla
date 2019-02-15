@@ -21,9 +21,9 @@ interface IProps {
     theme?: object;
     accessibleTitle?: string;
     previousTitle: string;
-    previousTo: string;
+    previousTo?: string;
     nextTitle: string;
-    nextTo: string;
+    nextTo?: string;
 }
 
 /**
@@ -155,30 +155,38 @@ export default class NextPrevious extends React.Component<IProps> {
 
     public render() {
         const { accessibleTitle, theme, className, previousTitle, previousTo, nextTitle, nextTo } = this.props;
-        const classes = this.nextPreviousStyles(theme);
 
-        return (
-            <nav className={classNames(className, classes.root)}>
-                <ScreenReaderContent>
-                    <Heading title={accessibleTitle} />
-                </ScreenReaderContent>
-                {/* Left */}
-                <AdjacentLink
-                    className={classes.previous}
-                    classes={classes}
-                    direction={LeftRight.LEFT}
-                    to={previousTo}
-                    title={previousTitle}
-                />
-                {/* Right */}
-                <AdjacentLink
-                    className={classes.next}
-                    classes={classes}
-                    direction={LeftRight.RIGHT}
-                    to={nextTo}
-                    title={nextTitle}
-                />
-            </nav>
-        );
+        if (!nextTo && !previousTo) {
+            return null; // skip if no sibling pages exist
+        } else {
+            const classes = this.nextPreviousStyles(theme);
+            return (
+                <nav className={classNames(className, classes.root)}>
+                    <ScreenReaderContent>
+                        <Heading title={accessibleTitle} />
+                    </ScreenReaderContent>
+                    {/* Left */}
+                    {previousTo && (
+                        <AdjacentLink
+                            className={classes.previous}
+                            classes={classes}
+                            direction={LeftRight.LEFT}
+                            to={previousTo}
+                            title={previousTitle}
+                        />
+                    )}
+                    {/* Right */}
+                    {nextTo && (
+                        <AdjacentLink
+                            className={classes.next}
+                            classes={classes}
+                            direction={LeftRight.RIGHT}
+                            to={nextTo}
+                            title={nextTitle}
+                        />
+                    )}
+                </nav>
+            );
+        }
     }
 }

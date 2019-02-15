@@ -12,7 +12,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, debugHelper } from "@library/styles/styleHelpers";
 import ScreenReaderContent from "@library/components/ScreenReaderContent";
 import Heading from "@library/components/Heading";
-import AdjacentLink, { LeftRight } from "@library/components/nextPrevious/adjacentLink";
+import AdjacentLink, { LeftRight } from "@library/components/nextPrevious/AdjacentLink";
 import { px } from "csx";
 import { PanelWidget } from "@library/components/layouts/PanelLayout";
 

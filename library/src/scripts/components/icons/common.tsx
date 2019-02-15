@@ -30,7 +30,12 @@ export function rightChevron(className?: string, centred: boolean = false) {
             style={{ transform: "scaleX(-1)", transformOrigin: "50% 50%" }}
         >
             <title>{title}</title>
-            <path className="icon-chevronRightPath" d={leftChevronPath} style={currentColorFill} />
+            <path
+                transform="translate(0 1.75)"
+                className="icon-chevronRightPath"
+                d={leftChevronPath}
+                style={currentColorFill}
+            />
         </svg>
     );
 }
@@ -45,7 +50,12 @@ export function leftChevron(className?: string, centred: boolean = false) {
             aria-hidden="true"
         >
             <title>{title}</title>
-            <path className="icon-chevronLeftPath" d={leftChevronPath} style={currentColorFill} />
+            <path
+                transform="translate(0 1.75)"
+                className="icon-chevronLeftPath"
+                d={leftChevronPath}
+                style={currentColorFill}
+            />
         </svg>
     );
 }

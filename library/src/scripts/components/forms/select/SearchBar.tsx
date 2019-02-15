@@ -81,6 +81,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
         triggerSearchOnClear: false,
         buttonText: t("Search"),
         disableAutocomplete: false,
+        placeholder: "",
     };
 
     public state: IState = {
@@ -121,7 +122,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                 menuIsOpen={this.isMenuVisible}
                 classNamePrefix={this.prefix}
                 className={classNames(this.prefix, className)}
-                placeholder={this.props.placeholder || ""}
+                placeholder={this.props.placeholder}
                 aria-label={t("Search")}
                 escapeClearsValue={true}
                 pageSize={20}

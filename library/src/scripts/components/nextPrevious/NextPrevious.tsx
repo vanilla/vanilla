@@ -127,8 +127,8 @@ export default class NextPrevious extends React.Component<IProps> {
         // Common to both left and right
         const adjacent = style({
             display: "block",
-            marginTop: px(4),
-            marginBottom: px(4),
+            marginTop: px(8),
+            marginBottom: px(8),
             color: vars.colors.title.toString(),
             $nest: {
                 "&.focus-visible": activeStyles,

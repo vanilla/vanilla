@@ -41,9 +41,9 @@ export default class AdjacentLink extends React.Component<IAdjacentLinks> {
             <SmartLink to={to} className={classNames(className, classes.adjacent)}>
                 <span className={classes.directionLabel}>{isLeft ? t("Previous") : t("Next")}</span>
                 <span className={classes.title}>
-                    {isLeft
-                        ? leftChevron(classNames(classes.chevron, classes.chevronLeft))
-                        : rightChevron(classNames(classes.chevron, classes.chevronRight))}
+                    <span className={classNames(classes.chevron, isLeft ? classes.chevronLeft : classes.chevronRight)}>
+                        {isLeft ? leftChevron("adjacentLinks-icon") : rightChevron("adjacentLinks-icon")}
+                    </span>
                     {title}
                 </span>
             </SmartLink>

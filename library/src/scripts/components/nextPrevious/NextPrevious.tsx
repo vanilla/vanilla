@@ -9,11 +9,12 @@ import classNames from "classnames";
 import { t } from "@library/application";
 import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper } from "@library/styles/styleHelpers";
+import { componentThemeVariables, debugHelper } from "@library/styles/styleHelpers";
 import ScreenReaderContent from "@library/components/ScreenReaderContent";
 import Heading from "@library/components/Heading";
 import AdjacentLink, { LeftRight } from "@library/components/nextPrevious/adjacentLink";
 import { px } from "csx";
+import { PanelWidget } from "@library/components/layouts/PanelLayout";
 
 interface IProps {
     className?: string;
@@ -34,44 +35,80 @@ export default class NextPrevious extends React.Component<IProps> {
     };
 
     public nextPreviousVariables = (theme?: object) => {
-        const sizing = {};
-        const fonts = {};
-        const colors = {};
-        return { sizing, fonts, colors };
+        const globalVars = globalVariables(theme);
+        const themeVars = componentThemeVariables(theme, "nextPreviousVars");
+
+        const fonts = {
+            label: globalVars.fonts.size.small,
+            title: globalVars.fonts.size.medium,
+            ...themeVars.subComponentStyles("fonts"),
+        };
+
+        const lineHeights = {
+            label: globalVars.lineHeights.condensed,
+            title: globalVars.lineHeights.condensed,
+            ...themeVars.subComponentStyles("lineHeights"),
+        };
+
+        const colors = {
+            title: globalVars.mixBgAndFg(0.9),
+            label: globalVars.mixBgAndFg(0.85),
+            hover: globalVars.mainColors.primary,
+            ...themeVars.subComponentStyles("colors"),
+        };
+        return { lineHeights, fonts, colors };
     };
 
     public nextPreviousStyles = (theme?: object) => {
         const globalVars = globalVariables(theme);
         const vars = this.nextPreviousVariables(theme);
         const debug = debugHelper("nextPrevious");
+        const activeStyles = {
+            color: vars.colors.title.toString(),
+            $nest: {
+                ".adjacentLinks-icon": {
+                    color: globalVars.mainColors.primary.toString(),
+                },
+            },
+        };
+
         const root = style({
             display: "flex",
             alignItems: "flex-start",
             flexWrap: "wrap",
             justifyContent: "space-between",
-            paddingLeft: globalVars.icon.sizes.default,
-            paddingRight: globalVars.icon.sizes.default,
-            color: globalVars.mainColors.fg,
+            color: globalVars.mainColors.fg.toString(),
             $nest: {
-                "&:hover": { color: globalVars.mainColors.fg },
-                "&:focus": { color: globalVars.mainColors.fg },
-                "&:active": { color: globalVars.mainColors.fg },
-                "&.focus-visible": { color: globalVars.mainColors.fg },
+                "&:hover": activeStyles,
+                "&:focus": activeStyles,
+                "&:active": activeStyles,
             },
             ...debug.name(),
+        });
+
+        const directionLabel = style({
+            display: "block",
+            fontSize: px(globalVars.fonts.size.small),
+            lineHeight: globalVars.lineHeights.condensed,
+            color: vars.colors.label.toString(),
+            marginBottom: px(2),
+            ...debug.name("label"),
         });
 
         const title = style({
             display: "block",
             position: "relative",
-            fontSize: globalVars.fonts.size.medium,
+            fontSize: px(globalVars.fonts.size.medium),
             lineHeight: globalVars.lineHeights.condensed,
+            fontWeight: globalVars.fonts.weights.semiBold,
             ...debug.name("title"),
         });
 
         const chevron = style({
             position: "absolute",
-            top: px(20),
+            top: px((vars.fonts.title * vars.lineHeights.title) / 2),
+            transform: `translateY(-50%)`,
+            color: globalVars.mixBgAndFg(0.75).toString(),
             ...debug.name("chevron"),
         });
 
@@ -83,30 +120,34 @@ export default class NextPrevious extends React.Component<IProps> {
 
         const chevronRight = style({
             right: px(0),
-            marginRight: px(globalVars.icon.sizes.default),
+            marginRight: px(-globalVars.icon.sizes.default),
             ...debug.name("chevronRight"),
         });
 
         // Common to both left and right
         const adjacent = style({
             display: "block",
+            marginTop: px(4),
+            marginBottom: px(4),
+            color: vars.colors.title.toString(),
+            $nest: {
+                "&.focus-visible": activeStyles,
+            },
             ...debug.name("adjacent"),
         });
 
         const previous = style({
+            paddingLeft: px(globalVars.icon.sizes.default),
+            paddingRight: px(globalVars.icon.sizes.default / 2),
             ...debug.name("previous"),
         });
 
         const next = style({
             marginLeft: "auto",
+            textAlign: "right",
+            paddingRight: px(globalVars.icon.sizes.default),
+            paddingLeft: px(globalVars.icon.sizes.default / 2),
             ...debug.name("next"),
-        });
-
-        const directionLabel = style({
-            display: "block",
-            fontSize: globalVars.fonts.size.small,
-            lineHeight: globalVars.lineHeights.condensed,
-            ...debug.name("label"),
         });
 
         return { root, adjacent, previous, next, title, chevron, directionLabel, chevronLeft, chevronRight };

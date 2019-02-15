@@ -9,11 +9,13 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, srOnly } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import vanillaHeaderStyles, { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 
 export default function backLinkClasses(theme?: object) {
     const globalVars = globalVariables(theme);
     const mediaQueries = layoutVariables(theme).mediaQueries();
     const debug = debugHelper("backLink");
+    const headerVars = vanillaHeaderVariables();
 
     const root = style({
         display: "inline-flex",
@@ -30,6 +32,7 @@ export default function backLinkClasses(theme?: object) {
         justifyContent: "flex-start",
         color: "inherit",
         minWidth: globalVars.icon.sizes.default,
+        maxHeight: px(headerVars.sizing.height),
         $nest: {
             "&:hover": {
                 color: globalVars.mainColors.primary.toString(),
@@ -40,7 +43,7 @@ export default function backLinkClasses(theme?: object) {
     const label = style(
         {
             ...debug.name("label"),
-            lineHeight: globalVars.icon.sizes.default,
+            lineHeight: px(globalVars.icon.sizes.default),
             fontWeight: globalVars.fonts.weights.semiBold,
             whiteSpace: "nowrap",
             paddingLeft: px(12),

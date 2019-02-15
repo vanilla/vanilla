@@ -23,9 +23,6 @@ jobs:
         - composer self-update
         - composer install --optimize-autoloader
         - tests/travis/setup.sh
-#      cache:
-#        directories:
-#          - $HOME/.composer/cache/files
       script:
         - tests/travis/main.sh
         - ls -lah ./conf
@@ -49,9 +46,6 @@ jobs:
         - composer self-update
         - composer install --optimize-autoloader
         - tests/travis/setup.sh
-#      cache:
-#        directories:
-#          - $HOME/.composer/cache/files
       script:
         - tests/travis/main.sh
         - ls -lah ./conf
@@ -76,9 +70,6 @@ jobs:
         - composer self-update
         - composer install --optimize-autoloader
         - tests/travis/setup.sh
-#      cache:
-#        directories:
-#          - $HOME/.composer/cache/files
       script:
         - tests/travis/main.sh
         - ls -lah ./conf
@@ -103,9 +94,6 @@ jobs:
         - composer self-update
         - composer install --optimize-autoloader
         - tests/travis/setup.sh
-#      cache:
-#        directories:
-#          - $HOME/.composer/cache/files
       script:
         - tests/travis/main.sh
         - ls -lah ./conf
@@ -120,14 +108,6 @@ jobs:
           sources:
             - google-chrome
         chrome: stable
-#      before_script:
-#        - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3 # Ensure a consistent yarn version
-#        - export PATH=$HOME/.yarn/bin:$PATH
-#        - yarn install --pure-lockfile
-#      cache:
-#        directories:
-#          - $TRAVIS_BUILD_DIR/node_modules
-#          - $TRAVIS_BUILD_DIR/plugins/rich-editor/node_modules
       script:
         - yarn audit
         - yarn build

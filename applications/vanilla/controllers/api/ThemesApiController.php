@@ -38,11 +38,26 @@ class ThemesApiController extends AbstractApiController {
         if (count($parts) === 1) {
             $theme = $this->getThemeByName($path);
             return $this->getThemeAssets($theme);
-
         }
 
-        var_dump($path);
-        die(__FILE__.':'.__FUNCTION__.':'.__LINE__);
+        if (count($parts) === 3) {
+            // parts[0] = :themeKey
+            // parts[1] = assets
+            // parts[2] = :assetKey | :assetFilename
+            if ('assets' === $parts[1]) {
+                $pathInfo =  pathinfo($parts[2]);
+                $theme = $this->getThemeByName($parts[0]);
+                $asset =  $this->getThemeAsset($theme, $pathInfo['filename'], !empty($pathInfo['extension']));
+                if (empty($pathInfo['extension'])) {
+                    // return asset as an array
+                    return $asset;
+                } else {
+                    // return asset as a file
+                    return new Data($asset['data'], ['CONTENT_TYPE' => $asset['mime-type']]);
+                }
+            }
+        }
+        throw new NotFoundException('Controller not found for: \''.$path.'\'');
     }
 
     public function getThemeByID(int $themeID) {
@@ -74,11 +89,38 @@ class ThemesApiController extends AbstractApiController {
         $res['logos'] = $theme->getInfoValue('logos');
         $res['mobileLogo'] = $theme->getInfoValue('mobileLogo');
         foreach ($assets as $aKey => &$aVal) {
-            $aVal['filename'] = PATH_ROOT.$theme->getSubdir().'/assets/'.$aVal['file'];
-            $aVal['data'] = file_get_contents($aVal['filename']);
+            $fileName = PATH_ROOT.$theme->getSubdir().'/assets/'.$aVal['file'];
+            $aVal['data'] = file_get_contents($fileName);
         }
         $res['assets'] = $assets;
         return json_encode($res);
     }
 
+    public function getThemeAsset(Addon $theme, string $assetKey, bool $mimeType = false) {
+        $assets  = $theme->getInfoValue('assets');
+        if (key_exists($assetKey, $assets)) {
+            $asset = $assets[$assetKey];
+            $fileName = PATH_ROOT.$theme->getSubdir().'/assets/'.$asset['file'];
+            $asset['data'] = file_get_contents($fileName);
+            if ($mimeType) {
+                switch ($asset['type']) {
+                    case 'json':
+                        $asset['mime-type'] = 'application/json';
+                        break;
+                    case 'js':
+                        $asset['mime-type'] = 'application/javascript';
+                        break;
+                    case 'css':
+                        $asset['mime-type'] = 'text/css';
+                        break;
+                    case 'html':
+                    default:
+                        $asset['mime-type'] = 'text/html';
+                }
+            }
+        } else {
+            throw new NotFoundException('Asset "'.$assetKey.'" not found for "'.$theme->getInfoValue('key').'"');
+        }
+        return $asset;
+    }
 }

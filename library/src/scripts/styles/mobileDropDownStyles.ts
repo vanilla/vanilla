@@ -4,14 +4,17 @@
  */
 
 import { calc, percent, px } from "csx";
-import { debugHelper, flexHelper, mixBgAndFg } from "@library/styles/styleHelpers";
-import { vanillaHeaderVariables } from "@library/components/headers/vanillaHeaderStyles";
+import { flexHelper } from "@library/styles/styleHelpers";
+import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutStyles } from "@library/styles/layoutStyles";
+import { debugHelper } from "@library/styles/styleHelpers";
+import { layoutVariables } from "@library/styles/layoutStyles";
 
-export const mobileDropDownVariables = () => {
+export const mobileDropDownVariables = (theme?: object) => {
+    const globalVars = globalVariables(theme);
     const vanillaHeaderVars = vanillaHeaderVariables();
+    const mixBgAndFg = globalVars.mixBgAndFg;
 
     const title = {
         letterSpacing: -0.26,
@@ -31,7 +34,7 @@ export const mobileDropDownVariables = () => {
 export const mobileDropDownClasses = () => {
     const vars = mobileDropDownVariables();
     const globalVars = globalVariables();
-    const mediaQueries = layoutStyles().mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
     const debug = debugHelper("mobileDropDown");
 
@@ -76,8 +79,8 @@ export const mobileDropDownClasses = () => {
             userSelect: "none",
             flexGrow: 1,
             maxWidth: calc(`100% - ${px(globalVars.spacer)}`),
-            marginLeft: globalVars.spacer / 2,
-            marginRight: globalVars.spacer / 2,
+            marginLeft: px(globalVars.spacer / 2),
+            marginRight: px(globalVars.spacer / 2),
         },
         mediaQueries.xs({
             ...debug.name("toggleButton-xs"),

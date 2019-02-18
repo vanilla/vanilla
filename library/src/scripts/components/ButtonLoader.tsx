@@ -6,16 +6,27 @@
 
 import * as React from "react";
 import { t } from "@library/application";
+import { buttonLoaderClasses } from "@library/styles/buttonStyles";
+import { ColorHelper } from "csx";
+import { globalVariables } from "@library/styles/globalStyleVars";
+
+interface IProps {
+    spinnerColor?: ColorHelper;
+}
 
 /**
  * A smart loading component. Takes up the full page and only displays in certain scenarios.
  */
-export default class ButtonLoader extends React.Component {
+export default class ButtonLoader extends React.Component<IProps> {
     public render() {
+        const globalVars = globalVariables();
+        const classes = buttonLoaderClasses(
+            this.props.spinnerColor ? this.props.spinnerColor : globalVars.mainColors.primary,
+        );
         return (
             <React.Fragment>
-                <div className="buttonLoader" aria-hidden="true" />
-                <h1 className="sr-only">{t("Loading")}</h1>
+                <div className={classes.root} aria-hidden="true" />
+                <span className="sr-only">{t("Loading")}</span>
             </React.Fragment>
         );
     }

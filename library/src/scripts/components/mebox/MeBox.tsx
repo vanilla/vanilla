@@ -42,6 +42,7 @@ export default class MeBox extends React.Component<IMeBoxProps> {
                     buttonClassName={buttonClassName}
                     contentsClassName={contentClassName}
                     countUnread={userInfo.countUnreadNotifications}
+                    toggleContentsClassName="meBox-buttonContent"
                 />
                 <MessagesDropDown
                     countClass={countsClass}

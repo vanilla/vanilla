@@ -12,7 +12,7 @@ import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeader
 import { signIn } from "@library/components/icons";
 import VanillaHeaderListItem from "@library/components/mebox/pieces/VanillaHeaderListItem";
 import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
-import vanillaHeaderClasses, { vanillaHeaderHomeClasses } from "@library/components/headers/vanillaHeaderStyles";
+import vanillaHeaderClasses, { vanillaHeaderHomeClasses } from "@library/styles/vanillaHeaderStyles";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import Container from "@library/components/layouts/components/Container";

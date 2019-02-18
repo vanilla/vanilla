@@ -18,9 +18,11 @@
             <script defer src="{{ script.getWebPath() }}"></script>
         {% endfor %}
 
-        <script type="application/ld+json">
-            {{ breadcrumbs|raw }}
-        </script>
+        {%- if breadcrumbsJson -%}
+            <script type="application/ld+json">
+                {{- breadcrumbsJson|raw -}}
+            </script>
+        {%- endif -%}
 
         {% for stylesheet in styles -%}
             <link href="{{ stylesheet.getWebPath() }}" rel="stylesheet" type="text/css" />

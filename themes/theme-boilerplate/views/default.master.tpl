@@ -45,13 +45,17 @@
                     <div class="Container">
                         <div class="Frame-contentWrap">
                             <div class="Frame-details">
-                                <div class="Frame-row">
-                                    <nav class="BreadcrumbsBox">
-                                        {breadcrumbs}
-                                    </nav>
-                                    {if !$SectionGroups}
+                                {if !$isHomepage}
+                                    <div class="Frame-row">
+                                        <nav class="BreadcrumbsBox">
+                                            {breadcrumbs}
+                                        </nav>
+                                    </div>
+                                {/if}
+                                <div class="Frame-row SearchBoxMobile">
+                                    {if !$SectionGroups && !inSection(["SearchResults"])}
                                         <div class="SearchBox js-sphinxAutoComplete" role="search">
-                                            {searchbox}
+                                            {module name="AdvancedSearchModule"}
                                         </div>
                                     {/if}
                                 </div>
@@ -78,6 +82,11 @@
                                         {event name="AfterBody"}
                                     </main>
                                     <aside class="Panel Panel-main">
+                                        {if !$SectionGroups}
+                                            <div class="SearchBox js-sphinxAutoComplete" role="search">
+                                                {searchbox}
+                                            </div>
+                                        {/if}
                                         {asset name="Panel"}
                                     </aside>
                                 </div>

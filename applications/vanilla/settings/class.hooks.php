@@ -10,12 +10,22 @@
 
 use Garden\Container\Container;
 use Garden\Container\Reference;
-use Vanilla\Formatting\Embeds\EmbedManager;
 
 /**
  * Vanilla's event handlers.
  */
 class VanillaHooks implements Gdn_IPlugin {
+
+    /**
+     * Handle the container init event to register things with the container.
+     *
+     * @param Container $dic
+     */
+    public function container_init(Container $dic) {
+        $dic->rule(\Vanilla\Navigation\BreadcrumbModel::class)
+            ->addCall('addProvider', [new Reference(\Vanilla\Forum\Navigation\ForumBreadcrumbProvider::class)])
+        ;
+    }
 
     /**
      * Add to valid media attachment types.

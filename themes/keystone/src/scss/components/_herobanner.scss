@@ -17,12 +17,12 @@
     align-items: center;
     color: $herobanner_fg;
 
+    @include maxWidth {
+        display: none;
+    }
+
     .HomepageTitle {
         font-size: 48px;
-
-        @include maxWidth($theme-breakpoint_tablet) {
-            font-size: $global-subTitle_fontSize;
-        }
     }
 
     .HomepageTitle,
@@ -35,16 +35,6 @@
         z-index: 1;
     }
 
-    @include maxWidth {
-        height: auto;
-        background: $content_bg;
-
-        .HomepageTitle,
-        .PageDescription {
-            display: none;
-        }
-    }
-
     //unset .ThemeOptions-panelToLeft margin
     .SearchBox.SearchBox {
         margin-left: auto;
@@ -52,10 +42,6 @@
 
     .SearchBox {
         max-width: $SearchboxFeatured_width;
-
-        .Handle {
-            display: none;
-        }
 
         @include minWidth {
             margin: 0 auto;
@@ -70,13 +56,9 @@
             }
         }
 
-        @include maxWidth {
-            margin-top: $utility-large_padding;
-            margin-bottom: 0;
+        .Handle {
+            display: none;
         }
-    }
-
-    @include minWidth {
 
         .InputAndButton {
             display: flex;

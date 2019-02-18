@@ -74,11 +74,7 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                         <Button buttonRef={this.cancelRef} onClick={onCancel}>
                             {t("Cancel")}
                         </Button>
-                        <Button
-                            onClick={onConfirm}
-                            className={buttons(ButtonTypes.PRIMARY)}
-                            disabled={isConfirmLoading}
-                        >
+                        <Button onClick={onConfirm} className={buttons.primary} disabled={isConfirmLoading}>
                             {isConfirmLoading ? <ButtonLoader /> : t("Ok")}
                         </Button>
                     </FrameFooter>

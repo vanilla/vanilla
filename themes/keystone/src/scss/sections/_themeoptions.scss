@@ -23,7 +23,7 @@
     .BreadcrumbsBox {
         order: 2;
         margin-left: auto;
-        width: calc(100% - #{$panel_width + $utility-xLarge_padding});
+        width: calc(100% - #{$panel_width + 50px});
 
          @include maxWidth($theme-breakpoint_tablet) {
              order: initial;
@@ -54,5 +54,12 @@
             margin-left: 0;
             width: 100%;
         }
+    }
+}
+
+.ThemeOptions-hasHeroBanner.ThemeOptions-hasFeatureSearchbox .Panel {
+
+    .SearchBox {
+        display: none;
     }
 }

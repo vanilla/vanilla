@@ -3,9 +3,10 @@
  * @license GPL-2.0-only
  */
 
-import { ColorHelper, important, percent, px, quote, viewHeight, viewWidth, color } from "csx";
+import { ColorHelper, important, percent, px, quote, viewHeight, viewWidth, color, deg } from "csx";
 import { BackgroundImageProperty, FlexWrapProperty } from "csstype";
-import { style } from "typestyle";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { style, keyframes } from "typestyle";
 
 export function flexHelper() {
     const middle = (wrap = false) => {
@@ -118,7 +119,7 @@ export const getColorDependantOnLightness = (
         throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
     }
 
-    if (referenceColor.lightness() >= 0.5 && !flip) {
+    if (referenceColor.lightness() >= 0.5 || flip) {
         // Lighten color
         return colorToModify.mix(color("#000"), 1 - weight);
     } else {
@@ -152,4 +153,50 @@ export const inheritHeightClass = () => {
         flexDirection: "column",
         flexGrow: 1,
     });
+};
+
+const vars = globalVariables();
+
+export const defaultTransition = (...properties) => {
+    const propLength = properties.length;
+    return `${properties.map((prop, index) => {
+        return `${prop} ${vars.animation.defaultTiming} ${vars.animation.defaultEasing}${
+            index === propLength ? ", " : ""
+        }`;
+    })}`;
+};
+
+const spinnerOffset = 73;
+const spinnerLoaderAnimation = keyframes({
+    "0%": { transform: `rotate(${deg(spinnerOffset)})` },
+    "100%": { transform: `rotate(${deg(360 + spinnerOffset)})` },
+});
+
+export const spinnerLoader = (
+    spinnerColor: ColorHelper = vars.mainColors.primary,
+    dimensions = px(18),
+    thicknesss = px(3),
+    speed = "0.7s",
+) => {
+    const debug = debugHelper("spinnerLoader");
+    return {
+        ...debug.name("spinner"),
+        position: "relative",
+        content: quote(""),
+        transition: defaultTransition("opacity"),
+        display: "block",
+        width: dimensions,
+        height: dimensions,
+        borderRadius: percent(50),
+        borderTop: `${thicknesss} solid ${spinnerColor.toString()}`,
+        borderRight: `${thicknesss} solid ${spinnerColor.fade(0.3).toString()}`,
+        borderBottom: `${thicknesss} solid ${spinnerColor.fade(0.3).toString()}`,
+        borderLeft: `${thicknesss} solid ${spinnerColor.fade(0.3).toString()}`,
+        transform: "translateZ(0)",
+        animation: `spillerLoader ${speed} infinite ease-in-out`,
+        animationName: spinnerLoaderAnimation,
+        animationDuration: speed,
+        animationIterationCount: "infinite",
+        animationTimingFunction: "ease-in-out",
+    };
 };

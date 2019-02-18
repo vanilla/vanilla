@@ -142,6 +142,7 @@ export default function vanillaHeaderClasses(theme?: object) {
             color: headerColors.fg.toString(),
             $nest: {
                 "&.isFixed": {
+                    ...debug.name("fixed"),
                     position: "fixed",
                     top: 0,
                     left: 0,
@@ -149,10 +150,12 @@ export default function vanillaHeaderClasses(theme?: object) {
                     zIndex: 1,
                 },
                 ".searchBar__control": {
+                    ...debug.name("control"),
                     color: vars.colors.fg.toString(),
                     cursor: "pointer",
                 },
                 ".suggestedTextInput-clear.searchBar-clear": {
+                    ...debug.name("clear"),
                     color: vars.colors.fg.toString(),
                     $nest: {
                         "&:hover": {
@@ -167,20 +170,23 @@ export default function vanillaHeaderClasses(theme?: object) {
                     },
                 },
                 ".searchBar__placeholder": {
+                    ...debug.name("placeholder"),
                     color: vars.colors.fg.fade(0.8).toString(),
                     cursor: "pointer",
                 },
                 ".backLink-link": {
-                    $nest: {
-                        "&:hover": {
-                            color: vars.colors.fg.toString(),
-                        },
-                    },
+                    maxHeight: percent(100),
+                    ...debug.name("backLink-link"),
                 },
             },
         },
         mediaQueries.oneColumn({
             height: px(vars.sizing.mobile.height),
+            $nest: {
+                ".backLink-link": {
+                    height: vars.sizing.mobile.height,
+                },
+            },
         }),
     );
 
@@ -281,6 +287,7 @@ export default function vanillaHeaderClasses(theme?: object) {
     const compactSearch = style({
         ...debug.name("compactSearch"),
         marginLeft: "auto",
+        maxWidth: px(vars.compactSearch.maxWidth),
     });
 
     const topElement = style(
@@ -432,7 +439,6 @@ export default function vanillaHeaderClasses(theme?: object) {
             flexShrink: 1,
             flexBasis: px(vars.endElements.mobile.flexBasis),
             height: px(vars.sizing.mobile.height),
-            // transform: `translateX(${px(vars.button.size - userPhotoVars.sizing.small / 2)})`, // so the icon is flush with the side margin, but still has the right padding when hovering.
         }),
     );
 

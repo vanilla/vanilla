@@ -14,7 +14,7 @@ body.Section-Profile {
     .BadgeGrid h4 {
         font-size: $global-subTitle_fontSize;
         font-weight: $global-heading_fontWeight;
-        margin-bottom: $utility-large_padding;
+        margin-bottom: $utility-baseUnitTriple;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -31,7 +31,7 @@ body.Section-Profile {
         position: relative;
 
         > * + * {
-            margin-top: $utility-large_padding;
+            margin-top: $utility-baseUnitTriple;
         }
     }
 
@@ -82,7 +82,7 @@ body.Section-Profile {
         flex-wrap: wrap;
         align-items: center;
         width: 100%;
-        margin: 0 0 $utility-large_padding;
+        margin: 0 0 $utility-baseUnitTriple;
 
         @include maxWidth($theme-breakpoint_tablet) {
             display: flex;
@@ -183,7 +183,7 @@ body.Section-Profile {
 
         @include maxWidth {
             margin-left: 0;
-            margin-bottom: $utility-large_padding;
+            margin-bottom: $utility-baseUnitTriple;
             width: 100%;
             justify-content: center;
             flex-wrap: wrap;
@@ -200,7 +200,7 @@ body.Section-Profile {
             }
 
             .MemberButtons {
-                margin-bottom: $utility-large_padding;
+                margin-bottom: $utility-baseUnitTriple;
             }
         }
     }
@@ -208,7 +208,7 @@ body.Section-Profile {
     .Panel-main {
 
         .PhotoWrapLarge {
-            margin-bottom: $utility-large_padding;
+            margin-bottom: $utility-baseUnitTriple;
         }
 
         @include maxWidth($theme-breakpoint_tablet) {
@@ -237,7 +237,7 @@ body.Section-Profile {
     .change-picture,
     &.quotes .Frame-content form {
         padding: $utility-baseUnitDouble;
-        margin-bottom: $utility-large_padding;
+        margin-bottom: $utility-baseUnitTriple;
 
         @include maxWidth {
             padding: 0;
@@ -260,8 +260,8 @@ body.Section-Profile {
     .Content .BadgeGrid a,
     .CountItemWrap {
         @include tilesColumns(5);
-        margin-top: $utility-large_padding;
-        margin-bottom: $utility-large_padding;
+        margin-top: $utility-baseUnitTriple;
+        margin-bottom: $utility-baseUnitTriple;
 
         @include maxWidth {
             @include tilesColumns(4);
@@ -445,7 +445,7 @@ body.Section-EditProfile {
     }
 
     .box-cropped-image {
-        margin-bottom: $utility-large_padding;
+        margin-bottom: $utility-baseUnitTriple;
     }
 
     .Preferences > form > div {
@@ -454,7 +454,7 @@ body.Section-EditProfile {
 
     table.PreferenceGroup {
         width: 100%;
-        margin-bottom: $utility-large_padding;
+        margin-bottom: $utility-baseUnitTriple;
 
         @include maxWidth {
             min-width: 500px;

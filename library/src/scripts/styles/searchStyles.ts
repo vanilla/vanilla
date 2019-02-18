@@ -26,7 +26,7 @@ export const searchVariables = (theme?: object) => {
 
     const placeholder = {
         color: globalVars.mainColors.fg,
-        ...themeVars.subComponentStyles("input"),
+        ...themeVars.subComponentStyles("placeholder"),
     };
 
     return { input, placeholder };
@@ -40,9 +40,11 @@ export const searchClasses = (theme?: object) => {
         ...debug.name(),
         $nest: {
             ".searchBar-valueContainer": {
+                ...debug.name("valueContainer"),
                 cursor: "text",
             },
             ".searchBar__control": {
+                ...debug.name("control"),
                 cursor: "text",
             },
         },

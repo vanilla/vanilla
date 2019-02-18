@@ -877,6 +877,28 @@ $Construct
     ->column("dateInserted", "datetime")
     ->set($Explicit, $Drop);
 
+$Construct
+    ->table("theme")
+    ->primaryKey("themeID")
+    ->column("parentTheme", "varchar(64)", false, ["index"])
+    ->column("insertUserID", "int", false, ["index"])
+    ->column("updateUserID", "int", false, ["index"])
+    ->column("dateInserted", "datetime")
+    ->column("dateUpdated", "datetime")
+    ->set($Explicit, $Drop);
+
+$Construct
+    ->table("themeAsset")
+    ->primaryKey("assetID")
+    ->column("themeID", "int", false, ["index", "index.record"])
+    ->column("assetKey", "varchar(32)", false, ["index", "index.record"])
+    ->column("data", "text", false)
+    ->column("insertUserID", "int", false, ["index"])
+    ->column("updateUserID", "int", false, ["index"])
+    ->column("dateInserted", "datetime")
+    ->column("dateUpdated", "datetime")
+    ->set($Explicit, $Drop);
+
 // If the AllIPAddresses column exists, attempt to migrate legacy IP data to the UserIP table.
 if (!$captureOnly && $AllIPAddressesExists) {
     $limit = 10000;

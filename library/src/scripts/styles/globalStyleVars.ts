@@ -172,6 +172,25 @@ export const globalVariables = (theme?: object) => {
         ...themeVars.subComponentStyles("embed"),
     };
 
+    const meta = {
+        text: {
+            fontSize: fonts.size.small,
+            color: mixBgAndFg(0.85),
+            margin: 4,
+        },
+        spacing: {
+            verticalMargin: 12,
+            default: gutter.quarter,
+        },
+        lineHeights: {
+            default: lineHeights.base,
+        },
+        colors: {
+            fg: mixBgAndFg(0.85),
+            deleted: feedbackColors.deleted,
+        },
+    };
+
     return {
         utility,
         elementaryColors,
@@ -190,5 +209,6 @@ export const globalVariables = (theme?: object) => {
         animation,
         links,
         embed,
+        meta,
     };
 };

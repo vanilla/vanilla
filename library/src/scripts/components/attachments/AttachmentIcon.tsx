@@ -10,6 +10,7 @@ import { t } from "@library/application";
 import Paragraph from "@library/components/Paragraph";
 import Translate from "@library/components/translation/Translate";
 import { AttachmentType, getAttachmentIcon } from "@library/components/attachments";
+import { attachmentIconClasses } from "@library/styles/attachmentIconsStyles";
 
 // Common to both attachment types
 export interface IAttachmentIcon {
@@ -18,15 +19,21 @@ export interface IAttachmentIcon {
 }
 
 // Attachment of type icon
-interface IProps extends IAttachmentIcon {}
+interface IProps extends IAttachmentIcon {
+    theme?: object;
+    classes: {
+        item?: string;
+    };
+}
 
 /**
  * Component representing 1 icon attachment.
  */
 export default class AttachmentIcon extends React.Component<IProps> {
     public render() {
+        const classes = attachmentIconClasses(this.props.theme);
         return (
-            <li className="attachmentsIcons-item">
+            <li className={classNames("attachmentsIcons-item", this.props.classes.item, classes.root)}>
                 <div
                     className={classNames("attachmentsIcons-file", `attachmentsIcons-${this.props.type}`)}
                     title={t(this.props.type)}
@@ -36,7 +43,7 @@ export default class AttachmentIcon extends React.Component<IProps> {
                             <Translate source="<0/> (Type: <1/>)" c0={this.props.name} c1={this.props.type} />
                         </Paragraph>
                     </span>
-                    {getAttachmentIcon(this.props.type)}
+                    {getAttachmentIcon(this.props.type, classes.root)}
                 </div>
             </li>
         );

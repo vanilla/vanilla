@@ -14,6 +14,7 @@ import { getAttachmentIcon, AttachmentType } from "@library/components/attachmen
 import ProgressEventEmitter from "@library/ProgressEventEmitter";
 import { FOCUS_CLASS } from "@library/embeds";
 import { attachmentClasses } from "@library/styles/attachmentStyles";
+import { attachmentIconClasses } from "@library/styles/attachmentIconsStyles";
 
 interface IProps extends IFileAttachment {
     type: AttachmentType;
@@ -38,6 +39,7 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
         const { title, name, type } = this.props;
         const label = title || name;
         const classes = attachmentClasses(this.props.theme);
+        const iconClasses = attachmentIconClasses(this.props.theme);
         return (
             <div
                 className={classNames("attachment", "isLoading", this.props.className, FOCUS_CLASS, classes.root)}
@@ -45,7 +47,9 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
                 aria-label={t("Uploading...")}
             >
                 <div className={classNames("attachment-box", "attachment-loadingContent", classes.box)}>
-                    <div className={classNames("attachment-format", classes.format)}>{getAttachmentIcon(type)}</div>
+                    <div className={classNames("attachment-format", classes.format)}>
+                        {getAttachmentIcon(type, iconClasses.root)}
+                    </div>
                     <div className={classNames("attachment-main", classes.main)}>
                         <div className={classNames("attachment-title", classes.title)}>
                             {label ? label : t("Uploading...")}

@@ -9,11 +9,14 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import { t } from "@library/application";
 import Translate from "@library/components/translation/Translate";
 import AttachmentIcon, { IAttachmentIcon } from "@library/components/attachments/AttachmentIcon";
+import { attachmentIconsClasses } from "@library/styles/attachmentIconsStyles";
+import classNames from "classnames";
 
 // Array of icon attachments
 interface IProps {
     attachments: IAttachmentIcon[];
     maxCount?: number;
+    theme?: object;
 }
 
 /**
@@ -38,16 +41,16 @@ export default class AttachmentIcons extends React.Component<IProps> {
         if (this.attachmentsCount < 1) {
             return null;
         }
-
-        const attachments = this.renderAttachments();
+        const classes = attachmentIconsClasses(this.props.theme);
+        const attachments = this.renderAttachments(classes);
 
         if (attachments) {
             return (
-                <section className="attachmentsIcons">
+                <section className={classNames("attachmentsIcons", classes.root)}>
                     <h3 id={this.titleID} className="sr-only">
                         {t("Attachments: ")}
                     </h3>
-                    <ul aria-labelledby={this.titleID} className="attachmentsIcons-items">
+                    <ul aria-labelledby={this.titleID} className={classNames("attachmentsIcons-items", classes.items)}>
                         {attachments}
                     </ul>
                 </section>
@@ -67,12 +70,19 @@ export default class AttachmentIcons extends React.Component<IProps> {
     /**
      * Render out the visible attachments.
      */
-    private renderAttachments() {
+    private renderAttachments(classes) {
         return this.props.attachments.map((attachment, i) => {
             const index = i + 1;
             const extraCount = this.attachmentsCount - index;
             if (i < this.maxCount) {
-                return <AttachmentIcon name={attachment.name} type={attachment.type} key={index} />;
+                return (
+                    <AttachmentIcon
+                        classes={{ item: classes.item }}
+                        name={attachment.name}
+                        type={attachment.type}
+                        key={index}
+                    />
+                );
             } else if (i === this.maxCount && extraCount > 0) {
                 return this.renderMorePlacholder(extraCount, index);
             } else {

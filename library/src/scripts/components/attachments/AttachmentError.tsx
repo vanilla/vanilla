@@ -13,6 +13,7 @@ import { fileUploadError } from "@library/components/icons/fileTypes";
 import { FOCUS_CLASS } from "@library/embeds";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import { attachmentClasses } from "@library/styles/attachmentStyles";
+import { attachmentIconClasses } from "@library/styles/attachmentIconsStyles";
 
 interface IProps extends IFileAttachment {
     message: string;
@@ -33,6 +34,7 @@ export default class AttachmentError extends React.Component<IProps> {
         const [errorTitle, ...errorBodyMessages] = messages;
         const showFileName = label && errorBodyMessages.length === 0;
         const classes = attachmentClasses(this.props.theme);
+        const iconClasses = attachmentIconClasses(this.props.theme);
 
         return (
             <div
@@ -44,7 +46,9 @@ export default class AttachmentError extends React.Component<IProps> {
                 aria-live="assertive"
             >
                 <div className={classNames("attachment-box", classes.box)}>
-                    <div className={classNames("attachment-format", classes.format)}>{fileUploadError()}</div>
+                    <div className={classNames("attachment-format", classes.format)}>
+                        {fileUploadError(iconClasses.error)}
+                    </div>
                     <div className={classNames("attachment-main", classes.main)}>
                         <div id={this.descrID} className={classNames("attachment-title", classes.title)}>
                             {errorTitle}

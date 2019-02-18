@@ -12,6 +12,7 @@ import classNames from "classnames";
 import { t } from "@library/application";
 import { HumanFileSize, humanFileSize } from "@library/utils/fileUtils";
 import { attachmentClasses } from "@library/styles/attachmentStyles";
+import { attachmentIconClasses } from "@library/styles/attachmentIconsStyles";
 
 export interface IFileAttachment {
     name: string; // File name
@@ -34,6 +35,7 @@ export default class Attachment extends React.Component<IProps> {
         const { title, name, url, dateUploaded, type, mimeType, size, className } = this.props;
         const label = title || name;
         const classes = attachmentClasses(this.props.theme);
+        const iconClasses = attachmentIconClasses(this.props.theme);
 
         return (
             <div className={classNames("attachment", className, classes.root)}>
@@ -45,7 +47,9 @@ export default class Attachment extends React.Component<IProps> {
                     tabIndex={1}
                 >
                     {type && (
-                        <div className={classNames("attachment-format", classes.format)}>{getAttachmentIcon(type)}</div>
+                        <div className={classNames("attachment-format", classes.format)}>
+                            {getAttachmentIcon(type, iconClasses.root)}
+                        </div>
                     )}
                     <div className={classNames("attachment-main", classes.main)}>
                         <div className={classNames("attachment-title", classes.title)}>{label}</div>

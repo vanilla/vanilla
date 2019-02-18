@@ -28,6 +28,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { style, keyframes } from "typestyle";
 import { TLength } from "typestyle/lib/types";
 import { borderRadius } from "react-select/lib/theme";
+import { formElementsVariables } from "@library/components/forms/formElementStyles";
 
 export function flexHelper() {
     const middle = (wrap = false) => {
@@ -166,14 +167,21 @@ export const inheritHeightClass = () => {
 };
 
 const vars = globalVariables();
+const formElementVars = formElementsVariables();
 
 export const defaultTransition = (...properties) => {
     const propLength = properties.length;
-    return `${properties.map((prop, index) => {
-        return `${prop} ${vars.animation.defaultTiming} ${vars.animation.defaultEasing}${
-            index === propLength ? ", " : ""
-        }`;
-    })}`;
+    if (propLength > 0) {
+        return {
+            transition: `${properties.map((prop, index) => {
+                return `${prop} ${vars.animation.defaultTiming} ${vars.animation.defaultEasing}${
+                    index === propLength ? ", " : ""
+                }`;
+            })}`,
+        };
+    } else {
+        return undefined;
+    }
 };
 
 const spinnerOffset = 73;
@@ -357,4 +365,13 @@ export const absolutePosition = {
             margin: "auto 0",
         };
     },
+};
+
+export const disabledInput = () => {
+    return {
+        pointerEvents: important("none"),
+        userSelect: important("none"),
+        cursor: important("default"),
+        opacity: important(formElementVars.disabled.opacity),
+    };
 };

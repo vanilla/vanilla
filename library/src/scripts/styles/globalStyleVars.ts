@@ -34,6 +34,14 @@ export const globalVariables = (theme?: object) => {
         return mainColors.fg.mix(mainColors.bg, weight);
     };
 
+    const mixPrimaryAndFg = weight => {
+        return mainColors.primary.mix(mainColors.fg, weight);
+    };
+
+    const mixPrimaryAndBg = weight => {
+        return mainColors.primary.mix(mainColors.bg, weight);
+    };
+
     const errorFg = color("#ff3933");
     const warning = color("#ffce00");
     const deleted = color("#D0021B");
@@ -191,6 +199,27 @@ export const globalVariables = (theme?: object) => {
         },
     };
 
+    const states = {
+        icon: {
+            opacity: 0.6,
+        },
+        text: {
+            opacity: 0.75,
+        },
+        hover: {
+            color: mixPrimaryAndBg(0.1),
+            opacity: 1,
+        },
+        focus: {
+            color: mixPrimaryAndBg(0.12),
+            opacity: 1,
+        },
+        active: {
+            color: mixPrimaryAndBg(0.95),
+            opacity: 1,
+        },
+    };
+
     return {
         utility,
         elementaryColors,
@@ -210,5 +239,6 @@ export const globalVariables = (theme?: object) => {
         links,
         embed,
         meta,
+        states,
     };
 };

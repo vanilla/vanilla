@@ -14,6 +14,7 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import { t } from "@library/application";
 import { PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
 import Heading from "@library/components/Heading";
+import ConditionalWrap from "@library/components/ConditionalWrap";
 
 interface IProps extends RouteComponentProps<{}> {
     activeRecord: IActiveRecord;
@@ -24,6 +25,8 @@ interface IProps extends RouteComponentProps<{}> {
     bottomCTA: React.ReactNode;
     onItemHover?(item: INavigationTreeItem);
     title?: string;
+    hiddenTitle?: boolean;
+    clickableCategoryLabels?: boolean;
 }
 
 /**
@@ -44,6 +47,7 @@ export class SiteNav extends React.Component<IProps> {
                           depth={0}
                           collapsible={collapsible}
                           onItemHover={onItemHover}
+                          clickableCategoryLabels={!!this.props.clickableCategoryLabels}
                       />
                   );
               })
@@ -53,9 +57,11 @@ export class SiteNav extends React.Component<IProps> {
             return (
                 <nav onKeyDownCapture={this.handleKeyDown} className={classNames("siteNav", this.props.className)}>
                     {this.props.title ? (
-                        <PanelWidgetVerticalPadding>
-                            <Heading title={this.props.title} className="siteNav-title" />
-                        </PanelWidgetVerticalPadding>
+                        <ConditionalWrap condition={!!this.props.hiddenTitle} className={"sr-only"}>
+                            <PanelWidgetVerticalPadding>
+                                <Heading title={this.props.title} className="siteNav-title" />
+                            </PanelWidgetVerticalPadding>
+                        </ConditionalWrap>
                     ) : (
                         <h2 id={this.titleID} className="sr-only">
                             {t("Navigation")}

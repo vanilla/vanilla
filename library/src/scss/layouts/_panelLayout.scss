@@ -5,7 +5,7 @@
  */
 
 $panelLayout_topMargin                                                : 0;
-$panelLayout_bottomMargin                                             : 48px;
+$panelLayout_bottomMargin                                             : 50px;
 
 $panelLayout-noBleed_breakpoint                                       : $global-content_width !default;
 $panelLayout-twoColumn_breakpoint                                     : $global-twoColumn_breakpoint !default;
@@ -148,12 +148,7 @@ $panelLayout-panelAndSpacingWidth                                     : $global-
 }
 
 
-.panelLayout-breadcrumbs {
-    padding: {
-        top: $global-gutter_halfSize;
-        bottom: $global-gutter_halfSize;
-    }
-
+.panelArea-breadcrumbs {
     &.hasAdjacentPanel {
         flex-basis: calc(100% - #{$panelLayout-panelAndSpacingWidth});
         max-width: calc(100% - #{$panelLayout-panelAndSpacingWidth});

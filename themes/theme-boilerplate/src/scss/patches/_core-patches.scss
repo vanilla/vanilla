@@ -74,7 +74,7 @@ body {
 
 .CategoryTable,
 .DiscussionTable {
-    margin-bottom: $utility-large_padding;
+    margin-bottom: $utility-baseUnitTriple;
 }
 
 .CategoryTable,
@@ -158,7 +158,7 @@ body {
 
     > span,
     > a {
-        margin-left: $utility-baseUnitHalf;
+        margin-left: $utility-baseUnit;
     }
 }
 

@@ -37,7 +37,7 @@ body.Section-SearchResults {
         }
 
         .KeywordsWrap {
-            margin: 0 0 $utility-large_padding;
+            margin: 0 0 $utility-baseUnitTriple;
             padding: 0;
 
             @include maxWidth {

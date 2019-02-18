@@ -9,9 +9,11 @@
 \* -------------------------------------------------------------- */
 
 .Header.hasOpenNavigation {
+
     @include maxWidth {
         border-bottom-left-radius: $navigation_borderRadius;
         border-bottom-right-radius: $navigation_borderRadius;
+        border-bottom-width: 0;
     }
 }
 
@@ -186,7 +188,7 @@
 }
 
 .Navigation-row {
-    padding: $utility-large_padding;
+    padding: $utility-baseUnitTriple;
     display: flex;
     align-items: center;
 }
@@ -197,7 +199,7 @@
     min-height: $navigation-item_height;
     display: block;
     width: 100%;
-    padding: 0 $utility-large_padding;
+    padding: 0 $utility-baseUnitTriple;
     color: $navigation_fg;
     display: flex;
     align-items: center;
@@ -281,7 +283,7 @@
     user-select: none;
     height: 28px;
     width: 28px;
-    right: $content_padding;
+    right: $frame-mobile_padding;
 
     @include maxWidth {
         position: absolute;
@@ -343,6 +345,9 @@
         }
 
         .Alert {
+            color: $MobileMeBox_fg;
+            background-color: $MobileMeBoxAlert_bg;
+            border-color: $MobileMeBoxAlert_borderColor;
 
             @include maxWidth {
                 top: -6px;

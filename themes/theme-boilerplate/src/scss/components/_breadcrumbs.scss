@@ -13,7 +13,7 @@
 }
 
 .Breadcrumbs {
-    margin-bottom: $utility-large_padding;
+    margin-bottom: $utility-baseUnitTriple;
     display: block;
     line-height: $global-base_lineHeight;
 
@@ -39,18 +39,3 @@
         }
     }
 }
-
-.BreadcrumbsBox + .SearchBox {
-    margin-left: auto;
-    max-width: $panel_width;
-
-    .Handle.Handle {
-        display: none;
-    }
-
-    @include maxWidth {
-        margin-left: 0;
-        max-width: 100%;
-    }
-}
-

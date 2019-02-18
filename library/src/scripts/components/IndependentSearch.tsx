@@ -25,6 +25,7 @@ export interface ICompactSearchProps extends IWithSearchProps, RouteComponentPro
     buttonContentClass?: string;
     cancelContentClassName?: string;
     theme?: object;
+    isLarge?: boolean;
 }
 
 interface IState {
@@ -61,7 +62,9 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
                     resultsRef={this.resultsRef}
                     onOpenSuggestions={this.props.onOpenSuggestions}
                     onCloseSuggestions={this.props.onCloseSuggestions}
-                    buttonClassName={buttons(ButtonTypes.TRANSPARENT)}
+                    buttonClassName={this.props.buttonClass}
+                    className={classes.root}
+                    isBigInput={this.props.isLarge}
                 />
                 <div ref={this.resultsRef} className="search-results" />
             </div>

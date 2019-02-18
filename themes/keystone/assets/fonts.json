@@ -1,3 +1,8 @@
+[
 {
-    "Roboto": "https://fonts.googleapis.com/css?family=Roboto"
+    "type": "url",
+    "name": "Roboto",
+    "fallbacks": "",
+    "url": "https://fonts.googleapis.com/css?family=Roboto"
 }
+]

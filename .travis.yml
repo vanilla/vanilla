@@ -144,4 +144,5 @@ env:
 # Send status update notifications to a HipChat room.
 notifications:
   slack:
+    on_pull_requests: false
     secure: Wxsh9jI4Noq8BQtEl7CjfsHtQRmVo5l7jCDkY0W7zqHqnPRUBiAd847uPcBRUcWE8zYWDLXqtTHJMc/ctyLodentArgvHTtBIw6gp2QaFFFYe1WE0tPSYmhGa9GjI46D2/a4rCjNo1uIpytoHGTSp6RNBhY3TFKqZf+qy6RnIcU=

@@ -141,7 +141,7 @@ install: true
 env:
   - VANILLA_BUILD_DISABLE_AUTO_BUILD=true
 
-# Send status update notifications to a HipChat room.
+# Send cron job notification to our Slack room.
 notifications:
   slack:
     on_pull_requests: false

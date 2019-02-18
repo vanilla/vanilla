@@ -141,12 +141,8 @@ install: true
 env:
   - VANILLA_BUILD_DISABLE_AUTO_BUILD=true
 
-# Send status update notifications to a HipChat room.
+# Send cron job notification to our Slack room.
 notifications:
-  hipchat:
-    format: html
-    on_success: change
-    rooms:
-      - secure: "SsKmSAZFynBz4ZKm5NPyuXvNjIMyxpNMXsgfXVImG8xjQHdXjEpZAiyckK8E2lXBBypv59Oex6wsS0RvyxpI/mwQ9dTQ9ayurQxwH3V5Q/+pRbtXJOkP+DSIsHhRb9D4xa5nPbh4N48+QZvUFiH2ety9/gev4mtMkLv3lC0vgpc="
-    template:
-      - '%{repository_slug} build <a href="%{build_url}">#%{build_number}</a> (%{branch} - <a href="%{compare_url}">%{commit}</a> by %{author}): %{message}'
+  slack:
+    on_pull_requests: false
+    secure: Wxsh9jI4Noq8BQtEl7CjfsHtQRmVo5l7jCDkY0W7zqHqnPRUBiAd847uPcBRUcWE8zYWDLXqtTHJMc/ctyLodentArgvHTtBIw6gp2QaFFFYe1WE0tPSYmhGa9GjI46D2/a4rCjNo1uIpytoHGTSp6RNBhY3TFKqZf+qy6RnIcU=

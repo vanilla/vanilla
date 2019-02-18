@@ -81,10 +81,10 @@ class Gdn_Session {
      */
     public function checkRankedPermission($permission) {
         $permissionsRanked = [
-            'Garden.Curation.Manage',
             'Garden.Settings.Manage',
             'Garden.Community.Manage',
             'Garden.Moderation.Manage',
+            'Garden.Curation.Manage',
             'Garden.SignIn.Allow',
 
         ];

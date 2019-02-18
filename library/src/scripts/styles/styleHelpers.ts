@@ -4,9 +4,30 @@
  */
 
 import { ColorHelper, important, percent, px, quote, viewHeight, viewWidth, color, deg } from "csx";
-import { BackgroundImageProperty, FlexWrapProperty } from "csstype";
+import {
+    BackgroundImageProperty,
+    BorderRadiusProperty,
+    BorderStyleProperty,
+    BorderWidthProperty,
+    FlexWrapProperty,
+    MarginTopProperty,
+    MarginRightProperty,
+    MarginBottomProperty,
+    MarginLeftProperty,
+    PaddingTopProperty,
+    PaddingRightProperty,
+    PaddingBottomProperty,
+    PaddingLeftProperty,
+    TopProperty,
+    LeftProperty,
+    RightProperty,
+    BottomProperty,
+    PositionProperty,
+} from "csstype";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { style, keyframes } from "typestyle";
+import { TLength } from "typestyle/lib/types";
+import { borderRadius } from "react-select/lib/theme";
 
 export function flexHelper() {
     const middle = (wrap = false) => {
@@ -53,17 +74,6 @@ export function fakeBackgroundFixed() {
         left: px(0),
         width: viewWidth(100),
         height: viewHeight(100),
-    };
-}
-
-export function fullSizeOfParent() {
-    return {
-        display: "block",
-        position: "absolute",
-        top: px(0),
-        left: px(0),
-        width: percent(100),
-        height: percent(100),
     };
 }
 
@@ -172,6 +182,75 @@ const spinnerLoaderAnimation = keyframes({
     "100%": { transform: `rotate(${deg(360 + spinnerOffset)})` },
 });
 
+interface IBorderStyles {
+    color?: ColorHelper | "transparent";
+    width?: BorderWidthProperty<TLength>;
+    style?: BorderStyleProperty;
+    radius?: BorderRadiusProperty<TLength>;
+}
+
+export const borderStyles = (styles: IBorderStyles) => {
+    return {
+        borderColor: styles.color ? styles.color.toString() : vars.border.color.toString(),
+        borderWidth: addUnitIfNumber(styles.width),
+        borderStyle: styles.style ? styles.style : vars.border.style,
+        borderRadius: addUnitIfNumber(styles.radius),
+    };
+};
+
+export const allLinkStates = (styles: object) => {
+    return {
+        ...styles,
+        $nest: {
+            "&:hover": styles,
+            "&:active": styles,
+            "&:visited": styles,
+        },
+    };
+};
+
+export const addUnitIfNumber = (val: string | number | undefined, unitFunction = px) => {
+    if (typeof val === "string") {
+        return val;
+    } else if (!!val && !isNaN(val)) {
+        return unitFunction(val as number);
+    } else {
+        return undefined;
+    }
+};
+
+interface IMargins {
+    top?: string | number;
+    right?: string | number;
+    bottom?: string | number;
+    left?: string | number;
+}
+
+export const margins = (styles: IMargins) => {
+    return {
+        marginTop: addUnitIfNumber(styles.top),
+        marginRight: addUnitIfNumber(styles.right),
+        marginBottom: addUnitIfNumber(styles.bottom),
+        marginLeft: addUnitIfNumber(styles.left),
+    };
+};
+
+interface IPaddings {
+    top?: string | number;
+    right?: string | number;
+    bottom?: string | number;
+    left?: string | number;
+}
+
+export const paddings = (styles: IPaddings) => {
+    return {
+        paddingTop: addUnitIfNumber(styles.top),
+        paddingRight: addUnitIfNumber(styles.right),
+        paddingBottom: addUnitIfNumber(styles.bottom),
+        paddingLeft: addUnitIfNumber(styles.left),
+    };
+};
+
 export const spinnerLoader = (
     spinnerColor: ColorHelper = vars.mainColors.primary,
     dimensions = px(18),
@@ -199,4 +278,83 @@ export const spinnerLoader = (
         animationIterationCount: "infinite",
         animationTimingFunction: "ease-in-out",
     };
+};
+
+export function fullSizeOfParent() {
+    return {
+        display: "block",
+        position: "absolute" as PositionProperty,
+        top: px(0),
+        left: px(0),
+        width: percent(100),
+        height: percent(100),
+    };
+}
+
+export const absolutePosition = {
+    topRight: (top: string | number = "0", right: RightProperty<TLength> = px(0)) => {
+        return {
+            position: "absolute" as PositionProperty,
+            top,
+            right,
+        };
+    },
+    topLeft: (top: string | number = "0", left: LeftProperty<TLength> = px(0)) => {
+        return {
+            position: "absolute" as PositionProperty,
+            top,
+            left,
+        };
+    },
+    bottomRight: (bottom: BottomProperty<TLength> = px(0), right: RightProperty<TLength> = px(0)) => {
+        return {
+            position: "absolute" as PositionProperty,
+            bottom,
+            right,
+        };
+    },
+    bottomLeft: (bottom: BottomProperty<TLength> = px(0), left: LeftProperty<TLength> = px(0)) => {
+        return {
+            position: "absolute" as PositionProperty,
+            bottom,
+            left,
+        };
+    },
+    middleOfParent: () => {
+        return {
+            position: "absolute" as PositionProperty,
+            display: "block",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            maxHeight: percent(100),
+            maxWidth: percent(100),
+            margin: "auto",
+        };
+    },
+    middleLeftOfParent: (left: LeftProperty<TLength> = px(0)) => {
+        return {
+            position: "absolute" as PositionProperty,
+            display: "block",
+            top: 0,
+            left,
+            bottom: 0,
+            maxHeight: percent(100),
+            maxWidth: percent(100),
+            margin: "auto 0",
+        };
+    },
+    middleRightOfParent: (right: RightProperty<TLength> = px(0)) => {
+        return {
+            position: "absolute" as PositionProperty,
+            display: "block",
+            top: 0,
+            right,
+            bottom: 0,
+            maxHeight: percent(100),
+            maxWidth: percent(100),
+            margin: "auto 0",
+        };
+    },
 };

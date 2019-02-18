@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { color, ColorHelper, percent, px } from "csx";
+import { color, ColorHelper, percent, px, rgba } from "csx";
 import { componentThemeVariables, getColorDependantOnLightness } from "@library/styles/styleHelpers";
 
 export const globalVariables = (theme?: object) => {
@@ -52,6 +52,7 @@ export const globalVariables = (theme?: object) => {
     const links = {
         color: mainColors.primary,
         visited: mainColors.primary,
+        ...themeVars.subComponentStyles("links"),
     };
 
     const body = {
@@ -61,9 +62,9 @@ export const globalVariables = (theme?: object) => {
 
     const border = {
         color: mainColors.fg.mix(mainColors.bg, 24),
-        width: px(1),
+        width: 1,
         style: "solid",
-        radius: px(6),
+        radius: 6,
         ...themeVars.subComponentStyles("border"),
     };
 
@@ -146,6 +147,31 @@ export const globalVariables = (theme?: object) => {
         ...themeVars.subComponentStyles("animation"),
     };
 
+    const embed = {
+        error: {
+            bg: feedbackColors.error,
+        },
+        focus: {
+            color: mainColors.primary,
+        },
+        text: {
+            padding: fonts.size.medium,
+        },
+        sizing: {
+            smallPadding: 4,
+            width: 640,
+        },
+        select: {
+            borderWidth: 2,
+        },
+        overlay: {
+            hover: {
+                color: mainColors.bg.fade(0.5),
+            },
+        },
+        ...themeVars.subComponentStyles("embed"),
+    };
+
     return {
         utility,
         elementaryColors,
@@ -163,5 +189,6 @@ export const globalVariables = (theme?: object) => {
         mixBgAndFg,
         animation,
         links,
+        embed,
     };
 };

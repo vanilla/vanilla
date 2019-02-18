@@ -13,11 +13,13 @@ import { IFileAttachment } from "@library/components/attachments/Attachment";
 import { getAttachmentIcon, AttachmentType } from "@library/components/attachments";
 import ProgressEventEmitter from "@library/ProgressEventEmitter";
 import { FOCUS_CLASS } from "@library/embeds";
+import { attachmentClasses } from "@library/styles/attachmentStyles";
 
 interface IProps extends IFileAttachment {
     type: AttachmentType;
     size: number; // bytes
     progressEventEmitter?: ProgressEventEmitter;
+    theme?: object;
 }
 
 interface IState {
@@ -35,23 +37,28 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
     public render() {
         const { title, name, type } = this.props;
         const label = title || name;
+        const classes = attachmentClasses(this.props.theme);
         return (
             <div
-                className={classNames("attachment", "isLoading", this.props.className, FOCUS_CLASS)}
+                className={classNames("attachment", "isLoading", this.props.className, FOCUS_CLASS, classes.root)}
                 tabIndex={0}
                 aria-label={t("Uploading...")}
             >
-                <div className="attachment-box attachment-loadingContent">
-                    <div className="attachment-format">{getAttachmentIcon(type)}</div>
-                    <div className="attachment-main">
-                        <div className="attachment-title">{label}</div>
-                        <div className="attachment-metas metas">
-                            <span className="meta">{t("Uploading...")}</span>
+                <div className={classNames("attachment-box", "attachment-loadingContent", classes.box)}>
+                    <div className={classNames("attachment-format", classes.format)}>{getAttachmentIcon(type)}</div>
+                    <div className={classNames("attachment-main", classes.main)}>
+                        <div className={classNames("attachment-title", classes.title)}>
+                            {label ? label : t("Uploading...")}
                         </div>
+                        {label && (
+                            <div className={classNames("attachment-metas", "metas", classes.metas)}>
+                                <span className="meta">{t("Uploading...")}</span>
+                            </div>
+                        )}
                     </div>
                     <CloseButton
                         title={t("Cancel")}
-                        className="attachment-close"
+                        className={classNames("attachment-close", classes.close)}
                         onClick={this.props.deleteAttachment}
                     />
                 </div>

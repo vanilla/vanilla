@@ -220,6 +220,17 @@ export const globalVariables = (theme?: object) => {
         },
     };
 
+    const overlay = {
+        bg: "",
+        dropShadow: {
+            color: "",
+            position: "",
+        },
+        border: {
+            color: "",
+        },
+    };
+
     return {
         utility,
         elementaryColors,
@@ -242,5 +253,6 @@ export const globalVariables = (theme?: object) => {
         embed,
         meta,
         states,
+        overlay,
     };
 };

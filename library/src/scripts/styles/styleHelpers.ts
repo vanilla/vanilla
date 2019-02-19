@@ -293,29 +293,29 @@ export const absolutePosition = {
     topRight: (top: string | number = "0", right: RightProperty<TLength> = px(0)) => {
         return {
             position: "absolute" as PositionProperty,
-            top,
-            right,
+            top: addUnitIfNumber(top),
+            right: addUnitIfNumber(right),
         };
     },
     topLeft: (top: string | number = "0", left: LeftProperty<TLength> = px(0)) => {
         return {
             position: "absolute" as PositionProperty,
-            top,
-            left,
+            top: addUnitIfNumber(top),
+            left: addUnitIfNumber(left),
         };
     },
     bottomRight: (bottom: BottomProperty<TLength> = px(0), right: RightProperty<TLength> = px(0)) => {
         return {
             position: "absolute" as PositionProperty,
-            bottom,
-            right,
+            bottom: addUnitIfNumber(bottom),
+            right: addUnitIfNumber(right),
         };
     },
     bottomLeft: (bottom: BottomProperty<TLength> = px(0), left: LeftProperty<TLength> = px(0)) => {
         return {
             position: "absolute" as PositionProperty,
-            bottom,
-            left,
+            bottom: addUnitIfNumber(bottom),
+            left: addUnitIfNumber(left),
         };
     },
     middleOfParent: () => {
@@ -365,6 +365,35 @@ export const absolutePosition = {
             height: percent(100),
         };
     },
+};
+
+export interface IDropShadowShorthand {
+    nonColorProps: string;
+    color: string;
+}
+
+export interface IDropShadow {
+    x: string;
+    y: string;
+    blur: string;
+    spread: string;
+    inset: boolean;
+    color: string;
+}
+
+export const dropShadow = (vals: IDropShadowShorthand | IDropShadow | "none" | "initial" | "inherit") => {
+    if (typeof vals !== "object") {
+        return { dropShadow: vals };
+    } else if ("nonColorProps" in vals) {
+        return { dropShadow: `${vals.nonColorProps} ${vals.color.toString()}` };
+    } else {
+        const { x, y, blur, spread, inset, shadowColor } = this.props;
+        return {
+            dropShadow: `${x ? x + " " : ""}${y ? y + " " : ""}${blur ? blur + " " : ""}${
+                spread ? spread + " " : ""
+            }${shadowColor}${inset ? " inset" : ""}`,
+        };
+    }
 };
 
 export const disabledInput = () => {

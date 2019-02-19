@@ -22,10 +22,12 @@ import { IInjectableUserState } from "@library/users/UsersModel";
 import classNames from "classnames";
 import get from "lodash/get";
 import * as React from "react";
+import { compactMeBoxClasses } from "@library/styles/compactMeBoxStyles";
 
 export interface IUserDropDownProps extends IInjectableUserState, IMeBoxProps {
     buttonClass?: string;
     userPhotoClass?: string;
+    theme?: object;
 }
 
 interface IState {
@@ -50,16 +52,17 @@ export default class CompactMeBox extends React.Component<IUserDropDownProps, IS
             countUnreadNotifications: 0,
         });
 
+        const classes = compactMeBoxClasses(this.props.theme);
         const countClass = this.props.countsClass;
         const buttonClass = this.props.buttonClass;
-        const panelContentClass = "compactMeBox-panel";
-        const panelBodyClass = "compactMeBox-body";
+        const panelContentClass = classNames("compactMeBox-panel", classes.panel);
+        const panelBodyClass = classNames("compactMeBox-body", classes.body);
 
         return (
-            <div className={classNames("compactMeBox", this.props.className)}>
+            <div className={classNames("compactMeBox", this.props.className, classes.root)}>
                 <Button
                     title={t("My Account")}
-                    className={classNames("compactMeBox-openButton", this.props.buttonClass)}
+                    className={classNames("compactMeBox-openButton", this.props.buttonClass, classes.openButton)}
                     onClick={this.open}
                     buttonRef={this.buttonRef}
                     baseClass={ButtonBaseClass.CUSTOM}
@@ -79,23 +82,32 @@ export default class CompactMeBox extends React.Component<IUserDropDownProps, IS
                         className="compactMeBox-modal"
                         exitHandler={this.close}
                     >
-                        <div className="compactMeBox-contents">
+                        <div className={classNames("compactMeBox-contents", classes.contents)}>
                             <CloseButton
                                 onClick={this.close}
-                                className="compactMeBox-closeModal"
+                                className={classNames("compactMeBox-closeModal", classes.closeModal)}
                                 baseClass={ButtonBaseClass.CUSTOM}
                             />
                             <Tabs
                                 label={t("My Account Tab")}
-                                className="compactMeBox-tabs inheritHeight"
-                                tabListClass="compactMeBox-tabList"
-                                tabPanelsClass="compactMeBox-tabPanels inheritHeight"
-                                tabPanelClass="compactMeBox-tabPanel inheritHeight"
-                                buttonClass={classNames(buttonClass, "compactMeBox-tabButton")}
+                                className={classNames("compactMeBox-tabs", "inheritHeight")}
+                                tabListClass={classNames("compactMeBox-tabList", classes.tabList)}
+                                tabPanelsClass={classNames(
+                                    "compactMeBox-tabPanels",
+                                    "inheritHeight",
+                                    classes.tabPanels,
+                                )}
+                                tabPanelClass={classNames("compactMeBox-tabPanel", "inheritHeight", classes.panel)}
+                                buttonClass={classNames(buttonClass, "compactMeBox-tabButton", classes.tabButton)}
                                 tabs={[
                                     {
                                         buttonContent: (
-                                            <div className="compactMeBox-tabButtonContent">
+                                            <div
+                                                className={classNames(
+                                                    "compactMeBox-tabButtonContent",
+                                                    classes.tabButtonContent,
+                                                )}
+                                            >
                                                 <UserPhoto
                                                     userInfo={userInfo}
                                                     open={this.state.open}
@@ -105,7 +117,12 @@ export default class CompactMeBox extends React.Component<IUserDropDownProps, IS
                                             </div>
                                         ),
                                         openButtonContent: (
-                                            <div className="compactMeBox-tabButtonContent">
+                                            <div
+                                                className={classNames(
+                                                    "compactMeBox-tabButtonContent",
+                                                    classes.tabButtonContent,
+                                                )}
+                                            >
                                                 <UserPhoto
                                                     userInfo={userInfo}
                                                     open={this.state.open}
@@ -125,14 +142,20 @@ export default class CompactMeBox extends React.Component<IUserDropDownProps, IS
                                         buttonContent: (
                                             <NotificationsCounter
                                                 open={false}
-                                                className="compactMeBox-tabButtonContent"
+                                                className={classNames(
+                                                    "compactMeBox-tabButtonContent",
+                                                    classes.tabButtonContent,
+                                                )}
                                                 countClass="vanillaHeader-count vanillaHeader-notificationsCount"
                                             />
                                         ),
                                         openButtonContent: (
                                             <NotificationsCounter
                                                 open={true}
-                                                className="compactMeBox-tabButtonContent"
+                                                className={classNames(
+                                                    "compactMeBox-tabButtonContent",
+                                                    classes.tabButtonContent,
+                                                )}
                                                 countClass="vanillaHeader-count vanillaHeader-notificationsCount"
                                             />
                                         ),
@@ -149,14 +172,20 @@ export default class CompactMeBox extends React.Component<IUserDropDownProps, IS
                                         buttonContent: (
                                             <MessagesCount
                                                 open={false}
-                                                className="compactMeBox-tabButtonContent"
+                                                className={classNames(
+                                                    "compactMeBox-tabButtonContent",
+                                                    classes.tabButtonContent,
+                                                )}
                                                 countClass={this.props.countClass}
                                             />
                                         ),
                                         openButtonContent: (
                                             <MessagesCount
                                                 open={true}
-                                                className="compactMeBox-tabButtonContent"
+                                                className={classNames(
+                                                    "compactMeBox-tabButtonContent",
+                                                    classes.tabButtonContent,
+                                                )}
                                                 countClass={this.props.countClass}
                                             />
                                         ),

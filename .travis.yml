@@ -145,7 +145,7 @@ env:
 notifications:
   slack:
     rooms:
-      secure: cNkM+jJmkVUbXA1Fh9C9YF8Dp9N6SwRMPDYD9M5rz8KHjHg1qHhBFxrPab+e01r07W+FikUA4+dw5OstteW1iGIoQLtYevW4M+rKOQxZxjET/q/UpK2DAM3kNiWfPsKkSlLWssc8mwBbW4yaCesdADYma/NtQJq3YN983AEvHq4=
+      secure: "Q3JgEgNfNfe2Ud6SSkBhQBTEXRJxA70LvDZmMWE7Nc04hLT74GPL5pqcm01euFMF7lkIqTwUrTbrD5pL6e0aW4af6zatx/r7H86DM4Qw8FODddKiBTGQg+vRTabmz/6aIacKkoEr3FLwES1uZwEJawX3LWZHu1NDN3zVjKVW2Ns="
     on_success: always
     on_failure: always
     on_pull_requests: true

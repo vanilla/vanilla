@@ -15,7 +15,7 @@ $siteNav-spacer_width               : 7px;
 
 $siteNav-node_active_color          : $link-default_color;
 $siteNav-node_borderWidth           : 1px;
-$siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWidth;
+$siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWidth * 2;
 
 .siteNav {
     position: relative;
@@ -73,7 +73,9 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     flex-grow: 1;
     color: inherit;
     line-height: $global-condensed_lineHeight;
+    min-height: 30px;
     outline: 0;
+    padding: 0;
 
     &:active,
     &:focus {
@@ -99,14 +101,15 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     display: block;
     width: calc(100% + #{$siteNav-nodeToggle_width});
     margin-left: -$siteNav-nodeToggle_width;
+    text-align: left;
     border: {
         style: solid;
         width: $siteNav-node_borderWidth;
         color: transparent;
     }
     padding: {
-        top: $siteNav-node_padding;
-        bottom: $siteNav-node_padding;
+        top: $siteNav-node_padding + $siteNav-node_borderWidth;
+        bottom: $siteNav-node_padding + $siteNav-node_borderWidth;
         right: $siteNav-node_padding;
         left: $siteNav-nodeToggle_width - $siteNav-node_borderWidth;
     }
@@ -150,6 +153,6 @@ $siteNav-node_padding               : $utility-baseUnit - $siteNav-node_borderWi
     justify-content: flex-end;
     width: $siteNav-nodeToggle_width;
     margin-left: -#{$siteNav-nodeToggle_width};
-    top: #{(37 / 2)}px;
+    top: 16px;
     transform: translateY(-50%);
 }

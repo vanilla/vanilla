@@ -1674,7 +1674,7 @@ class CommentModel extends Gdn_Model {
             return true;
         }
 
-        //
+        // Check if user can view the category contents.
         if (CategoryModel::checkPermission($category, 'Vanilla.Comments.View')) {
             return false;
         }

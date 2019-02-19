@@ -358,6 +358,11 @@ $dic->call(function (
     $config->overlayDynamic();
 
     /**
+     * Bootstrap the MessageQueue component
+     */
+    \Garden\MessageQueue\JobQueue::bootstrap($dic);
+
+    /**
      * Bootstrap Late
      *
      * All configurations are loaded, as well as the Application, Plugin and Theme
@@ -438,3 +443,8 @@ require_once PATH_LIBRARY_CORE.'/functions.render.php';
 if (!defined('CLIENT_NAME')) {
     define('CLIENT_NAME', 'vanilla');
 }
+
+// Trigger BeforeShutdown Event
+register_shutdown_function(function () use ($dic) {
+    $dic->get("Gdn_Dispatcher")->fireEvent("BeforeShutdown");
+});

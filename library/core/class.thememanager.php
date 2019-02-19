@@ -544,7 +544,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     /**
      * Checks if a theme has theme options.
      *
-     * @param $themeKey The key value of the theme we're checking.
+     * @param string $themeKey The key value of the theme we're checking.
      * @return bool Whether the given theme has theme options.
      */
     public function hasThemeOptions($themeKey) {

@@ -14,9 +14,22 @@
     @include maxWidth($theme-breakpoint_tablet) {
 
         .SearchBox,
-        .BoxNewDiscussion,
         .BoxCategories {
             display: none;
+        }
+
+        .BoxNewDiscussion.BoxNewDiscussion {
+            margin: $utility-baseUnitTriple 0;
+        }
+
+        .ButtonGroup.Multi,
+        .BigButton {
+            margin-left: auto;
+            margin-right: auto;
+
+            @include maxWidth(500px) {
+                max-width: 100%;
+            }
         }
 
         .Box h4 {

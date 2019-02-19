@@ -144,9 +144,5 @@ env:
 # Send cron job notification to our Slack room.
 notifications:
   slack:
-    rooms:
-      secure: "Q3JgEgNfNfe2Ud6SSkBhQBTEXRJxA70LvDZmMWE7Nc04hLT74GPL5pqcm01euFMF7lkIqTwUrTbrD5pL6e0aW4af6zatx/r7H86DM4Qw8FODddKiBTGQg+vRTabmz/6aIacKkoEr3FLwES1uZwEJawX3LWZHu1NDN3zVjKVW2Ns="
-    on_success: always
-    on_failure: always
-    on_pull_requests: true
+    secure: "eud+r2fXw0iHVBgt7Eu/gLlUE/v40DDuaVnFi+/MdPcGXsvBUqPbhE9fH8o1WndxkBx6auLO7x+aX+vQiPFc2EnJa3SlVe6/S+d4gfrvUHtrFD7QyCiq7LIK7YHfkwz1Fde7XsTtYxdxf75VquDMDo3c3Ksfr9OovQY8rGZKlpA="
 

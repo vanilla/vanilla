@@ -33,7 +33,7 @@ $breadcrumbs_lineHeight:                         $global-condensed_lineHeight !d
     color: $breadcrumbs_fg;
     font-size: $global-small_fontSize;
     font-weight: $breadcrumbs_fontWeight;
-    margin-bottom: $utility-baseUnitTriple;
+    padding: $utility-baseUnitDouble 0;
 
     a {
         font-size: inherit;

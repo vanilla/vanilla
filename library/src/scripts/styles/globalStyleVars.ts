@@ -235,6 +235,8 @@ export const globalVariables = (theme?: object) => {
         lineHeights,
         icon,
         mixBgAndFg,
+        mixPrimaryAndFg,
+        mixPrimaryAndBg,
         animation,
         links,
         embed,

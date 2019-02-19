@@ -23,6 +23,7 @@ import {
     RightProperty,
     BottomProperty,
     PositionProperty,
+    GlobalsNumber,
 } from "csstype";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { style, keyframes } from "typestyle";
@@ -288,17 +289,6 @@ export const spinnerLoader = (
     };
 };
 
-export function fullSizeOfParent() {
-    return {
-        display: "block",
-        position: "absolute" as PositionProperty,
-        top: px(0),
-        left: px(0),
-        width: percent(100),
-        height: percent(100),
-    };
-}
-
 export const absolutePosition = {
     topRight: (top: string | number = "0", right: RightProperty<TLength> = px(0)) => {
         return {
@@ -365,6 +355,16 @@ export const absolutePosition = {
             margin: "auto 0",
         };
     },
+    fullSizeOfParent: () => {
+        return {
+            display: "block",
+            position: "absolute" as PositionProperty,
+            top: px(0),
+            left: px(0),
+            width: percent(100),
+            height: percent(100),
+        };
+    },
 };
 
 export const disabledInput = () => {
@@ -372,6 +372,6 @@ export const disabledInput = () => {
         pointerEvents: important("none"),
         userSelect: important("none"),
         cursor: important("default"),
-        opacity: important(formElementVars.disabled.opacity),
+        opacity: important((formElementVars.disabled.opacity as any).toString()),
     };
 };

@@ -14,6 +14,7 @@ import {
     defaultTransition,
     srOnly,
     disabledInput,
+    flexHelper,
 } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
@@ -56,11 +57,6 @@ export function checkRadioVariables(theme?: object) {
             width: 6,
             height: 6,
         },
-        bar: {
-            fg: globalVars.mainColors.primary,
-            width: 8,
-            height: 2,
-        },
     };
 
     const radioButton = {
@@ -86,7 +82,8 @@ export function checkRadioVariables(theme?: object) {
 export function checkRadioClasses(theme?: object) {
     const globalVars = globalVariables(theme);
     const vars = checkRadioVariables(theme);
-    const debug = debugHelper("attachment");
+    const debug = debugHelper("checkRadio");
+    const flexes = flexHelper();
 
     //.radioButton,
     //.checkbox
@@ -114,49 +111,44 @@ export function checkRadioClasses(theme?: object) {
             },
             ".radioButton-input:not([disabled]), .checkbox-input:not([disabled])": {
                 $nest: {
-                    ".radioButton-input:not([disabled]), .checkbox-input:not([disabled])": {
+                    "&:focus, &:active": {
                         $nest: {
-                            "&:focus, &:active": {
-                                $nest: {
-                                    "& + .radioButton-disk, & + .checkbox-box": {
-                                        borderColor: vars.main.hover.border.color.toString(),
-                                    },
-                                },
+                            "& + .radioButton-disk, & + .checkbox-box": {
+                                borderColor: vars.main.hover.border.color.toString(),
                             },
                         },
                     },
                 },
             },
 
-            "& + .radioButton,& + .checkbox": {
+            "& + .radioButton, & + .checkbox": {
                 marginTop: px(12),
             },
         },
-        ...debug.name(),
     });
 
     //.radioButton-label,
     // .checkbox-label
-    const label = {
+    const label = style({
         ...debug.name("label"),
         lineHeight: addUnitIfNumber(vars.sizing.width),
         marginLeft: addUnitIfNumber(8),
         cursor: "pointer",
         userSelect: "none",
-    };
+    });
 
-    const labelNote = {
+    const labelNote = style({
         ...debug.name("labelNote"),
         display: "inline-block",
         fontSize: addUnitIfNumber(vars.labelNote.fontSize),
         marginLeft: addUnitIfNumber(24),
         opacity: vars.labelNote.opacity,
         verticalAlign: "middle",
-    };
+    });
 
     // .radioButton-disk,
     // .checkbox-box
-    const iconContainer = {
+    const iconContainer = style({
         ...debug.name("iconContainer"),
         ...defaultTransition("border", "background", "opacity"),
         position: "relative",
@@ -167,54 +159,48 @@ export function checkRadioClasses(theme?: object) {
         cursor: "pointer",
         backgroundColor: vars.main.bg,
         ...borderStyles(vars.border),
-    };
+    });
 
-    const radioIcon = {
+    const radioIcon = style({
         ...debug.name("radioIcon"),
         ...absolutePosition.middleLeftOfParent(),
         display: "none",
         width: addUnitIfNumber(vars.radioButton.icon.width),
         height: addUnitIfNumber(vars.radioButton.icon.height),
         margin: "auto",
-    };
+    });
 
-    const checkBoxIcon = {
+    const checkIcon = style({
         ...debug.name("checkBoxIcon"),
-        ...absolutePosition.middleLeftOfParent(),
+        ...absolutePosition.middleOfParent(),
         display: "none",
         width: addUnitIfNumber(vars.checkBox.check.width),
         height: addUnitIfNumber(vars.checkBox.check.height),
+        color: vars.main.fg.toString(),
         margin: "auto",
-    };
+    });
 
-    // For mixed values. Example, you've got a checkbox above a columb to check or uncheck all, but the column has both checked and unchecked values.
-    const checkBoxBar = {
-        ...debug.name("checkBoxBar"),
-        color: vars.checkBox.bar.fg.toString(),
-        width: addUnitIfNumber(vars.checkBox.bar.width),
-        height: addUnitIfNumber(vars.checkBox.bar.height),
-    };
-
-    const disk = {
+    const disk = style({
         ...debug.name("disk"),
         borderRadius: percent(50),
-    };
+    });
 
     // .radioButton-state,
     // .checkbox-state
-    const state = {
+    const state = style({
         ...debug.name("state"),
-        color: vars.main.checked.fg.toString(),
-    };
+        ...absolutePosition.fullSizeOfParent(),
+        color: vars.main.checked.fg,
+    });
 
-    const diskIcon = {
+    const diskIcon = style({
         width: vars.checkBox.disk.width,
         height: vars.checkBox.disk.height,
-    };
+    });
 
     // .radioButton-input,
     // .checkbox-input
-    const input = {
+    const input = style({
         ...srOnly(),
         $nest: {
             "&:checked": {
@@ -245,7 +231,7 @@ export function checkRadioClasses(theme?: object) {
                 },
             },
         },
-    };
+    });
 
     return {
         root,
@@ -253,8 +239,7 @@ export function checkRadioClasses(theme?: object) {
         labelNote,
         iconContainer,
         radioIcon,
-        checkBoxIcon,
-        checkBoxBar,
+        checkIcon,
         disk,
         state,
         diskIcon,

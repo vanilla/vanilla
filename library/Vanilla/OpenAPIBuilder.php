@@ -144,8 +144,17 @@ class OpenAPIBuilder {
         foreach ($addons as $addon) {
             /* @var Addon $addon */
 
-            $glob = $addon->path('/openapi/*.{json,yml,yaml}', Addon::PATH_FULL);
-            $paths = glob($glob, GLOB_BRACE);
+            if (defined("GLOB_BRACE")) {
+                $glob = $addon->path('/openapi/*.{json,yml,yaml}', Addon::PATH_FULL);
+                $paths = glob($glob, GLOB_BRACE);
+            } else {
+                // GLOB_BRACE not available on this platform? Got to do it the longform way.
+                $paths = array_merge(
+                    glob($addon->path('/openapi/*.json', Addon::PATH_FULL)),
+                    glob($addon->path('/openapi/*.yml', Addon::PATH_FULL)),
+                    glob($addon->path('/openapi/*.yaml', Addon::PATH_FULL))
+                );
+            }
 
             foreach ($paths as $path) {
                 $data = $this->getFileData($path);

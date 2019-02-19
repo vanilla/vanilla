@@ -4,7 +4,7 @@
     "description": "A responsive Vanilla theme with customization options.",
     "version": "1.0.0",
     "hidden": false,
-     "authors": [
+    "authors": [
         {
             "name": "Isis Graziatto",
             "email": "isis.g@vanillaforums.com",
@@ -16,6 +16,7 @@
             "homepage": "http://vanillaforums.com"
         }
     ],
+    "isResponsive": true,
     "license": "GPL-2.0-only",
     "sites": [],
     "priority": 1000,

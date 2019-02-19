@@ -1,0 +1,352 @@
+openapi: 3.0.2
+info:
+paths:
+  /drafts:
+    get:
+      parameters:
+      - description: |
+          Filter drafts by record type.
+        in: query
+        name: recordType
+        schema:
+          enum:
+          - comment
+          - discussion
+          type: string
+      - description: >
+          Filter by the unique ID of the parent for a draft. Used with
+          recordType.
+        in: query
+        name: parentRecordID
+        schema:
+          type: integer
+        allowEmptyValue: true
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  properties:
+                    attributes:
+                      description: >-
+                        A free-form object containing all custom data for this
+                        draft.
+                      type: object
+                    dateInserted:
+                      description: When the draft was created.
+                      format: date-time
+                      type: string
+                    dateUpdated:
+                      description: When the draft was updated.
+                      format: date-time
+                      nullable: true
+                      type: string
+                    draftID:
+                      description: The unique ID of the draft.
+                      type: integer
+                    insertUserID:
+                      description: The unique ID of the user who created this draft.
+                      type: integer
+                    parentRecordID:
+                      description: The unique ID of the intended parent to this record.
+                      nullable: true
+                      type: integer
+                    recordType:
+                      description: The type of record associated with this draft.
+                      enum:
+                      - comment
+                      - discussion
+                      minLength: 1
+                      type: string
+                    updateUserID:
+                      description: The unique ID of the user who updated this draft.
+                      nullable: true
+                      type: integer
+                  required:
+                  - draftID
+                  - recordType
+                  - parentRecordID
+                  - attributes
+                  - insertUserID
+                  - dateInserted
+                  - updateUserID
+                  - dateUpdated
+                  type: object
+                type: array
+          description: Success
+      tags:
+      - Drafts
+      summary: List drafts created by the current user.
+    post:
+      summary: Create a draft.
+      responses:
+        '201':
+          content:
+            'application/json':
+              schema:
+                properties:
+                  attributes:
+                    description: |
+                      A free-form object containing all custom data for this draft.
+                    type: object
+                  dateInserted:
+                    description: When the draft was created.
+                    format: date-time
+                    type: string
+                  dateUpdated:
+                    description: When the draft was updated.
+                    format: date-time
+                    nullable: true
+                    type: string
+                  draftID:
+                    description: The unique ID of the draft.
+                    type: integer
+                  insertUserID:
+                    description: The unique ID of the user who created this draft.
+                    type: integer
+                  parentRecordID:
+                    description: The unique ID of the intended parent to this record.
+                    nullable: true
+                    type: integer
+                  recordType:
+                    description: The type of record associated with this draft.
+                    enum:
+                    - comment
+                    - discussion
+                    minLength: 1
+                    type: string
+                  updateUserID:
+                    description: The unique ID of the user who updated this draft.
+                    nullable: true
+                    type: integer
+                required:
+                - draftID
+                - recordType
+                - parentRecordID
+                - attributes
+                - insertUserID
+                - dateInserted
+                - updateUserID
+                - dateUpdated
+                type: object
+          description: Success
+      tags:
+      - Drafts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DraftPost'
+        required: true
+  '/drafts/{id}':
+    delete:
+      parameters:
+      - description: |
+          The draft ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Drafts
+      summary: Delete a draft.
+    get:
+      parameters:
+      - description: |
+          The draft ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                properties:
+                  attributes:
+                    description: |
+                      A free-form object containing all custom data for this draft.
+                    type: object
+                  dateInserted:
+                    description: When the draft was created.
+                    format: date-time
+                    type: string
+                  dateUpdated:
+                    description: When the draft was updated.
+                    format: date-time
+                    nullable: true
+                    type: string
+                  draftID:
+                    description: The unique ID of the draft.
+                    type: integer
+                  insertUserID:
+                    description: The unique ID of the user who created this draft.
+                    type: integer
+                  parentRecordID:
+                    description: The unique ID of the intended parent to this record.
+                    nullable: true
+                    type: integer
+                  recordType:
+                    description: The type of record associated with this draft.
+                    enum:
+                    - comment
+                    - discussion
+                    minLength: 1
+                    type: string
+                  updateUserID:
+                    description: The unique ID of the user who updated this draft.
+                    nullable: true
+                    type: integer
+                required:
+                - draftID
+                - recordType
+                - parentRecordID
+                - attributes
+                - insertUserID
+                - dateInserted
+                - updateUserID
+                - dateUpdated
+                type: object
+          description: Success
+      tags:
+      - Drafts
+      summary: Get a draft.
+    patch:
+      parameters:
+      - description: The draft ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                properties:
+                  attributes:
+                    description: |
+                      A free-form object containing all custom data for this draft.
+                    type: object
+                  draftID:
+                    description: The unique ID of the draft.
+                    type: integer
+                  parentRecordID:
+                    description: The unique ID of the intended parent to this record.
+                    nullable: true
+                    type: integer
+                required:
+                - draftID
+                - parentRecordID
+                - attributes
+                type: object
+          description: Success
+      tags:
+      - Drafts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DraftPost'
+        required: true
+      summary: Update a draft.
+  '/drafts/{id}/edit':
+    get:
+      parameters:
+      - description: |
+          The draft ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                properties:
+                  attributes:
+                    description: |
+                      A free-form object containing all custom data for this draft.
+                    type: object
+                  draftID:
+                    description: The unique ID of the draft.
+                    type: integer
+                  parentRecordID:
+                    description: The unique ID of the intended parent to this record.
+                    nullable: true
+                    type: integer
+                required:
+                - draftID
+                - parentRecordID
+                - attributes
+                type: object
+          description: Success
+      tags:
+      - Drafts
+      summary: Get a draft for editing.
+components:
+  schemas:
+    DraftPost:
+      type: object
+      properties:
+        attributes:
+          description: A free-form object containing all custom data for this draft.
+          type: object
+        parentRecordID:
+          description: The unique ID of the intended parent to this record.
+          nullable: true
+          type: integer
+        recordType:
+          description: The type of record associated with this draft.
+          enum:
+          - comment
+          - discussion
+          minLength: 1
+          type: string
+      required:
+      - recordType
+      - attributes
+    DraftPatch:
+      type: object
+      properties:
+        attributes:
+          description: A free-form object containing all custom data for this draft.
+          type: object
+        parentRecordID:
+          description: The unique ID of the intended parent to this record.
+          nullable: true
+          type: integer
+        recordType:
+          description: The type of record associated with this draft.
+          enum:
+          - comment
+          - discussion
+          minLength: 1
+          type: string

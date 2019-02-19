@@ -1,0 +1,137 @@
+openapi: 3.0.2
+info:
+paths:
+  /notifications:
+    get:
+      parameters:
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+        in: query
+        name: page
+        required: true
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/NotificationSchema'
+                type: array
+          description: Success
+      tags:
+      - Notifications
+      summary: List notifications for the current user.
+    patch:
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Notifications
+      requestBody:
+        $ref: '#/components/requestBodies/NotificationSchema'
+      summary: Update all notifications.
+  '/notifications/{id}':
+    get:
+      parameters:
+      - description: |
+          The notification ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSchema'
+          description: Success
+      tags:
+      - Notifications
+      summary: Get a single notification.
+    patch:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSchema'
+          description: Success
+      tags:
+      - Notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationSchema'
+        required: true
+      summary: Update a notification.
+components:
+  requestBodies:
+    NotificationSchema:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotificationSchema'
+      required: true
+  schemas:
+    NotificationSchema:
+      properties:
+        body:
+          description: 'The notification text. This contains some HTML, but only <b> tags.'
+          type: string
+        dateInserted:
+          description: When the notification was first made.
+          format: date-time
+          type: string
+        dateUpdated:
+          description: >-
+            When the notification was last updated.
+
+
+            Notifications on the same record will group together into a single
+            notification, updating just the dateUpdated property.
+          format: date-time
+          type: string
+        notificationID:
+          description: A unique ID to identify the notification.
+          type: integer
+        photoUrl:
+          description: An avatar or thumbnail associated with the notification.
+          nullable: true
+          type: string
+        read:
+          description: Whether or not the notification has been seen.
+          type: boolean
+        url:
+          description: The target of the notification.
+          type: string
+      required:
+      - notificationID
+      - body
+      - photoUrl
+      - url
+      - dateInserted
+      - dateUpdated
+      - read
+      type: object

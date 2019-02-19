@@ -18,7 +18,7 @@ import {
 } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { percent, px } from "csx";
+import { important, percent, px } from "csx";
 
 export function checkRadioVariables(theme?: object) {
     const globalVars = globalVariables(theme);
@@ -28,7 +28,7 @@ export function checkRadioVariables(theme?: object) {
     const border = {
         width: formElementVars.border.width,
         radius: 2,
-        color: globalVars.mixBgAndFg(0.8),
+        color: globalVars.mixBgAndFg(0.5),
         ...themeVars.subComponentStyles("border"),
     };
 
@@ -40,7 +40,7 @@ export function checkRadioVariables(theme?: object) {
         },
         hover: {
             border: {
-                color: globalVars.mainColors.primary,
+                color: globalVars.mixPrimaryAndBg(0.682),
             },
             bg: globalVars.states.hover.color,
             opacity: 0.8,
@@ -96,31 +96,20 @@ export function checkRadioClasses(theme?: object) {
         $nest: {
             "&:hover": {
                 $nest: {
-                    ".radioButton-input:not([disabled]), .checkbox-input:not([disabled])": {
+                    "& .radioButton-input:not([disabled]), & .checkbox-input:not([disabled])": {
                         $nest: {
                             "& + .radioButton-disk, & + .checkbox-box": {
                                 borderColor: vars.main.hover.border.color.toString(),
                                 opacity: vars.main.hover.opacity,
+                                backgroundColor: vars.main.hover.bg.toString(),
                             },
                         },
                     },
-                    ".radioButton-disk, .checkbox-box": {
+                    "& .radioButton-disk, & .checkbox-box": {
                         backgroundColor: vars.main.hover.bg,
                     },
                 },
             },
-            ".radioButton-input:not([disabled]), .checkbox-input:not([disabled])": {
-                $nest: {
-                    "&:focus, &:active": {
-                        $nest: {
-                            "& + .radioButton-disk, & + .checkbox-box": {
-                                borderColor: vars.main.hover.border.color.toString(),
-                            },
-                        },
-                    },
-                },
-            },
-
             "& + .radioButton, & + .checkbox": {
                 marginTop: px(12),
             },
@@ -202,17 +191,24 @@ export function checkRadioClasses(theme?: object) {
     // .checkbox-input
     const input = style({
         ...srOnly(),
+        ...debug.name("input"),
         $nest: {
-            "&:checked": {
+            "&:not([disabled]):focus, &:not([disabled]):active, &:not([disabled]).focus-visible ": {
                 $nest: {
                     "& + .radioButton-disk, & + .checkbox-box": {
-                        backgroundColor: vars.main.checked.bg.toString(),
-                        borderColor: vars.main.checked.bg.toString(),
-                        $nest: {
-                            ".radioButton-diskIcon, .checkbox-checkIcon": {
-                                display: "block",
-                            },
-                        },
+                        borderColor: vars.main.hover.border.color.toString(),
+                        opacity: vars.main.hover.opacity,
+                        backgroundColor: vars.main.hover.bg.toString(),
+                    },
+                },
+            },
+            "&:checked + .radioButton-disk, &:checked + .checkbox-box": {
+                ...debug.name("checked"),
+                backgroundColor: important(vars.main.checked.bg.toString()),
+                borderColor: vars.main.checked.bg.toString(),
+                $nest: {
+                    "& .radioButton-diskIcon, & .checkbox-checkIcon": {
+                        display: "block",
                     },
                 },
             },

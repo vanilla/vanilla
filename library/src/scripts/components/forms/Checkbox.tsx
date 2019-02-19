@@ -54,6 +54,7 @@ export default class Checkbox extends React.Component<IProps, IState> {
                     onChange={this.props.onChange}
                     checked={this.props.checked}
                     disabled={this.props.disabled}
+                    tabIndex={0}
                 />
                 <span className={classNames("checkbox-box", classes.iconContainer)} aria-hidden="true">
                     <span className={classNames("checkbox-state", classes.state)}>

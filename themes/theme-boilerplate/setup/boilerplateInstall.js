@@ -20,8 +20,6 @@ if (!utils.validateArgs(themeKey, themeName)) {
     console.error('Install command should be followed by the theme-key and "Theme Name"');
     process.exit(1);
 }
-const themeHooksFileName = utils.convertToDashedCase(themeKey);
-const themeHooksClassName = utils.convertToPascalCase(themeKey);
 
 try {
     //copy addon.json
@@ -77,6 +75,9 @@ try {
 
     //copy views/ dir
     fse.copySync(path.resolve(TOOL_ROOT, "views"), path.resolve(DEST, "views"));
+
+    //copy settings/ dir
+    fse.copySync(path.resolve(TOOL_ROOT, "settings"), path.resolve(DEST, "settings"));
 
     console.log("Boilerplate successfully installed!");
 

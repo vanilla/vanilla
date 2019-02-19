@@ -34,16 +34,6 @@ try {
         fse.writeFileSync(path.resolve(DEST, "addon.json"), data);
     });
 
-    //copy class.vanillathemeboilerplate.themehooks.php and rename it
-    fse.copyFileSync(path.resolve(TOOL_ROOT, "class.vanillathemeboilerplate.themehooks.php"), path.resolve(DEST, "class."+themeHooksFileName+".themehooks.php"));
-    fse.readFile(path.resolve(DEST, "class."+themeHooksFileName+".themehooks.php"), 'utf8', function (err,data) {
-
-        data = data.replace(/theme-boilerplate/g, themeKey);
-        data = data.replace(/VanillaThemeBoilerplate/g, themeHooksClassName);
-
-        fse.writeFileSync(path.resolve(DEST, "class."+themeHooksFileName+".themehooks.php"), data);
-    });
-
     //copy README.md and swap theme name
     fse.copyFileSync(path.resolve(TOOL_ROOT, "setup/src/README.md"), path.resolve(DEST, "README.md"));
     fse.readFile(path.resolve(DEST, "README.md"), 'utf8', function (err,data) {

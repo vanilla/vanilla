@@ -1993,13 +1993,17 @@ class SettingsController extends DashboardController {
 
         // Filter themes.
         foreach ($Themes as $ThemeKey => $ThemeData) {
+            $isMobile = $ThemeData['IsMobile'] ?? false;
+            $isArchived = $ThemeData['Archived'] ?? false;
+            $isResponsive = $ThemeData['IsResponsive'] ?? false;
+
             // Only show mobile themes.
-            if (empty($ThemeData['IsMobile'])) {
+            if (!$isMobile && !$isResponsive) {
                 unset($Themes[$ThemeKey]);
             }
 
             // Remove themes that are archived
-            if (!empty($ThemeData['Archived'])) {
+            if ($isArchived) {
                 unset($Themes[$ThemeKey]);
             }
         }

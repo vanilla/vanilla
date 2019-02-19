@@ -90,7 +90,7 @@ class Addon implements Contracts\AddonInterface {
         $this->setClasses($classes);
 
         // Scan for a structure file.
-        if ($this->getType() === static::TYPE_ADDON) {
+        if ($this->getType() === static::TYPE_ADDON || $this->getType() === static::TYPE_THEME) {
             if (file_exists($this->path('/settings/structure.php'))) {
                 $this->special['structure'] = '/settings/structure.php';
             }

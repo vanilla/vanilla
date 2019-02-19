@@ -26,6 +26,7 @@ interface IProps extends RouteComponentProps<{}> {
     onItemHover?(item: INavigationTreeItem);
     title?: string;
     hiddenTitle?: boolean;
+    clickableCategoryLabels?: boolean;
 }
 
 /**
@@ -46,6 +47,7 @@ export class SiteNav extends React.Component<IProps> {
                           depth={0}
                           collapsible={collapsible}
                           onItemHover={onItemHover}
+                          clickableCategoryLabels={!!this.props.clickableCategoryLabels}
                       />
                   );
               })

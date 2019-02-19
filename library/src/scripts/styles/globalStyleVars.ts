@@ -49,6 +49,11 @@ export const globalVariables = (theme?: object) => {
         ...themeVars.subComponentStyles("feedbackColors"),
     };
 
+    const links = {
+        color: mainColors.primary,
+        visited: mainColors.primary,
+    };
+
     const body = {
         bg: mainColors.bg,
         ...themeVars.subComponentStyles("body"),
@@ -157,5 +162,6 @@ export const globalVariables = (theme?: object) => {
         icon,
         mixBgAndFg,
         animation,
+        links,
     };
 };

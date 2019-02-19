@@ -302,11 +302,11 @@ class DashboardHooks extends Gdn_Plugin {
         $nav = $sender;
 
         $session = Gdn::session();
-        $mobileTheme = $this->addonManager->lookupTheme($this->desktopThemeKey);
-        $desktopTheme = $this->addonManager->lookupTheme($this->mobileThemeKey);
+        $desktopTheme = $this->addonManager->lookupTheme($this->desktopThemeKey);
+        $mobileTheme = $this->addonManager->lookupTheme($this->mobileThemeKey);
         $isDistinctMobileTheme = $mobileTheme !== $desktopTheme;
-        $hasThemeOptions = $desktopTheme->getInfoValue('options') !== null;
-        $hasMobileThemeOptions = $isDistinctMobileTheme &&  $mobileTheme->getInfoValue('options') !== null;
+        $hasThemeOptions = count($desktopTheme->getInfoValue('options', [])) > 0;
+        $hasMobileThemeOptions = $isDistinctMobileTheme && count($mobileTheme->getInfoValue('options', [])) > 0;
 
         $sort = -1; // Ensure these nav items come before any plugin nav items.
 

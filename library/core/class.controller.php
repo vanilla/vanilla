@@ -153,6 +153,9 @@ class Gdn_Controller extends Gdn_Pluggable {
     /** @var string Name of the view that has been requested. Typically part of the view's file name. ie. $this->View.'.php' */
     public $View;
 
+    /** @var bool Indicate that the controller add the `defer` attribute to it's legacy scripts. */
+    protected $useDeferredLegacyScripts;
+
     /** @var array An array of CSS file names to search for in theme folders & include in the page. */
     protected $_CssFiles;
 
@@ -215,6 +218,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      *
      */
     public function __construct() {
+        $this->useDeferredLegacyScripts = \Vanilla\FeatureFlagHelper::featureEnabled('DeferredLegacyScripts');
         $this->Application = '';
         $this->ApplicationFolder = '';
         $this->Assets = [];
@@ -1911,7 +1915,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $section = $this->MasterView === 'admin' ? 'admin' : 'forum';
                 $jsAssets = $webpackAssetProvider->getScripts($section);
                 foreach ($jsAssets as $asset) {
-                    $this->Head->addScript($asset->getWebPath(), 'text/javascript', false, ['defer' => 'true']);
+                    $this->Head->addScript($asset->getWebPath(), 'text/javascript', false, ['defer' => 'defer']);
                 }
 
                 // The the built stylesheets
@@ -1926,6 +1930,10 @@ class Gdn_Controller extends Gdn_Pluggable {
                         $JsInfo['Options'] = [];
                     }
                     $Options = &$JsInfo['Options'];
+
+                    if ($this->useDeferredLegacyScripts) {
+                        $Options['defer'] = 'defer';
+                    }
 
                     if (isset($Cdns[$JsFile])) {
                         $JsFile = $Cdns[$JsFile];

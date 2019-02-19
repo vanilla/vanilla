@@ -53,7 +53,7 @@ export default class SiteNavNode extends React.Component<IProps> {
             isFirstLevel: this.props.depth === 0,
         });
 
-        if (this.props.clickableCategoryLabels) {
+        if (this.props.clickableCategoryLabels && hasChildren) {
             linkContents = (
                 <Button
                     baseClass={ButtonBaseClass.CUSTOM}

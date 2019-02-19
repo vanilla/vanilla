@@ -357,10 +357,10 @@ class Gdn_Email extends Gdn_Pluggable {
             throw new Exception('No valid email recipients.', self::ERR_SKIPPED);
         }
 
-        $this->PhpMailer->setThrowExceptions(true);
-        if (!$this->PhpMailer->send()) {
-            throw new Exception($this->PhpMailer->ErrorInfo);
-        }
+        // Schedules a SendMailJob
+        /* @var $jobQueue \Garden\MessageQueue\JobQueue */
+        $jobQueue = Gdn::getContainer()->get('JobQueue');
+        $jobQueue->addJob(Vanilla\Job\SendMailJob::class, ['phpMailer' => $this->PhpMailer]);
 
         return true;
     }

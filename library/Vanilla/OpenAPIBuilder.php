@@ -100,7 +100,7 @@ class OpenAPIBuilder {
         if (!($fp = @fopen($temp, 'wb'))) {
             $temp = dirname($filename).DIRECTORY_SEPARATOR.uniqid('atomic');
             if (!($fp = @fopen($temp, 'wb'))) {
-                trigger_error("AddonManager::filePutContents(): error writing temporary file '$temp'", E_USER_WARNING);
+                trigger_error("OpenAPIBuilder::filePutContents(): error writing temporary file '$temp'", E_USER_WARNING);
                 return false;
             }
         }
@@ -112,7 +112,7 @@ class OpenAPIBuilder {
             $r = @unlink($filename);
             $r &= @rename($temp, $filename);
             if (!$r) {
-                trigger_error("AddonManager::filePutContents(): error writing file '$filename'", E_USER_WARNING);
+                trigger_error("OpenAPIBuilder::filePutContents(): error writing file '$filename'", E_USER_WARNING);
                 return false;
             }
         }

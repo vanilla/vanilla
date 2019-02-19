@@ -26,7 +26,7 @@ export const searchVariables = (theme?: object) => {
 
     const placeholder = {
         color: globalVars.mainColors.fg,
-        ...themeVars.subComponentStyles("input"),
+        ...themeVars.subComponentStyles("placeholder"),
     };
 
     return { input, placeholder };

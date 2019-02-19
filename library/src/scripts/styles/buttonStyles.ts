@@ -7,7 +7,7 @@
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { style } from "typestyle";
-import { color, deg, percent, px, quote } from "csx";
+import { color, ColorHelper, deg, percent, px, quote } from "csx";
 import {
     componentThemeVariables,
     debugHelper,
@@ -42,6 +42,7 @@ export function buttonStyles(theme?: object) {
 export interface IButtonType {
     fg: string;
     bg: string;
+    spinner: ColorHelper;
     border: {
         color: string;
         width: string;
@@ -70,13 +71,14 @@ export interface IButtonType {
     };
 }
 
-export function buttonVars(theme?: object) {
+export function buttonVariables(theme?: object) {
     const globalVars = globalVariables(theme);
     const themeVars = componentThemeVariables(theme, "button");
 
     const standard: IButtonType = {
         fg: globalVars.mainColors.fg.toString(),
         bg: globalVars.mainColors.bg.toString(),
+        spinner: globalVars.mainColors.primary,
         border: {
             color: globalVars.mixBgAndFg(0.24).toString(),
             width: px(1),
@@ -118,6 +120,7 @@ export function buttonVars(theme?: object) {
     const primary: IButtonType = {
         fg: globalVars.elementaryColors.white.toString(),
         bg: globalVars.mainColors.primary.toString(),
+        spinner: globalVars.elementaryColors.white,
         border: {
             color: globalVars.mainColors.primary.toString(),
             width: px(1),
@@ -151,6 +154,7 @@ export function buttonVars(theme?: object) {
     const transparent: IButtonType = {
         fg: transparentButtonColor.toString(),
         bg: "transparent",
+        spinner: globalVars.mainColors.primary,
         border: {
             color: transparentButtonColor.toString(),
             width: px(1),
@@ -274,7 +278,7 @@ export enum ButtonTypes {
 }
 
 export function buttonClasses(theme?: object) {
-    const vars = buttonVars(theme);
+    const vars = buttonVariables(theme);
     return {
         primary: generateButtonClass(vars.primary, "primary"),
         standard: generateButtonClass(vars.standard, "standard"),
@@ -282,7 +286,7 @@ export function buttonClasses(theme?: object) {
     };
 }
 
-export function buttonLoaderClasses(spinnerColor: string, theme?: object) {
+export function buttonLoaderClasses(buttonType: IButtonType, theme?: object) {
     const globalVars = globalVariables(theme);
     const themeVars = componentThemeVariables(theme, "buttonLoader");
     const flexUtils = flexHelper();
@@ -294,10 +298,9 @@ export function buttonLoaderClasses(spinnerColor: string, theme?: object) {
         height: percent(100),
         width: percent(100),
         $nest: {
-            "&::after": spinnerLoader(globalVars.mainColors.primary, px(20)),
+            "&::after": spinnerLoader(buttonType.spinner, px(20)),
         },
-        ...themeVars.subComponentStyles(""),
+        ...themeVars.subComponentStyles("root"),
     });
-
     return { root };
 }

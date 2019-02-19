@@ -144,5 +144,5 @@ env:
 # Send cron job notification to our Slack room.
 notifications:
   slack:
-    rooms:
-      - secure: Wxsh9jI4Noq8BQtEl7CjfsHtQRmVo5l7jCDkY0W7zqHqnPRUBiAd847uPcBRUcWE8zYWDLXqtTHJMc/ctyLodentArgvHTtBIw6gp2QaFFFYe1WE0tPSYmhGa9GjI46D2/a4rCjNo1uIpytoHGTSp6RNBhY3TFKqZf+qy6RnIcU= #dev-ci
+    secure: cNkM+jJmkVUbXA1Fh9C9YF8Dp9N6SwRMPDYD9M5rz8KHjHg1qHhBFxrPab+e01r07W+FikUA4+dw5OstteW1iGIoQLtYevW4M+rKOQxZxjET/q/UpK2DAM3kNiWfPsKkSlLWssc8mwBbW4yaCesdADYma/NtQJq3YN983AEvHq4=
+

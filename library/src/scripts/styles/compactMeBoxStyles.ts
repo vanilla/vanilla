@@ -5,13 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    absolutePosition,
-    addUnitIfNumber,
-    componentThemeVariables,
-    debugHelper,
-    flexHelper,
-} from "@library/styles/styleHelpers";
+import { absolutePosition, unit, componentThemeVariables, debugHelper, flexHelper } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc, percent, px } from "csx";
@@ -58,16 +52,16 @@ export function compactMeBoxClasses(theme?: object) {
         $nest: {
             "&&": {
                 ...absolutePosition.topRight(),
-                width: addUnitIfNumber(vars.tab.width),
-                height: addUnitIfNumber(vars.tab.height),
+                width: unit(vars.tab.width),
+                height: unit(vars.tab.height),
             },
         },
     });
 
     const tabList = style({
-        marginRight: addUnitIfNumber(vars.tab.width),
-        height: addUnitIfNumber(vars.tab.height),
-        flexBasis: addUnitIfNumber(vars.tab.width),
+        marginRight: unit(vars.tab.width),
+        height: unit(vars.tab.height),
+        flexBasis: unit(vars.tab.width),
         color: globalVars.mainColors.fg.toString(),
         ...debug.name("tabList"),
     });
@@ -75,8 +69,8 @@ export function compactMeBoxClasses(theme?: object) {
     const tabButtonContent = style({
         ...flexHelper().middle(),
         position: "relative",
-        width: addUnitIfNumber(vars.tab.width),
-        height: addUnitIfNumber(vars.tab.height),
+        width: unit(vars.tab.width),
+        height: unit(vars.tab.height),
         ...debug.name("tabButtonContent"),
     });
 

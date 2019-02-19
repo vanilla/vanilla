@@ -201,9 +201,9 @@ interface IBorderStyles {
 export const borderStyles = (styles: IBorderStyles) => {
     return {
         borderColor: styles.color ? styles.color.toString() : vars.border.color.toString(),
-        borderWidth: addUnitIfNumber(styles.width),
+        borderWidth: unit(styles.width),
         borderStyle: styles.style ? styles.style : vars.border.style,
-        borderRadius: addUnitIfNumber(styles.radius),
+        borderRadius: unit(styles.radius),
     };
 };
 
@@ -218,7 +218,7 @@ export const allLinkStates = (styles: object) => {
     };
 };
 
-export const addUnitIfNumber = (val: string | number | undefined, unitFunction = px) => {
+export const unit = (val: string | number | undefined, unitFunction = px) => {
     if (typeof val === "string") {
         return val;
     } else if (!!val && !isNaN(val)) {
@@ -237,10 +237,10 @@ interface IMargins {
 
 export const margins = (styles: IMargins) => {
     return {
-        marginTop: addUnitIfNumber(styles.top),
-        marginRight: addUnitIfNumber(styles.right),
-        marginBottom: addUnitIfNumber(styles.bottom),
-        marginLeft: addUnitIfNumber(styles.left),
+        marginTop: unit(styles.top),
+        marginRight: unit(styles.right),
+        marginBottom: unit(styles.bottom),
+        marginLeft: unit(styles.left),
     };
 };
 
@@ -253,10 +253,10 @@ interface IPaddings {
 
 export const paddings = (styles: IPaddings) => {
     return {
-        paddingTop: addUnitIfNumber(styles.top),
-        paddingRight: addUnitIfNumber(styles.right),
-        paddingBottom: addUnitIfNumber(styles.bottom),
-        paddingLeft: addUnitIfNumber(styles.left),
+        paddingTop: unit(styles.top),
+        paddingRight: unit(styles.right),
+        paddingBottom: unit(styles.bottom),
+        paddingLeft: unit(styles.left),
     };
 };
 
@@ -293,29 +293,29 @@ export const absolutePosition = {
     topRight: (top: string | number = "0", right: RightProperty<TLength> = px(0)) => {
         return {
             position: "absolute" as PositionProperty,
-            top: addUnitIfNumber(top),
-            right: addUnitIfNumber(right),
+            top: unit(top),
+            right: unit(right),
         };
     },
     topLeft: (top: string | number = "0", left: LeftProperty<TLength> = px(0)) => {
         return {
             position: "absolute" as PositionProperty,
-            top: addUnitIfNumber(top),
-            left: addUnitIfNumber(left),
+            top: unit(top),
+            left: unit(left),
         };
     },
     bottomRight: (bottom: BottomProperty<TLength> = px(0), right: RightProperty<TLength> = px(0)) => {
         return {
             position: "absolute" as PositionProperty,
-            bottom: addUnitIfNumber(bottom),
-            right: addUnitIfNumber(right),
+            bottom: unit(bottom),
+            right: unit(right),
         };
     },
     bottomLeft: (bottom: BottomProperty<TLength> = px(0), left: LeftProperty<TLength> = px(0)) => {
         return {
             position: "absolute" as PositionProperty,
-            bottom: addUnitIfNumber(bottom),
-            left: addUnitIfNumber(left),
+            bottom: unit(bottom),
+            left: unit(left),
         };
     },
     middleOfParent: () => {

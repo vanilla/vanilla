@@ -12,7 +12,7 @@ import {
     allLinkStates,
     margins,
     absolutePosition,
-    addUnitIfNumber,
+    unit,
 } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
@@ -127,8 +127,8 @@ export function attachmentClasses(theme?: object) {
 
     const format = style({
         flexBasis: px(globalVars.icon.sizes.small + vars.padding.default),
-        height: addUnitIfNumber(globalVars.icon.sizes.small),
-        paddingRight: addUnitIfNumber(vars.padding.small),
+        height: unit(globalVars.icon.sizes.small),
+        paddingRight: unit(vars.padding.small),
         flexShrink: 1,
         ...debug.name("format"),
     });

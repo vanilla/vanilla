@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     absolutePosition,
-    addUnitIfNumber,
+    unit,
     borderStyles,
     componentThemeVariables,
     debugHelper,
@@ -131,8 +131,8 @@ export function checkRadioClasses(theme?: object) {
     // .checkbox-label
     const label = style({
         ...debug.name("label"),
-        lineHeight: addUnitIfNumber(vars.sizing.width),
-        marginLeft: addUnitIfNumber(8),
+        lineHeight: unit(vars.sizing.width),
+        marginLeft: unit(8),
         cursor: "pointer",
         userSelect: "none",
     });
@@ -140,8 +140,8 @@ export function checkRadioClasses(theme?: object) {
     const labelNote = style({
         ...debug.name("labelNote"),
         display: "inline-block",
-        fontSize: addUnitIfNumber(vars.labelNote.fontSize),
-        marginLeft: addUnitIfNumber(24),
+        fontSize: unit(vars.labelNote.fontSize),
+        marginLeft: unit(24),
         opacity: vars.labelNote.opacity,
         verticalAlign: "middle",
     });
@@ -153,8 +153,8 @@ export function checkRadioClasses(theme?: object) {
         ...defaultTransition("border", "background", "opacity"),
         position: "relative",
         display: "inline-block",
-        width: addUnitIfNumber(vars.sizing.width),
-        height: addUnitIfNumber(vars.sizing.width),
+        width: unit(vars.sizing.width),
+        height: unit(vars.sizing.width),
         verticalAlign: "-0.18em",
         cursor: "pointer",
         backgroundColor: vars.main.bg,
@@ -165,8 +165,8 @@ export function checkRadioClasses(theme?: object) {
         ...debug.name("radioIcon"),
         ...absolutePosition.middleLeftOfParent(),
         display: "none",
-        width: addUnitIfNumber(vars.radioButton.icon.width),
-        height: addUnitIfNumber(vars.radioButton.icon.height),
+        width: unit(vars.radioButton.icon.width),
+        height: unit(vars.radioButton.icon.height),
         margin: "auto",
     });
 
@@ -174,8 +174,8 @@ export function checkRadioClasses(theme?: object) {
         ...debug.name("checkBoxIcon"),
         ...absolutePosition.middleOfParent(),
         display: "none",
-        width: addUnitIfNumber(vars.checkBox.check.width),
-        height: addUnitIfNumber(vars.checkBox.check.height),
+        width: unit(vars.checkBox.check.width),
+        height: unit(vars.checkBox.check.height),
         color: vars.main.fg.toString(),
         margin: "auto",
     });

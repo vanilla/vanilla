@@ -1804,7 +1804,7 @@ if (!function_exists('getRecord')) {
                         throw permissionException();
                     }
 
-                    $row['Name'] = formatString($row['HeadlineFormat'], $row);
+                    $row['Name'] = $row['ActivityName'];
                     $row['Body'] = $row['Story'];
                 }
                 break;

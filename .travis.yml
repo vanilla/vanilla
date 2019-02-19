@@ -109,10 +109,10 @@ jobs:
             - google-chrome
         chrome: stable
       script:
-        - yarn audit
         - yarn build
         - yarn test
         - yarn check-types
+        - ./tests/travis/audit.sh
 
 install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3 # Ensure a consistent yarn version
@@ -129,12 +129,8 @@ cache:
 env:
   - VANILLA_BUILD_DISABLE_AUTO_BUILD=true
 
-# Send status update notifications to a HipChat room.
+# Send cron job notification to our Slack room.
 notifications:
-  hipchat:
-    format: html
-    on_success: change
-    rooms:
-      - secure: "SsKmSAZFynBz4ZKm5NPyuXvNjIMyxpNMXsgfXVImG8xjQHdXjEpZAiyckK8E2lXBBypv59Oex6wsS0RvyxpI/mwQ9dTQ9ayurQxwH3V5Q/+pRbtXJOkP+DSIsHhRb9D4xa5nPbh4N48+QZvUFiH2ety9/gev4mtMkLv3lC0vgpc="
-    template:
-      - '%{repository_slug} build <a href="%{build_url}">#%{build_number}</a> (%{branch} - <a href="%{compare_url}">%{commit}</a> by %{author}): %{message}'
+  slack:
+    secure: "dPlWx1f+SQeJocUfTcMcmYo97jwfewGinSPEuaeM3FYdZWUsXTIAMnhULqpOIAeChg0UlI4QaZGP2ueT6aHIkz3hdU3kslVdVDiT1o31DRa6zg+nFMjsohAUh/zNRwfT7QExEeCD1LvKWy8+7bBVTYauY00SxkgD8pIt0voWWodbdG98QPhyun6rX5wEafIWWVQ3B8DCYwzApibY3UrHGVTYI57m7gm8qmO4h0FMZTHX2ohGHFqP2L7t3HE0gkNNgTfOmONXieojf0dATwiMYmzl8CBQa0+hUiigVSarbGIi9u9I/L/RhkyFXhT4jjc4Yal3B1g799qnprmAQqYvZeLfifsol4LM23NZrAb9tSUW/ADS+NZNGgNr9nrcP9bXWuV5Xr5JV6pIyH/UmeKXQ+2JzrAOv0nWAIwSlY3aRHdkXTYcTYD5Umo4ReSaNQXWpI7lfZ1dEzPPi5QHmcG4HWDul6BhPJ9E4Fx4RXdOo7puWPTzyvis+6LaHAbUhOPG9PAck/syWThIUTW2bLWMb3d1sOrmu8jVHI7gM4nMptqh+byYZxdWhMszTtoRhjsx06Ic/gWLLW1TATUqZvn/wlshzQ15cvH3fhlfpWFRxugQONgeb0DoVLh6oaZeHfN7SmAYApYNyKRmNflTEje1okMgk0Q2bWJChIBKBRxuuVs="
+

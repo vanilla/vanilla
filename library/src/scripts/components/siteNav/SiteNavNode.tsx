@@ -25,6 +25,7 @@ interface IProps extends INavigationTreeItem {
     depth: number;
     collapsible?: boolean;
     onItemHover?(item: INavigationTreeItem);
+    clickableCategoryLabels?: boolean;
 }
 
 export interface IActiveRecord {
@@ -45,6 +46,45 @@ export default class SiteNavNode extends React.Component<IProps> {
         const collapsible = !!this.props.collapsible;
 
         const { activeRecord } = this.props;
+
+        let linkContents;
+        const linkContentClasses = classNames("siteNavNode-link", {
+            hasChildren,
+            isFirstLevel: this.props.depth === 0,
+        });
+
+        if (this.props.clickableCategoryLabels) {
+            linkContents = (
+                <Button
+                    baseClass={ButtonBaseClass.CUSTOM}
+                    onKeyDownCapture={this.handleKeyDown}
+                    className={linkContentClasses}
+                    onClick={this.handleClick as any}
+                >
+                    <span className="siteNavNode-label">{this.props.name}</span>
+                </Button>
+            );
+        } else {
+            linkContents = (
+                <Hoverable onHover={this.handleHover} duration={50}>
+                    {provided => (
+                        <SmartLink
+                            {...provided}
+                            onKeyDownCapture={this.handleKeyDown}
+                            className={classNames("siteNavNode-link", {
+                                hasChildren,
+                                isFirstLevel: this.props.depth === 0,
+                            })}
+                            tabIndex={0}
+                            to={this.props.url}
+                        >
+                            <span className="siteNavNode-label">{this.props.name}</span>
+                        </SmartLink>
+                    )}
+                </Hoverable>
+            );
+        }
+
         const childrenContents =
             hasChildren &&
             this.props.children.map(child => {
@@ -58,6 +98,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                         depth={this.props.depth + 1}
                         collapsible={collapsible}
                         onItemHover={this.props.onItemHover}
+                        clickableCategoryLabels={!!this.props.clickableCategoryLabels}
                     />
                 );
             });
@@ -91,22 +132,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                     )
                 )}
                 <div className={classNames("siteNavNode-contents")}>
-                    <Hoverable onHover={this.handleHover} duration={50}>
-                        {provided => (
-                            <SmartLink
-                                {...provided}
-                                onKeyDownCapture={this.handleKeyDown}
-                                className={classNames("siteNavNode-link", {
-                                    hasChildren,
-                                    isFirstLevel: this.props.depth === 0,
-                                })}
-                                tabIndex={0}
-                                to={this.props.url}
-                            >
-                                <span className="siteNavNode-label">{this.props.name}</span>
-                            </SmartLink>
-                        )}
-                    </Hoverable>
+                    {linkContents}
                     {hasChildren && (
                         <ul
                             className={classNames("siteNavNode-children", depthClass, {

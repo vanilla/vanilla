@@ -1,3 +1,5 @@
-{
-    "googleAnalytics": "https://www.google-analytics.com/analytics.js"
-}
+[
+    {
+        "googleAnalytics": "https://www.google-analytics.com/analytics.js"
+    }
+]

@@ -10,68 +10,258 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use Vanilla\AddonManager;
 use Vanilla\Addon;
+use Vanilla\Models\ThemeModel;
 
 /**
  * API Controller for the `/drafts` resource.
  */
 class ThemesApiController extends AbstractApiController {
+    const ASSET_TYPES = ['html', 'js', 'json', 'css'];
+
+    const ASSET_LIST = [
+        "header" => [
+            "type" => "html",
+            "file" => "header.html"
+        ],
+        "footer" => [
+            "type" => "html",
+            "file" => "footer.html"
+        ],
+        "variables" => [
+            "type" => "json",
+            "file" => "variables.json"
+        ],
+        "fonts" => [
+            "type" => "json",
+            "file" => "fonts.json"
+        ],
+        "scripts" => [
+            "type" => "json",
+            "file" => "scripts.json"
+        ],
+        "styles" => [
+            "type" => "css",
+            "file" => "styles.css"
+        ],
+        "inlineJs" => [
+            "type" => "js",
+            "file" => "inlineJs.js"
+        ]
+
+    ];
 
     /* @var AddonManager */
     private $addonManager;
 
-    public function __construct(AddonManager $addonManager) {
+    /* @var ThemeModel */
+    private $themeModel;
+
+    public function __construct(
+        AddonManager $addonManager,
+        ThemeModel $themeModel
+    ) {
         $this->addonManager = $addonManager;
+        $this->themeModel = $themeModel;
     }
 
     /**
      * Get a theme assets.
      *
-     * @param string $path The unique theme key or theme ID.
+     * @param string $themeKey The unique theme key or theme ID.
      * @return array
      */
-    public function get(string $path) {
-        $path = ltrim($path,'/');
-        if (ctype_digit($path)) {
-            return $this->getThemeByID((int)$path);
-        }
-        $parts = explode('/', $path);
-        if (count($parts) === 1) {
-            $theme = $this->getThemeByName($path);
-            return $this->getThemeAssets($theme);
-        }
+    public function get(string $themeKey): array {
 
-        if (count($parts) === 3) {
-            // parts[0] = :themeKey
-            // parts[1] = assets
-            // parts[2] = :assetKey | :assetFilename
-            if ('assets' === $parts[1]) {
-                $pathInfo =  pathinfo($parts[2]);
-                $theme = $this->getThemeByName($parts[0]);
-                $asset =  $this->getThemeAsset($theme, $pathInfo['filename'], !empty($pathInfo['extension']));
-                if (empty($pathInfo['extension'])) {
-                    // return asset as an array
-                    return $asset;
-                } else {
-                    // return asset as a file
-                    return new Data($asset['data'], ['CONTENT_TYPE' => $asset['mime-type']]);
-                }
-            }
-        }
-        throw new NotFoundException('Controller not found for: \''.$path.'\'');
+        $in = $this->themeKeySchema('in')->setDescription('Get theme assets.');
+        $out = $this->themeResultSchema('out');
+
+        $themeAssets = $this->getThemeAssets($themeKey);
+        //unset($themeAssets['assets']['header']);
+       // die(print_r($themeAssets));
+        $themeAssets = $out->validate($themeAssets);
+        return $themeAssets;
     }
 
+    /**
+     * Create new theme from parent theme.
+     *
+     * @param string $themeKey The unique theme key or theme ID.
+     * @return array
+     */
+    public function post(array $body): array {
+        $this->permission("Garden.Settings.Manage");
+
+        $in = $this->themePostSchema('in')->setDescription('Post theme assets.');
+        $out = $this->themeResultSchema('out');
+        $body = $in->validate($body);
+        $themeID = $this->themeModel->insert($body);
+
+        $theme = $this->getThemeAssets($themeID);
+        $themeAssets = $out->validate($theme);
+        return $themeAssets;
+    }
+
+    /**
+     * Get theme asset.
+     *
+     * @param string $id The unique theme key or theme ID (ex: keystone).
+     * @param string $assetKey Unique asset key (ex: header, footer, fonts, styles)
+     *        Note: assetKey can be filename (ex: header.html, styles.css)
+     *              in that case file content returned instaed of json structure
+     * @link https://github.com/vanilla/roadmap/blob/master/theming/theming-data.md#api
+     *
+     * @return array|Data
+     */
+    public function get_assets(string $id, string $assetKey) {
+
+        $in = $this->themeKeySchema('in')->setDescription('Get theme assets.');
+        $out = $this->schema([], 'out');
+
+        $pathInfo =  pathinfo($assetKey);
+        $asset =  $this->getThemeAsset($id, $pathInfo['filename'], !empty($pathInfo['extension']));
+        if (empty($pathInfo['extension'])) {
+            // return asset as an array
+            return $asset;
+        } else {
+            // return asset as a file
+            return new Data($asset['data'], ['CONTENT_TYPE' => $asset['mime-type']]);
+        }
+    }
+
+    /**
+     * Get ThemeKey schema
+     *
+     * @param string $type
+     * @return Schema
+     */
+    public function themeKeySchema(string $type = 'in'): Schema {
+        static $schema;
+        if (!isset($schema)) {
+            $schema = $this->schema(
+                Schema::parse(['themeKey:s' => [
+                    'description' => 'Theme name.',
+                    'enum' => $this->getAllThemes()
+                ]]),
+                $type
+            );
+        }
+        return $this->schema($schema, $type);
+    }
+
+    /**
+     * POST theme schema
+     *
+     * @param string $type
+     * @return Schema
+     */
+    public function themePostSchema(string $type = 'in'): Schema {
+        $schema = $this->schema(
+            Schema::parse([
+                'type:s',
+                'themeID:s',
+                'parentTheme:s' => [
+                    'description' => 'Parent theme name.',
+                    'enum' => $this->getAllThemes()
+                ],
+                'ver:s',
+                'logos:s',
+                'mobileLogo:s',
+                'parentVersion:s' => 'Parent theme version.',
+                'assets' => $this->assetsSchema()
+            ]),
+            $type
+        );
+        return $schema;
+    }
+
+    /**
+     * Result theme schema
+     *
+     * @param string $type
+     * @return Schema
+     */
+    public function themeResultSchema(string $type = 'out'): Schema {
+        $schema = $this->schema(
+            Schema::parse([
+                'type:s',
+                'themeID:s',
+                'ver:s',
+                'parentTheme:s' => [
+                    'description' => 'Parent theme name.',
+                    'enum' => $this->getAllThemes()
+                ],
+                'parentVersion:s' => 'Parent theme version.',
+                'logos:s?',
+                'mobileLogo:s?',
+                'assets?' => $this->assetsSchema()
+            ]),
+            $type
+        );
+        return $schema;
+    }
+
+    public function assetsSchema() {
+        $schema = Schema::parse([
+            "header" => Schema::parse([
+                "type:s" => ['description' => 'Header asset type: html.', 'enum' => ['html']],
+                "body:s"
+            ]),
+            "footer" => Schema::parse([
+                "type:s" => ['description' => 'Footer asset type: html.', 'enum' => ['html']],
+                "body:s"
+            ]),
+            "variables" => Schema::parse([
+                "type:s" => ['description' => 'Variables asset type: json.', 'enum' => ['json']],
+                "data:o"
+            ]),
+            "fonts" => Schema::parse([
+                "type:s" => ['description' => 'Fonts asset type: data.', 'enum' => ['data']],
+                'data:a' => Schema::parse([
+                    "type:s",
+                    "name:s",
+                    "fallbacks:s?",
+                    "url:s"
+                ])
+            ]),
+            "scripts" => Schema::parse([
+                "type:s" => ['description' => 'Scripts asset type: data.', 'enum' => ['data']],
+                "data:a"
+            ]),
+            "styles" => Schema::parse([
+                "type:s" => ['description' => 'Styles asset type: css.', 'enum' => ['css']],
+                "data:s"
+            ]),
+            "inlineJs" => Schema::parse([
+                "type:s"=> ['description' => 'Javascript asset type: js.', 'enum' => ['js']],
+                "js:s"
+            ])
+        ]);
+        return $schema;
+    }
+
+    /**
+     * Get custom theme by ID
+     *
+     * @param int $themeID
+     * @return array
+     */
     public function getThemeByID(int $themeID) {
-        var_dump($themeID);
-        die(__FILE__.':'.__FUNCTION__.':'.__LINE__);
+        $theme = $this->themeModel->get(['themeID' => $themeID]);
+        if (empty($theme)) {
+            throw new NotFoundException('Theme '.$themeID.' not found');
+        }
+        return $theme[0];
     }
 
-    public function get_asset(int $id, string $path) {
-        echo $id."\n";
-        echo $path."\n";
-        die(__FILE__.':'.__FUNCTION__.':'.__LINE__);
-    }
-
-    public function getThemeByName(string $themeName) {
+    /**
+     * Get theme by name
+     *
+     * @param string $themeName
+     * @return Addon Returns theme addon
+     *
+     * @throws NotFoundException
+     */
+    public function getThemeByName(string $themeName): Addon {
         $theme = $this->addonManager->lookupTheme($themeName);
         if (null === $theme) {
             throw new NotFoundException('There is no theme: \''.$themeName.'\' installed.');
@@ -79,29 +269,78 @@ class ThemesApiController extends AbstractApiController {
         return $theme;
     }
 
-    public function getThemeAssets(Addon $theme) {
-       // die(print_r($theme));
+    /**
+     * Get list of all available themes
+     *
+     * @return array List of all available themes
+     */
+    public function getAllThemes(): array {
+        $themes = $this->addonManager->lookupAllByType(Addon::TYPE_THEME);
+        $result = [];
+        foreach ($themes as $theme) {
+            $result[] = $theme->getKey();
+        }
+        return $result;
+    }
+
+    /**
+     * @param string $themeKey
+     * @return array
+     */
+    public function getThemeAssets(string $themeKey): array {
+        $customAssets = [];
+        if (ctype_digit($themeKey)) {
+            $customAssets = $this->getThemeByID((int)$themeKey);
+            $theme = $this->getThemeByName($customAssets['parentTheme']);
+        } else {
+            $theme = $this->getThemeByName($themeKey);
+        }
+
         $assets  = $theme->getInfoValue('assets');
         $res = [];
         $res['type'] = 'themeFile';
-        $res['themeID'] = $theme->getInfoValue('key');
+        $res['themeID'] = $customAssets['themeID'] ?? $theme->getInfoValue('key');
+        $res['parentTheme'] = $customAssets['parentTheme'] ?? $theme->getInfoValue('key');
         $res['ver'] = $theme->getInfoValue('version');
+        $res['parentVersion'] = $customAssets['parentVersion'] ?? $theme->getInfoValue('version');
         $res['logos'] = $theme->getInfoValue('logos');
         $res['mobileLogo'] = $theme->getInfoValue('mobileLogo');
         foreach ($assets as $aKey => &$aVal) {
             $fileName = PATH_ROOT.$theme->getSubdir().'/assets/'.$aVal['file'];
-            $aVal['data'] = file_get_contents($fileName);
+            $aVal['data'] = $customAssets[$aKey]['data'] ?? file_get_contents($fileName);
+            switch ($aVal['type']) {
+                case 'json':
+                    $aVal['data'] = json_decode($aVal['data'], true);
+                    break;
+                case 'data':
+                    $aVal['data'] = json_decode($aVal['data'], true);
+                    break;
+                case 'html':
+                    $aVal['body'] = $aVal['data'];
+                    break;
+                case 'js':
+                    $aVal['js'] = $aVal['data'];
+                    break;
+            }
+
         }
         $res['assets'] = $assets;
-        return json_encode($res);
+        return $res;
     }
 
-    public function getThemeAsset(Addon $theme, string $assetKey, bool $mimeType = false) {
+    public function getThemeAsset(string $id, string $assetKey, bool $mimeType = false) {
+        $customAssets = [];
+        if (ctype_digit($id)) {
+            $customAssets[$assetKey] = $this->getThemeByID((int)$id, $assetKey);
+            $theme = $this->getThemeByName($customAssets['parentTheme']);
+        } else {
+            $theme = $this->getThemeByName($id);
+        }
         $assets  = $theme->getInfoValue('assets');
         if (key_exists($assetKey, $assets)) {
             $asset = $assets[$assetKey];
             $fileName = PATH_ROOT.$theme->getSubdir().'/assets/'.$asset['file'];
-            $asset['data'] = file_get_contents($fileName);
+            $asset['data'] = $customAssets[$assetKey]['data'] ?? file_get_contents($fileName);
             if ($mimeType) {
                 switch ($asset['type']) {
                     case 'json':

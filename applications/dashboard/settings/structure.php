@@ -881,8 +881,9 @@ $Construct
     ->table("theme")
     ->primaryKey("themeID")
     ->column("parentTheme", "varchar(64)", false, ["index"])
-    ->column("insertUserID", "int", false, ["index"])
-    ->column("updateUserID", "int", false, ["index"])
+    ->column("parentVersion", "varchar(16)", false)
+    ->column("insertUserID", "int", false)
+    ->column("updateUserID", "int", false)
     ->column("dateInserted", "datetime")
     ->column("dateUpdated", "datetime")
     ->set($Explicit, $Drop);

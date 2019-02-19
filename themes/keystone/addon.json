@@ -47,11 +47,11 @@
             "file": "variables.json"
         },
         "fonts": {
-            "type": "json",
+            "type": "data",
             "file": "fonts.json"
         },
         "scripts": {
-            "type": "json",
+            "type": "data",
             "file": "scripts.json"
         },
         "styles": {

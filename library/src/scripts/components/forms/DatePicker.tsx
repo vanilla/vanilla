@@ -14,7 +14,7 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { leftChevron, rightChevron } from "@library/components/icons";
 import { NullComponent } from "@library/components/forms/select/overwrites";
 import moment, { Moment } from "moment";
-import { dayPickerInputClasses } from "@library/styles/dateInputStyles";
+import { dayPickerClasses } from "@library/styles/datePickerStyles";
 
 interface IProps {
     value: string; // ISO formatted date
@@ -34,7 +34,7 @@ interface IState {
 /**
  * Implements the DateRange component
  */
-export default class DateInput extends React.PureComponent<IProps, IState> {
+export default class DatePicker extends React.PureComponent<IProps, IState> {
     public static defaultProps: Partial<IProps> = {
         alignment: "left",
     };
@@ -58,39 +58,40 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
      */
     private renderReactInput() {
         const value = this.props.value ? moment(this.props.value).toDate() : undefined;
-        const dayPickerClasses = dayPickerInputClasses(this.props.theme);
+        const classes = dayPickerClasses(this.props.theme);
         return (
-            <DayPickerInput
-                format="YYYY-MM-DD"
-                placeholder={t(`yyyy-mm-dd`)}
-                formatDate={formatDate}
-                parseDate={parseDate}
-                value={value}
-                overlayComponent={this.CustomOverlay}
-                onDayChange={this.handleDayPickerChange}
-                classNames={
-                    {
-                        wrapper: dayPickerClasses.root,
-                        container: classNames("dayPickerInput-container", this.props.contentClassName),
-                        overlay: "dayPickerInput-overlay",
-                    } as any
-                }
-                dayPickerProps={{
-                    captionElement: NullComponent,
-                    navbarElement: this.CustomNavBar,
-                    disabledDays: this.props.disabledDays,
-                    showOutsideDays: true,
-                }}
-                inputProps={{
-                    className: classNames("inputText", this.props.inputClassName, {
-                        isInvalid: this.state.hasBadValue && this.state.wasBlurred,
-                    }),
-                    "aria-label": t("Date Input ") + "(yyyy-mm-dd)",
-                    onBlur: this.handleBlur,
-                    onFocus: this.handleFocus,
-                    onChange: this.handleNativeInputChange,
-                }}
-            />
+            <div className={classNames(classes.root)}>
+                <DayPickerInput
+                    format="YYYY-MM-DD"
+                    placeholder={t(`yyyy-mm-dd`)}
+                    formatDate={formatDate}
+                    parseDate={parseDate}
+                    value={value}
+                    overlayComponent={this.CustomOverlay}
+                    onDayChange={this.handleDayPickerChange}
+                    classNames={
+                        {
+                            container: classNames("dayPickerInput-container", this.props.contentClassName),
+                            overlay: "dayPickerInput-overlay",
+                        } as any
+                    }
+                    dayPickerProps={{
+                        captionElement: NullComponent,
+                        navbarElement: this.CustomNavBar,
+                        disabledDays: this.props.disabledDays,
+                        showOutsideDays: true,
+                    }}
+                    inputProps={{
+                        className: classNames("inputText", this.props.inputClassName, {
+                            isInvalid: this.state.hasBadValue && this.state.wasBlurred,
+                        }),
+                        "aria-label": t("Date Input ") + "(yyyy-mm-dd)",
+                        onBlur: this.handleBlur,
+                        onFocus: this.handleFocus,
+                        onChange: this.handleNativeInputChange,
+                    }}
+                />
+            </div>
         );
     }
 
@@ -191,11 +192,11 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
         const prev = () => onPreviousClick();
         const next = () => onNextClick();
         const title = (month as Date).toLocaleDateString(undefined, { year: "numeric", month: "long" });
-
+        const classes = dayPickerClasses();
         return (
-            <div className="datePicker-header">
-                <h3 className="datePicker-title">{title}</h3>
-                <span className={classNames("datePicker-navigation", className)}>
+            <div className={classNames("datePicker-header", classes.header)}>
+                <h3 className={classNames("datePicker-title", classes.title)}>{title}</h3>
+                <span className={classNames("datePicker-navigation", className, classes.navigation)}>
                     <Button baseClass={ButtonBaseClass.ICON} onClick={prev}>
                         {leftChevron("", true)}
                     </Button>

@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
-import { percent, px } from "csx";
+import { percent } from "csx";
 
 export function dateRangeClasses(theme?: object) {
     const globalVars = globalVariables(theme);
@@ -52,23 +52,4 @@ export function dateRangeClasses(theme?: object) {
     });
 
     return { root, boundary, label, input };
-}
-
-export function dayPickerInputClasses(theme?: object) {
-    const debug = debugHelper("dayPickerInput");
-
-    const root = style({
-        display: "inline-flex",
-        flexGrow: 1,
-        ...debug.name(),
-    });
-    const day = style({
-        whiteSpace: "nowrap",
-        ...debug.name("day"),
-    });
-    const weekday = style({
-        whiteSpace: "nowrap",
-        ...debug.name("weekday"),
-    });
-    return { root };
 }

@@ -12,6 +12,7 @@ import NotificationsDropdown from "./pieces/NotificationsDropDown";
 import UserDropdown from "./pieces/UserDropdown";
 import { IInjectableUserState } from "@library/users/UsersModel";
 import get from "lodash/get";
+import { meBoxClasses } from "@library/styles/meBoxStyles";
 
 export interface IMeBoxProps extends IInjectableUserState {
     countClass?: string;
@@ -19,6 +20,7 @@ export interface IMeBoxProps extends IInjectableUserState {
     countsClass?: string;
     buttonClassName?: string;
     contentClassName?: string;
+    theme?: object;
 }
 
 /**
@@ -33,29 +35,30 @@ export default class MeBox extends React.Component<IMeBoxProps> {
             userID: null,
             photoUrl: null,
         });
+        const classes = meBoxClasses(this.props.theme);
 
         return (
-            <div className={classNames("meBox", this.props.className)}>
+            <div className={classNames("meBox", this.props.className, classes.root)}>
                 <NotificationsDropdown
                     userSlug={userInfo.name}
                     countClass={countsClass}
                     buttonClassName={buttonClassName}
                     contentsClassName={contentClassName}
                     countUnread={userInfo.countUnreadNotifications}
-                    toggleContentsClassName="meBox-buttonContent"
+                    toggleContentClassName={classNames("meBox-buttonContent", classes.buttonContent)}
                 />
                 <MessagesDropDown
                     countClass={countsClass}
                     buttonClassName={buttonClassName}
                     contentsClassName={contentClassName}
-                    toggleContentsClassName="meBox-buttonContent"
+                    toggleContentClassName={classNames("meBox-buttonContent", classes.buttonContent)}
                 />
                 <UserDropdown
                     className="meBox-userDropdown"
                     countsClass={countsClass}
                     buttonClassName={buttonClassName}
                     contentsClassName={contentClassName}
-                    toggleContentClassName="meBox-buttonContent"
+                    toggleContentClassName={classNames("meBox-buttonContent", classes.buttonContent)}
                 />
             </div>
         );

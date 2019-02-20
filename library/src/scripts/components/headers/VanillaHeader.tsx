@@ -29,6 +29,7 @@ import * as React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import vanillaHeaderClasses from "@library/styles/vanillaHeaderStyles";
+import { meBoxClasses } from "@library/styles/meBoxStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -36,6 +37,7 @@ interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     title?: string; // Needed for mobile dropdown
     mobileDropDownContent?: React.ReactNode; // Needed for mobile dropdown
     isFixed?: boolean;
+    theme?: object;
 }
 
 interface IState {
@@ -70,6 +72,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
         const classes = vanillaHeaderClasses();
         const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
+        const classesMeBox = meBoxClasses(this.props.theme);
 
         return ReactDOM.createPortal(
             <>
@@ -152,7 +155,10 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                             showingSuggestions={this.state.showingSuggestions}
                                             onOpenSuggestions={this.setOpenSuggestions}
                                             onCloseSuggestions={this.setCloseSuggestions}
-                                            buttonContentClass="meBox-buttonContent"
+                                            buttonContentClass={classNames(
+                                                "meBox-buttonContent",
+                                                classesMeBox.buttonContent,
+                                            )}
                                         />
 
                                         {isGuest ? (

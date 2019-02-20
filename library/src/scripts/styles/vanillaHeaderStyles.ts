@@ -109,6 +109,12 @@ export function vanillaHeaderVariables(theme?: object) {
         ...themeVars.subComponentStyles("mobileDropDown"),
     });
 
+    const meBox = {
+        sizing: {
+            buttonContents: 32,
+        },
+    };
+
     return {
         sizing,
         colors,
@@ -122,6 +128,7 @@ export function vanillaHeaderVariables(theme?: object) {
         compactSearch,
         buttonContents,
         mobileDropDown,
+        meBox,
     };
 }
 

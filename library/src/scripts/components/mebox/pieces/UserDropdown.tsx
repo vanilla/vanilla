@@ -24,6 +24,7 @@ import DropDownItemLinkWithCount from "@library/components/dropdown/items/DropDo
 import Permission from "@library/users/Permission";
 import classNames from "classnames";
 import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
+import { meBoxClasses } from "@library/styles/meBoxStyles";
 
 export interface IUserDropDownProps extends IInjectableUserState {
     className?: string;
@@ -31,6 +32,7 @@ export interface IUserDropDownProps extends IInjectableUserState {
     buttonClassName?: string;
     contentsClassName?: string;
     toggleContentClassName?: string;
+    theme?: object;
 }
 
 interface IState {

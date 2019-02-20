@@ -80,7 +80,7 @@ class ThemesApiController extends AbstractApiController {
      * @return array
      */
     public function get(string $themeKey): array {
-
+        $this->permission();
         $in = $this->themeKeySchema('in')->setDescription('Get theme assets.');
         $out = $this->themeResultSchema('out');
 
@@ -132,6 +132,7 @@ class ThemesApiController extends AbstractApiController {
      * @return array|Data
      */
     public function get_assets(string $id, string $assetKey) {
+        $this->permission();
 
         $in = $this->themeKeySchema('in')->setDescription('Get theme assets.');
         $out = $this->schema([], 'out');
@@ -153,7 +154,7 @@ class ThemesApiController extends AbstractApiController {
      * @param string $type
      * @return Schema
      */
-    public function themeKeySchema(string $type = 'in'): Schema {
+    private function themeKeySchema(string $type = 'in'): Schema {
         static $schema;
         if (!isset($schema)) {
             $schema = $this->schema(
@@ -173,7 +174,7 @@ class ThemesApiController extends AbstractApiController {
      * @param string $type
      * @return Schema
      */
-    public function themePostSchema(string $type = 'in'): Schema {
+    private function themePostSchema(string $type = 'in'): Schema {
         $schema = $this->schema(
             Schema::parse([
                 'parentTheme:s' => [
@@ -194,7 +195,7 @@ class ThemesApiController extends AbstractApiController {
      * @param string $type
      * @return Schema
      */
-    public function themeResultSchema(string $type = 'out'): Schema {
+    private function themeResultSchema(string $type = 'out'): Schema {
         $schema = $this->schema(
             Schema::parse([
                 'type:s',
@@ -219,7 +220,7 @@ class ThemesApiController extends AbstractApiController {
      *
      * @return Schema
      */
-    public function assetsSchema(): Schema {
+    private function assetsSchema(): Schema {
         $schema = Schema::parse([
             "header?" => Schema::parse([
                 "type:s" => ['description' => 'Header asset type: html.', 'enum' => ['html']],

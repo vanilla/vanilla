@@ -321,6 +321,10 @@ class ThemesApiController extends AbstractApiController {
      */
     public function getThemeAssets(string $themeKey): array {
         $customAssets = [];
+        // first check if themeKey only contains digits
+        // in that case get parentTheme name from themeModel
+        // and grab customized assets from ThemeAssetModel if exist
+        // if not - then just return original assets from Theme
         if (ctype_digit($themeKey)) {
             $customAssets = $this->getThemeByID((int)$themeKey);
             $theme = $this->getThemeByName($customAssets['parentTheme']);

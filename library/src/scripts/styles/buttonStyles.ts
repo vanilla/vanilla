@@ -42,7 +42,7 @@ export function buttonStyles(theme?: object) {
 export interface IButtonType {
     fg: string;
     bg: string;
-    spinner: ColorHelper;
+    spinnerColor: ColorHelper;
     border: {
         color: string;
         width: string;
@@ -78,7 +78,7 @@ export function buttonVariables(theme?: object) {
     const standard: IButtonType = {
         fg: globalVars.mainColors.fg.toString(),
         bg: globalVars.mainColors.bg.toString(),
-        spinner: globalVars.mainColors.primary,
+        spinnerColor: globalVars.mainColors.primary,
         border: {
             color: globalVars.mixBgAndFg(0.24).toString(),
             width: px(1),
@@ -120,7 +120,7 @@ export function buttonVariables(theme?: object) {
     const primary: IButtonType = {
         fg: globalVars.elementaryColors.white.toString(),
         bg: globalVars.mainColors.primary.toString(),
-        spinner: globalVars.elementaryColors.white,
+        spinnerColor: globalVars.elementaryColors.white,
         border: {
             color: globalVars.mainColors.primary.toString(),
             width: px(1),
@@ -154,7 +154,7 @@ export function buttonVariables(theme?: object) {
     const transparent: IButtonType = {
         fg: transparentButtonColor.toString(),
         bg: "transparent",
-        spinner: globalVars.mainColors.primary,
+        spinnerColor: globalVars.mainColors.primary,
         border: {
             color: transparentButtonColor.toString(),
             width: px(1),
@@ -298,7 +298,10 @@ export function buttonLoaderClasses(buttonType: IButtonType, theme?: object) {
         height: percent(100),
         width: percent(100),
         $nest: {
-            "&::after": spinnerLoader(buttonType.spinner, px(20)),
+            "&:after": spinnerLoader({
+                color: buttonType.spinnerColor,
+                dimensions: 20,
+            }),
         },
         ...themeVars.subComponentStyles("root"),
     });

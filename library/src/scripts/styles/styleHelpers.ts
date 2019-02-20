@@ -24,6 +24,16 @@ import {
     BottomProperty,
     PositionProperty,
     GlobalsNumber,
+    DisplayProperty,
+    AlignItemsProperty,
+    JustifyContentProperty,
+    ContentProperty,
+    TransitionProperty,
+    AnimationTimingFunctionProperty,
+    AnimationIterationCountProperty,
+    AnimationNameProperty,
+    HeightProperty,
+    WidthProperty,
 } from "csstype";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { style, keyframes } from "typestyle";
@@ -34,18 +44,18 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 export function flexHelper() {
     const middle = (wrap = false) => {
         return {
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexWrap: wrap ? "wrap" : ("nowrap" as FlexWrapProperty),
+            display: "flex" as DisplayProperty,
+            alignItems: "center" as AlignItemsProperty,
+            justifyContent: "center" as JustifyContentProperty,
+            flexWrap: (wrap ? "wrap" : "nowrap") as FlexWrapProperty,
         };
     };
 
     const middleLeft = (wrap = false) => {
         return {
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-start",
+            display: "flex" as DisplayProperty,
+            alignItems: "center" as AlignItemsProperty,
+            justifyContent: "flex-start" as JustifyContentProperty,
             flexWrap: wrap ? "wrap" : ("nowrap" as FlexWrapProperty),
         };
     };
@@ -256,30 +266,40 @@ export const paddings = (styles: IPaddings) => {
     };
 };
 
-export const spinnerLoader = (
-    spinnerColor: ColorHelper = vars.mainColors.primary,
-    dimensions = px(18),
-    thicknesss = px(3),
-    speed = "0.7s",
-) => {
+export interface ISpinnerProps {
+    color?: ColorHelper;
+    dimensions?: string | number;
+    thicknesss?: string | number;
+    speed?: string;
+}
+
+export const spinnerLoader = (props: ISpinnerProps) => {
     const debug = debugHelper("spinnerLoader");
+    const spinnerVars = {
+        color: vars.mainColors.primary,
+        size: 18,
+        thickness: 3,
+        speed: "0.7s",
+        ...props,
+    };
+    const mainColor = spinnerVars.color;
     return {
         ...debug.name("spinner"),
-        position: "relative",
-        content: quote(""),
-        transition: defaultTransition("opacity"),
-        display: "block",
-        width: dimensions,
-        height: dimensions,
+        position: "relative" as PositionProperty,
+        content: quote("") as ContentProperty,
+        ...defaultTransition("opacity"),
+        display: "block" as DisplayProperty,
+        width: unit(spinnerVars.size),
+        height: unit(spinnerVars.size),
         borderRadius: percent(50),
-        borderTop: `${thicknesss} solid ${spinnerColor.toString()}`,
-        borderRight: `${thicknesss} solid ${spinnerColor.fade(0.3).toString()}`,
-        borderBottom: `${thicknesss} solid ${spinnerColor.fade(0.3).toString()}`,
-        borderLeft: `${thicknesss} solid ${spinnerColor.fade(0.3).toString()}`,
+        borderTop: `${unit(spinnerVars.thickness)} solid ${mainColor.toString()}`,
+        borderRight: `${unit(spinnerVars.thickness)} solid ${mainColor.fade(0.3).toString()}`,
+        borderBottom: `${unit(spinnerVars.thickness)} solid ${mainColor.fade(0.3).toString()}`,
+        borderLeft: `${unit(spinnerVars.thickness)} solid ${mainColor.fade(0.3).toString()}`,
         transform: "translateZ(0)",
-        animation: `spillerLoader ${speed} infinite ease-in-out`,
+        animation: `spillerLoader ${spinnerVars.speed} infinite ease-in-out`,
         animationName: spinnerLoaderAnimation,
-        animationDuration: speed,
+        animationDuration: spinnerVars.speed,
         animationIterationCount: "infinite",
         animationTimingFunction: "ease-in-out",
     };

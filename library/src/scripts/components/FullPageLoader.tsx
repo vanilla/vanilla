@@ -8,18 +8,14 @@ import * as React from "react";
 import { t } from "@library/application";
 import { style } from "typestyle";
 import classNames from "classnames";
-
-export enum LoaderStyle {
-    FULL = "fullPageLoader",
-    MEDIUM = "mediumLoader",
-    FIXED_SIZE = "fixedSizeLoader",
-}
+import { loaderClasses } from "@library/styles/loaderStyles";
 
 interface IProps {
     minimumTime?: number;
-    loaderStyle?: LoaderStyle;
+    loaderStyleClass?: string;
     height?: number;
     width?: number;
+    theme?: object;
 }
 
 interface IState {
@@ -39,15 +35,12 @@ export default class FullPageLoader extends React.Component<IProps, IState> {
             return null;
         }
 
-        const sizeClass = this.props.loaderStyle || LoaderStyle.FULL;
-        const styleClass = style({
-            height: this.props.height,
-            width: this.props.width,
-        });
-
         return (
             <React.Fragment>
-                <div className={classNames(sizeClass, styleClass)} aria-hidden="true" />
+                <div
+                    className={this.props.loaderStyleClass || loaderClasses(this.props.theme).fullPageLoader}
+                    aria-hidden="true"
+                />
                 <h1 className="sr-only">{t("Loading")}</h1>
             </React.Fragment>
         );

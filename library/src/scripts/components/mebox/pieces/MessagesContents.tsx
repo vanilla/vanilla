@@ -24,7 +24,8 @@ import { IConversationsStoreState } from "@library/conversations/ConversationsMo
 import { IUserFragment, IConversation, LoadStatus, GetConversationsExpand } from "@library/@types/api";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
-import FullPageLoader, { LoaderStyle } from "@library/components/FullPageLoader";
+import FullPageLoader from "@library/components/FullPageLoader";
+import { loaderClasses } from "@library/styles/loaderStyles";
 
 /**
  * Implements Messages Contents to be included in drop down or tabs
@@ -75,7 +76,8 @@ export class MessagesContents extends React.Component<IProps> {
             // This is the height that it happens to be right now.
             // This will be calculated better once we finish the CSS in JS transition.
             const height = this.props.device === Devices.MOBILE ? 80 : 69;
-            return <FullPageLoader loaderStyle={LoaderStyle.FIXED_SIZE} height={height} minimumTime={0} />;
+            const loaderStyles = loaderClasses(this.props.theme);
+            return <FullPageLoader loaderStyleClass={loaderStyles.fixedSizeLoader} height={height} minimumTime={0} />;
         }
 
         return (
@@ -94,6 +96,7 @@ interface IOwnProps extends IDeviceProps {
     className?: string;
     countClass?: string;
     panelBodyClass?: string;
+    theme?: object;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;

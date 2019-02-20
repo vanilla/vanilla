@@ -1,0 +1,248 @@
+openapi: 3.0.2
+info:
+paths:
+  /search:
+    get:
+      parameters:
+      - description: |
+          <p>Restrict the search to the specified main type(s) of records.</p>
+        in: query
+        name: recordTypes
+        schema:
+          items:
+            enum:
+            - discussion
+            - comment
+            - group
+            type: string
+          type: array
+        style: form
+      - description: |
+          <p>Restrict the search to the specified type(s) of records.</p>
+        in: query
+        name: types
+        schema:
+          items:
+            enum:
+            - discussion
+            - comment
+            - question
+            - group
+            type: string
+          type: array
+        style: form
+      - description: >
+          <p>Set the scope of the search to the comments of a discussion.
+          Incompatible with recordType and type.</p>
+        in: query
+        name: discussionID
+        schema:
+          type: integer
+        x-search-scope: true
+      - description: |
+          <p>Set the scope of the search to a specific category.</p>
+        in: query
+        name: categoryID
+        schema:
+          type: integer
+        x-search-scope: true
+      - description: |
+          <p>Set the scope of the search to followed categories only.</p>
+        in: query
+        name: followedCategories
+        schema:
+          default: false
+          type: boolean
+        x-search-scope: true
+      - description: >
+          <p>Search the specified category's subtree. Works with
+          categoryID</p>
+        in: query
+        name: includeChildCategories
+        schema:
+          default: false
+          type: boolean
+      - description: |
+          <p>Allow search in archived categories.</p>
+        in: query
+        name: includeArchivedCategories
+        schema:
+          default: false
+          type: boolean
+      - description: |
+          <p>Filter the records using the supplied terms.</p>
+        in: query
+        name: query
+        schema:
+          type: string
+        x-search-filter: true
+      - description: |
+          <p>Filter the records by matching part of their name.</p>
+        in: query
+        name: name
+        schema:
+          type: string
+        x-search-filter: true
+      - description: |
+          <p>Filter the records by inserted user names.</p>
+        in: query
+        name: insertUserNames
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+        x-search-filter: true
+      - description: |
+          <p>Filter the records by inserted userIDs.</p>
+        in: query
+        name: insertUserIDs
+        schema:
+          items:
+            type: integer
+          type: array
+        style: form
+        x-search-filter: true
+      - description: >
+          <p>Filter the record by when it was inserted.<br />
+
+          This filter receive a string that can take two forms.<br />
+
+          A single date that matches '{Operator}{DateTime}' where {Operator}
+          can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to
+          =.<br />
+
+          A date range that matches '{Opening}{DateTime},{DateTime}{Closing}'
+          where {Opening} can be '[' or '(' and {Closing} can be ']' or ')'.
+          '[]' are inclusive and '()' are exclusive.</p>
+        in: query
+        name: dateInserted
+        schema:
+          format: date-filter
+          type: string
+      - description: |
+          <p>Filter discussions by matching tags.</p>
+        in: query
+        name: tags
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+        x-search-filter: true
+      - description: |
+          <p>Tags search condition.<br />
+          Must be one of: "and", "or".</p>
+        in: query
+        name: tagOperator
+        schema:
+          type: string
+          default: or
+          enum:
+          - and
+          - or
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - description: |
+          <p>Desired number of items per page.</p>
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/SearchResult'
+                type: array
+          description: Success
+      tags:
+      - Search
+      summary: Search for records matching specific criteria.
+components:
+  schemas:
+    SearchResult:
+      properties:
+        body:
+          description: The content of the record.
+          minLength: 1
+          type: string
+        categoryID:
+          description: The category containing the record.
+          type: integer
+        commentID:
+          description: The id of the comment.
+          type: integer
+        dateInserted:
+          description: When the record was created.
+          format: date-time
+          type: string
+        dateUpdated:
+          description: When the user was updated.
+          format: date-time
+          nullable: true
+          type: string
+        discussionID:
+          description: The id of the discussion.
+          type: integer
+        groupID:
+          description: The id of the group or the id of the group containing the record.
+          nullable: true
+          type: integer
+        insertUserID:
+          description: The user that created the record.
+          type: integer
+        name:
+          description: 'The title of the record. A comment would be "RE: {DiscussionTitle}".'
+          minLength: 1
+          type: string
+        recordID:
+          description: The identifier of the record.
+          type: integer
+        recordType:
+          description: The main type of record.
+          enum:
+          - discussion
+          - comment
+          - group
+          minLength: 1
+          type: string
+        score:
+          description: Score of the record.
+          type: integer
+        type:
+          description: Sub-type of the discussion.
+          enum:
+          - discussion
+          - comment
+          - question
+          - group
+          minLength: 1
+          type: string
+        updateUserID:
+          description: The user that updated the record.
+          nullable: true
+          type: integer
+      required:
+      - recordID
+      - recordType
+      - type
+      - name
+      - body
+      - score
+      - insertUserID
+      - dateInserted
+      - updateUserID
+      - dateUpdated
+      type: object

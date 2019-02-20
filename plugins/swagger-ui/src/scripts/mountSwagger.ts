@@ -19,7 +19,7 @@ export function mountSwagger() {
             request.headers["x-transient-key"] = getMeta("TransientKey");
             return request;
         },
-        url: formatUrl("/api/v2/open-api/v2"),
+        url: formatUrl("/api/v2/open-api/v3" + window.location.search),
         validatorUrl: null,
     });
 }

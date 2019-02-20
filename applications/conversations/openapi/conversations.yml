@@ -1,0 +1,301 @@
+openapi: 3.0.2
+info:
+paths:
+  /conversations:
+    get:
+      parameters:
+      - description: |
+          Filter by author.
+        in: query
+        name: insertUserID
+        schema:
+          type: integer
+      - description: >
+          Filter by participating user. (Has no effect if insertUserID is
+          used)
+        in: query
+        name: participantUserID
+        schema:
+          type: integer
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 50
+          maximum: 100
+          minimum: 1
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - insertUser
+            - lastInsertUser
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Conversation'
+                type: array
+          description: Success
+      tags:
+      - Conversations
+      summary: List user conversations.
+    post:
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+          description: Success
+      tags:
+      - Conversations
+      requestBody:
+        $ref: '#/components/requestBodies/ConversationPost'
+      summary: Add a conversation.
+  '/conversations/{id}':
+    get:
+      parameters:
+      - description: |
+          The conversation ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+          description: Success
+      tags:
+      - Conversations
+      summary: Get a conversation.
+  '/conversations/{id}/leave':
+    delete:
+      parameters:
+      - description: |
+          The conversation ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Conversations
+      summary: Leave a conversation.
+  '/conversations/{id}/participants':
+    get:
+      parameters:
+      - description: |
+          The conversation ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: |
+          Filter by participant status.
+        in: query
+        name: status
+        schema:
+          type: string
+          default: participating
+          enum:
+          - all
+          - participating
+          - deleted
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 5
+          maximum: 100
+          minimum: 5
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - user
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationParticipants'
+          description: List of participants.
+      tags:
+      - Conversations
+      summary: Get participants of a conversation.
+    post:
+      parameters:
+      - description: The conversation ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationParticipants'
+          description: List of participants.
+      tags:
+      - Conversations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationPost'
+        required: true
+      summary: Add participants to a conversation.
+components:
+  requestBodies:
+    ConversationPost:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ConversationPost'
+      required: true
+  schemas:
+    Conversation:
+      properties:
+        body:
+          description: The most recent unread message in the conversation.
+          minLength: 1
+          type: string
+        conversationID:
+          description: The ID of the conversation.
+          type: integer
+        countMessages:
+          description: The number of messages on the conversation.
+          type: integer
+        countParticipants:
+          description: The number of participants on the conversation.
+          type: integer
+        countUnread:
+          description: The number of unread messages.
+          type: integer
+        dateInserted:
+          description: When the conversation was created.
+          format: date-time
+          type: string
+        insertUser:
+          $ref: '#/components/schemas/UserFragment'
+        insertUserID:
+          description: The user that created the conversation.
+          type: integer
+        lastMessage:
+          properties:
+            dateInserted:
+              description: The date of the message.
+              format: date-time
+              type: string
+            insertUser:
+              $ref: '#/components/schemas/UserFragment'
+            insertUserID:
+              description: The author of the your most recent message.
+              type: integer
+          required:
+          - insertUserID
+          - dateInserted
+          - insertUser
+          type: object
+        name:
+          description: The name of the conversation.
+          minLength: 1
+          type: string
+        participants:
+          $ref: '#/components/schemas/ConversationParticipants'
+        unread:
+          description: Whether the conversation has an unread indicator.
+          type: boolean
+        url:
+          description: The URL of the conversation.
+          minLength: 1
+          type: string
+      required:
+      - conversationID
+      - name
+      - body
+      - url
+      - dateInserted
+      - insertUserID
+      - countParticipants
+      - countMessages
+      type: object
+    ConversationParticipants:
+      description: List of participants.
+      items:
+        properties:
+          userID:
+            description: The userID of the participant.
+            type: integer
+          status:
+            description: Participation status of the user.
+            enum:
+            - participating
+            - deleted
+            type: string
+          user:
+            $ref: '#/components/schemas/UserFragment'
+        required:
+        - userID
+        - status
+        type: object
+      type: array
+    ConversationPost:
+      properties:
+        participantUserIDs:
+          description: List of userID of the participants.
+          items:
+            type: integer
+          type: array
+      required:
+      - participantUserIDs
+      type: object

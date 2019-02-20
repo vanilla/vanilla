@@ -231,6 +231,26 @@ export const globalVariables = (theme?: object) => {
         },
     };
 
+    const userContent = {
+        font: {
+            sizes: {
+                default: fonts.size.medium,
+                h1: "2em",
+                h2: "1.5em",
+                h3: "1.25em",
+                h4: "1em",
+                h5: ".875em",
+                h6: ".85em",
+            },
+        },
+        list: {
+            margin: "2em",
+            listDecoration: {
+                minWidth: "2em",
+            },
+        },
+    };
+
     return {
         utility,
         elementaryColors,
@@ -254,5 +274,6 @@ export const globalVariables = (theme?: object) => {
         meta,
         states,
         overlay,
+        userContent,
     };
 };

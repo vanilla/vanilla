@@ -9,6 +9,7 @@ import { uniqueIDFromPrefix } from "@library/componentIDs";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import classNames from "classnames";
 import { rightChevron } from "../icons/common";
+import { drawerClasses } from "@library/styles/drawerStyles";
 
 export interface IDrawerProps {
     title: string;
@@ -16,6 +17,7 @@ export interface IDrawerProps {
     className?: string;
     disabled?: boolean;
     contentsClassName?: string;
+    theme?: object;
 }
 
 export interface IState {
@@ -37,18 +39,19 @@ export default class Drawer extends React.Component<IDrawerProps, IState> {
     public render() {
         const chevronRight = `▸`;
         const chevronDown = `▾`;
+        const classes = drawerClasses(this.props.theme);
         return (
-            <div className={classNames("drawer", this.props.className)}>
+            <div className={classNames("drawer", this.props.className, classes.root)}>
                 <Button
                     id={this.buttonID}
                     aria-controls={this.contentID}
                     aria-expanded={this.state.open}
                     disabled={this.props.disabled}
                     baseClass={ButtonBaseClass.CUSTOM}
-                    className="drawer-toggle"
+                    className={classNames("drawer-toggle", classes.toggle)}
                     onClick={this.toggle}
                 >
-                    <span aria-hidden={true} className="drawer-icon icon-fake">
+                    <span aria-hidden={true} className={classNames("drawer-icon", "icon-fake", classes.icon)}>
                         {this.state.open && chevronDown}
                         {!this.state.open && chevronRight}
                     </span>
@@ -58,7 +61,7 @@ export default class Drawer extends React.Component<IDrawerProps, IState> {
                     <div
                         id={this.contentID}
                         aria-controlledby={this.buttonID}
-                        className={classNames("drawer-contents", this.props.contentsClassName)}
+                        className={classNames("drawer-contents", this.props.contentsClassName, classes.contents)}
                     >
                         {this.props.children}
                     </div>

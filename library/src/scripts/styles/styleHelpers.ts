@@ -171,18 +171,14 @@ const vars = globalVariables();
 const formElementVars = formElementsVariables();
 
 export const defaultTransition = (...properties) => {
-    const propLength = properties.length;
-    if (propLength > 0) {
-        return {
-            transition: `${properties.map((prop, index) => {
-                return `${prop} ${vars.animation.defaultTiming} ${vars.animation.defaultEasing}${
-                    index === propLength ? ", " : ""
-                }`;
-            })}`,
-        };
-    } else {
-        return undefined;
-    }
+    properties = properties.length === 0 ? ["all"] : properties;
+    return {
+        transition: `${properties.map((prop, index) => {
+            return `${prop} ${vars.animation.defaultTiming} ${vars.animation.defaultEasing}${
+                index === properties.length ? ", " : ""
+            }`;
+        })}`,
+    };
 };
 
 const spinnerOffset = 73;

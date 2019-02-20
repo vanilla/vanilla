@@ -14,6 +14,7 @@ import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { leftChevron, rightChevron } from "@library/components/icons";
 import { NullComponent } from "@library/components/forms/select/overwrites";
 import moment, { Moment } from "moment";
+import { dayPickerInputClasses } from "@library/styles/dateInputStyles";
 
 interface IProps {
     value: string; // ISO formatted date
@@ -22,6 +23,7 @@ interface IProps {
     inputClassName?: string;
     alignment: "left" | "right";
     disabledDays?: any; // See http://react-day-picker.js.org/examples/disabled
+    theme?: object;
 }
 
 interface IState {
@@ -56,6 +58,7 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
      */
     private renderReactInput() {
         const value = this.props.value ? moment(this.props.value).toDate() : undefined;
+        const dayPickerClasses = dayPickerInputClasses(this.props.theme);
         return (
             <DayPickerInput
                 format="YYYY-MM-DD"
@@ -67,6 +70,7 @@ export default class DateInput extends React.PureComponent<IProps, IState> {
                 onDayChange={this.handleDayPickerChange}
                 classNames={
                     {
+                        wrapper: dayPickerClasses.root,
                         container: classNames("dayPickerInput-container", this.props.contentClassName),
                         overlay: "dayPickerInput-overlay",
                     } as any

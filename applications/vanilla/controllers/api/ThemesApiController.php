@@ -262,14 +262,24 @@ class ThemesApiController extends AbstractApiController {
      * Get custom theme by ID
      *
      * @param int $themeID
+     * @param string $assetKey
      * @return array
      */
-    public function getThemeByID(int $themeID) {
+    public function getThemeByID(int $themeID, string $assetKey = '') {
         $theme = $this->themeModel->get(['themeID' => $themeID]);
         if (empty($theme)) {
             throw new NotFoundException('Theme '.$themeID.' not found');
         }
-        return $theme[0];
+        $theme = $theme[0];
+        $filter = ['themeID' => $themeID];
+        if (!empty($assetKey)) {
+            $filter['assetKey'] = $assetKey;
+        }
+        $assets =  $this->themeAssetModel->get($filter);
+        foreach ($assets as $asset) {
+            $theme['assets'][$asset['assetKey']]['data'] = $asset['data'];
+        }
+        return $theme;
     }
 
     /**
@@ -328,7 +338,7 @@ class ThemesApiController extends AbstractApiController {
         $res['mobileLogo'] = $theme->getInfoValue('mobileLogo');
         foreach ($assets as $aKey => &$aVal) {
             $fileName = PATH_ROOT.$theme->getSubdir().'/assets/'.$aVal['file'];
-            $aVal['data'] = $customAssets[$aKey]['data'] ?? file_get_contents($fileName);
+            $aVal['data'] = $customAssets['assets'][$aKey]['data'] ?? file_get_contents($fileName);
             switch ($aVal['type']) {
                 case 'json':
                     $aVal['data'] = json_decode($aVal['data'], true);

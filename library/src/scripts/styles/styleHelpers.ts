@@ -137,7 +137,7 @@ export const componentThemeVariables = (theme: any | undefined, componentName: s
     // const themeVars = get(theme, componentName, {});
     const themeVars = (theme && theme[componentName]) || {};
 
-    const subComponentStyles = (subElementName: string) => {
+    const subComponentStyles = (subElementName: string): object => {
         return (themeVars && themeVars[subElementName]) || {};
         // return get(themeVars, subElementName, {});
     };
@@ -173,7 +173,7 @@ const spinnerLoaderAnimation = keyframes({
 });
 
 export const spinnerLoader = (
-    spinnerColor: ColorHelper = vars.mainColors.primary,
+    spinnerColor: string = vars.mainColors.primary.toString(),
     dimensions = px(18),
     thicknesss = px(3),
     speed = "0.7s",
@@ -188,10 +188,16 @@ export const spinnerLoader = (
         width: dimensions,
         height: dimensions,
         borderRadius: percent(50),
-        borderTop: `${thicknesss} solid ${spinnerColor.toString()}`,
-        borderRight: `${thicknesss} solid ${spinnerColor.fade(0.3).toString()}`,
-        borderBottom: `${thicknesss} solid ${spinnerColor.fade(0.3).toString()}`,
-        borderLeft: `${thicknesss} solid ${spinnerColor.fade(0.3).toString()}`,
+        borderTop: `${thicknesss} solid ${color(spinnerColor).toString()}`,
+        borderRight: `${thicknesss} solid ${color(spinnerColor)
+            .fade(0.3)
+            .toString()}`,
+        borderBottom: `${thicknesss} solid ${color(spinnerColor)
+            .fade(0.3)
+            .toString()}`,
+        borderLeft: `${thicknesss} solid ${color(spinnerColor)
+            .fade(0.3)
+            .toString()}`,
         transform: "translateZ(0)",
         animation: `spillerLoader ${speed} infinite ease-in-out`,
         animationName: spinnerLoaderAnimation,

@@ -39,34 +39,36 @@ export function buttonStyles(theme?: object) {
     return { padding, sizing, border };
 }
 
+type Unit = string | number;
+
 export interface IButtonType {
     fg: string;
     bg: string;
-    spinner: ColorHelper;
+    spinner: string;
     border: {
         color: string;
-        width: string;
+        width: Unit;
         style: string;
-        radius: string;
+        radius: Unit;
     };
     hover: {
-        fg: string;
-        bg: string;
+        color: string;
+        backgroundColor: string;
         borderColor: string;
     };
     focus: {
-        fg: string;
-        bg: string;
+        color: string;
+        backgroundColor: string;
         borderColor: string;
     };
     active: {
-        fg: string;
-        bg: string;
+        color: string;
+        backgroundColor: string;
         borderColor: string;
     };
     focusAccessible: {
-        fg: string;
-        bg: string;
+        color: string;
+        backgroundColor: string;
         borderColor: string;
     };
 }
@@ -78,7 +80,7 @@ export function buttonVariables(theme?: object) {
     const standard: IButtonType = {
         fg: globalVars.mainColors.fg.toString(),
         bg: globalVars.mainColors.bg.toString(),
-        spinner: globalVars.mainColors.primary,
+        spinner: globalVars.mainColors.primary.toString(),
         border: {
             color: globalVars.mixBgAndFg(0.24).toString(),
             width: px(1),
@@ -120,7 +122,7 @@ export function buttonVariables(theme?: object) {
     const primary: IButtonType = {
         fg: globalVars.elementaryColors.white.toString(),
         bg: globalVars.mainColors.primary.toString(),
-        spinner: globalVars.elementaryColors.white,
+        spinner: globalVars.elementaryColors.white.toString(),
         border: {
             color: globalVars.mainColors.primary.toString(),
             width: px(1),
@@ -154,12 +156,12 @@ export function buttonVariables(theme?: object) {
     const transparent: IButtonType = {
         fg: transparentButtonColor.toString(),
         bg: "transparent",
-        spinner: globalVars.mainColors.primary,
+        spinner: globalVars.mainColors.primary.toString(),
         border: {
             color: transparentButtonColor.toString(),
             width: px(1),
             style: "solid",
-            radius: globalVars.border.radius,
+            radius: globalVars.border.radius.toString(),
         },
         hover: {
             color: transparentButtonColor.toString(),
@@ -243,27 +245,27 @@ export function generateButtonClass(
                     },
                     "&:hover": {
                         zIndex,
-                        backgroundColor: buttonType.hover.bg,
+                        backgroundColor: buttonType.hover.backgroundColor,
                         borderColor: buttonType.hover.borderColor,
-                        color: buttonType.hover.fg,
+                        color: buttonType.hover.color,
                     },
                     "&:focus": {
                         zIndex,
-                        backgroundColor: buttonType.focus.bg,
+                        backgroundColor: buttonType.focus.backgroundColor,
                         borderColor: buttonType.focus.borderColor,
-                        color: buttonType.focus.fg,
+                        color: buttonType.focus.color,
                     },
                     "&:active": {
                         zIndex,
-                        backgroundColor: buttonType.active.bg,
+                        backgroundColor: buttonType.active.backgroundColor,
                         borderColor: buttonType.active.borderColor,
-                        color: buttonType.active.fg,
+                        color: buttonType.active.color,
                     },
                     "&.focus-visible": {
                         zIndex,
-                        backgroundColor: buttonType.focus.bg,
+                        backgroundColor: buttonType.focus.backgroundColor,
                         borderColor: buttonType.focus.borderColor,
-                        color: buttonType.focus.fg,
+                        color: buttonType.focus.color,
                     },
                 },
             },
@@ -298,7 +300,7 @@ export function buttonLoaderClasses(buttonType: IButtonType, theme?: object) {
         height: percent(100),
         width: percent(100),
         $nest: {
-            "&::after": spinnerLoader(buttonType.spinner, px(20)),
+            "&::after": spinnerLoader(buttonType.spinner, px(20)) as any,
         },
         ...themeVars.subComponentStyles("root"),
     });

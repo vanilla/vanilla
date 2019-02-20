@@ -10,6 +10,8 @@ export const globalVariables = (theme?: object) => {
     const colorPrimary = color("#0291db");
     const themeVars = componentThemeVariables(theme, "globalVariables");
 
+    const baseUnit = 6;
+
     const utility = {
         "percentage.third": percent(100 / 3),
         "percentage.nineSixteenths": percent((9 / 16) * 100),
@@ -119,13 +121,18 @@ export const globalVariables = (theme?: object) => {
                 title: 26,
             },
         },
-
         weights: {
             normal: 400,
             semiBold: 600,
             bold: 700,
         },
         ...themeVars.subComponentStyles("fonts"),
+    };
+
+    const meta = {
+        fontSize: fonts.size.small,
+        color: mixBgAndFg(0.85),
+        margin: 4,
     };
 
     const icon = {
@@ -147,12 +154,14 @@ export const globalVariables = (theme?: object) => {
     };
 
     return {
+        baseUnit,
         utility,
         elementaryColors,
         mainColors,
         feedbackColors,
         body,
         border,
+        meta,
         gutter,
         panel,
         content,

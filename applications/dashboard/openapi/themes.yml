@@ -15,9 +15,7 @@ paths:
           content:
             "application/json":
               schema:
-                items:
-                  $ref: "#/components/schemas/Theme"
-                type: array
+                $ref: "#/components/schemas/Theme"
           description: Success
       tags:
         - Themes

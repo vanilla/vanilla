@@ -25,6 +25,7 @@ import ReactDOM from "react-dom";
 import { LinkContext } from "@library/components/navigation/LinkContextProvider";
 import { RouteComponentProps } from "react-router";
 import { buttonVariables } from "@library/styles/buttonStyles";
+import { searchBarClasses } from "@library/styles/searchBarStyles";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;
@@ -58,6 +59,7 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     onCloseSuggestions?: () => void;
     buttonText?: string;
     disableAutocomplete?: boolean;
+    theme?: object;
 }
 
 interface IState {
@@ -101,8 +103,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const { className, disabled, isLoading } = this.props;
-
+        const { className, disabled, isLoading, theme } = this.props;
         return (
             <AsyncCreatableSelect
                 id={this.id}
@@ -238,30 +239,39 @@ export default class SearchBar extends React.Component<IProps, IState> {
      */
     private SearchControl = (props, theme?: object) => {
         const buttonVars = buttonVariables(theme);
+        const classes = searchBarClasses(theme);
         return (
-            <div className="searchBar">
-                <form className="searchBar-form" onSubmit={this.onFormSubmit}>
+            <div className={classNames("searchBar", classes.root)}>
+                <form className={classNames("searchBar-form", classes.form)} onSubmit={this.onFormSubmit}>
                     {!this.props.noHeading && (
-                        <Heading depth={1} className="searchBar-heading pageSmallTitle" title={this.props.title}>
-                            <label className="searchBar-label" htmlFor={this.searchInputID}>
+                        <Heading
+                            depth={1}
+                            className={classNames("searchBar-heading", "pageSmallTitle", classes.heading)}
+                            title={this.props.title}
+                        >
+                            <label
+                                className={classNames("searchBar-label", classes.label)}
+                                htmlFor={this.searchInputID}
+                            >
                                 {this.props.titleAsComponent ? this.props.titleAsComponent : this.props.title}
                             </label>
                         </Heading>
                     )}
-                    <div onClick={this.focus} className="searchBar-content">
+                    <div onClick={this.focus} className={classNames("searchBar-content", classes.content)}>
                         <div
                             className={classNames(
                                 `${this.prefix}-valueContainer`,
                                 "suggestedTextInput-inputText",
                                 "inputText",
                                 "isClearable",
+                                classes.valueContainer,
                                 {
                                     isLarge: this.props.isBigInput,
                                 },
                             )}
                         >
                             <components.Control {...props} />
-                            {this.props.value && <ClearButton onClick={this.clear} />}
+                            {this.props.value && <ClearButton onClick={this.clear} className={classes.clear} />}
                         </div>
                         <ConditionalWrap condition={!!this.props.hideSearchButton} className="sr-only">
                             <Button
@@ -282,8 +292,11 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 )}
                             </Button>
                         </ConditionalWrap>
-                        <div onClick={this.focus} className="searchBar-iconContainer">
-                            {search("searchBar-icon")}
+                        <div
+                            onClick={this.focus}
+                            className={classNames("searchBar-iconContainer", classes.iconContainer)}
+                        >
+                            {search(classNames("searchBar-icon", classes.icon))}
                         </div>
                     </div>
                 </form>

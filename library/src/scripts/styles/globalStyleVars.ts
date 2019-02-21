@@ -256,6 +256,12 @@ export const globalVariables = (theme?: object) => {
         },
     };
 
+    const buttonIconSize = 36;
+    const buttonIcon = {
+        size: buttonIconSize,
+        offset: (buttonIconSize - icon.sizes.default) / 2,
+    };
+
     return {
         utility,
         elementaryColors,
@@ -270,9 +276,7 @@ export const globalVariables = (theme?: object) => {
         spacer,
         lineHeights,
         icon,
-        mixBgAndFg,
-        mixPrimaryAndFg,
-        mixPrimaryAndBg,
+        buttonIcon,
         animation,
         links,
         embed,
@@ -280,5 +284,8 @@ export const globalVariables = (theme?: object) => {
         states,
         overlay,
         userContent,
+        mixBgAndFg,
+        mixPrimaryAndFg,
+        mixPrimaryAndBg,
     };
 };

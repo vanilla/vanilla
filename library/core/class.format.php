@@ -23,7 +23,6 @@ use \Vanilla\Formatting;
  */
 class Gdn_Format {
     use \Garden\StaticCacheTranslationTrait;
-    use \Garden\StaticCacheContainerTrait;
 
     /**
      * @var bool Flag which allows plugins to decide if the output should include rel="nofollow" on any <a> links.

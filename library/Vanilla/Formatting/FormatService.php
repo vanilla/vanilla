@@ -20,18 +20,6 @@ class FormatService {
     /** @var array */
     private $formats = [];
 
-    /** @var Container */
-    private $container;
-
-    /**
-     * Format Factory constructor
-     *
-     * @param Container $container The container instance so we can create Format instances.
-     */
-    public function __construct(Container $container) {
-        $this->container = $container;
-    }
-
     /**
      * Parse attachment data from a message.
      *
@@ -50,11 +38,11 @@ class FormatService {
      * Register a format type and the class name handles it.
      *
      * @param string $formatKey
-     * @param string $formatClass
+     * @param FormatInterface $format
      */
-    public function registerFormat(string $formatKey, string $formatClass) {
+    public function registerFormat(string $formatKey, FormatInterface $format) {
         $formatKey = strtolower($formatKey);
-        $this->formats[$formatKey] = $formatClass;
+        $this->formats[$formatKey] = $format;
     }
 
     /**
@@ -68,15 +56,9 @@ class FormatService {
      */
     public function getFormatter(string $formatKey, $throw = false): FormatInterface {
         $formatKey = strtolower($formatKey);
-        $formatClass = $this->formats[$formatKey] ?? null;
+        $format = $this->formats[$formatKey] ?? null;
         $errorMessage = "Unable to find a formatter for the formatKey $formatKey.";
-        if (!$formatClass) {
-            throw new FormatterNotFoundException($errorMessage);
-        }
-
-        try {
-            $formatter = $this->container->get($formatClass);
-        } catch (ContainerException $e) {
+        if (!$format) {
             if ($throw) {
                 throw new FormatterNotFoundException($errorMessage);
             } else {
@@ -84,6 +66,6 @@ class FormatService {
             }
         }
 
-        return $formatter;
+        return $format;
     }
 }

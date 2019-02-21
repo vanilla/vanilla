@@ -615,7 +615,7 @@ if (!function_exists('writeEmbedCommentForm')) :
 
                 // If we aren't ajaxing this call then we need to target the url of the parent frame.
                 $returnUrl = $controller->data('ForeignSource.vanilla_url', Gdn::request()->pathAndQuery());
-                $returnUrl = trim($returnUrl,'/').'#vanilla-comments';
+                $returnUrl = trim($returnUrl, '/').'#vanilla-comments';
 
                 if ($session->isValid()) {
                     $authenticationUrl = url(signOutUrl($returnUrl), true);

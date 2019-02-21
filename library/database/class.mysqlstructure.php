@@ -267,7 +267,6 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             .$keys
             ."\n)";
 
-
         $forceDatabaseEngine = Gdn::config('Database.ForceStorageEngine');
         if ($forceDatabaseEngine && !$this->_TableStorageEngine) {
             $this->_TableStorageEngine = $forceDatabaseEngine;

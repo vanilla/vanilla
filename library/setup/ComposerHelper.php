@@ -27,7 +27,7 @@ class ComposerHelper {
         $cacheDir = realpath(__DIR__.'/../../cache');
 
         $paths = array_merge(
-            [$cacheDir.'/addon.php'],
+            [$cacheDir.'/addon.php', $cacheDir.'/openapi.php'],
             glob($cacheDir.'/locale/*.php'),
             glob($cacheDir.'/theme/*.php'),
             glob($cacheDir.'/*-index.php')

@@ -584,24 +584,7 @@
         }
 
         .RecordReactions {
-            margin-left: -$utility-baseUnitHalf;
-            margin-right: -$utility-baseUnitHalf;
 
-            .PhotoWrap {
-                position: relative;
-                width: 24px;
-                height: 24px;
-            }
-
-            .ReactSprite {
-                color: $global-color_white;
-                margin-right: 0;
-            }
-
-            .UserReactionWrap {
-                width: 24px;
-                margin: 0 $utility-baseUnitHalf $utility-baseUnitHalf;
-            }
         }
     }
 }

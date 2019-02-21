@@ -11,7 +11,7 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        200:
           content:
             "application/json":
               schema:
@@ -36,6 +36,12 @@ paths:
               schema:
                 type: string
           description: Success
+        404:
+          description: Footer could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThemeAssetNotFound"
       tags:
         - Themes
       summary: Get the footer HTML of a theme.
@@ -57,6 +63,12 @@ paths:
                   $ref: "#/components/schemas/ThemeFont"
                 type: array
           description: Success
+        404:
+          description: Fonts could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThemeAssetNotFound"
       tags:
         - Themes
       summary: Get custom fonts of a theme.
@@ -76,6 +88,12 @@ paths:
               schema:
                 type: string
           description: Success
+        404:
+          description: Header could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThemeAssetNotFound"
       tags:
         - Themes
       summary: Get the header HTML of a theme.
@@ -95,6 +113,12 @@ paths:
               schema:
                 type: string
           description: Success
+        404:
+          description: JavaScript could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThemeAssetNotFound"
       tags:
         - Themes
       summary: Get JavaScript to be used as part of a theme.
@@ -116,9 +140,15 @@ paths:
                   $ref: "#/components/schemas/ThemeScript"
                 type: array
           description: Success
+        404:
+          description: Additional scripts could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThemeAssetNotFound"
       tags:
         - Themes
-      summary: Get external scripts of a theme.
+      summary: Get additional script files of a theme.
   /themes/{key}/assets/styles.css:
     get:
       parameters:
@@ -135,6 +165,12 @@ paths:
               schema:
                 type: string
           description: Success
+        404:
+          description: Stylesheet could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThemeAssetNotFound"
       tags:
         - Themes
       summary: Get theme styles.
@@ -154,6 +190,12 @@ paths:
               schema:
                 type: object
           description: Success
+        404:
+          description: Variables could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThemeAssetNotFound"
       tags:
         - Themes
       summary: Get theme variables.
@@ -216,6 +258,23 @@ components:
         - scripts
         - styles
         - variables
+      type: object
+    ThemeAssetNotFound:
+      properties:
+        description:
+          description: Verbose description of the error.
+          nullable: true
+          type: string
+        message:
+          description: Short description of the error.
+          type: string
+        status:
+          description: Status code of the error response.
+          type: integer
+      required:
+        - description
+        - message
+        - status
       type: object
     ThemeFont:
       description: An external font resource.

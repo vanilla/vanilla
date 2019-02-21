@@ -34,6 +34,9 @@ import {
     AnimationNameProperty,
     HeightProperty,
     WidthProperty,
+    MarginProperty,
+    ObjectFitProperty,
+    ObjectPositionProperty,
 } from "csstype";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { style, keyframes } from "typestyle";
@@ -418,5 +421,25 @@ export const disabledInput = () => {
         userSelect: important("none"),
         cursor: important("default"),
         opacity: important((formElementVars.disabled.opacity as any).toString()),
+    };
+};
+
+export const objectFitWithFallback = () => {
+    return {
+        position: "absolute" as PositionProperty,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        margin: "auto",
+        height: "auto",
+        width: percent(100),
+        $nest: {
+            "@supports (object-fit: cover)": {
+                objectFit: "cover" as ObjectFitProperty,
+                objectPosition: "center",
+                height: percent(100),
+            },
+        },
     };
 };

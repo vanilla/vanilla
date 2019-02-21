@@ -69,7 +69,7 @@ export const globalVariables = (theme?: object) => {
     };
 
     const border = {
-        color: mainColors.fg.mix(mainColors.bg, 24),
+        color: mixPrimaryAndBg(0.24),
         width: 1,
         style: "solid",
         radius: 6,

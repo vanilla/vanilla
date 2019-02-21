@@ -13,7 +13,7 @@ import FrameBody from "@library/components/frame/FrameBody";
 import FrameFooter from "@library/components/frame/FrameFooter";
 import FrameHeaderWithAction from "@library/components/frame/FrameHeaderWithAction";
 import FramePanel from "@library/components/frame/FramePanel";
-import FullPageLoader from "@library/components/FullPageLoader";
+import Loader from "@library/components/Loader";
 import { settings } from "@library/components/icons/header";
 import LinkAsButton from "@library/components/LinkAsButton";
 import { IMeBoxNotificationItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
@@ -86,7 +86,7 @@ export class NotificationsContents extends React.Component<IProps> {
             // This will be calculated better once we finish the CSS in JS transition.
             const height = this.props.device === Devices.MOBILE ? 80 : 69;
             const loaders = loaderClasses(this.props.theme);
-            return <FullPageLoader loaderStyleClass={loaders.fixedSizeLoader} height={height} minimumTime={0} />;
+            return <Loader loaderStyleClass={loaders.fixedSizeLoader} height={height} minimumTime={0} padding={10} />;
         }
 
         return (

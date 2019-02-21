@@ -28,7 +28,7 @@ export function dateRangeClasses(theme?: object) {
         justifyContent: "flex-start",
         width: percent(100),
         $nest: {
-            "& + .dateRange-boundary": {
+            "& + &": {
                 marginTop: unit(12),
             },
         },

@@ -58,9 +58,9 @@
             "type": "css",
             "file": "styles.css"
         },
-        "inlineJs": {
+        "javascript": {
             "type": "js",
-            "file": "inlineJs.js"
+            "file": "javascript.js"
         }
     }
 }

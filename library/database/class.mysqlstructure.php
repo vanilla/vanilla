@@ -210,11 +210,6 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         $sql = '';
         $tableName = Gdn_Format::alphaNumeric($this->_TableName);
 
-        $forceDatabaseEngine = c('Database.ForceStorageEngine');
-        if ($forceDatabaseEngine && !$this->_TableStorageEngine) {
-            $this->_TableStorageEngine = $forceDatabaseEngine;
-        }
-
         foreach ($this->_Columns as $columnName => $column) {
             if ($sql != '') {
                 $sql .= ',';
@@ -272,28 +267,11 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             .$keys
             ."\n)";
 
-        // Check to see if there are any fulltext columns, otherwise use innodb.
-        if (!$this->_TableStorageEngine) {
-            $hasFulltext = false;
-            foreach ($this->_Columns as $column) {
-                $columnKeyTypes = (array)$column->KeyType;
-                array_map('strtolower', $columnKeyTypes);
-                if (in_array('fulltext', $columnKeyTypes)) {
-                    $hasFulltext = true;
-                    break;
-                }
-            }
-            if ($hasFulltext) {
-                $this->_TableStorageEngine = 'myisam';
-            } else {
-                $this->_TableStorageEngine = c('Database.DefaultStorageEngine', 'innodb');
-            }
 
-            if (!$this->hasEngine($this->_TableStorageEngine)) {
-                $this->_TableStorageEngine = 'myisam';
-            }
+        $forceDatabaseEngine = Gdn::config('Database.ForceStorageEngine');
+        if ($forceDatabaseEngine && !$this->_TableStorageEngine) {
+            $this->_TableStorageEngine = $forceDatabaseEngine;
         }
-
         if ($this->_TableStorageEngine) {
             $sql .= ' engine='.$this->_TableStorageEngine;
         }

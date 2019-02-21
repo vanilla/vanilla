@@ -1,0 +1,42 @@
+openapi: 3.0.2
+info:
+paths:
+  /rich/quote:
+    post:
+      summary: Create a rich-compatible HTML representation of a string for quoting.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                body:
+                  description: Raw post text to render as a rich post quote.
+                  minLength: 1
+                  type: string
+                format:
+                  description: The format to be used for rendering the text.
+                  minLength: 1
+                  type: string
+              required:
+              - body
+              - format
+              type: object
+        required: true
+      responses:
+        '201':
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  quote:
+                    description: 'A quoted representation of the text, rendered as HTML.'
+                    minLength: 1
+                    type: string
+                required:
+                - quote
+          description: Success
+      tags:
+      - Rich
+components:
+  schemas:

@@ -8,6 +8,7 @@
 namespace Vanilla\Dashboard\Controllers\API;
 
 use Garden\Schema\Schema;
+use Vanilla\OpenAPIBuilder;
 use Vanilla\Web\Controller;
 use Vanilla\Dashboard\Models\SwaggerModel;
 
@@ -21,18 +22,26 @@ class OpenApiApiController extends Controller {
     private $swaggerModel;
 
     /**
+     * @var OpenAPIBuilder The OpenAPI builder dependency.
+     */
+    private $openApiBuilder;
+
+    /**
      * Construct a {@link SwaggerApiController}.
      *
      * @param SwaggerModel $swaggerModel The swagger model dependency.
+     * @param OpenAPIBuilder $openApiBuilder The OpenAPI generator.
      */
-    public function __construct(SwaggerModel $swaggerModel) {
+    public function __construct(SwaggerModel $swaggerModel, OpenApiBuilder $openApiBuilder) {
         $this->swaggerModel = $swaggerModel;
+        $this->openApiBuilder = $openApiBuilder;
     }
 
     /**
      * Get the root swagger object.
      *
      * @return array Returns the swagger object as an array.
+     * @deprecated
      */
     public function get_v2() {
         $this->permission('Garden.Settings.Manage');
@@ -44,6 +53,31 @@ class OpenApiApiController extends Controller {
 
         $this->getSession()->getPermissions()->setAdmin(true);
         return $this->swaggerModel->getSwaggerObject();
+    }
+
+    /**
+     * Get the Open API object for endpoints on add-ons.
+     *
+     * @param array $query The querystring.
+     * @return array Returns the OpenAPI object as an array.
+     */
+    public function get_v3(array $query = []) {
+        $this->permission('Garden.Settings.Manage');
+
+        $in = $this->schema([
+            'disabled:b' => [
+                'description' => 'Show endpoints for disabled add-ons.',
+                'default' => false,
+            ],
+            'hidden:b' => [
+                'description' => 'Show hidden endpoints.',
+                'default' => false
+            ],
+        ], 'in');
+        $query = $in->validate($query);
+
+        $result = $this->openApiBuilder->getEnabledOpenAPI($query['disabled'], $query['hidden']);
+        return $result;
     }
 
     /**

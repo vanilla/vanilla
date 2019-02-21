@@ -60,7 +60,7 @@ class PocketsPlugin extends Gdn_Plugin {
         }
         if ($this->ShowPocketLocations && checkPermission('Plugins.Pockets.Manage') && $sender->MasterView != 'admin') {
             // Add the css for the test pockets to the page.
-            $sender->addCSSFile('pockets.css', 'plugins/Pockets');
+            $sender->addCSSFile('pockets.css', 'plugins/pockets');
         }
     }
 
@@ -139,7 +139,7 @@ class PocketsPlugin extends Gdn_Plugin {
     public function settingsController_pockets_create($sender, $args = []) {
         $sender->permission('Plugins.Pockets.Manage');
         $sender->setHighlightRoute('settings/pockets');
-        $sender->addJsFile('pockets.js', 'plugins/Pockets');
+        $sender->addJsFile('pockets.js', 'plugins/pockets');
 
         $page = val(0, $args);
         switch (strtolower($page)) {
@@ -250,7 +250,7 @@ class PocketsPlugin extends Gdn_Plugin {
         }
 
         $sender->Form = $form;
-        $sender->render('Index', '', 'plugins/Pockets');
+        $sender->render('Index', '', 'plugins/pockets');
     }
 
     /**
@@ -433,7 +433,7 @@ class PocketsPlugin extends Gdn_Plugin {
             ]
         );
 
-        return $sender->render('AddEdit', '', 'plugins/Pockets');
+        return $sender->render('AddEdit', '', 'plugins/pockets');
     }
 
     /**
@@ -464,7 +464,7 @@ class PocketsPlugin extends Gdn_Plugin {
         }
 
         $sender->Form = $form;
-        $sender->render('Delete', '', 'plugins/Pockets');
+        $sender->render('Delete', '', 'plugins/pockets');
         return true;
     }
 

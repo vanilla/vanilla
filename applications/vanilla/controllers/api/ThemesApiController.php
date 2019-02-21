@@ -136,6 +136,34 @@ class ThemesApiController extends AbstractApiController {
     }
 
     /**
+     * PUT theme asset (update existing or create new if asset does not exist).
+     *
+     * @param string $id The unique theme key or theme ID (ex: keystone).
+     * @param string $assetKey Unique asset key (ex: header, footer, fonts, styles)
+     * @param array $body Array of incoming params.
+     *              Should have ONE key === $assetKey and value (structure of associated asset).
+     *
+     * @return array|Data
+     */
+    public function put_assets(string $id, string $assetKey, array $body) {
+        $this->permission("Garden.Settings.Manage");
+
+        $in = $this->schema($this->assetsSchema(), 'in')->setDescription('PUT theme asset.');
+        $out = $this->schema($this->assetsSchema(), 'out');
+
+        $body = $in->validate($body);
+        if (isset($body[$assetKey])) {
+            $this->themeAssetModel->updateThemeAssets($id, [$assetKey => $body[$assetKey]]);
+        } else {
+            throw new \Garden\Schema\ValidationException('Request body must have "'.$assetKey.'" field.');
+        }
+
+        $asset = $this->getThemeAsset($id, $assetKey);
+        $asset = $out->validate([$assetKey => $asset]);
+        return $asset;
+    }
+
+    /**
      * Get theme asset.
      *
      * @param string $id The unique theme key or theme ID (ex: keystone).
@@ -156,6 +184,7 @@ class ThemesApiController extends AbstractApiController {
         $asset =  $this->getThemeAsset($id, $pathInfo['filename'], !empty($pathInfo['extension']));
         if (empty($pathInfo['extension'])) {
             // return asset as an array
+            $asset = $out->validate([$assetKey => $asset]);
             return $asset;
         } else {
             // return asset as a file

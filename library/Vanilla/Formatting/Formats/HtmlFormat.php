@@ -7,10 +7,8 @@
 
 namespace Vanilla\Formatting\Formats;
 
-use Garden\EventManager;
 use Garden\StaticCacheTranslationTrait;
 use Vanilla\Contracts\Formatting\FormatInterface;
-use Vanilla\Formatting\Attachment;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Heading;
 use Vanilla\Formatting\Html\HtmlEnhancer;
@@ -35,6 +33,7 @@ class HtmlFormat implements FormatInterface {
     private $shouldCleanupLineBreaks;
 
     /**
+     * Constructor for dependency injection.
      *
      * @param HtmlSanitizer $htmlSanitizer
      * @param HtmlEnhancer $htmlEnhancer
@@ -50,6 +49,9 @@ class HtmlFormat implements FormatInterface {
         $this->shouldCleanupLineBreaks = $shouldCleanupLineBreaks;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function renderHtml(string $value): string {
         $sanitized = $this->htmlSanitizer->filter($value);
 
@@ -61,18 +63,30 @@ class HtmlFormat implements FormatInterface {
         return $enhanced;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function renderExcerpt(string $content, string $query = null): string {
         // TODO: Implement renderExcerpt() method.
     }
 
+    /**
+     * @inheritdoc
+     */
     public function renderPlainText(string $content): string {
         // TODO: Implement renderPlainText() method.
     }
 
+    /**
+     * @inheritdoc
+     */
     public function renderQuote(string $content): string {
         // TODO: Implement renderQuote() method.
     }
 
+    /**
+     * @inheritdoc
+     */
     public function filter(string $content): string {
         try {
             $this->renderHtml($content);
@@ -83,10 +97,16 @@ class HtmlFormat implements FormatInterface {
         return $content;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function parseAttachments(string $content): array {
         return [];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function parseHeadings(string $content): array {
         $rendered = $this->renderHtml($content);
         $dom = new \DOMDocument();
@@ -117,6 +137,9 @@ class HtmlFormat implements FormatInterface {
         return $headings;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function parseMentions(string $content): array {
         return [];
     }

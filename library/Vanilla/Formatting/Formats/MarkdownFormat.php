@@ -10,6 +10,9 @@ namespace Vanilla\Formatting\Formats;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 
+/**
+ * Class for rendering content of the markdown format.
+ */
 class MarkdownFormat extends HtmlFormat {
 
     const FORMAT_KEY = "Markdown";
@@ -17,6 +20,14 @@ class MarkdownFormat extends HtmlFormat {
     /** @var \MarkdownVanilla */
     private $markdownParser;
 
+    
+    /**
+     * Constructor for dependency Injection.
+     *
+     * @param \MarkdownVanilla $markdownParser
+     * @param HtmlSanitizer $htmlSanitizer
+     * @param HtmlEnhancer $htmlEnhancer
+     */
     public function __construct(
         \MarkdownVanilla $markdownParser,
         HtmlSanitizer $htmlSanitizer,
@@ -29,6 +40,9 @@ class MarkdownFormat extends HtmlFormat {
         $this->markdownParser->addAllFlavor();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function renderHtml(string $value): string {
         $markdownParsed = $this->markdownParser->transform($value);
         return parent::renderHtml($markdownParsed);

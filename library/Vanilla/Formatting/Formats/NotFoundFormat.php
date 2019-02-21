@@ -12,6 +12,9 @@ use \Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\Formatting\Exception\FormatterNotFoundException;
 use Vanilla\Web\TwigRenderTrait;
 
+/**
+ * Stub format for rendering errors in every output format if content in an unregisterd format is encountered.
+ */
 class NotFoundFormat implements FormatInterface {
     use TwigRenderTrait;
     use StaticCacheTranslationTrait;
@@ -22,6 +25,7 @@ class NotFoundFormat implements FormatInterface {
     private $searchedFormat;
 
     /**
+     * Constructor.
      *
      * @param string $searchedFormat The format that could not be found.
      */
@@ -63,7 +67,7 @@ class NotFoundFormat implements FormatInterface {
     /**
      * @inheritdoc
      */
-    public function filter(string $content): string {
+    public function filter(string $content) {
         throw new FormatterNotFoundException($this->getErrorMessage());
     }
 
@@ -88,8 +92,12 @@ class NotFoundFormat implements FormatInterface {
         return [];
     }
 
-    private function getErrorMessage() {
+    /**
+     * Get the error message string.
+     *
+     * @return string
+     */
+    private function getErrorMessage(): string {
         return sprintf(self::t('No formatter is installed for the format %s'), $this->searchedFormat);
     }
-
 }

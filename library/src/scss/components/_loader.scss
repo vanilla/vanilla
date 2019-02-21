@@ -4,12 +4,14 @@
  * @license GPL-2.0-only
  */
 
-$fullPageLoader-size            : 100px;
-$fullPageLoader-thickness       : 6px;
-$mediumLoader-size              : 20px;
-$mediumLoader-thickness         : 6px;
+$fullPageLoader-size: 100px;
+$fullPageLoader-thickness: 6px;
+$fixedSizeLoader-size: 32px;
+$fixedSizeLoader-thickness: 4px;
+$mediumLoader-size: 20px;
+$mediumLoader-thickness: 6px;
 
-.loader {
+.fullPageLoader {
     position: fixed;
     top: 0;
     left: 0;
@@ -22,7 +24,7 @@ $mediumLoader-thickness         : 6px;
 
     &::after {
         @include spinnerLoader($fullPageLoader-size, $fullPageLoader-thickness);
-        content: '';
+        content: "";
     }
 }
 
@@ -36,6 +38,19 @@ $mediumLoader-thickness         : 6px;
 
     &::after {
         @include spinnerLoader($mediumLoader-size, $mediumLoader-thickness);
-        content: '';
+        content: "";
+    }
+}
+
+.fixedSizeLoader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+
+    &::after {
+        @include spinnerLoader($fixedSizeLoader-size, $fixedSizeLoader-thickness);
+        content: "";
     }
 }

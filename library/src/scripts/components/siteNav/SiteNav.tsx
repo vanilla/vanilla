@@ -14,6 +14,7 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import { t } from "@library/application";
 import { PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
 import Heading from "@library/components/Heading";
+import ConditionalWrap from "@library/components/ConditionalWrap";
 
 interface IProps extends RouteComponentProps<{}> {
     activeRecord: IActiveRecord;
@@ -24,41 +25,43 @@ interface IProps extends RouteComponentProps<{}> {
     bottomCTA: React.ReactNode;
     onItemHover?(item: INavigationTreeItem);
     title?: string;
-}
-
-export interface IState {
-    id: string;
+    hiddenTitle?: boolean;
+    clickableCategoryLabels?: boolean;
 }
 
 /**
  * Implementation of SiteNav component
  */
-export class SiteNav extends React.Component<IProps, IState> {
+export class SiteNav extends React.Component<IProps> {
     public render() {
-        const hasChildren = this.props.children && this.props.children.length > 0;
+        const { activeRecord, collapsible, onItemHover, children } = this.props;
+        const hasChildren = children && children.length > 0;
         const content = hasChildren
-            ? this.props.children.map((child, i) => {
+            ? children.map((child, i) => {
                   return (
                       <SiteNavNode
                           {...child}
-                          activeRecord={this.props.activeRecord}
-                          key={`navNode-${i}`}
+                          activeRecord={activeRecord}
+                          key={child.recordType + child.recordID}
                           titleID={this.titleID}
                           depth={0}
-                          collapsible={this.props.collapsible}
-                          onItemHover={this.props.onItemHover}
+                          collapsible={collapsible}
+                          onItemHover={onItemHover}
+                          clickableCategoryLabels={!!this.props.clickableCategoryLabels}
                       />
                   );
               })
             : null;
 
-        if (hasChildren || this.props.bottomCTA) {
+        if (hasChildren) {
             return (
                 <nav onKeyDownCapture={this.handleKeyDown} className={classNames("siteNav", this.props.className)}>
                     {this.props.title ? (
-                        <PanelWidgetVerticalPadding>
-                            <Heading title={this.props.title} className="siteNav-title" />
-                        </PanelWidgetVerticalPadding>
+                        <ConditionalWrap condition={!!this.props.hiddenTitle} className={"sr-only"}>
+                            <PanelWidgetVerticalPadding>
+                                <Heading title={this.props.title} className="siteNav-title" />
+                            </PanelWidgetVerticalPadding>
+                        </ConditionalWrap>
                     ) : (
                         <h2 id={this.titleID} className="sr-only">
                             {t("Navigation")}
@@ -71,7 +74,7 @@ export class SiteNav extends React.Component<IProps, IState> {
                 </nav>
             );
         } else {
-            return null;
+            return this.props.bottomCTA;
         }
     }
 

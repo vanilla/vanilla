@@ -8,6 +8,10 @@
   box-shadow: 0 1px 3px 0 rgba($baseColor, .3);
 }
 
+@mixin shadow-embed-hover($baseColor: $global-color_fg) {
+  box-shadow: 0 1px 3px 0 rgba($baseColor, .7);
+}
+
 @mixin shadow-dropDown($baseColor: #000) {
   box-shadow: 0 5px 10px 0 rgba($baseColor, .3);
 }

@@ -84,7 +84,8 @@ class Gdn_Session {
             'Garden.Settings.Manage',
             'Garden.Community.Manage',
             'Garden.Moderation.Manage',
-            'Garden.SignIn.Allow'
+            'Garden.Curation.Manage',
+            'Garden.SignIn.Allow',
         ];
 
         if ($permission === true) {

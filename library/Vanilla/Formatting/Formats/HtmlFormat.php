@@ -23,6 +23,8 @@ class HtmlFormat implements FormatInterface {
 
     use StaticCacheTranslationTrait;
 
+    const FORMAT_KEY = "Html";
+
     /** @var HtmlSanitizer */
     private $htmlSanitizer;
 

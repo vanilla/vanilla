@@ -34,8 +34,8 @@ body.Post .FormWrapper {
         justify-content: flex-start;
 
         .Button {
-            margin-bottom: $utility-small_padding;
-            margin-left: $utility-small_padding;
+            margin-bottom: $utility-baseUnitHalf;
+            margin-left: $utility-baseUnitHalf;
             margin-right: 0;
             margin-top: 0;
         }
@@ -47,7 +47,7 @@ body.Post .FormWrapper {
 
     .ShowTags {
         display: block;
-        margin-top: $utility-small_padding;
+        margin-top: $utility-baseUnitHalf;
     }
 }
 

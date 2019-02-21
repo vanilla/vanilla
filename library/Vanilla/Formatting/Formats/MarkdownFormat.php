@@ -12,6 +12,8 @@ use Vanilla\Formatting\Html\HtmlSanitizer;
 
 class MarkdownFormat extends HtmlFormat {
 
+    const FORMAT_KEY = "Markdown";
+
     /** @var \MarkdownVanilla */
     private $markdownParser;
 

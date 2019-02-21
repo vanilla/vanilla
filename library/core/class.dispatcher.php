@@ -32,6 +32,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /** @var array List of exceptions not to block */
     private $blockExceptions = [
         '#^api/v\d+/applicants(/|$)#' => self::BLOCK_NEVER,
+        '#^api/v\d+/locales.*#' => self::BLOCK_NEVER,
         '#^asset(/|$)#' => self::BLOCK_NEVER,
         '#^authenticate(/|$)#' => self::BLOCK_NEVER,
         '#^discussions/getcommentcounts(/|$)#' => self::BLOCK_NEVER,
@@ -427,23 +428,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     }
 
     /**
-     * Get the enabled addon folders.
-     *
-     * @return string[] An array of addon folders.
-     */
-    private function getEnabledAddonFolders(): array {
-        $addonFolders = [];
-        $addons = $this->addonManager->getEnabled();
-
-        /* @var Addon $addon */
-        foreach ($addons as $addon) {
-            $addonFolders[] = $addon->getKey();
-        }
-        $addonFolders = array_unique($addonFolders);
-        return $addonFolders;
-    }
-
-    /**
      *
      *
      * @param string $enabledApplications
@@ -491,7 +475,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      */
     private function findController(array $parts) {
         // Look for the old-school application name as the first part of the path.
-        if (in_array(($parts[0] ?? false), $this->getEnabledAddonFolders())) {
+        if (in_array(($parts[0] ?? false), $this->getEnabledApplicationFolders())) {
             $application = array_shift($parts);
         } else {
             $application = '';

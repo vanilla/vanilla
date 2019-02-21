@@ -6,7 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { getOptionalID, IOptionalComponentID } from "../../componentIDs";
+import { getOptionalID, IOptionalComponentID } from "@library/componentIDs";
 
 interface IProps extends IOptionalComponentID {
     children: React.ReactNode;
@@ -25,6 +25,7 @@ interface IProps extends IOptionalComponentID {
     lang?: string;
     buttonRef?: React.RefObject<HTMLButtonElement>;
     role?: string;
+    onKeyDownCapture?: (event: any) => void;
 }
 
 interface IState {
@@ -81,6 +82,7 @@ export default class Button extends React.Component<IProps, IState> {
                 onKeyDown={this.props.onKeyDown}
                 lang={this.props.lang}
                 role={this.props.role}
+                onKeyDownCapture={this.props.onKeyDownCapture}
             >
                 {this.props.children}
             </button>

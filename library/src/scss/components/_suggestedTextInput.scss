@@ -35,11 +35,7 @@ $suggestedTextInput-clearButton_color: mixContentBgAndFg(25%);
 }
 
 .suggestedTextInput-menu {
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
-    border-bottom-right-radius: $global_borderRadius;
-    border-bottom-left-radius: $global_borderRadius;
-
+    border-radius: $global_borderRadius;
     margin: {
         top: -$formElement_borderWidth;
         bottom: -$formElement_borderWidth;

@@ -8,6 +8,7 @@ import React from "react";
 import className from "classnames";
 import { t } from "@library/application";
 import Breadcrumb from "@library/components/Breadcrumb";
+import { style } from "typestyle";
 
 export interface ICrumb {
     name: string;
@@ -17,7 +18,8 @@ export interface ICrumb {
 export interface IProps {
     children: ICrumb[];
     className?: string;
-    hideSingleCrumb?: boolean;
+    forceDisplay: boolean;
+    minimumCrumbCount?: number;
 }
 
 /**
@@ -25,16 +27,16 @@ export interface IProps {
  */
 export default class Breadcrumbs extends React.Component<IProps> {
     public render() {
-        const crumbCount = this.props.children.length - 1;
-        if (this.props.hideSingleCrumb && crumbCount <= 1) {
+        const minimumCrumbCount = this.props.minimumCrumbCount || 1;
+        const crumbCount = this.props.children.length;
+        if (crumbCount < minimumCrumbCount && !this.props.forceDisplay) {
             return null;
         }
 
-        if (crumbCount === 0) {
-            return null;
-        }
-        const crumbs = this.props.children.map((crumb, index) => {
-            const lastElement = index === crumbCount;
+        let content: React.ReactNode;
+
+        content = this.props.children.map((crumb, index) => {
+            const lastElement = index === crumbCount - 1;
             const crumbSeparator = `›`;
             return (
                 <React.Fragment key={`breadcrumb-${index}`}>
@@ -47,9 +49,23 @@ export default class Breadcrumbs extends React.Component<IProps> {
                 </React.Fragment>
             );
         });
+
+        const hasForcedCrumb = crumbCount === 0 && this.props.forceDisplay;
+        if (hasForcedCrumb) {
+            const cssClass = style({
+                minHeight: 22,
+                display: "inline-block",
+            });
+            content = <span className={cssClass} />;
+        }
+
         return (
-            <nav aria-label={t("Breadcrumb")} className={className("breadcrumbs", this.props.className)}>
-                <ol className="breadcrumbs-list">{crumbs}</ol>
+            <nav
+                aria-label={t("Breadcrumb")}
+                className={className("breadcrumbs", this.props.className)}
+                aria-hidden={hasForcedCrumb}
+            >
+                <ol className="breadcrumbs-list">{content}</ol>
             </nav>
         );
     }

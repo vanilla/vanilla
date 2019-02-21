@@ -13,7 +13,7 @@
     color: $footer_color;
     font-size: $footer-base_fontSize;
     line-height: $footer-base_lineHeight;
-    padding: $utility-large_padding 0;
+    padding: $utility-baseUnitTriple 0;
 
     a {
         color: $footer-link_color;
@@ -28,11 +28,11 @@
         flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
-        margin: 0 -$utility-small_padding;
+        margin: 0 -$utility-baseUnitHalf;
     }
 
     .col {
-        padding: 0 $utility-small_padding;
+        padding: 0 $utility-baseUnitHalf;
 
         @include maxWidth($theme-breakpoint_base) {
             width: 100%;

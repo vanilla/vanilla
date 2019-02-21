@@ -4,14 +4,14 @@ user:
         name: "Vanilla Forums"
         nick: "Vanilla"
         role: "administrator"
-        email: "vanilla@stub.vanillacommunity.com"
+        email: "vanilla@stub.vanillacommunity.example"
         photo: "https://images.v-cdn.net/stubcontent/vanilla_avatar.jpg"
     -
         tag: "user1"
         name: "Karen A. Thomas"
         nick: "Karen"
         role: "administrator"
-        email: "karen@stub.vanillacommunity.com"
+        email: "karen@stub.vanillacommunity.example"
         photo: "https://images.v-cdn.net/stubcontent/avatar_01.png"
         
     -
@@ -19,7 +19,7 @@ user:
         name: "Victorine Courtois"
         nick: "Victorine"
         role: "moderator"
-        email: "victorine@stub.vanillacommunity.com"
+        email: "victorine@stub.vanillacommunity.example"
         photo: "https://images.v-cdn.net/stubcontent/avatar_02.png"
         
     -
@@ -27,5 +27,5 @@ user:
         name: "Alex Powell"
         nick: "Alex"
         role: "member"
-        email: "alex@stub.vanillacommunity.com"
+        email: "alex@stub.vanillacommunity.example"
         photo: "https://images.v-cdn.net/stubcontent/avatar_03.png"

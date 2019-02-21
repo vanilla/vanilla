@@ -1,0 +1,56 @@
+openapi: 3.0.2
+info:
+paths:
+  '/locales/translations/{locale}':
+    get:
+      summary: Get all of the application's translation strings.
+      tags:
+      - Locales
+      parameters:
+      - $ref: '#/components/parameters/LocaleCodeParameter'
+      - $ref: '#/components/parameters/CacheBusterParameter'
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                description: A map of string keys to translation strings.
+                type: object
+                additionalProperties:
+                  type: string
+          description: Success
+  '/locales/translations/{locale}.js':
+    get:
+      summary: Get the application's translations strings as a javascrpt file.
+      description: |
+        This endpoint is intended for application optimization where translations are requested within a `<script>` tag
+        rather than as an external API call.
+      tags:
+      - Locales
+      parameters:
+      - $ref: '#/components/parameters/LocaleCodeParameter'
+      - $ref: '#/components/parameters/CacheBusterParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            'application/javascript':
+              schema:
+                type: string
+components:
+  parameters:
+    LocaleCodeParameter:
+      name: locale
+      in: path
+      description: The locale code requested.
+      required: true
+      schema:
+        type: string
+        pattern: '[a-zA-Z0-9-]+'
+    CacheBusterParameter:
+      name: etag
+      in: query
+      description: |
+        Whether or not output is cached.
+      schema:
+        type: string

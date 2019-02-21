@@ -14,6 +14,7 @@
 use Garden\EventManager;
 use Vanilla\Formatting\Formats;
 use Vanilla\Formatting\Html;
+use \Vanilla\Formatting;
 
 /**
  * Output formatter.
@@ -203,21 +204,6 @@ class Gdn_Format {
     }
 
     /**
-     *
-     * @deprecated 9 Nov 2016
-     * @param array $array
-     * @return string
-     */
-    public static function arrayAsAttributes($array) {
-        deprecated('arrayAsAttributes');
-        $return = '';
-        foreach ($array as $property => $value) {
-            $return .= ' '.$property.'="'.$value.'"';
-        }
-        return $return;
-    }
-
-    /**
      * Takes an object and convert's it's properties => values to an associative
      * array of $array[Property] => Value sets.
      *
@@ -276,9 +262,9 @@ class Gdn_Format {
         if (!is_string($mixed)) {
             return self::to($mixed, 'BBCode');
         } else {
-            /** @var Formats\BBCodeFormat $bbcodeFormat */
-            $bbcodeFormat = self::getCachedInstance(Formats\BBCodeFormat::class);
-            return $bbcodeFormat->renderHtml($mixed);
+            return self::getFormatService()
+                ->getFormatter(Formats\BBCodeFormat::FORMAT_KEY)
+                ->renderHtml($mixed);
         }
     }
 
@@ -783,9 +769,9 @@ class Gdn_Format {
             return self::to($mixed, 'Html');
         }
 
-        /** @var Formats\HtmlFormat $htmlFormat */
-        $htmlFormat = self::getCachedInstance(Formats\HtmlFormat::class);
-        return $htmlFormat->renderHtml($mixed);
+        return self::getFormatService()
+            ->getFormatter(Formats\HtmlFormat::FORMAT_KEY)
+            ->renderHTML($mixed);
     }
 
     /**
@@ -983,15 +969,21 @@ class Gdn_Format {
      */
     public static function plainText($body, $format = 'Html', $collapse = false) {
         if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
-            return self::getCachedInstance(Formats\RichFormat::class)->renderPlainText($body);
+            return self::getFormatService()
+                ->getFormatter(Formats\RichFormat::FORMAT_KEY)
+                ->renderPlainText($body);
         }
 
-        $result = Gdn_Format::to($body, $format);
-        $result = Gdn_Format::replaceSpoilers($result);
-        if (strtolower($format) !== 'text') {
+        if (strcasecmp($format, 'text') === 0) {
+            // for content that is initially content, we can skip a lot of processing.
+            // We still need to filter/sanitize afterwards though.
+            $result = $body;
+        } else {
+            $result = Gdn_Format::to($body, $format);
+            $result = Gdn_Format::replaceSpoilers($result);
             $result = Gdn_Format::convertCommonHTMLTagsToPlainText($result, $collapse);
+            $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
         }
-        $result = trim(html_entity_decode($result, ENT_QUOTES, 'UTF-8'));
 
         // Always filter after basic parsing.
         $sanitized = Gdn_Format::htmlFilter($result);
@@ -1018,7 +1010,9 @@ class Gdn_Format {
      */
     public static function excerpt($body, $format = 'Html', $collapse = false) {
         if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
-            return self::getCachedInstance(Formats\RichFormat::class)->renderExcerpt($body);
+            return self::getFormatService()
+                ->getFormatter(Formats\RichFormat::FORMAT_KEY)
+                ->renderExcerpt($body);
         }
         $result = Gdn_Format::to($body, $format);
         $result = Gdn_Format::replaceSpoilers($result);
@@ -1202,7 +1196,7 @@ class Gdn_Format {
                 $punc .= '&nbsp;';
             }
 
-            if (preg_match('`^(.+)([.?,;:])$`', $url, $matches)) {
+            if (preg_match('`^(.+)([.?,;!:])$`', $url, $matches)) {
                 $url = $matches[1];
                 $punc = $matches[2].$punc;
             }
@@ -1332,7 +1326,10 @@ class Gdn_Format {
                 'regex' => ['/https?:\/\/(?:www\.)?instagr(?:\.am|am\.com)\/p\/([\w-]+)/i']
             ],
             'Pinterest' => [
-                'regex' => ['/https?:\/\/(?:www\.)?pinterest\.com\/pin\/([\d]+)/i']
+                'regex' => [
+                    '/https?:\/\/(?:www\.)?pinterest\.com\/pin\/([\d]+)/i',
+                    '/https?:\/\/(?:www\.)?pinterest\.ca\/pin\/([\d]+)/i'
+                ]
             ],
             'Getty' => [
                 'regex' => ['/https?:\/\/embed.gettyimages\.com\/([\w=?&;+-_]*)\/([\d]*)\/([\d]*)/i']
@@ -1535,92 +1532,19 @@ EOT;
     }
 
     /**
-     * Replaces text or anchor urls with either their embed code, or sanitized and wrapped in an anchor.
+     * Get the event manager.
      *
-     * @deprecated
-     * @param $matches
-     * @return string|void The anchor or embed code for the url.
+     * The event manager should only be used by the formatter itself so leave this private.
+     *
+     * @return EventManager Returns the eventManager.
      */
-    public static function linksCallback($matches) {
-        deprecated('Gdn_Format::linksCallback');
-        static $inTag = 0;
-        static $inAnchor = false;
-
-        $inOut = $matches[1];
-        $tag = strtolower($matches[2]);
-
-        if ($inOut == '<') {
-            $inTag++;
-            if ($tag == 'a') {
-                $inAnchor = true;
-            }
-        } elseif ($inOut == '</') {
-            $inTag++;
-            if ($tag == 'a') {
-                $inAnchor = false;
-            }
-        } elseif ($matches[3]) {
-            $inTag--;
+    private static function getEventManager() {
+        if (self::$eventManager === null) {
+            global $dic;
+            static::$eventManager = $dic->get(EventManager::class);
         }
 
-        if (c('Garden.Format.WarnLeaving', false) && isset($matches[4]) && $inAnchor) {
-            // This is a the href url value in an anchor tag.
-            $url = $matches[4];
-            $domain = parse_url($url, PHP_URL_HOST);
-            if (!isTrustedDomain($domain)) {
-                return url('/home/leaving?target='.urlencode($url)).'" class="Popup';
-            }
-        }
-
-        if (!isset($matches[4]) || $inTag || $inAnchor) {
-            return $matches[0];
-        }
-
-        $url = $matches[4];
-
-        $embeddedResult = self::embedReplacement($url);
-        if ($embeddedResult !== '') {
-            return $embeddedResult;
-        }
-
-        // Unformatted links
-        if (!self::$FormatLinks) {
-            return $url;
-        }
-
-        // Strip punctuation off of the end of the url.
-        $punc = '';
-
-        // Special case where &nbsp; is right after an url and is not part of it!
-        // This can happen in WYSIWYG format if the url is the last text of the body.
-        while (stringEndsWith($url, '&nbsp;')) {
-            $url = substr($url, 0, -6);
-            $punc .= '&nbsp;';
-        }
-
-        if (preg_match('`^(.+)([.?,;:])$`', $url, $matches)) {
-            $url = $matches[1];
-            $punc = $matches[2].$punc;
-        }
-
-        // Get human-readable text from url.
-        $text = $url;
-        if (strpos($text, '%') !== false) {
-            $text = rawurldecode($text);
-            $text = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
-        }
-
-        $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
-
-        if (c('Garden.Format.WarnLeaving', false)) {
-            // This is a plaintext url we're converting into an anchor.
-            $domain = parse_url($url, PHP_URL_HOST);
-            if (!isTrustedDomain($domain)) {
-                return '<a href="'.url('/home/leaving?target='.urlencode($url)).'" class="Popup">'.$text.'</a>'.$punc;
-            }
-        }
-
-        return '<a href="'.$url.'"'.$nofollow.'>'.$text.'</a>'.$punc;
+        return self::$eventManager;
     }
 
     /**
@@ -1687,9 +1611,9 @@ EOT;
         if (!is_string($mixed)) {
             return self::to($mixed, 'Markdown');
         } else {
-            /** @var Formats\MarkdownFormat $markdownFormat */
-            $markdownFormat = self::getCachedInstance(Formats\MarkdownFormat::class);
-            return $markdownFormat->renderHtml($mixed);
+            return self::getFormatService()
+                ->getFormatter(Formats\MarkdownFormat::FORMAT_KEY)
+                ->renderHTML($mixed);
         }
     }
 
@@ -1706,7 +1630,7 @@ EOT;
      */
     protected static function processHTML($html, $mentions = true) {
         /** @var Html\HtmlEnhancer $htmlEnhancer */
-        $htmlEnhancer = self::getCachedInstance(Html\HtmlEnhancer::class);
+        $htmlEnhancer = Gdn::getContainer()->get(Html\HtmlEnhancer::class);
         return $htmlEnhancer->enhance((string) $html, (bool) $mentions);
     }
 
@@ -2031,6 +1955,10 @@ EOT;
      * @since 2.1
      */
     public static function textEx($str) {
+        if (!is_string($str)) {
+            return self::to($str, 'TextEx');
+        }
+
         // Basic text parsing.
         $str = self::text($str);
 
@@ -2055,10 +1983,6 @@ EOT;
         if (is_string($mixed)) {
             if (in_array(strtolower($formatMethod), self::$SanitizedFormats) && method_exists('Gdn_Format', $formatMethod)) {
                 $mixed = self::$formatMethod($mixed);
-            } elseif (function_exists('format'.$formatMethod)) {
-                deprecated('format'.$formatMethod, 'gdn_formatter_'.$formatMethod, '2015-10-26');
-                $formatMethod = 'format'.$formatMethod;
-                $mixed = $formatMethod($mixed);
             } elseif (function_exists('gdn_formatter_'.$formatMethod)) {
                 $formatMethod = 'gdn_formatter_'.$formatMethod;
                 $mixed = $formatMethod($mixed);
@@ -2309,6 +2233,13 @@ EOT;
     }
 
     /**
+     * @return Formatting\FormatService
+     */
+    private static function getFormatService(): Formatting\FormatService {
+        return Gdn::getContainer()->get(Formatting\FormatService::class);
+    }
+
+    /**
      * Format text from Rich editor input.
      *
      * @param string $deltas A JSON encoded array of Quill deltas.
@@ -2316,7 +2247,9 @@ EOT;
      * @return string - The rendered HTML output.
      */
     public static function rich(string $deltas): string {
-        return self::getCachedInstance(Formats\RichFormat::class)->renderHTML($deltas);
+        return self::getFormatService()
+            ->getFormatter(Formats\RichFormat::FORMAT_KEY)
+            ->renderHTML($deltas);
     }
 
     /**
@@ -2332,7 +2265,9 @@ EOT;
             if (is_array($body)) {
                 $body = json_encode($body);
             }
-            return self::getCachedInstance(Formats\RichFormat::class)->renderQuote($body);
+            return self::getFormatService()
+                ->getFormatter(Formats\RichFormat::FORMAT_KEY)
+                ->renderQuote($body);
         }
 
         $previousLinksValue = c('Garden.Format.Links');
@@ -2355,7 +2290,9 @@ EOT;
      * @return string[]
      */
     public static function getRichMentionUsernames(string $body): array {
-        return self::getCachedInstance(Formats\RichFormat::class)->parseMentions($body);
+        return self::getFormatService()
+            ->getFormatter(Formats\RichFormat::FORMAT_KEY)
+            ->parseMentions($body);
     }
 
     const SAFE_PROTOCOLS = [

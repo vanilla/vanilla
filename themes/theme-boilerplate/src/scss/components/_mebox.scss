@@ -8,12 +8,51 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$mebox-photo_size:                      24px !default;
-$mebox-button_borderRadius:             $global_borderRadius !default;
+$mebox-photo_size:                      28px !default;
+$mebox-button_borderRadius:             3px !default;
 
 /* -------------------------------------------------------------- *\
     Styles
 \* -------------------------------------------------------------- */
+
+.SpNotifications,
+.SpInbox,
+.SpBookmarks {
+
+    &::before {
+        @include kbicon();
+    }
+}
+
+.SpNotifications::before {
+    font-size: 24px;
+    content: $kbicon-notifications-empty;
+}
+
+.SpInbox::before {
+    font-size: 24px;
+    content: $kbicon-message-empty;
+}
+
+.SpBookmarks::before {
+    font-size: 22px;
+    content: $kbicon-star-empty;
+}
+
+.Open {
+
+    .SpNotifications::before {
+        content: $kbicon-notifications;
+    }
+
+    .SpInbox::before {
+        content: $kbicon-message;
+    }
+
+    .SpBookmarks::before {
+        content: $kbicon-star;
+    }
+}
 
 .MeBox {
     min-height: initial;
@@ -81,7 +120,7 @@ $mebox-button_borderRadius:             $global_borderRadius !default;
 }
 
 .SignInIcons {
-    margin-left: $utility-large_padding;
+    margin-left: $utility-baseUnitTriple;
 }
 
 // Reset base theme style
@@ -90,7 +129,7 @@ $mebox-button_borderRadius:             $global_borderRadius !default;
     line-height: inherit;
 }
 
-.MeBox--header {
+.MeBox-header {
 
     @include maxWidth($theme-breakpoint_base) {
         display: none;
@@ -111,19 +150,12 @@ $mebox-button_borderRadius:             $global_borderRadius !default;
     }
 
     .MeMenu {
-        margin-left: $utility-large_padding;
+        margin-left: $utility-baseUnitTriple;
         display: flex;
         align-items: center;
 
         .ToggleFlyout + .ToggleFlyout {
             margin-left: 8px;
-        }
-
-        .Alert {
-            border: 1px solid $bullet_borderColor;
-            background: $bullet_bg;
-            color: $bullet_fg;
-            white-space: nowrap;
         }
     }
 }

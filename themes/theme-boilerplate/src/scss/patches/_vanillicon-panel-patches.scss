@@ -20,8 +20,8 @@
             @if($panel_item-showIcons == false) {
                 content: none !important;
             } @else {
-                margin-right: $utility-small_padding;
-                margin-left: $utility-small_padding;
+                margin-right: $utility-baseUnitHalf;
+                margin-left: $utility-baseUnitHalf;
             }
         }
 

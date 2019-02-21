@@ -99,8 +99,8 @@ $richEditor-scrollContainer_overshoot: 48px;
 .richEditor-text {
     position: relative;
     min-height: $richEditor_minHeight;
-    outline-color: transparent;
     white-space: pre-wrap !important; // Needed for spaces around embed blots to work properly!
+    outline: 0;
 }
 
 .ql-clipboard {
@@ -120,6 +120,7 @@ $richEditor-scrollContainer_overshoot: 48px;
     padding: 0;
     -ms-overflow-style: -ms-autohiding-scrollbar;
     margin: 0;
+    z-index: 1;
 
     .richEditor-menuItem {
         display: block;

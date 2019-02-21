@@ -28,6 +28,7 @@ $frame-panel_minHeight: 500px;
     position: relative;
     background-color: $frame-bgColor;
     max-height: 100vh;
+    border-radius: $frame-border_radius;
 }
 
 .frameHeader {

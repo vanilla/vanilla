@@ -11,8 +11,8 @@ import { ITabProps, withTabs } from "@library/contexts/TabContext";
 interface IProps extends ITabProps {
     label: string;
     className?: string;
-    data: any;
-    defaultTab: any;
+    data: string | number;
+    activeTab: string | number;
 }
 
 /**
@@ -27,7 +27,8 @@ class RadioButtonTab extends React.Component<IProps> {
                     type="radio"
                     onClick={this.onClick}
                     onKeyDown={this.onKeyDown}
-                    defaultChecked={this.props.defaultTab === this.props.data}
+                    onChange={this.handleOnChange}
+                    checked={this.props.activeTab === this.props.data}
                     name={this.props.groupID}
                     value={this.props.label}
                 />
@@ -38,6 +39,10 @@ class RadioButtonTab extends React.Component<IProps> {
 
     private onClick = event => {
         this.props.setData(this.props.data);
+    };
+
+    private handleOnChange = event => {
+        return;
     };
 
     private onKeyDown = event => {

@@ -7,7 +7,7 @@
     "settingsUrl": "/settings/heroimage",
     "settingsPermission": "Garden.Settings.Manage",
     "documentationUrl": "https://docs.vanillaforums.com/help/addons/hero-image",
-    "author": [
+    "authors": [
         {
             "name": "Adam Charron",
             "email": "adam.c@vanillaforums.com"

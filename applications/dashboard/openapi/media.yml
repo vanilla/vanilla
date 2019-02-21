@@ -1,0 +1,521 @@
+openapi: 3.0.2
+info:
+paths:
+  /media:
+    post:
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                properties:
+                  dateInserted:
+                    description: When the media item was created.
+                    format: date-time
+                    type: string
+                  foreignID:
+                    description: The ID of the table.
+                    nullable: true
+                    type: integer
+                  foreignType:
+                    description: Table the media is linked to.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                  height:
+                    description: Image height
+                    nullable: true
+                    type: integer
+                  insertUserID:
+                    description: The user that created the media item.
+                    type: integer
+                  mediaID:
+                    description: The ID of the record.
+                    type: integer
+                  name:
+                    description: The original filename of the upload.
+                    minLength: 1
+                    type: string
+                  size:
+                    description: File size in bytes
+                    type: integer
+                  type:
+                    description: MIME type
+                    minLength: 1
+                    type: string
+                  url:
+                    description: The URL of the file.
+                    minLength: 1
+                    type: string
+                  width:
+                    description: Image width
+                    nullable: true
+                    type: integer
+                required:
+                - mediaID
+                - url
+                - name
+                - type
+                - size
+                - dateInserted
+                - insertUserID
+                - foreignType
+                - foreignID
+                type: object
+          description: Success
+      tags:
+      - Media
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                file:
+                  $ref: '#/components/schemas/UploadedFile'
+                type:
+                  description: The upload type.
+                  enum:
+                  - image
+                  - text
+                  - archive
+                  - binary
+                  minLength: 1
+                  type: string
+              required:
+              - file
+              - type
+              type: object
+        required: true
+      summary: Add a media item.
+  /media/by-url:
+    delete:
+      parameters:
+      - description: |
+          Full URL to the item.
+        in: query
+        name: url
+        required: true
+        schema:
+          minLength: 1
+          type: string
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Media
+      summary: 'Delete a media item, using its URL.'
+    get:
+      parameters:
+      - description: |
+          Full URL to the item.
+        in: query
+        name: url
+        required: true
+        schema:
+          minLength: 1
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  dateInserted:
+                    description: When the media item was created.
+                    format: date-time
+                    type: string
+                  foreignID:
+                    description: The ID of the table.
+                    nullable: true
+                    type: integer
+                  foreignType:
+                    description: Table the media is linked to.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                  height:
+                    description: Image height
+                    nullable: true
+                    type: integer
+                  insertUserID:
+                    description: The user that created the media item.
+                    type: integer
+                  mediaID:
+                    description: The ID of the record.
+                    type: integer
+                  name:
+                    description: The original filename of the upload.
+                    minLength: 1
+                    type: string
+                  size:
+                    description: File size in bytes
+                    type: integer
+                  type:
+                    description: MIME type
+                    minLength: 1
+                    type: string
+                  url:
+                    description: The URL of the file.
+                    minLength: 1
+                    type: string
+                  width:
+                    description: Image width
+                    nullable: true
+                    type: integer
+                required:
+                - mediaID
+                - url
+                - name
+                - type
+                - size
+                - dateInserted
+                - insertUserID
+                - foreignType
+                - foreignID
+                type: object
+          description: Success
+      tags:
+      - Media
+      summary: 'Get a media item, using its URL.'
+  /media/scrape:
+    post:
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                properties:
+                  attributes:
+                    description: >-
+                      Any additional attributes required by the the specific
+                      embed.
+                    nullable: true
+                    type: object
+                  body:
+                    description: >-
+                      A paragraph summarizing the content, if any. This is not
+                      what is what gets rendered to the page.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                  height:
+                    description: >-
+                      The height of the image/video/etc. if applicable. This may
+                      be the photoUrl, but might exist even when there is no
+                      photoUrl in the case of a video without preview image.
+                    nullable: true
+                    type: integer
+                  name:
+                    description: The title of the page/item/etc. if any.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                  photoUrl:
+                    description: A photo that goes with the content.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                  type:
+                    description: >-
+                      The type of site. This determines how the embed is
+                      rendered.
+                    enum:
+                    - quote
+                    - twitter
+                    - youtube
+                    - vimeo
+                    - instagram
+                    - soundcloud
+                    - imgur
+                    - twitch
+                    - getty
+                    - giphy
+                    - wistia
+                    - codepen
+                    - image
+                    - link
+                    minLength: 1
+                    type: string
+                  url:
+                    description: The URL that was scraped.
+                    minLength: 1
+                    type: string
+                  width:
+                    description: The width of the image/video/etc. if applicable.
+                    nullable: true
+                    type: integer
+                required:
+                - url
+                - type
+                - name
+                - body
+                - photoUrl
+                - height
+                - width
+                - attributes
+                type: object
+          description: Success
+      tags:
+      - Media
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                force:
+                  default: false
+                  description: Force the scrape even if the result is cached.
+                  type: boolean
+                url:
+                  description: The URL to scrape.
+                  minLength: 1
+                  type: string
+              required:
+              - url
+              type: object
+        required: true
+      summary: Scrape information from a URL.
+  '/media/{id}':
+    delete:
+      parameters:
+      - description: |
+          The media ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  dateInserted:
+                    description: When the media item was created.
+                    format: date-time
+                    type: string
+                  foreignID:
+                    description: The ID of the table.
+                    nullable: true
+                    type: integer
+                  foreignType:
+                    description: Table the media is linked to.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                  height:
+                    description: Image height
+                    nullable: true
+                    type: integer
+                  insertUserID:
+                    description: The user that created the media item.
+                    type: integer
+                  mediaID:
+                    description: The ID of the record.
+                    type: integer
+                  name:
+                    description: The original filename of the upload.
+                    minLength: 1
+                    type: string
+                  size:
+                    description: File size in bytes
+                    type: integer
+                  type:
+                    description: MIME type
+                    minLength: 1
+                    type: string
+                  url:
+                    description: The URL of the file.
+                    minLength: 1
+                    type: string
+                  width:
+                    description: Image width
+                    nullable: true
+                    type: integer
+                required:
+                - mediaID
+                - url
+                - name
+                - type
+                - size
+                - dateInserted
+                - insertUserID
+                - foreignType
+                - foreignID
+                type: object
+          description: Success
+      tags:
+      - Media
+      summary: Delete a media item.
+    get:
+      parameters:
+      - description: |
+          The media ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  dateInserted:
+                    description: When the media item was created.
+                    format: date-time
+                    type: string
+                  foreignID:
+                    description: The ID of the table.
+                    nullable: true
+                    type: integer
+                  foreignType:
+                    description: Table the media is linked to.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                  height:
+                    description: Image height
+                    nullable: true
+                    type: integer
+                  insertUserID:
+                    description: The user that created the media item.
+                    type: integer
+                  mediaID:
+                    description: The ID of the record.
+                    type: integer
+                  name:
+                    description: The original filename of the upload.
+                    minLength: 1
+                    type: string
+                  size:
+                    description: File size in bytes
+                    type: integer
+                  type:
+                    description: MIME type
+                    minLength: 1
+                    type: string
+                  url:
+                    description: The URL of the file.
+                    minLength: 1
+                    type: string
+                  width:
+                    description: Image width
+                    nullable: true
+                    type: integer
+                required:
+                - mediaID
+                - url
+                - name
+                - type
+                - size
+                - dateInserted
+                - insertUserID
+                - foreignType
+                - foreignID
+                type: object
+          description: Success
+      tags:
+      - Media
+      summary: Get a media item.
+  '/media/{id}/attachment':
+    patch:
+      parameters:
+      - description: The media ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  dateInserted:
+                    description: When the media item was created.
+                    format: date-time
+                    type: string
+                  foreignID:
+                    description: The ID of the table.
+                    nullable: true
+                    type: integer
+                  foreignType:
+                    description: Table the media is linked to.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                  height:
+                    description: Image height
+                    nullable: true
+                    type: integer
+                  insertUserID:
+                    description: The user that created the media item.
+                    type: integer
+                  mediaID:
+                    description: The ID of the record.
+                    type: integer
+                  name:
+                    description: The original filename of the upload.
+                    minLength: 1
+                    type: string
+                  size:
+                    description: File size in bytes
+                    type: integer
+                  type:
+                    description: MIME type
+                    minLength: 1
+                    type: string
+                  url:
+                    description: The URL of the file.
+                    minLength: 1
+                    type: string
+                  width:
+                    description: Image width
+                    nullable: true
+                    type: integer
+                required:
+                - mediaID
+                - url
+                - name
+                - type
+                - size
+                - dateInserted
+                - insertUserID
+                - foreignType
+                - foreignID
+                type: object
+          description: Success
+      tags:
+      - Media
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaItemPatch'
+        required: true
+      summary: Update a media item's attachment to another record.
+components:
+  schemas:
+    MediaItemPatch:
+      properties:
+        foreignID:
+          description: Unique ID of the resource this media item will be attached to.
+          type: integer
+        foreignType:
+          description: Type of resource the media item will be attached to (e.g. comment).
+          enum:
+          - embed
+          - comment
+          - discussion
+          type: string
+      required:
+      - foreignType
+      - foreignID
+      type: object
+    UploadedFile:
+      type: string
+      format: binary

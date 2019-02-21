@@ -5,6 +5,18 @@
  */
 
 /* -------------------------------------------------------------- *\
+    Utility Variables
+\* -------------------------------------------------------------- */
+
+$utility-baseUnit:                      6px;
+$utility-baseUnitHalf:                  $utility-baseUnit / 2; // Derived
+$utility-baseUnitDouble:                $utility-baseUnit * 2; // Derived
+$utility-baseUnitTriple:                $utility-baseUnit * 3; // Derived
+$utility-percentage_third:              (100% / 3);
+$utility-percentage_nineSixteenths:     (9 / 16 * 100%);
+$utility-SVGEncoding:                   "data:image/svg+xml,";
+
+/* -------------------------------------------------------------- *\
     Global Overwrites
 \* -------------------------------------------------------------- */
 
@@ -70,13 +82,19 @@ $footer_bg:                              rgba($global-color_secondary, .2) !defa
 \* -------------------------------------------------------------- */
 
 $navigation_bg:                          lighten($header_bg, 10%) !default;
+$navigation_fg:                          $global-color_white !default;
+
+$navigation-hover_fg:                    $navigation_fg !default;
+
+$headerMeBoxAlert_fg:                    $navigation_fg !default;
+$headerMeBoxAlert_bg:                    $global-color_butter !default;
+$headerMeBoxAlert_borderColor:           $global-color_butter !default;
 
 /* -------------------------------------------------------------- *\
     Components
 \* -------------------------------------------------------------- */
 
 $component-item_spacing:                 0 !default;
-
 
 $component-title_color:                  $global-color_secondary !default;
 $component-title-hover_color:            darken($global-color_secondary, 8%) !default;
@@ -88,37 +106,21 @@ $component-meta-link-hover_color:        darken($global-color_secondary, 8%) !de
 
 $mebox_hover_bg:                         mix($global-color_black, $header-bg, 12%) !default;
 
-/* -------------------------------------------------------------- *\
-    SearchBox
-\* -------------------------------------------------------------- */
+$MobileMeBox_bg:                         $navigation_bg !default;
 
-$searchbox-button_borderWidth:           0 !default;
+$MobileMeBoxAlert_bg:                    $global-color_primary !default;
+$MobileMeBoxAlert_borderColor:           $global-color_primary !default;
 
 /* -------------------------------------------------------------- *\
     Form Elements
 \* -------------------------------------------------------------- */
 
-$formElement_height:                     36px !default;
-$formElement_borderRadius:               25px !default;
-
-/* -------------------------------------------------------------- *\
-    Bullets
-\* -------------------------------------------------------------- */
-
-$bullet_borderColor:                     $global-color_butter !default;
-$bullet_bg:                              $global-color_butter !default;
-$bullet_fg:                              $global-color_white !default;
-
-/* -------------------------------------------------------------- *\
-    Count
-\* -------------------------------------------------------------- */
-
-$count-hover_bg:                         $global-color_primary !default;
-$count-hover_borderColor:                $global-color_primary !default;
+$formElement_height:                     $utility-baseUnit * 6 !default;
+$formElement_borderRadius:               18px !default; // $formElement_height / 2
 
 /* -------------------------------------------------------------- *\
     Buttons
 \* -------------------------------------------------------------- */
 
 $formButton_height:                      $formElement_height !default;
-$formButton_borderRadius:                #{$formButton_height / 2} !default;
+$formButton_borderRadius:                18px !default; // $formButton_height / 2

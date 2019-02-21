@@ -258,7 +258,7 @@ $formElement_giantInput_height                       : 82px !default;
 $formElement_giantInput_fontSize                     : 24px !default;
 
 // For Search
-$formElement_largeInput_height                       : 48px !default;
+$formElement_largeInput_height                       : 40px !default;
 $formElement_largeInput_fontSize                     : 16px !default;
 
 $formElement_halfHeight                              : $formElement_height / 2 !default; // Derived
@@ -270,6 +270,7 @@ $formElement_maxWidth                                : 528px !default;
 $formElement_fg                                      : mix($global-color_fg, $global-color_bg, 80%) !default; // Derived
 $formElement_bg                                      : $global-color_bg !default;
 $formElement_miniInput_width                         : 100px !default;
+
 $global-formNote_fg                                  : mix($global-color_fg, $global-color_bg, 72%) !default; // Derived
 $global-formNoteLink_fg                              : $global-color_primary !default; // Derived
 
@@ -466,8 +467,10 @@ $vanillaHeader_mobile_height                        : 44px !default;
 $vanillaHeader_fg                                   : $global-color_bg !default;
 $vanillaHeader_bg                                   : $global-color_primary !default;
 $vanillaHeader-spacer_width                         : 12px;
+
 $vanillaHeader-button_borderRadius                  : 3px;
 $vanillaHeader-button_size                          : 40px;
+
 $vanillaMenu-guest_spacer                           : 8px !default;
 $vanillaMenu-signIn_bg                              : getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 10%) !default;
 $vanillaMenu-signIn_bg_hover                        : getBgDependingOnContrastColor($vanillaHeader_fg, $global-color_primary, 20%) !default;

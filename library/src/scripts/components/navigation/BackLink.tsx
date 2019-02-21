@@ -9,6 +9,7 @@ import classNames from "classnames";
 import { t, formatUrl } from "@library/application";
 import { leftChevronCompact } from "@library/components/icons/common";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
+import backLinkClasses from "@library/components/navigation/backLinkStyles";
 
 interface IProps extends RouteComponentProps<{}> {
     fallbackUrl?: string;
@@ -33,22 +34,23 @@ export class BackLink extends React.Component<IProps> {
             // Optional fallback element to render if no history exists and no fallback url given
             return this.props.fallbackElement;
         } else {
+            const classes = backLinkClasses();
             const routingUrl = this.props.fallbackUrl ? this.props.fallbackUrl : formatUrl("/kb");
             return (
-                <div className={classNames("backLink", this.props.className)}>
+                <div className={classNames(classes.root, this.props.className)}>
                     <Link
                         to={routingUrl}
                         aria-label={this.props.title as string}
                         title={this.props.title as string}
                         onClick={this.clickHandler}
                         className={classNames(
-                            "backLink-link",
+                            classes.link,
                             { hasVisibleLabel: !!this.props.visibleLabel },
                             this.props.linkClassName,
                         )}
                     >
                         {leftChevronCompact("backLink-icon")}
-                        {this.props.visibleLabel && <span className="backLink-label">{this.props.title}</span>}
+                        {this.props.visibleLabel && <span className={classes.label}>{this.props.title}</span>}
                     </Link>
                 </div>
             );

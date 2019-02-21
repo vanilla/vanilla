@@ -8,6 +8,7 @@ $searchBar-search_minWidth: 109px;
 $searchBar-searchIcon_space: 32px;
 
 .searchBar {
+    cursor: pointer;
     .suggestedTextInput-inputText {
         border: {
             top-right-radius: 0;
@@ -31,7 +32,10 @@ $searchBar-searchIcon_space: 32px;
 
 .searchBar-content {
     display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
     position: relative;
+    min-height: $formElement-height;
 }
 
 .searchBar-inputWrap {

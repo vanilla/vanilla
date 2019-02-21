@@ -5,13 +5,14 @@
  */
 
 $panelLayout_topMargin                                                : 0;
-$panelLayout_bottomMargin                                             : 48px;
+$panelLayout_bottomMargin                                             : 50px;
 
 $panelLayout-noBleed_breakpoint                                       : $global-content_width !default;
 $panelLayout-twoColumn_breakpoint                                     : $global-twoColumn_breakpoint !default;
 $panelLayout-oneColumn_breakpoint                                     : $panelLayout-twoColumn_breakpoint - $global-panel_paddedWidth !default;
 
 $panelLayout-border_color                                             : rgba($global-border_color, .4) !default;
+$panelLayout-topPadding                                               : $global_gutter_halfSize * 1.5;
 
 $panelLayout-panelAndSpacingWidth                                     : $global-panel_paddedWidth + $global-gutter_size;
 
@@ -147,12 +148,7 @@ $panelLayout-panelAndSpacingWidth                                     : $global-
 }
 
 
-.panelLayout-breadcrumbs {
-    padding: {
-        top: $global-gutter_halfSize;
-        bottom: $global-gutter_halfSize;
-    }
-
+.panelArea-breadcrumbs {
     &.hasAdjacentPanel {
         flex-basis: calc(100% - #{$panelLayout-panelAndSpacingWidth});
         max-width: calc(100% - #{$panelLayout-panelAndSpacingWidth});

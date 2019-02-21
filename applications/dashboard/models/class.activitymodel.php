@@ -969,8 +969,13 @@ class ActivityModel extends Gdn_Model {
             $message = $prefix;
         }
 
-        if ($story = val('Story', $activity)) {
-            $message .= $story;
+        $isArray = is_array($activity);
+
+        $story = $isArray ? $activity['Story'] ?? null : $activity->Story ?? null;
+        $format = $isArray ? $activity['Format'] ?? null : $activity->Format ?? null;
+
+        if ($story && $format) {
+            $message .= Gdn_Format::to($story, $format);
         }
 
         return $message;
@@ -1255,6 +1260,25 @@ class ActivityModel extends Gdn_Model {
         // Clear out the queue
         unset($this->_NotificationQueue);
         $this->_NotificationQueue = [];
+    }
+
+    /**
+     * Get total unread notifications for a user.
+     *
+     * @param integer $userID
+     */
+    public function getUserTotalUnread($userID) {
+        $notifications = $this->SQL
+            ->select("ActivityID", "count", "total")
+            ->from($this->Name)
+            ->where("NotifyUserID", $userID)
+            ->where("Notified", self::SENT_PENDING)
+            ->get()
+            ->resultArray();
+        if (!is_array($notifications) || !isset($notifications[0])) {
+            return 0;
+        }
+        return $notifications[0]["total"] ?? 0;
     }
 
     /**

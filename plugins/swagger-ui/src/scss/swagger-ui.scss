@@ -31,4 +31,14 @@
         margin-bottom: 0;
         padding-left: 2px;
     }
+
+    .opblock-description-wrapper {
+        p + p {
+            margin-top: .5em;
+        }
+    }
+
+    .scheme-container {
+        display: none;
+    }
 }

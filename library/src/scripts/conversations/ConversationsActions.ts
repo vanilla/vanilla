@@ -33,7 +33,7 @@ export default class ConversationsActions extends ReduxActions {
     /**
      * Get a paginated list of conversations for the current user.
      */
-    public getConversations(params: IGetConversationsRequest = {}) {
+    public getConversations = (params: IGetConversationsRequest = {}) => {
         return this.dispatchApi("get", "/conversations", ConversationsActions.getConversationsACs, params);
-    }
+    };
 }

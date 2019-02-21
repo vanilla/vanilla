@@ -15,6 +15,7 @@ import SearchOption from "@library/components/search/SearchOption";
 import { withSearch, IWithSearchProps } from "@library/contexts/SearchContext";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import FocusWatcher from "@library/FocusWatcher";
+import vanillaHeaderClasses from "@library/styles/vanillaHeaderStyles";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
@@ -50,6 +51,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
     };
 
     public render() {
+        const classes = vanillaHeaderClasses();
         return (
             <div
                 ref={this.selfRef}
@@ -113,7 +115,10 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                         </Button>
                     </div>
                 )}
-                <div ref={this.resultsRef} className="vanillaHeader-compactSearchResults" />
+                <div
+                    ref={this.resultsRef}
+                    className={classNames("vanillaHeader-compactSearchResults", classes.compactSearchResults)}
+                />
             </div>
         );
     }

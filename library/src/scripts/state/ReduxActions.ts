@@ -7,6 +7,9 @@
 import { IApiError, IApiResponse } from "@library/@types/api";
 import { AxiosResponse, AxiosInstance } from "axios";
 import { logError } from "@library/utility";
+import { ThunkDispatch, ThunkAction } from "redux-thunk";
+import { AnyAction } from "redux";
+import { AsyncActionCreators } from "typescript-fsa";
 
 /**
  * Base class for creating redux actions.
@@ -201,6 +204,50 @@ export default class ReduxActions {
         });
     }
 }
+
+// Redux FSA
+
+/**
+ * It's either a promise, or it isn't
+ */
+type MaybePromise<Type> = Type | Promise<Type>;
+
+/**
+ * A redux-thunk with the params as the first argument.  You don't have to
+ * return a promise; but, the result of the dispatch will be one.
+ */
+type AsyncWorker<Params, Succ, State, Extra = any> = (
+    params: Params,
+    dispatch: ThunkDispatch<State, Extra, AnyAction>,
+    getState: () => State,
+    extra: Extra,
+) => MaybePromise<Succ>;
+
+/** A function that takes parameters and returns a redux-thunk */
+type ThunkActionCreator<Params, Result, State, Extra> = (
+    params?: Params,
+) => ThunkAction<Result, State, Extra, AnyAction>;
+
+/**
+ * Bind a redux-thunk to typescript-fsa async action creators
+ * @param actionCreators The typescript-fsa async action creators
+ * @param asyncWorker A redux-thunk with extra `params` as the first argument
+ * @returns a ThunkActionCreator, the result of which you can pass to dispatch()
+ */
+export const bindThunkAction = <Params, Succ, Err, State, Extra = any>(
+    actionCreators: AsyncActionCreators<Params, Succ, Err>,
+    asyncWorker: AsyncWorker<Params, Succ, State, Extra>,
+): ThunkActionCreator<Params, Promise<Succ>, State, Extra> => params => async (dispatch, getState, extra) => {
+    try {
+        dispatch(actionCreators.started(params!));
+        const result = await asyncWorker(params!, dispatch, getState, extra);
+        dispatch(actionCreators.done({ params: params!, result }));
+        return result;
+    } catch (error) {
+        dispatch(actionCreators.failed({ params: params!, error }));
+        throw error;
+    }
+};
 
 // Action interfaces
 export interface IAction<T extends string> {

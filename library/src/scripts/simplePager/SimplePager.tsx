@@ -8,10 +8,12 @@ import LinkAsButton from "@library/components/LinkAsButton";
 import { ILinkPages } from "@library/simplePager/SimplePagerModel";
 import classNames from "classnames";
 import * as React from "react";
+import { simplePagerClasses } from "@library/styles/simplePagerStyles";
 
 interface IProps {
     url: string;
     pages: ILinkPages;
+    theme?: object;
 }
 
 /**
@@ -20,15 +22,15 @@ interface IProps {
 export default class SimplePager extends React.Component<IProps> {
     public render() {
         const { next, prev } = this.props.pages;
-
         const buttons = [] as JSX.Element[];
         const isSingle = (prev && !next) || (!prev && next);
+        const classes = simplePagerClasses(this.props.theme);
 
         return (
-            <div className="simplePager">
+            <div className={classNames("simplePager", classes.root)}>
                 {prev && (
                     <LinkAsButton
-                        className={classNames(["simplePager-button", "simplePager-prev", { isSingle }])}
+                        className={classNames(["simplePager-button", "simplePager-prev", classes.button, { isSingle }])}
                         to={this.makeUrl(prev)}
                     >
                         {t("Previous")}
@@ -36,7 +38,7 @@ export default class SimplePager extends React.Component<IProps> {
                 )}
                 {next && (
                     <LinkAsButton
-                        className={classNames(["simplePager-button", "simplePager-next", { isSingle }])}
+                        className={classNames(["simplePager-button", "simplePager-next", classes.button, { isSingle }])}
                         to={this.makeUrl(next)}
                     >
                         {t("Next")}

@@ -5,28 +5,46 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper } from "@library/styles/styleHelpers";
+import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
 
-export function attachmentVariables(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const formElementVars = formElementsVariables(theme);
+export function simplePagerVariables(theme?: object) {
     const themeVars = componentThemeVariables(theme, "attachment");
-    const something = {
-        ...themeVars.subComponentStyles("something"),
+
+    const sizing = {
+        minWidth: 208,
     };
 
-    return { something };
+    const spacing = {
+        outerMargin: 10,
+        innerMargin: 8,
+        ...themeVars.subComponentStyles("spacing"),
+    };
+
+    return { spacing, sizing };
 }
 
-export function attachmentClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const vars = attachmentVariables(theme);
-    const debug = debugHelper("attachment");
+export function simplePagerClasses(theme?: object) {
+    const vars = simplePagerVariables(theme);
+    const debug = debugHelper("simplePager");
 
     const root = style({
+        alignItems: "center",
+        display: "flex",
+        justifyContent: "center",
+        margin: `${unit(vars.spacing.outerMargin)} 0`,
         ...debug.name(),
     });
-    return { root };
+
+    const button = {
+        margin: unit(vars.spacing.innerMargin),
+        $nest: {
+            "&.isSingle": {
+                minWidth: unit(vars.sizing.minWidth),
+            },
+        },
+        ...debug.name("button"),
+    };
+
+    return { root, button };
 }

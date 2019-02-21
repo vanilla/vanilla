@@ -205,7 +205,6 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         $primaryKey = [];
         $uniqueKey = [];
         $fullTextKey = [];
-        $allowFullText = true;
         $indexes = [];
         $keys = '';
         $sql = '';
@@ -214,7 +213,6 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         $forceDatabaseEngine = c('Database.ForceStorageEngine');
         if ($forceDatabaseEngine && !$this->_TableStorageEngine) {
             $this->_TableStorageEngine = $forceDatabaseEngine;
-            $allowFullText = $this->_supportsFulltext();
         }
 
         foreach ($this->_Columns as $columnName => $column) {
@@ -239,7 +237,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                     $indexes['IX'][$indexGroup][] = $columnName;
                 elseif ($columnKeyType == 'unique')
                     $uniqueKey[] = $columnName;
-                elseif ($columnKeyType == 'fulltext' && $allowFullText)
+                elseif ($columnKeyType == 'fulltext')
                     $fullTextKey[] = $columnName;
             }
         }
@@ -384,11 +382,6 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                     continue;
                 }
 
-                // Don't add a fulltext if we don't support.
-                if ($columnKeyType == 'fulltext' && !$this->_supportsFulltext()) {
-                    continue;
-                }
-
                 $indexes[$columnKeyType][$indexGroup][] = $columnName;
             }
         }
@@ -529,18 +522,6 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             $currentEngine = val('engine', $tableInfo);
 
             if (strcasecmp($currentEngine, $this->_TableStorageEngine)) {
-                // Check to drop a fulltext index if we don't support it.
-                if (!$this->_supportsFulltext()) {
-                    foreach ($indexesDb as $indexName => $indexSql) {
-                        if (stringBeginsWith($indexSql, 'fulltext', true)) {
-                            $dropIndexQuery = "$alterSqlPrefix drop index $indexName;\n";
-                            if (!$this->executeQuery($dropIndexQuery)) {
-                                throw new Exception(sprintf(t('Failed to drop the index `%1$s` on table `%2$s`.'), $indexName, $this->_TableName));
-                            }
-                        }
-                    }
-                }
-
                 $engineQuery = $alterSqlPrefix.' engine = '.$this->_TableStorageEngine;
                 if (!$this->executeQuery($engineQuery, true)) {
                     throw new Exception(sprintf(t('Failed to alter the storage engine of table `%1$s` to `%2$s`.'), $this->_DatabasePrefix.$this->_TableName, $this->_TableStorageEngine));
@@ -823,14 +804,5 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         } else {
             return "'".str_replace("'", "''", $value)."'";
         }
-    }
-
-    /**
-     *
-     *
-     * @return bool
-     */
-    protected function _supportsFulltext() {
-        return strcasecmp($this->_TableStorageEngine, 'myisam') == 0;
     }
 }

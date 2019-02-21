@@ -58,8 +58,13 @@ export const globalVariables = (theme?: object) => {
     };
 
     const links = {
-        color: mainColors.primary,
-        visited: mainColors.primary,
+        colors: {
+            default: mainColors.fg,
+            hover: mainColors.secondary,
+            focus: mainColors.secondary,
+            accessibleFocus: mainColors.secondary,
+            active: mainColors.secondary,
+        },
         ...themeVars.subComponentStyles("links"),
     };
 

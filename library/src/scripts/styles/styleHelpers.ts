@@ -443,3 +443,57 @@ export const objectFitWithFallback = () => {
         },
     };
 };
+
+const toStringColor = (colorValue: ColorHelper | "transparent") => {
+    if (typeof colorValue === "string") {
+        return colorValue;
+    } else if (colorValue instanceof ColorHelper) {
+        return colorValue.toString();
+    } else {
+        throw Error("Invalid color value");
+    }
+};
+
+export interface ILinkStates {
+    default?: object;
+    hover?: object;
+    focus?: object;
+    accessibleFocus?: object;
+    active?: object;
+    visited?: object;
+}
+
+export const setAllLinkColors = (overwrites?: ILinkStates) => {
+    // We want to default to the standard styles and only overwrite what we want/need
+    const linkColors = vars.links.colors;
+
+    const styles: ILinkStates = {
+        default: {
+            color: toStringColor(linkColors.default),
+        },
+        hover: {
+            color: toStringColor(linkColors.hover),
+        },
+        focus: {
+            color: toStringColor(linkColors.focus),
+        },
+        accessibleFocus: {
+            color: toStringColor(linkColors.accessibleFocus),
+        },
+        active: {
+            color: toStringColor(linkColors.active),
+        },
+        ...overwrites,
+    };
+
+    return {
+        ...styles.default,
+        $nest: {
+            "&:hover": styles.hover,
+            "&:focus": styles.focus,
+            "&.focus-visible": styles.accessibleFocus,
+            "&:active": styles.active,
+            "&:visited": styles.visited,
+        },
+    };
+};

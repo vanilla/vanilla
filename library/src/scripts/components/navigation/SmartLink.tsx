@@ -10,7 +10,9 @@ import { NavLinkProps, NavLink } from "react-router-dom";
 import { LocationDescriptor, createPath, createLocation } from "history";
 import { IWithLinkContext, LinkContext, makeLocationDescriptorObject } from "./LinkContextProvider";
 
-interface IProps extends NavLinkProps {}
+interface IProps extends NavLinkProps {
+    tabIndex?: number;
+}
 
 /**
  * Link component that checks it's <LinkContext /> to know if it needs to do a full refresh
@@ -41,12 +43,12 @@ export default function SmartLink(props: IProps) {
                             {...passthru}
                             to={makeLocationDescriptorObject(props.to, href)}
                             activeClassName="isCurrent"
-                            tabIndex={props.tabIndex}
+                            tabIndex={props.tabIndex ? props.tabIndex : 0}
                             replace={replace}
                         />
                     );
                 } else {
-                    return <a {...passthru} href={href} tabIndex={props.tabIndex} />;
+                    return <a {...passthru} href={href} tabIndex={props.tabIndex ? props.tabIndex : 0} />;
                 }
             }}
         </LinkContext.Consumer>

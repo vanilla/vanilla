@@ -6,8 +6,13 @@
 
  namespace Vanilla\Formatting;
 
- class FormatUtil {
-         /**
+ /**
+  * Static utilities for text formatting.
+  *
+  * Do NOT put any stateful logic in this file.
+  */
+class FormatUtil {
+    /**
      * Do a preg_replace, but don't affect things inside <code> tags.
      *
      * The three parameters are identical to the ones you'd pass
@@ -15,14 +20,14 @@
      *
      * @param mixed $search The value being searched for, just like in
      *              preg_replace or preg_replace_callback.
-     * @param mixed $replace The replacement value, just like in
+     * @param string|callable $replace The replacement value, just like in
      *              preg_replace or preg_replace_callback.
-     * @param mixed $subject The string being searched.
+     * @param string $subject The string being searched.
      * @param bool $isCallback If true, do preg_replace_callback. Do
      *             preg_replace otherwise.
      * @return string
      */
-    public static function replaceButProtectCodeBlocks(string $search, string $replace, string $subject, bool $isCallback = false) {
+    public static function replaceButProtectCodeBlocks(string $search, $replace, string $subject, bool $isCallback = false): string {
         // Take the code blocks out, replace with a hash of the string, and
         // keep track of what substring got replaced with what hash.
         $codeBlockContents = [];

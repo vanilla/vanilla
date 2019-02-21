@@ -178,11 +178,11 @@ class ThemesApiController extends AbstractApiController
         $schema = Schema::parse([
             "header?" => Schema::parse([
                 "type:s" => ['description' => 'Header asset type: html.', 'enum' => ['html']],
-                "body:s"
+                "data:s"
             ]),
             "footer?" => Schema::parse([
                 "type:s" => ['description' => 'Footer asset type: html.', 'enum' => ['html']],
-                "body:s"
+                "data:s"
             ]),
             "variables?" => Schema::parse([
                 "type:s" => ['description' => 'Variables asset type: json.', 'enum' => ['json']],
@@ -333,7 +333,7 @@ class ThemesApiController extends AbstractApiController
                 }
                 break;
             case 'html':
-                $asset['body'] = $assetData;
+                $asset['data'] = $assetData;
                 if ($mimeType) {
                     $asset['mime-type'] = 'text/html';
                 }

@@ -15,7 +15,8 @@ use Vanilla\Models\ThemeAssetModel;
 /**
  * API Controller for the `/themes` resource.
  */
-class ThemesApiController extends AbstractApiController {
+class ThemesApiController extends AbstractApiController
+{
     const ASSET_TYPES = ['html', 'js', 'json', 'css'];
 
     const ASSET_LIST = [
@@ -78,7 +79,8 @@ class ThemesApiController extends AbstractApiController {
      * @param string $themeKey The unique theme key or theme ID.
      * @return array
      */
-    public function get(string $themeKey): array {
+    public function get(string $themeKey): array
+    {
         $this->permission();
         $in = $this->themeKeySchema('in')->setDescription('Get theme assets.');
         $out = $this->themeResultSchema('out');
@@ -86,81 +88,6 @@ class ThemesApiController extends AbstractApiController {
         $themeAssets = $this->getThemeAssets($themeKey);
         $themeAssets = $out->validate($themeAssets);
         return $themeAssets;
-    }
-
-    /**
-     * Create new theme from parent theme.
-     *
-     * @param array $body Array of incoming params.
-     * @return array
-     */
-    public function post(array $body): array {
-        $this->permission("Garden.Settings.Manage");
-
-        $in = $this->themePostSchema('in')->setDescription('Post theme assets.');
-        $out = $this->themeResultSchema('out');
-        $body = $in->validate($body);
-        $themeID = $this->themeModel->insert($body);
-        if (isset($body['assets'])) {
-            $this->themeAssetModel->updateThemeAssets($themeID, $body['assets']);
-        }
-
-        $theme = $this->getThemeAssets($themeID);
-        $themeAssets = $out->validate($theme);
-        return $themeAssets;
-    }
-
-    /**
-     * Update theme  by ID.
-     *
-     * @param int $id Theme ID
-     * @param array $body Array of incoming params.
-     * @return array
-     */
-    public function patch(int $id, array $body): array {
-        $this->permission("Garden.Settings.Manage");
-
-        $in = $this->themePostSchema('in')->setDescription('Update theme assets.');
-        $out = $this->themeResultSchema('out');
-        $body = $in->validate($body);
-
-        if ($this->themeModel->update($body, ['themeID' => $id])) {
-            if (isset($body['assets'])) {
-                $this->themeAssetModel->updateThemeAssets($id, $body['assets']);
-            }
-        }
-
-        $theme = $this->getThemeAssets($id);
-        $themeAssets = $out->validate($theme);
-        return $themeAssets;
-    }
-
-    /**
-     * PUT theme asset (update existing or create new if asset does not exist).
-     *
-     * @param string $id The unique theme key or theme ID (ex: keystone).
-     * @param string $assetKey Unique asset key (ex: header, footer, fonts, styles)
-     * @param array $body Array of incoming params.
-     *              Should have ONE key === $assetKey and value (structure of associated asset).
-     *
-     * @return array|Data
-     */
-    public function put_assets(string $id, string $assetKey, array $body) {
-        $this->permission("Garden.Settings.Manage");
-
-        $in = $this->schema($this->assetsSchema(), 'in')->setDescription('PUT theme asset.');
-        $out = $this->schema($this->assetsSchema(), 'out');
-
-        $body = $in->validate($body);
-        if (isset($body[$assetKey])) {
-            $this->themeAssetModel->updateThemeAssets($id, [$assetKey => $body[$assetKey]]);
-        } else {
-            throw new \Garden\Schema\ValidationException('Request body must have "'.$assetKey.'" field.');
-        }
-
-        $asset = $this->getThemeAsset($id, $assetKey);
-        $asset = $out->validate([$assetKey => $asset]);
-        return $asset;
     }
 
     /**
@@ -174,7 +101,8 @@ class ThemesApiController extends AbstractApiController {
      *
      * @return array|Data
      */
-    public function get_assets(string $id, string $assetKey) {
+    public function get_assets(string $id, string $assetKey)
+    {
         $this->permission();
 
         $in = $this->themeKeySchema('in')->setDescription('Get theme assets.');
@@ -198,7 +126,8 @@ class ThemesApiController extends AbstractApiController {
      * @param string $type
      * @return Schema
      */
-    private function themeKeySchema(string $type = 'in'): Schema {
+    private function themeKeySchema(string $type = 'in'): Schema
+    {
         static $schema;
         if (!isset($schema)) {
             $schema = $this->schema(
@@ -213,33 +142,13 @@ class ThemesApiController extends AbstractApiController {
     }
 
     /**
-     * POST theme schema
-     *
-     * @param string $type
-     * @return Schema
-     */
-    private function themePostSchema(string $type = 'in'): Schema {
-        $schema = $this->schema(
-            Schema::parse([
-                'parentTheme:s' => [
-                    'description' => 'Parent theme name.',
-                    'enum' => $this->getAllThemes()
-                ],
-                'parentVersion:s' => 'Parent theme version.',
-                'assets?' => $this->assetsSchema()
-            ]),
-            $type
-        );
-        return $schema;
-    }
-
-    /**
      * Result theme schema
      *
      * @param string $type
      * @return Schema
      */
-    private function themeResultSchema(string $type = 'out'): Schema {
+    private function themeResultSchema(string $type = 'out'): Schema
+    {
         $schema = $this->schema(
             Schema::parse([
                 'type:s',
@@ -264,42 +173,43 @@ class ThemesApiController extends AbstractApiController {
      *
      * @return Schema
      */
-    private function assetsSchema(): Schema {
+    private function assetsSchema(): Schema
+    {
         $schema = Schema::parse([
-                "header?" => Schema::parse([
-                    "type:s" => ['description' => 'Header asset type: html.', 'enum' => ['html']],
-                    "body:s"
-                ]),
-                "footer?" => Schema::parse([
-                    "type:s" => ['description' => 'Footer asset type: html.', 'enum' => ['html']],
-                    "body:s"
-                ]),
-                "variables?" => Schema::parse([
-                    "type:s" => ['description' => 'Variables asset type: json.', 'enum' => ['json']],
-                    "data:o"
-                ]),
-                "fonts?" => Schema::parse([
-                    "type:s" => ['description' => 'Fonts asset type: data.', 'enum' => ['data']],
-                    'data:a' => Schema::parse([
-                        "type:s",
-                        "name:s",
-                        "fallbacks:s?",
-                        "url:s"
-                    ])
-                ]),
-                "scripts?" => Schema::parse([
-                    "type:s" => ['description' => 'Scripts asset type: data.', 'enum' => ['data']],
-                    "data:a" =>Schema::parse([])
-                ]),
-                "styles?" => Schema::parse([
-                    "type:s" => ['description' => 'Styles asset type: css.', 'enum' => ['css']],
-                    "data:s"
-                ]),
-                "inlineJs?" => Schema::parse([
-                    "type:s" => ['description' => 'Javascript asset type: js.', 'enum' => ['js']],
-                    "js:s"
+            "header?" => Schema::parse([
+                "type:s" => ['description' => 'Header asset type: html.', 'enum' => ['html']],
+                "body:s"
+            ]),
+            "footer?" => Schema::parse([
+                "type:s" => ['description' => 'Footer asset type: html.', 'enum' => ['html']],
+                "body:s"
+            ]),
+            "variables?" => Schema::parse([
+                "type:s" => ['description' => 'Variables asset type: json.', 'enum' => ['json']],
+                "data:o"
+            ]),
+            "fonts?" => Schema::parse([
+                "type:s" => ['description' => 'Fonts asset type: data.', 'enum' => ['data']],
+                'data:a' => Schema::parse([
+                    "type:s",
+                    "name:s",
+                    "fallbacks:s?",
+                    "url:s"
                 ])
-            ])->setID('themeAssetsSchema');
+            ]),
+            "scripts?" => Schema::parse([
+                "type:s" => ['description' => 'Scripts asset type: data.', 'enum' => ['data']],
+                "data:a" => Schema::parse([])
+            ]),
+            "styles?" => Schema::parse([
+                "type:s" => ['description' => 'Styles asset type: css.', 'enum' => ['css']],
+                "data:s"
+            ]),
+            "inlineJs?" => Schema::parse([
+                "type:s" => ['description' => 'Javascript asset type: js.', 'enum' => ['js']],
+                "js:s"
+            ])
+        ])->setID('themeAssetsSchema');
         return $schema;
     }
 
@@ -310,10 +220,11 @@ class ThemesApiController extends AbstractApiController {
      * @param string $assetKey
      * @return array
      */
-    public function getThemeByID(int $themeID, string $assetKey = '') {
+    public function getThemeByID(int $themeID, string $assetKey = '')
+    {
         $theme = $this->themeModel->get(['themeID' => $themeID]);
         if (empty($theme)) {
-            throw new NotFoundException('Theme '.$themeID.' not found');
+            throw new NotFoundException('Theme ' . $themeID . ' not found');
         }
         $theme = $theme[0];
         $filter = ['themeID' => $themeID];
@@ -335,10 +246,11 @@ class ThemesApiController extends AbstractApiController {
      *
      * @throws NotFoundException Throws an exception when themeName not found.
      */
-    public function getThemeByName(string $themeName): Addon {
+    public function getThemeByName(string $themeName): Addon
+    {
         $theme = $this->addonManager->lookupTheme($themeName);
         if (null === $theme) {
-            throw new NotFoundException('There is no theme: \''.$themeName.'\' installed.');
+            throw new NotFoundException('There is no theme: \'' . $themeName . '\' installed.');
         }
         return $theme;
     }
@@ -348,7 +260,8 @@ class ThemesApiController extends AbstractApiController {
      *
      * @return array List of all available themes
      */
-    public function getAllThemes(): array {
+    public function getAllThemes(): array
+    {
         $themes = $this->addonManager->lookupAllByType(Addon::TYPE_THEME);
         $result = [];
         foreach ($themes as $theme) {
@@ -363,7 +276,8 @@ class ThemesApiController extends AbstractApiController {
      * @param string $themeKey
      * @return array
      */
-    private function getThemeAssets(string $themeKey): array {
+    private function getThemeAssets(string $themeKey): array
+    {
         $customAssets = [];
         // first check if themeKey only contains digits
         // in that case get parentTheme name from themeModel
@@ -408,7 +322,7 @@ class ThemesApiController extends AbstractApiController {
         array &$asset,
         bool $mimeType = false
     ) {
-        $fileName = PATH_ROOT.$theme->getSubdir().'/assets/'.$asset['file'];
+        $fileName = PATH_ROOT . $theme->getSubdir() . '/assets/' . $asset['file'];
         $assetData = $customAssets['assets'][$assetKey]['data'] ?? file_get_contents($fileName);
         switch ($asset['type']) {
             case 'json':
@@ -448,7 +362,8 @@ class ThemesApiController extends AbstractApiController {
      * @return mixed
      * @throws NotFoundException Throws an exception if asset not found.
      */
-    private function getThemeAsset(string $id, string $assetKey, bool $mimeType = false): array {
+    private function getThemeAsset(string $id, string $assetKey, bool $mimeType = false): array
+    {
         $customAssets = [];
         if (ctype_digit($id)) {
             $customAssets = $this->getThemeByID((int)$id, $assetKey);
@@ -461,7 +376,7 @@ class ThemesApiController extends AbstractApiController {
             $asset = $assets[$assetKey];
             $this->castAsset($theme, $customAssets, $assetKey, $asset, $mimeType);
         } else {
-            throw new NotFoundException('Asset "'.$assetKey.'" not found for "'.$theme->getInfoValue('key').'"');
+            throw new NotFoundException('Asset "' . $assetKey . '" not found for "' . $theme->getInfoValue('key') . '"');
         }
         return $asset;
     }

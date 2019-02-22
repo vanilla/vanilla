@@ -8,6 +8,8 @@ import SmartLink from "@library/components/navigation/SmartLink";
 import Paragraph from "@library/components/Paragraph";
 import classNames from "classnames";
 import { t } from "@library/application";
+import { subcommunityTileClasses } from "@library/styles/subcommunityTitleStyles";
+import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
 
 interface IProps {
     icon: string;
@@ -17,7 +19,8 @@ interface IProps {
     url: string;
     className?: string;
     headingLevel?: 2 | 3 | 4 | 5 | 6;
-    fallbackIcon: React.ReactNode;
+    fallbackIcon?: React.ReactNode;
+    theme?: object;
 }
 
 /**
@@ -28,21 +31,24 @@ export default class SubcommunityTile extends React.Component<IProps> {
         headingLevel: 3,
     };
     public render() {
-        const { icon, title, description, url, className, iconAltText, headingLevel } = this.props;
+        const { icon, title, description, url, className, iconAltText, headingLevel, theme } = this.props;
         const H = `h${headingLevel}`;
         const alt = iconAltText ? iconAltText : `${t("Icon for: ")} ${this.props.title}`;
-
+        const classes = subcommunityTileClasses(theme);
         return (
-            <div className={classNames("subcommunityTile", className)}>
-                <SmartLink className="subcommunityTile-link" to={url}>
-                    <div className="subcommunityTile">
-                        <div className="subcommunityTile-iconFrame">
-                            {icon && <img className="subcommunityTile-icon" src={icon} alt={alt} />}
-                            {!icon && this.props.fallbackIcon}
-                        </div>
-                        <H className="subcommunityTile-title">{title}</H>
-                        {description && <Paragraph className="subcommunityTile-description">{description}</Paragraph>}
+            <div className={classNames("subcommunityTile", className, classes.root)}>
+                <SmartLink className={classNames("subcommunityTile-link", classes.link)} to={url}>
+                    <div className={classNames("subcommunityTile-iconFrame", classes.frame)}>
+                        {icon && (
+                            <img className={classNames("subcommunityTile-icon", classes.icon)} src={icon} alt={alt} />
+                        )}
+                        {!icon &&
+                            (this.props.fallbackIcon
+                                ? this.props.fallbackIcon
+                                : knowledgeBaseNoIcon(classes.fallBackIcon))}
                     </div>
+                    <H className="subcommunityTile-title">{title}</H>
+                    {description && <Paragraph className="subcommunityTile-description">{description}</Paragraph>}
                 </SmartLink>
             </div>
         );

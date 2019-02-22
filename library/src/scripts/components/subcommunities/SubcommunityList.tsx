@@ -24,7 +24,7 @@ interface IProps {
     titleLevel?: 1 | 2 | 3 | 4 | 5 | 6;
     hiddenTitle?: boolean;
     emptyMessage: string;
-    fallbackIcon: React.ReactNode;
+    fallbackIcon?: React.ReactNode;
     theme?: object;
 }
 
@@ -53,7 +53,6 @@ export default class SubcommunityList extends React.Component<IProps> {
                                     title={subcommunity.name}
                                     description={subcommunity.description}
                                     url={subcommunity.url}
-                                    fallbackIcon={this.props.fallbackIcon}
                                 />
                             </li>
                         ))}

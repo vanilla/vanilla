@@ -4,13 +4,20 @@
  * @license GPL-2.0-only
  */
 
+use Gdn_Request;
 use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ServerException;
 use Vanilla\AddonManager;
 use Vanilla\Addon;
 use Vanilla\Models\ThemeModel;
-use Vanilla\Models\ThemeAssetModel;
+use Vanilla\Theme\Asset;
+use Vanilla\Theme\FontsAsset;
+use Vanilla\Theme\HtmlAsset;
+use Vanilla\Theme\JsonAsset;
+use Vanilla\Utility\InstanceValidatorSchema;
+use Vanilla\Theme\ScriptsAsset;
 
 /**
  * API Controller for the `/themes` resource.
@@ -43,12 +50,14 @@ class ThemesApiController extends AbstractApiController {
             "type" => "css",
             "file" => "styles.css"
         ],
-        "inlineJs" => [
+        "javascript" => [
             "type" => "js",
-            "file" => "inlineJs.js"
+            "file" => "javascript.js"
         ]
 
     ];
+
+    const ASSET_KEY = "assets";
 
     /* @var AddonManager */
     private $addonManager;
@@ -56,20 +65,16 @@ class ThemesApiController extends AbstractApiController {
     /* @var ThemeModel */
     private $themeModel;
 
-    /* @var ThemeAssetModel */
-    private $themeAssetModel;
+    /** @var Gdn_Request */
+    private $request;
 
     /**
      * @inheritdoc
      */
-    public function __construct(
-        AddonManager $addonManager,
-        ThemeModel $themeModel,
-        ThemeAssetModel $themeAssetModel
-    ) {
+    public function __construct(AddonManager $addonManager, ThemeModel $themeModel, Gdn_Request $request) {
         $this->addonManager = $addonManager;
+        $this->request = $request;
         $this->themeModel = $themeModel;
-        $this->themeAssetModel = $themeAssetModel;
     }
 
     /**
@@ -80,12 +85,13 @@ class ThemesApiController extends AbstractApiController {
      */
     public function get(string $themeKey): array {
         $this->permission();
-        $in = $this->themeKeySchema('in')->setDescription('Get theme assets.');
+
         $out = $this->themeResultSchema('out');
 
-        $themeAssets = $this->getThemeAssets($themeKey);
-        $themeAssets = $out->validate($themeAssets);
-        return $themeAssets;
+        $theme = $this->getThemeByName($themeKey);
+        $normalizedTheme = $this->normalizeTheme($theme);
+        $result = $out->validate($normalizedTheme);
+        return $result;
     }
 
     /**
@@ -102,39 +108,16 @@ class ThemesApiController extends AbstractApiController {
     public function get_assets(string $id, string $assetKey) {
         $this->permission();
 
-        $in = $this->themeKeySchema('in')->setDescription('Get theme assets.');
-        $out = $this->schema($this->assetsSchema(), 'out');
-
-        $pathInfo =  pathinfo($assetKey);
-        $asset =  $this->getThemeAsset($id, $pathInfo['filename'], !empty($pathInfo['extension']));
-        if (empty($pathInfo['extension'])) {
-            // return asset as an array
-            $asset = $out->validate([$assetKey => $asset]);
-            return $asset;
-        } else {
-            // return asset as a file
-            return new Data($asset['data'], ['CONTENT_TYPE' => $asset['mime-type']]);
+        $theme = $this->getThemeByName($id);
+        $assets = $theme->getInfoValue(self::ASSET_KEY, []);
+        $files = array_column($assets, "file");
+        if (!in_array($assetKey, $files)) {
+            throw NotFoundException("Asset");
         }
-    }
 
-    /**
-     * Get ThemeKey schema
-     *
-     * @param string $type
-     * @return Schema
-     */
-    private function themeKeySchema(string $type = 'in'): Schema {
-        static $schema;
-        if (!isset($schema)) {
-            $schema = $this->schema(
-                Schema::parse(['themeKey:s' => [
-                    'description' => 'Theme name.',
-                    'enum' => $this->getAllThemes()
-                ]]),
-                $type
-            );
-        }
-        return $this->schema($schema, $type);
+        $content = $this->getFileAsset($theme, $assetKey);
+        $result = new Data($content);
+        return $result->setHeader("Content-Type", "application/javascript");
     }
 
     /**
@@ -149,11 +132,8 @@ class ThemesApiController extends AbstractApiController {
                 'type:s',
                 'themeID:s',
                 'version:s',
-                'parentTheme:s' => [
-                    'description' => 'Parent theme name.',
-                    'enum' => $this->getAllThemes()
-                ],
-                'parentVersion:s' => 'Parent theme version.',
+                'parentTheme:s|n' => ['enum' => $this->getAllThemes()],
+                'parentVersion:s|n',
                 'logos:s?',
                 'mobileLogo:s?',
                 'assets?' => $this->assetsSchema()
@@ -170,41 +150,34 @@ class ThemesApiController extends AbstractApiController {
      */
     private function assetsSchema(): Schema {
         $schema = Schema::parse([
-            "header?" => Schema::parse([
-                "type:s" => ['description' => 'Header asset type: html.', 'enum' => ['html']],
-                "data:s"
-            ]),
-            "footer?" => Schema::parse([
-                "type:s" => ['description' => 'Footer asset type: html.', 'enum' => ['html']],
-                "data:s"
-            ]),
-            "variables?" => Schema::parse([
-                "type:s" => ['description' => 'Variables asset type: json.', 'enum' => ['json']],
-                "data:o"
-            ]),
-            "fonts?" => Schema::parse([
-                "type:s" => ['description' => 'Fonts asset type: data.', 'enum' => ['data']],
-                'data:a' => Schema::parse([
-                    "type:s",
-                    "name:s",
-                    "fallbacks:s?",
-                    "url:s"
-                ])
-            ]),
-            "scripts?" => Schema::parse([
-                "type:s" => ['description' => 'Scripts asset type: data.', 'enum' => ['data']],
-                "data:a" => Schema::parse([])
-            ]),
-            "styles?" => Schema::parse([
-                "type:s" => ['description' => 'Styles asset type: css.', 'enum' => ['css']],
-                "data:s"
-            ]),
-            "inlineJs?" => Schema::parse([
-                "type:s" => ['description' => 'Javascript asset type: js.', 'enum' => ['js']],
-                "js:s"
-            ])
+            "header?" => new InstanceValidatorSchema(HtmlAsset::class),
+            "footer?" => new InstanceValidatorSchema(HtmlAsset::class),
+            "variables?" => new InstanceValidatorSchema(JsonAsset::class),
+            "fonts?" => new InstanceValidatorSchema(FontsAsset::class),
+            "scripts?" => new InstanceValidatorSchema(ScriptsAsset::class),
+            "styles:s?",
+            "javascript:s?",
         ])->setID('themeAssetsSchema');
         return $schema;
+    }
+
+    /**
+     * Generate a new data theme asset.
+     *
+     * @param string $key
+     * @param string $content
+     * @return Asset
+     */
+    private function dataAsset(string $key, string $content): Asset {
+        $key = strtolower($key);
+        switch ($key) {
+            case "fonts":
+                return new FontsAsset(json_decode($content, true));
+            case "scripts":
+                return new ScriptsAsset(json_decode($content, true));
+            default:
+                throw new ServerException("Unrecognized data asset: {$key}");
+        }
     }
 
     /**
@@ -217,8 +190,8 @@ class ThemesApiController extends AbstractApiController {
      */
     public function getThemeByName(string $themeName): Addon {
         $theme = $this->addonManager->lookupTheme($themeName);
-        if (null === $theme) {
-            throw new NotFoundException('There is no theme: \'' . $themeName . '\' installed.');
+        if (!($theme instanceof Addon)) {
+            throw new NotFoundException("Theme");
         }
         return $theme;
     }
@@ -240,75 +213,92 @@ class ThemesApiController extends AbstractApiController {
     /**
      * Get all theme assets
      *
-     * @param string $themeKey
+     * @param Addon $theme
      * @return array
      */
-    private function getThemeAssets(string $themeKey): array {
-        $customAssets = [];
-        $theme = $this->getThemeByName($themeKey);
-
-        $assets  = $theme->getInfoValue('assets');
+    private function normalizeTheme(Addon $theme): array {
         $res = [
             'type' => 'themeFile',
-            'themeID' => $customAssets['themeID'] ?? $theme->getInfoValue('key'),
-            'parentTheme' => $customAssets['parentTheme'] ?? $theme->getInfoValue('key'),
+            'themeID' => $theme->getInfoValue('key'),
+            'parentTheme' => null,
             'version' => $theme->getInfoValue('version'),
-            'parentVersion' => $customAssets['parentVersion'] ?? $theme->getInfoValue('version'),
+            'parentVersion' => null,
             'logos' => $theme->getInfoValue('logos'),
             'mobileLogo' => $theme->getInfoValue('mobileLogo'),
         ];
-        foreach ($assets as $assetKey => &$asset) {
-            $this->castAsset($theme, $customAssets, $assetKey, $asset);
+
+        $res["assets"] = [];
+        $themeAssets = $theme->getInfoValue("assets", []);
+
+        $primaryAssets = array_intersect_key(
+            $themeAssets,
+            array_flip(["fonts", "footer", "header", "scripts", "variables"])
+        );
+        foreach ($primaryAssets as $assetKey => $asset) {
+            $res["assets"][$assetKey] = $this->generateAsset($assetKey, $asset, $theme);
         }
-        $res['assets'] = $assets;
+
+        $secondaryAssets = array_intersect_key(
+            $themeAssets,
+            array_flip(["javascript", "styles"])
+        );
+        foreach ($secondaryAssets as $assetKey => $asset) {
+            $path = $theme->path("/assets/{$asset['file']}", Addon::PATH_ADDON);
+            $res["assets"][$assetKey] = $this->request->url($path, true);
+        }
+
         return $res;
+    }
+
+    /**
+     * Generate an asset object, given an asset array.
+     *
+     * @param string $key
+     * @param array $asset
+     * @param Addon $theme
+     * @return Asset
+     */
+    private function generateAsset(string $key, array $asset, Addon $theme): Asset {
+        $type = $asset["type"] ?? null;
+        if ($type === null) {
+            throw new ServerException("Missing theme asset type.");
+        }        $filename = $asset["file"] ?? null;
+        $type = strtolower($type);
+
+        $filename = $asset["file"] ?? null;
+        if ($filename === null) {
+            throw new ServerException("File key missing for theme asset.");
+        }
+        $data = $this->getFileAsset($theme, $filename);
+
+        switch ($type) {
+            case "data":
+                return $this->dataAsset($key, $data);
+            case "html":
+                return new HtmlAsset($data);
+            case "json":
+                return new JsonAsset($data);
+            default:
+                throw new ServerException("Unrecognized type: {$type}");
+        }
     }
 
     /**
      * Cast themeAssetModel data to out schema data by calculating and casting required fields.
      *
      * @param Addon $theme
-     * @param array $customAssets
-     * @param string $assetKey
-     * @param array $asset
-     * @param bool $mimeType
+     * @param string $filename
      */
-    private function castAsset(
-        Addon $theme,
-        array $customAssets,
-        string $assetKey,
-        array &$asset,
-        bool $mimeType = false
-    ) {
-        $fileName = PATH_ROOT . $theme->getSubdir() . '/assets/' . $asset['file'];
-        $assetData = $customAssets['assets'][$assetKey]['data'] ?? file_get_contents($fileName);
-        switch ($asset['type']) {
-            case 'json':
-            case 'data':
-                $asset['data'] = json_decode($assetData, true);
-                if ($mimeType) {
-                    $asset['mime-type'] = 'application/json';
-                }
-                break;
-            case 'html':
-                $asset['data'] = $assetData;
-                if ($mimeType) {
-                    $asset['mime-type'] = 'text/html';
-                }
-                break;
-            case 'css':
-                $asset['data'] = $assetData;
-                if ($mimeType) {
-                    $asset['mime-type'] = 'text/css';
-                }
-                break;
-            case 'js':
-                $asset['js'] = $assetData;
-                if ($mimeType) {
-                    $asset['mime-type'] = 'application/javascript';
-                }
-                break;
+    private function getFileAsset(Addon $theme, string $filename): string {
+        $filename = basename($filename);
+        $fullFilename = $theme->path("/assets/{$filename}");
+        if (!file_exists($fullFilename)) {
+            throw new ServerException("Theme asset file does not exist: {$fullFilename}");
         }
+        if (!is_readable($fullFilename)) {
+            throw new ServerException("Unable to read theme asset file: {$fullFilename}");
+        }
+        return file_get_contents($fullFilename);
     }
 
     /**
@@ -316,24 +306,18 @@ class ThemesApiController extends AbstractApiController {
      *
      * @param string $id
      * @param string $assetKey
-     * @param bool $mimeType
      * @return mixed
      * @throws NotFoundException Throws an exception if asset not found.
      */
-    private function getThemeAsset(string $id, string $assetKey, bool $mimeType = false): array {
-        $customAssets = [];
-        if (ctype_digit($id)) {
-            $customAssets = $this->getThemeByID((int)$id, $assetKey);
-            $theme = $this->getThemeByName($customAssets['parentTheme']);
-        } else {
-            $theme = $this->getThemeByName($id);
-        }
-        $assets  = $theme->getInfoValue('assets');
-        if (!key_exists($assetKey, $assets)) {
+    private function getThemeAsset(string $id, string $assetKey): array {
+        $theme = $this->getThemeByName($id);
+        $assets  = $theme->getInfoValue("assets", []);
+        $asset = $assets[$assetKey] ?? null;
+        if ($asset === null) {
             throw new NotFoundException('Asset "' . $assetKey . '" not found for "' . $theme->getInfoValue('key') . '"');
         }
-        $asset = $assets[$assetKey];
-        $this->castAsset($theme, $customAssets, $assetKey, $asset, $mimeType);
-        return $asset;
+
+        $result = $this->getFileAsset($theme, "");
+        return [];
     }
 }

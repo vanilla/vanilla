@@ -211,8 +211,10 @@ components:
           type: string
         parentTheme:
           type: string
+          nullable: true
         parentVersion:
           type: string
+          nullable: true
         type:
           type: string
           enum:
@@ -240,24 +242,14 @@ components:
           $ref: "#/components/schemas/ThemeFontsAsset"
         javascript:
           description: An absolute URL to the theme's JavaScript file.
-          nullable: true
           type: string
         scripts:
           $ref: "#/components/schemas/ThemeScriptsAsset"
         styles:
           description: An absolute URL to the theme's stylesheet.
-          nullable: true
           type: string
         variables:
           $ref: "#/components/schemas/ThemeVariablesAsset"
-      required:
-        - header
-        - footer
-        - fonts
-        - javascript
-        - scripts
-        - styles
-        - variables
       type: object
     ThemeAssetNotFound:
       properties:
@@ -281,6 +273,7 @@ components:
       properties:
         fallbacks:
           type: string
+          nullable: true
         name:
           type: string
         type:

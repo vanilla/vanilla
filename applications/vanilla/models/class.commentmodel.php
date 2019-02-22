@@ -1674,6 +1674,11 @@ class CommentModel extends Gdn_Model {
             return true;
         }
 
+        // Check if user can view the category contents.
+        if (!CategoryModel::checkPermission($category, 'Vanilla.Comments.Add')) {
+            return false;
+        }
+
         // Make sure only moderators can edit closed things.
         if (val('Closed', $discussion)) {
             return false;

@@ -225,15 +225,14 @@ export const globalVariables = (theme?: object) => {
         },
     };
 
+    const overlayBg = getColorDependantOnLightness(mainColors.bg, mainColors.fg, 0.2);
     const overlay = {
-        bg: "",
-        dropShadow: {
-            color: "",
-            position: "",
-        },
+        dropShadow: `0 5px 10px ${overlayBg}`,
         border: {
-            color: "",
+            color: mixBgAndFg(0.15),
+            radius: border.radius,
         },
+        spacer: 32,
     };
 
     const userContent = {

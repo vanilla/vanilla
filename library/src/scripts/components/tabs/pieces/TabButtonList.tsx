@@ -9,6 +9,7 @@ import classNames from "classnames";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import TabHandler from "@library/TabHandler";
 import TabButton from "@library/components/tabs/pieces/TabButton";
+import { tabButtonListClasses } from "@library/styles/tabButtonListStyles";
 
 export interface ITabButton {
     buttonContent: React.ReactNode;
@@ -41,6 +42,7 @@ export default class TabButtonList extends React.Component<IProps, IState> {
     };
     public render() {
         const { className, label, tabs, selectedTab, getTabButtonID, getTabPanelID, buttonClass } = this.props;
+        const classes = tabButtonListClasses();
         const content = tabs.map((tab: ITabButton, index) => {
             const isSelected = selectedTab === index;
             const hasAlternateContents = !!tab.openButtonContent;
@@ -51,7 +53,7 @@ export default class TabButtonList extends React.Component<IProps, IState> {
                     ariaSelected={isSelected}
                     key={`tabButton-${index}`}
                     baseClass={ButtonBaseClass.TAB}
-                    className={classNames("tabButton", "tabButtonList-button", isSelected, buttonClass)}
+                    className={classNames("tabButton", "tabButtonList-button", isSelected, buttonClass, classes.button)}
                     tabIndex={isSelected || this.state.setAllTabIndexes ? 0 : -1}
                     index={index}
                     setTab={this.props.setTab}
@@ -66,7 +68,7 @@ export default class TabButtonList extends React.Component<IProps, IState> {
             <div
                 role="tablist"
                 aria-label={label}
-                className={classNames("tabButtonList", className)}
+                className={classNames("tabButtonList", className, classes.root)}
                 ref={this.tabButtons}
             >
                 {content}

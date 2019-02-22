@@ -15,6 +15,7 @@ import {
     getColorDependantOnLightness,
     spinnerLoader,
 } from "@library/styles/styleHelpers";
+import { WidthProperty, BorderRadiusProperty } from "csstype";
 
 export function buttonStyles(theme?: object) {
     const globalVars = globalVariables(theme);
@@ -39,17 +40,15 @@ export function buttonStyles(theme?: object) {
     return { padding, sizing, border };
 }
 
-type Unit = string | number;
-
 export interface IButtonType {
     fg: ColorHelper;
     bg: ColorHelper;
     spinner: ColorHelper;
     border: {
         color: ColorHelper;
-        width: Unit;
+        width: WidthProperty<string | number>;
         style: string;
-        radius: Unit;
+        radius: BorderRadiusProperty<string | number>;
     };
     hover: {
         fg: ColorHelper;

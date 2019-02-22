@@ -10,8 +10,6 @@ export const globalVariables = (theme?: object) => {
     const colorPrimary = color("#0291db");
     const themeVars = componentThemeVariables(theme, "globalVariables");
 
-    const baseUnit = 6;
-
     const utility = {
         "percentage.third": percent(100 / 3),
         "percentage.nineSixteenths": percent((9 / 16) * 100),
@@ -154,7 +152,6 @@ export const globalVariables = (theme?: object) => {
     };
 
     return {
-        baseUnit,
         utility,
         elementaryColors,
         mainColors,

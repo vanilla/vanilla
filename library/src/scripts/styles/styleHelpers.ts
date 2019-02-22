@@ -208,7 +208,7 @@ const spinnerLoaderAnimation = keyframes({
 });
 
 export const spinnerLoader = (
-    spinnerColor: string = vars.mainColors.primary.toString(),
+    spinnerColor: ColorHelper = vars.mainColors.primary,
     dimensions = px(18),
     thicknesss = px(3),
     speed = "0.7s",
@@ -223,16 +223,10 @@ export const spinnerLoader = (
         width: dimensions,
         height: dimensions,
         borderRadius: percent(50),
-        borderTop: `${thicknesss} solid ${color(spinnerColor).toString()}`,
-        borderRight: `${thicknesss} solid ${color(spinnerColor)
-            .fade(0.3)
-            .toString()}`,
-        borderBottom: `${thicknesss} solid ${color(spinnerColor)
-            .fade(0.3)
-            .toString()}`,
-        borderLeft: `${thicknesss} solid ${color(spinnerColor)
-            .fade(0.3)
-            .toString()}`,
+        borderTop: `${thicknesss} solid ${spinnerColor.toString()}`,
+        borderRight: `${thicknesss} solid ${spinnerColor.fade(0.3).toString()}`,
+        borderBottom: `${thicknesss} solid ${spinnerColor.fade(0.3).toString()}`,
+        borderLeft: `${thicknesss} solid ${spinnerColor.fade(0.3).toString()}`,
         transform: "translateZ(0)",
         animation: `spillerLoader ${speed} infinite ease-in-out`,
         animationName: spinnerLoaderAnimation,

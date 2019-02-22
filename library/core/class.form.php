@@ -443,15 +443,17 @@ class Gdn_Form extends Gdn_Pluggable {
      *
      *   Attribute     Options                        Default
      *   ------------------------------------------------------------------------
-     *   Value         The ID of the category that    FALSE
-     *                 is selected.
-     *   IncludeNull   Include a blank row?           TRUE
-     *   Context       A set of categories to         []
-     *                 interset with the CategoryData
-     *                 that is relative to the category
-     *                 we're in.
-     *   CategoryData  Custom set of categories to    CategoryModel::categories()
-     *                 display.
+     *   Value          The ID of the category that    FALSE
+     *                  is selected.
+     *   IncludeNull    Include a blank row?           TRUE
+     *   Context        A set of categories to         []
+     *                  interset with the CategoryData
+     *                  that is relative to the category
+     *                  we're in.
+     *   CategoryData   Custom set of categories to    CategoryModel::categories()
+     *                  display.
+     *   Headings       Whether or not do display headings.
+     *   EnableHeadings Whether or not headings should be enabled for selection.
      *
      * @return string
      */
@@ -558,11 +560,13 @@ class Gdn_Form extends Gdn_Pluggable {
         // browser will auto-select the first disabled option.
         $forceCleanSelection = ($doHeadings && !$hasValue && !$includeNull);
 
-        // Write out the category options
+        // Write out the category options.
+        $enableHeadings = $options['EnableHeadings'] ?? false;
         if (is_array($safeCategoryData)) {
             foreach ($safeCategoryData as $categoryID => $category) {
                 $depth = val('Depth', $category, 0);
-                $disabled = (($depth == 1 && $doHeadings) || !$category['AllowDiscussions'] || val('DisplayAs', $category) != 'Discussions');
+                $isHeading = ($depth == 1 && $doHeadings) || val('DisplayAs', $category) === 'Heading';
+                $disabled = ($isHeading && !$enableHeadings) && (!$category['AllowDiscussions'] || val('DisplayAs', $category) != 'Discussions');
                 $selected = in_array($categoryID, $value) && $hasValue;
                 if ($forceCleanSelection && $depth > 1) {
                     $selected = true;

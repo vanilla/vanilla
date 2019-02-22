@@ -4,7 +4,6 @@
  * @license GPL-2.0-only
  */
 
-use Gdn_Request;
 use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
@@ -90,7 +89,7 @@ class ThemesApiController extends AbstractApiController {
             "header" => "text/html",
             "javascript" => "application/javascript",
             "scripts" => "application/json",
-            "styles" => "application/json",
+            "styles" => "text/css",
             "variables" => "application/json",
         ];
         $basename = pathinfo($assetKey, PATHINFO_FILENAME);
@@ -230,6 +229,7 @@ class ThemesApiController extends AbstractApiController {
      * Get all theme assets
      *
      * @param Addon $theme
+     * @param array $assets
      * @return array
      */
     private function normalizeTheme(Addon $theme, array $assets): array {

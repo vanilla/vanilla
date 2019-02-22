@@ -43,6 +43,7 @@ import { style, keyframes } from "typestyle";
 import { TLength } from "typestyle/lib/types";
 import { borderRadius } from "react-select/lib/theme";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { ColorHelperAndTransparent } from "@library/styles/buttonStyles";
 
 export function flexHelper() {
     const middle = (wrap = false) => {
@@ -146,10 +147,10 @@ export const getColorDependantOnLightness = (
 
     if (referenceColor.lightness() >= 0.5 || flip) {
         // Lighten color
-        return colorToModify.mix(color("#000"), 1 - weight);
+        return colorToModify.mix(color("#000"), 1 - weight) as ColorHelper;
     } else {
         // Darken color
-        return colorToModify.mix(color("#fff"), 1 - weight);
+        return colorToModify.mix(color("#fff"), 1 - weight) as ColorHelper;
     }
 };
 
@@ -162,7 +163,7 @@ export const componentThemeVariables = (theme: any | undefined, componentName: s
     // const themeVars = get(theme, componentName, {});
     const themeVars = (theme && theme[componentName]) || {};
 
-    const subComponentStyles = (subElementName: string) => {
+    const subComponentStyles = (subElementName: string): object => {
         return (themeVars && themeVars[subElementName]) || {};
         // return get(themeVars, subElementName, {});
     };
@@ -272,7 +273,8 @@ export const paddings = (styles: IPaddings) => {
 export interface ISpinnerProps {
     color?: ColorHelper;
     dimensions?: string | number;
-    thicknesss?: string | number;
+    thickness?: string | number;
+    size?: string | number;
     speed?: string;
 }
 
@@ -285,7 +287,6 @@ export const spinnerLoader = (props: ISpinnerProps) => {
         speed: "0.7s",
         ...props,
     };
-    const mainColor = spinnerVars.color;
     return {
         ...debug.name("spinner"),
         position: "relative" as PositionProperty,
@@ -295,10 +296,10 @@ export const spinnerLoader = (props: ISpinnerProps) => {
         width: unit(spinnerVars.size),
         height: unit(spinnerVars.size),
         borderRadius: percent(50),
-        borderTop: `${unit(spinnerVars.thickness)} solid ${mainColor.toString()}`,
-        borderRight: `${unit(spinnerVars.thickness)} solid ${mainColor.fade(0.3).toString()}`,
-        borderBottom: `${unit(spinnerVars.thickness)} solid ${mainColor.fade(0.3).toString()}`,
-        borderLeft: `${unit(spinnerVars.thickness)} solid ${mainColor.fade(0.3).toString()}`,
+        borderTop: `${unit(spinnerVars.thickness)} solid ${spinnerVars.color.toString()}`,
+        borderRight: `${unit(spinnerVars.thickness)} solid ${spinnerVars.color.fade(0.3).toString()}`,
+        borderBottom: `${unit(spinnerVars.thickness)} solid ${spinnerVars.color.fade(0.3).toString()}`,
+        borderLeft: `${unit(spinnerVars.thickness)} solid ${spinnerVars.color.fade(0.3).toString()}`,
         transform: "translateZ(0)",
         animation: `spillerLoader ${spinnerVars.speed} infinite ease-in-out`,
         animationName: spinnerLoaderAnimation,
@@ -444,14 +445,8 @@ export const objectFitWithFallback = () => {
     };
 };
 
-const toStringColor = (colorValue: ColorHelper | "transparent") => {
-    if (typeof colorValue === "string") {
-        return colorValue;
-    } else if (colorValue instanceof ColorHelper) {
-        return colorValue.toString();
-    } else {
-        throw Error("Invalid color value");
-    }
+export const toStringColor = (colorValue: ColorHelper | "transparent") => {
+    return typeof colorValue === "string" ? colorValue : colorValue.toString();
 };
 
 export interface ILinkStates {

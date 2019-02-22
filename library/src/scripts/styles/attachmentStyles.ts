@@ -128,7 +128,7 @@ export function attachmentClasses(theme?: object) {
     const format = style({
         flexBasis: px(globalVars.icon.sizes.small + vars.padding.default),
         height: unit(globalVars.icon.sizes.small),
-        paddingRight: unit(vars.padding.small),
+        paddingRight: unit(vars.padding.default),
         flexShrink: 1,
         ...debug.name("format"),
     });

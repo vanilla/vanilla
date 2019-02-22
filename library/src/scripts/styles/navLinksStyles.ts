@@ -15,6 +15,7 @@ export function navLinksVariables(theme?: object) {
     const globalVars = globalVariables(theme);
 
     const linksWithHeadings = {
+        padding: 16,
         ...themeVars.subComponentStyles("linksWithHeadings"),
     };
 

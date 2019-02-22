@@ -30,16 +30,16 @@ export const globalVariables = (theme?: object) => {
         ...themeVars.subComponentStyles("mainColors"),
     };
 
-    const mixBgAndFg = weight => {
-        return mainColors.fg.mix(mainColors.bg, weight);
+    const mixBgAndFg = (weight: number) => {
+        return mainColors.fg.mix(mainColors.bg, weight) as ColorHelper;
     };
 
-    const mixPrimaryAndFg = weight => {
-        return mainColors.primary.mix(mainColors.fg, weight);
+    const mixPrimaryAndFg = (weight: number) => {
+        return mainColors.primary.mix(mainColors.fg, weight) as ColorHelper;
     };
 
-    const mixPrimaryAndBg = weight => {
-        return mainColors.primary.mix(mainColors.bg, weight);
+    const mixPrimaryAndBg = (weight: number) => {
+        return mainColors.primary.mix(mainColors.bg, weight) as ColorHelper;
     };
 
     const errorFg = color("#ff3933");

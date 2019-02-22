@@ -47,8 +47,12 @@ export default class SubcommunityTile extends React.Component<IProps> {
                                 ? this.props.fallbackIcon
                                 : knowledgeBaseNoIcon(classes.fallBackIcon))}
                     </div>
-                    <H className="subcommunityTile-title">{title}</H>
-                    {description && <Paragraph className="subcommunityTile-description">{description}</Paragraph>}
+                    <H className={classNames("subcommunityTile-title", classes.title)}>{title}</H>
+                    {description && (
+                        <Paragraph className={classNames("subcommunityTile-description", classes.description)}>
+                            {description}
+                        </Paragraph>
+                    )}
                 </SmartLink>
             </div>
         );

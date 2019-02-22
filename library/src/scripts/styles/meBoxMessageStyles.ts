@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borderStyles, componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
+import { borderStyles, componentThemeVariables, debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc, percent, quote } from "csx";
@@ -54,7 +54,7 @@ export function meBoxMessageClasses(theme?: object) {
         color: "inherit",
         $nest: {
             "&:active, &:focus, &:hover, &.focus-visible": {
-                backgroundColor: globalVars.states.active.color,
+                backgroundColor: toStringColor(globalVars.states.active.color),
                 textDecoration: "none",
             },
         },

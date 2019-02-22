@@ -15,10 +15,11 @@ import {
     srOnly,
     disabledInput,
     flexHelper,
+    toStringColor,
 } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { important, percent, px } from "csx";
+import { em, important, percent, px } from "csx";
 
 export function checkRadioVariables(theme?: object) {
     const globalVars = globalVariables(theme);
@@ -36,6 +37,7 @@ export function checkRadioVariables(theme?: object) {
         fg: globalVars.mainColors.bg,
         bg: globalVars.mainColors.bg,
         checked: {
+            fg: globalVars.elementaryColors.white,
             bg: globalVars.mainColors.primary,
         },
         hover: {
@@ -106,7 +108,7 @@ export function checkRadioClasses(theme?: object) {
                         },
                     },
                     "& .radioButton-disk, & .checkbox-box": {
-                        backgroundColor: vars.main.hover.bg,
+                        backgroundColor: vars.main.hover.bg.toString(),
                     },
                 },
             },
@@ -144,9 +146,9 @@ export function checkRadioClasses(theme?: object) {
         display: "inline-block",
         width: unit(vars.sizing.width),
         height: unit(vars.sizing.width),
-        verticalAlign: "-0.18em",
+        verticalAlign: em(-0.18),
         cursor: "pointer",
-        backgroundColor: vars.main.bg,
+        backgroundColor: toStringColor(vars.main.bg),
         ...borderStyles(vars.border),
     });
 
@@ -179,7 +181,7 @@ export function checkRadioClasses(theme?: object) {
     const state = style({
         ...debug.name("state"),
         ...absolutePosition.fullSizeOfParent(),
-        color: vars.main.checked.fg,
+        color: vars.main.checked.fg.toString(),
     });
 
     const diskIcon = style({
@@ -205,7 +207,7 @@ export function checkRadioClasses(theme?: object) {
             "&:checked + .radioButton-disk, &:checked + .checkbox-box": {
                 ...debug.name("checked"),
                 backgroundColor: important(vars.main.checked.bg.toString()),
-                borderColor: vars.main.checked.bg.toString(),
+                borderColor: vars.main.checked.fg.toString(),
                 $nest: {
                     "& .radioButton-diskIcon, & .checkbox-checkIcon": {
                         display: "block",

@@ -12,9 +12,12 @@ import {
     componentThemeVariables,
     debugHelper,
     flexHelper,
-    getColorDependantOnLightness,
     spinnerLoader,
+    toStringColor,
+    unit,
 } from "@library/styles/styleHelpers";
+import { BorderColorProperty, BorderRadiusProperty, BorderStyleProperty, WidthProperty } from "csstype";
+import { TLength } from "typestyle/lib/types";
 
 export function buttonStyles(theme?: object) {
     const globalVars = globalVariables(theme);
@@ -39,35 +42,37 @@ export function buttonStyles(theme?: object) {
     return { padding, sizing, border };
 }
 
+export type ColorHelperAndTransparent = ColorHelper | "transparent";
+
 export interface IButtonType {
-    fg: string;
-    bg: string;
+    fg: ColorHelperAndTransparent;
+    bg: ColorHelperAndTransparent;
     spinnerColor: ColorHelper;
     border: {
-        color: string;
-        width: string;
-        style: string;
-        radius: string;
+        color: ColorHelperAndTransparent;
+        width: WidthProperty<TLength>;
+        style: BorderStyleProperty;
+        radius: BorderRadiusProperty<TLength>;
     };
     hover: {
-        fg: string;
-        bg: string;
-        borderColor: string;
+        fg: ColorHelperAndTransparent;
+        bg: ColorHelperAndTransparent;
+        borderColor: ColorHelperAndTransparent;
     };
     focus: {
-        fg: string;
-        bg: string;
-        borderColor: string;
+        fg: ColorHelperAndTransparent;
+        bg: ColorHelperAndTransparent;
+        borderColor: ColorHelperAndTransparent;
     };
     active: {
-        fg: string;
-        bg: string;
-        borderColor: string;
+        fg: ColorHelperAndTransparent;
+        bg: ColorHelperAndTransparent;
+        borderColor: ColorHelperAndTransparent;
     };
     focusAccessible: {
-        fg: string;
-        bg: string;
-        borderColor: string;
+        fg: ColorHelperAndTransparent;
+        bg: ColorHelperAndTransparent;
+        borderColor: ColorHelperAndTransparent;
     };
 }
 
@@ -76,110 +81,101 @@ export function buttonVariables(theme?: object) {
     const themeVars = componentThemeVariables(theme, "button");
 
     const standard: IButtonType = {
-        fg: globalVars.mainColors.fg.toString(),
-        bg: globalVars.mainColors.bg.toString(),
+        fg: globalVars.mainColors.fg,
+        bg: globalVars.mainColors.bg,
         spinnerColor: globalVars.mainColors.primary,
         border: {
-            color: globalVars.mixBgAndFg(0.24).toString(),
+            color: globalVars.mixBgAndFg(0.24),
             width: px(1),
             style: "solid",
             radius: globalVars.border.radius,
         },
         hover: {
-            color: globalVars.mainColors.fg.toString(),
-            backgroundColor: globalVars.mainColors.bg.darken(0.1).toString(),
-            borderColor: globalVars
-                .mixBgAndFg(0.4)
-                .darken(0.1)
-                .toString(),
+            fg: globalVars.mainColors.fg,
+            bg: globalVars.mainColors.bg.darken(0.1),
+            borderColor: globalVars.mixBgAndFg(0.4).darken(0.1),
         },
         active: {
-            color: globalVars.mainColors.fg.toString(),
-            backgroundColor: globalVars.mainColors.bg.darken(0.1).toString(),
-            borderColor: globalVars
-                .mixBgAndFg(0.4)
-                .darken(0.1)
-                .toString(),
+            fg: globalVars.mainColors.fg,
+            bg: globalVars.mainColors.bg.darken(0.1),
+            borderColor: globalVars.mixBgAndFg(0.4).darken(0.1),
         },
         focus: {
-            color: globalVars.mainColors.fg.toString(),
-            backgroundColor: globalVars.mainColors.bg.darken(0.1).toString(),
-            borderColor: globalVars
-                .mixBgAndFg(0.8)
-                .darken(0.1)
-                .toString(),
+            fg: globalVars.mainColors.fg,
+            bg: globalVars.mainColors.bg.darken(0.1),
+            borderColor: globalVars.mixBgAndFg(0.8).darken(0.1),
         },
         focusAccessible: {
-            color: globalVars.mainColors.fg.toString(),
-            backgroundColor: globalVars.mainColors.bg.darken(0.3).toString(),
-            borderColor: globalVars.mainColors.bg.darken(1).toString(),
+            fg: globalVars.mainColors.fg,
+            bg: globalVars.mainColors.bg.darken(0.3),
+            borderColor: globalVars.mainColors.bg.darken(1),
         },
         ...themeVars.subComponentStyles("basic"),
     };
 
     const primary: IButtonType = {
-        fg: globalVars.elementaryColors.white.toString(),
-        bg: globalVars.mainColors.primary.toString(),
+        fg: globalVars.elementaryColors.white,
+        bg: globalVars.mainColors.primary,
         spinnerColor: globalVars.elementaryColors.white,
         border: {
-            color: globalVars.mainColors.primary.toString(),
+            color: globalVars.mainColors.primary,
             width: px(1),
             style: "solid",
             radius: globalVars.border.radius,
         },
         hover: {
-            color: globalVars.elementaryColors.white.toString(),
-            backgroundColor: globalVars.mainColors.secondary.toString(),
-            borderColor: globalVars.mainColors.primary.toString(),
+            fg: globalVars.elementaryColors.white,
+            bg: globalVars.mainColors.secondary,
+            borderColor: globalVars.mainColors.primary,
         },
         active: {
-            color: globalVars.elementaryColors.white.toString(),
-            backgroundColor: globalVars.mainColors.secondary.toString(),
-            borderColor: globalVars.mainColors.primary.toString(),
+            fg: globalVars.elementaryColors.white,
+            bg: globalVars.mainColors.secondary,
+            borderColor: globalVars.mainColors.primary,
         },
         focus: {
-            color: globalVars.elementaryColors.white.toString(),
-            backgroundColor: globalVars.mainColors.secondary.toString(),
-            borderColor: globalVars.mainColors.primary.toString(),
+            fg: globalVars.elementaryColors.white,
+            bg: globalVars.mainColors.secondary,
+            borderColor: globalVars.mainColors.primary,
         },
         focusAccessible: {
-            color: globalVars.elementaryColors.white.toString(),
-            backgroundColor: globalVars.mainColors.secondary.toString(),
-            borderColor: globalVars.mainColors.primary.toString(),
+            fg: globalVars.elementaryColors.white,
+            bg: globalVars.mainColors.secondary,
+            borderColor: globalVars.mainColors.primary,
         },
         ...themeVars.subComponentStyles("primary"),
     };
 
     const transparentButtonColor = globalVars.mainColors.bg;
     const transparent: IButtonType = {
-        fg: transparentButtonColor.toString(),
+        fg: transparentButtonColor,
         bg: "transparent",
         spinnerColor: globalVars.mainColors.primary,
         border: {
-            color: transparentButtonColor.toString(),
+            color: transparentButtonColor,
             width: px(1),
             style: "solid",
             radius: globalVars.border.radius,
         },
         hover: {
-            color: transparentButtonColor.toString(),
-            backgroundColor: globalVars.elementaryColors.white.fade(0.1).toString(),
-            borderColor: transparentButtonColor.toString(),
+            fg: transparentButtonColor,
+            bg: globalVars.elementaryColors.white.fade(0.1),
+            borderColor: transparentButtonColor,
         },
         active: {
-            color: transparentButtonColor.toString(),
-            backgroundColor: globalVars.elementaryColors.white.fade(0.1).toString(),
-            borderColor: transparentButtonColor.toString(),
+            fg: transparentButtonColor,
+            bg: globalVars.elementaryColors.white.fade(0.1),
+            borderColor: transparentButtonColor,
         },
         focus: {
-            color: transparentButtonColor.toString(),
-            backgroundColor: globalVars.elementaryColors.white.fade(0.1).toString(),
-            borderColor: transparentButtonColor.toString(),
+            fg: transparentButtonColor,
+            bg: globalVars.elementaryColors.white.fade(0.1),
+            borderColor: transparentButtonColor,
         },
         focusAccessible: {
-            color: transparentButtonColor.toString(),
-            backgroundColor: globalVars.elementaryColors.white.fade(0.5).toString(),
-            borderColor: transparentButtonColor.toString(),
+            fg: transparentButtonColor,
+            bg: globalVars.elementaryColors.white.fade(0.5),
+            borderColor: transparentButtonColor,
         },
         ...themeVars.subComponentStyles("transparent"),
     };
@@ -229,12 +225,12 @@ export function generateButtonClass(
         minWidth: vars.sizing.minWidth,
         userSelect: "none",
         cursor: "pointer",
-        color: buttonType.fg,
-        backgroundColor: buttonType.bg,
-        borderColor: buttonType.border.color,
-        borderRadius: buttonType.border.radius,
+        color: buttonType.fg.toString(),
+        backgroundColor: buttonType.bg.toString(),
+        borderColor: buttonType.border.color.toString(),
+        borderRadius: unit(buttonType.border.radius),
         borderStyle: buttonType.border.style,
-        borderWidth: buttonType.border.width,
+        borderWidth: unit(buttonType.border.width),
         $nest: {
             "&:not([disabled])": {
                 $nest: {
@@ -243,27 +239,27 @@ export function generateButtonClass(
                     },
                     "&:hover": {
                         zIndex,
-                        backgroundColor: buttonType.hover.bg,
-                        borderColor: buttonType.hover.borderColor,
-                        color: buttonType.hover.fg,
+                        backgroundColor: buttonType.hover.bg.toString(),
+                        borderColor: buttonType.hover.borderColor.toString(),
+                        color: buttonType.hover.fg.toString(),
                     },
                     "&:focus": {
                         zIndex,
-                        backgroundColor: buttonType.focus.bg,
-                        borderColor: buttonType.focus.borderColor,
-                        color: buttonType.focus.fg,
+                        backgroundColor: buttonType.focus.bg.toString(),
+                        borderColor: buttonType.focus.borderColor.toString(),
+                        color: buttonType.focus.fg.toString(),
                     },
                     "&:active": {
                         zIndex,
-                        backgroundColor: buttonType.active.bg,
-                        borderColor: buttonType.active.borderColor,
-                        color: buttonType.active.fg,
+                        backgroundColor: buttonType.active.bg.toString(),
+                        borderColor: buttonType.active.borderColor.toString(),
+                        color: buttonType.active.fg.toString(),
                     },
                     "&.focus-visible": {
                         zIndex,
-                        backgroundColor: buttonType.focus.bg,
-                        borderColor: buttonType.focus.borderColor,
-                        color: buttonType.focus.fg,
+                        backgroundColor: buttonType.focus.bg.toString(),
+                        borderColor: buttonType.focus.borderColor.toString(),
+                        color: buttonType.focus.fg.toString(),
                     },
                 },
             },

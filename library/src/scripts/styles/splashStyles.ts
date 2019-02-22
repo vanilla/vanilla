@@ -30,6 +30,7 @@ export function splashVariables(theme?: object) {
         fontSize: globalVars.fonts.size.title,
         textAlign: "center",
         fontWeight: globalVars.fonts.weights.semiBold,
+        textShadow: `0 1px 25px ${elementaryColor.black.fade(0.5).toString()}`,
         marginTop: 28,
         marginBottom: 40,
         ...themeVars.subComponentStyles("title"),

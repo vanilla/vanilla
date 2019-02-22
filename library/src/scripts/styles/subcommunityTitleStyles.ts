@@ -38,11 +38,12 @@ export function subcommunityTileVariables(theme?: object) {
     const title = {
         fontSize: globalVars.fonts.size.large as FontSizeProperty<TLength>,
         lineHeight: globalVars.lineHeights.condensed,
+        marginBottom: 6,
         ...themeVars.subComponentStyles("title"),
     };
 
     const description = {
-        fontSize: globalVars.fonts.size.large as FontSizeProperty<TLength>,
+        fontSize: globalVars.fonts.size.medium as FontSizeProperty<TLength>,
         marginTop: 6,
         lineHeight: globalVars.lineHeights.excerpt,
         ...themeVars.subComponentStyles("description"),
@@ -142,6 +143,7 @@ export function subcommunityTileClasses(theme?: object) {
         fontSize: unit(vars.title.fontSize),
         lineHeight: vars.title.lineHeight,
         textAlign: "center",
+        marginBottom: unit(vars.title.marginBottom),
         ...debug.name("title"),
     });
 

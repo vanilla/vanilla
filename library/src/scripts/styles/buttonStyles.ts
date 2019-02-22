@@ -145,7 +145,7 @@ export function buttonVariables(theme?: object) {
     const transparentButtonColor = globalVars.mainColors.bg;
     const transparent: IButtonType = {
         fg: transparentButtonColor,
-        bg: color("transparent"),
+        bg: "transparent" as any, // Cast because otherwise it turns if you wrap it in `color()`.
         spinner: globalVars.mainColors.primary,
         border: {
             color: transparentButtonColor,

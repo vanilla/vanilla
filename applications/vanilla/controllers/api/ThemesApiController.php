@@ -131,9 +131,6 @@ class ThemesApiController extends AbstractApiController {
             Schema::parse([
                 'type:s',
                 'themeID:s',
-                'version:s',
-                'parentTheme:s|n' => ['enum' => $this->getAllThemes()],
-                'parentVersion:s|n',
                 'logos:s?',
                 'mobileLogo:s?',
                 'assets?' => $this->assetsSchema()
@@ -220,9 +217,7 @@ class ThemesApiController extends AbstractApiController {
         $res = [
             'type' => 'themeFile',
             'themeID' => $theme->getInfoValue('key'),
-            'parentTheme' => null,
             'version' => $theme->getInfoValue('version'),
-            'parentVersion' => null,
             'logos' => $theme->getInfoValue('logos'),
             'mobileLogo' => $theme->getInfoValue('mobileLogo'),
         ];

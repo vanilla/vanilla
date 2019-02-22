@@ -209,12 +209,6 @@ components:
           type: string
         mobileLogo:
           type: string
-        parentTheme:
-          type: string
-          nullable: true
-        parentVersion:
-          type: string
-          nullable: true
         type:
           type: string
           enum:
@@ -225,8 +219,6 @@ components:
           type: string
       required:
         - assets
-        - parentTheme
-        - parentVersion
         - type
         - themeID
         - version

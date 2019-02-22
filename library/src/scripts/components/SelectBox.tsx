@@ -15,6 +15,7 @@ import DropDown from "@library/components/dropdown/DropDown";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import Frame from "@library/components/frame/Frame";
 import FrameBody from "@library/components/frame/FrameBody";
+import { selectBoxClasses } from "@library/styles/selectBoxStyles";
 
 export interface ISelectBoxItem {
     name: string;
@@ -83,6 +84,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
     };
 
     public render() {
+        const classes = selectBoxClasses();
         const selectItems = this.props.children.map((child, i) => {
             const selected = this.state.selectedIndex === i;
             return (

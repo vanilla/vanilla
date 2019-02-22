@@ -14,6 +14,7 @@ import { t } from "@library/application";
 import SearchOption from "@library/components/search/SearchOption";
 import { searchClasses } from "@library/styles/searchStyles";
 import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
+import { searchBarClasses } from "@library/styles/searchBarStyles";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
@@ -45,6 +46,7 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
 
     public render() {
         const classes = searchClasses();
+        const classesSearchBar = searchBarClasses();
         const buttons = buttonClasses();
         return (
             <div className={classNames(classes.root, this.props.className)}>
@@ -66,7 +68,7 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
                     className={classes.root}
                     isBigInput={this.props.isLarge}
                 />
-                <div ref={this.resultsRef} className="search-results" />
+                <div ref={this.resultsRef} className={classNames("search-results", classesSearchBar.results)} />
             </div>
         );
     }

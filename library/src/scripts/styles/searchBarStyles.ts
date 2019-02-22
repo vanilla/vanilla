@@ -9,7 +9,7 @@ import { componentThemeVariables, debugHelper, unit } from "@library/styles/styl
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
-import { calc, important, percent } from "csx";
+import { calc, important, percent, px } from "csx";
 import { buttonVariables } from "@library/styles/buttonStyles";
 
 export function searchBarVariables(theme?: object) {
@@ -51,21 +51,46 @@ export function searchBarClasses(theme?: object) {
     const vanillaHeaderVars = vanillaHeaderVariables(theme);
     const debug = debugHelper("attachment");
     const buttonVars = buttonVariables(theme);
+    const formElementVars = formElementsVariables(theme);
 
     const root = style({
         ...debug.name(),
         cursor: "pointer",
-
         $nest: {
-            ".suggestedTextInput-inputText": {
+            "& .suggestedTextInput-inputText": {
                 borderTopRightRadius: 0,
                 borderBottomRightRadius: 0,
+                $nest: {
+                    "&.inputText": {
+                        paddingTop: 0,
+                        paddingBottom: 0,
+                    },
+                },
             },
-            ".searchBar__placeholder": {
+
+            "& .suggestedTextInput-clear": {
+                $nest: {
+                    "&, &.buttonIcon": {
+                        border: "none",
+                        boxShadow: "none",
+                        color: globalVars.mainColors.primary.toString(),
+                    },
+                },
+            },
+
+            "& .searchBar__placeholder": {
                 color: vars.placeholder.color.toString(),
                 margin: "auto",
             },
-            ".searchBar-submitButton": {
+
+            "& .suggestedTextInput-valueContainer": {
+                $nest: {
+                    ".inputBlock-inputText": {
+                        height: "auto",
+                    },
+                },
+            },
+            "& .searchBar-submitButton": {
                 position: "relative",
                 borderTopLeftRadius: 0,
                 borderBottomLeftRadius: 0,
@@ -78,7 +103,7 @@ export function searchBarClasses(theme?: object) {
                     },
                 },
             },
-            ".searchBar__control": {
+            "& .searchBar__control": {
                 display: "flex",
                 flex: 1,
                 border: 0,
@@ -98,7 +123,7 @@ export function searchBarClasses(theme?: object) {
                     },
                 },
             },
-            ".searchBar__value-container": {
+            "& .searchBar__value-container": {
                 overflow: "auto",
                 $nest: {
                     "& > div": {
@@ -106,10 +131,10 @@ export function searchBarClasses(theme?: object) {
                     },
                 },
             },
-            ".searchBar__indicators": {
+            "& .searchBar__indicators": {
                 display: "none",
             },
-            ".searchBar__input": {
+            "& .searchBar__input": {
                 width: percent(100),
                 display: important("block"),
                 $nest: {
@@ -119,10 +144,47 @@ export function searchBarClasses(theme?: object) {
                     },
                 },
             },
-            ".searchBar__menu-list": {
+            "& .searchBar__menu-list": {
                 maxHeight: calc(`100vh - ${unit(vanillaHeaderVars.sizing.height)}`),
             },
         },
+    });
+
+    const results = style({
+        $nest: {
+            ".suggestedTextInput__placeholder": {
+                color: formElementVars.placeholder.color.toString(),
+            },
+            ".suggestedTextInput-noOptions": {
+                padding: px(12),
+            },
+            ".suggestedTextInput-option": {
+                width: percent(100),
+                padding: px(12),
+                textAlign: "left",
+                display: "block",
+                color: "inherit",
+                $nest: {
+                    "&:hover, &:focus, &.isFocused": {
+                        color: "inherit",
+                        backgroundColor: globalVars.states.hover.color.toString(),
+                    },
+                },
+            },
+            ".suggestedTextInput-menu": {
+                borderRadius: unit(globalVars.border.radius),
+                marginTop: unit(-formElementVars.border.width),
+                marginBottom: unit(-formElementVars.border.width),
+            },
+            ".suggestedTextInput-item": {
+                $nest: {
+                    "& + .suggestedTextInput-item": {
+                        borderTop: `solid 1px ${globalVars.border.color.toString()}`,
+                    },
+                },
+            },
+        },
+        ...debug.name("results"),
     });
 
     const valueContainer = style({
@@ -222,5 +284,6 @@ export function searchBarClasses(theme?: object) {
         heading,
         iconContainer,
         icon,
+        results,
     };
 }

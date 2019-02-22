@@ -24,8 +24,8 @@ export interface ICompactSearchProps extends IWithSearchProps, RouteComponentPro
     onCloseSuggestions?: () => void;
     buttonContentClass?: string;
     cancelContentClassName?: string;
-    theme?: object;
     isLarge?: boolean;
+    theme?: object;
 }
 
 interface IState {
@@ -44,8 +44,8 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
     };
 
     public render() {
-        const classes = searchClasses(this.props.theme);
-        const buttons = buttonClasses(this.props.theme);
+        const classes = searchClasses();
+        const buttons = buttonClasses();
         return (
             <div className={classNames(classes.root, this.props.className)}>
                 <SearchBar

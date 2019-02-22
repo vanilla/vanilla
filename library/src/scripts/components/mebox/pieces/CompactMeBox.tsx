@@ -27,7 +27,6 @@ import { compactMeBoxClasses } from "@library/styles/compactMeBoxStyles";
 export interface IUserDropDownProps extends IInjectableUserState, IMeBoxProps {
     buttonClass?: string;
     userPhotoClass?: string;
-    theme?: object;
 }
 
 interface IState {
@@ -52,7 +51,7 @@ export default class CompactMeBox extends React.Component<IUserDropDownProps, IS
             countUnreadNotifications: 0,
         });
 
-        const classes = compactMeBoxClasses(this.props.theme);
+        const classes = compactMeBoxClasses();
         const countClass = this.props.countsClass;
         const buttonClass = this.props.buttonClass;
         const panelContentClass = classNames("compactMeBox-panel", classes.panel);

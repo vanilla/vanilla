@@ -13,7 +13,6 @@ import { simplePagerClasses } from "@library/styles/simplePagerStyles";
 interface IProps {
     url: string;
     pages: ILinkPages;
-    theme?: object;
 }
 
 /**
@@ -24,7 +23,7 @@ export default class SimplePager extends React.Component<IProps> {
         const { next, prev } = this.props.pages;
         const buttons = [] as JSX.Element[];
         const isSingle = (prev && !next) || (!prev && next);
-        const classes = simplePagerClasses(this.props.theme);
+        const classes = simplePagerClasses();
 
         return (
             <div className={classNames("simplePager", classes.root)}>

@@ -24,7 +24,7 @@ import DropDownItemLinkWithCount from "@library/components/dropdown/items/DropDo
 import Permission from "@library/users/Permission";
 import classNames from "classnames";
 import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
-import { meBoxClasses } from "@library/styles/meBoxStyles";
+import { userDropDownClasses } from "@library/styles/userDropDownStyles";
 
 export interface IUserDropDownProps extends IInjectableUserState {
     className?: string;
@@ -32,7 +32,6 @@ export interface IUserDropDownProps extends IInjectableUserState {
     buttonClassName?: string;
     contentsClassName?: string;
     toggleContentClassName?: string;
-    theme?: object;
 }
 
 interface IState {
@@ -57,6 +56,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
         });
 
         const counts = dummyUserDropDownData;
+        const classes = userDropDownClasses();
 
         return (
             <DropDown
@@ -64,7 +64,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                 name={t("My Account")}
                 className={classNames("userDropDown", this.props.className)}
                 buttonClassName={classNames("vanillaHeader-account", this.props.buttonClassName)}
-                contentsClassName={classNames("userDropDown-contents", this.props.contentsClassName)}
+                contentsClassName={classNames("userDropDown-contents", this.props.contentsClassName, classes.contents)}
                 renderLeft={true}
                 buttonContents={
                     <div className={classNames("meBox-buttonContent", this.props.toggleContentClassName)}>

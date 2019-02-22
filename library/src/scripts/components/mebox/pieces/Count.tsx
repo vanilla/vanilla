@@ -13,7 +13,6 @@ export interface IProps {
     count?: number;
     label: string; // For accessibility, should be in the style of: "Notifications: "
     max?: number;
-    theme?: object;
 }
 
 /**
@@ -24,7 +23,7 @@ export default class Count extends React.Component<IProps> {
         const hasCount = !!this.props.count;
         const max = this.props.max || 99;
         const visibleCount = hasCount && this.props.count! < max ? this.props.count : `${max}+`;
-        const classes = countClasses(this.props.theme);
+        const classes = countClasses();
 
         return (
             <div className={classNames("count", this.props.className, classes.root)}>

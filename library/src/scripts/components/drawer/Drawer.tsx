@@ -17,7 +17,6 @@ export interface IDrawerProps {
     className?: string;
     disabled?: boolean;
     contentsClassName?: string;
-    theme?: object;
 }
 
 export interface IState {
@@ -39,7 +38,7 @@ export default class Drawer extends React.Component<IDrawerProps, IState> {
     public render() {
         const chevronRight = `▸`;
         const chevronDown = `▾`;
-        const classes = drawerClasses(this.props.theme);
+        const classes = drawerClasses();
         return (
             <div className={classNames("drawer", this.props.className, classes.root)}>
                 <Button

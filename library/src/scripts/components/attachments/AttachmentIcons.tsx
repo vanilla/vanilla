@@ -16,7 +16,6 @@ import classNames from "classnames";
 interface IProps {
     attachments: IAttachmentIcon[];
     maxCount?: number;
-    theme?: object;
 }
 
 /**
@@ -41,7 +40,7 @@ export default class AttachmentIcons extends React.Component<IProps> {
         if (this.attachmentsCount < 1) {
             return null;
         }
-        const classes = attachmentIconsClasses(this.props.theme);
+        const classes = attachmentIconsClasses();
         const attachments = this.renderAttachments(classes);
 
         if (attachments) {

@@ -20,7 +20,6 @@ interface IProps extends IFileAttachment {
     type: AttachmentType;
     size: number; // bytes
     progressEventEmitter?: ProgressEventEmitter;
-    theme?: object;
 }
 
 interface IState {
@@ -38,8 +37,8 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
     public render() {
         const { title, name, type } = this.props;
         const label = title || name;
-        const classes = attachmentClasses(this.props.theme);
-        const iconClasses = attachmentIconClasses(this.props.theme);
+        const classes = attachmentClasses();
+        const iconClasses = attachmentIconClasses();
         return (
             <div
                 className={classNames("attachment", "isLoading", this.props.className, FOCUS_CLASS, classes.root)}

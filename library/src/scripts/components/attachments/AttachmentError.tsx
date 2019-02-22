@@ -17,7 +17,6 @@ import { attachmentIconClasses } from "@library/styles/attachmentIconsStyles";
 
 interface IProps extends IFileAttachment {
     message: string;
-    theme?: object;
 }
 
 /**
@@ -33,8 +32,8 @@ export default class AttachmentError extends React.Component<IProps> {
 
         const [errorTitle, ...errorBodyMessages] = messages;
         const showFileName = label && errorBodyMessages.length === 0;
-        const classes = attachmentClasses(this.props.theme);
-        const iconClasses = attachmentIconClasses(this.props.theme);
+        const classes = attachmentClasses();
+        const iconClasses = attachmentIconClasses();
 
         return (
             <div

@@ -20,7 +20,6 @@ export interface IMeBoxProps extends IInjectableUserState {
     countsClass?: string;
     buttonClassName?: string;
     contentClassName?: string;
-    theme?: object;
 }
 
 /**
@@ -35,7 +34,7 @@ export default class MeBox extends React.Component<IMeBoxProps> {
             userID: null,
             photoUrl: null,
         });
-        const classes = meBoxClasses(this.props.theme);
+        const classes = meBoxClasses();
 
         return (
             <div className={classNames("meBox", this.props.className, classes.root)}>

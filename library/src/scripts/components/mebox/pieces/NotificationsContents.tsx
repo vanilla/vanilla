@@ -85,7 +85,7 @@ export class NotificationsContents extends React.Component<IProps> {
             // This is the height that it happens to be right now.
             // This will be calculated better once we finish the CSS in JS transition.
             const height = this.props.device === Devices.MOBILE ? 80 : 69;
-            const loaders = loaderClasses(this.props.theme);
+            const loaders = loaderClasses();
             return <Loader loaderStyleClass={loaders.fixedSizeLoader} height={height} minimumTime={0} padding={10} />;
         }
 
@@ -119,7 +119,6 @@ export class NotificationsContents extends React.Component<IProps> {
 interface IOwnProps extends INotificationsProps, IDeviceProps {
     className?: string;
     userSlug: string;
-    theme?: object;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;

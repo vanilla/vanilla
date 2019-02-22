@@ -20,7 +20,6 @@ interface IProps {
     className?: string;
     headingLevel?: 2 | 3 | 4 | 5 | 6;
     fallbackIcon?: React.ReactNode;
-    theme?: object;
 }
 
 /**
@@ -31,10 +30,10 @@ export default class SubcommunityTile extends React.Component<IProps> {
         headingLevel: 3,
     };
     public render() {
-        const { icon, title, description, url, className, iconAltText, headingLevel, theme } = this.props;
+        const { icon, title, description, url, className, iconAltText, headingLevel } = this.props;
         const H = `h${headingLevel}`;
         const alt = iconAltText ? iconAltText : `${t("Icon for: ")} ${this.props.title}`;
-        const classes = subcommunityTileClasses(theme);
+        const classes = subcommunityTileClasses();
         return (
             <div className={classNames("subcommunityTile", className, classes.root)}>
                 <SmartLink className={classNames("subcommunityTile-link", classes.link)} to={url}>

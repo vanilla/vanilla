@@ -72,7 +72,7 @@ export class MessagesContents extends React.Component<IProps> {
 
     private renderContents(): React.ReactNode {
         const { status, data } = this.props;
-        const classesLoader = loaderClasses(this.props.theme);
+        const classesLoader = loaderClasses();
         if (status !== LoadStatus.SUCCESS || !data) {
             // This is the height that it happens to be right now.
             // This will be calculated better once we finish the CSS in JS transition.
@@ -98,7 +98,6 @@ interface IOwnProps extends IDeviceProps {
     className?: string;
     countClass?: string;
     panelBodyClass?: string;
-    theme?: object;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;

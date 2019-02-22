@@ -32,7 +32,6 @@ export interface ICompactSearchProps extends IWithSearchProps, RouteComponentPro
     focusOnMount?: boolean;
     buttonContentClass?: string;
     cancelContentClassName?: string;
-    theme?: object;
 }
 
 interface IState {
@@ -53,8 +52,8 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
     };
 
     public render() {
-        const headerClasses = vanillaHeaderClasses(this.props.theme);
-        const classes = compactSearchClasses(this.props.theme);
+        const headerClasses = vanillaHeaderClasses();
+        const classes = compactSearchClasses();
         return (
             <div
                 ref={this.selfRef}

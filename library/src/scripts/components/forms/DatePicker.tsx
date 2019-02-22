@@ -23,7 +23,6 @@ interface IProps {
     inputClassName?: string;
     alignment: "left" | "right";
     disabledDays?: any; // See http://react-day-picker.js.org/examples/disabled
-    theme?: object;
 }
 
 interface IState {
@@ -58,7 +57,7 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
      */
     private renderReactInput() {
         const value = this.props.value ? moment(this.props.value).toDate() : undefined;
-        const classes = dayPickerClasses(this.props.theme);
+        const classes = dayPickerClasses();
         return (
             <div className={classNames(classes.root)}>
                 <DayPickerInput

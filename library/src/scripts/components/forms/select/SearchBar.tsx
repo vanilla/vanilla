@@ -59,7 +59,6 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     onCloseSuggestions?: () => void;
     buttonText?: string;
     disableAutocomplete?: boolean;
-    theme?: object;
 }
 
 interface IState {
@@ -103,7 +102,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const { className, disabled, isLoading, theme } = this.props;
+        const { className, disabled, isLoading } = this.props;
         return (
             <AsyncCreatableSelect
                 id={this.id}
@@ -237,9 +236,9 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * Overwrite for the Control component in react select
      * @param props
      */
-    private SearchControl = (props, theme?: object) => {
-        const buttonVars = buttonVariables(theme);
-        const classes = searchBarClasses(theme);
+    private SearchControl = props => {
+        const buttonVars = buttonVariables();
+        const classes = searchBarClasses();
         return (
             <div className={classNames("searchBar", classes.root)}>
                 <form className={classNames("searchBar-form", classes.form)} onSubmit={this.onFormSubmit}>

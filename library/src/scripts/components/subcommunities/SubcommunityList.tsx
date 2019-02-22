@@ -25,7 +25,6 @@ interface IProps {
     hiddenTitle?: boolean;
     emptyMessage: string;
     fallbackIcon?: React.ReactNode;
-    theme?: object;
 }
 
 /**
@@ -33,8 +32,8 @@ interface IProps {
  */
 export default class SubcommunityList extends React.Component<IProps> {
     public render() {
-        const { className, items, theme } = this.props;
-        const classes = subcommunityListClasses(theme);
+        const { className, items } = this.props;
+        const classes = subcommunityListClasses();
 
         if (items.length === 0) {
             return (

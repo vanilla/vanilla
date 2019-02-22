@@ -35,12 +35,10 @@ export interface IMeBoxMessageItem extends IMeBoxItem {
     authors: IUserFragment[];
     countMessages: number;
     type: MeBoxItemType.MESSAGE;
-    theme?: object;
 }
 
 export interface IMeBoxNotificationItem extends IMeBoxItem {
     type: MeBoxItemType.NOTIFICATION;
-    theme?: object;
 }
 
 type IProps = IMeBoxMessageItem | IMeBoxNotificationItem;
@@ -50,8 +48,8 @@ type IProps = IMeBoxMessageItem | IMeBoxNotificationItem;
  */
 export default class MeBoxDropDownItem extends React.Component<IProps> {
     public render() {
-        const { unread, message, timestamp, to, theme } = this.props;
-        const classesMeBoxMessage = meBoxMessageClasses(theme);
+        const { unread, message, timestamp, to } = this.props;
+        const classesMeBoxMessage = meBoxMessageClasses();
 
         let authors: JSX.Element[];
 

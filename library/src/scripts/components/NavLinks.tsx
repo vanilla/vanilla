@@ -21,7 +21,6 @@ interface IProps {
     url?: string;
     depth?: 1 | 2 | 3 | 4 | 5 | 6;
     accessibleViewAllMessage?: string;
-    theme?: object;
 }
 
 /**
@@ -31,7 +30,7 @@ export default class NavLinks extends Component<IProps> {
     public render() {
         if (this.props.items.length !== 0) {
             const viewAll = t("View All");
-            const classes = navLinksClasses(this.props.theme);
+            const classes = navLinksClasses();
             const contents = this.props.items.map((item, i) => {
                 return (
                     <li className={classNames("navLinks-item", classes.item)} key={i}>

@@ -17,7 +17,6 @@ interface IProps extends IOptionalComponentID {
     disabled?: boolean;
     onChange: any;
     label: string;
-    theme?: object;
 }
 
 interface IState {
@@ -44,7 +43,7 @@ export default class Checkbox extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const classes = checkRadioClasses(this.props.theme);
+        const classes = checkRadioClasses();
         return (
             <label id={this.state.id} className={classNames("checkbox", this.props.className, classes.root)}>
                 <input

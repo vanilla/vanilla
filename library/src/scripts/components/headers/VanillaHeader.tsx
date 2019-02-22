@@ -37,7 +37,6 @@ interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     title?: string; // Needed for mobile dropdown
     mobileDropDownContent?: React.ReactNode; // Needed for mobile dropdown
     isFixed?: boolean;
-    theme?: object;
 }
 
 interface IState {
@@ -72,7 +71,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
         const classes = vanillaHeaderClasses();
         const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
-        const classesMeBox = meBoxClasses(this.props.theme);
+        const classesMeBox = meBoxClasses();
 
         return ReactDOM.createPortal(
             <>

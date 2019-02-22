@@ -12,14 +12,13 @@ interface IProps {
     children: React.ReactNode;
     outerTag?: string;
     innerTag?: string;
-    theme?: object;
 }
 
 export default class SmartAlign extends React.Component<IProps> {
     public render() {
         const Outer = this.props.outerTag ? `${this.props.outerTag}` : "div";
         const Inner = this.props.outerTag ? `${this.props.innerTag}` : "div";
-        const classes = smartAlignClasses(this.props.theme);
+        const classes = smartAlignClasses();
         return (
             <Outer className={classNames("smartAlign-outer", this.props.className, classes.root)}>
                 <Inner className={classNames("smartAlign-inner", classes.inner)}>{this.props.children}</Inner>

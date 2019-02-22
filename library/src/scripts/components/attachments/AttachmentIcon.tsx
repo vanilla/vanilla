@@ -20,7 +20,6 @@ export interface IAttachmentIcon {
 
 // Attachment of type icon
 interface IProps extends IAttachmentIcon {
-    theme?: object;
     classes: {
         item?: string;
     };
@@ -31,7 +30,7 @@ interface IProps extends IAttachmentIcon {
  */
 export default class AttachmentIcon extends React.Component<IProps> {
     public render() {
-        const classes = attachmentIconClasses(this.props.theme);
+        const classes = attachmentIconClasses();
         return (
             <li className={classNames("attachmentsIcons-item", this.props.classes.item, classes.root)}>
                 <div

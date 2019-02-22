@@ -21,7 +21,6 @@ interface IProps {
     size?: UserPhotoSize;
     open?: boolean; // Only useful when using as dropdown button with SVG.
     userInfo: IUserFragment;
-    theme?: object;
 }
 
 /**
@@ -33,7 +32,7 @@ export class UserPhoto extends React.Component<IProps> {
         const photoUrl = userInfo ? userInfo.photoUrl : null;
         const name = userInfo ? userInfo.name : null;
         const open = !!this.props.open;
-        const classes = userPhotoClasses(this.props.theme);
+        const classes = userPhotoClasses();
         let sizeClass = classes.small;
         switch (this.props.size) {
             case UserPhotoSize.LARGE:

@@ -20,7 +20,6 @@ interface IProps {
     classNames?: string;
     data: ILinkListData;
     accessibleViewAllMessage?: string;
-    theme?: object;
 }
 
 /**
@@ -31,7 +30,7 @@ export default class NavLinksWithHeadings extends Component<IProps> {
         const ungrouped = this.props.data.ungroupedItems || [];
         const grouped = this.props.data.groups || [];
         const groupLevel = Math.min((this.props.depth || 2) + 1, 6);
-        const classes = navLinksClasses(this.props.theme);
+        const classes = navLinksClasses();
 
         if (ungrouped.length !== 0 || grouped.length !== 0) {
             const ungroupedContent = <NavLinks title={t("Overview")} items={ungrouped} />;

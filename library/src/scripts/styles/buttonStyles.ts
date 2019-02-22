@@ -192,15 +192,10 @@ export function buttonSizing(height, minWidth, fontSize, paddingHorizontal, form
     };
 }
 
-export function generateButtonClass(
-    buttonType: IButtonType,
-    buttonName: string,
-    theme?: object,
-    setZIndexOnState = false,
-) {
-    const globalVars = globalVariables(theme);
-    const formElVars = formElementsVariables(theme);
-    const vars = buttonStyles(theme);
+export function generateButtonClass(buttonType: IButtonType, buttonName: string, setZIndexOnState = false) {
+    const globalVars = globalVariables();
+    const formElVars = formElementsVariables();
+    const vars = buttonStyles();
     const debug = debugHelper("button");
     const zIndex = setZIndexOnState ? 1 : undefined;
 
@@ -273,8 +268,8 @@ export enum ButtonTypes {
     TRANSPARENT = "transparent",
 }
 
-export function buttonClasses(theme?: object) {
-    const vars = buttonVariables(theme);
+export function buttonClasses() {
+    const vars = buttonVariables();
     return {
         primary: generateButtonClass(vars.primary, "primary"),
         standard: generateButtonClass(vars.standard, "standard"),

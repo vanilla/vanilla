@@ -21,7 +21,6 @@ export interface IFileAttachment {
     className?: string;
     mimeType?: string;
     deleteAttachment?: () => void;
-    theme?: object;
 }
 
 interface IProps extends IFileAttachment {
@@ -34,8 +33,8 @@ export default class Attachment extends React.Component<IProps> {
     public render() {
         const { title, name, url, dateUploaded, type, mimeType, size, className } = this.props;
         const label = title || name;
-        const classes = attachmentClasses(this.props.theme);
-        const iconClasses = attachmentIconClasses(this.props.theme);
+        const classes = attachmentClasses();
+        const iconClasses = attachmentIconClasses();
 
         return (
             <div className={classNames("attachment", className, classes.root)}>

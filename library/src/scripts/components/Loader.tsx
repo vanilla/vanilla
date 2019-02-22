@@ -20,7 +20,6 @@ interface IProps {
     loaderStyleClass?: string;
     height?: number;
     width?: number;
-    theme?: object;
     padding?: PaddingProperty<TLength>;
 }
 

@@ -7,6 +7,7 @@ import { ColorHelper, important, percent, px, quote, viewHeight, viewWidth, colo
 import { BackgroundImageProperty, FlexWrapProperty } from "csstype";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { style, keyframes } from "typestyle";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export function flexHelper() {
     const middle = (wrap = false) => {
@@ -102,6 +103,40 @@ export const debugHelper = (componentName: string) => {
     };
 };
 
+/**
+ * A better helper to generate human readable classes generated from TypeStyle.
+ *
+ * This works like debugHelper but automatically. The generated function behaves just like `style()`
+ * but can automatically adds a debug name & allows the first argument to be a string subcomponent name.
+ *
+ * @example
+ * const style = styleFactory("myComponent");
+ * const myClass = style({ color: "red" }); // .myComponent-sad421s
+ * const mySubClass = style("subcomponent", { color: "red" }) // .myComponent-subcomponent-23sdaf43
+ *
+ */
+export function styleFactory(componentName: string) {
+    function styleCreator(subcomponentName: string, ...objects: Array<NestedCSSProperties | undefined>);
+    function styleCreator(...objects: Array<NestedCSSProperties | undefined>);
+    function styleCreator(...objects: Array<NestedCSSProperties | undefined | string>) {
+        if (objects.length === 0) {
+            return style();
+        }
+
+        let debugName = componentName;
+        let styleObjs: Array<NestedCSSProperties | undefined> = objects as any;
+        if (typeof objects[0] === "string") {
+            const [subcomponentName, ...restObjects] = styleObjs;
+            debugName += `-${subcomponentName}`;
+            styleObjs = restObjects;
+        }
+
+        return style({ $debugName: debugName }, ...styleObjs);
+    }
+
+    return styleCreator;
+}
+
 /*
  * Color modification based on colors lightness.
  * @param referenceColor - The reference colour to determine if we're in a dark or light context.
@@ -137,7 +172,7 @@ export const componentThemeVariables = (theme: any | undefined, componentName: s
     // const themeVars = get(theme, componentName, {});
     const themeVars = (theme && theme[componentName]) || {};
 
-    const subComponentStyles = (subElementName: string) => {
+    const subComponentStyles = (subElementName: string): object => {
         return (themeVars && themeVars[subElementName]) || {};
         // return get(themeVars, subElementName, {});
     };

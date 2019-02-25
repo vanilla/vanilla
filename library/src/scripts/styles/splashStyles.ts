@@ -106,9 +106,7 @@ export function splashStyles(theme?: object) {
         color: vars.title.fg.toString(),
         paddingTop: px(vars.title.marginTop),
         marginBottom: px(vars.title.marginBottom),
-        textShadow: vars.title.textShadow
-            ? vars.title.textShadow
-            : `0 1px 25px ${getColorDependantOnLightness(vars.title.fg, vars.title.fg, 0.9).fade(0.4)}`,
+        textShadow: `0 1px 25px ${getColorDependantOnLightness(vars.title.fg, vars.title.fg, 0.9).fade(0.4)}`,
         ...debug.name("title"),
     });
 

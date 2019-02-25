@@ -38,6 +38,12 @@ class ReactionOwnerModel extends PipelineModel {
         $this->addPipelineProcessor($userProcessor);
     }
 
+    /**
+     * Get unique reactionOwnerID for the combination of filters: ownerType, reactionType, recordType
+     *
+     * @param array $filters Structure of 3 elements: ownerType, reactionType, recordType
+     * @return int Result reactionOwnerID
+     */
     public function getReactionOwnerID(array $filters): int {
         $schema = Schema::parse([
             'ownerType:s',

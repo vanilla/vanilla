@@ -9,7 +9,7 @@ import { componentThemeVariables, debugHelper, unit } from "@library/styles/styl
 import { style } from "typestyle";
 
 export function simplePagerVariables(theme?: object) {
-    const themeVars = componentThemeVariables(theme, "attachment");
+    const themeVars = componentThemeVariables(theme, "simplePager");
 
     const sizing = {
         minWidth: 208,

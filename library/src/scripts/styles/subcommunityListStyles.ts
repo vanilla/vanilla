@@ -11,7 +11,7 @@ import { layoutVariables } from "@library/styles/layoutStyles";
 import { percent } from "csx";
 
 export function subcommunityListVariables(theme?: object) {
-    const themeVars = componentThemeVariables(theme, "attachment");
+    const themeVars = componentThemeVariables(theme, "subcommunityList");
     const globalVars = globalVariables(theme);
     const spacing = {
         padding: 24,
@@ -29,7 +29,7 @@ export function subcommunityListVariables(theme?: object) {
 export function subcommunityListClasses(theme?: object) {
     const globalVars = globalVariables(theme);
     const vars = subcommunityListVariables(theme);
-    const debug = debugHelper("attachment");
+    const debug = debugHelper("subcommunityList");
     const mediaQueries = layoutVariables(theme).mediaQueries();
 
     const root = style(

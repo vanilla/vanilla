@@ -27,7 +27,7 @@ export function compactMeBoxVariables(theme?: object) {
 export function compactMeBoxClasses(theme?: object) {
     const globalVars = globalVariables(theme);
     const vars = compactMeBoxVariables(theme);
-    const debug = debugHelper("attachment");
+    const debug = debugHelper("compactMeBox");
 
     const root = style({
         display: "block",

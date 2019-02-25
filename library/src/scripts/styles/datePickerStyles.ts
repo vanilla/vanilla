@@ -13,7 +13,7 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 export function dayPickerVariables(theme?: object) {
     const globalVars = globalVariables(theme);
     const formElementVars = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "attachment");
+    const themeVars = componentThemeVariables(theme, "datePicker");
 
     const spacing = {
         padding: 9,

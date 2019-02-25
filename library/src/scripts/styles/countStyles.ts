@@ -33,7 +33,7 @@ export function countVariables(theme?: object) {
 export function countClasses(theme?: object) {
     const globalVars = globalVariables(theme);
     const vars = countVariables(theme);
-    const debug = debugHelper("attachment");
+    const debug = debugHelper("count");
 
     const root = style({
         ...absolutePosition.topRight(4),

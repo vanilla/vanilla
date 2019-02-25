@@ -14,7 +14,7 @@ import { buttonVariables } from "@library/styles/buttonStyles";
 
 export function searchBarVariables(theme?: object) {
     const formElementVars = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "attachment");
+    const themeVars = componentThemeVariables(theme, "searchBar");
 
     const search = {
         minWidth: 109,
@@ -49,7 +49,7 @@ export function searchBarClasses(theme?: object) {
     const globalVars = globalVariables(theme);
     const vars = searchBarVariables(theme);
     const vanillaHeaderVars = vanillaHeaderVariables(theme);
-    const debug = debugHelper("attachment");
+    const debug = debugHelper("searchBar");
     const buttonVars = buttonVariables(theme);
     const formElementVars = formElementsVariables(theme);
 
@@ -110,7 +110,7 @@ export function searchBarClasses(theme?: object) {
                 border: 0,
                 backgroundColor: "transparent",
                 height: percent(100),
-                maxWidth: calc(`100% - ${vars.sizing.height}`),
+                maxWidth: calc(`100% - ${unit(vars.sizing.height)}`),
                 $nest: {
                     "&.searchBar__control--is-focused": {
                         boxShadow: "none",

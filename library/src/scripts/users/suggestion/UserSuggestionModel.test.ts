@@ -10,6 +10,7 @@ import { IMentionSuggestionData } from "@rich-editor/components/toolbars/pieces/
 import { LoadStatus } from "@library/@types/api";
 import UserSuggestionModel from "@library/users/suggestion/UserSuggestionModel";
 import UserSuggestionActions from "@library/users/suggestion/UserSuggestionActions";
+import sinon from "sinon";
 
 type SortProviderTuple = [string[], string, string[]];
 interface ISortTestData {
@@ -98,6 +99,8 @@ describe("UserSuggestionModel", () => {
         it("can handle LOAD_USERS_FAILURE", () => {
             let state = model.reducer(undefined, UserSuggestionActions.loadUsersACs.request({ username: "test" }));
 
+            const consoleStub = sinon.stub(console, "error");
+
             const error = new Error("Failure!");
             state = model.reducer(state, UserSuggestionActions.loadUsersACs.error(error as any, { username: "test" }));
 
@@ -106,6 +109,7 @@ describe("UserSuggestionModel", () => {
                 data: undefined,
                 error,
             });
+            consoleStub.restore();
         });
 
         describe("LOAD_USERS_SUCCESS", () => {

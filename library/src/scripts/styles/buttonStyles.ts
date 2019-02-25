@@ -12,10 +12,11 @@ import {
     componentThemeVariables,
     debugHelper,
     flexHelper,
-    getColorDependantOnLightness,
     spinnerLoader,
+    toStringColor,
+    unit,
 } from "@library/styles/styleHelpers";
-import { WidthProperty, BorderRadiusProperty } from "csstype";
+import { BorderColorProperty, BorderRadiusProperty, BorderStyleProperty, WidthProperty } from "csstype";
 import { TLength } from "typestyle/lib/types";
 
 export function buttonStyles(theme?: object) {
@@ -41,35 +42,37 @@ export function buttonStyles(theme?: object) {
     return { padding, sizing, border };
 }
 
+export type ColorHelperAndTransparent = ColorHelper | "transparent";
+
 export interface IButtonType {
-    fg: ColorHelper;
-    bg: ColorHelper;
-    spinner: ColorHelper;
+    fg: ColorHelperAndTransparent;
+    bg: ColorHelperAndTransparent;
+    spinnerColor: ColorHelper;
     border: {
-        color: ColorHelper;
+        color: ColorHelperAndTransparent;
         width: WidthProperty<TLength>;
-        style: string;
+        style: BorderStyleProperty;
         radius: BorderRadiusProperty<TLength>;
     };
     hover: {
-        fg: ColorHelper;
-        bg: ColorHelper;
-        borderColor: ColorHelper;
+        fg: ColorHelperAndTransparent;
+        bg: ColorHelperAndTransparent;
+        borderColor: ColorHelperAndTransparent;
     };
     focus: {
-        fg: ColorHelper;
-        bg: ColorHelper;
-        borderColor: ColorHelper;
+        fg: ColorHelperAndTransparent;
+        bg: ColorHelperAndTransparent;
+        borderColor: ColorHelperAndTransparent;
     };
     active: {
-        fg: ColorHelper;
-        bg: ColorHelper;
-        borderColor: ColorHelper;
+        fg: ColorHelperAndTransparent;
+        bg: ColorHelperAndTransparent;
+        borderColor: ColorHelperAndTransparent;
     };
     focusAccessible: {
-        fg: ColorHelper;
-        bg: ColorHelper;
-        borderColor: ColorHelper;
+        fg: ColorHelperAndTransparent;
+        bg: ColorHelperAndTransparent;
+        borderColor: ColorHelperAndTransparent;
     };
 }
 
@@ -80,7 +83,7 @@ export function buttonVariables(theme?: object) {
     const standard: IButtonType = {
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
-        spinner: globalVars.mainColors.primary,
+        spinnerColor: globalVars.mainColors.primary,
         border: {
             color: globalVars.mixBgAndFg(0.24),
             width: px(1),
@@ -113,7 +116,7 @@ export function buttonVariables(theme?: object) {
     const primary: IButtonType = {
         fg: globalVars.elementaryColors.white,
         bg: globalVars.mainColors.primary,
-        spinner: globalVars.elementaryColors.white,
+        spinnerColor: globalVars.elementaryColors.white,
         border: {
             color: globalVars.mainColors.primary,
             width: px(1),
@@ -146,8 +149,8 @@ export function buttonVariables(theme?: object) {
     const transparentButtonColor = globalVars.mainColors.bg;
     const transparent: IButtonType = {
         fg: transparentButtonColor,
-        bg: "transparent" as any, // Cast because otherwise it turns if you wrap it in `color()`.
-        spinner: globalVars.mainColors.primary,
+        bg: "transparent",
+        spinnerColor: globalVars.mainColors.primary,
         border: {
             color: transparentButtonColor,
             width: px(1),
@@ -189,15 +192,10 @@ export function buttonSizing(height, minWidth, fontSize, paddingHorizontal, form
     };
 }
 
-export function generateButtonClass(
-    buttonType: IButtonType,
-    buttonName: string,
-    theme?: object,
-    setZIndexOnState = false,
-) {
-    const globalVars = globalVariables(theme);
-    const formElVars = formElementsVariables(theme);
-    const vars = buttonStyles(theme);
+export function generateButtonClass(buttonType: IButtonType, buttonName: string, setZIndexOnState = false) {
+    const globalVars = globalVariables();
+    const formElVars = formElementsVariables();
+    const vars = buttonStyles();
     const debug = debugHelper("button");
     const zIndex = setZIndexOnState ? 1 : undefined;
 
@@ -225,9 +223,9 @@ export function generateButtonClass(
         color: buttonType.fg.toString(),
         backgroundColor: buttonType.bg.toString(),
         borderColor: buttonType.border.color.toString(),
-        borderRadius: buttonType.border.radius,
+        borderRadius: unit(buttonType.border.radius),
         borderStyle: buttonType.border.style,
-        borderWidth: buttonType.border.width,
+        borderWidth: unit(buttonType.border.width),
         $nest: {
             "&:not([disabled])": {
                 $nest: {
@@ -270,8 +268,8 @@ export enum ButtonTypes {
     TRANSPARENT = "transparent",
 }
 
-export function buttonClasses(theme?: object) {
-    const vars = buttonVariables(theme);
+export function buttonClasses() {
+    const vars = buttonVariables();
     return {
         primary: generateButtonClass(vars.primary, "primary"),
         standard: generateButtonClass(vars.standard, "standard"),
@@ -291,7 +289,10 @@ export function buttonLoaderClasses(buttonType: IButtonType, theme?: object) {
         height: percent(100),
         width: percent(100),
         $nest: {
-            "&::after": spinnerLoader(buttonType.spinner, px(20)) as any,
+            "&:after": spinnerLoader({
+                color: buttonType.spinnerColor,
+                dimensions: 20,
+            }),
         },
         ...themeVars.subComponentStyles("root"),
     });

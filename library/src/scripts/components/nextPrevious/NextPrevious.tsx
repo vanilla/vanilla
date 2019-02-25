@@ -21,7 +21,6 @@ interface IUrlItem {
 
 interface IProps {
     className?: string;
-    theme?: object;
     accessibleTitle: string;
     prevItem?: IUrlItem | null;
     nextItem?: IUrlItem | null;
@@ -32,13 +31,13 @@ interface IProps {
  */
 export default class NextPrevious extends React.Component<IProps> {
     public render() {
-        const { accessibleTitle, theme, className, prevItem, nextItem } = this.props;
+        const { accessibleTitle, className, prevItem, nextItem } = this.props;
 
         if (!nextItem && !prevItem) {
             return null; // skip if no sibling pages exist
         }
 
-        const classes = this.nextPreviousStyles(theme);
+        const classes = this.nextPreviousStyles();
         return (
             <nav className={classNames(className, classes.root)}>
                 <ScreenReaderContent>

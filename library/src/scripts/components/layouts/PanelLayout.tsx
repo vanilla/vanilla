@@ -11,6 +11,7 @@ import { style } from "typestyle";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import throttle from "lodash/throttle";
 import { withDevice } from "@library/contexts/DeviceContext";
+import { debugHelper } from "@library/styles/styleHelpers";
 
 interface IProps extends IDeviceProps {
     className?: string;
@@ -275,6 +276,7 @@ class PanelLayout extends React.Component<IProps> {
         const { isFixed } = this.props;
         const leftPanelEl = this.leftPanelRef.current;
         const rightPanelEl = this.rightPanelRef.current;
+        const debug = debugHelper("panelFixed");
 
         // The classes default to visually hidden (but still visible to screen readers) until fully calced.
         // The content may already be rendered, but we need a second layout pass for computed values.
@@ -288,7 +290,6 @@ class PanelLayout extends React.Component<IProps> {
         const base: NestedCSSProperties = {
             position: "fixed",
             bottom: 0,
-            overflow: "auto",
         };
 
         if (leftPanelEl) {
@@ -297,6 +298,7 @@ class PanelLayout extends React.Component<IProps> {
                 ...base,
                 top: leftPanelRect.top + "px",
                 left: leftPanelRect.left + "px",
+                ...debug.name("leftPanel"),
             });
         }
 
@@ -306,6 +308,7 @@ class PanelLayout extends React.Component<IProps> {
                 ...base,
                 top: rightPanelRect.top + "px",
                 left: rightPanelRect.left + "px",
+                ...debug.name("rightPanel"),
             });
         }
 

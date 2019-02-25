@@ -5,7 +5,7 @@
 
 import * as React from "react";
 import { LoadStatus } from "@library/@types/api";
-import FullPageLoader from "@library/components/FullPageLoader";
+import Loader from "@library/components/Loader";
 
 interface IProps {
     children: React.ReactNode;
@@ -23,7 +23,7 @@ export default class PageLoader extends React.PureComponent<IProps, {}> {
                 return this.props.children;
             case LoadStatus.LOADING:
                 document.body.classList.add("isLoading");
-                return <FullPageLoader />;
+                return <Loader />;
             default:
                 return null;
         }

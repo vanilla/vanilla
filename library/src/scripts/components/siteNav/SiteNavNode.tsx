@@ -14,6 +14,7 @@ import classNames from "classnames";
 import * as React from "react";
 import Hoverable from "@library/utils/Hoverable";
 import { SiteNavContext } from "@library/components/siteNav/SiteNavContext";
+import { siteNavNodeClasses } from "@library/styles/siteNavStyles";
 
 type RecordToggle = (recordType: string, recordID: number) => void;
 
@@ -44,11 +45,12 @@ export default class SiteNavNode extends React.Component<IProps> {
         const hasChildren = !!this.props.children && this.props.children.length > 0;
         const depthClass = `hasDepth-${this.props.depth + 1}`;
         const collapsible = !!this.props.collapsible;
+        const classes = siteNavNodeClasses();
 
         const { activeRecord } = this.props;
 
         let linkContents;
-        const linkContentClasses = classNames("siteNavNode-link", {
+        const linkContentClasses = classNames("siteNavNode-link", classes.link, {
             hasChildren,
             isFirstLevel: this.props.depth === 0,
         });
@@ -61,7 +63,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                     className={linkContentClasses}
                     onClick={this.handleClick as any}
                 >
-                    <span className="siteNavNode-label">{this.props.name}</span>
+                    <span className={classNames("siteNavNode-label", classes.label)}>{this.props.name}</span>
                 </Button>
             );
         } else {
@@ -71,14 +73,14 @@ export default class SiteNavNode extends React.Component<IProps> {
                         <SmartLink
                             {...provided}
                             onKeyDownCapture={this.handleKeyDown}
-                            className={classNames("siteNavNode-link", {
+                            className={classNames("siteNavNode-link", classes.link, {
                                 hasChildren,
                                 isFirstLevel: this.props.depth === 0,
                             })}
                             tabIndex={0}
                             to={this.props.url}
                         >
-                            <span className="siteNavNode-label">{this.props.name}</span>
+                            <span className={classNames("siteNavNode-label", classes.label)}>{this.props.name}</span>
                         </SmartLink>
                     )}
                 </Hoverable>
@@ -104,14 +106,18 @@ export default class SiteNavNode extends React.Component<IProps> {
             });
         return (
             <li
-                className={classNames("siteNavNode", this.props.className, depthClass, {
+                className={classNames("siteNavNode", this.props.className, depthClass, classes.root, {
                     isCurrent: this.isActiveRecord(),
                 })}
                 role="treeitem"
                 aria-expanded={this.isOpen}
             >
                 {hasChildren && collapsible ? (
-                    <div className={classNames("siteNavNode-buttonOffset", { hasNoOffset: this.props.depth === 1 })}>
+                    <div
+                        className={classNames("siteNavNode-buttonOffset", classes.buttonOffset, {
+                            hasNoOffset: this.props.depth === 1,
+                        })}
+                    >
                         <Button
                             tabIndex={-1}
                             ariaHidden={true}
@@ -119,23 +125,23 @@ export default class SiteNavNode extends React.Component<IProps> {
                             ariaLabel={t("Toggle Category")}
                             onClick={this.handleClick as any}
                             baseClass={ButtonBaseClass.CUSTOM}
-                            className="siteNavNode-toggle"
+                            className={classNames("siteNavNode-toggle", classes.toggle)}
                         >
                             {this.isOpen ? downTriangle("", t("Expand")) : rightTriangle("", t("Collapse"))}
                         </Button>
                     </div>
                 ) : (
                     this.props.depth !== 0 && (
-                        <span className="siteNavNode-spacer" aria-hidden={true}>
+                        <span className={classNames("siteNavNode-spacer", classes.spacer)} aria-hidden={true}>
                             {` `}
                         </span>
                     )
                 )}
-                <div className={classNames("siteNavNode-contents")}>
+                <div className={classNames("siteNavNode-contents", classes.contents)}>
                     {linkContents}
                     {hasChildren && (
                         <ul
-                            className={classNames("siteNavNode-children", depthClass, {
+                            className={classNames("siteNavNode-children", depthClass, classes.children, {
                                 isHidden: collapsible ? !this.isOpen : false,
                             })}
                             role="group"

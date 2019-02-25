@@ -63,5 +63,9 @@ export function formElementsVariables(theme?: object) {
         ...themeVars.subComponentStyles("placeholder"),
     };
 
-    return { sizing, spacing, border, giantInput, largeInput, miniInput, colors, placeholder };
+    const disabled = {
+        opacity: 0.5,
+    };
+
+    return { sizing, spacing, border, giantInput, largeInput, miniInput, colors, placeholder, disabled };
 }

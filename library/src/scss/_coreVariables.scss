@@ -100,7 +100,6 @@ $global-title_mobile_fontSize                        : 26px !default;
 $global-subTitle_fontSize                            : 18px !default;
 
 $userContent_fontSize                                : $global-medium_fontSize !default; // 14 for forums, but 16 for KB
-
 $userContent-fontSizeH1                              : 2em !default;
 $userContent-fontSizeH2                              : 1.5em !default;
 $userContent-fontSizeH3                              : 1.25em !default;
@@ -307,7 +306,6 @@ $overlay-dropShadow_color                               : $overlay_bgColor !defa
 $overlay-border_color                                   : mix($global-color_fg, $global-color_bg, 15%) !default;
 $overlay-dropShadow                                     : 0 5px 10px $overlay_bgColor !default;
 $overlay-borderRadius                                   : $global_borderRadius !default;
-
 $overlay-fullPageHeading_spacer                         : 32px;
 
 /* -------------------------------------------------------------- *\

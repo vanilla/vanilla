@@ -29,6 +29,7 @@ import * as React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import vanillaHeaderClasses from "@library/styles/vanillaHeaderStyles";
+import { meBoxClasses } from "@library/styles/meBoxStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -70,6 +71,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
         const classes = vanillaHeaderClasses();
         const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
+        const classesMeBox = meBoxClasses();
 
         return ReactDOM.createPortal(
             <>
@@ -94,7 +96,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                     "vanillaHeader-leftFlexBasis",
                                                     "vanillaHeader-backLink",
                                                     classes.leftFlexBasis,
-                                                    classes.backLink,
                                                 )}
                                                 linkClassName={classes.button}
                                                 fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
@@ -152,7 +153,8 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                             showingSuggestions={this.state.showingSuggestions}
                                             onOpenSuggestions={this.setOpenSuggestions}
                                             onCloseSuggestions={this.setCloseSuggestions}
-                                            buttonContentClass="meBox-buttonContent"
+                                            buttonContentClass={classNames(classesMeBox.buttonContent)}
+                                            clearButtonClass={classes.clearButtonClass}
                                         />
 
                                         {isGuest ? (
@@ -166,9 +168,8 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                     <VanillaHeaderNavItem
                                                         linkClassName={classNames(
                                                             "button",
-                                                            "vanillaHeader-guestButton",
-                                                            "vanillaHeader-signIn",
                                                             classes.signIn,
+                                                            classes.guestButton,
                                                         )}
                                                         to={`/entry/signin?target=${window.location.pathname}`}
                                                     >
@@ -177,9 +178,8 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                     <VanillaHeaderNavItem
                                                         linkClassName={classNames(
                                                             "button",
-                                                            "vanillaHeader-guestButton",
-                                                            "vanillaHeader-register",
                                                             classes.register,
+                                                            classes.guestButton,
                                                         )}
                                                         to={`/entry/register?target=${window.location.pathname}`}
                                                     >
@@ -208,8 +208,8 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                                 classes.button,
                                                             )}
                                                             buttonClass={classNames(
-                                                                "vanillaHeader-tabButton",
-                                                                classes.tabButton,
+                                                                classes.centeredButtonClass,
+                                                                classes.button,
                                                             )}
                                                             userPhotoClass="headerDropDown-user"
                                                             currentUser={this.props.currentUser}

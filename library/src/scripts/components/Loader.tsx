@@ -8,18 +8,19 @@ import * as React from "react";
 import { t } from "@library/application";
 import { style } from "typestyle";
 import classNames from "classnames";
-
-export enum LoaderStyle {
-    FULL = "fullPageLoader",
-    MEDIUM = "mediumLoader",
-    FIXED_SIZE = "fixedSizeLoader",
-}
+import { loaderClasses } from "@library/styles/loaderStyles";
+import { PaddingProperty } from "csstype";
+import { TLength } from "typestyle/lib/types";
+import ScreenReaderContent from "@library/components/ScreenReaderContent";
+import ConditionalWrap from "@library/components/ConditionalWrap";
+import { unit } from "@library/styles/styleHelpers";
 
 interface IProps {
     minimumTime?: number;
-    loaderStyle?: LoaderStyle;
+    loaderStyleClass?: string;
     height?: number;
     width?: number;
+    padding?: PaddingProperty<TLength>;
 }
 
 interface IState {
@@ -29,7 +30,7 @@ interface IState {
 /**
  * A smart loading component. Takes up the full page and only displays in certain scenarios.
  */
-export default class FullPageLoader extends React.Component<IProps, IState> {
+export default class Loader extends React.Component<IProps, IState> {
     public state: IState = {
         showLoader: false,
     };
@@ -38,17 +39,17 @@ export default class FullPageLoader extends React.Component<IProps, IState> {
         if (this.props.minimumTime && this.props.minimumTime > 0 && !this.state.showLoader) {
             return null;
         }
-
-        const sizeClass = this.props.loaderStyle || LoaderStyle.FULL;
-        const styleClass = style({
-            height: this.props.height,
-            width: this.props.width,
-        });
-
         return (
             <React.Fragment>
-                <div className={classNames(sizeClass, styleClass)} aria-hidden="true" />
-                <h1 className="sr-only">{t("Loading")}</h1>
+                <ConditionalWrap
+                    condition={!!this.props.padding}
+                    className={style({ padding: unit(this.props.padding) })}
+                >
+                    <div className={this.props.loaderStyleClass} aria-hidden="true" />
+                    <ScreenReaderContent>
+                        <p>{t("Loading")}</p>
+                    </ScreenReaderContent>
+                </ConditionalWrap>
             </React.Fragment>
         );
     }

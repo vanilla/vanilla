@@ -12,11 +12,11 @@ import {
     debugHelper,
     flexHelper,
     getColorDependantOnLightness,
+    unit,
 } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { vanillaMenuVariables } from "@library/styles/vanillaMenu";
 
 export function vanillaHeaderVariables(theme?: object) {
     const globalVars = globalVariables(theme);
@@ -40,7 +40,7 @@ export function vanillaHeaderVariables(theme?: object) {
     };
 
     const guest = {
-        spacer: px(8),
+        spacer: 8,
         ...themeVars.subComponentStyles("guest"),
     };
 
@@ -49,6 +49,9 @@ export function vanillaHeaderVariables(theme?: object) {
     const button = {
         borderRadius: 3,
         size: buttonSize,
+        guest: {
+            minWidth: 86,
+        },
         mobile: {
             fontSize: 16,
             width: buttonMobileSize,
@@ -96,9 +99,19 @@ export function vanillaHeaderVariables(theme?: object) {
     };
 
     const signIn = {
-        bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1),
+        bg: getColorDependantOnLightness(
+            globalVars.mainColors.primary,
+            globalVars.mainColors.primary,
+            0.1,
+            true,
+        ).toString(),
         hover: {
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2),
+            bg: getColorDependantOnLightness(
+                globalVars.mainColors.primary,
+                globalVars.mainColors.primary,
+                0.2,
+                true,
+            ).toString(),
         },
         ...themeVars.subComponentStyles("signIn"),
     };
@@ -144,7 +157,6 @@ export default function vanillaHeaderClasses(theme?: object) {
     const vars = vanillaHeaderVariables(theme);
     const formElementVars = formElementsVariables(theme);
     const headerColors = vars.colors;
-    const vanillaMenuVars = vanillaMenuVariables(theme);
     const mediaQueries = layoutVariables(theme).mediaQueries();
     const flex = flexHelper();
     const debug = debugHelper("vanillaHeader");
@@ -476,14 +488,14 @@ export default function vanillaHeaderClasses(theme?: object) {
         $nest: {
             "&:not([disabled])": {
                 color: vars.colors.fg.toString(),
-                backgroundColor: vanillaMenuVars.signIn.bg.toString(),
+                backgroundColor: vars.signIn.bg.toString(),
                 border: `solid ${vars.colors.fg.toString()} 1px`,
-                marginLeft: px(vanillaMenuVars.guest.spacer * 1.5),
-                marginRight: px(vanillaMenuVars.guest.spacer),
+                marginLeft: unit(vars.guest.spacer * 1.5),
+                marginRight: unit(vars.guest.spacer),
                 $nest: {
                     "&:hover": {
                         border: `solid ${vars.colors.fg} 1px`,
-                        backgroundColor: vanillaMenuVars.signIn.hover.bg.toString(),
+                        backgroundColor: vars.signIn.hover.bg.toString(),
                         color: vars.colors.fg.toString(),
                     },
                     "&.focus-visible": {
@@ -511,7 +523,7 @@ export default function vanillaHeaderClasses(theme?: object) {
                 color: vars.colors.bg.toString(),
                 backgroundColor: vars.colors.fg.toString(),
                 border: `solid ${vars.colors.fg} 1px;`,
-                marginLeft: vanillaMenuVars.guest.spacer.toString(),
+                marginLeft: unit(vars.guest.spacer),
                 $nest: {
                     "&:hover": {
                         color: vars.colors.bg.toString(),
@@ -554,6 +566,10 @@ export default function vanillaHeaderClasses(theme?: object) {
         color: vars.colors.fg.toString(),
     });
 
+    const guestButton = style({
+        minWidth: unit(vars.button.guest.minWidth),
+    });
+
     return {
         root,
         spacer,
@@ -581,6 +597,7 @@ export default function vanillaHeaderClasses(theme?: object) {
         centeredButtonClass,
         compactSearchResults,
         clearButtonClass,
+        guestButton,
     };
 }
 

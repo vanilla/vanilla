@@ -168,9 +168,8 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                     <VanillaHeaderNavItem
                                                         linkClassName={classNames(
                                                             "button",
-                                                            "vanillaHeader-guestButton",
-                                                            "vanillaHeader-signIn",
                                                             classes.signIn,
+                                                            classes.guestButton,
                                                         )}
                                                         to={`/entry/signin?target=${window.location.pathname}`}
                                                     >
@@ -179,9 +178,8 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                     <VanillaHeaderNavItem
                                                         linkClassName={classNames(
                                                             "button",
-                                                            "vanillaHeader-guestButton",
-                                                            "vanillaHeader-register",
                                                             classes.register,
+                                                            classes.guestButton,
                                                         )}
                                                         to={`/entry/register?target=${window.location.pathname}`}
                                                     >

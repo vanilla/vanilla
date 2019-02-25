@@ -10,40 +10,20 @@ import {
     BorderStyleProperty,
     BorderWidthProperty,
     FlexWrapProperty,
-    MarginTopProperty,
-    MarginRightProperty,
-    MarginBottomProperty,
-    MarginLeftProperty,
-    PaddingTopProperty,
-    PaddingRightProperty,
-    PaddingBottomProperty,
-    PaddingLeftProperty,
-    TopProperty,
     LeftProperty,
     RightProperty,
     BottomProperty,
     PositionProperty,
-    GlobalsNumber,
     DisplayProperty,
     AlignItemsProperty,
     JustifyContentProperty,
     ContentProperty,
-    TransitionProperty,
-    AnimationTimingFunctionProperty,
-    AnimationIterationCountProperty,
-    AnimationNameProperty,
-    HeightProperty,
-    WidthProperty,
-    MarginProperty,
     ObjectFitProperty,
-    ObjectPositionProperty,
 } from "csstype";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { style, keyframes } from "typestyle";
 import { TLength } from "typestyle/lib/types";
-import { borderRadius } from "react-select/lib/theme";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { ColorHelperAndTransparent } from "@library/styles/buttonStyles";
 
 export function flexHelper() {
     const middle = (wrap = false) => {

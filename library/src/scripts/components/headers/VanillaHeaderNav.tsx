@@ -6,14 +6,16 @@
 
 import { percent, px, quote, calc } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper } from "@library/styles/styleHelpers";
+import { debugHelper, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { flexHelper } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import { formElementsVariables } from "@library/components/forms/formElementStyles";
 
 export function vanillaHeaderNavigation() {
     const globalVars = globalVariables();
+    const varsFormElements = formElementsVariables();
 
     const border = {
         verticalWidth: 3,
@@ -29,7 +31,7 @@ export function vanillaHeaderNavigation() {
     };
 
     const item = {
-        size: 30,
+        size: varsFormElements.sizing.height,
     };
 
     return {
@@ -69,7 +71,7 @@ export default function vanillaHeaderNavClasses() {
         {
             ...debug.name("items"),
             ...flex.middle(),
-            height: px(vars.item.size),
+            height: unit(vars.item.size),
             $nest: {
                 "&.isCurrent": {
                     $nest: {
@@ -96,7 +98,7 @@ export default function vanillaHeaderNavClasses() {
         display: "flex",
         justifyContent: "center",
         alignItems: "stretch",
-        height: px(vars.item.size),
+        height: unit(vars.item.size),
         $nest: {
             "&.focus-visible": {
                 backgroundColor: headerVars.buttonContents.hover.bg.toString(),

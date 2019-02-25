@@ -5,9 +5,8 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper } from "@library/styles/styleHelpers";
+import { debugHelper } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { percent, px } from "csx";
 
 export function selectBoxClasses(theme?: object) {

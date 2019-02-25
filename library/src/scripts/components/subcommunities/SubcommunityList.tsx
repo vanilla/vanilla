@@ -9,7 +9,6 @@ import classNames from "classnames";
 import Paragraph from "@library/components/Paragraph";
 import SubcommunityTile from "@library/components/subcommunities/SubcommunityTile";
 import { subcommunityListClasses } from "@library/styles/subcommunityListStyles";
-import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
 import { subcommunityTileClasses } from "@library/styles/subcommunityTitleStyles";
 
 interface ISubcommunity {
@@ -52,7 +51,7 @@ export default class SubcommunityList extends React.Component<IProps> {
                             <li key={i} className={classNames("subcommunityList-item", classes.item)}>
                                 <SubcommunityTile
                                     icon={subcommunity.icon}
-                                    fallbackIcon={knowledgeBaseNoIcon(classesSubCommunityTile.fallBackIcon)}
+                                    fallbackIcon={this.props.fallbackIcon}
                                     title={subcommunity.name}
                                     description={subcommunity.description}
                                     url={subcommunity.url}

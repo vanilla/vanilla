@@ -22,7 +22,7 @@ import {
 } from "csstype";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { style, keyframes } from "typestyle";
-import { TLength } from "typestyle/lib/types";
+import { TLength, NestedCSSProperties } from "typestyle/lib/types";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 
 export function flexHelper() {
@@ -73,6 +73,17 @@ export function fakeBackgroundFixed() {
     };
 }
 
+export function fullSizeOfParent() {
+    return {
+        display: "block",
+        position: "absolute",
+        top: px(0),
+        left: px(0),
+        width: percent(100),
+        height: percent(100),
+    };
+}
+
 export function centeredBackgroundProps() {
     return {
         backgroundPosition: `50% 50%`,
@@ -107,6 +118,40 @@ export const debugHelper = (componentName: string) => {
         },
     };
 };
+
+/**
+ * A better helper to generate human readable classes generated from TypeStyle.
+ *
+ * This works like debugHelper but automatically. The generated function behaves just like `style()`
+ * but can automatically adds a debug name & allows the first argument to be a string subcomponent name.
+ *
+ * @example
+ * const style = styleFactory("myComponent");
+ * const myClass = style({ color: "red" }); // .myComponent-sad421s
+ * const mySubClass = style("subcomponent", { color: "red" }) // .myComponent-subcomponent-23sdaf43
+ *
+ */
+export function styleFactory(componentName: string) {
+    function styleCreator(subcomponentName: string, ...objects: Array<NestedCSSProperties | undefined>);
+    function styleCreator(...objects: Array<NestedCSSProperties | undefined>);
+    function styleCreator(...objects: Array<NestedCSSProperties | undefined | string>) {
+        if (objects.length === 0) {
+            return style();
+        }
+
+        let debugName = componentName;
+        let styleObjs: Array<NestedCSSProperties | undefined> = objects as any;
+        if (typeof objects[0] === "string") {
+            const [subcomponentName, ...restObjects] = styleObjs;
+            debugName += `-${subcomponentName}`;
+            styleObjs = restObjects;
+        }
+
+        return style({ $debugName: debugName }, ...styleObjs);
+    }
+
+    return styleCreator;
+}
 
 /*
  * Color modification based on colors lightness.

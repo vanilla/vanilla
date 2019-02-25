@@ -133,7 +133,6 @@ export const globalVariables = (theme?: object) => {
                 title: 26,
             },
         },
-
         weights: {
             normal: 400,
             semiBold: 600,
@@ -268,6 +267,7 @@ export const globalVariables = (theme?: object) => {
         feedbackColors,
         body,
         border,
+        meta,
         gutter,
         panel,
         content,
@@ -279,7 +279,6 @@ export const globalVariables = (theme?: object) => {
         animation,
         links,
         embed,
-        meta,
         states,
         overlay,
         userContent,

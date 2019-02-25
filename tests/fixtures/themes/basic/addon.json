@@ -1,7 +1,13 @@
 {
-	"key": "basic",
-	"name": "Test Theme",
-	"type": "theme",
-	"parent": "basic-parent",
-    "a": "a"
+    "key": "basic",
+    "name": "Test Theme",
+    "type": "theme",
+    "parent": "basic-parent",
+    "a": "a",
+    "assets": {
+        "header": {
+            "type": "html",
+            "file": "header.html"
+        }
+    }
 }

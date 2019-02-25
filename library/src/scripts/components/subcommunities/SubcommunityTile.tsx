@@ -9,7 +9,6 @@ import Paragraph from "@library/components/Paragraph";
 import classNames from "classnames";
 import { t } from "@library/application";
 import { subcommunityTileClasses } from "@library/styles/subcommunityTitleStyles";
-import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
 
 interface IProps {
     icon: string;
@@ -41,10 +40,7 @@ export default class SubcommunityTile extends React.Component<IProps> {
                         {icon && (
                             <img className={classNames("subcommunityTile-icon", classes.icon)} src={icon} alt={alt} />
                         )}
-                        {!icon &&
-                            (this.props.fallbackIcon
-                                ? this.props.fallbackIcon
-                                : knowledgeBaseNoIcon(classes.fallBackIcon))}
+                        {!icon && (this.props.fallbackIcon ? this.props.fallbackIcon : "")}
                     </div>
                     <H className={classNames("subcommunityTile-title", classes.title)}>{title}</H>
                     {description && (

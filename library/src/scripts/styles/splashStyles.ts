@@ -62,7 +62,6 @@ export function splashVariables(theme?: object) {
 }
 
 export function splashStyles(theme?: object) {
-    const globalVars = globalVariables(theme);
     const vars = splashVariables(theme);
     const debug = debugHelper("splash");
 

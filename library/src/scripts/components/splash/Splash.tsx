@@ -7,8 +7,6 @@
 import * as React from "react";
 import classNames from "classnames";
 import Heading from "@library/components/Heading";
-import { ColorHelper } from "csx";
-import { BackgroundImageProperty } from "csstype";
 import Container from "@library/components/layouts/components/Container";
 import { PanelWidget, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 import { withDevice } from "@library/contexts/DeviceContext";

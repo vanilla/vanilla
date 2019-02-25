@@ -58,6 +58,7 @@ export function searchBarClasses(theme?: object) {
         cursor: "pointer",
         $nest: {
             "& .suggestedTextInput-inputText": {
+                borderRight: 0,
                 borderTopRightRadius: 0,
                 borderBottomRightRadius: 0,
                 $nest: {

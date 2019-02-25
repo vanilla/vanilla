@@ -16,6 +16,7 @@ import {
     spinnerLoader,
 } from "@library/styles/styleHelpers";
 import { WidthProperty, BorderRadiusProperty } from "csstype";
+import { TLength } from "typestyle/lib/types";
 
 export function buttonStyles(theme?: object) {
     const globalVars = globalVariables(theme);
@@ -46,9 +47,9 @@ export interface IButtonType {
     spinner: ColorHelper;
     border: {
         color: ColorHelper;
-        width: WidthProperty<string | number>;
+        width: WidthProperty<TLength>;
         style: string;
-        radius: BorderRadiusProperty<string | number>;
+        radius: BorderRadiusProperty<TLength>;
     };
     hover: {
         fg: ColorHelper;

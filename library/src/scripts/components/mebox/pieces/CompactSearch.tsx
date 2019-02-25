@@ -62,7 +62,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                 {!this.props.open && (
                     <Button
                         onClick={this.props.onSearchButtonClick}
-                        className={classNames("compactSearch-open", this.props.buttonClass)}
+                        className={classNames(headerClasses.centeredButtonClass, this.props.buttonClass)}
                         title={t("Search")}
                         aria-expanded={false}
                         aria-haspopup="true"
@@ -70,9 +70,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                         aria-controls={this.id}
                         buttonRef={this.openSearchButton}
                     >
-                        <div className={classNames("compactSearch-buttonContent", this.props.buttonContentClass)}>
-                            {search()}
-                        </div>
+                        <div className={classNames(this.props.buttonContentClass)}>{search()}</div>
                     </Button>
                 )}
                 {this.props.open && (

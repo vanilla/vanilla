@@ -34,6 +34,8 @@ export function meBoxClasses(theme?: object) {
     const buttonContent = style({
         ...flex.middle(),
         width: unit(vanillaHeaderVars.meBox.sizing.buttonContents),
+        maxWidth: unit(vanillaHeaderVars.meBox.sizing.buttonContents),
+        flexBasis: unit(vanillaHeaderVars.meBox.sizing.buttonContents),
         height: unit(vanillaHeaderVars.meBox.sizing.buttonContents),
     });
 

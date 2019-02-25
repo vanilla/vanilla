@@ -154,10 +154,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                             showingSuggestions={this.state.showingSuggestions}
                                             onOpenSuggestions={this.setOpenSuggestions}
                                             onCloseSuggestions={this.setCloseSuggestions}
-                                            buttonContentClass={classNames(
-                                                "meBox-buttonContent",
-                                                classesMeBox.buttonContent,
-                                            )}
+                                            buttonContentClass={classNames(classesMeBox.buttonContent)}
                                         />
 
                                         {isGuest ? (
@@ -213,8 +210,8 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                                 classes.button,
                                                             )}
                                                             buttonClass={classNames(
-                                                                "vanillaHeader-tabButton",
-                                                                classes.tabButton,
+                                                                classes.centeredButtonClass,
+                                                                classes.button,
                                                             )}
                                                             userPhotoClass="headerDropDown-user"
                                                             currentUser={this.props.currentUser}

@@ -20,6 +20,7 @@ import { vanillaMenuVariables } from "@library/styles/vanillaMenu";
 
 export function vanillaHeaderVariables(theme?: object) {
     const globalVars = globalVariables(theme);
+    const formElementVars = formElementsVariables(theme);
     const themeVars = componentThemeVariables(theme, "vanillaHeader");
 
     const sizing = {
@@ -27,6 +28,7 @@ export function vanillaHeaderVariables(theme?: object) {
         spacer: 12,
         mobile: {
             height: 44,
+            width: formElementVars.sizing.height,
         },
         ...themeVars.subComponentStyles("sizing"),
     };
@@ -43,11 +45,13 @@ export function vanillaHeaderVariables(theme?: object) {
     };
 
     const buttonSize = 40;
+    const buttonMobileSize = formElementVars.sizing.height;
     const button = {
         borderRadius: 3,
         size: buttonSize,
         mobile: {
             fontSize: 16,
+            width: buttonMobileSize,
         },
         ...themeVars.subComponentStyles("button"),
     };
@@ -68,13 +72,16 @@ export function vanillaHeaderVariables(theme?: object) {
     const endElements = {
         flexBasis: buttonSize * 4,
         mobile: {
-            flexBasis: buttonSize * 2,
+            flexBasis: buttonMobileSize * 2,
         },
         ...themeVars.subComponentStyles("endElements"),
     };
 
     const compactSearch = {
         maxWidth: 672,
+        mobile: {
+            width: buttonMobileSize,
+        },
         ...themeVars.subComponentStyles("compactSearch"),
     };
 
@@ -156,12 +163,12 @@ export default function vanillaHeaderClasses(theme?: object) {
                     right: 0,
                     zIndex: 1,
                 },
-                ".searchBar__control": {
+                "& .searchBar__control": {
                     ...debug.name("control"),
                     color: vars.colors.fg.toString(),
                     cursor: "pointer",
                 },
-                ".suggestedTextInput-clear.searchBar-clear": {
+                "& .suggestedTextInput-clear.searchBar-clear": {
                     ...debug.name("clear"),
                     color: vars.colors.fg.toString(),
                     $nest: {
@@ -176,24 +183,15 @@ export default function vanillaHeaderClasses(theme?: object) {
                         },
                     },
                 },
-                ".searchBar__placeholder": {
+                "& .searchBar__placeholder": {
                     ...debug.name("placeholder"),
                     color: vars.colors.fg.fade(0.8).toString(),
                     cursor: "pointer",
-                },
-                ".backLink-link": {
-                    maxHeight: percent(100),
-                    ...debug.name("backLink-link"),
                 },
             },
         },
         mediaQueries.oneColumn({
             height: px(vars.sizing.mobile.height),
-            $nest: {
-                ".backLink-link": {
-                    height: vars.sizing.mobile.height,
-                },
-            },
         }),
     );
 
@@ -291,11 +289,16 @@ export default function vanillaHeaderClasses(theme?: object) {
         color: "inherit",
     });
 
-    const compactSearch = style({
-        ...debug.name("compactSearch"),
-        marginLeft: "auto",
-        maxWidth: px(vars.compactSearch.maxWidth),
-    });
+    const compactSearch = style(
+        {
+            ...debug.name("compactSearch"),
+            marginLeft: "auto",
+            maxWidth: px(vars.compactSearch.maxWidth),
+        },
+        mediaQueries.oneColumn({
+            maxWidth: px(vars.compactSearch.mobile.width),
+        }),
+    );
 
     const topElement = style(
         {
@@ -334,26 +337,29 @@ export default function vanillaHeaderClasses(theme?: object) {
 
     const button = style(
         {
-            ...debug.name("bottom"),
-            ...flex.middle(),
+            ...debug.name("button"),
             color: vars.colors.fg.toString(),
             height: px(vars.sizing.height),
             minWidth: px(vars.button.size),
+            maxWidth: percent(100),
             padding: px(0),
             $nest: {
                 "&:active": {
+                    color: vars.colors.fg.toString(),
                     $nest: {
                         ".meBox-contentHover": meBoxStateStyles,
                         ".meBox-buttonContent": meBoxStateStyles,
                     },
                 },
                 "&:hover": {
+                    color: vars.colors.fg.toString(),
                     $nest: {
                         ".meBox-contentHover": meBoxStateStyles,
                         ".meBox-buttonContent": meBoxStateStyles,
                     },
                 },
                 "&.focus-visible": {
+                    color: vars.colors.fg.toString(),
                     $nest: {
                         ".meBox-contentHover": meBoxStateStyles,
                         ".meBox-buttonContent": meBoxStateStyles,
@@ -373,8 +379,14 @@ export default function vanillaHeaderClasses(theme?: object) {
         },
         mediaQueries.oneColumn({
             height: px(vars.sizing.mobile.height),
+            width: px(vars.sizing.mobile.width),
+            minWidth: px(vars.sizing.mobile.width),
         }),
     );
+
+    const centeredButtonClass = style({
+        ...flex.middle(),
+    });
 
     const searchCancel = style({
         ...debug.name("searchCancel"),
@@ -464,11 +476,6 @@ export default function vanillaHeaderClasses(theme?: object) {
         }),
     );
 
-    const backLink = style({
-        ...debug.name("backLink"),
-        transform: `translateX(${-px(globalVars.gutter.half)})`,
-    });
-
     const signIn = style({
         ...debug.name("signIn"),
         $nest: {
@@ -538,7 +545,7 @@ export default function vanillaHeaderClasses(theme?: object) {
         {
             ...debug.name("compactSearchResults"),
             top: (vars.sizing.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
-            display: "block",
+            display: "flex",
             position: "relative",
             margin: "auto",
             maxWidth: px(vars.compactSearch.maxWidth),
@@ -570,9 +577,9 @@ export default function vanillaHeaderClasses(theme?: object) {
         horizontalScroll,
         rightFlexBasis,
         leftFlexBasis,
-        backLink,
         signIn,
         register,
+        centeredButtonClass,
         compactSearchResults,
     };
 }

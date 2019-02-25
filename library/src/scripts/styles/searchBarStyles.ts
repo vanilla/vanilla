@@ -11,6 +11,7 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { calc, important, percent, px } from "csx";
 import { buttonVariables } from "@library/styles/buttonStyles";
+import { layoutVariables } from "@library/styles/layoutStyles";
 
 export function searchBarVariables(theme?: object) {
     const formElementVars = formElementsVariables(theme);
@@ -52,104 +53,114 @@ export function searchBarClasses(theme?: object) {
     const debug = debugHelper("searchBar");
     const buttonVars = buttonVariables(theme);
     const formElementVars = formElementsVariables(theme);
+    const mediaQueries = layoutVariables(theme).mediaQueries();
 
-    const root = style({
-        ...debug.name(),
-        cursor: "pointer",
-        $nest: {
-            "& .suggestedTextInput-inputText": {
-                borderRight: 0,
-                borderTopRightRadius: 0,
-                borderBottomRightRadius: 0,
-                $nest: {
-                    "&.inputText": {
-                        paddingTop: 0,
-                        paddingBottom: 0,
+    const root = style(
+        {
+            ...debug.name(),
+            cursor: "pointer",
+            $nest: {
+                "& .suggestedTextInput-inputText": {
+                    borderRight: 0,
+                    borderTopRightRadius: 0,
+                    borderBottomRightRadius: 0,
+                    $nest: {
+                        "&.inputText": {
+                            paddingTop: 0,
+                            paddingBottom: 0,
+                        },
                     },
                 },
-            },
 
-            "& .suggestedTextInput-clear": {
-                $nest: {
-                    "&, &.buttonIcon": {
-                        border: "none",
-                        boxShadow: "none",
-                        color: globalVars.mainColors.primary.toString(),
+                "& .suggestedTextInput-clear": {
+                    $nest: {
+                        "&, &.buttonIcon": {
+                            border: "none",
+                            boxShadow: "none",
+                            color: globalVars.mainColors.primary.toString(),
+                        },
                     },
                 },
-            },
 
-            "& .searchBar__placeholder": {
-                color: vars.placeholder.color.toString(),
-                margin: "auto",
-            },
+                "& .searchBar__placeholder": {
+                    color: vars.placeholder.color.toString(),
+                    margin: "auto",
+                },
 
-            "& .suggestedTextInput-valueContainer": {
-                $nest: {
-                    ".inputBlock-inputText": {
-                        height: "auto",
+                "& .suggestedTextInput-valueContainer": {
+                    $nest: {
+                        ".inputBlock-inputText": {
+                            height: "auto",
+                        },
                     },
                 },
-            },
-            "& .searchBar-submitButton": {
-                position: "relative",
-                borderTopLeftRadius: 0,
-                borderBottomLeftRadius: 0,
-                marginLeft: -1,
-                minWidth: unit(vars.search.minWidth),
-                flexBasis: unit(vars.search.minWidth),
-                $nest: {
-                    "&:hover, &:focus": {
-                        zIndex: 1,
+                "& .searchBar-submitButton": {
+                    position: "relative",
+                    borderTopLeftRadius: 0,
+                    borderBottomLeftRadius: 0,
+                    marginLeft: -1,
+                    minWidth: unit(vars.search.minWidth),
+                    flexBasis: unit(vars.search.minWidth),
+                    $nest: {
+                        "&:hover, &:focus": {
+                            zIndex: 1,
+                        },
                     },
                 },
-            },
-            "& .searchBar__control": {
-                display: "flex",
-                flex: 1,
-                border: 0,
-                backgroundColor: "transparent",
-                height: percent(100),
-                maxWidth: calc(`100% - ${unit(vars.sizing.height)}`),
-                $nest: {
-                    "&.searchBar__control--is-focused": {
-                        boxShadow: "none",
-                        $nest: {
-                            "&.inputText": {
-                                borderTopRightRadius: 0,
-                                borderBottomRightRadius: 0,
-                                borderColor: buttonVars.standard.focus.borderColor.toString(),
+                "& .searchBar__control": {
+                    display: "flex",
+                    flex: 1,
+                    border: 0,
+                    backgroundColor: "transparent",
+                    height: percent(100),
+                    maxWidth: calc(`100% - ${unit(vars.sizing.height)}`),
+                    $nest: {
+                        "&.searchBar__control--is-focused": {
+                            boxShadow: "none",
+                            $nest: {
+                                "&.inputText": {
+                                    borderTopRightRadius: 0,
+                                    borderBottomRightRadius: 0,
+                                    borderColor: buttonVars.standard.focus.borderColor.toString(),
+                                },
                             },
                         },
                     },
                 },
-            },
-            "& .searchBar__value-container": {
-                overflow: "auto",
-                $nest: {
-                    "& > div": {
-                        width: percent(100),
+                "& .searchBar__value-container": {
+                    overflow: "auto",
+                    $nest: {
+                        "& > div": {
+                            width: percent(100),
+                        },
                     },
                 },
-            },
-            "& .searchBar__indicators": {
-                display: "none",
-            },
-            "& .searchBar__input": {
-                width: percent(100),
-                display: important("block"),
-                $nest: {
-                    input: {
-                        width: important(percent(100).toString()),
-                        lineHeight: globalVars.lineHeights.base,
+                "& .searchBar__indicators": {
+                    display: "none",
+                },
+                "& .searchBar__input": {
+                    width: percent(100),
+                    display: important("block"),
+                    $nest: {
+                        input: {
+                            width: important(percent(100).toString()),
+                            lineHeight: globalVars.lineHeights.base,
+                        },
                     },
                 },
-            },
-            "& .searchBar__menu-list": {
-                maxHeight: calc(`100vh - ${unit(vanillaHeaderVars.sizing.height)}`),
+                "& .searchBar__menu-list": {
+                    maxHeight: calc(`100vh - ${unit(vanillaHeaderVars.sizing.height)}`),
+                },
             },
         },
-    });
+        mediaQueries.oneColumn({
+            $nest: {
+                "& .searchBar-submitButton": {
+                    minWidth: 0,
+                },
+            },
+        }),
+    );
 
     const results = style({
         $nest: {

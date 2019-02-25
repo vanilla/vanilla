@@ -73,7 +73,7 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
                             position: "absolute",
                             top: y.position,
                             left: x.position,
-                            zIndex: 1,
+                            zIndex: 10,
                             visibility: "visible",
                         };
                     }

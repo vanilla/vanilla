@@ -59,6 +59,7 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     onCloseSuggestions?: () => void;
     buttonText?: string;
     disableAutocomplete?: boolean;
+    clearButtonClass?: string;
 }
 
 interface IState {
@@ -270,7 +271,12 @@ export default class SearchBar extends React.Component<IProps, IState> {
                             )}
                         >
                             <components.Control {...props} />
-                            {this.props.value && <ClearButton onClick={this.clear} className={classes.clear} />}
+                            {this.props.value && (
+                                <ClearButton
+                                    onClick={this.clear}
+                                    className={classNames(classes.clear, this.props.clearButtonClass)}
+                                />
+                            )}
                         </div>
                         <ConditionalWrap condition={!!this.props.hideSearchButton} className="sr-only">
                             <Button

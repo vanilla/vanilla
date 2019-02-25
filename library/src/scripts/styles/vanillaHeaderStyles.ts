@@ -168,7 +168,7 @@ export default function vanillaHeaderClasses(theme?: object) {
                     color: vars.colors.fg.toString(),
                     cursor: "pointer",
                 },
-                "& .suggestedTextInput-clear.searchBar-clear": {
+                "&& .suggestedTextInput-clear.searchBar-clear": {
                     ...debug.name("clear"),
                     color: vars.colors.fg.toString(),
                     $nest: {
@@ -289,16 +289,11 @@ export default function vanillaHeaderClasses(theme?: object) {
         color: "inherit",
     });
 
-    const compactSearch = style(
-        {
-            ...debug.name("compactSearch"),
-            marginLeft: "auto",
-            maxWidth: px(vars.compactSearch.maxWidth),
-        },
-        mediaQueries.oneColumn({
-            maxWidth: px(vars.compactSearch.mobile.width),
-        }),
-    );
+    const compactSearch = style({
+        ...debug.name("compactSearch"),
+        marginLeft: "auto",
+        maxWidth: px(vars.compactSearch.maxWidth),
+    });
 
     const topElement = style(
         {
@@ -555,6 +550,10 @@ export default function vanillaHeaderClasses(theme?: object) {
         }),
     );
 
+    const clearButtonClass = style({
+        color: vars.colors.fg.toString(),
+    });
+
     return {
         root,
         spacer,
@@ -581,6 +580,7 @@ export default function vanillaHeaderClasses(theme?: object) {
         register,
         centeredButtonClass,
         compactSearchResults,
+        clearButtonClass,
     };
 }
 

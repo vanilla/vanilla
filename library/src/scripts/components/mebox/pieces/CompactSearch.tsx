@@ -17,6 +17,7 @@ import { withRouter, RouteComponentProps } from "react-router-dom";
 import FocusWatcher from "@library/FocusWatcher";
 import vanillaHeaderClasses from "@library/styles/vanillaHeaderStyles";
 import { compactSearchClasses } from "@library/styles/compactSearchStyles";
+import { searchBarClasses } from "@library/styles/searchBarStyles";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
@@ -32,6 +33,7 @@ export interface ICompactSearchProps extends IWithSearchProps, RouteComponentPro
     focusOnMount?: boolean;
     buttonContentClass?: string;
     cancelContentClassName?: string;
+    clearButtonClass?: string;
 }
 
 interface IState {
@@ -54,6 +56,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
     public render() {
         const headerClasses = vanillaHeaderClasses();
         const classes = compactSearchClasses();
+        const classesSearchBar = searchBarClasses();
         return (
             <div
                 ref={this.selfRef}
@@ -94,6 +97,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                             onOpenSuggestions={this.props.onOpenSuggestions}
                             onCloseSuggestions={this.props.onCloseSuggestions}
                             className={"compactSearch-searchBar"}
+                            clearButtonClass={this.props.clearButtonClass}
                         />
                         <Button
                             onClick={this.props.onCloseSearch}
@@ -122,7 +126,11 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                 )}
                 <div
                     ref={this.resultsRef}
-                    className={classNames("vanillaHeader-compactSearchResults", headerClasses.compactSearchResults)}
+                    className={classNames(
+                        "vanillaHeader-compactSearchResults",
+                        headerClasses.compactSearchResults,
+                        classesSearchBar.results,
+                    )}
                 />
             </div>
         );

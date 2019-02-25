@@ -96,7 +96,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                     "vanillaHeader-leftFlexBasis",
                                                     "vanillaHeader-backLink",
                                                     classes.leftFlexBasis,
-                                                    classes.backLink,
                                                 )}
                                                 linkClassName={classes.button}
                                                 fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
@@ -155,6 +154,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                             onOpenSuggestions={this.setOpenSuggestions}
                                             onCloseSuggestions={this.setCloseSuggestions}
                                             buttonContentClass={classNames(classesMeBox.buttonContent)}
+                                            clearButtonClass={classes.clearButtonClass}
                                         />
 
                                         {isGuest ? (

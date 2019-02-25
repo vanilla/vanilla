@@ -16,6 +16,7 @@ import {
 } from "@rich-editor/quill/utility";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import OpUtils from "@rich-editor/__tests__/OpUtils";
+import { _executeReady } from "@library/application";
 
 const prettyNewline = (contents: string) => contents.replace(/\n/g, "↵ ");
 
@@ -216,7 +217,8 @@ describe("getIDForQuill()", () => {
 });
 
 describe("insertBlockBlotAt()", () => {
-    it("can split a line in the middle", () => {
+    it("can split a line in the middle", async () => {
+        await _executeReady();
         const content = [{ insert: "\n\n\n1234567890\n" }];
         const expected = [
             {

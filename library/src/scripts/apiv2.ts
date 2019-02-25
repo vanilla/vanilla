@@ -14,7 +14,7 @@ import { IFieldError, LoadStatus, ILoadable } from "@library/@types/api";
 import { humanFileSize } from "@library/utils/fileUtils";
 
 function fieldErrorTransformer(responseData) {
-    if (responseData.status && responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {
+    if (responseData && responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {
         responseData.errors = indexArrayByKey(responseData.errors, "field");
     }
 

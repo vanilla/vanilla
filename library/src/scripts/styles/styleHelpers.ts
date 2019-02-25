@@ -206,10 +206,8 @@ export const inheritHeightClass = () => {
     });
 };
 
-const vars = globalVariables();
-const formElementVars = formElementsVariables();
-
 export const defaultTransition = (...properties) => {
+    const vars = globalVariables();
     properties = properties.length === 0 ? ["all"] : properties;
     return {
         transition: `${properties.map((prop, index) => {
@@ -234,6 +232,7 @@ interface IBorderStyles {
 }
 
 export const borderStyles = (styles: IBorderStyles) => {
+    const vars = globalVariables();
     return {
         borderColor: styles.color ? styles.color.toString() : vars.border.color.toString(),
         borderWidth: unit(styles.width),
@@ -304,6 +303,7 @@ export interface ISpinnerProps {
 }
 
 export const spinnerLoader = (props: ISpinnerProps) => {
+    const vars = globalVariables();
     const debug = debugHelper("spinnerLoader");
     const spinnerVars = {
         color: vars.mainColors.primary,
@@ -442,6 +442,7 @@ export const dropShadow = (vals: IDropShadowShorthand | IDropShadow | "none" | "
 };
 
 export const disabledInput = () => {
+    const formElementVars = formElementsVariables();
     return {
         pointerEvents: important("none"),
         userSelect: important("none"),
@@ -484,6 +485,7 @@ export interface ILinkStates {
 }
 
 export const setAllLinkColors = (overwrites?: ILinkStates) => {
+    const vars = globalVariables();
     // We want to default to the standard styles and only overwrite what we want/need
     const linkColors = vars.links.colors;
 

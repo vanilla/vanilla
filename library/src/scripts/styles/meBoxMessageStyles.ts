@@ -5,12 +5,12 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borderStyles, componentThemeVariables, debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
+import { componentThemeVariables, debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc, percent, quote } from "csx";
 import { objectFitWithFallback } from "@library/styles/styleHelpers";
 import { absolutePosition } from "@library/styles/styleHelpers";
+import vanillaHeaderStyles, { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 
 export function meBoxMessageVariables(theme?: object) {
     const themeVars = componentThemeVariables(theme, "meBoxMessage");
@@ -35,6 +35,7 @@ export function meBoxMessageVariables(theme?: object) {
 export function meBoxMessageClasses(theme?: object) {
     const globalVars = globalVariables(theme);
     const vars = meBoxMessageVariables(theme);
+    const headerVars = vanillaHeaderVariables(theme);
     const debug = debugHelper("meBoxMessage");
 
     const root = style({
@@ -52,10 +53,16 @@ export function meBoxMessageClasses(theme?: object) {
         flexWrap: "nowrap",
         padding: unit(vars.spacing.padding),
         color: "inherit",
+        userSelect: "none",
         $nest: {
             "&:active, &:focus, &:hover, &.focus-visible": {
                 backgroundColor: toStringColor(globalVars.states.active.color),
                 textDecoration: "none",
+                color: headerVars.colors.fg.toString(),
+            },
+            "&:active .meta, &:focus .meta, &:hover .meta, &.focus-visible .meta": {
+                color: headerVars.colors.fg.toString(),
+                opacity: 0.75,
             },
         },
         ...debug.name("link"),

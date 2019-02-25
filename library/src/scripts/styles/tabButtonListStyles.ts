@@ -21,19 +21,21 @@ export function tabButtonListClasses(theme?: object) {
 
     const button = style({
         flexGrow: 1,
+        color: globalVars.mainColors.fg.toString(),
         $nest: {
             ".icon": {
                 ...defaultTransition("opacity"),
                 opacity: 0.8,
             },
             "&:hover": {
+                color: globalVars.mainColors.primary.toString(),
                 $nest: {
                     ".icon": {
                         opacity: 1,
                     },
                 },
             },
-            "&:focus, &:active": {
+            "&:focus, &:active, &.focus-visible": {
                 color: globalVars.mainColors.primary.toString(),
             },
         },

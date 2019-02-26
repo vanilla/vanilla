@@ -62,12 +62,6 @@ export function formElementsVariables(theme?: object) {
         ...themeVars.subComponentStyles("colors"),
     };
 
-    const errors = {
-        bg: color("#FFF3D4"),
-        fg: vars.mainColors.fg,
-        ...themeVars.subComponentStyles("errors"),
-    };
-
     const errorSpacing = {
         horizontalPadding: varsLayouts.gutter.size,
         verticalPadding: varsLayouts.gutter.size,
@@ -92,7 +86,6 @@ export function formElementsVariables(theme?: object) {
         giantInput,
         largeInput,
         miniInput,
-        errors,
         colors,
         placeholder,
         disabled,
@@ -105,8 +98,8 @@ export function formErrorClasses(theme?: object) {
     const vars = formElementsVariables(theme);
 
     const root = style({
-        backgroundColor: vars.errors.bg.toString(),
-        color: vars.errors.fg.toString(),
+        backgroundColor: varsGlobal.feedbackColors.error.bg.toString(),
+        color: varsGlobal.feedbackColors.error.fg.toString(),
         marginBottom: px(16),
         paddingLeft: vars.errorSpacing.horizontalPadding,
         paddingRight: vars.errorSpacing.horizontalPadding,

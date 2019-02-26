@@ -5,10 +5,14 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, styleFactory } from "@library/styles/styleHelpers";
+import { componentThemeVariables, styleFactory } from "@library/styles/styleHelpers";
+import { color } from "csx/lib/color";
+import { px } from "csx";
+import { layoutVariables } from "@library/styles/layoutStyles";
 
 export function formElementsVariables(theme?: object) {
     const vars = globalVariables(theme);
+    const varsLayouts = layoutVariables(theme);
     const mixBgAndFg = vars.mixBgAndFg;
     const themeVars = componentThemeVariables(theme, "formElements");
 
@@ -58,6 +62,19 @@ export function formElementsVariables(theme?: object) {
         ...themeVars.subComponentStyles("colors"),
     };
 
+    const errors = {
+        bg: color("#FFF3D4"),
+        fg: vars.mainColors.fg,
+        ...themeVars.subComponentStyles("errors"),
+    };
+
+    const errorSpacing = {
+        horizontalPadding: varsLayouts.gutter.size,
+        verticalPadding: varsLayouts.gutter.size,
+        verticalMargin: varsLayouts.gutter.halfSize,
+        ...themeVars.subComponentStyles("errorSpacing"),
+    };
+
     const placeholder = {
         color: mixBgAndFg(0.5),
         ...themeVars.subComponentStyles("placeholder"),
@@ -67,7 +84,19 @@ export function formElementsVariables(theme?: object) {
         opacity: 0.5,
     };
 
-    return { sizing, spacing, border, giantInput, largeInput, miniInput, colors, placeholder, disabled };
+    return {
+        sizing,
+        errorSpacing,
+        spacing,
+        border,
+        giantInput,
+        largeInput,
+        miniInput,
+        errors,
+        colors,
+        placeholder,
+        disabled,
+    };
 }
 
 export function formErrorClasses(theme?: object) {
@@ -75,15 +104,34 @@ export function formErrorClasses(theme?: object) {
     const varsGlobal = globalVariables(theme);
     const vars = formElementsVariables(theme);
 
-    const root = style({});
-    const message = style("message", {});
-    const actions = style("actions", {});
-    const actionButton = style("button");
+    const root = style({
+        backgroundColor: vars.errors.bg.toString(),
+        color: vars.errors.fg.toString(),
+        marginBottom: px(16),
+        paddingLeft: vars.errorSpacing.horizontalPadding,
+        paddingRight: vars.errorSpacing.horizontalPadding,
+        paddingTop: vars.errorSpacing.verticalPadding,
+        paddingBottom: vars.errorSpacing.verticalPadding,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+    });
+    const actions = style("actions", {
+        display: "flex",
+        alignItems: "center",
+    });
+
+    const actionButton = style("button", {
+        marginLeft: px(12),
+    });
+    const activeButton = style("activeButton", {
+        fontWeight: "bold",
+    });
 
     return {
-        root,
-        message,
-        actions,
         actionButton,
+        root,
+        activeButton,
+        actions,
     };
 }

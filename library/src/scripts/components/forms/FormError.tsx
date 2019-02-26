@@ -7,8 +7,8 @@ import React from "react";
 import Button, { ButtonBaseClass } from "./Button";
 import { t } from "@library/application";
 import { formErrorClasses } from "@library/components/forms/formElementStyles";
-import { classes } from "typestyle";
-import { buttonClasses } from "@library/styles/buttonStyles";
+import classNames from "classnames";
+import Paragraph from "@library/components/Paragraph";
 
 interface IProps {
     children: React.ReactNode;
@@ -19,27 +19,22 @@ interface IProps {
 export default class FormError extends React.Component<IProps> {
     public render(): React.ReactNode {
         const { onRetryClick, onDismissClick, children } = this.props;
-        const mClasses = formErrorClasses();
-        const mButtonclasses = buttonClasses();
+        const classes = formErrorClasses();
 
         return (
-            <div className={mClasses.root}>
-                <p className={mClasses.message}>{children}</p>
-                <div className={mClasses.actions}>
+            <div className={classes.root}>
+                <Paragraph>{children}</Paragraph>
+                <div className={classes.actions}>
                     {onRetryClick && (
                         <Button
                             onClick={onRetryClick}
                             baseClass={ButtonBaseClass.TEXT}
-                            className={classes(mClasses.actionButton, mButtonclasses.primary)}
+                            className={classNames(classes.actionButton, classes.activeButton)}
                         >
                             {t("Retry")}
                         </Button>
                     )}
-                    <Button
-                        onClick={onDismissClick}
-                        baseClass={ButtonBaseClass.TEXT}
-                        className={classes(mClasses.actionButton)}
-                    >
+                    <Button onClick={onDismissClick} baseClass={ButtonBaseClass.TEXT} className={classes.actionButton}>
                         {t("Dismiss")}
                     </Button>
                 </div>

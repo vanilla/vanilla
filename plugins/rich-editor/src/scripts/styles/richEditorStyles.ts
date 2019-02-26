@@ -230,15 +230,13 @@ export function richEditorClasses(theme?: object) {
         height: percent(100),
         width: calc(`100% + ${unit(vars.scrollContainer.overshoot * 2)}`),
         marginLeft: unit(-vars.scrollContainer.overshoot),
-        padding: {
-            left: unit(vars.scrollContainer.overshoot),
-            right: unit(vars.scrollContainer.overshoot),
-        },
+        paddingLeft: unit(vars.scrollContainer.overshoot),
+        paddingRight: unit(vars.scrollContainer.overshoot),
     });
 
     const frame = style("frame", {
         position: "relative",
-        backgroundColor: vars.colors.bg,
+        backgroundColor: toStringColor(vars.colors.bg),
         height: "auto",
         padding: 0,
         $nest: {

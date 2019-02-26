@@ -9,13 +9,19 @@ import { t } from "@library/application";
 import { formErrorClasses } from "@library/components/forms/formElementStyles";
 import classNames from "classnames";
 import Paragraph from "@library/components/Paragraph";
+import ButtonLoader from "@library/components/ButtonLoader";
+import { buttonVariables } from "@library/styles/buttonStyles";
 
 interface IProps {
     children: React.ReactNode;
+    isRetryLoading?: boolean;
     onDismissClick: () => void;
-    onRetryClick?: () => void;
+    onRetryClick?: () => void; // If this is passed a rety button will appear to call it.
 }
 
+/**
+ * Component for representing a Form Error.
+ */
 export default class FormError extends React.Component<IProps> {
     public render(): React.ReactNode {
         const { onRetryClick, onDismissClick, children } = this.props;
@@ -31,7 +37,11 @@ export default class FormError extends React.Component<IProps> {
                             baseClass={ButtonBaseClass.TEXT}
                             className={classNames(classes.actionButton, classes.activeButton)}
                         >
-                            {t("Retry")}
+                            {this.props.isRetryLoading ? (
+                                <ButtonLoader buttonType={buttonVariables().standard} />
+                            ) : (
+                                t("Retry")
+                            )}
                         </Button>
                     )}
                     <Button onClick={onDismissClick} baseClass={ButtonBaseClass.TEXT} className={classes.actionButton}>

@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     absolutePosition,
     unit,
-    borderStyles,
+    borders,
     componentThemeVariables,
     debugHelper,
     defaultTransition,
@@ -149,7 +149,7 @@ export function checkRadioClasses(theme?: object) {
         verticalAlign: em(-0.18),
         cursor: "pointer",
         backgroundColor: toStringColor(vars.main.bg),
-        ...borderStyles(vars.border),
+        ...borders(vars.border),
     });
 
     const radioIcon = style({

@@ -55,6 +55,7 @@ export function formElementsVariables(theme?: object) {
     const colors = {
         fg: mixBgAndFg(0.8),
         bg: vars.mainColors.bg,
+        placeholder: mixBgAndFg(0.5),
         ...themeVars.subComponentStyles("colors"),
     };
 

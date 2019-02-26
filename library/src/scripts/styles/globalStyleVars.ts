@@ -231,6 +231,7 @@ export const globalVariables = (theme?: object) => {
             color: mixBgAndFg(0.15),
             radius: border.radius,
         },
+        fullPageHeadingSpacer: 32,
         spacer: 32,
     };
 

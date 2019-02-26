@@ -6,7 +6,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
-    borderStyles,
+    borders,
     componentThemeVariables,
     debugHelper,
     allLinkStates,
@@ -81,7 +81,7 @@ export function attachmentClasses(theme?: object) {
         margin: "auto",
         overflow: "hidden",
         userSelect: "none",
-        ...borderStyles(vars.border),
+        ...borders(vars.border),
         $nest: {
             "&.isLoading, &.hasError": {
                 cursor: "pointer",
@@ -117,7 +117,7 @@ export function attachmentClasses(theme?: object) {
         justifyContent: "space-between",
         padding: px(vars.padding.default),
         width: percent(100),
-        ...borderStyles({
+        ...borders({
             color: "transparent",
             width: 2,
             radius: 0,

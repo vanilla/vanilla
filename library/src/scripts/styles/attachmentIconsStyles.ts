@@ -6,7 +6,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
-    borderStyles,
+    borders,
     componentThemeVariables,
     debugHelper,
     allLinkStates,

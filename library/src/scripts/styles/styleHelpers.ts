@@ -19,6 +19,10 @@ import {
     JustifyContentProperty,
     ContentProperty,
     ObjectFitProperty,
+    WhiteSpaceProperty,
+    TextOverflowProperty,
+    OverflowXProperty,
+    MaxWidthProperty,
 } from "csstype";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { style, keyframes } from "typestyle";
@@ -102,6 +106,50 @@ export function backgroundCover(backgroundImage: BackgroundImageProperty) {
         backgroundImage: backgroundImage.toString(),
     });
 }
+
+export function inputLineHeight(height: number, paddingTop: number, fullBorderWidth: number) {
+    return unit(height - (2 * paddingTop + fullBorderWidth));
+}
+
+export const textInputSizing = (
+    height: number,
+    fontSize: number,
+    paddingTop: number,
+    fg: ColorHelper,
+    fullBorderWidth: number,
+) => {
+    return {
+        fontSize: unit(fontSize),
+        color: fg.toString(),
+        width: percent(100),
+        height: unit(height),
+        lineHeight: inputLineHeight(height, paddingTop, fullBorderWidth),
+        ...paddings({
+            top: unit(paddingTop),
+            bottom: unit(paddingTop),
+            left: unit(paddingTop * 2),
+            right: unit(paddingTop * 2),
+        }),
+    };
+};
+
+// must be nested
+export const placeholderStyles = (styles: object) => {
+    return {
+        "&::-webkit-input-placeholder": {
+            $unique: true,
+            ...styles,
+        },
+        "&::-moz-placeholder": {
+            $unique: true,
+            ...styles,
+        },
+        "&::-ms-input-placeholder": {
+            $unique: true,
+            ...styles,
+        },
+    };
+};
 
 /*
  * Helper to generate human readable classes generated from TypeStyle
@@ -231,7 +279,7 @@ interface IBorderStyles {
     radius?: BorderRadiusProperty<TLength>;
 }
 
-export const borderStyles = (styles: IBorderStyles) => {
+export const borders = (styles: IBorderStyles = {}) => {
     const vars = globalVariables();
     return {
         borderColor: styles.color ? styles.color.toString() : vars.border.color.toString(),
@@ -517,5 +565,21 @@ export const setAllLinkColors = (overwrites?: ILinkStates) => {
             "&:active": styles.active,
             "&:visited": styles.visited,
         },
+    };
+};
+
+export const singleLineEllipsis = () => {
+    return {
+        whiteSpace: "nowrap" as WhiteSpaceProperty,
+        textOverflow: "ellipsis" as TextOverflowProperty,
+        overflowX: "hidden" as OverflowXProperty,
+        maxWidth: percent(100) as MaxWidthProperty<TLength>,
+    };
+};
+export const longWordEllipsis = () => {
+    return {
+        textOverflow: "ellipsis" as TextOverflowProperty,
+        overflowX: "hidden" as OverflowXProperty,
+        maxWidth: percent(100) as MaxWidthProperty<TLength>,
     };
 };

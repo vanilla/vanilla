@@ -4,389 +4,377 @@
  * @license GPL-2.0-only
  */
 
-$richEditor-scrollContainer_overshoot: 48px;
+//$richEditor-scrollContainer_overshoot: 48px;
 
-.richEditor {
-    position: relative;
-    display: block;
-    &.isDisabled { // Before React has replaced initial HTML
-        &,
-        .richEditor-button {
-            cursor: progress !important;
-        }
-    }
+//.richEditor {
+    //position: relative;
+    //display: block;
+    //&.isDisabled { // Before React has replaced initial HTML
+    //    &,
+    //    .richEditor-button {
+    //        cursor: progress !important;
+    //    }
+    //}
+    //
+    //&.inheritHeight {
+    //    .richEditor-text,
+    //    .richEditor-textWrap,
+    //    .richEditor-frame {
+    //        display: flex;
+    //        flex-direction: column;
+    //        flex-grow: 1;
+    //    }
+    //}
+//}
+//
+//.richEditor-scrollContainer {
+//    position: relative;
+//    overflow: auto;
+//    height: 100%;
+//    width: calc(100% + #{$richEditor-scrollContainer_overshoot * 2});
+//    margin-left: -$richEditor-scrollContainer_overshoot;
+//    padding: {
+//        left: $richEditor-scrollContainer_overshoot;
+//        right: $richEditor-scrollContainer_overshoot;
+//    }
+//}
 
-    &.inheritHeight {
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
+//.richEditor-frame {
+//    position: relative;
+//    background: $richEditor_bg;
+//    height: auto;
+//    padding: 0;
+//
+//
+//    &.isMenuInset {
+//        overflow: initial;
+//        position: relative;
+//    }
+//}
 
+//.richEditor-menu {
+//    display: inline-block;
+//    position: relative;
+//}
+//
+//.richEditorParagraphMenu {
+//    position: absolute;
+//    display: flex;
+//    align-items: center;
+//    justify-content: center;
+//    top: $richEditor-pilcrow_offset;
+//    left: $richEditor_horizontalPadding - $icon_default_size + 2px;
+//    transform: translateX(-100%);
+//    height: $richEditor-floatingButton_size;
+//    width: $icon_default_size;
+//    z-index: 1;
+//    animation: fadein $richEditor-pilcrowAnimation_duration ease-out;
+//    animation-iteration-count: 1;
+//
+//    .richEditor-button {
+//        &.isActive {
+//            &:hover {
+//                cursor: default;
+//            }
+//        }
+//    }
+//
+//    &.isMenuInset {
+//        transform: none;
+//    }
+//}
 
-        .richEditor-text,
-        .richEditor-textWrap,
-        .richEditor-frame {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-    }
-}
+//.richEditorParagraphMenu-handle {
+//    width: $richEditor-floatingButton_size;
+//    max-width: $richEditor-floatingButton_size;
+//    min-width: $richEditor-floatingButton_size;
+//    height: $richEditor-floatingButton_size;
+//}
 
-.richEditor-scrollContainer {
-    position: relative;
-    overflow: auto;
-    height: 100%;
-    width: calc(100% + #{$richEditor-scrollContainer_overshoot * 2});
-    margin-left: -$richEditor-scrollContainer_overshoot;
-    padding: {
-        left: $richEditor-scrollContainer_overshoot;
-        right: $richEditor-scrollContainer_overshoot;
-    }
-}
+//.richEditor-text {
+//    position: relative;
+//    min-height: $richEditor_minHeight;
+//    white-space: pre-wrap !important; // Needed for spaces around embed blots to work properly!
+//    outline: 0;
+//}
 
-.richEditor-frame {
-    position: relative;
-    background: $richEditor_bg;
-    height: auto;
-    padding: 0;
+//.ql-clipboard {
+//    @include sr-only();
+//
+//    // Fixed https://github.com/quilljs/quill/issues/1374#issuecomment-415333651
+//    position: fixed;
+//}
 
+//.richEditor-menuItems {
+    //position: relative;
+    //display: flex;
+    //align-items: flex-start;
+    //justify-content: flex-start;
+    //flex-wrap: nowrap;
+    //list-style: none;
+    //padding: 0;
+    //-ms-overflow-style: -ms-autohiding-scrollbar;
+    //margin: 0;
+    //z-index: 1;
 
-    &.isMenuInset {
-        overflow: initial;
-        position: relative;
-    }
-}
+    //.richEditor-menuItem {
+        //display: block;
+        //padding: 0;
+        //margin: 0;
 
-.richEditor-menu {
-    display: inline-block;
-    position: relative;
-}
+        //.richEditor-button,
+        //&.richEditor-button {
+        //    width: $richEditor-menuButton_size;
+        //    font-size: #{$richEditor-menuButton_size * 24 / 39};
+        //    line-height: $richEditor-menuButton_size;
+        //
+        //    &.emojiChar-🇺🇳 {
+        //        font-size: 10px;
+        //    }
+        //}
 
-.richEditorParagraphMenu {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    top: $richEditor-pilcrow_offset;
-    left: $richEditor_horizontalPadding - $icon_default_size + 2px;
-    transform: translateX(-100%);
-    height: $richEditor-floatingButton_size;
-    width: $icon_default_size;
-    z-index: 1;
-    animation: fadein $richEditor-pilcrowAnimation_duration ease;
-    animation-iteration-count: 1;
+        //&:first-child {
+        //    .richEditor-embedButton {
+        //        border-bottom-left-radius: $global-borderRadius;
+        //    }
+        //}
 
-    .richEditor-button {
-        &.isActive {
-            &:hover {
-                cursor: default;
-            }
-        }
-    }
+        //&.isRightAligned {
+        //    margin-left: auto;
+        //}
+    //}
+//}
 
-    &.isMenuInset {
-        transform: none;
-    }
-}
-
-.richEditorParagraphMenu-handle {
-    width: $richEditor-floatingButton_size;
-    max-width: $richEditor-floatingButton_size;
-    min-width: $richEditor-floatingButton_size;
-    height: $richEditor-floatingButton_size;
-}
-
-.richEditor-text {
-    position: relative;
-    min-height: $richEditor_minHeight;
-    white-space: pre-wrap !important; // Needed for spaces around embed blots to work properly!
-    outline: 0;
-}
-
-.ql-clipboard {
-    @include sr-only();
-
-    // Fixed https://github.com/quilljs/quill/issues/1374#issuecomment-415333651
-    position: fixed;
-}
-
-.richEditor-menuItems {
-    position: relative;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    flex-wrap: nowrap;
-    list-style: none;
-    padding: 0;
-    -ms-overflow-style: -ms-autohiding-scrollbar;
-    margin: 0;
-    z-index: 1;
-
-    .richEditor-menuItem {
-        display: block;
-        padding: 0;
-        margin: 0;
-
-        .richEditor-button,
-        &.richEditor-button {
-            width: $richEditor-menuButton_size;
-            font-size: #{$richEditor-menuButton_size * 24 / 39};
-            line-height: $richEditor-menuButton_size;
-
-            &.emojiChar-🇺🇳 {
-                font-size: 10px;
-            }
-        }
-
-        &:first-child {
-            .richEditor-embedButton {
-                border-bottom-left-radius: $global-borderRadius;
-            }
-        }
-
-        &.isRightAligned {
-            margin-left: auto;
-        }
-    }
-}
-
-
-
-// button reset
-.richEditor-nextInput,
-.iconButton,
-.richEditor-button {
-    @include singleLineEllipsis;
-    position: relative;
-    appearance: none;
-    border: 0;
-    padding: 0;
-    background: none;
-    text-align: left;
-}
+//// button reset
+//.richEditor-nextInput,
+//.iconButton,
+//.richEditor-button {
+//    @include singleLineEllipsis;
+//    position: relative;
+//    appearance: none;
+//    border: 0;
+//    padding: 0;
+//    background: none;
+//    text-align: left;
+//}
 
 
 
-.richEditor-button {
-    display: block;
-    user-select: none;
-    cursor: pointer;
+//.richEditor-button {
+    //display: block;
+    //user-select: none;
+    //cursor: pointer;
 
-    &.richEditor-formatButton,
-    &.richEditor-embedButton {
-        height: $richEditor-menuButton_size;
-        color: inherit;
-    }
+    //&.richEditor-formatButton,
+    //&.richEditor-embedButton {
+    //    height: $richEditor-menuButton_size;
+    //    color: inherit;
+    //}
 
-    &.emojiGroup {
-        display: block;
-        width: $richEditor-menuButton_size;
-        height: $richEditor-menuButton_size;
-        text-align: center;
+    //&.emojiGroup {
+    //    display: block;
+    //    width: $richEditor-menuButton_size;
+    //    height: $richEditor-menuButton_size;
+    //    text-align: center;
+    //
+    //    &.isSelected {
+    //        @include iconButtonActiveState;
+    //    }
+    //}
+    //&:not(:disabled) {
+    //    cursor: pointer;
+    //}
 
-        &.isSelected {
-            @include iconButtonActiveState;
-        }
-    }
+    //&:hover {
+    //    @include iconButtonHoverState;
+    //    .Close-x,
+    //    .richEditorButton-icon {
+    //        opacity: 1;
+    //    }
+    //}
+    //
+    //&:focus {
+    //    @include iconButtonFocusState;
+    //    z-index: 2;
+    //    .Close-x,
+    //    .richEditorButton-icon {
+    //        opacity: 1;
+    //    }
+    //}
 
-    &:not(:disabled) {
-        cursor: pointer;
-    }
+    //&.isActive {
+    //    @include iconButtonActiveState;
+    //    .Close-x,
+    //    .richEditorButton-icon {
+    //        opacity: 1;
+    //    }
+    //}
 
-    &:hover {
-        @include iconButtonHoverState;
-        .Close-x,
-        .richEditorButton-icon {
-            opacity: 1;
-        }
-    }
+    //&.isOpen {
+    //    @include iconButtonActiveState;
+    //}
 
-    &:focus {
-        @include iconButtonFocusState;
-        z-index: 2;
-        .Close-x,
-        .richEditorButton-icon {
-            opacity: 1;
-        }
-    }
+    //&.richEditor-formatButton {
+    //    &:focus {
+    //        @include iconButtonFocusState($richEditor-paragraphMenuButton_offset);
+    //    }
+    //}
+//}
 
-    &.isActive {
-        @include iconButtonActiveState;
-        .Close-x,
-        .richEditorButton-icon {
-            opacity: 1;
-        }
-    }
+//.richEditor-menuItem {
+    //display: block;
+    //padding: 0;
+    //margin: 0;
 
-    &.isOpen {
-        @include iconButtonActiveState;
-    }
+    //.richEditor-button,
+    //&.richEditor-button {
+        //width: $richEditor-menuButton_size;
+        //height: $richEditor-menuButton_size;
+        //max-width: $richEditor-menuButton_size;
+        //font-size: #{$richEditor-menuButton_size * 24 / 39};
+        //line-height: $richEditor-menuButton_size;
+        //&.emojiChar-🇺🇳 {
+        //    font-size: 14px;
+        //}
+    //}
+    //&.isRightAligned {
+    //    margin-left: auto;
+    //}
+//}
 
-    &.richEditor-formatButton {
-        &:focus {
-            @include iconButtonFocusState($richEditor-paragraphMenuButton_offset);
-        }
-    }
-}
+//.richEditor-upload {
+//    display: none !important;
+//}
+//
+//.richEditor-embedBar {
+//    display: block;
+//    width: 100%;
+//    padding: $richEditor-embedMenu_padding;
+//    margin-top: $formElement-borderWidth;
+//}
 
-.richEditor-menuItem {
-    display: block;
-    padding: 0;
-    margin: 0;
+//.richEditorButton-icon {
+//    display: block;
+//    margin: auto;
+//    height: $icon-default_size;
+//    width: $icon-default_size;
+//    opacity: $state-icon_opacity;
+//}
+//
+//.Close-x {
+//    display: block;
+//    opacity: $state-icon_opacity;
+//    cursor: pointer;
+//}
 
-    .richEditor-button,
-    &.richEditor-button {
-        width: $richEditor-menuButton_size;
-        height: $richEditor-menuButton_size;
-        max-width: $richEditor-menuButton_size;
-        font-size: #{$richEditor-menuButton_size * 24 / 39};
-        line-height: $richEditor-menuButton_size;
+//// Link Menu
+//.insertLink {
+//    display: flex;
+//    flex-wrap: nowrap;
+//    align-items: center;
+//    max-width: $richEditor-insertLink_width;
+//    width: 100%;
+//    padding: {
+//        left: 9px;
+//    }
+//}
 
-        &.emojiChar-🇺🇳 {
-            font-size: 14px;
-        }
-    }
+//.richEditor-close.Close {
+    //position: relative;
+    //display: block;
+    //width: $richEditor-menuButton_size;
+    //height: $richEditor-menuButton_size;
+    //line-height: $richEditor-menuButton_size;
+    //vertical-align: bottom;
+    //top: auto;
+    //right: auto;
+    //text-align: center;
+    //user-select: none;
+    //background: transparent;
+    //cursor: pointer;
+    //opacity: $state-icon_opacity;
 
-    &.isRightAligned {
-        margin-left: auto;
-    }
-}
+    //&:hover {
+    //    @include iconButtonHoverState;
+    //}
+    //&:focus {
+    //    @include iconButtonFocusState;
+    //}
+    //&:active {
+    //    @include iconButtonActiveState;
+    //}
+//}
 
-.richEditor-upload {
-    display: none !important;
-}
-
-.richEditor-embedBar {
-    display: block;
-    width: 100%;
-    padding: $richEditor-embedMenu_padding;
-    margin-top: $formElement-borderWidth;
-}
-
-.richEditorButton-icon {
-    display: block;
-    margin: auto;
-    height: $icon-default_size;
-    width: $icon-default_size;
-    opacity: $state-icon_opacity;
-}
-
-.Close-x {
-    display: block;
-    opacity: $state-icon_opacity;
-    cursor: pointer;
-}
-
-// Link Menu
-.insertLink {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    max-width: $richEditor-insertLink_width;
-    width: 100%;
-    padding: {
-        left: 9px;
-    }
-}
-
-.richEditor-close.Close {
-    position: relative;
-    display: block;
-    width: $richEditor-menuButton_size;
-    height: $richEditor-menuButton_size;
-    line-height: $richEditor-menuButton_size;
-    vertical-align: bottom;
-    top: auto;
-    right: auto;
-    text-align: center;
-    user-select: none;
-    background: transparent;
-    cursor: pointer;
-    opacity: $state-icon_opacity;
-
-    &:hover {
-        @include iconButtonHoverState;
-    }
-    &:focus {
-        @include iconButtonFocusState;
-    }
-    &:active {
-        @include iconButtonActiveState;
-    }
-}
-
-.insertLink-input.InputBox {
-  border: 0 !important;
-  margin-bottom: 0 !important;
-  flex-grow: 1;
-  max-width: calc(100% - #{$richEditor-menuButton_size})
-}
+//.insertLink-input.InputBox {
+//  border: 0 !important;
+//  margin-bottom: 0 !important;
+//  flex-grow: 1;
+//  max-width: calc(100% - #{$richEditor-menuButton_size})
+//}
 
 // Insert Media
-.richEditorFlyout {
-    @include shadow-dropDown;
-    position: relative;
-    overflow: hidden;
-    background-color: $global-color_bg;
-    border: {
-        radius: $global-borderRadius;
-        color: $global-border_color;
-        style: $global-border_style;
-        width: $global-border_width;
-    }
-    z-index: 6;
-
-    .InputBox {
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .richEditor-close {
-        position: absolute;
-        top: 0;
-        right: 0;
-    }
-
-    .Footer {
-        display: flex;
-    }
-}
-
-.richEditorFlyout-header {
-    padding: {
-        top: $richEditor-flyout_paddingHorizontal / 2;
-        right: $richEditor-flyout_paddingHorizontal;
-        bottom: $richEditor-flyout_paddingHorizontal / 2;
-        left: $richEditor-flyout_paddingHorizontal;
-    }
-}
-
-.richEditorFlyout-footer {
-    padding: {
-        top: $richEditor-flyout_paddingVertical;
-        bottom: $richEditor-flyout_paddingVertical;
-        left: $richEditor-flyout_paddingHorizontal;
-        right: $richEditor-flyout_paddingHorizontal;
-    }
-
-    &.insertEmoji-footer {
-        padding: 0;
-    }
-}
-
-.richEditorFlyout-title {
-    @include longWordEllipsis;
-    margin: 0;
-    max-width: calc(100% - #{$richEditor-menuButton_size});
-    min-height: #{$richEditor-menuButton_size - $richEditor-flyout_paddingVertical};
-    font-size: 100%;
-    line-height: inherit;
-    color: $global-color_fg;
-
-    &:focus {
-        outline: 0;
-    }
-}
+//.richEditorFlyout {
+//    @include shadow-dropDown;
+//    position: relative;
+//    overflow: hidden;
+//    background-color: $global-color_bg;
+//    border: {
+//        radius: $global-borderRadius;
+//        color: $global-border_color;
+//        style: $global-border_style;
+//        width: $global-border_width;
+//    }
+//    z-index: 6;
+//
+//    .InputBox {
+//        width: 100%;
+//        box-sizing: border-box;
+//    }
+//
+//    .richEditor-close {
+//        position: absolute;
+//        top: 0;
+//        right: 0;
+//    }
+//
+//    .Footer {
+//        display: flex;
+//    }
+//}
+//.richEditorFlyout-header {
+//    padding: {
+//        top: $richEditor-flyout_paddingHorizontal / 2;
+//        right: $richEditor-flyout_paddingHorizontal;
+//        bottom: $richEditor-flyout_paddingHorizontal / 2;
+//        left: $richEditor-flyout_paddingHorizontal;
+//    }
+//}
+//
+//.richEditorFlyout-footer {
+//    padding: {
+//        top: $richEditor-flyout_paddingVertical;
+//        bottom: $richEditor-flyout_paddingVertical;
+//        left: $richEditor-flyout_paddingHorizontal;
+//        right: $richEditor-flyout_paddingHorizontal;
+//    }
+//
+//    &.insertEmoji-footer {
+//        padding: 0;
+//    }
+//}
+//.richEditorFlyout-title {
+//    @include longWordEllipsis;
+//    margin: 0;
+//    max-width: calc(100% - #{$richEditor-menuButton_size});
+//    min-height: #{$richEditor-menuButton_size - $richEditor-flyout_paddingVertical};
+//    font-size: 100%;
+//    line-height: inherit;
+//    color: $global-color_fg;
+//
+//    &:focus {
+//        outline: 0;
+//    }
+//}
 
 .insertMedia-footer {
     display: flex;

@@ -76,7 +76,7 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
                     <form id={this.id} onSubmit={this.handleSubmit} aria-labelledby={this.pageTitleID} noValidate>
                         <Paragraph
                             className="authenticateUser-paragraph"
-                            children={getGlobalErrorMessage(this.props.requestPasswordState, ["email"])}
+                            children={getGlobalErrorMessage(this.props.requestPasswordState.error, ["email"])}
                             isError={true}
                         />
                         <InputTextBlock
@@ -87,7 +87,7 @@ export class RecoverPasswordPage extends React.Component<IProps, IState> {
                                 onChange: this.handleEmailChange,
                                 disabled: !this.allowEdit,
                             }}
-                            errors={getFieldErrors(this.props.requestPasswordState, "email")}
+                            errors={getFieldErrors(this.props.requestPasswordState.error, "email")}
                             ref={this.emainInput}
                         />
                         <ButtonSubmit disabled={!this.allowEdit || this.state.email.length === 0} legacyMode={true}>

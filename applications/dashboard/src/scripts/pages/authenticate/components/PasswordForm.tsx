@@ -51,7 +51,7 @@ export class PasswordForm extends React.Component<IProps, IState> {
 
     public render() {
         let formDescribedBy;
-        const globalErrorMessage = getGlobalErrorMessage(this.props.passwordState, ["username", "password"]);
+        const globalErrorMessage = getGlobalErrorMessage(this.props.passwordState.error, ["username", "password"]);
         if (globalErrorMessage) {
             formDescribedBy = this.formDescriptionID;
         }
@@ -73,7 +73,7 @@ export class PasswordForm extends React.Component<IProps, IState> {
                 />
                 <InputTextBlock
                     label={t("Email/Username")}
-                    errors={getFieldErrors(this.props.passwordState, "username")}
+                    errors={getFieldErrors(this.props.passwordState.error, "username")}
                     ref={this.usernameInput}
                     inputProps={{
                         required: true,
@@ -86,7 +86,7 @@ export class PasswordForm extends React.Component<IProps, IState> {
                 <InputTextBlock
                     label={t("Password")}
                     ref={this.passwordInput}
-                    errors={getFieldErrors(this.props.passwordState, "password")}
+                    errors={getFieldErrors(this.props.passwordState.error, "password")}
                     inputProps={{
                         required: true,
                         disabled: !this.allowEdit,
@@ -124,9 +124,9 @@ export class PasswordForm extends React.Component<IProps, IState> {
             return;
         }
 
-        if (getFieldErrors(this.props.passwordState, "username")) {
+        if (getFieldErrors(this.props.passwordState.error, "username")) {
             this.usernameInput.current!.select();
-        } else if (getFieldErrors(this.props.passwordState, "password")) {
+        } else if (getFieldErrors(this.props.passwordState.error, "password")) {
             this.passwordInput.current!.select();
         } else {
             this.usernameInput.current!.select();

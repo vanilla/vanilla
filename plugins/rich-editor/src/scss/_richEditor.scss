@@ -376,167 +376,162 @@
 //    }
 //}
 
-.insertMedia-footer {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding: {
-        left: $richEditor-flyout_paddingHorizontal;
-        right: $richEditor-flyout_paddingHorizontal;
-        bottom: $richEditor-flyout_paddingVertical;
-    }
-}
+//.insertMedia-footer {
+//    display: flex;
+//    align-items: center;
+//    justify-content: flex-end;
+//    padding: {
+//        left: $richEditor-flyout_paddingHorizontal;
+//        right: $richEditor-flyout_paddingHorizontal;
+//        bottom: $richEditor-flyout_paddingVertical;
+//    }
+//}
 
-.insertMedia-help {
-    margin-right: auto;
-    font-size: 12px;
-}
+//.insertMedia-help {
+//    margin-right: auto;
+//    font-size: 12px;
+//}
+//
+//.insertMedia-insert {
+//    width: auto;
+//}
+//.richEditorFlyout {
+//    @include shadow-dropDown;
+//    position: absolute;
+//    left: 0;
+//    width: #{$richEditor-flyout_paddingHorizontal * 2 + 7 * $richEditor-menuButton_size};
+//    border: $formElement-borderWidth $formElement-borderStyle $formElement_borderColor;
+//    background: $global-color_bg;
+//    border-radius: $global-borderRadius;
+//}
 
-.insertMedia-insert {
-    width: auto;
-}
+//.richEditorFlyout-body {
+//    padding: {
+//        left: $richEditor-flyout_paddingHorizontal;
+//        right: $richEditor-flyout_paddingHorizontal;
+//    }
+//}
 
-.richEditorFlyout {
-    @include shadow-dropDown;
-    position: absolute;
-    left: 0;
-    width: #{$richEditor-flyout_paddingHorizontal * 2 + 7 * $richEditor-menuButton_size};
-    border: $formElement-borderWidth $formElement-borderStyle $formElement_borderColor;
-    background: $global-color_bg;
-    border-radius: $global-borderRadius;
-}
+//.insertEmoji-body {
+//    max-height: $richEditor-flyout_maxHeight;
+//    height: $richEditor-flyout_height;
+//}
+//.content-wrapper {
+//    height: 100%;
+//}
 
-.richEditorFlyout-body {
-    padding: {
-        left: $richEditor-flyout_paddingHorizontal;
-        right: $richEditor-flyout_paddingHorizontal;
-    }
-}
+//.embedDialogue {
+//    position: relative;
+//}
 
-.insertEmoji-body {
-    max-height: $richEditor-flyout_maxHeight;
-    height: $richEditor-flyout_height;
-}
+//.richEditor-insertEmoji {
+    //font-size: $icon-default_size;
+    //text-align: center;
+    //overflow: hidden;
+    //opacity: $state-text_opacity;
 
-.content-wrapper {
-    height: 100%;
-}
-
-.embedDialogue {
-    position: relative;
-}
-
-.richEditor-insertEmoji {
-    font-size: $icon-default_size;
-    text-align: center;
-    overflow: hidden;
-    opacity: $state-text_opacity;
-
-    .fallBackEmoji {
-        display: block;
-        margin: auto;
-    }
-
-    &:hover,
-    &:focus {
-        opacity: 1;
-    }
-}
+    //.fallBackEmoji {
+    //    display: block;
+    //    margin: auto;
+    //}
+    //
+    //&:hover,
+    //&:focus {
+    //    opacity: 1;
+    //}
+//}
 
 // Nub styles
-.richEditor-nubPosition {
-    position: absolute;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    overflow: hidden;
-    width: $richEditor-nub_width * 2;
-    height: $richEditor-nub_width * 2;
-    user-select: none;
-    transform: translateX(-50%);
-    margin-top: -$richEditor-menu_borderWidth;
-    pointer-events: none;
-}
+//.richEditor-nubPosition {
+//    position: absolute;
+//    display: flex;
+//    align-items: flex-start;
+//    justify-content: center;
+//    overflow: hidden;
+//    width: $richEditor-nub_width * 2;
+//    height: $richEditor-nub_width * 2;
+//    user-select: none;
+//    transform: translateX(-50%);
+//    margin-top: -$richEditor-menu_borderWidth;
+//    pointer-events: none;
+//}
 
-.richEditor-nub {
-    position: relative;
-    display: block;
-    width: $richEditor-nub_width;
-    height: $richEditor-nub_width;
-    border: {
-        top: $richEditor-menu_borderWidth solid $global-border_color;
-        right: $richEditor-menu_borderWidth solid $global-border_color;
-    }
-    box-shadow: #{$richEditor-menu_borderWidth} #{-$richEditor-menu_borderWidth} 5px 0 rgba($overlay-dropShadow_color, .1);
-    background: $richEditor_bg;
-}
+//.richEditor-nub {
+//    position: relative;
+//    display: block;
+//    width: $richEditor-nub_width;
+//    height: $richEditor-nub_width;
+//    border: {
+//        top: $richEditor-menu_borderWidth solid $global-border_color;
+//        right: $richEditor-menu_borderWidth solid $global-border_color;
+//    }
+//    box-shadow: #{$richEditor-menu_borderWidth} #{-$richEditor-menu_borderWidth} 5px 0 rgba($overlay-dropShadow_color, .1);
+//    background: $richEditor_bg;
+//}
 
 
 // Orientation specific styles
-.richEditor-inlineToolbarContainer {
-    &.isUp {
-        transform: translateY(-$richEditor-menu_offset);
+//.richEditor-inlineToolbarContainer {
+    //&.isUp {
+    //    transform: translateY(-$richEditor-menu_offset);
+    //
+    //    .richEditor-nubPosition {
+    //        top: 100%;
+    //    }
+    //
+    //    .richEditor-nub {
+    //        transform: translateY(-50%) rotate(135deg);
+    //    }
+    //}
 
-        .richEditor-nubPosition {
-            top: 100%;
-        }
+    //&.isDown {
+    //    transform: translateY($richEditor-menu_offset);
+    //
+    //    .richEditor-nubPosition {
+    //        bottom: 100%;
+    //        align-items: flex-end;
+    //        transform: translateY(-50%) translateX(-50%);
+    //        margin-top: $richEditor-menu_borderWidth;
+    //    }
+    //    .richEditor-nub {
+    //        transform: translateY(50%) rotate(-45deg);
+    //    }
+    //}
+//}
 
-        .richEditor-nub {
-            transform: translateY(-50%) rotate(135deg);
-        }
-    }
-
-    &.isDown {
-        transform: translateY($richEditor-menu_offset);
-
-        .richEditor-nubPosition {
-            bottom: 100%;
-        }
-
-        .richEditor-nubPosition {
-            align-items: flex-end;
-            transform: translateY(-50%) translateX(-50%);
-            margin-top: $richEditor-menu_borderWidth;
-        }
-        .richEditor-nub {
-            transform: translateY(50%) rotate(-45deg);
-        }
-    }
-}
-
-.richEditor-paragraphToolbarContainer {
-    position: absolute;
-    left: calc(50% - #{$richEditor_horizontalPadding / 2});
-
-
-    &.isUp {
-        bottom: calc(50% + #{$richEditor_horizontalPadding / 2 - $formElement-borderWidth});
-    }
-
-    &.isDown {
-        top: calc(50% + #{$richEditor_horizontalPadding / 2 - $formElement-borderWidth});
-    }
-}
+//.richEditor-paragraphToolbarContainer {
+//    //position: absolute;
+//    //left: calc(50% - #{$richEditor_horizontalPadding / 2});
+//    //
+//
+//    &.isUp {
+//        bottom: calc(50% + #{$richEditor_horizontalPadding / 2 - $formElement-borderWidth});
+//    }
+//
+//    &.isDown {
+//        top: calc(50% + #{$richEditor_horizontalPadding / 2 - $formElement-borderWidth});
+//    }
+//}
 
 
 // Emoji Groups
 
-.emojiGroups {
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: center;
-}
+//.emojiGroups {
+//    display: flex;
+//    flex-wrap: nowrap;
+//    justify-content: center;
+//}
+//
+//.emojiGroup-icon {
+//    display: block;
+//    position: relative;
+//    margin: auto;
+//    padding: 0;
+//    width: $icon-default_size;
+//    size: $icon-default_size;
+//}
 
-.emojiGroup-icon {
-    display: block;
-    position: relative;
-    margin: auto;
-    padding: 0;
-    width: $icon-default_size;
-    size: $icon-default_size;
-}
 
-
-.richEditor-popoverDescription {
-    margin-bottom: .5em;
-}
+//.richEditor-popoverDescription {
+//    margin-bottom: .5em;
+//}

@@ -14,10 +14,12 @@ import {
     longWordEllipsis,
     paddings,
     placeholderStyles,
+    singleBorder,
     singleLineEllipsis,
     srOnly,
     styleFactory,
     textInputSizing,
+    toStringColor,
     unit,
 } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/styles/layoutStyles";
@@ -212,6 +214,12 @@ export function richEditorClasses(theme?: object) {
                 display: "block",
                 opacity: globalVars.states.icon.opacity,
                 cursor: "pointer",
+            },
+            ".content-wrapper": {
+                height: percent(100),
+            },
+            ".embedDialogue": {
+                position: "relative",
             },
         },
     });
@@ -443,6 +451,10 @@ export function richEditorClasses(theme?: object) {
         },
     });
 
+    const popoverDescription = style("popoverDescription", {
+        marginBottom: ".5em",
+    });
+
     return {
         root,
         scrollContainer,
@@ -458,6 +470,7 @@ export function richEditorClasses(theme?: object) {
         button,
         icon,
         close,
+        popoverDescription,
     };
 }
 
@@ -485,6 +498,59 @@ export function insertLinkClasses(theme?: object) {
         },
     });
 
+    return { root, input };
+}
+
+export function inlineToolbarClasses(theme?: object) {
+    const vars = richEditorVariables(theme);
+    const style = styleFactory("inlineToolbar");
+
+    const up = style("up", {
+        transform: `translateY(${-vars.menu.offset})`,
+        $nest: {
+            ".richEditor-nubPosition": {
+                top: percent(100),
+            },
+            ".richEditor-nub": {
+                transform: `translateY(-50%) rotate(135deg)`,
+            },
+        },
+    });
+
+    const down = style("down", {
+        transform: `translateY(${vars.menu.offset})`,
+        $nest: {
+            ".richEditor-nubPosition": {
+                bottom: percent(100),
+                alignItems: "flex-end",
+                transform: `translateY(-50%) translateX(-50%)`,
+                marginTop: unit(vars.menu.borderWidth),
+            },
+            ".richEditor-nub": {
+                transform: `translateY(-50%) rotate(135deg)`,
+            },
+        },
+    });
+    return { up, down };
+}
+
+export function paragraphToolbarContainerClasses(theme?: object) {
+    const vars = richEditorVariables(theme);
+    const formVars = formElementsVariables(theme);
+    const style = styleFactory("paragraphToolbarContainer");
+
+    const root = style({
+        position: "absolute",
+        left: calc(`50% - ${vars.spacing.paddingLeft / 2}`),
+        $nest: {
+            "&.isUp": {
+                bottom: calc(`50% + ${vars.spacing.paddingRight / 2 - formVars.border.width}`),
+            },
+            "&.isDown": {
+                top: calc(`50% + ${vars.spacing.paddingRight / 2 - formVars.border.width}`),
+            },
+        },
+    });
     return { root };
 }
 
@@ -496,61 +562,18 @@ export function richEditorFlyoutClasses(theme?: object) {
 
     const root = style({
         ...shadows.dropDown(),
+        position: "absolute",
+        left: 0,
+        width: unit(vars.flyout.padding.left + vars.flyout.padding.right + 7 * vars.menuButton.size),
         ...borders(),
-        position: "relative",
-        overflow: "hidden",
-        backgroundColor: globalVars.mainColors.bg.toString(),
-        zIndex: 6,
-        $nest: {
-            "& .InputBox": {
-                width: percent(100),
-                boxSizing: "border-box",
-            },
-            "& .richEditor-close": {
-                position: "absolute",
-                top: 0,
-                right: 0,
-            },
-            "& .Footer": {
-                display: "flex",
-            },
-        },
     });
 
-    const header = style("header", {
-        ...paddings({
-            top: unit(vars.flyout.padding.top / 2),
-            right: unit(vars.flyout.padding.right),
-            bottom: unit(vars.flyout.padding.bottom / 2),
-            left: unit(vars.flyout.padding.left),
-        }),
+    const body = style("body", {
+        paddingLeft: unit(vars.flyout.padding.left),
+        paddingRight: unit(vars.flyout.padding.right),
     });
 
-    const footer = style("footer", {
-        ...paddings(vars.flyout.padding),
-        $nest: {
-            "&.insertEmoji-footer": {
-                padding: 0,
-            },
-        },
-    });
-
-    const title = style("title", {
-        ...longWordEllipsis(),
-        margin: 0,
-        maxWidth: calc(`100% - ${unit(vars.menuButton.size)}`),
-        minHeight: unit(vars.menuButton.size - vars.flyout.padding.top),
-        fontSize: percent(100),
-        lineHeight: "inherit",
-        color: globalVars.mainColors.fg.toString(),
-        $nest: {
-            "&:focus": {
-                outline: 0,
-            },
-        },
-    });
-
-    return { root, header, footer, title };
+    return { root, body };
 }
 
 export function insertMediaClasses(theme?: object) {
@@ -560,9 +583,26 @@ export function insertMediaClasses(theme?: object) {
     const formElementVars = formElementsVariables(theme);
     const style = styleFactory("insertMedia");
 
-    const root = style({});
+    const root = style({
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        ...paddings({
+            left: vars.flyout.padding.left,
+            right: vars.flyout.padding.left,
+            bottom: vars.flyout.padding.bottom,
+        }),
+    });
 
-    return { root };
+    const help = style("help", {
+        marginRight: "auto",
+        fontSize: unit(globalVars.fonts.size.small),
+    });
+    const insert = style("insert", {
+        width: "auto",
+    });
+
+    return { root, help, insert };
 }
 
 export function richEditorFormClasses(theme?: object) {
@@ -650,4 +690,90 @@ export function richEditorFormClasses(theme?: object) {
         body,
         inlineMenuItems,
     };
+}
+
+export function insertEmojiClasses(theme?: object) {
+    const globalVars = globalVariables(theme);
+    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const vars = richEditorVariables(theme);
+    const formElementVars = formElementsVariables(theme);
+    const style = styleFactory("insertEmoji");
+
+    const root = style({
+        fontSize: unit(globalVars.icon.sizes.default),
+        textAlign: "center",
+        overflow: "hidden",
+        opacity: globalVars.states.icon.opacity,
+        $nest: {
+            ".fallBackEmoji": {
+                display: "block",
+                margin: "auto",
+            },
+            "&:hover, &:focus, &.focus-visible": {
+                opacity: 1,
+            },
+        },
+    });
+
+    return { root };
+}
+
+export function emojiGroupsClasses(theme?: object) {
+    const globalVars = globalVariables(theme);
+    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const vars = richEditorVariables(theme);
+    const formElementVars = formElementsVariables(theme);
+    const style = styleFactory("emojiGroups");
+
+    const root = style({
+        display: "flex",
+        flexWrap: "nowrap",
+        justifyContent: "center",
+    });
+
+    const icon = style("icon", {
+        display: "block",
+        position: "relative",
+        margin: "auto",
+        padding: 0,
+        width: unit(globalVars.icon.sizes.default),
+        height: unit(globalVars.icon.sizes.default),
+    });
+
+    return { root, icon };
+}
+
+export function nubPositionClasses(theme?: object) {
+    const globalVars = globalVariables(theme);
+    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const vars = richEditorVariables(theme);
+    const formElementVars = formElementsVariables(theme);
+    const style = styleFactory("nubPosition");
+
+    const root = style({
+        position: "relative",
+        display: "block",
+        width: unit(vars.nub.width),
+        height: unit(vars.nub.width),
+        borderTop: singleBorder(),
+        borderRight: singleBorder(),
+        boxShadow: globalVars.overlay.dropShadow,
+        background: toStringColor(vars.colors.bg),
+    });
+
+    const nubPosition = style("nubPosition", {
+        position: "absolute",
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "center",
+        overflow: "hidden",
+        width: unit(vars.nub.width * 2),
+        height: unit(vars.nub.width * 2),
+        userSelect: "none",
+        transform: `translateX(-50%)`,
+        marginTop: unit(-vars.menu.borderWidth),
+        pointerEvents: "none",
+    });
+
+    return { root, nubPosition };
 }

@@ -29,6 +29,10 @@ import { style, keyframes } from "typestyle";
 import { TLength, NestedCSSProperties } from "typestyle/lib/types";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 
+export const toStringColor = (colorValue: ColorHelper | "transparent") => {
+    return typeof colorValue === "string" ? colorValue : colorValue.toString();
+};
+
 export function flexHelper() {
     const middle = (wrap = false) => {
         return {
@@ -272,10 +276,13 @@ const spinnerLoaderAnimation = keyframes({
     "100%": { transform: `rotate(${deg(360 + spinnerOffset)})` },
 });
 
-interface IBorderStyles {
+interface ISingleBorderStyle {
     color?: ColorHelper | "transparent";
     width?: BorderWidthProperty<TLength>;
     style?: BorderStyleProperty;
+}
+
+interface IBorderStyles extends ISingleBorderStyle {
     radius?: BorderRadiusProperty<TLength>;
 }
 
@@ -287,6 +294,13 @@ export const borders = (styles: IBorderStyles = {}) => {
         borderStyle: styles.style ? styles.style : vars.border.style,
         borderRadius: unit(styles.radius),
     };
+};
+
+export const singleBorder = (styles: ISingleBorderStyle = {}) => {
+    const vars = globalVariables();
+    return `${styles.style ? styles.style : vars.border.style} ${
+        styles.color ? toStringColor(styles.color) : toStringColor(vars.border.color)
+    } ${styles.width ? unit(styles.width) : unit(vars.border.width)}`;
 };
 
 export const allLinkStates = (styles: object) => {
@@ -335,10 +349,10 @@ interface IPaddings {
 
 export const paddings = (styles: IPaddings) => {
     return {
-        paddingTop: unit(styles.top),
-        paddingRight: unit(styles.right),
-        paddingBottom: unit(styles.bottom),
-        paddingLeft: unit(styles.left),
+        paddingTop: styles.top ? unit(styles.top) : undefined,
+        paddingRight: styles.right ? unit(styles.right) : undefined,
+        paddingBottom: styles.bottom ? unit(styles.bottom) : undefined,
+        paddingLeft: styles.left ? unit(styles.left) : undefined,
     };
 };
 
@@ -517,10 +531,6 @@ export const objectFitWithFallback = () => {
             },
         },
     };
-};
-
-export const toStringColor = (colorValue: ColorHelper | "transparent") => {
-    return typeof colorValue === "string" ? colorValue : colorValue.toString();
 };
 
 export interface ILinkStates {

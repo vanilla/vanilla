@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper } from "@library/styles/styleHelpers";
+import { componentThemeVariables, debugHelper, styleFactory } from "@library/styles/styleHelpers";
 
 export function formElementsVariables(theme?: object) {
     const vars = globalVariables(theme);
@@ -68,4 +68,22 @@ export function formElementsVariables(theme?: object) {
     };
 
     return { sizing, spacing, border, giantInput, largeInput, miniInput, colors, placeholder, disabled };
+}
+
+export function formErrorClasses(theme?: object) {
+    const style = styleFactory("formError");
+    const varsGlobal = globalVariables(theme);
+    const vars = formElementsVariables(theme);
+
+    const root = style({});
+    const message = style("message", {});
+    const actions = style("actions", {});
+    const actionButton = style("button");
+
+    return {
+        root,
+        message,
+        actions,
+        actionButton,
+    };
 }

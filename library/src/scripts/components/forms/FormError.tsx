@@ -6,6 +6,9 @@
 import React from "react";
 import Button, { ButtonBaseClass } from "./Button";
 import { t } from "@library/application";
+import { formErrorClasses } from "@library/components/forms/formElementStyles";
+import { classes } from "typestyle";
+import { buttonClasses } from "@library/styles/buttonStyles";
 
 interface IProps {
     children: React.ReactNode;
@@ -16,20 +19,27 @@ interface IProps {
 export default class FormError extends React.Component<IProps> {
     public render(): React.ReactNode {
         const { onRetryClick, onDismissClick, children } = this.props;
+        const mClasses = formErrorClasses();
+        const mButtonclasses = buttonClasses();
+
         return (
-            <div className="formError">
-                <p className="formError-message">{children}</p>
-                <div className="formError-actions">
+            <div className={mClasses.root}>
+                <p className={mClasses.message}>{children}</p>
+                <div className={mClasses.actions}>
                     {onRetryClick && (
                         <Button
                             onClick={onRetryClick}
                             baseClass={ButtonBaseClass.TEXT}
-                            className="formError-action formError-action_primary"
+                            className={classes(mClasses.actionButton, mButtonclasses.primary)}
                         >
                             {t("Retry")}
                         </Button>
                     )}
-                    <Button onClick={onDismissClick} baseClass={ButtonBaseClass.TEXT} className="formError-action">
+                    <Button
+                        onClick={onDismissClick}
+                        baseClass={ButtonBaseClass.TEXT}
+                        className={classes(mClasses.actionButton)}
+                    >
                         {t("Dismiss")}
                     </Button>
                 </div>

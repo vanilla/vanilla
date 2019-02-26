@@ -56,13 +56,8 @@ export function meBoxMessageClasses(theme?: object) {
         userSelect: "none",
         $nest: {
             "&:active, &:focus, &:hover, &.focus-visible": {
-                backgroundColor: toStringColor(globalVars.states.active.color),
+                backgroundColor: toStringColor(globalVars.states.active.color.fade(0.1)),
                 textDecoration: "none",
-                color: headerVars.colors.fg.toString(),
-            },
-            "&:active .meta, &:focus .meta, &:hover .meta, &.focus-visible .meta": {
-                color: headerVars.colors.fg.toString(),
-                opacity: 0.75,
             },
         },
         ...debug.name("link"),

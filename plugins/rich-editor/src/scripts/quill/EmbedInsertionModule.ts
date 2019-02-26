@@ -64,10 +64,15 @@ export default class EmbedInsertionModule extends Module {
     };
 
     private pasteHandler = (event: ClipboardEvent) => {
-        const image = getPastedFile(event);
-        if (image) {
-            const imagePromise = uploadFile(image).then();
-            this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });
+        const file = getPastedFile(event);
+        if (!file) {
+            return;
+        }
+
+        if (isFileImage(file)) {
+            this.createImageEmbed(file);
+        } else {
+            this.createFileEmbed(file);
         }
     };
 

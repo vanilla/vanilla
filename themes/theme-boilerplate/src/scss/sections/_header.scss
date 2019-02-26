@@ -20,6 +20,7 @@
         height: $header_minHeight;
     }
 
+    .mobileMeBox-button,
     .Hamburger {
         display: none;
 
@@ -27,10 +28,50 @@
             display: flex;
         }
     }
+
+    // Mebox component
+    .MeButton {
+        color: $headerMebutton_fg;
+        background-color: $headerMebutton_bg;
+
+        &:focus,
+        &:hover,
+        &:active {
+            color: $headerMebutton-hover_fg;
+            background-color: $headerMebutton-hover_bg;
+        }
+
+        .Alert {
+            color: $headerMeBoxAlert_fg;
+            background-color: $headerMeBoxAlert_bg;
+            border-color: $headerMeBoxAlert_borderColor;
+        }
+    }
+
+    .ToggleFlyout.Open .MeButton {
+        background-color: $headerMebutton-active_bg;
+    }
+
+    .WhoIs > .Username {
+        color: $headerMebutton_fg;
+    }
+
+    .SignInLinks {
+        a {
+            @include Button(
+                $headerButton_bg,
+                $headerButton_fg,
+                $headerButton_borderColor,
+                $headerButton-hover_bg,
+                $headerButton-hover_fg,
+                $headerButton-hover_borderColor
+            );
+        }
+    }
 }
 
 .Header-logo {
-    padding: $utility-small_padding 0;
+    padding: $utility-baseUnitHalf 0;
     display: flex;
     align-items: center;
 

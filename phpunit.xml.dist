@@ -16,6 +16,7 @@
         <ini name="intl.error_level" value="0"/>
         <ini name="memory_limit" value="-1"/>
         <ini name="date.timezone" value="America/Montreal"/>
+        <const name="TESTMODE_ENABLED" value="true"/>
 
         <env name="TEST_BASEURL" value="http://vanilla.test:8080" />
         <env name="TEST_DB_NAME" value="vanilla_test"/>
@@ -26,6 +27,9 @@
     <testsuites>
         <testsuite name="Library">
             <directory suffix="Test.php">./tests/Library/</directory>
+        </testsuite>
+        <testsuite name="Formatting">
+            <directory suffix="Test.php">./tests/Library/Vanilla/Formatting</directory>
         </testsuite>
         <testsuite name="Models">
             <directory suffix="Test.php">./tests/Models</directory>

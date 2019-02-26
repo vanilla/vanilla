@@ -6,7 +6,7 @@
 
 import React from "react";
 import { withRouter, RouteComponentProps } from "react-router-dom";
-import FullPageLoader from "@library/components/FullPageLoader";
+import Loader from "@library/components/Loader";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import Modal from "@library/components/modal/Modal";
 import { t } from "@library/application";
@@ -25,7 +25,7 @@ class ModalLoader extends React.Component<IProps> {
                 exitHandler={this.navigateToBacklink}
                 elementToFocusOnExit={document.activeElement as HTMLElement}
             >
-                <FullPageLoader />
+                <Loader />
             </Modal>
         );
     }

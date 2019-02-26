@@ -10,6 +10,9 @@ import DateTime from "@library/components/DateTime";
 import { getAttachmentIcon, AttachmentType, mimeTypeToAttachmentType } from "@library/components/attachments";
 import classNames from "classnames";
 import { t } from "@library/application";
+import { HumanFileSize, humanFileSize } from "@library/utils/fileUtils";
+import { attachmentClasses } from "@library/styles/attachmentStyles";
+import { attachmentIconClasses } from "@library/styles/attachmentIconsStyles";
 
 export interface IFileAttachment {
     name: string; // File name
@@ -26,56 +29,38 @@ interface IProps extends IFileAttachment {
     url: string;
 }
 
-export function getUnabbreviatedFileSizeUnit(unit: string) {
-    switch (unit.toLowerCase()) {
-        case "byte":
-        case "b":
-            return t("Byte");
-        case "kilobyte":
-        case "kb":
-            return t("Kilobyte");
-        case "megabyte":
-        case "mb":
-            return t("Megabyte");
-        case "terabyte":
-        case "tb":
-            return t("Terabyte");
-        default:
-            return null;
-    }
-}
-
-export function humanFileSize(size: number) {
-    const i: number = Math.floor(Math.log(size) / Math.log(1024));
-    const sizes = ["B", "KB", "MB", "GB", "TB"];
-    const unit = sizes[i];
-    const unabbreviated = getUnabbreviatedFileSizeUnit(unit);
-    return (
-        <>
-            {((size / Math.pow(1024, i)) as any).toFixed(2) * 1}
-            {unabbreviated ? <abbr title={unabbreviated}>{` ${unit}`}</abbr> : sizes[i]}
-        </>
-    );
-}
-
 export default class Attachment extends React.Component<IProps> {
     public render() {
         const { title, name, url, dateUploaded, type, mimeType, size, className } = this.props;
         const label = title || name;
+        const classes = attachmentClasses();
+        const iconClasses = attachmentIconClasses();
 
         return (
-            <div className={classNames("attachment", className)}>
-                <a href={url} className="attachment-link attachment-box" type={mimeType} download={name} tabIndex={1}>
-                    {type && <div className="attachment-format">{getAttachmentIcon(type)}</div>}
-                    <div className="attachment-main">
-                        <div className="attachment-title">{label}</div>
-                        <div className="attachment-metas metas">
+            <div className={classNames("attachment", className, classes.root)}>
+                <a
+                    href={url}
+                    className={classNames("attachment-link", "attachment-box", classes.link, classes.box)}
+                    type={mimeType}
+                    download={name}
+                    tabIndex={1}
+                >
+                    {type && (
+                        <div className={classNames("attachment-format", classes.format)}>
+                            {getAttachmentIcon(type, iconClasses.root)}
+                        </div>
+                    )}
+                    <div className={classNames("attachment-main", classes.main)}>
+                        <div className={classNames("attachment-title", classes.title)}>{label}</div>
+                        <div className={classNames("attachment-metas", "metas", classes.metas)}>
                             {dateUploaded && (
                                 <span className="meta">
                                     <Translate source="Uploaded <0/>" c0={<DateTime timestamp={dateUploaded} />} />
                                 </span>
                             )}
-                            <span className="meta">{humanFileSize(size)}</span>
+                            <span className="meta">
+                                <HumanFileSize numBytes={size} />
+                            </span>
                         </div>
                     </div>
                 </a>

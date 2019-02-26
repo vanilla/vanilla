@@ -10,7 +10,7 @@ import { Optionalize } from "@library/@types/utils";
 export interface ITabProps {
     setData: (data: any) => void;
     groupID: string;
-    defaultTab: any;
+    activeTab: string | number;
     childClass: string;
 }
 

@@ -9,10 +9,12 @@ import { formatUrl, t, getMeta } from "@library/application";
 import { indexArrayByKey } from "@library/utility";
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 import qs from "qs";
+import { sprintf } from "sprintf-js";
 import { IFieldError, LoadStatus, ILoadable } from "@library/@types/api";
+import { humanFileSize } from "@library/utils/fileUtils";
 
 function fieldErrorTransformer(responseData) {
-    if (responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {
+    if (responseData && responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {
         responseData.errors = indexArrayByKey(responseData.errors, "field");
     }
 
@@ -53,9 +55,19 @@ export async function uploadFile(file: File, requestConfig: AxiosRequestConfig =
     const extension = filePieces[filePieces.length - 1] || "";
 
     if (file.size > maxSize) {
-        throw new Error(t("File exceeds maximum size."));
+        const humanSize = humanFileSize(maxSize);
+        const stringTotal: string = humanSize.amount + humanSize.unitAbbr;
+        const message = sprintf(t("The uploaded file was too big (max %s)."), stringTotal);
+        throw new Error(message);
     } else if (!allowedAttachments.includes(extension)) {
-        throw new Error("File extension not allowed.");
+        const attachmentsString = allowedAttachments.join(", ");
+        const message = sprintf(
+            t(
+                "The uploaded file did not have an allowed extension. \nOnly the following extensions are allowed. \n%s.",
+            ),
+            attachmentsString,
+        );
+        throw new Error(message);
     }
 
     const data = new FormData();

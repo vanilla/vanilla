@@ -190,6 +190,11 @@ class PostController extends VanillaController {
 
         touchValue('Type', $this->Data, 'Discussion');
 
+        // Remove Announce parameter if it was injected into the form.
+        if (!CategoryModel::checkPermission($category['CategoryID'], 'Vanilla.Discussions.Announce')) {
+            $this->Form->removeFormValue('Announce');
+        }
+
         if (!$useCategories || $this->ShowCategorySelector) {
             // See if we should fill the CategoryID value.
             $allowedCategories = CategoryModel::getByPermission(
@@ -220,14 +225,17 @@ class PostController extends VanillaController {
             // Prep form with current data for editing
             if (isset($this->Discussion)) {
                 $this->Form->setData($this->Discussion);
-            } elseif (isset($this->Draft))
+            } elseif (isset($this->Draft)) {
                 $this->Form->setData($this->Draft);
-            else {
+            } else {
                 if ($this->Category !== null) {
                     $this->Form->setData(['CategoryID' => $this->Category->CategoryID]);
                 }
                 $this->populateForm($this->Form);
             }
+            
+            // Decode HTML entities escaped by DiscussionModel::calculate() here.
+            $this->Form->setValue('Name', htmlspecialchars_decode($this->Form->getValue('Name')));
 
         } elseif ($this->Form->authenticatedPostBack()) { // Form was submitted
             // Save as a draft?
@@ -424,6 +432,9 @@ class PostController extends VanillaController {
             $this->setData('Discussion', $this->DiscussionModel->getID($discussionID), true);
             $this->CategoryID = $this->Discussion->CategoryID;
         }
+
+        // Verify we can add to the category content
+        $this->categoryPermission($this->CategoryID, 'Vanilla.Discussions.Add');
 
         if (c('Garden.ForceInputFormatter')) {
             $this->Form->removeFormValue('Format');
@@ -666,10 +677,24 @@ class PostController extends VanillaController {
         if ($this->Form->authenticatedPostBack()) {
             // Save as a draft?
             $FormValues = $this->Form->formValues();
+
+            if (isset($FormValues['DiscussionID'])) {
+                $formID = (int)$FormValues['DiscussionID'];
+                $DiscussionID = (int)$DiscussionID;
+                if ($formID !== $DiscussionID) {
+                    throw new Exception('DiscussionID mismatch.');
+                }
+            }
+
             $filters = ['Score'];
             $FormValues = $this->filterFormValues($FormValues, $filters);
             $FormValues = $this->CommentModel->filterForm($FormValues);
+            $formDiscussion = $this->DiscussionModel->getID($this->Form->_FormValues['DiscussionID']);
 
+            if ($formDiscussion && $formDiscussion->Closed === 1 && !CategoryModel::checkPermission($formDiscussion->CategoryID, 'Vanilla.Discussions.Close')) {
+                throw new Exception(t('You cannot comment in a closed discussion.'));
+            }
+            
             if (!$Editing) {
                 unset($FormValues['CommentID']);
             }

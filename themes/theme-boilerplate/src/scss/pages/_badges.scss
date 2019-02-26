@@ -15,7 +15,7 @@ body.Badges {
     }
 
     .CellWrap {
-        margin-top: $utility-medium_padding;
+        margin-top: $utility-baseUnitDouble;
     }
 
     .Content {
@@ -25,13 +25,13 @@ body.Badges {
         }
 
         h2 {
-            margin-top: $utility-xLarge_padding;
+            margin-top: 50px;
             border-bottom: $component_border;
 
         }
 
         .Badge-Details {
-            margin-bottom: $utility-xLarge_padding;
+            margin-bottom: 50px;
         }
 
         .Badge-Earned {
@@ -40,7 +40,7 @@ body.Badges {
                 @include photoWrap;
                 width: $theme-photo-small_size;
                 height: $theme-photo-small_size;
-                margin-right: $utility-medium_padding;
+                margin-right: $utility-baseUnitDouble;
             }
         }
     }

@@ -11,6 +11,7 @@ import { IInjectableUserState } from "@library/users/UsersModel";
 import { connect } from "react-redux";
 import UsersModel from "@library/users/UsersModel";
 import SmartLink from "@library/components/navigation/SmartLink";
+import { userDropDownClasses } from "@library/styles/userDropDownStyles";
 
 export interface IProps extends IInjectableUserState {
     className?: string;
@@ -24,16 +25,23 @@ export class DropDownUserCard extends React.Component<IProps> {
     public render() {
         const currentUser = this.props.currentUser.data!;
         const profileLink = `${window.location.origin}/profile/${currentUser.name}`;
+        const classesUserDropDown = userDropDownClasses();
         return (
             <li className={classNames("dropDown-userCard", this.props.className)}>
-                <SmartLink to={profileLink} className="userDropDown-userCardPhotoLink">
+                <SmartLink
+                    to={profileLink}
+                    className={classNames("userDropDown-userCardPhotoLink", classesUserDropDown.userCardPhotoLink)}
+                >
                     <UserPhoto
-                        className="userDropDown-userCardPhoto"
+                        className={classNames("userDropDown-userCardPhoto", classesUserDropDown.userCardPhoto)}
                         userInfo={currentUser}
                         size={this.props.photoSize || UserPhotoSize.LARGE}
                     />
                 </SmartLink>
-                <SmartLink to={profileLink} className="userDropDown-userCardName" tabIndex={-1}>
+                <SmartLink
+                    to={profileLink}
+                    className={classNames("userDropDown-userCardName", classesUserDropDown.userCardName)}
+                >
                     {currentUser.name}
                 </SmartLink>
             </li>

@@ -988,6 +988,18 @@ class EditorPlugin extends Gdn_Plugin {
         // Array of Media IDs, as input is MediaIDs[]
         $mediaIds = (array)Gdn::request()->getValue('MediaIDs');
 
+        $discussionID = Gdn::request()->getValue('DiscussionID');
+        $discussionModel = new DiscussionModel();
+        $discussion = $discussionModel->getID($discussionID);
+        if ($discussion) {
+            $categoryID = $discussion->CategoryID;
+            $category = CategoryModel::categories($categoryID);
+
+            if ($category && $category['AllowFileUploads'] !==1  && Gdn::request()->getValue('MediaIDs') !== false) {
+                throw new Exception(t('You are not allowed to upload files in this category.'));
+            }
+        }
+        
         if (count($mediaIds)) {
             foreach ($mediaIds as $mediaId) {
                 $this->attachEditorUploads($mediaId, $id, $type);
@@ -1452,7 +1464,7 @@ class EditorPlugin extends Gdn_Plugin {
      * This way, the editor plugin always takes precedence.
      */
     public function setup() {
-        touchConfig([
+        \Gdn::config()->touch([
             'Garden.MobileInputFormatter' => 'TextEx',
             'Plugins.editor.ForceWysiwyg' => false
         ]);
@@ -1465,7 +1477,7 @@ class EditorPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function structure() {
-         $pluginEditors = [
+        $pluginEditors = [
             'cleditor',
             'ButtonBar',
             'Emotify',
@@ -1477,7 +1489,7 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         // Set to false by default, so change in config if uploads allowed.
-        touchConfig('Garden.AllowFileUploads', true);
+        \Gdn::config()->touch('Garden.AllowFileUploads', true);
 
         $structure = Gdn::structure();
         $structure

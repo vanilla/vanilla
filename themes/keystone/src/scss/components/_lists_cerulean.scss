@@ -64,13 +64,13 @@
                 .Item-Header {
 
                     .PhotoWrap {
-                        top: $utility-medium_padding;
-                        left: $utility-medium_padding;
+                        top: $utility-baseUnitDouble;
+                        left: $utility-baseUnitDouble;
                     }
 
                     .Meta,
                     .AuthorWrap {
-                        padding-left: calc(#{$theme-photo_size} + #{$utility-medium_padding});
+                        padding-left: calc(#{$theme-photo_size} + #{$utility-baseUnitDouble});
                     }
                 }
             }

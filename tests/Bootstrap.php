@@ -17,6 +17,7 @@ use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Authenticator\PasswordAuthenticator;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\AuthenticatorModel;
 use Vanilla\Models\SSOModel;
@@ -85,12 +86,14 @@ class Bootstrap {
             ->addAlias('Cache')
 
             // Configuration
-            ->rule(\Gdn_Configuration::class)
+            ->rule(ConfigurationInterface::class)
+            ->setClass(\Gdn_Configuration::class)
             ->setShared(true)
             ->addCall('defaultPath', [$this->getConfigPath()])
             ->addCall('autoSave', [false])
             ->addCall('load', [PATH_ROOT.'/conf/config-defaults.php'])
             ->addAlias('Config')
+            ->addAlias(\Gdn_Configuration::class)
 
             // AddonManager
             ->rule(AddonManager::class)
@@ -247,8 +250,20 @@ class Bootstrap {
             ->rule(\Vanilla\Formatting\Quill\Renderer::class)
             ->setShared(true)
 
+            ->rule('BBCodeFormatter')
+            ->setClass(\BBCode::class)
+            ->setShared(true)
+
+            ->rule('HtmlFormatter')
+            ->setClass(\VanillaHtmlFormatter::class)
+            ->setShared(true)
+
             ->rule(\Vanilla\Formatting\FormatService::class)
             ->addCall('registerFormat', [\Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY, \Vanilla\Formatting\Formats\RichFormat::class])
+            ->setShared(true)
+
+            ->rule('HtmlFormatter')
+            ->setClass(\VanillaHtmlFormatter::class)
             ->setShared(true)
             ;
     }

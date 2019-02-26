@@ -37,19 +37,32 @@ export default class ErrorBlot extends FocusableEmbedBlot {
         return node;
     }
 
+    /**
+     * Extend the base attach to remove ourselves if we are missing some particular data.
+     */
+    public attach() {
+        super.attach();
+        if (!this.data.error) {
+            this.remove();
+            this.quill && this.quill.update();
+        }
+    }
+
+    private data: IErrorData;
+
     constructor(domNode: HTMLElement, data: IErrorData) {
         super(domNode);
+        this.data = data;
         const id = uniqueId("embedLoader");
 
         if (!data.error) {
-            this.remove();
-            this.quill!.update();
             return;
         }
 
         if (data.type === ErrorBlotType.FILE) {
             const now = new Date();
             const file = data.file!;
+            domNode.classList.remove(FOCUS_CLASS);
             ReactDOM.render(
                 <AttachmentError
                     message={data.error.message}

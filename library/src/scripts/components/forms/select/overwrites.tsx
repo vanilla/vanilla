@@ -16,6 +16,7 @@ import { MenuProps, MenuListComponentProps } from "react-select/lib/components/M
 import { ValueContainerProps } from "react-select/lib/components/containers";
 import { ControlProps } from "react-select/lib/components/Control";
 import { MultiValueRemoveProps } from "react-select/lib/components/MultiValue";
+import { tokensClasses } from "@library/styles/tokensStyles";
 
 /**
  * Overwrite for the controlContainer component in React Select
@@ -66,6 +67,7 @@ export function MenuList(props: MenuListComponentProps<any>) {
  */
 export function MultiValueRemove(props: MultiValueRemoveProps<any>) {
     const { innerProps, selectProps } = props;
+    const classesTokens = tokensClasses();
 
     // We need to bind the function to the props for that component
     const handleKeyDown = event => {
@@ -93,7 +95,7 @@ export function MultiValueRemove(props: MultiValueRemoveProps<any>) {
                 title={t("Clear")}
                 aria-label={t("Clear")}
             >
-                {close("suggestedTextInput-tokenRemoveIcon")}
+                {close(classNames("suggestedTextInput-tokenRemoveIcon", classesTokens.removeIcon))}
             </button>
         </components.MultiValueRemove>
     );
@@ -125,7 +127,7 @@ export function SelectOption(props: OptionProps<any>) {
     return (
         <li className="suggestedTextInput-item">
             <button
-                {...props.innerProps}
+                {...props.innerProps as any}
                 type="button"
                 className={classNames("suggestedTextInput-option", {
                     isSelected,

@@ -13,9 +13,9 @@ textarea,
 ul.token-input-list,
 input.InputBox,
 .AdvancedSearch .InputBox,
-select,
-.AdvancedSearch select {
-    line-height: $formElement_lineHeight;
+.AdvancedSearch select,
+select {
+    line-height: $formElement_height;
     height: $formElement_height;
     border: $formElement_border;
     border-radius: $formElement_borderRadius;
@@ -41,27 +41,22 @@ select,
 }
 
 textarea {
-    padding-top: 3px;
-    padding-bottom: 3px;
     overflow: auto;
 
-    @if ($formElement_borderRadius == $formElement_height) {
-        border-radius: #{$formElement_borderRadius / 2}
+    @if ($formElement_borderRadius >= 16px) {
+        border-radius: 16px;
     }
 }
 
 select,
 .AdvancedSearch select {
-    line-height: initial;
     -moz-appearance: none;
-    height: $formElement_height;
 
     font-family: "system-ui", -apple-system, BlinkMacSystemFont, "Segoe UI",
         "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
         "Helvetica Neue", sans-serif;
     padding-top: 0;
     padding-bottom: 0;
-    line-height: 24px;
 
     &:focus {
         -moz-appearance: none;
@@ -87,7 +82,7 @@ select::-ms-expand {
     }
 
     .Buttons .Back {
-        padding-right: $utility-medium_padding;
+        padding-right: $utility-baseUnitDouble;
     }
 }
 
@@ -122,8 +117,8 @@ select::-ms-expand {
     .Buttons .Back {
         margin-right: 0;
         padding-right: 0;
-        margin-bottom: $utility-small_padding;
-        margin-left: $utility-xSmall_padding;
+        margin-bottom: $utility-baseUnitHalf;
+        margin-left: $utility-baseUnitHalf;
     }
 
     .Buttons .Back {
@@ -140,7 +135,7 @@ select::-ms-expand {
             margin-left: 0;
             text-align: left;
             line-height: $global-base_lineHeight;
-            margin-bottom: $utility-medium_padding;
+            margin-bottom: $utility-baseUnitDouble;
         }
     }
 
@@ -176,7 +171,7 @@ select::-ms-expand {
 }
 
 .ActivityFormWrap {
-    margin-bottom: $utility-medium_padding;
+    margin-bottom: $utility-baseUnitDouble;
 }
 
 label {
@@ -194,7 +189,7 @@ ul.token-input-list {
     li input {
         margin: 0 !important;
         padding: 0;
-        height: $formElement_lineHeight - 2px;
+        height: $formElement_height - 2px;
         line-height: initial;
         font-size: $global-medium_fontSize;
         font-weight: $global-normal_fontWeight !important;
@@ -209,12 +204,7 @@ ul.token-input-list {
 }
 
 li.token-input-token {
-    background: $global-color_primary;
-    color: $global-color_white;
-    border: darken($global-color_primary, 0.03);
-    border-radius: $formElement_borderRadius;
-    font-size: $global-medium_fontSize;
-    margin-right: 3px;
+    @include Tag;
 }
 
 div.token-input-dropdown {
@@ -265,7 +255,10 @@ div.token-input-dropdown {
     }
 }
 
+.Button-Controls .Button.Primary,
+.BigButton:not(.Danger),
 .NewConversation.NewConversation {
+
     @include Button(
         $button-primary_bg,
         $button-primary_fg,
@@ -276,8 +269,8 @@ div.token-input-dropdown {
     );
 }
 
-.ButtonGroup.Multi {
-
+.groupToolbar .Button.Primary,
+.BoxButtons .Button.Primary {
     @include Button(
         $button-primary_bg,
         $button-primary_fg,
@@ -286,47 +279,66 @@ div.token-input-dropdown {
         $button-primary-hover_fg,
         $button-primary-hover_border
     );
+}
+
+.BigButton,
+.ButtonGroup.Multi {
+    display: flex;
+    justify-content: center;
     align-items: center;
+    width: 100%;
     max-width: $formButton_maxWidth;
-    padding-right: 32px;
-    padding-left: 32px;
-    margin: 0;
-    width: initial;
-    display: inline-flex;
+
 
     @include maxWidth {
         width: 100%;
         display: flex;
         margin: 0 auto;
     }
+}
 
-    .Button {
-        background: none;
-        border: none;
-        font-size: inherit;
-        line-height: inherit;
-        padding: 0;
-        color: inherit;
+.ButtonGroup.Multi {
+
+    > .Button:first-child {
+        width: 100%;
+        text-align: center;
+        border-top-right-radius: $formButton_borderRadius;
+        border-bottom-right-radius: $formButton_borderRadius;
     }
 
     .Button.Handle,
     &.Open .Button.Handle {
+        padding: 0;
         position: absolute;
         right: 0;
         top: 0;
-        bottom: 0;
-        background: none;
-        color: $global-color_white;
+        border-color: $button-primary_border;
+        background-color: $button-primary_bg;
+        color: $button-primary_fg;
 
         .SpDropdownHandle::before {
-            padding: 0 $utility-medium_padding;
+            height: 100%;
+            padding: 0 $utility-baseUnitDouble;
         }
 
         &:hover,
         &:focus,
         &:active {
-            background: rgba($global-color_black, 0.05);
-            color: $global-color_white;
+            background-color: rgba($button-primary-hover_bg, 0.05);
+            color: $button-primary-hover_fg;
+        }
+    }
+}
+
+.ButtonGroup.Multi {
+
+    &:focus,
+    &:hover,
+    &:active {
+
+        .Button.Handle {
+            background-color: rgba($button-primary-hover_bg, 0.3);
+            color: $button-primary-hover_fg;
         }
     }
 }
@@ -334,7 +346,7 @@ div.token-input-dropdown {
 .change-picture {
 
     .WarningMessage {
-        margin: $utility-medium_padding 0;
+        margin: $utility-baseUnitDouble 0;
     }
 
     @include maxWidth {
@@ -344,7 +356,7 @@ div.token-input-dropdown {
         }
 
         .change-picture-new {
-           margin: 0 0 $utility-small_padding;
+           margin: 0 0 $utility-baseUnitHalf;
        }
     }
 }
@@ -354,23 +366,20 @@ div.token-input-dropdown {
     min-height: 100px;
 }
 
+.FormTitleWrapper .H {
+    margin-bottom: $utility-baseUnit;
+}
+
 .Form-HeaderWrap .Author {
     display: none;
 }
 
+.FormTitleWrapper {
+    margin-bottom: $global-block_margin;
+}
+
 .FormWrapper-Condensed,
 .CommentForm.CommentForm {
-    padding: $component-base_padding;
-    background: $component_bg;
-    box-shadow: $component_boxShadow;
-    border-radius: $component_borderRadius;
-    border: $component_border;
-    margin: 0 0 $utility-large_padding;
-
-    @if $component-item_spacing == 0 {
-        box-shadow: $component_boxShadow;
-        border-radius: $component_borderRadius;
-    }
 
     .FormWrapper {
         border-width: 0;
@@ -383,5 +392,9 @@ div.token-input-dropdown {
             padding: 0;
         }
     }
+}
+
+.CommentForm .DraftButton {
+    display: none !important;
 }
 

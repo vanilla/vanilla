@@ -74,10 +74,10 @@ $vanillaBox-icon_hover_paddingTop
 
 ### Utility
 
-- **$utility-medium_padding**: Utility variables are heavily inherited through the theme. Editing those variables may break your layout, please do not edit them.
-- **$utility-xSmall_padding**: Utility variables are heavily inherited through the theme. Editing those variables may break your layout, please do not edit them.
-- **$utility-small_padding**: Utility variables are heavily inherited through the theme. Editing those variables may break your layout, please do not edit them.
-- **$utility-large_padding**: Utility variables are heavily inherited through the theme. Editing those variables may break your layout, please do not edit them.
+- **$utility-baseUnitDouble**: Utility variables are heavily inherited through the theme. Editing those variables may break your layout, please do not edit them.
+- **$utility-baseUnitHalf**: Utility variables are heavily inherited through the theme. Editing those variables may break your layout, please do not edit them.
+- **$utility-baseUnitHalf**: Utility variables are heavily inherited through the theme. Editing those variables may break your layout, please do not edit them.
+- **$utility-baseUnitTriple**: Utility variables are heavily inherited through the theme. Editing those variables may break your layout, please do not edit them.
 - **$utility-xLarge_padding**: Utility variables are heavily inherited through the theme. Editing those variables may break your layout, please do not edit them.
 
 ### Theme

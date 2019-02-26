@@ -17,6 +17,7 @@ interface IStringMap {
 interface IProps extends RouteComponentProps<any> {
     value: IStringMap;
     defaults?: IStringMap;
+    syncOnFirstMount?: boolean;
 }
 
 /**
@@ -27,8 +28,10 @@ class QueryString extends React.Component<IProps> {
         return null;
     }
 
-    public componentWillMount() {
-        this.updateQueryString();
+    public componentDidMount() {
+        if (this.props.syncOnFirstMount) {
+            this.updateQueryString();
+        }
     }
 
     public componentDidUpdate(prevProps: IProps) {

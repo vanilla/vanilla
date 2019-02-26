@@ -6,11 +6,6 @@
 
 import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
 import { IMe } from "@library/@types/api";
-import apiv2 from "@library/apiv2";
-
-export interface IInjectableUsersActions {
-    usersActions: UsersActions;
-}
 
 /**
  * Redux actions for the users data.
@@ -22,17 +17,6 @@ export default class UsersActions extends ReduxActions {
 
     public static readonly ACTION_TYPES: ActionsUnion<typeof UsersActions.getMeACs>;
 
-    /**
-     * Map redux's dispatch into a user actions instance prop.
-     *
-     * @param dispatch The redux dispatch function.
-     */
-    public static mapDispatch(dispatch): IInjectableUsersActions {
-        return {
-            usersActions: new UsersActions(dispatch, apiv2),
-        };
-    }
-
     public static getMeACs = ReduxActions.generateApiActionCreators(
         UsersActions.GET_ME_REQUEST,
         UsersActions.GET_ME_RESPONSE,
@@ -41,7 +25,7 @@ export default class UsersActions extends ReduxActions {
         {},
     );
 
-    public getMe() {
+    public getMe = () => {
         return this.dispatchApi("get", "/users/me", UsersActions.getMeACs, {});
-    }
+    };
 }

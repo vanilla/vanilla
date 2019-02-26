@@ -316,6 +316,7 @@ export class Editor extends React.Component<IProps> {
         ) as any) as HeaderBlot[]; // Explicit mapping of types because the parchments types suck.
 
         headers.forEach(header => header.setGeneratedID());
+        this.quill.update(Quill.sources.API);
     }
 
     /**

@@ -23,10 +23,13 @@ $pager-highlight_bg:                     $pager-hover_bg !default;
 $pager-highlight-border:                 $pager_border !default;
 $pager-highlight_color:                  $global-color_primaryAlt !default;
 
-$quickSearch_bg:                         $global-color_primary !default;
-$quickSearch-hover_bg:                   $global-color_primaryAlt !default;
-$quickSearch_border:                     1px solid $global-color_primaryAlt !default;
-$quickSearch_color:                      $global-color_white !default;
+$quickSearch_bg:                         $button-primary_bg !default;
+$quickSearch_fg:                         $button-primary_fg !default;
+$quickSearch_borderColor:                $button-primary_border !default;
+
+$quickSearch-hover_bg:                   $button-primary-hover_bg !default;
+$quickSearch-hover_fg:                   $button-primary-hover_fg !default;
+$quickSearch-hover_borderColor:          $button-primary-hover_border !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -69,6 +72,10 @@ $quickSearch_color:                      $global-color_white !default;
 .PrevNextPager .Previous,
 .PrevNextPager .Next {
     @include Button;
+
+    flex: initial;
+    min-width: 120px;
+    text-align: center;
 }
 
 .PagerWrap,
@@ -87,33 +94,41 @@ $quickSearch_color:                      $global-color_white !default;
 
 .CommentHeading {
     float: left;
-    margin: 0 0 $utility-large_padding;
+    min-height: $pager_height;
+    display: flex;
+    align-items: center;
+    margin: 0 0 $utility-baseUnit;
 }
 
-.DataBox {
-    margin: 0 0 $utility-large_padding;
+.BeforeCommentHeading {
+    margin-bottom: $global-block_margin;
 }
 
 .PageControls {
     @include clearfix;
     min-height: initial;
     margin: initial;
+    margin-bottom: $global-block_margin;
+
+    .H {
+        margin-bottom: $global-block_margin;
+    }
 }
 
 .QuickSearch .MenuItems {
 
     @include clearfix;
 
-    right: 0;
-    top: calc(#{$pager_height} + #{$utility-medium_padding});
+    right: -2px;
+    top: 100%;
 
     .InputBox {
-        margin-right: $utility-medium_padding;
+        margin-right: $utility-baseUnitDouble;
     }
 
     .bwrap {
         position: static;
-        margin-left: $utility-small_padding;
+        margin-left: $utility-baseUnitHalf;
 
         button {
             padding: 0;
@@ -145,7 +160,7 @@ a.MoreWrap,
         float: none;
         width: 100%;
         justify-content: center;
-        margin-bottom: $utility-medium_padding;
+        margin-bottom: $utility-baseUnitDouble;
 
         .QuickSearch {
             display: none;
@@ -155,7 +170,7 @@ a.MoreWrap,
     .QuickSearchButton {
         display: inline-flex;
         align-items: center;
-        margin: 0 0 0 $utility-medium_padding;
+        margin: 0 0 0 $utility-baseUnitDouble;
     }
 
     span,
@@ -206,7 +221,8 @@ a.MoreWrap,
 
     .Next,
     .Previous {
-        padding: 0 $utility-medium_padding;
+        padding: 0 $utility-baseUnitDouble;
+        text-align: center;
      }
 
     .Previous {
@@ -222,27 +238,26 @@ a.MoreWrap,
     .QuickSearchWrap .Button,
     .QuickSearchButton {
         @include Button(
-            $button-primary_bg,
-            $button-primary_fg,
-            $button-primary_border,
-            $button-primary-hover_bg,
-            $button-primary-hover_fg,
-            $button-primary-hover_border
+            $quickSearch_bg,
+            $quickSearch_fg,
+            $quickSearch_borderColor,
+            $quickSearch-hover_bg,
+            $quickSearch-hover_fg,
+            $quickSearch-hover_borderColor
         );
     }
 
     .QuickSearchButton {
         height: $formButton_height;
         width: $formButton_height;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .QuickSearchButton.QuickSearchButton span {
-        min-width: 0;
-        height: auto;
-        width: auto;
+        display: inherit;
         color: inherit;
-        margin: 0;
-        vertical-align: baseline;
 
         &:hover,
         &:focus {
@@ -259,12 +274,6 @@ a.MoreWrap,
         line-height: $formButton-height;
         height: $formButton-height;
     }
-}
-
-.PageControls .Button-Controls,
-.Pager.PrevNextPager,
-.Pager.NumberedPager {
-    margin: 0 0 $utility-large_padding;
 }
 
 .selectBox-toggle {
@@ -307,7 +316,7 @@ a.MoreWrap,
 .PageControls.PageControls {
 
     .discussion-sorts {
-        margin-right: $utility-medium_padding;
+        margin-right: $utility-baseUnitDouble;
     }
 
     @include maxWidth {
@@ -325,42 +334,6 @@ a.MoreWrap,
         display: none;
     }
 
-    .BoxNewDiscussion > .Button,
-    .BoxNewDiscussion {
-
-        @include maxWidth {
-            display: block;
-            width: 100%;
-            margin-right: 0;
-            text-align: center;
-            margin-bottom: $utility-large_padding;
-        }
-    }
-
-    .ButtonGroup.Multi {
-        padding-right: 0;
-    }
-
-    .NewDiscussion {
-
-        .Button.Handle {
-            margin-left: 32px - $utility-medium_padding;
-            position: relative;
-        }
-
-        @include maxWidth {
-            padding: 0;
-
-            .Primary:first-child {
-                width: 100%;
-            }
-
-            .Button.Handle {
-                position: absolute;
-            }
-        }
-    }
-
     // Reset styles from ideation
     .discussion-sort-filter-module {
         float: none !important;
@@ -370,12 +343,23 @@ a.MoreWrap,
     .selectBox {
         display: inline-flex;
         float: none;
-        height: 38px;
-        margin: 0 0 $utility-large_padding;
+        height: #{$pager_height + 2px};
 
         @include maxWidth {
             margin: 0;
         }
+    }
+}
+
+.Button-Controls.Button-Controls {
+
+    .BigButton,
+    .ButtonGroup.Multi {
+        min-width: 200px;
+    }
+
+    .BoxNewDiscussion {
+        display: block;
     }
 }
 

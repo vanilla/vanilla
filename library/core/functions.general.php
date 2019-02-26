@@ -1804,7 +1804,7 @@ if (!function_exists('getRecord')) {
                         throw permissionException();
                     }
 
-                    $row['Name'] = formatString($row['HeadlineFormat'], $row);
+                    $row['Name'] = $row['ActivityName'];
                     $row['Body'] = $row['Story'];
                 }
                 break;
@@ -2488,23 +2488,6 @@ if (!function_exists('recordType')) {
         } else {
             return [null, null];
         }
-    }
-}
-
-if (!function_exists('touchConfig')) {
-    /**
-     * Make sure the config has a setting.
-     *
-     * This function is useful to call in the setup/structure of plugins to
-     * make sure they have some default config set.
-     *
-     * @param string|array $name The name of the config key or an array of config key value pairs.
-     * @param mixed $default The default value to set in the config.
-     *
-     * @deprecated 2.8 Use Gdn_Configuration::touch()
-     */
-    function touchConfig($name, $default = null) {
-        Gdn::config()->touch($name, $default);
     }
 }
 
@@ -3859,6 +3842,10 @@ if (!function_exists('isTrustedDomain')) {
      */
     function isTrustedDomain($url) {
         static $trusted = null;
+
+        if (defined('TESTMODE_ENABLED') && constant('TESTMODE_ENABLED')) {
+            $trusted = null;
+        }
 
         if (empty($url)) {
             return false;

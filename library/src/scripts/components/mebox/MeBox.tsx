@@ -4,20 +4,19 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
+import { IMe, IUserFragment } from "@library/@types/api/users";
 import classNames from "classnames";
-import NotificationsDropdown from "./pieces/NotificationsDropDown";
+import * as React from "react";
 import MessagesDropDown from "./pieces/MessagesDropDown";
+import NotificationsDropdown from "./pieces/NotificationsDropDown";
 import UserDropdown from "./pieces/UserDropdown";
-import { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
-import { IMessagesContentsProps } from "@library/components/mebox/pieces/MessagesContents";
-import MessagesToggle from "@library/components/mebox/pieces/MessagesToggle";
+import { IInjectableUserState } from "@library/users/UsersModel";
+import get from "lodash/get";
+import { meBoxClasses } from "@library/styles/meBoxStyles";
 
-export interface IMeBoxProps {
+export interface IMeBoxProps extends IInjectableUserState {
+    countClass?: string;
     className?: string;
-    notificationsProps: INotificationsProps;
-    messagesProps: IMessagesContentsProps;
-    counts: any;
     countsClass?: string;
     buttonClassName?: string;
     contentClassName?: string;
@@ -28,31 +27,37 @@ export interface IMeBoxProps {
  */
 export default class MeBox extends React.Component<IMeBoxProps> {
     public render() {
-        const countClass = this.props.countsClass;
-        const buttonClassName = this.props.buttonClassName;
-        const contentClassName = this.props.contentClassName;
+        const { buttonClassName, contentClassName, countsClass } = this.props;
+        const userInfo: IMe = get(this.props, "currentUser.data", {
+            countUnreadNotifications: 0,
+            name: null,
+            userID: null,
+            photoUrl: null,
+        });
+        const classes = meBoxClasses();
+
         return (
-            <div className={classNames("meBox", this.props.className)}>
+            <div className={classNames("meBox", this.props.className, classes.root)}>
                 <NotificationsDropdown
-                    {...this.props.notificationsProps}
-                    countClass={countClass}
+                    userSlug={userInfo.name}
+                    countClass={countsClass}
                     buttonClassName={buttonClassName}
                     contentsClassName={contentClassName}
+                    countUnread={userInfo.countUnreadNotifications}
+                    toggleContentClassName={classNames("meBox-buttonContent", classes.buttonContent)}
                 />
                 <MessagesDropDown
-                    {...this.props.messagesProps}
-                    countClass={countClass}
+                    countClass={countsClass}
                     buttonClassName={buttonClassName}
                     contentsClassName={contentClassName}
-                    toggleContentsClassName="meBox-buttonContent"
+                    toggleContentClassName={classNames("meBox-buttonContent", classes.buttonContent)}
                 />
                 <UserDropdown
-                    counts={this.props.counts}
                     className="meBox-userDropdown"
-                    countsClass={countClass}
+                    countsClass={countsClass}
                     buttonClassName={buttonClassName}
                     contentsClassName={contentClassName}
-                    toggleContentClassName="meBox-buttonContent"
+                    toggleContentClassName={classNames("meBox-buttonContent", classes.buttonContent)}
                 />
             </div>
         );

@@ -12,6 +12,7 @@ import { clear } from "@library/components/icons/common";
 
 interface IProps {
     onClick: (event: React.SyntheticEvent) => void;
+    className?: string;
 }
 
 /**
@@ -21,7 +22,7 @@ export function ClearButton(props: IProps) {
     return (
         <Button
             baseClass={ButtonBaseClass.ICON}
-            className={"suggestedTextInput-clear searchBar-clear"}
+            className={classNames("suggestedTextInput-clear", "searchBar-clear", props.className)}
             type="button"
             onClick={props.onClick}
             title={t("Clear")}

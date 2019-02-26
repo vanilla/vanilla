@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { onReady, onContent } from "@library/application";
+import { onContent } from "@library/application";
 import hljs from "highlight.js";
 import "highlight.js/styles/github.css";
 

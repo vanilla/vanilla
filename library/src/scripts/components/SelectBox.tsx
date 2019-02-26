@@ -15,6 +15,7 @@ import DropDown from "@library/components/dropdown/DropDown";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import Frame from "@library/components/frame/Frame";
 import FrameBody from "@library/components/frame/FrameBody";
+import { selectBoxClasses } from "@library/styles/selectBoxStyles";
 
 export interface ISelectBoxItem {
     name: string;
@@ -83,6 +84,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
     };
 
     public render() {
+        const classes = selectBoxClasses();
         const selectItems = this.props.children.map((child, i) => {
             const selected = this.state.selectedIndex === i;
             return (
@@ -96,20 +98,24 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                     index={i}
                     current={selected}
                     lang={child.lang}
-                    buttonClassName={classNames("dropDownItem-button", "selectBox-buttonItem", {
+                    buttonClassName={classNames("dropDownItem-button", "selectBox-buttonItem", classes.buttonItem, {
                         isInModal: this.props.openAsModal,
                     })}
                 >
-                    <span className="selectBox-checkContainer sc-only">
+                    <span className={classNames("selectBox-checkContainer", "sc-only", classes.checkContainer)}>
                         {selected && checkCompact("selectBox-selectedIcon")}
                         {!selected && (
-                            <span className="selectBox-spacer" aria-hidden={true}>
+                            <span className={classNames("selectBox-spacer", classes.spacer)} aria-hidden={true}>
                                 {` `}
                             </span>
                         )}
                     </span>
-                    <span className="selectBox-itemLabel">{child.name}</span>
-                    {child.outdated && <span className="selectBox-outdated metaStyle">{t("(Outdated)")}</span>}
+                    <span className={classNames("selectBox-itemLabel", classes.itemLabel)}>{child.name}</span>
+                    {child.outdated && (
+                        <span className={classNames("selectBox-outdated", "metaStyle", classes.outdated)}>
+                            {t("(Outdated)")}
+                        </span>
+                    )}
                 </DropDownItemButton>
             );
         });
@@ -117,7 +123,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
             this.state.selectedItem && this.state.selectedItem.name ? (
                 <React.Fragment>
                     {this.state.selectedItem.name}
-                    {downTriangle("selectBox-buttonIcon")}
+                    {downTriangle("selectBox-buttonIcon", classes.buttonIcon)}
                 </React.Fragment>
             ) : null;
         return (
@@ -132,7 +138,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         className="selectBox-dropDown"
                         name={"label" in this.props ? this.props.label : this.state.selectedItem.name}
                         buttonContents={buttonContents}
-                        buttonClassName={classNames(this.props.buttonClassName, "selectBox-toggle")}
+                        buttonClassName={classNames(this.props.buttonClassName, "selectBox-toggle", classes.toggle)}
                         contentsClassName={classNames({ isParentWidth: this.props.widthOfParent })}
                         buttonBaseClass={this.props.buttonBaseClass}
                         renderAbove={this.props.renderAbove}

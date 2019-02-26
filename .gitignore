@@ -10,6 +10,7 @@
 !/build/build.xml
 !/build/package-include.txt
 !/build/package-exclude.txt
+!/build/README.md
 !/build/webpack.aliases.js
 /cache/*
 .cache
@@ -38,6 +39,7 @@
 !/plugins/HtmLawed/
 !/plugins/OpenID/
 !/plugins/oauth2/
+!/plugins/pockets/
 !/plugins/PrivateCommunity/
 !/plugins/ProfileExtender/
 !/plugins/Quotes/

@@ -544,7 +544,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     /**
      * Checks if a theme has theme options.
      *
-     * @param $themeKey The key value of the theme we're checking.
+     * @param string $themeKey The key value of the theme we're checking.
      * @return bool Whether the given theme has theme options.
      */
     public function hasThemeOptions($themeKey) {
@@ -585,6 +585,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
 
         if ($oldTheme !== $themeName) {
             $this->themeHook($themeName, self::ACTION_ENABLE, true);
+            $this->themeHook($oldTheme, self::ACTION_DISABLE, true);
             Logger::event(
                 'theme_changed',
                 Logger::NOTICE,

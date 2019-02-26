@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { createStore, compose, applyMiddleware, combineReducers, Store } from "redux";
+import { createStore, compose, applyMiddleware, combineReducers, Store, AnyAction } from "redux";
 import { getReducers } from "@library/state/reducerRegistry";
 import thunk from "redux-thunk";
 
@@ -13,8 +13,18 @@ const initialActions = window.__ACTIONS__ || [];
 
 const middleware = [thunk];
 
+// https://github.com/zalmoxisus/redux-devtools-extension/blob/master/docs/Troubleshooting.md#excessive-use-of-memory-and-cpu
+const actionSanitizer = (action: AnyAction) =>
+    (action.type as string).includes("[editorInstance]") && action.payload && action.payload.quill
+        ? {
+              ...action,
+              payload: { ...action.payload, quill: "<<Quill Instance>>" },
+          }
+        : action;
 // Browser may have redux dev tools installed, if so integrate with it.
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({ actionSanitizer })
+    : compose;
 const enhancer = composeEnhancers(applyMiddleware(...middleware));
 
 // Build the store, add devtools extension support if it's available.

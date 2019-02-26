@@ -45,13 +45,17 @@
                     <div class="Container">
                         <div class="Frame-contentWrap">
                             <div class="Frame-details">
-                                <div class="Frame-row">
-                                    <nav class="BreadcrumbsBox">
-                                        {breadcrumbs}
-                                    </nav>
-                                    {if !$SectionGroups}
+                                {if !$isHomepage}
+                                    <div class="Frame-row">
+                                        <nav class="BreadcrumbsBox">
+                                            {breadcrumbs}
+                                        </nav>
+                                    </div>
+                                {/if}
+                                <div class="Frame-row SearchBoxMobile">
+                                    {if !$SectionGroups && !inSection(["SearchResults"])}
                                         <div class="SearchBox js-sphinxAutoComplete" role="search">
-                                            {searchbox}
+                                            {module name="AdvancedSearchModule"}
                                         </div>
                                     {/if}
                                 </div>
@@ -60,14 +64,9 @@
                                         {if inSection("Profile")}
                                             <div class="Profile-header">
                                                 <div class="Profile-photo">
-                                                    <div class="PhotoLarge"
-                                                        {if $Profile.PhotoUrl}
-                                                            style="background: url('{$Profile.PhotoUrl}') center/cover no-repeat;"
-                                                        {else}
-                                                            style="background: url('{$Profile.Photo}') center/cover no-repeat;"
-                                                        {/if}>
+                                                    <div class="PhotoLarge">
+                                                        {module name="UserPhotoModule"}
                                                     </div>
-                                                    {module name="UserPhotoModule"}
                                                 </div>
                                                 <div class="Profile-name">
                                                     <h1 class="Profile-username">
@@ -83,6 +82,11 @@
                                         {event name="AfterBody"}
                                     </main>
                                     <aside class="Panel Panel-main">
+                                        {if !$SectionGroups}
+                                            <div class="SearchBox js-sphinxAutoComplete" role="search">
+                                                {searchbox}
+                                            </div>
+                                        {/if}
                                         {asset name="Panel"}
                                     </aside>
                                 </div>

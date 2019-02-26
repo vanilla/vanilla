@@ -114,10 +114,10 @@ export function getGlobalErrorMessage(apiError: IApiError | undefined, validFiel
         }
     }
 
-    const serverError = apiError.response.data;
+    const serverError = apiError.response && apiError.response.data;
     if (serverError && serverError.message) {
         return serverError.message;
     }
 
-    return t("An error has occurred, please try again.");
+    return t("Something went wrong while contacting the server.");
 }

@@ -23,13 +23,15 @@ interface IProps {
  * Component for representing a Form Error.
  */
 export default class FormError extends React.Component<IProps> {
+    private selfRef = React.createRef<HTMLDivElement>();
+
     public render(): React.ReactNode {
         const { onRetryClick, onDismissClick, children } = this.props;
         const classes = formErrorClasses();
 
         return (
-            <div className={classes.root}>
-                <Paragraph>{children}</Paragraph>
+            <div ref={this.selfRef} className={classes.root}>
+                <p role="alert">{children}</p>
                 <div className={classes.actions}>
                     {onRetryClick && (
                         <Button
@@ -50,5 +52,14 @@ export default class FormError extends React.Component<IProps> {
                 </div>
             </div>
         );
+    }
+
+    /**
+     * Scroll to ourselves when added to the DOM.
+     */
+    public componentDidMount() {
+        if (this.selfRef.current) {
+            this.selfRef.current.scrollIntoView();
+        }
     }
 }

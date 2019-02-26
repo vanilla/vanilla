@@ -10,7 +10,7 @@ import { indexArrayByKey } from "@library/utility";
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 import qs from "qs";
 import { sprintf } from "sprintf-js";
-import { IFieldError, LoadStatus, ILoadable } from "@library/@types/api";
+import { IFieldError, LoadStatus, ILoadable, IApiError } from "@library/@types/api";
 import { humanFileSize } from "@library/utils/fileUtils";
 
 function fieldErrorTransformer(responseData) {
@@ -80,37 +80,44 @@ export async function uploadFile(file: File, requestConfig: AxiosRequestConfig =
 /**
  * Extract a field specific error from an ILoadable if applicable.
  *
- * @param loadable - The loadable to extract from.
+ * @param apiError - The error to extract from.
  * @param field - The field to extract.
  *
  * @returns an array of IFieldErrors if found or undefined.
  */
-export function getFieldErrors(loadable: ILoadable<any>, field: string): IFieldError[] | undefined {
-    if (loadable.status === LoadStatus.ERROR || loadable.status === LoadStatus.LOADING) {
-        if (loadable.error && loadable.error.errors && loadable.error.errors[field]) {
-            return loadable.error.errors[field];
-        }
+export function getFieldErrors(apiError: IApiError | undefined, field: string): IFieldError[] | undefined {
+    if (!apiError) {
+        return;
+    }
+
+    const serverError = apiError.response.data;
+    if (serverError && serverError.errors && serverError.errors[field]) {
+        return serverError.errors[field];
     }
 }
 
 /**
  * Extract a global error message out of an ILoadable if applicable.
  *
- * @param loadable - The loadable to extract from.
+ * @param apiError - The error to extract from.
  * @param validFields - Field to check for overriding fields errors from. A global error only shows if there are no valid field errors.
  *
  * @returns A global error message or an undefined.
  */
-export function getGlobalErrorMessage(loadable: ILoadable<any>, validFields: string[]): string | undefined {
-    if (loadable.status === LoadStatus.ERROR || loadable.status === LoadStatus.LOADING) {
-        for (const field of validFields) {
-            if (getFieldErrors(loadable, field)) {
-                return;
-            }
-        }
-
-        if (loadable.error) {
-            return loadable.error.message || t("An error has occurred, please try again.");
+export function getGlobalErrorMessage(apiError: IApiError | undefined, validFields: string[] = []): string | undefined {
+    if (!apiError) {
+        return;
+    }
+    for (const field of validFields) {
+        if (getFieldErrors(apiError, field)) {
+            return;
         }
     }
+
+    const serverError = apiError.response && apiError.response.data;
+    if (serverError && serverError.message) {
+        return serverError.message;
+    }
+
+    return t("Something went wrong while contacting the server.");
 }

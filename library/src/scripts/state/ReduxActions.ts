@@ -192,9 +192,8 @@ export default class ReduxActions {
             const response: AxiosResponse<T> = await requestPromise;
             this.dispatch(actionCreators.response(response, meta));
             return response;
-        } catch (axiosError) {
-            const error = axiosError.response ? axiosError.response.data : (axiosError as any);
-            this.dispatch(actionCreators.error(error, meta));
+        } catch (apiError) {
+            this.dispatch(actionCreators.error(apiError, meta));
         }
     }
 

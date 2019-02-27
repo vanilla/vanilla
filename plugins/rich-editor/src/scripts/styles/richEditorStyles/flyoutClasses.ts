@@ -4,10 +4,11 @@
  * @license GPL-2.0-only
  */
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
-import { borders, longWordEllipsis, paddings, styleFactory, toStringColor, unit } from "@library/styles/styleHelpers";
+import { borders, longWordEllipsis, paddings, toStringColor, unit } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, percent } from "csx";
+import styleFactory from "@library/styles/styleFactory";
 
 export function richEditorFlyoutClasses(theme?: object) {
     const vars = richEditorVariables(theme);

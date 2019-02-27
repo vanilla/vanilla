@@ -8,7 +8,8 @@ import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEd
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { paddings, styleFactory, unit } from "@library/styles/styleHelpers";
+import { paddings, unit } from "@library/styles/styleHelpers";
+import styleFactory from "@library/styles/styleFactory";
 
 export function insertMediaClasses(theme?: object) {
     const globalVars = globalVariables(theme);

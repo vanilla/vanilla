@@ -7,7 +7,8 @@ import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEd
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { singleBorder, styleFactory, toStringColor, unit } from "@library/styles/styleHelpers";
+import { singleBorder, toStringColor, unit } from "@library/styles/styleHelpers";
+import styleFactory from "@library/styles/styleFactory";
 
 export function nubPositionClasses(theme?: object) {
     const globalVars = globalVariables(theme);

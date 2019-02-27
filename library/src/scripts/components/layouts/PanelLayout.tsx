@@ -11,7 +11,7 @@ import { style } from "typestyle";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import throttle from "lodash/throttle";
 import { withDevice } from "@library/contexts/DeviceContext";
-import { debugHelper } from "@library/styles/styleHelpers";
+import { debugHelper, inheritHeightClass } from "@library/styles/styleHelpers";
 
 interface IProps extends IDeviceProps {
     className?: string;
@@ -92,8 +92,8 @@ class PanelLayout extends React.Component<IProps> {
             { noRightPanel: !shouldRenderRightPanel },
             { noBreadcrumbs: !childComponents.breadcrumbs },
             className,
-            { inheritHeight: growMiddleBottom },
             { hasTopPadding: topPadding },
+            growMiddleBottom ? inheritHeightClass() : "",
         );
 
         const fixedPanelClasses = this.calcFixedPanelClasses();
@@ -121,9 +121,14 @@ class PanelLayout extends React.Component<IProps> {
                     </div>
                 )}
 
-                <main className={classNames("panelLayout-main", { inheritHeight: this.props.growMiddleBottom })}>
+                <main
+                    className={classNames("panelLayout-main", this.props.growMiddleBottom ? inheritHeightClass() : "")}
+                >
                     <div
-                        className={classNames("panelLayout-container", { inheritHeight: this.props.growMiddleBottom })}
+                        className={classNames(
+                            "panelLayout-container",
+                            this.props.growMiddleBottom ? inheritHeightClass() : "",
+                        )}
                     >
                         {!isMobile &&
                             shouldRenderLeftPanel && (
@@ -164,10 +169,13 @@ class PanelLayout extends React.Component<IProps> {
                             })}
                         >
                             <Panel
-                                className={classNames("panelLayout-middle", {
-                                    hasAdjacentPanel: shouldRenderRightPanel,
-                                    inheritHeight: this.props.growMiddleBottom,
-                                })}
+                                className={classNames(
+                                    "panelLayout-middle",
+                                    {
+                                        hasAdjacentPanel: shouldRenderRightPanel,
+                                    },
+                                    this.props.growMiddleBottom ? inheritHeightClass() : "",
+                                )}
                             >
                                 {childComponents.middleTop && (
                                     <PanelArea className="panelAndNav-middleTop">{childComponents.middleTop}</PanelArea>
@@ -185,9 +193,10 @@ class PanelLayout extends React.Component<IProps> {
                                         </PanelArea>
                                     )}
                                 <PanelArea
-                                    className={classNames("panelAndNav-middleBottom", {
-                                        inheritHeight: this.props.growMiddleBottom,
-                                    })}
+                                    className={classNames(
+                                        "panelAndNav-middleBottom",
+                                        this.props.growMiddleBottom ? inheritHeightClass() : "",
+                                    )}
                                 >
                                     {childComponents.middleBottom}
                                 </PanelArea>

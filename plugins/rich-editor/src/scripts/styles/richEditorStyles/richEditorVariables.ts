@@ -4,22 +4,9 @@
  * @license GPL-2.0-only
  */
 
-import { calc, important, percent, px, viewHeight } from "csx";
+import { viewHeight } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    absolutePosition,
-    borders,
-    componentThemeVariables,
-    paddings,
-    placeholderStyles,
-    singleBorder,
-    singleLineEllipsis,
-    srOnly,
-    styleFactory,
-    textInputSizing,
-    toStringColor,
-    unit,
-} from "@library/styles/styleHelpers";
+import { componentThemeVariables } from "@library/styles/styleHelpers";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { standardAnimations } from "@library/styles/animationHelpers";
 
@@ -50,7 +37,7 @@ export function richEditorVariables(theme?: object) {
     };
 
     const menuButton = {
-        size: globalVars.icon.sizes.default,
+        size: varsFormElements.sizing.height,
         ...themeVars.subComponentStyles("menuButton"),
     };
 

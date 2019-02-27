@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
+import { componentThemeVariables, debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
@@ -35,7 +35,7 @@ export function searchBarVariables(theme?: object) {
     };
 
     const placeholder = {
-        color: formElementVars.placeholder.color,
+        color: formElementVars.colors.placeholder,
         ...themeVars.subComponentStyles("placeholder"),
     };
 
@@ -165,7 +165,7 @@ export function searchBarClasses(theme?: object) {
     const results = style({
         $nest: {
             ".suggestedTextInput__placeholder": {
-                color: formElementVars.placeholder.color.toString(),
+                color: toStringColor(formElementVars.colors.placeholder),
             },
             ".suggestedTextInput-noOptions": {
                 padding: px(12),

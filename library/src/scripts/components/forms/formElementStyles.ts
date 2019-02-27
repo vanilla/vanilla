@@ -53,20 +53,15 @@ export function formElementsVariables(theme?: object) {
     };
 
     const colors = {
-        fg: mixBgAndFg(0.8),
+        fg: vars.mainColors.fg,
         bg: vars.mainColors.bg,
         placeholder: mixBgAndFg(0.5),
         ...themeVars.subComponentStyles("colors"),
-    };
-
-    const placeholder = {
-        color: mixBgAndFg(0.5),
-        ...themeVars.subComponentStyles("placeholder"),
     };
 
     const disabled = {
         opacity: 0.5,
     };
 
-    return { sizing, spacing, border, giantInput, largeInput, miniInput, colors, placeholder, disabled };
+    return { sizing, spacing, border, giantInput, largeInput, miniInput, colors, disabled };
 }

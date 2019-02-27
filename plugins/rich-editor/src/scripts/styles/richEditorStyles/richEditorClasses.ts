@@ -5,14 +5,8 @@
  */
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    absolutePosition,
-    singleLineEllipsis,
-    srOnly,
-    styleFactory,
-    toStringColor,
-    unit,
-} from "@library/styles/styleHelpers";
+import { absolutePosition, singleLineEllipsis, srOnly, toStringColor, unit } from "@library/styles/styleHelpers";
+import styleFactory from "@library/styles/styleFactory";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc, important, percent } from "csx";
 export function richEditorClasses(theme?: object) {
@@ -32,14 +26,10 @@ export function richEditorClasses(theme?: object) {
                     },
                 },
             },
-            "&.inheritHeight": {
-                $nest: {
-                    ".richEditor-text, richEditor-textWrap, richEditor-frame": {
-                        display: "flex",
-                        flexDirection: "column",
-                        flexGrow: 1,
-                    },
-                },
+            ".richEditor-text, richEditor-textWrap, richEditor-frame": {
+                display: "flex",
+                flexDirection: "column",
+                flexGrow: 1,
             },
             ".ql-clipboard": {
                 ...srOnly(),
@@ -237,7 +227,7 @@ export function richEditorClasses(theme?: object) {
         padding: 0,
         margin: 0,
         $nest: {
-            ".richEditor-button, &.richEditor-button": {
+            "& .richEditor-button, &.richEditor-button": {
                 width: unit(vars.menuButton.size),
                 height: unit(vars.menuButton.size),
                 maxWidth: unit(vars.menuButton.size),

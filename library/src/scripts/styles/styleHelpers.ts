@@ -25,9 +25,10 @@ import {
     MaxWidthProperty,
 } from "csstype";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { style, keyframes } from "typestyle";
-import { TLength, NestedCSSProperties } from "typestyle/lib/types";
+import { keyframes } from "typestyle";
+import { TLength } from "typestyle/lib/types";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import styleFactory from "@library/styles/styleFactory";
 
 export const toStringColor = (colorValue: ColorHelper | "transparent") => {
     return typeof colorValue === "string" ? colorValue : colorValue.toString();
@@ -100,10 +101,12 @@ export function centeredBackgroundProps() {
 }
 
 export function centeredBackground() {
+    const style = styleFactory("centeredBackground");
     return style(centeredBackgroundProps());
 }
 
 export function backgroundCover(backgroundImage: BackgroundImageProperty) {
+    const style = styleFactory("backgroundCover");
     return style({
         ...centeredBackgroundProps(),
         backgroundSize: "cover",
@@ -115,16 +118,9 @@ export function inputLineHeight(height: number, paddingTop: number, fullBorderWi
     return unit(height - (2 * paddingTop + fullBorderWidth));
 }
 
-export const textInputSizing = (
-    height: number,
-    fontSize: number,
-    paddingTop: number,
-    fg: ColorHelper,
-    fullBorderWidth: number,
-) => {
+export const textInputSizing = (height: number, fontSize: number, paddingTop: number, fullBorderWidth: number) => {
     return {
         fontSize: unit(fontSize),
-        color: fg.toString(),
         width: percent(100),
         height: unit(height),
         lineHeight: inputLineHeight(height, paddingTop, fullBorderWidth),
@@ -170,40 +166,6 @@ export const debugHelper = (componentName: string) => {
         },
     };
 };
-
-/**
- * A better helper to generate human readable classes generated from TypeStyle.
- *
- * This works like debugHelper but automatically. The generated function behaves just like `style()`
- * but can automatically adds a debug name & allows the first argument to be a string subcomponent name.
- *
- * @example
- * const style = styleFactory("myComponent");
- * const myClass = style({ color: "red" }); // .myComponent-sad421s
- * const mySubClass = style("subcomponent", { color: "red" }) // .myComponent-subcomponent-23sdaf43
- *
- */
-export function styleFactory(componentName: string) {
-    function styleCreator(subcomponentName: string, ...objects: Array<NestedCSSProperties | undefined>);
-    function styleCreator(...objects: Array<NestedCSSProperties | undefined>);
-    function styleCreator(...objects: Array<NestedCSSProperties | undefined | string>) {
-        if (objects.length === 0) {
-            return style();
-        }
-
-        let debugName = componentName;
-        let styleObjs: Array<NestedCSSProperties | undefined> = objects as any;
-        if (typeof objects[0] === "string") {
-            const [subcomponentName, ...restObjects] = styleObjs;
-            debugName += `-${subcomponentName}`;
-            styleObjs = restObjects;
-        }
-
-        return style({ $debugName: debugName }, ...styleObjs);
-    }
-
-    return styleCreator;
-}
 
 /*
  * Color modification based on colors lightness.
@@ -251,6 +213,7 @@ export const componentThemeVariables = (theme: any | undefined, componentName: s
 };
 
 export const inheritHeightClass = () => {
+    const style = styleFactory("inheritHeight");
     return style({
         display: "flex",
         flexDirection: "column",
@@ -317,10 +280,10 @@ export const allLinkStates = (styles: object) => {
 export const unit = (val: string | number | undefined, unitFunction = px) => {
     if (typeof val === "string") {
         return val;
-    } else if (!!val && !isNaN(val)) {
+    } else if (val !== undefined && val !== null && !isNaN(val)) {
         return unitFunction(val as number);
     } else {
-        return undefined;
+        return val;
     }
 };
 
@@ -348,12 +311,25 @@ interface IPaddings {
 }
 
 export const paddings = (styles: IPaddings) => {
-    return {
-        paddingTop: styles.top ? unit(styles.top) : undefined,
-        paddingRight: styles.right ? unit(styles.right) : undefined,
-        paddingBottom: styles.bottom ? unit(styles.bottom) : undefined,
-        paddingLeft: styles.left ? unit(styles.left) : undefined,
-    };
+    const paddingVals = {} as any;
+
+    if (styles.top !== undefined) {
+        paddingVals.paddingTop = unit(styles.top);
+    }
+
+    if (styles.right !== undefined) {
+        paddingVals.paddingRight = unit(styles.right);
+    }
+
+    if (styles.bottom !== undefined) {
+        paddingVals.paddingBottom = unit(styles.bottom);
+    }
+
+    if (styles.left !== undefined) {
+        paddingVals.paddingLeft = unit(styles.left);
+    }
+
+    return paddingVals;
 };
 
 export interface ISpinnerProps {

@@ -8,10 +8,11 @@ import {
     absolutePosition,
     paddings,
     placeholderStyles,
-    styleFactory,
     textInputSizing,
+    toStringColor,
     unit,
 } from "@library/styles/styleHelpers";
+import styleFactory from "@library/styles/styleFactory";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc, percent } from "csx";
@@ -47,20 +48,29 @@ export function richEditorFormClasses(theme?: object) {
                     vars.title.height,
                     vars.title.fontSize,
                     globalVars.gutter.half,
-                    formElementVars.colors.fg,
                     formElementVars.border.fullWidth,
                 ),
+                color: toStringColor(formElementVars.colors.fg),
+                position: "relative",
+                fontWeight: globalVars.fonts.weights.semiBold,
+                border: 0,
+                borderRadius: 0,
+                marginBottom: unit(globalVars.spacer),
+                ...paddings({
+                    left: 0,
+                    right: 0,
+                }),
                 $nest: {
                     "&:active, &:focus, &.focus-visible": {
                         boxShadow: "none",
                     },
-                    ...placeholderStyles({
-                        lineHeight: "inherit",
-                        padding: "inherit",
-                        color: formElementVars.colors.placeholder.toString(),
-                    }),
                 },
             },
+            ...placeholderStyles({
+                lineHeight: "inherit",
+                padding: "inherit",
+                color: toStringColor(formElementVars.colors.placeholder),
+            }),
         },
     });
 

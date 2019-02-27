@@ -5,7 +5,8 @@
  */
 
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
-import { styleFactory, unit } from "@library/styles/styleHelpers";
+import { unit } from "@library/styles/styleHelpers";
+import styleFactory from "@library/styles/styleFactory";
 import { percent } from "csx";
 
 export function inlineToolbarClasses(theme?: object) {

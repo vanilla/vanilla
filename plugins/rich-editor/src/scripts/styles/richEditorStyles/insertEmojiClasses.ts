@@ -8,7 +8,8 @@ import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEd
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { styleFactory, unit } from "@library/styles/styleHelpers";
+import { unit } from "@library/styles/styleHelpers";
+import styleFactory from "@library/styles/styleFactory";
 
 export function insertEmojiClasses(theme?: object) {
     const globalVars = globalVariables(theme);

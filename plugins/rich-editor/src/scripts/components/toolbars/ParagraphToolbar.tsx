@@ -15,6 +15,8 @@ import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
 import classNames from "classnames";
 import FocusWatcher from "@library/FocusWatcher";
 import ActiveFormatIcon from "@rich-editor/components/toolbars/pieces/ActiveFormatIcon";
+import { paragraphToolbarContainerClasses } from "@rich-editor/styles/richEditorStyles/paragraphToolbarClasses";
+import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
 
 interface IProps extends IWithEditorProps {}
 
@@ -69,10 +71,13 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     }
 
     public render() {
+        const classesRichEditor = richEditorClasses();
         let pilcrowClasses = classNames(
             { isOpen: this.isMenuVisible },
             "richEditor-button",
             "richEditorParagraphMenu-handle",
+            classesRichEditor.paragraphMenuHandle,
+            classesRichEditor.button,
         );
 
         if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
@@ -83,7 +88,12 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
             <div
                 id={this.componentID}
                 style={this.pilcrowStyles}
-                className={classNames("richEditorParagraphMenu", { isMenuInset: !this.props.legacyMode })}
+                className={classNames(
+                    "richEditorParagraphMenu",
+                    classesRichEditor.paragraphMenu,
+                    { isMenuInset: !this.props.legacyMode },
+                    classesRichEditor.paragraphMenu,
+                )}
                 onKeyDown={this.handleKeyDown}
                 ref={this.selfRef}
             >

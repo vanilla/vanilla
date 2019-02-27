@@ -29,6 +29,7 @@ import ParagraphToolbar from "@rich-editor/components/toolbars/ParagraphToolbar"
 import throttle from "lodash/throttle";
 import EmbedBar from "@rich-editor/components/editor/pieces/EmbedBar";
 import hljs from "highlight.js";
+import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -97,9 +98,15 @@ export class Editor extends React.Component<IProps> {
      */
     private renderModern(): React.ReactNode {
         const { className } = this.props as INewProps;
+        const classesRichEditor = richEditorClasses();
         return (
             <div
-                className={classNames("richEditor", className, { isDisabled: this.props.isLoading })}
+                className={classNames(
+                    "richEditor",
+                    className,
+                    { isDisabled: this.props.isLoading },
+                    classesRichEditor.root,
+                )}
                 aria-label={t("Type your message.")}
                 aria-describedby={this.descriptionID}
                 role="textbox"
@@ -109,10 +116,21 @@ export class Editor extends React.Component<IProps> {
                 {this.renderContexts(
                     <>
                         {this.renderEmbedBar()}
-                        <div className="richEditor-scrollFrame">
-                            <div className="richEditor-scrollContainer" ref={this.scrollContainerRef}>
+                        <div className={classNames("richEditor-scrollFrame", classesRichEditor.scrollFrame)}>
+                            <div
+                                className={classNames("richEditor-scrollContainer", classesRichEditor.scrollContainer)}
+                                ref={this.scrollContainerRef}
+                            >
                                 {/*<div className="richEditor-scrollable">*/}
-                                <div className={classNames("richEditor-frame InputBox isMenuInset")} id="testScroll">
+                                <div
+                                    className={classNames(
+                                        "richEditor-frame",
+                                        "InputBox",
+                                        "isMenuInset",
+                                        classesRichEditor.scrollFrame,
+                                    )}
+                                    id="testScroll"
+                                >
                                     {this.renderMountPoint()}
                                     {this.renderInlineToolbars()}
                                 </div>
@@ -130,8 +148,9 @@ export class Editor extends React.Component<IProps> {
      * The legacy rendering mode has everything at the bottom, and uses the document as it's scroll container.
      */
     private renderLegacy(): React.ReactNode {
+        const classesRichEditor = richEditorClasses();
         return this.renderContexts(
-            <div className={classNames("richEditor-frame", "InputBox")} id="testScroll">
+            <div className={classNames("richEditor-frame", "InputBox", classesRichEditor.scrollFrame)} id="testScroll">
                 {this.renderMountPoint()}
                 {this.renderParagraphToolbar()}
                 {this.renderInlineToolbars()}
@@ -144,10 +163,11 @@ export class Editor extends React.Component<IProps> {
      * Render the elements that Quill will mount into.
      */
     private renderMountPoint(): React.ReactNode {
+        const classesRichEditor = richEditorClasses();
         return (
             <div className="richEditor-textWrap" ref={this.quillMountRef}>
                 <div
-                    className="ql-editor richEditor-text userContent"
+                    className={classNames("ql-editor", "richEditor-text", "userContent", classesRichEditor.text)}
                     data-gramm="false"
                     contentEditable={this.props.isLoading}
                     data-placeholder="Create a new post..."

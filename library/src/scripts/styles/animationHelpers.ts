@@ -3,11 +3,11 @@
  * @license GPL-2.0-only
  */
 
-import typestyle from "typestyle";
+import { keyframes } from "typestyle";
 
 export const standardAnimations = () => {
     return {
-        fadeIn: typestyle.keyframes({
+        fadeIn: keyframes({
             $debugName: "animation-fadeIn",
             "0%": { opacity: 0 },
             "100%": { opacity: 1 },

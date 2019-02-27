@@ -8,6 +8,9 @@ import React from "react";
 import { RangeStatic } from "quill/core";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import ToolbarPositioner from "@rich-editor/components/toolbars/pieces/ToolbarPositioner";
+import { nubPositionClasses } from "@rich-editor/styles/richEditorStyles/nubPositionClasses";
+import classNames from "classnames";
+import { inlineToolbarClasses } from "@rich-editor/styles/richEditorStyles/inlineToolbarClasses";
 
 interface IProps extends IWithEditorProps {
     selection: RangeStatic;
@@ -47,6 +50,8 @@ export class ToolbarContainer extends React.PureComponent<IProps, IState> {
                 isActive={isVisible}
             >
                 {({ x, y }) => {
+                    const classesNub = nubPositionClasses();
+                    const classesInlineToolbar = inlineToolbarClasses();
                     let toolbarStyles: React.CSSProperties = {
                         visibility: "hidden",
                         position: "absolute",
@@ -68,13 +73,17 @@ export class ToolbarContainer extends React.PureComponent<IProps, IState> {
                             top: y ? y.nubPosition : 0,
                         };
 
-                        classes += y && y.nubPointsDown ? "isUp" : "isDown";
+                        classes += y && y.nubPointsDown ? classesInlineToolbar.up : classesInlineToolbar.down;
                     }
                     return (
                         <div className={classes} style={toolbarStyles} ref={this.flyoutRef}>
                             {this.props.children}
-                            <div style={nubStyles} className="richEditor-nubPosition" ref={this.nubRef}>
-                                <div className="richEditor-nub" />
+                            <div
+                                style={nubStyles}
+                                className={classNames("richEditor-nubPosition", classesNub.position)}
+                                ref={this.nubRef}
+                            >
+                                <div className={classNames("richEditor-nub", classesNub.root)} />
                             </div>
                         </div>
                     );

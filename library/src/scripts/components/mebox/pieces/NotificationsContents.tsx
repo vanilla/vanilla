@@ -161,6 +161,15 @@ function mapStateToProps(state: INotificationsStoreState) {
                 : undefined,
     };
 
+    if (notifications.data) {
+        // Notifications are likely sorted by ID. Make sure they're sorted by the date they were created, in descending order.
+        notifications.data.sort((a: IMeBoxNotificationItem, b: IMeBoxNotificationItem) => {
+            const dateA = new Date(a.timestamp).getTime();
+            const dateB = new Date(b.timestamp).getTime();
+            return dateB - dateA;
+        });
+    }
+
     return {
         notifications,
     };

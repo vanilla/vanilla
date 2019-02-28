@@ -42,14 +42,14 @@ export const globalVariables = (theme?: object) => {
         return mainColors.primary.mix(mainColors.bg, weight) as ColorHelper;
     };
 
-    const errorFg = color("#ff3933");
+    const errorFg = color("#555A62");
     const warning = color("#ffce00");
     const deleted = color("#D0021B");
     const feedbackColors = {
         warning,
         error: {
             fg: errorFg,
-            bg: errorFg.mix(mainColors.bg, 10),
+            bg: color("#FFF3D4"),
         },
         confirm: color("#60bd68"),
         unresolved: warning.mix(mainColors.fg, 10),

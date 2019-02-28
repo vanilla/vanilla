@@ -49,7 +49,8 @@ export function createTrackableRequest(
  * @param file - The file to upload.
  */
 export async function uploadFile(file: File, requestConfig: AxiosRequestConfig = {}) {
-    const allowedAttachments = getMeta("upload.allowedExtensions", []) as string[];
+    let allowedExtensions = getMeta("upload.allowedExtensions", []) as string[];
+    allowedExtensions = allowedExtensions.map((ext: string) => ext.toLowerCase());
     const maxSize = getMeta("upload.maxSize", 0);
     const filePieces = file.name.split(".");
     const extension = filePieces[filePieces.length - 1] || "";
@@ -59,8 +60,8 @@ export async function uploadFile(file: File, requestConfig: AxiosRequestConfig =
         const stringTotal: string = humanSize.amount + humanSize.unitAbbr;
         const message = sprintf(t("The uploaded file was too big (max %s)."), stringTotal);
         throw new Error(message);
-    } else if (!allowedAttachments.includes(extension)) {
-        const attachmentsString = allowedAttachments.join(", ");
+    } else if (!allowedExtensions.includes(extension.toLowerCase())) {
+        const attachmentsString = allowedExtensions.join(", ");
         const message = sprintf(
             t(
                 "The uploaded file did not have an allowed extension. \nOnly the following extensions are allowed. \n%s.",

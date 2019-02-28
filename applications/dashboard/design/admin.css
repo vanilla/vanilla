@@ -9227,11 +9227,14 @@ button.close {
 
 .main-container {
   width: 100%;
-  overflow-x: hidden;
+  height: 100%;
 }
 
 .navbar {
   position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   width: 100%;
   height: 3rem;
   z-index: 1010;
@@ -9247,6 +9250,7 @@ button.close {
       -ms-flex-pack: center;
           justify-content: center;
   margin-top: 3rem;
+  height: 100%;
 }
 
 @media (max-width: 991px) {
@@ -9312,6 +9316,10 @@ button.close {
 
 .panel-left {
   padding-left: 1.125rem;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  height: 100%;
 }
 
 .panel-right {
@@ -9323,6 +9331,8 @@ button.close {
 }
 
 .panel-right .panel-content {
+  max-height: 100%;
+  overflow: auto;
   padding-left: 1.125rem;
 }
 

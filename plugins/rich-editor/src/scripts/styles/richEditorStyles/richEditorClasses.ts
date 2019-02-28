@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { absolutePosition, singleLineEllipsis, srOnly, toStringColor, unit } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { calc, important, percent } from "csx";
+import { calc, important, percent, translateY } from "csx";
 export function richEditorClasses(theme?: object) {
     const globalVars = globalVariables(theme);
     const style = styleFactory("richEditor");
@@ -26,7 +26,7 @@ export function richEditorClasses(theme?: object) {
                     },
                 },
             },
-            ".richEditor-text, richEditor-textWrap, richEditor-frame": {
+            "& .richEditor-text, & .richEditor-textWrap, & .richEditor-frame": {
                 display: "flex",
                 flexDirection: "column",
                 flexGrow: 1,
@@ -70,12 +70,6 @@ export function richEditorClasses(theme?: object) {
     });
 
     const scrollFrame = style("scrollFrame", {
-        ...absolutePosition.bottomLeft(),
-        width: percent(100),
-        height: calc(`100% - ${formElementVars.border.width + formElementVars.sizing.height}`),
-    });
-
-    const frame = style("frame", {
         position: "relative",
         backgroundColor: toStringColor(vars.colors.bg),
         height: "auto",
@@ -86,6 +80,11 @@ export function richEditorClasses(theme?: object) {
                 position: "relative",
             },
         },
+    });
+
+    const frame = style("frame", {
+        width: percent(100),
+        height: calc(`100% - ${unit(formElementVars.border.width + formElementVars.sizing.height)}`),
     });
 
     const menu = style("menu", {

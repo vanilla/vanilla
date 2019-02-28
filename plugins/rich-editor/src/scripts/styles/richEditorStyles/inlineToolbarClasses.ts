@@ -7,37 +7,38 @@
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { unit } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
-import { percent } from "csx";
+import { important, percent, px, translateY } from "csx";
 
 export function inlineToolbarClasses(theme?: object) {
     const vars = richEditorVariables(theme);
     const style = styleFactory("inlineToolbar");
 
-    const up = style("up", {
-        transform: `translateY(${-vars.menu.offset})`,
+    const root = style({
         $nest: {
-            ".richEditor-nubPosition": {
-                top: percent(100),
+            "&.isUp": {
+                transform: `translateY(${unit(-vars.menu.offset)})`,
+                $nest: {
+                    ".richEditor-nubPosition": {
+                        transform: `translateY(-1px) translateX(-50%)`,
+                        alignItems: "flex-end",
+                        bottom: percent(100),
+                    },
+                    ".richEditor-nub": {
+                        transform: `translateY(-100%) rotate(135deg)`,
+                        marginBottom: unit(vars.nub.width / 2),
+                    },
+                },
             },
-            ".richEditor-nub": {
-                transform: `translateY(-50%) rotate(135deg)`,
+            "&.isDown": {
+                transform: `translateY(${unit(vars.menu.offset)})`,
+                $nest: {
+                    ".richEditor-nub": {
+                        transform: `translateY(100%) rotate(-45deg)`,
+                        marginTop: unit(vars.nub.width / 2),
+                    },
+                },
             },
         },
     });
-
-    const down = style("down", {
-        transform: `translateY(${vars.menu.offset})`,
-        $nest: {
-            ".richEditor-nubPosition": {
-                bottom: percent(100),
-                alignItems: "flex-end",
-                transform: `translateY(-50%) translateX(-50%)`,
-                marginTop: unit(vars.menu.borderWidth),
-            },
-            ".richEditor-nub": {
-                transform: `translateY(-50%) rotate(135deg)`,
-            },
-        },
-    });
-    return { up, down };
+    return { root };
 }

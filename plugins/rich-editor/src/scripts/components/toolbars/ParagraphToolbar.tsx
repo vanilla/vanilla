@@ -178,16 +178,21 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
             return "";
         }
         const bounds = this.quill.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
-        let classes = "richEditor-toolbarContainer richEditor-paragraphToolbarContainer";
+        const classesParagraphToolBar = paragraphToolbarContainerClasses();
+        let classes = classNames(
+            "richEditor-toolbarContainer",
+            "richEditor-paragraphToolbarContainer",
+            classesParagraphToolBar.root,
+        );
 
         if (!this.props.legacyMode) {
             classes += " likeDropDownContent";
         }
 
         if (bounds.top > 30) {
-            classes += " isUp";
-        } else {
             classes += " isDown";
+        } else {
+            classes += " isUp";
         }
 
         return classes;

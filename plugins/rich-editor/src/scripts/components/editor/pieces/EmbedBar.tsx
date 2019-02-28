@@ -13,6 +13,7 @@ import EmbedPopover from "@rich-editor/components/popovers/EmbedPopover";
 import EditorUploadButton from "@rich-editor/components/editor/pieces/EditorUploadButton";
 import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
 import classNames from "classnames";
+import { richEditorFormClasses } from "@rich-editor/styles/richEditorStyles/richEditorFormClasses";
 
 interface IProps {
     isMobile: boolean;
@@ -25,6 +26,7 @@ export default function EmbedBar(props: IProps) {
     const { isMobile, isLoading, legacyMode } = props;
     const mimeTypes = getMeta("upload.allowedExtensions");
     const classesRichEditor = richEditorClasses();
+    const classesRichEditorForm = richEditorFormClasses();
 
     return (
         <div className={classNames("richEditor-embedBar", classesRichEditor.embedBar)} ref={props.barRef}>
@@ -33,6 +35,7 @@ export default function EmbedBar(props: IProps) {
                     "richEditor-menuItems",
                     "richEditor-inlineMenuItems",
                     classesRichEditor.menuItems,
+                    classesRichEditorForm.inlineMenuItems,
                 )}
                 role="menubar"
                 aria-label={t("Inline Level Formatting Menu")}

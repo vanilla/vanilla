@@ -8,9 +8,10 @@ import React from "react";
 import { RangeStatic } from "quill/core";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import ToolbarPositioner from "@rich-editor/components/toolbars/pieces/ToolbarPositioner";
-import { nubPositionClasses } from "@rich-editor/styles/richEditorStyles/nubPositionClasses";
 import classNames from "classnames";
 import { inlineToolbarClasses } from "@rich-editor/styles/richEditorStyles/inlineToolbarClasses";
+import { nubClasses } from "@rich-editor/styles/richEditorStyles/nubClasses";
+import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 
 interface IProps extends IWithEditorProps {
     selection: RangeStatic;
@@ -42,22 +43,28 @@ export class ToolbarContainer extends React.PureComponent<IProps, IState> {
 
     public render() {
         const { isVisible, selection } = this.props;
+        const classesInlineToolbar = inlineToolbarClasses();
         return (
             <ToolbarPositioner
                 {...this.state}
                 selectionIndex={selection.index}
                 selectionLength={selection.length}
                 isActive={isVisible}
+                className={classesInlineToolbar.root}
             >
                 {({ x, y }) => {
-                    const classesNub = nubPositionClasses();
-                    const classesInlineToolbar = inlineToolbarClasses();
+                    const classesNub = nubClasses();
+
                     let toolbarStyles: React.CSSProperties = {
                         visibility: "hidden",
                         position: "absolute",
                     };
                     let nubStyles = {};
-                    let classes = "richEditor-inlineToolbarContainer richEditor-toolbarContainer ";
+                    let classes = classNames(
+                        "richEditor-inlineToolbarContainer",
+                        "richEditor-toolbarContainer",
+                        classesInlineToolbar.root,
+                    );
 
                     if (x && y && isVisible) {
                         toolbarStyles = {
@@ -73,7 +80,7 @@ export class ToolbarContainer extends React.PureComponent<IProps, IState> {
                             top: y ? y.nubPosition : 0,
                         };
 
-                        classes += y && y.nubPointsDown ? classesInlineToolbar.up : classesInlineToolbar.down;
+                        classes += y && y.nubPointsDown ? " isUp" : " isDown";
                     }
                     return (
                         <div className={classes} style={toolbarStyles} ref={this.flyoutRef}>
@@ -96,10 +103,11 @@ export class ToolbarContainer extends React.PureComponent<IProps, IState> {
      * Mount quill listeners.
      */
     public componentDidMount() {
+        const richEditorVars = richEditorVariables();
         this.setState({
             flyoutWidth: this.flyoutRef.current ? this.flyoutRef.current.offsetWidth : null,
             flyoutHeight: this.flyoutRef.current ? this.flyoutRef.current.offsetHeight : null,
-            nubHeight: this.nubRef.current ? this.nubRef.current.offsetHeight : null,
+            nubHeight: richEditorVars.nub.width || 12,
         });
     }
 }

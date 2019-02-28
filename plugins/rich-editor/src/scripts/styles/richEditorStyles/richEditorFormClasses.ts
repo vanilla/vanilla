@@ -98,7 +98,7 @@ export function richEditorFormClasses(theme?: object) {
     });
 
     const inlineMenuItems = style("inlineMenuItems", {
-        borderBottom: `${formElementVars.border.width} solid ${formElementVars.border.color.toString()}`,
+        borderBottom: `${unit(formElementVars.border.width)} solid ${toStringColor(formElementVars.border.color)}`,
     });
 
     return {

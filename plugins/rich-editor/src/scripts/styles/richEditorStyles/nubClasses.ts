@@ -6,24 +6,26 @@
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { singleBorder, toStringColor, unit } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
+import { translateX } from "csx";
 
-export function nubPositionClasses(theme?: object) {
+export function nubClasses(theme?: object) {
     const globalVars = globalVariables(theme);
-    const mediaQueries = layoutVariables(theme).mediaQueries();
     const vars = richEditorVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const style = styleFactory("nubPosition");
+    const style = styleFactory("nub");
 
     const root = style({
         position: "relative",
         display: "block",
         width: unit(vars.nub.width),
         height: unit(vars.nub.width),
-        borderTop: singleBorder(),
-        borderRight: singleBorder(),
+        borderTop: singleBorder({
+            width: vars.menu.borderWidth,
+        }),
+        borderRight: singleBorder({
+            width: vars.menu.borderWidth,
+        }),
         boxShadow: globalVars.overlay.dropShadow,
         background: toStringColor(vars.colors.bg),
     });
@@ -37,8 +39,7 @@ export function nubPositionClasses(theme?: object) {
         width: unit(vars.nub.width * 2),
         height: unit(vars.nub.width * 2),
         userSelect: "none",
-        transform: `translateX(-50%)`,
-        marginTop: unit(-vars.menu.borderWidth),
+        transform: translateX("-50%"),
         pointerEvents: "none",
     });
 

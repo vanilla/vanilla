@@ -39,6 +39,7 @@ interface IProps extends IWithEditorProps {
     isActive: boolean;
     selectionIndex: number | null;
     selectionLength: number | null;
+    className?: string;
 }
 
 interface IState {
@@ -231,7 +232,7 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
             position = bounds.bottom + offset;
 
             if (nubHeight) {
-                nubPosition = 0 - nubHeight / 2;
+                nubPosition = 1 - nubHeight * 2;
                 nubPointsDown = false;
             }
         }

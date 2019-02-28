@@ -7,6 +7,7 @@ import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEd
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc } from "csx";
 import styleFactory from "@library/styles/styleFactory";
+import { unit } from "@library/styles/styleHelpers";
 
 export function paragraphToolbarContainerClasses(theme?: object) {
     const vars = richEditorVariables(theme);
@@ -15,13 +16,13 @@ export function paragraphToolbarContainerClasses(theme?: object) {
 
     const root = style({
         position: "absolute",
-        left: calc(`50% - ${vars.spacing.paddingLeft / 2}`),
+        left: calc(`50% - ${unit(vars.spacing.paddingLeft / 2)}`),
         $nest: {
             "&.isUp": {
-                bottom: calc(`50% + ${vars.spacing.paddingRight / 2 - formVars.border.width}`),
+                bottom: calc(`50% + ${unit(vars.spacing.paddingRight / 2 - formVars.border.width)}`),
             },
             "&.isDown": {
-                top: calc(`50% + ${vars.spacing.paddingRight / 2 - formVars.border.width}`),
+                top: calc(`50% + ${unit(vars.spacing.paddingRight / 2 - formVars.border.width)}`),
             },
         },
     });

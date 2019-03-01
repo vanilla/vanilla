@@ -118,13 +118,13 @@ that and makes it clear what you&#39;re doing.</p>
 <p>This section covers our workflow. This includes adding/removing/updating vendor dependencies, concatinating javascript,
 compiling css, etc.</p>
 <h3 id="grunt-tasks">Grunt Tasks</h3>
-<p>Grunt is our task manager. It provides us with a bunch of tools to accomplish a variety of tasks. In the future, 
+<p>Grunt is our task manager. It provides us with a bunch of tools to accomplish a variety of tasks. In the future,
 we may wish to look into using npm as a build tool instead.</p>
 <p>Here are our Grunt tasks:</p>
 <ul>
 <li>sass_globbing - Creates scss files with maps to a directory&#39;s scss files. This allows us to add or remove scss files
 without having to worry about including them or removing them from any stylesheet.</li>
-<li>scsslint - Gives us hints about best practices in our Sass. It&#39;s run with the force flag, so the Sass will compile 
+<li>scsslint - Gives us hints about best practices in our Sass. It&#39;s run with the force flag, so the Sass will compile
 even if the linting fails. All the same, it&#39;s good to heed the linter where possible and eliminate notices.</li>
 <li>sass - Compiles our Sass into CSS and creates a source map.</li>
 <li>autoprefixer - Adds vendor prefixes to the CSS and updates the source map.</li>
@@ -144,7 +144,7 @@ need to run this if you update the version of a dependency.</li>
 </ul>
 <h3 id="dependency-managers">Dependency Managers</h3>
 <h4 id="bower">Bower</h4>
-<p>Bower is the dependency manager for our frontend vendor code. The current dependencies and their versions are listed in 
+<p>Bower is the dependency manager for our frontend vendor code. The current dependencies and their versions are listed in
 bower.json in the dashboard application&#39;s root.</p>
 <h5 id="add-a-bower-dependency">Add a Bower Dependency</h5>
 <ol>
@@ -156,8 +156,8 @@ bower.json in the dashboard application&#39;s root.</p>
 <p>npm is the dependency manager for our process/workflow. It takes care of installing grunt, grunt tasks and bower. The
 full list of dependencies can be found in the package.json file in the dashboard application&#39;s root.</p>
 <h4 id="do-we-need-two-dependency-managers-">Do We Need Two Dependency Managers?</h4>
-<p>Maybe not. We could probably accomplish everything with npm. However, it&#39;s nice to have the separation of frontend 
-code and process code that having the two dependency managers provides. It may be something we want to revisit in the 
+<p>Maybe not. We could probably accomplish everything with npm. However, it&#39;s nice to have the separation of frontend
+code and process code that having the two dependency managers provides. It may be something we want to revisit in the
 future.</p>
 <hr>
 <h2 id="vendor-dependencies">Vendor Dependencies</h2>
@@ -194,15 +194,14 @@ future.</p>
 <li>iCheck - For our radio and checkbox styling.</li>
 <li>Drop - For our user card dropdown.</li>
 <li>Clipboard - For copying text. (Used in the embed section.)</li>
-<li>CheckAll - For checking/unchecking a set of checkboxes at the same time. </li>
+<li>CheckAll - For checking/unchecking a set of checkboxes at the same time.</li>
 </ul>
 <hr>
 <h2 id="other-dependencies">Other Dependencies</h2>
 <p>Other than the vendor js above, we also rely on the following js:</p>
 <p>in <code>/applications/dashboard/js</code>:</p>
 <ul>
-<li>jquery.tablejenga.js - Table Jenga handles responsiveness by translating table columns into meta data.</li>
-<li>jquery.fluidfixed.js - Fluid Fixed manages the fixed panel scrolling. It will scroll up when the user scrolls up 
+<li>jquery.tablejenga.js - Table Jenga handles responsiveness by translating table columns into meta data.
 and scrolls down when the user scrolls down.</li>
 <li>colorpicker.js - For color picker form inputs.</li>
 <li>cropimage.js - For image cropping.</li>

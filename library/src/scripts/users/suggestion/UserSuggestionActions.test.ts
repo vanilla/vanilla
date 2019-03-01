@@ -31,7 +31,7 @@ describe("UserSuggestionActions.filterSuggestions()", () => {
 
     let results: IUserSuggestion[] = [];
 
-    before(() => {
+    beforeEach(() => {
         results = UserSuggestionActions.filterSuggestions(initalSuggestions, lookup);
     });
 

@@ -126,7 +126,7 @@ describe("UserSuggestionModel", () => {
 
             let state;
 
-            before(() => {
+            beforeAll(() => {
                 const setSuggestionState = model.reducer(
                     undefined,
                     UserSuggestionActions.setActiveAC("asdfasdfasdf", 134124),

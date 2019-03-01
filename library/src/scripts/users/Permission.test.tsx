@@ -4,20 +4,21 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { expect, assert } from "chai";
-import { shallow, mount, render } from "enzyme";
-import sinon from "sinon";
+import { ILoadable, IMe, LoadStatus } from "@library/@types/api";
+import { __mockStore } from "@library/state/__mocks__/getStore";
 import FullReduxPermission, { Permission } from "@library/users/Permission";
-import UsersActions from "./UsersActions";
-import { IMe } from "@library/@types/api";
-import { LoadStatus, ILoadable } from "@library/@types/api";
-import apiv2 from "@library/apiv2";
-import { Provider } from "react-redux";
-import { createMockStore } from "redux-test-utils";
 import UsersModel, { IUsersStoreState } from "@library/users/UsersModel";
-import { mockApi, mockStore } from "@library/__tests__/utility";
-import rewiremock from "rewiremock";
+import { __mockApi } from "@library/__mocks__/apiv2";
+import { assert } from "chai";
+import { mount, shallow } from "enzyme";
+import React from "react";
+import { Provider } from "react-redux";
+import sinon from "sinon";
+import UsersActions from "./UsersActions";
+import getStore from "@library/state/getStore";
+
+jest.mock("@library/apiv2");
+jest.mock("@library/state/getStore");
 
 // tslint:disable:jsx-use-translation-function
 
@@ -159,7 +160,7 @@ describe("<Permission />", () => {
 
     it("Fetches the user if it is not present", done => {
         const mockUser = makeMockUser();
-        mockApi()
+        __mockApi()
             .onGet("/users/me")
             .reply(() => {
                 done();
@@ -168,8 +169,9 @@ describe("<Permission />", () => {
         const storeState: IUsersStoreState = {
             users: UsersModel.DEFAULT_STATE,
         };
-        const store = mockStore(storeState);
-        rewiremock.enable();
+        __mockStore(storeState);
+
+        const store = getStore();
 
         mount(
             <Provider store={store}>

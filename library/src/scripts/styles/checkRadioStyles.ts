@@ -16,6 +16,7 @@ import {
     disabledInput,
     flexHelper,
     toStringColor,
+    userSelect,
 } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
@@ -125,7 +126,7 @@ export function checkRadioClasses(theme?: object) {
         lineHeight: unit(vars.sizing.width),
         marginLeft: unit(8),
         cursor: "pointer",
-        userSelect: "none",
+        ...userSelect(),
     });
 
     const labelNote = style({

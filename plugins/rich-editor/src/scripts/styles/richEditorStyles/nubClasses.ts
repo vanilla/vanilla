@@ -6,7 +6,7 @@
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { singleBorder, toStringColor, unit } from "@library/styles/styleHelpers";
+import { singleBorder, toStringColor, unit, userSelect } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
 import { translateX } from "csx";
 
@@ -38,7 +38,7 @@ export function nubClasses(theme?: object) {
         overflow: "hidden",
         width: unit(vars.nub.width * 2),
         height: unit(vars.nub.width * 2),
-        userSelect: "none",
+        ...userSelect(),
         transform: translateX("-50%"),
         pointerEvents: "none",
     });

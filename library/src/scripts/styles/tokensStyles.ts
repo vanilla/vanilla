@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
+import { componentThemeVariables, debugHelper, unit, userSelect } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { percent, px } from "csx";
@@ -75,7 +75,7 @@ export function tokensClasses(theme?: object) {
                 paddingRight: px(2),
                 margin: px(3),
                 backgroundColor: vars.token.bg.toString(),
-                userSelect: "none",
+                ...userSelect(),
             },
         },
     });

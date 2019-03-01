@@ -4,7 +4,7 @@
  */
 
 import { calc, percent, px } from "csx";
-import { flexHelper } from "@library/styles/styleHelpers";
+import { flexHelper, userSelect } from "@library/styles/styleHelpers";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -76,7 +76,7 @@ export const mobileDropDownClasses = () => {
         {
             ...debug.name("toggleButton"),
             ...flex.middle(),
-            userSelect: "none",
+            ...userSelect(),
             flexGrow: 1,
             maxWidth: calc(`100% - ${px(globalVars.spacer)}`),
             marginLeft: px(globalVars.spacer / 2),

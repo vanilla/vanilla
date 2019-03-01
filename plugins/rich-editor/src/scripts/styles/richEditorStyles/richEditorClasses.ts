@@ -5,7 +5,15 @@
  */
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, singleLineEllipsis, srOnly, toStringColor, unit } from "@library/styles/styleHelpers";
+import {
+    absolutePosition,
+    appearance,
+    singleLineEllipsis,
+    srOnly,
+    toStringColor,
+    unit,
+    userSelect,
+} from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc, important, percent, translateY } from "csx";
@@ -37,8 +45,8 @@ export function richEditorClasses(theme?: object) {
             },
             ".richEditor-nextInput, .iconButton, .richEditor-button": {
                 ...singleLineEllipsis(),
+                ...appearance(),
                 position: "relative",
-                appearance: "none",
                 border: 0,
                 padding: 0,
                 background: "none",
@@ -174,7 +182,7 @@ export function richEditorClasses(theme?: object) {
 
     const button = style("button", {
         display: "block",
-        userSelect: "none",
+        ...userSelect(),
         cursor: "pointer",
         $nest: {
             "&.richEditor-formatButton, &.richEditor-embedButton": {
@@ -268,12 +276,12 @@ export function richEditorClasses(theme?: object) {
 
     const close = style("close", {
         ...absolutePosition.topRight(),
+        ...userSelect(),
         width: unit(vars.menuButton.size),
         height: unit(vars.menuButton.size),
         lineHeight: unit(vars.menuButton.size),
         verticalAlign: "bottom",
         textAlign: "center",
-        userSelect: "none",
         background: "transparent",
         cursor: "pointer",
         opacity: globalVars.states.icon.opacity,

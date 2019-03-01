@@ -37,6 +37,7 @@ interface IProps extends IWithEditorProps {
     renderAbove?: boolean;
     renderLeft?: boolean;
     legacyMode: boolean;
+    bodyClass?: string;
 }
 
 export class Popover extends React.Component<IProps, IState> {
@@ -53,7 +54,6 @@ export class Popover extends React.Component<IProps, IState> {
         const { additionalClassRoot } = this.props;
         const classesRichEditor = richEditorClasses();
         const classesFlyout = richEditorFlyoutClasses();
-        const classesInsertEmoji = insertEmojiClasses();
 
         let classes = classNames("richEditor-menu", "richEditorFlyout", classesFlyout.root, {
             [additionalClassRoot as any]: !!additionalClassRoot,
@@ -66,7 +66,7 @@ export class Popover extends React.Component<IProps, IState> {
             [additionalClassRoot + "-header"]: !!additionalClassRoot,
         });
 
-        const bodyClasses = classNames("richEditorFlyout-body", classesFlyout.body, classesInsertEmoji.body, {
+        const bodyClasses = classNames("richEditorFlyout-body", classesFlyout.body, this.props.bodyClass, {
             [additionalClassRoot + "-body"]: !!additionalClassRoot,
         });
 

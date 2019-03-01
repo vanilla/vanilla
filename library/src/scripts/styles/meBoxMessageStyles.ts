@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
+import { componentThemeVariables, debugHelper, toStringColor, unit, userSelect } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { calc, percent, quote } from "csx";
 import { objectFitWithFallback } from "@library/styles/styleHelpers";
@@ -53,7 +53,7 @@ export function meBoxMessageClasses(theme?: object) {
         flexWrap: "nowrap",
         padding: unit(vars.spacing.padding),
         color: "inherit",
-        userSelect: "none",
+        ...userSelect(),
         $nest: {
             "&:active, &:focus, &:hover, &.focus-visible": {
                 backgroundColor: toStringColor(globalVars.states.active.color.fade(0.1)),

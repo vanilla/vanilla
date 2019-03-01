@@ -13,6 +13,7 @@ import {
     flexHelper,
     getColorDependantOnLightness,
     unit,
+    userSelect,
 } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
@@ -397,8 +398,8 @@ export default function vanillaHeaderClasses(theme?: object) {
 
     const searchCancel = style({
         ...debug.name("searchCancel"),
+        ...userSelect(),
         height: px(formElementVars.sizing.height),
-        userSelect: "none",
         $nest: {
             "&.focus-visible": {
                 $nest: {

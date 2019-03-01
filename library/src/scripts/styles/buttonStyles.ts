@@ -15,6 +15,7 @@ import {
     spinnerLoader,
     toStringColor,
     unit,
+    userSelect,
 } from "@library/styles/styleHelpers";
 import { BorderColorProperty, BorderRadiusProperty, BorderStyleProperty, WidthProperty } from "csstype";
 import { TLength } from "typestyle/lib/types";
@@ -204,6 +205,7 @@ export function generateButtonClass(buttonType: IButtonType, buttonName: string,
         textOverflow: "ellipsis",
         overflow: "hidden",
         maxWidth: percent(100),
+        ...userSelect(),
         ...buttonSizing(
             formElVars.sizing.height,
             vars.sizing.minWidth,
@@ -218,7 +220,6 @@ export function generateButtonClass(buttonType: IButtonType, buttonName: string,
         verticalAlign: "middle",
         touchAction: "manipulation",
         minWidth: vars.sizing.minWidth,
-        userSelect: "none",
         cursor: "pointer",
         color: buttonType.fg.toString(),
         backgroundColor: buttonType.bg.toString(),

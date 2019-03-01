@@ -6,7 +6,7 @@
 
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { unit } from "@library/styles/styleHelpers";
+import { appearance, unit } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
 import { viewHeight } from "csx";
 
@@ -16,6 +16,7 @@ export function insertEmojiClasses(theme?: object) {
     const style = styleFactory("insertEmoji");
 
     const root = style({
+        ...appearance(),
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

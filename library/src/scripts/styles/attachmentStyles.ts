@@ -13,6 +13,7 @@ import {
     margins,
     absolutePosition,
     unit,
+    userSelect,
 } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
@@ -80,7 +81,7 @@ export function attachmentClasses(theme?: object) {
         maxWidth: percent(100),
         margin: "auto",
         overflow: "hidden",
-        userSelect: "none",
+        ...userSelect(),
         ...borders(vars.border),
         $nest: {
             "&.isLoading, &.hasError": {

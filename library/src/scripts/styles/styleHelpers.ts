@@ -23,6 +23,8 @@ import {
     TextOverflowProperty,
     OverflowXProperty,
     MaxWidthProperty,
+    AppearanceProperty,
+    UserSelectProperty,
 } from "csstype";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { keyframes } from "typestyle";
@@ -483,7 +485,7 @@ export const disabledInput = () => {
     const formElementVars = formElementsVariables();
     return {
         pointerEvents: important("none"),
-        userSelect: important("none"),
+        ...userSelect("none", true),
         cursor: important("default"),
         opacity: important((formElementVars.disabled.opacity as any).toString()),
     };
@@ -567,5 +569,24 @@ export const longWordEllipsis = () => {
         textOverflow: "ellipsis" as TextOverflowProperty,
         overflowX: "hidden" as OverflowXProperty,
         maxWidth: percent(100) as MaxWidthProperty<TLength>,
+    };
+};
+
+export const appearance = (value: AppearanceProperty = "none", isImportant: boolean = false) => {
+    const val = (isImportant ? important(value) : value) as any;
+    return {
+        "-webkit-appearance": val,
+        "-moz-appearance": val,
+        appearance: val,
+    };
+};
+
+export const userSelect = (value: UserSelectProperty = "none", isImportant: boolean = false) => {
+    const val = (isImportant ? important(value) : value) as any;
+    return {
+        "-webkit-user-select": val,
+        "-moz-user-select": val,
+        "-ms-user-select": val,
+        userSelect: val,
     };
 };

@@ -11,6 +11,7 @@ import {
     debugHelper,
     defaultTransition,
     unit,
+    userSelect,
 } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { FontSizeProperty, HeightProperty, MarginProperty, PaddingProperty, WidthProperty } from "csstype";
@@ -80,7 +81,7 @@ export function subcommunityTileClasses(theme?: object) {
         alignItems: "stretch",
         width: percent(100),
         padding: unit(vars.spacing.default),
-        userSelect: "none",
+        ...userSelect(),
         flexGrow: 1,
         ...debug.name(),
     });

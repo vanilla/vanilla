@@ -3287,7 +3287,7 @@ class DiscussionModel extends Gdn_Model {
      *              where 'field' - is discussion model column name (ex: Name, Body, Type)
      *              and 'alias' - is the column name to add|replace to $data array (ex: DiscussionName, DiscussionBody)
      */
-    public function joinDiscussionData( &$dataSet, string $discussionID, array $fields) {
+    public function joinDiscussionData(&$dataSet, string $discussionID, array $fields) {
         if ($dataSet instanceof Gdn_DataSet) {
             $data = $dataSet->result();
             $arrayMode = $dataSet->datasetType() === DATASET_TYPE_ARRAY;
@@ -3295,7 +3295,6 @@ class DiscussionModel extends Gdn_Model {
             $data = &$dataSet;
             $arrayMode = true;
         }
-
         if ($arrayMode) {
             $discussionIDs = array_column($data, $discussionID);
         } else {
@@ -3331,7 +3330,6 @@ class DiscussionModel extends Gdn_Model {
                 } else {
                     $row->$alias = $discussion[$alias];
                 }
-
             }
         }
     }

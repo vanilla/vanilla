@@ -65,7 +65,7 @@ class GdnFormatLinksTest extends TestCase {
     }
     
     /**
-     * Testing a simple link conversion.
+     * Testing a link with Right-To-Left character override.
      */
     public function testRightLeftOverrideLink() {
         $input = 'https://‮test.com';

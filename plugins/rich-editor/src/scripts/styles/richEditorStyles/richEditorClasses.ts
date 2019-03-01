@@ -16,8 +16,10 @@ import {
 } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { calc, important, percent, translateY } from "csx";
-export function richEditorClasses(theme?: object) {
+import { calc, important, percent } from "csx";
+import memoize from "lodash/memoize";
+
+export const richEditorClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const style = styleFactory("richEditor");
     const formElementVars = formElementsVariables(theme);
@@ -315,4 +317,4 @@ export function richEditorClasses(theme?: object) {
         close,
         popoverDescription,
     };
-}
+});

@@ -121,7 +121,6 @@ export class Editor extends React.Component<IProps> {
                                 className={classNames("richEditor-scrollContainer", classesRichEditor.scrollContainer)}
                                 ref={this.scrollContainerRef}
                             >
-                                {/*<div className="richEditor-scrollable">*/}
                                 <div
                                     className={classNames(
                                         "richEditor-frame",
@@ -135,7 +134,6 @@ export class Editor extends React.Component<IProps> {
                                     {this.renderInlineToolbars()}
                                 </div>
                                 {this.renderParagraphToolbar()}
-                                {/*</div>*/}
                             </div>
                         </div>
                     </>,

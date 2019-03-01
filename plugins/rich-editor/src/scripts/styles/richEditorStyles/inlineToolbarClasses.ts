@@ -4,12 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
-import { unit } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
-import { important, percent, px, translateY } from "csx";
+import { unit } from "@library/styles/styleHelpers";
+import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
+import { percent } from "csx";
+import memoize from "lodash/memoize";
 
-export function inlineToolbarClasses(theme?: object) {
+export const inlineToolbarClasses = memoize((theme?: object) => {
     const vars = richEditorVariables(theme);
     const style = styleFactory("inlineToolbar");
 
@@ -41,4 +42,4 @@ export function inlineToolbarClasses(theme?: object) {
         },
     });
     return { root };
-}
+});

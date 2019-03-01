@@ -9,8 +9,9 @@ import { shadowHelper } from "@library/styles/shadowHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, percent } from "csx";
 import styleFactory from "@library/styles/styleFactory";
+import memoize from "lodash/memoize";
 
-export function richEditorFlyoutClasses(theme?: object) {
+export const richEditorFlyoutClasses = memoize((theme?: object) => {
     const vars = richEditorVariables(theme);
     const style = styleFactory("richEditorFlyout");
     const shadows = shadowHelper(theme);
@@ -71,4 +72,4 @@ export function richEditorFlyoutClasses(theme?: object) {
     });
 
     return { root, header, body, footer, title };
-}
+});

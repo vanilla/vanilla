@@ -3,10 +3,11 @@
  * @license GPL-2.0-only
  */
 
-import { color, ColorHelper, percent, px, rgba } from "csx";
 import { componentThemeVariables, getColorDependantOnLightness } from "@library/styles/styleHelpers";
+import { color, ColorHelper, percent } from "csx";
+import memoize from "lodash/memoize";
 
-export const globalVariables = (theme?: object) => {
+export const globalVariables = memoize((theme?: object) => {
     const colorPrimary = color("#0291db");
     const themeVars = componentThemeVariables(theme, "globalVariables");
 
@@ -287,4 +288,4 @@ export const globalVariables = (theme?: object) => {
         mixPrimaryAndFg,
         mixPrimaryAndBg,
     };
-};
+});

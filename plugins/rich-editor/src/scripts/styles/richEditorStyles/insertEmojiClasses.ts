@@ -9,8 +9,9 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { appearance, unit } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
 import { em, viewHeight } from "csx";
+import memoize from "lodash/memoize";
 
-export function insertEmojiClasses(theme?: object) {
+export const insertEmojiClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vars = richEditorVariables(theme);
     const style = styleFactory("insertEmoji");
@@ -53,4 +54,4 @@ export function insertEmojiClasses(theme?: object) {
     });
 
     return { root, body, popoverDescription };
-}
+});

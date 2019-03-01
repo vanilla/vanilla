@@ -9,8 +9,9 @@ import { layoutVariables } from "@library/styles/layoutStyles";
 import { singleBorder, toStringColor, unit, userSelect } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
 import { translateX } from "csx";
+import memoize from "lodash/memoize";
 
-export function nubClasses(theme?: object) {
+export const nubClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vars = richEditorVariables(theme);
     const style = styleFactory("nub");
@@ -44,4 +45,4 @@ export function nubClasses(theme?: object) {
     });
 
     return { root, position };
-}
+});

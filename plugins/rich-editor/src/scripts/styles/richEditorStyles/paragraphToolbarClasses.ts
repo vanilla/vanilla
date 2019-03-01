@@ -8,8 +8,9 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 import { calc } from "csx";
 import styleFactory from "@library/styles/styleFactory";
 import { unit } from "@library/styles/styleHelpers";
+import memoize from "lodash/memoize";
 
-export function paragraphToolbarContainerClasses(theme?: object) {
+export const paragraphToolbarContainerClasses = memoize((theme?: object) => {
     const vars = richEditorVariables(theme);
     const formVars = formElementsVariables(theme);
     const style = styleFactory("paragraphToolbarContainer");
@@ -27,4 +28,4 @@ export function paragraphToolbarContainerClasses(theme?: object) {
         },
     });
     return { root };
-}
+});

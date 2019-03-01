@@ -8,8 +8,9 @@ import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEd
 import { unit } from "@library/styles/styleHelpers";
 import { calc, important, percent } from "csx";
 import styleFactory from "@library/styles/styleFactory";
+import memoize from "lodash/memoize";
 
-export function insertLinkClasses(theme?: object) {
+export const insertLinkClasses = memoize((theme?: object) => {
     const vars = richEditorVariables(theme);
     const style = styleFactory("insertLink");
 
@@ -34,4 +35,4 @@ export function insertLinkClasses(theme?: object) {
     });
 
     return { root, input };
-}
+});

@@ -9,8 +9,9 @@ import { layoutVariables } from "@library/styles/layoutStyles";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { unit } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
+import memoize from "lodash/memoize";
 
-export function emojiGroupsClasses(theme?: object) {
+export const emojiGroupsClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const mediaQueries = layoutVariables(theme).mediaQueries();
     const vars = richEditorVariables(theme);
@@ -33,4 +34,4 @@ export function emojiGroupsClasses(theme?: object) {
     });
 
     return { root, icon };
-}
+});

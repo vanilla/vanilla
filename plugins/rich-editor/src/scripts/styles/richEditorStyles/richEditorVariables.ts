@@ -9,8 +9,9 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables } from "@library/styles/styleHelpers";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { standardAnimations } from "@library/styles/animationHelpers";
+import memoize from "lodash/memoize";
 
-export function richEditorVariables(theme?: object) {
+export const richEditorVariables = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const varsFormElements = formElementsVariables(theme);
     const themeVars = componentThemeVariables(theme, "richEditor");
@@ -155,4 +156,4 @@ export function richEditorVariables(theme?: object) {
         scrollContainer,
         emojiBody,
     };
-}
+});

@@ -10,8 +10,9 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { paddings, unit } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
+import memoize from "lodash/memoize";
 
-export function insertMediaClasses(theme?: object) {
+export const insertMediaClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const mediaQueries = layoutVariables(theme).mediaQueries();
     const vars = richEditorVariables(theme);
@@ -46,4 +47,4 @@ export function insertMediaClasses(theme?: object) {
     });
 
     return { root, help, insert };
-}
+});

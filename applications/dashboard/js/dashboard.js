@@ -881,18 +881,6 @@ $(document).on('contentLoad', function(e) {
     }
 
     /**
-     * Start fluidfixed on the dashboard panel navigation.
-     *
-     * @param element - The scope of the function.
-     */
-    function fluidFixedInit(element) {
-        // margin-bottom on panel nav h4 is 9px, padding-bottom on .panel-left is 72px
-        $('.js-fluid-fixed', element).fluidfixed({
-            offsetBottom: 72 + 9
-        });
-    }
-
-    /**
      * Initialize drop.js on any element with the class 'js-drop'. The element must have their id attribute set and
      * must specify the html content it will reveal when it is clicked.
      *
@@ -999,20 +987,6 @@ $(document).on('contentLoad', function(e) {
 
         $(drawerToggle).on('click', function() {
             window.scrollTo(0, 0);
-        });
-
-        $(drawer, element).on('drawer.show', function() {
-            $('.panel-nav .js-fluid-fixed', element).trigger('detach.FluidFixed');
-            $(content, element).height($('.panel-nav .js-fluid-fixed', element).outerHeight(true) + 132);
-            $(content, element).css('overflow', 'hidden');
-
-        });
-
-        $(drawer, element).on('drawer.hide', function() {
-            // TODO: We should only reset if the panel is actually displayed.
-            $('.panel-nav .js-fluid-fixed', element).trigger('reset.FluidFixed');
-            $(content, element).height('auto');
-            $(content, element).css('overflow', 'inherit');
         });
 
         $(window).resize(function() {
@@ -1184,7 +1158,6 @@ $(document).on('contentLoad', function(e) {
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
         navbarHeightInit(e.target); // navbar height settings
-        fluidFixedInit(e.target); // panel and scroll settings
         dropInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)
         clipboardInit(); // copy elements to the clipboard
@@ -1269,8 +1242,6 @@ $(document).on('contentLoad', function(e) {
     $(document).on('shown.bs.collapse', function() {
         if ($('.main-container').hasClass('drawer-show')) {
             $('.js-drawer').trigger('drawer.show');
-        } else {
-            $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
         }
     });
 
@@ -1280,8 +1251,6 @@ $(document).on('contentLoad', function(e) {
     $(document).on('hidden.bs.collapse', function() {
         if ($('.main-container').hasClass('drawer-show')) {
             $('.js-drawer').trigger('drawer.show');
-        } else {
-            $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
         }
     });
 

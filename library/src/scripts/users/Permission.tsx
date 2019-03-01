@@ -80,7 +80,7 @@ export class Permission extends React.Component<IProps> {
 function mapDispatchToProps(dispatch) {
     const actions = new UsersActions(dispatch, apiv2);
     return {
-        requestData: () => actions.getMe,
+        requestData: actions.getMe,
     };
 }
 

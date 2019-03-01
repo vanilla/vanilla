@@ -41,6 +41,9 @@
     </head>
     <body class="{{ cssClasses|join(' ') }}">
         <div id="page" class="page">
+            {%- if header -%}
+                <div id="themeHeader">{{ header|raw }}</div>
+            {%- endif -%}
             <div id="vanillaHeader"></div>
             <div id="app" class="page-minHeight">
             {%- if seoContent -%}
@@ -62,9 +65,9 @@
 
                 <div class="fullPageLoader"></div>
             </div>
-            <div id="footerContainer">
-                {#{{ include('partials/footer.twig') }}#}
-            </div>
+            {%- if footer -%}
+                <div id="themeFooter">{{ footer|raw }}</div>
+            {%- endif -%}
         </div>
         <div id="modals"></div>
         <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>

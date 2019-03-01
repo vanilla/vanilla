@@ -46,4 +46,13 @@ class HtmlAsset extends Asset {
     public function getData(): string {
         return $this->data;
     }
+
+    /**
+     * Return the HTML string content of the asset.
+     *
+     * @return string
+     */
+    public function __toString() {
+        return $this->data;
+    }
 }

@@ -7,7 +7,7 @@
  namespace Vanilla\Theme;
 
  use JsonSerializable;
- 
+
  /**
   * Basic theme asset.
   */

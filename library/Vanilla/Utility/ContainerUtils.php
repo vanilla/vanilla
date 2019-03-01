@@ -12,6 +12,7 @@ use Garden\Container\Reference;
 use Garden\Container\ReferenceInterface;
 use Psr\Container\ContainerInterface;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\AddonManager;
 
 /**
  * Utility functions for container configuration.
@@ -37,6 +38,19 @@ class ContainerUtils {
         return new Callback(function (ContainerInterface $dic) {
             $locale = $dic->get(\Gdn_Locale::class);
             return $locale->current();
+        });
+    }
+
+    /**
+     * Lazily load the current theme for some container initialization.
+     *
+     * @return ReferenceInterface A reference for use in the container initialization.
+     */
+    public static function currentTheme(): ReferenceInterface {
+        return new Callback(function (ContainerInterface $dic) {
+            /** @type AddonManager addonManager */
+            $addonManager = $dic->get(AddonManager::class);
+            return $addonManager->getTheme();
         });
     }
 

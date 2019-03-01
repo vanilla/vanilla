@@ -28,7 +28,7 @@ export interface IUsersStoreState {
 /**
  * Reducer and state mapping for users data.
  */
-export default class UsersModel implements ReduxReducer<IUsersState> {
+export default class UsersModel {
     public static readonly GUEST_ID = 0;
 
     /**
@@ -49,21 +49,18 @@ export default class UsersModel implements ReduxReducer<IUsersState> {
 
     private userSuggestionModel = new UserSuggestionModel();
 
-    /**
-     * @inheritdoc
-     */
-    public readonly initialState: IUsersState = {
+    public static DEFAULT_STATE: IUsersState = {
         current: {
             status: LoadStatus.PENDING,
         },
-        suggestions: this.userSuggestionModel.reducer(undefined, "" as any),
+        suggestions: UserSuggestionModel.DEFAULT_STATE,
     };
 
     /**
      * @inheritdoc
      */
     public reducer = (
-        state: IUsersState = this.initialState,
+        state: IUsersState = UsersModel.DEFAULT_STATE,
         action: typeof UsersActions.ACTION_TYPES | typeof NotificationsActions.ACTION_TYPES,
     ): IUsersState => {
         return produce(state, draft => {

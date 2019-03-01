@@ -48,7 +48,7 @@ describe("UserSuggestionModel", () => {
 
     describe("reducer()", () => {
         it("should return the initial state", () => {
-            expect(model.reducer(undefined, {} as any)).deep.equals(model.initialState);
+            expect(model.reducer(undefined, {} as any)).deep.equals(UserSuggestionModel.DEFAULT_STATE);
         });
 
         describe("LOAD_USERS_REQUEST", () => {

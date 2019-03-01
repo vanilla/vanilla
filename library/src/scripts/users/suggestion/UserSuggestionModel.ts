@@ -28,7 +28,7 @@ export interface IInjectableSuggestionsProps {
     isLoading: boolean;
 }
 
-export default class UserSuggestionModel implements ReduxReducer<IUserSuggestionState> {
+export default class UserSuggestionModel {
     private static readonly defaultSuggestions: ILoadable<IUserSuggestion[]> = {
         status: LoadStatus.PENDING,
     };
@@ -87,7 +87,7 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
         });
     }
 
-    public readonly initialState: IUserSuggestionState = {
+    public static readonly DEFAULT_STATE: IUserSuggestionState = {
         lastSuccessfulUsername: null,
         currentUsername: null,
         trie: new SuggestionTrie(),
@@ -95,7 +95,10 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
         activeSuggestionIndex: 0,
     };
 
-    public reducer(state = this.initialState, action: typeof UserSuggestionActions.ACTION_TYPES): IUserSuggestionState {
+    public reducer(
+        state = UserSuggestionModel.DEFAULT_STATE,
+        action: typeof UserSuggestionActions.ACTION_TYPES,
+    ): IUserSuggestionState {
         switch (action.type) {
             case UserSuggestionActions.LOAD_USERS_REQUEST: {
                 const { username } = action.meta;

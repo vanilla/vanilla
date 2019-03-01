@@ -6,12 +6,18 @@
 
 import React from "react";
 import { expect, assert } from "chai";
-import { shallow, mount } from "enzyme";
+import { shallow, mount, render } from "enzyme";
 import sinon from "sinon";
-import { Permission } from "@library/users/Permission";
+import FullReduxPermission, { Permission } from "@library/users/Permission";
 import UsersActions from "./UsersActions";
 import { IMe } from "@library/@types/api";
 import { LoadStatus, ILoadable } from "@library/@types/api";
+import apiv2 from "@library/apiv2";
+import { Provider } from "react-redux";
+import { createMockStore } from "redux-test-utils";
+import UsersModel, { IUsersStoreState } from "@library/users/UsersModel";
+import { mockApi, mockStore } from "@library/__tests__/utility";
+import rewiremock from "rewiremock";
 
 // tslint:disable:jsx-use-translation-function
 
@@ -149,5 +155,28 @@ describe("<Permission />", () => {
                 "the success component did not render with 1 bad permission passed and an isAdmin flag set to true",
             );
         });
+    });
+
+    it("Fetches the user if it is not present", done => {
+        const mockUser = makeMockUser();
+        mockApi()
+            .onGet("/users/me")
+            .reply(() => {
+                done();
+                return [200, mockUser];
+            });
+        const storeState: IUsersStoreState = {
+            users: UsersModel.DEFAULT_STATE,
+        };
+        const store = mockStore(storeState);
+        rewiremock.enable();
+
+        mount(
+            <Provider store={store}>
+                <FullReduxPermission permission="hello.world">
+                    <span />
+                </FullReduxPermission>
+            </Provider>,
+        );
     });
 });

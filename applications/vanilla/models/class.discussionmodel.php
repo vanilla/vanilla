@@ -3276,4 +3276,63 @@ class DiscussionModel extends Gdn_Model {
         }
         return $result;
     }
+
+    /**
+     * Add discussion data to an array.
+     *
+     * @param array||Gdn_DataSet $dataSet Results we need to join discussion data to.
+     * @param string $discussionID Column name for provided $data to get discussionIDs.
+     * @param array $fields Optionally pass list of discussion fields to add to array.
+     *        NOTE: $fields is an associative array of 'field' => 'alias'
+     *              where 'field' - is discussion model column name (ex: Name, Body, Type)
+     *              and 'alias' - is the column name to add|replace to $data array (ex: DiscussionName, DiscussionBody)
+     */
+    public function joinDiscussionData( &$dataSet, string $discussionID, array $fields) {
+        if ($dataSet instanceof Gdn_DataSet) {
+            $data = $dataSet->result();
+            $arrayMode = $dataSet->datasetType() === DATASET_TYPE_ARRAY;
+        } else {
+            $data = &$dataSet;
+            $arrayMode = true;
+        }
+
+        if ($arrayMode) {
+            $discussionIDs = array_column($data, $discussionID);
+        } else {
+            $discussionIDs = [];
+            foreach ($data as $obj) {
+                $discussionIDs[] = $obj->$discussionID;
+            }
+        }
+
+        // Get the discussions.
+        $sql = $this->SQL->from('Discussion d');
+
+        if (empty($fields)) {
+            $sql->select('d.*');
+        } else {
+            $sql->select('d.DiscussionID');
+            foreach ($fields as $field => $alias) {
+                $sql->select($field, '', $alias);
+            }
+        }
+
+        $discussions = $sql->whereIn('d.DiscussionID', $discussionIDs)
+            ->get()
+            ->resultArray();
+
+        $discussions = array_combine(array_column($discussions, 'DiscussionID'), $discussions);
+
+        foreach ($data as &$row) {
+            $discussion = $arrayMode ? $discussions[$row[$discussionID]] : $discussions[$row->$discussionID];
+            foreach ($fields as $field => $alias) {
+                if ($arrayMode) {
+                    $row[$alias] = $discussion[$alias];
+                } else {
+                    $row->$alias = $discussion[$alias];
+                }
+
+            }
+        }
+    }
 }

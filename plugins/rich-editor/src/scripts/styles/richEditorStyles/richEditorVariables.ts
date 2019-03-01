@@ -132,6 +132,10 @@ export function richEditorVariables(theme?: object) {
         ...themeVars.subComponentStyles("scrollContainer"),
     };
 
+    const emojiBody = {
+        height: 252,
+    };
+
     return {
         colors,
         spacing,
@@ -149,5 +153,6 @@ export function richEditorVariables(theme?: object) {
         title,
         embedMenu,
         scrollContainer,
+        emojiBody,
     };
 }

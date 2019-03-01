@@ -16,6 +16,7 @@ import MentionSuggestion, {
 } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 import ToolbarPositioner from "@rich-editor/components/toolbars/pieces/ToolbarPositioner";
 import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
+import { richEditorFlyoutClasses } from "@rich-editor/styles/richEditorStyles/flyoutClasses";
 
 interface IProps extends IWithEditorProps {
     mentionProps: Array<Partial<IMentionProps>>;

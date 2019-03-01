@@ -21,6 +21,9 @@ export function richEditorFlyoutClasses(theme?: object) {
         position: "absolute",
         left: 0,
         width: unit(vars.flyout.padding.left + vars.flyout.padding.right + 7 * vars.menuButton.size),
+        zIndex: 6,
+        overflow: "hidden",
+        backgroundColor: toStringColor(vars.colors.bg),
         ...borders(),
     });
 
@@ -33,6 +36,26 @@ export function richEditorFlyoutClasses(theme?: object) {
         }),
     });
 
+    const title = style("title", {
+        ...longWordEllipsis(),
+        margin: 0,
+        maxWidth: calc(`100% - ${unit(vars.menuButton.size)}`),
+        minHeight: vars.menuButton.size - vars.flyout.padding.top,
+        fontSize: percent(100),
+        lineHeight: "inherit",
+        color: toStringColor(globalVars.mainColors.fg),
+        $nest: {
+            "&:focus": {
+                outline: 0,
+            },
+        },
+    });
+
+    const body = style("body", {
+        paddingLeft: unit(vars.flyout.padding.left),
+        paddingRight: unit(vars.flyout.padding.right),
+    });
+
     const footer = style("head", {
         ...paddings({
             top: unit(vars.flyout.padding.top),
@@ -43,26 +66,6 @@ export function richEditorFlyoutClasses(theme?: object) {
         $nest: {
             "&.insertEmoji-footer": {
                 padding: 0,
-            },
-        },
-    });
-
-    const body = style("body", {
-        paddingLeft: unit(vars.flyout.padding.left),
-        paddingRight: unit(vars.flyout.padding.right),
-    });
-
-    const title = style("title", {
-        ...longWordEllipsis(),
-        margin: 0,
-        maxWidth: calc(`100% - ${vars.menuButton.size}`),
-        minHeight: vars.menuButton.size - vars.flyout.padding.top,
-        fontSize: percent(100),
-        lineHeight: "inherit",
-        color: toStringColor(globalVars.mainColors.fg),
-        $nest: {
-            "&:focus": {
-                outline: 0,
             },
         },
     });

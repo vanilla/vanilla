@@ -55,6 +55,9 @@ export function richEditorClasses(theme?: object) {
             ".embedDialogue": {
                 position: "relative",
             },
+            ".ReactVirtualized__Grid": {
+                minWidth: unit(252),
+            },
         },
     });
 
@@ -264,27 +267,20 @@ export function richEditorClasses(theme?: object) {
     });
 
     const close = style("close", {
+        ...absolutePosition.topRight(),
+        width: unit(vars.menuButton.size),
+        height: unit(vars.menuButton.size),
+        lineHeight: unit(vars.menuButton.size),
+        verticalAlign: "bottom",
+        textAlign: "center",
+        userSelect: "none",
+        background: "transparent",
+        cursor: "pointer",
+        opacity: globalVars.states.icon.opacity,
         $nest: {
-            "&, &.Close": {
-                position: "relative",
-                display: "block",
-                width: unit(vars.menuButton.size),
-                height: unit(vars.menuButton.size),
-                lineHeight: unit(vars.menuButton.size),
-                verticalAlign: "bottom",
-                top: "auto",
-                right: "auto",
-                textAlign: "center",
-                userSelect: "none",
-                background: "transparent",
+            "&:hover, &:focus, &.focus-visible, &:active": {
+                opacity: 1,
                 cursor: "pointer",
-                opacity: globalVars.states.icon.opacity,
-                $nest: {
-                    "&:hover, &:focus, &.focus-visible, &:active": {
-                        opacity: 1,
-                        cursor: "pointer",
-                    },
-                },
             },
         },
     });

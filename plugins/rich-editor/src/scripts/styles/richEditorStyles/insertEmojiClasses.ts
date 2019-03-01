@@ -6,33 +6,42 @@
 
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutVariables } from "@library/styles/layoutStyles";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { unit } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
+import { viewHeight } from "csx";
 
 export function insertEmojiClasses(theme?: object) {
     const globalVars = globalVariables(theme);
-    const mediaQueries = layoutVariables(theme).mediaQueries();
     const vars = richEditorVariables(theme);
-    const formElementVars = formElementsVariables(theme);
     const style = styleFactory("insertEmoji");
 
     const root = style({
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         fontSize: unit(globalVars.icon.sizes.default),
         textAlign: "center",
         overflow: "hidden",
-        opacity: globalVars.states.icon.opacity,
+        opacity: globalVars.states.text.opacity,
         $nest: {
             ".fallBackEmoji": {
                 display: "block",
                 margin: "auto",
             },
-            "&:hover, &:focus, &.focus-visible": {
+            "&:hover, &:focus, &:active, &.focus-visible": {
                 opacity: 1,
             },
         },
     });
 
-    return { root };
+    const body = style("body", {
+        height: unit(vars.emojiBody.height),
+        maxHeight: viewHeight(80),
+    });
+
+    const popoverDescription = style("popoverDescription", {
+        marginBottom: ".5em",
+    });
+
+    return { root, body, popoverDescription };
 }

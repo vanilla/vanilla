@@ -9,7 +9,6 @@ import Quill from "quill/core";
 import classNames from "classnames";
 import { convertToSafeEmojiCharacters } from "@library/dom";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
-import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
 import { insertEmojiClasses } from "@rich-editor/styles/richEditorStyles/insertEmojiClasses";
 
 interface IProps extends IWithEditorProps {
@@ -41,15 +40,8 @@ export class EmojiButton extends React.Component<IProps> {
     }
 
     public render() {
-        const classesRichEditor = richEditorClasses();
         const classesEmoji = insertEmojiClasses();
-        const componentClasses = classNames(
-            "richEditor-button",
-            "richEditor-insertEmoji",
-            classesEmoji.root,
-            "emojiChar-" + this.emojiChar,
-            classesRichEditor.button,
-        );
+        const componentClasses = classNames("richEditor-insertEmoji", classesEmoji.root, "emojiChar-" + this.emojiChar);
         return (
             <button
                 ref={elButton => {

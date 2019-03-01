@@ -82,7 +82,11 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                         <React.Fragment>
                             <p
                                 id={this.descriptionID}
-                                className="insertMedia-description richEditor-popoverDescription"
+                                className={classNames(
+                                    "insertMedia-description",
+                                    "richEditor-popoverDescription",
+                                    classesRichEditor.popoverDescription,
+                                )}
                             >
                                 {t("Paste the URL of the media you want.")}
                             </p>

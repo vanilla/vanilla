@@ -252,10 +252,10 @@ interface IBorderStyles extends ISingleBorderStyle {
 export const borders = (styles: IBorderStyles = {}) => {
     const vars = globalVariables();
     return {
-        borderColor: styles.color ? styles.color.toString() : vars.border.color.toString(),
-        borderWidth: unit(styles.width),
+        borderColor: styles.color ? styles.color.toString() : toStringColor(vars.border.color),
+        borderWidth: styles.width ? unit(styles.width) : unit(vars.border.width),
         borderStyle: styles.style ? styles.style : vars.border.style,
-        borderRadius: unit(styles.radius),
+        borderRadius: styles.radius ? unit(styles.radius) : unit(vars.border.radius),
     };
 };
 

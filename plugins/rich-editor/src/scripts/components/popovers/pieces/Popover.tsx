@@ -11,6 +11,7 @@ import { IWithEditorProps, withEditor } from "@rich-editor/components/context";
 import { flyoutPosition } from "./flyoutPosition";
 import { richEditorFlyoutClasses } from "@rich-editor/styles/richEditorStyles/flyoutClasses";
 import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
+import { insertEmojiClasses } from "@rich-editor/styles/richEditorStyles/insertEmojiClasses";
 
 interface IState {
     id: string;
@@ -52,8 +53,9 @@ export class Popover extends React.Component<IProps, IState> {
         const { additionalClassRoot } = this.props;
         const classesRichEditor = richEditorClasses();
         const classesFlyout = richEditorFlyoutClasses();
+        const classesInsertEmoji = insertEmojiClasses();
 
-        let classes = classNames("richEditor-menu", "richEditorFlyout", classesRichEditor.menu, classesFlyout.root, {
+        let classes = classNames("richEditor-menu", "richEditorFlyout", classesFlyout.root, {
             [additionalClassRoot as any]: !!additionalClassRoot,
             isHidden: !this.props.isVisible,
         });
@@ -64,7 +66,7 @@ export class Popover extends React.Component<IProps, IState> {
             [additionalClassRoot + "-header"]: !!additionalClassRoot,
         });
 
-        const bodyClasses = classNames("richEditorFlyout-body", classesFlyout.body, {
+        const bodyClasses = classNames("richEditorFlyout-body", classesFlyout.body, classesInsertEmoji.body, {
             [additionalClassRoot + "-body"]: !!additionalClassRoot,
         });
 

@@ -1167,7 +1167,7 @@ class Gdn_Format {
             return $mixed;
         }
         // Strip  Right-To-Left override.
-        $mixed = str_replace("\xE2\x80\xAE", '', $mixed);
+        $mixed = str_replace('\xE2\x80\xAE', '', $mixed);
         if (!is_string($mixed)) {
             return self::to($mixed, 'Links');
         }

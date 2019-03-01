@@ -17,8 +17,9 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc, percent } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import { memoize } from "lodash";
 
-export function richEditorFormClasses(theme?: object) {
+export const richEditorFormClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const mediaQueries = layoutVariables(theme).mediaQueries();
     const vars = richEditorVariables(theme);
@@ -112,4 +113,4 @@ export function richEditorFormClasses(theme?: object) {
         body,
         inlineMenuItems,
     };
-}
+});

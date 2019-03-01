@@ -12,8 +12,9 @@ import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { calc, important, percent, px } from "csx";
 import { buttonVariables } from "@library/styles/buttonStyles";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import memoize from "lodash/memoize";
 
-export function searchBarVariables(theme?: object) {
+export const searchBarVariables = memoize((theme?: object) => {
     const formElementVars = formElementsVariables(theme);
     const themeVars = componentThemeVariables(theme, "searchBar");
 
@@ -44,9 +45,9 @@ export function searchBarVariables(theme?: object) {
     };
 
     return { search, searchIcon, sizing, placeholder, heading };
-}
+});
 
-export function searchBarClasses(theme?: object) {
+export const searchBarClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vars = searchBarVariables(theme);
     const vanillaHeaderVars = vanillaHeaderVariables(theme);
@@ -298,4 +299,4 @@ export function searchBarClasses(theme?: object) {
         icon,
         results,
     };
-}
+});

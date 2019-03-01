@@ -18,8 +18,9 @@ import { FontSizeProperty, HeightProperty, MarginProperty, PaddingProperty, Widt
 import { TLength } from "typestyle/lib/types";
 import { ColorHelper, percent } from "csx";
 import { shadowHelper } from "@library/styles/shadowHelpers";
+import memoize from "lodash/memoize";
 
-export function subcommunityTileVariables(theme?: object) {
+export const subcommunityTileVariables = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const themeVars = componentThemeVariables(theme, "subcommunityTile");
 
@@ -68,9 +69,9 @@ export function subcommunityTileVariables(theme?: object) {
     };
 
     return { spacing, frame, title, description, link, fallBackIcon };
-}
+});
 
-export function subcommunityTileClasses(theme?: object) {
+export const subcommunityTileClasses = memoize((theme?: object) => {
     const vars = subcommunityTileVariables(theme);
     const debug = debugHelper("subcommunityTile");
     const shadow = shadowHelper(theme);
@@ -166,4 +167,4 @@ export function subcommunityTileClasses(theme?: object) {
     });
 
     return { root, link, frame, icon, main, title, description, fallBackIcon };
-}
+});

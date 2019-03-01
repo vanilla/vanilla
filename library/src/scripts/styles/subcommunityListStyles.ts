@@ -9,8 +9,9 @@ import { absolutePosition, componentThemeVariables, debugHelper, unit } from "@l
 import { style } from "typestyle";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { percent } from "csx";
+import memoize from "lodash/memoize";
 
-export function subcommunityListVariables(theme?: object) {
+export const subcommunityListVariables = memoize((theme?: object) => {
     const themeVars = componentThemeVariables(theme, "subcommunityList");
     const globalVars = globalVariables(theme);
     const spacing = {
@@ -24,9 +25,9 @@ export function subcommunityListVariables(theme?: object) {
     };
 
     return { spacing, sizing };
-}
+});
 
-export function subcommunityListClasses(theme?: object) {
+export const subcommunityListClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vars = subcommunityListVariables(theme);
     const debug = debugHelper("subcommunityList");
@@ -72,4 +73,4 @@ export function subcommunityListClasses(theme?: object) {
     );
 
     return { root, items, item };
-}
+});

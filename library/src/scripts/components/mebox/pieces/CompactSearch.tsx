@@ -15,7 +15,7 @@ import SearchOption from "@library/components/search/SearchOption";
 import { withSearch, IWithSearchProps } from "@library/contexts/SearchContext";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import FocusWatcher from "@library/FocusWatcher";
-import vanillaHeaderClasses from "@library/styles/vanillaHeaderStyles";
+import { vanillaHeaderClasses } from "@library/styles/vanillaHeaderStyles";
 import { compactSearchClasses } from "@library/styles/compactSearchStyles";
 import { searchBarClasses } from "@library/styles/searchBarStyles";
 

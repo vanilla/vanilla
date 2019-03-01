@@ -18,8 +18,9 @@ import {
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { percent, px } from "csx";
+import memoize from "lodash/memoize";
 
-export function attachmentVariables(theme?: object) {
+export const attachmentVariables = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const formElementVars = formElementsVariables(theme);
     const themeVars = componentThemeVariables(theme, "attachment");
@@ -63,9 +64,9 @@ export function attachmentVariables(theme?: object) {
     };
 
     return { border, padding, shadows, text, title, loading, sizing };
-}
+});
 
-export function attachmentClasses(theme?: object) {
+export const attachmentClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const formElementVars = formElementsVariables(theme);
     const vars = attachmentVariables(theme);
@@ -190,4 +191,4 @@ export function attachmentClasses(theme?: object) {
     });
 
     return { root, link, box, format, main, title, metas, close, loadingProgress, loadingContent };
-}
+});

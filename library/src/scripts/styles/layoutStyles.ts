@@ -7,8 +7,9 @@ import { px } from "csx";
 import { media } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, componentThemeVariables } from "@library/styles/styleHelpers";
+import memoize from "lodash/memoize";
 
-export const layoutVariables = (theme?: object) => {
+export const layoutVariables = memoize((theme?: object) => {
     const themeVars = componentThemeVariables(theme, "globalVariables");
 
     const gutterSize = 24;
@@ -76,4 +77,4 @@ export const layoutVariables = (theme?: object) => {
     };
 
     return { gutterSize, gutter, panelWidth, panel, middleColumnWidth, middleColumn, content, mediaQueries };
-};
+});

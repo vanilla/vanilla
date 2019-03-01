@@ -8,8 +8,9 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { percent, px } from "csx";
+import memoize from "lodash/memoize";
 
-export function selectBoxClasses(theme?: object) {
+export const selectBoxClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const debug = debugHelper("selectBox");
 
@@ -103,4 +104,4 @@ export function selectBoxClasses(theme?: object) {
         spacer,
         itemLabel,
     };
-}
+});

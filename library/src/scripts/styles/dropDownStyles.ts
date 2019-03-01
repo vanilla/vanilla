@@ -7,8 +7,9 @@
 import { debugHelper } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import { memoize } from "lodash";
 
-export function dropDownClasses(theme?: object) {
+export const dropDownClasses = memoize((theme?: object) => {
     const layoutVars = layoutVariables(theme);
     const debug = debugHelper("dropDown");
 
@@ -19,4 +20,4 @@ export function dropDownClasses(theme?: object) {
     });
 
     return { paddedList };
-}
+});

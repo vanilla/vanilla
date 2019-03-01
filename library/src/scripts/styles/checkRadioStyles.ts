@@ -21,8 +21,9 @@ import {
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { em, important, percent, px } from "csx";
+import memoize from "lodash/memoize";
 
-export function checkRadioVariables(theme?: object) {
+export const checkRadioVariables = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const formElementVars = formElementsVariables(theme);
     const themeVars = componentThemeVariables(theme, "checkRadio");
@@ -80,9 +81,9 @@ export function checkRadioVariables(theme?: object) {
     };
 
     return { border, main, checkBox, radioButton, labelNote, sizing };
-}
+});
 
-export function checkRadioClasses(theme?: object) {
+export const checkRadioClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vars = checkRadioVariables(theme);
     const debug = debugHelper("checkRadio");
@@ -244,4 +245,4 @@ export function checkRadioClasses(theme?: object) {
         diskIcon,
         input,
     };
-}
+});

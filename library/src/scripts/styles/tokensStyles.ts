@@ -9,8 +9,9 @@ import { componentThemeVariables, debugHelper, unit, userSelect } from "@library
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { percent, px } from "csx";
+import memoize from "lodash/memoize";
 
-export function tokensVariables(theme?: object) {
+export const tokensVariables = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const themeVars = componentThemeVariables(theme, "tokens");
 
@@ -31,9 +32,9 @@ export function tokensVariables(theme?: object) {
     };
 
     return { clearIcon, clear, token };
-}
+});
 
-export function tokensClasses(theme?: object) {
+export const tokensClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vars = tokensVariables(theme);
     const formElVars = formElementsVariables(theme);
@@ -91,4 +92,4 @@ export function tokensClasses(theme?: object) {
     });
 
     return { root, removeIcon };
-}
+});

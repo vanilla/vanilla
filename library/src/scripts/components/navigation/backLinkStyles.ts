@@ -10,8 +10,9 @@ import { debugHelper, srOnly, userSelect } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import memoize from "lodash/memoize";
 
-export default function backLinkClasses(theme?: object) {
+const backLinkClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const mediaQueries = layoutVariables(theme).mediaQueries();
     const debug = debugHelper("backLink");
@@ -57,4 +58,6 @@ export default function backLinkClasses(theme?: object) {
         link,
         label,
     };
-}
+});
+
+export default backLinkClasses;

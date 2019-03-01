@@ -9,8 +9,9 @@ import { componentThemeVariables } from "@library/styles/styleHelpers";
 import { px } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import styleFactory from "@library/styles/styleFactory";
+import { memoize } from "lodash";
 
-export function formElementsVariables(theme?: object) {
+export const formElementsVariables = memoize((theme?: object) => {
     const vars = globalVariables(theme);
     const varsLayouts = layoutVariables(theme);
     const mixBgAndFg = vars.mixBgAndFg;
@@ -91,9 +92,9 @@ export function formElementsVariables(theme?: object) {
         placeholder,
         disabled,
     };
-}
+});
 
-export function formErrorClasses(theme?: object) {
+export const formErrorClasses = memoize((theme?: object) => {
     const style = styleFactory("formError");
     const varsGlobal = globalVariables(theme);
     const vars = formElementsVariables(theme);
@@ -128,4 +129,4 @@ export function formErrorClasses(theme?: object) {
         activeButton,
         actions,
     };
-}
+});

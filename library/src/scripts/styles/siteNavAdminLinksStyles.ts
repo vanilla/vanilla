@@ -10,8 +10,9 @@ import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { px } from "csx";
+import memoize from "lodash/memoize";
 
-export function siteNavAdminLinksClasses(theme?: object) {
+export const siteNavAdminLinksClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const debug = debugHelper("siteNavAdminLinks");
     const mediaQueries = layoutVariables(theme).mediaQueries();
@@ -46,4 +47,4 @@ export function siteNavAdminLinksClasses(theme?: object) {
     });
 
     return { root, item, divider, link };
-}
+});

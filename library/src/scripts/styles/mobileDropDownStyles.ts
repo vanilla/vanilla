@@ -10,8 +10,9 @@ import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import memoize from "lodash/memoize";
 
-export const mobileDropDownVariables = (theme?: object) => {
+export const mobileDropDownVariables = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vanillaHeaderVars = vanillaHeaderVariables();
     const mixBgAndFg = globalVars.mixBgAndFg;
@@ -29,9 +30,9 @@ export const mobileDropDownVariables = (theme?: object) => {
         minHeight: 28,
     };
     return { title, chevron, header };
-};
+});
 
-export const mobileDropDownClasses = () => {
+export const mobileDropDownClasses = memoize(() => {
     const vars = mobileDropDownVariables();
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();
@@ -176,4 +177,4 @@ export const mobileDropDownClasses = () => {
         closeModal,
         header,
     };
-};
+});

@@ -19,8 +19,9 @@ import {
 } from "@library/styles/styleHelpers";
 import { BorderColorProperty, BorderRadiusProperty, BorderStyleProperty, WidthProperty } from "csstype";
 import { TLength } from "typestyle/lib/types";
+import memoize from "lodash/memoize";
 
-export function buttonStyles(theme?: object) {
+export const buttonStyles = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const themeVars = componentThemeVariables(theme, "button");
     const padding = {
@@ -41,7 +42,7 @@ export function buttonStyles(theme?: object) {
     };
 
     return { padding, sizing, border };
-}
+});
 
 export type ColorHelperAndTransparent = ColorHelper | "transparent";
 
@@ -77,7 +78,7 @@ export interface IButtonType {
     };
 }
 
-export function buttonVariables(theme?: object) {
+export const buttonVariables = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const themeVars = componentThemeVariables(theme, "button");
 
@@ -182,18 +183,18 @@ export function buttonVariables(theme?: object) {
     };
 
     return { standard, primary, transparent };
-}
+});
 
-export function buttonSizing(height, minWidth, fontSize, paddingHorizontal, formElementVars) {
+export const buttonSizing = memoize((height, minWidth, fontSize, paddingHorizontal, formElementVars) => {
     return {
         minHeight: px(formElementVars.sizing.height),
         fontSize: px(fontSize),
         padding: `${px(0)} ${px(paddingHorizontal)}`,
         lineHeight: px(formElementVars.sizing.height - formElementVars.border.width * 2),
     };
-}
+});
 
-export function generateButtonClass(buttonType: IButtonType, buttonName: string, setZIndexOnState = false) {
+export const generateButtonClass = memoize((buttonType: IButtonType, buttonName: string, setZIndexOnState = false) => {
     const globalVars = globalVariables();
     const formElVars = formElementsVariables();
     const vars = buttonStyles();
@@ -261,7 +262,7 @@ export function generateButtonClass(buttonType: IButtonType, buttonName: string,
             },
         },
     });
-}
+});
 
 export enum ButtonTypes {
     STANDARD = "standard",
@@ -269,16 +270,16 @@ export enum ButtonTypes {
     TRANSPARENT = "transparent",
 }
 
-export function buttonClasses() {
+export const buttonClasses = memoize(() => {
     const vars = buttonVariables();
     return {
         primary: generateButtonClass(vars.primary, "primary"),
         standard: generateButtonClass(vars.standard, "standard"),
         transparent: generateButtonClass(vars.transparent, "transparent"),
     };
-}
+});
 
-export function buttonLoaderClasses(buttonType: IButtonType, theme?: object) {
+export const buttonLoaderClasses = memoize((buttonType: IButtonType, theme?: object) => {
     const globalVars = globalVariables(theme);
     const themeVars = componentThemeVariables(theme, "buttonLoader");
     const flexUtils = flexHelper();
@@ -298,4 +299,4 @@ export function buttonLoaderClasses(buttonType: IButtonType, theme?: object) {
         ...themeVars.subComponentStyles("root"),
     });
     return { root };
-}
+});

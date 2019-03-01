@@ -10,9 +10,10 @@ import { style } from "typestyle";
 import { calc, percent, quote } from "csx";
 import { objectFitWithFallback } from "@library/styles/styleHelpers";
 import { absolutePosition } from "@library/styles/styleHelpers";
-import vanillaHeaderStyles, { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import { memoize } from "lodash";
 
-export function meBoxMessageVariables(theme?: object) {
+export const meBoxMessageVariables = memoize((theme?: object) => {
     const themeVars = componentThemeVariables(theme, "meBoxMessage");
     const spacing = {
         padding: 8,
@@ -30,9 +31,9 @@ export function meBoxMessageVariables(theme?: object) {
     };
 
     return { spacing, imageContainer, unreadDot };
-}
+});
 
-export function meBoxMessageClasses(theme?: object) {
+export const meBoxMessageClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vars = meBoxMessageVariables(theme);
     const headerVars = vanillaHeaderVariables(theme);
@@ -114,4 +115,4 @@ export function meBoxMessageClasses(theme?: object) {
     });
 
     return { root, link, imageContainer, image, status, contents, message };
-}
+});

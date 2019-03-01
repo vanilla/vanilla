@@ -8,7 +8,7 @@ import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEd
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { appearance, unit } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
-import { viewHeight } from "csx";
+import { em, viewHeight } from "csx";
 
 export function insertEmojiClasses(theme?: object) {
     const globalVars = globalVariables(theme);
@@ -23,7 +23,9 @@ export function insertEmojiClasses(theme?: object) {
         fontSize: unit(globalVars.icon.sizes.default),
         textAlign: "center",
         overflow: "hidden",
+        border: 0,
         opacity: globalVars.states.text.opacity,
+        cursor: "pointer",
         $nest: {
             ".fallBackEmoji": {
                 display: "block",
@@ -31,6 +33,12 @@ export function insertEmojiClasses(theme?: object) {
             },
             "&:hover, &:focus, &:active, &.focus-visible": {
                 opacity: 1,
+            },
+            ".safeEmoji": {
+                display: "block",
+                height: unit(globalVars.icon.sizes.default),
+                width: unit(globalVars.icon.sizes.default),
+                margin: "auto",
             },
         },
     });

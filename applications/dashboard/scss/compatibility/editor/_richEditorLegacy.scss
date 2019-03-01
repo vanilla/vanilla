@@ -15,6 +15,21 @@
     .richEditorParagraphMenu {
         left: 0;
     }
+
+    &.isDisabled { // Before React has replaced initial HTML
+        &,
+        .richEditor-button {
+            cursor: progress !important;
+        }
+    }
+
+    .ReactVirtualized__Grid {
+        min-width: 252px;
+    }
+
+    .richEditor-menuItems {
+        border-bottom: 0;
+    }
 }
 
 .userContent {
@@ -84,12 +99,12 @@
         width: calc(100% + #{$meta_spacing * 2});
         overflow: hidden;
         text-align: left;
-    
+
         margin: {
             left: -#{$meta_spacing};
             right: $meta_spacing;
         }
-    
+
         &.isFlexed {
             display: flex;
             flex-wrap: wrap;
@@ -103,11 +118,11 @@
         margin: 0 $meta_spacing;
         font-size: $metaText_fontSize;
         color: $metas_color;
-    
+
         .meta {
             margin: 0;
         }
-    }    
+    }
 }
 
 .richEditor-menu {
@@ -272,6 +287,7 @@ body.hasRichEditor {
 
 .richEditor-text {
     overflow: visible;
+    min-height: 237px;
     padding: {
         top: $richEditor_verticalPadding;
         right: $richEditor_innerPadding;
@@ -287,6 +303,16 @@ body.hasRichEditor {
     }
 }
 
+.ql-clipboard {
+    @include sr-only();
+    // Fixed https://github.com/quilljs/quill/issues/1374#issuecomment-415333651
+    position: fixed;
+}
+
+.richEditor-upload {
+    @include sr-only;
+}
+
 // Mobile
 body.isMobile {
     @include legacyMobileStyles();
@@ -296,6 +322,9 @@ body.isMobile {
     @include legacyMobileStyles();
 }
 
-.richEditorFlyout {
+.richEditor-menu.richEditorFlyout {
     bottom: 100%;
+    padding-top: 0;
+    padding-bottom: 0;
 }
+

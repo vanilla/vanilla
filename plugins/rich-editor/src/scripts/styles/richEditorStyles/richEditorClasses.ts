@@ -275,7 +275,7 @@ export function richEditorClasses(theme?: object) {
     });
 
     const close = style("close", {
-        ...absolutePosition.topRight(),
+        ...absolutePosition.middleRightOfParent(),
         ...userSelect(),
         width: unit(vars.menuButton.size),
         height: unit(vars.menuButton.size),

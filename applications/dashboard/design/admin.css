@@ -9388,11 +9388,15 @@ button.close {
     display: block;
   }
   .drawer-show .panel-left {
-    position: absolute;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
     display: block;
     width: 222px;
     height: 100%;
     padding-top: 7.5rem;
+    overflow: auto;
   }
 }
 

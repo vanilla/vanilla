@@ -169,10 +169,14 @@
   }
 
   .drawer-show .panel-left {
-    position: absolute;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
     display: block;
     width: $drawer-width;
     height: 100%;
     padding-top: $spacer * 4 + $navbar-height;
+    overflow: auto;
   }
 }

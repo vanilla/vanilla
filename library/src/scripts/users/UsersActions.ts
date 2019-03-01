@@ -5,7 +5,8 @@
  */
 
 import ReduxActions, { ActionsUnion } from "@library/state/ReduxActions";
-import { IMe } from "@library/@types/api";
+import { IMe, LoadStatus } from "@library/@types/api";
+import { IUsersStoreState } from "@library/users/UsersModel";
 
 /**
  * Redux actions for the users data.
@@ -25,7 +26,12 @@ export default class UsersActions extends ReduxActions {
         {},
     );
 
-    public getMe = () => {
-        return this.dispatchApi("get", "/users/me", UsersActions.getMeACs, {});
+    public getMe = async () => {
+        const currentUser = this.getState<IUsersStoreState>().users.current;
+        if (currentUser.status === LoadStatus.LOADING) {
+            // Don't request the user more than once.
+            return;
+        }
+        return await this.dispatchApi("get", "/users/me", UsersActions.getMeACs, {});
     };
 }

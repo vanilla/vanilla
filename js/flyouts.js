@@ -30,7 +30,10 @@
         $(document).delegate(".ButtonGroup > .Handle", "click", handleButtonHandleClick);
         $(document).delegate(".ToggleFlyout", "click", handleToggleFlyoutClick);
         $(document).delegate(".ToggleFlyout a", "mouseup", handleToggleFlyoutMouseUp);
-        $(document).delegate(document, "click", closeAllFlyouts);
+        $(document).delegate(".mobileFlyoutOverlay", 'click touchstart', closeAllFlyouts);
+        $(document).delegate('.Flyout', 'click touchstart', function(e) {
+            e.stopPropagation();
+        });
     });
 
     /**
@@ -142,6 +145,11 @@
         // Clear the button groups that are open as well.
         $(".ButtonGroup")
             .removeClass(OPEN_CLASS)
+            .setFlyoutAttributes();
+
+        // Kludge for legacy editor.
+        $(".editor-dropdown-open")
+            .removeClass("editor-dropdown-open")
             .setFlyoutAttributes();
         document.body.classList.remove(BODY_CLASS);
     }

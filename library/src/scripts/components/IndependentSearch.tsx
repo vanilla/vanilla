@@ -44,9 +44,8 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
     };
 
     public render() {
-        console.log(this.props.theme);
-        const classes = searchClasses(this.props.theme);
-        const classesSearchBar = searchBarClasses(this.props.theme);
+        const classes = searchClasses();
+        const classesSearchBar = searchBarClasses();
         return (
             <div className={classNames(classes.root, this.props.className)}>
                 <SearchBar

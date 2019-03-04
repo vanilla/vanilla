@@ -11,10 +11,10 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 import { standardAnimations } from "@library/styles/animationHelpers";
 import memoize from "lodash/memoize";
 
-export const richEditorVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const varsFormElements = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "richEditor");
+export const richEditorVariables = memoize(() => {
+    const globalVars = globalVariables();
+    const varsFormElements = formElementsVariables();
+    const themeVars = componentThemeVariables("richEditor");
     const animations = standardAnimations();
 
     const colors = {

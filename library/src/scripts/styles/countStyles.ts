@@ -9,9 +9,9 @@ import { absolutePosition, componentThemeVariables, debugHelper, unit } from "@l
 import { style } from "typestyle";
 import memoize from "lodash/memoize";
 
-export const countVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const themeVars = componentThemeVariables(theme, "count");
+export const countVariables = memoize(() => {
+    const globalVars = globalVariables();
+    const themeVars = componentThemeVariables("count");
 
     const font = {
         size: 10,
@@ -31,9 +31,9 @@ export const countVariables = memoize((theme?: object) => {
     return { font, sizing, color };
 });
 
-export const countClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vars = countVariables(theme);
+export const countClasses = memoize(() => {
+    const globalVars = globalVariables();
+    const vars = countVariables();
     const debug = debugHelper("count");
 
     const root = style({

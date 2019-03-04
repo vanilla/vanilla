@@ -11,9 +11,9 @@ import styleFactory from "@library/styles/styleFactory";
 import { translateX } from "csx";
 import memoize from "lodash/memoize";
 
-export const nubClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vars = richEditorVariables(theme);
+export const nubClasses = memoize(() => {
+    const globalVars = globalVariables();
+    const vars = richEditorVariables();
     const style = styleFactory("nub");
 
     const root = style({

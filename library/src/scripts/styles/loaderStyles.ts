@@ -18,9 +18,9 @@ import { percent, quote } from "csx";
 import { PositionProperty } from "csstype";
 import memoize from "lodash/memoize";
 
-export const loaderVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const themeVars = componentThemeVariables(theme, "loader");
+export const loaderVariables = memoize(() => {
+    const globalVars = globalVariables();
+    const themeVars = componentThemeVariables("loader");
 
     const fullPage: ISpinnerProps = {
         size: 100,
@@ -46,8 +46,8 @@ export const loaderVariables = memoize((theme?: object) => {
     return { fullPage, fixedSize, medium };
 });
 
-export const loaderClasses = memoize((theme?: object) => {
-    const vars = loaderVariables(theme);
+export const loaderClasses = memoize(() => {
+    const vars = loaderVariables();
     const debug = debugHelper("loader");
     const flex = flexHelper();
     const fullPageLoader = style({

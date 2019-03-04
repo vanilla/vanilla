@@ -9,8 +9,8 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, componentThemeVariables } from "@library/styles/styleHelpers";
 import memoize from "lodash/memoize";
 
-export const layoutVariables = memoize((theme?: object) => {
-    const themeVars = componentThemeVariables(theme, "globalVariables");
+export const layoutVariables = memoize(() => {
+    const themeVars = componentThemeVariables("globalVariables");
 
     const gutterSize = 24;
     const gutter = {

@@ -20,10 +20,10 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 import { percent, px } from "csx";
 import memoize from "lodash/memoize";
 
-export const attachmentVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "attachment");
+export const attachmentVariables = memoize(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const themeVars = componentThemeVariables("attachment");
 
     const border = {
         color: globalVars.mixBgAndFg(0.2),
@@ -66,10 +66,10 @@ export const attachmentVariables = memoize((theme?: object) => {
     return { border, padding, shadows, text, title, loading, sizing };
 });
 
-export const attachmentClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const vars = attachmentVariables(theme);
+export const attachmentClasses = memoize(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const vars = attachmentVariables();
     const debug = debugHelper("attachment");
 
     const root = style({

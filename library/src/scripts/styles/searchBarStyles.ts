@@ -14,9 +14,9 @@ import { buttonVariables } from "@library/styles/buttonStyles";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import memoize from "lodash/memoize";
 
-export const searchBarVariables = memoize((theme?: object) => {
-    const formElementVars = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "searchBar");
+export const searchBarVariables = memoize(() => {
+    const formElementVars = formElementsVariables();
+    const themeVars = componentThemeVariables("searchBar");
 
     const search = {
         minWidth: 109,
@@ -47,14 +47,14 @@ export const searchBarVariables = memoize((theme?: object) => {
     return { search, searchIcon, sizing, placeholder, heading };
 });
 
-export const searchBarClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vars = searchBarVariables(theme);
-    const vanillaHeaderVars = vanillaHeaderVariables(theme);
+export const searchBarClasses = memoize(() => {
+    const globalVars = globalVariables();
+    const vars = searchBarVariables();
+    const vanillaHeaderVars = vanillaHeaderVariables();
     const debug = debugHelper("searchBar");
-    const buttonVars = buttonVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const buttonVars = buttonVariables();
+    const formElementVars = formElementsVariables();
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style(
         {

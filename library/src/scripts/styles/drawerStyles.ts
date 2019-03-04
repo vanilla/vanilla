@@ -11,9 +11,9 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 import { percent } from "csx";
 import memoize from "lodash/memoize";
 
-export const drawerVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const themeVars = componentThemeVariables(theme, "drawer");
+export const drawerVariables = memoize(() => {
+    const globalVars = globalVariables();
+    const themeVars = componentThemeVariables("drawer");
 
     const spacing = {
         button: {
@@ -36,8 +36,8 @@ export const drawerVariables = memoize((theme?: object) => {
     return { spacing, fonts, sizing };
 });
 
-export const drawerClasses = memoize((theme?: object) => {
-    const vars = drawerVariables(theme);
+export const drawerClasses = memoize(() => {
+    const vars = drawerVariables();
     const debug = debugHelper("drawer");
 
     const root = style({

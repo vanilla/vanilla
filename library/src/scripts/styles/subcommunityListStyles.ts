@@ -11,9 +11,9 @@ import { layoutVariables } from "@library/styles/layoutStyles";
 import { percent } from "csx";
 import memoize from "lodash/memoize";
 
-export const subcommunityListVariables = memoize((theme?: object) => {
-    const themeVars = componentThemeVariables(theme, "subcommunityList");
-    const globalVars = globalVariables(theme);
+export const subcommunityListVariables = memoize(() => {
+    const themeVars = componentThemeVariables("subcommunityList");
+    const globalVars = globalVariables();
     const spacing = {
         padding: 24,
         ...themeVars.subComponentStyles("spacing"),
@@ -27,11 +27,11 @@ export const subcommunityListVariables = memoize((theme?: object) => {
     return { spacing, sizing };
 });
 
-export const subcommunityListClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vars = subcommunityListVariables(theme);
+export const subcommunityListClasses = memoize(() => {
+    const globalVars = globalVariables();
+    const vars = subcommunityListVariables();
     const debug = debugHelper("subcommunityList");
-    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style(
         {

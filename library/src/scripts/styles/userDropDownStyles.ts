@@ -9,9 +9,9 @@ import { componentThemeVariables, debugHelper, unit } from "@library/styles/styl
 import { style } from "typestyle";
 import memoize from "lodash/memoize";
 
-export const userDropDownVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const themeVars = componentThemeVariables(theme, "userDropDown");
+export const userDropDownVariables = memoize(() => {
+    const globalVars = globalVariables();
+    const themeVars = componentThemeVariables("userDropDown");
 
     const item = {
         topPadding: 6,
@@ -46,9 +46,9 @@ export const userDropDownVariables = memoize((theme?: object) => {
     return { userCard, userName, contents, item };
 });
 
-export const userDropDownClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vars = userDropDownVariables(theme);
+export const userDropDownClasses = memoize(() => {
+    const globalVars = globalVariables();
+    const vars = userDropDownVariables();
     const debug = debugHelper("userDropDown");
 
     const userCardPhotoLink = style({

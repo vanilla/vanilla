@@ -31,6 +31,7 @@ import { keyframes } from "typestyle";
 import { TLength } from "typestyle/lib/types";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import styleFactory from "@library/styles/styleFactory";
+import { getThemeVariables } from "@library/theming/ThemeContext";
 
 export const toStringColor = (colorValue: ColorHelper | "transparent") => {
     return typeof colorValue === "string" ? colorValue : colorValue.toString();
@@ -200,13 +201,12 @@ export const getColorDependantOnLightness = (
  * @param theme - The theme overwrites.
  * @param componentName - The name of the component to overwrite
  */
-export const componentThemeVariables = (theme: any | undefined, componentName: string) => {
-    // const themeVars = get(theme, componentName, {});
-    const themeVars = (theme && theme[componentName]) || {};
+export const componentThemeVariables = (componentName: string) => {
+    const themeVars = getThemeVariables();
+    const componentVars = (themeVars && themeVars[componentName]) || {};
 
     const subComponentStyles = (subElementName: string): object => {
-        return (themeVars && themeVars[subElementName]) || {};
-        // return get(themeVars, subElementName, {});
+        return (componentVars && componentVars[subElementName]) || {};
     };
 
     return {

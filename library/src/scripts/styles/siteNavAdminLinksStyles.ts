@@ -12,10 +12,10 @@ import { layoutVariables } from "@library/styles/layoutStyles";
 import { px } from "csx";
 import memoize from "lodash/memoize";
 
-export const siteNavAdminLinksClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
+export const siteNavAdminLinksClasses = memoize(() => {
+    const globalVars = globalVariables();
     const debug = debugHelper("siteNavAdminLinks");
-    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style(
         {

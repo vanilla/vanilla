@@ -7,9 +7,9 @@ import { componentThemeVariables, getColorDependantOnLightness, toStringColor } 
 import { color, ColorHelper, percent } from "csx";
 import memoize from "lodash/memoize";
 
-export const globalVariables = memoize((theme?: object) => {
+export const globalVariables = memoize(() => {
     const colorPrimary = color("#0291db");
-    const themeVars = componentThemeVariables(theme, "globalVariables");
+    const themeVars = componentThemeVariables("globalVariables");
 
     const utility = {
         "percentage.third": percent(100 / 3),

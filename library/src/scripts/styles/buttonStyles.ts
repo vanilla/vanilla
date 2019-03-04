@@ -21,9 +21,9 @@ import { BorderColorProperty, BorderRadiusProperty, BorderStyleProperty, WidthPr
 import { TLength } from "typestyle/lib/types";
 import memoize from "lodash/memoize";
 
-export const buttonStyles = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const themeVars = componentThemeVariables(theme, "button");
+export const buttonStyles = memoize(() => {
+    const globalVars = globalVariables();
+    const themeVars = componentThemeVariables("button");
     const padding = {
         top: 2,
         bottom: 3,
@@ -78,9 +78,9 @@ export interface IButtonType {
     };
 }
 
-export const buttonVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const themeVars = componentThemeVariables(theme, "button");
+export const buttonVariables = memoize(() => {
+    const globalVars = globalVariables();
+    const themeVars = componentThemeVariables("button");
 
     const standard: IButtonType = {
         fg: globalVars.mainColors.fg,
@@ -280,8 +280,8 @@ export const buttonClasses = memoize(() => {
 });
 
 export const buttonLoaderClasses = memoize((buttonType: IButtonType, theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const themeVars = componentThemeVariables(theme, "buttonLoader");
+    const globalVars = globalVariables();
+    const themeVars = componentThemeVariables("buttonLoader");
     const flexUtils = flexHelper();
     const debug = debugHelper("buttonLoader");
     const root = style({

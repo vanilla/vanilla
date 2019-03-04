@@ -12,10 +12,10 @@ import { layoutVariables } from "@library/styles/layoutStyles";
 import { calc, percent, px } from "csx";
 import memoize from "lodash/memoize";
 
-export const siteNavVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "siteNav");
+export const siteNavVariables = memoize(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const themeVars = componentThemeVariables("siteNav");
 
     const node = {
         fontSize: globalVars.fonts.size.medium,
@@ -49,9 +49,9 @@ export const siteNavVariables = memoize((theme?: object) => {
     return { node, title, nodeToggle, spacer };
 });
 
-export const siteNavClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vars = siteNavVariables(theme);
+export const siteNavClasses = memoize(() => {
+    const globalVars = globalVariables();
+    const vars = siteNavVariables();
     const mediaQueries = layoutVariables().mediaQueries();
 
     const debug = debugHelper("siteNav");
@@ -89,9 +89,9 @@ export const siteNavClasses = memoize((theme?: object) => {
     return { root, title, children };
 });
 
-export const siteNavNodeClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vars = siteNavVariables(theme);
+export const siteNavNodeClasses = memoize(() => {
+    const globalVars = globalVariables();
+    const vars = siteNavVariables();
     const mediaQueries = layoutVariables().mediaQueries();
 
     const debug = debugHelper("siteNavNode");

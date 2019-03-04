@@ -11,11 +11,11 @@ import { calc, percent } from "csx";
 import styleFactory from "@library/styles/styleFactory";
 import memoize from "lodash/memoize";
 
-export const richEditorFlyoutClasses = memoize((theme?: object) => {
-    const vars = richEditorVariables(theme);
+export const richEditorFlyoutClasses = memoize(() => {
+    const vars = richEditorVariables();
     const style = styleFactory("richEditorFlyout");
-    const shadows = shadowHelper(theme);
-    const globalVars = globalVariables(theme);
+    const shadows = shadowHelper();
+    const globalVars = globalVariables();
 
     const root = style({
         ...shadows.dropDown(),

@@ -10,9 +10,9 @@ import styleFactory from "@library/styles/styleFactory";
 import { unit } from "@library/styles/styleHelpers";
 import memoize from "lodash/memoize";
 
-export const paragraphToolbarContainerClasses = memoize((theme?: object) => {
-    const vars = richEditorVariables(theme);
-    const formVars = formElementsVariables(theme);
+export const paragraphToolbarContainerClasses = memoize(() => {
+    const vars = richEditorVariables();
+    const formVars = formElementsVariables();
     const style = styleFactory("paragraphToolbarContainer");
 
     const root = style({

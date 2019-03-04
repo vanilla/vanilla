@@ -11,10 +11,10 @@ import { percent, px } from "csx";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import memoize from "lodash/memoize";
 
-export const dayPickerVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "datePicker");
+export const dayPickerVariables = memoize(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const themeVars = componentThemeVariables("datePicker");
 
     const spacing = {
         padding: 9,
@@ -42,9 +42,9 @@ export const dayPickerVariables = memoize((theme?: object) => {
     return { spacing, sizing, colors, border };
 });
 
-export const dayPickerClasses = memoize((theme?: object) => {
+export const dayPickerClasses = memoize(() => {
     const debug = debugHelper("dayPicker");
-    const vars = dayPickerVariables(theme);
+    const vars = dayPickerVariables();
 
     // From third party, so we're targetting them this way
     const root = style({

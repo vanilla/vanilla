@@ -19,9 +19,9 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 import { calc, px, percent } from "csx";
 import memoize from "lodash/memoize";
 
-export const attachmentIconVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const themeVars = componentThemeVariables(theme, "attachmentIcon");
+export const attachmentIconVariables = memoize(() => {
+    const globalVars = globalVariables();
+    const themeVars = componentThemeVariables("attachmentIcon");
 
     const spacing = {
         default: 12,
@@ -41,10 +41,10 @@ export const attachmentIconVariables = memoize((theme?: object) => {
     return { spacing, shadow, icon };
 });
 
-export const attachmentIconsClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const vars = attachmentIconVariables(theme);
+export const attachmentIconsClasses = memoize(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const vars = attachmentIconVariables();
     const debug = debugHelper("attachmentIcons");
 
     const root = style({
@@ -76,8 +76,8 @@ export const attachmentIconsClasses = memoize((theme?: object) => {
     return { root, items, item };
 });
 
-export const attachmentIconClasses = memoize((theme?: object) => {
-    const vars = attachmentIconVariables(theme);
+export const attachmentIconClasses = memoize(() => {
+    const vars = attachmentIconVariables();
     const debug = debugHelper("attachmentIcon");
 
     const root = style({

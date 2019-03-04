@@ -12,11 +12,11 @@ import { paddings, unit } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
 import memoize from "lodash/memoize";
 
-export const insertMediaClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const mediaQueries = layoutVariables(theme).mediaQueries();
-    const vars = richEditorVariables(theme);
-    const formElementVars = formElementsVariables(theme);
+export const insertMediaClasses = memoize(() => {
+    const globalVars = globalVariables();
+    const mediaQueries = layoutVariables().mediaQueries();
+    const vars = richEditorVariables();
+    const formElementVars = formElementsVariables();
     const style = styleFactory("insertMedia");
 
     const root = style({

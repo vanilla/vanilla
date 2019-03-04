@@ -10,8 +10,8 @@ import { style } from "typestyle";
 import { percent, px } from "csx";
 import memoize from "lodash/memoize";
 
-export const selectBoxClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
+export const selectBoxClasses = memoize(() => {
+    const globalVars = globalVariables();
     const debug = debugHelper("selectBox");
 
     const toggle = style({

@@ -11,8 +11,8 @@ import styleFactory from "@library/styles/styleFactory";
 import memoize from "lodash/memoize";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
-export const insertLinkClasses = memoize((theme?: object) => {
-    const vars = richEditorVariables(theme);
+export const insertLinkClasses = memoize(() => {
+    const vars = richEditorVariables();
     const style = styleFactory("insertLink");
 
     const root = style({

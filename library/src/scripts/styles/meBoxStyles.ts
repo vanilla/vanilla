@@ -13,11 +13,11 @@ import { px } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import memoize from "lodash/memoize";
 
-export const meBoxClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vanillaHeaderVars = vanillaHeaderVariables(theme);
+export const meBoxClasses = memoize(() => {
+    const globalVars = globalVariables();
+    const vanillaHeaderVars = vanillaHeaderVariables();
     const debug = debugHelper("meBox");
-    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
 
     const root = style(

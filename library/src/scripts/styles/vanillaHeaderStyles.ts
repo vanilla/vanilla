@@ -19,11 +19,12 @@ import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import memoize from "lodash/memoize";
+import { getThemeVariables } from "@library/theming/ThemeContext";
 
-export const vanillaHeaderVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "vanillaHeader");
+export const vanillaHeaderVariables = memoize(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const themeVars = componentThemeVariables("vanillaHeader");
 
     const sizing = {
         height: 48,
@@ -154,12 +155,12 @@ export const vanillaHeaderVariables = memoize((theme?: object) => {
     };
 });
 
-export const vanillaHeaderClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vars = vanillaHeaderVariables(theme);
-    const formElementVars = formElementsVariables(theme);
+export const vanillaHeaderClasses = memoize(() => {
+    const globalVars = globalVariables();
+    const vars = vanillaHeaderVariables();
+    const formElementVars = formElementsVariables();
     const headerColors = vars.colors;
-    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
     const debug = debugHelper("vanillaHeader");
 
@@ -602,8 +603,8 @@ export const vanillaHeaderClasses = memoize((theme?: object) => {
     };
 });
 
-export const vanillaHeaderLogoClasses = memoize((theme?: object) => {
-    const vars = vanillaHeaderVariables(theme);
+export const vanillaHeaderLogoClasses = memoize(() => {
+    const vars = vanillaHeaderVariables();
     const logoFrame = style({ display: "inline-flex" });
     const debug = debugHelper("vanillaHeaderLogo");
 
@@ -627,9 +628,9 @@ export const vanillaHeaderLogoClasses = memoize((theme?: object) => {
     return { logoFrame, logo, link };
 });
 
-export const vanillaHeaderHomeClasses = memoize((theme?: object) => {
-    const vars = vanillaHeaderVariables(theme);
-    const globalVars = globalVariables(theme);
+export const vanillaHeaderHomeClasses = memoize(() => {
+    const vars = vanillaHeaderVariables();
+    const globalVars = globalVariables();
     const debug = debugHelper("vanillaHeaderHome");
 
     const root = style({

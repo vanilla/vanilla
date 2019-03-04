@@ -17,10 +17,10 @@ import { percent, px, url } from "csx";
 import { style } from "typestyle";
 import memoize from "lodash/memoize";
 
-export const splashVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
+export const splashVariables = memoize(() => {
+    const globalVars = globalVariables();
     const elementaryColor = globalVars.elementaryColors;
-    const themeVars = componentThemeVariables(theme, "splash");
+    const themeVars = componentThemeVariables("splash");
 
     const fullBackground = {
         bg: globalVars.mainColors.primary,
@@ -51,12 +51,7 @@ export const splashVariables = memoize((theme?: object) => {
         ...themeVars.subComponentStyles("border"),
     };
 
-    const search = searchVariables({
-        button: {
-            type: "transparent",
-        },
-        ...themeVars.subComponentStyles("search"),
-    });
+    const search = searchVariables();
 
     const searchContainer = {
         width: 670,
@@ -65,8 +60,8 @@ export const splashVariables = memoize((theme?: object) => {
     return { fullBackground, title, spacing, border, search, searchContainer };
 });
 
-export const splashStyles = memoize((theme?: object) => {
-    const vars = splashVariables(theme);
+export const splashStyles = memoize(() => {
+    const vars = splashVariables();
     const debug = debugHelper("splash");
 
     const bg = vars.fullBackground.image;

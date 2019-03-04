@@ -10,8 +10,8 @@ import { style } from "typestyle";
 import { percent } from "csx";
 import memoize from "lodash/memoize";
 
-export const dateRangeClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
+export const dateRangeClasses = memoize(() => {
+    const globalVars = globalVariables();
     const debug = debugHelper("dateRange");
 
     const root = style({

@@ -9,8 +9,8 @@ import { style } from "typestyle";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { memoize } from "lodash";
 
-export const dropDownClasses = memoize((theme?: object) => {
-    const layoutVars = layoutVariables(theme);
+export const dropDownClasses = memoize(() => {
+    const layoutVars = layoutVariables();
     const debug = debugHelper("dropDown");
 
     const paddedList = style({

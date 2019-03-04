@@ -13,10 +13,10 @@ import { memoize } from "lodash";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 
 export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolean = false) => {
-    const globalVars = globalVariables(theme);
-    const headerVars = vanillaHeaderVariables(theme);
-    const vars = richEditorVariables(theme);
-    const formElementVars = formElementsVariables(theme);
+    const globalVars = globalVariables();
+    const headerVars = vanillaHeaderVariables();
+    const vars = richEditorVariables();
+    const formElementVars = formElementsVariables();
     const style = styleFactory("richEditorForm");
     const overshoot = legacyMode ? 0 : vars.scrollContainer.overshoot;
 

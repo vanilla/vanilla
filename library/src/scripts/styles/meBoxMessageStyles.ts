@@ -13,8 +13,8 @@ import { absolutePosition } from "@library/styles/styleHelpers";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { memoize } from "lodash";
 
-export const meBoxMessageVariables = memoize((theme?: object) => {
-    const themeVars = componentThemeVariables(theme, "meBoxMessage");
+export const meBoxMessageVariables = memoize(() => {
+    const themeVars = componentThemeVariables("meBoxMessage");
     const spacing = {
         padding: 8,
         ...themeVars.subComponentStyles("spacing"),
@@ -33,10 +33,10 @@ export const meBoxMessageVariables = memoize((theme?: object) => {
     return { spacing, imageContainer, unreadDot };
 });
 
-export const meBoxMessageClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vars = meBoxMessageVariables(theme);
-    const headerVars = vanillaHeaderVariables(theme);
+export const meBoxMessageClasses = memoize(() => {
+    const globalVars = globalVariables();
+    const vars = meBoxMessageVariables();
+    const headerVars = vanillaHeaderVariables();
     const debug = debugHelper("meBoxMessage");
 
     const root = style({

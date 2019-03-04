@@ -11,9 +11,9 @@ import styleFactory from "@library/styles/styleFactory";
 import { em, viewHeight } from "csx";
 import memoize from "lodash/memoize";
 
-export const insertEmojiClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vars = richEditorVariables(theme);
+export const insertEmojiClasses = memoize(() => {
+    const globalVars = globalVariables();
+    const vars = richEditorVariables();
     const style = styleFactory("insertEmoji");
 
     const root = style({

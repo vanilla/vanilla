@@ -9,7 +9,7 @@ import { style } from "typestyle";
 import { percent } from "csx";
 import memoize from "lodash/memoize";
 
-export const smartAlignClasses = memoize((theme?: object) => {
+export const smartAlignClasses = memoize(() => {
     const debug = debugHelper("smartAlign");
 
     const root = style({

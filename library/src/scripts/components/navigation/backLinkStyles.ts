@@ -12,9 +12,9 @@ import { layoutVariables } from "@library/styles/layoutStyles";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import memoize from "lodash/memoize";
 
-const backLinkClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const mediaQueries = layoutVariables(theme).mediaQueries();
+const backLinkClasses = memoize(() => {
+    const globalVars = globalVariables();
+    const mediaQueries = layoutVariables().mediaQueries();
     const debug = debugHelper("backLink");
     const headerVars = vanillaHeaderVariables();
 

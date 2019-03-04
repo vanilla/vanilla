@@ -8,8 +8,8 @@ import memoize from "lodash/memoize";
  * @license GPL-2.0-only
  */
 
-export const userPhotoVariables = memoize((theme?: object) => {
-    const themeVars = componentThemeVariables(theme, "userPhoto");
+export const userPhotoVariables = memoize(() => {
+    const themeVars = componentThemeVariables("userPhoto");
 
     const border = {
         radius: "50%",
@@ -26,8 +26,8 @@ export const userPhotoVariables = memoize((theme?: object) => {
     return { border, sizing };
 });
 
-export const userPhotoClasses = memoize((theme?: object) => {
-    const vars = userPhotoVariables(theme);
+export const userPhotoClasses = memoize(() => {
+    const vars = userPhotoVariables();
     const debug = debugHelper("userPhoto");
 
     const root = style({

@@ -12,8 +12,8 @@ import { debugHelper } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import memoize from "lodash/memoize";
 
-export const mobileDropDownVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
+export const mobileDropDownVariables = memoize(() => {
+    const globalVars = globalVariables();
     const vanillaHeaderVars = vanillaHeaderVariables();
     const mixBgAndFg = globalVars.mixBgAndFg;
 

@@ -9,8 +9,8 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { TLength } from "typestyle/lib/types";
 import memoize from "lodash/memoize";
 
-export const shadowHelper = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
+export const shadowHelper = memoize(() => {
+    const globalVars = globalVariables();
 
     const embed = (baseColor: ColorHelper = globalVars.mainColors.fg) => {
         return {

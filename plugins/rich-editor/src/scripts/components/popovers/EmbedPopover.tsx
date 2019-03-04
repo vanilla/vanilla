@@ -140,6 +140,7 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                             title={title}
                             body={body}
                             footer={footer}
+                            footerClass={classesInsertMedia.footer}
                             additionalClassRoot="insertMedia"
                             onCloseClick={closeMenuHandler}
                             isVisible={isVisible}

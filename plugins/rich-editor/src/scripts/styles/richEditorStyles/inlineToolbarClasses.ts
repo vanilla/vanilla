@@ -37,6 +37,7 @@ export const inlineToolbarClasses = memoize((theme?: object, legacyMode: boolean
                     ".richEditor-nub": {
                         transform: `translateY(50%) rotate(-45deg)`,
                         marginTop: unit(offsetForNub),
+                        boxShadow: "none",
                     },
                 },
             },

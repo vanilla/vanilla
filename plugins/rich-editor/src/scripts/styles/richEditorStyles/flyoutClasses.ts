@@ -58,7 +58,7 @@ export const richEditorFlyoutClasses = memoize((theme?: object) => {
         paddingRight: unit(vars.flyout.padding.right),
     });
 
-    const footer = style("head", {
+    const footer = style("footer", {
         ...paddings({
             top: unit(vars.flyout.padding.top),
             right: unit(vars.flyout.padding.right),

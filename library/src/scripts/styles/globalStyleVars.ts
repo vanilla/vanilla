@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { componentThemeVariables, getColorDependantOnLightness } from "@library/styles/styleHelpers";
+import { componentThemeVariables, getColorDependantOnLightness, toStringColor } from "@library/styles/styleHelpers";
 import { color, ColorHelper, percent } from "csx";
 import memoize from "lodash/memoize";
 
@@ -225,11 +225,11 @@ export const globalVariables = memoize((theme?: object) => {
         },
     };
 
-    const overlayBg = getColorDependantOnLightness(mainColors.bg, mainColors.fg, 0.2);
+    const overlayBg = getColorDependantOnLightness(mainColors.fg, mainColors.fg, 0.5, true);
     const overlay = {
-        dropShadow: `0 5px 10px ${overlayBg}`,
+        dropShadow: `2px -2px 5px ${toStringColor(overlayBg.fade(0.3))}`,
         border: {
-            color: mixBgAndFg(0.15),
+            color: mixBgAndFg(0.1),
             radius: border.radius,
         },
         fullPageHeadingSpacer: 32,

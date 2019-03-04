@@ -17,6 +17,7 @@ export const insertLinkClasses = memoize((theme?: object) => {
     const style = styleFactory("insertLink");
 
     const root = style({
+        position: "relative",
         display: "flex",
         flexWrap: "nowrap",
         alignItems: "center",
@@ -26,6 +27,7 @@ export const insertLinkClasses = memoize((theme?: object) => {
     });
 
     const input = style("input", {
+        zIndex: 2,
         $nest: {
             "&, &.InputBox": {
                 border: important("0"),

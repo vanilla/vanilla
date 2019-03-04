@@ -37,14 +37,15 @@ export const insertMediaClasses = memoize((theme?: object) => {
 
     const insert = style("insert", {
         width: "auto",
+        position: "relative",
     });
 
     const footer = style("footer", {
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-end",
-        ...paddings(vars.flyout.padding),
+        padding: 0,
     });
 
-    return { root, help, insert };
+    return { root, help, insert, footer };
 });

@@ -37,7 +37,9 @@ interface IProps extends IWithEditorProps {
     renderAbove?: boolean;
     renderLeft?: boolean;
     legacyMode: boolean;
+    headerClass?: string;
     bodyClass?: string;
+    footerClass?: string;
 }
 
 export class Popover extends React.Component<IProps, IState> {
@@ -62,7 +64,7 @@ export class Popover extends React.Component<IProps, IState> {
 
         classes += this.props.className ? ` ${this.props.className}` : "";
 
-        const headerClasses = classNames("richEditorFlyout-header", classesFlyout.header, {
+        const headerClasses = classNames("richEditorFlyout-header", classesFlyout.header, this.props.headerClass, {
             [additionalClassRoot + "-header"]: !!additionalClassRoot,
         });
 
@@ -70,7 +72,7 @@ export class Popover extends React.Component<IProps, IState> {
             [additionalClassRoot + "-body"]: !!additionalClassRoot,
         });
 
-        const footerClasses = classNames("richEditorFlyout-footer", classesFlyout.footer, {
+        const footerClasses = classNames("richEditorFlyout-footer", classesFlyout.footer, this.props.footerClass, {
             [additionalClassRoot + "-footer"]: !!additionalClassRoot,
         });
 

@@ -214,6 +214,16 @@ export const componentThemeVariables = (componentName: string) => {
     };
 };
 
+export function variableFactory(componentName: string) {
+    const themeVars = getThemeVariables();
+    const componentVars = (themeVars && themeVars[componentName]) || {};
+
+    return function makeThemeVars<T extends object>(subElementName: string, declaredVars: T): T {
+        const subcomponentVars = (componentVars && componentVars[subElementName]) || {};
+        return { declaredVars, ...subcomponentVars };
+    };
+}
+
 export const inheritHeightClass = () => {
     const style = styleFactory("inheritHeight");
     return style({

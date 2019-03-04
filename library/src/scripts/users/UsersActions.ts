@@ -28,7 +28,7 @@ export default class UsersActions extends ReduxActions {
     );
 
     public getMe = async () => {
-        const currentUser = this.getState<ICoreStoreState>().users.current;
+        const currentUser = this.getState().users.current;
         if (currentUser.status === LoadStatus.LOADING) {
             // Don't request the user more than once.
             return;

@@ -1,169 +1,170 @@
-(function($, window, document, undefined) {
-    "use strict";
+;(function ($, window, document, undefined) {
+  'use strict';
+
+  /**
+   * Lithe Core JS library
+   *
+   * The {Lithe} object contains properties and functions required by the rest
+   * of the Lithe Components.
+   *
+   * @author Kasper Isager <kasper@vanillaforums.com>
+   */
+  window.Lithe = window.Lithe || {
+    /**
+     * Classes for use with toggleable Components.
+     *
+     * Can be overridden anywhere at any time:
+     *     Lithe.openClass = 'foo';
+     */
+    openClass   : 'is-open',
+    closedClass : 'is-closed',
+    activeClass : 'active',
+    lastOpen    : $('is-open'),
 
     /**
-     * Lithe Core JS library
+     * Clear Lithe Components
      *
-     * The {Lithe} object contains properties and functions required by the rest
-     * of the Lithe Components.
-     *
-     * @author Kasper Isager <kasper@vanillaforums.com>
+     * @this {Lithe}
      */
-    window.Lithe = window.Lithe || {
-        /**
-         * Classes for use with toggleable Components.
-         *
-         * Can be overridden anywhere at any time:
-         *     Lithe.openClass = 'foo';
-         */
-        openClass: "is-open",
-        closedClass: "is-closed",
-        activeClass: "active",
-        lastOpen: $("is-open"),
+    clear: function () {
+      // If a component was opened earlier, close it
+      if (Lithe.lastOpen !== undefined) {
+        Lithe.close(Lithe.lastOpen, Lithe.lastToggle);
+      }
+    },
 
-        /**
-         * Clear Lithe Components
-         *
-         * @this {Lithe}
-         */
-        clear: function() {
-            // If a component was opened earlier, close it
-            if (Lithe.lastOpen !== undefined) {
-                Lithe.close(Lithe.lastOpen, Lithe.lastToggle);
-            }
-        },
+    /**
+     * Show ("Open") a Lithe component
+     *
+     * @this  {Lithe}
+     * @param $el
+     * @param $toggle
+     */
+    open: function ($el, $toggle, callback) {
+      var self = this;
 
-        /**
-         * Show ("Open") a Lithe component
-         *
-         * @this  {Lithe}
-         * @param $el
-         * @param $toggle
-         */
-        open: function($el, $toggle, callback) {
-            var self = this;
+      // If a component was opened earlier, close it
+      self.clear();
 
-            // If a component was opened earlier, close it
-            self.clear();
+      self.lastOpen = $el;
+      self.lastToggle = $toggle || undefined;
 
-            self.lastOpen = $el;
-            self.lastToggle = $toggle || undefined;
+      $el.addClass(self.openClass).removeClass(self.closedClass);
 
-            $el.addClass(self.openClass).removeClass(self.closedClass);
+      if ($toggle !== undefined) Lithe.activate($toggle);
 
-            if ($toggle !== undefined) Lithe.activate($toggle);
+      if (callback) {
+        callback();
+      }
+      // Was a callback specified at an earlier instance? If so, execute it
+      else if (self.lastOpen.data('openCallback')) {
+        self.lastOpen.data('openCallback')();
+      }
 
-            if (callback) {
-                callback();
-            }
-            // Was a callback specified at an earlier instance? If so, execute it
-            else if (self.lastOpen.data("openCallback")) {
-                self.lastOpen.data("openCallback")();
-            }
+      // Clear any callback that might be stored
+      self.lastOpen.data('openCallback', undefined);
+    },
 
-            // Clear any callback that might be stored
-            self.lastOpen.data("openCallback", undefined);
-        },
+    /**
+     * Hide ("Close") a Lithe component
+     *
+     * @param $el
+     * @param $toggle
+     */
+    close: function ($el, $toggle, callback) {
+      var self = this;
 
-        /**
-         * Hide ("Close") a Lithe component
-         *
-         * @param $el
-         * @param $toggle
-         */
-        close: function($el, $toggle, callback) {
-            var self = this;
+      $el.addClass(self.closedClass).removeClass(self.openClass);
 
-            $el.addClass(self.closedClass).removeClass(self.openClass);
+      if ($toggle !== undefined) Lithe.deactivate($toggle);
 
-            if ($toggle !== undefined) Lithe.deactivate($toggle);
+      if (callback) {
+        callback();
+      }
+      // Was a callback specified at an earlier instance? If so, execute it
+      else if (self.lastOpen.data('closeCallback')) {
+        self.lastOpen.data('closeCallback')();
+      }
 
-            if (callback) {
-                callback();
-            }
-            // Was a callback specified at an earlier instance? If so, execute it
-            else if (self.lastOpen.data("closeCallback")) {
-                self.lastOpen.data("closeCallback")();
-            }
+      // Clear any callback that might be stored
+      self.lastOpen.data('closeCallback', undefined);
+    },
 
-            // Clear any callback that might be stored
-            self.lastOpen.data("closeCallback", undefined);
-        },
+    /**
+     * Activate a Lithe component
+     *
+     * @param $el
+     */
+    activate: function ($el) {
+      $el.addClass(this.activeClass);
+    },
 
-        /**
-         * Activate a Lithe component
-         *
-         * @param $el
-         */
-        activate: function($el) {
-            $el.addClass(this.activeClass);
-        },
+    /**
+     * Deactivate a Lithe component
+     *
+     * @param $el
+     */
+    deactivate: function ($el) {
+      $el.removeClass(this.activeClass);
+    },
 
-        /**
-         * Deactivate a Lithe component
-         *
-         * @param $el
-         */
-        deactivate: function($el) {
-            $el.removeClass(this.activeClass);
-        },
+    /**
+     * Toggle a Lithe component
+     *
+     * @param {Object}   $el
+     * @param {Object}   $toggle
+     * @param {Function} open
+     * @param {Function} close
+     */
+    toggle: function ($el, $toggle, open, close) {
+      var self = this;
 
-        /**
-         * Toggle a Lithe component
-         *
-         * @param {Object}   $el
-         * @param {Object}   $toggle
-         * @param {Function} open
-         * @param {Function} close
-         */
-        toggle: function($el, $toggle, open, close) {
-            var self = this;
+      // If no element exists, don't go any further
+      if (!$el.length) return;
 
-            // If no element exists, don't go any further
-            if (!$el.length) return;
+      if ($el.hasClass(self.openClass)) {
+        self.close($el, $toggle, close);
+      } else {
+        self.open($el, $toggle, open);
+      }
 
-            if ($el.hasClass(self.openClass)) {
-                self.close($el, $toggle, close);
-            } else {
-                self.open($el, $toggle, open);
-            }
+      // Store callbacks so we can use them later.
+      self.lastOpen.data('closeCallback', close);
+      self.lastOpen.data('openCallback', open);
+    }
+  };
 
-            // Store callbacks so we can use them later.
-            self.lastOpen.data("closeCallback", close);
-            self.lastOpen.data("openCallback", open);
-        },
-    };
+  // Clear Components on document click
+  $(document).on('click', Lithe.clear);
 
-    // Clear Components on document click
-    $(document).on("click", Lithe.clear);
-})(jQuery, window, document);
+}(jQuery, window, document));
 
 /**
  * Drawer component for the Lithe mobile theme
  *
  * @author  Kasper Isager <kasper@vanillaforums.com>
  */
-(function($, window, document, undefined) {
-    "use strict";
+;(function ($, window, document, undefined) {
+    'use strict';
 
     /**
      * @param   element The context in which the component was called
      * @param   options Options passed along when initializing the plugin
      * @constructor
      */
-    Lithe.Drawer = function(element, options) {
+    Lithe.Drawer = function (element, options) {
         var self = this;
 
         self.element = element;
 
         self.options = {
-            toggle: undefined, // Button, link or other element to toggle the drawer
-            container: undefined, // The container to attach the classes to
-            content: undefined, // The content, collapses the drawer when clicked
-            classes: {
-                show: "drawer-show",
-                hide: "drawer-hide",
-            },
+            toggle      : undefined, // Button, link or other element to toggle the drawer
+            container   : undefined, // The container to attach the classes to
+            content     : undefined, // The content, collapses the drawer when clicked
+            classes     : {
+                show: 'drawer-show',
+                hide: 'drawer-hide'
+            }
         };
 
         if (options) {
@@ -179,12 +180,12 @@
          *
          * @private
          */
-        _destroy: function() {
+        _destroy: function () {
             var self = this;
 
             self._disable();
 
-            jQuery(self.element).removeData("litheDrawer");
+            jQuery(self.element).removeData('litheDrawer');
         },
 
         /**
@@ -195,15 +196,15 @@
          * @param   value   The value we wish to assign to it
          * @returns {*}
          */
-        option: function(key, value) {
+        option: function (key, value) {
             var self, options;
 
-            self = this;
+            self    = this;
             options = self.options;
 
             self._disable();
 
-            if (key && value === "undefined") {
+            if (key && value === 'undefined') {
                 return options[key];
             }
 
@@ -224,18 +225,18 @@
          * @this {Drawer}
          * @private
          */
-        _enable: function() {
+        _enable: function () {
             var self, options;
 
             self = this;
             options = self.options;
 
             jQuery(document)
-                .on("click", options.toggle, function(e) {
+                .on('click', options.toggle, function (e) {
                     e.preventDefault();
                     self.toggle();
                 })
-                .on("click", "." + options.classes.show + " " + options.content, function(e) {
+                .on('click', '.' + options.classes.show + ' ' + options.content, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     self.hide();
@@ -248,15 +249,15 @@
          * @this {Drawer}
          * @private
          */
-        _disable: function() {
+        _disable: function () {
             var self, options;
 
             self = this;
             options = self.options;
 
             jQuery(document)
-                .off("click", options.toggle)
-                .off("click", options.content);
+                .off('click', options.toggle)
+                .off('click', options.content);
         },
 
         /**
@@ -264,7 +265,7 @@
          *
          * @this {Drawer}
          */
-        show: function() {
+        show: function () {
             var self, options;
 
             self = this;
@@ -272,7 +273,7 @@
 
             jQuery(options.container).addClass(options.classes.show);
             jQuery(options.container).removeClass(options.classes.hide);
-            jQuery(self.element).trigger("drawer.show");
+            jQuery(self.element).trigger('drawer.show');
         },
 
         /**
@@ -280,7 +281,7 @@
          *
          * @this {Drawer}
          */
-        hide: function() {
+        hide: function () {
             var self, options;
 
             self = this;
@@ -288,7 +289,7 @@
 
             jQuery(options.container).addClass(options.classes.hide);
             jQuery(options.container).removeClass(options.classes.show);
-            jQuery(self.element).trigger("drawer.hide");
+            jQuery(self.element).trigger('drawer.hide');
         },
 
         /**
@@ -296,7 +297,7 @@
          *
          * @this {Drawer}
          */
-        toggle: function() {
+        toggle: function () {
             var self, options;
 
             self = this;
@@ -307,16 +308,17 @@
             } else {
                 self.show();
             }
-        },
+        }
     };
 
-    $.fn.drawer = function(options) {
-        return this.each(function() {
-            if ($.data(this, "drawer") === undefined) {
-                $.data(this, "drawer", new Lithe.Drawer(this, options));
+    $.fn.drawer = function (options) {
+        return this.each(function () {
+            if ($.data(this, 'drawer') === undefined) {
+                $.data(this, 'drawer', new Lithe.Drawer(this, options));
             }
         });
-    };
+    }
+
 })(jQuery, window, document);
 
 /**
@@ -327,6 +329,7 @@
  *
  */
 var DashboardModal = (function() {
+
     /**
      * The settings we can configure when starting the DashboardModal.
      *
@@ -354,23 +357,23 @@ var DashboardModal = (function() {
      * @constructor
      */
     var DashboardModal = function($trigger, settings) {
-        this.id = Math.random()
-            .toString(36)
-            .substr(2, 9);
+        this.id = Math.random().toString(36).substr(2, 9);
         this.setupTrigger($trigger);
         this.addModalToDom();
 
         this.settings = {};
-        this.defaultContent.closeIcon = dashboardSymbol("close");
+        this.defaultContent.closeIcon = dashboardSymbol('close');
         $.extend(true, this.settings, this.defaultSettings, settings, $trigger.data());
 
         this.trigger = $trigger;
-        this.target = $trigger.attr("href");
+        this.target = $trigger.attr('href');
         this.addEventListeners();
         this.start();
     };
 
+
     DashboardModal.prototype = {
+
         /**
          * The current active modal in the page.
          */
@@ -380,36 +383,36 @@ var DashboardModal = (function() {
          * The default settings.
          */
         defaultSettings: {
-            httpmethod: "get",
+            httpmethod: 'get',
             afterSuccess: function(json, sender) {},
             reloadPageOnSave: true,
-            modalType: "regular",
+            modalType: 'regular'
         },
 
         /**
          * The generated id for the modal.
          */
-        id: "",
+        id: '',
 
         /**
          * The default content for the modal.
          */
         defaultContent: {
-            cssClass: "",
-            title: "",
-            footer: "",
-            body: "",
-            closeIcon: "",
+            cssClass: '',
+            title: '',
+            footer: '',
+            body: '',
+            closeIcon: '',
             form: {
-                open: "",
-                close: "",
-            },
+                open: '',
+                close: ''
+            }
         },
 
         /**
          * The url to fetch the modal content from.
          */
-        target: "",
+        target: '',
 
         /**
          * The jQuery trigger object that is clicked to activate the modal.
@@ -419,8 +422,7 @@ var DashboardModal = (function() {
         /**
          * The default modal template for all modals.
          */
-        modalHtml:
-            ' \
+        modalHtml: ' \
         <div class="modal-dialog {cssClass}" role="document"> \
             <div class="modal-content"> \
                 <div class="modal-header js-modal-fixed"> \
@@ -439,8 +441,7 @@ var DashboardModal = (function() {
         /**
          * A modal with no separate header and footer.
          */
-        modalHtmlNoHeader:
-            ' \
+        modalHtmlNoHeader: ' \
         <div class="modal-dialog modal-no-header {cssClass}" role="document"> \
             <h4 id="modalTitle" class="modal-title hidden">{title}</h4> \
             <div class="modal-content"> \
@@ -454,17 +455,14 @@ var DashboardModal = (function() {
         /**
          * The modal shell that we add to the DOM on initialization. Content eventually is added to the modal.
          */
-        modalShell:
-            '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="false" aria-labelledby="modalTitle"></div>',
+        modalShell: '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="false" aria-labelledby="modalTitle"></div>',
 
         /**
          * Shows, gives focus to, and renders the modal.
          */
         start: function() {
-            $("#" + this.id)
-                .modal("show")
-                .focus();
-            if (this.settings.modalType === "confirm") {
+            $('#' + this.id).modal('show').focus();
+            if (this.settings.modalType === 'confirm') {
                 this.renderConfirmModal();
             } else {
                 this.renderModal();
@@ -475,15 +473,15 @@ var DashboardModal = (function() {
          * Adds the modal to the DOM.
          */
         addModalToDom: function() {
-            $("body").append(this.modalShell.replace("{id}", this.id));
+            $('body').append(this.modalShell.replace('{id}', this.id));
         },
 
         /**
          * Adds the needed data attributes to the modal trigger.
          */
         setupTrigger: function($trigger) {
-            $trigger.attr("data-target", "#" + this.id);
-            $trigger.attr("data-modal-id", this.id);
+            $trigger.attr('data-target', '#' + this.id);
+            $trigger.attr('data-modal-id', this.id);
         },
 
         /**
@@ -491,17 +489,17 @@ var DashboardModal = (function() {
          */
         addEventListeners: function() {
             var self = this;
-            $("#" + self.id).on("shown.bs.modal", function() {
-                self.handleForm($("#" + self.id));
+            $('#' + self.id).on('shown.bs.modal', function() {
+                self.handleForm($('#' + self.id));
             });
-            $("#" + self.id).on("hidden.bs.modal", function() {
+            $('#' + self.id).on('hidden.bs.modal', function() {
                 $(this).remove();
             });
-            $("#" + self.id).on("click", ".js-ok", function() {
+            $('#' + self.id).on('click', '.js-ok', function() {
                 self.handleConfirm(this);
             });
-            $("#" + self.id).on("click", ".js-cancel", function() {
-                $("#" + self.id).modal("hide");
+            $('#' + self.id).on('click', '.js-cancel', function() {
+                $('#' + self.id).modal('hide');
             });
         },
 
@@ -509,19 +507,19 @@ var DashboardModal = (function() {
          * Gets the default content for a confirm modal.
          */
         getDefaultConfirmContent: function() {
-            var confirmHeading = gdn.definition("ConfirmHeading", "Confirm");
-            var confirmText = gdn.definition("ConfirmText", "Are you sure you want to do that?");
-            var ok = gdn.definition("Okay", "Okay");
-            var cancel = gdn.definition("Cancel", "Cancel");
+            var confirmHeading = gdn.definition('ConfirmHeading', 'Confirm');
+            var confirmText = gdn.definition('ConfirmText', 'Are you sure you want to do that?');
+            var ok = gdn.definition('Okay', 'Okay');
+            var cancel = gdn.definition('Cancel', 'Cancel');
 
-            var footer = '<button class="btn btn-secondary btn-cancel js-cancel">' + cancel + "</button>";
-            footer += '<button class="btn btn-primary btn-ok js-ok">' + ok + "</button>";
+            var footer = '<button class="btn btn-secondary btn-cancel js-cancel">' + cancel + '</button>';
+            footer += '<button class="btn btn-primary btn-ok js-ok">' + ok + '</button>';
 
             return {
                 title: confirmHeading,
                 footer: footer,
                 body: confirmText,
-                cssClass: "modal-sm modal-confirm",
+                cssClass: 'modal-sm modal-confirm'
             };
         },
 
@@ -530,7 +528,7 @@ var DashboardModal = (function() {
          */
         renderConfirmModal: function() {
             var self = this;
-            $("#" + self.id).htmlTrigger(self.addContentToTemplate(self.getDefaultConfirmContent()));
+            $('#' + self.id).htmlTrigger(self.addContentToTemplate(self.getDefaultConfirmContent()));
         },
 
         /**
@@ -539,24 +537,24 @@ var DashboardModal = (function() {
         renderModal: function() {
             var self = this;
             var ajaxData = {
-                DeliveryType: "VIEW",
-                DeliveryMethod: "JSON",
+                'DeliveryType' : 'VIEW',
+                'DeliveryMethod' : 'JSON'
             };
 
             $.ajax({
-                method: "GET",
+                method: 'GET',
                 url: self.target,
                 data: ajaxData,
-                dataType: "json",
+                dataType: 'json',
                 error: function(xhr) {
                     gdn.informError(xhr);
-                    $("#" + self.id).modal("hide");
+                    $('#' + self.id).modal('hide');
                 },
                 success: function(json) {
                     var body = json.Data;
                     var content = self.parseBody(body);
-                    $("#" + self.id).htmlTrigger(self.addContentToTemplate(content));
-                },
+                    $('#' + self.id).htmlTrigger(self.addContentToTemplate(content));
+                }
             });
         },
 
@@ -564,6 +562,7 @@ var DashboardModal = (function() {
          * Replaces curly-braced variables in the templates with the parsedContent.
          */
         addContentToTemplate: function(parsedContent) {
+
             // Copy the defaults into the content array
             var content = {};
             $.extend(true, content, this.defaultContent);
@@ -572,24 +571,25 @@ var DashboardModal = (function() {
             $.extend(true, parsedContent, this.settings);
             $.extend(true, content, parsedContent);
 
-            var html = "";
+            var html = '';
 
-            if (this.settings.modalType === "noheader") {
+            if (this.settings.modalType === 'noheader') {
                 html = this.modalHtmlNoHeader;
             } else {
                 html = this.modalHtml;
             }
 
-            html = html.replace("{body}", content.body);
-            html = html.replace("{cssClass}", content.cssClass);
-            html = html.replace("{title}", content.title);
-            html = html.replace("{closeIcon}", content.closeIcon);
-            html = html.replace("{footer}", content.footer);
-            html = html.replace("{form.open}", content.form.open);
-            html = html.replace("{form.close}", content.form.close);
+            html = html.replace('{body}', content.body);
+            html = html.replace('{cssClass}', content.cssClass);
+            html = html.replace('{title}', content.title);
+            html = html.replace('{closeIcon}', content.closeIcon);
+            html = html.replace('{footer}', content.footer);
+            html = html.replace('{form.open}', content.form.open);
+            html = html.replace('{form.close}', content.form.close);
 
             return html;
         },
+
 
         /**
          * Parses a page to find the title, footer, form and body elements.
@@ -601,20 +601,20 @@ var DashboardModal = (function() {
          * `.form-footer` or `.js-modal-footer` element, if one exists on the page.
          */
         parseBody: function(body) {
-            var title = "";
-            var footer = "";
-            var formTag = "";
-            var formCloseTag = "";
-            var $elem = $("<div />").append($($.parseHTML(body + ""))); // Typecast html to a string and create a DOM node
-            var $title = $elem.find("h1");
-            var $footer = $elem.find(".Buttons, .form-footer, .js-modal-footer");
-            var $form = $elem.find("form");
+            var title = '';
+            var footer = '';
+            var formTag = '';
+            var formCloseTag = '';
+            var $elem = $('<div />').append($($.parseHTML(body + ''))); // Typecast html to a string and create a DOM node
+            var $title = $elem.find('h1');
+            var $footer = $elem.find('.Buttons, .form-footer, .js-modal-footer');
+            var $form = $elem.find('form');
 
             // Pull out the H1 block from the view to add to the modal title
-            if (this.settings.modalType !== "noheader" && $title.length !== 0) {
+            if (this.settings.modalType !== 'noheader' && $title.length !== 0) {
                 title = $title.html();
-                if ($elem.find(".header-block").length !== 0) {
-                    $elem.find(".header-block").remove();
+                if ($elem.find('.header-block').length !== 0) {
+                    $elem.find('.header-block').remove();
                 } else {
                     $title.remove();
                 }
@@ -630,11 +630,11 @@ var DashboardModal = (function() {
 
             // Pull out the form opening and closing tags to wrap around the modal-content and modal-footer
             if ($form.length !== 0) {
-                formCloseTag = "</form>";
-                var formHtml = $form.prop("outerHTML");
-                formTag = formHtml.split(">")[0] += ">";
-                body = body.replace(formTag, "");
-                body = body.replace("</form>", "");
+                formCloseTag = '</form>';
+                var formHtml = $form.prop('outerHTML');
+                formTag = formHtml.split('>')[0] += '>';
+                body = body.replace(formTag, '');
+                body = body.replace('</form>', '');
             }
 
             return {
@@ -643,8 +643,8 @@ var DashboardModal = (function() {
                 body: body,
                 form: {
                     open: formTag,
-                    close: formCloseTag,
-                },
+                    close: formCloseTag
+                }
             };
         },
 
@@ -654,12 +654,12 @@ var DashboardModal = (function() {
         handleForm: function(element) {
             var self = this;
 
-            $("form", element).ajaxForm({
+            $('form', element).ajaxForm({
                 data: {
-                    DeliveryType: "VIEW",
-                    DeliveryMethod: "JSON",
+                    'DeliveryType': 'VIEW',
+                    'DeliveryMethod': 'JSON'
                 },
-                dataType: "json",
+                dataType: 'json',
                 success: function(json, sender) {
                     self.settings.afterSuccess(json, sender);
                     gdn.inform(json);
@@ -670,14 +670,14 @@ var DashboardModal = (function() {
                     } else {
                         var body = json.Data;
                         var content = self.parseBody(body);
-                        $("#" + self.id + " .modal-body").htmlTrigger(content.body);
-                        $("#" + self.id + " .modal-body").scrollTop(0);
+                        $('#' + self.id + ' .modal-body').htmlTrigger(content.body);
+                        $('#' + self.id + ' .modal-body').scrollTop(0);
                     }
                 },
                 error: function(xhr) {
                     gdn.informError(xhr);
-                    $("#" + self.id).modal("hide");
-                },
+                    $('#' + self.id).modal('hide');
+                }
             });
         },
 
@@ -692,26 +692,26 @@ var DashboardModal = (function() {
                 document.location.replace(self.target);
             } else {
                 // request the target via ajax
-                var ajaxData = { DeliveryType: "VIEW", DeliveryMethod: "JSON" };
-                if (self.settings.httpmethod === "post") {
-                    ajaxData.TransientKey = gdn.definition("TransientKey");
+                var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
+                if (self.settings.httpmethod === 'post') {
+                    ajaxData.TransientKey = gdn.definition('TransientKey');
                 }
 
                 $.ajax({
-                    method: self.settings.httpmethod === "post" ? "POST" : "GET",
+                    method: (self.settings.httpmethod === 'post') ? 'POST' : 'GET',
                     url: self.target,
                     data: ajaxData,
-                    dataType: "json",
+                    dataType: 'json',
                     error: function(xhr) {
                         gdn.informError(xhr);
-                        $("#" + self.id).modal("hide");
+                        $('#' + self.id).modal('hide');
                     },
                     success: function(json, sender) {
                         self.settings.afterSuccess(json, sender);
                         gdn.inform(json);
                         gdn.processTargets(json.Targets);
                         self.handleSuccess(json);
-                    },
+                    }
                 });
             }
         },
@@ -728,32 +728,30 @@ var DashboardModal = (function() {
                     document.location.replace(json.RedirectTo);
                 }, 300);
             } else {
-                $("#" + this.id).modal("hide");
+                $('#' + this.id).modal('hide');
 
                 // We'll only reload if there are no targets set. If there are targets set, we can
                 // assume that the page doesn't need to be reloaded, since we'll ajax remove/edit
                 // the page.
-                if (this.settings.reloadPageOnSave && json.Targets.length === 0) {
+                if (this.settings.reloadPageOnSave && (json.Targets.length === 0)) {
                     document.location.replace(window.location.href);
                 }
             }
-        },
+        }
     };
 
     return DashboardModal;
+
 })();
 
-$(document).on("contentLoad", function(e) {
+$(document).on('contentLoad', function(e) {
     // Reveals spoiler
-    $(e.target).on("click", ".spoiler-trigger", function(e) {
+    $(e.target).on('click', '.spoiler-trigger', function(e) {
         e.stopPropagation();
         e.preventDefault();
-        $(this)
-            .closest(".spoiler")
-            .addClass("spoiler-visible")
-            .find(".form-control")
-            .focus()
-            .select(); // Select text field if it's text
+        $(this).closest('.spoiler')
+            .addClass('spoiler-visible')
+            .find('.form-control').focus().select(); // Select text field if it's text
     });
 });
 
@@ -765,9 +763,10 @@ $(document).on("contentLoad", function(e) {
  * @license   MIT
  */
 
-("use strict");
+'use strict';
 
 (function($) {
+
     /**
      * This uses the ace vendor component to wire up our code editors. We currently use the code editor
      * in the Custom CSS plugin and in the Pockets plugin.
@@ -777,7 +776,7 @@ $(document).on("contentLoad", function(e) {
     var codeInput = {
         // Replaces any textarea with the 'js-code-input' class with an code editor.
         start: function(element) {
-            $(".js-code-input", element).each(function() {
+            $('.js-code-input', element).each(function () {
                 codeInput.makeAceTextArea($(this));
             });
         },
@@ -787,39 +786,39 @@ $(document).on("contentLoad", function(e) {
             if (!$textarea.length) {
                 return;
             }
-            $textarea.addClass("js-code-input");
-            $textarea.data("code-input", { mode: mode, height: height });
+            $textarea.addClass('js-code-input');
+            $textarea.data('code-input', {'mode': mode, 'height': height});
         },
 
-        makeAceTextArea: function($textarea) {
-            var mode = $textarea.data("code-input").mode;
-            var height = $textarea.data("code-input").height;
-            var modes = ["html", "css"];
+        makeAceTextArea: function ($textarea) {
+            var mode = $textarea.data('code-input').mode;
+            var height = $textarea.data('code-input').height;
+            var modes = ['html', 'css'];
 
             if (modes.indexOf(mode) === -1) {
-                mode = "html";
+                mode = 'html';
             }
             if (!height) {
                 height = 400;
             }
 
             // Add the ace input before the actual textarea and hide the textarea.
-            var formID = $textarea.attr("id");
+            var formID = $textarea.attr('id');
             $textarea.before('<div id="editor-' + formID + '" style="height: ' + height + 'px;"></div>');
             $textarea.hide();
 
-            var editor = ace.edit("editor-" + formID);
+            var editor = ace.edit('editor-' + formID);
             editor.$blockScrolling = Infinity;
-            editor.getSession().setMode("ace/mode/" + mode);
+            editor.getSession().setMode('ace/mode/' + mode);
             editor.getSession().setUseWorker(false);
-            editor.setTheme("ace/theme/clouds");
+            editor.setTheme('ace/theme/clouds');
 
             // Set the textarea value on the ace input and update the textarea when the ace input is updated.
             editor.getSession().setValue($textarea.val());
-            editor.getSession().on("change", function() {
+            editor.getSession().on('change', function () {
                 $textarea.val(editor.getSession().getValue());
             });
-        },
+        }
     };
 
     /**
@@ -831,11 +830,11 @@ $(document).on("contentLoad", function(e) {
      */
     function aceInit(element) {
         // Editor classes
-        codeInput.init($(".js-pocket-body", element), "html", 300);
+        codeInput.init($('.js-pocket-body', element), 'html', 300);
 
         // Don't let our code editor go taller than the window length. Makes for weird scrolling.
-        codeInput.init($("#Form_CustomHtml", element), "html", $(window).height() - 100);
-        codeInput.init($("#Form_CustomCSS", element), "css", $(window).height() - 100);
+        codeInput.init($('#Form_CustomHtml', element), 'html', $(window).height() - 100);
+        codeInput.init($('#Form_CustomCSS', element), 'css', $(window).height() - 100);
         codeInput.start(element);
     }
 
@@ -845,11 +844,11 @@ $(document).on("contentLoad", function(e) {
      * @param element - The scope of the function.
      */
     function prettyPrintInit(element) {
-        $("#Pockets td:nth-child(4)", element).each(function() {
+        $('#Pockets td:nth-child(4)', element).each(function () {
             var html = $(this).html();
-            $(this).html('<pre class="prettyprint lang-html" style="white-space: pre-wrap;">' + html + "</pre>");
+            $(this).html('<pre class="prettyprint lang-html" style="white-space: pre-wrap;">' + html + '</pre>');
         });
-        $("pre", element).addClass("prettyprint lang-html");
+        $('pre', element).addClass('prettyprint lang-html');
         prettyPrint();
     }
 
@@ -859,24 +858,24 @@ $(document).on("contentLoad", function(e) {
      * @param element - The scope of the function.
      */
     function navbarHeightInit(element) {
-        var $navbar = $(".js-navbar", element);
+        var $navbar = $('.js-navbar', element);
 
-        $navbar.addClass("navbar-short");
+        $navbar.addClass('navbar-short');
         var navShortHeight = $navbar.outerHeight(true);
-        $navbar.removeClass("navbar-short");
+        $navbar.removeClass('navbar-short');
         var navHeight = $navbar.outerHeight(true);
         var navOffset = navHeight - navShortHeight;
 
         // If we load in the middle of the page, we should have a short navbar.
         if ($(window).scrollTop() > navOffset) {
-            $navbar.addClass("navbar-short");
+            $navbar.addClass('navbar-short');
         }
 
-        $(window).on("scroll", function() {
+        $(window).on('scroll', function() {
             if ($(window).scrollTop() > navOffset) {
-                $navbar.addClass("navbar-short");
+                $navbar.addClass('navbar-short');
             } else {
-                $navbar.removeClass("navbar-short");
+                $navbar.removeClass('navbar-short');
             }
         });
     }
@@ -891,34 +890,34 @@ $(document).on("contentLoad", function(e) {
      * @param element - The scope of the function.
      */
     function dropInit(element) {
-        $(".js-drop", element).each(function() {
+        $('.js-drop', element).each(function() {
             var $trigger = $(this);
-            var contentSelector = $trigger.data("contentId");
-            var triggerSelector = $trigger.attr("id");
-            var html = $("#" + contentSelector).html();
+            var contentSelector = $trigger.data('contentId');
+            var triggerSelector = $trigger.attr('id');
+            var html = $('#' + contentSelector).html();
 
             if (triggerSelector === undefined) {
-                console.error("Drop trigger must be unique and have an id attribute set.");
+                console.error('Drop trigger must be unique and have an id attribute set.');
                 return;
             }
 
             if (html === undefined) {
-                console.error("The drop content needs to be configured properly with the correct id attribute.");
+                console.error('The drop content needs to be configured properly with the correct id attribute.');
                 return;
             }
 
             new Drop({
-                target: document.querySelector("#" + triggerSelector),
+                target: document.querySelector('#' + triggerSelector),
                 content: html,
                 constrainToWindow: true,
                 remove: true,
                 tetherOptions: {
-                    attachment: "top right",
-                    targetAttachment: "bottom right",
-                    offset: "-10 0",
-                },
-            }).on("open", function() {
-                $(this.content).trigger("contentLoad");
+                    attachment: 'top right',
+                    targetAttachment: 'bottom right',
+                    offset: '-10 0'
+                }
+            }).on('open', function() {
+                $(this.content).trigger('contentLoad');
             });
         });
     }
@@ -930,11 +929,11 @@ $(document).on("contentLoad", function(e) {
      * @param element - The scope of the function.
      */
     function collapseInit(element) {
-        var $active = $(".js-nav-collapsible a.active", element);
-        var $collapsible = $active.parents(".collapse");
-        $collapsible.addClass("in");
-        $("a[href=#" + $collapsible.attr("id") + "]").attr("aria-expanded", "true");
-        $("a[href=#" + $collapsible.attr("id") + "]").removeClass("collapsed");
+        var $active = $('.js-nav-collapsible a.active', element);
+        var $collapsible = $active.parents('.collapse');
+        $collapsible.addClass('in');
+        $('a[href=#' + $collapsible.attr('id') + ']').attr('aria-expanded', 'true');
+        $('a[href=#' + $collapsible.attr('id') + ']').removeClass('collapsed');
     }
 
     /**
@@ -947,22 +946,22 @@ $(document).on("contentLoad", function(e) {
      *             `data-success-text="Copied!"`
      */
     function clipboardInit() {
-        var clipboard = new Clipboard(".btn-copy");
+        var clipboard = new Clipboard('.btn-copy');
 
-        clipboard.on("success", function(e) {
+        clipboard.on('success', function(e) {
             var tooltip = $(e.trigger).tooltip({
                 show: true,
-                placement: "bottom",
-                title: $(e.trigger).attr("data-success-text"),
-                trigger: "manual",
+                placement: 'bottom',
+                title: $(e.trigger).attr('data-success-text'),
+                trigger: 'manual',
             });
-            tooltip.tooltip("show");
+            tooltip.tooltip('show');
             setTimeout(function() {
-                tooltip.tooltip("hide");
-            }, "2000");
+                tooltip.tooltip('hide');
+            }, '2000');
         });
 
-        clipboard.on("error", function(e) {
+        clipboard.on('error', function(e) {
             console.log(e);
         });
     }
@@ -973,27 +972,28 @@ $(document).on("contentLoad", function(e) {
      * @param element - The scope of the function.
      */
     function drawerInit(element) {
+
         // Selectors
-        var drawer = ".js-drawer";
-        var drawerToggle = ".js-drawer-toggle";
-        var content = ".main-row .main";
-        var container = ".main-container";
+        var drawer = '.js-drawer';
+        var drawerToggle = '.js-drawer-toggle';
+        var content = '.main-row .main';
+        var container = '.main-container';
 
         $(drawer, element).drawer({
             toggle: drawerToggle,
             container: container,
-            content: content,
+            content: content
         });
 
-        $(drawerToggle).on("click", function() {
+        $(drawerToggle).on('click', function() {
             window.scrollTo(0, 0);
         });
 
         $(window).resize(function() {
-            if ($(drawerToggle, element).css("display") !== "none") {
-                $(container, element).addClass("drawer-hide");
-                $(container, element).removeClass("drawer-show");
-                $(drawer, element).trigger("drawer.hide");
+            if ($(drawerToggle, element).css('display') !== 'none') {
+                $(container, element).addClass('drawer-hide');
+                $(container, element).removeClass('drawer-show');
+                $(drawer, element).trigger('drawer.hide');
             }
         });
     }
@@ -1006,38 +1006,36 @@ $(document).on("contentLoad", function(e) {
      */
     function icheckInit(element) {
         var ignores = [
-            ".label-selector-input",
-            ".toggle-input",
-            ".avatar-delete-input",
-            ".jcrop-keymgr",
-            ".checkbox-painted-wrapper input",
-            ".radio-painted-wrapper input",
+            '.label-selector-input',
+            '.toggle-input',
+            '.avatar-delete-input',
+            '.jcrop-keymgr',
+            '.checkbox-painted-wrapper input',
+            '.radio-painted-wrapper input'
         ];
 
-        var selector = "input";
+        var selector = 'input';
 
         ignores.forEach(function(element) {
-            selector += ":not(" + element + ")";
+            selector += ':not(' + element + ')';
         });
 
-        $(selector, element)
-            .iCheck({
-                aria: true,
-            })
-            .on("ifChanged", function() {
-                $(this).trigger("change");
+        $(selector, element).iCheck({
+            aria: true
+        }).on('ifChanged', function() {
+            $(this).trigger('change');
 
                 // Re-firing event for forward-compatibility.
                 var evt = document.createEvent("HTMLEvents");
                 evt.initEvent("change", false, true);
                 $(this)[0].dispatchEvent(evt);
-            });
-
-        $(selector, element).on("inputChecked", function() {
-            $(this).iCheck("check");
         });
-        $(selector, element).on("inputDisabled", function() {
-            $(this).iCheck("disable");
+
+        $(selector, element).on('inputChecked', function() {
+            $(this).iCheck('check');
+        });
+        $(selector, element).on('inputDisabled', function() {
+            $(this).iCheck('disable');
         });
     }
 
@@ -1048,18 +1046,18 @@ $(document).on("contentLoad", function(e) {
      * @param element - The scope of the function.
      */
     function expanderInit(element) {
-        $(".FeedDescription", element).expander({
+        $('.FeedDescription', element).expander({
             slicePoint: 65,
             normalizeWhitespace: true,
-            expandText: gdn.definition("ExpandText", "more"),
-            userCollapseText: gdn.definition("CollapseText", "less"),
+            expandText: gdn.definition('ExpandText', 'more'),
+            userCollapseText: gdn.definition('CollapseText', 'less')
         });
 
-        $(".InformMessageBody, .toaster-body", element).expander({
+        $('.InformMessageBody, .toaster-body', element).expander({
             slicePoint: 60,
             normalizeWhitespace: true,
-            expandText: gdn.definition("ExpandText", "more"),
-            userCollapseText: gdn.definition("", ""),
+            expandText: gdn.definition('ExpandText', 'more'),
+            userCollapseText: gdn.definition('', '')
         });
     }
 
@@ -1067,7 +1065,7 @@ $(document).on("contentLoad", function(e) {
      * Shows any active modal. This is needed for form errors.
      */
     function modalInit() {
-        if (typeof DashboardModal.activeModal === "object") {
+        if (typeof(DashboardModal.activeModal) === 'object') {
             DashboardModal.activeModal.handleForm();
         }
     }
@@ -1080,14 +1078,14 @@ $(document).on("contentLoad", function(e) {
      * @param element - The scope of the function.
      */
     function responsiveTablesInit(element) {
-        var containerSelector = "#main-row .main";
+        var containerSelector = '#main-row .main';
 
         // We're in a popup.
-        if (typeof DashboardModal.activeModal === "object") {
-            containerSelector = "#" + DashboardModal.activeModal.id + " .modal-body";
+        if (typeof(DashboardModal.activeModal) === 'object') {
+            containerSelector = '#' + DashboardModal.activeModal.id + ' .modal-body';
         }
 
-        $(".js-tj", element).tablejenga({ container: containerSelector });
+        $('.js-tj', element).tablejenga({container: containerSelector});
     }
 
     /**
@@ -1099,9 +1097,9 @@ $(document).on("contentLoad", function(e) {
      * @param element - The scope of the function.
      */
     function foggyInit(element) {
-        var $foggy = $(".js-foggy", element);
-        if ($foggy.data("isFoggy")) {
-            $foggy.trigger("foggyOn");
+        var $foggy = $('.js-foggy', element);
+        if ($foggy.data('isFoggy')) {
+            $foggy.trigger('foggyOn');
         }
     }
 
@@ -1116,8 +1114,8 @@ $(document).on("contentLoad", function(e) {
      * @param element - The scope of the function.
      */
     function checkallInit(element) {
-        $(".js-check-all", element).checkall({
-            target: ".js-check-me",
+        $('.js-check-all', element).checkall({
+            target: '.js-check-me'
         });
     }
 
@@ -1132,16 +1130,16 @@ $(document).on("contentLoad", function(e) {
      * @param element - The scope of the function.
      */
     function dropDownInit(element) {
-        $(".dropdown", element).each(function() {
+        $('.dropdown', element).each(function() {
             var $dropdown = $(this);
             var offset = $dropdown.offset();
-            var menuHeight = $(".dropdown-menu", $dropdown).height();
-            var toggleHeight = $(".dropdown-toggle", $dropdown).height();
+            var menuHeight = $('.dropdown-menu', $dropdown).height();
+            var toggleHeight = $('.dropdown-toggle', $dropdown).height();
             var documentHeight = $(document).height();
             var padding = 6;
 
             if (menuHeight + toggleHeight + offset.top + padding >= documentHeight) {
-                $dropdown.addClass("dropup");
+                $dropdown.addClass('dropup');
             }
         });
     }
@@ -1160,7 +1158,7 @@ $(document).on("contentLoad", function(e) {
     /**
      * Run through all our javascript functionality and start everything up.
      */
-    $(document).on("contentLoad", function(e) {
+    $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
@@ -1190,13 +1188,11 @@ $(document).on("contentLoad", function(e) {
      */
     function readUrl(input) {
         if (input.files && input.files[0]) {
-            var $preview = $(input)
-                .parents(".js-image-preview-form-group")
-                .find(".js-image-preview-new .js-image-preview");
+            var $preview = $(input).parents('.js-image-preview-form-group').find('.js-image-preview-new .js-image-preview');
             var reader = new FileReader();
-            reader.onload = function(e) {
-                if (e.target.result.startsWith("data:image")) {
-                    $preview.attr("src", e.target.result);
+            reader.onload = function (e) {
+                if (e.target.result.startsWith('data:image')) {
+                    $preview.attr('src', e.target.result);
                 }
             };
             reader.readAsDataURL(input.files[0]);
@@ -1215,15 +1211,9 @@ $(document).on("contentLoad", function(e) {
      *            `.js-image-preview-new`
      *            `.js-image-preview-form-group`
      */
-    $(document).on("change", ".js-image-upload", function() {
-        $(this)
-            .parents(".js-image-preview-form-group")
-            .find(".js-image-preview-new")
-            .removeClass("hidden");
-        $(this)
-            .parents(".js-image-preview-form-group")
-            .find(".js-image-preview-old")
-            .addClass("hidden");
+    $(document).on('change', '.js-image-upload', function() {
+        $(this).parents('.js-image-preview-form-group').find('.js-image-preview-new').removeClass('hidden');
+        $(this).parents('.js-image-preview-form-group').find('.js-image-preview-old').addClass('hidden');
         readUrl(this);
     });
 
@@ -1239,37 +1229,33 @@ $(document).on("contentLoad", function(e) {
      *            `.js-image-upload`
      *            `.js-image-preview-form-group`
      */
-    $(document).on("click", ".js-remove-image-preview", function(e) {
+    $(document).on('click', '.js-remove-image-preview', function(e) {
         e.preventDefault();
-        var $parent = $(this).parents(".js-image-preview-form-group");
-        $parent.find(".js-image-preview-old").removeClass("hidden");
-        $parent
-            .find(".js-image-preview-new")
-            .addClass("hidden")
-            .find(".js-image-preview")
-            .attr("src", "");
-        var $input = $parent.find(".js-image-upload");
-        var $inputFileName = $parent.find(".file-upload-choose");
-        $input.val("");
-        $input.removeAttr("value");
-        $inputFileName.html($inputFileName.data("placeholder"));
+        var $parent = $(this).parents('.js-image-preview-form-group');
+        $parent.find('.js-image-preview-old').removeClass('hidden');
+        $parent.find('.js-image-preview-new').addClass('hidden').find('.js-image-preview').attr('src', '');
+        var $input = $parent.find('.js-image-upload');
+        var $inputFileName = $parent.find('.file-upload-choose');
+        $input.val('');
+        $input.removeAttr('value');
+        $inputFileName.html($inputFileName.data('placeholder'));
     });
 
     /**
      * Reset the panel javascript when the panel navigation is expanded.
      */
-    $(document).on("shown.bs.collapse", function() {
-        if ($(".main-container").hasClass("drawer-show")) {
-            $(".js-drawer").trigger("drawer.show");
+    $(document).on('shown.bs.collapse', function() {
+        if ($('.main-container').hasClass('drawer-show')) {
+            $('.js-drawer').trigger('drawer.show');
         }
     });
 
     /**
      * Reset the panel javascript when the panel navigation is collapsed.
      */
-    $(document).on("hidden.bs.collapse", function() {
-        if ($(".main-container").hasClass("drawer-show")) {
-            $(".js-drawer").trigger("drawer.show");
+    $(document).on('hidden.bs.collapse', function() {
+        if ($('.main-container').hasClass('drawer-show')) {
+            $('.js-drawer').trigger('drawer.show');
         }
     });
 
@@ -1280,16 +1266,13 @@ $(document).on("contentLoad", function(e) {
      *
      * Selector: `.js-file-upload`
      */
-    $(document).on("change", ".js-file-upload", function() {
+    $(document).on('change', '.js-file-upload', function() {
         var filename = $(this).val();
-        if (filename.substring(3, 11) === "fakepath") {
+        if (filename.substring(3, 11) === 'fakepath') {
             filename = filename.substring(12);
         }
         if (filename) {
-            $(this)
-                .parent()
-                .find(".file-upload-choose")
-                .html(filename);
+            $(this).parent().find('.file-upload-choose').html(filename);
         }
     });
 
@@ -1300,7 +1283,7 @@ $(document).on("contentLoad", function(e) {
      *
      * Selector: `.js-modal`
      */
-    $(document).on("click", ".js-modal", function(e) {
+    $(document).on('click', '.js-modal', function(e) {
         e.preventDefault();
         DashboardModal.activeModal = new DashboardModal($(this), {});
     });
@@ -1311,14 +1294,14 @@ $(document).on("contentLoad", function(e) {
      * Selector: `.js-modal-confirm`
      * Attribute: `data-follow-link:true` - Follows the link on confirm, otherwise stays on the page.
      */
-    $(document).on("click", ".js-modal-confirm", function(e) {
+    $(document).on('click', '.js-modal-confirm', function(e) {
         e.preventDefault();
-        var followLink = $(this).data("followLink") === "true";
+        var followLink = $(this).data('followLink') === 'true';
 
         DashboardModal.activeModal = new DashboardModal($(this), {
-            httpmethod: "post",
-            modalType: "confirm",
-            followLink: followLink, // no ajax
+            httpmethod: 'post',
+            modalType: 'confirm',
+            followLink: followLink // no ajax
         });
     });
 
@@ -1327,9 +1310,9 @@ $(document).on("contentLoad", function(e) {
      *
      * Selector: `.js-modal-close`
      */
-    $(document).on("click", ".js-modal-close", function() {
-        if (typeof DashboardModal.activeModal === "object") {
-            $("#" + DashboardModal.activeModal.id).modal("hide");
+    $(document).on('click', '.js-modal-close', function() {
+        if (typeof(DashboardModal.activeModal) === 'object') {
+            $('#' + DashboardModal.activeModal.id).modal('hide');
         }
     });
 
@@ -1338,18 +1321,18 @@ $(document).on("contentLoad", function(e) {
     /**
      * Disables inputs and adds a foggy CSS class to the target to make the target look foggy.
      */
-    $(document).on("foggyOn", function(e) {
+    $(document).on('foggyOn', function(e) {
         var $target = $(e.target);
-        $target.attr("aria-hidden", "true");
-        $target.data("isFoggy", "true");
-        $target.addClass("foggy");
+        $target.attr('aria-hidden', 'true');
+        $target.data('isFoggy', 'true');
+        $target.addClass('foggy');
 
         // Make sure we mark already-disabled fields so as not to mistakenly mark them as enabled on foggyOff.
-        $target.find(":input").each(function() {
-            if ($(this).prop("disabled")) {
-                $(this).data("foggy-disabled", "true");
+        $target.find(':input').each(function() {
+            if ($(this).prop('disabled')) {
+                $(this).data('foggy-disabled', 'true');
             } else {
-                $(this).prop("disabled", true);
+                $(this).prop('disabled', true);
             }
         });
     });
@@ -1357,16 +1340,16 @@ $(document).on("contentLoad", function(e) {
     /**
      * Enables inputs and removes the foggy CSS class.
      */
-    $(document).on("foggyOff", function(e) {
+    $(document).on('foggyOff', function(e) {
         var $target = $(e.target);
-        $target.attr("aria-hidden", "false");
-        $target.data("isFoggy", "false");
-        $target.removeClass("foggy");
+        $target.attr('aria-hidden', 'false');
+        $target.data('isFoggy', 'false');
+        $target.removeClass('foggy');
 
         // Be careful not to enable fields that should be disabled.
-        $target.find(":input").each(function() {
-            if (!$(this).data("foggy-disabled")) {
-                $(this).prop("disabled", false);
+        $target.find(':input').each(function() {
+            if (!$(this).data('foggy-disabled')) {
+                $(this).prop('disabled', false);
             }
         });
     });
@@ -1378,22 +1361,22 @@ $(document).on("contentLoad", function(e) {
      *
      * Selector: `.js-save-pref-collapse`
      */
-    $(document).on("click", ".js-save-pref-collapse", function() {
-        var key = $(this).data("key");
-        var collapsed = !$(this).hasClass("collapsed");
+    $(document).on('click', '.js-save-pref-collapse', function() {
+        var key = $(this).data('key');
+        var collapsed = !$(this).hasClass('collapsed');
 
         // request the target via ajax
-        var ajaxData = { DeliveryType: "VIEW", DeliveryMethod: "JSON" };
+        var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
 
-        ajaxData.TransientKey = gdn.definition("TransientKey");
+        ajaxData.TransientKey = gdn.definition('TransientKey');
         ajaxData.key = key;
         ajaxData.collapsed = collapsed;
 
         $.ajax({
-            method: "POST",
-            url: gdn.url("dashboard/userpreferencecollapse"),
+            method: 'POST',
+            url: gdn.url('dashboard/userpreferencecollapse'),
             data: ajaxData,
-            dataType: "json",
+            dataType: 'json'
         });
     });
 
@@ -1404,22 +1387,22 @@ $(document).on("contentLoad", function(e) {
      * Attributes: `data-link-path="/path/to/settingspage"`
      *             `data-section="Moderation"`
      */
-    $(document).on("click", ".js-save-pref-section-landing-page", function() {
-        var url = $(this).data("linkPath");
-        var section = $(this).data("section");
+    $(document).on('click', '.js-save-pref-section-landing-page', function() {
+        var url = $(this).data('linkPath');
+        var section = $(this).data('section');
 
         // request the target via ajax
-        var ajaxData = { DeliveryType: "VIEW", DeliveryMethod: "JSON" };
+        var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
 
-        ajaxData.TransientKey = gdn.definition("TransientKey");
+        ajaxData.TransientKey = gdn.definition('TransientKey');
         ajaxData.url = url;
         ajaxData.section = section;
 
         $.ajax({
-            method: "POST",
-            url: gdn.url("dashboard/userpreferencesectionlandingpage"),
+            method: 'POST',
+            url: gdn.url('dashboard/userpreferencesectionlandingpage'),
             data: ajaxData,
-            dataType: "json",
+            dataType: 'json'
         });
     });
 
@@ -1429,20 +1412,20 @@ $(document).on("contentLoad", function(e) {
      * Selector: `.js-save-pref-dashboard-landing-page`
      * Attribute: `data-section="Moderation"`
      */
-    $(document).on("click", ".js-save-pref-dashboard-landing-page", function() {
-        var section = $(this).data("section");
+    $(document).on('click', '.js-save-pref-dashboard-landing-page', function() {
+        var section = $(this).data('section');
 
         // request the target via ajax
-        var ajaxData = { DeliveryType: "VIEW", DeliveryMethod: "JSON" };
+        var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
 
-        ajaxData.TransientKey = gdn.definition("TransientKey");
+        ajaxData.TransientKey = gdn.definition('TransientKey');
         ajaxData.section = section;
 
         $.ajax({
-            method: "POST",
-            url: gdn.url("dashboard/userpreferencedashboardlandingpage"),
+            method: 'POST',
+            url: gdn.url('dashboard/userpreferencedashboardlandingpage'),
             data: ajaxData,
-            dataType: "json",
+            dataType: 'json'
         });
     });
 })(jQuery);
@@ -1455,26 +1438,16 @@ $(document).on("contentLoad", function(e) {
  * @param {string} cssClass - The css class to apply to the svg.
  * @returns {string} The HTML for the svg icon.
  */
-var dashboardSymbol = function(name, alt, cssClass) {
+var dashboardSymbol =  function(name, alt, cssClass) {
     if (alt) {
         alt = 'alt="' + alt + '" ';
     } else {
-        alt = "";
+        alt = '';
     }
 
     if (!cssClass) {
-        cssClass = "";
+        cssClass = '';
     }
 
-    return (
-        "<svg " +
-        alt +
-        ' class="icon ' +
-        cssClass +
-        "icon-svg-" +
-        name +
-        '" viewBox="0 0 17 17"><use xlink:href="#' +
-        name +
-        '" /></svg>'
-    );
+    return '<svg ' + alt + ' class="icon ' + cssClass + 'icon-svg-' + name + '" viewBox="0 0 17 17"><use xlink:href=\"#' + name + '" /></svg>';
 };

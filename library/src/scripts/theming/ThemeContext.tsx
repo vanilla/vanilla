@@ -14,6 +14,7 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 import React from "react";
 import { connect } from "react-redux";
 import { Optionalize } from "@library/@types/utils";
+import getStore from "@library/state/getStore";
 
 export interface IWithThemeProps {
     theme: IThemeVariables;
@@ -40,7 +41,6 @@ class BaseThemeContextProvider extends React.Component<IProps> {
     }
 
     public componentDidMount() {
-        console.log("mounting");
         void this.props.requestData();
     }
 }
@@ -63,6 +63,11 @@ export function withTheme<T extends IWithThemeProps = IWithThemeProps>(WrappedCo
     };
     ComponentWithDevice.displayName = `withTheme(${displayName})`;
     return ComponentWithDevice;
+}
+
+export function getThemeVariables() {
+    const store = getStore<ICoreStoreState>();
+    return store.getState().theme.variables;
 }
 
 interface IOwnProps {

@@ -5,15 +5,16 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
+import { componentThemeVariables, debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { calc, important, percent, px } from "csx";
 import { buttonVariables } from "@library/styles/buttonStyles";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import memoize from "lodash/memoize";
 
-export function searchBarVariables(theme?: object) {
+export const searchBarVariables = memoize((theme?: object) => {
     const formElementVars = formElementsVariables(theme);
     const themeVars = componentThemeVariables(theme, "searchBar");
 
@@ -35,7 +36,7 @@ export function searchBarVariables(theme?: object) {
     };
 
     const placeholder = {
-        color: formElementVars.placeholder.color,
+        color: formElementVars.colors.placeholder,
         ...themeVars.subComponentStyles("placeholder"),
     };
 
@@ -44,9 +45,9 @@ export function searchBarVariables(theme?: object) {
     };
 
     return { search, searchIcon, sizing, placeholder, heading };
-}
+});
 
-export function searchBarClasses(theme?: object) {
+export const searchBarClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vars = searchBarVariables(theme);
     const vanillaHeaderVars = vanillaHeaderVariables(theme);
@@ -165,7 +166,7 @@ export function searchBarClasses(theme?: object) {
     const results = style({
         $nest: {
             ".suggestedTextInput__placeholder": {
-                color: formElementVars.placeholder.color.toString(),
+                color: toStringColor(formElementVars.colors.placeholder),
             },
             ".suggestedTextInput-noOptions": {
                 padding: px(12),
@@ -298,4 +299,4 @@ export function searchBarClasses(theme?: object) {
         icon,
         results,
     };
-}
+});

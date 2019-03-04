@@ -13,8 +13,9 @@ import { EMOJIS, EMOJI_GROUPS } from "@rich-editor/components/popovers/pieces/em
 import Popover from "@rich-editor/components/popovers/pieces/Popover";
 import EmojiButton from "@rich-editor/components/popovers/pieces/EmojiButton";
 import { IPopoverControllerChildParameters } from "@library/components/PopoverController";
-import { emoji } from "@library/components/icons/editorIcons";
 import { EmojiGroupButton } from "@rich-editor/components/popovers/pieces/EmojiGroupButton";
+import { emojiGroupsClasses } from "@rich-editor/styles/richEditorStyles/insertEmojiGroupClasses";
+import { insertEmojiClasses } from "@rich-editor/styles/richEditorStyles/insertEmojiClasses";
 
 const BUTTON_SIZE = 36;
 const COL_SIZE = 7;
@@ -81,6 +82,8 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
 
     public render() {
         const description = [t("Insert an emoji in your message."), t("richEditor.emoji.pagingInstructions")].join(" ");
+        const emojiClasses = emojiGroupsClasses();
+        const classesInsertEmoji = insertEmojiClasses();
 
         const extraHeadingContent = (
             <button type="button" className="accessibility-jumpTo" onClick={this.focusOnCategories}>
@@ -89,7 +92,12 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
         );
 
         const footer = (
-            <div id={this.categoryPickerID} className="emojiGroups" aria-label={t("Emoji Categories")} tabIndex={-1}>
+            <div
+                id={this.categoryPickerID}
+                className={classNames("emojiGroups", emojiClasses.root)}
+                aria-label={t("Emoji Categories")}
+                tabIndex={-1}
+            >
                 {Object.values(EMOJI_GROUPS).map((group, groupIndex) => {
                     const { name, icon } = group;
                     const isSelected = this.state.selectedGroupIndex === groupIndex;
@@ -153,6 +161,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 isVisible={this.props.isVisible}
                 renderAbove={this.props.renderAbove}
                 renderLeft={this.props.renderLeft}
+                bodyClass={classesInsertEmoji.body}
             />
         );
     }

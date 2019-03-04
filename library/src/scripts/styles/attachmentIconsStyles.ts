@@ -6,7 +6,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
-    borderStyles,
+    borders,
     componentThemeVariables,
     debugHelper,
     allLinkStates,
@@ -17,8 +17,9 @@ import {
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc, px, percent } from "csx";
+import memoize from "lodash/memoize";
 
-export function attachmentIconVariables(theme?: object) {
+export const attachmentIconVariables = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const themeVars = componentThemeVariables(theme, "attachmentIcon");
 
@@ -38,9 +39,9 @@ export function attachmentIconVariables(theme?: object) {
     };
 
     return { spacing, shadow, icon };
-}
+});
 
-export function attachmentIconsClasses(theme?: object) {
+export const attachmentIconsClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const formElementVars = formElementsVariables(theme);
     const vars = attachmentIconVariables(theme);
@@ -73,9 +74,9 @@ export function attachmentIconsClasses(theme?: object) {
     };
 
     return { root, items, item };
-}
+});
 
-export function attachmentIconClasses(theme?: object) {
+export const attachmentIconClasses = memoize((theme?: object) => {
     const vars = attachmentIconVariables(theme);
     const debug = debugHelper("attachmentIcon");
 
@@ -94,4 +95,4 @@ export function attachmentIconClasses(theme?: object) {
     });
 
     return { root, error };
-}
+});

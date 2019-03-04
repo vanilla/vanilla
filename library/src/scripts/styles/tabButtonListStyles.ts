@@ -7,8 +7,9 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, defaultTransition } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
+import memoize from "lodash/memoize";
 
-export function tabButtonListClasses(theme?: object) {
+export const tabButtonListClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const debug = debugHelper("tabButtonList");
 
@@ -43,4 +44,4 @@ export function tabButtonListClasses(theme?: object) {
     });
 
     return { root, button };
-}
+});

@@ -896,11 +896,6 @@ label.checkbox input.checkbox-input {
 }
 
 /*!
- * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-/*!
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -923,7 +918,6 @@ label.checkbox input.checkbox-input {
  */
 .richEditor {
   color: #555a62;
-  padding-left: 36px;
 }
 
 .richEditor blockquote {
@@ -933,6 +927,19 @@ label.checkbox input.checkbox-input {
 
 .richEditor .richEditorParagraphMenu {
   left: 0;
+}
+
+.richEditor.isDisabled,
+.richEditor.isDisabled .richEditor-button {
+  cursor: progress !important;
+}
+
+.richEditor .ReactVirtualized__Grid {
+  min-width: 252px;
+}
+
+.richEditor .richEditor-menuItems {
+  border-bottom: 0;
 }
 
 .userContent {
@@ -1139,6 +1146,7 @@ body.hasRichEditor #Form_Preview {
 
 .richEditor-text {
   overflow: visible;
+  min-height: 237px;
   padding-top: 12px;
   padding-right: 12px;
   padding-bottom: 12px;
@@ -1148,8 +1156,27 @@ body.hasRichEditor #Form_Preview {
   border-bottom-right-radius: 0;
 }
 
-.richEditor-text:focus {
-  box-shadow: 0 0 0 1px rgba(2, 145, 219, 0.6);
+.ql-clipboard {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  position: fixed;
+}
+
+.richEditor-upload {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 
 body.isMobile .embedDialogue {
@@ -1219,8 +1246,14 @@ body.isMobile .Popup.hasRichEditor .Border {
   }
 }
 
-.richEditorFlyout {
+.richEditor-menu.richEditorFlyout {
   bottom: 100%;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.richEditor-textWrap {
+  min-height: 236px;
 }
 
 /*!
@@ -2461,7 +2494,10 @@ body.isMobile .Popup.hasRichEditor .Border {
  * @license GPL-2.0-only
  */
 .safeEmoji {
-  display: inline-block;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
   font-family: "Segoe UI Emoji", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   vertical-align: middle;
   text-align: center;

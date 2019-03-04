@@ -7,8 +7,9 @@
 import { debugHelper } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { percent } from "csx";
+import memoize from "lodash/memoize";
 
-export function smartAlignClasses(theme?: object) {
+export const smartAlignClasses = memoize((theme?: object) => {
     const debug = debugHelper("smartAlign");
 
     const root = style({
@@ -24,4 +25,4 @@ export function smartAlignClasses(theme?: object) {
     });
 
     return { root, inner };
-}
+});

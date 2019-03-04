@@ -13,12 +13,14 @@ import {
     flexHelper,
     getColorDependantOnLightness,
     unit,
+    userSelect,
 } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import memoize from "lodash/memoize";
 
-export function vanillaHeaderVariables(theme?: object) {
+export const vanillaHeaderVariables = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const formElementVars = formElementsVariables(theme);
     const themeVars = componentThemeVariables(theme, "vanillaHeader");
@@ -150,9 +152,9 @@ export function vanillaHeaderVariables(theme?: object) {
         mobileDropDown,
         meBox,
     };
-}
+});
 
-export default function vanillaHeaderClasses(theme?: object) {
+export const vanillaHeaderClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vars = vanillaHeaderVariables(theme);
     const formElementVars = formElementsVariables(theme);
@@ -396,8 +398,8 @@ export default function vanillaHeaderClasses(theme?: object) {
 
     const searchCancel = style({
         ...debug.name("searchCancel"),
+        ...userSelect(),
         height: px(formElementVars.sizing.height),
-        userSelect: "none",
         $nest: {
             "&.focus-visible": {
                 $nest: {
@@ -598,9 +600,9 @@ export default function vanillaHeaderClasses(theme?: object) {
         clearButtonClass,
         guestButton,
     };
-}
+});
 
-export function vanillaHeaderLogoClasses(theme?: object) {
+export const vanillaHeaderLogoClasses = memoize((theme?: object) => {
     const vars = vanillaHeaderVariables(theme);
     const logoFrame = style({ display: "inline-flex" });
     const debug = debugHelper("vanillaHeaderLogo");
@@ -623,9 +625,9 @@ export function vanillaHeaderLogoClasses(theme?: object) {
     });
 
     return { logoFrame, logo, link };
-}
+});
 
-export function vanillaHeaderHomeClasses(theme?: object) {
+export const vanillaHeaderHomeClasses = memoize((theme?: object) => {
     const vars = vanillaHeaderVariables(theme);
     const globalVars = globalVariables(theme);
     const debug = debugHelper("vanillaHeaderHome");
@@ -648,4 +650,4 @@ export function vanillaHeaderHomeClasses(theme?: object) {
     });
 
     return { root, bottom, left };
-}
+});

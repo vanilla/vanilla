@@ -7,8 +7,9 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
+import memoize from "lodash/memoize";
 
-export function userDropDownVariables(theme?: object) {
+export const userDropDownVariables = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const themeVars = componentThemeVariables(theme, "userDropDown");
 
@@ -43,9 +44,9 @@ export function userDropDownVariables(theme?: object) {
     };
 
     return { userCard, userName, contents, item };
-}
+});
 
-export function userDropDownClasses(theme?: object) {
+export const userDropDownClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vars = userDropDownVariables(theme);
     const debug = debugHelper("userDropDown");
@@ -85,4 +86,4 @@ export function userDropDownClasses(theme?: object) {
     });
 
     return { userCardPhotoLink, userCardPhoto, userCardName, contents };
-}
+});

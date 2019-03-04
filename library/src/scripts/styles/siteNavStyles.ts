@@ -10,8 +10,9 @@ import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { calc, percent, px } from "csx";
+import memoize from "lodash/memoize";
 
-export function siteNavVariables(theme?: object) {
+export const siteNavVariables = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const formElementVars = formElementsVariables(theme);
     const themeVars = componentThemeVariables(theme, "siteNav");
@@ -46,9 +47,9 @@ export function siteNavVariables(theme?: object) {
     };
 
     return { node, title, nodeToggle, spacer };
-}
+});
 
-export function siteNavClasses(theme?: object) {
+export const siteNavClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vars = siteNavVariables(theme);
     const mediaQueries = layoutVariables().mediaQueries();
@@ -86,9 +87,9 @@ export function siteNavClasses(theme?: object) {
     });
 
     return { root, title, children };
-}
+});
 
-export function siteNavNodeClasses(theme?: object) {
+export const siteNavNodeClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vars = siteNavVariables(theme);
     const mediaQueries = layoutVariables().mediaQueries();
@@ -208,4 +209,4 @@ export function siteNavNodeClasses(theme?: object) {
     });
 
     return { root, children, contents, link, label, spacer, toggle, buttonOffset };
-}
+});

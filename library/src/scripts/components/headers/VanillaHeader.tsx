@@ -28,7 +28,7 @@ import classNames from "classnames";
 import * as React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
-import vanillaHeaderClasses from "@library/styles/vanillaHeaderStyles";
+import { vanillaHeaderClasses } from "@library/styles/vanillaHeaderStyles";
 import { meBoxClasses } from "@library/styles/meBoxStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {

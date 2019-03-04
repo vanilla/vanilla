@@ -9,6 +9,8 @@ import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { isFileImage } from "@library/utility";
 import { image, attachment } from "@library/components/icons/editorIcons";
+import classNames from "classnames";
+import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -20,9 +22,15 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
     private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
 
     public render() {
+        const classesRichEditor = richEditorClasses();
         return (
             <button
-                className="richEditor-button richEditor-embedButton richEditor-buttonUpload"
+                className={classNames(
+                    "richEditor-button",
+                    "richEditor-embedButton",
+                    "richEditor-buttonUpload",
+                    classesRichEditor.button,
+                )}
                 type="button"
                 aria-pressed="false"
                 disabled={this.props.disabled}
@@ -32,7 +40,7 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
                 <input
                     ref={this.inputRef}
                     onChange={this.onInputChange}
-                    className="richEditor-upload"
+                    className={classNames("richEditor-upload", classesRichEditor.upload)}
                     type="file"
                     accept={this.inputAccepts}
                 />

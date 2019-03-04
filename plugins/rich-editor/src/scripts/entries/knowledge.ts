@@ -6,6 +6,5 @@
 
 import { registerReducer } from "@library/state/reducerRegistry";
 import editorReducer from "@rich-editor/state/editorReducer";
-import "../../scss/editor.scss";
 
 registerReducer("editor", editorReducer);

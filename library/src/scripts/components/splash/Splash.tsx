@@ -14,6 +14,7 @@ import { IDeviceProps } from "@library/components/DeviceChecker";
 import IndependentSearch from "@library/components/IndependentSearch";
 import { splashStyles, splashVariables } from "@library/styles/splashStyles";
 import { buttonClasses } from "@library/styles/buttonStyles";
+import { t } from "@library/application";
 
 interface IProps extends IDeviceProps {
     title: string; // Often the message to display isn't the real H1
@@ -40,6 +41,7 @@ export class Splash extends React.Component<IProps> {
                                     className={classes.search}
                                     buttonClass={buttons.transparent}
                                     isLarge={true}
+                                    placeholder={t("Search Articles")}
                                 />
                             </div>
                         </PanelWidgetHorizontalPadding>

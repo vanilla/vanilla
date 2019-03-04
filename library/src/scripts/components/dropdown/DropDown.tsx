@@ -16,6 +16,7 @@ import classNames from "classnames";
 import FlexSpacer from "@library/components/FlexSpacer";
 import CloseButton from "@library/components/CloseButton";
 import { Frame } from "@library/components/frame";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 export interface IProps {
     id?: string;
@@ -35,6 +36,7 @@ export interface IProps {
     onVisibilityChange?: (isVisible: boolean) => void;
     openAsModal?: boolean;
     title?: string;
+    paddedList?: boolean;
 }
 
 export interface IState {
@@ -69,6 +71,7 @@ export default class DropDown extends React.Component<IProps, IState> {
 
     public render() {
         const { title } = this.props;
+        const classesDropDown = dropDownClasses();
         return (
             <PopoverController
                 id={this.id}
@@ -90,7 +93,10 @@ export default class DropDown extends React.Component<IProps, IState> {
                             {...params}
                             id={this.id + "-handle"}
                             parentID={this.id}
-                            className={this.props.contentsClassName}
+                            className={classNames(
+                                this.props.contentsClassName,
+                                this.props.paddedList ? classesDropDown.paddedList : "",
+                            )}
                             onClick={this.doNothing}
                             renderLeft={!!this.props.renderLeft}
                             renderAbove={!!this.props.renderAbove}

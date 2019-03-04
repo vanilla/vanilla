@@ -12,6 +12,8 @@ import PopoverController, { IPopoverControllerChildParameters } from "@library/c
 import { t } from "@library/application";
 import { ButtonBaseClass } from "@library/components/forms/Button";
 import { emoji } from "@library/components/icons/editorIcons";
+import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
+import classNames from "classnames";
 
 interface IProps extends IOptionalComponentID {
     disabled?: boolean;
@@ -32,12 +34,13 @@ export default class EmojiPopover extends React.Component<IProps, IRequiredCompo
      */
     public render() {
         const icon = emoji();
+        const classesRichEditor = richEditorClasses();
 
         return (
             <PopoverController
                 id={this.state.id}
                 className="emojiPicker"
-                buttonClassName="richEditor-button richEditor-embedButton"
+                buttonClassName={classNames("richEditor-button", "richEditor-embedButton", classesRichEditor.button)}
                 onVisibilityChange={forceSelectionUpdate}
                 disabled={this.props.disabled}
                 name={t("Emoji Picker")}

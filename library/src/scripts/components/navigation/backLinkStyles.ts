@@ -6,23 +6,24 @@
 
 import { px } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, srOnly } from "@library/styles/styleHelpers";
+import { debugHelper, srOnly, userSelect } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import vanillaHeaderStyles, { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import memoize from "lodash/memoize";
 
-export default function backLinkClasses(theme?: object) {
+const backLinkClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const mediaQueries = layoutVariables(theme).mediaQueries();
     const debug = debugHelper("backLink");
     const headerVars = vanillaHeaderVariables();
 
     const root = style({
+        ...debug.name(),
+        ...userSelect(),
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "flex-start",
-        userSelect: "none",
-        ...debug.name(),
     });
 
     const link = style({
@@ -57,4 +58,6 @@ export default function backLinkClasses(theme?: object) {
         link,
         label,
     };
-}
+});
+
+export default backLinkClasses;

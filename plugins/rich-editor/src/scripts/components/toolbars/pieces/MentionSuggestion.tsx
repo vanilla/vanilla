@@ -9,6 +9,7 @@ import classNames from "classnames";
 import { t } from "@library/application";
 import { splitStringLoosely } from "@library/utility";
 import { IUserFragment } from "@library/@types/api";
+import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
 
 export interface IMentionSuggestionData extends IUserFragment {
     domID: string;
@@ -37,8 +38,9 @@ export interface IMentionLoadingProps extends IGenericMentionProps {
 export default function MentionSuggestion(props: IMentionProps) {
     const { isActive, matchedString, mentionData, onClick, onMouseEnter } = props;
     const { photoUrl, name, domID } = mentionData;
+    const classesRichEditor = richEditorClasses();
 
-    const classes = classNames("richEditor-menuItem", "atMentionList-item", {
+    const classes = classNames("richEditor-menuItem", "atMentionList-item", classesRichEditor.menuItem, {
         isActive,
     });
 
@@ -89,9 +91,16 @@ export default function MentionSuggestion(props: IMentionProps) {
 export function MentionSuggestionLoading(props: IMentionLoadingProps) {
     const { loadingData, onMouseEnter, isActive } = props;
     const { domID } = loadingData;
-    const classes = classNames("richEditor-menuItem", "atMentionList-item", "atMentionList-loader", {
-        isActive,
-    });
+    const classesRichEditor = richEditorClasses();
+    const classes = classNames(
+        "richEditor-menuItem",
+        "atMentionList-item",
+        "atMentionList-loader",
+        classesRichEditor.menuItem,
+        {
+            isActive,
+        },
+    );
 
     return (
         <li id={domID} className={classes} role="option" aria-selected={isActive} onMouseEnter={onMouseEnter}>
@@ -111,8 +120,13 @@ export function MentionSuggestionLoading(props: IMentionLoadingProps) {
  * We need a dummy "spacer" suggestion so that we can get our initial measurements.
  */
 export function MentionSuggestionSpacer() {
-    const classes = classNames("richEditor-menuItem", "atMentionList-item", "atMentionList-spacer");
-
+    const classesRichEditor = richEditorClasses();
+    const classes = classNames(
+        "richEditor-menuItem",
+        "atMentionList-item",
+        "atMentionList-spacer",
+        classesRichEditor.menuItem,
+    );
     return (
         <li aria-hidden="true" className={classes} style={{ visibility: "hidden" }}>
             <button type="button" className="atMentionList-suggestion">

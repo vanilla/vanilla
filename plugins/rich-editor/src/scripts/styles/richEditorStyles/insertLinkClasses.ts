@@ -5,13 +5,15 @@
  */
 
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
-import { unit } from "@library/styles/styleHelpers";
+import { toStringColor, unit } from "@library/styles/styleHelpers";
 import { calc, important, percent } from "csx";
 import styleFactory from "@library/styles/styleFactory";
 import memoize from "lodash/memoize";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
 export const insertLinkClasses = memoize((theme?: object) => {
     const vars = richEditorVariables(theme);
+    const globalVars = globalVariables(theme);
     const style = styleFactory("insertLink");
 
     const root = style({

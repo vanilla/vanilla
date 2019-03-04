@@ -263,6 +263,7 @@ export const richEditorClasses = memoize((theme?: object) => {
             "&:hover, &:focus, &.focus-visible, &:active": {
                 opacity: 1,
                 cursor: "pointer",
+                color: toStringColor(globalVars.mainColors.primary),
             },
         },
     });

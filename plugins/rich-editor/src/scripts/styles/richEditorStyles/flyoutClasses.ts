@@ -29,6 +29,7 @@ export const richEditorFlyoutClasses = memoize((theme?: object) => {
     });
 
     const header = style("header", {
+        position: "relative",
         ...paddings({
             top: unit(vars.flyout.padding.top / 2),
             right: unit(vars.flyout.padding.right),

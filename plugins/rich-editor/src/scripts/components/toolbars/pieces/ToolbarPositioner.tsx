@@ -224,7 +224,6 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
         if (bounds == null || this.props.flyoutHeight == null) {
             return null;
         }
-
         const vars = richEditorVariables();
         const { flyoutHeight, nubHeight, verticalAlignment } = this.props;
 

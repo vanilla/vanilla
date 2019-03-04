@@ -55,8 +55,8 @@ export class InlineToolbarLinkInput extends React.PureComponent<IProps, {}> {
                     onChange={this.props.onInputChange}
                     ref={this.props.inputRef}
                     onKeyDown={this.props.onInputKeyDown}
-                    className={classNames("InputBox", "insertLink-input", classesInsertLink.input)}
-                    placeholder={t("Paste or type a link…")}
+                    className={classNames("InputBox", "inputText", "insertLink-input", classesInsertLink.input)}
+                    placeholder={t("Paste or type url")}
                 />
                 <CloseButton
                     className={classNames("richEditor-close", classesRichEditor.close)}

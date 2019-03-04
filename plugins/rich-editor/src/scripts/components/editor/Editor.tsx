@@ -100,7 +100,7 @@ export class Editor extends React.Component<IProps> {
     private renderModern(): React.ReactNode {
         const { className } = this.props as INewProps;
         const classesRichEditor = richEditorClasses();
-        const classesRichEditorForm = richEditorFormClasses();
+        const classesRichEditorForm = richEditorFormClasses({}, this.props.legacyMode);
         return (
             <div
                 className={classNames(
@@ -151,7 +151,7 @@ export class Editor extends React.Component<IProps> {
      * The legacy rendering mode has everything at the bottom, and uses the document as it's scroll container.
      */
     private renderLegacy(): React.ReactNode {
-        const classesRichEditorForm = richEditorFormClasses();
+        const classesRichEditorForm = richEditorFormClasses({}, true);
         return this.renderContexts(
             <div
                 className={classNames("richEditor-frame", "InputBox", classesRichEditorForm.scrollFrame)}

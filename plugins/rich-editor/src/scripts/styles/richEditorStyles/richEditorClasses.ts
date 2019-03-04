@@ -13,17 +13,14 @@ import {
     toStringColor,
     unit,
     userSelect,
-    paddings,
 } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc, important, percent } from "csx";
 import memoize from "lodash/memoize";
 
-export const richEditorClasses = memoize((theme?: object) => {
+export const richEditorClasses = memoize((theme?: object, legacyMode: boolean = false) => {
     const globalVars = globalVariables(theme);
     const style = styleFactory("richEditor");
-    const formElementVars = formElementsVariables(theme);
     const vars = richEditorVariables(theme);
 
     const root = style({
@@ -84,7 +81,7 @@ export const richEditorClasses = memoize((theme?: object) => {
         justifyContent: "center",
         top: unit(vars.pilcrow.offset),
         left: 0,
-        marginLeft: unit(-globalVars.icon.sizes.default - 12),
+        marginLeft: unit(-globalVars.gutter.half + (!legacyMode ? -globalVars.gutter.size : 0)),
         transform: `translateX(-100%)`,
         height: unit(vars.paragraphMenuHandle.size),
         width: unit(globalVars.icon.sizes.default),
@@ -121,7 +118,7 @@ export const richEditorClasses = memoize((theme?: object) => {
         "-ms-overflow-style": "-ms-autohiding-scrollbar",
         position: "relative",
         display: "flex",
-        alignItems: "flex-start",
+        alignItems: "center",
         justifyContent: "flex-start",
         flexWrap: "nowrap",
         listStyle: "none",

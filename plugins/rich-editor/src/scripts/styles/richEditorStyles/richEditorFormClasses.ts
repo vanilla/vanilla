@@ -12,12 +12,13 @@ import { calc, percent, px, viewHeight } from "csx";
 import { memoize } from "lodash";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 
-export const richEditorFormClasses = memoize((theme?: object) => {
+export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolean = false) => {
     const globalVars = globalVariables(theme);
     const headerVars = vanillaHeaderVariables(theme);
     const vars = richEditorVariables(theme);
     const formElementVars = formElementsVariables(theme);
     const style = styleFactory("richEditorForm");
+    const overshoot = legacyMode ? 0 : vars.scrollContainer.overshoot;
 
     const root = style({});
 
@@ -106,10 +107,10 @@ export const richEditorFormClasses = memoize((theme?: object) => {
         padding: 0,
         overflow: "auto",
         minHeight: percent(100),
-        width: calc(`100% + ${unit(vars.scrollContainer.overshoot * 2)}`),
-        marginLeft: unit(-vars.scrollContainer.overshoot),
-        paddingLeft: unit(vars.scrollContainer.overshoot),
-        paddingRight: unit(vars.scrollContainer.overshoot),
+        width: legacyMode ? percent(100) : calc(`100% + ${unit(overshoot * 2)}`),
+        marginLeft: legacyMode ? undefined : unit(-overshoot),
+        paddingLeft: legacyMode ? undefined : unit(overshoot),
+        paddingRight: legacyMode ? undefined : unit(overshoot),
         $nest: {
             "&.isMenuInset": {
                 overflow: "initial",
@@ -117,8 +118,6 @@ export const richEditorFormClasses = memoize((theme?: object) => {
             },
         },
     });
-
-    //marginTop: unit(globalVars.overlay.fullPageHeadingSpacer),
 
     const scrollContainer = style("scrollContainer", {
         position: "relative",

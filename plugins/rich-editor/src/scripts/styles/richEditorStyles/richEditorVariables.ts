@@ -132,7 +132,7 @@ export const richEditorVariables = memoize((theme?: object) => {
     };
 
     const scrollContainer = {
-        overshoot: 40,
+        overshoot: 48,
         ...themeVars.subComponentStyles("scrollContainer"),
     };
 

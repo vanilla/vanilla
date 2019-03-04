@@ -5,7 +5,6 @@
 
 .richEditor {
     color: $global-color_fg;
-    padding-left: $richEditor_horizontalPadding;
 
     blockquote {
         display: block;
@@ -297,10 +296,6 @@ body.hasRichEditor {
     border-radius: $formElement_borderRadius;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-    &:focus {
-        // Use a box shadow so border-radiuses work
-        box-shadow: 0 0 0 $formElement-borderWidth $richEditor-outline_color;
-    }
 }
 
 .ql-clipboard {

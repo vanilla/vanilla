@@ -5,7 +5,7 @@
  */
 
  namespace Vanilla\Theme;
- 
+
  /**
   * A collection of JavaScript files for a theme.
   */
@@ -15,7 +15,7 @@ class ScriptsAsset extends Asset {
     private $data = [];
 
     /** @var string Type of asset. */
-    private $type = "data";
+    protected $type = "data";
 
     /**
      * Configure the scripts collection asset.

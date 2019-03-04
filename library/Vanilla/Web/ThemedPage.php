@@ -7,6 +7,7 @@
 namespace Vanilla\Web;
 
 use Garden\Web\Data;
+use Garden\Web\Exception\ServerException;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Theme\JsonAsset;
@@ -43,7 +44,18 @@ abstract class ThemedPage extends Page {
     private function initThemeData() {
         $themeKey = $this->siteMeta->getActiveTheme()->getKey();
         $themeData = $this->themesApi->get($themeKey);
-        $themeVariables = $this->themesApi->get_assets($themeKey, "variables.json");
+        $variables = [];
+
+        /** @var JsonAsset $variablesAsset */
+        $variablesAsset = $themeData['assets']['variables'];
+        if ($variablesAsset->getType()) {
+            $variables = json_decode($variablesAsset->getData(), true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new ServerException(
+                    "Failed to initialize theme data for theme $themeKey. Theme variables were not valid JSON"
+                );
+            }
+        }
 
         // Apply theme data to the master view.
         $this->headerHtml = $themeData['assets']['header'] ?? '';
@@ -52,7 +64,7 @@ abstract class ThemedPage extends Page {
         // Preload the theme variables for the frontend.
         $this->addReduxAction(new ReduxAction(
             \ThemesApiController::GET_THEME_VARIABLES_ACTION,
-            Data::box($themeVariables),
+            Data::box($variables),
             [ 'key' => $themeKey ]
         ));
     }

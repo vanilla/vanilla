@@ -15,7 +15,7 @@ class HtmlAsset extends Asset {
     private $data = "";
 
     /** @var string Type of asset. */
-    private $type = "html";
+    protected $type = "html";
 
     /**
      * Configure the HTML asset.

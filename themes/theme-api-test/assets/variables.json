@@ -1,3 +1,7 @@
 {
-    "theme": "keystone"
+    "formElements": {
+        "sizing": {
+            "height": "100px"
+        }
+    }
 }

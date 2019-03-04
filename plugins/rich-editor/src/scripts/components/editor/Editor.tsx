@@ -127,12 +127,7 @@ export class Editor extends React.Component<IProps> {
                                 ref={this.scrollContainerRef}
                             >
                                 <div
-                                    className={classNames(
-                                        "richEditor-frame",
-                                        "InputBox",
-                                        "isMenuInset",
-                                        classesRichEditor.frame,
-                                    )}
+                                    className={classNames("richEditor-frame", "InputBox", "isMenuInset")}
                                     id="testScroll"
                                 >
                                     {this.renderMountPoint()}

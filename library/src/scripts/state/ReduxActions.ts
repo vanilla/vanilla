@@ -10,6 +10,7 @@ import { logError } from "@library/utility";
 import { ThunkDispatch, ThunkAction } from "redux-thunk";
 import { AnyAction } from "redux";
 import { AsyncActionCreators } from "typescript-fsa";
+import { ICoreStoreState } from "@library/state/reducerRegistry";
 
 /**
  * Base class for creating redux actions.
@@ -197,7 +198,7 @@ export default class ReduxActions {
         }
     }
 
-    protected getState<T>(): T {
+    protected getState<T extends ICoreStoreState = ICoreStoreState>(): T {
         return this.dispatch((c, getState) => {
             return getState();
         });

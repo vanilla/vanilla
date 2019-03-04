@@ -210,7 +210,6 @@ export default function vanillaHeaderClasses(theme?: object) {
     const spacer = style(
         {
             ...debug.name("spacer"),
-            backgroundColor: headerColors.bg.toString(),
             height: px(vars.sizing.height),
         },
         mediaQueries.oneColumn({

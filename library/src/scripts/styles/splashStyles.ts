@@ -4,14 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import { style } from "typestyle";
-import { px, quote, viewWidth, viewHeight, url, percent } from "csx";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, componentThemeVariables, getColorDependantOnLightness } from "@library/styles/styleHelpers";
-import { centeredBackgroundProps } from "@library/styles/styleHelpers";
-import { searchVariables } from "@library/styles/searchStyles";
 import { assetUrl } from "@library/application";
-import { IButtonType } from "@library/styles/buttonStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { searchVariables } from "@library/styles/searchStyles";
+import {
+    centeredBackgroundProps,
+    componentThemeVariables,
+    debugHelper,
+    getColorDependantOnLightness,
+} from "@library/styles/styleHelpers";
+import { percent, px, url } from "csx";
+import { style } from "typestyle";
 
 export function splashVariables(theme?: object) {
     const globalVars = globalVariables(theme);

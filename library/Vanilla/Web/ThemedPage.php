@@ -43,18 +43,16 @@ abstract class ThemedPage extends Page {
     private function initThemeData() {
         $themeKey = $this->siteMeta->getActiveTheme()->getKey();
         $themeData = $this->themesApi->get($themeKey);
+        $themeVariables = $this->themesApi->get_assets($themeKey, "variables.json");
 
         // Apply theme data to the master view.
         $this->headerHtml = $themeData['assets']['header'] ?? '';
         $this->footerHtml = $themeData['assets']['footer'] ?? '';
 
-        /** @var JsonAsset|null $variablesAsset */
-        $variablesAsset = $themeData['assets']['variables'];
-        $variables = $variablesAsset ? $variablesAsset->asArray() : [];
         // Preload the theme variables for the frontend.
         $this->addReduxAction(new ReduxAction(
             \ThemesApiController::GET_THEME_VARIABLES_ACTION,
-            Data::box($variables),
+            Data::box($themeVariables),
             [ 'key' => $themeKey ]
         ));
     }

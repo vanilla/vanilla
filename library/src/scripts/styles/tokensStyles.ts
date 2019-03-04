@@ -5,12 +5,13 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
+import { componentThemeVariables, debugHelper, unit, userSelect } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { percent, px } from "csx";
+import memoize from "lodash/memoize";
 
-export function tokensVariables(theme?: object) {
+export const tokensVariables = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const themeVars = componentThemeVariables(theme, "tokens");
 
@@ -31,9 +32,9 @@ export function tokensVariables(theme?: object) {
     };
 
     return { clearIcon, clear, token };
-}
+});
 
-export function tokensClasses(theme?: object) {
+export const tokensClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vars = tokensVariables(theme);
     const formElVars = formElementsVariables(theme);
@@ -75,7 +76,7 @@ export function tokensClasses(theme?: object) {
                 paddingRight: px(2),
                 margin: px(3),
                 backgroundColor: vars.token.bg.toString(),
-                userSelect: "none",
+                ...userSelect(),
             },
         },
     });
@@ -91,4 +92,4 @@ export function tokensClasses(theme?: object) {
     });
 
     return { root, removeIcon };
-}
+});

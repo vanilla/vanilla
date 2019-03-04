@@ -23,6 +23,7 @@ import classNames from "classnames";
 import get from "lodash/get";
 import * as React from "react";
 import { compactMeBoxClasses } from "@library/styles/compactMeBoxStyles";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
 
 export interface IUserDropDownProps extends IInjectableUserState, IMeBoxProps {
     buttonClass?: string;
@@ -89,14 +90,14 @@ export default class CompactMeBox extends React.Component<IUserDropDownProps, IS
                             />
                             <Tabs
                                 label={t("My Account Tab")}
-                                className={classNames("compactMeBox-tabs", "inheritHeight")}
+                                className={classNames("compactMeBox-tabs", inheritHeightClass())}
                                 tabListClass={classNames("compactMeBox-tabList", classes.tabList)}
                                 tabPanelsClass={classNames(
                                     "compactMeBox-tabPanels",
-                                    "inheritHeight",
+                                    inheritHeightClass(),
                                     classes.tabPanels,
                                 )}
-                                tabPanelClass={classNames("compactMeBox-tabPanel", "inheritHeight", classes.panel)}
+                                tabPanelClass={classNames("compactMeBox-tabPanel", inheritHeightClass(), classes.panel)}
                                 buttonClass={classNames(buttonClass, "compactMeBox-tabButton", classes.tabButton)}
                                 tabs={[
                                     {

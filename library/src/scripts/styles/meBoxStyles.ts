@@ -11,8 +11,9 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { px } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import memoize from "lodash/memoize";
 
-export function meBoxClasses(theme?: object) {
+export const meBoxClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vanillaHeaderVars = vanillaHeaderVariables(theme);
     const debug = debugHelper("meBox");
@@ -40,4 +41,4 @@ export function meBoxClasses(theme?: object) {
     });
 
     return { root, buttonContent };
-}
+});

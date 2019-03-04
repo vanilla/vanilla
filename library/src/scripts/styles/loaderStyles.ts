@@ -16,8 +16,9 @@ import {
 import { style } from "typestyle";
 import { percent, quote } from "csx";
 import { PositionProperty } from "csstype";
+import memoize from "lodash/memoize";
 
-export function loaderVariables(theme?: object) {
+export const loaderVariables = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const themeVars = componentThemeVariables(theme, "loader");
 
@@ -43,9 +44,9 @@ export function loaderVariables(theme?: object) {
     };
 
     return { fullPage, fixedSize, medium };
-}
+});
 
-export function loaderClasses(theme?: object) {
+export const loaderClasses = memoize((theme?: object) => {
     const vars = loaderVariables(theme);
     const debug = debugHelper("loader");
     const flex = flexHelper();
@@ -88,4 +89,4 @@ export function loaderClasses(theme?: object) {
     });
 
     return { fullPageLoader, mediumLoader, fixedSizeLoader };
-}
+});

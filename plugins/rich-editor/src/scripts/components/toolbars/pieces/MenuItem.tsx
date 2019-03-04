@@ -6,6 +6,7 @@
 
 import React from "react";
 import classnames from "classnames";
+import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
 
 export interface IMenuItemData {
     icon: JSX.Element;
@@ -29,10 +30,18 @@ export interface IProps extends IMenuItemData {
 export default class MenuItem extends React.PureComponent<IProps> {
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
     public render() {
+        const classesRichEditor = richEditorClasses();
         const { label, isDisabled, isActive, onClick, icon, role } = this.props;
-        const buttonClasses = classnames("richEditor-button", "richEditor-formatButton", "richEditor-menuItem", {
-            isActive,
-        });
+        const buttonClasses = classnames(
+            "richEditor-button",
+            "richEditor-formatButton",
+            "richEditor-menuItem",
+            classesRichEditor.button,
+            classesRichEditor.menuItem,
+            {
+                isActive,
+            },
+        );
 
         const ariaAttributes = {
             role,

@@ -12,8 +12,9 @@ import { centeredBackgroundProps } from "@library/styles/styleHelpers";
 import { searchVariables } from "@library/styles/searchStyles";
 import { assetUrl } from "@library/application";
 import { IButtonType } from "@library/styles/buttonStyles";
+import memoize from "lodash/memoize";
 
-export function splashVariables(theme?: object) {
+export const splashVariables = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const elementaryColor = globalVars.elementaryColors;
     const themeVars = componentThemeVariables(theme, "splash");
@@ -59,9 +60,9 @@ export function splashVariables(theme?: object) {
     };
 
     return { fullBackground, title, spacing, border, search, searchContainer };
-}
+});
 
-export function splashStyles(theme?: object) {
+export const splashStyles = memoize((theme?: object) => {
     const vars = splashVariables(theme);
     const debug = debugHelper("splash");
 
@@ -130,4 +131,4 @@ export function splashStyles(theme?: object) {
     });
 
     return { root, container, innerContainer, title, search, fullBackground, searchContainer };
-}
+});

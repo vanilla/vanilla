@@ -6,19 +6,21 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
-    borderStyles,
+    borders,
     componentThemeVariables,
     debugHelper,
     allLinkStates,
     margins,
     absolutePosition,
     unit,
+    userSelect,
 } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { percent, px } from "csx";
+import memoize from "lodash/memoize";
 
-export function attachmentVariables(theme?: object) {
+export const attachmentVariables = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const formElementVars = formElementsVariables(theme);
     const themeVars = componentThemeVariables(theme, "attachment");
@@ -62,9 +64,9 @@ export function attachmentVariables(theme?: object) {
     };
 
     return { border, padding, shadows, text, title, loading, sizing };
-}
+});
 
-export function attachmentClasses(theme?: object) {
+export const attachmentClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const formElementVars = formElementsVariables(theme);
     const vars = attachmentVariables(theme);
@@ -80,8 +82,8 @@ export function attachmentClasses(theme?: object) {
         maxWidth: percent(100),
         margin: "auto",
         overflow: "hidden",
-        userSelect: "none",
-        ...borderStyles(vars.border),
+        ...userSelect(),
+        ...borders(vars.border),
         $nest: {
             "&.isLoading, &.hasError": {
                 cursor: "pointer",
@@ -117,7 +119,7 @@ export function attachmentClasses(theme?: object) {
         justifyContent: "space-between",
         padding: px(vars.padding.default),
         width: percent(100),
-        ...borderStyles({
+        ...borders({
             color: "transparent",
             width: 2,
             radius: 0,
@@ -189,4 +191,4 @@ export function attachmentClasses(theme?: object) {
     });
 
     return { root, link, box, format, main, title, metas, close, loadingProgress, loadingContent };
-}
+});

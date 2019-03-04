@@ -7,8 +7,9 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
+import memoize from "lodash/memoize";
 
-export function simplePagerVariables(theme?: object) {
+export const simplePagerVariables = memoize((theme?: object) => {
     const themeVars = componentThemeVariables(theme, "simplePager");
 
     const sizing = {
@@ -22,9 +23,9 @@ export function simplePagerVariables(theme?: object) {
     };
 
     return { spacing, sizing };
-}
+});
 
-export function simplePagerClasses(theme?: object) {
+export const simplePagerClasses = memoize((theme?: object) => {
     const vars = simplePagerVariables(theme);
     const debug = debugHelper("simplePager");
 
@@ -47,4 +48,4 @@ export function simplePagerClasses(theme?: object) {
     };
 
     return { root, button };
-}
+});

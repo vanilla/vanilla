@@ -8,6 +8,7 @@ import React from "react";
 import debounce from "lodash/debounce";
 import Quill, { RangeStatic, BoundsStatic } from "quill/core";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
+import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 
 interface IXCoordinates {
     position: number;
@@ -23,6 +24,7 @@ interface IYCoordinates {
 interface IParameters {
     x: IXCoordinates | null;
     y: IYCoordinates | null;
+    offsetX?: IXCoordinates | null;
 }
 
 type HorizontalAlignment = "center" | "start";
@@ -39,6 +41,7 @@ interface IProps extends IWithEditorProps {
     isActive: boolean;
     selectionIndex: number | null;
     selectionLength: number | null;
+    className?: string;
 }
 
 interface IState {
@@ -93,9 +96,10 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
     }
 
     public render() {
+        const vars = richEditorVariables();
         const params = this.props.isActive
             ? {
-                  x: this.getXCoordinates(),
+                  x: this.getXCoordinates(this.props.legacyMode ? 0 : -vars.scrollContainer.overshoot),
                   y: this.getYCoordinates(),
               }
             : {
@@ -144,7 +148,7 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
      *
      * @returns The current quill bounds.
      */
-    private getBounds(): BoundsStatic | null {
+    private getBounds(offsetX?: number, offsetY?: number): BoundsStatic | null {
         const { selectionIndex, selectionLength } = this.props;
         if (selectionIndex === null || selectionLength === null) {
             return null;
@@ -162,6 +166,8 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
             const length = Math.min(lastLine.length() - 1, selectionIndex + selectionLength - index);
             bounds = this.quill.getBounds(index, length);
         }
+        bounds.y += offsetY;
+        bounds.x += offsetX;
 
         return bounds;
     }
@@ -169,8 +175,8 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
     /**
      * Calculate the X coordinates for the toolbar and it's nub.
      */
-    private getXCoordinates(): IXCoordinates | null {
-        const bounds = this.getBounds();
+    private getXCoordinates(offsetX?: number): IXCoordinates | null {
+        const bounds = this.getBounds(offsetX);
         if (!bounds || !this.props.flyoutWidth) {
             return null;
         }
@@ -218,7 +224,7 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
         if (bounds == null || this.props.flyoutHeight == null) {
             return null;
         }
-
+        const vars = richEditorVariables();
         const { flyoutHeight, nubHeight, verticalAlignment } = this.props;
 
         const offset = 0;
@@ -226,12 +232,12 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
         let nubPosition = flyoutHeight;
         let nubPointsDown = true;
 
-        const isNearStart = bounds.top < 30;
+        const isNearStart = bounds.top <= vars.menuButton.size * 2;
         if (isNearStart || verticalAlignment === "below") {
             position = bounds.bottom + offset;
 
             if (nubHeight) {
-                nubPosition = 0 - nubHeight / 2;
+                nubPosition = 1 - nubHeight * 2;
                 nubPointsDown = false;
             }
         }

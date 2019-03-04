@@ -9,6 +9,9 @@ import classNames from "classnames";
 import CloseButton from "@library/components/CloseButton";
 import { IWithEditorProps, withEditor } from "@rich-editor/components/context";
 import { flyoutPosition } from "./flyoutPosition";
+import { richEditorFlyoutClasses } from "@rich-editor/styles/richEditorStyles/flyoutClasses";
+import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
+import { insertEmojiClasses } from "@rich-editor/styles/richEditorStyles/insertEmojiClasses";
 
 interface IState {
     id: string;
@@ -34,6 +37,9 @@ interface IProps extends IWithEditorProps {
     renderAbove?: boolean;
     renderLeft?: boolean;
     legacyMode: boolean;
+    headerClass?: string;
+    bodyClass?: string;
+    footerClass?: string;
 }
 
 export class Popover extends React.Component<IProps, IState> {
@@ -48,23 +54,25 @@ export class Popover extends React.Component<IProps, IState> {
 
     public render() {
         const { additionalClassRoot } = this.props;
+        const classesRichEditor = richEditorClasses();
+        const classesFlyout = richEditorFlyoutClasses();
 
-        let classes = classNames("richEditor-menu", "richEditorFlyout", {
+        let classes = classNames("richEditor-menu", "richEditorFlyout", classesFlyout.root, {
             [additionalClassRoot as any]: !!additionalClassRoot,
             isHidden: !this.props.isVisible,
         });
 
         classes += this.props.className ? ` ${this.props.className}` : "";
 
-        const headerClasses = classNames("richEditorFlyout-header", {
+        const headerClasses = classNames("richEditorFlyout-header", classesFlyout.header, this.props.headerClass, {
             [additionalClassRoot + "-header"]: !!additionalClassRoot,
         });
 
-        const bodyClasses = classNames("richEditorFlyout-body", {
+        const bodyClasses = classNames("richEditorFlyout-body", classesFlyout.body, this.props.bodyClass, {
             [additionalClassRoot + "-body"]: !!additionalClassRoot,
         });
 
-        const footerClasses = classNames("richEditorFlyout-footer", {
+        const footerClasses = classNames("richEditorFlyout-footer", classesFlyout.footer, this.props.footerClass, {
             [additionalClassRoot + "-footer"]: !!additionalClassRoot,
         });
 
@@ -95,7 +103,7 @@ export class Popover extends React.Component<IProps, IState> {
                     <h2
                         id={this.props.titleID}
                         tabIndex={-1}
-                        className="richEditorFlyout-title"
+                        className={classNames("richEditorFlyout-title", classesFlyout.title)}
                         ref={this.props.titleRef}
                     >
                         {this.props.title}
@@ -104,7 +112,7 @@ export class Popover extends React.Component<IProps, IState> {
 
                     <CloseButton
                         onClick={this.props.onCloseClick}
-                        className="richEditor-close"
+                        className={classNames("richEditor-close", classesRichEditor.close)}
                         legacyMode={this.props.legacyMode}
                     />
 

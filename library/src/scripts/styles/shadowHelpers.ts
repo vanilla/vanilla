@@ -7,8 +7,9 @@ import { ColorHelper, color } from "csx";
 import { BorderRadiusProperty } from "csstype";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { TLength } from "typestyle/lib/types";
+import memoize from "lodash/memoize";
 
-export function shadowHelper(theme?: object) {
+export const shadowHelper = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
 
     const embed = (baseColor: ColorHelper = globalVars.mainColors.fg) => {
@@ -57,4 +58,4 @@ export function shadowHelper(theme?: object) {
     };
 
     return { embed, embedHover, dropDown, modal, contrast };
-}
+});

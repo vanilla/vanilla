@@ -7,6 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
+import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
 
 interface IProps {
     name: string;
@@ -18,8 +19,9 @@ interface IProps {
 
 export class EmojiGroupButton extends React.Component<IProps> {
     public render() {
+        const classesRichEditor = richEditorClasses();
         const { name, icon, groupIndex, isSelected } = this.props;
-        const buttonClasses = classNames("richEditor-button", "emojiGroup", { isSelected });
+        const buttonClasses = classNames("richEditor-button", "emojiGroup", { isSelected }, classesRichEditor.button);
 
         return (
             <button

@@ -10,8 +10,9 @@ import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { percent, px } from "csx";
+import { memoize } from "lodash";
 
-export function compactSearchClasses(theme?: object) {
+export const compactSearchClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const formElementVars = formElementsVariables(theme);
     const vanillaHeaderVars = vanillaHeaderVariables(theme);
@@ -71,4 +72,4 @@ export function compactSearchClasses(theme?: object) {
         ...debug.name("cancelContents"),
     });
     return { root, contents, close, cancelContents };
-}
+});

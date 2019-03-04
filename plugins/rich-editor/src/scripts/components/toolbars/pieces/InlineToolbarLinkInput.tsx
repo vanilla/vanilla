@@ -8,6 +8,9 @@ import React from "react";
 import { t } from "@library/application";
 import CloseButton from "@library/components/CloseButton";
 import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
+import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
+import classNames from "classnames";
+import { insertLinkClasses } from "@rich-editor/styles/richEditorStyles/insertLinkClasses";
 
 interface IProps extends IWithEditorProps {
     inputRef: React.RefObject<HTMLInputElement>;
@@ -33,18 +36,30 @@ export class InlineToolbarLinkInput extends React.PureComponent<IProps, {}> {
     }
 
     public render() {
+        const classesRichEditor = richEditorClasses();
+        const classesInsertLink = insertLinkClasses();
         return (
-            <div className="richEditor-menu insertLink likeDropDownContent" role="dialog" aria-label={t("Insert Url")}>
+            <div
+                className={classNames(
+                    "richEditor-menu",
+                    "insertLink",
+                    "likeDropDownContent",
+                    classesRichEditor.menu,
+                    classesInsertLink.root,
+                )}
+                role="dialog"
+                aria-label={t("Insert Url")}
+            >
                 <input
                     value={this.props.inputValue}
                     onChange={this.props.onInputChange}
                     ref={this.props.inputRef}
                     onKeyDown={this.props.onInputKeyDown}
-                    className="InputBox insertLink-input"
-                    placeholder={t("Paste or type a link…")}
+                    className={classNames("InputBox", "inputText", "insertLink-input", classesInsertLink.input)}
+                    placeholder={t("Paste or type url")}
                 />
                 <CloseButton
-                    className="richEditor-close"
+                    className={classNames("richEditor-close", classesRichEditor.close)}
                     onClick={this.props.onCloseClick}
                     legacyMode={this.props.legacyMode}
                 />

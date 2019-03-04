@@ -11,14 +11,16 @@ import {
     debugHelper,
     defaultTransition,
     unit,
+    userSelect,
 } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { FontSizeProperty, HeightProperty, MarginProperty, PaddingProperty, WidthProperty } from "csstype";
 import { TLength } from "typestyle/lib/types";
 import { ColorHelper, percent } from "csx";
 import { shadowHelper } from "@library/styles/shadowHelpers";
+import memoize from "lodash/memoize";
 
-export function subcommunityTileVariables(theme?: object) {
+export const subcommunityTileVariables = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const themeVars = componentThemeVariables(theme, "subcommunityTile");
 
@@ -67,9 +69,9 @@ export function subcommunityTileVariables(theme?: object) {
     };
 
     return { spacing, frame, title, description, link, fallBackIcon };
-}
+});
 
-export function subcommunityTileClasses(theme?: object) {
+export const subcommunityTileClasses = memoize((theme?: object) => {
     const vars = subcommunityTileVariables(theme);
     const debug = debugHelper("subcommunityTile");
     const shadow = shadowHelper(theme);
@@ -80,7 +82,7 @@ export function subcommunityTileClasses(theme?: object) {
         alignItems: "stretch",
         width: percent(100),
         padding: unit(vars.spacing.default),
-        userSelect: "none",
+        ...userSelect(),
         flexGrow: 1,
         ...debug.name(),
     });
@@ -165,4 +167,4 @@ export function subcommunityTileClasses(theme?: object) {
     });
 
     return { root, link, frame, icon, main, title, description, fallBackIcon };
-}
+});

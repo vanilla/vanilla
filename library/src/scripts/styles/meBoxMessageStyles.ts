@@ -5,14 +5,15 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
+import { componentThemeVariables, debugHelper, toStringColor, unit, userSelect } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { calc, percent, quote } from "csx";
 import { objectFitWithFallback } from "@library/styles/styleHelpers";
 import { absolutePosition } from "@library/styles/styleHelpers";
-import vanillaHeaderStyles, { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import { memoize } from "lodash";
 
-export function meBoxMessageVariables(theme?: object) {
+export const meBoxMessageVariables = memoize((theme?: object) => {
     const themeVars = componentThemeVariables(theme, "meBoxMessage");
     const spacing = {
         padding: 8,
@@ -30,9 +31,9 @@ export function meBoxMessageVariables(theme?: object) {
     };
 
     return { spacing, imageContainer, unreadDot };
-}
+});
 
-export function meBoxMessageClasses(theme?: object) {
+export const meBoxMessageClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vars = meBoxMessageVariables(theme);
     const headerVars = vanillaHeaderVariables(theme);
@@ -53,16 +54,11 @@ export function meBoxMessageClasses(theme?: object) {
         flexWrap: "nowrap",
         padding: unit(vars.spacing.padding),
         color: "inherit",
-        userSelect: "none",
+        ...userSelect(),
         $nest: {
             "&:active, &:focus, &:hover, &.focus-visible": {
-                backgroundColor: toStringColor(globalVars.states.active.color),
+                backgroundColor: toStringColor(globalVars.states.active.color.fade(0.1)),
                 textDecoration: "none",
-                color: headerVars.colors.fg.toString(),
-            },
-            "&:active .meta, &:focus .meta, &:hover .meta, &.focus-visible .meta": {
-                color: headerVars.colors.fg.toString(),
-                opacity: 0.75,
             },
         },
         ...debug.name("link"),
@@ -119,4 +115,4 @@ export function meBoxMessageClasses(theme?: object) {
     });
 
     return { root, link, imageContainer, image, status, contents, message };
-}
+});

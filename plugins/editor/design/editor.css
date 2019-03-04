@@ -1,5 +1,7 @@
 .bodybox-wrap {
-  position: relative; }
+  position: relative;
+  overflow: visible;
+  }
 
 .editor-upload-progress {
   position: absolute;

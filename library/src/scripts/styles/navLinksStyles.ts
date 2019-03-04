@@ -9,8 +9,9 @@ import { componentThemeVariables, debugHelper, setAllLinkColors, unit } from "@l
 import { style } from "typestyle";
 import { percent, px } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import memoize from "lodash/memoize";
 
-export function navLinksVariables(theme?: object) {
+export const navLinksVariables = memoize((theme?: object) => {
     const themeVars = componentThemeVariables(theme, "navLinks");
     const globalVars = globalVariables(theme);
 
@@ -61,9 +62,9 @@ export function navLinksVariables(theme?: object) {
     };
 
     return { linksWithHeadings, item, title, sizing, link, viewAll, spacing };
-}
+});
 
-export function navLinksClasses(theme?: object) {
+export const navLinksClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
     const vars = navLinksVariables(theme);
     const debug = debugHelper("navLinks");
@@ -147,4 +148,4 @@ export function navLinksClasses(theme?: object) {
     );
 
     return { root, items, item, title, link, viewAll, linksWithHeadings };
-}
+});

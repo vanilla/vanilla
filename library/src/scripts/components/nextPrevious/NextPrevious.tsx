@@ -13,6 +13,7 @@ import ScreenReaderContent from "@library/components/ScreenReaderContent";
 import Heading from "@library/components/Heading";
 import AdjacentLink, { LeftRight } from "@library/components/nextPrevious/AdjacentLink";
 import { px } from "csx";
+import memoize from "lodash/memoize";
 
 interface IUrlItem {
     name: string;
@@ -67,7 +68,7 @@ export default class NextPrevious extends React.Component<IProps> {
         );
     }
 
-    public nextPreviousVariables = (theme?: object) => {
+    public nextPreviousVariables = memoize((theme?: object) => {
         const globalVars = globalVariables(theme);
         const themeVars = componentThemeVariables(theme, "nextPreviousVars");
 
@@ -90,9 +91,9 @@ export default class NextPrevious extends React.Component<IProps> {
             ...themeVars.subComponentStyles("colors"),
         };
         return { lineHeights, fonts, colors };
-    };
+    });
 
-    public nextPreviousStyles = (theme?: object) => {
+    public nextPreviousStyles = memoize((theme?: object) => {
         const globalVars = globalVariables(theme);
         const vars = this.nextPreviousVariables(theme);
         const debug = debugHelper("nextPrevious");
@@ -181,5 +182,5 @@ export default class NextPrevious extends React.Component<IProps> {
         });
 
         return { root, adjacent, previous, next, title, chevron, directionLabel, chevronLeft, chevronRight };
-    };
+    });
 }

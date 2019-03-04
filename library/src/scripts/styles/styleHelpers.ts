@@ -19,11 +19,22 @@ import {
     JustifyContentProperty,
     ContentProperty,
     ObjectFitProperty,
+    WhiteSpaceProperty,
+    TextOverflowProperty,
+    OverflowXProperty,
+    MaxWidthProperty,
+    AppearanceProperty,
+    UserSelectProperty,
 } from "csstype";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { style, keyframes } from "typestyle";
-import { TLength, NestedCSSProperties } from "typestyle/lib/types";
+import { keyframes } from "typestyle";
+import { TLength } from "typestyle/lib/types";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import styleFactory from "@library/styles/styleFactory";
+
+export const toStringColor = (colorValue: ColorHelper | "transparent") => {
+    return typeof colorValue === "string" ? colorValue : colorValue.toString();
+};
 
 export function flexHelper() {
     const middle = (wrap = false) => {
@@ -92,16 +103,55 @@ export function centeredBackgroundProps() {
 }
 
 export function centeredBackground() {
+    const style = styleFactory("centeredBackground");
     return style(centeredBackgroundProps());
 }
 
 export function backgroundCover(backgroundImage: BackgroundImageProperty) {
+    const style = styleFactory("backgroundCover");
     return style({
         ...centeredBackgroundProps(),
         backgroundSize: "cover",
         backgroundImage: backgroundImage.toString(),
     });
 }
+
+export function inputLineHeight(height: number, paddingTop: number, fullBorderWidth: number) {
+    return unit(height - (2 * paddingTop + fullBorderWidth));
+}
+
+export const textInputSizing = (height: number, fontSize: number, paddingTop: number, fullBorderWidth: number) => {
+    return {
+        fontSize: unit(fontSize),
+        width: percent(100),
+        height: unit(height),
+        lineHeight: inputLineHeight(height, paddingTop, fullBorderWidth),
+        ...paddings({
+            top: unit(paddingTop),
+            bottom: unit(paddingTop),
+            left: unit(paddingTop * 2),
+            right: unit(paddingTop * 2),
+        }),
+    };
+};
+
+// must be nested
+export const placeholderStyles = (styles: object) => {
+    return {
+        "&::-webkit-input-placeholder": {
+            $unique: true,
+            ...styles,
+        },
+        "&::-moz-placeholder": {
+            $unique: true,
+            ...styles,
+        },
+        "&::-ms-input-placeholder": {
+            $unique: true,
+            ...styles,
+        },
+    };
+};
 
 /*
  * Helper to generate human readable classes generated from TypeStyle
@@ -118,40 +168,6 @@ export const debugHelper = (componentName: string) => {
         },
     };
 };
-
-/**
- * A better helper to generate human readable classes generated from TypeStyle.
- *
- * This works like debugHelper but automatically. The generated function behaves just like `style()`
- * but can automatically adds a debug name & allows the first argument to be a string subcomponent name.
- *
- * @example
- * const style = styleFactory("myComponent");
- * const myClass = style({ color: "red" }); // .myComponent-sad421s
- * const mySubClass = style("subcomponent", { color: "red" }) // .myComponent-subcomponent-23sdaf43
- *
- */
-export function styleFactory(componentName: string) {
-    function styleCreator(subcomponentName: string, ...objects: Array<NestedCSSProperties | undefined>);
-    function styleCreator(...objects: Array<NestedCSSProperties | undefined>);
-    function styleCreator(...objects: Array<NestedCSSProperties | undefined | string>) {
-        if (objects.length === 0) {
-            return style();
-        }
-
-        let debugName = componentName;
-        let styleObjs: Array<NestedCSSProperties | undefined> = objects as any;
-        if (typeof objects[0] === "string") {
-            const [subcomponentName, ...restObjects] = styleObjs;
-            debugName += `-${subcomponentName}`;
-            styleObjs = restObjects;
-        }
-
-        return style({ $debugName: debugName }, ...styleObjs);
-    }
-
-    return styleCreator;
-}
 
 /*
  * Color modification based on colors lightness.
@@ -199,6 +215,7 @@ export const componentThemeVariables = (theme: any | undefined, componentName: s
 };
 
 export const inheritHeightClass = () => {
+    const style = styleFactory("inheritHeight");
     return style({
         display: "flex",
         flexDirection: "column",
@@ -224,21 +241,31 @@ const spinnerLoaderAnimation = keyframes({
     "100%": { transform: `rotate(${deg(360 + spinnerOffset)})` },
 });
 
-interface IBorderStyles {
+interface ISingleBorderStyle {
     color?: ColorHelper | "transparent";
     width?: BorderWidthProperty<TLength>;
     style?: BorderStyleProperty;
+}
+
+interface IBorderStyles extends ISingleBorderStyle {
     radius?: BorderRadiusProperty<TLength>;
 }
 
-export const borderStyles = (styles: IBorderStyles) => {
+export const borders = (styles: IBorderStyles = {}) => {
     const vars = globalVariables();
     return {
-        borderColor: styles.color ? styles.color.toString() : vars.border.color.toString(),
-        borderWidth: unit(styles.width),
+        borderColor: styles.color ? styles.color.toString() : toStringColor(vars.border.color),
+        borderWidth: styles.width ? unit(styles.width) : unit(vars.border.width),
         borderStyle: styles.style ? styles.style : vars.border.style,
-        borderRadius: unit(styles.radius),
+        borderRadius: styles.radius ? unit(styles.radius) : unit(vars.border.radius),
     };
+};
+
+export const singleBorder = (styles: ISingleBorderStyle = {}) => {
+    const vars = globalVariables();
+    return `${styles.style ? styles.style : vars.border.style} ${
+        styles.color ? toStringColor(styles.color) : toStringColor(vars.border.color)
+    } ${styles.width ? unit(styles.width) : unit(vars.border.width)}`;
 };
 
 export const allLinkStates = (styles: object) => {
@@ -255,10 +282,10 @@ export const allLinkStates = (styles: object) => {
 export const unit = (val: string | number | undefined, unitFunction = px) => {
     if (typeof val === "string") {
         return val;
-    } else if (!!val && !isNaN(val)) {
+    } else if (val !== undefined && val !== null && !isNaN(val)) {
         return unitFunction(val as number);
     } else {
-        return undefined;
+        return val;
     }
 };
 
@@ -286,12 +313,25 @@ interface IPaddings {
 }
 
 export const paddings = (styles: IPaddings) => {
-    return {
-        paddingTop: unit(styles.top),
-        paddingRight: unit(styles.right),
-        paddingBottom: unit(styles.bottom),
-        paddingLeft: unit(styles.left),
-    };
+    const paddingVals = {} as any;
+
+    if (styles.top !== undefined) {
+        paddingVals.paddingTop = unit(styles.top);
+    }
+
+    if (styles.right !== undefined) {
+        paddingVals.paddingRight = unit(styles.right);
+    }
+
+    if (styles.bottom !== undefined) {
+        paddingVals.paddingBottom = unit(styles.bottom);
+    }
+
+    if (styles.left !== undefined) {
+        paddingVals.paddingLeft = unit(styles.left);
+    }
+
+    return paddingVals;
 };
 
 export interface ISpinnerProps {
@@ -445,7 +485,7 @@ export const disabledInput = () => {
     const formElementVars = formElementsVariables();
     return {
         pointerEvents: important("none"),
-        userSelect: important("none"),
+        ...userSelect("none", true),
         cursor: important("default"),
         opacity: important((formElementVars.disabled.opacity as any).toString()),
     };
@@ -469,10 +509,6 @@ export const objectFitWithFallback = () => {
             },
         },
     };
-};
-
-export const toStringColor = (colorValue: ColorHelper | "transparent") => {
-    return typeof colorValue === "string" ? colorValue : colorValue.toString();
 };
 
 export interface ILinkStates {
@@ -517,5 +553,40 @@ export const setAllLinkColors = (overwrites?: ILinkStates) => {
             "&:active": styles.active,
             "&:visited": styles.visited,
         },
+    };
+};
+
+export const singleLineEllipsis = () => {
+    return {
+        whiteSpace: "nowrap" as WhiteSpaceProperty,
+        textOverflow: "ellipsis" as TextOverflowProperty,
+        overflowX: "hidden" as OverflowXProperty,
+        maxWidth: percent(100) as MaxWidthProperty<TLength>,
+    };
+};
+export const longWordEllipsis = () => {
+    return {
+        textOverflow: "ellipsis" as TextOverflowProperty,
+        overflowX: "hidden" as OverflowXProperty,
+        maxWidth: percent(100) as MaxWidthProperty<TLength>,
+    };
+};
+
+export const appearance = (value: AppearanceProperty = "none", isImportant: boolean = false) => {
+    const val = (isImportant ? important(value) : value) as any;
+    return {
+        "-webkit-appearance": val,
+        "-moz-appearance": val,
+        appearance: val,
+    };
+};
+
+export const userSelect = (value: UserSelectProperty = "none", isImportant: boolean = false) => {
+    const val = (isImportant ? important(value) : value) as any;
+    return {
+        "-webkit-user-select": val,
+        "-moz-user-select": val,
+        "-ms-user-select": val,
+        userSelect: val,
     };
 };

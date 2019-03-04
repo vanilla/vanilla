@@ -13,6 +13,7 @@ import {
     toStringColor,
     unit,
     userSelect,
+    paddings,
 } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
@@ -71,35 +72,6 @@ export const richEditorClasses = memoize((theme?: object) => {
         },
     });
 
-    const scrollContainer = style("scrollContainer", {
-        position: "relative",
-        overflow: "auto",
-        height: percent(100),
-        width: calc(`100% + ${unit(vars.scrollContainer.overshoot * 2)}`),
-        marginLeft: unit(-vars.scrollContainer.overshoot),
-        paddingTop: unit(globalVars.gutter.half),
-        paddingLeft: unit(vars.scrollContainer.overshoot),
-        paddingRight: unit(vars.scrollContainer.overshoot),
-    });
-
-    const scrollFrame = style("scrollFrame", {
-        position: "relative",
-        backgroundColor: toStringColor(vars.colors.bg),
-        height: "auto",
-        padding: 0,
-        $nest: {
-            "&.isMenuInset": {
-                overflow: "initial",
-                position: "relative",
-            },
-        },
-    });
-
-    const frame = style("frame", {
-        width: percent(100),
-        height: calc(`100% - ${unit(formElementVars.border.width + formElementVars.sizing.height)}`),
-    });
-
     const menu = style("menu", {
         display: "inline-block",
         position: "relative",
@@ -111,7 +83,8 @@ export const richEditorClasses = memoize((theme?: object) => {
         alignItems: "center",
         justifyContent: "center",
         top: unit(vars.pilcrow.offset),
-        left: unit(vars.spacing.paddingLeft - globalVars.icon.sizes.default + 2),
+        left: 0,
+        marginLeft: unit(-globalVars.icon.sizes.default - 12),
         transform: `translateX(-100%)`,
         height: unit(vars.paragraphMenuHandle.size),
         width: unit(globalVars.icon.sizes.default),
@@ -265,7 +238,6 @@ export const richEditorClasses = memoize((theme?: object) => {
         display: "block",
         width: percent(100),
         padding: unit(vars.embedMenu.padding),
-        marginTop: unit(formElementVars.border.width),
     });
 
     const icon = style("icon", {
@@ -301,8 +273,6 @@ export const richEditorClasses = memoize((theme?: object) => {
 
     return {
         root,
-        scrollContainer,
-        scrollFrame,
         menu,
         paragraphMenu,
         paragraphMenuHandle,
@@ -311,7 +281,6 @@ export const richEditorClasses = memoize((theme?: object) => {
         upload,
         embedBar,
         menuItem,
-        frame,
         button,
         icon,
         close,

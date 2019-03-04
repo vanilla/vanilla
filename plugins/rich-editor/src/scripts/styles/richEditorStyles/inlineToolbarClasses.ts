@@ -31,7 +31,7 @@ export const inlineToolbarClasses = memoize((theme?: object) => {
                 },
             },
             "&.isDown": {
-                transform: `translateY(${unit(vars.menu.offset)})`,
+                transform: `translateY(${unit(vars.menu.offset * 2)})`,
                 $nest: {
                     ".richEditor-nub": {
                         transform: `translateY(100%) rotate(-45deg)`,

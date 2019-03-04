@@ -30,6 +30,7 @@ import throttle from "lodash/throttle";
 import EmbedBar from "@rich-editor/components/editor/pieces/EmbedBar";
 import hljs from "highlight.js";
 import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
+import { richEditorFormClasses } from "@rich-editor/styles/richEditorStyles/richEditorFormClasses";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -99,6 +100,7 @@ export class Editor extends React.Component<IProps> {
     private renderModern(): React.ReactNode {
         const { className } = this.props as INewProps;
         const classesRichEditor = richEditorClasses();
+        const classesRichEditorForm = richEditorFormClasses();
         return (
             <div
                 className={classNames(
@@ -116,9 +118,12 @@ export class Editor extends React.Component<IProps> {
                 {this.renderContexts(
                     <>
                         {this.renderEmbedBar()}
-                        <div className={classNames("richEditor-scrollFrame", classesRichEditor.scrollFrame)}>
+                        <div className={classNames("richEditor-scrollFrame", classesRichEditorForm.scrollFrame)}>
                             <div
-                                className={classNames("richEditor-scrollContainer", classesRichEditor.scrollContainer)}
+                                className={classNames(
+                                    "richEditor-scrollContainer",
+                                    classesRichEditorForm.scrollContainer,
+                                )}
                                 ref={this.scrollContainerRef}
                             >
                                 <div
@@ -126,7 +131,7 @@ export class Editor extends React.Component<IProps> {
                                         "richEditor-frame",
                                         "InputBox",
                                         "isMenuInset",
-                                        classesRichEditor.scrollFrame,
+                                        classesRichEditorForm.scrollFrame,
                                     )}
                                     id="testScroll"
                                 >
@@ -146,9 +151,12 @@ export class Editor extends React.Component<IProps> {
      * The legacy rendering mode has everything at the bottom, and uses the document as it's scroll container.
      */
     private renderLegacy(): React.ReactNode {
-        const classesRichEditor = richEditorClasses();
+        const classesRichEditorForm = richEditorFormClasses();
         return this.renderContexts(
-            <div className={classNames("richEditor-frame", "InputBox", classesRichEditor.scrollFrame)} id="testScroll">
+            <div
+                className={classNames("richEditor-frame", "InputBox", classesRichEditorForm.scrollFrame)}
+                id="testScroll"
+            >
                 {this.renderMountPoint()}
                 {this.renderParagraphToolbar()}
                 {this.renderInlineToolbars()}

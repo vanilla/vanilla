@@ -189,7 +189,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
             classes += " likeDropDownContent";
         }
 
-        if (bounds.top > 30) {
+        if (bounds.top <= 30) {
             classes += " isDown";
         } else {
             classes += " isUp";

@@ -4,24 +4,17 @@
  * @license GPL-2.0-only
  */
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
-import {
-    absolutePosition,
-    paddings,
-    placeholderStyles,
-    textInputSizing,
-    toStringColor,
-    unit,
-} from "@library/styles/styleHelpers";
+import { paddings, placeholderStyles, textInputSizing, toStringColor, unit } from "@library/styles/styleHelpers";
 import styleFactory from "@library/styles/styleFactory";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { calc, percent } from "csx";
-import { layoutVariables } from "@library/styles/layoutStyles";
+import { calc, percent, px, viewHeight } from "csx";
 import { memoize } from "lodash";
+import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 
 export const richEditorFormClasses = memoize((theme?: object) => {
     const globalVars = globalVariables(theme);
-    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const headerVars = vanillaHeaderVariables(theme);
     const vars = richEditorVariables(theme);
     const formElementVars = formElementsVariables(theme);
     const style = styleFactory("richEditorForm");
@@ -29,8 +22,8 @@ export const richEditorFormClasses = memoize((theme?: object) => {
     const root = style({});
 
     const frame = style("frame", {
-        width: calc(`100% + ${unit(globalVars.gutter.half)}`),
-        marginLeft: unit(-globalVars.gutter.quarter),
+        width: percent(100),
+        margin: "auto",
     });
 
     const textWrap = style("textWrap", {
@@ -80,26 +73,61 @@ export const richEditorFormClasses = memoize((theme?: object) => {
         borderTopRightRadius: 0,
         marginTop: unit(-formElementVars.border.width),
         display: "flex",
+        flexGrow: 1,
         flexDirection: "column",
     });
 
-    const scrollContainer = style("scrollContainer", {
-        paddingTop: unit(globalVars.gutter.half),
-    });
-
-    const scrollFrame = style("scrollFrame", {
-        ...absolutePosition.bottomLeft(),
-        width: percent(100),
-        height: calc(`100% - ${formElementVars.border.width + formElementVars.sizing.height}`),
-    });
-
     const body = style("body", {
-        paddingTop: unit(globalVars.overlay.fullPageHeadingSpacer),
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "flex-start",
         flexGrow: 1,
+        maxHeight: calc(`100vh - ${unit(headerVars.sizing.height)}`),
+        paddingTop: unit(globalVars.overlay.fullPageHeadingSpacer),
+        marginBottom: px(12),
+        overflow: "hidden",
     });
 
     const inlineMenuItems = style("inlineMenuItems", {
         borderBottom: `${unit(formElementVars.border.width)} solid ${toStringColor(formElementVars.border.color)}`,
+    });
+
+    const formContent = style("formContent", {
+        display: "flex",
+        flexDirection: "column",
+        flexGrow: 1,
+    });
+
+    const scrollFrame = style("scrollFrame", {
+        position: "relative",
+        backgroundColor: toStringColor(vars.colors.bg),
+        flexGrow: 1,
+        padding: 0,
+        overflow: "auto",
+        minHeight: percent(100),
+        width: calc(`100% + ${unit(vars.scrollContainer.overshoot * 2)}`),
+        marginLeft: unit(-vars.scrollContainer.overshoot),
+        paddingLeft: unit(vars.scrollContainer.overshoot),
+        paddingRight: unit(vars.scrollContainer.overshoot),
+        $nest: {
+            "&.isMenuInset": {
+                overflow: "initial",
+                position: "relative",
+            },
+        },
+    });
+
+    //marginTop: unit(globalVars.overlay.fullPageHeadingSpacer),
+
+    const scrollContainer = style("scrollContainer", {
+        position: "relative",
+        display: "block",
+        height: "auto",
+        ...paddings({
+            top: globalVars.gutter.half,
+            bottom: globalVars.gutter.size,
+        }),
     });
 
     return {
@@ -108,9 +136,10 @@ export const richEditorFormClasses = memoize((theme?: object) => {
         textWrap,
         title,
         editor,
-        scrollContainer,
         scrollFrame,
+        scrollContainer,
         body,
         inlineMenuItems,
+        formContent,
     };
 });

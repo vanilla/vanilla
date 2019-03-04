@@ -42,6 +42,9 @@ export const richEditorVariables = memoize((theme?: object) => {
         ...themeVars.subComponentStyles("menuButton"),
     };
 
+    const paragraphMenu = {
+        ...themeVars.subComponentStyles("paragraphMenu"),
+    };
     const paragraphMenuHandle = {
         size: 28,
         offset: -varsFormElements.border.width + 1,
@@ -129,7 +132,7 @@ export const richEditorVariables = memoize((theme?: object) => {
     };
 
     const scrollContainer = {
-        overshoot: 48,
+        overshoot: 40,
         ...themeVars.subComponentStyles("scrollContainer"),
     };
 
@@ -142,6 +145,7 @@ export const richEditorVariables = memoize((theme?: object) => {
         spacing,
         sizing,
         menuButton,
+        paragraphMenu,
         paragraphMenuHandle,
         insertLink,
         flyout,

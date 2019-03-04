@@ -44,6 +44,7 @@ export class ToolbarContainer extends React.PureComponent<IProps, IState> {
     public render() {
         const { isVisible, selection } = this.props;
         const classesInlineToolbar = inlineToolbarClasses();
+        const editorVariables = richEditorVariables();
         return (
             <ToolbarPositioner
                 {...this.state}
@@ -52,7 +53,7 @@ export class ToolbarContainer extends React.PureComponent<IProps, IState> {
                 isActive={isVisible}
                 className={classesInlineToolbar.root}
             >
-                {({ x, y }) => {
+                {({ x, y, offsetX = editorVariables.scrollContainer.overshoot }) => {
                     const classesNub = nubClasses();
 
                     let toolbarStyles: React.CSSProperties = {
@@ -70,16 +71,15 @@ export class ToolbarContainer extends React.PureComponent<IProps, IState> {
                         toolbarStyles = {
                             position: "absolute",
                             top: y ? y.position : 0,
-                            left: x ? x.position : 0,
+                            left: (x ? x.position : 0) + editorVariables.scrollContainer.overshoot,
                             zIndex: 5,
                             visibility: "visible",
                         };
 
                         nubStyles = {
-                            left: x ? x.nubPosition : 0,
-                            top: y ? y.nubPosition : 0,
+                            left: x && x.nubPosition ? x.nubPosition : 0,
+                            top: y && y.nubPosition ? y.nubPosition : 0,
                         };
-
                         classes += y && y.nubPointsDown ? " isUp" : " isDown";
                     }
                     return (

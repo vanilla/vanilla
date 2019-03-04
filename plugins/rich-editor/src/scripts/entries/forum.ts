@@ -7,7 +7,6 @@
 import editorReducer from "@rich-editor/state/editorReducer";
 import { registerReducer } from "@library/state/reducerRegistry";
 import { onReady, onContent } from "@library/application";
-import "../../scss/editor.scss";
 
 onReady(() => {
     registerReducer("editor", editorReducer);

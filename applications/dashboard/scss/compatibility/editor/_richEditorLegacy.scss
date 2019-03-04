@@ -3,6 +3,10 @@
  * @license GPL-2.0-only
  */
 
+$richEditor_horizontalPadding                     : 36px !default;
+$richEditor_verticalPadding                       : 12px !default;
+$richEditor_innerPadding                          : 12px !default;
+
 .richEditor {
     color: $global-color_fg;
 

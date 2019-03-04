@@ -896,11 +896,6 @@ label.checkbox input.checkbox-input {
 }
 
 /*!
- * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-/*!
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -923,7 +918,6 @@ label.checkbox input.checkbox-input {
  */
 .richEditor {
   color: #555a62;
-  padding-left: 36px;
 }
 
 .richEditor blockquote {
@@ -1160,10 +1154,6 @@ body.hasRichEditor #Form_Preview {
   border-radius: 6px;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-}
-
-.richEditor-text:focus {
-  box-shadow: 0 0 0 1px rgba(2, 145, 219, 0.6);
 }
 
 .ql-clipboard {

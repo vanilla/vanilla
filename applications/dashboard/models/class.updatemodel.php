@@ -148,6 +148,19 @@ class UpdateModel extends Gdn_Model {
                 $deleteEntries = true;
             }
 
+            // Set addon.json to the first entry if it exists and isn't already.
+            // This is a patch to avoid parseArrayInfo errors because getInfoZip is returning the entries
+            // in the right order.
+            $names = array_column($entries, 'Name');
+            $addonJSONExists = in_array('/addon.json', $names);
+
+            if ($entries[0]['Name'] !== '/addon.json' && $addonJSONExists) {
+                $tempArray = $entries[0];
+                $arrayKey = array_search('/addon.json', $names);
+                $entries[0] = $entries[$arrayKey];
+                $entries[$arrayKey] = $tempArray;
+            }
+
             foreach ($entries as $entry) {
                 if ($entry['Name'] == '/environment.php') {
                     // This could be the core vanilla package.

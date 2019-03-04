@@ -10,7 +10,7 @@
 import { onReady } from "@library/application";
 import { logError } from "@library/utility";
 import { Reducer, ReducersMapObject } from "redux";
-import UsersModel from "@library/users/UsersModel";
+import UsersModel, { IUsersStoreState } from "@library/users/UsersModel";
 import { IUsersState } from "@dashboard/@types/state";
 import { IThemeState, themeReducer } from "@library/theming/themeReducer";
 
@@ -30,8 +30,7 @@ export function registerReducer(name: string, reducer: Reducer) {
     }
 }
 
-export interface ICoreStoreState {
-    users: IUsersState;
+export interface ICoreStoreState extends IUsersStoreState {
     theme: IThemeState;
 }
 

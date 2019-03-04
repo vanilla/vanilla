@@ -18,7 +18,6 @@ export const inlineToolbarClasses = memoize((theme?: object, legacyMode: boolean
     const root = style({
         $nest: {
             "&.isUp": {
-                transform: `translateY(${unit(-offsetForNub * 2)})`,
                 $nest: {
                     ".richEditor-nubPosition": {
                         transform: `translateY(${!legacyMode ? "-1px" : "9px"}) translateX(-50%)`,
@@ -32,7 +31,7 @@ export const inlineToolbarClasses = memoize((theme?: object, legacyMode: boolean
                 },
             },
             "&.isDown": {
-                transform: `translateY(${unit(offsetForNub)})`,
+                transform: `translateY(50%)`,
                 $nest: {
                     ".richEditor-nub": {
                         transform: `translateY(50%) rotate(-45deg)`,

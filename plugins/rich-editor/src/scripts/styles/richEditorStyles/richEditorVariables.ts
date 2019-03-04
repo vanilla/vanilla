@@ -53,7 +53,6 @@ export const richEditorVariables = memoize((theme?: object) => {
 
     const insertLink = {
         width: 287,
-        leftPadding: 9,
         ...themeVars.subComponentStyles("insertLink"),
     };
 

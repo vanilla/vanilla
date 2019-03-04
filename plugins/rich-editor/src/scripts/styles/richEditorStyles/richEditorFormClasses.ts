@@ -22,11 +22,6 @@ export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolea
 
     const root = style({});
 
-    const frame = style("frame", {
-        width: percent(100),
-        margin: "auto",
-    });
-
     const textWrap = style("textWrap", {
         ...paddings({
             top: 0,
@@ -101,12 +96,15 @@ export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolea
     });
 
     const scrollFrame = style("scrollFrame", {
+        margin: "auto",
+        minHeight: unit(vars.sizing.minHeight + vars.menuButton.size),
         position: "relative",
         backgroundColor: toStringColor(vars.colors.bg),
-        flexGrow: 1,
+        display: !legacyMode ? "flex" : undefined,
+        flexDirection: !legacyMode ? "column" : undefined,
+        flexGrow: !legacyMode ? 1 : undefined,
         padding: 0,
-        overflow: "auto",
-        minHeight: percent(100),
+        overflow: !legacyMode ? "auto" : undefined,
         width: legacyMode ? percent(100) : calc(`100% + ${unit(overshoot * 2)}`),
         marginLeft: legacyMode ? undefined : unit(-overshoot),
         paddingLeft: legacyMode ? undefined : unit(overshoot),
@@ -121,8 +119,10 @@ export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolea
 
     const scrollContainer = style("scrollContainer", {
         position: "relative",
-        display: "block",
         height: "auto",
+        display: "flex",
+        flexDirection: "column",
+        flexGrow: 1,
         ...paddings({
             top: globalVars.gutter.half,
             bottom: globalVars.gutter.size,
@@ -131,7 +131,6 @@ export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolea
 
     return {
         root,
-        frame,
         textWrap,
         title,
         editor,

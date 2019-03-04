@@ -109,7 +109,6 @@ export const richEditorClasses = memoize((theme?: object, legacyMode: boolean = 
 
     const text = style("text", {
         position: "relative",
-        minHeight: unit(vars.sizing.minHeight),
         whiteSpace: important("pre-wrap"),
         outline: 0,
     });

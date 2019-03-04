@@ -131,7 +131,7 @@ export class Editor extends React.Component<IProps> {
                                         "richEditor-frame",
                                         "InputBox",
                                         "isMenuInset",
-                                        classesRichEditorForm.scrollFrame,
+                                        classesRichEditor.frame,
                                     )}
                                     id="testScroll"
                                 >

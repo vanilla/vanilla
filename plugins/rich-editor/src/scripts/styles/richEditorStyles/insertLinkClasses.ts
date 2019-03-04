@@ -13,7 +13,6 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 
 export const insertLinkClasses = memoize((theme?: object) => {
     const vars = richEditorVariables(theme);
-    const globalVars = globalVariables(theme);
     const style = styleFactory("insertLink");
 
     const root = style({
@@ -23,7 +22,7 @@ export const insertLinkClasses = memoize((theme?: object) => {
         alignItems: "center",
         maxWidth: unit(vars.insertLink.width),
         width: percent(100),
-        paddingLeft: unit(vars.insertLink.leftPadding),
+        paddingLeft: 0,
     });
 
     const input = style("input", {

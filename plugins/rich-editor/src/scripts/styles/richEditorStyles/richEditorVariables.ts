@@ -76,7 +76,7 @@ export const richEditorVariables = memoize((theme?: object) => {
 
     const menu = {
         borderWidth: 1,
-        offset: nub.width,
+        offset: nub.width * 2,
         ...themeVars.subComponentStyles("menu"),
     };
 

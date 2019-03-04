@@ -99,7 +99,7 @@ export class Editor extends React.Component<IProps> {
      */
     private renderModern(): React.ReactNode {
         const { className } = this.props as INewProps;
-        const classesRichEditor = richEditorClasses();
+        const classesRichEditor = richEditorClasses({}, this.props.legacyMode);
         const classesRichEditorForm = richEditorFormClasses({}, this.props.legacyMode);
         return (
             <div
@@ -169,7 +169,7 @@ export class Editor extends React.Component<IProps> {
      * Render the elements that Quill will mount into.
      */
     private renderMountPoint(): React.ReactNode {
-        const classesRichEditor = richEditorClasses();
+        const classesRichEditor = richEditorClasses({}, this.props.legacyMode);
         return (
             <div className="richEditor-textWrap" ref={this.quillMountRef}>
                 <div

@@ -99,7 +99,7 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
         const vars = richEditorVariables();
         const params = this.props.isActive
             ? {
-                  x: this.getXCoordinates(-vars.scrollContainer.overshoot),
+                  x: this.getXCoordinates(this.props.legacyMode ? 0 : -vars.scrollContainer.overshoot),
                   y: this.getYCoordinates(),
               }
             : {

@@ -20,11 +20,12 @@ interface IProps {
     lastGoodSelection: RangeStatic;
     onLinkClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
     className?: string;
+    legacyMode?: boolean;
 }
 
 export default class InlineToolbarMenuItems extends React.PureComponent<IProps> {
     public render() {
-        const classesInlineToolbar = inlineToolbarClasses();
+        const classesInlineToolbar = inlineToolbarClasses({}, !!this.props.legacyMode);
         return (
             <MenuItems
                 menuItemData={this.menuItemData}

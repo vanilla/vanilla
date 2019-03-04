@@ -10,32 +10,33 @@ import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEd
 import { percent } from "csx";
 import memoize from "lodash/memoize";
 
-export const inlineToolbarClasses = memoize((theme?: object) => {
+export const inlineToolbarClasses = memoize((theme?: object, legacyMode: boolean = false) => {
     const vars = richEditorVariables(theme);
     const style = styleFactory("inlineToolbar");
 
+    const offsetForNub = vars.menu.offset / 2;
     const root = style({
         $nest: {
             "&.isUp": {
-                transform: `translateY(${unit(-vars.menu.offset)})`,
+                transform: `translateY(${unit(-offsetForNub * 2)})`,
                 $nest: {
                     ".richEditor-nubPosition": {
-                        transform: `translateY(-1px) translateX(-50%)`,
+                        transform: `translateY(${!legacyMode ? "-1px" : "9px"}) translateX(-50%)`,
                         alignItems: "flex-end",
                         bottom: percent(100),
                     },
                     ".richEditor-nub": {
-                        transform: `translateY(-100%) rotate(135deg)`,
-                        marginBottom: unit(vars.nub.width / 2),
+                        transform: `translateY(-50%) rotate(135deg)`,
+                        marginBottom: unit(offsetForNub),
                     },
                 },
             },
             "&.isDown": {
-                transform: `translateY(${unit(vars.menu.offset * 2)})`,
+                transform: `translateY(${unit(offsetForNub)})`,
                 $nest: {
                     ".richEditor-nub": {
-                        transform: `translateY(100%) rotate(-45deg)`,
-                        marginTop: unit(vars.nub.width / 2),
+                        transform: `translateY(50%) rotate(-45deg)`,
+                        marginTop: unit(offsetForNub),
                     },
                 },
             },

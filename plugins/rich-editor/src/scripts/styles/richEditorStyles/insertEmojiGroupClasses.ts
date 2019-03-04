@@ -3,15 +3,14 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
+import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { unit } from "@library/styles/styleHelpers";
-import styleFactory from "@library/styles/styleFactory";
-import memoize from "lodash/memoize";
+import { memoizeTheme, styleFactory } from "@library/styles/styleUtils";
+import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 
-export const emojiGroupsClasses = memoize(() => {
+export const emojiGroupsClasses = memoizeTheme(() => {
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const vars = richEditorVariables();

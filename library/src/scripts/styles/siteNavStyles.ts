@@ -4,15 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
+import { memoizeTheme } from "@library/styles/styleUtils";
 import { calc, percent, px } from "csx";
-import memoize from "lodash/memoize";
+import { style } from "typestyle";
 
-export const siteNavVariables = memoize(() => {
+export const siteNavVariables = memoizeTheme(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const themeVars = componentThemeVariables("siteNav");
@@ -49,7 +49,7 @@ export const siteNavVariables = memoize(() => {
     return { node, title, nodeToggle, spacer };
 });
 
-export const siteNavClasses = memoize(() => {
+export const siteNavClasses = memoizeTheme(() => {
     const globalVars = globalVariables();
     const vars = siteNavVariables();
     const mediaQueries = layoutVariables().mediaQueries();
@@ -89,7 +89,7 @@ export const siteNavClasses = memoize(() => {
     return { root, title, children };
 });
 
-export const siteNavNodeClasses = memoize(() => {
+export const siteNavNodeClasses = memoizeTheme(() => {
     const globalVars = globalVariables();
     const vars = siteNavVariables();
     const mediaQueries = layoutVariables().mediaQueries();

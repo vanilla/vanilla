@@ -1,14 +1,13 @@
-import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, debugHelper, objectFitWithFallback, unit } from "@library/styles/styleHelpers";
+import { memoizeTheme } from "@library/styles/styleUtils";
 import { style } from "typestyle";
-import memoize from "lodash/memoize";
 
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-export const userPhotoVariables = memoize(() => {
+export const userPhotoVariables = memoizeTheme(() => {
     const themeVars = componentThemeVariables("userPhoto");
 
     const border = {
@@ -26,7 +25,7 @@ export const userPhotoVariables = memoize(() => {
     return { border, sizing };
 });
 
-export const userPhotoClasses = memoize(() => {
+export const userPhotoClasses = memoizeTheme(() => {
     const vars = userPhotoVariables();
     const debug = debugHelper("userPhoto");
 

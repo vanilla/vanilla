@@ -4,7 +4,7 @@
  */
 
 import { createStore, compose, applyMiddleware, combineReducers, Store, AnyAction } from "redux";
-import { getReducers } from "@library/state/reducerRegistry";
+import { getReducers, getReducersReady } from "@library/state/reducerRegistry";
 import thunk from "redux-thunk";
 
 // There may be an initial state to import.
@@ -41,4 +41,12 @@ export default function getStore<S>(): Store<S> {
     }
 
     return store;
+}
+
+export function getDeferredStoreState<S, T>(fallback: T): S | T {
+    if (getReducersReady()) {
+        return getStore<S>().getState();
+    } else {
+        return fallback;
+    }
 }

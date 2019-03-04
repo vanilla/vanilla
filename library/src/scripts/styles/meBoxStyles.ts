@@ -5,15 +5,13 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, flexHelper, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
-import { px } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import memoize from "lodash/memoize";
+import { debugHelper, flexHelper, unit } from "@library/styles/styleHelpers";
+import { memoizeTheme } from "@library/styles/styleUtils";
+import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import { style } from "typestyle";
 
-export const meBoxClasses = memoize(() => {
+export const meBoxClasses = memoizeTheme(() => {
     const globalVars = globalVariables();
     const vanillaHeaderVars = vanillaHeaderVariables();
     const debug = debugHelper("meBox");

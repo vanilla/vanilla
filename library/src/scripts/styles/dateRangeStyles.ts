@@ -8,9 +8,9 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { percent } from "csx";
-import memoize from "lodash/memoize";
+import { memoizeTheme } from "@library/styles/styleUtils";
 
-export const dateRangeClasses = memoize(() => {
+export const dateRangeClasses = memoizeTheme(() => {
     const globalVars = globalVariables();
     const debug = debugHelper("dateRange");
 

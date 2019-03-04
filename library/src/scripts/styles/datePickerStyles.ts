@@ -9,9 +9,9 @@ import { componentThemeVariables, debugHelper, unit } from "@library/styles/styl
 import { style } from "typestyle";
 import { percent, px } from "csx";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import memoize from "lodash/memoize";
+import { memoizeTheme } from "@library/styles/styleUtils";
 
-export const dayPickerVariables = memoize(() => {
+export const dayPickerVariables = memoizeTheme(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const themeVars = componentThemeVariables("datePicker");
@@ -42,7 +42,7 @@ export const dayPickerVariables = memoize(() => {
     return { spacing, sizing, colors, border };
 });
 
-export const dayPickerClasses = memoize(() => {
+export const dayPickerClasses = memoizeTheme(() => {
     const debug = debugHelper("dayPicker");
     const vars = dayPickerVariables();
 

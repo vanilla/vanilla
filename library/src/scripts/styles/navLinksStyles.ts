@@ -5,13 +5,13 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, setAllLinkColors, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
-import { percent, px } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import memoize from "lodash/memoize";
+import { componentThemeVariables, debugHelper, setAllLinkColors, unit } from "@library/styles/styleHelpers";
+import { memoizeTheme } from "@library/styles/styleUtils";
+import { percent } from "csx";
+import { style } from "typestyle";
 
-export const navLinksVariables = memoize(() => {
+export const navLinksVariables = memoizeTheme(() => {
     const themeVars = componentThemeVariables("navLinks");
     const globalVars = globalVariables();
 
@@ -64,7 +64,7 @@ export const navLinksVariables = memoize(() => {
     return { linksWithHeadings, item, title, sizing, link, viewAll, spacing };
 });
 
-export const navLinksClasses = memoize(() => {
+export const navLinksClasses = memoizeTheme(() => {
     const globalVars = globalVariables();
     const vars = navLinksVariables();
     const debug = debugHelper("navLinks");

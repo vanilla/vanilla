@@ -4,14 +4,14 @@
  * @license GPL-2.0-only
  */
 
+import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, debugHelper, unit, userSelect } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { memoizeTheme } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
-import memoize from "lodash/memoize";
+import { style } from "typestyle";
 
-export const tokensVariables = memoize(() => {
+export const tokensVariables = memoizeTheme(() => {
     const globalVars = globalVariables();
     const themeVars = componentThemeVariables("tokens");
 
@@ -34,7 +34,7 @@ export const tokensVariables = memoize(() => {
     return { clearIcon, clear, token };
 });
 
-export const tokensClasses = memoize(() => {
+export const tokensClasses = memoizeTheme(() => {
     const globalVars = globalVariables();
     const vars = tokensVariables();
     const formElVars = formElementsVariables();

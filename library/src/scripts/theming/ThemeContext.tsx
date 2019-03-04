@@ -67,7 +67,7 @@ export function withTheme<T extends IWithThemeProps = IWithThemeProps>(WrappedCo
 
 export function getThemeVariables() {
     const store = getStore<ICoreStoreState>();
-    return store.getState().theme.variables;
+    return store.getState().theme.variables.data || {};
 }
 
 interface IOwnProps {

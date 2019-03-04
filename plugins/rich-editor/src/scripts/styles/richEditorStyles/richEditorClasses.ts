@@ -14,7 +14,7 @@ import {
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
-import styleFactory from "@library/styles/styleFactory";
+import { styleFactory } from "@library/styles/styleUtils";
 import { calc, important, percent } from "csx";
 import memoize from "lodash/memoize";
 

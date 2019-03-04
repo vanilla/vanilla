@@ -5,6 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { shadowHelper } from "@library/styles/shadowHelpers";
 import {
     absolutePosition,
     componentThemeVariables,
@@ -13,14 +14,13 @@ import {
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
+import { memoizeTheme } from "@library/styles/styleUtils";
 import { FontSizeProperty, HeightProperty, MarginProperty, PaddingProperty, WidthProperty } from "csstype";
-import { TLength } from "typestyle/lib/types";
 import { ColorHelper, percent } from "csx";
-import { shadowHelper } from "@library/styles/shadowHelpers";
-import memoize from "lodash/memoize";
+import { style } from "typestyle";
+import { TLength } from "typestyle/lib/types";
 
-export const subcommunityTileVariables = memoize(() => {
+export const subcommunityTileVariables = memoizeTheme(() => {
     const globalVars = globalVariables();
     const themeVars = componentThemeVariables("subcommunityTile");
 
@@ -71,7 +71,7 @@ export const subcommunityTileVariables = memoize(() => {
     return { spacing, frame, title, description, link, fallBackIcon };
 });
 
-export const subcommunityTileClasses = memoize(() => {
+export const subcommunityTileClasses = memoizeTheme(() => {
     const vars = subcommunityTileVariables();
     const debug = debugHelper("subcommunityTile");
     const shadow = shadowHelper();

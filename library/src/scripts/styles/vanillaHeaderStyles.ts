@@ -4,9 +4,9 @@
  * @license GPL-2.0-only
  */
 
-import { percent, px } from "csx";
+import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-
+import { layoutVariables } from "@library/styles/layoutStyles";
 import {
     componentThemeVariables,
     debugHelper,
@@ -15,13 +15,11 @@ import {
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
+import { memoizeTheme } from "@library/styles/styleUtils";
+import { percent, px } from "csx";
 import { style } from "typestyle";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { layoutVariables } from "@library/styles/layoutStyles";
-import memoize from "lodash/memoize";
-import { getThemeVariables } from "@library/theming/ThemeContext";
 
-export const vanillaHeaderVariables = memoize(() => {
+export const vanillaHeaderVariables = memoizeTheme(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const themeVars = componentThemeVariables("vanillaHeader");
@@ -155,7 +153,7 @@ export const vanillaHeaderVariables = memoize(() => {
     };
 });
 
-export const vanillaHeaderClasses = memoize(() => {
+export const vanillaHeaderClasses = memoizeTheme(() => {
     const globalVars = globalVariables();
     const vars = vanillaHeaderVariables();
     const formElementVars = formElementsVariables();
@@ -603,7 +601,7 @@ export const vanillaHeaderClasses = memoize(() => {
     };
 });
 
-export const vanillaHeaderLogoClasses = memoize(() => {
+export const vanillaHeaderLogoClasses = memoizeTheme(() => {
     const vars = vanillaHeaderVariables();
     const logoFrame = style({ display: "inline-flex" });
     const debug = debugHelper("vanillaHeaderLogo");
@@ -628,7 +626,7 @@ export const vanillaHeaderLogoClasses = memoize(() => {
     return { logoFrame, logo, link };
 });
 
-export const vanillaHeaderHomeClasses = memoize(() => {
+export const vanillaHeaderHomeClasses = memoizeTheme(() => {
     const vars = vanillaHeaderVariables();
     const globalVars = globalVariables();
     const debug = debugHelper("vanillaHeaderHome");

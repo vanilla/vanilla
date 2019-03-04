@@ -4,14 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import { viewHeight } from "csx";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables } from "@library/styles/styleHelpers";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { standardAnimations } from "@library/styles/animationHelpers";
-import memoize from "lodash/memoize";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { componentThemeVariables } from "@library/styles/styleHelpers";
+import { memoizeTheme } from "@library/styles/styleUtils";
+import { viewHeight } from "csx";
 
-export const richEditorVariables = memoize(() => {
+export const richEditorVariables = memoizeTheme(() => {
     const globalVars = globalVariables();
     const varsFormElements = formElementsVariables();
     const themeVars = componentThemeVariables("richEditor");

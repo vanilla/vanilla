@@ -4,14 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { appearance, unit } from "@library/styles/styleHelpers";
-import styleFactory from "@library/styles/styleFactory";
-import { em, viewHeight } from "csx";
-import memoize from "lodash/memoize";
+import { memoizeTheme, styleFactory } from "@library/styles/styleUtils";
+import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
+import { viewHeight } from "csx";
 
-export const insertEmojiClasses = memoize(() => {
+export const insertEmojiClasses = memoizeTheme(() => {
     const globalVars = globalVariables();
     const vars = richEditorVariables();
     const style = styleFactory("insertEmoji");

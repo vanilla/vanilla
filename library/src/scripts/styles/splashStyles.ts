@@ -6,13 +6,11 @@
 
 import { assetUrl } from "@library/application";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { searchVariables } from "@library/styles/searchStyles";
-import { centeredBackgroundProps, getColorDependantOnLightness, variableFactory } from "@library/styles/styleHelpers";
+import { centeredBackgroundProps, getColorDependantOnLightness } from "@library/styles/styleHelpers";
+import { memoizeTheme, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { percent, px, url } from "csx";
-import memoize from "lodash/memoize";
-import styleFactory from "@library/styles/styleFactory";
 
-export const splashVariables = memoize(() => {
+export const splashVariables = memoizeTheme(() => {
     const makeThemeVars = variableFactory("splash");
     const globalVars = globalVariables();
     const elementaryColor = globalVars.elementaryColors;
@@ -49,7 +47,7 @@ export const splashVariables = memoize(() => {
     return { fullBackground, title, spacing, border, searchContainer };
 });
 
-export const splashStyles = memoize(() => {
+export const splashStyles = memoizeTheme(() => {
     const vars = splashVariables();
     const style = styleFactory("splash");
 

@@ -4,12 +4,11 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, componentThemeVariables } from "@library/styles/styleHelpers";
+import { componentThemeVariables, debugHelper } from "@library/styles/styleHelpers";
+import { memoizeTheme } from "@library/styles/styleUtils";
 import { style } from "typestyle";
-import { IButtonType } from "@library/styles/buttonStyles";
-import memoize from "lodash/memoize";
 
-export const searchVariables = memoize(() => {
+export const searchVariables = memoizeTheme(() => {
     const globalVars = globalVariables();
     const elementaryColor = globalVars.elementaryColors;
     const themeVars = componentThemeVariables("search");
@@ -33,7 +32,7 @@ export const searchVariables = memoize(() => {
     return { input, placeholder };
 });
 
-export const searchClasses = memoize(() => {
+export const searchClasses = memoizeTheme(() => {
     const vars = searchVariables();
     const debug = debugHelper("search");
 

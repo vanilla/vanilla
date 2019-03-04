@@ -5,15 +5,21 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, toStringColor, unit, userSelect } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
-import { calc, percent, quote } from "csx";
-import { objectFitWithFallback } from "@library/styles/styleHelpers";
-import { absolutePosition } from "@library/styles/styleHelpers";
+import {
+    absolutePosition,
+    componentThemeVariables,
+    debugHelper,
+    objectFitWithFallback,
+    toStringColor,
+    unit,
+    userSelect,
+} from "@library/styles/styleHelpers";
+import { memoizeTheme } from "@library/styles/styleUtils";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
-import { memoize } from "lodash";
+import { calc, percent, quote } from "csx";
+import { style } from "typestyle";
 
-export const meBoxMessageVariables = memoize(() => {
+export const meBoxMessageVariables = memoizeTheme(() => {
     const themeVars = componentThemeVariables("meBoxMessage");
     const spacing = {
         padding: 8,
@@ -33,7 +39,7 @@ export const meBoxMessageVariables = memoize(() => {
     return { spacing, imageContainer, unreadDot };
 });
 
-export const meBoxMessageClasses = memoize(() => {
+export const meBoxMessageClasses = memoizeTheme(() => {
     const globalVars = globalVariables();
     const vars = meBoxMessageVariables();
     const headerVars = vanillaHeaderVariables();

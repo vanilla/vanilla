@@ -5,11 +5,10 @@
 
 import { px } from "csx";
 import { media } from "typestyle";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, componentThemeVariables } from "@library/styles/styleHelpers";
-import memoize from "lodash/memoize";
+import { componentThemeVariables } from "@library/styles/styleHelpers";
+import { memoizeTheme } from "@library/styles/styleUtils";
 
-export const layoutVariables = memoize(() => {
+export const layoutVariables = memoizeTheme(() => {
     const themeVars = componentThemeVariables("globalVariables");
 
     const gutterSize = 24;

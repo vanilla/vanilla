@@ -4,12 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
+import { memoizeTheme } from "@library/styles/styleUtils";
 import { style } from "typestyle";
-import memoize from "lodash/memoize";
 
-export const simplePagerVariables = memoize(() => {
+export const simplePagerVariables = memoizeTheme(() => {
     const themeVars = componentThemeVariables("simplePager");
 
     const sizing = {
@@ -25,7 +24,7 @@ export const simplePagerVariables = memoize(() => {
     return { spacing, sizing };
 });
 
-export const simplePagerClasses = memoize(() => {
+export const simplePagerClasses = memoizeTheme(() => {
     const vars = simplePagerVariables();
     const debug = debugHelper("simplePager");
 

@@ -7,9 +7,9 @@
 import { debugHelper } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { memoize } from "lodash";
+import { memoizeTheme } from "@library/styles/styleUtils";
 
-export const dropDownClasses = memoize(() => {
+export const dropDownClasses = memoizeTheme(() => {
     const layoutVars = layoutVariables();
     const debug = debugHelper("dropDown");
 

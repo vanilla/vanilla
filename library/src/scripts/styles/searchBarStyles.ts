@@ -4,17 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { buttonVariables } from "@library/styles/buttonStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { layoutVariables } from "@library/styles/layoutStyles";
+import { componentThemeVariables, debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
+import { memoizeTheme } from "@library/styles/styleUtils";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { calc, important, percent, px } from "csx";
-import { buttonVariables } from "@library/styles/buttonStyles";
-import { layoutVariables } from "@library/styles/layoutStyles";
-import memoize from "lodash/memoize";
+import { style } from "typestyle";
 
-export const searchBarVariables = memoize(() => {
+export const searchBarVariables = memoizeTheme(() => {
     const formElementVars = formElementsVariables();
     const themeVars = componentThemeVariables("searchBar");
 
@@ -47,7 +47,7 @@ export const searchBarVariables = memoize(() => {
     return { search, searchIcon, sizing, placeholder, heading };
 });
 
-export const searchBarClasses = memoize(() => {
+export const searchBarClasses = memoizeTheme(() => {
     const globalVars = globalVariables();
     const vars = searchBarVariables();
     const vanillaHeaderVars = vanillaHeaderVariables();

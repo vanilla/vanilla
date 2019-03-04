@@ -3,13 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import { ColorHelper, color } from "csx";
-import { BorderRadiusProperty } from "csstype";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { memoizeTheme } from "@library/styles/styleUtils";
+import { BorderRadiusProperty } from "csstype";
+import { color, ColorHelper } from "csx";
 import { TLength } from "typestyle/lib/types";
-import memoize from "lodash/memoize";
 
-export const shadowHelper = memoize(() => {
+export const shadowHelper = memoizeTheme(() => {
     const globalVars = globalVariables();
 
     const embed = (baseColor: ColorHelper = globalVars.mainColors.fg) => {

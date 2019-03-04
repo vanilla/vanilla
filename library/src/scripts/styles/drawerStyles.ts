@@ -7,11 +7,10 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { percent } from "csx";
-import memoize from "lodash/memoize";
+import { memoizeTheme } from "@library/styles/styleUtils";
 
-export const drawerVariables = memoize(() => {
+export const drawerVariables = memoizeTheme(() => {
     const globalVars = globalVariables();
     const themeVars = componentThemeVariables("drawer");
 
@@ -36,7 +35,7 @@ export const drawerVariables = memoize(() => {
     return { spacing, fonts, sizing };
 });
 
-export const drawerClasses = memoize(() => {
+export const drawerClasses = memoizeTheme(() => {
     const vars = drawerVariables();
     const debug = debugHelper("drawer");
 

@@ -9,9 +9,9 @@ import { absolutePosition, unit, componentThemeVariables, debugHelper, flexHelpe
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc, percent, px } from "csx";
-import memoize from "lodash/memoize";
+import { memoizeTheme } from "@library/styles/styleUtils";
 
-export const compactMeBoxVariables = memoize(() => {
+export const compactMeBoxVariables = memoizeTheme(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const themeVars = componentThemeVariables("compactMeBox");
@@ -25,7 +25,7 @@ export const compactMeBoxVariables = memoize(() => {
     return { tab };
 });
 
-export const compactMeBoxClasses = memoize(() => {
+export const compactMeBoxClasses = memoizeTheme(() => {
     const globalVars = globalVariables();
     const vars = compactMeBoxVariables();
     const debug = debugHelper("compactMeBox");

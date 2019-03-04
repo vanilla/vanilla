@@ -8,10 +8,10 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables } from "@library/styles/styleHelpers";
 import { px } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import styleFactory from "@library/styles/styleFactory";
+import { styleFactory, memoizeTheme } from "@library/styles/styleUtils";
 import { memoize } from "lodash";
 
-export const formElementsVariables = memoize(() => {
+export const formElementsVariables = memoizeTheme(() => {
     const vars = globalVariables();
     const varsLayouts = layoutVariables();
     const mixBgAndFg = vars.mixBgAndFg;
@@ -94,7 +94,7 @@ export const formElementsVariables = memoize(() => {
     };
 });
 
-export const formErrorClasses = memoize(() => {
+export const formErrorClasses = memoizeTheme(() => {
     const style = styleFactory("formError");
     const varsGlobal = globalVariables();
     const vars = formElementsVariables();

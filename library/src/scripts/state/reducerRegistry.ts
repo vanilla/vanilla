@@ -8,11 +8,10 @@
  */
 
 import { onReady } from "@library/application";
+import { IThemeState, themeReducer } from "@library/theming/themeReducer";
+import UsersModel, { IUsersStoreState } from "@library/users/UsersModel";
 import { logError } from "@library/utility";
 import { Reducer, ReducersMapObject } from "redux";
-import UsersModel, { IUsersStoreState } from "@library/users/UsersModel";
-import { IUsersState } from "@dashboard/@types/state";
-import { IThemeState, themeReducer } from "@library/theming/themeReducer";
 
 let haveGot = false;
 let wasReadyCalled = false;
@@ -32,6 +31,10 @@ export function registerReducer(name: string, reducer: Reducer) {
 
 export interface ICoreStoreState extends IUsersStoreState {
     theme: IThemeState;
+}
+
+export function getReducersReady(): boolean {
+    return haveGot;
 }
 
 export function getReducers(): ReducersMapObject<any, any> {

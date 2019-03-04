@@ -3,15 +3,13 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutVariables } from "@library/styles/layoutStyles";
 import { singleBorder, toStringColor, unit, userSelect } from "@library/styles/styleHelpers";
-import styleFactory from "@library/styles/styleFactory";
+import { memoizeTheme, styleFactory } from "@library/styles/styleUtils";
+import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { translateX } from "csx";
-import memoize from "lodash/memoize";
 
-export const nubClasses = memoize(() => {
+export const nubClasses = memoizeTheme(() => {
     const globalVars = globalVariables();
     const vars = richEditorVariables();
     const style = styleFactory("nub");

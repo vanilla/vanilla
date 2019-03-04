@@ -3,13 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import { componentThemeVariables, getColorDependantOnLightness, toStringColor } from "@library/styles/styleHelpers";
+import { getColorDependantOnLightness, toStringColor } from "@library/styles/styleHelpers";
+import { memoizeTheme, variableFactory } from "@library/styles/styleUtils";
 import { color, ColorHelper, percent } from "csx";
-import memoize from "lodash/memoize";
 
-export const globalVariables = memoize(() => {
+export const globalVariables = memoizeTheme(() => {
     const colorPrimary = color("#0291db");
-    const themeVars = componentThemeVariables("globalVariables");
+    const makeThemeVars = variableFactory("globalVariables");
 
     const utility = {
         "percentage.third": percent(100 / 3),
@@ -23,13 +23,12 @@ export const globalVariables = memoize(() => {
         transparent: `transparent`,
     };
 
-    const mainColors = {
+    const mainColors = makeThemeVars("mainColors", {
         fg: color("#555a62"),
         bg: color("#fff"),
         primary: colorPrimary,
         secondary: getColorDependantOnLightness(colorPrimary, colorPrimary, 0.1, true),
-        ...themeVars.subComponentStyles("mainColors"),
-    };
+    });
 
     const mixBgAndFg = (weight: number) => {
         return mainColors.fg.mix(mainColors.bg, weight) as ColorHelper;
@@ -46,7 +45,7 @@ export const globalVariables = memoize(() => {
     const errorFg = color("#555A62");
     const warning = color("#ffce00");
     const deleted = color("#D0021B");
-    const feedbackColors = {
+    const feedbackColors = makeThemeVars("feedbackColors", {
         warning,
         error: {
             fg: errorFg,
@@ -55,10 +54,9 @@ export const globalVariables = memoize(() => {
         confirm: color("#60bd68"),
         unresolved: warning.mix(mainColors.fg, 10),
         deleted,
-        ...themeVars.subComponentStyles("feedbackColors"),
-    };
+    });
 
-    const links = {
+    const links = makeThemeVars("links", {
         colors: {
             default: mainColors.fg,
             hover: mainColors.secondary,
@@ -66,51 +64,44 @@ export const globalVariables = memoize(() => {
             accessibleFocus: mainColors.secondary,
             active: mainColors.secondary,
         },
-        ...themeVars.subComponentStyles("links"),
-    };
+    });
 
-    const body = {
+    const body = makeThemeVars("body", {
         bg: mainColors.bg,
-        ...themeVars.subComponentStyles("body"),
-    };
+    });
 
-    const border = {
+    const border = makeThemeVars("border", {
         color: mixBgAndFg(0.24),
         width: 1,
         style: "solid",
         radius: 6,
-        ...themeVars.subComponentStyles("border"),
-    };
+    });
 
     const gutterSize = 24;
-    const gutter = {
+    const gutter = makeThemeVars("gutter", {
         size: gutterSize,
         half: gutterSize / 2,
         quarter: gutterSize / 4,
-        ...themeVars.subComponentStyles("gutter"),
-    };
+    });
 
-    const lineHeights = {
+    const lineHeights = makeThemeVars("lineHeight", {
         base: 1.5,
         condensed: 1.25,
         code: 1.45,
         excerpt: 1.45,
-        ...themeVars.subComponentStyles("lineHeight"),
-    };
+    });
 
     const panelWidth = 216;
-    const panel = {
+    const panel = makeThemeVars("panelWidth", {
         width: panelWidth,
         paddedWidth: panelWidth + gutter.size,
-        ...themeVars.subComponentStyles("panelWidth"),
-    };
+    });
 
     const middleColumnWidth = 672;
-    const middleColumn = {
+    const middleColumn = makeThemeVars("middleColumn", {
         width: middleColumnWidth,
         paddedWidth: middleColumnWidth + gutter.size,
-        ...themeVars.subComponentStyles("middleColumn"),
-    };
+    });
 
     const content = {
         width:
@@ -119,7 +110,7 @@ export const globalVariables = memoize(() => {
             gutter.size * 3 /* *3 from margin between columns and half margin on .container*/,
     };
 
-    const fonts = {
+    const fonts = makeThemeVars("fonts", {
         size: {
             large: 16,
             medium: 14,
@@ -139,28 +130,25 @@ export const globalVariables = memoize(() => {
             semiBold: 600,
             bold: 700,
         },
-        ...themeVars.subComponentStyles("fonts"),
-    };
+    });
 
-    const icon = {
+    const icon = makeThemeVars("icon", {
         sizes: {
             large: 32,
             default: 24,
             small: 16,
         },
         color: mixBgAndFg(0.18),
-        ...themeVars.subComponentStyles("icon"),
-    };
+    });
 
     const spacer = fonts.size.medium * lineHeights.base;
 
-    const animation = {
+    const animation = makeThemeVars("animation", {
         defaultTiming: ".15s",
         defaultEasing: "ease-out",
-        ...themeVars.subComponentStyles("animation"),
-    };
+    });
 
-    const embed = {
+    const embed = makeThemeVars("embed", {
         error: {
             bg: feedbackColors.error,
         },
@@ -182,10 +170,9 @@ export const globalVariables = memoize(() => {
                 color: mainColors.bg.fade(0.5),
             },
         },
-        ...themeVars.subComponentStyles("embed"),
-    };
+    });
 
-    const meta = {
+    const meta = makeThemeVars("meta", {
         text: {
             fontSize: fonts.size.small,
             color: mixBgAndFg(0.85),
@@ -202,7 +189,7 @@ export const globalVariables = memoize(() => {
             fg: mixBgAndFg(0.85),
             deleted: feedbackColors.deleted,
         },
-    };
+    });
 
     const states = {
         icon: {
@@ -236,7 +223,7 @@ export const globalVariables = memoize(() => {
         spacer: 32,
     };
 
-    const userContent = {
+    const userContent = makeThemeVars("userContent", {
         font: {
             sizes: {
                 default: fonts.size.medium,
@@ -254,7 +241,7 @@ export const globalVariables = memoize(() => {
                 minWidth: "2em",
             },
         },
-    };
+    });
 
     const buttonIconSize = 36;
     const buttonIcon = {

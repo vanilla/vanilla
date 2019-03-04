@@ -20,8 +20,9 @@ import {
 import { BorderColorProperty, BorderRadiusProperty, BorderStyleProperty, WidthProperty } from "csstype";
 import { TLength } from "typestyle/lib/types";
 import memoize from "lodash/memoize";
+import { memoizeTheme } from "@library/styles/styleUtils";
 
-export const buttonStyles = memoize(() => {
+export const buttonStyles = memoizeTheme(() => {
     const globalVars = globalVariables();
     const themeVars = componentThemeVariables("button");
     const padding = {
@@ -78,7 +79,7 @@ export interface IButtonType {
     };
 }
 
-export const buttonVariables = memoize(() => {
+export const buttonVariables = memoizeTheme(() => {
     const globalVars = globalVariables();
     const themeVars = componentThemeVariables("button");
 
@@ -185,16 +186,16 @@ export const buttonVariables = memoize(() => {
     return { standard, primary, transparent };
 });
 
-export const buttonSizing = memoize((height, minWidth, fontSize, paddingHorizontal, formElementVars) => {
+export const buttonSizing = (height, minWidth, fontSize, paddingHorizontal, formElementVars) => {
     return {
         minHeight: px(formElementVars.sizing.height),
         fontSize: px(fontSize),
         padding: `${px(0)} ${px(paddingHorizontal)}`,
         lineHeight: px(formElementVars.sizing.height - formElementVars.border.width * 2),
     };
-});
+};
 
-export const generateButtonClass = memoize((buttonType: IButtonType, buttonName: string, setZIndexOnState = false) => {
+export const generateButtonClass = (buttonType: IButtonType, buttonName: string, setZIndexOnState = false) => {
     const globalVars = globalVariables();
     const formElVars = formElementsVariables();
     const vars = buttonStyles();
@@ -262,7 +263,7 @@ export const generateButtonClass = memoize((buttonType: IButtonType, buttonName:
             },
         },
     });
-});
+};
 
 export enum ButtonTypes {
     STANDARD = "standard",
@@ -270,7 +271,7 @@ export enum ButtonTypes {
     TRANSPARENT = "transparent",
 }
 
-export const buttonClasses = memoize(() => {
+export const buttonClasses = memoizeTheme(() => {
     const vars = buttonVariables();
     return {
         primary: generateButtonClass(vars.primary, "primary"),

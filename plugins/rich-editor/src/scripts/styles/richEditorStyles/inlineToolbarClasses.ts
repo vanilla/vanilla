@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import styleFactory from "@library/styles/styleFactory";
+import { styleFactory } from "@library/styles/styleUtils";
 import { unit } from "@library/styles/styleHelpers";
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { percent } from "csx";

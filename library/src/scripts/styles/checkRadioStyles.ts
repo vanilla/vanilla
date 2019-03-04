@@ -21,9 +21,9 @@ import {
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { em, important, percent, px } from "csx";
-import memoize from "lodash/memoize";
+import { memoizeTheme } from "@library/styles/styleUtils";
 
-export const checkRadioVariables = memoize(() => {
+export const checkRadioVariables = memoizeTheme(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const themeVars = componentThemeVariables("checkRadio");
@@ -83,7 +83,7 @@ export const checkRadioVariables = memoize(() => {
     return { border, main, checkBox, radioButton, labelNote, sizing };
 });
 
-export const checkRadioClasses = memoize(() => {
+export const checkRadioClasses = memoizeTheme(() => {
     const globalVars = globalVariables();
     const vars = checkRadioVariables();
     const debug = debugHelper("checkRadio");

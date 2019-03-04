@@ -5,13 +5,13 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
+import { memoizeTheme } from "@library/styles/styleUtils";
 import { percent } from "csx";
-import memoize from "lodash/memoize";
+import { style } from "typestyle";
 
-export const subcommunityListVariables = memoize(() => {
+export const subcommunityListVariables = memoizeTheme(() => {
     const themeVars = componentThemeVariables("subcommunityList");
     const globalVars = globalVariables();
     const spacing = {
@@ -27,7 +27,7 @@ export const subcommunityListVariables = memoize(() => {
     return { spacing, sizing };
 });
 
-export const subcommunityListClasses = memoize(() => {
+export const subcommunityListClasses = memoizeTheme(() => {
     const globalVars = globalVariables();
     const vars = subcommunityListVariables();
     const debug = debugHelper("subcommunityList");

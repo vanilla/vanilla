@@ -30,8 +30,12 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { keyframes } from "typestyle";
 import { TLength } from "typestyle/lib/types";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import styleFactory from "@library/styles/styleFactory";
+import { styleFactory } from "@library/styles/styleUtils";
 import { getThemeVariables } from "@library/theming/ThemeContext";
+import memoize from "lodash/memoize";
+import getStore from "@library/state/getStore";
+import { ICoreStoreState } from "@library/state/reducerRegistry";
+import { getMeta } from "@library/application";
 
 export const toStringColor = (colorValue: ColorHelper | "transparent") => {
     return typeof colorValue === "string" ? colorValue : colorValue.toString();
@@ -213,16 +217,6 @@ export const componentThemeVariables = (componentName: string) => {
         subComponentStyles,
     };
 };
-
-export function variableFactory(componentName: string) {
-    const themeVars = getThemeVariables();
-    const componentVars = (themeVars && themeVars[componentName]) || {};
-
-    return function makeThemeVars<T extends object>(subElementName: string, declaredVars: T): T {
-        const subcomponentVars = (componentVars && componentVars[subElementName]) || {};
-        return { declaredVars, ...subcomponentVars };
-    };
-}
 
 export const inheritHeightClass = () => {
     const style = styleFactory("inheritHeight");

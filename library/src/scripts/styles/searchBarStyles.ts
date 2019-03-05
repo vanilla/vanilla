@@ -30,7 +30,7 @@ export function searchBarVariables(theme?: object) {
     };
 
     const sizing = {
-        height: formElementVars.sizing.height,
+        height: 40,
         ...themeVars.subComponentStyles("sizing"),
     };
 
@@ -101,6 +101,7 @@ export function searchBarClasses(theme?: object) {
                     marginLeft: -1,
                     minWidth: unit(vars.search.minWidth),
                     flexBasis: unit(vars.search.minWidth),
+                    minHeight: unit(vars.sizing.height),
                     $nest: {
                         "&:hover, &:focus": {
                             zIndex: 1,

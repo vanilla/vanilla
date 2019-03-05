@@ -196,11 +196,11 @@ class UpdateModel extends Gdn_Model {
                         $info = self::parseInfoArray($entry['Path']);
                     }
 
-                    if ($info === false || !is_array($info)) {
-                        continue;
+                    $result = self::checkAddon($info, $entry);
+                    if (!empty($result)) {
+                      continue;
                     }
 
-                    $result = self::checkAddon($info, $entry);
                     $addon = self::buildAddon($info);
                 }
             }

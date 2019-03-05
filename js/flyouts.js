@@ -30,8 +30,8 @@
         $(document).delegate(".ButtonGroup > .Handle", "click", handleButtonHandleClick);
         $(document).delegate(".ToggleFlyout", "click", handleToggleFlyoutClick);
         $(document).delegate(".ToggleFlyout a", "mouseup", handleToggleFlyoutMouseUp);
-        $(document).delegate(".mobileFlyoutOverlay", 'click touchstart', closeAllFlyouts);
-        $(document).delegate('.Flyout', 'click touchstart', function(e) {
+        $(document).delegate(".mobileFlyoutOverlay", "click", closeAllFlyouts);
+        $(document).delegate(".Flyout", "click", function(e) {
             e.stopPropagation();
         });
     });
@@ -70,7 +70,7 @@
             var wrap = document.createElement("span");
             wrap.classList.add("mobileFlyoutOverlay");
 
-            $contents.each(function () {
+            $contents.each(function() {
                 var $item = $(this);
                 if (!this.parentElement.classList.contains("mobileFlyoutOverlay")) {
                     $item.wrap(wrap);
@@ -307,7 +307,7 @@
             $toggleFlyouts.each(function() {
                 $toggle = $(this);
                 var $handle = $(this).find(
-                    ".FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)"
+                    ".FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)",
                 );
                 var $flyout = $(this).find(".Flyout, .Dropdown");
                 var isOpen = $toggle.hasClass(OPEN_CLASS);

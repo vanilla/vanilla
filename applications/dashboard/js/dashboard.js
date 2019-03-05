@@ -1024,6 +1024,11 @@ $(document).on('contentLoad', function(e) {
             aria: true
         }).on('ifChanged', function() {
             $(this).trigger('change');
+
+                // Re-firing event for forward-compatibility.
+                var evt = document.createEvent("HTMLEvents");
+                evt.initEvent("change", false, true);
+                $(this)[0].dispatchEvent(evt);
         });
 
         $(selector, element).on('inputChecked', function() {

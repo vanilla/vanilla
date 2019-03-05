@@ -13,6 +13,7 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 import React from "react";
 import { connect } from "react-redux";
 import getStore from "@library/state/getStore";
+import Backgrounds from "@library/components/body/Backgrounds";
 
 export interface IWithThemeProps {
     theme: IThemeVariables;
@@ -33,7 +34,12 @@ class BaseThemeProvider extends React.Component<IProps> {
             return null;
         }
 
-        return this.props.children;
+        return (
+            <>
+                <Backgrounds />
+                {this.props.children}
+            </>
+        );
     }
 
     public componentDidMount() {

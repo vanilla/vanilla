@@ -108,13 +108,17 @@ export function centeredBackground() {
     return style(centeredBackgroundProps());
 }
 
-export function backgroundCover(backgroundImage: BackgroundImageProperty) {
-    const style = styleFactory("backgroundCover");
-    return style({
-        ...centeredBackgroundProps(),
-        backgroundSize: "cover",
-        backgroundImage: backgroundImage.toString(),
-    });
+export function backgroundCover(backgroundImage: BackgroundImageProperty | null) {
+    if (backgroundImage) {
+        return {
+            backgroundPosition: `50% 50%`,
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            backgroundImage,
+        };
+    } else {
+        return {};
+    }
 }
 
 export function inputLineHeight(height: number, paddingTop: number, fullBorderWidth: number) {

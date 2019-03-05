@@ -5,10 +5,11 @@
 
 import { getColorDependantOnLightness, toStringColor } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { color, ColorHelper, percent } from "csx";
+import { color, ColorHelper, percent, viewHeight } from "csx";
 
 export const globalVariables = useThemeCache(() => {
     const colorPrimary = color("#0291db");
+    const dark = color("#2c2c2c");
     const makeThemeVars = variableFactory("globalVariables");
 
     const utility = {
@@ -68,6 +69,11 @@ export const globalVariables = useThemeCache(() => {
 
     const body = makeThemeVars("body", {
         bg: mainColors.bg,
+        backgroundImage: {
+            image: "",
+            repeat: false,
+            height: viewHeight(100),
+        },
     });
 
     const border = makeThemeVars("border", {

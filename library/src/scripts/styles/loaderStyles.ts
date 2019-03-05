@@ -13,11 +13,11 @@ import {
     ISpinnerProps,
     spinnerLoader,
 } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { style } from "typestyle";
 
-export const loaderVariables = memoizeTheme(() => {
+export const loaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const themeVars = componentThemeVariables("loader");
 
@@ -45,7 +45,7 @@ export const loaderVariables = memoizeTheme(() => {
     return { fullPage, fixedSize, medium };
 });
 
-export const loaderClasses = memoizeTheme(() => {
+export const loaderClasses = useThemeCache(() => {
     const vars = loaderVariables();
     const debug = debugHelper("loader");
     const flex = flexHelper();

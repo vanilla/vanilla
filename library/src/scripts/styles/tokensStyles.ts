@@ -7,11 +7,11 @@
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, debugHelper, unit, userSelect } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
 import { style } from "typestyle";
 
-export const tokensVariables = memoizeTheme(() => {
+export const tokensVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const themeVars = componentThemeVariables("tokens");
 
@@ -34,7 +34,7 @@ export const tokensVariables = memoizeTheme(() => {
     return { clearIcon, clear, token };
 });
 
-export const tokensClasses = memoizeTheme(() => {
+export const tokensClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = tokensVariables();
     const formElVars = formElementsVariables();

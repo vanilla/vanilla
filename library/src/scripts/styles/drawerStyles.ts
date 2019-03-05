@@ -8,9 +8,9 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { percent } from "csx";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-export const drawerVariables = memoizeTheme(() => {
+export const drawerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const themeVars = componentThemeVariables("drawer");
 
@@ -35,7 +35,7 @@ export const drawerVariables = memoizeTheme(() => {
     return { spacing, fonts, sizing };
 });
 
-export const drawerClasses = memoizeTheme(() => {
+export const drawerClasses = useThemeCache(() => {
     const vars = drawerVariables();
     const debug = debugHelper("drawer");
 

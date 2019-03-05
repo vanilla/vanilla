@@ -10,9 +10,9 @@ import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { percent, px } from "csx";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-export const compactSearchClasses = memoizeTheme(() => {
+export const compactSearchClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const vanillaHeaderVars = vanillaHeaderVariables();

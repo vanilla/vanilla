@@ -6,12 +6,12 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { debugHelper, flexHelper, userSelect } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { calc, percent, px } from "csx";
 import { style } from "typestyle";
 
-export const mobileDropDownVariables = memoizeTheme(() => {
+export const mobileDropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const vanillaHeaderVars = vanillaHeaderVariables();
     const mixBgAndFg = globalVars.mixBgAndFg;
@@ -31,7 +31,7 @@ export const mobileDropDownVariables = memoizeTheme(() => {
     return { title, chevron, header };
 });
 
-export const mobileDropDownClasses = memoizeTheme(() => {
+export const mobileDropDownClasses = useThemeCache(() => {
     const vars = mobileDropDownVariables();
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();

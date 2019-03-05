@@ -1,5 +1,5 @@
 import { componentThemeVariables, debugHelper, objectFitWithFallback, unit } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
 
 /**
@@ -7,7 +7,7 @@ import { style } from "typestyle";
  * @license GPL-2.0-only
  */
 
-export const userPhotoVariables = memoizeTheme(() => {
+export const userPhotoVariables = useThemeCache(() => {
     const themeVars = componentThemeVariables("userPhoto");
 
     const border = {
@@ -25,7 +25,7 @@ export const userPhotoVariables = memoizeTheme(() => {
     return { border, sizing };
 });
 
-export const userPhotoClasses = memoizeTheme(() => {
+export const userPhotoClasses = useThemeCache(() => {
     const vars = userPhotoVariables();
     const debug = debugHelper("userPhoto");
 

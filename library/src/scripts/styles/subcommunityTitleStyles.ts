@@ -14,13 +14,13 @@ import {
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { FontSizeProperty, HeightProperty, MarginProperty, PaddingProperty, WidthProperty } from "csstype";
 import { ColorHelper, percent } from "csx";
 import { style } from "typestyle";
 import { TLength } from "typestyle/lib/types";
 
-export const subcommunityTileVariables = memoizeTheme(() => {
+export const subcommunityTileVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const themeVars = componentThemeVariables("subcommunityTile");
 
@@ -71,7 +71,7 @@ export const subcommunityTileVariables = memoizeTheme(() => {
     return { spacing, frame, title, description, link, fallBackIcon };
 });
 
-export const subcommunityTileClasses = memoizeTheme(() => {
+export const subcommunityTileClasses = useThemeCache(() => {
     const vars = subcommunityTileVariables();
     const debug = debugHelper("subcommunityTile");
     const shadow = shadowHelper();

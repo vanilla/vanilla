@@ -5,11 +5,11 @@
  */
 
 import { unit } from "@library/styles/styleHelpers";
-import { memoizeTheme, styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { calc, important, percent } from "csx";
 
-export const insertLinkClasses = memoizeTheme(() => {
+export const insertLinkClasses = useThemeCache(() => {
     const vars = richEditorVariables();
     const style = styleFactory("insertLink");
 

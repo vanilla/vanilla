@@ -5,10 +5,10 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, debugHelper } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
 
-export const searchVariables = memoizeTheme(() => {
+export const searchVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const elementaryColor = globalVars.elementaryColors;
     const themeVars = componentThemeVariables("search");
@@ -32,7 +32,7 @@ export const searchVariables = memoizeTheme(() => {
     return { input, placeholder };
 });
 
-export const searchClasses = memoizeTheme(() => {
+export const searchClasses = useThemeCache(() => {
     const vars = searchVariables();
     const debug = debugHelper("search");
 

@@ -5,10 +5,10 @@
  */
 
 import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
 
-export const simplePagerVariables = memoizeTheme(() => {
+export const simplePagerVariables = useThemeCache(() => {
     const themeVars = componentThemeVariables("simplePager");
 
     const sizing = {
@@ -24,7 +24,7 @@ export const simplePagerVariables = memoizeTheme(() => {
     return { spacing, sizing };
 });
 
-export const simplePagerClasses = memoizeTheme(() => {
+export const simplePagerClasses = useThemeCache(() => {
     const vars = simplePagerVariables();
     const debug = debugHelper("simplePager");
 

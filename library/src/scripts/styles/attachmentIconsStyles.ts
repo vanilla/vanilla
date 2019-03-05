@@ -17,9 +17,9 @@ import {
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc, px, percent } from "csx";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-export const attachmentIconVariables = memoizeTheme(() => {
+export const attachmentIconVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const themeVars = componentThemeVariables("attachmentIcon");
 
@@ -41,7 +41,7 @@ export const attachmentIconVariables = memoizeTheme(() => {
     return { spacing, shadow, icon };
 });
 
-export const attachmentIconsClasses = memoizeTheme(() => {
+export const attachmentIconsClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const vars = attachmentIconVariables();
@@ -76,7 +76,7 @@ export const attachmentIconsClasses = memoizeTheme(() => {
     return { root, items, item };
 });
 
-export const attachmentIconClasses = memoizeTheme(() => {
+export const attachmentIconClasses = useThemeCache(() => {
     const vars = attachmentIconVariables();
     const debug = debugHelper("attachmentIcon");
 

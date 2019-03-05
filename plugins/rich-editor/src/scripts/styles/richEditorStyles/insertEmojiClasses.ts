@@ -6,11 +6,11 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { appearance, unit } from "@library/styles/styleHelpers";
-import { memoizeTheme, styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { viewHeight } from "csx";
 
-export const insertEmojiClasses = memoizeTheme(() => {
+export const insertEmojiClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = richEditorVariables();
     const style = styleFactory("insertEmoji");

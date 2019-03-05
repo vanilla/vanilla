@@ -7,11 +7,11 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { debugHelper, flexHelper, unit } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { style } from "typestyle";
 
-export const meBoxClasses = memoizeTheme(() => {
+export const meBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vanillaHeaderVars = vanillaHeaderVariables();
     const debug = debugHelper("meBox");

@@ -9,12 +9,12 @@ import { buttonVariables } from "@library/styles/buttonStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { componentThemeVariables, debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { calc, important, percent, px } from "csx";
 import { style } from "typestyle";
 
-export const searchBarVariables = memoizeTheme(() => {
+export const searchBarVariables = useThemeCache(() => {
     const formElementVars = formElementsVariables();
     const themeVars = componentThemeVariables("searchBar");
 
@@ -47,7 +47,7 @@ export const searchBarVariables = memoizeTheme(() => {
     return { search, searchIcon, sizing, placeholder, heading };
 });
 
-export const searchBarClasses = memoizeTheme(() => {
+export const searchBarClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = searchBarVariables();
     const vanillaHeaderVars = vanillaHeaderVariables();

@@ -7,9 +7,9 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { absolutePosition, componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-export const countVariables = memoizeTheme(() => {
+export const countVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const themeVars = componentThemeVariables("count");
 
@@ -31,7 +31,7 @@ export const countVariables = memoizeTheme(() => {
     return { font, sizing, color };
 });
 
-export const countClasses = memoizeTheme(() => {
+export const countClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = countVariables();
     const debug = debugHelper("count");

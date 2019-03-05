@@ -15,11 +15,11 @@ import {
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
 import { style } from "typestyle";
 
-export const vanillaHeaderVariables = memoizeTheme(() => {
+export const vanillaHeaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const themeVars = componentThemeVariables("vanillaHeader");
@@ -153,7 +153,7 @@ export const vanillaHeaderVariables = memoizeTheme(() => {
     };
 });
 
-export const vanillaHeaderClasses = memoizeTheme(() => {
+export const vanillaHeaderClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = vanillaHeaderVariables();
     const formElementVars = formElementsVariables();
@@ -601,7 +601,7 @@ export const vanillaHeaderClasses = memoizeTheme(() => {
     };
 });
 
-export const vanillaHeaderLogoClasses = memoizeTheme(() => {
+export const vanillaHeaderLogoClasses = useThemeCache(() => {
     const vars = vanillaHeaderVariables();
     const logoFrame = style({ display: "inline-flex" });
     const debug = debugHelper("vanillaHeaderLogo");
@@ -626,7 +626,7 @@ export const vanillaHeaderLogoClasses = memoizeTheme(() => {
     return { logoFrame, logo, link };
 });
 
-export const vanillaHeaderHomeClasses = memoizeTheme(() => {
+export const vanillaHeaderHomeClasses = useThemeCache(() => {
     const vars = vanillaHeaderVariables();
     const globalVars = globalVariables();
     const debug = debugHelper("vanillaHeaderHome");

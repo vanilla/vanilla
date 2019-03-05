@@ -8,11 +8,11 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { calc, percent, px } from "csx";
 import { style } from "typestyle";
 
-export const siteNavVariables = memoizeTheme(() => {
+export const siteNavVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const themeVars = componentThemeVariables("siteNav");
@@ -49,7 +49,7 @@ export const siteNavVariables = memoizeTheme(() => {
     return { node, title, nodeToggle, spacer };
 });
 
-export const siteNavClasses = memoizeTheme(() => {
+export const siteNavClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = siteNavVariables();
     const mediaQueries = layoutVariables().mediaQueries();
@@ -89,7 +89,7 @@ export const siteNavClasses = memoizeTheme(() => {
     return { root, title, children };
 });
 
-export const siteNavNodeClasses = memoizeTheme(() => {
+export const siteNavNodeClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = siteNavVariables();
     const mediaQueries = layoutVariables().mediaQueries();

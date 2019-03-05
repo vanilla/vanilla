@@ -6,10 +6,10 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
 
-export const userDropDownVariables = memoizeTheme(() => {
+export const userDropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const themeVars = componentThemeVariables("userDropDown");
 
@@ -46,7 +46,7 @@ export const userDropDownVariables = memoizeTheme(() => {
     return { userCard, userName, contents, item };
 });
 
-export const userDropDownClasses = memoizeTheme(() => {
+export const userDropDownClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = userDropDownVariables();
     const debug = debugHelper("userDropDown");

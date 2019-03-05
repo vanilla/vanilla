@@ -5,11 +5,11 @@
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { singleBorder, toStringColor, unit, userSelect } from "@library/styles/styleHelpers";
-import { memoizeTheme, styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { translateX } from "csx";
 
-export const nubClasses = memoizeTheme(() => {
+export const nubClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = richEditorVariables();
     const style = styleFactory("nub");

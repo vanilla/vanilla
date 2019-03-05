@@ -7,10 +7,10 @@
 import { assetUrl } from "@library/application";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { centeredBackgroundProps, getColorDependantOnLightness } from "@library/styles/styleHelpers";
-import { memoizeTheme, styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { percent, px, url } from "csx";
 
-export const splashVariables = memoizeTheme(() => {
+export const splashVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("splash");
     const globalVars = globalVariables();
     const elementaryColor = globalVars.elementaryColors;
@@ -47,7 +47,7 @@ export const splashVariables = memoizeTheme(() => {
     return { fullBackground, title, spacing, border, searchContainer };
 });
 
-export const splashStyles = memoizeTheme(() => {
+export const splashStyles = useThemeCache(() => {
     const vars = splashVariables();
     const style = styleFactory("splash");
 

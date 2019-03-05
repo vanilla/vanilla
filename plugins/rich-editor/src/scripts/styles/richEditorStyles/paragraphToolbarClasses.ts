@@ -5,11 +5,11 @@
  */
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { unit } from "@library/styles/styleHelpers";
-import { memoizeTheme, styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { calc } from "csx";
 
-export const paragraphToolbarContainerClasses = memoizeTheme(() => {
+export const paragraphToolbarContainerClasses = useThemeCache(() => {
     const vars = richEditorVariables();
     const formVars = formElementsVariables();
     const style = styleFactory("paragraphToolbarContainer");

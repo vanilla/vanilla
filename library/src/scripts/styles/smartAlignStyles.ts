@@ -5,11 +5,11 @@
  */
 
 import { debugHelper } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { style } from "typestyle";
 
-export const smartAlignClasses = memoizeTheme(() => {
+export const smartAlignClasses = useThemeCache(() => {
     const debug = debugHelper("smartAlign");
 
     const root = style({

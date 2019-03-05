@@ -18,9 +18,9 @@ import {
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { percent, px } from "csx";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-export const attachmentVariables = memoizeTheme(() => {
+export const attachmentVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const themeVars = componentThemeVariables("attachment");
@@ -66,7 +66,7 @@ export const attachmentVariables = memoizeTheme(() => {
     return { border, padding, shadows, text, title, loading, sizing };
 });
 
-export const attachmentClasses = memoizeTheme(() => {
+export const attachmentClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const vars = attachmentVariables();

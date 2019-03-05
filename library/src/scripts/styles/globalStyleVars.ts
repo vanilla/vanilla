@@ -4,10 +4,10 @@
  */
 
 import { getColorDependantOnLightness, toStringColor } from "@library/styles/styleHelpers";
-import { memoizeTheme, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { color, ColorHelper, percent } from "csx";
 
-export const globalVariables = memoizeTheme(() => {
+export const globalVariables = useThemeCache(() => {
     const colorPrimary = color("#0291db");
     const makeThemeVars = variableFactory("globalVariables");
 

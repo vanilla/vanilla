@@ -7,11 +7,11 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { componentThemeVariables, debugHelper, setAllLinkColors, unit } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { style } from "typestyle";
 
-export const navLinksVariables = memoizeTheme(() => {
+export const navLinksVariables = useThemeCache(() => {
     const themeVars = componentThemeVariables("navLinks");
     const globalVars = globalVariables();
 
@@ -64,7 +64,7 @@ export const navLinksVariables = memoizeTheme(() => {
     return { linksWithHeadings, item, title, sizing, link, viewAll, spacing };
 });
 
-export const navLinksClasses = memoizeTheme(() => {
+export const navLinksClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = navLinksVariables();
     const debug = debugHelper("navLinks");

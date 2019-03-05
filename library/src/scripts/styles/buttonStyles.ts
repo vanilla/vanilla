@@ -20,9 +20,9 @@ import {
 import { BorderColorProperty, BorderRadiusProperty, BorderStyleProperty, WidthProperty } from "csstype";
 import { TLength } from "typestyle/lib/types";
 import memoize from "lodash/memoize";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-export const buttonStyles = memoizeTheme(() => {
+export const buttonStyles = useThemeCache(() => {
     const globalVars = globalVariables();
     const themeVars = componentThemeVariables("button");
     const padding = {
@@ -79,7 +79,7 @@ export interface IButtonType {
     };
 }
 
-export const buttonVariables = memoizeTheme(() => {
+export const buttonVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const themeVars = componentThemeVariables("button");
 
@@ -271,7 +271,7 @@ export enum ButtonTypes {
     TRANSPARENT = "transparent",
 }
 
-export const buttonClasses = memoizeTheme(() => {
+export const buttonClasses = useThemeCache(() => {
     const vars = buttonVariables();
     return {
         primary: generateButtonClass(vars.primary, "primary"),

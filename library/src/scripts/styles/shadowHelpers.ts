@@ -4,12 +4,12 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { BorderRadiusProperty } from "csstype";
 import { color, ColorHelper } from "csx";
 import { TLength } from "typestyle/lib/types";
 
-export const shadowHelper = memoizeTheme(() => {
+export const shadowHelper = useThemeCache(() => {
     const globalVars = globalVariables();
 
     const embed = (baseColor: ColorHelper = globalVars.mainColors.fg) => {

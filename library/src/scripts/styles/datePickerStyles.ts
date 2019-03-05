@@ -9,9 +9,9 @@ import { componentThemeVariables, debugHelper, unit } from "@library/styles/styl
 import { style } from "typestyle";
 import { percent, px } from "csx";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-export const dayPickerVariables = memoizeTheme(() => {
+export const dayPickerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const themeVars = componentThemeVariables("datePicker");
@@ -42,7 +42,7 @@ export const dayPickerVariables = memoizeTheme(() => {
     return { spacing, sizing, colors, border };
 });
 
-export const dayPickerClasses = memoizeTheme(() => {
+export const dayPickerClasses = useThemeCache(() => {
     const debug = debugHelper("dayPicker");
     const vars = dayPickerVariables();
 

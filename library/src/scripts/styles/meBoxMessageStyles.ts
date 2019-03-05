@@ -14,12 +14,12 @@ import {
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { calc, percent, quote } from "csx";
 import { style } from "typestyle";
 
-export const meBoxMessageVariables = memoizeTheme(() => {
+export const meBoxMessageVariables = useThemeCache(() => {
     const themeVars = componentThemeVariables("meBoxMessage");
     const spacing = {
         padding: 8,
@@ -39,7 +39,7 @@ export const meBoxMessageVariables = memoizeTheme(() => {
     return { spacing, imageContainer, unreadDot };
 });
 
-export const meBoxMessageClasses = memoizeTheme(() => {
+export const meBoxMessageClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = meBoxMessageVariables();
     const headerVars = vanillaHeaderVariables();

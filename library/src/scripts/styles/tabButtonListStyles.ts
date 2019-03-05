@@ -6,10 +6,10 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, defaultTransition } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
 
-export const tabButtonListClasses = memoizeTheme(() => {
+export const tabButtonListClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const debug = debugHelper("tabButtonList");
 

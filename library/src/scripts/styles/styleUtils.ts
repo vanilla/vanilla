@@ -47,7 +47,12 @@ export function styleFactory(componentName: string) {
     return styleCreator;
 }
 
-export function memoizeTheme<Cb>(callback: Cb): Cb {
+/**
+ * Wrap a callback so that it will only run once with a particular set of global theme variables.
+ *
+ * @param callback The function to wrap.
+ */
+export function useThemeCache<Cb>(callback: Cb): Cb {
     const makeCacheKey = () => {
         const storeState = getDeferredStoreState<ICoreStoreState, null>(null);
         const themeKey = getMeta("ui.themeKey", "default");

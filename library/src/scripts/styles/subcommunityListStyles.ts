@@ -7,11 +7,11 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { style } from "typestyle";
 
-export const subcommunityListVariables = memoizeTheme(() => {
+export const subcommunityListVariables = useThemeCache(() => {
     const themeVars = componentThemeVariables("subcommunityList");
     const globalVars = globalVariables();
     const spacing = {
@@ -27,7 +27,7 @@ export const subcommunityListVariables = memoizeTheme(() => {
     return { spacing, sizing };
 });
 
-export const subcommunityListClasses = memoizeTheme(() => {
+export const subcommunityListClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = subcommunityListVariables();
     const debug = debugHelper("subcommunityList");

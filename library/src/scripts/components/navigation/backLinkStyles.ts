@@ -10,9 +10,9 @@ import { debugHelper, srOnly, userSelect } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-const backLinkClasses = memoizeTheme(() => {
+const backLinkClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const debug = debugHelper("backLink");

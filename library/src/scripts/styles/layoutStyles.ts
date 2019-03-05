@@ -6,9 +6,9 @@
 import { px } from "csx";
 import { media } from "typestyle";
 import { componentThemeVariables } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-export const layoutVariables = memoizeTheme(() => {
+export const layoutVariables = useThemeCache(() => {
     const themeVars = componentThemeVariables("globalVariables");
 
     const gutterSize = 24;

@@ -8,10 +8,10 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { paddings, unit } from "@library/styles/styleHelpers";
-import { memoizeTheme, styleFactory } from "@library/styles/styleUtils";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 
-export const insertMediaClasses = memoizeTheme(() => {
+export const insertMediaClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const vars = richEditorVariables();

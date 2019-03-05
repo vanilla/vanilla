@@ -8,10 +8,10 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 import { standardAnimations } from "@library/styles/animationHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables } from "@library/styles/styleHelpers";
-import { memoizeTheme } from "@library/styles/styleUtils";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { viewHeight } from "csx";
 
-export const richEditorVariables = memoizeTheme(() => {
+export const richEditorVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const varsFormElements = formElementsVariables();
     const themeVars = componentThemeVariables("richEditor");

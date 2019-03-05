@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import ErrorPage from "@knowledge/routes/ErrorPage";
 import { LoadStatus } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
 import { getMeta } from "@library/application";
@@ -27,7 +26,7 @@ class BaseThemeProvider extends React.Component<IProps> {
             case LoadStatus.LOADING:
                 return <Loader />;
             case LoadStatus.ERROR:
-                return <ErrorPage />;
+                return this.props.errorComponent;
         }
 
         if (!variables.data) {
@@ -49,6 +48,7 @@ export function getThemeVariables() {
 
 interface IOwnProps {
     children: React.ReactNode;
+    errorComponent: React.ReactNode;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;

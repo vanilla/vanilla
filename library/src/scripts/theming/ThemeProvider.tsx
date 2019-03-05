@@ -13,16 +13,13 @@ import ThemeActions from "@library/theming/ThemeActions";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import React from "react";
 import { connect } from "react-redux";
-import { Optionalize } from "@library/@types/utils";
 import getStore from "@library/state/getStore";
 
 export interface IWithThemeProps {
     theme: IThemeVariables;
 }
 
-const ThemeContext = React.createContext<IWithThemeProps>({ theme: {} });
-
-class BaseThemeContextProvider extends React.Component<IProps> {
+class BaseThemeProvider extends React.Component<IProps> {
     public render() {
         const { variables } = this.props;
         switch (variables.status) {
@@ -37,32 +34,12 @@ class BaseThemeContextProvider extends React.Component<IProps> {
             return null;
         }
 
-        return <ThemeContext.Provider value={{ theme: variables.data }}>{this.props.children}</ThemeContext.Provider>;
+        return this.props.children;
     }
 
     public componentDidMount() {
         void this.props.requestData();
     }
-}
-
-/**
- * HOC to inject ThemeContext as props.
- *
- * @param WrappedComponent - The component to wrap
- */
-export function withTheme<T extends IWithThemeProps = IWithThemeProps>(WrappedComponent: React.ComponentType<T>) {
-    const displayName = WrappedComponent.displayName || WrappedComponent.name || "Component";
-    const ComponentWithDevice = (props: Optionalize<T, IWithThemeProps>) => {
-        return (
-            <ThemeContext.Consumer>
-                {context => {
-                    return <WrappedComponent {...context} {...props} />;
-                }}
-            </ThemeContext.Consumer>
-        );
-    };
-    ComponentWithDevice.displayName = `withTheme(${displayName})`;
-    return ComponentWithDevice;
 }
 
 export function getThemeVariables() {
@@ -89,7 +66,7 @@ function mapDispatchToProps(dispatch: any) {
     };
 }
 
-export const ThemeContextProvider = connect(
+export const ThemeProvider = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(BaseThemeContextProvider);
+)(BaseThemeProvider);

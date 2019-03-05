@@ -3,39 +3,35 @@
  * @license GPL-2.0-only
  */
 
-import { ColorHelper, important, percent, px, quote, viewHeight, viewWidth, color, deg } from "csx";
+import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { styleFactory } from "@library/styles/styleUtils";
 import {
+    AlignItemsProperty,
+    AppearanceProperty,
     BackgroundImageProperty,
     BorderRadiusProperty,
     BorderStyleProperty,
     BorderWidthProperty,
-    FlexWrapProperty,
-    LeftProperty,
-    RightProperty,
     BottomProperty,
-    PositionProperty,
-    DisplayProperty,
-    AlignItemsProperty,
-    JustifyContentProperty,
     ContentProperty,
-    ObjectFitProperty,
-    WhiteSpaceProperty,
-    TextOverflowProperty,
-    OverflowXProperty,
+    DisplayProperty,
+    FlexWrapProperty,
+    JustifyContentProperty,
+    LeftProperty,
     MaxWidthProperty,
-    AppearanceProperty,
+    ObjectFitProperty,
+    OverflowXProperty,
+    PositionProperty,
+    RightProperty,
+    TextOverflowProperty,
     UserSelectProperty,
+    WhiteSpaceProperty,
 } from "csstype";
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { color, ColorHelper, deg, important, percent, px, quote, viewHeight, viewWidth } from "csx";
 import { keyframes } from "typestyle";
 import { TLength } from "typestyle/lib/types";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { styleFactory } from "@library/styles/styleUtils";
-import { getThemeVariables } from "@library/theming/ThemeContext";
-import memoize from "lodash/memoize";
-import getStore from "@library/state/getStore";
-import { ICoreStoreState } from "@library/state/reducerRegistry";
-import { getMeta } from "@library/application";
+import { getThemeVariables } from "@library/theming/ThemeProvider";
 
 export const toStringColor = (colorValue: ColorHelper | "transparent") => {
     return typeof colorValue === "string" ? colorValue : colorValue.toString();

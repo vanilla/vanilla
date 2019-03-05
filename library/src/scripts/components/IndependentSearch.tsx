@@ -14,9 +14,8 @@ import { t } from "@library/application";
 import SearchOption from "@library/components/search/SearchOption";
 import { searchClasses } from "@library/styles/searchStyles";
 import { searchBarClasses } from "@library/styles/searchBarStyles";
-import { withTheme, IWithThemeProps } from "@library/theming/ThemeContext";
 
-export interface ICompactSearchProps extends IWithSearchProps, IWithThemeProps, RouteComponentProps<{}> {
+export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
     placeholder?: string;
     buttonClass?: string;
@@ -82,4 +81,4 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
     };
 }
 
-export default withTheme(withSearch(withRouter(IndependentSearch)));
+export default withSearch(withRouter(IndependentSearch));

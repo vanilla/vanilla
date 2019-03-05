@@ -5,15 +5,15 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, setAllLinkColors, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
-import { percent, px } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import memoize from "lodash/memoize";
+import { componentThemeVariables, debugHelper, setAllLinkColors, unit } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
+import { percent } from "csx";
+import { style } from "typestyle";
 
-export const navLinksVariables = memoize((theme?: object) => {
-    const themeVars = componentThemeVariables(theme, "navLinks");
-    const globalVars = globalVariables(theme);
+export const navLinksVariables = useThemeCache(() => {
+    const themeVars = componentThemeVariables("navLinks");
+    const globalVars = globalVariables();
 
     const linksWithHeadings = {
         padding: 16,
@@ -64,11 +64,11 @@ export const navLinksVariables = memoize((theme?: object) => {
     return { linksWithHeadings, item, title, sizing, link, viewAll, spacing };
 });
 
-export const navLinksClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vars = navLinksVariables(theme);
+export const navLinksClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const vars = navLinksVariables();
     const debug = debugHelper("navLinks");
-    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style(
         {

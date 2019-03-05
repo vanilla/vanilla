@@ -3,19 +3,18 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
-import { borders, longWordEllipsis, paddings, toStringColor, unit } from "@library/styles/styleHelpers";
-import { shadowHelper } from "@library/styles/shadowHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { shadowHelper } from "@library/styles/shadowHelpers";
+import { borders, longWordEllipsis, paddings, toStringColor, unit } from "@library/styles/styleHelpers";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
+import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { calc, percent } from "csx";
-import styleFactory from "@library/styles/styleFactory";
-import memoize from "lodash/memoize";
 
-export const richEditorFlyoutClasses = memoize((theme?: object) => {
-    const vars = richEditorVariables(theme);
+export const richEditorFlyoutClasses = useThemeCache(() => {
+    const vars = richEditorVariables();
     const style = styleFactory("richEditorFlyout");
-    const shadows = shadowHelper(theme);
-    const globalVars = globalVariables(theme);
+    const shadows = shadowHelper();
+    const globalVars = globalVariables();
 
     const root = style({
         ...shadows.dropDown(),

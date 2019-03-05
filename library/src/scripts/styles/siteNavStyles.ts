@@ -4,18 +4,18 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { calc, percent, px } from "csx";
-import memoize from "lodash/memoize";
+import { style } from "typestyle";
 
-export const siteNavVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "siteNav");
+export const siteNavVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const themeVars = componentThemeVariables("siteNav");
 
     const node = {
         fontSize: globalVars.fonts.size.medium,
@@ -49,9 +49,9 @@ export const siteNavVariables = memoize((theme?: object) => {
     return { node, title, nodeToggle, spacer };
 });
 
-export const siteNavClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vars = siteNavVariables(theme);
+export const siteNavClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const vars = siteNavVariables();
     const mediaQueries = layoutVariables().mediaQueries();
 
     const debug = debugHelper("siteNav");
@@ -89,9 +89,9 @@ export const siteNavClasses = memoize((theme?: object) => {
     return { root, title, children };
 });
 
-export const siteNavNodeClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vars = siteNavVariables(theme);
+export const siteNavNodeClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const vars = siteNavVariables();
     const mediaQueries = layoutVariables().mediaQueries();
 
     const debug = debugHelper("siteNavNode");

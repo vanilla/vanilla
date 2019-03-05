@@ -3,17 +3,16 @@
  * @license GPL-2.0-only
  */
 
-import { calc, percent, px } from "csx";
-import { flexHelper, userSelect } from "@library/styles/styleHelpers";
-import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
-import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import memoize from "lodash/memoize";
+import { debugHelper, flexHelper, userSelect } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
+import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import { calc, percent, px } from "csx";
+import { style } from "typestyle";
 
-export const mobileDropDownVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
+export const mobileDropDownVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
     const vanillaHeaderVars = vanillaHeaderVariables();
     const mixBgAndFg = globalVars.mixBgAndFg;
 
@@ -32,7 +31,7 @@ export const mobileDropDownVariables = memoize((theme?: object) => {
     return { title, chevron, header };
 });
 
-export const mobileDropDownClasses = memoize(() => {
+export const mobileDropDownClasses = useThemeCache(() => {
     const vars = mobileDropDownVariables();
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();

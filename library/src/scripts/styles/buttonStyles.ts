@@ -6,24 +6,16 @@
 
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { style } from "typestyle";
-import { color, ColorHelper, deg, percent, px, quote } from "csx";
-import {
-    componentThemeVariables,
-    debugHelper,
-    flexHelper,
-    spinnerLoader,
-    toStringColor,
-    unit,
-    userSelect,
-} from "@library/styles/styleHelpers";
-import { BorderColorProperty, BorderRadiusProperty, BorderStyleProperty, WidthProperty } from "csstype";
-import { TLength } from "typestyle/lib/types";
+import { componentThemeVariables, flexHelper, spinnerLoader, unit, userSelect } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { BorderRadiusProperty, BorderStyleProperty, WidthProperty } from "csstype";
+import { ColorHelper, percent, px } from "csx";
 import memoize from "lodash/memoize";
+import { TLength } from "typestyle/lib/types";
 
-export const buttonStyles = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const themeVars = componentThemeVariables(theme, "button");
+export const buttonStyles = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const themeVars = componentThemeVariables("button");
     const padding = {
         top: 2,
         bottom: 3,
@@ -78,11 +70,11 @@ export interface IButtonType {
     };
 }
 
-export const buttonVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const themeVars = componentThemeVariables(theme, "button");
+export const buttonVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const makeThemeVars = variableFactory("button");
 
-    const standard: IButtonType = {
+    const standard: IButtonType = makeThemeVars("basic", {
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
         spinnerColor: globalVars.mainColors.primary,
@@ -112,10 +104,9 @@ export const buttonVariables = memoize((theme?: object) => {
             bg: globalVars.mainColors.bg.darken(0.3),
             borderColor: globalVars.mainColors.bg.darken(1),
         },
-        ...themeVars.subComponentStyles("basic"),
-    };
+    });
 
-    const primary: IButtonType = {
+    const primary: IButtonType = makeThemeVars("primary", {
         fg: globalVars.elementaryColors.white,
         bg: globalVars.mainColors.primary,
         spinnerColor: globalVars.elementaryColors.white,
@@ -145,13 +136,12 @@ export const buttonVariables = memoize((theme?: object) => {
             bg: globalVars.mainColors.secondary,
             borderColor: globalVars.mainColors.primary,
         },
-        ...themeVars.subComponentStyles("primary"),
-    };
+    });
 
     const transparentButtonColor = globalVars.mainColors.bg;
-    const transparent: IButtonType = {
+    const transparent: IButtonType = makeThemeVars("transparent", {
         fg: transparentButtonColor,
-        bg: "transparent",
+        bg: "transparent" as any,
         spinnerColor: globalVars.mainColors.primary,
         border: {
             color: transparentButtonColor,
@@ -179,30 +169,28 @@ export const buttonVariables = memoize((theme?: object) => {
             bg: globalVars.elementaryColors.white.fade(0.5),
             borderColor: transparentButtonColor,
         },
-        ...themeVars.subComponentStyles("transparent"),
-    };
+    });
 
     return { standard, primary, transparent };
 });
 
-export const buttonSizing = memoize((height, minWidth, fontSize, paddingHorizontal, formElementVars) => {
+export const buttonSizing = (height, minWidth, fontSize, paddingHorizontal, formElementVars) => {
     return {
         minHeight: px(formElementVars.sizing.height),
         fontSize: px(fontSize),
         padding: `${px(0)} ${px(paddingHorizontal)}`,
         lineHeight: px(formElementVars.sizing.height - formElementVars.border.width * 2),
     };
-});
+};
 
-export const generateButtonClass = memoize((buttonType: IButtonType, buttonName: string, setZIndexOnState = false) => {
+export const generateButtonClass = (buttonType: IButtonType, buttonName: string, setZIndexOnState = false) => {
     const globalVars = globalVariables();
     const formElVars = formElementsVariables();
     const vars = buttonStyles();
-    const debug = debugHelper("button");
+    const style = styleFactory("button");
     const zIndex = setZIndexOnState ? 1 : undefined;
 
     return style({
-        ...debug.name(buttonName),
         textOverflow: "ellipsis",
         overflow: "hidden",
         maxWidth: percent(100),
@@ -262,7 +250,7 @@ export const generateButtonClass = memoize((buttonType: IButtonType, buttonName:
             },
         },
     });
-});
+};
 
 export enum ButtonTypes {
     STANDARD = "standard",
@@ -270,7 +258,7 @@ export enum ButtonTypes {
     TRANSPARENT = "transparent",
 }
 
-export const buttonClasses = memoize(() => {
+export const buttonClasses = useThemeCache(() => {
     const vars = buttonVariables();
     return {
         primary: generateButtonClass(vars.primary, "primary"),
@@ -279,13 +267,11 @@ export const buttonClasses = memoize(() => {
     };
 });
 
-export const buttonLoaderClasses = memoize((buttonType: IButtonType, theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const themeVars = componentThemeVariables(theme, "buttonLoader");
+export const buttonLoaderClasses = memoize((buttonType: IButtonType) => {
+    const themeVars = componentThemeVariables("buttonLoader");
     const flexUtils = flexHelper();
-    const debug = debugHelper("buttonLoader");
+    const style = styleFactory("buttonLoader");
     const root = style({
-        ...debug.name(),
         ...flexUtils.middle(),
         padding: px(4),
         height: percent(100),

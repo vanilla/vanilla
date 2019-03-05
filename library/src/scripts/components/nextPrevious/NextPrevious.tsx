@@ -13,7 +13,7 @@ import ScreenReaderContent from "@library/components/ScreenReaderContent";
 import Heading from "@library/components/Heading";
 import AdjacentLink, { LeftRight } from "@library/components/nextPrevious/AdjacentLink";
 import { px } from "csx";
-import memoize from "lodash/memoize";
+import { useThemeCache } from "@library/styles/styleUtils";
 
 interface IUrlItem {
     name: string;
@@ -68,9 +68,9 @@ export default class NextPrevious extends React.Component<IProps> {
         );
     }
 
-    public nextPreviousVariables = memoize((theme?: object) => {
-        const globalVars = globalVariables(theme);
-        const themeVars = componentThemeVariables(theme, "nextPreviousVars");
+    public nextPreviousVariables = useThemeCache(() => {
+        const globalVars = globalVariables();
+        const themeVars = componentThemeVariables("nextPreviousVars");
 
         const fonts = {
             label: globalVars.fonts.size.small,
@@ -93,9 +93,9 @@ export default class NextPrevious extends React.Component<IProps> {
         return { lineHeights, fonts, colors };
     });
 
-    public nextPreviousStyles = memoize((theme?: object) => {
-        const globalVars = globalVariables(theme);
-        const vars = this.nextPreviousVariables(theme);
+    public nextPreviousStyles = useThemeCache(() => {
+        const globalVars = globalVariables();
+        const vars = this.nextPreviousVariables();
         const debug = debugHelper("nextPrevious");
         const activeStyles = {
             color: vars.colors.title.toString(),

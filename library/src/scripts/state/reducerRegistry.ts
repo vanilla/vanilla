@@ -8,9 +8,10 @@
  */
 
 import { onReady } from "@library/application";
+import { IThemeState, themeReducer } from "@library/theming/themeReducer";
+import UsersModel, { IUsersStoreState } from "@library/users/UsersModel";
 import { logError } from "@library/utility";
 import { Reducer, ReducersMapObject } from "redux";
-import UsersModel from "@library/users/UsersModel";
 
 let haveGot = false;
 let wasReadyCalled = false;
@@ -28,6 +29,14 @@ export function registerReducer(name: string, reducer: Reducer) {
     }
 }
 
+export interface ICoreStoreState extends IUsersStoreState {
+    theme: IThemeState;
+}
+
+export function getReducersReady(): boolean {
+    return haveGot;
+}
+
 export function getReducers(): ReducersMapObject<any, any> {
     haveGot = true;
 
@@ -37,6 +46,7 @@ export function getReducers(): ReducersMapObject<any, any> {
 
     return {
         users: new UsersModel().reducer,
+        theme: themeReducer,
         ...reducers,
     };
 }

@@ -4,19 +4,18 @@
  * @license GPL-2.0-only
  */
 
-import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
-import { layoutVariables } from "@library/styles/layoutStyles";
-import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { layoutVariables } from "@library/styles/layoutStyles";
 import { paddings, unit } from "@library/styles/styleHelpers";
-import styleFactory from "@library/styles/styleFactory";
-import memoize from "lodash/memoize";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
+import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 
-export const insertMediaClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const mediaQueries = layoutVariables(theme).mediaQueries();
-    const vars = richEditorVariables(theme);
-    const formElementVars = formElementsVariables(theme);
+export const insertMediaClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const mediaQueries = layoutVariables().mediaQueries();
+    const vars = richEditorVariables();
+    const formElementVars = formElementsVariables();
     const style = styleFactory("insertMedia");
 
     const root = style({

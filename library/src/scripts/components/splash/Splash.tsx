@@ -26,7 +26,6 @@ interface IProps extends IDeviceProps {
  */
 export class Splash extends React.Component<IProps> {
     public render() {
-        const vars = splashVariables();
         const classes = splashStyles();
         const buttons = buttonClasses();
         const { title, className } = this.props;
@@ -41,7 +40,6 @@ export class Splash extends React.Component<IProps> {
                                 <IndependentSearch
                                     className={classes.search}
                                     buttonClass={buttons.transparent}
-                                    theme={vars.search}
                                     isLarge={true}
                                     placeholder={t("Search Articles")}
                                 />

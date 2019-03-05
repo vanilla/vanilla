@@ -5,17 +5,16 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import { debugHelper, unit } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { px } from "csx";
-import memoize from "lodash/memoize";
+import { style } from "typestyle";
 
-export const siteNavAdminLinksClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
+export const siteNavAdminLinksClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
     const debug = debugHelper("siteNavAdminLinks");
-    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style(
         {

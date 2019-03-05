@@ -6,12 +6,12 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
-import memoize from "lodash/memoize";
+import { style } from "typestyle";
 
-export const selectBoxClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
+export const selectBoxClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
     const debug = debugHelper("selectBox");
 
     const toggle = style({

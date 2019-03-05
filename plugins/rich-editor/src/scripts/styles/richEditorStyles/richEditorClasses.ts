@@ -14,14 +14,14 @@ import {
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
-import styleFactory from "@library/styles/styleFactory";
+import { styleFactory } from "@library/styles/styleUtils";
 import { calc, important, percent } from "csx";
 import memoize from "lodash/memoize";
 
 export const richEditorClasses = memoize((theme?: object, legacyMode: boolean = false) => {
-    const globalVars = globalVariables(theme);
+    const globalVars = globalVariables();
     const style = styleFactory("richEditor");
-    const vars = richEditorVariables(theme);
+    const vars = richEditorVariables();
 
     const root = style({
         position: "relative",

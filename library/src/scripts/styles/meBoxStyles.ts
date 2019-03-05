@@ -5,19 +5,17 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, flexHelper, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
-import { px } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import memoize from "lodash/memoize";
+import { debugHelper, flexHelper, unit } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
+import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import { style } from "typestyle";
 
-export const meBoxClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vanillaHeaderVars = vanillaHeaderVariables(theme);
+export const meBoxClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const vanillaHeaderVars = vanillaHeaderVariables();
     const debug = debugHelper("meBox");
-    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
 
     const root = style(

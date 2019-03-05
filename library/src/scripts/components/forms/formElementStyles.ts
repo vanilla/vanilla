@@ -8,14 +8,14 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables } from "@library/styles/styleHelpers";
 import { px } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import styleFactory from "@library/styles/styleFactory";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { memoize } from "lodash";
 
-export const formElementsVariables = memoize((theme?: object) => {
-    const vars = globalVariables(theme);
-    const varsLayouts = layoutVariables(theme);
+export const formElementsVariables = useThemeCache(() => {
+    const vars = globalVariables();
+    const varsLayouts = layoutVariables();
     const mixBgAndFg = vars.mixBgAndFg;
-    const themeVars = componentThemeVariables(theme, "formElements");
+    const themeVars = componentThemeVariables("formElements");
 
     const sizing = {
         height: 36,
@@ -94,10 +94,10 @@ export const formElementsVariables = memoize((theme?: object) => {
     };
 });
 
-export const formErrorClasses = memoize((theme?: object) => {
+export const formErrorClasses = useThemeCache(() => {
     const style = styleFactory("formError");
-    const varsGlobal = globalVariables(theme);
-    const vars = formElementsVariables(theme);
+    const varsGlobal = globalVariables();
+    const vars = formElementsVariables();
 
     const root = style({
         backgroundColor: varsGlobal.feedbackColors.error.bg.toString(),

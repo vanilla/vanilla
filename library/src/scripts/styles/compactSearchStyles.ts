@@ -10,12 +10,12 @@ import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { percent, px } from "csx";
-import { memoize } from "lodash";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-export const compactSearchClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const vanillaHeaderVars = vanillaHeaderVariables(theme);
+export const compactSearchClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const vanillaHeaderVars = vanillaHeaderVariables();
     const debug = debugHelper("compactSearch");
 
     const root = style({

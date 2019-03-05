@@ -13,7 +13,6 @@ import SearchBar from "@library/components/forms/select/SearchBar";
 import { t } from "@library/application";
 import SearchOption from "@library/components/search/SearchOption";
 import { searchClasses } from "@library/styles/searchStyles";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 import { searchBarClasses } from "@library/styles/searchBarStyles";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
@@ -26,7 +25,6 @@ export interface ICompactSearchProps extends IWithSearchProps, RouteComponentPro
     buttonContentClass?: string;
     cancelContentClassName?: string;
     isLarge?: boolean;
-    theme?: object;
 }
 
 interface IState {
@@ -47,7 +45,6 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
     public render() {
         const classes = searchClasses();
         const classesSearchBar = searchBarClasses();
-        const buttons = buttonClasses();
         return (
             <div className={classNames(classes.root, this.props.className)}>
                 <SearchBar

@@ -4,29 +4,24 @@
  * @license GPL-2.0-only
  */
 
-import { style } from "typestyle";
-import { px, quote, viewWidth, viewHeight, url, percent } from "csx";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, componentThemeVariables, getColorDependantOnLightness } from "@library/styles/styleHelpers";
-import { centeredBackgroundProps } from "@library/styles/styleHelpers";
-import { searchVariables } from "@library/styles/searchStyles";
 import { assetUrl } from "@library/application";
-import { IButtonType } from "@library/styles/buttonStyles";
-import memoize from "lodash/memoize";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { centeredBackgroundProps, getColorDependantOnLightness } from "@library/styles/styleHelpers";
+import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { percent, px, url } from "csx";
 
-export const splashVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
+export const splashVariables = useThemeCache(() => {
+    const makeThemeVars = variableFactory("splash");
+    const globalVars = globalVariables();
     const elementaryColor = globalVars.elementaryColors;
-    const themeVars = componentThemeVariables(theme, "splash");
 
-    const fullBackground = {
+    const fullBackground = makeThemeVars("fullBackground", {
         bg: globalVars.mainColors.primary,
         image: assetUrl("/resources/design/fallbackSplashBackground.svg"),
-        ...themeVars.subComponentStyles("fullBackground"),
-    };
+    });
 
     // Optional textShadow available
-    const title = {
+    const title = makeThemeVars("title", {
         fg: elementaryColor.white,
         fontSize: globalVars.fonts.size.title,
         textAlign: "center",
@@ -34,44 +29,33 @@ export const splashVariables = memoize((theme?: object) => {
         textShadow: `0 1px 25px ${elementaryColor.black.fade(0.5).toString()}`,
         marginTop: 28,
         marginBottom: 40,
-        ...themeVars.subComponentStyles("title"),
-    };
+    });
 
-    const spacing = {
+    const spacing = makeThemeVars("spacing", {
         top: 48,
         bottom: 48,
-        ...themeVars.subComponentStyles("spacing"),
-    };
+    });
 
-    const border = {
+    const border = makeThemeVars("border", {
         color: globalVars.mainColors.fg,
-        ...themeVars.subComponentStyles("border"),
-    };
-
-    const search = searchVariables({
-        button: {
-            type: "transparent",
-        },
-        ...themeVars.subComponentStyles("search"),
     });
 
     const searchContainer = {
         width: 670,
     };
 
-    return { fullBackground, title, spacing, border, search, searchContainer };
+    return { fullBackground, title, spacing, border, searchContainer };
 });
 
-export const splashStyles = memoize((theme?: object) => {
-    const vars = splashVariables(theme);
-    const debug = debugHelper("splash");
+export const splashStyles = useThemeCache(() => {
+    const vars = splashVariables();
+    const style = styleFactory("splash");
 
     const bg = vars.fullBackground.image;
 
     const root = style({
         backgroundColor: vars.fullBackground.bg.toString(),
         position: "relative",
-        ...debug.name(),
     });
 
     const backgroundImage = bg ? url(bg) : undefined;
@@ -87,17 +71,13 @@ export const splashStyles = memoize((theme?: object) => {
         backgroundSize: "cover",
         backgroundImage,
         opacity,
-        ...debug.name(),
     });
 
-    const container = style({
-        ...debug.name("container"),
-    });
+    const container = style({});
 
     const innerContainer = style({
         paddingTop: vars.spacing.top,
         paddingBottom: vars.spacing.bottom,
-        ...debug.name("innerContainer"),
     });
 
     const title = style({
@@ -108,15 +88,11 @@ export const splashStyles = memoize((theme?: object) => {
         paddingTop: px(vars.title.marginTop),
         marginBottom: px(vars.title.marginBottom),
         textShadow: `0 1px 25px ${getColorDependantOnLightness(vars.title.fg, vars.title.fg, 0.9).fade(0.4)}`,
-        ...debug.name("title"),
     });
 
-    const search = style({
-        ...debug.name("search"),
-    });
+    const search = style({});
 
     const searchContainer = style({
-        ...debug.name("searchContainer"),
         position: "relative",
         maxWidth: percent(100),
         width: px(vars.searchContainer.width),

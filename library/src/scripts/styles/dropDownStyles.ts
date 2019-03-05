@@ -7,10 +7,10 @@
 import { debugHelper } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { memoize } from "lodash";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-export const dropDownClasses = memoize((theme?: object) => {
-    const layoutVars = layoutVariables(theme);
+export const dropDownClasses = useThemeCache(() => {
+    const layoutVars = layoutVariables();
     const debug = debugHelper("dropDown");
 
     const paddedList = style({

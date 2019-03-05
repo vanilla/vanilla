@@ -4,14 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import styleFactory from "@library/styles/styleFactory";
+import { styleFactory } from "@library/styles/styleUtils";
 import { unit } from "@library/styles/styleHelpers";
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { percent } from "csx";
 import memoize from "lodash/memoize";
 
 export const inlineToolbarClasses = memoize((theme?: object, legacyMode: boolean = false) => {
-    const vars = richEditorVariables(theme);
+    const vars = richEditorVariables();
     const style = styleFactory("inlineToolbar");
 
     const offsetForNub = vars.menu.offset / 2;

@@ -4,19 +4,19 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { buttonVariables } from "@library/styles/buttonStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { layoutVariables } from "@library/styles/layoutStyles";
+import { componentThemeVariables, debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { calc, important, percent, px } from "csx";
-import { buttonVariables } from "@library/styles/buttonStyles";
-import { layoutVariables } from "@library/styles/layoutStyles";
-import memoize from "lodash/memoize";
+import { style } from "typestyle";
 
-export const searchBarVariables = memoize((theme?: object) => {
-    const formElementVars = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "searchBar");
+export const searchBarVariables = useThemeCache(() => {
+    const formElementVars = formElementsVariables();
+    const themeVars = componentThemeVariables("searchBar");
 
     const search = {
         minWidth: 109,
@@ -47,14 +47,14 @@ export const searchBarVariables = memoize((theme?: object) => {
     return { search, searchIcon, sizing, placeholder, heading };
 });
 
-export const searchBarClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vars = searchBarVariables(theme);
-    const vanillaHeaderVars = vanillaHeaderVariables(theme);
+export const searchBarClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const vars = searchBarVariables();
+    const vanillaHeaderVars = vanillaHeaderVariables();
     const debug = debugHelper("searchBar");
-    const buttonVars = buttonVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const buttonVars = buttonVariables();
+    const formElementVars = formElementsVariables();
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style(
         {

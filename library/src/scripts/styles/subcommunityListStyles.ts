@@ -5,15 +5,15 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { percent } from "csx";
-import memoize from "lodash/memoize";
+import { style } from "typestyle";
 
-export const subcommunityListVariables = memoize((theme?: object) => {
-    const themeVars = componentThemeVariables(theme, "subcommunityList");
-    const globalVars = globalVariables(theme);
+export const subcommunityListVariables = useThemeCache(() => {
+    const themeVars = componentThemeVariables("subcommunityList");
+    const globalVars = globalVariables();
     const spacing = {
         padding: 24,
         ...themeVars.subComponentStyles("spacing"),
@@ -27,11 +27,11 @@ export const subcommunityListVariables = memoize((theme?: object) => {
     return { spacing, sizing };
 });
 
-export const subcommunityListClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vars = subcommunityListVariables(theme);
+export const subcommunityListClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const vars = subcommunityListVariables();
     const debug = debugHelper("subcommunityList");
-    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style(
         {

@@ -4,15 +4,13 @@
  * @license GPL-2.0-only
  */
 
+import { unit } from "@library/styles/styleHelpers";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
-import { toStringColor, unit } from "@library/styles/styleHelpers";
 import { calc, important, percent } from "csx";
-import styleFactory from "@library/styles/styleFactory";
-import memoize from "lodash/memoize";
-import { globalVariables } from "@library/styles/globalStyleVars";
 
-export const insertLinkClasses = memoize((theme?: object) => {
-    const vars = richEditorVariables(theme);
+export const insertLinkClasses = useThemeCache(() => {
+    const vars = richEditorVariables();
     const style = styleFactory("insertLink");
 
     const root = style({

@@ -7,13 +7,12 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { percent } from "csx";
-import memoize from "lodash/memoize";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-export const drawerVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const themeVars = componentThemeVariables(theme, "drawer");
+export const drawerVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const themeVars = componentThemeVariables("drawer");
 
     const spacing = {
         button: {
@@ -36,8 +35,8 @@ export const drawerVariables = memoize((theme?: object) => {
     return { spacing, fonts, sizing };
 });
 
-export const drawerClasses = memoize((theme?: object) => {
-    const vars = drawerVariables(theme);
+export const drawerClasses = useThemeCache(() => {
+    const vars = drawerVariables();
     const debug = debugHelper("drawer");
 
     const root = style({

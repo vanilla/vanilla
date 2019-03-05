@@ -5,7 +5,7 @@
  */
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { paddings, placeholderStyles, textInputSizing, toStringColor, unit } from "@library/styles/styleHelpers";
-import styleFactory from "@library/styles/styleFactory";
+import { styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc, percent, px, viewHeight } from "csx";
@@ -13,10 +13,10 @@ import { memoize } from "lodash";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 
 export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolean = false) => {
-    const globalVars = globalVariables(theme);
-    const headerVars = vanillaHeaderVariables(theme);
-    const vars = richEditorVariables(theme);
-    const formElementVars = formElementsVariables(theme);
+    const globalVars = globalVariables();
+    const headerVars = vanillaHeaderVariables();
+    const vars = richEditorVariables();
+    const formElementVars = formElementsVariables();
     const style = styleFactory("richEditorForm");
     const overshoot = legacyMode ? 0 : vars.scrollContainer.overshoot;
 

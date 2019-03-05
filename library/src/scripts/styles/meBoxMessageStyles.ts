@@ -5,16 +5,22 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, toStringColor, unit, userSelect } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
-import { calc, percent, quote } from "csx";
-import { objectFitWithFallback } from "@library/styles/styleHelpers";
-import { absolutePosition } from "@library/styles/styleHelpers";
+import {
+    absolutePosition,
+    componentThemeVariables,
+    debugHelper,
+    objectFitWithFallback,
+    toStringColor,
+    unit,
+    userSelect,
+} from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
-import { memoize } from "lodash";
+import { calc, percent, quote } from "csx";
+import { style } from "typestyle";
 
-export const meBoxMessageVariables = memoize((theme?: object) => {
-    const themeVars = componentThemeVariables(theme, "meBoxMessage");
+export const meBoxMessageVariables = useThemeCache(() => {
+    const themeVars = componentThemeVariables("meBoxMessage");
     const spacing = {
         padding: 8,
         ...themeVars.subComponentStyles("spacing"),
@@ -33,10 +39,10 @@ export const meBoxMessageVariables = memoize((theme?: object) => {
     return { spacing, imageContainer, unreadDot };
 });
 
-export const meBoxMessageClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
-    const vars = meBoxMessageVariables(theme);
-    const headerVars = vanillaHeaderVariables(theme);
+export const meBoxMessageClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const vars = meBoxMessageVariables();
+    const headerVars = vanillaHeaderVariables();
     const debug = debugHelper("meBoxMessage");
 
     const root = style({

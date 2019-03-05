@@ -6,11 +6,11 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, defaultTransition } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
-import memoize from "lodash/memoize";
 
-export const tabButtonListClasses = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
+export const tabButtonListClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
     const debug = debugHelper("tabButtonList");
 
     const root = style({

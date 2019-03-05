@@ -4,15 +4,14 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, componentThemeVariables } from "@library/styles/styleHelpers";
+import { componentThemeVariables, debugHelper } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
-import { IButtonType } from "@library/styles/buttonStyles";
-import memoize from "lodash/memoize";
 
-export const searchVariables = memoize((theme?: object) => {
-    const globalVars = globalVariables(theme);
+export const searchVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
     const elementaryColor = globalVars.elementaryColors;
-    const themeVars = componentThemeVariables(theme, "search");
+    const themeVars = componentThemeVariables("search");
 
     const input = {
         border: {
@@ -33,8 +32,8 @@ export const searchVariables = memoize((theme?: object) => {
     return { input, placeholder };
 });
 
-export const searchClasses = memoize((theme?: object) => {
-    const vars = searchVariables(theme);
+export const searchClasses = useThemeCache(() => {
+    const vars = searchVariables();
     const debug = debugHelper("search");
 
     const root = style({

@@ -48,7 +48,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /** @var AssetInterface[] */
     protected $scripts = [];
 
-    /** @var $styles [] */
+    /** @var AssetInterface[] */
     protected $styles = [];
 
     /** @var string[] */
@@ -88,6 +88,12 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     /** @var BreadcrumbModel */
     protected $breadcrumbModel;
 
+    /** @var string */
+    protected $headerHtml = '';
+
+    /** @var string */
+    protected $footerHtml = '';
+
     /**
      * Dependendency Injection.
      *
@@ -96,6 +102,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @param \Gdn_Session $session
      * @param WebpackAssetProvider $assetProvider
      * @param BreadcrumbModel $breadcrumbModel
+
      */
     public function setDependencies(
         SiteMeta $siteMeta,
@@ -136,6 +143,8 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             'inlineStyles' => $this->inlineStyles,
             'seoContent' => $this->seoContent,
             'metaTags' => $this->metaTags,
+            'header' => $this->headerHtml,
+            'footer' => $this->footerHtml,
             'cssClasses' => ['isLoading'],
             'breadcrumbsJson' => $this->seoBreadcrumbs ?
                 $this->breadcrumbModel->crumbsAsJsonLD($this->seoBreadcrumbs) :

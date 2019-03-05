@@ -1,0 +1,12 @@
+{
+    "globalVariables": {
+        "mainColors": {
+            "primary": "#7E0B1C"
+        },
+        "fonts": {
+            "size": {
+                "title": 100
+            }
+        }
+    }
+}

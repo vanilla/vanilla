@@ -198,7 +198,7 @@ class UpdateModel extends Gdn_Model {
 
                     $result = self::checkAddon($info, $entry);
                     if (!empty($result)) {
-                      continue;
+                        continue;
                     }
 
                     $addon = self::buildAddon($info);

@@ -15,39 +15,36 @@ import {
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
-import { useThemeCache } from "@library/styles/styleUtils";
+import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
 import { style } from "typestyle";
 
 export const vanillaHeaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
-    const themeVars = componentThemeVariables("vanillaHeader");
+    const makeThemeVars = variableFactory("vanillaHeader");
 
-    const sizing = {
+    const sizing = makeThemeVars("sizing", {
         height: 48,
         spacer: 12,
         mobile: {
             height: 44,
             width: formElementVars.sizing.height,
         },
-        ...themeVars.subComponentStyles("sizing"),
-    };
+    });
 
-    const colors = {
+    const colors = makeThemeVars("colors", {
         fg: globalVars.mainColors.bg,
         bg: globalVars.mainColors.primary,
-        ...themeVars.subComponentStyles("colors"),
-    };
+    });
 
-    const guest = {
+    const guest = makeThemeVars("guest", {
         spacer: 8,
-        ...themeVars.subComponentStyles("guest"),
-    };
+    });
 
     const buttonSize = 40;
     const buttonMobileSize = formElementVars.sizing.height;
-    const button = {
+    const button = makeThemeVars("button", {
         borderRadius: 3,
         size: buttonSize,
         guest: {
@@ -57,84 +54,65 @@ export const vanillaHeaderVariables = useThemeCache(() => {
             fontSize: 16,
             width: buttonMobileSize,
         },
-        ...themeVars.subComponentStyles("button"),
-    };
+    });
 
-    const count = {
+    const count = makeThemeVars("count", {
         size: 18,
         fontSize: 10,
         fg: globalVars.mainColors.bg,
         bg: globalVars.mainColors.primary,
-        ...themeVars.subComponentStyles("count"),
-    };
+    });
 
-    const dropDownContents = {
+    const dropDownContents = makeThemeVars("dropDownContents", {
         minWidth: 350,
-        ...themeVars.subComponentStyles("dropDownContents"),
-    };
+    });
 
-    const endElements = {
+    const endElements = makeThemeVars("endElements", {
         flexBasis: buttonSize * 4,
         mobile: {
             flexBasis: buttonMobileSize * 2,
         },
-        ...themeVars.subComponentStyles("endElements"),
-    };
+    });
 
-    const compactSearch = {
+    const compactSearch = makeThemeVars("compactSearch", {
         maxWidth: 672,
         mobile: {
             width: buttonMobileSize,
         },
-        ...themeVars.subComponentStyles("compactSearch"),
-    };
+    });
 
-    const buttonContents = {
+    const buttonContents = makeThemeVars("buttonContents", {
         hover: {
             bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1, true),
         },
         active: {
             bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2, true),
         },
-        ...themeVars.subComponentStyles("buttonContents"),
-    };
-
-    const signIn = {
-        bg: getColorDependantOnLightness(
-            globalVars.mainColors.primary,
-            globalVars.mainColors.primary,
-            0.1,
-            true,
-        ).toString(),
-        hover: {
-            bg: getColorDependantOnLightness(
-                globalVars.mainColors.primary,
-                globalVars.mainColors.primary,
-                0.2,
-                true,
-            ).toString(),
-        },
-        ...themeVars.subComponentStyles("signIn"),
-    };
-
-    const resister = {
-        bg: globalVars.mainColors.bg,
-        hover: {
-            bg: globalVars.mainColors.bg.fade(0.9).toString(),
-        },
-        ...themeVars.subComponentStyles("register"),
-    };
-
-    const mobileDropDown = style({
-        height: px(sizing.mobile.height),
-        ...themeVars.subComponentStyles("mobileDropDown"),
     });
 
-    const meBox = {
+    const signIn = makeThemeVars("signIn", {
+        bg: getColorDependantOnLightness(globalVars.mainColors.primary, globalVars.mainColors.primary, 0.1, true),
+        hover: {
+            bg: getColorDependantOnLightness(globalVars.mainColors.primary, globalVars.mainColors.primary, 0.2, true),
+        },
+    });
+
+    const resister = makeThemeVars("register", {
+        bg: globalVars.mainColors.bg,
+        hover: {
+            bg: globalVars.mainColors.bg.fade(0.9),
+        },
+    });
+
+    const mobileDropDown = makeThemeVars("mobileDropdown", {
+        height: px(sizing.mobile.height),
+    });
+
+    const meBox = makeThemeVars("meBox", {
         sizing: {
             buttonContents: 32,
         },
-    };
+    });
 
     return {
         sizing,

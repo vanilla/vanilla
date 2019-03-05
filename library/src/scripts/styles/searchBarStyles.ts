@@ -31,7 +31,7 @@ export const searchBarVariables = useThemeCache(() => {
     };
 
     const sizing = {
-        height: formElementVars.sizing.height,
+        height: 40,
         ...themeVars.subComponentStyles("sizing"),
     };
 
@@ -102,6 +102,7 @@ export const searchBarClasses = useThemeCache(() => {
                     marginLeft: -1,
                     minWidth: unit(vars.search.minWidth),
                     flexBasis: unit(vars.search.minWidth),
+                    minHeight: unit(vars.sizing.height),
                     $nest: {
                         "&:hover, &:focus": {
                             zIndex: 1,

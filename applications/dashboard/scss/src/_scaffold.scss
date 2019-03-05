@@ -87,6 +87,7 @@
 .panel-content,
 .panel-content-wrapper {
   width: 204px;
+  height: 100%;
 }
 
 .panel-left {
@@ -94,6 +95,12 @@
   position: sticky;
   top: 0;
   height: 100%;
+  padding-bottom: 0;
+
+  .panel-content {
+    max-height: calc(100vh - #{$navbar-height * 2});
+    overflow: auto;
+  }
 }
 
 .panel-right {

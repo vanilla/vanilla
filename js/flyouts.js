@@ -272,7 +272,6 @@
      * Close all of the flyouts unless we are clicking on a button inside of a flyout.
      */
     function handleToggleFlyoutMouseUp() {
-        console.log("flyout mouseup");
         if ($(this).hasClass("FlyoutButton")) return;
         closeAllFlyouts();
     }

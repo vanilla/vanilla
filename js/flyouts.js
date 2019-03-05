@@ -29,11 +29,18 @@
         $(document).delegate(".Hijack, .js-hijack", "click", handleHijackClick);
         $(document).delegate(".ButtonGroup > .Handle", "click", handleButtonHandleClick);
         $(document).delegate(".ToggleFlyout", "click", handleToggleFlyoutClick);
-        $(document).delegate(".ToggleFlyout a", "mouseup", handleToggleFlyoutMouseUp);
-        $(document).delegate(".mobileFlyoutOverlay", "click", closeAllFlyouts);
-        $(document).delegate(".Flyout", "click", function(e) {
+        $(document).delegate(".ToggleFlyout a, .Dropdown a", "mouseup", handleToggleFlyoutMouseUp);
+        $(document).delegate(".mobileFlyoutOverlay", "click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeAllFlyouts();
+        });
+        $(document).delegate(".Flyout, .Dropdown", "click", function (e) {
             e.stopPropagation();
         });
+        $(document).on("click", function (e) {
+            closeAllFlyouts();
+        })
     });
 
     /**
@@ -140,7 +147,7 @@
     /**
      * Close all flyouts, including ButtonGroups.
      */
-    function closeAllFlyouts() {
+    function closeAllFlyouts(e) {
         closeFlyout($(".ToggleFlyout"), $(".Flyout"));
         // Clear the button groups that are open as well.
         $(".ButtonGroup")
@@ -153,6 +160,8 @@
             .setFlyoutAttributes();
         document.body.classList.remove(BODY_CLASS);
     }
+
+    window.closeAllFlyouts = closeAllFlyouts;
 
     /**
      * Take over the clicking of an element in order to make a post request.
@@ -229,8 +238,8 @@
         var isHandle = false;
 
         if ($(e.target).closest(".Flyout").length === 0) {
-            e.stopPropagation();
             isHandle = true;
+            e.stopPropagation();
         } else if (
             $(e.target).hasClass("Hijack") ||
             $(e.target)
@@ -263,6 +272,7 @@
      * Close all of the flyouts unless we are clicking on a button inside of a flyout.
      */
     function handleToggleFlyoutMouseUp() {
+        console.log("flyout mouseup");
         if ($(this).hasClass("FlyoutButton")) return;
         closeAllFlyouts();
     }

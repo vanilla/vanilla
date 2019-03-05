@@ -47,8 +47,8 @@ abstract class ThemedPage extends Page {
         $variables = [];
 
         /** @var JsonAsset $variablesAsset */
-        $variablesAsset = $themeData['assets']['variables'];
-        if ($variablesAsset->getType()) {
+        $variablesAsset = $themeData['assets']['variables'] ?? null;
+        if ($variablesAsset && $variablesAsset->getType()) {
             $variables = json_decode($variablesAsset->getData(), true);
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new ServerException(

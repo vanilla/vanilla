@@ -150,6 +150,18 @@ export function assetUrl(path: string): string {
 }
 
 /**
+ * Create the URL to the theme's asset folder
+ *
+ * @param path - The path to format.
+ *
+ * @returns Returns a URL that can be used for a static asset.
+ */
+export function themeAsset(path: string): string {
+    const themeKey = getMeta("ui.themeKey");
+    return assetUrl(`/themes/${themeKey}/${path}`);
+}
+
+/**
  * @type {Object} The currently registered Components.
  * @private
  */

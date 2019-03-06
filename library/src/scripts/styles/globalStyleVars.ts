@@ -9,8 +9,7 @@ import { color, ColorHelper, percent, viewHeight } from "csx";
 
 export const globalVariables = useThemeCache(() => {
     const colorPrimary = color("#0291db");
-    const dark = color("#2c2c2c");
-    const makeThemeVars = variableFactory("globalVariables");
+    const makeThemeVars = variableFactory("global");
 
     const utility = {
         "percentage.third": percent(100 / 3),

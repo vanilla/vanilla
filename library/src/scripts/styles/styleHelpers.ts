@@ -27,7 +27,9 @@ import {
     OverflowXProperty,
     PositionProperty,
     RightProperty,
+    TextAlignLastProperty,
     TextOverflowProperty,
+    TextShadowProperty,
     UserSelectProperty,
     WhiteSpaceProperty,
 } from "csstype";
@@ -194,12 +196,16 @@ export const getColorDependantOnLightness = (
         throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
     }
 
-    if (referenceColor.lightness() >= 0.5 || flip) {
-        // Lighten color
-        return colorToModify.mix(color("#000"), 1 - weight) as ColorHelper;
+    if (referenceColor && referenceColor.lightness) {
+        if (referenceColor.lightness() >= 0.5 || flip) {
+            // Lighten color
+            return colorToModify.mix(color("#000"), 1 - weight) as ColorHelper;
+        } else {
+            // Darken color
+            return colorToModify.mix(color("#fff"), 1 - weight) as ColorHelper;
+        }
     } else {
-        // Darken color
-        return colorToModify.mix(color("#fff"), 1 - weight) as ColorHelper;
+        return colorToModify; // do nothing
     }
 };
 
@@ -603,6 +609,8 @@ interface IFont {
     weight?: FontWeightProperty;
     color?: ColorHelper | "transparent";
     lineHeight?: LineHeightProperty<TLength>;
+    shadow?: TextShadowProperty;
+    align?: TextAlignLastProperty;
 }
 
 export const font = (props: IFont) => {
@@ -611,5 +619,7 @@ export const font = (props: IFont) => {
         weight: props.weight ? props.weight : undefined,
         color: props.color ? toStringColor(props.color) : undefined,
         lineHeight: props.lineHeight ? unit(props.lineHeight) : undefined,
+        align: props.align ? props.align : undefined,
+        shadow: props.shadow ? props.shadow : undefined,
     };
 };

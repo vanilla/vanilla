@@ -20,8 +20,6 @@ if (!utils.validateArgs(themeKey, themeName)) {
     console.error('Install command should be followed by the theme-key and "Theme Name"');
     process.exit(1);
 }
-const themeHooksFileName = utils.convertToDashedCase(themeKey);
-const themeHooksClassName = utils.convertToPascalCase(themeKey);
 
 try {
     //copy addon.json
@@ -32,16 +30,6 @@ try {
         data = data.replace(/Theme Boilerplate/g, themeName);
 
         fse.writeFileSync(path.resolve(DEST, "addon.json"), data);
-    });
-
-    //copy class.vanillathemeboilerplate.themehooks.php and rename it
-    fse.copyFileSync(path.resolve(TOOL_ROOT, "class.vanillathemeboilerplate.themehooks.php"), path.resolve(DEST, "class."+themeHooksFileName+".themehooks.php"));
-    fse.readFile(path.resolve(DEST, "class."+themeHooksFileName+".themehooks.php"), 'utf8', function (err,data) {
-
-        data = data.replace(/theme-boilerplate/g, themeKey);
-        data = data.replace(/VanillaThemeBoilerplate/g, themeHooksClassName);
-
-        fse.writeFileSync(path.resolve(DEST, "class."+themeHooksFileName+".themehooks.php"), data);
     });
 
     //copy README.md and swap theme name
@@ -87,6 +75,9 @@ try {
 
     //copy views/ dir
     fse.copySync(path.resolve(TOOL_ROOT, "views"), path.resolve(DEST, "views"));
+
+    //copy settings/ dir
+    fse.copySync(path.resolve(TOOL_ROOT, "settings"), path.resolve(DEST, "settings"));
 
     console.log("Boilerplate successfully installed!");
 

@@ -12,14 +12,15 @@ import {
     debugHelper,
     flexHelper,
     getColorDependantOnLightness,
+    unit,
 } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { vanillaMenuVariables } from "@library/styles/vanillaMenu";
 
 export function vanillaHeaderVariables(theme?: object) {
     const globalVars = globalVariables(theme);
+    const formElementVars = formElementsVariables(theme);
     const themeVars = componentThemeVariables(theme, "vanillaHeader");
 
     const sizing = {
@@ -27,6 +28,7 @@ export function vanillaHeaderVariables(theme?: object) {
         spacer: 12,
         mobile: {
             height: 44,
+            width: formElementVars.sizing.height,
         },
         ...themeVars.subComponentStyles("sizing"),
     };
@@ -38,16 +40,21 @@ export function vanillaHeaderVariables(theme?: object) {
     };
 
     const guest = {
-        spacer: px(8),
+        spacer: 8,
         ...themeVars.subComponentStyles("guest"),
     };
 
     const buttonSize = 40;
+    const buttonMobileSize = formElementVars.sizing.height;
     const button = {
         borderRadius: 3,
         size: buttonSize,
+        guest: {
+            minWidth: 86,
+        },
         mobile: {
             fontSize: 16,
+            width: buttonMobileSize,
         },
         ...themeVars.subComponentStyles("button"),
     };
@@ -68,13 +75,16 @@ export function vanillaHeaderVariables(theme?: object) {
     const endElements = {
         flexBasis: buttonSize * 4,
         mobile: {
-            flexBasis: buttonSize * 2,
+            flexBasis: buttonMobileSize * 2,
         },
         ...themeVars.subComponentStyles("endElements"),
     };
 
     const compactSearch = {
         maxWidth: 672,
+        mobile: {
+            width: buttonMobileSize,
+        },
         ...themeVars.subComponentStyles("compactSearch"),
     };
 
@@ -89,9 +99,19 @@ export function vanillaHeaderVariables(theme?: object) {
     };
 
     const signIn = {
-        bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1),
+        bg: getColorDependantOnLightness(
+            globalVars.mainColors.primary,
+            globalVars.mainColors.primary,
+            0.1,
+            true,
+        ).toString(),
         hover: {
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2),
+            bg: getColorDependantOnLightness(
+                globalVars.mainColors.primary,
+                globalVars.mainColors.primary,
+                0.2,
+                true,
+            ).toString(),
         },
         ...themeVars.subComponentStyles("signIn"),
     };
@@ -109,6 +129,12 @@ export function vanillaHeaderVariables(theme?: object) {
         ...themeVars.subComponentStyles("mobileDropDown"),
     });
 
+    const meBox = {
+        sizing: {
+            buttonContents: 32,
+        },
+    };
+
     return {
         sizing,
         colors,
@@ -122,6 +148,7 @@ export function vanillaHeaderVariables(theme?: object) {
         compactSearch,
         buttonContents,
         mobileDropDown,
+        meBox,
     };
 }
 
@@ -130,7 +157,6 @@ export default function vanillaHeaderClasses(theme?: object) {
     const vars = vanillaHeaderVariables(theme);
     const formElementVars = formElementsVariables(theme);
     const headerColors = vars.colors;
-    const vanillaMenuVars = vanillaMenuVariables(theme);
     const mediaQueries = layoutVariables(theme).mediaQueries();
     const flex = flexHelper();
     const debug = debugHelper("vanillaHeader");
@@ -149,12 +175,12 @@ export default function vanillaHeaderClasses(theme?: object) {
                     right: 0,
                     zIndex: 1,
                 },
-                ".searchBar__control": {
+                "& .searchBar__control": {
                     ...debug.name("control"),
                     color: vars.colors.fg.toString(),
                     cursor: "pointer",
                 },
-                ".suggestedTextInput-clear.searchBar-clear": {
+                "&& .suggestedTextInput-clear.searchBar-clear": {
                     ...debug.name("clear"),
                     color: vars.colors.fg.toString(),
                     $nest: {
@@ -169,24 +195,15 @@ export default function vanillaHeaderClasses(theme?: object) {
                         },
                     },
                 },
-                ".searchBar__placeholder": {
+                "& .searchBar__placeholder": {
                     ...debug.name("placeholder"),
                     color: vars.colors.fg.fade(0.8).toString(),
                     cursor: "pointer",
-                },
-                ".backLink-link": {
-                    maxHeight: percent(100),
-                    ...debug.name("backLink-link"),
                 },
             },
         },
         mediaQueries.oneColumn({
             height: px(vars.sizing.mobile.height),
-            $nest: {
-                ".backLink-link": {
-                    height: vars.sizing.mobile.height,
-                },
-            },
         }),
     );
 
@@ -327,26 +344,29 @@ export default function vanillaHeaderClasses(theme?: object) {
 
     const button = style(
         {
-            ...debug.name("bottom"),
-            ...flex.middle(),
+            ...debug.name("button"),
             color: vars.colors.fg.toString(),
             height: px(vars.sizing.height),
             minWidth: px(vars.button.size),
+            maxWidth: percent(100),
             padding: px(0),
             $nest: {
                 "&:active": {
+                    color: vars.colors.fg.toString(),
                     $nest: {
                         ".meBox-contentHover": meBoxStateStyles,
                         ".meBox-buttonContent": meBoxStateStyles,
                     },
                 },
                 "&:hover": {
+                    color: vars.colors.fg.toString(),
                     $nest: {
                         ".meBox-contentHover": meBoxStateStyles,
                         ".meBox-buttonContent": meBoxStateStyles,
                     },
                 },
                 "&.focus-visible": {
+                    color: vars.colors.fg.toString(),
                     $nest: {
                         ".meBox-contentHover": meBoxStateStyles,
                         ".meBox-buttonContent": meBoxStateStyles,
@@ -366,8 +386,14 @@ export default function vanillaHeaderClasses(theme?: object) {
         },
         mediaQueries.oneColumn({
             height: px(vars.sizing.mobile.height),
+            width: px(vars.sizing.mobile.width),
+            minWidth: px(vars.sizing.mobile.width),
         }),
     );
+
+    const centeredButtonClass = style({
+        ...flex.middle(),
+    });
 
     const searchCancel = style({
         ...debug.name("searchCancel"),
@@ -457,24 +483,19 @@ export default function vanillaHeaderClasses(theme?: object) {
         }),
     );
 
-    const backLink = style({
-        ...debug.name("backLink"),
-        transform: `translateX(${-px(globalVars.gutter.half)})`,
-    });
-
     const signIn = style({
         ...debug.name("signIn"),
         $nest: {
             "&:not([disabled])": {
                 color: vars.colors.fg.toString(),
-                backgroundColor: vanillaMenuVars.signIn.bg.toString(),
+                backgroundColor: vars.signIn.bg.toString(),
                 border: `solid ${vars.colors.fg.toString()} 1px`,
-                marginLeft: px(vanillaMenuVars.guest.spacer * 1.5),
-                marginRight: px(vanillaMenuVars.guest.spacer),
+                marginLeft: unit(vars.guest.spacer * 1.5),
+                marginRight: unit(vars.guest.spacer),
                 $nest: {
                     "&:hover": {
                         border: `solid ${vars.colors.fg} 1px`,
-                        backgroundColor: vanillaMenuVars.signIn.hover.bg.toString(),
+                        backgroundColor: vars.signIn.hover.bg.toString(),
                         color: vars.colors.fg.toString(),
                     },
                     "&.focus-visible": {
@@ -502,7 +523,7 @@ export default function vanillaHeaderClasses(theme?: object) {
                 color: vars.colors.bg.toString(),
                 backgroundColor: vars.colors.fg.toString(),
                 border: `solid ${vars.colors.fg} 1px;`,
-                marginLeft: vanillaMenuVars.guest.spacer.toString(),
+                marginLeft: unit(vars.guest.spacer),
                 $nest: {
                     "&:hover": {
                         color: vars.colors.bg.toString(),
@@ -531,7 +552,7 @@ export default function vanillaHeaderClasses(theme?: object) {
         {
             ...debug.name("compactSearchResults"),
             top: (vars.sizing.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
-            display: "block",
+            display: "flex",
             position: "relative",
             margin: "auto",
             maxWidth: px(vars.compactSearch.maxWidth),
@@ -540,6 +561,14 @@ export default function vanillaHeaderClasses(theme?: object) {
             top: (vars.sizing.mobile.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
         }),
     );
+
+    const clearButtonClass = style({
+        color: vars.colors.fg.toString(),
+    });
+
+    const guestButton = style({
+        minWidth: unit(vars.button.guest.minWidth),
+    });
 
     return {
         root,
@@ -563,10 +592,12 @@ export default function vanillaHeaderClasses(theme?: object) {
         horizontalScroll,
         rightFlexBasis,
         leftFlexBasis,
-        backLink,
         signIn,
         register,
+        centeredButtonClass,
         compactSearchResults,
+        clearButtonClass,
+        guestButton,
     };
 }
 

@@ -16,7 +16,7 @@ interface IProps {
     buttonClassName?: string;
     className?: string;
     contentsClassName?: string;
-    toggleContentsClassName?: string;
+    toggleContentClassName?: string;
     countClass?: string;
 }
 
@@ -48,7 +48,7 @@ export default class MessagesDropDown extends React.Component<IProps, IState> {
                 renderLeft={true}
                 contentsClassName={this.props.contentsClassName}
                 toggleButtonClassName="vanillaHeader-button"
-                buttonContents={<MessagesCount open={this.state.open} className={this.props.toggleContentsClassName} />}
+                buttonContents={<MessagesCount open={this.state.open} className={this.props.toggleContentClassName} />}
                 onVisibilityChange={this.setOpen}
             >
                 <MessagesContents countClass={this.props.countClass} />

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { color, ColorHelper, percent, px } from "csx";
+import { color, ColorHelper, percent, px, rgba } from "csx";
 import { componentThemeVariables, getColorDependantOnLightness } from "@library/styles/styleHelpers";
 
 export const globalVariables = (theme?: object) => {
@@ -30,18 +30,26 @@ export const globalVariables = (theme?: object) => {
         ...themeVars.subComponentStyles("mainColors"),
     };
 
-    const mixBgAndFg = weight => {
-        return mainColors.fg.mix(mainColors.bg, weight);
+    const mixBgAndFg = (weight: number) => {
+        return mainColors.fg.mix(mainColors.bg, weight) as ColorHelper;
     };
 
-    const errorFg = color("#ff3933");
+    const mixPrimaryAndFg = (weight: number) => {
+        return mainColors.primary.mix(mainColors.fg, weight) as ColorHelper;
+    };
+
+    const mixPrimaryAndBg = (weight: number) => {
+        return mainColors.primary.mix(mainColors.bg, weight) as ColorHelper;
+    };
+
+    const errorFg = color("#555A62");
     const warning = color("#ffce00");
     const deleted = color("#D0021B");
     const feedbackColors = {
         warning,
         error: {
             fg: errorFg,
-            bg: errorFg.mix(mainColors.bg, 10),
+            bg: color("#FFF3D4"),
         },
         confirm: color("#60bd68"),
         unresolved: warning.mix(mainColors.fg, 10),
@@ -50,8 +58,14 @@ export const globalVariables = (theme?: object) => {
     };
 
     const links = {
-        color: mainColors.primary,
-        visited: mainColors.primary,
+        colors: {
+            default: mainColors.fg,
+            hover: mainColors.secondary,
+            focus: mainColors.secondary,
+            accessibleFocus: mainColors.secondary,
+            active: mainColors.secondary,
+        },
+        ...themeVars.subComponentStyles("links"),
     };
 
     const body = {
@@ -60,10 +74,10 @@ export const globalVariables = (theme?: object) => {
     };
 
     const border = {
-        color: mainColors.fg.mix(mainColors.bg, 24),
-        width: px(1),
+        color: mixBgAndFg(0.24),
+        width: 1,
         style: "solid",
-        radius: px(6),
+        radius: 6,
         ...themeVars.subComponentStyles("border"),
     };
 
@@ -119,7 +133,6 @@ export const globalVariables = (theme?: object) => {
                 title: 26,
             },
         },
-
         weights: {
             normal: 400,
             semiBold: 600,
@@ -146,6 +159,107 @@ export const globalVariables = (theme?: object) => {
         ...themeVars.subComponentStyles("animation"),
     };
 
+    const embed = {
+        error: {
+            bg: feedbackColors.error,
+        },
+        focus: {
+            color: mainColors.primary,
+        },
+        text: {
+            padding: fonts.size.medium,
+        },
+        sizing: {
+            smallPadding: 4,
+            width: 640,
+        },
+        select: {
+            borderWidth: 2,
+        },
+        overlay: {
+            hover: {
+                color: mainColors.bg.fade(0.5),
+            },
+        },
+        ...themeVars.subComponentStyles("embed"),
+    };
+
+    const meta = {
+        text: {
+            fontSize: fonts.size.small,
+            color: mixBgAndFg(0.85),
+            margin: 4,
+        },
+        spacing: {
+            verticalMargin: 12,
+            default: gutter.quarter,
+        },
+        lineHeights: {
+            default: lineHeights.base,
+        },
+        colors: {
+            fg: mixBgAndFg(0.85),
+            deleted: feedbackColors.deleted,
+        },
+    };
+
+    const states = {
+        icon: {
+            opacity: 0.6,
+        },
+        text: {
+            opacity: 0.75,
+        },
+        hover: {
+            color: mixPrimaryAndBg(0.1),
+            opacity: 1,
+        },
+        focus: {
+            color: mixPrimaryAndBg(0.12),
+            opacity: 1,
+        },
+        active: {
+            color: mixPrimaryAndBg(0.95),
+            opacity: 1,
+        },
+    };
+
+    const overlayBg = getColorDependantOnLightness(mainColors.bg, mainColors.fg, 0.2);
+    const overlay = {
+        dropShadow: `0 5px 10px ${overlayBg}`,
+        border: {
+            color: mixBgAndFg(0.15),
+            radius: border.radius,
+        },
+        spacer: 32,
+    };
+
+    const userContent = {
+        font: {
+            sizes: {
+                default: fonts.size.medium,
+                h1: "2em",
+                h2: "1.5em",
+                h3: "1.25em",
+                h4: "1em",
+                h5: ".875em",
+                h6: ".85em",
+            },
+        },
+        list: {
+            margin: "2em",
+            listDecoration: {
+                minWidth: "2em",
+            },
+        },
+    };
+
+    const buttonIconSize = 36;
+    const buttonIcon = {
+        size: buttonIconSize,
+        offset: (buttonIconSize - icon.sizes.default) / 2,
+    };
+
     return {
         utility,
         elementaryColors,
@@ -153,6 +267,7 @@ export const globalVariables = (theme?: object) => {
         feedbackColors,
         body,
         border,
+        meta,
         gutter,
         panel,
         content,
@@ -160,8 +275,15 @@ export const globalVariables = (theme?: object) => {
         spacer,
         lineHeights,
         icon,
-        mixBgAndFg,
+        buttonIcon,
         animation,
         links,
+        embed,
+        states,
+        overlay,
+        userContent,
+        mixBgAndFg,
+        mixPrimaryAndFg,
+        mixPrimaryAndBg,
     };
 };

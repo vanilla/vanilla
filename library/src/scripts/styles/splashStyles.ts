@@ -30,6 +30,7 @@ export function splashVariables(theme?: object) {
         fontSize: globalVars.fonts.size.title,
         textAlign: "center",
         fontWeight: globalVars.fonts.weights.semiBold,
+        textShadow: `0 1px 25px ${elementaryColor.black.fade(0.5).toString()}`,
         marginTop: 28,
         marginBottom: 40,
         ...themeVars.subComponentStyles("title"),
@@ -61,7 +62,6 @@ export function splashVariables(theme?: object) {
 }
 
 export function splashStyles(theme?: object) {
-    const globalVars = globalVariables(theme);
     const vars = splashVariables(theme);
     const debug = debugHelper("splash");
 
@@ -106,9 +106,7 @@ export function splashStyles(theme?: object) {
         color: vars.title.fg.toString(),
         paddingTop: px(vars.title.marginTop),
         marginBottom: px(vars.title.marginBottom),
-        textShadow: vars.title.textShadow
-            ? vars.title.textShadow
-            : `0 1px 25px ${getColorDependantOnLightness(vars.title.fg, vars.title.fg, 0.9).fade(0.4)}`,
+        textShadow: `0 1px 25px ${getColorDependantOnLightness(vars.title.fg, vars.title.fg, 0.9).fade(0.4)}`,
         ...debug.name("title"),
     });
 

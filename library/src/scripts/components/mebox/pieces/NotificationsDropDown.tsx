@@ -16,7 +16,7 @@ import * as React from "react";
 interface IProps extends INotificationsProps {
     buttonClassName?: string;
     className?: string;
-    toggleContentsClassName?: string;
+    toggleContentClassName?: string;
     contentsClassName?: string;
     countUnread: number;
     userSlug: string;
@@ -56,7 +56,7 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
                 buttonContents={
                     <NotificationsCounter
                         open={this.state.open}
-                        className={this.props.toggleContentsClassName}
+                        className={this.props.toggleContentClassName}
                         countClass={this.props.countClass}
                     />
                 }

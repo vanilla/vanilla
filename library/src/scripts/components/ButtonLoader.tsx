@@ -12,7 +12,6 @@ import classNames from "classnames";
 interface IProps {
     className?: string;
     buttonType?: IButtonType;
-    theme?: object;
 }
 
 /**
@@ -20,7 +19,7 @@ interface IProps {
  */
 export default class ButtonLoader extends React.Component<IProps> {
     public render() {
-        const classes = buttonLoaderClasses(this.props.buttonType || buttonVariables(this.props.theme).primary);
+        const classes = buttonLoaderClasses(this.props.buttonType || buttonVariables().primary);
         return (
             <React.Fragment>
                 <div className={classNames(classes.root, this.props.className)} aria-hidden="true" />

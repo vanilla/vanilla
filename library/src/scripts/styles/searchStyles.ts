@@ -39,6 +39,9 @@ export const searchClasses = (theme?: object) => {
     const root = style({
         ...debug.name(),
         $nest: {
+            ".inputText": {
+                borderColor: vars.input.border.color.toString(),
+            },
             ".searchBar-valueContainer": {
                 ...debug.name("valueContainer"),
                 cursor: "text",

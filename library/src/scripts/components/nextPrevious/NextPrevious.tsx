@@ -6,7 +6,6 @@
 
 import React from "react";
 import classNames from "classnames";
-import { t } from "@library/application";
 import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, debugHelper } from "@library/styles/styleHelpers";
@@ -14,25 +13,59 @@ import ScreenReaderContent from "@library/components/ScreenReaderContent";
 import Heading from "@library/components/Heading";
 import AdjacentLink, { LeftRight } from "@library/components/nextPrevious/AdjacentLink";
 import { px } from "csx";
-import { PanelWidget } from "@library/components/layouts/PanelLayout";
+
+interface IUrlItem {
+    name: string;
+    url: string;
+}
 
 interface IProps {
     className?: string;
-    theme?: object;
-    accessibleTitle?: string;
-    previousTitle: string;
-    previousTo?: string;
-    nextTitle: string;
-    nextTo?: string;
+    accessibleTitle: string;
+    prevItem?: IUrlItem | null;
+    nextItem?: IUrlItem | null;
 }
 
 /**
  * Implement mobile next/previous nav to articles
  */
 export default class NextPrevious extends React.Component<IProps> {
-    public static defaultProps = {
-        accessibleTitle: t("More Articles"),
-    };
+    public render() {
+        const { accessibleTitle, className, prevItem, nextItem } = this.props;
+
+        if (!nextItem && !prevItem) {
+            return null; // skip if no sibling pages exist
+        }
+
+        const classes = this.nextPreviousStyles();
+        return (
+            <nav className={classNames(className, classes.root)}>
+                <ScreenReaderContent>
+                    <Heading title={accessibleTitle} />
+                </ScreenReaderContent>
+                {/* Left */}
+                {prevItem && (
+                    <AdjacentLink
+                        className={classes.previous}
+                        classes={classes}
+                        direction={LeftRight.LEFT}
+                        to={prevItem.url}
+                        title={prevItem.name}
+                    />
+                )}
+                {/* Right */}
+                {nextItem && (
+                    <AdjacentLink
+                        className={classes.next}
+                        classes={classes}
+                        direction={LeftRight.RIGHT}
+                        to={nextItem.url}
+                        title={nextItem.name}
+                    />
+                )}
+            </nav>
+        );
+    }
 
     public nextPreviousVariables = (theme?: object) => {
         const globalVars = globalVariables(theme);
@@ -78,11 +111,6 @@ export default class NextPrevious extends React.Component<IProps> {
             flexWrap: "wrap",
             justifyContent: "space-between",
             color: globalVars.mainColors.fg.toString(),
-            $nest: {
-                "&:hover": activeStyles,
-                "&:focus": activeStyles,
-                "&:active": activeStyles,
-            },
             ...debug.name(),
         });
 
@@ -132,6 +160,8 @@ export default class NextPrevious extends React.Component<IProps> {
             color: vars.colors.title.toString(),
             $nest: {
                 "&.focus-visible": activeStyles,
+                "&:hover": activeStyles,
+                "&:active": activeStyles,
             },
             ...debug.name("adjacent"),
         });
@@ -152,41 +182,4 @@ export default class NextPrevious extends React.Component<IProps> {
 
         return { root, adjacent, previous, next, title, chevron, directionLabel, chevronLeft, chevronRight };
     };
-
-    public render() {
-        const { accessibleTitle, theme, className, previousTitle, previousTo, nextTitle, nextTo } = this.props;
-
-        if (!nextTo && !previousTo) {
-            return null; // skip if no sibling pages exist
-        } else {
-            const classes = this.nextPreviousStyles(theme);
-            return (
-                <nav className={classNames(className, classes.root)}>
-                    <ScreenReaderContent>
-                        <Heading title={accessibleTitle} />
-                    </ScreenReaderContent>
-                    {/* Left */}
-                    {previousTo && (
-                        <AdjacentLink
-                            className={classes.previous}
-                            classes={classes}
-                            direction={LeftRight.LEFT}
-                            to={previousTo}
-                            title={previousTitle}
-                        />
-                    )}
-                    {/* Right */}
-                    {nextTo && (
-                        <AdjacentLink
-                            className={classes.next}
-                            classes={classes}
-                            direction={LeftRight.RIGHT}
-                            to={nextTo}
-                            title={nextTitle}
-                        />
-                    )}
-                </nav>
-            );
-        }
-    }
 }

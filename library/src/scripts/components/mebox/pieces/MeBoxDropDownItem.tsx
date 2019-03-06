@@ -13,6 +13,7 @@ import { t } from "@library/application";
 import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
 import SmartLink from "@library/components/navigation/SmartLink";
+import { meBoxMessageClasses } from "@library/styles/meBoxMessageStyles";
 
 export enum MeBoxItemType {
     NOTIFICATION = "notification",
@@ -48,6 +49,7 @@ type IProps = IMeBoxMessageItem | IMeBoxNotificationItem;
 export default class MeBoxDropDownItem extends React.Component<IProps> {
     public render() {
         const { unread, message, timestamp, to } = this.props;
+        const classesMeBoxMessage = meBoxMessageClasses();
 
         let authors: JSX.Element[];
 
@@ -67,20 +69,30 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
         }
 
         return (
-            <li className={classNames("meBoxMessage", this.props.className)}>
-                <SmartLink to={to} className="meBoxMessage-link" tabIndex={0}>
-                    <div className="meBoxMessage-imageContainer">
+            <li className={classNames("meBoxMessage", this.props.className, classesMeBoxMessage.root)}>
+                <SmartLink to={to} className={classNames("meBoxMessage-link", classesMeBoxMessage.link)} tabIndex={0}>
+                    <div className={classNames("meBoxMessage-imageContainer", classesMeBoxMessage.imageContainer)}>
                         {this.props.photo ? (
-                            <img className="meBoxMessage-image" src={this.props.photo} />
+                            <img
+                                className={classNames("meBoxMessage-image", classesMeBoxMessage.image)}
+                                src={this.props.photo}
+                            />
                         ) : (
-                            noUserPhoto("meBoxMessage-image")
+                            noUserPhoto(classNames("meBoxMessage-image", classesMeBoxMessage.image))
                         )}
                     </div>
-                    <div className="meBoxMessage-contents">
-                        {!!authors! && <div className="meBoxMessage-message">{authors!}</div>}
+                    <div className={classNames("meBoxMessage-contents", classesMeBoxMessage.contents)}>
+                        {!!authors! && (
+                            <div className={classNames("meBoxMessage-message", classesMeBoxMessage.message)}>
+                                {authors!}
+                            </div>
+                        )}
                         {/* Current notifications API returns HTML-formatted messages. Should be updated to return something aside from raw HTML. */}
-                        <div className="meBoxMessage-message" dangerouslySetInnerHTML={{ __html: message }} />
-                        <div className="meBoxMessage-metas metas isFlexed">
+                        <div
+                            className={classNames("meBoxMessage-message", classesMeBoxMessage.message)}
+                            dangerouslySetInnerHTML={{ __html: message }}
+                        />
+                        <div className={classNames("meBoxMessage-metas", "metas", "isFlexed")}>
                             {timestamp && <DateTime timestamp={timestamp} className="meta" />}
                             {this.props.type === MeBoxItemType.MESSAGE && (
                                 <span className="meta">
@@ -92,9 +104,21 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
                             )}
                         </div>
                     </div>
-                    {!unread && <FlexSpacer className="meBoxMessage-status isRead" />}
+                    {!unread && (
+                        <FlexSpacer
+                            className={classNames("meBoxMessage-status", "isRead", classesMeBoxMessage.status)}
+                        />
+                    )}
                     {unread && (
-                        <div title={t("Unread")} className="u-flexSpacer meBoxMessage-status isUnread">
+                        <div
+                            title={t("Unread")}
+                            className={classNames(
+                                "u-flexSpacer",
+                                "meBoxMessage-status",
+                                "isUnread",
+                                classesMeBoxMessage.status,
+                            )}
+                        >
                             <span className="sr-only">{t("Unread")}</span>
                         </div>
                     )}

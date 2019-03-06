@@ -12,6 +12,7 @@ import { t } from "@library/application";
 import Paragraph from "@library/components/Paragraph";
 import * as selectOverrides from "./overwrites";
 import { IComboBoxOption } from "./SearchBar";
+import { tokensClasses } from "@library/styles/tokensStyles";
 
 interface IProps extends IOptionalComponentID {
     label: string;
@@ -43,9 +44,10 @@ export default class Tokens extends React.Component<IProps, IState> {
 
     public render() {
         const { className, disabled, options, isLoading } = this.props;
+        const classes = tokensClasses();
 
         return (
-            <div className={classNames("tokens", "inputBlock", this.props.className)}>
+            <div className={classNames("tokens", "inputBlock", this.props.className, classes.root)}>
                 <label htmlFor={this.inputID} className="inputBlock-labelAndDescription">
                     <span className="inputBlock-labelText">{this.props.label}</span>
                     <Paragraph className="inputBlock-labelNote" children={this.props.labelNote} />

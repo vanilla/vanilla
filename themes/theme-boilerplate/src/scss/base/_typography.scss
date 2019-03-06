@@ -89,6 +89,10 @@ b {
     font-weight: bold;
 }
 
+abbr {
+    text-underline: none;
+}
+
 // [role="heading"][aria-level="3"]
 .CategoryHeading,
 .Item .Title,

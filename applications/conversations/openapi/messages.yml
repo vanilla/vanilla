@@ -1,0 +1,145 @@
+openapi: 3.0.2
+info:
+paths:
+  /messages:
+    get:
+      parameters:
+      - description: |
+          Filter by conversation.
+        in: query
+        name: conversationID
+        schema:
+          type: integer
+      - description: |
+          Filter by author.
+        in: query
+        name: insertUserID
+        schema:
+          type: integer
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 50
+          maximum: 100
+          minimum: 1
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - insertUser
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Message'
+                type: array
+          description: Success
+      tags:
+      - Messages
+      summary: List user messages.
+    post:
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: Success
+      tags:
+      - Messages
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessagePost'
+        required: true
+      summary: Add a message.
+  '/messages/{id}':
+    get:
+      parameters:
+      - description: |
+          The message ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: Success
+      tags:
+      - Messages
+      summary: Get a message.
+components:
+  schemas:
+    Message:
+      properties:
+        body:
+          description: The body of the message.
+          maxLength: 2000
+          minLength: 1
+          type: string
+        conversationID:
+          description: The ID of the conversation.
+          type: integer
+        dateInserted:
+          description: When the message was created.
+          format: date-time
+          type: string
+        insertUser:
+          $ref: '#/components/schemas/UserFragment'
+        insertUserID:
+          description: The user that created the message.
+          type: integer
+        messageID:
+          description: The ID of the message.
+          type: integer
+      required:
+      - messageID
+      - conversationID
+      - body
+      - insertUserID
+      - dateInserted
+      type: object
+    MessagePost:
+      properties:
+        body:
+          description: The body of the message.
+          maxLength: 2000
+          minLength: 1
+          type: string
+        conversationID:
+          description: The ID of the conversation.
+          type: integer
+        format:
+          description: The input format of the record.
+          type: string
+      required:
+      - conversationID
+      - body
+      type: object

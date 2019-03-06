@@ -7,7 +7,8 @@
 import { t } from "@library/application";
 import React from "react";
 import classNames from "classnames";
-import { IOptionalComponentID, getOptionalID } from "@library/componentIDs";
+import { IOptionalComponentID, getOptionalID, getRequiredID } from "@library/componentIDs";
+import { checkRadioClasses } from "@library/styles/checkRadioStyles";
 
 interface IProps extends IOptionalComponentID {
     id?: string;
@@ -28,13 +29,12 @@ interface IState {
 export default class Checkbox extends React.Component<IProps, IState> {
     public static defaultProps = {
         disabled: false,
-        id: false,
     };
 
     constructor(props) {
         super(props);
         this.state = {
-            id: getOptionalID(props, "checkbox") as string,
+            id: getRequiredID(props, "checkbox") as string,
         };
     }
 
@@ -43,21 +43,22 @@ export default class Checkbox extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const componentClasses = classNames("checkbox", this.props.className);
-
+        const classes = checkRadioClasses();
         return (
-            <label id={this.state.id} className={componentClasses}>
+            <label id={this.state.id} className={classNames("checkbox", this.props.className, classes.root)}>
                 <input
-                    className="checkbox-input"
+                    className={classNames("checkbox-input", classes.input)}
                     aria-labelledby={this.labelID}
                     type="checkbox"
                     onChange={this.props.onChange}
                     checked={this.props.checked}
+                    disabled={this.props.disabled}
+                    tabIndex={0}
                 />
-                <span className="checkbox-box" aria-hidden="true">
-                    <span className="checkbox-state">
+                <span className={classNames("checkbox-box", classes.iconContainer)} aria-hidden="true">
+                    <span className={classNames("checkbox-state", classes.state)}>
                         <svg
-                            className="checkbox-icon checkbox-checkIcon"
+                            className={classNames("checkbox-icon checkbox-checkIcon", classes.checkIcon)}
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 10 10"
                         >
@@ -69,7 +70,7 @@ export default class Checkbox extends React.Component<IProps, IState> {
                         </svg>
                     </span>
                 </span>
-                <span id={this.labelID} className="checkbox-label">
+                <span id={this.labelID} className={classNames("checkbox-label", classes.label)}>
                     {this.props.label}
                 </span>
             </label>

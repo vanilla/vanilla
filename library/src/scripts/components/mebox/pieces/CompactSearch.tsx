@@ -16,6 +16,8 @@ import { withSearch, IWithSearchProps } from "@library/contexts/SearchContext";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import FocusWatcher from "@library/FocusWatcher";
 import vanillaHeaderClasses from "@library/styles/vanillaHeaderStyles";
+import { compactSearchClasses } from "@library/styles/compactSearchStyles";
+import { searchBarClasses } from "@library/styles/searchBarStyles";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
@@ -31,6 +33,7 @@ export interface ICompactSearchProps extends IWithSearchProps, RouteComponentPro
     focusOnMount?: boolean;
     buttonContentClass?: string;
     cancelContentClassName?: string;
+    clearButtonClass?: string;
 }
 
 interface IState {
@@ -51,16 +54,18 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
     };
 
     public render() {
-        const classes = vanillaHeaderClasses();
+        const headerClasses = vanillaHeaderClasses();
+        const classes = compactSearchClasses();
+        const classesSearchBar = searchBarClasses();
         return (
             <div
                 ref={this.selfRef}
-                className={classNames("compactSearch", this.props.className, { isOpen: this.props.open })}
+                className={classNames("compactSearch", this.props.className, classes.root, { isOpen: this.props.open })}
             >
                 {!this.props.open && (
                     <Button
                         onClick={this.props.onSearchButtonClick}
-                        className={classNames("compactSearch-open", this.props.buttonClass)}
+                        className={classNames(headerClasses.centeredButtonClass, this.props.buttonClass)}
                         title={t("Search")}
                         aria-expanded={false}
                         aria-haspopup="true"
@@ -68,13 +73,11 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                         aria-controls={this.id}
                         buttonRef={this.openSearchButton}
                     >
-                        <div className={classNames("compactSearch-buttonContent", this.props.buttonContentClass)}>
-                            {search()}
-                        </div>
+                        <div className={classNames(this.props.buttonContentClass)}>{search()}</div>
                     </Button>
                 )}
                 {this.props.open && (
-                    <div className={classNames("compactSearch-contents")}>
+                    <div className={classNames("compactSearch-contents", classes.contents)}>
                         <SearchBar
                             id={this.id}
                             placeholder={this.props.placeholder}
@@ -94,10 +97,15 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                             onOpenSuggestions={this.props.onOpenSuggestions}
                             onCloseSuggestions={this.props.onCloseSuggestions}
                             className={"compactSearch-searchBar"}
+                            clearButtonClass={this.props.clearButtonClass}
                         />
                         <Button
                             onClick={this.props.onCloseSearch}
-                            className={classNames("compactSearch-close", this.props.cancelButtonClassName)}
+                            className={classNames(
+                                "compactSearch-close",
+                                this.props.cancelButtonClassName,
+                                classes.close,
+                            )}
                             title={t("Search")}
                             aria-expanded={true}
                             aria-haspopup="true"
@@ -108,6 +116,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                                 className={classNames(
                                     "compactSearch-cancelContents",
                                     this.props.cancelContentClassName,
+                                    classes.cancelContents,
                                 )}
                             >
                                 {t("Cancel")}
@@ -117,7 +126,11 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                 )}
                 <div
                     ref={this.resultsRef}
-                    className={classNames("vanillaHeader-compactSearchResults", classes.compactSearchResults)}
+                    className={classNames(
+                        "vanillaHeader-compactSearchResults",
+                        headerClasses.compactSearchResults,
+                        classesSearchBar.results,
+                    )}
                 />
             </div>
         );

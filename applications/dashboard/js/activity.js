@@ -134,7 +134,14 @@ jQuery(document).ready(function($) {
                     gdn.inform(json);
 
                     if (json['FormSaved'] == true) {
-                        $(inp).val('').closest('form').trigger('clearCommentForm');
+                        var $form = $(inp).val('').closest('form');
+                        $form.trigger('clearCommentForm');
+
+                        // Dispatch a native event for things that don't use jquery
+                        var event = document.createEvent('CustomEvent');
+                        event.initCustomEvent('X-ClearCommentForm', true, false, {});
+                        $form[0].dispatchEvent(event);
+
                         // If there were no activities.
                         if ($('ul.Activities').length == 0) {
                             // Make sure that empty rows are removed

@@ -16,7 +16,7 @@ module.exports = function (grunt) {
     watch: {
       js: {
         files: ['js/src/**/*.js']
-        , tasks: ['jshint', 'concat:dist']
+        , tasks: ['concat:dist']
       }
       , gruntfile: {
         files: ['Gruntfile.js']
@@ -216,7 +216,6 @@ module.exports = function (grunt) {
           'js/cropimage.js',
           'js/buttonGroup.js',
           'js/jquery.tablejenga.js',
-          'js/jquery.fluidfixed.js',
           '../../js/library/jquery.expander.js',
           '../../js/library/jquery.gardencheckboxgrid.js',
           '../../js/library/jquery.form.js',

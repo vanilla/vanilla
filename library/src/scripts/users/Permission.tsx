@@ -8,13 +8,15 @@ import React from "react";
 import { connect } from "react-redux";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import { LoadStatus } from "@library/@types/api";
-import UsersActions, { IInjectableUsersActions } from "@library/users/UsersActions";
+import UsersActions from "@library/users/UsersActions";
 import { logError } from "@library/utility";
+import apiv2 from "@library/apiv2";
 
-interface IProps extends IInjectableUserState, IInjectableUsersActions {
+interface IProps extends IInjectableUserState {
     permission: string | string[];
     children: React.ReactNode;
     fallback?: React.ReactNode;
+    requestData: () => void;
 }
 
 /**
@@ -32,7 +34,7 @@ export class Permission extends React.Component<IProps> {
      */
     public componentDidMount() {
         if (this.props.currentUser.status === LoadStatus.PENDING) {
-            void this.props.usersActions.getMe();
+            void this.props.requestData();
         }
     }
 
@@ -75,9 +77,16 @@ export class Permission extends React.Component<IProps> {
     }
 }
 
+function mapDispatchToProps(dispatch) {
+    const actions = new UsersActions(dispatch, apiv2);
+    return {
+        requestData: actions.getMe,
+    };
+}
+
 const withRedux = connect(
     UsersModel.mapStateToProps,
-    UsersActions.mapDispatch,
+    mapDispatchToProps,
 );
 
 export default withRedux(Permission);

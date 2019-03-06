@@ -13,7 +13,7 @@ import FrameBody from "@library/components/frame/FrameBody";
 import FrameFooter from "@library/components/frame/FrameFooter";
 import FrameHeaderWithAction from "@library/components/frame/FrameHeaderWithAction";
 import FramePanel from "@library/components/frame/FramePanel";
-import FullPageLoader, { LoaderStyle } from "@library/components/FullPageLoader";
+import Loader from "@library/components/Loader";
 import { settings } from "@library/components/icons/header";
 import LinkAsButton from "@library/components/LinkAsButton";
 import { IMeBoxNotificationItem, MeBoxItemType } from "@library/components/mebox/pieces/MeBoxDropDownItem";
@@ -25,6 +25,7 @@ import { connect } from "react-redux";
 import MeBoxDropDownItemList from "./MeBoxDropDownItemList";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
+import { loaderClasses } from "@library/styles/loaderStyles";
 
 export interface INotificationsProps {
     countClass?: string;
@@ -84,7 +85,8 @@ export class NotificationsContents extends React.Component<IProps> {
             // This is the height that it happens to be right now.
             // This will be calculated better once we finish the CSS in JS transition.
             const height = this.props.device === Devices.MOBILE ? 80 : 69;
-            return <FullPageLoader loaderStyle={LoaderStyle.FIXED_SIZE} height={height} minimumTime={0} />;
+            const loaders = loaderClasses();
+            return <Loader loaderStyleClass={loaders.fixedSizeLoader} height={height} minimumTime={0} padding={10} />;
         }
 
         return (
@@ -158,6 +160,15 @@ function mapStateToProps(state: INotificationsStoreState) {
                   })
                 : undefined,
     };
+
+    if (notifications.data) {
+        // Notifications are likely sorted by ID. Make sure they're sorted by the date they were created, in descending order.
+        notifications.data.sort((a: IMeBoxNotificationItem, b: IMeBoxNotificationItem) => {
+            const dateA = new Date(a.timestamp).getTime();
+            const dateB = new Date(b.timestamp).getTime();
+            return dateB - dateA;
+        });
+    }
 
     return {
         notifications,

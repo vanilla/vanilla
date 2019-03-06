@@ -11,6 +11,7 @@ import MeBoxDropDownItem, {
     IMeBoxNotificationItem,
     MeBoxItemType,
 } from "@library/components/mebox/pieces/MeBoxDropDownItem";
+import { frameBodyClasses } from "@library/styles/frameStyles";
 
 export interface IVanillaHeaderNavProps {
     className?: string;
@@ -25,6 +26,7 @@ export interface IVanillaHeaderNavProps {
 export default class MeBoxDropDownItemList extends React.Component<IVanillaHeaderNavProps> {
     public render() {
         const count = this.props.data.length;
+        const classesFrameBody = frameBodyClasses();
         return (
             <div className={classNames("meBoxMessageList", this.props.className)}>
                 {count > 0 && (
@@ -36,7 +38,11 @@ export default class MeBoxDropDownItemList extends React.Component<IVanillaHeade
                         })}
                     </ul>
                 )}
-                {count === 0 && <div className="frameBody-noContentMessage">{this.props.emptyMessage}</div>}
+                {count === 0 && (
+                    <div className={classNames("frameBody-noContentMessage", classesFrameBody.noContentMessage)}>
+                        {this.props.emptyMessage}
+                    </div>
+                )}
             </div>
         );
     }

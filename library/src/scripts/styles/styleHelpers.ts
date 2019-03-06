@@ -17,8 +17,11 @@ import {
     ContentProperty,
     DisplayProperty,
     FlexWrapProperty,
+    FontSizeProperty,
+    FontWeightProperty,
     JustifyContentProperty,
     LeftProperty,
+    LineHeightProperty,
     MaxWidthProperty,
     ObjectFitProperty,
     OverflowXProperty,
@@ -592,5 +595,21 @@ export const userSelect = (value: UserSelectProperty = "none", isImportant: bool
         "-moz-user-select": val,
         "-ms-user-select": val,
         userSelect: val,
+    };
+};
+
+interface IFont {
+    size?: FontSizeProperty<TLength>;
+    weight?: FontWeightProperty;
+    color?: ColorHelper | "transparent";
+    lineHeight?: LineHeightProperty<TLength>;
+}
+
+export const font = (props: IFont) => {
+    return {
+        size: props.size ? unit(props.size) : undefined,
+        weight: props.weight ? props.weight : undefined,
+        color: props.color ? toStringColor(props.color) : undefined,
+        lineHeight: props.lineHeight ? unit(props.lineHeight) : undefined,
     };
 };

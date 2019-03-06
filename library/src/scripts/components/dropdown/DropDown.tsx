@@ -17,6 +17,7 @@ import FlexSpacer from "@library/components/FlexSpacer";
 import CloseButton from "@library/components/CloseButton";
 import { Frame } from "@library/components/frame";
 import { dropDownClasses } from "@library/styles/dropDownStyles";
+import { frameHeaderClasses } from "@library/styles/frameStyles";
 
 export interface IProps {
     id?: string;
@@ -72,6 +73,7 @@ export default class DropDown extends React.Component<IProps, IState> {
     public render() {
         const { title } = this.props;
         const classesDropDown = dropDownClasses();
+        const classesFrameHeader = frameHeaderClasses();
         return (
             <PopoverController
                 id={this.id}
@@ -103,12 +105,20 @@ export default class DropDown extends React.Component<IProps, IState> {
                             openAsModal={this.props.openAsModal}
                         >
                             {title ? (
-                                <header className="frameHeader">
-                                    <FlexSpacer className="frameHeader-leftSpacer" />
+                                <header className={classNames("frameHeader", classesFrameHeader.root)}>
+                                    <FlexSpacer
+                                        className={classNames("frameHeader-leftSpacer", classesFrameHeader.leftSpacer)}
+                                    />
                                     <SmartAlign>
                                         <Heading title={title} className="dropDown-title" />
                                     </SmartAlign>
-                                    <div className="frameHeader-closePosition">
+                                    <div
+                                        className={classNames(
+                                            "frameHeader-closePosition",
+                                            classesFrameHeader.closePosition,
+                                            classesFrameHeader.action,
+                                        )}
+                                    >
                                         <CloseButton
                                             className="frameHeader-close"
                                             onClick={params.closeMenuHandler}

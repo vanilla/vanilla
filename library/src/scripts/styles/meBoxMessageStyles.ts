@@ -50,7 +50,7 @@ export const meBoxMessageClasses = useThemeCache(() => {
         display: "block",
         $nest: {
             "& + &": {
-                borderTop: `solid 1px ${globalVars.border.color.toString()}`,
+                borderTop: `solid 1px ${toStringColor(globalVars.border.color)}`,
             },
         },
     });

@@ -9,7 +9,13 @@ import { styleFactory } from "@library/styles/styleUtils";
 import {
     AlignItemsProperty,
     AppearanceProperty,
+    BackgroundAttachmentProperty,
+    BackgroundColorProperty,
     BackgroundImageProperty,
+    BackgroundOriginProperty,
+    BackgroundPositionProperty,
+    BackgroundRepeatProperty,
+    BackgroundSizeProperty,
     BorderRadiusProperty,
     BorderStyleProperty,
     BorderWidthProperty,
@@ -302,7 +308,7 @@ export const unit = (val: string | number | undefined, unitFunction = px) => {
     }
 };
 
-interface IMargins {
+export interface IMargins {
     top?: string | number;
     right?: string | number;
     bottom?: string | number;
@@ -318,7 +324,7 @@ export const margins = (styles: IMargins) => {
     };
 };
 
-interface IPaddings {
+export interface IPaddings {
     top?: string | number;
     right?: string | number;
     bottom?: string | number;
@@ -604,7 +610,7 @@ export const userSelect = (value: UserSelectProperty = "none", isImportant: bool
     };
 };
 
-interface IFont {
+export interface IFont {
     size?: FontSizeProperty<TLength>;
     weight?: FontWeightProperty;
     color?: ColorHelper | "transparent";
@@ -621,5 +627,26 @@ export const font = (props: IFont) => {
         lineHeight: props.lineHeight ? unit(props.lineHeight) : undefined,
         align: props.align ? props.align : undefined,
         shadow: props.shadow ? props.shadow : undefined,
+    };
+};
+
+export interface IBackgroundImage {
+    color?: ColorHelper | "transparent";
+    attachment?: BackgroundAttachmentProperty;
+    position?: BackgroundPositionProperty<TLength>;
+    repeat?: BackgroundRepeatProperty;
+    size?: BackgroundSizeProperty<TLength>;
+    image?: BackgroundImageProperty;
+    fallbackImage?: BackgroundImageProperty;
+}
+
+export const backgroundImage = (props: IBackgroundImage) => {
+    return {
+        backgroundColor: props.color ? toStringColor(props.color) : undefined,
+        backgroundAttachment: props.attachment ? props.attachment : undefined,
+        backgroundPosition: props.position ? props.position : `50% 50%`,
+        backgroundRepeat: props.repeat ? props.repeat : "no-repeat",
+        backgroundSize: props.size ? props.size : "cover",
+        backgroundImage: props.image ? props.image : props.fallbackImage ? props.fallbackImage : undefined,
     };
 };

@@ -7,17 +7,20 @@
 import { assetUrl, isAllowedUrl, themeAsset } from "@library/application";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
+    borders,
     centeredBackgroundProps,
     font,
     getColorDependantOnLightness,
+    paddings,
     toStringColor,
     unit,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { percent, px, url } from "csx";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
-import { AlignItemsProperty, TextAlignLastProperty, TextShadowProperty } from "csstype";
+import { PaddingProperty, TextAlignLastProperty, TextShadowProperty } from "csstype";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { TLength } from "typestyle/lib/types";
 
 export const splashVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("splash");
@@ -28,22 +31,33 @@ export const splashVariables = useThemeCache(() => {
     const topPadding = 69;
     const spacing = makeThemeVars("spacing", {
         padding: {
-            top: topPadding,
-            bottom: topPadding * 0.8,
-            right: unit(widgetVars.spacing.inner.horizontalPadding + globalVars.gutter.quarter),
-            left: unit(widgetVars.spacing.inner.horizontalPadding + globalVars.gutter.quarter),
+            top: topPadding as PaddingProperty<TLength>,
+            bottom: (topPadding * 0.8) as PaddingProperty<TLength>,
+            right: unit(widgetVars.spacing.inner.horizontalPadding + globalVars.gutter.quarter) as PaddingProperty<
+                TLength
+            >,
+            left: unit(widgetVars.spacing.inner.horizontalPadding + globalVars.gutter.quarter) as PaddingProperty<
+                TLength
+            >,
         },
     });
 
     const outerBackground = makeThemeVars("outerBackground", {
         bg: globalVars.mainColors.primary,
+        backgroundPosition: "50% 50%",
+        backgroundSize: "cover",
         image: assetUrl("/resources/design/fallbackSplashBackground.svg"),
         fallbackImage: assetUrl("/resources/design/fallbackSplashBackground.svg"),
     });
 
     const innerBackground = makeThemeVars("innerBackground", {
         bg: undefined,
-        padding: spacing.padding,
+        padding: {
+            top: spacing.padding,
+            right: spacing.padding,
+            bottom: spacing.padding,
+            left: spacing.padding,
+        },
     });
 
     const colors = makeThemeVars("color", {
@@ -135,7 +149,6 @@ export const splashVariables = useThemeCache(() => {
         search,
         searchDrawer,
         searchBar,
-        button,
     };
 });
 
@@ -143,21 +156,25 @@ export const splashStyles = useThemeCache(() => {
     const vars = splashVariables();
     const style = styleFactory("splash");
 
+    /*
+        const outerBackground = makeThemeVars("outerBackground", {
+        bg: globalVars.mainColors.primary,
+        image: assetUrl("/resources/design/fallbackSplashBackground.svg"),
+        fallbackImage: assetUrl("/resources/design/fallbackSplashBackground.svg"),
+     */
+
     const root = style({
         position: "relative",
         backgroundColor: toStringColor(vars.outerBackground.bg),
     });
 
-    const main = style("main", {});
-
-    const fallbackImg = vars.outerBackground.fallbackImage;
     let backgroundImage = vars.outerBackground.image;
-    let opacity = 1;
+    let opacity;
 
     if (backgroundImage.charAt(0) === "~") {
         backgroundImage = themeAsset(backgroundImage.substr(1, backgroundImage.length - 1));
-    } else if (isAllowedUrl(backgroundImage)) {
-        backgroundImage = fallbackImg;
+    } else if (!isAllowedUrl(backgroundImage)) {
+        backgroundImage = vars.outerBackground.fallbackImage;
         opacity = 0.4; // only for default bg
     }
 
@@ -170,26 +187,76 @@ export const splashStyles = useThemeCache(() => {
         width: percent(100),
         height: percent(100),
         backgroundSize: "cover",
-        backgroundImage,
+        backgroundImage: url(backgroundImage),
         opacity,
     });
 
     const container = style({});
 
     const innerContainer = style({
-        paddingTop: vars.spacing.top,
-        paddingBottom: vars.spacing.bottom,
+        ...paddings(vars.spacing.padding),
+        backgroundColor: vars.innerBackground.bg,
     });
 
     const title = style({
-        textAlign: "center",
         ...font(vars.title.font),
         paddingTop: px(vars.title.marginTop),
-        marginBottom: px(vars.title.marginBottom),
-        // textShadow: `0 1px 25px ${getColorDependantOnLightness(vars.title.fg, vars.title.fg, 0.9).fade(0.4)}`,
+        marginBottom: px(0),
+        textShadow: `0 1px 25px ${getColorDependantOnLightness(vars.title.font.color, vars.title.font.color, 0.9).fade(
+            0.4,
+        )}`,
     });
 
-    const search = style({});
+    const text = style("text", {
+        display: "block",
+        color: toStringColor(vars.colors.fg),
+        width: unit(vars.text.maxWidth),
+        maxWidth: percent(100),
+        margin: `auto auto 0`,
+        textAlign: "center",
+        $nest: {
+            "& + .splash-p": {
+                marginTop: unit(vars.search.margin),
+            },
+        },
+    });
+
+    /*
+    const searchBar = makeThemeVars("searchBar", {
+        sizing: {
+            height: formElVars.giantInput.height,
+            width: 705,
+        },
+        font: {
+            size: formElVars.giantInput.fontSize,
+        },
+        button: {
+            minWidth: 130,
+            border: {
+                width: formElVars.border.width,
+                radius: formElVars.border.radius,
+                color: formElVars.border.color,
+            },
+            font: {
+                size: globalVars.fonts.size.medium,
+            },
+        },
+        icon: {
+            color: globalVars.mixBgAndFg(0.4),
+        },
+        input: {
+            font: {
+                size: globalVars.fonts.size.subTitle,
+            },
+        },
+    });
+    */
+
+    const searchButton = style("searchButton", {
+        minWidth: unit(vars.searchBar.button.minWidth),
+        fontSize: unit(vars.searchBar.button.font.size),
+        ...borders(vars.searchBar.button.border as any),
+    });
 
     const searchContainer = style({
         position: "relative",
@@ -205,5 +272,14 @@ export const splashStyles = useThemeCache(() => {
         },
     });
 
-    return { root, container, innerContainer, title, search, outerBackground, searchContainer };
+    return {
+        root,
+        container,
+        innerContainer,
+        title,
+        text,
+        searchButton,
+        outerBackground,
+        searchContainer,
+    };
 });

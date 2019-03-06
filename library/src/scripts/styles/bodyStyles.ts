@@ -13,6 +13,7 @@ export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();
     cssRule("body", {
         backgroundColor: toStringColor(globalVars.body.bg),
+        color: toStringColor(globalVars.mainColors.fg),
     });
 });
 

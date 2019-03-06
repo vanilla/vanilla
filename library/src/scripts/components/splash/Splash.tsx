@@ -32,16 +32,19 @@ export class Splash extends React.Component<IProps> {
         return (
             <div className={classNames(className, classes.root)}>
                 <div className={classes.outerBackground} />
-                <Container className={classes.container}>
+                <Container>
                     <div className={classes.innerContainer}>
                         <PanelWidgetHorizontalPadding>
                             {title && <Heading title={title} className={classes.title} />}
                             <div className={classes.searchContainer}>
                                 <IndependentSearch
-                                    className={classes.search}
-                                    buttonClass={buttons.transparent}
+                                    className={classes.searchContainer}
+                                    buttonClass={classNames(buttons.transparent, classes.searchButton)}
                                     isLarge={true}
                                     placeholder={t("Search Articles")}
+                                    inputClass={classes.input}
+                                    iconClass={classes.icon}
+                                    buttonLoaderClass={classes.buttonLoader}
                                 />
                             </div>
                         </PanelWidgetHorizontalPadding>

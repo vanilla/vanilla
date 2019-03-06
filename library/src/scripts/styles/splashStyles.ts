@@ -191,8 +191,6 @@ export const splashStyles = useThemeCache(() => {
         opacity,
     });
 
-    const container = style({});
-
     const innerContainer = style({
         ...paddings(vars.spacing.padding),
         backgroundColor: vars.innerBackground.bg,
@@ -258,7 +256,7 @@ export const splashStyles = useThemeCache(() => {
         ...borders(vars.searchBar.button.border as any),
     });
 
-    const searchContainer = style({
+    const searchContainer = style("searchContainer", {
         position: "relative",
         maxWidth: percent(100),
         width: px(vars.searchContainer.width),
@@ -272,14 +270,20 @@ export const splashStyles = useThemeCache(() => {
         },
     });
 
+    const input = style("input", {});
+    const icon = style("icon", {});
+    const buttonLoader = style("buttonLoader", {});
+
     return {
         root,
-        container,
+        outerBackground,
         innerContainer,
         title,
         text,
         searchButton,
-        outerBackground,
         searchContainer,
+        input,
+        icon,
+        buttonLoader,
     };
 });

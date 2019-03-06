@@ -31,7 +31,7 @@ export interface ICompactSearchProps extends IWithSearchProps, RouteComponentPro
     onOpenSuggestions?: () => void;
     onCloseSuggestions?: () => void;
     focusOnMount?: boolean;
-    buttonContentClass?: string;
+    buttonContentClassName?: string;
     cancelContentClassName?: string;
     clearButtonClass?: string;
 }
@@ -73,7 +73,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                         aria-controls={this.id}
                         buttonRef={this.openSearchButton}
                     >
-                        <div className={classNames(this.props.buttonContentClass)}>{search()}</div>
+                        <div className={classNames(this.props.buttonContentClassName)}>{search()}</div>
                     </Button>
                 )}
                 {this.props.open && (

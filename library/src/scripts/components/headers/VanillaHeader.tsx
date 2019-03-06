@@ -153,7 +153,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                             showingSuggestions={this.state.showingSuggestions}
                                             onOpenSuggestions={this.setOpenSuggestions}
                                             onCloseSuggestions={this.setCloseSuggestions}
-                                            buttonContentClass={classNames(classesMeBox.buttonContent)}
+                                            buttonContentClassName={classNames(classesMeBox.buttonContent)}
                                             clearButtonClass={classes.clearButtonClass}
                                         />
 

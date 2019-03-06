@@ -19,10 +19,13 @@ export interface ICompactSearchProps extends IWithSearchProps, RouteComponentPro
     className?: string;
     placeholder?: string;
     buttonClass?: string;
+    inputClass?: string;
+    iconClass?: string;
     showingSuggestions?: boolean;
     onOpenSuggestions?: () => void;
     onCloseSuggestions?: () => void;
-    buttonContentClass?: string;
+    buttonContentClassName?: string;
+    buttonLoaderClassName?: string;
     cancelContentClassName?: string;
     isLarge?: boolean;
 }
@@ -64,6 +67,7 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
                     buttonClassName={this.props.buttonClass}
                     className={classes.root}
                     isBigInput={this.props.isLarge}
+                    buttonLoaderClassName={this.props.buttonLoaderClassName}
                 />
                 <div ref={this.resultsRef} className={classNames("search-results", classesSearchBar.results)} />
             </div>

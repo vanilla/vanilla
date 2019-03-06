@@ -207,7 +207,7 @@ export const frameBodyClasses = useThemeCache(() => {
 export const framePanelClasses = useThemeCache(() => {
     const vars = frameVariables();
     const globalVars = globalVariables();
-    const style = styleFactory("frameFooter");
+    const style = styleFactory("framePanel");
 
     const root = style({
         position: "relative",
@@ -215,7 +215,7 @@ export const framePanelClasses = useThemeCache(() => {
         height: percent(100),
         backgroundColor: toStringColor(vars.colors.bg),
         overflow: "auto",
-        maxHeight: calc(`100vh - ${vars.header.minHeight + vars.footer.minHeight + vars.spacing.padding * 2}`),
+        maxHeight: calc(`100vh - ${unit(vars.header.minHeight + vars.footer.minHeight + vars.spacing.padding * 2)}`),
 
         $nest: {
             "& > .inputBlock": {

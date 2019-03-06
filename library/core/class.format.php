@@ -1263,7 +1263,8 @@ class Gdn_Format {
 
             return '<a href="'.$url.'"'.$nofollow.'>'.$text.'</a>'.$punc;
         };
-
+        // Strip  Right-To-Left override.
+        $mixed = str_replace("\xE2\x80\xAE", '', $mixed);
         if (unicodeRegexSupport()) {
             $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`iu";
         } else {

@@ -154,8 +154,6 @@ class ThemesApiController extends AbstractApiController {
             Schema::parse([
                 'type:s',
                 'themeID:s',
-                'logos:s?',
-                'mobileLogo:s?',
                 'assets?' => $this->assetsSchema()
             ]),
             $type

@@ -61,18 +61,6 @@ export const searchBarClasses = useThemeCache(() => {
             ...debug.name(),
             cursor: "pointer",
             $nest: {
-                "& .suggestedTextInput-inputText": {
-                    borderRight: 0,
-                    borderTopRightRadius: 0,
-                    borderBottomRightRadius: 0,
-                    $nest: {
-                        "&.inputText": {
-                            paddingTop: 0,
-                            paddingBottom: 0,
-                        },
-                    },
-                },
-
                 "& .suggestedTextInput-clear": {
                     $nest: {
                         "&, &.buttonIcon": {
@@ -203,6 +191,9 @@ export const searchBarClasses = useThemeCache(() => {
     const valueContainer = style({
         display: "flex",
         alignItems: "center",
+        borderRight: 0,
+        paddingTop: 0,
+        paddingBottom: 0,
         $nest: {
             "&&&": {
                 display: "flex",
@@ -213,6 +204,12 @@ export const searchBarClasses = useThemeCache(() => {
             },
         },
         ...debug.name("valueContainer"),
+    });
+
+    // Has a search button attached.
+    const compoundValueContainer = style(debug.name("compoundValueContainer"), {
+        borderTopRightRadius: 0,
+        borderBottomRightRadius: 0,
     });
 
     const actionButton = style({
@@ -289,6 +286,7 @@ export const searchBarClasses = useThemeCache(() => {
     return {
         root,
         valueContainer,
+        compoundValueContainer,
         actionButton,
         label,
         clear,

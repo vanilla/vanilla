@@ -266,6 +266,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 "isClearable",
                                 classes.valueContainer,
                                 {
+                                    [classes.compoundValueContainer]: !this.props.hideSearchButton,
                                     isLarge: this.props.isBigInput,
                                 },
                             )}

@@ -10,6 +10,7 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\AddonManager;
 use Vanilla\Addon;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Models\ThemeModel;
 use Vanilla\Theme\Asset;
 use Vanilla\Theme\FontsAsset;
@@ -17,6 +18,7 @@ use Vanilla\Theme\HtmlAsset;
 use Vanilla\Theme\JsonAsset;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Theme\ScriptsAsset;
+use Vanilla\Theme\ImageAsset;
 
 /**
  * API Controller for the `/themes` resource.
@@ -52,16 +54,18 @@ class ThemesApiController extends AbstractApiController {
         "javascript" => [
             "type" => "js",
             "file" => "javascript.js"
-        ]
-
+        ],
     ];
 
     const ASSET_KEY = "assets";
 
-    /* @var AddonManager */
+    /** @var AddonManager */
     private $addonManager;
 
-    /* @var ThemeModel */
+    /** @var ConfigurationInterface */
+    private $config;
+
+    /** @var ThemeModel */
     private $themeModel;
 
     /** @var Gdn_Request */
@@ -70,8 +74,9 @@ class ThemesApiController extends AbstractApiController {
     /**
      * @inheritdoc
      */
-    public function __construct(AddonManager $addonManager, ThemeModel $themeModel, Gdn_Request $request) {
+    public function __construct(AddonManager $addonManager, ThemeModel $themeModel, Gdn_Request $request, ConfigurationInterface $config) {
         $this->addonManager = $addonManager;
+        $this->config = $config;
         $this->request = $request;
         $this->themeModel = $themeModel;
     }
@@ -172,6 +177,8 @@ class ThemesApiController extends AbstractApiController {
             "scripts?" => new InstanceValidatorSchema(ScriptsAsset::class),
             "styles:s?",
             "javascript:s?",
+            "logo?" => new InstanceValidatorSchema(ImageAsset::class),
+            "mobileLogo?" => new InstanceValidatorSchema(ImageAsset::class),
         ])->setID('themeAssetsSchema');
         return $schema;
     }
@@ -235,8 +242,6 @@ class ThemesApiController extends AbstractApiController {
     private function normalizeTheme(Addon $theme, array $assets): array {
         $res = [
             "assets" => $assets,
-            'logos' => $theme->getInfoValue('logos'),
-            'mobileLogo' => $theme->getInfoValue('mobileLogo'),
             'themeID' => $theme->getInfoValue('key'),
             'type' => 'themeFile',
             'version' => $theme->getInfoValue('version'),
@@ -259,6 +264,17 @@ class ThemesApiController extends AbstractApiController {
         foreach ($secondaryAssets as $assetKey => $asset) {
             $path = $theme->path("/assets/{$asset['file']}", Addon::PATH_ADDON);
             $res["assets"][$assetKey] = $this->request->url($path, true);
+        }
+
+        $logos = [
+            "logo" => "Garden.Logo",
+            "mobileLogo" => "Garden.MobileLogo",
+        ];
+        foreach ($logos as $logoName => $logoConfig) {
+            if ($logo = $this->config->get($logoConfig)) {
+                $logoUrl = Gdn_Upload::url($logo);
+                $res["assets"][$logoName] = new ImageAsset($logoUrl);
+            }
         }
 
         return $res;

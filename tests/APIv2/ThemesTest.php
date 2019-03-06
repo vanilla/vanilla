@@ -6,6 +6,8 @@
 
 namespace VanillaTests\APIv2;
 
+use Gdn_Configuration;
+use Gdn_Upload;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 
@@ -81,5 +83,33 @@ class ThemesTest extends AbstractAPIv2Test {
         foreach ($expectedAssets as $asset) {
             $this->assertArrayHasKey($asset, $body["assets"], "Theme does not have expected asset: {$asset}");
         }
+    }
+
+    /**
+     * Test getting a theme's logo.
+     *
+     * @depends testGetByName
+     */
+    public function testLogo() {
+        $logo = "logo.png";
+        self::container()->get(Gdn_Configuration::class)->set("Garden.Logo", $logo);
+
+        $response = $this->api()->get("themes/asset-test");
+        $body = json_decode($response->getRawBody(), true);
+        $this->assertEquals($body["assets"]["logo"]["url"], Gdn_Upload::url($logo));
+    }
+
+    /**
+     * Test getting a theme's mobile logo.
+     *
+     * @depends testGetByName
+     */
+    public function testMobileLogo() {
+        $mobileLogo = "mobileLogo.png";
+        self::container()->get(Gdn_Configuration::class)->set("Garden.MobileLogo", $mobileLogo);
+
+        $response = $this->api()->get("themes/asset-test");
+        $body = json_decode($response->getRawBody(), true);
+        $this->assertEquals($body["assets"]["mobileLogo"]["url"], Gdn_Upload::url($mobileLogo));
     }
 }

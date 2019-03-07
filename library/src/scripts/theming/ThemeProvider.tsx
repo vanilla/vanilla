@@ -44,7 +44,26 @@ class BaseThemeProvider extends React.Component<IProps> {
 
     public componentDidMount() {
         void this.props.requestData();
+        this.wrapIdInShadowRoot("themeHeader");
+        this.wrapIdInShadowRoot("themeFooter");
     }
+
+    private wrapIdInShadowRoot(id: string) {
+        const themeHeaderNoScript = document.getElementById(id);
+        if (themeHeaderNoScript) {
+            const html = themeHeaderNoScript.innerHTML;
+
+            const headerDiv = document.createElement("div");
+            headerDiv.id = id;
+            themeHeaderNoScript.parentNode!.insertBefore(headerDiv, themeHeaderNoScript);
+            themeHeaderNoScript.remove();
+
+            const shadowHeader = headerDiv.attachShadow({ mode: "open" });
+            shadowHeader.innerHTML = html;
+        }
+    }
+
+    private exposeThemeFooter() {}
 }
 
 export function getThemeVariables() {

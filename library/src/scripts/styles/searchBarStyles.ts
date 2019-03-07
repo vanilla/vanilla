@@ -62,18 +62,6 @@ export const searchBarClasses = useThemeCache(() => {
         {
             cursor: "pointer",
             $nest: {
-                "& .suggestedTextInput-inputText": {
-                    borderRight: 0,
-                    borderTopRightRadius: 0,
-                    borderBottomRightRadius: 0,
-                    $nest: {
-                        "&.inputText": {
-                            paddingTop: 0,
-                            paddingBottom: 0,
-                        },
-                    },
-                },
-
                 "& .suggestedTextInput-clear": {
                     $nest: {
                         "&, &.buttonIcon": {
@@ -204,6 +192,9 @@ export const searchBarClasses = useThemeCache(() => {
     const valueContainer = style("valueContainer", {
         display: "flex",
         alignItems: "center",
+        borderRight: 0,
+        paddingTop: 0,
+        paddingBottom: 0,
         $nest: {
             "&&&": {
                 display: "flex",
@@ -215,7 +206,17 @@ export const searchBarClasses = useThemeCache(() => {
         },
     });
 
+<<<<<<< HEAD
     const actionButton = style("actionButton", {
+=======
+    // Has a search button attached.
+    const compoundValueContainer = style(debug.name("compoundValueContainer"), {
+        borderTopRightRadius: 0,
+        borderBottomRightRadius: 0,
+    });
+
+    const actionButton = style({
+>>>>>>> feature/theming
         marginLeft: "auto",
         marginRight: -(globalVars.buttonIcon.offset + 3), // the "3" is to offset the pencil
         opacity: 0.8,
@@ -282,6 +283,7 @@ export const searchBarClasses = useThemeCache(() => {
     return {
         root,
         valueContainer,
+        compoundValueContainer,
         actionButton,
         label,
         clear,

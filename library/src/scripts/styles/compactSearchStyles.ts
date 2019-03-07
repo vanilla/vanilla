@@ -26,7 +26,7 @@ export const compactSearchClasses = useThemeCache(() => {
             },
             ".searchBar-valueContainer.suggestedTextInput-inputText": {
                 height: unit(formElementVars.sizing.height),
-                backgroundColor: vanillaHeaderVars.colors.fg.fade(0.15).toString(),
+                backgroundColor: vanillaHeaderVars.colors.bg.darken(0.05).toString(),
                 border: 0,
             },
             ".searchBar__placeholder": {

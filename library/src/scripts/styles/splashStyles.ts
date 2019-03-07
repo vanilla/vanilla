@@ -248,6 +248,7 @@ export const splashStyles = useThemeCache(() => {
         },
     });
 
+    const icon = style("icon", {});
     const input = style("input", {});
 
     const buttonLoader = style("buttonLoader", {});
@@ -258,6 +259,7 @@ export const splashStyles = useThemeCache(() => {
         innerContainer,
         title,
         text,
+        icon,
         searchButton,
         searchContainer,
         input,

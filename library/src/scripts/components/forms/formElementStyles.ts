@@ -62,7 +62,7 @@ export const formElementsVariables = useThemeCache(() => {
     });
 
     const placeholder = themeVars("placeholder", {
-        color: mixBgAndFg(0.5),
+        color: color(mixBgAndFg(0.5)),
     });
 
     const disabled = themeVars("disabled", {

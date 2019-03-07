@@ -77,6 +77,11 @@ jQuery(document).ready(function($) {
       var frm = $('#Form_ConversationMessage');
       frm.find('textarea').val('');
       frm.trigger('clearCommentForm');
+
+     // Dispatch a native event for things that don't use jquery
+      var event = document.createEvent('CustomEvent');
+      event.initCustomEvent('X-ClearCommentForm', true, false, {});
+      frm[0].dispatchEvent(event);
       frm.find('div.Errors').remove();
       $('div.Information').fadeOut('fast', function() { $(this).remove(); });
    }

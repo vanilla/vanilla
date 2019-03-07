@@ -14,6 +14,8 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import { t } from "@library/application";
 import { PanelWidgetVerticalPadding } from "@library/components/layouts/PanelLayout";
 import Heading from "@library/components/Heading";
+import ConditionalWrap from "@library/components/ConditionalWrap";
+import { siteNavClasses } from "@library/styles/siteNavStyles";
 
 interface IProps extends RouteComponentProps<{}> {
     activeRecord: IActiveRecord;
@@ -24,6 +26,8 @@ interface IProps extends RouteComponentProps<{}> {
     bottomCTA: React.ReactNode;
     onItemHover?(item: INavigationTreeItem);
     title?: string;
+    hiddenTitle?: boolean;
+    clickableCategoryLabels?: boolean;
 }
 
 /**
@@ -33,6 +37,7 @@ export class SiteNav extends React.Component<IProps> {
     public render() {
         const { activeRecord, collapsible, onItemHover, children } = this.props;
         const hasChildren = children && children.length > 0;
+        const classes = siteNavClasses();
         const content = hasChildren
             ? children.map((child, i) => {
                   return (
@@ -44,6 +49,7 @@ export class SiteNav extends React.Component<IProps> {
                           depth={0}
                           collapsible={collapsible}
                           onItemHover={onItemHover}
+                          clickableCategoryLabels={!!this.props.clickableCategoryLabels}
                       />
                   );
               })
@@ -51,17 +57,29 @@ export class SiteNav extends React.Component<IProps> {
 
         if (hasChildren) {
             return (
-                <nav onKeyDownCapture={this.handleKeyDown} className={classNames("siteNav", this.props.className)}>
+                <nav
+                    onKeyDownCapture={this.handleKeyDown}
+                    className={classNames("siteNav", this.props.className, classes.root)}
+                >
                     {this.props.title ? (
-                        <PanelWidgetVerticalPadding>
-                            <Heading title={this.props.title} className="siteNav-title" />
-                        </PanelWidgetVerticalPadding>
+                        <ConditionalWrap condition={!!this.props.hiddenTitle} className={"sr-only"}>
+                            <PanelWidgetVerticalPadding>
+                                <Heading
+                                    title={this.props.title}
+                                    className={classNames("siteNav-title", classes.title)}
+                                />
+                            </PanelWidgetVerticalPadding>
+                        </ConditionalWrap>
                     ) : (
                         <h2 id={this.titleID} className="sr-only">
                             {t("Navigation")}
                         </h2>
                     )}
-                    <ul className="siteNav-children hasDepth-0" role="tree" aria-labelledby={this.titleID}>
+                    <ul
+                        className={classNames("siteNav-children", "hasDepth-0", classes.children)}
+                        role="tree"
+                        aria-labelledby={this.titleID}
+                    >
                         {content}
                     </ul>
                     {this.props.bottomCTA}

@@ -6,7 +6,8 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import VanillaHeaderNavItem, { IHeaderNav } from "./VanillaHeaderNavItem";
+import vanillaHeaderNavClasses from "@library/components/headers/VanillaHeaderNav";
+import VanillaHeaderNavItem, { IHeaderNav } from "@library/components/mebox/pieces/VanillaHeaderNavItem";
 
 export interface IVanillaHeaderNavProps {
     className?: string;
@@ -22,6 +23,7 @@ export interface IVanillaHeaderNavProps {
  */
 export default class VanillaHeaderNav extends React.Component<IVanillaHeaderNavProps> {
     public render() {
+        const classes = vanillaHeaderNavClasses();
         const content = !!this.props.data
             ? this.props.data.map((item, key) => {
                   return (
@@ -36,8 +38,8 @@ export default class VanillaHeaderNav extends React.Component<IVanillaHeaderNavP
             : null;
 
         return (
-            <nav className={classNames("headerNavigation", this.props.className)}>
-                <ul className={classNames("headerNavigation-items", this.props.listClassName)}>
+            <nav className={classNames("headerNavigation", this.props.className, classes.navigation)}>
+                <ul className={classNames("headerNavigation-items", this.props.listClassName, classes.items)}>
                     {!!content && content}
                     {!!this.props.children && this.props.children}
                 </ul>

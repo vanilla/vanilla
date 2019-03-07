@@ -23,10 +23,13 @@ $pager-highlight_bg:                     $pager-hover_bg !default;
 $pager-highlight-border:                 $pager_border !default;
 $pager-highlight_color:                  $global-color_primaryAlt !default;
 
-$quickSearch_bg:                         $global-color_primary !default;
-$quickSearch-hover_bg:                   $global-color_primaryAlt !default;
-$quickSearch_border:                     1px solid $global-color_primaryAlt !default;
-$quickSearch_color:                      $global-color_white !default;
+$quickSearch_bg:                         $button-primary_bg !default;
+$quickSearch_fg:                         $button-primary_fg !default;
+$quickSearch_borderColor:                $button-primary_border !default;
+
+$quickSearch-hover_bg:                   $button-primary-hover_bg !default;
+$quickSearch-hover_fg:                   $button-primary-hover_fg !default;
+$quickSearch-hover_borderColor:          $button-primary-hover_border !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -69,6 +72,10 @@ $quickSearch_color:                      $global-color_white !default;
 .PrevNextPager .Previous,
 .PrevNextPager .Next {
     @include Button;
+
+    flex: initial;
+    min-width: 120px;
+    text-align: center;
 }
 
 .PagerWrap,
@@ -90,7 +97,7 @@ $quickSearch_color:                      $global-color_white !default;
     min-height: $pager_height;
     display: flex;
     align-items: center;
-    margin: 0 0 $global-block_margin;
+    margin: 0 0 $utility-baseUnit;
 }
 
 .BeforeCommentHeading {
@@ -215,6 +222,7 @@ a.MoreWrap,
     .Next,
     .Previous {
         padding: 0 $utility-baseUnitDouble;
+        text-align: center;
      }
 
     .Previous {
@@ -230,12 +238,12 @@ a.MoreWrap,
     .QuickSearchWrap .Button,
     .QuickSearchButton {
         @include Button(
-            $button-primary_bg,
-            $button-primary_fg,
-            $button-primary_border,
-            $button-primary-hover_bg,
-            $button-primary-hover_fg,
-            $button-primary-hover_border
+            $quickSearch_bg,
+            $quickSearch_fg,
+            $quickSearch_borderColor,
+            $quickSearch-hover_bg,
+            $quickSearch-hover_fg,
+            $quickSearch-hover_borderColor
         );
     }
 

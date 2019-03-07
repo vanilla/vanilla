@@ -12,6 +12,7 @@ import classNames from "classnames";
 import NavLinks from "@library/components/NavLinks";
 import ScreenReaderContent from "@library/components/ScreenReaderContent";
 import { ILinkListData } from "@library/@types/api";
+import { navLinksClasses } from "@library/styles/navLinksStyles";
 
 interface IProps {
     title: string; // For accessibility, title of group
@@ -29,6 +30,7 @@ export default class NavLinksWithHeadings extends Component<IProps> {
         const ungrouped = this.props.data.ungroupedItems || [];
         const grouped = this.props.data.groups || [];
         const groupLevel = Math.min((this.props.depth || 2) + 1, 6);
+        const classes = navLinksClasses();
 
         if (ungrouped.length !== 0 || grouped.length !== 0) {
             const ungroupedContent = <NavLinks title={t("Overview")} items={ungrouped} />;
@@ -46,7 +48,7 @@ export default class NavLinksWithHeadings extends Component<IProps> {
             });
 
             return (
-                <nav className={classNames("navLinksWithHeadings", this.props.classNames)}>
+                <nav className={classNames("navLinksWithHeadings", this.props.classNames, classes.linksWithHeadings)}>
                     <ScreenReaderContent>
                         <Heading title={this.props.title} depth={this.props.depth} />
                     </ScreenReaderContent>

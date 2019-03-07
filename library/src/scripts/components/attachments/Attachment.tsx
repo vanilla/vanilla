@@ -11,6 +11,8 @@ import { getAttachmentIcon, AttachmentType, mimeTypeToAttachmentType } from "@li
 import classNames from "classnames";
 import { t } from "@library/application";
 import { HumanFileSize, humanFileSize } from "@library/utils/fileUtils";
+import { attachmentClasses } from "@library/styles/attachmentStyles";
+import { attachmentIconClasses } from "@library/styles/attachmentIconsStyles";
 
 export interface IFileAttachment {
     name: string; // File name
@@ -31,14 +33,26 @@ export default class Attachment extends React.Component<IProps> {
     public render() {
         const { title, name, url, dateUploaded, type, mimeType, size, className } = this.props;
         const label = title || name;
+        const classes = attachmentClasses();
+        const iconClasses = attachmentIconClasses();
 
         return (
-            <div className={classNames("attachment", className)}>
-                <a href={url} className="attachment-link attachment-box" type={mimeType} download={name} tabIndex={1}>
-                    {type && <div className="attachment-format">{getAttachmentIcon(type)}</div>}
-                    <div className="attachment-main">
-                        <div className="attachment-title">{label}</div>
-                        <div className="attachment-metas metas">
+            <div className={classNames("attachment", className, classes.root)}>
+                <a
+                    href={url}
+                    className={classNames("attachment-link", "attachment-box", classes.link, classes.box)}
+                    type={mimeType}
+                    download={name}
+                    tabIndex={1}
+                >
+                    {type && (
+                        <div className={classNames("attachment-format", classes.format)}>
+                            {getAttachmentIcon(type, iconClasses.root)}
+                        </div>
+                    )}
+                    <div className={classNames("attachment-main", classes.main)}>
+                        <div className={classNames("attachment-title", classes.title)}>{label}</div>
+                        <div className={classNames("attachment-metas", "metas", classes.metas)}>
                             {dateUploaded && (
                                 <span className="meta">
                                     <Translate source="Uploaded <0/>" c0={<DateTime timestamp={dateUploaded} />} />

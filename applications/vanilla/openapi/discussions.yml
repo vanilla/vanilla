@@ -1,0 +1,1130 @@
+openapi: 3.0.2
+info:
+paths:
+  /discussions:
+    get:
+      parameters:
+      - description: Filter by a category.
+        in: query
+        name: categoryID
+        schema:
+          type: integer
+        x-filter:
+          field: d.CategoryID
+      - description: >
+          When the discussion was created.<br />
+
+          This filter receive a string that can take two forms.<br />
+
+          A single date that matches '{Operator}{DateTime}' where {Operator}
+          can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to
+          =.<br />
+
+          A date range that matches '{Opening}{DateTime},{DateTime}{Closing}'
+          where {Opening} can be '[' or '(' and {Closing} can be ']' or ')'.
+          '[]' are inclusive and '()' are exclusive.
+        in: query
+        name: dateInserted
+        schema:
+          format: date-range
+          type: string
+        x-filter:
+          field: d.DateInserted
+          processor:
+          - Vanilla\DateFilterSchema
+          - dateFilterField
+      - description: >
+          When the discussion was updated.<br />
+
+          This filter receive a string that can take two forms.<br />
+
+          A single date that matches '{Operator}{DateTime}' where {Operator}
+          can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to
+          =.<br />
+
+          A date range that matches '{Opening}{DateTime},{DateTime}{Closing}'
+          where {Opening} can be '[' or '(' and {Closing} can be ']' or ')'.
+          '[]' are inclusive and '()' are exclusive.
+        in: query
+        name: dateUpdated
+        schema:
+          format: date-range
+          type: string
+        x-filter:
+          field: d.DateUpdated
+          processor:
+          - Vanilla\DateFilterSchema
+          - dateFilterField
+      - description: |
+          Filter by discussion type.
+        in: query
+        name: type
+        schema:
+          type: string
+        x-filter:
+          field: d.Type
+      - description: >
+          Only fetch discussions from followed categories. Pinned
+          discussions are mixed in.
+        in: query
+        name: followed
+        required: true
+        schema:
+          default: false
+          type: boolean
+      - description: >
+          Whether or not to include pinned discussions. If true, only
+          return pinned discussions. Cannot be used with the pinOrder
+          parameter.
+        in: query
+        name: pinned
+        schema:
+          type: boolean
+      - description: >
+          If including pinned posts, in what order should they be
+          integrated? When "first", discussions pinned to a specific category
+          will only be affected if the discussion's category is passed as the
+          categoryID parameter. Cannot be used with the pinned parameter.<br
+          />
+
+          Must be one of: "first", "mixed".
+        in: query
+        name: pinOrder
+        schema:
+          type: string
+          default: first
+          enum:
+          - first
+          - mixed
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          maximum: 100
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      - description: |
+          Filter by author.
+        in: query
+        name: insertUserID
+        schema:
+          type: integer
+        x-filter:
+          field: d.InsertUserID
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - category
+            - insertUser
+            - lastUser
+            - lastPost
+            - all
+            - reactions
+            type: string
+          type: array
+        style: form
+      - description: The group the discussion is in.
+        in: query
+        name: groupID
+        schema:
+          type: integer
+        allowEmptyValue: true
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/Discussion'
+                type: array
+          description: Success
+      tags:
+      - Discussions
+      summary: List discussions.
+    post:
+      responses:
+        '201':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Discussion'
+          description: Success
+      tags:
+      - Discussions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscussionPost'
+        required: true
+      summary: Add a discussion.
+  /discussions/bookmarked:
+    get:
+      parameters:
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          maximum: 100
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - insertUser
+            - lastUser
+            - lastPost
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/Discussion'
+                type: array
+          description: Success
+      tags:
+      - Discussions
+      summary: Get a list of the current user's bookmarked discussions.
+  /discussions/idea:
+    x-addon: ideation
+    post:
+      responses:
+        '201':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Discussion'
+          description: Success
+      tags:
+      - Discussions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscussionPost'
+        required: true
+      summary: Add an idea.
+  /discussions/question:
+    x-addon: qna
+    post:
+      responses:
+        '201':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Discussion'
+          description: Success
+      tags:
+      - Discussions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscussionPost'
+        required: true
+      summary: Add a discussion.
+  /discussions/search:
+    get:
+      parameters:
+      - description: |
+          The numeric ID of a category to limit search results to.
+        in: query
+        name: categoryID
+        schema:
+          type: integer
+      - description: >
+          Limit results to those in followed categories. Cannot be used
+          with the categoryID parameter.
+        in: query
+        name: followed
+        schema:
+          type: boolean
+      - description: |
+          Search terms.
+        in: query
+        name: query
+        required: true
+        schema:
+          minLength: 1
+          type: string
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          maximum: 100
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      - description: |
+          Expand associated records.
+        in: query
+        name: expand
+        schema:
+          default: false
+          type: boolean
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/Discussion'
+                type: array
+          description: Success
+      tags:
+      - Discussions
+      summary: Search discussions.
+  '/discussions/{id}':
+    delete:
+      parameters:
+      - description: |
+          The discussion ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - reactions
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Discussions
+      summary: Delete a discussion.
+    get:
+      parameters:
+      - description: |
+          The discussion ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - reactions
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Discussion'
+          description: Success
+      tags:
+      - Discussions
+      summary: Get a discussion.
+    patch:
+      parameters:
+      - description: The discussion ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Discussion'
+          description: Success
+      tags:
+      - Discussions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscussionPost'
+        required: true
+      summary: Update a discussion.
+  '/discussions/{id}/bookmark':
+    put:
+      parameters:
+      - description: The discussion ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                properties:
+                  bookmarked:
+                    description: The current bookmark value.
+                    type: boolean
+                required:
+                - bookmarked
+                type: object
+          description: Success
+      tags:
+      - Discussions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                bookmarked:
+                  description: Pass true to bookmark or false to remove bookmark.
+                  type: boolean
+              required:
+              - bookmarked
+              type: object
+        required: true
+      summary: Bookmark a discussion.
+  '/discussions/{id}/edit':
+    get:
+      parameters:
+      - description: |
+          The discussion ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - reactions
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/DiscussionGetEdit'
+          description: Success
+      tags:
+      - Discussions
+      summary: Get a discussion for editing.
+  '/discussions/{id}/idea':
+    x-addon: ideation
+    patch:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                properties:
+                  statusID:
+                    description: Idea status ID.
+                    type: integer
+                  statusNotes:
+                    description: >-
+                      Notes on a status change. Notes will persist until
+                      overwritten.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                required:
+                - statusID
+                - statusNotes
+                type: object
+          description: Success
+      tags:
+      - Discussions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                statusID:
+                  description: Idea status ID.
+                  type: integer
+                statusNotes:
+                  description: >-
+                    Notes on a status change. Notes will persist until
+                    overwritten.
+                  minLength: 1
+                  nullable: true
+                  type: string
+              required:
+              - statusID
+              - statusNotes
+              type: object
+        required: true
+      summary: Update idea metadata on a discussion.
+  '/discussions/{id}/quote':
+    get:
+      parameters:
+      - description: |
+          The discussion ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - reactions
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                properties:
+                  bodyRaw:
+                    description: >-
+                      The raw body of the discussion. This can be an array of
+                      rich operations or a string for other formats
+                    minLength: 1
+                    type: string
+                    x-todo: 'tpye: array'
+                  dateInserted:
+                    description: When the discussion was created.
+                    format: date-time
+                    type: string
+                  dateUpdated:
+                    description: When the discussion was last updated.
+                    format: date-time
+                    nullable: true
+                    type: string
+                  discussionID:
+                    description: The ID of the discussion.
+                    type: integer
+                  format:
+                    description: The original format of the discussion
+                    minLength: 1
+                    type: string
+                  insertUser:
+                    $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment'
+                  name:
+                    description: The title of the discussion
+                    minLength: 1
+                    type: string
+                  url:
+                    description: The full URL to the discussion.
+                    minLength: 1
+                    type: string
+                required:
+                - discussionID
+                - name
+                - bodyRaw
+                - dateInserted
+                - dateUpdated
+                - insertUser
+                - url
+                - format
+                type: object
+          description: Success
+      tags:
+      - Discussions
+  '/discussions/{id}/reactions':
+    x-addon: reactions
+    get:
+      parameters:
+      - description: |
+          The discussion ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - reactions
+            - all
+            type: string
+          type: array
+        style: form
+      - description: Filter to a specific reaction type by using its URL code.
+        in: query
+        name: type
+        required: true
+        schema:
+          minLength: 1
+          type: string
+        allowEmptyValue: true
+      - description: >
+          Page number. See <a rel="nofollow" href="https://docs.vanillaforums.com/apiv2/#pagination">Pagination</a>.
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          maximum: 100
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  properties:
+                    dateInserted:
+                      format: date-time
+                      type: string
+                    reactionType:
+                      properties:
+                        class:
+                          minLength: 1
+                          type: string
+                        name:
+                          minLength: 1
+                          type: string
+                        tagID:
+                          type: integer
+                        urlcode:
+                          minLength: 1
+                          type: string
+                      required:
+                      - tagID
+                      - urlcode
+                      - name
+                      - class
+                      type: object
+                    recordID:
+                      type: integer
+                    recordType:
+                      minLength: 1
+                      type: string
+                    tagID:
+                      type: integer
+                    user:
+                      $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment'
+                    userID:
+                      type: integer
+                  required:
+                  - recordType
+                  - recordID
+                  - tagID
+                  - userID
+                  - dateInserted
+                  - user
+                  - reactionType
+                  type: object
+                type: array
+          description: Success
+      tags:
+      - Discussions
+      summary: Get reactions to a discussion.
+    post:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  properties:
+                    class:
+                      minLength: 1
+                      type: string
+                    count:
+                      type: integer
+                    name:
+                      minLength: 1
+                      type: string
+                    tagID:
+                      type: integer
+                    urlcode:
+                      minLength: 1
+                      type: string
+                  required:
+                  - tagID
+                  - urlcode
+                  - name
+                  - class
+                  - count
+                  type: object
+                type: array
+          description: Success
+      tags:
+      - Discussions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                reactionType:
+                  description: URL code of a reaction type.
+                  minLength: 1
+                  type: string
+              required:
+              - reactionType
+              type: object
+        required: true
+      summary: React to a discussion.
+  '/discussions/{id}/reactions/{userID}':
+    x-addon: reactions
+    delete:
+      parameters:
+      - description: |
+          The discussion ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: |
+          The target user ID.
+        in: path
+        name: userID
+        required: true
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - reactions
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Discussions
+      summary: Remove a user's reaction.
+components:
+  schemas:
+    CategoryFragment:
+      properties:
+        categoryID:
+          description: The ID of the category.
+          type: integer
+        name:
+          description: The name of the category.
+          minLength: 1
+          type: string
+        url:
+          description: Full URL to the category.
+          minLength: 1
+          type: string
+      required:
+      - categoryID
+      - name
+      - url
+      type: object
+    Discussion:
+      properties:
+        attributes:
+          properties:
+            idea:
+              x-addon: ideation
+              properties:
+                status:
+                  properties:
+                    name:
+                      description: Label for the status.
+                      minLength: 1
+                      type: string
+                    state:
+                      description: The open/closed state of an idea.
+                      enum:
+                      - open
+                      - closed
+                      minLength: 1
+                      type: string
+                  required:
+                  - name
+                  - state
+                  type: object
+                statusID:
+                  description: Unique numeric ID of a status.
+                  type: integer
+                statusNotes:
+                  description: Status update notes.
+                  minLength: 1
+                  nullable: true
+                  type: string
+                type:
+                  description: 'Voting type for this idea: up-only or up and down.'
+                  enum:
+                  - up
+                  - up-down
+                  minLength: 1
+                  type: string
+              required:
+              - statusNotes
+              - statusID
+              - status
+              - type
+              type: object
+              x-addon: ideation
+          type: object
+        body:
+          description: The body of the discussion.
+          minLength: 1
+          type: string
+        bookmarked:
+          description: Whether or not the discussion is bookmarked by the current user.
+          type: boolean
+        category:
+          $ref: '#/components/schemas/CategoryFragment'
+        categoryID:
+          description: The category the discussion is in.
+          type: integer
+        closed:
+          description: Whether the discussion is closed or open.
+          type: boolean
+        countComments:
+          description: The number of comments on the discussion.
+          type: integer
+        countUnread:
+          description: The number of unread comments.
+          type: integer
+        countViews:
+          description: The number of views on the discussion.
+          type: integer
+        dateInserted:
+          description: When the discussion was created.
+          format: date-time
+          type: string
+        dateUpdated:
+          description: When the discussion was last updated.
+          format: date-time
+          nullable: true
+          type: string
+        discussionID:
+          description: The ID of the discussion.
+          type: integer
+        groupID:
+          x-addon: groups
+          description: The group the discussion is in.
+          nullable: true
+          type: integer
+        insertUser:
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment'
+        insertUserID:
+          description: The user that created the discussion.
+          type: integer
+        lastPost:
+          $ref: '#/components/schemas/PostFragment'
+        lastUser:
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment'
+        name:
+          description: The title of the discussion.
+          minLength: 1
+          type: string
+        pinLocation:
+          description: >-
+            The location for the discussion, if pinned. "category" are pinned to
+            their own category. "recent" are pinned to the recent discussions
+            list, as well as their own category.
+          enum:
+          - category
+          - recent
+          minLength: 1
+          nullable: true
+          type: string
+        pinned:
+          description: Whether or not the discussion has been pinned.
+          type: boolean
+        reactions:
+          x-addon: reactions
+          items:
+            properties:
+              class:
+                minLength: 1
+                type: string
+              count:
+                type: integer
+              name:
+                minLength: 1
+                type: string
+              tagID:
+                type: integer
+              urlcode:
+                minLength: 1
+                type: string
+            required:
+            - tagID
+            - urlcode
+            - name
+            - class
+            - count
+            type: object
+          type: array
+          x-addon: reactions
+        score:
+          description: Total points associated with this post.
+          nullable: true
+          type: integer
+        sink:
+          description: Whether or not the discussion has been sunk.
+          type: boolean
+        type:
+          description: The type of this discussion if any.
+          minLength: 1
+          nullable: true
+          type: string
+        unread:
+          description: Whether or not the discussion should have an unread indicator.
+          type: boolean
+        url:
+          description: The full URL to the discussion.
+          type: string
+      required:
+      - discussionID
+      - type
+      - name
+      - body
+      - categoryID
+      - dateInserted
+      - dateUpdated
+      - insertUserID
+      - pinLocation
+      - closed
+      - sink
+      - countComments
+      - countViews
+      - score
+      - bookmarked
+      - unread
+      - attributes
+      type: object
+    DiscussionGetEdit:
+      properties:
+        body:
+          description: The body of the discussion.
+          minLength: 1
+          type: string
+        categoryID:
+          description: The category the discussion is in.
+          type: integer
+        closed:
+          description: Whether the discussion is closed or open.
+          type: boolean
+        discussionID:
+          description: The ID of the discussion.
+          type: integer
+        format:
+          description: The input format of the discussion.
+          minLength: 1
+          type: string
+        groupID:
+          x-addon: groups
+          description: The group the discussion is in.
+          nullable: true
+          type: integer
+        name:
+          description: The title of the discussion.
+          minLength: 1
+          type: string
+        pinLocation:
+          description: |
+            The location for the discussion, if pinned. "category" are pinned to their own category.
+            "recent" are pinned to the recent discussions list, as well as their own category.
+          enum:
+          - category
+          - recent
+          minLength: 1
+          nullable: true
+          type: string
+        pinned:
+          description: Whether or not the discussion has been pinned.
+          type: boolean
+        sink:
+          description: Whether or not the discussion has been sunk.
+          type: boolean
+      required:
+      - discussionID
+      - name
+      - body
+      - format
+      - categoryID
+      - sink
+      - closed
+      - pinned
+      - pinLocation
+      type: object
+    DiscussionPost:
+      properties:
+        body:
+          description: The body of the discussion.
+          minLength: 1
+          type: string
+        categoryID:
+          description: The category the discussion is in.
+          type: integer
+        closed:
+          description: Whether the discussion is closed or open.
+          type: boolean
+        format:
+          description: The input format of the discussion.
+          minLength: 1
+          type: string
+        groupID:
+          x-addon: groups
+          description: The group the discussion is in.
+          nullable: true
+          type: integer
+        name:
+          description: The title of the discussion.
+          minLength: 1
+          type: string
+        pinLocation:
+          description: >-
+            The location for the discussion, if pinned. "category" are pinned to
+            their own category. "recent" are pinned to the recent discussions
+            list, as well as their own category.
+          enum:
+          - category
+          - recent
+          minLength: 1
+          nullable: true
+          type: string
+        pinned:
+          description: Whether or not the discussion has been pinned.
+          type: boolean
+        sink:
+          description: Whether or not the discussion has been sunk.
+          type: boolean
+      required:
+      - name
+      - body
+      - format
+      type: object
+    PostFragment:
+      properties:
+        commentID:
+          description: 'The comment ID of the post, if any.'
+          type: integer
+        dateInserted:
+          description: The date of the post.
+          format: date-time
+          type: string
+        discussionID:
+          description: The discussion ID of the post.
+          type: integer
+        insertUser:
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment'
+        insertUserID:
+          description: The author of the post.
+          type: integer
+        name:
+          description: The title of the post.
+          minLength: 1
+          type: string
+        url:
+          description: The URL of the post.
+          minLength: 1
+          type: string
+      required:
+      - name
+      - url
+      - dateInserted
+      - insertUserID
+      type: object

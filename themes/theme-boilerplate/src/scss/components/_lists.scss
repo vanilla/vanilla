@@ -10,7 +10,7 @@
 
 .DataList,
 .MessageList {
-    margin: 0 0 $global-block_margin;
+    margin: 0 0 $utility-baseUnitTriple;
 
     .Item {
         @include listItem;
@@ -584,23 +584,27 @@
         }
 
         .RecordReactions {
-            margin-left: -$utility-baseUnitHalf;
-            margin-right: -$utility-baseUnitHalf;
 
-            .PhotoWrap {
-                position: relative;
-                width: 24px;
-                height: 24px;
-            }
+        }
+    }
+}
 
-            .ReactSprite {
-                color: $global-color_white;
-                margin-right: 0;
-            }
+.MessageList {
 
-            .UserReactionWrap {
-                width: 24px;
-                margin: 0 $utility-baseUnitHalf $utility-baseUnitHalf;
+    &.Comments,
+    &.AcceptedAnswers {
+
+        .Item:first-child {
+            @if $component_lateralBorder == false {
+                border-top-width: 0;
+
+                .Item-Header {
+                    padding-top: 0;
+                }
+
+                .Options {
+                    margin-top: 0;
+                }
             }
         }
     }
@@ -653,7 +657,7 @@
 }
 
 .DataList-Search {
-    margin-top: $utility-large_padding;
+    margin-top: $utility-baseUnitTriple;
 
     h3,
     .Item-Body {

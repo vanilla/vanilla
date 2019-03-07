@@ -10,6 +10,7 @@ import { IMe } from "@library/@types/api";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import UsersActions from "@library/users/UsersActions";
 import UserSuggestionModel, { IUserSuggestionState } from "@library/users/suggestion/UserSuggestionModel";
+import NotificationsActions from "@library/notifications/NotificationsActions";
 
 export interface IInjectableUserState {
     currentUser: ILoadable<IMe>;
@@ -63,7 +64,7 @@ export default class UsersModel implements ReduxReducer<IUsersState> {
      */
     public reducer = (
         state: IUsersState = this.initialState,
-        action: typeof UsersActions.ACTION_TYPES,
+        action: typeof UsersActions.ACTION_TYPES | typeof NotificationsActions.ACTION_TYPES,
     ): IUsersState => {
         return produce(state, draft => {
             switch (action.type) {
@@ -77,6 +78,11 @@ export default class UsersModel implements ReduxReducer<IUsersState> {
                 case UsersActions.GET_ME_ERROR:
                     draft.current.status = LoadStatus.ERROR;
                     draft.current.error = action.payload;
+                    break;
+                case NotificationsActions.MARK_ALL_READ_RESPONSE:
+                    if (draft.current.data) {
+                        draft.current.data.countUnreadNotifications = 0;
+                    }
                     break;
             }
 

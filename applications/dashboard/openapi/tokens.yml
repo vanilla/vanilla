@@ -1,0 +1,103 @@
+openapi: 3.0.2
+info:
+paths:
+  /tokens:
+    get:
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/Token'
+                type: array
+          description: Success
+      tags:
+      - Tokens
+      summary: Get a list of access token IDs for the current user.
+    post:
+      responses:
+        '201':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Token'
+          description: Success
+      tags:
+      - Tokens
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Token'
+        required: true
+      summary: Issue a new access token for the current user.
+  '/tokens/{id}':
+    delete:
+      parameters:
+      - description: |
+          The numeric ID of a token.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Tokens
+      summary: Revoke an access token.
+    get:
+      parameters:
+      - description: |
+          The numeric ID of a token.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: |
+          A valid CSRF token for the current user.
+        in: query
+        name: transientKey
+        required: true
+        schema:
+          minLength: 1
+          type: string
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Token'
+          description: Success
+      tags:
+      - Tokens
+      summary: Reveal a usable access token.
+components:
+  schemas:
+    Token:
+      properties:
+        accessToken:
+          description: A signed version of the token.
+          minLength: 1
+          type: string
+        accessTokenID:
+          description: The unique numeric ID.
+          type: integer
+        dateInserted:
+          description: When the token was generated.
+          format: date-time
+          type: string
+        name:
+          description: A user-specified label.
+          minLength: 1
+          nullable: true
+          type: string
+      required:
+      - accessTokenID
+      - name
+      - accessToken
+      - dateInserted
+      type: object

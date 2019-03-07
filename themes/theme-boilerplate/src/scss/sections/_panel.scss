@@ -13,9 +13,23 @@
 
     @include maxWidth($theme-breakpoint_tablet) {
 
-        .BoxNewDiscussion,
+        .SearchBox,
         .BoxCategories {
             display: none;
+        }
+
+        .BoxNewDiscussion.BoxNewDiscussion {
+            margin: $utility-baseUnitTriple 0;
+        }
+
+        .ButtonGroup.Multi,
+        .BigButton {
+            margin-left: auto;
+            margin-right: auto;
+
+            @include maxWidth(500px) {
+                max-width: 100%;
+            }
         }
 
         .Box h4 {
@@ -72,11 +86,10 @@
         justify-content: space-between;
         padding: $panel-item_padding;
         margin-bottom: 0;
-        border: $panel-item_border;
 
         .Count {
             margin-right: 6px;
-            margin-bottom: 4px;
+            margin-bottom: -3px;
         }
     }
 
@@ -101,7 +114,7 @@
     }
 
     .BoxButtons {
-        margin: 0 0 $utility-large_padding;
+        margin: 0 0 $utility-baseUnitTriple;
     }
 
     .PhotoWrap {
@@ -153,7 +166,7 @@
             &:active {
                 color: $panel-item-hover_fg;
                 background-color: $panel-item-hover_bg;
-                border-color: $panel-item-hover_borderColor;
+                border-color: $panel-item-hover_border;
             }
         }
     }
@@ -164,9 +177,9 @@
         li:not(.Heading) + li:not(.Heading) {
             margin-top: $panel_item-spacing;
 
-            @if($panel_item-spacing == 0) {
+            @if($panel-item_spacing == 0) {
                 a {
-                    border-top-width: 0;
+                    margin-top: -1px;
                 }
             }
         }
@@ -186,7 +199,7 @@
             &:active {
                 color: $panel-item_fg;
                 background-color: $panel-item-hover_bg;
-                border-color: $panel-item-hover_borderColor;
+                border-color: $panel-item-hover_border;
             }
         }
 
@@ -262,6 +275,16 @@ body.Section-EditProfile .Box,
         border-radius: $formElement_borderRadius;
     }
 
+    li:not(.Heading) + li:not(.Heading) {
+        margin-top: $panel_item-spacing;
+
+        @if($panel-item_spacing == 0) {
+             a {
+                 margin-top: -1px;
+             }
+        }
+    }
+
     li.Heading {
         display: flex;
         align-items: center;
@@ -294,18 +317,17 @@ body.Section-EditProfile .Box,
         &:active {
             color: $panel-item-hover_fg;
             background-color: $panel-item-hover_bg;
-            border-color: $panel-item-hover_borderColor;
+            border-color: $panel-item-hover_border;
         }
     }
 
     li:not(.Heading) + li:not(.Heading) {
 
-        @if($panel_item-spacing == 0) {
-
-            a {
-                border-top-width: 0;
-            }
-        }
+         @if($panel-item_spacing == 0) {
+             a {
+                 margin-top: -1px;
+             }
+         }
     }
 
     &.BadgeGrid a {

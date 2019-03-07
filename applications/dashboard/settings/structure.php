@@ -865,6 +865,26 @@ $Construct
     ->column("dateUpdated", "datetime")
     ->set($Explicit, $Drop);
 
+$Construct
+    ->table("reaction")
+    ->primaryKey("reactionID")
+    ->column("reactionOwnerID", "int", false, ["index", "index.record"])
+    ->column("recordID", "int", false, "index.record")
+    ->column("reactionValue", "int", false)
+    ->column("insertUserID", "int", false, ["index"])
+    ->column("dateInserted", "datetime")
+    ->set($Explicit, $Drop);
+
+$Construct
+    ->table("reactionOwner")
+    ->primaryKey("reactionOwnerID")
+    ->column("ownerType", "varchar(64)", false, ["index", "unique.record"])
+    ->column("reactionType", "varchar(64)", false, ["index", "unique.record"])
+    ->column("recordType", "varchar(64)", false, ["index", "unique.record"])
+    ->column("insertUserID", "int", false, ["index"])
+    ->column("dateInserted", "datetime")
+    ->set($Explicit, $Drop);
+
 // If the AllIPAddresses column exists, attempt to migrate legacy IP data to the UserIP table.
 if (!$captureOnly && $AllIPAddressesExists) {
     $limit = 10000;
@@ -970,6 +990,13 @@ if (c('Plugins.TouchIcon.Uploaded')) {
 // Remove AllowJSONP globally
 if (c('Garden.AllowJSONP')) {
     removeFromConfig('Garden.AllowJSONP');
+}
+
+// Avoid the mobile posts having the rich format fall through as the default when the addon is not enabled.
+$mobileInputFormatter = Gdn::config()->get("Garden.MobileInputFormatter");
+$richEditorEnabled = Gdn::addonManager()->isEnabled("rich-editor", \Vanilla\Addon::TYPE_ADDON);
+if ($mobileInputFormatter === "Rich" && $richEditorEnabled === false) {
+    Gdn::config()->set("Garden.MobileInputFormatter", Gdn::config()->get("Garden.InputFormatter"));
 }
 
 Gdn::router()->setRoute('apple-touch-icon.png', 'utility/showtouchicon', 'Internal');

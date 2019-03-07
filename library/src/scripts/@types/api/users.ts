@@ -12,6 +12,7 @@ export interface IUserFragment {
 
 export interface IMe extends IUserFragment {
     permissions: string[];
+    countUnreadNotifications: number;
     isAdmin: boolean;
 }
 

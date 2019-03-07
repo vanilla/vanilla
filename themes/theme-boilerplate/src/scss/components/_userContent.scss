@@ -50,7 +50,7 @@ $code-block_padding:                    $userContent_fontSize !default;
     p,
     li {
         a {
-            color: $link_default-color;
+            color: $link-default_color;
 
             &:focus,
             &:hover {
@@ -59,7 +59,7 @@ $code-block_padding:                    $userContent_fontSize !default;
             }
 
             &:visited {
-                color: $link_default_visited-color;
+                color: $link-default_visited_color;
             }
         }
     }

@@ -15,6 +15,10 @@ import { LoadStatus, ILoadable } from "@library/@types/api";
 
 // tslint:disable:jsx-use-translation-function
 
+const noop = () => {
+    return;
+};
+
 describe("<Permission />", () => {
     let user: ILoadable<IMe>;
     let actions: UsersActions;
@@ -27,6 +31,7 @@ describe("<Permission />", () => {
             isAdmin,
             photoUrl: "",
             dateLastActive: "",
+            countUnreadNotifications: 1,
         };
     };
 
@@ -35,12 +40,11 @@ describe("<Permission />", () => {
             user = {
                 status: LoadStatus.PENDING,
             };
-            actions = new UsersActions(sinon.fake(), sinon.fake() as any);
         });
 
         it("returns nothing if the data isn't loaded yet.", () => {
             const result = shallow(
-                <Permission permission="test" currentUser={user} usersActions={actions}>
+                <Permission permission="test" currentUser={user} requestData={noop}>
                     Test
                 </Permission>,
             );
@@ -51,7 +55,7 @@ describe("<Permission />", () => {
         it("loads the fallback if nothing is rendered yet.", () => {
             const fallback = <div>{`fallback`}</div>;
             const result = shallow(
-                <Permission permission="test" currentUser={user} usersActions={actions} fallback={fallback}>
+                <Permission permission="test" currentUser={user} requestData={noop} fallback={fallback}>
                     Test
                 </Permission>,
             );
@@ -61,10 +65,9 @@ describe("<Permission />", () => {
 
         it("dispatches an action to get the data", () => {
             const spy = sinon.spy();
-            actions = new UsersActions(spy, sinon.fake() as any);
             assert(!spy.called, "The spy was called before the component even mounted.");
             mount(
-                <Permission permission="test" currentUser={user} usersActions={actions}>
+                <Permission permission="test" currentUser={user} requestData={spy}>
                     Test
                 </Permission>,
             );
@@ -85,7 +88,7 @@ describe("<Permission />", () => {
         it("renders children if the user has one of the given permissions", () => {
             const successComponent = <div>{`Success`}</div>;
             let result = shallow(
-                <Permission permission="perm1" currentUser={user} usersActions={actions}>
+                <Permission permission="perm1" currentUser={user} requestData={noop}>
                     {successComponent}
                 </Permission>,
             );
@@ -96,7 +99,7 @@ describe("<Permission />", () => {
             );
 
             result = shallow(
-                <Permission permission={["perm1", "asdfa"]} currentUser={user} usersActions={actions}>
+                <Permission permission={["perm1", "asdfa"]} currentUser={user} requestData={noop}>
                     {successComponent}
                 </Permission>,
             );
@@ -110,7 +113,7 @@ describe("<Permission />", () => {
         it("renders children if the user does not have one of the given permissions", () => {
             const successComponent = <div>{`Success`}</div>;
             let result = shallow(
-                <Permission permission="asd" currentUser={user} usersActions={actions}>
+                <Permission permission="asd" currentUser={user} requestData={noop}>
                     {successComponent}
                 </Permission>,
             );
@@ -118,7 +121,7 @@ describe("<Permission />", () => {
             assert(!result.contains(successComponent), "the success component rendered with 1 bad permission passed");
 
             result = shallow(
-                <Permission permission={["fds", "asdfa"]} currentUser={user} usersActions={actions}>
+                <Permission permission={["fds", "asdfa"]} currentUser={user} requestData={noop}>
                     {successComponent}
                 </Permission>,
             );
@@ -136,7 +139,7 @@ describe("<Permission />", () => {
                 data: makeMockUser([], true),
             };
             const result = shallow(
-                <Permission permission="asd" currentUser={user} usersActions={actions}>
+                <Permission permission="asd" currentUser={user} requestData={noop}>
                     {successComponent}
                 </Permission>,
             );

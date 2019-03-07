@@ -81,7 +81,7 @@ body.hasRichEditor.Profile {
     .FormWrapper-Condensed.FormWrapper-Condensed {
 
         @include maxWidth($theme-breakpoint_tablet) {
-            padding-left: $utility-large_padding;
+            padding-left: $utility-baseUnitTriple;
         }
 
         @include maxWidth {

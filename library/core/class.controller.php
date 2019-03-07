@@ -153,6 +153,9 @@ class Gdn_Controller extends Gdn_Pluggable {
     /** @var string Name of the view that has been requested. Typically part of the view's file name. ie. $this->View.'.php' */
     public $View;
 
+    /** @var bool Indicate that the controller add the `defer` attribute to it's legacy scripts. */
+    protected $useDeferredLegacyScripts;
+
     /** @var array An array of CSS file names to search for in theme folders & include in the page. */
     protected $_CssFiles;
 
@@ -215,6 +218,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      *
      */
     public function __construct() {
+        $this->useDeferredLegacyScripts = \Vanilla\FeatureFlagHelper::featureEnabled('DeferredLegacyScripts');
         $this->Application = '';
         $this->ApplicationFolder = '';
         $this->Assets = [];
@@ -1900,32 +1904,17 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                 $this->Head->addScript('', 'text/javascript', false, ['content' => $this->definitionList(false)]);
 
-                // Webpack based scripts
-                /** @var \Vanilla\Web\Asset\WebpackAssetProvider $webpackAssetProvider */
-                $webpackAssetProvider = Gdn::getContainer()->get(\Vanilla\Web\Asset\WebpackAssetProvider::class);
-
-                $polyfillContent = $webpackAssetProvider->getInlinePolyfillContents();
-                $this->Head->addScript(null, null, false, ["content" => $polyfillContent]);
-
-                // Add the built webpack javascript files.
-                $section = $this->MasterView === 'admin' ? 'admin' : 'forum';
-                $jsAssets = $webpackAssetProvider->getScripts($section);
-                foreach ($jsAssets as $asset) {
-                    $this->Head->addScript($asset->getWebPath(), 'text/javascript', false, ['defer' => 'true']);
-                }
-
-                // The the built stylesheets
-                $styleAssets = $webpackAssetProvider->getStylesheets($section);
-                foreach ($styleAssets as $asset) {
-                    $this->Head->addCss($asset->getWebPath(), null, false);
-                }
-
+                // Add legacy style scripts
                 foreach ($this->_JsFiles as $Index => $JsInfo) {
                     $JsFile = $JsInfo['FileName'];
                     if (!is_array($JsInfo['Options'])) {
                         $JsInfo['Options'] = [];
                     }
                     $Options = &$JsInfo['Options'];
+
+                    if ($this->useDeferredLegacyScripts) {
+                        $Options['defer'] = 'defer';
+                    }
 
                     if (isset($Cdns[$JsFile])) {
                         $JsFile = $Cdns[$JsFile];
@@ -1951,6 +1940,8 @@ class Gdn_Controller extends Gdn_Pluggable {
                         continue;
                     }
                 }
+
+                $this->addWebpackAssets();
             }
 
             // Add the favicon.
@@ -2032,6 +2023,31 @@ class Gdn_Controller extends Gdn_Pluggable {
             include($MasterViewPath);
         } else {
             $ViewHandler->render($MasterViewPath, $this);
+        }
+    }
+
+    /**
+     * Add the assets from WebpackAssetProvider to the page.
+     */
+    private function addWebpackAssets() {
+        // Webpack based scripts
+        /** @var \Vanilla\Web\Asset\WebpackAssetProvider $webpackAssetProvider */
+        $webpackAssetProvider = Gdn::getContainer()->get(\Vanilla\Web\Asset\WebpackAssetProvider::class);
+
+        $polyfillContent = $webpackAssetProvider->getInlinePolyfillContents();
+        $this->Head->addScript(null, null, false, ["content" => $polyfillContent]);
+
+        // Add the built webpack javascript files.
+        $section = $this->MasterView === 'admin' ? 'admin' : 'forum';
+        $jsAssets = $webpackAssetProvider->getScripts($section);
+        foreach ($jsAssets as $asset) {
+            $this->Head->addScript($asset->getWebPath(), 'text/javascript', false, ['defer' => 'defer']);
+        }
+
+        // The the built stylesheets
+        $styleAssets = $webpackAssetProvider->getStylesheets($section);
+        foreach ($styleAssets as $asset) {
+            $this->Head->addCss($asset->getWebPath(), null, false);
         }
     }
 

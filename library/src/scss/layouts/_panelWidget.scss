@@ -35,8 +35,8 @@
 
     @include mediaQuery-panelLayout_oneColumn {
         padding: {
-            left: 0;
-            right: 0;
+            left: 4px;
+            right: 4px;
         }
     }
 }

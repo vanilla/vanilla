@@ -1,6 +1,6 @@
 {
     "name": "+Baseline",
-    "description": "The default theme for Vanilla. This theme's purpose is to give the bare-minimum of styling on everything except the forum contents. Our goal is for you to take this theme and customize it by adding your own header & footer.",
+    "description": "A classic 2000s look for Vanilla. This was Vanilla 2.0s original theme and was the default until 2.8.",
     "version": "2.4.201",
     "hidden": false,
     "key": "default",

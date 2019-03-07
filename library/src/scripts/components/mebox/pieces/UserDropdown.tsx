@@ -23,9 +23,10 @@ import DropDownSection from "@library/components/dropdown/items/DropDownSection"
 import DropDownItemLinkWithCount from "@library/components/dropdown/items/DropDownItemLinkWithCount";
 import Permission from "@library/users/Permission";
 import classNames from "classnames";
-import { IUserDropDownContentsProps } from "@library/components/mebox/pieces/UserDropdownContents";
+import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
+import { userDropDownClasses } from "@library/styles/userDropDownStyles";
 
-export interface IUserDropDownProps extends IInjectableUserState, IUserDropDownContentsProps {
+export interface IUserDropDownProps extends IInjectableUserState {
     className?: string;
     countsClass?: string;
     buttonClassName?: string;
@@ -54,7 +55,8 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
             photoUrl: null,
         });
 
-        const counts = this.props.counts;
+        const counts = dummyUserDropDownData;
+        const classes = userDropDownClasses();
 
         return (
             <DropDown
@@ -62,7 +64,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                 name={t("My Account")}
                 className={classNames("userDropDown", this.props.className)}
                 buttonClassName={classNames("vanillaHeader-account", this.props.buttonClassName)}
-                contentsClassName={classNames("userDropDown-contents", this.props.contentsClassName)}
+                contentsClassName={classNames("userDropDown-contents", this.props.contentsClassName, classes.contents)}
                 renderLeft={true}
                 buttonContents={
                     <div className={classNames("meBox-buttonContent", this.props.toggleContentClassName)}>
@@ -87,7 +89,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                                 name={t("Bookmarks")}
                                 count={counts.bookmarkCount}
                             />
-                            <DropDownItemLinkWithCount to="/drafts" name={t("Drafts")} count={counts.draftsCount} />
+                            <DropDownItemLinkWithCount to="/kb/drafts" name={t("Drafts")} count={counts.draftsCount} />
                             <DropDownItemLink to="/discussions/mine" name={t("My Discussions")} />
                             <DropDownItemLink to="/activity" name={t("Participated")} />
                         </DropDownSection>

@@ -5,6 +5,20 @@
  */
 
 /* -------------------------------------------------------------- *\
+    Variables
+\* -------------------------------------------------------------- */
+
+$breadcrumbs_fg:                                 $global-color_fg !default;
+$breadcrumbs-link_fg:                            $global-color_primary !default;
+$breadcrumbs-link-hover_fg:                      $global-color_primary !default;
+$breadcrumbs-last_fg:                            $breadcrumbs-link_fg !default;
+$breadcrumbs_textTransform:                      uppercase !default;
+$breadcrumbs-hover_textDecoration:               underline !default;
+$breadcrumbs_fontSize:                           $global-small_fontSize !default;
+$breadcrumbs_fontWeight:                         $global-normal_fontWeight !default;
+$breadcrumbs_lineHeight:                         $global-condensed_lineHeight !default;
+
+/* -------------------------------------------------------------- *\
     Styles
 \* -------------------------------------------------------------- */
 
@@ -13,44 +27,36 @@
 }
 
 .Breadcrumbs {
-    margin-bottom: $utility-large_padding;
     display: block;
     line-height: $global-base_lineHeight;
+    text-transform: $breadcrumbs_textTransform;
+    color: $breadcrumbs_fg;
+    font-size: $global-small_fontSize;
+    font-weight: $breadcrumbs_fontWeight;
+    padding: $utility-baseUnitDouble 0;
 
     a {
-        font-size: $global-small_fontSize;
-        color: $global-color_fg;
-        font-weight: $global-normal_fontWeight;
+        font-size: inherit;
+        color: $breadcrumbs-link_fg;
 
         &:focus,
         &:hover {
-            text-decoration: $theme-link-hover_textDecoration;
+            color: $breadcrumbs-link-hover_fg;
+            text-decoration: $breadcrumbs-hover_textDecoration;
         }
     }
 
-    .Last a,
     .Crumb {
-        color: $component-meta-link_color;
+        opacity: .5;
+    }
+
+    .Last a {
+        color: $breadcrumbs-last_fg;
 
         &:focus,
         &:hover {
-            text-decoration: $theme-link-hover_textDecoration;
-            color: $component-meta-link-hover_color;
+            color: $breadcrumbs-link-hover_fg;
+            text-decoration: $breadcrumbs-hover_textDecoration;
         }
     }
 }
-
-.BreadcrumbsBox + .SearchBox {
-    margin-left: auto;
-    max-width: $panel_width;
-
-    .Handle.Handle {
-        display: none;
-    }
-
-    @include maxWidth {
-        margin-left: 0;
-        max-width: 100%;
-    }
-}
-

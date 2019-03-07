@@ -14,7 +14,6 @@ import { style } from "typestyle";
 
 export const siteNavVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const formElementVars = formElementsVariables();
     const themeVars = componentThemeVariables("siteNav");
 
     const node = {
@@ -146,6 +145,7 @@ export const siteNavNodeClasses = useThemeCache(() => {
             },
             "&.hasChildren": {
                 fontWeight: globalVars.fonts.weights.semiBold,
+                color: "inherit",
                 $nest: {
                     "&.isFirstLevel": {
                         fontSize: unit(globalVars.fonts.size.large),

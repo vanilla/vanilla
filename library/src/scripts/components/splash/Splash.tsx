@@ -10,7 +10,7 @@ import Heading from "@library/components/Heading";
 import Container from "@library/components/layouts/components/Container";
 import { PanelWidget, PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
 import { withDevice } from "@library/contexts/DeviceContext";
-import { IDeviceProps } from "@library/components/DeviceChecker";
+import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 import IndependentSearch from "@library/components/IndependentSearch";
 import { splashStyles, splashVariables } from "@library/styles/splashStyles";
 import { buttonClasses } from "@library/styles/buttonStyles";
@@ -42,6 +42,7 @@ export class Splash extends React.Component<IProps> {
                                     buttonClass={buttons.transparent}
                                     isLarge={true}
                                     placeholder={t("Search Articles")}
+                                    hideSearchButton={this.props.device === Devices.MOBILE}
                                 />
                             </div>
                         </PanelWidgetHorizontalPadding>

@@ -58,7 +58,7 @@ export const globalVariables = useThemeCache(() => {
 
     const links = makeThemeVars("links", {
         colors: {
-            default: mainColors.fg,
+            default: mainColors.primary,
             hover: mainColors.secondary,
             focus: mainColors.secondary,
             accessibleFocus: mainColors.secondary,

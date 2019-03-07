@@ -206,17 +206,13 @@ export const searchBarClasses = useThemeCache(() => {
         },
     });
 
-<<<<<<< HEAD
-    const actionButton = style("actionButton", {
-=======
     // Has a search button attached.
     const compoundValueContainer = style(debug.name("compoundValueContainer"), {
         borderTopRightRadius: 0,
         borderBottomRightRadius: 0,
     });
 
-    const actionButton = style({
->>>>>>> feature/theming
+    const actionButton = style("actionButton", {
         marginLeft: "auto",
         marginRight: -(globalVars.buttonIcon.offset + 3), // the "3" is to offset the pencil
         opacity: 0.8,

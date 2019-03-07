@@ -5,10 +5,9 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables } from "@library/styles/styleHelpers";
-import { px } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { unit } from "@library/styles/styleHelpers";
 
 export const formElementsVariables = useThemeCache(() => {
     const vars = globalVariables();
@@ -62,7 +61,7 @@ export const formElementsVariables = useThemeCache(() => {
     });
 
     const placeholder = themeVars("placeholder", {
-        color: color(mixBgAndFg(0.5)),
+        color: mixBgAndFg(0.5),
     });
 
     const disabled = themeVars("disabled", {
@@ -91,7 +90,7 @@ export const formErrorClasses = useThemeCache(() => {
     const root = style({
         backgroundColor: varsGlobal.feedbackColors.error.bg.toString(),
         color: varsGlobal.feedbackColors.error.fg.toString(),
-        marginBottom: px(16),
+        marginBottom: unit(16),
         paddingLeft: vars.errorSpacing.horizontalPadding,
         paddingRight: vars.errorSpacing.horizontalPadding,
         paddingTop: vars.errorSpacing.verticalPadding,
@@ -106,7 +105,7 @@ export const formErrorClasses = useThemeCache(() => {
     });
 
     const actionButton = style("button", {
-        marginLeft: px(12),
+        marginLeft: unit(12),
     });
     const activeButton = style("activeButton", {
         fontWeight: "bold",

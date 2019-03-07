@@ -32,7 +32,7 @@ export const searchBarVariables = useThemeCache(() => {
     });
 
     const placeholder = themeVars("placeholder", {
-        color: formElementVars.colors.placeholder,
+        color: formElementVars.placeholder.color,
     });
 
     const heading = themeVars("heading", {
@@ -156,7 +156,7 @@ export const searchBarClasses = useThemeCache(() => {
     const results = style("results", {
         $nest: {
             ".suggestedTextInput__placeholder": {
-                color: toStringColor(formElementVars.colors.placeholder),
+                color: toStringColor(formElementVars.placeholder.color),
             },
             ".suggestedTextInput-noOptions": {
                 padding: px(12),

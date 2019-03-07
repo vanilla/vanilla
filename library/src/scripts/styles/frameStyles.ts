@@ -114,10 +114,8 @@ export const frameHeaderClasses = useThemeCache(() => {
         alignItems: "center",
         flexGrow: 1,
         textOverflow: "ellipsis",
-        ...font({
-            weight: globalVars.fonts.weights.semiBold,
-            size: globalVars.fonts.size.large,
-        }),
+        fontWeight: globalVars.fonts.weights.semiBold,
+        fontSize: unit(globalVars.fonts.size.large),
     });
 
     const left = style("left", {

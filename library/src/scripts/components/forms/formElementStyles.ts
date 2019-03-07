@@ -6,28 +6,28 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { unit } from "@library/styles/styleHelpers";
 
 export const formElementsVariables = useThemeCache(() => {
     const vars = globalVariables();
     const varsLayouts = layoutVariables();
     const mixBgAndFg = vars.mixBgAndFg;
-    const themeVars = styleFactory("formElements");
+    const makeThemeVars = variableFactory("formElements");
 
-    const sizing = themeVars("sizing", {
+    const sizing = makeThemeVars("sizing", {
         height: 36,
         halfHeight: 18,
         maxWidth: 528,
     });
 
-    const spacing = themeVars("spacing", {
+    const spacing = makeThemeVars("spacing", {
         margin: 12,
         horizontalPadding: 12,
         verticalPadding: 6,
     });
 
-    const border = themeVars("border", {
+    const border = makeThemeVars("border", {
         width: 1,
         fullWidth: 2,
         color: vars.border.color,
@@ -35,36 +35,36 @@ export const formElementsVariables = useThemeCache(() => {
         radius: vars.border.radius,
     });
 
-    const giantInput = themeVars("giantInput", {
+    const giantInput = makeThemeVars("giantInput", {
         height: 82,
         fontSize: 24,
     });
 
-    const largeInput = themeVars("largeInput", {
+    const largeInput = makeThemeVars("largeInput", {
         height: 48,
         fontSize: 16,
     });
 
-    const miniInput = themeVars("miniInput", {
+    const miniInput = makeThemeVars("miniInput", {
         width: 100,
     });
 
-    const colors = themeVars("colors", {
+    const colors = makeThemeVars("colors", {
         fg: vars.mainColors.fg,
         bg: vars.mainColors.bg,
     });
 
-    const errorSpacing = themeVars("errorSpacing", {
+    const errorSpacing = makeThemeVars("errorSpacing", {
         horizontalPadding: varsLayouts.gutter.size,
         verticalPadding: varsLayouts.gutter.size,
         verticalMargin: varsLayouts.gutter.halfSize,
     });
 
-    const placeholder = themeVars("placeholder", {
+    const placeholder = makeThemeVars("placeholder", {
         color: mixBgAndFg(0.5),
     });
 
-    const disabled = themeVars("disabled", {
+    const disabled = makeThemeVars("disabled", {
         opacity: 0.5,
     });
 

@@ -59,7 +59,7 @@ export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolea
             ...placeholderStyles({
                 lineHeight: "inherit",
                 padding: "inherit",
-                color: toStringColor(formElementVars.colors.placeholder),
+                color: toStringColor(formElementVars.placeholder.color),
             }),
         },
     });

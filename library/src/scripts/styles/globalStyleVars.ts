@@ -5,11 +5,11 @@
 
 import { getColorDependantOnLightness, toStringColor } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { color, ColorHelper, percent } from "csx";
+import { color, ColorHelper, percent, viewHeight } from "csx";
 
 export const globalVariables = useThemeCache(() => {
     const colorPrimary = color("#0291db");
-    const makeThemeVars = variableFactory("globalVariables");
+    const makeThemeVars = variableFactory("global");
 
     const utility = {
         "percentage.third": percent(100 / 3),
@@ -68,6 +68,11 @@ export const globalVariables = useThemeCache(() => {
 
     const body = makeThemeVars("body", {
         bg: mainColors.bg,
+        backgroundImage: {
+            image: "",
+            repeat: false,
+            height: viewHeight(100),
+        },
     });
 
     const border = makeThemeVars("border", {

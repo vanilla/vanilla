@@ -26,6 +26,7 @@ import MeBoxDropDownItemList from "./MeBoxDropDownItemList";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 import { loaderClasses } from "@library/styles/loaderStyles";
+import { frameFooterClasses } from "@library/styles/frameStyles";
 
 export interface INotificationsProps {
     countClass?: string;
@@ -39,6 +40,7 @@ export class NotificationsContents extends React.Component<IProps> {
     public render() {
         const { userSlug } = this.props;
         const title = t("Notifications");
+        const classesFrameFooter = frameFooterClasses();
 
         return (
             <Frame className={this.props.className}>
@@ -66,7 +68,7 @@ export class NotificationsContents extends React.Component<IProps> {
                     <Button
                         onClick={this.markAllRead}
                         baseClass={ButtonBaseClass.TEXT}
-                        className="frameFooter-markRead"
+                        className={classNames("frameFooter-markRead", classesFrameFooter.markRead)}
                     >
                         {t("Mark All Read")}
                     </Button>

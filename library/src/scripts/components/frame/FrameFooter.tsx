@@ -6,6 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
+import { frameFooterClasses } from "@library/styles/frameStyles";
 
 export interface IFrameFooterProps {
     className?: string;
@@ -21,6 +22,11 @@ export default class FrameFooter extends React.PureComponent<IFrameFooterProps> 
     };
 
     public render() {
-        return <footer className={classNames("frameFooter", this.props.className)}>{this.props.children}</footer>;
+        const classes = frameFooterClasses();
+        return (
+            <footer className={classNames("frameFooter", this.props.className, classes.root)}>
+                {this.props.children}
+            </footer>
+        );
     }
 }

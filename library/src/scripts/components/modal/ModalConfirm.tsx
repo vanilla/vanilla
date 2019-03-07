@@ -14,6 +14,8 @@ import { getRequiredID } from "@library/componentIDs";
 import Modal from "@library/components/modal/Modal";
 import ButtonLoader from "@library/components/ButtonLoader";
 import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
+import { frameBodyClasses } from "@library/styles/frameStyles";
+import classNames from "classnames";
 
 interface IProps {
     title: string; // required for accessibility
@@ -50,6 +52,7 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
     public render() {
         const { onCancel, onConfirm, srOnlyTitle, isConfirmLoading, title, children } = this.props;
         const buttons = buttonClasses();
+        const classesFrameBody = frameBodyClasses();
         return (
             <Modal
                 size={ModalSizes.SMALL}
@@ -67,7 +70,9 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                     />
                     <FrameBody>
                         <FramePanel>
-                            <SmartAlign className="frameBody-contents">{children}</SmartAlign>
+                            <SmartAlign className={classNames("frameBody-contents", classesFrameBody.contents)}>
+                                {children}
+                            </SmartAlign>
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter>

@@ -31,17 +31,20 @@ export class Splash extends React.Component<IProps> {
         const { title, className } = this.props;
         return (
             <div className={classNames(className, classes.root)}>
-                <div className={classes.fullBackground} />
-                <Container className={classes.container}>
+                <div className={classes.outerBackground} />
+                <Container>
                     <div className={classes.innerContainer}>
                         <PanelWidgetHorizontalPadding>
                             {title && <Heading title={title} className={classes.title} />}
                             <div className={classes.searchContainer}>
                                 <IndependentSearch
-                                    className={classes.search}
-                                    buttonClass={buttons.transparent}
+                                    className={classes.searchContainer}
+                                    buttonClass={classNames(buttons.transparent, classes.searchButton)}
                                     isLarge={true}
                                     placeholder={t("Search Articles")}
+                                    inputClass={classes.input}
+                                    iconClass={classes.icon}
+                                    buttonLoaderClassName={classes.buttonLoader}
                                     hideSearchButton={this.props.device === Devices.MOBILE}
                                 />
                             </div>

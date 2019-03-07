@@ -6,6 +6,7 @@
 
 import React, { ReactNode } from "react";
 import classNames from "classnames";
+import { frameClasses } from "@library/styles/frameStyles";
 
 interface IProps {
     className?: string;
@@ -18,6 +19,9 @@ interface IProps {
  */
 export default class Frame extends React.Component<IProps> {
     public render() {
-        return <section className={classNames("frame", this.props.className)}>{this.props.children}</section>;
+        const classes = frameClasses();
+        return (
+            <section className={classNames("frame", this.props.className, classes.root)}>{this.props.children}</section>
+        );
     }
 }

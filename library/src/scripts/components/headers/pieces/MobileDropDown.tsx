@@ -18,6 +18,7 @@ import Heading from "@library/components/Heading";
 import CloseButton from "@library/components/CloseButton";
 import FlexSpacer from "@library/components/FlexSpacer";
 import { mobileDropDownClasses } from "@library/styles/mobileDropDownStyles";
+import { frameHeaderClasses } from "@library/styles/frameStyles";
 
 export interface IProps {
     className?: string;
@@ -44,6 +45,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
 
     public render() {
         const classes = mobileDropDownClasses();
+        const classesFrameHeader = frameHeaderClasses();
         const { className, children, title, buttonClass } = this.props;
         return children ? (
             <div className={classNames(classes.root, className)}>
@@ -71,11 +73,30 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                             <Panel className={classes.panel}>
                                 <Frame className={this.props.frameClassName}>
                                     <header className={classes.header}>
-                                        <FlexSpacer className="frameHeader-leftSpacer" />
-                                        <Heading title={title} className="frameHeader-heading frameHeader-centred">
+                                        <FlexSpacer
+                                            className={classNames(
+                                                "frameHeader-leftSpacer",
+                                                classesFrameHeader.leftSpacer,
+                                            )}
+                                        />
+                                        <Heading
+                                            title={title}
+                                            className={classNames(
+                                                "frameHeader-heading",
+                                                "frameHeader-centred",
+                                                classesFrameHeader.centred,
+                                                classesFrameHeader.heading,
+                                            )}
+                                        >
                                             <SmartAlign>{title}</SmartAlign>
                                         </Heading>
-                                        <div className="frameHeader-closePosition">
+                                        <div
+                                            className={classNames(
+                                                "frameHeader-closePosition",
+                                                classesFrameHeader.closePosition,
+                                                classesFrameHeader.action,
+                                            )}
+                                        >
                                             <CloseButton
                                                 className="frameHeader-close"
                                                 onClick={this.close}

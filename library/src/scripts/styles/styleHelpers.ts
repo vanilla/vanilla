@@ -9,7 +9,13 @@ import { styleFactory } from "@library/styles/styleUtils";
 import {
     AlignItemsProperty,
     AppearanceProperty,
+    BackgroundAttachmentProperty,
+    BackgroundColorProperty,
     BackgroundImageProperty,
+    BackgroundOriginProperty,
+    BackgroundPositionProperty,
+    BackgroundRepeatProperty,
+    BackgroundSizeProperty,
     BorderRadiusProperty,
     BorderStyleProperty,
     BorderWidthProperty,
@@ -17,14 +23,19 @@ import {
     ContentProperty,
     DisplayProperty,
     FlexWrapProperty,
+    FontSizeProperty,
+    FontWeightProperty,
     JustifyContentProperty,
     LeftProperty,
+    LineHeightProperty,
     MaxWidthProperty,
     ObjectFitProperty,
     OverflowXProperty,
     PositionProperty,
     RightProperty,
+    TextAlignLastProperty,
     TextOverflowProperty,
+    TextShadowProperty,
     UserSelectProperty,
     WhiteSpaceProperty,
 } from "csstype";
@@ -34,7 +45,11 @@ import { TLength } from "typestyle/lib/types";
 import { getThemeVariables } from "@library/theming/ThemeProvider";
 
 export const toStringColor = (colorValue: ColorHelper | "transparent") => {
-    return typeof colorValue === "string" ? colorValue : colorValue.toString();
+    if (!colorValue) {
+        return undefined;
+    } else {
+        return typeof colorValue === "string" ? colorValue : colorValue.toString();
+    }
 };
 
 export function flexHelper() {
@@ -108,13 +123,17 @@ export function centeredBackground() {
     return style(centeredBackgroundProps());
 }
 
-export function backgroundCover(backgroundImage: BackgroundImageProperty) {
-    const style = styleFactory("backgroundCover");
-    return style({
-        ...centeredBackgroundProps(),
-        backgroundSize: "cover",
-        backgroundImage: backgroundImage.toString(),
-    });
+export function backgroundCover(bgImage: BackgroundImageProperty | null) {
+    if (bgImage) {
+        return {
+            backgroundPosition: `50% 50%`,
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            backgroundImage: bgImage,
+        };
+    } else {
+        return {};
+    }
 }
 
 export function inputLineHeight(height: number, paddingTop: number, fullBorderWidth: number) {
@@ -187,12 +206,16 @@ export const getColorDependantOnLightness = (
         throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
     }
 
-    if (referenceColor.lightness() >= 0.5 || flip) {
-        // Lighten color
-        return colorToModify.mix(color("#000"), 1 - weight) as ColorHelper;
+    if (referenceColor && referenceColor.lightness) {
+        if (referenceColor.lightness() >= 0.5 || flip) {
+            // Lighten color
+            return colorToModify.mix(color("#000"), 1 - weight) as ColorHelper;
+        } else {
+            // Darken color
+            return colorToModify.mix(color("#fff"), 1 - weight) as ColorHelper;
+        }
     } else {
-        // Darken color
-        return colorToModify.mix(color("#fff"), 1 - weight) as ColorHelper;
+        return colorToModify; // do nothing
     }
 };
 
@@ -289,7 +312,7 @@ export const unit = (val: string | number | undefined, unitFunction = px) => {
     }
 };
 
-interface IMargins {
+export interface IMargins {
     top?: string | number;
     right?: string | number;
     bottom?: string | number;
@@ -305,7 +328,7 @@ export const margins = (styles: IMargins) => {
     };
 };
 
-interface IPaddings {
+export interface IPaddings {
     top?: string | number;
     right?: string | number;
     bottom?: string | number;
@@ -588,5 +611,50 @@ export const userSelect = (value: UserSelectProperty = "none", isImportant: bool
         "-moz-user-select": val,
         "-ms-user-select": val,
         userSelect: val,
+    };
+};
+
+export interface IFont {
+    color?: ColorHelper | "transparent";
+    size?: FontSizeProperty<TLength>;
+    weight?: FontWeightProperty;
+    lineHeight?: LineHeightProperty<TLength>;
+    shadow?: TextShadowProperty;
+    align?: TextAlignLastProperty;
+}
+
+export const font = (props: IFont) => {
+    if (props) {
+        return {
+            fontSize: props.size ? unit(props.size) : undefined,
+            fontWeight: props.weight ? (props.weight as FontWeightProperty) : undefined,
+            color: props.color ? toStringColor(props.color) : undefined,
+            lineHeight: props.lineHeight ? unit(props.lineHeight) : undefined,
+            textAlign: props.align ? (props.align as TextAlignLastProperty) : undefined,
+            textShadow: props.shadow ? (props.shadow as TextShadowProperty) : undefined,
+        };
+    } else {
+        return {};
+    }
+};
+
+export interface IBackgroundImage {
+    color?: ColorHelper | "transparent";
+    attachment?: BackgroundAttachmentProperty;
+    position?: BackgroundPositionProperty<TLength>;
+    repeat?: BackgroundRepeatProperty;
+    size?: BackgroundSizeProperty<TLength>;
+    image?: BackgroundImageProperty;
+    fallbackImage?: BackgroundImageProperty;
+}
+
+export const backgroundImage = (props: IBackgroundImage) => {
+    return {
+        backgroundColor: props.color ? toStringColor(props.color) : undefined,
+        backgroundAttachment: props.attachment ? props.attachment : undefined,
+        backgroundPosition: props.position ? props.position : `50% 50%`,
+        backgroundRepeat: props.repeat ? props.repeat : "no-repeat",
+        backgroundSize: props.size ? props.size : "cover",
+        backgroundImage: props.image ? props.image : props.fallbackImage ? props.fallbackImage : undefined,
     };
 };

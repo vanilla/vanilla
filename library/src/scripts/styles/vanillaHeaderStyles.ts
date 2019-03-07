@@ -12,6 +12,7 @@ import {
     debugHelper,
     flexHelper,
     getColorDependantOnLightness,
+    toStringColor,
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
@@ -220,7 +221,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
             display: "inline-flex",
             alignSelf: "center",
             flexBasis: vars.endElements.flexBasis,
-            color: vars.colors.fg.toString(),
+            color: toStringColor(vars.colors.fg),
             $nest: {
                 "&.focus-visible": {
                     $nest: {

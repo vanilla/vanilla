@@ -12,35 +12,37 @@ import {
     flexHelper,
     ISpinnerProps,
     spinnerLoader,
+    toStringColor,
 } from "@library/styles/styleHelpers";
-import { useThemeCache } from "@library/styles/styleUtils";
+import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { style } from "typestyle";
 
 export const loaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const themeVars = componentThemeVariables("loader");
+    const makeThemeVars = variableFactory("loader");
 
-    const fullPage: ISpinnerProps = {
+    const colors = makeThemeVars("colors", {
+        fg: globalVars.mainColors.primary,
+    });
+
+    const fullPage: ISpinnerProps = makeThemeVars("fullPage", {
         size: 100,
         thickness: 6,
-        color: globalVars.mainColors.primary,
-        ...themeVars.subComponentStyles("fullPage"),
-    };
+        color: colors.fg,
+    });
 
-    const fixedSize: ISpinnerProps = {
+    const fixedSize: ISpinnerProps = makeThemeVars("fixedSize", {
         size: 32,
         thickness: 4,
-        color: globalVars.mainColors.primary,
-        ...themeVars.subComponentStyles("fixedSize"),
-    };
+        color: colors.fg,
+    });
 
-    const medium: ISpinnerProps = {
+    const medium: ISpinnerProps = makeThemeVars("medium", {
         size: 20,
         thickness: 6,
-        color: globalVars.mainColors.primary,
-        ...themeVars.subComponentStyles("medium"),
-    };
+        color: colors.fg,
+    });
 
     return { fullPage, fixedSize, medium };
 });

@@ -7,59 +7,54 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { componentThemeVariables, debugHelper, setAllLinkColors, unit } from "@library/styles/styleHelpers";
-import { useThemeCache } from "@library/styles/styleUtils";
+import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { style } from "typestyle";
 
 export const navLinksVariables = useThemeCache(() => {
-    const themeVars = componentThemeVariables("navLinks");
+    const makeThemeVars = variableFactory("navLinks");
     const globalVars = globalVariables();
 
-    const linksWithHeadings = {
+    const linksWithHeadings = makeThemeVars("linksWithHeadings", {
         padding: 16,
-        ...themeVars.subComponentStyles("linksWithHeadings"),
-    };
+    });
 
-    const item = {
+    const item = makeThemeVars("item", {
         fontSize: globalVars.fonts.size.large,
-        ...themeVars.subComponentStyles("item"),
-    };
+    });
 
-    const title = {
+    const title = makeThemeVars("title", {
         fontSize: 20,
         fontWeight: globalVars.fonts.weights.semiBold,
         lineHeight: globalVars.lineHeights.condensed,
         width: 203,
         maxWidth: percent(100),
-        ...themeVars.subComponentStyles("link"),
-    };
+    });
 
-    const link = {
+    const link = makeThemeVars("link", {
         color: globalVars.mainColors.fg,
         fontWeight: globalVars.fonts.weights.semiBold,
         lineHeight: globalVars.lineHeights.condensed,
         width: 203,
         maxWidth: percent(100),
         fontSize: 16,
-        ...themeVars.subComponentStyles("link"),
-    };
+    });
 
-    const viewAll = {
+    const viewAll = makeThemeVars("viewAll", {
         fontWeight: globalVars.fonts.weights.semiBold,
         fontSize: globalVars.fonts.size.medium,
         marginTop: "auto",
         ...setAllLinkColors(),
-        ...themeVars.subComponentStyles("viewAll"),
-    };
+    });
 
-    const spacing = {
+    const spacing = makeThemeVars("spacing", {
         padding: 24,
         margin: 6,
-    };
+    });
 
-    const sizing = {
+    const sizing = makeThemeVars("sizing", {
         width: 250,
-    };
+    });
 
     return { linksWithHeadings, item, title, sizing, link, viewAll, spacing };
 });

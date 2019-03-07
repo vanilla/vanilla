@@ -412,3 +412,34 @@ export function getElementHeight(
         bottomMargin: bottomHeight,
     };
 }
+
+/**
+ * Prepare an element and it's contents for use in a shadow root.
+ *
+ * @param element
+ * @param cloneElement - If true, clone the element into a `newElementTag`. Preserves CSS classes and IDs.
+ *      Particularly useful for when the initial content is inside of a <noscript /> tag.
+ * @param newElementTag
+ */
+export function prepareShadowRoot(element: HTMLElement, cloneElement: boolean = false, newElementTag = "div") {
+    const html = element.innerHTML;
+    if (cloneElement) {
+        const newElement = document.createElement(newElementTag);
+
+        // Clone various attributes.
+        newElement.classList.value = element.classList.value;
+        newElement.id = element.id;
+
+        // Insert the element & remove the old old.
+        element.parentNode!.insertBefore(newElement, element);
+        element.remove();
+        element = newElement;
+    } else {
+        // If we aren't making a new real root, we need to empty it out.
+        // Otherwise we'll have duplicate contents.
+        element.innerHTML = "";
+    }
+
+    const shadowHeader = element.attachShadow({ mode: "open" });
+    shadowHeader.innerHTML = html;
+}

@@ -48,8 +48,13 @@ ${chalk.green(aliases)}`;
                 {
                     test: /\.(jsx?|tsx?)$/,
                     exclude: (modulePath: string) => {
+                        const modulesRequiringTranspilation = ["quill", "p-debounce"];
+                        const exlusionRegex = new RegExp(
+                            `node_modules\/(${modulesRequiringTranspilation.join("|")})\/`,
+                        );
+
                         // We need to transpile quill's ES6 because we are building from source.
-                        return /node_modules/.test(modulePath) && !/node_modules\/quill\//.test(modulePath);
+                        return /node_modules/.test(modulePath) && !exlusionRegex.test(modulePath);
                     },
                     use: [
                         {

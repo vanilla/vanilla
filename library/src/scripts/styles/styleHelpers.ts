@@ -45,7 +45,11 @@ import { TLength } from "typestyle/lib/types";
 import { getThemeVariables } from "@library/theming/ThemeProvider";
 
 export const toStringColor = (colorValue: ColorHelper | "transparent") => {
-    return typeof colorValue === "string" ? colorValue : colorValue.toString();
+    if (!colorValue) {
+        return undefined;
+    } else {
+        return typeof colorValue === "string" ? colorValue : colorValue.toString();
+    }
 };
 
 export function flexHelper() {
@@ -611,23 +615,27 @@ export const userSelect = (value: UserSelectProperty = "none", isImportant: bool
 };
 
 export interface IFont {
+    color?: ColorHelper | "transparent";
     size?: FontSizeProperty<TLength>;
     weight?: FontWeightProperty;
-    color?: ColorHelper | "transparent";
     lineHeight?: LineHeightProperty<TLength>;
     shadow?: TextShadowProperty;
     align?: TextAlignLastProperty;
 }
 
 export const font = (props: IFont) => {
-    return {
-        size: props.size ? unit(props.size) : undefined,
-        weight: props.weight ? props.weight : undefined,
-        color: props.color ? toStringColor(props.color) : undefined,
-        lineHeight: props.lineHeight ? unit(props.lineHeight) : undefined,
-        align: props.align ? props.align : undefined,
-        shadow: props.shadow ? props.shadow : undefined,
-    };
+    if (props) {
+        return {
+            fontSize: props.size ? unit(props.size) : undefined,
+            fontWeight: props.weight ? (props.weight as FontWeightProperty) : undefined,
+            color: props.color ? toStringColor(props.color) : undefined,
+            lineHeight: props.lineHeight ? unit(props.lineHeight) : undefined,
+            textAlign: props.align ? (props.align as TextAlignLastProperty) : undefined,
+            textShadow: props.shadow ? (props.shadow as TextShadowProperty) : undefined,
+        };
+    } else {
+        return {};
+    }
 };
 
 export interface IBackgroundImage {

@@ -9,76 +9,65 @@ import { componentThemeVariables } from "@library/styles/styleHelpers";
 import { px } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { memoize } from "lodash";
 
 export const formElementsVariables = useThemeCache(() => {
     const vars = globalVariables();
     const varsLayouts = layoutVariables();
     const mixBgAndFg = vars.mixBgAndFg;
-    const themeVars = componentThemeVariables("formElements");
+    const themeVars = styleFactory("formElements");
 
-    const sizing = {
+    const sizing = themeVars("sizing", {
         height: 36,
         halfHeight: 18,
         maxWidth: 528,
-        ...themeVars.subComponentStyles("sizing"),
-    };
+    });
 
-    const spacing = {
+    const spacing = themeVars("spacing", {
         margin: 12,
         horizontalPadding: 12,
         verticalPadding: 6,
-        ...themeVars.subComponentStyles("spacing"),
-    };
+    });
 
-    const border = {
+    const border = themeVars("border", {
         width: 1,
         fullWidth: 2,
         color: vars.border.color,
         style: "solid",
         radius: vars.border.radius,
-        ...themeVars.subComponentStyles("border"),
-    };
+    });
 
-    const giantInput = {
+    const giantInput = themeVars("giantInput", {
         height: 82,
         fontSize: 24,
-        ...themeVars.subComponentStyles("giantInput"),
-    };
+    });
 
-    const largeInput = {
+    const largeInput = themeVars("largeInput", {
         height: 48,
         fontSize: 16,
-        ...themeVars.subComponentStyles("largeInput"),
-    };
+    });
 
-    const miniInput = {
+    const miniInput = themeVars("miniInput", {
         width: 100,
-        ...themeVars.subComponentStyles("miniInput"),
-    };
+    });
 
-    const colors = {
+    const colors = themeVars("colors", {
         fg: vars.mainColors.fg,
         bg: vars.mainColors.bg,
-        placeholder: mixBgAndFg(0.5),
-        ...themeVars.subComponentStyles("colors"),
-    };
+    });
 
-    const errorSpacing = {
+    const errorSpacing = themeVars("errorSpacing", {
         horizontalPadding: varsLayouts.gutter.size,
         verticalPadding: varsLayouts.gutter.size,
         verticalMargin: varsLayouts.gutter.halfSize,
-        ...themeVars.subComponentStyles("errorSpacing"),
-    };
+    });
 
-    const placeholder = {
+    const placeholder = themeVars("placeholder", {
         color: mixBgAndFg(0.5),
-        ...themeVars.subComponentStyles("placeholder"),
-    };
+    });
 
-    const disabled = {
+    const disabled = themeVars("disabled", {
         opacity: 0.5,
-    };
+    });
 
     return {
         sizing,

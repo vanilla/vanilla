@@ -6,7 +6,14 @@
 
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, flexHelper, spinnerLoader, unit, userSelect } from "@library/styles/styleHelpers";
+import {
+    componentThemeVariables,
+    flexHelper,
+    spinnerLoader,
+    toStringColor,
+    unit,
+    userSelect,
+} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderRadiusProperty, BorderStyleProperty, WidthProperty } from "csstype";
 import { ColorHelper, percent, px } from "csx";
@@ -208,11 +215,11 @@ export const generateButtonClass = (buttonType: IButtonType, buttonName: string,
         whiteSpace: "nowrap",
         verticalAlign: "middle",
         touchAction: "manipulation",
-        minWidth: vars.sizing.minWidth,
+        minWidth: unit(vars.sizing.minWidth),
         cursor: "pointer",
-        color: buttonType.fg.toString(),
-        backgroundColor: buttonType.bg.toString(),
-        borderColor: buttonType.border.color.toString(),
+        color: toStringColor(buttonType.fg),
+        backgroundColor: toStringColor(buttonType.bg),
+        borderColor: toStringColor(buttonType.border.color),
         borderRadius: unit(buttonType.border.radius),
         borderStyle: buttonType.border.style,
         borderWidth: unit(buttonType.border.width),
@@ -224,27 +231,27 @@ export const generateButtonClass = (buttonType: IButtonType, buttonName: string,
                     },
                     "&:hover": {
                         zIndex,
-                        backgroundColor: buttonType.hover.bg.toString(),
-                        borderColor: buttonType.hover.borderColor.toString(),
-                        color: buttonType.hover.fg.toString(),
+                        backgroundColor: toStringColor(buttonType.hover.bg),
+                        borderColor: toStringColor(buttonType.hover.borderColor),
+                        color: toStringColor(buttonType.hover.fg),
                     },
                     "&:focus": {
                         zIndex,
-                        backgroundColor: buttonType.focus.bg.toString(),
-                        borderColor: buttonType.focus.borderColor.toString(),
-                        color: buttonType.focus.fg.toString(),
+                        backgroundColor: toStringColor(buttonType.focus.bg),
+                        borderColor: toStringColor(buttonType.focus.borderColor),
+                        color: toStringColor(buttonType.focus.fg),
                     },
                     "&:active": {
                         zIndex,
-                        backgroundColor: buttonType.active.bg.toString(),
-                        borderColor: buttonType.active.borderColor.toString(),
-                        color: buttonType.active.fg.toString(),
+                        backgroundColor: toStringColor(buttonType.active.bg),
+                        borderColor: toStringColor(buttonType.active.borderColor),
+                        color: toStringColor(buttonType.active.fg),
                     },
                     "&.focus-visible": {
                         zIndex,
-                        backgroundColor: buttonType.focus.bg.toString(),
-                        borderColor: buttonType.focus.borderColor.toString(),
-                        color: buttonType.focus.fg.toString(),
+                        backgroundColor: toStringColor(buttonType.focus.bg),
+                        borderColor: toStringColor(buttonType.focus.borderColor),
+                        color: toStringColor(buttonType.focus.fg),
                     },
                 },
             },

@@ -10,6 +10,7 @@ import {
     centeredBackgroundProps,
     font,
     getColorDependantOnLightness,
+    IFont,
     paddings,
     toStringColor,
     unit,
@@ -17,7 +18,7 @@ import {
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { percent, px, url } from "csx";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
-import { PaddingProperty, TextAlignLastProperty, TextShadowProperty } from "csstype";
+import { FontWeightProperty, PaddingProperty, TextAlignLastProperty, TextShadowProperty } from "csstype";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { TLength } from "typestyle/lib/types";
 import get from "lodash/get";
@@ -27,11 +28,6 @@ export const splashVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const widgetVars = widgetVariables();
     const formElVars = formElementsVariables();
-
-    const colors = {
-        fg: globalVars.elementaryColors.white,
-        shadowColor: globalVars.elementaryColors.black.fade(0.5),
-    };
 
     const topPadding = 69;
     const spacing = makeThemeVars("spacing", {
@@ -66,17 +62,23 @@ export const splashVariables = useThemeCache(() => {
     });
 
     const text = makeThemeVars("text", {
+        fg: globalVars.elementaryColors.white,
         align: "center",
-        maxWidth: 700,
+        shadowMix: 1,
+        shadowOpacity: 1,
     });
 
     const title = makeThemeVars("title", {
+        align: "center",
+        maxWidth: 700,
         font: {
-            color: globalVars.elementaryColors.white,
+            color: text.fg,
             size: globalVars.fonts.size.title,
-            weight: globalVars.fonts.weights.semiBold,
-            align: "center" as TextAlignLastProperty,
-            shadow: `0 1px 25px ${toStringColor(colors.shadowColor)}` as TextShadowProperty,
+            weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
+            align: text.align as TextAlignLastProperty,
+            shadow: `0 1px 15px ${getColorDependantOnLightness(text.fg, text.fg, text.shadowMix).fade(
+                text.shadowOpacity,
+            )}` as TextShadowProperty,
         },
         marginTop: 28,
         marginBottom: 40,
@@ -95,12 +97,13 @@ export const splashVariables = useThemeCache(() => {
         text: {
             size: 24,
             weight: 300,
-            align: title.font.align,
         },
     });
 
     const search = makeThemeVars("search", {
         margin: 30,
+        fg: globalVars.mainColors.fg,
+        bg: globalVars.mainColors.bg,
     });
 
     const searchDrawer = makeThemeVars("searchDrawer", {
@@ -134,13 +137,12 @@ export const splashVariables = useThemeCache(() => {
 
     return {
         outerBackground,
-        title,
         spacing,
         border,
         searchContainer,
         innerBackground,
-        colors,
         text,
+        title,
         paragraph,
         search,
         searchDrawer,
@@ -151,13 +153,6 @@ export const splashVariables = useThemeCache(() => {
 export const splashStyles = useThemeCache(() => {
     const vars = splashVariables();
     const style = styleFactory("splash");
-
-    /*
-        const outerBackground = makeThemeVars("outerBackground", {
-        bg: globalVars.mainColors.primary,
-        image: assetUrl("/resources/design/fallbackSplashBackground.svg"),
-        fallbackImage: assetUrl("/resources/design/fallbackSplashBackground.svg"),
-     */
 
     const root = style({
         position: "relative",
@@ -174,7 +169,7 @@ export const splashStyles = useThemeCache(() => {
         opacity = 0.4; // only for default bg
     }
 
-    const outerBackground = style({
+    const outerBackground = style("outerBackground", {
         ...centeredBackgroundProps(),
         display: "block",
         position: "absolute",
@@ -187,24 +182,24 @@ export const splashStyles = useThemeCache(() => {
         opacity,
     });
 
-    const innerContainer = style({
+    const innerContainer = style("innerContainer", {
         ...paddings(vars.spacing.padding),
         backgroundColor: vars.innerBackground.bg,
     });
 
-    const title = style({
-        ...font(vars.title.font),
-        paddingTop: px(vars.title.marginTop),
-        marginBottom: px(0),
-        textShadow: `0 1px 25px ${getColorDependantOnLightness(vars.title.font.color, vars.title.font.color, 0.9).fade(
-            0.4,
-        )}`,
+    const title = style("title", {
+        display: "block",
+        ...font(vars.title.font as IFont),
+        ...paddings({
+            top: unit(vars.title.marginTop),
+            bottom: unit(vars.title.marginBottom),
+        }),
     });
 
     const text = style("text", {
         display: "block",
-        color: toStringColor(vars.colors.fg),
-        width: unit(vars.text.maxWidth),
+        color: toStringColor(vars.text.fg),
+        width: unit(vars.title.maxWidth),
         maxWidth: percent(100),
         margin: `auto auto 0`,
         textAlign: "center",
@@ -215,37 +210,6 @@ export const splashStyles = useThemeCache(() => {
         },
     });
 
-    /*
-    const searchBar = makeThemeVars("searchBar", {
-        sizing: {
-            height: formElVars.giantInput.height,
-            width: 705,
-        },
-        font: {
-            size: formElVars.giantInput.fontSize,
-        },
-        button: {
-            minWidth: 130,
-            border: {
-                width: formElVars.border.width,
-                radius: formElVars.border.radius,
-                color: formElVars.border.color,
-            },
-            font: {
-                size: globalVars.fonts.size.medium,
-            },
-        },
-        icon: {
-            color: globalVars.mixBgAndFg(0.4),
-        },
-        input: {
-            font: {
-                size: globalVars.fonts.size.subTitle,
-            },
-        },
-    });
-    */
-
     const buttonBorderColor = get(vars, "searchBar.button.borderColor", false);
     const buttonBg = get(vars, "searchBar.button.bg", false);
     const buttonFg = get(vars, "searchBar.button.fg", false);
@@ -254,7 +218,7 @@ export const splashStyles = useThemeCache(() => {
         hoverBg = buttonFg ? buttonFg.fade(0.2) : buttonBorderColor ? buttonBorderColor.fade(0.2) : undefined;
     }
 
-    const searchButton = style("searchButtonXXX", {
+    const searchButton = style("searchButton", {
         $nest: {
             "&&&&": {
                 backgroundColor: buttonBg ? toStringColor(buttonBg) : undefined,

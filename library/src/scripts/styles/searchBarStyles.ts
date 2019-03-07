@@ -14,6 +14,7 @@ import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { calc, important, percent, px } from "csx";
 
 export const searchBarVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const themeVars = variableFactory("searchBar");
 
@@ -39,11 +40,20 @@ export const searchBarVariables = useThemeCache(() => {
         margin: 5,
     });
 
+    const input = themeVars("input", {
+        fg: globalVars.mainColors.fg,
+        bg: globalVars.mainColors.bg,
+        border: {
+            color: globalVars.mainColors.fg,
+        },
+    });
+
     return {
         search,
         searchIcon,
         sizing,
         placeholder,
+        input,
         heading,
     };
 });
@@ -195,6 +205,8 @@ export const searchBarClasses = useThemeCache(() => {
         borderRight: 0,
         paddingTop: 0,
         paddingBottom: 0,
+        backgroundColor: toStringColor(vars.input.bg),
+        color: toStringColor(vars.input.fg),
         $nest: {
             "&&&": {
                 display: "flex",
@@ -269,11 +281,12 @@ export const searchBarClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "center",
         width: unit(vars.searchIcon.gap),
-        color: toStringColor(vars.search.fg),
+        color: toStringColor(vars.input.fg),
     });
     const icon = style("icon", {
         width: unit(vars.searchIcon.width),
         height: unit(vars.searchIcon.height),
+        color: toStringColor(vars.input.fg),
     });
 
     return {

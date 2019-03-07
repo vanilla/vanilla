@@ -11,6 +11,7 @@ import {
     componentThemeVariables,
     debugHelper,
     defaultTransition,
+    paddings,
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
@@ -52,12 +53,15 @@ export const subcommunityTileVariables = useThemeCache(() => {
     };
 
     const link = {
-        topPadding: 38 as PaddingProperty<TLength>,
-        bottomPadding: 24 as PaddingProperty<TLength>,
-        leftPadding: 24 as PaddingProperty<TLength>,
-        rightPadding: 24 as PaddingProperty<TLength>,
+        padding: {
+            top: 38,
+            bottom: 24,
+            left: 24,
+            right: 24,
+        },
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
+        minHeight: 280,
         ...themeVars.subComponentStyles("link"),
     };
 
@@ -90,16 +94,14 @@ export const subcommunityTileClasses = useThemeCache(() => {
     const link = style({
         ...shadow.embed(),
         ...defaultTransition("box-shadow"),
+        ...paddings(vars.link.padding),
         display: "block",
         position: "relative",
         cursor: "pointer",
         flexGrow: 1,
         color: vars.link.fg.toString(),
         backgroundColor: vars.link.bg.toString(),
-        paddingTop: unit(vars.link.topPadding),
-        paddingRight: unit(vars.link.rightPadding),
-        paddingBottom: unit(vars.link.bottomPadding),
-        paddingLeft: unit(vars.link.leftPadding),
+        minHeight: unit(vars.link.minHeight),
         $nest: {
             "&:hover": {
                 ...shadow.embedHover(),

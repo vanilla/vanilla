@@ -123,13 +123,13 @@ export function centeredBackground() {
     return style(centeredBackgroundProps());
 }
 
-export function backgroundCover(backgroundImage: BackgroundImageProperty | null) {
-    if (backgroundImage) {
+export function backgroundCover(bgImage: BackgroundImageProperty | null) {
+    if (bgImage) {
         return {
             backgroundPosition: `50% 50%`,
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
-            backgroundImage,
+            backgroundImage: bgImage,
         };
     } else {
         return {};

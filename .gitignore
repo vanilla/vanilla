@@ -3,6 +3,7 @@
 !/applications/dashboard/
 !/applications/vanilla/
 /build/*
+!/build/.storybook
 !/build/entries
 !/build/scripts
 !/build/tsconfig.json

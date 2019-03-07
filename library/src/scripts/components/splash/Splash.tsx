@@ -44,7 +44,7 @@ export class Splash extends React.Component<IProps> {
                                     placeholder={t("Search Articles")}
                                     inputClass={classes.input}
                                     iconClass={classes.icon}
-                                    buttonLoaderClass={classes.buttonLoader}
+                                    buttonLoaderClassName={classes.buttonLoader}
                                 />
                             </div>
                         </PanelWidgetHorizontalPadding>

@@ -7,7 +7,6 @@
 import { assetUrl, isAllowedUrl, themeAsset } from "@library/application";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
-    borders,
     centeredBackgroundProps,
     font,
     getColorDependantOnLightness,
@@ -21,12 +20,18 @@ import { widgetVariables } from "@library/styles/widgetStyleVars";
 import { PaddingProperty, TextAlignLastProperty, TextShadowProperty } from "csstype";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { TLength } from "typestyle/lib/types";
+import get from "lodash/get";
 
 export const splashVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("splash");
     const globalVars = globalVariables();
     const widgetVars = widgetVariables();
     const formElVars = formElementsVariables();
+
+    const colors = {
+        fg: globalVars.elementaryColors.white,
+        shadowColor: globalVars.elementaryColors.black.fade(0.5),
+    };
 
     const topPadding = 69;
     const spacing = makeThemeVars("spacing", {
@@ -60,11 +65,6 @@ export const splashVariables = useThemeCache(() => {
         },
     });
 
-    const colors = makeThemeVars("color", {
-        fg: globalVars.mainColors.fg,
-        shadowColor: globalVars.elementaryColors.black.fade(0.5),
-    });
-
     const text = makeThemeVars("text", {
         align: "center",
         maxWidth: 700,
@@ -76,7 +76,7 @@ export const splashVariables = useThemeCache(() => {
             size: globalVars.fonts.size.title,
             weight: globalVars.fonts.weights.semiBold,
             align: "center" as TextAlignLastProperty,
-            shadow: `0 1px 25px ${colors.shadowColor}` as TextShadowProperty,
+            shadow: `0 1px 25px ${toStringColor(colors.shadowColor)}` as TextShadowProperty,
         },
         marginTop: 28,
         marginBottom: 40,
@@ -113,25 +113,21 @@ export const splashVariables = useThemeCache(() => {
             width: 705,
         },
         font: {
+            color: globalVars.elementaryColors.white,
             size: formElVars.giantInput.fontSize,
         },
         button: {
             minWidth: 130,
-            border: {
-                width: formElVars.border.width,
-                radius: formElVars.border.radius,
-                color: formElVars.border.color,
-            },
             font: {
                 size: globalVars.fonts.size.medium,
             },
-        },
-        icon: {
-            color: globalVars.mixBgAndFg(0.4),
-        },
-        input: {
-            font: {
-                size: globalVars.fonts.size.subTitle,
+            icon: {
+                color: globalVars.mixBgAndFg(0.4),
+            },
+            input: {
+                font: {
+                    size: globalVars.fonts.size.subTitle,
+                },
             },
         },
     });
@@ -250,10 +246,28 @@ export const splashStyles = useThemeCache(() => {
     });
     */
 
-    const searchButton = style("searchButton", {
-        minWidth: unit(vars.searchBar.button.minWidth),
-        fontSize: unit(vars.searchBar.button.font.size),
-        ...borders(vars.searchBar.button.border as any),
+    const buttonBorderColor = get(vars, "searchBar.button.borderColor", false);
+    const buttonBg = get(vars, "searchBar.button.bg", false);
+    const buttonFg = get(vars, "searchBar.button.fg", false);
+    let hoverBg = get(vars, "searchBar.button.hoverBg", false);
+    if (!hoverBg || buttonBg === "transparent") {
+        hoverBg = buttonFg ? buttonFg.fade(0.2) : buttonBorderColor ? buttonBorderColor.fade(0.2) : undefined;
+    }
+
+    const searchButton = style("searchButtonXXX", {
+        $nest: {
+            "&&&&": {
+                backgroundColor: buttonBg ? toStringColor(buttonBg) : undefined,
+                borderColor: buttonBorderColor ? toStringColor(buttonBorderColor) : undefined,
+                color: buttonFg ? toStringColor(buttonFg) : undefined,
+
+                $nest: {
+                    "&:hover, &:focus, &:active, &.focus-visible": {
+                        backgroundColor: toStringColor(hoverBg),
+                    },
+                },
+            },
+        },
     });
 
     const searchContainer = style("searchContainer", {
@@ -271,7 +285,7 @@ export const splashStyles = useThemeCache(() => {
     });
 
     const input = style("input", {});
-    const icon = style("icon", {});
+
     const buttonLoader = style("buttonLoader", {});
 
     return {
@@ -283,7 +297,6 @@ export const splashStyles = useThemeCache(() => {
         searchButton,
         searchContainer,
         input,
-        icon,
         buttonLoader,
     };
 });

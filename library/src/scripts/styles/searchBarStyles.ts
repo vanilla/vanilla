@@ -8,14 +8,14 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 import { buttonVariables } from "@library/styles/buttonStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { componentThemeVariables, debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { calc, important, percent, px } from "csx";
 
 export const searchBarVariables = useThemeCache(() => {
     const formElementVars = formElementsVariables();
-    const themeVars = styleFactory("searchBar");
+    const themeVars = variableFactory("searchBar");
 
     const search = themeVars("search", {
         minWidth: 109,

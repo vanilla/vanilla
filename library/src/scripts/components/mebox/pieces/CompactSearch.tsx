@@ -151,7 +151,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
     }
 
     private handleFocusChange = (gainedFocus: boolean) => {
-        if (!gainedFocus && !this.selfRef.current!.contains(document.activeElement)) {
+        if (!gainedFocus && this.selfRef.current && !this.selfRef.current!.contains(document.activeElement)) {
             this.props.onCloseSearch();
         }
     };

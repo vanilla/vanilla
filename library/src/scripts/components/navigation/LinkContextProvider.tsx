@@ -46,9 +46,16 @@ export const LinkContextProvider = withRouter((props: IProps) => {
         return href;
     };
 
+    /**
+     * Determine if the URL is one that we are able to navigate to dynamically.
+     *
+     * This should be true if we are nested inside of or are the linkContext.
+     * The current URL is excluded so that a click on your own page does something the user can see.
+     *
+     * @param href The URL to check.
+     */
     const isDynamicNavigation = (href: string): boolean => {
-        const link = document.createElement("a");
-        link.href = href;
+        const link = new URL(href);
         const isCurrentPage = link.pathname === window.location.pathname;
         return href.startsWith(props.linkContext) && !isCurrentPage;
     };
@@ -86,8 +93,7 @@ export const LinkContextProvider = withRouter((props: IProps) => {
  */
 export function makeLocationDescriptorObject(initial: LocationDescriptor, newHref: string): LocationDescriptorObject {
     // Get the search and pathName
-    const link = document.createElement("a");
-    link.href = newHref;
+    const link = new URL(newHref);
     const { search, pathname } = link;
 
     if (typeof initial === "string") {

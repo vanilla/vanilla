@@ -11,6 +11,7 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Theme\JsonAsset;
+use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\JsInterpop\ReduxAction;
 
@@ -57,9 +58,17 @@ abstract class ThemedPage extends Page {
             }
         }
 
+        /** @var ScriptsAsset */
+        $styleSheet = $themeData['assets']['styles'] ?? null;
+        $headerFooterPrefix = '';
+        if ($styleSheet) {
+            $style = $this->themesApi->get_assets($themeKey, 'styles.css') ?? null;
+            $headerFooterPrefix = '<style>' . $style->getData() . '</style>';
+        }
+
         // Apply theme data to the master view.
-        $this->headerHtml = $themeData['assets']['header'] ?? '';
-        $this->footerHtml = $themeData['assets']['footer'] ?? '';
+        $this->headerHtml = $headerFooterPrefix . ($themeData['assets']['header'] ?? '');
+        $this->footerHtml = $headerFooterPrefix . ($themeData['assets']['footer'] ?? '');
 
         // Preload the theme variables for the frontend.
         $this->addReduxAction(new ReduxAction(

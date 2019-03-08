@@ -5,19 +5,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    borders,
-    componentThemeVariables,
-    debugHelper,
-    allLinkStates,
-    margins,
-    absolutePosition,
-    unit,
-} from "@library/styles/styleHelpers";
-import { style } from "typestyle";
+import { componentThemeVariables, margins } from "@library/styles/styleHelpers";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc, px, percent } from "csx";
-import { useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 
 export const attachmentIconVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -45,53 +36,49 @@ export const attachmentIconsClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const vars = attachmentIconVariables();
-    const debug = debugHelper("attachmentIcons");
+    const style = styleFactory("attachmentIcons");
 
     const root = style({
         display: "block",
         position: "relative",
-        ...debug.name(),
     });
 
-    const items = {
+    const items = style("items", {
         display: "flex",
         flexWrap: "wrap",
         alignItems: "flex-start",
         justifyContent: "flex-end",
         width: calc(`100% + ${px(vars.spacing.default * 2)}`),
         overflow: "hidden",
-        ...debug.name("items"),
         ...margins({
             top: -vars.spacing.default,
             left: -vars.spacing.default,
             right: globalVars.meta.spacing.default,
         }),
-    };
+    });
 
-    const item = {
+    const item = style("item", {
         margin: vars.spacing.default,
         ...debug.name("item"),
-    };
+    });
 
     return { root, items, item };
 });
 
 export const attachmentIconClasses = useThemeCache(() => {
     const vars = attachmentIconVariables();
-    const debug = debugHelper("attachmentIcon");
+    const style = styleFactory("attachmentIcon");
 
     const root = style({
         display: "block",
         width: px(vars.icon.size),
         height: px(vars.icon.size),
         boxShadow: `0 0 0 1px ${vars.shadow.color}`,
-        ...debug.name(),
     });
 
-    const error = style({
+    const error = style("error", {
         width: px(vars.icon.size),
         height: px(vars.icon.errorIconHeight),
-        ...debug.name("error"),
     });
 
     return { root, error };

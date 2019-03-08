@@ -7,8 +7,10 @@
 import { assetUrl, isAllowedUrl, themeAsset } from "@library/application";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
+    backgroundImage,
     centeredBackgroundProps,
     font,
+    getBackgroundImage,
     getColorDependantOnLightness,
     IFont,
     paddings,
@@ -159,16 +161,7 @@ export const splashStyles = useThemeCache(() => {
         backgroundColor: toStringColor(vars.outerBackground.bg),
     });
 
-    let backgroundImage = vars.outerBackground.image;
-    let opacity;
-
-    if (backgroundImage.charAt(0) === "~") {
-        backgroundImage = themeAsset(backgroundImage.substr(1, backgroundImage.length - 1));
-    } else if (!isAllowedUrl(backgroundImage)) {
-        backgroundImage = vars.outerBackground.fallbackImage;
-        opacity = 0.4; // only for default bg
-    }
-
+    const image = getBackgroundImage(vars.outerBackground.image, vars.outerBackground.fallbackImage);
     const outerBackground = style("outerBackground", {
         ...centeredBackgroundProps(),
         display: "block",
@@ -177,9 +170,8 @@ export const splashStyles = useThemeCache(() => {
         left: px(0),
         width: percent(100),
         height: percent(100),
-        backgroundSize: "cover",
-        backgroundImage: url(backgroundImage),
-        opacity,
+        ...backgroundImage(vars.outerBackground),
+        opacity: vars.outerBackground.fallbackImage && image === vars.outerBackground.fallbackImage ? 0.4 : undefined,
     });
 
     const innerContainer = style("innerContainer", {

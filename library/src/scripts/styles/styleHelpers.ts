@@ -39,10 +39,11 @@ import {
     UserSelectProperty,
     WhiteSpaceProperty,
 } from "csstype";
-import { color, ColorHelper, deg, important, percent, px, quote, viewHeight, viewWidth } from "csx";
+import { color, ColorHelper, deg, important, percent, px, quote, viewHeight, viewWidth, url } from "csx";
 import { keyframes } from "typestyle";
 import { TLength } from "typestyle/lib/types";
 import { getThemeVariables } from "@library/theming/ThemeProvider";
+import { isAllowedUrl, themeAsset } from "@library/application";
 
 export const toStringColor = (colorValue: ColorHelper | "transparent") => {
     if (!colorValue) {
@@ -121,19 +122,6 @@ export function centeredBackgroundProps() {
 export function centeredBackground() {
     const style = styleFactory("centeredBackground");
     return style(centeredBackgroundProps());
-}
-
-export function backgroundCover(bgImage: BackgroundImageProperty | null) {
-    if (bgImage) {
-        return {
-            backgroundPosition: `50% 50%`,
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "cover",
-            backgroundImage: bgImage,
-        };
-    } else {
-        return {};
-    }
 }
 
 export function inputLineHeight(height: number, paddingTop: number, fullBorderWidth: number) {
@@ -648,13 +636,34 @@ export interface IBackgroundImage {
     fallbackImage?: BackgroundImageProperty;
 }
 
+export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImage?: BackgroundImageProperty) => {
+    // Get either image or fallback
+    let workingImage;
+    if (image) {
+        workingImage = image;
+    } else {
+        workingImage = fallbackImage;
+    }
+
+    if (workingImage.charAt(0) === "~") {
+        // Relative path to theme folder
+        workingImage = themeAsset(workingImage.substr(1, workingImage.length - 1));
+    } else if (workingImage.startsWith('"data:image/')) {
+        // Encoded background
+    } else if (!isAllowedUrl(workingImage)) {
+        return null; // bad image or bad fallback image
+    }
+    return workingImage;
+};
+
 export const backgroundImage = (props: IBackgroundImage) => {
+    const image = getBackgroundImage(props.image, props.fallbackImage);
     return {
         backgroundColor: props.color ? toStringColor(props.color) : undefined,
         backgroundAttachment: props.attachment ? props.attachment : undefined,
         backgroundPosition: props.position ? props.position : `50% 50%`,
         backgroundRepeat: props.repeat ? props.repeat : "no-repeat",
         backgroundSize: props.size ? props.size : "cover",
-        backgroundImage: props.image ? props.image : props.fallbackImage ? props.fallbackImage : undefined,
+        backgroundImage: image ? url(image) : undefined,
     };
 };

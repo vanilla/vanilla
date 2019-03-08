@@ -7,11 +7,11 @@ import * as React from "react";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import classNames from "classnames";
 import { ScrollOffsetContext } from "@library/contexts/ScrollOffsetContext";
-import { style } from "typestyle";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import throttle from "lodash/throttle";
 import { withDevice } from "@library/contexts/DeviceContext";
-import { debugHelper, inheritHeightClass } from "@library/styles/styleHelpers";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { styleFactory } from "@library/styles/styleUtils";
 
 interface IProps extends IDeviceProps {
     className?: string;
@@ -285,7 +285,7 @@ class PanelLayout extends React.Component<IProps> {
         const { isFixed } = this.props;
         const leftPanelEl = this.leftPanelRef.current;
         const rightPanelEl = this.rightPanelRef.current;
-        const debug = debugHelper("panelFixed");
+        const style = styleFactory("panelFixed");
 
         // The classes default to visually hidden (but still visible to screen readers) until fully calced.
         // The content may already be rendered, but we need a second layout pass for computed values.
@@ -303,21 +303,19 @@ class PanelLayout extends React.Component<IProps> {
 
         if (leftPanelEl) {
             const leftPanelRect = this.getCachedBoundingRect(leftPanelEl);
-            left = style({
+            left = style("leftPanel", {
                 ...base,
                 top: leftPanelRect.top + "px",
                 left: leftPanelRect.left + "px",
-                ...debug.name("leftPanel"),
             });
         }
 
         if (rightPanelEl) {
             const rightPanelRect = this.getCachedBoundingRect(rightPanelEl);
-            right = style({
+            right = style("rightPanel", {
                 ...base,
                 top: rightPanelRect.top + "px",
                 left: rightPanelRect.left + "px",
-                ...debug.name("rightPanel"),
             });
         }
 

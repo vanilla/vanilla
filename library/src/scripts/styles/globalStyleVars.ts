@@ -68,11 +68,6 @@ export const globalVariables = useThemeCache(() => {
 
     const body = makeThemeVars("body", {
         bg: mainColors.bg,
-        backgroundImage: {
-            image: "",
-            repeat: false,
-            height: viewHeight(100),
-        },
     });
 
     const border = makeThemeVars("border", {

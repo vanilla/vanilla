@@ -8,17 +8,15 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     borders,
     componentThemeVariables,
-    debugHelper,
     allLinkStates,
     margins,
-    absolutePosition,
     unit,
     userSelect,
+    absolutePosition,
 } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { percent, px } from "csx";
-import { useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 
 export const attachmentVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -70,7 +68,7 @@ export const attachmentClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const vars = attachmentVariables();
-    const debug = debugHelper("attachment");
+    const style = styleFactory("attachment");
 
     const root = style({
         display: "block",
@@ -101,17 +99,15 @@ export const attachmentClasses = useThemeCache(() => {
                 },
             },
         },
-        ...debug.name(),
     });
 
-    const link = style({
+    const link = style("link", {
         ...allLinkStates({
             textDecoration: "none",
         }),
-        ...debug.name("link"),
     });
 
-    const box = style({
+    const box = style("box", {
         position: "relative",
         display: "flex",
         flexWrap: "nowrap",
@@ -124,50 +120,44 @@ export const attachmentClasses = useThemeCache(() => {
             width: 2,
             radius: 0,
         }),
-        ...debug.name("box"),
     });
 
-    const format = style({
+    const format = style("format", {
         flexBasis: px(globalVars.icon.sizes.small + vars.padding.default),
         height: unit(globalVars.icon.sizes.small),
         paddingRight: unit(vars.padding.default),
         flexShrink: 1,
-        ...debug.name("format"),
     });
 
-    const main = style({
+    const main = style("main", {
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-start",
         justifyContent: "flex-start",
         flexGrow: 1,
-        ...debug.name("main"),
     });
 
-    const title = style({
+    const title = style("title", {
         fontSize: px(vars.text.fontSize),
         color: vars.title.color.toString(),
         fontWeight: globalVars.fonts.weights.semiBold,
         lineHeight: px(globalVars.icon.sizes.small),
-        ...debug.name("title"),
     });
 
-    const metas = style({
+    const metas = style("metas", {
         marginBottom: px(0),
         lineHeight: globalVars.lineHeights.condensed,
-        ...debug.name("metas"),
     });
 
-    const close = style({
+    const close = style("close", {
         ...margins({
             top: px(-((formElementVars.sizing.height - globalVars.icon.sizes.default) / 2)),
             right: px(-((formElementVars.sizing.height - globalVars.icon.sizes.default) / 2)),
         }),
         pointerEvents: "all",
-        ...debug.name("close"),
     });
 
-    const loadingProgress = style({
+    const loadingProgress = style("loadingProgress", {
         ...absolutePosition.bottomLeft(),
         transition: `width ease-out .2s`,
         height: px(3),
@@ -175,10 +165,9 @@ export const attachmentClasses = useThemeCache(() => {
         width: 0,
         maxWidth: percent(100),
         backgroundColor: globalVars.mainColors.primary.toString(),
-        ...debug.name("loadingProgress"),
     });
 
-    const loadingContent = style({
+    const loadingContent = style("loadingContent", {
         $nest: {
             ".attachment-format": {
                 opacity: vars.loading.opacity,
@@ -187,7 +176,6 @@ export const attachmentClasses = useThemeCache(() => {
                 opacity: vars.loading.opacity,
             },
         },
-        ...debug.name("loadingContent"),
     });
 
     return { root, link, box, format, main, title, metas, close, loadingProgress, loadingContent };

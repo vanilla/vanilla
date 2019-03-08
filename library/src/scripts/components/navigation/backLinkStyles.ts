@@ -6,28 +6,26 @@
 
 import { px } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, srOnly, userSelect } from "@library/styles/styleHelpers";
+import { srOnly, userSelect } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
-import { useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 
 const backLinkClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();
-    const debug = debugHelper("backLink");
+    const style = styleFactory("backLink");
     const headerVars = vanillaHeaderVariables();
 
     const root = style({
-        ...debug.name(),
         ...userSelect(),
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "flex-start",
     });
 
-    const link = style({
-        ...debug.name("link"),
+    const link = style("link", {
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "flex-start",
@@ -42,8 +40,8 @@ const backLinkClasses = useThemeCache(() => {
     });
 
     const label = style(
+        "label",
         {
-            ...debug.name("label"),
             lineHeight: px(globalVars.icon.sizes.default),
             fontWeight: globalVars.fonts.weights.semiBold,
             whiteSpace: "nowrap",

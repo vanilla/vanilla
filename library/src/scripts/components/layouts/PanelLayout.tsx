@@ -199,27 +199,27 @@ class PanelLayout extends React.Component<IProps> {
                                         </PanelArea>
                                     )}
                             </Panel>
-                            {shouldRenderRightPanel && (
-                                <Panel
-                                    className={classNames(
-                                        "panelLayout-right",
-                                        { [fixedPanelClass]: isFixed },
-                                        this.context.offsetClass,
-                                    )}
-                                >
-                                    {childComponents.rightTop && (
-                                        <PanelArea className="panelArea-rightTop" tag="aside">
-                                            {childComponents.rightTop}
-                                        </PanelArea>
-                                    )}
-                                    {childComponents.rightBottom && (
-                                        <PanelArea className="panelArea-rightBottom" tag="aside">
-                                            {childComponents.rightBottom}
-                                        </PanelArea>
-                                    )}
-                                </Panel>
-                            )}
                         </ContentTag>
+                        {shouldRenderRightPanel && (
+                            <Panel
+                                className={classNames(
+                                    "panelLayout-right",
+                                    { [fixedPanelClass]: isFixed },
+                                    this.context.offsetClass,
+                                )}
+                            >
+                                {childComponents.rightTop && (
+                                    <PanelArea className="panelArea-rightTop" tag="aside">
+                                        {childComponents.rightTop}
+                                    </PanelArea>
+                                )}
+                                {childComponents.rightBottom && (
+                                    <PanelArea className="panelArea-rightBottom" tag="aside">
+                                        {childComponents.rightBottom}
+                                    </PanelArea>
+                                )}
+                            </Panel>
+                        )}
                     </div>
                 </main>
             </div>

@@ -70,9 +70,6 @@ class PanelLayout extends React.Component<IProps> {
         isFixed: true,
     };
 
-    private leftPanelRef = React.createRef<HTMLElement>();
-    private rightPanelRef = React.createRef<HTMLElement>();
-
     public render() {
         const { topPadding, className, growMiddleBottom, device, isFixed, ...childComponents } = this.props;
 
@@ -101,6 +98,7 @@ class PanelLayout extends React.Component<IProps> {
             $debugName: "fixedPanelClasses",
             top: headerVars.sizing.height * 2,
             maxHeight: calc(`100vh - ${px(headerVars.sizing.height * 2)}`),
+            overflow: "auto",
         });
 
         // If applicable, set semantic tag, like "article"

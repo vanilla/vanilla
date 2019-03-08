@@ -75,7 +75,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
         const classesMeBox = meBoxClasses();
 
-        console.log("Fixed class", sticky());
         const fixedClass = style({
             ...sticky(),
             $debugName: "isFixed",

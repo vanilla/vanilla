@@ -101,7 +101,7 @@ class Gdn_ApplicationManager {
      */
     private function calcOldInfoArray(Addon $addon) {
         $info = Gdn_pluginManager::calcOldInfoArray($addon);
-        $directories = explode(DS, $addon->getSubdir());
+        $directories = explode('/', $addon->getSubdir());
         $info['Folder'] = $directories[count($directories) - 1];
 
         return $info;

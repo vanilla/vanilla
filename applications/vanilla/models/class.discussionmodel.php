@@ -710,18 +710,13 @@ class DiscussionModel extends Gdn_Model {
 
         $sql = $this->SQL;
 
+        $this->fireEvent('updateFilters');
+
         // Build up the base query. Self-join for optimization.
         $sql->select('d2.*')
             ->from('Discussion d')
             ->join('Discussion d2', 'd.DiscussionID = d2.DiscussionID')
             ->limit($limit, $offset);
-
-        if (isset($where['d.Tags'])) {
-            $sql->join('TagDiscussion td', "td.DiscussionID = d.DiscussionID", 'inner');
-            $tagID = $where['d.Tags'];
-            unset($where['d.Tags']);
-            $where['td.TagID'] = $tagID;
-        }
 
         foreach ($orderBy as $field => $direction) {
             $sql->orderBy($this->addFieldPrefix($field), $direction);
@@ -1557,6 +1552,7 @@ class DiscussionModel extends Gdn_Model {
         }
 
         $wheres = $this->combineWheres($this->getWheres(), $wheres);
+        $this->fireEvent('updateFilters');
 
         $this->EventArguments['Wheres'] = &$wheres;
         $this->fireEvent('BeforeGetCount'); // @see 'BeforeGet' for consistency in count vs. results

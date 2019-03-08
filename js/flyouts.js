@@ -316,7 +316,7 @@
             $toggleFlyouts.each(function() {
                 $toggle = $(this);
                 var $handle = $(this).find(
-                    ".FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)",
+                    ".FlyoutButton, .Button-Options, .Handle, .editor-action:not(.editor-action-separator)"
                 );
                 var $flyout = $(this).find(".Flyout, .Dropdown");
                 var isOpen = $toggle.hasClass(OPEN_CLASS);

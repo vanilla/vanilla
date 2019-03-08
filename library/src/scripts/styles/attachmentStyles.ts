@@ -17,6 +17,7 @@ import {
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { percent, px } from "csx";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { transparentColor } from "@library/styles/buttonStyles";
 
 export const attachmentVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -116,7 +117,7 @@ export const attachmentClasses = useThemeCache(() => {
         padding: px(vars.padding.default),
         width: percent(100),
         ...borders({
-            color: "transparent",
+            color: transparentColor,
             width: 2,
             radius: 0,
         }),

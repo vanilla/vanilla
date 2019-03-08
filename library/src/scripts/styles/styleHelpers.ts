@@ -45,8 +45,9 @@ import { TLength } from "typestyle/lib/types";
 import { getThemeVariables } from "@library/theming/ThemeProvider";
 import { isAllowedUrl, themeAsset } from "@library/application";
 import get from "lodash/get";
+import { ColorValues } from "@library/styles/buttonStyles";
 
-export const toStringColor = (colorValue: ColorHelper | "transparent") => {
+export const toStringColor = (colorValue: ColorValues) => {
     if (!colorValue) {
         return undefined;
     } else {
@@ -249,7 +250,7 @@ const spinnerLoaderAnimation = keyframes({
 });
 
 interface ISingleBorderStyle {
-    color?: ColorHelper | "transparent";
+    color?: ColorValues;
     width?: BorderWidthProperty<TLength>;
     style?: BorderStyleProperty;
 }
@@ -599,7 +600,7 @@ export const userSelect = (value: UserSelectProperty = "none", isImportant: bool
 };
 
 export interface IFont {
-    color?: ColorHelper | "transparent";
+    color?: ColorValues;
     size?: FontSizeProperty<TLength>;
     weight?: FontWeightProperty;
     lineHeight?: LineHeightProperty<TLength>;
@@ -612,7 +613,7 @@ export const font = (props: IFont) => {
         return {
             fontSize: get(props, "size") ? unit(props.size) : undefined,
             fontWeight: get(props, "weight") ? (props.weight as FontWeightProperty) : undefined,
-            color: get(props, "color") ? toStringColor(props.color as ColorHelper | "transparent") : undefined,
+            color: get(props, "color") ? toStringColor(props.color as ColorValues) : undefined,
             lineHeight: get(props, "lineHeight") ? unit(props.lineHeight) : undefined,
             textAlign: get(props, "align") ? (props.align as TextAlignLastProperty) : undefined,
             textShadow: get(props, "shadow") ? (props.shadow as TextShadowProperty) : undefined,
@@ -623,7 +624,7 @@ export const font = (props: IFont) => {
 };
 
 export interface IBackgroundImage {
-    color?: ColorHelper | "transparent";
+    color?: ColorValues;
     attachment?: BackgroundAttachmentProperty;
     position?: BackgroundPositionProperty<TLength>;
     repeat?: BackgroundRepeatProperty;

@@ -22,7 +22,7 @@ export const widgetVariables = useThemeCache(() => {
     });
 
     const color = makeThemeVars("color", {
-        bg: "transparent",
+        bg: transparentColor,
         fg: globalVars.mainColors.fg,
     });
 

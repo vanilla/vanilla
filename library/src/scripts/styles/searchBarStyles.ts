@@ -8,10 +8,11 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 import { buttonVariables } from "@library/styles/buttonStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
+import { borders, debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { calc, important, percent, px } from "csx";
+import get from "lodash/get";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -122,7 +123,7 @@ export const searchBarClasses = useThemeCache(() => {
                                 "&.inputText": {
                                     borderTopRightRadius: 0,
                                     borderBottomRightRadius: 0,
-                                    borderColor: buttonVars.standard.focus.borderColor.toString(),
+                                    ...borders(get(buttonVars.standard, "border")),
                                 },
                             },
                         },

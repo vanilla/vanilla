@@ -24,6 +24,7 @@ import { FontWeightProperty, PaddingProperty, TextAlignLastProperty, TextShadowP
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { TLength } from "typestyle/lib/types";
 import get from "lodash/get";
+import { transparentColor } from "@library/styles/buttonStyles";
 
 export const splashVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("splash");
@@ -206,7 +207,7 @@ export const splashStyles = useThemeCache(() => {
     const buttonBg = get(vars, "searchBar.button.bg", false);
     const buttonFg = get(vars, "searchBar.button.fg", false);
     let hoverBg = get(vars, "searchBar.button.hoverBg", false);
-    if (!hoverBg || buttonBg === "transparent") {
+    if (!hoverBg || buttonBg === transparentColor) {
         hoverBg = buttonFg ? buttonFg.fade(0.2) : buttonBorderColor ? buttonBorderColor.fade(0.2) : undefined;
     }
 

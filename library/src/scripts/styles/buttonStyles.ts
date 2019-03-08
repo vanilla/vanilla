@@ -10,7 +10,7 @@ import {
     borders,
     componentThemeVariables,
     flexHelper,
-    getColorDependantOnLightness,
+    modifyColorBasedOnLightness,
     spinnerLoader,
     toStringColor,
     unit,
@@ -109,22 +109,22 @@ export const buttonVariables = useThemeCache(() => {
         },
         hover: {
             fg: globalVars.mainColors.fg,
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.fg, 0.1),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.fg, 0.1),
             borderColor: globalVars.mixBgAndFg(0.1),
         },
         active: {
             fg: globalVars.mainColors.fg,
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.fg, 0.1),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.fg, 0.1),
             borderColor: globalVars.mixBgAndFg(0.1),
         },
         focus: {
             fg: globalVars.mainColors.fg,
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.fg, 0.1),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.fg, 0.1),
             borderColor: globalVars.mixBgAndFg(0.1),
         },
         focusAccessible: {
             fg: globalVars.mainColors.fg,
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.fg, 0.1),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.fg, 0.1),
             borderColor: globalVars.mixBgAndFg(0.1),
         },
     });

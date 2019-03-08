@@ -186,7 +186,7 @@ export const debugHelper = (componentName: string) => {
  * @param percentage - The amount you want to mix the two colors
  * @param flip - By default we darken light colours and lighten darks, but if you want to get the opposite result, use this param
  */
-export const getColorDependantOnLightness = (
+export const modifyColorBasedOnLightness = (
     referenceColor: ColorHelper,
     colorToModify: ColorHelper,
     weight: number,
@@ -195,7 +195,7 @@ export const getColorDependantOnLightness = (
     if (weight > 1 || weight < 0) {
         throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
     }
-    if (referenceColor.lightness() >= 0.5 || flip) {
+    if (referenceColor.lightness() >= 0.5 && !flip) {
         // Lighten color
         return colorToModify.mix(color("#000"), 1 - weight) as ColorHelper;
     } else {
@@ -255,17 +255,17 @@ interface ISingleBorderStyle {
     style?: BorderStyleProperty;
 }
 
-interface IBorderStyles extends ISingleBorderStyle {
+export interface IBorderStyles extends ISingleBorderStyle {
     radius?: BorderRadiusProperty<TLength>;
 }
 
-export const borders = (styles: IBorderStyles = {}) => {
+export const borders = (props: IBorderStyles = {}) => {
     const vars = globalVariables();
     return {
-        borderColor: styles.color ? styles.color.toString() : toStringColor(vars.border.color),
-        borderWidth: styles.width ? unit(styles.width) : unit(vars.border.width),
-        borderStyle: styles.style ? styles.style : vars.border.style,
-        borderRadius: styles.radius ? unit(styles.radius) : unit(vars.border.radius),
+        borderColor: get(props, "color") ? toStringColor(props.color as any) : toStringColor(vars.border.color),
+        borderWidth: get(props, "width") ? unit(props.width) : unit(vars.border.width),
+        borderStyle: get(props, "style") ? props.style : vars.border.style,
+        borderRadius: get(props, "radius") ? props.radius : vars.border.radius,
     };
 };
 

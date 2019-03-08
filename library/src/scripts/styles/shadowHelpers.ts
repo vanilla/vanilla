@@ -8,6 +8,7 @@ import { useThemeCache } from "@library/styles/styleUtils";
 import { BorderRadiusProperty } from "csstype";
 import { color, ColorHelper } from "csx";
 import { TLength } from "typestyle/lib/types";
+import { borders, IBorderStyles, IDropShadow } from "@library/styles/styleHelpers";
 
 export const shadowHelper = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -59,3 +60,21 @@ export const shadowHelper = useThemeCache(() => {
 
     return { embed, embedHover, dropDown, modal, contrast };
 });
+
+export const shadowOrBorderBasedOnLightness = (
+    referenceColor: ColorHelper,
+    borderStyles: object,
+    shadowStyles: object,
+    flip?: boolean,
+) => {
+    console.log("referenceColor", referenceColor.toHexString());
+    console.log("referenceColor.lightness()", referenceColor.lightness());
+
+    if (referenceColor.lightness() >= 0.5 && !flip) {
+        // Shadow for light colors
+        return shadowStyles;
+    } else {
+        // Border for dark colors
+        return borderStyles;
+    }
+};

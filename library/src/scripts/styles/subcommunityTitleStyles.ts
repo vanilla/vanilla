@@ -5,13 +5,16 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { shadowHelper } from "@library/styles/shadowHelpers";
+import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import {
     absolutePosition,
+    borders,
     componentThemeVariables,
     debugHelper,
     defaultTransition,
+    modifyColorBasedOnLightness,
     paddings,
+    toStringColor,
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
@@ -92,7 +95,6 @@ export const subcommunityTileClasses = useThemeCache(() => {
     });
 
     const link = style({
-        ...shadow.embed(),
         ...defaultTransition("box-shadow"),
         ...paddings(vars.link.padding),
         display: "block",
@@ -100,11 +102,24 @@ export const subcommunityTileClasses = useThemeCache(() => {
         cursor: "pointer",
         flexGrow: 1,
         color: vars.link.fg.toString(),
-        backgroundColor: vars.link.bg.toString(),
+        backgroundColor: toStringColor(vars.link.bg),
         minHeight: unit(vars.link.minHeight),
+        ...shadowOrBorderBasedOnLightness(
+            vars.link.bg,
+            borders({
+                color: vars.link.fg.fade(0.3),
+            }),
+            shadow.embed(vars.link.fg),
+        ),
         $nest: {
             "&:hover": {
-                ...shadow.embedHover(),
+                ...shadowOrBorderBasedOnLightness(
+                    vars.link.bg,
+                    borders({
+                        color: vars.link.fg.fade(0.5),
+                    }),
+                    shadow.embedHover(),
+                ),
             },
         },
         ...debug.name("link"),

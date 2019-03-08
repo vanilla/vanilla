@@ -11,7 +11,7 @@ import {
     centeredBackgroundProps,
     font,
     getBackgroundImage,
-    getColorDependantOnLightness,
+    modifyColorBasedOnLightness,
     IFont,
     paddings,
     toStringColor,
@@ -79,7 +79,7 @@ export const splashVariables = useThemeCache(() => {
             size: globalVars.fonts.size.title,
             weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
             align: text.align as TextAlignLastProperty,
-            shadow: `0 1px 15px ${getColorDependantOnLightness(text.fg, text.fg, text.shadowMix).fade(
+            shadow: `0 1px 15px ${modifyColorBasedOnLightness(text.fg, text.fg, text.shadowMix).fade(
                 text.shadowOpacity,
             )}` as TextShadowProperty,
         },

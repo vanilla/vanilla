@@ -414,6 +414,18 @@ export function getElementHeight(
 }
 
 /**
+ * Determine if the browser is escaping the inner contents of our <noscript /> browser.
+ */
+function browserEscapesNoScript(): boolean {
+    const ns = document.createElement("noscript");
+    ns.innerHTML = "<test></test>";
+    document.body.append(ns);
+    const result = ns.innerHTML.startsWith("&lt;");
+    ns.remove();
+    return result;
+}
+
+/**
  * Prepare an element and it's contents for use in a shadow root.
  *
  * @param element
@@ -422,7 +434,12 @@ export function getElementHeight(
  * @param newElementTag
  */
 export function prepareShadowRoot(element: HTMLElement, cloneElement: boolean = false, newElementTag = "div") {
-    const html = element.innerHTML;
+    let html = element.innerHTML;
+    // This is likely a noscript tag.
+    if (browserEscapesNoScript()) {
+        html = unescapeHTML(html);
+    }
+    // Safari escapes the contents of the noscript.
     if (cloneElement) {
         const newElement = document.createElement(newElementTag);
 

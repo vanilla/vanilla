@@ -63,5 +63,7 @@ class Filterer {
                 }
             }
         }
+
+        sort($operations);
     }
 }

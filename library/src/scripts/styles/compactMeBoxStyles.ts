@@ -6,7 +6,6 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { absolutePosition, unit, componentThemeVariables, flexHelper } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc, percent, px } from "csx";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";

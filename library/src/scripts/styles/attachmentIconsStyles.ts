@@ -6,7 +6,6 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, margins } from "@library/styles/styleHelpers";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc, px, percent } from "csx";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 
@@ -34,7 +33,6 @@ export const attachmentIconVariables = useThemeCache(() => {
 
 export const attachmentIconsClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const formElementVars = formElementsVariables();
     const vars = attachmentIconVariables();
     const style = styleFactory("attachmentIcons");
 
@@ -59,7 +57,6 @@ export const attachmentIconsClasses = useThemeCache(() => {
 
     const item = style("item", {
         margin: vars.spacing.default,
-        ...debug.name("item"),
     });
 
     return { root, items, item };

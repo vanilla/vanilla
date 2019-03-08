@@ -113,8 +113,7 @@ export default class NextPrevious extends React.Component<IProps> {
             color: globalVars.mainColors.fg.toString(),
         });
 
-        const directionLabel = style({
-            ...debug.name("label"),
+        const directionLabel = style("label", {
             display: "block",
             fontSize: px(globalVars.fonts.size.small),
             lineHeight: globalVars.lineHeights.condensed,
@@ -122,8 +121,7 @@ export default class NextPrevious extends React.Component<IProps> {
             marginBottom: px(2),
         });
 
-        const title = style({
-            ...debug.name("title"),
+        const title = style("title", {
             display: "block",
             position: "relative",
             fontSize: px(globalVars.fonts.size.medium),
@@ -131,16 +129,14 @@ export default class NextPrevious extends React.Component<IProps> {
             fontWeight: globalVars.fonts.weights.semiBold,
         });
 
-        const chevron = style({
-            ...debug.name("chevron"),
+        const chevron = style("chevron", {
             position: "absolute",
             top: px((vars.fonts.title * vars.lineHeights.title) / 2),
             transform: `translateY(-50%)`,
             color: globalVars.mixBgAndFg(0.75).toString(),
         });
 
-        const chevronLeft = style({
-            ...debug.name("chevronLeft"),
+        const chevronLeft = style("chevronLeft", {
             left: px(0),
             marginLeft: px(-globalVars.icon.sizes.default),
         });

@@ -8,7 +8,7 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 import { buttonVariables } from "@library/styles/buttonStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { borders, debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
+import { borders, toStringColor, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { calc, important, percent, px } from "csx";
@@ -63,7 +63,6 @@ export const searchBarClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = searchBarVariables();
     const vanillaHeaderVars = vanillaHeaderVariables();
-    const debug = debugHelper("searchBar");
     const buttonVars = buttonVariables();
     const formElementVars = formElementsVariables();
     const mediaQueries = layoutVariables().mediaQueries();
@@ -220,7 +219,7 @@ export const searchBarClasses = useThemeCache(() => {
     });
 
     // Has a search button attached.
-    const compoundValueContainer = style(debug.name("compoundValueContainer"), {
+    const compoundValueContainer = style("compoundValueContainer", {
         borderTopRightRadius: 0,
         borderBottomRightRadius: 0,
     });

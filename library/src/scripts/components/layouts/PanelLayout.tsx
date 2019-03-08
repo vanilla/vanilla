@@ -9,7 +9,7 @@ import { ScrollOffsetContext } from "@library/contexts/ScrollOffsetContext";
 import { inheritHeightClass, sticky } from "@library/styles/styleHelpers";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import classNames from "classnames";
-import { calc, px } from "csx";
+import { calc, px, percent } from "csx";
 import * as React from "react";
 import { style } from "typestyle";
 
@@ -97,7 +97,8 @@ class PanelLayout extends React.Component<IProps> {
         const fixedPanelClass = style(sticky(), {
             $debugName: "fixedPanelClasses",
             top: headerVars.sizing.height * 2,
-            maxHeight: calc(`100vh - ${px(headerVars.sizing.height * 2)}`),
+            // maxHeight: calc(`100vh - ${px(headerVars.sizing.height * 2)}`),
+            height: percent(100),
             overflow: "auto",
         });
 

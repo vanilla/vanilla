@@ -7,7 +7,6 @@
 import { px } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { srOnly, userSelect } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";

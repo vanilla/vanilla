@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { getColorDependantOnLightness, toStringColor } from "@library/styles/styleHelpers";
+import { modifyColorBasedOnLightness, toStringColor } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { color, ColorHelper, percent, viewHeight } from "csx";
 
@@ -27,7 +27,7 @@ export const globalVariables = useThemeCache(() => {
         fg: color("#555a62"),
         bg: color("#fff"),
         primary: colorPrimary,
-        secondary: getColorDependantOnLightness(colorPrimary, colorPrimary, 0.1, true),
+        secondary: modifyColorBasedOnLightness(colorPrimary, colorPrimary, 0.1, true),
     });
 
     const mixBgAndFg = (weight: number) => {
@@ -68,11 +68,6 @@ export const globalVariables = useThemeCache(() => {
 
     const body = makeThemeVars("body", {
         bg: mainColors.bg,
-        backgroundImage: {
-            image: "",
-            repeat: false,
-            height: viewHeight(100),
-        },
     });
 
     const border = makeThemeVars("border", {
@@ -217,7 +212,7 @@ export const globalVariables = useThemeCache(() => {
         },
     };
 
-    const overlayBg = getColorDependantOnLightness(mainColors.fg, mainColors.fg, 0.5, true);
+    const overlayBg = modifyColorBasedOnLightness(mainColors.fg, mainColors.fg, 0.5, true);
     const overlay = {
         dropShadow: `2px -2px 5px ${toStringColor(overlayBg.fade(0.3))}`,
         border: {

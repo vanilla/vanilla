@@ -4,7 +4,6 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
 import { useThemeCache } from "@library/styles/styleUtils";
@@ -13,7 +12,6 @@ import { style } from "typestyle";
 
 export const subcommunityListVariables = useThemeCache(() => {
     const themeVars = componentThemeVariables("subcommunityList");
-    const globalVars = globalVariables();
     const spacing = {
         padding: 24,
         ...themeVars.subComponentStyles("spacing"),
@@ -28,7 +26,6 @@ export const subcommunityListVariables = useThemeCache(() => {
 });
 
 export const subcommunityListClasses = useThemeCache(() => {
-    const globalVars = globalVariables();
     const vars = subcommunityListVariables();
     const debug = debugHelper("subcommunityList");
     const mediaQueries = layoutVariables().mediaQueries();

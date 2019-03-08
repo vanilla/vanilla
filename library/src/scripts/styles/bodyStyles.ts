@@ -3,15 +3,16 @@
  * @license GPL-2.0-only
  */
 
-import { backgroundCover, toStringColor } from "@library/styles/styleHelpers";
+import { backgroundImage, toStringColor } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { cssRule } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import get from "lodash/get";
+import { percent, viewHeight } from "csx";
 
 export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();
-    cssRule("body", {
+    cssRule("html, body", {
         backgroundColor: toStringColor(globalVars.body.bg),
         color: toStringColor(globalVars.mainColors.fg),
     });
@@ -19,9 +20,17 @@ export const bodyCSS = useThemeCache(() => {
 
 export const bodyClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const style = styleFactory("body");
+    const style = styleFactory("fullBackground");
+    const image = get(globalVars, "body.backgroundImage", undefined);
     const root = style({
-        ...backgroundCover(get(globalVars, "body.backgroundImage.image", null)),
+        display: !image ? "none" : "block",
+        ...backgroundImage(image),
+        backgroundColor: toStringColor(globalVars.body.bg),
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: percent(100),
+        height: viewHeight(100),
     });
 
     return { root };

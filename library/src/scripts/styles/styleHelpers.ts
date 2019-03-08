@@ -39,12 +39,15 @@ import {
     UserSelectProperty,
     WhiteSpaceProperty,
 } from "csstype";
-import { color, ColorHelper, deg, important, percent, px, quote, viewHeight, viewWidth } from "csx";
+import { color, ColorHelper, deg, important, percent, px, quote, viewHeight, viewWidth, url } from "csx";
 import { keyframes } from "typestyle";
 import { TLength } from "typestyle/lib/types";
 import { getThemeVariables } from "@library/theming/ThemeProvider";
+import { isAllowedUrl, themeAsset } from "@library/application";
+import get from "lodash/get";
+import { ColorValues } from "@library/styles/buttonStyles";
 
-export const toStringColor = (colorValue: ColorHelper | "transparent") => {
+export const toStringColor = (colorValue: ColorValues) => {
     if (!colorValue) {
         return undefined;
     } else {
@@ -123,19 +126,6 @@ export function centeredBackground() {
     return style(centeredBackgroundProps());
 }
 
-export function backgroundCover(bgImage: BackgroundImageProperty | null) {
-    if (bgImage) {
-        return {
-            backgroundPosition: `50% 50%`,
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "cover",
-            backgroundImage: bgImage,
-        };
-    } else {
-        return {};
-    }
-}
-
 export function inputLineHeight(height: number, paddingTop: number, fullBorderWidth: number) {
     return unit(height - (2 * paddingTop + fullBorderWidth));
 }
@@ -196,7 +186,7 @@ export const debugHelper = (componentName: string) => {
  * @param percentage - The amount you want to mix the two colors
  * @param flip - By default we darken light colours and lighten darks, but if you want to get the opposite result, use this param
  */
-export const getColorDependantOnLightness = (
+export const modifyColorBasedOnLightness = (
     referenceColor: ColorHelper,
     colorToModify: ColorHelper,
     weight: number,
@@ -205,17 +195,12 @@ export const getColorDependantOnLightness = (
     if (weight > 1 || weight < 0) {
         throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
     }
-
-    if (referenceColor && referenceColor.lightness) {
-        if (referenceColor.lightness() >= 0.5 || flip) {
-            // Lighten color
-            return colorToModify.mix(color("#000"), 1 - weight) as ColorHelper;
-        } else {
-            // Darken color
-            return colorToModify.mix(color("#fff"), 1 - weight) as ColorHelper;
-        }
+    if (referenceColor.lightness() >= 0.5 && !flip) {
+        // Lighten color
+        return colorToModify.mix(color("#000"), 1 - weight) as ColorHelper;
     } else {
-        return colorToModify; // do nothing
+        // Darken color
+        return colorToModify.mix(color("#fff"), 1 - weight) as ColorHelper;
     }
 };
 
@@ -265,22 +250,22 @@ const spinnerLoaderAnimation = keyframes({
 });
 
 interface ISingleBorderStyle {
-    color?: ColorHelper | "transparent";
+    color?: ColorValues;
     width?: BorderWidthProperty<TLength>;
     style?: BorderStyleProperty;
 }
 
-interface IBorderStyles extends ISingleBorderStyle {
+export interface IBorderStyles extends ISingleBorderStyle {
     radius?: BorderRadiusProperty<TLength>;
 }
 
-export const borders = (styles: IBorderStyles = {}) => {
+export const borders = (props: IBorderStyles = {}) => {
     const vars = globalVariables();
     return {
-        borderColor: styles.color ? styles.color.toString() : toStringColor(vars.border.color),
-        borderWidth: styles.width ? unit(styles.width) : unit(vars.border.width),
-        borderStyle: styles.style ? styles.style : vars.border.style,
-        borderRadius: styles.radius ? unit(styles.radius) : unit(vars.border.radius),
+        borderColor: get(props, "color") ? toStringColor(props.color as any) : toStringColor(vars.border.color),
+        borderWidth: get(props, "width") ? unit(props.width) : unit(vars.border.width),
+        borderStyle: get(props, "style") ? props.style : vars.border.style,
+        borderRadius: get(props, "radius") ? props.radius : vars.border.radius,
     };
 };
 
@@ -615,7 +600,7 @@ export const userSelect = (value: UserSelectProperty = "none", isImportant: bool
 };
 
 export interface IFont {
-    color?: ColorHelper | "transparent";
+    color?: ColorValues;
     size?: FontSizeProperty<TLength>;
     weight?: FontWeightProperty;
     lineHeight?: LineHeightProperty<TLength>;
@@ -626,12 +611,12 @@ export interface IFont {
 export const font = (props: IFont) => {
     if (props) {
         return {
-            fontSize: props.size ? unit(props.size) : undefined,
-            fontWeight: props.weight ? (props.weight as FontWeightProperty) : undefined,
-            color: props.color ? toStringColor(props.color) : undefined,
-            lineHeight: props.lineHeight ? unit(props.lineHeight) : undefined,
-            textAlign: props.align ? (props.align as TextAlignLastProperty) : undefined,
-            textShadow: props.shadow ? (props.shadow as TextShadowProperty) : undefined,
+            fontSize: get(props, "size") ? unit(props.size) : undefined,
+            fontWeight: get(props, "weight") ? (props.weight as FontWeightProperty) : undefined,
+            color: get(props, "color") ? toStringColor(props.color as ColorValues) : undefined,
+            lineHeight: get(props, "lineHeight") ? unit(props.lineHeight) : undefined,
+            textAlign: get(props, "align") ? (props.align as TextAlignLastProperty) : undefined,
+            textShadow: get(props, "shadow") ? (props.shadow as TextShadowProperty) : undefined,
         };
     } else {
         return {};
@@ -639,7 +624,7 @@ export const font = (props: IFont) => {
 };
 
 export interface IBackgroundImage {
-    color?: ColorHelper | "transparent";
+    color?: ColorValues;
     attachment?: BackgroundAttachmentProperty;
     position?: BackgroundPositionProperty<TLength>;
     repeat?: BackgroundRepeatProperty;
@@ -648,13 +633,38 @@ export interface IBackgroundImage {
     fallbackImage?: BackgroundImageProperty;
 }
 
+export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImage?: BackgroundImageProperty) => {
+    if (image) {
+        // Get either image or fallback
+        let workingImage;
+        if (image) {
+            workingImage = image;
+        } else {
+            workingImage = fallbackImage;
+        }
+
+        if (workingImage.charAt(0) === "~") {
+            // Relative path to theme folder
+            workingImage = themeAsset(workingImage.substr(1, workingImage.length - 1));
+        } else if (workingImage.startsWith('"data:image/')) {
+            // Encoded background
+        } else if (!isAllowedUrl(workingImage)) {
+            return null; // bad image or bad fallback image
+        }
+        return workingImage;
+    } else {
+        return undefined;
+    }
+};
+
 export const backgroundImage = (props: IBackgroundImage) => {
+    const image = getBackgroundImage(get(props, "image", undefined), get(props, "fallbackImage", undefined));
     return {
-        backgroundColor: props.color ? toStringColor(props.color) : undefined,
-        backgroundAttachment: props.attachment ? props.attachment : undefined,
-        backgroundPosition: props.position ? props.position : `50% 50%`,
-        backgroundRepeat: props.repeat ? props.repeat : "no-repeat",
-        backgroundSize: props.size ? props.size : "cover",
-        backgroundImage: props.image ? props.image : props.fallbackImage ? props.fallbackImage : undefined,
+        backgroundColor: get(props, "color") ? toStringColor(props.color as any) : undefined,
+        backgroundAttachment: get(props, "attachment") ? props.attachment : undefined,
+        backgroundPosition: get(props, "position") ? props.position : `50% 50%`,
+        backgroundRepeat: get(props, "repeat") ? props.repeat : "no-repeat",
+        backgroundSize: get(props, "size") ? props.size : "cover",
+        backgroundImage: image ? url(image) : undefined,
     };
 };

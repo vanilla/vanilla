@@ -6,14 +6,13 @@
 
 import React from "react";
 import classNames from "classnames";
-import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper } from "@library/styles/styleHelpers";
+import { componentThemeVariables } from "@library/styles/styleHelpers";
 import ScreenReaderContent from "@library/components/ScreenReaderContent";
 import Heading from "@library/components/Heading";
 import AdjacentLink, { LeftRight } from "@library/components/nextPrevious/AdjacentLink";
 import { px } from "csx";
-import { useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 
 interface IUrlItem {
     name: string;
@@ -96,7 +95,7 @@ export default class NextPrevious extends React.Component<IProps> {
     public nextPreviousStyles = useThemeCache(() => {
         const globalVars = globalVariables();
         const vars = this.nextPreviousVariables();
-        const debug = debugHelper("nextPrevious");
+        const style = styleFactory("nextPrevious");
         const activeStyles = {
             color: vars.colors.title.toString(),
             $nest: {
@@ -112,49 +111,43 @@ export default class NextPrevious extends React.Component<IProps> {
             flexWrap: "wrap",
             justifyContent: "space-between",
             color: globalVars.mainColors.fg.toString(),
-            ...debug.name(),
         });
 
-        const directionLabel = style({
+        const directionLabel = style("label", {
             display: "block",
             fontSize: px(globalVars.fonts.size.small),
             lineHeight: globalVars.lineHeights.condensed,
             color: vars.colors.label.toString(),
             marginBottom: px(2),
-            ...debug.name("label"),
         });
 
-        const title = style({
+        const title = style("title", {
             display: "block",
             position: "relative",
             fontSize: px(globalVars.fonts.size.medium),
             lineHeight: globalVars.lineHeights.condensed,
             fontWeight: globalVars.fonts.weights.semiBold,
-            ...debug.name("title"),
         });
 
-        const chevron = style({
+        const chevron = style("chevron", {
             position: "absolute",
             top: px((vars.fonts.title * vars.lineHeights.title) / 2),
             transform: `translateY(-50%)`,
             color: globalVars.mixBgAndFg(0.75).toString(),
-            ...debug.name("chevron"),
         });
 
-        const chevronLeft = style({
+        const chevronLeft = style("chevronLeft", {
             left: px(0),
             marginLeft: px(-globalVars.icon.sizes.default),
-            ...debug.name("chevronLeft"),
         });
 
-        const chevronRight = style({
+        const chevronRight = style("chevronRight", {
             right: px(0),
             marginRight: px(-globalVars.icon.sizes.default),
-            ...debug.name("chevronRight"),
         });
 
         // Common to both left and right
-        const adjacent = style({
+        const adjacent = style("adjacent", {
             display: "block",
             marginTop: px(8),
             marginBottom: px(8),
@@ -164,21 +157,18 @@ export default class NextPrevious extends React.Component<IProps> {
                 "&:hover": activeStyles,
                 "&:active": activeStyles,
             },
-            ...debug.name("adjacent"),
         });
 
-        const previous = style({
+        const previous = style("previous", {
             paddingLeft: px(globalVars.icon.sizes.default),
             paddingRight: px(globalVars.icon.sizes.default / 2),
-            ...debug.name("previous"),
         });
 
-        const next = style({
+        const next = style("next", {
             marginLeft: "auto",
             textAlign: "right",
             paddingRight: px(globalVars.icon.sizes.default),
             paddingLeft: px(globalVars.icon.sizes.default / 2),
-            ...debug.name("next"),
         });
 
         return { root, adjacent, previous, next, title, chevron, directionLabel, chevronLeft, chevronRight };

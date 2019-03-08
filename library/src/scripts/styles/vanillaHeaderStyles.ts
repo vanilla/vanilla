@@ -11,7 +11,7 @@ import {
     componentThemeVariables,
     debugHelper,
     flexHelper,
-    getColorDependantOnLightness,
+    modifyColorBasedOnLightness,
     toStringColor,
     unit,
     userSelect,
@@ -84,17 +84,17 @@ export const vanillaHeaderVariables = useThemeCache(() => {
 
     const buttonContents = makeThemeVars("buttonContents", {
         hover: {
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1, true),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1, true),
         },
         active: {
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2, true),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2, true),
         },
     });
 
     const signIn = makeThemeVars("signIn", {
-        bg: getColorDependantOnLightness(globalVars.mainColors.primary, globalVars.mainColors.primary, 0.1, true),
+        bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, globalVars.mainColors.primary, 0.1, true),
         hover: {
-            bg: getColorDependantOnLightness(globalVars.mainColors.primary, globalVars.mainColors.primary, 0.2, true),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, globalVars.mainColors.primary, 0.2, true),
         },
     });
 
@@ -396,7 +396,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         $nest: {
             ".vanillaHeader-tabButtonContent": {
                 color: vars.colors.fg.toString(),
-                backgroundColor: getColorDependantOnLightness(vars.colors.fg, vars.colors.bg, 1).toString(),
+                backgroundColor: modifyColorBasedOnLightness(vars.colors.fg, vars.colors.bg, 1).toString(),
                 borderRadius: px(vars.button.borderRadius),
             },
         },

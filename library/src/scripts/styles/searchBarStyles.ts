@@ -8,7 +8,7 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 import { buttonVariables } from "@library/styles/buttonStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { borders, toStringColor, unit } from "@library/styles/styleHelpers";
+import { borders, colorOut, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { calc, important, percent, px } from "csx";
@@ -49,6 +49,11 @@ export const searchBarVariables = useThemeCache(() => {
         },
     });
 
+    const results = themeVars("results", {
+        fg: globalVars.mainColors.fg,
+        bg: globalVars.mainColors.bg,
+    });
+
     return {
         search,
         searchIcon,
@@ -56,6 +61,7 @@ export const searchBarVariables = useThemeCache(() => {
         placeholder,
         input,
         heading,
+        results,
     };
 });
 
@@ -83,7 +89,7 @@ export const searchBarClasses = useThemeCache(() => {
                 },
 
                 "& .searchBar__placeholder": {
-                    color: toStringColor(globalVars.border.color),
+                    color: colorOut(globalVars.border.color),
                     margin: "auto",
                 },
 
@@ -164,9 +170,11 @@ export const searchBarClasses = useThemeCache(() => {
     );
 
     const results = style("results", {
+        backgroundColor: colorOut(vars.results.bg),
+        color: colorOut(vars.results.fg),
         $nest: {
             ".suggestedTextInput__placeholder": {
-                color: toStringColor(formElementVars.placeholder.color),
+                color: colorOut(formElementVars.placeholder.color),
             },
             ".suggestedTextInput-noOptions": {
                 padding: px(12),
@@ -205,8 +213,8 @@ export const searchBarClasses = useThemeCache(() => {
         borderRight: 0,
         paddingTop: 0,
         paddingBottom: 0,
-        backgroundColor: toStringColor(vars.input.bg),
-        color: toStringColor(vars.input.fg),
+        backgroundColor: colorOut(vars.input.bg),
+        color: colorOut(vars.input.fg),
         $nest: {
             "&&&": {
                 display: "flex",
@@ -281,12 +289,12 @@ export const searchBarClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "center",
         width: unit(vars.searchIcon.gap),
-        color: toStringColor(vars.input.fg),
+        color: colorOut(vars.input.fg),
     });
     const icon = style("icon", {
         width: unit(vars.searchIcon.width),
         height: unit(vars.searchIcon.height),
-        color: toStringColor(vars.input.fg),
+        color: colorOut(vars.input.fg),
     });
 
     return {

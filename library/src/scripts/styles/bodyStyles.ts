@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { backgroundImage, toStringColor } from "@library/styles/styleHelpers";
+import { backgroundImage, colorOut } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { cssRule } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -13,8 +13,8 @@ import { percent, viewHeight } from "csx";
 export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();
     cssRule("html, body", {
-        backgroundColor: toStringColor(globalVars.body.bg),
-        color: toStringColor(globalVars.mainColors.fg),
+        backgroundColor: colorOut(globalVars.body.bg),
+        color: colorOut(globalVars.mainColors.fg),
     });
 });
 
@@ -25,7 +25,7 @@ export const bodyClasses = useThemeCache(() => {
     const root = style({
         display: !image ? "none" : "block",
         ...backgroundImage(image),
-        backgroundColor: toStringColor(globalVars.body.bg),
+        backgroundColor: colorOut(globalVars.body.bg),
         position: "fixed",
         top: 0,
         left: 0,

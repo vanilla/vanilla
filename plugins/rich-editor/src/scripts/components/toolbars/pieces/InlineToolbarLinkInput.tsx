@@ -11,6 +11,7 @@ import { withEditor, IWithEditorProps } from "@rich-editor/components/context";
 import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
 import classNames from "classnames";
 import { insertLinkClasses } from "@rich-editor/styles/richEditorStyles/insertLinkClasses";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 interface IProps extends IWithEditorProps {
     inputRef: React.RefObject<HTMLInputElement>;
@@ -38,6 +39,7 @@ export class InlineToolbarLinkInput extends React.PureComponent<IProps, {}> {
     public render() {
         const classesRichEditor = richEditorClasses();
         const classesInsertLink = insertLinkClasses();
+        const classesDropDown = dropDownClasses();
         return (
             <div
                 className={classNames(
@@ -46,6 +48,7 @@ export class InlineToolbarLinkInput extends React.PureComponent<IProps, {}> {
                     "likeDropDownContent",
                     classesRichEditor.menu,
                     classesInsertLink.root,
+                    classesDropDown.likeDropDownContent,
                 )}
                 role="dialog"
                 aria-label={t("Insert Url")}

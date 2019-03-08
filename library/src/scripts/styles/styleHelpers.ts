@@ -47,7 +47,7 @@ import { isAllowedUrl, themeAsset } from "@library/application";
 import get from "lodash/get";
 import { ColorValues } from "@library/styles/buttonStyles";
 
-export const toStringColor = (colorValue: ColorValues) => {
+export const colorOut = (colorValue: ColorValues) => {
     if (!colorValue) {
         return undefined;
     } else {
@@ -262,7 +262,7 @@ export interface IBorderStyles extends ISingleBorderStyle {
 export const borders = (props: IBorderStyles = {}) => {
     const vars = globalVariables();
     return {
-        borderColor: get(props, "color") ? toStringColor(props.color as any) : toStringColor(vars.border.color),
+        borderColor: get(props, "color") ? colorOut(props.color as any) : colorOut(vars.border.color),
         borderWidth: get(props, "width") ? unit(props.width) : unit(vars.border.width),
         borderStyle: get(props, "style") ? props.style : vars.border.style,
         borderRadius: get(props, "radius") ? props.radius : vars.border.radius,
@@ -272,7 +272,7 @@ export const borders = (props: IBorderStyles = {}) => {
 export const singleBorder = (styles: ISingleBorderStyle = {}) => {
     const vars = globalVariables();
     return `${styles.style ? styles.style : vars.border.style} ${
-        styles.color ? toStringColor(styles.color) : toStringColor(vars.border.color)
+        styles.color ? colorOut(styles.color) : colorOut(vars.border.color)
     } ${styles.width ? unit(styles.width) : unit(vars.border.width)}`;
 };
 
@@ -535,19 +535,19 @@ export const setAllLinkColors = (overwrites?: ILinkStates) => {
 
     const styles: ILinkStates = {
         default: {
-            color: toStringColor(linkColors.default),
+            color: colorOut(linkColors.default),
         },
         hover: {
-            color: toStringColor(linkColors.hover),
+            color: colorOut(linkColors.hover),
         },
         focus: {
-            color: toStringColor(linkColors.focus),
+            color: colorOut(linkColors.focus),
         },
         accessibleFocus: {
-            color: toStringColor(linkColors.accessibleFocus),
+            color: colorOut(linkColors.accessibleFocus),
         },
         active: {
-            color: toStringColor(linkColors.active),
+            color: colorOut(linkColors.active),
         },
         ...overwrites,
     };
@@ -613,7 +613,7 @@ export const font = (props: IFont) => {
         return {
             fontSize: get(props, "size") ? unit(props.size) : undefined,
             fontWeight: get(props, "weight") ? (props.weight as FontWeightProperty) : undefined,
-            color: get(props, "color") ? toStringColor(props.color as ColorValues) : undefined,
+            color: get(props, "color") ? colorOut(props.color as ColorValues) : undefined,
             lineHeight: get(props, "lineHeight") ? unit(props.lineHeight) : undefined,
             textAlign: get(props, "align") ? (props.align as TextAlignLastProperty) : undefined,
             textShadow: get(props, "shadow") ? (props.shadow as TextShadowProperty) : undefined,
@@ -660,11 +660,41 @@ export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImag
 export const backgroundImage = (props: IBackgroundImage) => {
     const image = getBackgroundImage(get(props, "image", undefined), get(props, "fallbackImage", undefined));
     return {
-        backgroundColor: get(props, "color") ? toStringColor(props.color as any) : undefined,
+        backgroundColor: get(props, "color") ? colorOut(props.color as any) : undefined,
         backgroundAttachment: get(props, "attachment") ? props.attachment : undefined,
         backgroundPosition: get(props, "position") ? props.position : `50% 50%`,
         backgroundRepeat: get(props, "repeat") ? props.repeat : "no-repeat",
         backgroundSize: get(props, "size") ? props.size : "cover",
         backgroundImage: image ? url(image) : undefined,
+    };
+};
+
+export interface IStates {
+    hover?: object;
+    focus?: object;
+    active?: object;
+    accessibleFocus?: object;
+}
+
+export interface IStatesAll {
+    allStates?: object;
+}
+
+/*
+ * Helper to write CSS state styles
+ * @param defaultStyle - Set this to be the most common style, to avoid duplicating the same styles for each state
+ * @param specificStyles - Set styles for specific states. Will fallback to defaultStyle if they are set.
+ * *** You must use this inside of a "$nest" ***
+ * Focus visible is for accessible styles when the keyboard is used. It defaults to the regular focus
+ * styles, which will then default to the defaultStyle (if set)
+ */
+export const states = (defaultStyle?: object, specificStyles?: IStates) => {
+    const focus = get(specificStyles, "focus", get(defaultStyle, "focus", undefined));
+
+    return {
+        "&:hover": get(specificStyles, "hover", get(defaultStyle, "hover", undefined)),
+        "&:focus": focus,
+        "&.focus-visible": get(specificStyles, "accessibleFocus", focus),
+        "&:active": get(specificStyles, "active", get(defaultStyle, "active", undefined)),
     };
 };

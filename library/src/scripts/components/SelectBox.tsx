@@ -16,6 +16,7 @@ import { ButtonBaseClass } from "@library/components/forms/Button";
 import Frame from "@library/components/frame/Frame";
 import FrameBody from "@library/components/frame/FrameBody";
 import { selectBoxClasses } from "@library/styles/selectBoxStyles";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 export interface ISelectBoxItem {
     name: string;
@@ -85,6 +86,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
 
     public render() {
         const classes = selectBoxClasses();
+        const classesDropDown = dropDownClasses();
         const selectItems = this.props.children.map((child, i) => {
             const selected = this.state.selectedIndex === i;
             return (
@@ -98,9 +100,15 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                     index={i}
                     current={selected}
                     lang={child.lang}
-                    buttonClassName={classNames("dropDownItem-button", "selectBox-buttonItem", classes.buttonItem, {
-                        isInModal: this.props.openAsModal,
-                    })}
+                    buttonClassName={classNames(
+                        "dropDownItem-button",
+                        "selectBox-buttonItem",
+                        classesDropDown.action,
+                        classes.buttonItem,
+                        {
+                            isInModal: this.props.openAsModal,
+                        },
+                    )}
                 >
                     <span className={classNames("selectBox-checkContainer", "sc-only", classes.checkContainer)}>
                         {selected && checkCompact("selectBox-selectedIcon")}
@@ -146,7 +154,11 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         openAsModal={this.props.openAsModal}
                     >
                         <Frame>
-                            <FrameBody className="dropDownItem-verticalPadding">{selectItems}</FrameBody>
+                            <FrameBody
+                                className={classNames("dropDownItem-verticalPadding", classesDropDown.verticalPadding)}
+                            >
+                                {selectItems}
+                            </FrameBody>
                         </Frame>
                     </DropDown>
                 </div>

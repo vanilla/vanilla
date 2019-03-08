@@ -5,7 +5,7 @@
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { borders, longWordEllipsis, paddings, toStringColor, unit } from "@library/styles/styleHelpers";
+import { borders, longWordEllipsis, paddings, colorOut, unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { calc, percent } from "csx";
@@ -23,7 +23,7 @@ export const richEditorFlyoutClasses = useThemeCache(() => {
         width: unit(vars.flyout.padding.left + vars.flyout.padding.right + 7 * vars.menuButton.size),
         zIndex: 6,
         overflow: "hidden",
-        backgroundColor: toStringColor(vars.colors.bg),
+        backgroundColor: colorOut(vars.colors.bg),
         ...borders(),
     });
 
@@ -44,7 +44,7 @@ export const richEditorFlyoutClasses = useThemeCache(() => {
         minHeight: vars.menuButton.size - vars.flyout.padding.top,
         fontSize: percent(100),
         lineHeight: "inherit",
-        color: toStringColor(globalVars.mainColors.fg),
+        color: colorOut(globalVars.mainColors.fg),
         $nest: {
             "&:focus": {
                 outline: 0,

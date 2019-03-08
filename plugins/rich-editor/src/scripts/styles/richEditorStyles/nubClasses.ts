@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { singleBorder, toStringColor, unit, userSelect } from "@library/styles/styleHelpers";
+import { singleBorder, colorOut, unit, userSelect } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { translateX } from "csx";
@@ -26,7 +26,7 @@ export const nubClasses = useThemeCache(() => {
             width: vars.menu.borderWidth,
         }),
         boxShadow: globalVars.overlay.dropShadow,
-        background: toStringColor(vars.colors.bg),
+        background: colorOut(vars.colors.bg),
     });
 
     const position = style("position", {

@@ -8,6 +8,7 @@ import * as React from "react";
 import DropDownItemLink, { IDropDownItemLink } from "@library/components/dropdown/items/DropDownItemLink";
 import NumberFormatted from "@library/components/NumberFormatted";
 import classNames from "classnames";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 interface IProps extends IDropDownItemLink {
     count?: number;
@@ -27,12 +28,13 @@ export default class DropDownItemLinkWithCount extends React.Component<IProps> {
         const { name, children, count } = this.props;
         const linkContents = children ? children : name;
         const showCount = !!count && !(this.props.hideCountWhenZero && this.props.count === 0);
+        const classesDropDown = dropDownClasses();
         return (
             <DropDownItemLink {...this.props}>
-                <span className="dropDownItem-text">{linkContents}</span>
+                <span className={classNames("dropDownItem-text", classesDropDown.text)}>{linkContents}</span>
                 {showCount && (
                     <NumberFormatted
-                        className={classNames("dropDownItem-count", this.props.countsClass)}
+                        className={classNames("dropDownItem-count", classesDropDown.count, this.props.countsClass)}
                         value={count!}
                     />
                 )}

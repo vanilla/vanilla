@@ -10,7 +10,7 @@ import {
     componentThemeVariables,
     debugHelper,
     objectFitWithFallback,
-    toStringColor,
+    colorOut,
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
@@ -50,7 +50,7 @@ export const meBoxMessageClasses = useThemeCache(() => {
         display: "block",
         $nest: {
             "& + &": {
-                borderTop: `solid 1px ${toStringColor(globalVars.border.color)}`,
+                borderTop: `solid 1px ${colorOut(globalVars.border.color)}`,
             },
         },
     });
@@ -63,7 +63,7 @@ export const meBoxMessageClasses = useThemeCache(() => {
         ...userSelect(),
         $nest: {
             "&:active, &:focus, &:hover, &.focus-visible": {
-                backgroundColor: toStringColor(globalVars.states.active.color.fade(0.1)),
+                backgroundColor: colorOut(globalVars.states.active.color.fade(0.1)),
                 textDecoration: "none",
             },
         },

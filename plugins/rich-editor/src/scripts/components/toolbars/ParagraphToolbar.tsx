@@ -17,6 +17,7 @@ import FocusWatcher from "@library/FocusWatcher";
 import ActiveFormatIcon from "@rich-editor/components/toolbars/pieces/ActiveFormatIcon";
 import { paragraphToolbarContainerClasses } from "@rich-editor/styles/richEditorStyles/paragraphToolbarClasses";
 import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 interface IProps extends IWithEditorProps {}
 
@@ -179,6 +180,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
         }
         const bounds = this.quill.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
         const classesParagraphToolBar = paragraphToolbarContainerClasses();
+        const classesDropDown = dropDownClasses();
         let classes = classNames(
             "richEditor-toolbarContainer",
             "richEditor-paragraphToolbarContainer",
@@ -187,6 +189,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
 
         if (!this.props.legacyMode) {
             classes += " likeDropDownContent";
+            classes += " " + classesDropDown.likeDropDownContent;
         }
 
         if (bounds.top <= 30) {

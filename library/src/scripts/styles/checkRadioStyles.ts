@@ -14,7 +14,7 @@ import {
     srOnly,
     disabledInput,
     flexHelper,
-    toStringColor,
+    colorOut,
     userSelect,
 } from "@library/styles/styleHelpers";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
@@ -144,7 +144,7 @@ export const checkRadioClasses = useThemeCache(() => {
         height: unit(vars.sizing.width),
         verticalAlign: em(-0.18),
         cursor: "pointer",
-        backgroundColor: toStringColor(vars.main.bg),
+        backgroundColor: colorOut(vars.main.bg),
         ...borders(vars.border),
     });
 

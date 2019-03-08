@@ -14,7 +14,7 @@ import {
     defaultTransition,
     modifyColorBasedOnLightness,
     paddings,
-    toStringColor,
+    colorOut,
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
@@ -95,14 +95,14 @@ export const subcommunityTileClasses = useThemeCache(() => {
     });
 
     const link = style({
-        ...defaultTransition("box-shadow"),
+        ...defaultTransition("box-shadow", "border"),
         ...paddings(vars.link.padding),
         display: "block",
         position: "relative",
         cursor: "pointer",
         flexGrow: 1,
         color: vars.link.fg.toString(),
-        backgroundColor: toStringColor(vars.link.bg),
+        backgroundColor: colorOut(vars.link.bg),
         minHeight: unit(vars.link.minHeight),
         ...shadowOrBorderBasedOnLightness(
             vars.link.bg,

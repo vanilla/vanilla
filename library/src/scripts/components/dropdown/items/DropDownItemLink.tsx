@@ -11,6 +11,7 @@ import { LocationDescriptor } from "history";
 import DropDownItem from "./DropDownItem";
 import { ModalLink } from "@library/components/modal";
 import SmartLink from "@library/components/navigation/SmartLink";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 export interface IDropDownItemLink {
     to: LocationDescriptor;
@@ -33,7 +34,12 @@ export default class DropDownItemLink extends React.Component<IDropDownItemLink>
         const LinkComponent = isModalLink ? ModalLink : SmartLink;
         return (
             <DropDownItem className={classNames("dropDown-linkItem", className)}>
-                <LinkComponent to={to} title={name} lang={this.props.lang} className={DropDownItemLink.CSS_CLASS}>
+                <LinkComponent
+                    to={to}
+                    title={name}
+                    lang={this.props.lang}
+                    className={classNames(DropDownItemLink.CSS_CLASS, dropDownClasses().action)}
+                >
                     {linkContents}
                 </LinkComponent>
             </DropDownItem>

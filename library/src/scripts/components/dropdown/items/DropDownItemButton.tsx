@@ -9,6 +9,7 @@ import classNames from "classnames";
 import DropDownItem from "./DropDownItem";
 import Button, { ButtonBaseClass } from "@library/components/forms/Button";
 import { ISelectBoxItem } from "@library/components/SelectBox";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 export interface IDropDownItemButton {
     name: string;
@@ -29,7 +30,7 @@ export interface IDropDownItemButton {
 export default class DropDownItemButton extends React.Component<IDropDownItemButton> {
     public static defaultProps = {
         disabled: false,
-        buttonClassName: "dropDownItem-button",
+        buttonClassName: classNames("dropDownItem-button", dropDownClasses().action),
     };
 
     public render() {

@@ -26,6 +26,7 @@ import { LinkContext } from "@library/components/navigation/LinkContextProvider"
 import { RouteComponentProps } from "react-router";
 import { buttonVariables } from "@library/styles/buttonStyles";
 import { searchBarClasses } from "@library/styles/searchBarStyles";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;
@@ -332,10 +333,19 @@ export default class SearchBar extends React.Component<IProps, IState> {
      */
 
     private Menu = (props: MenuProps<any>) => {
+        const classes = dropDownClasses();
         return (
             <React.Fragment>
                 {ReactDOM.createPortal(
-                    <components.Menu {...props} className="suggestedTextInput-menu dropDown-contents isParentWidth" />,
+                    <components.Menu
+                        {...props}
+                        className={classNames(
+                            "suggestedTextInput-menu",
+                            "dropDown-contents",
+                            "isParentWidth",
+                            classes.contents,
+                        )}
+                    />,
                     this.props.resultsRef!.current!,
                 )}
             </React.Fragment>

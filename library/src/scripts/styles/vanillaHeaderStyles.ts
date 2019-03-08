@@ -12,7 +12,7 @@ import {
     debugHelper,
     flexHelper,
     modifyColorBasedOnLightness,
-    toStringColor,
+    colorOut,
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
@@ -221,7 +221,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
             display: "inline-flex",
             alignSelf: "center",
             flexBasis: vars.endElements.flexBasis,
-            color: toStringColor(vars.colors.fg),
+            color: colorOut(vars.colors.fg),
             $nest: {
                 "&.focus-visible": {
                     $nest: {

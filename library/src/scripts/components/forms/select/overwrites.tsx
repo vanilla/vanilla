@@ -17,6 +17,7 @@ import { ValueContainerProps } from "react-select/lib/components/containers";
 import { ControlProps } from "react-select/lib/components/Control";
 import { MultiValueRemoveProps } from "react-select/lib/components/MultiValue";
 import { tokensClasses } from "@library/styles/tokensStyles";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 /**
  * Overwrite for the controlContainer component in React Select
@@ -45,7 +46,13 @@ export function OptionLoader(props: OptionProps<any>) {
  * @param props - menu props
  */
 export function Menu(props: MenuProps<any>) {
-    return <components.Menu {...props} className="suggestedTextInput-menu dropDown-contents isParentWidth" />;
+    const classes = dropDownClasses();
+    return (
+        <components.Menu
+            {...props}
+            className={classNames("suggestedTextInput-menu", "dropDown-contents", "isParentWidth", classes.contents)}
+        />
+    );
 }
 
 /**

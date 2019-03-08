@@ -323,7 +323,8 @@ class SmokeTest extends BaseTest {
 
         $comment = [
             'DiscussionID' => $discussion['DiscussionID'],
-            'Body' => 'SmokeTest->testPostComment() '.date('r')
+            'Body' => 'SmokeTest->testPostComment() '.date('r'),
+            'Format' => 'Text'
         ];
 
         $r = $this->api()->post(
@@ -426,6 +427,7 @@ class SmokeTest extends BaseTest {
             'CategoryID' => $draft['CategoryID'],
             'Name' => $draft['Name'],
             'Body' => $draft['Body'],
+            'Format' => 'Text'
         ];
 
         $r2 = $api->post(

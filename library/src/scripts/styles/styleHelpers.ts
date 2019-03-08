@@ -44,6 +44,7 @@ import { keyframes } from "typestyle";
 import { TLength } from "typestyle/lib/types";
 import { getThemeVariables } from "@library/theming/ThemeProvider";
 import { isAllowedUrl, themeAsset } from "@library/application";
+import get from "lodash/get";
 
 export const toStringColor = (colorValue: ColorHelper | "transparent") => {
     if (!colorValue) {
@@ -193,17 +194,12 @@ export const getColorDependantOnLightness = (
     if (weight > 1 || weight < 0) {
         throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
     }
-
-    if (referenceColor && referenceColor.lightness) {
-        if (referenceColor.lightness() >= 0.5 || flip) {
-            // Lighten color
-            return colorToModify.mix(color("#000"), 1 - weight) as ColorHelper;
-        } else {
-            // Darken color
-            return colorToModify.mix(color("#fff"), 1 - weight) as ColorHelper;
-        }
+    if (referenceColor.lightness() >= 0.5 || flip) {
+        // Lighten color
+        return colorToModify.mix(color("#000"), 1 - weight) as ColorHelper;
     } else {
-        return colorToModify; // do nothing
+        // Darken color
+        return colorToModify.mix(color("#fff"), 1 - weight) as ColorHelper;
     }
 };
 
@@ -614,12 +610,12 @@ export interface IFont {
 export const font = (props: IFont) => {
     if (props) {
         return {
-            fontSize: props.size ? unit(props.size) : undefined,
-            fontWeight: props.weight ? (props.weight as FontWeightProperty) : undefined,
-            color: props.color ? toStringColor(props.color) : undefined,
-            lineHeight: props.lineHeight ? unit(props.lineHeight) : undefined,
-            textAlign: props.align ? (props.align as TextAlignLastProperty) : undefined,
-            textShadow: props.shadow ? (props.shadow as TextShadowProperty) : undefined,
+            fontSize: get(props, "size") ? unit(props.size) : undefined,
+            fontWeight: get(props, "weight") ? (props.weight as FontWeightProperty) : undefined,
+            color: get(props, "color") ? toStringColor(props.color as ColorHelper | "transparent") : undefined,
+            lineHeight: get(props, "lineHeight") ? unit(props.lineHeight) : undefined,
+            textAlign: get(props, "align") ? (props.align as TextAlignLastProperty) : undefined,
+            textShadow: get(props, "shadow") ? (props.shadow as TextShadowProperty) : undefined,
         };
     } else {
         return {};
@@ -637,33 +633,37 @@ export interface IBackgroundImage {
 }
 
 export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImage?: BackgroundImageProperty) => {
-    // Get either image or fallback
-    let workingImage;
     if (image) {
-        workingImage = image;
-    } else {
-        workingImage = fallbackImage;
-    }
+        // Get either image or fallback
+        let workingImage;
+        if (image) {
+            workingImage = image;
+        } else {
+            workingImage = fallbackImage;
+        }
 
-    if (workingImage.charAt(0) === "~") {
-        // Relative path to theme folder
-        workingImage = themeAsset(workingImage.substr(1, workingImage.length - 1));
-    } else if (workingImage.startsWith('"data:image/')) {
-        // Encoded background
-    } else if (!isAllowedUrl(workingImage)) {
-        return null; // bad image or bad fallback image
+        if (workingImage.charAt(0) === "~") {
+            // Relative path to theme folder
+            workingImage = themeAsset(workingImage.substr(1, workingImage.length - 1));
+        } else if (workingImage.startsWith('"data:image/')) {
+            // Encoded background
+        } else if (!isAllowedUrl(workingImage)) {
+            return null; // bad image or bad fallback image
+        }
+        return workingImage;
+    } else {
+        return undefined;
     }
-    return workingImage;
 };
 
 export const backgroundImage = (props: IBackgroundImage) => {
-    const image = getBackgroundImage(props.image, props.fallbackImage);
+    const image = getBackgroundImage(get(props, "image", undefined), get(props, "fallbackImage", undefined));
     return {
-        backgroundColor: props.color ? toStringColor(props.color) : undefined,
-        backgroundAttachment: props.attachment ? props.attachment : undefined,
-        backgroundPosition: props.position ? props.position : `50% 50%`,
-        backgroundRepeat: props.repeat ? props.repeat : "no-repeat",
-        backgroundSize: props.size ? props.size : "cover",
+        backgroundColor: get(props, "color") ? toStringColor(props.color as any) : undefined,
+        backgroundAttachment: get(props, "attachment") ? props.attachment : undefined,
+        backgroundPosition: get(props, "position") ? props.position : `50% 50%`,
+        backgroundRepeat: get(props, "repeat") ? props.repeat : "no-repeat",
+        backgroundSize: get(props, "size") ? props.size : "cover",
         backgroundImage: image ? url(image) : undefined,
     };
 };

@@ -21,10 +21,10 @@ export const bodyCSS = useThemeCache(() => {
 export const bodyClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("fullBackground");
-    const image = get(globalVars, "body.backgroundImage.image", undefined);
+    const image = get(globalVars, "body.backgroundImage", undefined);
     const root = style({
         display: !image ? "none" : "block",
-        ...backgroundImage({ image }),
+        ...backgroundImage(image),
         backgroundColor: toStringColor(globalVars.body.bg),
         position: "fixed",
         top: 0,

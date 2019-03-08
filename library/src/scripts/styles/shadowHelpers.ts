@@ -67,9 +67,6 @@ export const shadowOrBorderBasedOnLightness = (
     shadowStyles: object,
     flip?: boolean,
 ) => {
-    console.log("referenceColor", referenceColor.toHexString());
-    console.log("referenceColor.lightness()", referenceColor.lightness());
-
     if (referenceColor.lightness() >= 0.5 && !flip) {
         // Shadow for light colors
         return shadowStyles;

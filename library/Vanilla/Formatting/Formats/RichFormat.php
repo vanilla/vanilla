@@ -63,7 +63,8 @@ class RichFormat extends BaseFormat {
             $operations = Quill\Parser::jsonToOperations($content);
             $blotGroups = $this->parser->parse($operations);
             return $this->renderer->render($blotGroups);
-        } catch (FormattingException $e) {
+        } catch (\Throwable $e) {
+            $this->logBadInput($e);
             return $this->renderErrorMessage();
         }
     }
@@ -75,17 +76,17 @@ class RichFormat extends BaseFormat {
         $text = '';
         try {
             $operations = Quill\Parser::jsonToOperations($content);
-        } catch (FormattingException $e) {
+            $blotGroups = $this->parser->parse($operations);
+
+            /** @var Quill\BlotGroup $blotGroup */
+            foreach ($blotGroups as $blotGroup) {
+                $text .= $blotGroup->getUnsafeText();
+            }
+            return $text;
+        } catch (\Throwable $e) {
+            $this->logBadInput($e);
             return self::t(self::RENDER_ERROR_MESSAGE);
         }
-
-        $blotGroups = $this->parser->parse($operations);
-
-        /** @var Quill\BlotGroup $blotGroup */
-        foreach ($blotGroups as $blotGroup) {
-            $text .= $blotGroup->getUnsafeText();
-        }
-        return $text;
     }
 
     /**
@@ -94,17 +95,18 @@ class RichFormat extends BaseFormat {
     public function renderQuote(string $content): string {
         try {
             $operations = Quill\Parser::jsonToOperations($content);
-        } catch (FormattingException $e) {
+            $blotGroups = $this->parser->parse($operations, Quill\Parser::PARSE_MODE_QUOTE);
+            $rendered = $this->renderer->render($blotGroups);
+
+            // Trim out breaks and empty paragraphs.
+            $result = str_replace("<p><br></p>", "", $rendered);
+            $result = str_replace("<p></p>", "", $result);
+            return $result;
+        } catch (\Throwable $e) {
+            $this->logBadInput($e);
             return $this->renderErrorMessage();
         }
 
-        $blotGroups = $this->parser->parse($operations, Quill\Parser::PARSE_MODE_QUOTE);
-        $rendered = $this->renderer->render($blotGroups);
-
-        // Trim out breaks and empty paragraphs.
-        $result = str_replace("<p><br></p>", "", $rendered);
-        $result = str_replace("<p></p>", "", $result);
-        return $result;
     }
 
     /**
@@ -124,30 +126,30 @@ class RichFormat extends BaseFormat {
 
         try {
             $operations = Quill\Parser::jsonToOperations($content);
-        } catch (FormattingException $e) {
-            return [];
-        }
+            $parser = (new Quill\Parser())
+                ->addBlot(ExternalBlot::class);
+            $blotGroups = $parser->parse($operations);
 
-        $parser = (new Quill\Parser())
-            ->addBlot(ExternalBlot::class);
-        $blotGroups = $parser->parse($operations);
-
-        /** @var Quill\BlotGroup $blotGroup */
-        foreach ($blotGroups as $blotGroup) {
-            $blot = $blotGroup->getBlotForSurroundingTags();
-            if ($blot instanceof ExternalBlot &&
-                ($blot->getEmbedData()['type'] ?? null) === FileEmbed::EMBED_TYPE
-            ) {
-                try {
-                    $embedData = $blot->getEmbedData()['attributes'] ?? [];
-                    $attachment = Attachment::fromArray($embedData);
-                    $attachments[] = $attachment;
-                } catch (ValidationException $e) {
-                    continue;
+            /** @var Quill\BlotGroup $blotGroup */
+            foreach ($blotGroups as $blotGroup) {
+                $blot = $blotGroup->getBlotForSurroundingTags();
+                if ($blot instanceof ExternalBlot &&
+                    ($blot->getEmbedData()['type'] ?? null) === FileEmbed::EMBED_TYPE
+                ) {
+                    try {
+                        $embedData = $blot->getEmbedData()['attributes'] ?? [];
+                        $attachment = Attachment::fromArray($embedData);
+                        $attachments[] = $attachment;
+                    } catch (ValidationException $e) {
+                        continue;
+                    }
                 }
             }
+            return $attachments;
+        } catch (\Throwable $e) {
+            $this->logBadInput($e);
+            return [];
         }
-        return $attachments;
     }
 
     /**
@@ -156,10 +158,11 @@ class RichFormat extends BaseFormat {
     public function parseMentions(string $content): array {
         try {
             $operations = Quill\Parser::jsonToOperations($content);
-        } catch (FormattingException $e) {
+            return $this->parser->parseMentionUsernames($operations);
+        } catch (\Throwable $e) {
+            $this->logBadInput($e);
             return [];
         }
-        return $this->parser->parseMentionUsernames($operations);
     }
 
     /**
@@ -170,26 +173,27 @@ class RichFormat extends BaseFormat {
 
         try {
             $operations = Quill\Parser::jsonToOperations($content);
-        } catch (FormattingException $e) {
+            $parser = (new Quill\Parser())
+                ->addBlot(HeadingTerminatorBlot::class);
+            $blotGroups = $parser->parse($operations);
+
+            /** @var Quill\BlotGroup $blotGroup */
+            foreach ($blotGroups as $blotGroup) {
+                $blot = $blotGroup->getBlotForSurroundingTags();
+                if ($blot instanceof HeadingTerminatorBlot && $blot->getReference()) {
+                    $outline[] = new Heading(
+                        $blotGroup->getUnsafeText(),
+                        $blot->getHeadingLevel(),
+                        $blot->getReference()
+                    );
+                }
+            }
+            return $outline;
+        } catch (\Throwable $e) {
+            $this->logBadInput($e);
             return [];
         }
 
-        $parser = (new Quill\Parser())
-            ->addBlot(HeadingTerminatorBlot::class);
-        $blotGroups = $parser->parse($operations);
-
-        /** @var Quill\BlotGroup $blotGroup */
-        foreach ($blotGroups as $blotGroup) {
-            $blot = $blotGroup->getBlotForSurroundingTags();
-            if ($blot instanceof HeadingTerminatorBlot && $blot->getReference()) {
-                $outline[] = new Heading(
-                    $blotGroup->getUnsafeText(),
-                    $blot->getHeadingLevel(),
-                    $blot->getReference()
-                );
-            }
-        }
-        return $outline;
     }
 
     /**
@@ -204,5 +208,17 @@ class RichFormat extends BaseFormat {
         ];
 
         return $this->renderTwig('resources/views/userContentError.twig', $data);
+    }
+
+    private function logBadInput(string $input) {
+        trigger_error(
+            errorMessage(
+                "Bad input encountered",
+                self::class,
+                __METHOD__,
+                $input
+            ),
+            E_USER_ERROR
+        );
     }
 }

@@ -428,7 +428,8 @@ class ModerationControllerTest extends BaseTest {
         $discussion = self::$discussions[$discussionKey] = self::addDiscussion([
             'Name' => 'Discussion 1 of '.$srcCatKey,
             'Body' => 'Test '.$srcCatKey.' '.$destCatKey,
-            'CategoryID' => $srcCategory['CategoryID']
+            'CategoryID' => $srcCategory['CategoryID'],
+            'Format' => 'Text'
         ], $srcCatKey);
         $discussion['discussionKey'] = self::$discussions[$discussionKey]['discussionKey'] = $discussionKey;
         if (!($destCategory = (self::$categories[$destCatKey] ?? false))) {

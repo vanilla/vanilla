@@ -287,7 +287,8 @@ class SmokeTest extends BaseTest {
         $discussion = [
             'CategoryID' => 1,
             'Name' => 'SmokeTest::testPostDiscussion()',
-            'Body' => 'Test '.date('r')
+            'Body' => 'Test '.date('r'),
+            'Format' => 'Text'
         ];
 
         $r = $api->post(

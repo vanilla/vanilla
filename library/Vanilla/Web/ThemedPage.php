@@ -36,13 +36,13 @@ abstract class ThemedPage extends Page {
     ) {
         parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel);
         $this->themesApi = $themesApi;
-        $this->initThemeData();
+        $this->initAssets();
     }
 
     /**
      * Initialize data that is shared among all of the controllers.
      */
-    private function initThemeData() {
+    protected function initAssets() {
         $themeKey = $this->siteMeta->getActiveTheme()->getKey();
         $themeData = $this->themesApi->get($themeKey);
         $variables = [];
@@ -58,12 +58,17 @@ abstract class ThemedPage extends Page {
             }
         }
 
-        /** @var ScriptsAsset */
         $styleSheet = $themeData['assets']['styles'] ?? null;
         $headerFooterPrefix = '';
         if ($styleSheet) {
-            $style = $this->themesApi->get_assets($themeKey, 'styles.css') ?? null;
+            $style = $this->themesApi->get_assets($themeKey, 'styles.css');
             $headerFooterPrefix = '<style>' . $style->getData() . '</style>';
+        }
+
+        // Add the themes javascript to the page.
+        $script = $themeData['assets']['javascript'] ?? null;
+        if ($script) {
+            $this->scripts[] = new Asset\ThemeScriptAsset($this->request, $themeKey, $themeData['version']);
         }
 
         // Apply theme data to the master view.

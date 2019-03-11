@@ -115,11 +115,13 @@ $panelLayout-panelAndSpacingWidth                                     : $global-
     position: relative;
     width: $global-panel_paddedWidth;
     flex-basis: $global-panel_paddedWidth;
+    min-width: $global-panel_paddedWidth;
 }
 
 .panelLayout-right {
     width: $global-panel_paddedWidth;
     flex-basis: $global-panel_paddedWidth;
+    min-width: $global-panel_paddedWidth;
 }
 
 // Middle Column

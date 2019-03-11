@@ -120,8 +120,8 @@ class PanelLayout extends React.Component<IProps> {
                             <PanelArea className={classNames("panelArea-breadcrumbs", "hasAdjacentPanel")}>
                                 {childComponents.breadcrumbs}
                             </PanelArea>
-                            <Panel className={classNames("panelLayout-right")} ariaHidden={true} />
                         </Panel>
+                        <Panel className={classNames("panelLayout-right")} ariaHidden={true} />
                     </div>
                 )}
 

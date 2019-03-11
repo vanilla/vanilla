@@ -55,7 +55,7 @@ export const LinkContextProvider = withRouter((props: IProps) => {
      * @param href The URL to check.
      */
     const isDynamicNavigation = (href: string): boolean => {
-        const link = new URL(href);
+        const link = new URL(href, window.location.href);
         const isCurrentPage = link.pathname === window.location.pathname;
         return href.startsWith(props.linkContext) && !isCurrentPage;
     };
@@ -93,7 +93,7 @@ export const LinkContextProvider = withRouter((props: IProps) => {
  */
 export function makeLocationDescriptorObject(initial: LocationDescriptor, newHref: string): LocationDescriptorObject {
     // Get the search and pathName
-    const link = new URL(newHref);
+    const link = new URL(newHref, window.location.href);
     const { search, pathname } = link;
 
     if (typeof initial === "string") {

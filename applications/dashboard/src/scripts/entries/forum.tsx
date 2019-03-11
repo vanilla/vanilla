@@ -7,7 +7,6 @@ import { addRoutes, addComponent, onReady } from "@library/application";
 import React from "react";
 import { Route } from "react-router-dom";
 import Router from "@dashboard/components/Router";
-import { stickyHeader } from "@library/dom";
 import { registerReducer } from "@library/state/reducerRegistry";
 // The forum section needs these legacy scripts that have been moved into the bundled JS so it could be refactored.
 // Other sections should not need this yet.
@@ -34,8 +33,3 @@ addRoutes([
     <Route exact path="/authenticate/password" component={PasswordPage} />,
     <Route exact path="/authenticate/recoverpassword" component={RecoverPasswordPage} />,
 ]);
-
-// Other site initializations
-onReady(() => {
-    stickyHeader();
-});

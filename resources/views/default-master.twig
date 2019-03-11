@@ -42,9 +42,11 @@
     <body class="{{ cssClasses|join(' ') }}">
         <div id="page" class="page">
             {%- if header -%}
-                <div id="themeHeader">{{ header|raw }}</div>
+                <noscript id="themeHeader">
+                    {{ header|raw }}
+                </noscript>
             {%- endif -%}
-            <div id="vanillaHeader"></div>
+            <header id="vanillaHeader"></header>
             <div id="app" class="page-minHeight">
             {%- if seoContent -%}
                 <noscript>
@@ -66,7 +68,7 @@
                 <div class="fullPageLoader"></div>
             </div>
             {%- if footer -%}
-                <div id="themeFooter">{{ footer|raw }}</div>
+                <noscript id="themeFooter">{{ footer|raw }}</noscript>
             {%- endif -%}
         </div>
         <div id="modals"></div>

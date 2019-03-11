@@ -102,7 +102,7 @@ export const dropDownClasses = useThemeCache(() => {
     });
 
     const contents = style("contents", {
-        ...shadows.dropDown,
+        ...shadows.dropDown(),
         position: "absolute",
         minWidth: unit(vars.sizing.width),
         backgroundColor: colorOut(vars.contents.bg),

@@ -408,7 +408,11 @@ export const vanillaHeaderClasses = useThemeCache(() => {
 
     const dropDownContents = style({
         ...debug.name("dropDownContents"),
-        minWidth: px(vars.dropDownContents.minWidth),
+        $nest: {
+            "&&&": {
+                minWidth: px(vars.dropDownContents.minWidth),
+            },
+        },
     });
 
     const count = {

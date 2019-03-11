@@ -13,6 +13,7 @@ import {
     paddings,
     allLinkStates,
     absolutePosition,
+    states,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, px, quote } from "csx";
@@ -60,21 +61,18 @@ export const meBoxMessageClasses = useThemeCache(() => {
         flexWrap: "nowrap",
         color: "inherit",
         ...paddings(vars.spacing.padding),
-        ...allLinkStates({
+        ...states({
             allStates: {
                 textShadow: "none",
             },
-            noState: {
-                color: colorOut(globalVars.links.colors.default),
-            },
             hover: {
-                color: colorOut(globalVars.links.colors.hover),
+                backgroundColor: colorOut(globalVars.states.hover.color),
             },
             focus: {
-                color: colorOut(globalVars.links.colors.focus),
+                backgroundColor: colorOut(globalVars.states.focus.color),
             },
             active: {
-                color: colorOut(globalVars.links.colors.active),
+                backgroundColor: colorOut(globalVars.states.active.color),
             },
         }),
     });

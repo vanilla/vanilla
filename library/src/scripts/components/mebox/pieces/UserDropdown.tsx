@@ -26,6 +26,7 @@ import classNames from "classnames";
 import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
 import { userDropDownClasses } from "@library/styles/userDropDownStyles";
 import { dropDownClasses } from "@library/styles/dropDownStyles";
+import { frameBodyClasses } from "@library/styles/frameStyles";
 
 export interface IUserDropDownProps extends IInjectableUserState {
     className?: string;
@@ -59,6 +60,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
         const counts = dummyUserDropDownData;
         const classes = userDropDownClasses();
         const classesDropDown = dropDownClasses();
+        const classesFrameBody = frameBodyClasses();
 
         return (
             <DropDown
@@ -81,7 +83,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                 onVisibilityChange={this.setOpen}
             >
                 <Frame>
-                    <FrameBody className={classNames("dropDownItem-verticalPadding", classesDropDown.verticalPadding)}>
+                    <FrameBody className={classNames(classesFrameBody.root, classesDropDown.verticalPadding)}>
                         <DropDownUserCard currentUser={this.props.currentUser!} className="userDropDown-userCard" />
                         <DropDownItemSeparator />
                         <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />

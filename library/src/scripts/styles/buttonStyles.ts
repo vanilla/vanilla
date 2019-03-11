@@ -15,10 +15,11 @@ import {
     colorOut,
     unit,
     userSelect,
+    allLinkStates,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderRadiusProperty, BorderStyleProperty, WidthProperty } from "csstype";
-import { ColorHelper, percent, px } from "csx";
+import { ColorHelper, important, px, percent } from "csx";
 import memoize from "lodash/memoize";
 import { TLength } from "typestyle/lib/types";
 import get from "lodash/get";
@@ -299,6 +300,47 @@ export const buttonClasses = useThemeCache(() => {
         standard: generateButtonClass(vars.standard, "standard"),
         transparent: generateButtonClass(vars.transparent, "transparent"),
         compact: generateButtonClass(vars.transparent, "compact"),
+    };
+});
+
+export const buttonUtilityClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const style = styleFactory("buttonUtils");
+
+    const pushLeft = style("pushLeft", {
+        marginRight: important("auto"),
+    });
+
+    const pushRight = style("pushRight", {
+        marginLeft: important("auto"),
+    });
+
+    const buttonIcon = style("icon", {
+        alignItems: "center",
+        display: "flex",
+        height: unit(formElementVars.sizing.height),
+        minWidth: unit(formElementVars.sizing.height),
+        width: unit(formElementVars.sizing.height),
+        justifyContent: "center",
+        padding: 0,
+        color: "inherit",
+    });
+
+    const buttonAsText = style("asText", {
+        minWidth: important(0),
+        padding: important(0),
+        overflow: "hidden",
+        textAlign: "left",
+        lineHeight: globalVars.lineHeights.base,
+        color: "inherit",
+    });
+
+    return {
+        pushLeft,
+        buttonAsText,
+        pushRight,
+        buttonIcon,
     };
 });
 

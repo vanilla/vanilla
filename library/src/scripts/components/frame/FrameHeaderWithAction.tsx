@@ -23,9 +23,11 @@ export default class FrameHeaderWithAction extends React.PureComponent<IFrameHea
         return (
             <FrameHeader
                 {...this.props}
-                className={classNames(this.props.className, "frameHeaderWithAction", classes.action)}
+                className={classNames(this.props.className, "frameHeaderWithAction", classes.root)}
             >
-                <span className="frameHeaderWithAction-action">{this.props.children}</span>
+                <span className={classNames("frameHeaderWithAction-action", classes.action)}>
+                    {this.props.children}
+                </span>
             </FrameHeader>
         );
     }

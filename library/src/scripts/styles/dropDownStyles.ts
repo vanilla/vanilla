@@ -10,7 +10,8 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { borders, unit, paddings, states, font, userSelect, margins, colorOut } from "@library/styles/styleHelpers";
 import get from "lodash/get";
-import { percent } from "csx";
+import { important, percent } from "csx";
+import { formElementsVariables } from "@library/components/forms/formElementStyles";
 
 export const dropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -26,7 +27,9 @@ export const dropDownVariables = useThemeCache(() => {
     });
 
     // Defaults to globals, but here in case we want to overwrite it
-    const border = makeThemeVars("border", {});
+    const border = makeThemeVars("border", {
+        color: globalVars.border.color,
+    });
 
     const metas = makeThemeVars("metas", {
         font: {
@@ -88,6 +91,7 @@ export const dropDownClasses = useThemeCache(() => {
     const style = styleFactory("dropDown");
     const shadows = shadowHelper();
     const mediaQueries = layoutVariables().mediaQueries();
+    const formElementsVars = formElementsVariables();
 
     const root = style({
         position: "relative",
@@ -127,7 +131,9 @@ export const dropDownClasses = useThemeCache(() => {
             "&.hasVerticalPadding": {
                 ...paddings({
                     top: 12,
+                    left: important(0),
                     bottom: 12,
+                    right: important(0),
                 }),
             },
             "&:empty": {
@@ -190,6 +196,25 @@ export const dropDownClasses = useThemeCache(() => {
         width: percent(100),
     });
 
+    // Link or button
+    const itemAction = style("itemAction", {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        width: percent(100),
+        color: "inherit",
+        minHeight: unit(formElementsVars.sizing.height),
+        ...userSelect("none"),
+        textAlign: "left",
+        lineHeight: globalVars.lineHeights.condensed,
+        ...paddings({
+            top: 4,
+            right: 18,
+            bottom: 4,
+            left: 18,
+        }),
+    });
+
     const section = style("section", {
         display: "block",
     });
@@ -235,7 +260,7 @@ export const dropDownClasses = useThemeCache(() => {
 
     const separator = style("separator", {
         height: unit(globalVars.separator.size),
-        backgroundColor: colorOut(globalVars.separator.color),
+        backgroundColor: colorOut(vars.border.color),
         ...margins({
             top: vars.spacer.margin,
             bottom: vars.spacer.margin,
@@ -264,9 +289,9 @@ export const dropDownClasses = useThemeCache(() => {
     const verticalPadding = style("verticalPadding", {
         ...paddings({
             top: vars.spacer.margin,
-            right: 0,
+            right: important(0),
             bottom: vars.spacer.margin,
-            left: 0,
+            left: important(0),
         }),
     });
 
@@ -301,6 +326,7 @@ export const dropDownClasses = useThemeCache(() => {
         action,
         text,
         separator,
+        itemAction,
         sectionHeading,
         sectionContents,
         count,

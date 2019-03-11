@@ -13,6 +13,7 @@ import {
     colorOut,
     unit,
     userSelect,
+    paddings,
 } from "@library/styles/styleHelpers";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
@@ -22,7 +23,12 @@ import { style } from "typestyle";
 export const meBoxMessageVariables = useThemeCache(() => {
     const themeVars = componentThemeVariables("meBoxMessage");
     const spacing = {
-        padding: 8,
+        padding: {
+            top: 8,
+            right: 12,
+            bottom: 8,
+            left: 12,
+        },
         ...themeVars.subComponentStyles("spacing"),
     };
 
@@ -56,11 +62,11 @@ export const meBoxMessageClasses = useThemeCache(() => {
     });
 
     const link = style({
+        ...userSelect(),
         display: "flex",
         flexWrap: "nowrap",
-        padding: unit(vars.spacing.padding),
         color: "inherit",
-        ...userSelect(),
+        ...paddings(vars.spacing.padding),
         $nest: {
             "&:active, &:focus, &:hover, &.focus-visible": {
                 backgroundColor: colorOut(globalVars.states.active.color.fade(0.1)),
@@ -109,8 +115,10 @@ export const meBoxMessageClasses = useThemeCache(() => {
 
     const contents = style({
         flexGrow: 1,
-        paddingLeft: vars.spacing.padding,
-        paddingRight: vars.spacing.padding,
+        ...paddings({
+            left: vars.spacing.padding.left,
+            right: vars.spacing.padding.right,
+        }),
         maxWidth: calc(`100% - ${unit(vars.unreadDot.width + vars.imageContainer.width)}`),
         ...debug.name("contents"),
     });

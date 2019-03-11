@@ -9,6 +9,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { font, paddings, singleBorder, colorOut, unit } from "@library/styles/styleHelpers";
 import { calc, percent, viewHeight } from "csx";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { buttonUtilityClasses } from "@library/styles/buttonStyles";
 
 export const frameVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -16,6 +17,7 @@ export const frameVariables = useThemeCache(() => {
 
     const colors = makeThemeVars("colors", {
         bg: globalVars.mainColors.bg,
+        fg: globalVars.mainColors.fg,
     });
 
     const sizing = makeThemeVars("sizing", {
@@ -41,6 +43,7 @@ export const frameVariables = useThemeCache(() => {
     const footer = makeThemeVars("footer", {
         spacing: header.spacing,
         minHeight: header.minHeight,
+        padding: 12,
     });
 
     const panel = makeThemeVars("panel", {
@@ -77,15 +80,14 @@ export const frameHeaderClasses = useThemeCache(() => {
         flexWrap: "nowrap",
         width: percent(100),
         minHeight: unit(vars.header.minHeight),
+        color: colorOut(vars.colors.fg),
         zIndex: 1,
+        borderBottom: singleBorder(),
         ...paddings({
             top: 0,
             right: vars.footer.spacing,
             bottom: 0,
             left: vars.footer.spacing,
-        }),
-        borderTop: singleBorder({
-            color: globalVars.overlay.border.color,
         }),
         $nest: {
             "& .button + .button": {
@@ -143,6 +145,7 @@ export const frameHeaderClasses = useThemeCache(() => {
         flexShrink: 1,
         height: unit(formElVars.sizing.height),
         transform: `translateX(6px)`,
+        color: colorOut(vars.colors.fg),
     });
 
     const closePosition = style("closePosition", {
@@ -154,7 +157,7 @@ export const frameHeaderClasses = useThemeCache(() => {
 
 export const frameBodyClasses = useThemeCache(() => {
     const vars = frameVariables();
-    const style = styleFactory("frameFooter");
+    const style = styleFactory("frameBody");
 
     const root = style({
         position: "relative",
@@ -234,11 +237,18 @@ export const framePanelClasses = useThemeCache(() => {
 export const frameFooterClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("frameFooter");
+    const vars = frameVariables();
 
     const root = style({
+        display: "flex",
+        minHeight: unit(vars.footer.minHeight),
+        alignItems: "center",
+        position: "relative",
+        zIndex: 1,
         borderTop: singleBorder(),
         flexWrap: "wrap",
         justifyContent: "flex-end",
+        padding: unit(vars.footer.padding),
     });
 
     const markRead = style("markRead", {
@@ -249,5 +259,6 @@ export const frameFooterClasses = useThemeCache(() => {
             },
         },
     });
+
     return { root, markRead };
 });

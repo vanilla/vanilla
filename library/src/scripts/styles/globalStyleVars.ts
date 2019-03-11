@@ -250,7 +250,7 @@ export const globalVariables = useThemeCache(() => {
     });
 
     const separator = makeThemeVars("separator", {
-        color: mixBgAndFg(0.1),
+        color: colorOut(border.color),
         size: 1,
     });
 

@@ -7,6 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { getOptionalID, IOptionalComponentID } from "@library/componentIDs";
+import { buttonUtilityClasses } from "@library/styles/buttonStyles";
 
 interface IProps extends IOptionalComponentID {
     children: React.ReactNode;
@@ -40,6 +41,22 @@ export enum ButtonBaseClass {
     CUSTOM = "",
 }
 
+export const getBaseClass = (baseClass: string | undefined) => {
+    if (baseClass) {
+        const buttonUtils = buttonUtilityClasses();
+        switch (baseClass) {
+            case ButtonBaseClass.TEXT:
+                return buttonUtils.buttonAsText;
+            case ButtonBaseClass.ICON:
+                return buttonUtils.buttonIcon;
+            default:
+                return baseClass;
+        }
+    } else {
+        return "";
+    }
+};
+
 /**
  * A stylable, configurable button component.
  */
@@ -62,7 +79,7 @@ export default class Button extends React.Component<IProps, IState> {
 
     public render() {
         const componentClasses = classNames(
-            this.props.baseClass,
+            getBaseClass(this.props.baseClass),
             { Button: this.props.legacyMode },
             this.props.className,
         );

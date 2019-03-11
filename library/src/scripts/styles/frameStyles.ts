@@ -235,7 +235,11 @@ export const frameFooterClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("frameFooter");
 
-    const root = style({});
+    const root = style({
+        borderTop: singleBorder(),
+        flexWrap: "wrap",
+        justifyContent: "flex-end",
+    });
 
     const markRead = style("markRead", {
         $nest: {

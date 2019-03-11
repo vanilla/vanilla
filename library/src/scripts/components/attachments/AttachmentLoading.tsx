@@ -15,6 +15,7 @@ import ProgressEventEmitter from "@library/ProgressEventEmitter";
 import { FOCUS_CLASS } from "@library/embeds";
 import { attachmentClasses } from "@library/styles/attachmentStyles";
 import { attachmentIconClasses } from "@library/styles/attachmentIconsStyles";
+import { metasClasses } from "@library/styles/metasStyles";
 
 interface IProps extends IFileAttachment {
     type: AttachmentType;
@@ -39,6 +40,7 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
         const label = title || name;
         const classes = attachmentClasses();
         const iconClasses = attachmentIconClasses();
+        const classesMetas = metasClasses();
         return (
             <div
                 className={classNames("attachment", "isLoading", this.props.className, FOCUS_CLASS, classes.root)}
@@ -55,7 +57,7 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
                         </div>
                         {label && (
                             <div className={classNames("attachment-metas", "metas", classes.metas)}>
-                                <span className="meta">{t("Uploading...")}</span>
+                                <span className={classesMetas.meta}>{t("Uploading...")}</span>
                             </div>
                         )}
                     </div>

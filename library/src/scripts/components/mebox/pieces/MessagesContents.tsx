@@ -26,21 +26,23 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 import Loader from "@library/components/Loader";
 import { loaderClasses } from "@library/styles/loaderStyles";
+import { buttonUtilityClasses } from "@library/styles/buttonStyles";
 
 /**
  * Implements Messages Contents to be included in drop down or tabs
  */
 export class MessagesContents extends React.Component<IProps> {
     public render() {
+        const buttonUtils = buttonUtilityClasses();
         const title = t("Messages");
         return (
             <Frame className={this.props.className}>
                 <FrameHeaderWithAction title={title}>
                     <LinkAsButton
                         title={t("New Message")}
-                        className="headerDropDown-headerButton headerDropDown-messages button-pushRight"
                         to={"/messages/inbox"}
-                        baseClass={ButtonBaseClass.ICON}
+                        baseClass={buttonUtils.buttonIcon}
+                        className={classNames(buttonUtils.pushRight)}
                     >
                         {compose()}
                     </LinkAsButton>
@@ -50,7 +52,7 @@ export class MessagesContents extends React.Component<IProps> {
                 </FrameBody>
                 <FrameFooter>
                     <LinkAsButton
-                        className="headerDropDown-footerButton headerDropDown-allButton button-pushLeft"
+                        className={classNames(buttonUtils.pushLeft)}
                         to={"/messages/inbox"}
                         baseClass={ButtonBaseClass.TEXT}
                     >

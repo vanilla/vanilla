@@ -6,6 +6,7 @@
 
 import * as React from "react";
 import classNames from "classnames";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 export interface IProps {
     children: React.ReactNode;
@@ -17,6 +18,7 @@ export interface IProps {
  */
 export default class DropDownItem extends React.Component<IProps> {
     public render() {
-        return <li className={classNames("dropDown-item", this.props.className)}>{this.props.children}</li>;
+        const classes = dropDownClasses();
+        return <li className={classNames(this.props.className, classes.item)}>{this.props.children}</li>;
     }
 }

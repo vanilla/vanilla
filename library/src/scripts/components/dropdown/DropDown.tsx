@@ -74,10 +74,11 @@ export default class DropDown extends React.Component<IProps, IState> {
         const { title } = this.props;
         const classesDropDown = dropDownClasses();
         const classesFrameHeader = frameHeaderClasses();
+        const classes = dropDownClasses();
         return (
             <PopoverController
                 id={this.id}
-                className={this.props.className}
+                className={classNames(this.props.className)}
                 buttonBaseClass={this.props.buttonBaseClass || ButtonBaseClass.CUSTOM}
                 name={this.props.name}
                 buttonContents={this.props.buttonContents || dropDownMenu()}
@@ -110,7 +111,14 @@ export default class DropDown extends React.Component<IProps, IState> {
                                         className={classNames("frameHeader-leftSpacer", classesFrameHeader.leftSpacer)}
                                     />
                                     <SmartAlign>
-                                        <Heading title={title} className="dropDown-title" />
+                                        <Heading
+                                            title={title}
+                                            className={classNames(
+                                                "dropDown-title",
+                                                classesDropDown.title,
+                                                classes.title,
+                                            )}
+                                        />
                                     </SmartAlign>
                                     <div
                                         className={classNames(
@@ -127,7 +135,7 @@ export default class DropDown extends React.Component<IProps, IState> {
                                     </div>
                                 </header>
                             ) : null}
-                            <ul className="dropDownItems">{this.props.children}</ul>
+                            <ul className={classNames("dropDownItems", classes.items)}>{this.props.children}</ul>
                         </DropDownContents>
                     );
                 }}

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
-import { paddings, placeholderStyles, textInputSizing, toStringColor, unit } from "@library/styles/styleHelpers";
+import { paddings, placeholderStyles, textInputSizing, colorOut, unit } from "@library/styles/styleHelpers";
 import { styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
@@ -40,12 +40,12 @@ export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolea
                     globalVars.gutter.half,
                     formElementVars.border.fullWidth,
                 ),
-                color: toStringColor(formElementVars.colors.fg),
+                color: colorOut(formElementVars.colors.fg),
                 position: "relative",
                 fontWeight: globalVars.fonts.weights.semiBold,
                 border: 0,
                 borderRadius: 0,
-                marginBottom: unit(globalVars.spacer),
+                marginBottom: unit(globalVars.spacer.size),
                 ...paddings({
                     left: 0,
                     right: 0,
@@ -59,7 +59,7 @@ export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolea
             ...placeholderStyles({
                 lineHeight: "inherit",
                 padding: "inherit",
-                color: toStringColor(formElementVars.placeholder.color),
+                color: colorOut(formElementVars.placeholder.color),
             }),
         },
     });
@@ -86,7 +86,7 @@ export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolea
     });
 
     const inlineMenuItems = style("inlineMenuItems", {
-        borderBottom: `${unit(formElementVars.border.width)} solid ${toStringColor(formElementVars.border.color)}`,
+        borderBottom: `${unit(formElementVars.border.width)} solid ${colorOut(formElementVars.border.color)}`,
     });
 
     const formContent = style("formContent", {
@@ -100,7 +100,7 @@ export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolea
         height: "initial",
         minHeight: unit(vars.sizing.minHeight + vars.menuButton.size),
         position: "relative",
-        backgroundColor: toStringColor(vars.colors.bg),
+        backgroundColor: colorOut(vars.colors.bg),
         display: !legacyMode ? "flex" : undefined,
         flexDirection: !legacyMode ? "column" : undefined,
         flexGrow: !legacyMode ? 1 : undefined,

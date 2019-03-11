@@ -18,6 +18,8 @@ import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import Formatter from "@rich-editor/quill/Formatter";
 import InlineToolbarMenuItems from "@rich-editor/components/toolbars/pieces/InlineToolbarMenuItems";
 import FocusWatcher from "@library/FocusWatcher";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
+import classNames from "classnames";
 
 interface IProps extends IWithEditorProps {}
 
@@ -72,6 +74,7 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
     }
 
     public render() {
+        const classes = dropDownClasses();
         const { activeFormats } = this.props;
         const alertMessage = this.isFormatMenuVisible ? (
             <span aria-live="assertive" role="alert" className="sr-only">
@@ -88,7 +91,7 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
                         onLinkClick={this.toggleLinkMenu}
                         activeFormats={activeFormats}
                         lastGoodSelection={this.props.lastGoodSelection}
-                        className="likeDropDownContent"
+                        className={classNames("likeDropDownContent", classes.likeDropDownContent)}
                     />
                 </ToolbarContainer>
                 <ToolbarContainer selection={this.props.lastGoodSelection} isVisible={this.isLinkMenuVisible}>

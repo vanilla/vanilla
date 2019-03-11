@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { modifyColorBasedOnLightness, toStringColor } from "@library/styles/styleHelpers";
+import { modifyColorBasedOnLightness, colorOut } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { color, ColorHelper, percent, viewHeight } from "csx";
 
@@ -89,6 +89,7 @@ export const globalVariables = useThemeCache(() => {
         condensed: 1.25,
         code: 1.45,
         excerpt: 1.45,
+        meta: 1.5,
     });
 
     const panelWidth = 216;
@@ -103,12 +104,12 @@ export const globalVariables = useThemeCache(() => {
         paddedWidth: middleColumnWidth + gutter.size,
     });
 
-    const content = {
+    const content = makeThemeVars("content", {
         width:
             panel.paddedWidth * 2 +
             middleColumn.paddedWidth +
             gutter.size * 3 /* *3 from margin between columns and half margin on .container*/,
-    };
+    });
 
     const fonts = makeThemeVars("fonts", {
         size: {
@@ -141,7 +142,9 @@ export const globalVariables = useThemeCache(() => {
         color: mixBgAndFg(0.18),
     });
 
-    const spacer = fonts.size.medium * lineHeights.base;
+    const spacer = makeThemeVars("spacer", {
+        size: fonts.size.medium * lineHeights.base,
+    });
 
     const animation = makeThemeVars("animation", {
         defaultTiming: ".15s",
@@ -191,7 +194,7 @@ export const globalVariables = useThemeCache(() => {
         },
     });
 
-    const states = {
+    const states = makeThemeVars("states", {
         icon: {
             opacity: 0.6,
         },
@@ -199,29 +202,33 @@ export const globalVariables = useThemeCache(() => {
             opacity: 0.75,
         },
         hover: {
-            color: mixPrimaryAndBg(0.1),
+            color: mixPrimaryAndBg(0.2),
             opacity: 1,
         },
-        focus: {
-            color: mixPrimaryAndBg(0.12),
+        selected: {
+            color: mixPrimaryAndBg(0.5),
             opacity: 1,
         },
         active: {
-            color: mixPrimaryAndBg(0.95),
+            color: mixPrimaryAndBg(0.22),
             opacity: 1,
         },
-    };
+        focus: {
+            color: mixPrimaryAndBg(0.21),
+            opacity: 1,
+        },
+    });
 
     const overlayBg = modifyColorBasedOnLightness(mainColors.fg, mainColors.fg, 0.5, true);
-    const overlay = {
-        dropShadow: `2px -2px 5px ${toStringColor(overlayBg.fade(0.3))}`,
+    const overlay = makeThemeVars("overlay", {
+        dropShadow: `2px -2px 5px ${colorOut(overlayBg.fade(0.3))}`,
         border: {
             color: mixBgAndFg(0.1),
             radius: border.radius,
         },
         fullPageHeadingSpacer: 32,
         spacer: 32,
-    };
+    });
 
     const userContent = makeThemeVars("userContent", {
         font: {
@@ -244,10 +251,15 @@ export const globalVariables = useThemeCache(() => {
     });
 
     const buttonIconSize = 36;
-    const buttonIcon = {
+    const buttonIcon = makeThemeVars("buttonIcon", {
         size: buttonIconSize,
         offset: (buttonIconSize - icon.sizes.default) / 2,
-    };
+    });
+
+    const separator = makeThemeVars("separator", {
+        color: colorOut(border.color),
+        size: 1,
+    });
 
     return {
         utility,
@@ -274,5 +286,6 @@ export const globalVariables = useThemeCache(() => {
         mixBgAndFg,
         mixPrimaryAndFg,
         mixPrimaryAndBg,
+        separator,
     };
 });

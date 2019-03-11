@@ -6,35 +6,37 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
-    absolutePosition,
-    componentThemeVariables,
-    debugHelper,
     objectFitWithFallback,
-    toStringColor,
+    colorOut,
     unit,
     userSelect,
+    paddings,
+    allLinkStates,
+    absolutePosition,
+    states,
 } from "@library/styles/styleHelpers";
-import { useThemeCache } from "@library/styles/styleUtils";
-import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
-import { calc, percent, quote } from "csx";
-import { style } from "typestyle";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { calc, percent, px, quote } from "csx";
 
 export const meBoxMessageVariables = useThemeCache(() => {
-    const themeVars = componentThemeVariables("meBoxMessage");
-    const spacing = {
-        padding: 8,
-        ...themeVars.subComponentStyles("spacing"),
-    };
+    const makeThemeVars = variableFactory("meBoxMessage");
 
-    const imageContainer = {
+    const spacing = makeThemeVars("spacing", {
+        padding: {
+            top: 8,
+            right: 12,
+            bottom: 8,
+            left: 12,
+        },
+    });
+
+    const imageContainer = makeThemeVars("imageContainer", {
         width: 40,
-        ...themeVars.subComponentStyles("imageContainer"),
-    };
+    });
 
-    const unreadDot = {
+    const unreadDot = makeThemeVars("unreadDot", {
         width: 12,
-        ...themeVars.subComponentStyles("unreadDot"),
-    };
+    });
 
     return { spacing, imageContainer, unreadDot };
 });
@@ -42,35 +44,40 @@ export const meBoxMessageVariables = useThemeCache(() => {
 export const meBoxMessageClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = meBoxMessageVariables();
-    const headerVars = vanillaHeaderVariables();
-    const debug = debugHelper("meBoxMessage");
+    const style = styleFactory("meBoxMessage");
 
     const root = style({
-        ...debug.name(),
         display: "block",
         $nest: {
             "& + &": {
-                borderTop: `solid 1px ${toStringColor(globalVars.border.color)}`,
+                borderTop: `solid 1px ${colorOut(globalVars.border.color)}`,
             },
         },
     });
 
-    const link = style({
+    const link = style("link", {
+        ...userSelect(),
         display: "flex",
         flexWrap: "nowrap",
-        padding: unit(vars.spacing.padding),
         color: "inherit",
-        ...userSelect(),
-        $nest: {
-            "&:active, &:focus, &:hover, &.focus-visible": {
-                backgroundColor: toStringColor(globalVars.states.active.color.fade(0.1)),
-                textDecoration: "none",
+        ...paddings(vars.spacing.padding),
+        ...states({
+            allStates: {
+                textShadow: "none",
             },
-        },
-        ...debug.name("link"),
+            hover: {
+                backgroundColor: colorOut(globalVars.states.hover.color),
+            },
+            focus: {
+                backgroundColor: colorOut(globalVars.states.focus.color),
+            },
+            active: {
+                backgroundColor: colorOut(globalVars.states.active.color),
+            },
+        }),
     });
 
-    const imageContainer = style({
+    const imageContainer = style("imageContainer", {
         position: "relative",
         width: unit(vars.imageContainer.width),
         height: unit(vars.imageContainer.width),
@@ -78,19 +85,18 @@ export const meBoxMessageClasses = useThemeCache(() => {
         borderRadius: percent(50),
         overflow: "hidden",
         border: `solid 1px ${globalVars.border.color.toString()}`,
-        ...debug.name("imageContainer"),
     });
 
-    const image = style({
+    const image = style("image", {
+        width: unit(vars.imageContainer.width),
+        height: unit(vars.imageContainer.width),
         ...objectFitWithFallback(),
-        ...debug.name("image"),
     });
 
-    const status = style({
+    const status = style("status", {
         position: "relative",
         width: unit(vars.unreadDot.width),
         flexBasis: unit(vars.unreadDot.width),
-        ...debug.name("status"),
         $nest: {
             "&.isUnread": {
                 $nest: {
@@ -107,17 +113,18 @@ export const meBoxMessageClasses = useThemeCache(() => {
         },
     });
 
-    const contents = style({
+    const contents = style("contents", {
         flexGrow: 1,
-        paddingLeft: vars.spacing.padding,
-        paddingRight: vars.spacing.padding,
+        ...paddings({
+            left: vars.spacing.padding.left,
+            right: vars.spacing.padding.right,
+        }),
         maxWidth: calc(`100% - ${unit(vars.unreadDot.width + vars.imageContainer.width)}`),
-        ...debug.name("contents"),
     });
 
-    const message = style({
+    const message = style("message", {
         lineHeight: globalVars.lineHeights.excerpt,
-        ...debug.name("message"),
+        color: colorOut(globalVars.mainColors.fg),
     });
 
     return { root, link, imageContainer, image, status, contents, message };

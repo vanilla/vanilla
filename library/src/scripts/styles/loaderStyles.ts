@@ -12,7 +12,7 @@ import {
     flexHelper,
     ISpinnerProps,
     spinnerLoader,
-    toStringColor,
+    colorOut,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";

@@ -27,6 +27,7 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 import { loaderClasses } from "@library/styles/loaderStyles";
 import { frameFooterClasses } from "@library/styles/frameStyles";
+import { buttonUtilityClasses } from "@library/styles/buttonStyles";
 
 export interface INotificationsProps {
     countClass?: string;
@@ -41,15 +42,16 @@ export class NotificationsContents extends React.Component<IProps> {
         const { userSlug } = this.props;
         const title = t("Notifications");
         const classesFrameFooter = frameFooterClasses();
+        const buttonUtils = buttonUtilityClasses();
 
         return (
             <Frame className={this.props.className}>
                 <FrameHeaderWithAction className="hasAction" title={title}>
                     <LinkAsButton
                         title={t("Notification Preferences")}
-                        className="headerDropDown-headerButton headerDropDown-notifications button-pushRight"
+                        baseClass={buttonUtils.buttonIcon}
+                        className={classNames(buttonUtils.pushRight)}
                         to={`/profile/preferences/${userSlug}`}
-                        baseClass={ButtonBaseClass.ICON}
                     >
                         {settings()}
                     </LinkAsButton>
@@ -59,7 +61,7 @@ export class NotificationsContents extends React.Component<IProps> {
                 </FrameBody>
                 <FrameFooter>
                     <LinkAsButton
-                        className="headerDropDown-footerButton frameFooter-allButton button-pushLeft"
+                        className={classNames(buttonUtils.pushLeft)}
                         to={"/profile/notifications"}
                         baseClass={ButtonBaseClass.TEXT}
                     >

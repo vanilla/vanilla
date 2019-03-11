@@ -47,7 +47,7 @@ import { isAllowedUrl, themeAsset } from "@library/application";
 import get from "lodash/get";
 import { ColorValues } from "@library/styles/buttonStyles";
 
-export const toStringColor = (colorValue: ColorValues) => {
+export const colorOut = (colorValue: ColorValues) => {
     if (!colorValue) {
         return undefined;
     } else {
@@ -262,7 +262,7 @@ export interface IBorderStyles extends ISingleBorderStyle {
 export const borders = (props: IBorderStyles = {}) => {
     const vars = globalVariables();
     return {
-        borderColor: get(props, "color") ? toStringColor(props.color as any) : toStringColor(vars.border.color),
+        borderColor: get(props, "color") ? colorOut(props.color as any) : colorOut(vars.border.color),
         borderWidth: get(props, "width") ? unit(props.width) : unit(vars.border.width),
         borderStyle: get(props, "style") ? props.style : vars.border.style,
         borderRadius: get(props, "radius") ? props.radius : vars.border.radius,
@@ -272,17 +272,38 @@ export const borders = (props: IBorderStyles = {}) => {
 export const singleBorder = (styles: ISingleBorderStyle = {}) => {
     const vars = globalVariables();
     return `${styles.style ? styles.style : vars.border.style} ${
-        styles.color ? toStringColor(styles.color) : toStringColor(vars.border.color)
+        styles.color ? colorOut(styles.color) : colorOut(vars.border.color)
     } ${styles.width ? unit(styles.width) : unit(vars.border.width)}`;
 };
 
-export const allLinkStates = (styles: object) => {
+export interface ILinkStates {
+    allStates?: object; // Applies to all
+    noState?: object; // Applies to stateless link
+    hover?: object;
+    focus?: object;
+    accessibleFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
+    active?: object;
+    visited?: object;
+}
+
+export const allLinkStates = (styles: ILinkStates) => {
+    const allStates = get(styles, "allStates", {});
+    const noState = get(styles, "noState", {});
+    const hover = get(styles, "hover", {});
+    const focus = get(styles, "focus", {});
+    const accessibleFocus = get(styles, "accessibleFocus", focus);
+    const active = get(styles, "active", {});
+    const visited = get(styles, "visited", {});
+
     return {
-        ...styles,
+        ...allStates,
+        ...noState,
         $nest: {
-            "&:hover": styles,
-            "&:active": styles,
-            "&:visited": styles,
+            "&:hover": { ...allStates, ...hover },
+            "&:focus": { ...allStates, ...focus },
+            "&.focus-visible": { ...allStates, ...accessibleFocus },
+            "&:active": { ...allStates, ...active },
+            "&:visited": { ...allStates, ...visited },
         },
     };
 };
@@ -541,19 +562,19 @@ export const setAllLinkColors = (overwrites?: ILinkStates) => {
 
     const styles: ILinkStates = {
         default: {
-            color: toStringColor(linkColors.default),
+            color: colorOut(linkColors.default),
         },
         hover: {
-            color: toStringColor(linkColors.hover),
+            color: colorOut(linkColors.hover),
         },
         focus: {
-            color: toStringColor(linkColors.focus),
+            color: colorOut(linkColors.focus),
         },
         accessibleFocus: {
-            color: toStringColor(linkColors.accessibleFocus),
+            color: colorOut(linkColors.accessibleFocus),
         },
         active: {
-            color: toStringColor(linkColors.active),
+            color: colorOut(linkColors.active),
         },
         ...overwrites,
     };
@@ -616,13 +637,19 @@ export interface IFont {
 
 export const font = (props: IFont) => {
     if (props) {
+        const size = get(props, "size", undefined);
+        const fontWeight = get(props, "weight", undefined);
+        const fg = get(props, "color", undefined);
+        const lineHeight = get(props, "lineHeight", undefined);
+        const textAlign = get(props, "align", undefined);
+        const textShadow = get(props, "shadow", undefined);
         return {
-            fontSize: get(props, "size") ? unit(props.size) : undefined,
-            fontWeight: get(props, "weight") ? (props.weight as FontWeightProperty) : undefined,
-            color: get(props, "color") ? toStringColor(props.color as ColorValues) : undefined,
-            lineHeight: get(props, "lineHeight") ? unit(props.lineHeight) : undefined,
-            textAlign: get(props, "align") ? (props.align as TextAlignLastProperty) : undefined,
-            textShadow: get(props, "shadow") ? (props.shadow as TextShadowProperty) : undefined,
+            color: fg ? colorOut(fg) : undefined,
+            fontSize: size ? unit(size) : undefined,
+            fontWeight,
+            lineHeight: lineHeight ? unit(lineHeight) : undefined,
+            textAlign,
+            textShadow,
         };
     } else {
         return {};
@@ -666,11 +693,50 @@ export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImag
 export const backgroundImage = (props: IBackgroundImage) => {
     const image = getBackgroundImage(get(props, "image", undefined), get(props, "fallbackImage", undefined));
     return {
-        backgroundColor: get(props, "color") ? toStringColor(props.color as any) : undefined,
+        backgroundColor: get(props, "color") ? colorOut(props.color as any) : undefined,
         backgroundAttachment: get(props, "attachment") ? props.attachment : undefined,
         backgroundPosition: get(props, "position") ? props.position : `50% 50%`,
         backgroundRepeat: get(props, "repeat") ? props.repeat : "no-repeat",
         backgroundSize: get(props, "size") ? props.size : "cover",
         backgroundImage: image ? url(image) : undefined,
+    };
+};
+
+export interface IStates {
+    hover?: object;
+    focus?: object;
+    active?: object;
+    accessibleFocus?: object;
+}
+
+export interface IStatesAll {
+    allStates?: object;
+}
+
+// Similar to ILinkStates, but can be button or link, so we don't have link specific states here and not specific to colors
+export interface IActionStates {
+    allStates?: object; // Applies to all
+    hover?: object;
+    focus?: object;
+    accessibleFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
+    active?: object;
+}
+
+/*
+ * Helper to write CSS state styles. Note this one is for buttons or links
+ * *** You must use this inside of a "$nest" ***
+ */
+export const states = (styles: IActionStates) => {
+    const allStates = get(styles, "allStates", {});
+    const hover = get(styles, "hover", {});
+    const focus = get(styles, "focus", {});
+    const accessibleFocus = get(styles, "accessibleFocus", focus);
+    const active = get(styles, "active", {});
+
+    return {
+        "&:hover": { ...allStates, ...hover },
+        "&:focus": { ...allStates, ...focus },
+        "&.focus-visible": { ...allStates, ...accessibleFocus },
+        "&:active": { ...allStates, ...active },
     };
 };

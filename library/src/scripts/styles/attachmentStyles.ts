@@ -104,7 +104,9 @@ export const attachmentClasses = useThemeCache(() => {
 
     const link = style("link", {
         ...allLinkStates({
-            textDecoration: "none",
+            allStates: {
+                textDecoration: "none",
+            },
         }),
     });
 

@@ -15,6 +15,7 @@ import { leftChevron, rightChevron } from "@library/components/icons";
 import { NullComponent } from "@library/components/forms/select/overwrites";
 import moment, { Moment } from "moment";
 import { dayPickerClasses } from "@library/styles/datePickerStyles";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 interface IProps {
     value: string; // ISO formatted date
@@ -171,11 +172,12 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
      * Override for the date pickers dropdown.
      */
     private CustomOverlay = ({ classNames: c, selectedDay, children, ...props }) => {
-        const contentsClasses = classNames("dropDown-contents", "isOwnWidth", {
+        const classes = dropDownClasses();
+        const contentsClasses = classNames("dropDown-contents", classes.contents, "isOwnWidth", {
             isRightAligned: this.props.alignment === "right",
         });
         return (
-            <div className="dropDown" {...props}>
+            <div className={classNames("dropDown", classes.root)} {...props}>
                 <div className={contentsClasses}>{children}</div>
             </div>
         );

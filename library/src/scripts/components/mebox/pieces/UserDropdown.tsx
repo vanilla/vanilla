@@ -25,6 +25,9 @@ import Permission from "@library/users/Permission";
 import classNames from "classnames";
 import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
 import { userDropDownClasses } from "@library/styles/userDropDownStyles";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
+import { frameBodyClasses } from "@library/styles/frameStyles";
+import { vanillaHeaderClasses } from "@library/styles/vanillaHeaderStyles";
 
 export interface IUserDropDownProps extends IInjectableUserState {
     className?: string;
@@ -57,6 +60,9 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
 
         const counts = dummyUserDropDownData;
         const classes = userDropDownClasses();
+        const classesDropDown = dropDownClasses();
+        const classesFrameBody = frameBodyClasses();
+        const classesHeader = vanillaHeaderClasses();
 
         return (
             <DropDown
@@ -64,7 +70,12 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                 name={t("My Account")}
                 className={classNames("userDropDown", this.props.className)}
                 buttonClassName={classNames("vanillaHeader-account", this.props.buttonClassName)}
-                contentsClassName={classNames("userDropDown-contents", this.props.contentsClassName, classes.contents)}
+                contentsClassName={classNames(
+                    "userDropDown-contents",
+                    this.props.contentsClassName,
+                    classes.contents,
+                    classesHeader.dropDownContents,
+                )}
                 renderLeft={true}
                 buttonContents={
                     <div className={classNames("meBox-buttonContent", this.props.toggleContentClassName)}>
@@ -79,7 +90,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                 onVisibilityChange={this.setOpen}
             >
                 <Frame>
-                    <FrameBody className="dropDownItem-verticalPadding">
+                    <FrameBody className={classNames(classesFrameBody.root, classesDropDown.verticalPadding)}>
                         <DropDownUserCard currentUser={this.props.currentUser!} className="userDropDown-userCard" />
                         <DropDownItemSeparator />
                         <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />

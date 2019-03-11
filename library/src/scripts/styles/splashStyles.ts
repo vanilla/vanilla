@@ -14,7 +14,7 @@ import {
     modifyColorBasedOnLightness,
     IFont,
     paddings,
-    toStringColor,
+    colorOut,
     unit,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
@@ -159,7 +159,7 @@ export const splashStyles = useThemeCache(() => {
 
     const root = style({
         position: "relative",
-        backgroundColor: toStringColor(vars.outerBackground.bg),
+        backgroundColor: colorOut(vars.outerBackground.bg),
     });
 
     const image = getBackgroundImage(vars.outerBackground.image, vars.outerBackground.fallbackImage);
@@ -191,7 +191,7 @@ export const splashStyles = useThemeCache(() => {
 
     const text = style("text", {
         display: "block",
-        color: toStringColor(vars.text.fg),
+        color: colorOut(vars.text.fg),
         width: unit(vars.title.maxWidth),
         maxWidth: percent(100),
         margin: `auto auto 0`,
@@ -214,13 +214,13 @@ export const splashStyles = useThemeCache(() => {
     const searchButton = style("searchButton", {
         $nest: {
             "&&&&": {
-                backgroundColor: buttonBg ? toStringColor(buttonBg) : undefined,
-                borderColor: buttonBorderColor ? toStringColor(buttonBorderColor) : undefined,
-                color: buttonFg ? toStringColor(buttonFg) : undefined,
+                backgroundColor: buttonBg ? colorOut(buttonBg) : undefined,
+                borderColor: buttonBorderColor ? colorOut(buttonBorderColor) : undefined,
+                color: buttonFg ? colorOut(buttonFg) : undefined,
 
                 $nest: {
                     "&:hover, &:focus, &:active, &.focus-visible": {
-                        backgroundColor: toStringColor(hoverBg),
+                        backgroundColor: colorOut(hoverBg),
                     },
                 },
             },

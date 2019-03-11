@@ -12,7 +12,7 @@ import {
     debugHelper,
     flexHelper,
     modifyColorBasedOnLightness,
-    toStringColor,
+    colorOut,
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
@@ -213,7 +213,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
             display: "inline-flex",
             alignSelf: "center",
             flexBasis: vars.endElements.flexBasis,
-            color: toStringColor(vars.colors.fg),
+            color: colorOut(vars.colors.fg),
             $nest: {
                 "&.focus-visible": {
                     $nest: {
@@ -408,7 +408,11 @@ export const vanillaHeaderClasses = useThemeCache(() => {
 
     const dropDownContents = style({
         ...debug.name("dropDownContents"),
-        minWidth: px(vars.dropDownContents.minWidth),
+        $nest: {
+            "&&&": {
+                minWidth: px(vars.dropDownContents.minWidth),
+            },
+        },
     });
 
     const count = {

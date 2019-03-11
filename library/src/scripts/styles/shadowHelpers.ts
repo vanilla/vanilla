@@ -13,13 +13,13 @@ import { borders, IBorderStyles, IDropShadow } from "@library/styles/styleHelper
 export const shadowHelper = useThemeCache(() => {
     const globalVars = globalVariables();
 
-    const embed = (baseColor: ColorHelper = globalVars.mainColors.fg) => {
+    const embed = (baseColor: ColorHelper = globalVars.elementaryColors.black) => {
         return {
             boxShadow: `0 1px 3px 0 ${baseColor.fade(0.3)}`,
         };
     };
 
-    const embedHover = (baseColor: ColorHelper = globalVars.mainColors.fg) => {
+    const embedHover = (baseColor: ColorHelper = globalVars.elementaryColors.black) => {
         return {
             boxShadow: `0 1px 3px 0 ${baseColor.fade(0.7)}`,
         };

@@ -12,13 +12,14 @@ import {
     flexHelper,
     modifyColorBasedOnLightness,
     spinnerLoader,
-    toStringColor,
+    colorOut,
     unit,
     userSelect,
+    allLinkStates,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderRadiusProperty, BorderStyleProperty, WidthProperty } from "csstype";
-import { ColorHelper, percent, px } from "csx";
+import { ColorHelper, important, px, percent } from "csx";
 import memoize from "lodash/memoize";
 import { TLength } from "typestyle/lib/types";
 import get from "lodash/get";
@@ -246,8 +247,8 @@ export const generateButtonClass = (buttonType: IButtonType, buttonName: string,
         touchAction: "manipulation",
         minWidth: unit(vars.sizing.minWidth),
         cursor: "pointer",
-        color: toStringColor(buttonType.fg),
-        backgroundColor: toStringColor(buttonType.bg),
+        color: colorOut(buttonType.fg),
+        backgroundColor: colorOut(buttonType.bg),
         $nest: {
             "&:not([disabled])": {
                 $nest: {
@@ -256,28 +257,28 @@ export const generateButtonClass = (buttonType: IButtonType, buttonName: string,
                     },
                     "&:hover": {
                         zIndex,
-                        backgroundColor: toStringColor(buttonType.hover.bg),
+                        backgroundColor: colorOut(buttonType.hover.bg),
                         border: get(buttonType, "hover.border", {}),
-                        color: toStringColor(buttonType.hover.fg),
+                        color: colorOut(buttonType.hover.fg),
                         ...borders(buttonType.border),
                     },
                     "&:focus": {
                         zIndex,
-                        backgroundColor: toStringColor(buttonType.focus.bg),
+                        backgroundColor: colorOut(buttonType.focus.bg),
                         border: get(buttonType, "focus.border", {}),
-                        color: toStringColor(buttonType.focus.fg),
+                        color: colorOut(buttonType.focus.fg),
                     },
                     "&:active": {
                         zIndex,
-                        backgroundColor: toStringColor(buttonType.active.bg),
+                        backgroundColor: colorOut(buttonType.active.bg),
                         border: get(buttonType, "hover.active", {}),
-                        color: toStringColor(buttonType.active.fg),
+                        color: colorOut(buttonType.active.fg),
                     },
                     "&.focus-visible": {
                         zIndex,
-                        backgroundColor: toStringColor(buttonType.focus.bg),
+                        backgroundColor: colorOut(buttonType.focus.bg),
                         border: get(buttonType, "hover.accessibleFocus", {}),
-                        color: toStringColor(buttonType.focus.fg),
+                        color: colorOut(buttonType.focus.fg),
                     },
                 },
             },
@@ -299,6 +300,47 @@ export const buttonClasses = useThemeCache(() => {
         standard: generateButtonClass(vars.standard, "standard"),
         transparent: generateButtonClass(vars.transparent, "transparent"),
         compact: generateButtonClass(vars.transparent, "compact"),
+    };
+});
+
+export const buttonUtilityClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const style = styleFactory("buttonUtils");
+
+    const pushLeft = style("pushLeft", {
+        marginRight: important("auto"),
+    });
+
+    const pushRight = style("pushRight", {
+        marginLeft: important("auto"),
+    });
+
+    const buttonIcon = style("icon", {
+        alignItems: "center",
+        display: "flex",
+        height: unit(formElementVars.sizing.height),
+        minWidth: unit(formElementVars.sizing.height),
+        width: unit(formElementVars.sizing.height),
+        justifyContent: "center",
+        padding: 0,
+        color: "inherit",
+    });
+
+    const buttonAsText = style("asText", {
+        minWidth: important(0),
+        padding: important(0),
+        overflow: "hidden",
+        textAlign: "left",
+        lineHeight: globalVars.lineHeights.base,
+        color: "inherit",
+    });
+
+    return {
+        pushLeft,
+        buttonAsText,
+        pushRight,
+        buttonIcon,
     };
 });
 

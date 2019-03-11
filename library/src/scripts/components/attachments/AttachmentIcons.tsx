@@ -11,6 +11,7 @@ import Translate from "@library/components/translation/Translate";
 import AttachmentIcon, { IAttachmentIcon } from "@library/components/attachments/AttachmentIcon";
 import { attachmentIconsClasses } from "@library/styles/attachmentIconsStyles";
 import classNames from "classnames";
+import { metasClasses } from "@library/styles/metasStyles";
 
 // Array of icon attachments
 interface IProps {
@@ -95,10 +96,10 @@ export default class AttachmentIcons extends React.Component<IProps> {
      */
     private renderMorePlacholder(remainingCount: number, index: number): React.ReactNode {
         const message = <Translate source="+ <0/> more" c0={remainingCount} />;
-
+        const classesMetas = metasClasses();
         return (
             <li className="attachmentsIcons-item" key={index}>
-                <span className={"attachmentsIcons-more metaStyle"}>{message}</span>
+                <span className={classNames("attachmentsIcons-more", classesMetas.metaStyle)}>{message}</span>
             </li>
         );
     }

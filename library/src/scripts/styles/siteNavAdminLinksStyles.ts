@@ -6,7 +6,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { debugHelper, unit } from "@library/styles/styleHelpers";
+import { colorOut, debugHelper, unit } from "@library/styles/styleHelpers";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { px } from "csx";
 import { style } from "typestyle";
@@ -29,6 +29,7 @@ export const siteNavAdminLinksClasses = useThemeCache(() => {
 
     const item = style({
         display: "block",
+        color: colorOut(globalVars.mainColors.fg),
         ...debug.name("item"),
     });
 

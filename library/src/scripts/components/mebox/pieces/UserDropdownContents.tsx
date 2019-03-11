@@ -19,6 +19,7 @@ import { connect } from "react-redux";
 import UsersModel from "@library/users/UsersModel";
 import classNames from "classnames";
 import { dummyUserDropDownData } from "@library/components/mebox/state/dummyUserDropDownData";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 export interface IUserDropDownContentsProps extends IInjectableUserState {
     countsClass?: string;
@@ -32,9 +33,16 @@ export interface IUserDropDownContentsProps extends IInjectableUserState {
 export class UserDropdownContents extends React.Component<IUserDropDownContentsProps> {
     public render() {
         const counts = dummyUserDropDownData;
+        const classesDropDown = dropDownClasses();
         return (
             <Frame className={this.props.className}>
-                <FrameBody className={classNames("dropDownItem-verticalPadding", this.props.panelBodyClass)}>
+                <FrameBody
+                    className={classNames(
+                        "dropDownItem-verticalPadding",
+                        classesDropDown.verticalPadding,
+                        this.props.panelBodyClass,
+                    )}
+                >
                     <DropDownUserCard currentUser={this.props.currentUser!} className="userDropDown-userCard" />
                     <DropDownItemSeparator />
                     <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />

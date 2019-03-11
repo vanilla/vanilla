@@ -13,6 +13,7 @@ import EscapeListener from "@library/EscapeListener";
 import Modal from "@library/components/modal/Modal";
 import { t } from "@library/application";
 import ModalSizes from "@library/components/modal/ModalSizes";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 export interface IPopoverControllerChildParameters {
     id: string;
@@ -69,6 +70,7 @@ export default class PopoverController extends React.PureComponent<
     private escapeListener: EscapeListener;
 
     public render() {
+        const classes = dropDownClasses();
         const buttonClasses = classNames(this.props.buttonClassName, this.props.toggleButtonClassName, {
             isOpen: this.state.isVisible,
         });
@@ -85,13 +87,13 @@ export default class PopoverController extends React.PureComponent<
             openAsModal: this.props.openAsModal,
         };
 
+        const classesDropDown = !this.props.openAsModal ? classNames("dropdown", classes.root) : null;
         return (
             <div
                 id={this.state.id}
-                className={classNames(
-                    { dropDown: !this.props.openAsModal, asModal: this.props.openAsModal },
-                    this.props.className,
-                )}
+                className={classNames(classesDropDown, this.props.className, {
+                    asModal: this.props.openAsModal,
+                })}
                 ref={this.controllerRef}
                 onClick={this.stopPropagation}
             >

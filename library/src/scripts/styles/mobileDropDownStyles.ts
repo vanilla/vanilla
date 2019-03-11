@@ -78,9 +78,9 @@ export const mobileDropDownClasses = useThemeCache(() => {
             ...flex.middle(),
             ...userSelect(),
             flexGrow: 1,
-            maxWidth: calc(`100% - ${px(globalVars.spacer)}`),
-            marginLeft: px(globalVars.spacer / 2),
-            marginRight: px(globalVars.spacer / 2),
+            maxWidth: calc(`100% - ${px(globalVars.spacer.size)}`),
+            marginLeft: px(globalVars.spacer.size / 2),
+            marginRight: px(globalVars.spacer.size / 2),
         },
         mediaQueries.xs({
             ...debug.name("toggleButton-xs"),

@@ -14,6 +14,7 @@ import { FOCUS_CLASS } from "@library/embeds";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import { attachmentClasses } from "@library/styles/attachmentStyles";
 import { attachmentIconClasses } from "@library/styles/attachmentIconsStyles";
+import { metasClasses } from "@library/styles/metasStyles";
 
 interface IProps extends IFileAttachment {
     message: string;
@@ -34,6 +35,7 @@ export default class AttachmentError extends React.Component<IProps> {
         const showFileName = label && errorBodyMessages.length === 0;
         const classes = attachmentClasses();
         const iconClasses = attachmentIconClasses();
+        const classesMetas = metasClasses();
 
         return (
             <div
@@ -64,7 +66,7 @@ export default class AttachmentError extends React.Component<IProps> {
                         </div>
                         {showFileName && (
                             <div className={classNames("attachment-metas", "metas", classes.metas)}>
-                                <span className="meta">{label}</span>
+                                <span className={classesMetas.meta}>{label}</span>
                             </div>
                         )}
                     </div>

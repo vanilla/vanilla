@@ -13,6 +13,7 @@ import classNames from "classnames";
 import { IComboBoxOption } from "@library/components/forms/select/SearchBar";
 import { ICrumb } from "@library/components/Breadcrumbs";
 import SmartLink from "@library/components/navigation/SmartLink";
+import { metasClasses } from "@library/styles/metasStyles";
 
 export interface ISearchOptionData {
     crumbs: ICrumb[];
@@ -34,6 +35,7 @@ export default function SearchOption(props: IProps) {
     if (data) {
         const { dateUpdated, crumbs, url } = data;
         const hasLocationData = crumbs && crumbs.length > 0;
+        const classesMetas = metasClasses();
         return (
             <li className="suggestedTextInput-item">
                 <SmartLink
@@ -54,13 +56,13 @@ export default function SearchOption(props: IProps) {
                         <span className="suggestedTextInput-title">{props.children}</span>
                     </span>
                     <span className="suggestedTextInput-main">
-                        <span className="metas isFlexed">
+                        <span className={classNames("isFlexed", classesMetas.root)}>
                             {dateUpdated && (
-                                <span className="meta">
-                                    <DateTime className="meta" timestamp={dateUpdated} />
+                                <span className={classesMetas.meta}>
+                                    <DateTime className={classesMetas.meta} timestamp={dateUpdated} />
                                 </span>
                             )}
-                            {hasLocationData && <BreadCrumbString className="meta" crumbs={crumbs} />}
+                            {hasLocationData && <BreadCrumbString className={classesMetas.meta} crumbs={crumbs} />}
                         </span>
                     </span>
                 </SmartLink>

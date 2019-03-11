@@ -10,7 +10,7 @@ import {
     appearance,
     singleLineEllipsis,
     srOnly,
-    toStringColor,
+    colorOut,
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
@@ -259,7 +259,7 @@ export const richEditorClasses = memoize((theme?: object, legacyMode: boolean = 
             "&:hover, &:focus, &.focus-visible, &:active": {
                 opacity: 1,
                 cursor: "pointer",
-                color: toStringColor(globalVars.mainColors.primary),
+                color: colorOut(globalVars.mainColors.primary),
             },
         },
     });

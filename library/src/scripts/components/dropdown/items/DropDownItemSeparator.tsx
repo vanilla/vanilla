@@ -7,6 +7,7 @@
 import * as React from "react";
 import classNames from "classnames";
 import DropDownItem from "./DropDownItem";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 interface IProps {
     className?: string;
@@ -17,10 +18,11 @@ interface IProps {
  */
 export default class DropDownItemSeparator extends React.Component<IProps> {
     public render() {
+        const classes = dropDownClasses();
         return (
-            <DropDownItem className={classNames("dropDown-separator", this.props.className)}>
+            <li className={classNames(this.props.className, classes.separator)}>
                 <hr className="sr-only" />
-            </DropDownItem>
+            </li>
         );
     }
 }

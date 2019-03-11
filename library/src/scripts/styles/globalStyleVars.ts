@@ -142,7 +142,9 @@ export const globalVariables = useThemeCache(() => {
         color: mixBgAndFg(0.18),
     });
 
-    const spacer = fonts.size.medium * lineHeights.base;
+    const spacer = makeThemeVars("spacer", {
+        size: fonts.size.medium * lineHeights.base,
+    });
 
     const animation = makeThemeVars("animation", {
         defaultTiming: ".15s",

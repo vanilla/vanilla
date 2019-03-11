@@ -60,25 +60,23 @@ export const meBoxMessageClasses = useThemeCache(() => {
         flexWrap: "nowrap",
         color: "inherit",
         ...paddings(vars.spacing.padding),
-        $nest: {
-            ...allLinkStates({
-                allStates: {
-                    textShadow: "none",
-                },
-                noState: {
-                    color: colorOut(globalVars.links.colors.default),
-                },
-                hover: {
-                    color: colorOut(globalVars.links.colors.hover),
-                },
-                focus: {
-                    color: colorOut(globalVars.links.colors.focus),
-                },
-                active: {
-                    color: colorOut(globalVars.links.colors.active),
-                },
-            }),
-        },
+        ...allLinkStates({
+            allStates: {
+                textShadow: "none",
+            },
+            noState: {
+                color: colorOut(globalVars.links.colors.default),
+            },
+            hover: {
+                color: colorOut(globalVars.links.colors.hover),
+            },
+            focus: {
+                color: colorOut(globalVars.links.colors.focus),
+            },
+            active: {
+                color: colorOut(globalVars.links.colors.active),
+            },
+        }),
     });
 
     const imageContainer = style("imageContainer", {

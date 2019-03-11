@@ -45,7 +45,7 @@ export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolea
                 fontWeight: globalVars.fonts.weights.semiBold,
                 border: 0,
                 borderRadius: 0,
-                marginBottom: unit(globalVars.spacer),
+                marginBottom: unit(globalVars.spacer.size),
                 ...paddings({
                     left: 0,
                     right: 0,

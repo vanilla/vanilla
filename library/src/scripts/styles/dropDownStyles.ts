@@ -45,14 +45,13 @@ export const dropDownVariables = useThemeCache(() => {
     });
 
     const item = makeThemeVars("item", {
+        colors: {
+            fg: globalVars.mainColors.fg,
+        },
         minHeight: 30,
         mobile: {
             minHeight: 44,
             fontSize: 16,
-        },
-        padding: {
-            top: 4,
-            bottom: 4,
         },
     });
 
@@ -164,45 +163,33 @@ export const dropDownClasses = useThemeCache(() => {
     });
 
     const metaItems = style("metaItems", {
-        ...paddings(vars.metas.padding),
         $nest: {
-            "&.dropDown-item": {
+            "&&": {
                 display: "block",
-                ...font(vars.metas.font),
-                ...paddings(vars.metas.padding),
-            },
-            $nest: {
-                "& + .dropDown-metaItem": {
-                    paddingTop: unit(vars.metas.padding.top),
-                },
             },
         },
+        ...paddings(vars.metas.padding),
     });
 
+    const metaItem = style("metaItem", {
+        $nest: {
+            "& + &": {
+                paddingTop: unit(vars.metas.padding.top),
+            },
+        },
+        ...(font(vars.metas.font) as any),
+    });
+
+    // wrapping element
     const item = style("item", {
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
         width: percent(100),
-    });
-
-    // Link or button
-    const itemAction = style("itemAction", {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        width: percent(100),
         color: "inherit",
-        minHeight: unit(formElementsVars.sizing.height),
         ...userSelect("none"),
         textAlign: "left",
         lineHeight: globalVars.lineHeights.condensed,
-        ...paddings({
-            top: 4,
-            right: 18,
-            bottom: 4,
-            left: 18,
-        }),
     });
 
     const section = style("section", {
@@ -212,11 +199,14 @@ export const dropDownClasses = useThemeCache(() => {
     const toggleButtonIcon = style("toggleButtonIcon", {
         $nest: {
             ...states({
-                color: colorOut(globalVars.mainColors.primary),
+                allStates: {
+                    color: colorOut(globalVars.mainColors.primary),
+                },
             }),
         },
     });
 
+    // Contents (button or link)
     // Replaces: .dropDownItem-button, .dropDownItem-link
     const action = style(
         "action",
@@ -226,14 +216,21 @@ export const dropDownClasses = useThemeCache(() => {
             alignItems: "center",
             width: percent(100),
             textAlign: "left",
-            color: "inherit",
+            color: colorOut(vars.item.colors.fg),
             minHeight: unit(vars.item.minHeight),
             lineHeight: unit(globalVars.lineHeights.condensed),
-            ...paddings(vars.item.padding),
+            ...paddings({
+                top: 4,
+                right: 18,
+                bottom: 4,
+                left: 18,
+            }),
             ...userSelect("none"),
             $nest: {
                 ...states({
-                    backgroundColor: colorOut(globalVars.states.active.color),
+                    allStates: {
+                        backgroundColor: colorOut(globalVars.states.hover.color),
+                    },
                 }),
             },
         },
@@ -309,14 +306,13 @@ export const dropDownClasses = useThemeCache(() => {
         likeDropDownContent,
         items,
         metaItems,
-        meta,
+        metaItem,
         item,
         section,
         toggleButtonIcon,
         action,
         text,
         separator,
-        itemAction,
         sectionHeading,
         sectionContents,
         count,

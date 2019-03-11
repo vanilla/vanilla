@@ -20,9 +20,9 @@ export default class DropDownItemSeparator extends React.Component<IProps> {
     public render() {
         const classes = dropDownClasses();
         return (
-            <DropDownItem className={classNames("dropDown-separator", this.props.className, classes.separator)}>
+            <li className={classNames(this.props.className, classes.separator)}>
                 <hr className="sr-only" />
-            </DropDownItem>
+            </li>
         );
     }
 }

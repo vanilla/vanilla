@@ -6,7 +6,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { colorOut, margins, unit } from "@library/styles/styleHelpers";
+import { allLinkStates, colorOut, margins, unit } from "@library/styles/styleHelpers";
 import { calc } from "csx";
 
 export const metasVariables = useThemeCache(() => {
@@ -19,6 +19,15 @@ export const metasVariables = useThemeCache(() => {
 
     const colors = makeThemeVars("color", {
         fg: globalVars.mixBgAndFg(0.85),
+        hover: {
+            fg: globalVars.links.colors.active,
+        },
+        focus: {
+            fg: globalVars.links.colors.active,
+        },
+        active: {
+            fg: globalVars.links.colors.active,
+        },
         deleted: globalVars.feedbackColors.deleted,
     });
 
@@ -57,6 +66,25 @@ export const metasClasses = useThemeCache(() => {
             right: vars.spacing.default,
         }),
         $nest: {
+            a: {
+                ...allLinkStates({
+                    allStates: {
+                        textShadow: "none",
+                    },
+                    noState: {
+                        color: colorOut(vars.colors.fg),
+                    },
+                    hover: {
+                        color: colorOut(vars.colors.hover.fg),
+                    },
+                    focus: {
+                        color: colorOut(vars.colors.focus.fg),
+                    },
+                    active: {
+                        color: colorOut(vars.colors.active.fg),
+                    },
+                }),
+            },
             "&.isFlexed": {
                 display: "flex",
                 flexWrap: "wrap",

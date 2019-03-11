@@ -276,13 +276,34 @@ export const singleBorder = (styles: ISingleBorderStyle = {}) => {
     } ${styles.width ? unit(styles.width) : unit(vars.border.width)}`;
 };
 
-export const allLinkStates = (styles: object) => {
+export interface ILinkStates {
+    allStates?: object; // Applies to all
+    noState?: object; // Applies to stateless link
+    hover?: object;
+    focus?: object;
+    accessibleFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
+    active?: object;
+    visited?: object;
+}
+
+export const allLinkStates = (styles: ILinkStates) => {
+    const allStates = get(styles, "allStates", {});
+    const noState = get(styles, "noState", {});
+    const hover = get(styles, "hover", {});
+    const focus = get(styles, "focus", {});
+    const accessibleFocus = get(styles, "accessibleFocus", focus);
+    const active = get(styles, "active", {});
+    const visited = get(styles, "visited", {});
+
     return {
-        ...styles,
+        ...allStates,
+        ...noState,
         $nest: {
-            "&:hover": styles,
-            "&:active": styles,
-            "&:visited": styles,
+            "&:hover": { ...allStates, ...hover },
+            "&:focus": { ...allStates, ...focus },
+            "&.focus-visible": { ...allStates, ...accessibleFocus },
+            "&:active": { ...allStates, ...active },
+            "&:visited": { ...allStates, ...visited },
         },
     };
 };
@@ -610,13 +631,19 @@ export interface IFont {
 
 export const font = (props: IFont) => {
     if (props) {
+        const size = get(props, "size", undefined);
+        const fontWeight = get(props, "weight", undefined);
+        const fg = get(props, "color", undefined);
+        const lineHeight = get(props, "lineHeight", undefined);
+        const textAlign = get(props, "align", undefined);
+        const textShadow = get(props, "shadow", undefined);
         return {
-            fontSize: get(props, "size") ? unit(props.size) : undefined,
-            fontWeight: get(props, "weight") ? (props.weight as FontWeightProperty) : undefined,
-            color: get(props, "color") ? colorOut(props.color as ColorValues) : undefined,
-            lineHeight: get(props, "lineHeight") ? unit(props.lineHeight) : undefined,
-            textAlign: get(props, "align") ? (props.align as TextAlignLastProperty) : undefined,
-            textShadow: get(props, "shadow") ? (props.shadow as TextShadowProperty) : undefined,
+            color: fg ? colorOut(fg) : undefined,
+            fontSize: size ? unit(size) : undefined,
+            fontWeight,
+            lineHeight: lineHeight ? unit(lineHeight) : undefined,
+            textAlign,
+            textShadow,
         };
     } else {
         return {};
@@ -680,21 +707,30 @@ export interface IStatesAll {
     allStates?: object;
 }
 
+// Similar to ILinkStates, but can be button or link, so we don't have link specific states here and not specific to colors
+export interface IActionStates {
+    allStates?: object; // Applies to all
+    hover?: object;
+    focus?: object;
+    accessibleFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
+    active?: object;
+}
+
 /*
- * Helper to write CSS state styles
- * @param defaultStyle - Set this to be the most common style, to avoid duplicating the same styles for each state
- * @param specificStyles - Set styles for specific states. Will fallback to defaultStyle if they are set.
+ * Helper to write CSS state styles. Note this one is for buttons or links
  * *** You must use this inside of a "$nest" ***
- * Focus visible is for accessible styles when the keyboard is used. It defaults to the regular focus
- * styles, which will then default to the defaultStyle (if set)
  */
-export const states = (defaultStyle?: object, specificStyles?: IStates) => {
-    const focus = get(specificStyles, "focus", get(defaultStyle, "focus", undefined));
+export const states = (styles: IActionStates) => {
+    const allStates = get(styles, "allStates", {});
+    const hover = get(styles, "hover", {});
+    const focus = get(styles, "focus", {});
+    const accessibleFocus = get(styles, "accessibleFocus", focus);
+    const active = get(styles, "active", {});
 
     return {
-        "&:hover": get(specificStyles, "hover", get(defaultStyle, "hover", undefined)),
-        "&:focus": focus,
-        "&.focus-visible": get(specificStyles, "accessibleFocus", focus),
-        "&:active": get(specificStyles, "active", get(defaultStyle, "active", undefined)),
+        "&:hover": { ...allStates, ...hover },
+        "&:focus": { ...allStates, ...focus },
+        "&.focus-visible": { ...allStates, ...accessibleFocus },
+        "&:active": { ...allStates, ...active },
     };
 };

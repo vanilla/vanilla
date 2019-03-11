@@ -14,6 +14,8 @@ import {
     unit,
     userSelect,
     paddings,
+    states,
+    allLinkStates,
 } from "@library/styles/styleHelpers";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
@@ -68,10 +70,23 @@ export const meBoxMessageClasses = useThemeCache(() => {
         color: "inherit",
         ...paddings(vars.spacing.padding),
         $nest: {
-            "&:active, &:focus, &:hover, &.focus-visible": {
-                backgroundColor: colorOut(globalVars.states.active.color.fade(0.1)),
-                textDecoration: "none",
-            },
+            ...allLinkStates({
+                allStates: {
+                    textShadow: "none",
+                },
+                noState: {
+                    color: colorOut(globalVars.links.colors.default),
+                },
+                hover: {
+                    color: colorOut(globalVars.links.colors.hover),
+                },
+                focus: {
+                    color: colorOut(globalVars.links.colors.focus),
+                },
+                active: {
+                    color: colorOut(globalVars.links.colors.active),
+                },
+            }),
         },
         ...debug.name("link"),
     });

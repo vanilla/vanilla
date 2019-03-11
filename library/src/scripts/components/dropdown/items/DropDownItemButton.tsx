@@ -41,12 +41,12 @@ export default class DropDownItemButton extends React.Component<IDropDownItemBut
             this.props.onClick(clickData, index);
         };
         return (
-            <DropDownItem className={classNames(this.props.className, classesDropDown.itemAction)}>
+            <DropDownItem className={classNames(this.props.className, classesDropDown.item)}>
                 <Button
                     type="button"
                     title={this.props.name}
                     onClick={buttonClick}
-                    className={classNames(this.props.buttonClassName, classesDropDown.itemAction)}
+                    className={classNames(this.props.buttonClassName, classesDropDown.action)}
                     baseClass={ButtonBaseClass.CUSTOM}
                     disabled={this.props.disabled}
                     aria-current={this.props.current ? "true" : "false"}

@@ -6,10 +6,9 @@
 
 import { FOCUS_CLASS } from "@library/embeds";
 import { DeltaOperation, DeltaStatic } from "quill/core";
+import CodeBlock from "quill/formats/code";
 import BaseHistoryModule from "quill/modules/history";
 import ExternalEmbedBlot from "./blots/embeds/ExternalEmbedBlot";
-import CodeBlock from "quill/formats/code";
-import { delay } from "bluebird";
 
 const SHORTKEY = /Mac/i.test(navigator.platform) ? "metaKey" : "ctrlKey";
 

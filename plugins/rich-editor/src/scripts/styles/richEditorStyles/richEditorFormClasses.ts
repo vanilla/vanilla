@@ -97,6 +97,7 @@ export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolea
 
     const scrollFrame = style("scrollFrame", {
         margin: "auto",
+        height: "initial",
         minHeight: unit(vars.sizing.minHeight + vars.menuButton.size),
         position: "relative",
         backgroundColor: toStringColor(vars.colors.bg),

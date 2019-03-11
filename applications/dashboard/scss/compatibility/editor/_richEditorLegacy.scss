@@ -33,6 +33,11 @@ $richEditor_innerPadding                          : 12px !default;
     .richEditor-menuItems {
         border-bottom: 0;
     }
+
+    .richEditor-frame {
+        height: initial;
+        min-height: 275px;
+    }
 }
 
 .userContent {
@@ -290,7 +295,7 @@ body.hasRichEditor {
 
 .richEditor-text {
     overflow: visible;
-    min-height: 237px;
+    min-height: 200px;
     padding: {
         top: $richEditor_verticalPadding;
         right: $richEditor_innerPadding;

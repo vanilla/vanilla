@@ -26,6 +26,11 @@ async function setupEditor() {
         editorMountPoints.forEach(mountPoint => {
             if (!mountPoint.classList.contains(MOUNTED_CLASS)) {
                 mountPoint.classList.add(MOUNTED_CLASS);
+                const popup = mountPoint.closest(".Popup");
+                if (popup) {
+                    popup.classList.add("hasRichEditor");
+                }
+
                 mountEditor.default(mountPoint);
             }
         });

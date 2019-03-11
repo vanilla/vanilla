@@ -710,7 +710,7 @@ class DiscussionModel extends Gdn_Model {
 
         $sql = $this->SQL;
 
-        $this->fireEvent('modifyGetWhere');
+        $this->fireEvent('modifyWheres');
 
         // Build up the base query. Self-join for optimization.
         $sql->select('d2.*')
@@ -1552,7 +1552,7 @@ class DiscussionModel extends Gdn_Model {
         }
 
         $wheres = $this->combineWheres($this->getWheres(), $wheres);
-        $this->fireEvent('modifyGetWhere');
+        $this->fireEvent('modifyWheres');
 
         $this->EventArguments['Wheres'] = &$wheres;
         $this->fireEvent('BeforeGetCount'); // @see 'BeforeGet' for consistency in count vs. results

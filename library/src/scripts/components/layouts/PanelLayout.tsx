@@ -80,7 +80,8 @@ class PanelLayout extends React.Component<IProps> {
         const shouldRenderLeftPanel: boolean = !isMobile && (!!childComponents.leftTop || !!childComponents.leftBottom);
         const shouldRenderRightPanel: boolean =
             (isFullWidth || (isTablet && !shouldRenderLeftPanel)) &&
-            !!(childComponents.rightTop || childComponents.rightBottom);
+            !!(childComponents.rightTop || childComponents.rightBottom) &&
+            (!!this.props.rightTop || !!this.props.rightTop);
 
         // Determine the classes we want to display.
         const panelClasses = classNames(
@@ -114,14 +115,15 @@ class PanelLayout extends React.Component<IProps> {
                         )}
                         <Panel
                             className={classNames("panelLayout-content", "panel-breadcrumbs", {
-                                hasAdjacentPanel: true,
+                                hasAdjacentPanel: shouldRenderLeftPanel || shouldRenderRightPanel,
+                                hasTwoAdjacentPanels: shouldRenderLeftPanel && shouldRenderRightPanel,
                             })}
                         >
-                            <PanelArea className={classNames("panelArea-breadcrumbs", "hasAdjacentPanel")}>
-                                {childComponents.breadcrumbs}
-                            </PanelArea>
+                            <PanelArea>{childComponents.breadcrumbs}</PanelArea>
                         </Panel>
-                        <Panel className={classNames("panelLayout-right")} ariaHidden={true} />
+                        {shouldRenderRightPanel && (
+                            <Panel className={classNames("panelLayout-right")} ariaHidden={true} />
+                        )}
                     </div>
                 )}
 
@@ -157,15 +159,13 @@ class PanelLayout extends React.Component<IProps> {
 
                         <ContentTag
                             className={classNames("panelLayout-content", {
-                                hasAdjacentPanel: shouldRenderLeftPanel,
+                                hasAdjacentPanel: shouldRenderLeftPanel || shouldRenderRightPanel,
+                                hasTwoAdjacentPanels: shouldRenderLeftPanel && shouldRenderRightPanel,
                             })}
                         >
                             <Panel
                                 className={classNames(
                                     "panelLayout-middle",
-                                    {
-                                        hasAdjacentPanel: shouldRenderRightPanel,
-                                    },
                                     this.props.growMiddleBottom ? inheritHeightClass() : "",
                                 )}
                             >

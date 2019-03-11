@@ -152,6 +152,17 @@ $panelLayout-panelAndSpacingWidth                                     : $global-
             max-width: 100%;
         }
     }
+
+    &.hasTwoAdjacentPanels {
+        flex-basis: calc(100% - #{$panelLayout-panelAndSpacingWidth * 2});
+        max-width: calc(100% - #{$panelLayout-panelAndSpacingWidth * 2});
+
+        @include mediaQuery-panelLayout_oneColumn {
+            @include backLinkNoBleedStyles;
+            max-width: 100%;
+            flex-basis: 100%;
+        }
+    }
 }
 
 // Content section
@@ -164,6 +175,17 @@ $panelLayout-panelAndSpacingWidth                                     : $global-
     &.hasAdjacentPanel {
         flex-basis: calc(100% - #{$panelLayout-panelAndSpacingWidth});
         max-width: calc(100% - #{$panelLayout-panelAndSpacingWidth});
+
+        @include mediaQuery-panelLayout_oneColumn {
+            @include backLinkNoBleedStyles;
+            max-width: 100%;
+            flex-basis: 100%;
+        }
+    }
+
+    &.hasTwoAdjacentPanels {
+        flex-basis: calc(100% - #{$panelLayout-panelAndSpacingWidth * 2});
+        max-width: calc(100% - #{$panelLayout-panelAndSpacingWidth * 2});
 
         @include mediaQuery-panelLayout_oneColumn {
             @include backLinkNoBleedStyles;

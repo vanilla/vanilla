@@ -30,8 +30,6 @@
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Components
 \* -------------------------------------------------------------- */
-/* -------------------------------------------------------------- *    Widgets
-\* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Form Elements
 \* -------------------------------------------------------------- */
 /* -------------------------------------------------------------- *    Overlays (Menus, flyouts and Modals)
@@ -942,6 +940,11 @@ label.checkbox input.checkbox-input {
   border-bottom: 0;
 }
 
+.richEditor .richEditor-frame {
+  height: initial;
+  min-height: 275px;
+}
+
 .userContent {
   line-height: 1.5;
 }
@@ -1146,7 +1149,7 @@ body.hasRichEditor #Form_Preview {
 
 .richEditor-text {
   overflow: visible;
-  min-height: 237px;
+  min-height: 200px;
   padding-top: 12px;
   padding-right: 12px;
   padding-bottom: 12px;

@@ -89,6 +89,7 @@ export const globalVariables = useThemeCache(() => {
         condensed: 1.25,
         code: 1.45,
         excerpt: 1.45,
+        meta: 1.5,
     });
 
     const panelWidth = 216;

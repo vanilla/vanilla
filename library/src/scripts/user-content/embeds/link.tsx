@@ -10,6 +10,8 @@ import { getData, setData } from "@library/dom";
 import debounce from "lodash/debounce";
 import shave from "shave";
 import { registerEmbedComponent } from "@library/embeds";
+import {metasClasses} from "@library/styles/metasStyles";
+import classNames from "classnames";
 
 export function initLinkEmbeds() {
     registerEmbedComponent("link", LinkEmbed);
@@ -22,9 +24,10 @@ export function initLinkEmbeds() {
 export class LinkEmbed extends BaseEmbed {
     public render() {
         const { name, attributes, url, photoUrl, body } = this.props.data;
+        const classesMetas = metasClasses();
         const title = name ? <h3 className="embedText-title">{name}</h3> : null;
 
-        const source = <span className="embedLink-source metaStyle">{url}</span>;
+        const source = <span className={classNames("embedLink-source", classesMetas.metaStyle}>{url}</span>;
 
         let linkImage: JSX.Element | null = null;
         if (photoUrl) {
@@ -32,7 +35,7 @@ export class LinkEmbed extends BaseEmbed {
         }
         const dateTime =
             attributes.timestamp && attributes.humanTime ? (
-                <time className="embedLink-dateTime metaStyle" dateTime={attributes.timestamp}>
+                <time className={classNames("embedLink-dateTime", classesMetas.metaStyle)} dateTime={attributes.timestamp}>
                     {attributes.humanTime}
                 </time>
             ) : null;

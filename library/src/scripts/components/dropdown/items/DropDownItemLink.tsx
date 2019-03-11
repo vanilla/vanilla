@@ -34,7 +34,7 @@ export default class DropDownItemLink extends React.Component<IDropDownItemLink>
         const LinkComponent = isModalLink ? ModalLink : SmartLink;
         const classesDropDown = dropDownClasses();
         return (
-            <DropDownItem className={classNames("dropDown-linkItem", className, classesDropDown.item)}>
+            <DropDownItem className={classNames("dropDown-linkItem", className, classesDropDown.itemAction)}>
                 <LinkComponent
                     to={to}
                     title={name}

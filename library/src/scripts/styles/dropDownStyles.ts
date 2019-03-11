@@ -179,16 +179,6 @@ export const dropDownClasses = useThemeCache(() => {
         },
     });
 
-    const meta = style("meta", {
-        display: "block",
-    });
-
-    // const metaLink = style("metaLink", {
-    //     ...allLinkStates({
-    //         color: globalVars.links.colors.default,
-    //     }),
-    // });
-
     const item = style("item", {
         display: "flex",
         alignItems: "center",

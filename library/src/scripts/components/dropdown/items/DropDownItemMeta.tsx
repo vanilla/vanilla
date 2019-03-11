@@ -7,6 +7,7 @@
 import * as React from "react";
 import classNames from "classnames";
 import { dropDownClasses } from "@library/styles/dropDownStyles";
+import { metasClasses } from "@library/styles/metasStyles";
 
 interface IProps {
     className?: string;
@@ -19,8 +20,9 @@ interface IProps {
 export default class DropDownItemMeta extends React.Component<IProps> {
     public render() {
         const classes = dropDownClasses();
+        const classesMetas = metasClasses();
         return (
-            <div className={classNames("dropDown-meta", "metaStyle", classes.meta, this.props.className)}>
+            <div className={classNames("dropDown-meta", classesMetas.metaStyle, classes.meta, this.props.className)}>
                 {this.props.children}
             </div>
         );

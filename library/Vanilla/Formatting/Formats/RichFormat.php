@@ -218,7 +218,7 @@ class RichFormat extends BaseFormat {
                 __METHOD__,
                 $input
             ),
-            E_USER_ERROR
+            E_USER_WARNING
         );
     }
 }

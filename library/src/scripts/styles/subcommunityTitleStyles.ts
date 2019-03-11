@@ -80,6 +80,7 @@ export const subcommunityTileVariables = useThemeCache(() => {
 
 export const subcommunityTileClasses = useThemeCache(() => {
     const vars = subcommunityTileVariables();
+    const globalVars = globalVariables();
     const debug = debugHelper("subcommunityTile");
     const shadow = shadowHelper();
 
@@ -105,16 +106,16 @@ export const subcommunityTileClasses = useThemeCache(() => {
         backgroundColor: colorOut(vars.link.bg),
         minHeight: unit(vars.link.minHeight),
         ...shadowOrBorderBasedOnLightness(
-            vars.link.bg,
+            globalVars.body.bg,
             borders({
                 color: vars.link.fg.fade(0.3),
             }),
-            shadow.embed(vars.link.fg),
+            shadow.embed(),
         ),
         $nest: {
             "&:hover": {
                 ...shadowOrBorderBasedOnLightness(
-                    vars.link.bg,
+                    globalVars.body.bg,
                     borders({
                         color: vars.link.fg.fade(0.5),
                     }),

@@ -147,14 +147,6 @@ export const vanillaHeaderClasses = useThemeCache(() => {
             backgroundColor: headerColors.bg.toString(),
             color: headerColors.fg.toString(),
             $nest: {
-                "&.isFixed": {
-                    ...debug.name("fixed"),
-                    position: "fixed",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    zIndex: 1,
-                },
                 "& .searchBar__control": {
                     ...debug.name("control"),
                     color: vars.colors.fg.toString(),

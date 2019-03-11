@@ -119,7 +119,7 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
             const newScrolledValue = window.scrollY;
 
             // Always show if we are within the initial scrolloffset.
-            if (newScrolledValue < this.state.scrollOffset) {
+            if (newScrolledValue < this.state.scrollOffset * 2) {
                 this.setState({ isScrolledOff: false });
                 return;
             }

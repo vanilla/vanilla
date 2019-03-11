@@ -14,6 +14,7 @@ import React from "react";
 import { connect } from "react-redux";
 import getStore from "@library/state/getStore";
 import Backgrounds from "@library/components/body/Backgrounds";
+import { prepareShadowRoot } from "@library/dom";
 
 export interface IWithThemeProps {
     theme: IThemeVariables;
@@ -44,6 +45,16 @@ class BaseThemeProvider extends React.Component<IProps> {
 
     public componentDidMount() {
         void this.props.requestData();
+        const themeHeader = document.getElementById("themeHeader");
+        const themeFooter = document.getElementById("themeFooter");
+
+        if (themeHeader) {
+            prepareShadowRoot(themeHeader, true);
+        }
+
+        if (themeFooter) {
+            prepareShadowRoot(themeFooter, true);
+        }
     }
 }
 

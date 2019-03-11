@@ -9,6 +9,7 @@
  */
 
 import "@babel/polyfill";
+import "@webcomponents/webcomponentsjs";
 
 /**
  * Polyfill forEach on NodeList.

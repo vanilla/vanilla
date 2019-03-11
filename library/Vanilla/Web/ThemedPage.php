@@ -11,6 +11,7 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Theme\JsonAsset;
+use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\JsInterpop\ReduxAction;
 
@@ -35,13 +36,13 @@ abstract class ThemedPage extends Page {
     ) {
         parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel);
         $this->themesApi = $themesApi;
-        $this->initThemeData();
+        $this->initAssets();
     }
 
     /**
      * Initialize data that is shared among all of the controllers.
      */
-    private function initThemeData() {
+    protected function initAssets() {
         $themeKey = $this->siteMeta->getActiveTheme()->getKey();
         $themeData = $this->themesApi->get($themeKey);
         $variables = [];
@@ -57,9 +58,22 @@ abstract class ThemedPage extends Page {
             }
         }
 
+        $styleSheet = $themeData['assets']['styles'] ?? null;
+        $headerFooterPrefix = '';
+        if ($styleSheet) {
+            $style = $this->themesApi->get_assets($themeKey, 'styles.css');
+            $headerFooterPrefix = '<style>' . $style->getData() . '</style>';
+        }
+
+        // Add the themes javascript to the page.
+        $script = $themeData['assets']['javascript'] ?? null;
+        if ($script) {
+            $this->scripts[] = new Asset\ThemeScriptAsset($this->request, $themeKey, $themeData['version']);
+        }
+
         // Apply theme data to the master view.
-        $this->headerHtml = $themeData['assets']['header'] ?? '';
-        $this->footerHtml = $themeData['assets']['footer'] ?? '';
+        $this->headerHtml = $headerFooterPrefix . ($themeData['assets']['header'] ?? '');
+        $this->footerHtml = $headerFooterPrefix . ($themeData['assets']['footer'] ?? '');
 
         // Preload the theme variables for the frontend.
         $this->addReduxAction(new ReduxAction(

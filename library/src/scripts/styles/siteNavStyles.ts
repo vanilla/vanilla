@@ -136,6 +136,7 @@ export const siteNavNodeClasses = useThemeCache(() => {
         minHeight: px(30),
         outline: 0,
         padding: 0,
+        width: percent(100),
         $nest: {
             "&:active, &:focus": {
                 outline: 0,

@@ -41,7 +41,7 @@ import {
 } from "csstype";
 import { color, ColorHelper, deg, important, percent, px, quote, viewHeight, viewWidth, url } from "csx";
 import { keyframes } from "typestyle";
-import { TLength } from "typestyle/lib/types";
+import { TLength, NestedCSSProperties } from "typestyle/lib/types";
 import { getThemeVariables } from "@library/theming/ThemeProvider";
 import { isAllowedUrl, themeAsset } from "@library/application";
 import get from "lodash/get";
@@ -459,6 +459,12 @@ export const absolutePosition = {
         };
     },
 };
+
+export function sticky(): NestedCSSProperties {
+    return {
+        position: ["-webkit-sticky", "sticky"],
+    };
+}
 
 export interface IDropShadowShorthand {
     nonColorProps: string;

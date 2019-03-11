@@ -8,12 +8,15 @@ import { FOCUS_CLASS } from "@library/embeds";
 import { DeltaOperation, DeltaStatic } from "quill/core";
 import BaseHistoryModule from "quill/modules/history";
 import ExternalEmbedBlot from "./blots/embeds/ExternalEmbedBlot";
+import CodeBlock from "quill/formats/code";
+import { delay } from "bluebird";
 
 const SHORTKEY = /Mac/i.test(navigator.platform) ? "metaKey" : "ctrlKey";
 
 /**
  * A custom history module to allow redo/undo to work while an Embed is focused
  * and hack around the fact that Quill doesn't have first class support for asynchronusly rendering things.
+ * @link https://quilljs.com/docs/modules/history
  */
 export default class HistoryModule extends BaseHistoryModule {
     private readonly Z_KEYCODE = 90;
@@ -44,8 +47,8 @@ export default class HistoryModule extends BaseHistoryModule {
             typeof operation === "object" &&
             "attributes" in operation &&
             typeof operation.attributes === "object" &&
-            "code-block" in operation.attributes &&
-            operation.attributes["code-block"]
+            CodeBlock.blotName in operation.attributes &&
+            operation.attributes[CodeBlock.blotName]
         );
     };
 
@@ -99,10 +102,12 @@ export default class HistoryModule extends BaseHistoryModule {
      */
     public record(changeDelta: DeltaStatic, oldDelta: DeltaStatic) {
         if (this.operationsContain(changeDelta.ops, this.isEmbedInsert)) {
+            // Avoid merging several changes as single undo/redo if an embed was added.
             this.cutoff();
         }
 
         if (this.operationsContain(changeDelta.ops, this.isCodeBlock)) {
+            // Avoid merging several changes as single undo/redo if a code block was added.
             this.cutoff();
         }
 
@@ -110,6 +115,7 @@ export default class HistoryModule extends BaseHistoryModule {
         if (this.actionIsEmbedCompletion(undoDelta, changeDelta)) {
             return;
         }
+
         super.record(changeDelta, oldDelta);
     }
 

@@ -210,6 +210,11 @@ class RichFormat extends BaseFormat {
         return $this->renderTwig('resources/views/userContentError.twig', $data);
     }
 
+    /**
+     * Trigger an error message for invalid input.
+     *
+     * @param string $input
+     */
     private function logBadInput(string $input) {
         trigger_error(
             errorMessage(

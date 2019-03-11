@@ -399,7 +399,8 @@ class ModerationControllerTest extends BaseTest {
         //Create new comment to Discussion d1_case5
         $comment = $this->addComment([
             'DiscussionID' => self::$discussions['d1_case5']['DiscussionID'],
-            'Body' => 'Moderation controller test.'
+            'Body' => 'Moderation controller test.',
+            "Format" => "Text",
         ], 'd1_case5', 'cat2_1');
         // Move discussion d1_case5 to cat1_1_1
         $this->moveDiscussion(self::$discussions['d1_case5'], 'cat2_1', 'cat1_1_1', self::$discussions['d1_case6']);

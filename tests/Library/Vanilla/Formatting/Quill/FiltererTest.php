@@ -14,6 +14,9 @@ use Vanilla\Formatting\Quill\Formats\Bold;
 use Vanilla\Formatting\Quill\Formats\Italic;
 use Vanilla\Formatting\Quill\Formats\Link;
 
+/**
+ * General testing of Filterer.
+ */
 class FiltererTest extends TestCase {
 
     /**
@@ -24,14 +27,19 @@ class FiltererTest extends TestCase {
      *
      * @dataProvider provideIO
      */
-    public function testFilterer (string $input, string $output) {
+    public function testFilterer(string $input, string $output) {
         $filterer = new Filterer();
 
         $filteredOutput = $filterer->filter($input);
         $this->assertEquals($output, $filteredOutput);
     }
 
-    public function provideIO () {
+    /**
+     * Provide input and expected output examples.
+     *
+     * @return array
+     */
+    public function provideIO() {
         $loadingEmbed = <<<JSON
    {  
       "insert":{  

@@ -15,16 +15,23 @@ import "../scss/_base.scss";
 const errorMessage = "There was an error fetching the theme.";
 
 const Error = () => <p>{errorMessage}</p>;
-const styleDecorator = storyFn => (
-    <>
-        <Provider store={getStore()}>
-            <ThemeProvider errorComponent={<Error />} themeKey="keystone">
-                <Backgrounds />
-                {storyFn()}
-            </ThemeProvider>
-        </Provider>
-    </>
-);
+const styleDecorator = storyFn => {
+    const style = {
+        padding: 24,
+    };
+    return (
+        <>
+            <Provider store={getStore()}>
+                <ThemeProvider errorComponent={<Error />} themeKey="theme-variables-dark">
+                    <div style={style}>
+                        <Backgrounds />
+                        {storyFn()}
+                    </div>
+                </ThemeProvider>
+            </Provider>
+        </>
+    );
+};
 
 addDecorator(styleDecorator);
 

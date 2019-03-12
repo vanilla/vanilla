@@ -37,7 +37,7 @@ export function lineHeightAdjustment(
 
     const result: NestedCSSSelectors = {
         "&::before, &::after": {
-            content: "",
+            content: "''",
             display: "block",
             height: 0,
             width: 0,

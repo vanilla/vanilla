@@ -232,7 +232,7 @@ class CommentModel extends Gdn_Model {
      */
     public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
         $where = $this->stripWherePrefixes($where);
-        list($where, $options) = $this->splitWhere($where, ['joinUsers' => true]);
+        list($where, $options) = $this->splitWhere($where, ['joinUsers' => true, 'joinDiscussions' => false]);
 
         // Build up an inner select of comments to force late-loading.
         $innerSelect = $this->select($where, $orderFields, $orderDirection, $limit, $offset, 'c3');
@@ -250,6 +250,10 @@ class CommentModel extends Gdn_Model {
             Gdn::userModel()->joinUsers($result, ['InsertUserID', 'UpdateUserID']);
         }
 
+        if ($options['joinDiscussions']) {
+            $discussionModel = GDN::getContainer()->get(DiscussionModel::class);
+            $discussionModel->joinDiscussionData($result, 'DiscussionID', $options['joinDiscussions']);
+        }
         $this->setCalculatedFields($result);
 
         return $result;
@@ -1672,6 +1676,11 @@ class CommentModel extends Gdn_Model {
         $category = CategoryModel::categories(val('CategoryID', $discussion));
         if (CategoryModel::checkPermission($category, 'Vanilla.Comments.Edit')) {
             return true;
+        }
+
+        // Check if user can view the category contents.
+        if (!CategoryModel::checkPermission($category, 'Vanilla.Comments.Add')) {
+            return false;
         }
 
         // Make sure only moderators can edit closed things.

@@ -372,7 +372,8 @@ class ModerationControllerTest extends BaseTest {
     public function testAddCommentMoveDiscussion() {
         $comment = $this->addComment([
             'DiscussionID' => self::$discussions['d1_case1']['DiscussionID'],
-            'Body' => 'Moderation controller test.'
+            'Body' => 'Moderation controller test.',
+            'Format' => 'Text'
         ], 'd1_case1', 'cat2_1');
         $this->recheckCategories();
         $this->moveDiscussion(self::$discussions['d1_case1'], 'cat2_1', 'cat3_1_1', self::$discussions['d1_case6']);
@@ -398,7 +399,8 @@ class ModerationControllerTest extends BaseTest {
         //Create new comment to Discussion d1_case5
         $comment = $this->addComment([
             'DiscussionID' => self::$discussions['d1_case5']['DiscussionID'],
-            'Body' => 'Moderation controller test.'
+            'Body' => 'Moderation controller test.',
+            "Format" => "Text",
         ], 'd1_case5', 'cat2_1');
         // Move discussion d1_case5 to cat1_1_1
         $this->moveDiscussion(self::$discussions['d1_case5'], 'cat2_1', 'cat1_1_1', self::$discussions['d1_case6']);
@@ -428,7 +430,8 @@ class ModerationControllerTest extends BaseTest {
         $discussion = self::$discussions[$discussionKey] = self::addDiscussion([
             'Name' => 'Discussion 1 of '.$srcCatKey,
             'Body' => 'Test '.$srcCatKey.' '.$destCatKey,
-            'CategoryID' => $srcCategory['CategoryID']
+            'CategoryID' => $srcCategory['CategoryID'],
+            'Format' => 'Text'
         ], $srcCatKey);
         $discussion['discussionKey'] = self::$discussions[$discussionKey]['discussionKey'] = $discussionKey;
         if (!($destCategory = (self::$categories[$destCatKey] ?? false))) {

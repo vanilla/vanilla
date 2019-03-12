@@ -9312,6 +9312,7 @@ button.close {
 .panel-content,
 .panel-content-wrapper {
   width: 204px;
+  height: 100%;
 }
 
 .panel-left {
@@ -9320,6 +9321,13 @@ button.close {
   position: sticky;
   top: 0;
   height: 100%;
+  padding-bottom: 0;
+}
+
+.panel-left .panel-content {
+  max-height: -webkit-calc(100vh - 6rem);
+  max-height: calc(100vh - 6rem);
+  overflow: auto;
 }
 
 .panel-right {

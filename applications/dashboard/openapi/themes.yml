@@ -205,10 +205,6 @@ components:
       properties:
         assets:
           $ref: "#/components/schemas/ThemeAssets"
-        logo:
-          type: string
-        mobileLogo:
-          type: string
         type:
           type: string
           enum:
@@ -242,6 +238,10 @@ components:
           type: string
         variables:
           $ref: "#/components/schemas/ThemeVariablesAsset"
+        logo:
+          $ref: "#/components/schemas/ThemeLogoAsset"
+        mobileLogo:
+          $ref: "#/components/schemas/ThemeMobileLogoAsset"
       type: object
     ThemeAssetNotFound:
       properties:
@@ -350,5 +350,31 @@ components:
             - json
       required:
         - data
+        - type
+      type: object
+    ThemeLogoAsset:
+      description: Site logo to be displayed in the theme.
+      properties:
+        url:
+          type: string
+        type:
+          type: string
+          enum:
+            - image
+      required:
+        - url
+        - type
+      type: object
+    ThemeMobileLogoAsset:
+      description: Site logo to be displayed in the theme when viewed on a mobile device.
+      properties:
+        url:
+          type: string
+        type:
+          type: string
+          enum:
+            - image
+      required:
+        - url
         - type
       type: object

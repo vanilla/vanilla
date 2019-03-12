@@ -188,6 +188,11 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
 
         resolvedPromise
             .then(data => {
+                // DOM node has been removed from the document.
+                if (!document.contains(this.domNode)) {
+                    return;
+                }
+
                 const newValue: IEmbedValue = {
                     data,
                     loaderData: value.loaderData,
@@ -201,6 +206,10 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             })
             .catch(e => {
                 logError(e);
+                // DOM node has been removed from the document.
+                if (!document.contains(this.domNode)) {
+                    return;
+                }
                 const errorData: IErrorData = {
                     error: e,
                     type: value.loaderData.type === "file" ? ErrorBlotType.FILE : ErrorBlotType.STANDARD,

@@ -502,7 +502,8 @@ class DashboardHooks extends Gdn_Plugin {
                     $sQL = Gdn::sql();
                     $sQL->delete('TagDiscussion', ['TagID' => $tagID]);
                     $sQL->delete('Tag', ['TagID' => $tagID]);
-
+                    $tag['Name'] = htmlspecialchars($tag['Name']);
+                    $tag['FullName'] = htmlspecialchars($tag['FullName']);
                     $sender->informMessage(formatString(t('<b>{Name}</b> deleted.'), $tag));
                     $sender->jsonTarget("#Tag_{$tag['TagID']}", null, 'Remove');
                 }
@@ -613,6 +614,10 @@ class DashboardHooks extends Gdn_Plugin {
             throw notFoundException('Discussion');
         }
 
+        $hasPermission = Gdn::session()->checkPermission('Garden.Moderation.Manage');
+        if (!$hasPermission && $discussion['InsertUserID'] !== GDN::session()->UserID) {
+            throw permissionException('Garden.Moderation.Manage');
+        }
         $sender->title('Add Tags');
 
         if ($sender->Form->authenticatedPostBack()) {

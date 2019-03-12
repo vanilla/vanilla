@@ -5,7 +5,7 @@
 
 import { onContent } from "@library/application";
 import hljs from "highlight.js";
-import "highlight.js/styles/github.css";
+import "./_code.scss";
 
 export function initCodeHighlighting() {
     highlightCodeBlocks();

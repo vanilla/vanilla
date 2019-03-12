@@ -325,7 +325,7 @@ export interface IMargins {
     left?: string | number;
 }
 
-export const margins = (styles: IMargins) => {
+export const margins = (styles: IMargins): NestedCSSProperties => {
     return {
         marginTop: unit(styles.top),
         marginRight: unit(styles.right),

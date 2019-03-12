@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { modifyColorBasedOnLightness, colorOut } from "@library/styles/styleHelpers";
+import { modifyColorBasedOnLightness, colorOut, IBackground } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { color, ColorHelper, percent, viewHeight } from "csx";
 
@@ -66,8 +66,14 @@ export const globalVariables = useThemeCache(() => {
         },
     });
 
-    const body = makeThemeVars("body", {
-        bg: mainColors.bg,
+    interface IBody {
+        backgroundImage: IBackground;
+    }
+
+    const body: IBody = makeThemeVars("body", {
+        backgroundImage: {
+            color: mainColors.bg,
+        },
     });
 
     const border = makeThemeVars("border", {

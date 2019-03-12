@@ -43,7 +43,7 @@ import { color, ColorHelper, deg, important, percent, px, quote, viewHeight, vie
 import { keyframes } from "typestyle";
 import { TLength, NestedCSSProperties } from "typestyle/lib/types";
 import { getThemeVariables } from "@library/theming/ThemeProvider";
-import { isAllowedUrl, themeAsset } from "@library/application";
+import { isAllowedUrl, themeAsset, assetUrl } from "@library/application";
 import get from "lodash/get";
 import { ColorValues } from "@library/styles/buttonStyles";
 
@@ -656,8 +656,8 @@ export const font = (props: IFont) => {
     }
 };
 
-export interface IBackgroundImage {
-    color?: ColorValues;
+export interface IBackground {
+    color: ColorValues;
     attachment?: BackgroundAttachmentProperty;
     position?: BackgroundPositionProperty<TLength>;
     repeat?: BackgroundRepeatProperty;
@@ -667,37 +667,34 @@ export interface IBackgroundImage {
 }
 
 export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImage?: BackgroundImageProperty) => {
-    if (image) {
-        // Get either image or fallback
-        let workingImage;
-        if (image) {
-            workingImage = image;
-        } else {
-            workingImage = fallbackImage;
-        }
-
-        if (workingImage.charAt(0) === "~") {
-            // Relative path to theme folder
-            workingImage = themeAsset(workingImage.substr(1, workingImage.length - 1));
-        } else if (workingImage.startsWith('"data:image/')) {
-            // Encoded background
-        } else if (!isAllowedUrl(workingImage)) {
-            return null; // bad image or bad fallback image
-        }
-        return workingImage;
-    } else {
-        return undefined;
+    // Get either image or fallback
+    const workingImage = image ? image : fallbackImage;
+    if (!workingImage) {
+        return;
     }
+
+    if (workingImage.charAt(0) === "~") {
+        // Relative path to theme folder
+        return themeAsset(workingImage.substr(1, workingImage.length - 1));
+    }
+
+    if (workingImage.startsWith('"data:image/')) {
+        return workingImage;
+    }
+
+    // Fallback to a general asset URL.
+    const assetImage = assetUrl(workingImage);
+    return assetImage;
 };
 
-export const backgroundImage = (props: IBackgroundImage) => {
-    const image = getBackgroundImage(get(props, "image", undefined), get(props, "fallbackImage", undefined));
+export const background = (props: IBackground) => {
+    const image = getBackgroundImage(props.image, props.fallbackImage);
     return {
-        backgroundColor: get(props, "color") ? colorOut(props.color as any) : undefined,
-        backgroundAttachment: get(props, "attachment") ? props.attachment : undefined,
-        backgroundPosition: get(props, "position") ? props.position : `50% 50%`,
-        backgroundRepeat: get(props, "repeat") ? props.repeat : "no-repeat",
-        backgroundSize: get(props, "size") ? props.size : "cover",
+        backgroundColor: props.color ? colorOut(props.color) : undefined,
+        backgroundAttachment: props.attachment || undefined,
+        backgroundPosition: props.position || `50% 50%`,
+        backgroundRepeat: props.repeat || "no-repeat",
+        backgroundSize: props.size || "cover",
         backgroundImage: image ? url(image) : undefined,
     };
 };

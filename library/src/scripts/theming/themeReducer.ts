@@ -34,8 +34,15 @@ export const themeReducer = produce(
             return state;
         })
         .case(ThemeActions.getVariables.failed, (state, payload) => {
-            state.variables.status = LoadStatus.ERROR;
-            state.variables.error = payload.error;
-            return state;
+            if (payload.error.response.status === 404) {
+                // This theme just doesn't have variables. Use the defaults.
+                state.variables.data = {};
+                state.variables.status = LoadStatus.SUCCESS;
+                return state;
+            } else {
+                state.variables.status = LoadStatus.ERROR;
+                state.variables.error = payload.error;
+                return state;
+            }
         }),
 );

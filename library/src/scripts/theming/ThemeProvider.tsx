@@ -65,6 +65,7 @@ export function getThemeVariables() {
 
 interface IOwnProps {
     children: React.ReactNode;
+    themeKey: string;
     errorComponent: React.ReactNode;
 }
 
@@ -76,10 +77,10 @@ function mapStateToProps(state: ICoreStoreState, ownProps: IOwnProps) {
     };
 }
 
-function mapDispatchToProps(dispatch: any) {
+function mapDispatchToProps(dispatch: any, ownProps: IOwnProps) {
     const themeActions = new ThemeActions(dispatch, apiv2);
     return {
-        requestData: () => themeActions.getVariables(getMeta("ui.themeKey", "default")),
+        requestData: () => themeActions.getVariables(ownProps.themeKey),
     };
 }
 

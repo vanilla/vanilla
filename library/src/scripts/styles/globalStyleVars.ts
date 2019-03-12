@@ -290,3 +290,9 @@ export const globalVariables = useThemeCache(() => {
         separator,
     };
 });
+
+export enum IIconSizes {
+    SMALL = "small",
+    DEFAULT = "default",
+    LARGE = "large",
+}

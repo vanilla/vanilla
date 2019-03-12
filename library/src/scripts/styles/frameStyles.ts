@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { font, paddings, singleBorder, colorOut, unit } from "@library/styles/styleHelpers";
 import { calc, percent, viewHeight } from "csx";
@@ -97,18 +97,14 @@ export const frameHeaderClasses = useThemeCache(() => {
     });
 
     const backButton = style("backButton", {
-        $nest: {
-            ".&.buttonIcon": {
-                display: "flex",
-                flexWrap: "nowrap",
-                justifyContent: "center",
-                alignItems: "flex-end",
-                flexShrink: 1,
-                minWidth: unit(globalVars.icon.sizes.large),
-                width: unit(globalVars.icon.sizes.large),
-                marginLeft: unit(-8),
-            },
-        },
+        display: "flex",
+        flexWrap: "nowrap",
+        justifyContent: "center",
+        alignItems: "flex-end",
+        flexShrink: 1,
+        minWidth: unit(globalVars.icon.sizes.large),
+        width: unit(globalVars.icon.sizes.large),
+        transform: `translateX(-4px)`,
     });
 
     const heading = style("heading", {

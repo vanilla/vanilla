@@ -13,10 +13,12 @@ import {
     ISpinnerProps,
     spinnerLoader,
     colorOut,
+    unit,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 import { style } from "typestyle";
+import { TLength } from "typestyle/lib/types";
 
 export const loaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -32,19 +34,19 @@ export const loaderVariables = useThemeCache(() => {
         color: colors.fg,
     });
 
-    const fixedSize: ISpinnerProps = makeThemeVars("fixedSize", {
-        size: 32,
+    const medium: ISpinnerProps = makeThemeVars("medium", {
+        size: 50,
         thickness: 4,
         color: colors.fg,
     });
 
-    const medium: ISpinnerProps = makeThemeVars("medium", {
+    const small: ISpinnerProps = makeThemeVars("small", {
         size: 20,
-        thickness: 6,
+        thickness: 2,
         color: colors.fg,
     });
 
-    return { fullPage, fixedSize, medium };
+    return { fullPage, small, medium };
 });
 
 export const loaderClasses = useThemeCache(() => {
@@ -77,17 +79,32 @@ export const loaderClasses = useThemeCache(() => {
             },
         },
     });
-    const fixedSizeLoader = style({
+    const smallLoader = style({
         ...debug.name("fixedSizeLoader"),
         ...flex.middle(),
         height: percent(100),
         width: percent(100),
         $nest: {
             "&:after": {
-                ...spinnerLoader(vars.fixedSize),
+                ...spinnerLoader(vars.small),
             },
         },
     });
 
-    return { fullPageLoader, mediumLoader, fixedSizeLoader };
+    const loaderContainer = (size: TLength) => {
+        return style({
+            position: "relative",
+            display: "block",
+            margin: "auto",
+            height: unit(size),
+            width: unit(size),
+        });
+    };
+
+    return {
+        fullPageLoader,
+        mediumLoader,
+        smallLoader,
+        loaderContainer,
+    };
 });

@@ -80,7 +80,7 @@ export class MessagesContents extends React.Component<IProps> {
             // This will be calculated better once we finish the CSS in JS transition.
             const height = this.props.device === Devices.MOBILE ? 80 : 69;
             return (
-                <Loader loaderStyleClass={classesLoader.fixedSizeLoader} height={height} minimumTime={0} padding={10} />
+                <Loader loaderStyleClass={classesLoader.mediumLoader} height={height} minimumTime={0} padding={10} />
             );
         }
 

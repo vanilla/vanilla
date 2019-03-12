@@ -24,7 +24,7 @@ import { FontWeightProperty, PaddingProperty, TextAlignLastProperty, TextShadowP
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { TLength } from "typestyle/lib/types";
 import get from "lodash/get";
-import { transparentColor } from "@library/styles/buttonStyles";
+import { transparentColor } from "@library/styles/buttonVariables";
 
 export const splashVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("splash");

@@ -24,7 +24,7 @@ import { MenuProps } from "react-select/lib/components/Menu";
 import ReactDOM from "react-dom";
 import { LinkContext } from "@library/components/navigation/LinkContextProvider";
 import { RouteComponentProps } from "react-router";
-import { buttonVariables } from "@library/styles/buttonStyles";
+import { buttonVariables } from "@library/styles/buttonVariables";
 import { searchBarClasses } from "@library/styles/searchBarStyles";
 import { dropDownClasses } from "@library/styles/dropDownStyles";
 

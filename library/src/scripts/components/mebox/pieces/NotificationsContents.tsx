@@ -27,7 +27,7 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 import { loaderClasses } from "@library/styles/loaderStyles";
 import { frameFooterClasses } from "@library/styles/frameStyles";
-import { buttonUtilityClasses } from "@library/styles/buttonStyles";
+import { buttonUtilityClasses } from "@library/styles/buttonVariables";
 
 export interface INotificationsProps {
     countClass?: string;

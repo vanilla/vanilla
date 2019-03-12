@@ -26,7 +26,7 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 import Loader from "@library/components/Loader";
 import { loaderClasses } from "@library/styles/loaderStyles";
-import { buttonUtilityClasses } from "@library/styles/buttonStyles";
+import { buttonUtilityClasses } from "@library/styles/buttonVariables";
 
 /**
  * Implements Messages Contents to be included in drop down or tabs

@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { IOptionalComponentID } from "../componentIDs";
-import { ButtonBaseClass, getBaseClass } from "./forms/Button";
+import { ButtonBaseClass, getDynamicClassFromButtonType } from "./forms/Button";
 import SmartLink from "@library/components/navigation/SmartLink";
 import { LinkProps } from "react-router-dom";
 
@@ -32,7 +32,7 @@ export default class LinkAsButton extends React.Component<IProps> {
 
     public render() {
         const { baseClass, className, title, ariaLabel, to, children, tabIndex, ...restProps } = this.props;
-        const componentClasses = classNames(getBaseClass(baseClass), className);
+        const componentClasses = classNames(getDynamicClassFromButtonType(baseClass), className);
         return (
             <SmartLink
                 className={componentClasses}

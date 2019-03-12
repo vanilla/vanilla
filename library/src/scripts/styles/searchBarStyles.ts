@@ -5,7 +5,7 @@
  */
 
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { buttonVariables } from "@library/styles/buttonStyles";
+import { buttonVariables } from "@library/styles/buttonVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { borders, colorOut, unit } from "@library/styles/styleHelpers";
@@ -89,7 +89,7 @@ export const searchBarClasses = useThemeCache(() => {
                 },
 
                 "& .searchBar__placeholder": {
-                    color: colorOut(globalVars.border.color),
+                    color: colorOut(globalVars.mixBgAndFg(0.5)),
                     margin: "auto",
                 },
 
@@ -104,7 +104,7 @@ export const searchBarClasses = useThemeCache(() => {
                     position: "relative",
                     borderTopLeftRadius: important(0),
                     borderBottomLeftRadius: important(0),
-                    marginLeft: -1,
+                    marginLeft: unit(-1),
                     minWidth: unit(vars.search.minWidth),
                     flexBasis: unit(vars.search.minWidth),
                     minHeight: unit(vars.sizing.height),
@@ -146,6 +146,7 @@ export const searchBarClasses = useThemeCache(() => {
                     display: "none",
                 },
                 "& .searchBar__input": {
+                    color: colorOut(globalVars.mainColors.fg),
                     width: percent(100),
                     display: important("block"),
                     $nest: {

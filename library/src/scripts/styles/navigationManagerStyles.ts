@@ -9,6 +9,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { borders, colorOut, margins, paddings, unit } from "@library/styles/styleHelpers";
 import { important, percent } from "csx";
 import { shadowHelper } from "@library/styles/shadowHelpers";
+import { OutlineProperty } from "csstype";
 
 export const navigationManagerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -143,15 +144,14 @@ export const navigationManagerClasses = useThemeCache(() => {
                     color: globalVars.states.hover.color,
                 }),
             },
+            "&:hover, &:focus": {
+                outlineWidth: 0,
+                backgroundColor: colorOut(globalVars.mainColors.primary),
+            },
             "&:focus .navigationManager-action": {
                 display: "block",
             },
 
-            "&:hover, &:focus": {
-                outline: 0,
-                backgroundColor: globalVars.mainColors.primary,
-            },
-            "&:hover .navigationManager-action": {},
             "&.hasError .navigationManager-itemLabel": {
                 color: colorOut(globalVars.feedbackColors.error.fg),
             },

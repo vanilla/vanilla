@@ -45,7 +45,7 @@ import { TLength, NestedCSSProperties } from "typestyle/lib/types";
 import { getThemeVariables } from "@library/theming/ThemeProvider";
 import { isAllowedUrl, themeAsset } from "@library/application";
 import get from "lodash/get";
-import { ColorValues } from "@library/styles/buttonStyles";
+import { ColorValues } from "@library/styles/buttonVariables";
 
 export const colorOut = (colorValue: ColorValues) => {
     if (!colorValue) {

@@ -10,7 +10,7 @@ import { formErrorClasses } from "@library/components/forms/formElementStyles";
 import classNames from "classnames";
 import Paragraph from "@library/components/Paragraph";
 import ButtonLoader from "@library/components/ButtonLoader";
-import { buttonVariables } from "@library/styles/buttonStyles";
+import { buttonVariables } from "@library/styles/buttonVariables";
 
 interface IProps {
     children: React.ReactNode;

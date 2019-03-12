@@ -7,9 +7,9 @@
 import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { font, paddings, singleBorder, colorOut, unit } from "@library/styles/styleHelpers";
-import { calc, percent, viewHeight } from "csx";
+import { calc, important, percent, viewHeight } from "csx";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { buttonUtilityClasses } from "@library/styles/buttonStyles";
+import { buttonUtilityClasses } from "@library/styles/buttonVariables";
 
 export const frameVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -43,7 +43,12 @@ export const frameVariables = useThemeCache(() => {
     const footer = makeThemeVars("footer", {
         spacing: header.spacing,
         minHeight: header.minHeight,
-        padding: 12,
+        padding: {
+            top: 0,
+            right: 12,
+            bottom: 0,
+            left: 12,
+        },
     });
 
     const panel = makeThemeVars("panel", {
@@ -248,7 +253,7 @@ export const frameFooterClasses = useThemeCache(() => {
         borderTop: singleBorder(),
         flexWrap: "wrap",
         justifyContent: "flex-end",
-        padding: unit(vars.footer.padding),
+        ...paddings(vars.footer.padding),
     });
 
     const markRead = style("markRead", {
@@ -260,5 +265,10 @@ export const frameFooterClasses = useThemeCache(() => {
         },
     });
 
-    return { root, markRead };
+    const selfPadded = style({
+        paddingLeft: important(0),
+        paddingRight: important(0),
+    });
+
+    return { root, markRead, selfPadded };
 });

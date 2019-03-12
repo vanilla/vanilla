@@ -21,7 +21,7 @@ import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import Quill, { DeltaOperation, Sources, QuillOptionsStatic } from "quill/core";
 import { hot } from "react-hot-loader";
 import registerQuill from "@rich-editor/quill/registerQuill";
-import { uniqueId } from "lodash";
+import uniqueId from "lodash/uniqueId";
 import classNames from "classnames";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import { Devices } from "@library/components/DeviceChecker";

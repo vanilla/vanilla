@@ -222,6 +222,7 @@ export const globalVariables = useThemeCache(() => {
     const overlayBg = modifyColorBasedOnLightness(mainColors.fg, mainColors.fg, 0.5, true);
     const overlay = makeThemeVars("overlay", {
         dropShadow: `2px -2px 5px ${colorOut(overlayBg.fade(0.3))}`,
+        bg: overlayBg,
         border: {
             color: mixBgAndFg(0.1),
             radius: border.radius,

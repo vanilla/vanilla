@@ -118,6 +118,10 @@ export const frameHeaderClasses = useThemeCache(() => {
         textOverflow: "ellipsis",
         fontWeight: globalVars.fonts.weights.semiBold,
         fontSize: unit(globalVars.fonts.size.large),
+        ...paddings({
+            top: unit(4),
+            bottom: unit(4),
+        }),
     });
 
     const left = style("left", {

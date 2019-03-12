@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { modifyColorBasedOnLightness, colorOut } from "@library/styles/styleHelpers";
+import { modifyColorBasedOnLightness, colorOut, IBackground } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { color, ColorHelper, percent, viewHeight } from "csx";
 
@@ -19,6 +19,7 @@ export const globalVariables = useThemeCache(() => {
 
     const elementaryColors = {
         black: color("#000"),
+        grey: color("#555a62"),
         white: color("#fff"),
         transparent: `transparent`,
     };
@@ -66,8 +67,14 @@ export const globalVariables = useThemeCache(() => {
         },
     });
 
-    const body = makeThemeVars("body", {
-        bg: mainColors.bg,
+    interface IBody {
+        backgroundImage: IBackground;
+    }
+
+    const body: IBody = makeThemeVars("body", {
+        backgroundImage: {
+            color: mainColors.bg,
+        },
     });
 
     const border = makeThemeVars("border", {
@@ -202,7 +209,7 @@ export const globalVariables = useThemeCache(() => {
             opacity: 0.75,
         },
         hover: {
-            color: mixPrimaryAndBg(0.2),
+            color: mixPrimaryAndBg(0.08),
             opacity: 1,
         },
         selected: {
@@ -210,11 +217,11 @@ export const globalVariables = useThemeCache(() => {
             opacity: 1,
         },
         active: {
-            color: mixPrimaryAndBg(0.22),
+            color: mixPrimaryAndBg(0.2),
             opacity: 1,
         },
         focus: {
-            color: mixPrimaryAndBg(0.21),
+            color: mixPrimaryAndBg(0.15),
             opacity: 1,
         },
     });

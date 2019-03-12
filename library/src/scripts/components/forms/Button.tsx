@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { getOptionalID, IOptionalComponentID } from "@library/componentIDs";
-import { buttonUtilityClasses } from "@library/styles/buttonStyles";
+import { buttonClasses, ButtonTypes, buttonUtilityClasses } from "@library/styles/buttonStyles";
 
 interface IProps extends IOptionalComponentID {
     children: React.ReactNode;
@@ -20,7 +20,7 @@ interface IProps extends IOptionalComponentID {
     onKeyDown?: (e) => void;
     title?: string;
     ariaLabel?: string;
-    baseClass?: ButtonBaseClass;
+    baseClass?: ButtonTypes;
     ariaHidden?: boolean;
     tabIndex?: number;
     lang?: string;
@@ -33,24 +33,31 @@ interface IState {
     id?: string;
 }
 
-export enum ButtonBaseClass {
-    STANDARD = "button",
-    ICON = "buttonIcon",
-    TEXT = "buttonAsText",
-    TAB = "buttonAsTab",
-    CUSTOM = "",
-}
-
-export const getBaseClass = (baseClass: string | undefined) => {
-    if (baseClass) {
+export const getDynamicClassFromButtonType = (type: ButtonTypes | undefined) => {
+    if (type) {
         const buttonUtils = buttonUtilityClasses();
-        switch (baseClass) {
-            case ButtonBaseClass.TEXT:
+        const classes = buttonClasses();
+        switch (type) {
+            case ButtonTypes.TEXT:
                 return buttonUtils.buttonAsText;
-            case ButtonBaseClass.ICON:
+            case ButtonTypes.ICON:
                 return buttonUtils.buttonIcon;
+            case ButtonTypes.COMPACT:
+                return classes.compact;
+            case ButtonTypes.COMPACT_PRIMARY:
+                return classes.compactPrimary;
+            case ButtonTypes.PRIMARY:
+                return classes.primary;
+            case ButtonTypes.TRANSLUCID:
+                return classes.translucid;
+            case ButtonTypes.INVERTED:
+                return classes.inverted;
+            case ButtonTypes.TAB:
+                return classes.tab;
+            case ButtonTypes.CUSTOM:
+                return classes.custom;
             default:
-                return baseClass;
+                return classes.standard;
         }
     } else {
         return "";
@@ -67,7 +74,7 @@ export default class Button extends React.Component<IProps, IState> {
         type: "button",
         prefix: "button",
         legacyMode: false,
-        baseClass: ButtonBaseClass.STANDARD,
+        baseClass: ButtonTypes.STANDARD,
     };
 
     constructor(props) {
@@ -79,7 +86,7 @@ export default class Button extends React.Component<IProps, IState> {
 
     public render() {
         const componentClasses = classNames(
-            getBaseClass(this.props.baseClass),
+            getDynamicClassFromButtonType(this.props.baseClass),
             { Button: this.props.legacyMode },
             this.props.className,
         );

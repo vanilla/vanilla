@@ -239,7 +239,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * @param props
      */
     private SearchControl = props => {
-        const buttonVars = buttonVariables();
+        const buttonClasses = buttonVariables();
         const classes = searchBarClasses();
         return (
             <div className={classNames("searchBar", classes.root)}>
@@ -291,7 +291,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                             >
                                 {this.props.isLoading ? (
                                     <ButtonLoader
-                                        buttonType={buttonVars.primary}
+                                        buttonType={buttonClasses.primary}
                                         className={this.props.buttonLoaderClassName}
                                     />
                                 ) : (

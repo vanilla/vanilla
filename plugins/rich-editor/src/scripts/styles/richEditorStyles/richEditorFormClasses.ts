@@ -41,6 +41,7 @@ export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolea
                     formElementVars.border.fullWidth,
                 ),
                 color: colorOut(formElementVars.colors.fg),
+                backgroundColor: colorOut(formElementVars.colors.bg),
                 position: "relative",
                 fontWeight: globalVars.fonts.weights.semiBold,
                 border: 0,
@@ -50,11 +51,9 @@ export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolea
                     left: 0,
                     right: 0,
                 }),
-                $nest: {
-                    "&:active, &:focus, &.focus-visible": {
-                        boxShadow: "none",
-                    },
-                },
+            },
+            "&:not(.focus-visible)": {
+                outline: "none",
             },
             ...placeholderStyles({
                 lineHeight: "inherit",

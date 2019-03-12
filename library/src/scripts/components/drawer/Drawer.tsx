@@ -6,10 +6,11 @@
 
 import * as React from "react";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import classNames from "classnames";
 import { rightChevron } from "../icons/common";
 import { drawerClasses } from "@library/styles/drawerStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 export interface IDrawerProps {
     title: string;
@@ -46,7 +47,7 @@ export default class Drawer extends React.Component<IDrawerProps, IState> {
                     aria-controls={this.contentID}
                     aria-expanded={this.state.open}
                     disabled={this.props.disabled}
-                    baseClass={ButtonBaseClass.CUSTOM}
+                    baseClass={ButtonTypes.CUSTOM}
                     className={classNames("drawer-toggle", classes.toggle)}
                     onClick={this.toggle}
                 >

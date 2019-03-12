@@ -4,10 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { font, paddings, singleBorder, colorOut, unit } from "@library/styles/styleHelpers";
-import { calc, percent, viewHeight } from "csx";
+import { calc, important, percent, viewHeight } from "csx";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { buttonUtilityClasses } from "@library/styles/buttonStyles";
 
@@ -43,14 +43,22 @@ export const frameVariables = useThemeCache(() => {
     const footer = makeThemeVars("footer", {
         spacing: header.spacing,
         minHeight: header.minHeight,
-        padding: 12,
+        padding: {
+            top: 0,
+            right: 12,
+            bottom: 0,
+            left: 12,
+        },
     });
 
-    const panel = makeThemeVars("panel", {
-        minHeight: 500,
-    });
-
-    return { colors, sizing, border, spacing, header, footer, panel };
+    return {
+        colors,
+        sizing,
+        border,
+        spacing,
+        header,
+        footer,
+    };
 });
 
 export const frameClasses = useThemeCache(() => {
@@ -97,18 +105,14 @@ export const frameHeaderClasses = useThemeCache(() => {
     });
 
     const backButton = style("backButton", {
-        $nest: {
-            ".&.buttonIcon": {
-                display: "flex",
-                flexWrap: "nowrap",
-                justifyContent: "center",
-                alignItems: "flex-end",
-                flexShrink: 1,
-                minWidth: unit(globalVars.icon.sizes.large),
-                width: unit(globalVars.icon.sizes.large),
-                marginLeft: unit(-8),
-            },
-        },
+        display: "flex",
+        flexWrap: "nowrap",
+        justifyContent: "center",
+        alignItems: "flex-end",
+        flexShrink: 1,
+        minWidth: unit(globalVars.icon.sizes.large),
+        width: unit(globalVars.icon.sizes.large),
+        transform: `translateX(-4px)`,
     });
 
     const heading = style("heading", {
@@ -118,6 +122,10 @@ export const frameHeaderClasses = useThemeCache(() => {
         textOverflow: "ellipsis",
         fontWeight: globalVars.fonts.weights.semiBold,
         fontSize: unit(globalVars.fonts.size.large),
+        ...paddings({
+            top: unit(4),
+            bottom: unit(4),
+        }),
     });
 
     const left = style("left", {
@@ -217,6 +225,7 @@ export const framePanelClasses = useThemeCache(() => {
         backgroundColor: colorOut(vars.colors.bg),
         overflow: "auto",
         maxHeight: calc(`100vh - ${unit(vars.header.minHeight + vars.footer.minHeight + vars.spacing.padding * 2)}`),
+        minHeight: 56,
 
         $nest: {
             "& > .inputBlock": {
@@ -248,7 +257,7 @@ export const frameFooterClasses = useThemeCache(() => {
         borderTop: singleBorder(),
         flexWrap: "wrap",
         justifyContent: "flex-end",
-        padding: unit(vars.footer.padding),
+        ...paddings(vars.footer.padding),
     });
 
     const markRead = style("markRead", {
@@ -260,5 +269,10 @@ export const frameFooterClasses = useThemeCache(() => {
         },
     });
 
-    return { root, markRead };
+    const selfPadded = style({
+        paddingLeft: important(0),
+        paddingRight: important(0),
+    });
+
+    return { root, markRead, selfPadded };
 });

@@ -4,19 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
-import { useThemeCache } from "@library/styles/styleUtils";
+import { unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, px } from "csx";
-import { style } from "typestyle";
 
 export const siteNavVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const themeVars = componentThemeVariables("siteNav");
+    const makeThemeVars = variableFactory("siteNav");
 
-    const node = {
+    const node = makeThemeVars("node", {
         fontSize: globalVars.fonts.size.medium,
         fg: globalVars.mainColors.fg,
         lineHeight: globalVars.lineHeights.condensed,
@@ -26,24 +24,22 @@ export const siteNavVariables = useThemeCache(() => {
             fg: globalVars.links.colors.default,
             fontWeight: globalVars.fonts.weights.bold,
         },
-        ...themeVars.subComponentStyles("node"),
-    };
+    });
 
-    const title = {
+    const title = makeThemeVars("title", {
         fontSize: globalVars.fonts.size.large,
         fontWeight: globalVars.fonts.weights.bold,
-    };
+    });
 
-    const nodeToggle = {
+    const nodeToggle = makeThemeVars("nodeToggle", {
         height: node.fontSize * node.lineHeight,
         width: globalVars.gutter.size,
         iconWidth: 7,
-        ...themeVars.subComponentStyles("nodeToggle"),
-    };
+    });
 
-    const spacer = {
+    const spacer = makeThemeVars("spacer", {
         default: 7,
-    };
+    });
 
     return { node, title, nodeToggle, spacer };
 });
@@ -53,7 +49,7 @@ export const siteNavClasses = useThemeCache(() => {
     const vars = siteNavVariables();
     const mediaQueries = layoutVariables().mediaQueries();
 
-    const debug = debugHelper("siteNav");
+    const style = styleFactory("siteNav");
 
     const root = style(
         {
@@ -61,20 +57,18 @@ export const siteNavClasses = useThemeCache(() => {
             display: "block",
             zIndex: 1,
             marginTop: unit(vars.nodeToggle.height / 2 - vars.node.fontSize / 2),
-            ...debug.name(),
         },
         mediaQueries.noBleed({
             marginLeft: unit(vars.nodeToggle.width - vars.nodeToggle.iconWidth / 2 - vars.spacer.default),
         }),
     );
 
-    const title = style({
+    const title = style("title", {
         fontSize: unit(globalVars.fonts.size.large),
         fontWeight: globalVars.fonts.weights.bold,
-        ...debug.name("title"),
     });
 
-    const children = style({
+    const children = style("children", {
         position: "relative",
         display: "block",
         $nest: {
@@ -82,7 +76,6 @@ export const siteNavClasses = useThemeCache(() => {
                 margin: `25px 0 0`,
             },
         },
-        ...debug.name("children"),
     });
 
     return { root, title, children };
@@ -93,7 +86,7 @@ export const siteNavNodeClasses = useThemeCache(() => {
     const vars = siteNavVariables();
     const mediaQueries = layoutVariables().mediaQueries();
 
-    const debug = debugHelper("siteNavNode");
+    const style = styleFactory("siteNavNode");
 
     const root = style({
         position: "relative",
@@ -109,15 +102,13 @@ export const siteNavNodeClasses = useThemeCache(() => {
                 fontWeight: vars.node.active.fontWeight,
             },
         },
-        ...debug.name(),
     });
 
-    const children = style({
+    const children = style("children", {
         marginLeft: unit(vars.spacer.default),
-        ...debug.name("children"),
     });
 
-    const contents = style({
+    const contents = style("contents", {
         display: "block",
         width: percent(100),
         $nest: {
@@ -125,10 +116,9 @@ export const siteNavNodeClasses = useThemeCache(() => {
                 top: unit(15.5),
             },
         },
-        ...debug.name("contents"),
     });
 
-    const link = style({
+    const link = style("link", {
         display: "block",
         flexGrow: 1,
         color: "inherit",
@@ -155,10 +145,10 @@ export const siteNavNodeClasses = useThemeCache(() => {
                 },
             },
         },
-        ...debug.name("link"),
     });
 
     const label = style(
+        "label",
         {
             position: "relative",
             display: "block",
@@ -170,22 +160,20 @@ export const siteNavNodeClasses = useThemeCache(() => {
             paddingRight: unit(vars.node.padding),
             paddingBottom: unit(vars.node.padding + vars.node.borderWidth),
             paddingLeft: unit(vars.nodeToggle.width - vars.node.borderWidth),
-            ...debug.name("label"),
         },
         mediaQueries.oneColumn({
             fontSize: unit(globalVars.fonts.size.large),
         }),
     );
 
-    const spacer = style({
+    const spacer = style("spacer", {
         display: "block",
         height: unit(vars.nodeToggle.height),
         width: unit(vars.spacer.default),
         margin: `6px 0`,
-        ...debug.name("spacer"),
     });
 
-    const toggle = style({
+    const toggle = style("toggle", {
         margin: `6px 0`,
         padding: 0,
         zIndex: 1,
@@ -195,10 +183,9 @@ export const siteNavNodeClasses = useThemeCache(() => {
         outline: 0,
         height: unit(vars.nodeToggle.height),
         width: unit(vars.nodeToggle.width),
-        ...debug.name("toggle"),
     });
 
-    const buttonOffset = style({
+    const buttonOffset = style("buttonOffset", {
         position: "relative",
         display: "flex",
         justifyContent: "flex-end",
@@ -206,7 +193,6 @@ export const siteNavNodeClasses = useThemeCache(() => {
         marginLeft: unit(-vars.nodeToggle.width),
         top: px(16),
         transform: `translateY(-50%)`,
-        ...debug.name("buttonOffset"),
     });
 
     return { root, children, contents, link, label, spacer, toggle, buttonOffset };

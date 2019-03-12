@@ -13,10 +13,11 @@ import {
     ISpinnerProps,
     spinnerLoader,
     colorOut,
+    unit,
 } from "@library/styles/styleHelpers";
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
-import { style } from "typestyle";
+import { TLength } from "typestyle/lib/types";
 
 export const loaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -32,27 +33,26 @@ export const loaderVariables = useThemeCache(() => {
         color: colors.fg,
     });
 
-    const fixedSize: ISpinnerProps = makeThemeVars("fixedSize", {
-        size: 32,
+    const medium: ISpinnerProps = makeThemeVars("medium", {
+        size: 50,
         thickness: 4,
         color: colors.fg,
     });
 
-    const medium: ISpinnerProps = makeThemeVars("medium", {
-        size: 20,
-        thickness: 6,
+    const small: ISpinnerProps = makeThemeVars("small", {
+        size: 36,
+        thickness: 4,
         color: colors.fg,
     });
 
-    return { fullPage, fixedSize, medium };
+    return { fullPage, small, medium };
 });
 
 export const loaderClasses = useThemeCache(() => {
     const vars = loaderVariables();
-    const debug = debugHelper("loader");
     const flex = flexHelper();
-    const fullPageLoader = style({
-        ...debug.name("fullPageLoader"),
+    const style = styleFactory("loader");
+    const fullPageLoader = style("fullPageLoader", {
         ...flex.middle(),
         position: "fixed",
         top: 0,
@@ -65,8 +65,7 @@ export const loaderClasses = useThemeCache(() => {
             },
         },
     });
-    const mediumLoader = style({
-        ...debug.name("mediumLoader"),
+    const mediumLoader = style("mediumLoader", {
         ...absolutePosition.fullSizeOfParent(),
         ...flex.middle(),
         height: percent(100),
@@ -77,17 +76,32 @@ export const loaderClasses = useThemeCache(() => {
             },
         },
     });
-    const fixedSizeLoader = style({
-        ...debug.name("fixedSizeLoader"),
+    const smallLoader = style("smallLoader", {
         ...flex.middle(),
-        height: percent(100),
-        width: percent(100),
+        height: percent(46),
+        width: percent(46),
+        margin: "auto",
         $nest: {
             "&:after": {
-                ...spinnerLoader(vars.fixedSize),
+                ...spinnerLoader(vars.small),
             },
         },
     });
 
-    return { fullPageLoader, mediumLoader, fixedSizeLoader };
+    const loaderContainer = (size: TLength) => {
+        return style({
+            position: "relative",
+            display: "block",
+            margin: "auto",
+            height: unit(size),
+            width: unit(size),
+        });
+    };
+
+    return {
+        fullPageLoader,
+        mediumLoader,
+        smallLoader,
+        loaderContainer,
+    };
 });

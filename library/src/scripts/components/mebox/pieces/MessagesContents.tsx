@@ -10,7 +10,6 @@ import { t } from "@library/application";
 import FrameBody from "@library/components/frame/FrameBody";
 import FramePanel from "@library/components/frame/FramePanel";
 import FrameFooter from "@library/components/frame/FrameFooter";
-import { ButtonBaseClass } from "@library/components/forms/Button";
 import LinkAsButton from "@library/components/LinkAsButton";
 import Frame from "@library/components/frame/Frame";
 import { compose } from "@library/components/icons/header";
@@ -26,7 +25,7 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 import Loader from "@library/components/Loader";
 import { loaderClasses } from "@library/styles/loaderStyles";
-import { buttonUtilityClasses } from "@library/styles/buttonStyles";
+import { ButtonTypes, buttonUtilityClasses } from "@library/styles/buttonStyles";
 
 /**
  * Implements Messages Contents to be included in drop down or tabs
@@ -54,7 +53,7 @@ export class MessagesContents extends React.Component<IProps> {
                     <LinkAsButton
                         className={classNames(buttonUtils.pushLeft)}
                         to={"/messages/inbox"}
-                        baseClass={ButtonBaseClass.TEXT}
+                        baseClass={ButtonTypes.TEXT}
                     >
                         {t("All Messages")}
                     </LinkAsButton>
@@ -79,9 +78,7 @@ export class MessagesContents extends React.Component<IProps> {
             // This is the height that it happens to be right now.
             // This will be calculated better once we finish the CSS in JS transition.
             const height = this.props.device === Devices.MOBILE ? 80 : 69;
-            return (
-                <Loader loaderStyleClass={classesLoader.fixedSizeLoader} height={height} minimumTime={0} padding={10} />
-            );
+            return <Loader loaderStyleClass={classesLoader.smallLoader} height={height} minimumTime={0} padding={10} />;
         }
 
         return (

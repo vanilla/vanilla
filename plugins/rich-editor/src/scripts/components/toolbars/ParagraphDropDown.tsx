@@ -12,9 +12,10 @@ import Formatter from "@rich-editor/quill/Formatter";
 import ParagraphToolbarMenuItems from "@rich-editor/components/toolbars/pieces/ParagraphToolbarMenuItems";
 import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
 import DropDown from "@library/components/dropdown/DropDown";
-import { ButtonBaseClass } from "@library/components/forms/Button";
+
 import * as editorIcons from "@library/components/icons/editorIcons";
 import ActiveFormatIcon from "./pieces/ActiveFormatIcon";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -53,7 +54,7 @@ export class ParagraphDropDown extends React.PureComponent<IProps, IState> {
                 id={this.ID}
                 className="mobileParagraphMenu-dropDown"
                 buttonContents={editorIcons.pilcrow()}
-                buttonBaseClass={ButtonBaseClass.ICON}
+                buttonBaseClass={ButtonTypes.ICON}
                 disabled={this.props.disabled}
                 renderAbove={this.props.renderAbove}
                 renderLeft={this.props.renderLeft}

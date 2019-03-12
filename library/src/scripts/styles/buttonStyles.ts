@@ -15,36 +15,53 @@ import {
     colorOut,
     unit,
     userSelect,
-    allLinkStates,
+    IFont,
+    IBorderStyles,
+    font,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { BorderRadiusProperty, BorderStyleProperty, WidthProperty } from "csstype";
+import { BorderRadiusProperty, BorderStyleProperty, FontWeightProperty, WidthProperty } from "csstype";
 import { ColorHelper, important, px, percent } from "csx";
 import memoize from "lodash/memoize";
 import { TLength } from "typestyle/lib/types";
 import get from "lodash/get";
 
-export const buttonStyles = useThemeCache(() => {
+export const buttonGlobalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const themeVars = componentThemeVariables("button");
-    const padding = {
+    const formElVars = formElementsVariables();
+    const makeThemeVars = variableFactory("button");
+
+    const colors = makeThemeVars("color", {
+        fg: globalVars.mainColors.fg,
+        bg: globalVars.mainColors.bg,
+    });
+
+    const padding = makeThemeVars("padding", {
         top: 2,
         bottom: 3,
         side: 12,
-        ...themeVars.subComponentStyles("padding"),
-    };
+    });
 
-    const sizing = {
+    const fonts = makeThemeVars("font", {
+        size: globalVars.fonts.size.medium,
+    });
+
+    const sizing = makeThemeVars("sizing", {
+        minHeight: formElVars.sizing.height,
         minWidth: 96,
-        ...themeVars.subComponentStyles("sizing"),
-    };
+    });
 
-    const border = {
+    const border = makeThemeVars("border", {
         radius: globalVars.border.radius,
-        ...themeVars.subComponentStyles("border"),
-    };
+    });
 
-    return { padding, sizing, border };
+    return {
+        padding,
+        sizing,
+        border,
+        fonts,
+        colors,
+    };
 });
 
 export type ColorValues = ColorHelper | "transparent" | undefined;
@@ -52,49 +69,46 @@ export type ColorValues = ColorHelper | "transparent" | undefined;
 export const transparentColor = "transparent" as ColorValues;
 
 export interface IButtonType {
-    fg: ColorValues;
-    bg?: ColorValues;
-    border: {
-        color: ColorValues;
-        width?: WidthProperty<TLength>;
-        style?: BorderStyleProperty;
-        radius?: BorderRadiusProperty<TLength>;
-    };
-    hover: {
-        fg: ColorValues;
+    colors?: {
+        fg?: ColorValues;
         bg?: ColorValues;
-        border?: {
-            color: ColorValues;
-            style?: BorderStyleProperty;
-            radius?: BorderRadiusProperty<TLength>;
-        };
+    };
+    sizing?: {
+        minHeight?: TLength;
+        minWidth?: TLength;
+    };
+    padding?: {
+        top?: TLength;
+        bottom?: TLength;
+        side?: TLength;
+    };
+    font?: {
+        size?: TLength;
+    };
+    border?: IBorderStyles;
+    hover: {
+        fg?: ColorValues;
+        bg?: ColorValues;
+        border?: IBorderStyles;
+        font?: IFont;
     };
     focus: {
-        fg: ColorValues;
+        fg?: ColorValues;
         bg?: ColorValues;
-        border?: {
-            color: ColorValues;
-            style?: BorderStyleProperty;
-            radius?: BorderRadiusProperty<TLength>;
-        };
+        border?: IBorderStyles;
+        font?: IFont;
     };
     active: {
-        fg: ColorValues;
+        fg?: ColorValues;
         bg?: ColorValues;
-        border?: {
-            color: ColorValues;
-            style?: BorderStyleProperty;
-            radius?: BorderRadiusProperty<TLength>;
-        };
+        border?: IBorderStyles;
+        font?: IFont;
     };
     focusAccessible: {
-        fg: ColorValues;
+        fg?: ColorValues;
         bg?: ColorValues;
-        border?: {
-            color: ColorValues;
-            style?: BorderStyleProperty;
-            radius?: BorderRadiusProperty<TLength>;
-        };
+        border?: IBorderStyles;
+        font?: IFont;
     };
 }
 
@@ -103,8 +117,10 @@ export const buttonVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("button");
 
     const standard: IButtonType = makeThemeVars("basic", {
-        fg: globalVars.mainColors.fg,
-        bg: globalVars.mainColors.bg,
+        colors: {
+            fg: globalVars.mainColors.fg,
+            bg: globalVars.mainColors.bg,
+        },
         border: {
             color: globalVars.mixBgAndFg(0.24),
         },
@@ -131,7 +147,38 @@ export const buttonVariables = useThemeCache(() => {
     });
 
     const compact: IButtonType = makeThemeVars("compact", {
-        fg: globalVars.mainColors.fg,
+        colors: {
+            fg: globalVars.mainColors.fg,
+            bg: globalVars.mainColors.bg,
+        },
+        sizing: {
+            minHeight: 24,
+        },
+        border: {
+            color: transparentColor,
+        },
+        hover: {
+            fg: globalVars.mainColors.primary,
+        },
+        active: {
+            fg: globalVars.mainColors.primary,
+        },
+        focus: {
+            fg: globalVars.mainColors.primary,
+        },
+        focusAccessible: {
+            fg: globalVars.mainColors.primary,
+        },
+    });
+
+    const compactPrimary: IButtonType = makeThemeVars("compactPrimary", {
+        colors: {
+            fg: globalVars.mainColors.primary.fade(0.7),
+            bg: globalVars.mainColors.bg,
+        },
+        sizing: {
+            minHeight: 24,
+        },
         border: {
             color: transparentColor,
         },
@@ -150,8 +197,10 @@ export const buttonVariables = useThemeCache(() => {
     });
 
     const primary: IButtonType = makeThemeVars("primary", {
-        fg: globalVars.elementaryColors.white,
-        bg: globalVars.mainColors.primary,
+        colors: {
+            fg: globalVars.mainColors.bg,
+            bg: globalVars.mainColors.primary,
+        },
         spinnerColor: globalVars.elementaryColors.white,
         border: {
             color: globalVars.mainColors.primary,
@@ -180,63 +229,140 @@ export const buttonVariables = useThemeCache(() => {
 
     const transparentButtonColor = globalVars.mainColors.bg;
     const transparent: IButtonType = makeThemeVars("transparent", {
-        fg: transparentButtonColor,
-        bg: transparentColor,
+        colors: {
+            fg: transparentButtonColor,
+            bg: transparentColor,
+        },
         border: {
             color: transparentButtonColor,
         },
         hover: {
             fg: transparentButtonColor,
             bg: globalVars.elementaryColors.white.fade(0.1),
-            borderColor: transparentButtonColor,
+            border: {
+                color: transparentButtonColor,
+            },
         },
         active: {
             fg: transparentButtonColor,
             bg: globalVars.elementaryColors.white.fade(0.1),
-            borderColor: transparentButtonColor,
+            border: {
+                color: transparentButtonColor,
+            },
         },
         focus: {
             fg: transparentButtonColor,
             bg: globalVars.elementaryColors.white.fade(0.1),
-            borderColor: transparentButtonColor,
+            border: {
+                color: transparentButtonColor,
+            },
         },
         focusAccessible: {
             fg: transparentButtonColor,
             bg: globalVars.elementaryColors.white.fade(0.5),
-            borderColor: transparentButtonColor,
+            border: {
+                color: transparentButtonColor,
+            },
         },
     });
 
-    return { standard, primary, transparent };
+    const translucid: IButtonType = makeThemeVars("translucid", {
+        colors: {
+            fg: globalVars.mainColors.bg,
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, globalVars.mainColors.bg, 1).fade(0.1),
+        },
+        spinnerColor: globalVars.mainColors.bg,
+        border: {
+            color: globalVars.mainColors.bg,
+        },
+        hover: {
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, globalVars.mainColors.bg, 1).fade(0.2),
+            border: {
+                color: globalVars.mainColors.bg,
+            },
+        },
+        active: {
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, globalVars.mainColors.bg, 1).fade(0.2),
+            border: {
+                color: globalVars.mainColors.bg,
+            },
+        },
+        focus: {
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, globalVars.mainColors.bg, 1).fade(0.2),
+            border: {
+                color: globalVars.mainColors.bg,
+            },
+        },
+        focusAccessible: {
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, globalVars.mainColors.bg, 1).fade(0.2),
+            border: {
+                color: globalVars.mainColors.bg,
+            },
+        },
+    });
+
+    const inverted: IButtonType = makeThemeVars("inverted", {
+        colors: {
+            fg: globalVars.mainColors.primary,
+            bg: globalVars.mainColors.fg,
+        },
+        spinnerColor: globalVars.elementaryColors.white,
+        border: {
+            color: globalVars.mainColors.fg,
+        },
+        hover: {
+            bg: globalVars.mainColors.fg.fade(0.9),
+        },
+        active: {
+            bg: globalVars.mainColors.fg.fade(0.8),
+        },
+        focus: { bg: globalVars.mainColors.fg.fade(0.8) },
+        focusAccessible: { bg: globalVars.mainColors.fg.fade(0.8) },
+    });
+
+    return {
+        standard,
+        primary,
+        transparent,
+        compact,
+        compactPrimary,
+        inverted,
+        translucid,
+    };
 });
 
 export const buttonSizing = (height, minWidth, fontSize, paddingHorizontal, formElementVars) => {
     return {
-        minHeight: px(formElementVars.sizing.height),
-        fontSize: px(fontSize),
-        padding: `${px(0)} ${px(paddingHorizontal)}`,
-        lineHeight: px(formElementVars.sizing.height - formElementVars.border.width * 2),
+        minHeight: unit(formElementVars.sizing.minHeight),
+        fontSize: unit(fontSize),
+        padding: `${unit(0)} ${px(paddingHorizontal)}`,
+        lineHeight: unit(formElementVars.sizing.height - formElementVars.border.width * 2),
     };
 };
 
-export const generateButtonClass = (buttonType: IButtonType, buttonName: string, setZIndexOnState = false) => {
+export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: string, setZIndexOnState = false) => {
     const globalVars = globalVariables();
     const formElVars = formElementsVariables();
-    const vars = buttonStyles();
+    const buttonGlobals = buttonGlobalVariables();
     const style = styleFactory("button");
     const zIndex = setZIndexOnState ? 1 : undefined;
+    const buttonDimensions = buttonTypeVars.sizing || false;
 
     return style({
         textOverflow: "ellipsis",
         overflow: "hidden",
         maxWidth: percent(100),
-        ...borders(buttonType.border),
+        ...borders(buttonTypeVars.border),
         ...userSelect(),
         ...buttonSizing(
-            formElVars.sizing.height,
-            vars.sizing.minWidth,
-            globalVars.fonts.size.medium,
-            vars.padding.side,
+            buttonDimensions && buttonDimensions.minHeight
+                ? buttonDimensions.minHeight
+                : buttonGlobals.sizing.minHeight,
+            buttonDimensions && buttonDimensions.minWidth ? buttonDimensions.minWidth : buttonGlobals.sizing.minWidth,
+            buttonTypeVars.font && buttonTypeVars.font.size ? buttonTypeVars.font.size : buttonGlobals.fonts.size,
+            buttonTypeVars.padding && buttonTypeVars.padding.side
+                ? buttonTypeVars.padding.side
+                : buttonGlobals.padding.side,
             formElVars,
         ),
         display: "inline-block",
@@ -245,10 +371,15 @@ export const generateButtonClass = (buttonType: IButtonType, buttonName: string,
         whiteSpace: "nowrap",
         verticalAlign: "middle",
         touchAction: "manipulation",
-        minWidth: unit(vars.sizing.minWidth),
         cursor: "pointer",
-        color: colorOut(buttonType.fg),
-        backgroundColor: colorOut(buttonType.bg),
+        minWidth: buttonGlobals.sizing.minWidth,
+        minHeight: buttonGlobals.sizing.minHeight,
+        color: colorOut(
+            buttonTypeVars.colors && buttonTypeVars.colors.fg ? buttonTypeVars.colors.fg : buttonGlobals.colors.fg,
+        ),
+        backgroundColor: colorOut(
+            buttonTypeVars.colors && buttonTypeVars.colors.bg ? buttonTypeVars.colors.bg : buttonGlobals.colors.bg,
+        ),
         $nest: {
             "&:not([disabled])": {
                 $nest: {
@@ -257,30 +388,49 @@ export const generateButtonClass = (buttonType: IButtonType, buttonName: string,
                     },
                     "&:hover": {
                         zIndex,
-                        backgroundColor: colorOut(buttonType.hover.bg),
-                        border: get(buttonType, "hover.border", {}),
-                        color: colorOut(buttonType.hover.fg),
-                        ...borders(buttonType.border),
+                        backgroundColor: colorOut(buttonTypeVars.hover.bg),
+                        color: colorOut(buttonTypeVars.hover.fg),
+                        ...borders(get(buttonTypeVars, "hover.border", {})),
+                        ...(font(
+                            buttonTypeVars.hover && buttonTypeVars.hover.font ? buttonTypeVars.hover.font : {},
+                        ) as any),
                     },
                     "&:focus": {
                         zIndex,
-                        backgroundColor: colorOut(buttonType.focus.bg),
-                        border: get(buttonType, "focus.border", {}),
-                        color: colorOut(buttonType.focus.fg),
+                        backgroundColor: colorOut(buttonTypeVars.focus.bg),
+                        ...borders(get(buttonTypeVars, "focus.border", {})),
+                        color: colorOut(buttonTypeVars.focus.fg),
+                        ...(font(
+                            buttonTypeVars.focus && buttonTypeVars.focus.font ? buttonTypeVars.focus.font : {},
+                        ) as any),
                     },
                     "&:active": {
                         zIndex,
-                        backgroundColor: colorOut(buttonType.active.bg),
-                        border: get(buttonType, "hover.active", {}),
-                        color: colorOut(buttonType.active.fg),
+                        backgroundColor: colorOut(buttonTypeVars.active.bg),
+                        ...borders(get(buttonTypeVars, "active.border", {})),
+                        color: colorOut(buttonTypeVars.active.fg),
+                        ...(font(
+                            buttonTypeVars.active && buttonTypeVars.active.font ? buttonTypeVars.active.font : {},
+                        ) as any),
                     },
                     "&.focus-visible": {
                         zIndex,
-                        backgroundColor: colorOut(buttonType.focus.bg),
-                        border: get(buttonType, "hover.accessibleFocus", {}),
-                        color: colorOut(buttonType.focus.fg),
+                        backgroundColor: colorOut(buttonTypeVars.focus.bg),
+                        ...borders(get(buttonTypeVars, "accessibleFocus.border", {})),
+                        color: colorOut(buttonTypeVars.focusAccessible.fg),
+                        ...(font(
+                            buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.font
+                                ? buttonTypeVars.focusAccessible.font
+                                : {},
+                        ) as any),
                     },
                 },
+            },
+            "&[disabled]": {
+                opacity: 0.5,
+            },
+            "&:focus, &.focus-visible": {
+                zIndex: 1,
             },
         },
     });
@@ -291,15 +441,29 @@ export enum ButtonTypes {
     PRIMARY = "primary",
     TRANSPARENT = "transparent",
     COMPACT = "compact",
+    COMPACT_PRIMARY = "compactPrimary",
+    TRANSLUCID = "translucid",
+    INVERTED = "inverted",
+    CUSTOM = "custom",
+    TAB = "tab",
+    TEXT = "text",
+    ICON = "icon",
 }
 
 export const buttonClasses = useThemeCache(() => {
     const vars = buttonVariables();
     return {
-        primary: generateButtonClass(vars.primary, "primary"),
-        standard: generateButtonClass(vars.standard, "standard"),
-        transparent: generateButtonClass(vars.transparent, "transparent"),
-        compact: generateButtonClass(vars.transparent, "compact"),
+        primary: generateButtonClass(vars.primary, ButtonTypes.PRIMARY),
+        standard: generateButtonClass(vars.standard, ButtonTypes.STANDARD),
+        transparent: generateButtonClass(vars.transparent, ButtonTypes.TRANSPARENT),
+        compact: generateButtonClass(vars.compact, ButtonTypes.COMPACT),
+        compactPrimary: generateButtonClass(vars.compactPrimary, ButtonTypes.COMPACT_PRIMARY),
+        translucid: generateButtonClass(vars.translucid, ButtonTypes.TRANSLUCID),
+        inverted: generateButtonClass(vars.inverted, ButtonTypes.INVERTED),
+        tab: "buttonAsTab",
+        icon: "buttonAsIcon",
+        text: "buttonAsText",
+        custom: "",
     };
 });
 
@@ -344,7 +508,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
     };
 });
 
-export const buttonLoaderClasses = memoize((buttonType: IButtonType) => {
+export const buttonLoaderClasses = (buttonType: IButtonType = buttonVariables().primary) => {
     const themeVars = componentThemeVariables("buttonLoader");
     const globalVars = globalVariables();
     const flexUtils = flexHelper();
@@ -356,11 +520,11 @@ export const buttonLoaderClasses = memoize((buttonType: IButtonType) => {
         width: percent(100),
         $nest: {
             "&:after": spinnerLoader({
-                color: get(buttonType, "spinnerColor", globalVars.mainColors.primary),
+                color: buttonType.colors!.fg || (globalVars.mainColors.primary as any),
                 dimensions: 20,
             }),
         },
         ...themeVars.subComponentStyles("root"),
     });
     return { root };
-});
+};

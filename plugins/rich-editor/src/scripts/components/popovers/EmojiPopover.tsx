@@ -10,10 +10,11 @@ import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import EmojiPicker from "@rich-editor/components/popovers/pieces/EmojiPicker";
 import PopoverController, { IPopoverControllerChildParameters } from "@library/components/PopoverController";
 import { t } from "@library/application";
-import { ButtonBaseClass } from "@library/components/forms/Button";
+
 import { emoji } from "@library/components/icons/editorIcons";
 import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
 import classNames from "classnames";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IOptionalComponentID {
     disabled?: boolean;
@@ -45,7 +46,7 @@ export default class EmojiPopover extends React.Component<IProps, IRequiredCompo
                 disabled={this.props.disabled}
                 name={t("Emoji Picker")}
                 buttonContents={icon}
-                buttonBaseClass={ButtonBaseClass.ICON}
+                buttonBaseClass={ButtonTypes.ICON}
                 renderAbove={this.props.renderAbove}
                 renderLeft={this.props.renderLeft}
                 openAsModal={false}

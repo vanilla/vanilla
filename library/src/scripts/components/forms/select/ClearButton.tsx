@@ -6,9 +6,10 @@
 
 import React from "react";
 import classNames from "classnames";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import { t } from "@library/application";
 import { clear } from "@library/components/icons/common";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps {
     onClick: (event: React.SyntheticEvent) => void;
@@ -21,7 +22,7 @@ interface IProps {
 export function ClearButton(props: IProps) {
     return (
         <Button
-            baseClass={ButtonBaseClass.ICON}
+            baseClass={ButtonTypes.ICON}
             className={classNames("suggestedTextInput-clear", "searchBar-clear", props.className)}
             type="button"
             onClick={props.onClick}

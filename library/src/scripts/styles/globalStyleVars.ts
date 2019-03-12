@@ -208,7 +208,7 @@ export const globalVariables = useThemeCache(() => {
             opacity: 0.75,
         },
         hover: {
-            color: mixPrimaryAndBg(0.2),
+            color: mixPrimaryAndBg(0.08),
             opacity: 1,
         },
         selected: {
@@ -216,11 +216,11 @@ export const globalVariables = useThemeCache(() => {
             opacity: 1,
         },
         active: {
-            color: mixPrimaryAndBg(0.22),
+            color: mixPrimaryAndBg(0.2),
             opacity: 1,
         },
         focus: {
-            color: mixPrimaryAndBg(0.21),
+            color: mixPrimaryAndBg(0.15),
             opacity: 1,
         },
     });

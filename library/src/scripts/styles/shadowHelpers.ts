@@ -3,13 +3,12 @@
  * @license GPL-2.0-only
  */
 
+import { ColorValues } from "@library/styles/buttonStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { useThemeCache } from "@library/styles/styleUtils";
-import { BorderRadiusProperty, Color } from "csstype";
-import { color, ColorHelper } from "csx";
+import { BorderRadiusProperty } from "csstype";
+import { ColorHelper } from "csx";
 import { TLength } from "typestyle/lib/types";
-import { borders, IBorderStyles, IDropShadow } from "@library/styles/styleHelpers";
-import { ColorValues } from "@library/styles/buttonStyles";
 
 export const shadowHelper = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -23,7 +22,7 @@ export const shadowHelper = useThemeCache(() => {
 
     const embedHover = (baseColor: ColorHelper = shadowBaseColor) => {
         return {
-            boxShadow: `0 1px 3px 0 ${baseColor.fade(0.5)}`,
+            boxShadow: `0 1px 3px 0 ${baseColor.fade(0.3)}, 0 2px 4px 0 ${baseColor.darken(0.5).fade(0.22)}`,
         };
     };
 

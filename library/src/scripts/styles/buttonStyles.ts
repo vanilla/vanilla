@@ -372,6 +372,8 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
         verticalAlign: "middle",
         touchAction: "manipulation",
         cursor: "pointer",
+        minWidth: buttonGlobals.sizing.minWidth,
+        minHeight: buttonGlobals.sizing.minHeight,
         color: colorOut(
             buttonTypeVars.colors && buttonTypeVars.colors.fg ? buttonTypeVars.colors.fg : buttonGlobals.colors.fg,
         ),
@@ -506,7 +508,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
     };
 });
 
-export const buttonLoaderClasses = memoize((buttonType: IButtonType) => {
+export const buttonLoaderClasses = (buttonType: IButtonType = buttonVariables().primary) => {
     const themeVars = componentThemeVariables("buttonLoader");
     const globalVars = globalVariables();
     const flexUtils = flexHelper();
@@ -518,11 +520,11 @@ export const buttonLoaderClasses = memoize((buttonType: IButtonType) => {
         width: percent(100),
         $nest: {
             "&:after": spinnerLoader({
-                color: get(buttonType, "spinnerColor", globalVars.mainColors.primary),
+                color: buttonType.colors!.fg || (globalVars.mainColors.primary as any),
                 dimensions: 20,
             }),
         },
         ...themeVars.subComponentStyles("root"),
     });
     return { root };
-});
+};

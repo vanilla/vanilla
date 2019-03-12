@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { t } from "@library/application";
-import { buttonClasses, buttonLoaderClasses, IButtonType } from "@library/styles/buttonStyles";
+import { buttonLoaderClasses, IButtonType, buttonVariables } from "@library/styles/buttonStyles";
 import classNames from "classnames";
 
 interface IProps {
@@ -19,7 +19,7 @@ interface IProps {
  */
 export default class ButtonLoader extends React.Component<IProps> {
     public render() {
-        const classes = buttonLoaderClasses(this.props.buttonType || buttonClasses().primary);
+        const classes = buttonLoaderClasses(this.props.buttonType || buttonVariables().primary);
         return (
             <React.Fragment>
                 <div className={classNames(classes.root, this.props.className)} aria-hidden="true" />

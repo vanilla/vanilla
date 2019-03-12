@@ -7,7 +7,7 @@
 import { assetUrl, isAllowedUrl, themeAsset } from "@library/application";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
-    backgroundImage,
+    background,
     centeredBackgroundProps,
     font,
     getBackgroundImage,
@@ -16,6 +16,7 @@ import {
     paddings,
     colorOut,
     unit,
+    IBackground,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { percent, px, url } from "csx";
@@ -46,8 +47,8 @@ export const splashVariables = useThemeCache(() => {
         },
     });
 
-    const outerBackground = makeThemeVars("outerBackground", {
-        bg: globalVars.mainColors.primary,
+    const outerBackground: IBackground = makeThemeVars("outerBackground", {
+        color: globalVars.mainColors.primary,
         backgroundPosition: "50% 50%",
         backgroundSize: "cover",
         image: assetUrl("/resources/design/fallbackSplashBackground.svg"),
@@ -159,7 +160,7 @@ export const splashStyles = useThemeCache(() => {
 
     const root = style({
         position: "relative",
-        backgroundColor: colorOut(vars.outerBackground.bg),
+        backgroundColor: colorOut(vars.outerBackground.color),
     });
 
     const image = getBackgroundImage(vars.outerBackground.image, vars.outerBackground.fallbackImage);
@@ -171,7 +172,7 @@ export const splashStyles = useThemeCache(() => {
         left: px(0),
         width: percent(100),
         height: percent(100),
-        ...backgroundImage(vars.outerBackground),
+        ...background(vars.outerBackground),
         opacity: vars.outerBackground.fallbackImage && image === vars.outerBackground.fallbackImage ? 0.4 : undefined,
     });
 

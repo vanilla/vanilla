@@ -5,11 +5,12 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { unit } from "@library/styles/styleHelpers";
+import { unit, colorOut } from "@library/styles/styleHelpers";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { percent, px } from "csx";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { searchBarVariables } from "@library/styles/searchBarStyles";
 
 export const compactSearchClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -23,12 +24,15 @@ export const compactSearchClasses = useThemeCache(() => {
                 flexGrow: 1,
             },
             ".searchBar-valueContainer.suggestedTextInput-inputText": {
-                height: unit(formElementVars.sizing.height),
-                backgroundColor: vanillaHeaderVars.colors.bg.darken(0.05).toString(),
+                height: unit(searchBarVariables().sizing.height),
+                backgroundColor: colorOut(vanillaHeaderVars.colors.bg.darken(0.05)),
                 border: 0,
             },
             ".searchBar__placeholder": {
                 color: globalVars.mainColors.bg.toString(),
+            },
+            ".searchBar-icon": {
+                color: colorOut(vanillaHeaderVars.colors.fg),
             },
             ".searchBar__control": {
                 opacity: 0.8,

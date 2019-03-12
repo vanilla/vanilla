@@ -104,9 +104,10 @@ export const subcommunityTileClasses = useThemeCache(() => {
         flexGrow: 1,
         color: vars.link.fg.toString(),
         backgroundColor: colorOut(vars.link.bg),
+        borderRadius: unit(2),
         minHeight: unit(vars.link.minHeight),
         ...shadowOrBorderBasedOnLightness(
-            globalVars.body.bg,
+            globalVars.body.backgroundImage.color,
             borders({
                 color: vars.link.fg.fade(0.3),
             }),
@@ -115,7 +116,7 @@ export const subcommunityTileClasses = useThemeCache(() => {
         $nest: {
             "&:hover": {
                 ...shadowOrBorderBasedOnLightness(
-                    globalVars.body.bg,
+                    globalVars.body.backgroundImage.color,
                     borders({
                         color: vars.link.fg.fade(0.5),
                     }),

@@ -6,7 +6,6 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { ButtonBaseClass } from "@library/components/forms/Button";
 import { t } from "@library/application";
 import { clear, close } from "@library/components/icons";
 import { components } from "react-select";
@@ -18,6 +17,7 @@ import { ControlProps } from "react-select/lib/components/Control";
 import { MultiValueRemoveProps } from "react-select/lib/components/MultiValue";
 import { tokensClasses } from "@library/styles/tokensStyles";
 import { dropDownClasses } from "@library/styles/dropDownStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 /**
  * Overwrite for the controlContainer component in React Select
@@ -91,7 +91,7 @@ export function MultiValueRemove(props: MultiValueRemoveProps<any>) {
         <components.MultiValueRemove {...props} className="suggestedTextInput-tokenRemove">
             <button
                 {...innerProps}
-                className={classNames(ButtonBaseClass.CUSTOM, `${selectProps.classNamePrefix}-clear`)}
+                className={classNames(ButtonTypes.CUSTOM, `${selectProps.classNamePrefix}-clear`)}
                 type="button"
                 style={{}}
                 aria-hidden={undefined} // Unset the prop in restInnerProps

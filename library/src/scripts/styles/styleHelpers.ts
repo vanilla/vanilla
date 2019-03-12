@@ -372,12 +372,12 @@ export interface ISpinnerProps {
 }
 
 export const spinnerLoader = (props: ISpinnerProps) => {
-    const vars = globalVariables();
     const debug = debugHelper("spinnerLoader");
+    const globalVars = globalVariables();
     const spinnerVars = {
-        color: vars.mainColors.primary,
-        size: 18,
-        thickness: 3,
+        color: props.color || globalVars.mainColors.primary,
+        size: props.size || 18,
+        thickness: props.thickness || 3,
         speed: "0.7s",
         ...props,
     };

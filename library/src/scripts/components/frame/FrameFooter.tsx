@@ -11,6 +11,7 @@ import { frameFooterClasses } from "@library/styles/frameStyles";
 export interface IFrameFooterProps {
     className?: string;
     children: React.ReactNode;
+    selfPadded?: boolean;
 }
 
 /**
@@ -24,7 +25,14 @@ export default class FrameFooter extends React.PureComponent<IFrameFooterProps> 
     public render() {
         const classes = frameFooterClasses();
         return (
-            <footer className={classNames("frameFooter", this.props.className, classes.root)}>
+            <footer
+                className={classNames(
+                    "frameFooter",
+                    this.props.className,
+                    classes.root,
+                    this.props.selfPadded ? classes.selfPadded : "",
+                )}
+            >
                 {this.props.children}
             </footer>
         );

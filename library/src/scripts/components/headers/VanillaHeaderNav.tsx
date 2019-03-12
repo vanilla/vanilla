@@ -110,24 +110,6 @@ export default function vanillaHeaderNavClasses() {
     const linkContent = style("linkContent", {
         ...flex.middleLeft(),
         position: "relative",
-        $nest: {
-            "&:after": {
-                content: quote(""),
-                position: "absolute",
-                top: 0,
-                right: 0,
-                bottom: 0,
-                left: 0,
-                width: percent(100),
-                marginBottom: -vars.active.bottomOffset,
-                borderStyle: "solid",
-                borderColor: "transparent",
-                borderTopWidth: vars.border.verticalWidth,
-                borderRightWidth: 0,
-                borderBottomWidth: vars.border.verticalWidth,
-                borderLeftWidth: 0,
-            },
-        },
     });
 
     return {

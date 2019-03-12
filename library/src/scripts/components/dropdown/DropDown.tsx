@@ -9,15 +9,14 @@ import { dropDownMenu } from "@library/components/icons/common";
 import { getRequiredID } from "@library/componentIDs";
 import PopoverController from "@library/components/PopoverController";
 import DropDownContents from "./DropDownContents";
-import { ButtonBaseClass } from "@library/components/forms/Button";
 import Heading from "@library/components/Heading";
 import SmartAlign from "@library/components/SmartAlign";
 import classNames from "classnames";
 import FlexSpacer from "@library/components/FlexSpacer";
 import CloseButton from "@library/components/CloseButton";
-import { Frame } from "@library/components/frame";
 import { dropDownClasses } from "@library/styles/dropDownStyles";
 import { frameHeaderClasses } from "@library/styles/frameStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 export interface IProps {
     id?: string;
@@ -30,7 +29,7 @@ export interface IProps {
     contentsClassName?: string;
     buttonContents?: React.ReactNode;
     buttonClassName?: string;
-    buttonBaseClass?: ButtonBaseClass;
+    buttonBaseClass?: ButtonTypes;
     disabled?: boolean;
     toggleButtonClassName?: string;
     setExternalButtonRef?: (ref: React.RefObject<HTMLButtonElement>) => void;
@@ -79,7 +78,7 @@ export default class DropDown extends React.Component<IProps, IState> {
             <PopoverController
                 id={this.id}
                 className={classNames(this.props.className)}
-                buttonBaseClass={this.props.buttonBaseClass || ButtonBaseClass.CUSTOM}
+                buttonBaseClass={this.props.buttonBaseClass || ButtonTypes.CUSTOM}
                 name={this.props.name}
                 buttonContents={this.props.buttonContents || dropDownMenu()}
                 buttonClassName={this.props.buttonClassName}
@@ -130,7 +129,7 @@ export default class DropDown extends React.Component<IProps, IState> {
                                         <CloseButton
                                             className="frameHeader-close"
                                             onClick={params.closeMenuHandler}
-                                            baseClass={ButtonBaseClass.CUSTOM}
+                                            baseClass={ButtonTypes.CUSTOM}
                                         />
                                     </div>
                                 </header>

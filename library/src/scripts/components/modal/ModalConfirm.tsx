@@ -75,11 +75,11 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                             </SmartAlign>
                         </FramePanel>
                     </FrameBody>
-                    <FrameFooter>
-                        <Button buttonRef={this.cancelRef} onClick={onCancel}>
+                    <FrameFooter selfPadded={true}>
+                        <Button baseClass={ButtonTypes.COMPACT} buttonRef={this.cancelRef} onClick={onCancel}>
                             {t("Cancel")}
                         </Button>
-                        <Button onClick={onConfirm} className={buttons.primary} disabled={isConfirmLoading}>
+                        <Button onClick={onConfirm} baseClass={ButtonTypes.COMPACT_PRIMARY} disabled={isConfirmLoading}>
                             {isConfirmLoading ? <ButtonLoader /> : t("Ok")}
                         </Button>
                     </FrameFooter>

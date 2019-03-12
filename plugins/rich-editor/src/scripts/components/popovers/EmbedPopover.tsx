@@ -13,11 +13,12 @@ import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import Popover from "@rich-editor/components/popovers/pieces/Popover";
 import PopoverController, { IPopoverControllerChildParameters } from "@library/components/PopoverController";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import { embed } from "@library/components/icons/editorIcons";
 import classNames from "classnames";
 import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
 import { insertMediaClasses } from "@rich-editor/styles/richEditorStyles/insertMediaClasses";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -70,7 +71,7 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                 disabled={this.props.disabled}
                 name={t("Embed")}
                 buttonContents={Icon}
-                buttonBaseClass={ButtonBaseClass.CUSTOM}
+                buttonBaseClass={ButtonTypes.CUSTOM}
                 renderAbove={!!this.props.renderAbove}
                 renderLeft={!!this.props.renderLeft}
                 openAsModal={legacyMode ? false : !!this.props.openAsModal}

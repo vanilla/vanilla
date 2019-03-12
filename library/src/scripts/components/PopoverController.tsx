@@ -7,13 +7,14 @@
 import React, { RefObject } from "react";
 import { getRequiredID } from "@library/componentIDs";
 import classNames from "classnames";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import FocusWatcher from "@library/FocusWatcher";
 import EscapeListener from "@library/EscapeListener";
 import Modal from "@library/components/modal/Modal";
 import { t } from "@library/application";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import { dropDownClasses } from "@library/styles/dropDownStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 export interface IPopoverControllerChildParameters {
     id: string;
@@ -31,7 +32,7 @@ export interface IPopoverControllerProps {
     disabled?: boolean;
     children: (props: IPopoverControllerChildParameters) => JSX.Element;
     onClose?: () => void;
-    buttonBaseClass: ButtonBaseClass;
+    buttonBaseClass: ButtonTypes;
     buttonClassName?: string;
     onVisibilityChange?: (isVisible: boolean) => void;
     renderAbove?: boolean;

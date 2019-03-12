@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import { t } from "@library/application";
-import { buttonClasses, buttonLoaderClasses, buttonVariables, IButtonType } from "@library/styles/buttonStyles";
+import { buttonLoaderClasses, IButtonType, buttonVariables } from "@library/styles/buttonStyles";
 import classNames from "classnames";
 
 interface IProps {

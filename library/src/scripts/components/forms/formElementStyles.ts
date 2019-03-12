@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
+import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { unit } from "@library/styles/styleHelpers";
@@ -68,6 +68,22 @@ export const formElementsVariables = useThemeCache(() => {
         opacity: 0.5,
     });
 
+    const buttonMarginAlignment = (size: IIconSizes = IIconSizes.DEFAULT) => {
+        const globalVars = globalVariables();
+        let iconSize = globalVars.icon.sizes.default;
+
+        switch (size) {
+            case IIconSizes.SMALL:
+                iconSize = globalVars.icon.sizes.small;
+                break;
+            case IIconSizes.LARGE:
+                iconSize = globalVars.icon.sizes.small;
+                break;
+        }
+
+        return (sizing.height - iconSize) / 2;
+    };
+
     return {
         sizing,
         errorSpacing,
@@ -79,6 +95,7 @@ export const formElementsVariables = useThemeCache(() => {
         colors,
         placeholder,
         disabled,
+        buttonMarginAlignment,
     };
 });
 

@@ -6,7 +6,7 @@
 
 import { INavigationTreeItem } from "@library/@types/api";
 import { t } from "@library/application";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import { downTriangle, rightTriangle } from "@library/components/icons/common";
 import SmartLink from "@library/components/navigation/SmartLink";
 import TabHandler from "@library/TabHandler";
@@ -15,6 +15,7 @@ import * as React from "react";
 import Hoverable from "@library/utils/Hoverable";
 import { SiteNavContext } from "@library/components/siteNav/SiteNavContext";
 import { siteNavNodeClasses } from "@library/styles/siteNavStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 type RecordToggle = (recordType: string, recordID: number) => void;
 
@@ -58,7 +59,7 @@ export default class SiteNavNode extends React.Component<IProps> {
         if (this.props.clickableCategoryLabels && hasChildren) {
             linkContents = (
                 <Button
-                    baseClass={ButtonBaseClass.CUSTOM}
+                    baseClass={ButtonTypes.CUSTOM}
                     onKeyDownCapture={this.handleKeyDown}
                     className={linkContentClasses}
                     onClick={this.handleClick as any}
@@ -124,7 +125,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                             title={t("Toggle Category")}
                             ariaLabel={t("Toggle Category")}
                             onClick={this.handleClick as any}
-                            baseClass={ButtonBaseClass.CUSTOM}
+                            baseClass={ButtonTypes.CUSTOM}
                             className={classNames("siteNavNode-toggle", classes.toggle)}
                         >
                             {this.isOpen ? downTriangle("", t("Expand")) : rightTriangle("", t("Collapse"))}

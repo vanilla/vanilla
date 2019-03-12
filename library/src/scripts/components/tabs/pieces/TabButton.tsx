@@ -5,13 +5,14 @@
  */
 
 import * as React from "react";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps {
     id: string;
     ariaControls: string;
     ariaSelected: boolean;
-    baseClass: ButtonBaseClass;
+    baseClass: ButtonTypes;
     className: string;
     tabIndex: number;
     children: React.ReactNode;

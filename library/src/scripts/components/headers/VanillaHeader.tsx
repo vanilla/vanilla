@@ -32,6 +32,7 @@ import { vanillaHeaderClasses, vanillaHeaderVariables } from "@library/styles/va
 import { meBoxClasses } from "@library/styles/meBoxStyles";
 import { style } from "typestyle";
 import { sticky } from "@library/styles/styleHelpers";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -171,21 +172,15 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                             )}
                                         >
                                             <VanillaHeaderNavItem
-                                                linkClassName={classNames(
-                                                    "button",
-                                                    classes.signIn,
-                                                    classes.guestButton,
-                                                )}
+                                                buttonType={ButtonTypes.TRANSLUCID}
+                                                linkClassName={classNames(classes.signIn, classes.guestButton)}
                                                 to={`/entry/signin?target=${window.location.pathname}`}
                                             >
                                                 {t("Sign in")}
                                             </VanillaHeaderNavItem>
                                             <VanillaHeaderNavItem
-                                                linkClassName={classNames(
-                                                    "button",
-                                                    classes.register,
-                                                    classes.guestButton,
-                                                )}
+                                                buttonType={ButtonTypes.INVERTED}
+                                                linkClassName={classNames(classes.register, classes.guestButton)}
                                                 to={`/entry/register?target=${window.location.pathname}`}
                                             >
                                                 {t("Register")}

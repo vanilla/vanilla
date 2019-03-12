@@ -9,7 +9,7 @@ import { t } from "@library/application";
 import classNames from "classnames";
 import Modal from "@library/components/modal/Modal";
 import ModalSizes from "@library/components/modal/ModalSizes";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import { chevronUp, downTriangle } from "@library/components/icons/common";
 import { Panel } from "@library/components/layouts/PanelLayout";
 import { Frame, FrameBody, FrameFooter } from "@library/components/frame";
@@ -19,6 +19,7 @@ import CloseButton from "@library/components/CloseButton";
 import FlexSpacer from "@library/components/FlexSpacer";
 import { mobileDropDownClasses } from "@library/styles/mobileDropDownStyles";
 import { frameHeaderClasses } from "@library/styles/frameStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 export interface IProps {
     className?: string;
@@ -54,7 +55,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                     className={classNames(classes.toggleButton, buttonClass)}
                     onClick={this.open}
                     buttonRef={this.buttonRef}
-                    baseClass={ButtonBaseClass.CUSTOM}
+                    baseClass={ButtonTypes.CUSTOM}
                 >
                     <span className={classNames(classes.buttonContents)}>
                         <span className={classes.title}>{this.props.title}</span>
@@ -100,7 +101,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                                             <CloseButton
                                                 className="frameHeader-close"
                                                 onClick={this.close}
-                                                baseClass={ButtonBaseClass.CUSTOM}
+                                                baseClass={ButtonTypes.CUSTOM}
                                             />
                                         </div>
                                     </header>
@@ -108,7 +109,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                                     <FrameFooter>
                                         <Button
                                             onClick={this.close}
-                                            baseClass={ButtonBaseClass.CUSTOM}
+                                            baseClass={ButtonTypes.CUSTOM}
                                             className={classes.closeModal}
                                         >
                                             {chevronUp(classes.closeModalIcon)}

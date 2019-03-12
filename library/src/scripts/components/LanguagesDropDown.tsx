@@ -8,7 +8,7 @@ import * as React from "react";
 import { t } from "../application";
 import classNames from "classnames";
 import SelectBox, { ISelectBoxItem } from "@library/components/SelectBox";
-import { ButtonBaseClass } from "@library/components/forms/Button";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IState {
     id: string;
@@ -27,7 +27,7 @@ export interface ILanguageDropDownProps {
     selected: any;
     className?: string;
     buttonClassName?: string;
-    buttonBaseClass?: ButtonBaseClass;
+    buttonBaseClass?: ButtonTypes;
     renderLeft?: boolean;
     openAsModal?: boolean;
 }

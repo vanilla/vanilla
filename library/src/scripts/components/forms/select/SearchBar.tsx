@@ -24,7 +24,7 @@ import { MenuProps } from "react-select/lib/components/Menu";
 import ReactDOM from "react-dom";
 import { LinkContext } from "@library/components/navigation/LinkContextProvider";
 import { RouteComponentProps } from "react-router";
-import { buttonVariables } from "@library/styles/buttonVariables";
+import { buttonVariables } from "@library/styles/buttonStyles";
 import { searchBarClasses } from "@library/styles/searchBarStyles";
 import { dropDownClasses } from "@library/styles/dropDownStyles";
 
@@ -239,7 +239,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * @param props
      */
     private SearchControl = props => {
-        const buttonVars = buttonVariables();
+        const buttonClasses = buttonVariables();
         const classes = searchBarClasses();
         return (
             <div className={classNames("searchBar", classes.root)}>
@@ -291,7 +291,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                             >
                                 {this.props.isLoading ? (
                                     <ButtonLoader
-                                        buttonType={buttonVars.primary}
+                                        buttonType={buttonClasses.primary}
                                         className={this.props.buttonLoaderClassName}
                                     />
                                 ) : (

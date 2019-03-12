@@ -24,8 +24,8 @@ import VanillaHeaderNav from "@library/components/mebox/pieces/VanillaHeaderNav"
 import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
 import LanguagesDropDown from "@library/components/LanguagesDropDown";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
-import { ButtonBaseClass } from "@library/components/forms/Button";
 import { withDevice } from "@library/contexts/DeviceContext";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -87,7 +87,7 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                                     renderLeft={true}
                                     className="vanillaHeader-locales"
                                     buttonClassName="vanillaHeader-localeToggle"
-                                    buttonBaseClass={ButtonBaseClass.CUSTOM}
+                                    buttonBaseClass={ButtonTypes.CUSTOM}
                                     widthOfParent={false}
                                     openAsModal={isMobile}
                                 />

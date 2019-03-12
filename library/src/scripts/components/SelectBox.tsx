@@ -12,12 +12,12 @@ import { t } from "../application";
 import DropDownItemButton from "@library/components/dropdown/items/DropDownItemButton";
 import { checkCompact, downTriangle } from "@library/components/icons/common";
 import DropDown from "@library/components/dropdown/DropDown";
-import { ButtonBaseClass } from "@library/components/forms/Button";
 import Frame from "@library/components/frame/Frame";
 import FrameBody from "@library/components/frame/FrameBody";
 import { selectBoxClasses } from "@library/styles/selectBoxStyles";
 import { dropDownClasses } from "@library/styles/dropDownStyles";
 import { metasClasses } from "@library/styles/metasStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 export interface ISelectBoxItem {
     name: string;
@@ -35,7 +35,7 @@ interface IProps {
     renderAbove?: boolean; // Adjusts the flyout position vertically
     renderLeft?: boolean; // Adjusts the flyout position horizontally
     buttonClassName?: string;
-    buttonBaseClass?: ButtonBaseClass;
+    buttonBaseClass?: ButtonTypes;
     widthOfParent?: boolean;
     openAsModal?: boolean;
 }
@@ -60,7 +60,7 @@ interface IState {
 export default class SelectBox extends React.Component<ISelfLabelledProps | IExternalLabelledProps, IState> {
     public static defaultProps = {
         selectedIndex: 0,
-        buttonBaseClass: ButtonBaseClass.TEXT,
+        buttonBaseClass: ButtonTypes.TEXT,
     };
 
     public constructor(props) {

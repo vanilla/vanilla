@@ -5,7 +5,7 @@
  */
 
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { buttonVariables } from "@library/styles/buttonVariables";
+import { buttonClasses } from "@library/styles/buttonStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { borders, colorOut, unit } from "@library/styles/styleHelpers";
@@ -69,7 +69,7 @@ export const searchBarClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = searchBarVariables();
     const vanillaHeaderVars = vanillaHeaderVariables();
-    const buttonVars = buttonVariables();
+    const classesButton = buttonClasses();
     const formElementVars = formElementsVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const style = styleFactory("searchBar");
@@ -128,7 +128,7 @@ export const searchBarClasses = useThemeCache(() => {
                                 "&.inputText": {
                                     borderTopRightRadius: 0,
                                     borderBottomRightRadius: 0,
-                                    ...borders(get(buttonVars.standard, "border")),
+                                    ...borders(get(classesButton.standard, "border")),
                                 },
                             },
                         },

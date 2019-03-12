@@ -7,7 +7,7 @@
 import { IMe } from "@library/@types/api/users";
 import { t } from "@library/application";
 import CloseButton from "@library/components/CloseButton";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import { IMeBoxProps } from "@library/components/mebox/MeBox";
 import MessagesContents from "@library/components/mebox/pieces/MessagesContents";
 import MessagesCount from "@library/components/mebox/pieces/MessagesCount";
@@ -24,6 +24,7 @@ import get from "lodash/get";
 import * as React from "react";
 import { compactMeBoxClasses } from "@library/styles/compactMeBoxStyles";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 export interface IUserDropDownProps extends IInjectableUserState, IMeBoxProps {
     buttonClass?: string;
@@ -65,7 +66,7 @@ export default class CompactMeBox extends React.Component<IUserDropDownProps, IS
                     className={classNames("compactMeBox-openButton", this.props.buttonClass, classes.openButton)}
                     onClick={this.open}
                     buttonRef={this.buttonRef}
-                    baseClass={ButtonBaseClass.CUSTOM}
+                    baseClass={ButtonTypes.CUSTOM}
                 >
                     <UserPhoto
                         userInfo={userInfo}
@@ -86,7 +87,7 @@ export default class CompactMeBox extends React.Component<IUserDropDownProps, IS
                             <CloseButton
                                 onClick={this.close}
                                 className={classNames("compactMeBox-closeModal", classes.closeModal)}
-                                baseClass={ButtonBaseClass.CUSTOM}
+                                baseClass={ButtonTypes.CUSTOM}
                             />
                             <Tabs
                                 label={t("My Account Tab")}

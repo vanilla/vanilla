@@ -15,9 +15,8 @@ import {
     colorOut,
     unit,
 } from "@library/styles/styleHelpers";
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
-import { style } from "typestyle";
 import { TLength } from "typestyle/lib/types";
 
 export const loaderVariables = useThemeCache(() => {
@@ -41,8 +40,8 @@ export const loaderVariables = useThemeCache(() => {
     });
 
     const small: ISpinnerProps = makeThemeVars("small", {
-        size: 20,
-        thickness: 2,
+        size: 36,
+        thickness: 4,
         color: colors.fg,
     });
 
@@ -51,10 +50,9 @@ export const loaderVariables = useThemeCache(() => {
 
 export const loaderClasses = useThemeCache(() => {
     const vars = loaderVariables();
-    const debug = debugHelper("loader");
     const flex = flexHelper();
-    const fullPageLoader = style({
-        ...debug.name("fullPageLoader"),
+    const style = styleFactory("loader");
+    const fullPageLoader = style("fullPageLoader", {
         ...flex.middle(),
         position: "fixed",
         top: 0,
@@ -67,8 +65,7 @@ export const loaderClasses = useThemeCache(() => {
             },
         },
     });
-    const mediumLoader = style({
-        ...debug.name("mediumLoader"),
+    const mediumLoader = style("mediumLoader", {
         ...absolutePosition.fullSizeOfParent(),
         ...flex.middle(),
         height: percent(100),
@@ -79,11 +76,11 @@ export const loaderClasses = useThemeCache(() => {
             },
         },
     });
-    const smallLoader = style({
-        ...debug.name("fixedSizeLoader"),
+    const smallLoader = style("smallLoader", {
         ...flex.middle(),
-        height: percent(100),
-        width: percent(100),
+        height: percent(46),
+        width: percent(46),
+        margin: "auto",
         $nest: {
             "&:after": {
                 ...spinnerLoader(vars.small),

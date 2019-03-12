@@ -5,7 +5,7 @@
 
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { transparentColor } from "@library/styles/buttonVariables";
+import { transparentColor } from "@library/styles/buttonStyles";
 
 export const widgetVariables = useThemeCache(() => {
     const globalVars = globalVariables();

@@ -6,15 +6,16 @@
 
 import React from "react";
 import classNames from "classnames";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import { IOptionalComponentID } from "@library/componentIDs";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IOptionalComponentID {
     children: React.ReactNode;
     className?: string;
     disabled?: boolean;
     legacyMode?: boolean;
-    baseClass?: ButtonBaseClass;
+    baseClass?: ButtonTypes;
     tabIndex?: number;
 }
 

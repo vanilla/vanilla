@@ -90,7 +90,6 @@ export const dropDownClasses = useThemeCache(() => {
     const style = styleFactory("dropDown");
     const shadows = shadowHelper();
     const mediaQueries = layoutVariables().mediaQueries();
-    const formElementsVars = formElementsVariables();
 
     const root = style({
         position: "relative",

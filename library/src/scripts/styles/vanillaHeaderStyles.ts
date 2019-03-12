@@ -8,17 +8,16 @@ import { formElementsVariables } from "@library/components/forms/formElementStyl
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import {
-    componentThemeVariables,
     debugHelper,
     flexHelper,
     modifyColorBasedOnLightness,
     colorOut,
     unit,
     userSelect,
+    states,
 } from "@library/styles/styleHelpers";
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { percent, px } from "csx";
-import { style } from "typestyle";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { important, percent, px } from "csx";
 
 export const vanillaHeaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -92,6 +91,7 @@ export const vanillaHeaderVariables = useThemeCache(() => {
     });
 
     const signIn = makeThemeVars("signIn", {
+        fg: colors.fg,
         bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, globalVars.mainColors.primary, 0.1, true),
         hover: {
             bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, globalVars.mainColors.primary, 0.2, true),
@@ -99,7 +99,7 @@ export const vanillaHeaderVariables = useThemeCache(() => {
     });
 
     const resister = makeThemeVars("register", {
-        bg: globalVars.mainColors.bg,
+        fg: colors.bg,
         hover: {
             bg: globalVars.mainColors.bg.fade(0.9),
         },
@@ -139,21 +139,18 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     const headerColors = vars.colors;
     const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
-    const debug = debugHelper("vanillaHeader");
+    const style = styleFactory("vanillaHeader");
 
     const root = style(
         {
-            ...debug.name(),
             backgroundColor: headerColors.bg.toString(),
             color: headerColors.fg.toString(),
             $nest: {
                 "& .searchBar__control": {
-                    ...debug.name("control"),
                     color: vars.colors.fg.toString(),
                     cursor: "pointer",
                 },
                 "&& .suggestedTextInput-clear.searchBar-clear": {
-                    ...debug.name("clear"),
                     color: vars.colors.fg.toString(),
                     $nest: {
                         "&:hover": {
@@ -168,7 +165,6 @@ export const vanillaHeaderClasses = useThemeCache(() => {
                     },
                 },
                 "& .searchBar__placeholder": {
-                    ...debug.name("placeholder"),
                     color: vars.colors.fg.fade(0.8).toString(),
                     cursor: "pointer",
                 },
@@ -180,8 +176,8 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     );
 
     const spacer = style(
+        "spacer",
         {
-            ...debug.name("spacer"),
             height: px(vars.sizing.height),
         },
         mediaQueries.oneColumn({
@@ -190,8 +186,8 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     );
 
     const bar = style(
+        "bar",
         {
-            ...debug.name("bar"),
             display: "flex",
             justifyContent: "space-between",
             flexWrap: "nowrap",
@@ -208,8 +204,8 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     );
 
     const logoContainer = style(
+        "logoContainer",
         {
-            ...debug.name("logoContainer"),
             display: "inline-flex",
             alignSelf: "center",
             flexBasis: vars.endElements.flexBasis,
@@ -229,13 +225,11 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }),
     );
 
-    const meBox = style({
-        ...debug.name("meBox"),
+    const meBox = style("meBox", {
         justifyContent: "flex-end",
     });
 
-    const nav = style({
-        ...debug.name("nav"),
+    const nav = style("nav", {
         display: "flex",
         flexWrap: "wrap",
         height: percent(100),
@@ -243,8 +237,8 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     });
 
     const locales = style(
+        "locales",
         {
-            ...debug.name("locales"),
             height: px(vars.sizing.height),
             $nest: {
                 "&.buttonAsText": {
@@ -262,25 +256,22 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }),
     );
 
-    const messages = style({
-        ...debug.name("messages"),
+    const messages = style("messages", {
         color: vars.colors.fg.toString(),
     });
 
-    const notifications = style({
-        ...debug.name("notifications"),
+    const notifications = style("notifications", {
         color: "inherit",
     });
 
-    const compactSearch = style({
-        ...debug.name("compactSearch"),
+    const compactSearch = style("compactSearch", {
         marginLeft: "auto",
         maxWidth: px(vars.compactSearch.maxWidth),
     });
 
     const topElement = style(
+        "topElement",
         {
-            ...debug.name("topElement"),
             color: vars.colors.fg.toString(),
             padding: `0 ${px(vars.sizing.spacer / 2)}`,
             margin: `0 ${px(vars.sizing.spacer / 2)}`,
@@ -293,8 +284,8 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     );
 
     const localeToggle = style(
+        "localeToggle",
         {
-            ...debug.name("localeToggle"),
             height: px(vars.sizing.height),
         },
         mediaQueries.oneColumn({
@@ -302,23 +293,21 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         }),
     );
 
-    const languages = style({
-        ...debug.name("languages"),
+    const languages = style("languages", {
         marginLeft: "auto",
     });
 
-    const meBoxStateStyles = {
-        ...debug.name("meBoxStateStyles"),
+    const meBoxStateStyles = style("meBoxStateStyles", {
         borderRadius: px(vars.button.borderRadius),
         backgroundColor: vars.buttonContents.hover.bg.toString(),
-    };
+    });
 
     const button = style(
+        "button",
         {
-            ...debug.name("button"),
             color: vars.colors.fg.toString(),
             height: px(vars.sizing.height),
-            minWidth: px(vars.button.size),
+            minWidth: px(formElementVars.sizing.height),
             maxWidth: percent(100),
             padding: px(0),
             $nest: {
@@ -362,12 +351,11 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         }),
     );
 
-    const centeredButtonClass = style({
+    const centeredButtonClass = style("centeredButtonClass", {
         ...flex.middle(),
     });
 
-    const searchCancel = style({
-        ...debug.name("searchCancel"),
+    const searchCancel = style("searchCancel", {
         ...userSelect(),
         height: px(formElementVars.sizing.height),
         $nest: {
@@ -382,8 +370,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         },
     });
 
-    const tabButtonActive = {
-        ...debug.name("tabButtonActive"),
+    const tabButtonActive = style("tabButtonActive", {
         color: globalVars.mainColors.primary.toString(),
         $nest: {
             ".vanillaHeader-tabButtonContent": {
@@ -392,10 +379,9 @@ export const vanillaHeaderClasses = useThemeCache(() => {
                 borderRadius: px(vars.button.borderRadius),
             },
         },
-    };
+    });
 
-    const tabButton = style({
-        ...debug.name("tabButton"),
+    const tabButton = style("tabButton", {
         display: "block",
         height: percent(100),
         padding: px(0),
@@ -406,8 +392,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         },
     });
 
-    const dropDownContents = style({
-        ...debug.name("dropDownContents"),
+    const dropDownContents = style("dropDownContents", {
         $nest: {
             "&&&": {
                 minWidth: px(vars.dropDownContents.minWidth),
@@ -415,20 +400,20 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         },
     });
 
-    const count = {
+    const count = style("count", {
         height: px(vars.count.size),
         fontSize: px(vars.count.fontSize),
         backgroundColor: vars.count.bg.toString(),
         color: vars.count.fg.toString(),
-    };
+    });
 
-    const horizontalScroll = {
+    const horizontalScroll = style("horizontalScroll", {
         overflowX: "auto",
-    };
+    });
 
     const rightFlexBasis = style(
+        "rightFlexBasis",
         {
-            ...debug.name("rightFlexBasis"),
             display: "flex",
             height: px(vars.sizing.height),
             flexWrap: "nowrap",
@@ -444,8 +429,8 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     );
 
     const leftFlexBasis = style(
+        "leftFlexBasis",
         {
-            ...debug.name("leftFlexBasis"),
             ...flex.middleLeft(),
             flexBasis: vars.endElements.flexBasis,
         },
@@ -458,74 +443,43 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         }),
     );
 
-    const signIn = style({
-        ...debug.name("signIn"),
+    const signIn = style("signIn", {
+        marginLeft: unit(vars.guest.spacer),
+        marginRight: unit(vars.guest.spacer),
         $nest: {
-            "&:not([disabled])": {
-                color: vars.colors.fg.toString(),
-                backgroundColor: vars.signIn.bg.toString(),
-                border: `solid ${vars.colors.fg.toString()} 1px`,
-                marginLeft: unit(vars.guest.spacer * 1.5),
-                marginRight: unit(vars.guest.spacer),
-                $nest: {
-                    "&:hover": {
-                        border: `solid ${vars.colors.fg} 1px`,
-                        backgroundColor: vars.signIn.hover.bg.toString(),
-                        color: vars.colors.fg.toString(),
+            "&&&": {
+                color: colorOut(vars.signIn.fg),
+                borderColor: colorOut(vars.colors.fg),
+                ...states({
+                    allStates: {
+                        borderColor: colorOut(vars.colors.fg),
                     },
-                    "&.focus-visible": {
-                        fontWeight: globalVars.fonts.weights.semiBold,
-                    },
-                    "&:focus": {
-                        fontWeight: globalVars.fonts.weights.semiBold,
-                    },
-                },
-            },
-            ".vanillaHeaderNav-linkContent": {
-                $nest: {
-                    "&:after": {
-                        fontWeight: globalVars.fonts.weights.semiBold,
-                    },
-                },
+                }),
             },
         },
     });
 
-    const register = style({
-        ...debug.name("register"),
+    const register = style("register", {
+        marginLeft: unit(vars.guest.spacer),
+        marginRight: unit(vars.guest.spacer),
         $nest: {
-            "&:not([disabled])": {
-                color: vars.colors.bg.toString(),
-                backgroundColor: vars.colors.fg.toString(),
-                border: `solid ${vars.colors.fg} 1px;`,
-                marginLeft: unit(vars.guest.spacer),
-                $nest: {
-                    "&:hover": {
-                        color: vars.colors.bg.toString(),
-                        border: `solid ${vars.colors.fg} 1px;`,
-                        backgroundColor: vars.resister.hover.bg.toString(),
+            "&&&": {
+                backgroundColor: colorOut(vars.colors.fg),
+                color: colorOut(vars.resister.fg),
+                borderColor: colorOut(vars.colors.fg),
+                ...states({
+                    allStates: {
+                        backgroundColor: colorOut(vars.colors.fg.fade(0.9)),
+                        borderColor: colorOut(vars.colors.fg),
                     },
-                    "&.focus-visible": {
-                        fontWeight: globalVars.fonts.weights.semiBold,
-                    },
-                    "&:focus": {
-                        fontWeight: globalVars.fonts.weights.semiBold,
-                    },
-                },
-            },
-            ".vanillaHeaderNav-linkContent": {
-                $nest: {
-                    "&:after": {
-                        display: "none",
-                    },
-                },
+                }),
             },
         },
     });
 
     const compactSearchResults = style(
+        "compactSearchResults",
         {
-            ...debug.name("compactSearchResults"),
             top: (vars.sizing.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
             display: "flex",
             position: "relative",
@@ -537,11 +491,11 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         }),
     );
 
-    const clearButtonClass = style({
+    const clearButtonClass = style("clearButtonClass", {
         color: vars.colors.fg.toString(),
     });
 
-    const guestButton = style({
+    const guestButton = style("guestButton", {
         minWidth: unit(vars.button.guest.minWidth),
     });
 
@@ -578,11 +532,10 @@ export const vanillaHeaderClasses = useThemeCache(() => {
 
 export const vanillaHeaderLogoClasses = useThemeCache(() => {
     const vars = vanillaHeaderVariables();
-    const logoFrame = style({ display: "inline-flex" });
-    const debug = debugHelper("vanillaHeaderLogo");
+    const style = styleFactory("vanillaHeaderLogo");
+    const logoFrame = style("logoFrame", { display: "inline-flex" });
 
-    const logo = style({
-        ...debug.name("logo"),
+    const logo = style("logo", {
         display: "block",
         height: px(vars.sizing.height - 18),
         width: "auto",
@@ -593,8 +546,7 @@ export const vanillaHeaderLogoClasses = useThemeCache(() => {
         },
     });
 
-    const link = style({
-        ...debug.name("link"),
+    const link = style("link", {
         textDecoration: "none",
     });
 
@@ -604,20 +556,17 @@ export const vanillaHeaderLogoClasses = useThemeCache(() => {
 export const vanillaHeaderHomeClasses = useThemeCache(() => {
     const vars = vanillaHeaderVariables();
     const globalVars = globalVariables();
-    const debug = debugHelper("vanillaHeaderHome");
+    const style = styleFactory("vanillaHeaderHome");
 
     const root = style({
-        ...debug.name(),
         minHeight: vars.sizing.mobile.height * 2,
     });
 
-    const bottom = style({
-        ...debug.name("bottom"),
+    const bottom = style("bottom", {
         backgroundColor: globalVars.mainColors.fg.fade(0.1).toString(),
     });
 
-    const left = style({
-        ...debug.name("left"),
+    const left = style("left", {
         height: px(1),
         width: px(vars.button.size),
         flexBasis: vars.button.size,

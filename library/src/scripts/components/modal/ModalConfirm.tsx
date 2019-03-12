@@ -6,14 +6,14 @@
 
 import * as React from "react";
 import { t } from "@library/application";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import { Frame, FrameBody, FrameFooter, FrameHeader, FramePanel } from "@library/components/frame";
 import SmartAlign from "@library/components/SmartAlign";
 import ModalSizes from "@library/components/modal/ModalSizes";
 import { getRequiredID } from "@library/componentIDs";
 import Modal from "@library/components/modal/Modal";
 import ButtonLoader from "@library/components/ButtonLoader";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonVariables";
+import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 import { frameBodyClasses } from "@library/styles/frameStyles";
 import classNames from "classnames";
 
@@ -76,14 +76,10 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                         </FramePanel>
                     </FrameBody>
                     <FrameFooter selfPadded={true}>
-                        <Button baseClass={ButtonBaseClass.COMPACT} buttonRef={this.cancelRef} onClick={onCancel}>
+                        <Button baseClass={ButtonTypes.COMPACT} buttonRef={this.cancelRef} onClick={onCancel}>
                             {t("Cancel")}
                         </Button>
-                        <Button
-                            onClick={onConfirm}
-                            baseClass={ButtonBaseClass.COMPACT_PRIMARY}
-                            disabled={isConfirmLoading}
-                        >
+                        <Button onClick={onConfirm} baseClass={ButtonTypes.COMPACT_PRIMARY} disabled={isConfirmLoading}>
                             {isConfirmLoading ? <ButtonLoader /> : t("Ok")}
                         </Button>
                     </FrameFooter>

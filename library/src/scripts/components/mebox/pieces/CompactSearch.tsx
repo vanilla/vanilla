@@ -7,7 +7,7 @@
 import * as React from "react";
 import SearchBar from "@library/components/forms/select/SearchBar";
 import { t } from "@library/application";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import classNames from "classnames";
 import { search } from "@library/components/icons/header";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
@@ -18,6 +18,7 @@ import FocusWatcher from "@library/FocusWatcher";
 import { vanillaHeaderClasses } from "@library/styles/vanillaHeaderStyles";
 import { compactSearchClasses } from "@library/styles/compactSearchStyles";
 import { searchBarClasses } from "@library/styles/searchBarStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
@@ -69,7 +70,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                         title={t("Search")}
                         aria-expanded={false}
                         aria-haspopup="true"
-                        baseClass={ButtonBaseClass.CUSTOM}
+                        baseClass={ButtonTypes.CUSTOM}
                         aria-controls={this.id}
                         buttonRef={this.openSearchButton}
                     >
@@ -110,7 +111,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                             aria-expanded={true}
                             aria-haspopup="true"
                             aria-controls={this.id}
-                            baseClass={ButtonBaseClass.CUSTOM}
+                            baseClass={ButtonTypes.CUSTOM}
                         >
                             <div
                                 className={classNames(

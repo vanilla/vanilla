@@ -9,7 +9,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { font, paddings, singleBorder, colorOut, unit } from "@library/styles/styleHelpers";
 import { calc, important, percent, viewHeight } from "csx";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { buttonUtilityClasses } from "@library/styles/buttonVariables";
+import { buttonUtilityClasses } from "@library/styles/buttonStyles";
 
 export const frameVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -51,11 +51,14 @@ export const frameVariables = useThemeCache(() => {
         },
     });
 
-    const panel = makeThemeVars("panel", {
-        minHeight: 500,
-    });
-
-    return { colors, sizing, border, spacing, header, footer, panel };
+    return {
+        colors,
+        sizing,
+        border,
+        spacing,
+        header,
+        footer,
+    };
 });
 
 export const frameClasses = useThemeCache(() => {
@@ -222,6 +225,7 @@ export const framePanelClasses = useThemeCache(() => {
         backgroundColor: colorOut(vars.colors.bg),
         overflow: "auto",
         maxHeight: calc(`100vh - ${unit(vars.header.minHeight + vars.footer.minHeight + vars.spacing.padding * 2)}`),
+        minHeight: 56,
 
         $nest: {
             "& > .inputBlock": {

@@ -17,7 +17,7 @@ import {
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { percent, px } from "csx";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { transparentColor } from "@library/styles/buttonVariables";
+import { transparentColor } from "@library/styles/buttonStyles";
 
 export const attachmentVariables = useThemeCache(() => {
     const globalVars = globalVariables();

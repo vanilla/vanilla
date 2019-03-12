@@ -10,9 +10,10 @@ import classNames from "classnames";
 import { t } from "@library/application";
 import CloseButton from "@library/components/CloseButton";
 import Heading, { ICommonHeadingProps } from "@library/components/Heading";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import { leftChevron } from "@library/components/icons/common";
 import { frameFooterClasses, frameHeaderClasses } from "@library/styles/frameStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 export interface IFrameHeaderProps extends ICommonHeadingProps {
     closeFrame?: (e) => void; // Necessary when in modal, but not if in dropdown
@@ -41,7 +42,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                 <Button
                     title={backTitle}
                     aria-label={backTitle}
-                    baseClass={ButtonBaseClass.ICON}
+                    baseClass={ButtonTypes.ICON}
                     onClick={this.props.onBackClick}
                     className={classNames("frameHeader-backButton", classes.backButton)}
                 >

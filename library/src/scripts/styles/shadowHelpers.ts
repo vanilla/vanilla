@@ -13,26 +13,27 @@ import { ColorValues } from "@library/styles/buttonStyles";
 
 export const shadowHelper = useThemeCache(() => {
     const globalVars = globalVariables();
+    const shadowBaseColor = globalVars.elementaryColors.grey;
 
-    const embed = (baseColor: ColorHelper = globalVars.elementaryColors.black) => {
+    const embed = (baseColor: ColorHelper = shadowBaseColor) => {
         return {
             boxShadow: `0 1px 3px 0 ${baseColor.fade(0.3)}`,
         };
     };
 
-    const embedHover = (baseColor: ColorHelper = globalVars.elementaryColors.black) => {
+    const embedHover = (baseColor: ColorHelper = shadowBaseColor) => {
         return {
-            boxShadow: `0 1px 3px 0 ${baseColor.fade(0.7)}`,
+            boxShadow: `0 1px 3px 0 ${baseColor.fade(0.5)}`,
         };
     };
 
-    const dropDown = (baseColor: ColorHelper = color("#000")) => {
+    const dropDown = (baseColor: ColorHelper = shadowBaseColor) => {
         return {
             boxShadow: `0 5px 10px 0 ${baseColor.fade(0.3)}`,
         };
     };
 
-    const modal = (baseColor: ColorHelper = color("#000")) => {
+    const modal = (baseColor: ColorHelper = shadowBaseColor) => {
         return {
             boxShadow: `0 5px 20px ${baseColor.fade(0.5)}`,
         };

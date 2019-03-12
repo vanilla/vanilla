@@ -104,6 +104,7 @@ export const subcommunityTileClasses = useThemeCache(() => {
         flexGrow: 1,
         color: vars.link.fg.toString(),
         backgroundColor: colorOut(vars.link.bg),
+        borderRadius: unit(2),
         minHeight: unit(vars.link.minHeight),
         ...shadowOrBorderBasedOnLightness(
             globalVars.body.backgroundImage.color,

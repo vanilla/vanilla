@@ -106,7 +106,7 @@ export default class HistoryModule extends BaseHistoryModule {
         }
 
         if (this.operationsContain(changeDelta.ops, this.isCodeBlock)) {
-            // Avoid merging several changes as single undo/redo if a code block was added.
+            // Avoid merging preceding changes as single undo/redo when a code block is added.
             this.cutoff();
         }
 

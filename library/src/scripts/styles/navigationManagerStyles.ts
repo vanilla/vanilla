@@ -269,9 +269,8 @@ export const navigationManagerClasses = useThemeCache(() => {
     const articlePage = style("articlePage", {
         display: "flex",
         alignItems: "center",
-        width: unit(vars.item.height),
+        width: unit(buttonWidth),
         minHeight: unit(vars.item.height),
-        marginLeft: unit(18),
     });
 
     const toggleSpacer = style("toggleSpacer", {

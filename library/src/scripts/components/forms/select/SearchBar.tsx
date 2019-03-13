@@ -292,7 +292,10 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 tabIndex={!!this.props.hideSearchButton ? -1 : 0}
                             >
                                 {this.props.isLoading ? (
-                                    <ButtonLoader className={this.props.buttonLoaderClassName} />
+                                    <ButtonLoader
+                                        className={this.props.buttonLoaderClassName}
+                                        buttonType={this.props.buttonBaseClass}
+                                    />
                                 ) : (
                                     this.props.buttonText
                                 )}

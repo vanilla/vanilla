@@ -8,6 +8,7 @@ import React from "react";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import classNames from "classnames";
 import TabContext from "@library/contexts/TabContext";
+import { radioTabCss } from "@library/components/radioButtonsAsTabs/radioTabStyles";
 
 interface IProps {
     prefix: string;
@@ -31,6 +32,8 @@ export default class RadioButtonsAsTabs extends React.Component<IProps> {
     }
 
     public render() {
+        radioTabCss();
+
         return (
             <TabContext.Provider
                 value={{

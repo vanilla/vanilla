@@ -98,9 +98,12 @@ class PanelLayout extends React.Component<IProps> {
         const fixedPanelClass = style(sticky(), {
             $debugName: "fixedPanelClasses",
             top: headerVars.sizing.height * 2,
-            // maxHeight: calc(`100vh - ${px(headerVars.sizing.height * 2)}`),
             height: percent(100),
             overflow: "auto",
+        });
+
+        const rightPanelClass = style({
+            overflow: "initial",
         });
 
         // If applicable, set semantic tag, like "article"
@@ -205,6 +208,7 @@ class PanelLayout extends React.Component<IProps> {
                                 className={classNames(
                                     "panelLayout-right",
                                     { [fixedPanelClass]: isFixed },
+                                    rightPanelClass,
                                     this.context.offsetClass,
                                 )}
                             >

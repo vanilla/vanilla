@@ -198,36 +198,36 @@ export const buttonVariables = useThemeCache(() => {
 
     const primary: IButtonType = makeThemeVars("primary", {
         colors: {
-            fg: globalVars.mainColors.fg,
+            fg: globalVars.elementaryColors.white,
             bg: globalVars.mainColors.primary,
         },
-        spinnerColor: globalVars.mainColors.fg,
+        spinnerColor: globalVars.elementaryColors.white,
         border: {
-            color: globalVars.mainColors.fg,
+            color: globalVars.mainColors.primary,
         },
         hover: {
-            fg: globalVars.mainColors.fg,
+            fg: globalVars.elementaryColors.white,
             bg: globalVars.mainColors.secondary,
             border: {
                 color: globalVars.mainColors.primary,
             },
         },
         active: {
-            fg: globalVars.mainColors.fg,
+            fg: globalVars.elementaryColors.white,
             bg: globalVars.mainColors.secondary,
             border: {
                 color: globalVars.mainColors.primary,
             },
         },
         focus: {
-            fg: globalVars.mainColors.fg,
+            fg: globalVars.elementaryColors.white,
             bg: globalVars.mainColors.secondary,
             border: {
                 color: globalVars.mainColors.primary,
             },
         },
         focusAccessible: {
-            fg: globalVars.mainColors.fg,
+            fg: globalVars.elementaryColors.white,
             bg: globalVars.mainColors.secondary,
             border: {
                 color: globalVars.mainColors.primary,

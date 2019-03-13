@@ -7,12 +7,12 @@
 export const dummyNavigationData = {
     data: [
         {
-            to: "/discussions",
-            children: "Community",
-        },
-        {
             to: "/categories",
             children: "Categories",
+        },
+        {
+            to: "/discussions",
+            children: "Discussions",
         },
         {
             to: "/kb",

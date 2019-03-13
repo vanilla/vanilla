@@ -66,7 +66,7 @@ class BaseThemeProvider extends React.Component<IProps> {
     }
 }
 
-export function getLogo(logoType: LogoType): string | undefined {
+export function getLogo(logoType: LogoType): string | null {
     const store = getStore<ICoreStoreState>();
     const assets = store.getState().theme.assets.data || {};
     let logo;
@@ -78,7 +78,7 @@ export function getLogo(logoType: LogoType): string | undefined {
     }
 
     if (!logo) {
-        return undefined;
+        return null;
     } else {
         return logo.url;
     }

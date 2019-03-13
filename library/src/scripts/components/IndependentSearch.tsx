@@ -14,6 +14,7 @@ import { t } from "@library/application";
 import SearchOption from "@library/components/search/SearchOption";
 import { searchClasses } from "@library/styles/searchStyles";
 import { searchBarClasses } from "@library/styles/searchBarStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
@@ -29,6 +30,7 @@ export interface ICompactSearchProps extends IWithSearchProps, RouteComponentPro
     cancelContentClassName?: string;
     hideSearchButton?: boolean;
     isLarge?: boolean;
+    buttonBaseClass?: ButtonTypes;
 }
 
 interface IState {
@@ -66,6 +68,7 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
                     onOpenSuggestions={this.props.onOpenSuggestions}
                     onCloseSuggestions={this.props.onCloseSuggestions}
                     buttonClassName={this.props.buttonClass}
+                    buttonBaseClass={this.props.buttonBaseClass}
                     className={classes.root}
                     isBigInput={this.props.isLarge}
                     buttonLoaderClassName={this.props.buttonLoaderClassName}

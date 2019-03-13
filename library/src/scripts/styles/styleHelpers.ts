@@ -197,11 +197,34 @@ export const modifyColorBasedOnLightness = (
         throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
     }
     if (referenceColor.lightness() >= 0.5 && !flip) {
-        // Lighten color
-        return colorToModify.mix(color("#000"), 1 - weight) as ColorHelper;
+        return colorToModify.darken(weight) as ColorHelper;
+    } else {
+        return colorToModify.lighten(weight) as ColorHelper;
+    }
+};
+
+/*
+ * Color modification based on saturation.
+ * @param referenceColor - The reference colour to determine if we're in a dark or light context.
+ * @param colorToModify - The color you wish to modify
+ * @param percentage - The amount you want to mix the two colors
+ * @param flip - By default we darken light colours and lighten darks, but if you want to get the opposite result, use this param
+ */
+export const modifyColorSaturationBasedOnLightness = (
+    referenceColor: ColorHelper,
+    colorToModify: ColorHelper,
+    weight: number,
+    flip: boolean = false,
+) => {
+    if (weight > 1 || weight < 0) {
+        throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
+    }
+    if (referenceColor.saturation() <= 0.5 && !flip) {
+        // Saturate
+        return colorToModify.desaturate(weight) as ColorHelper;
     } else {
         // Darken color
-        return colorToModify.mix(color("#fff"), 1 - weight) as ColorHelper;
+        return colorToModify.saturate(weight) as ColorHelper;
     }
 };
 

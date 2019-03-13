@@ -24,7 +24,7 @@ import { MenuProps } from "react-select/lib/components/Menu";
 import ReactDOM from "react-dom";
 import { LinkContext } from "@library/components/navigation/LinkContextProvider";
 import { RouteComponentProps } from "react-router";
-import { buttonVariables } from "@library/styles/buttonStyles";
+import { ButtonTypes, buttonVariables } from "@library/styles/buttonStyles";
 import { searchBarClasses } from "@library/styles/searchBarStyles";
 import { dropDownClasses } from "@library/styles/dropDownStyles";
 
@@ -61,6 +61,7 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     buttonText?: string;
     disableAutocomplete?: boolean;
     clearButtonClass?: string;
+    buttonBaseClass?: ButtonTypes;
 }
 
 interface IState {
@@ -284,16 +285,14 @@ export default class SearchBar extends React.Component<IProps, IState> {
                             <Button
                                 type="submit"
                                 id={this.searchButtonID}
+                                baseClass={this.props.buttonBaseClass}
                                 className={classNames("searchBar-submitButton", this.props.buttonClassName, {
                                     isLarge: this.props.isBigInput,
                                 })}
                                 tabIndex={!!this.props.hideSearchButton ? -1 : 0}
                             >
                                 {this.props.isLoading ? (
-                                    <ButtonLoader
-                                        buttonType={buttonClasses.primary}
-                                        className={this.props.buttonLoaderClassName}
-                                    />
+                                    <ButtonLoader className={this.props.buttonLoaderClassName} />
                                 ) : (
                                     this.props.buttonText
                                 )}

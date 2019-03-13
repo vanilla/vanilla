@@ -1376,6 +1376,10 @@ body.isMobile .Popup.hasRichEditor .Border {
   padding: 2px 4px;
 }
 
+.embed-focusableElement.focus-visible {
+  outline: none !important;
+}
+
 .richEditor .embedExternal {
   -webkit-user-select: none;
      -moz-user-select: none;

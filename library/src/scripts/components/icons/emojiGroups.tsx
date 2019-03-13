@@ -7,10 +7,15 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/application";
+import { emojiGroupsClasses } from "@rich-editor/styles/richEditorStyles/insertEmojiGroupClasses";
 
 export function emojiGroup_smileysPeople(group = "Smileys & People", className = "") {
+    const classesEmojiGroup = emojiGroupsClasses();
     return (
-        <svg className={classNames("emojiGroup-icon", "emojiGroup-smileysAndPeople", className)} viewBox="0 0 24 24">
+        <svg
+            className={classNames("emojiGroup-icon", "emojiGroup-smileysAndPeople", className, classesEmojiGroup.icon)}
+            viewBox="0 0 24 24"
+        >
             <title>{t(group)}</title>
             <path
                 fill="currentColor"
@@ -21,8 +26,12 @@ export function emojiGroup_smileysPeople(group = "Smileys & People", className =
 }
 
 export function emojiGroup_animalsNature(group = "Animals & Nature", className = "") {
+    const classesEmojiGroup = emojiGroupsClasses();
     return (
-        <svg className={classNames("emojiGroup-icon", "emojiGroup-animalsAndNature", className)} viewBox="0 0 24 24">
+        <svg
+            className={classNames("emojiGroup-icon", "emojiGroup-animalsAndNature", className, classesEmojiGroup.icon)}
+            viewBox="0 0 24 24"
+        >
             <title>{t(group)}</title>
             <path
                 fill="currentColor"
@@ -33,8 +42,12 @@ export function emojiGroup_animalsNature(group = "Animals & Nature", className =
 }
 
 export function emojiGroup_foodDrink(group = "Food & Drink", className = "") {
+    const classesEmojiGroup = emojiGroupsClasses();
     return (
-        <svg className={classNames("emojiGroup-icon", "emojiGroup-foodAndDrink", className)} viewBox="0 0 24 24">
+        <svg
+            className={classNames("emojiGroup-icon", "emojiGroup-foodAndDrink", className, classesEmojiGroup.icon)}
+            viewBox="0 0 24 24"
+        >
             <title>{t(group)}</title>
             <path
                 fill="currentColor"
@@ -45,8 +58,12 @@ export function emojiGroup_foodDrink(group = "Food & Drink", className = "") {
 }
 
 export function emojiGroup_travelPlaces(group = "Travel & Places", className = "") {
+    const classesEmojiGroup = emojiGroupsClasses();
     return (
-        <svg className={classNames("emojiGroup-icon", "emojiGroup-travelAndPlaces", className)} viewBox="0 0 24 24">
+        <svg
+            className={classNames("emojiGroup-icon", "emojiGroup-travelAndPlaces", className, classesEmojiGroup.icon)}
+            viewBox="0 0 24 24"
+        >
             <title>{t(group)}</title>
             <path
                 fill="currentColor"
@@ -57,8 +74,12 @@ export function emojiGroup_travelPlaces(group = "Travel & Places", className = "
 }
 
 export function emojiGroup_activities(group = "Activities", className = "") {
+    const classesEmojiGroup = emojiGroupsClasses();
     return (
-        <svg className={classNames("emojiGroup-icon", "emojiGroup-activities", className)} viewBox="0 0 24 24">
+        <svg
+            className={classNames("emojiGroup-icon", "emojiGroup-activities", className, classesEmojiGroup.icon)}
+            viewBox="0 0 24 24"
+        >
             <title>{t(group)}</title>
             <path
                 fill="currentColor"
@@ -69,8 +90,12 @@ export function emojiGroup_activities(group = "Activities", className = "") {
 }
 
 export function emojiGroup_objects(group = "Objects", className = "") {
+    const classesEmojiGroup = emojiGroupsClasses();
     return (
-        <svg className={classNames("emojiGroup-icon", "emojiGroup-objects", className)} viewBox="0 0 24 24">
+        <svg
+            className={classNames("emojiGroup-icon", "emojiGroup-objects", className, classesEmojiGroup.icon)}
+            viewBox="0 0 24 24"
+        >
             <title>{t(group)}</title>
             <path
                 fill="currentColor"
@@ -82,8 +107,12 @@ export function emojiGroup_objects(group = "Objects", className = "") {
 }
 
 export function emojiGroup_symbols(group = "Symbols", className = "") {
+    const classesEmojiGroup = emojiGroupsClasses();
     return (
-        <svg className={classNames("emojiGroup-icon", "emojiGroup-symbols", className)} viewBox="0 0 24 24">
+        <svg
+            className={classNames("emojiGroup-icon", "emojiGroup-symbols", className, classesEmojiGroup.icon)}
+            viewBox="0 0 24 24"
+        >
             <title>{t(group)}</title>
             <path
                 fill="currentColor"
@@ -94,8 +123,12 @@ export function emojiGroup_symbols(group = "Symbols", className = "") {
 }
 
 export function emojiGroup_flags(group = "Flags", className = "") {
+    const classesEmojiGroup = emojiGroupsClasses();
     return (
-        <svg className={classNames("emojiGroup-icon", "emojiGroup-flags", className)} viewBox="0 0 24 24">
+        <svg
+            className={classNames("emojiGroup-icon", "emojiGroup-flags", className, classesEmojiGroup.icon)}
+            viewBox="0 0 24 24"
+        >
             <title>{t(group)}</title>
             <path
                 fill="currentColor"

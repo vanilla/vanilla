@@ -4,49 +4,47 @@
  * @license GPL-2.0-only
  */
 
-import { percent, px } from "csx";
+import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-
+import { layoutVariables } from "@library/styles/layoutStyles";
 import {
-    componentThemeVariables,
     debugHelper,
     flexHelper,
-    getColorDependantOnLightness,
+    modifyColorBasedOnLightness,
+    colorOut,
     unit,
+    userSelect,
+    states,
 } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { layoutVariables } from "@library/styles/layoutStyles";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { important, percent, px } from "csx";
 
-export function vanillaHeaderVariables(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "vanillaHeader");
+export const vanillaHeaderVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const makeThemeVars = variableFactory("vanillaHeader");
 
-    const sizing = {
+    const sizing = makeThemeVars("sizing", {
         height: 48,
         spacer: 12,
         mobile: {
             height: 44,
             width: formElementVars.sizing.height,
         },
-        ...themeVars.subComponentStyles("sizing"),
-    };
+    });
 
-    const colors = {
+    const colors = makeThemeVars("colors", {
         fg: globalVars.mainColors.bg,
         bg: globalVars.mainColors.primary,
-        ...themeVars.subComponentStyles("colors"),
-    };
+    });
 
-    const guest = {
+    const guest = makeThemeVars("guest", {
         spacer: 8,
-        ...themeVars.subComponentStyles("guest"),
-    };
+    });
 
     const buttonSize = 40;
     const buttonMobileSize = formElementVars.sizing.height;
-    const button = {
+    const button = makeThemeVars("button", {
         borderRadius: 3,
         size: buttonSize,
         guest: {
@@ -56,84 +54,66 @@ export function vanillaHeaderVariables(theme?: object) {
             fontSize: 16,
             width: buttonMobileSize,
         },
-        ...themeVars.subComponentStyles("button"),
-    };
+    });
 
-    const count = {
+    const count = makeThemeVars("count", {
         size: 18,
         fontSize: 10,
         fg: globalVars.mainColors.bg,
         bg: globalVars.mainColors.primary,
-        ...themeVars.subComponentStyles("count"),
-    };
+    });
 
-    const dropDownContents = {
+    const dropDownContents = makeThemeVars("dropDownContents", {
         minWidth: 350,
-        ...themeVars.subComponentStyles("dropDownContents"),
-    };
+    });
 
-    const endElements = {
+    const endElements = makeThemeVars("endElements", {
         flexBasis: buttonSize * 4,
         mobile: {
             flexBasis: buttonMobileSize * 2,
         },
-        ...themeVars.subComponentStyles("endElements"),
-    };
+    });
 
-    const compactSearch = {
+    const compactSearch = makeThemeVars("compactSearch", {
         maxWidth: 672,
         mobile: {
             width: buttonMobileSize,
         },
-        ...themeVars.subComponentStyles("compactSearch"),
-    };
-
-    const buttonContents = {
-        hover: {
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1, true),
-        },
-        active: {
-            bg: getColorDependantOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2, true),
-        },
-        ...themeVars.subComponentStyles("buttonContents"),
-    };
-
-    const signIn = {
-        bg: getColorDependantOnLightness(
-            globalVars.mainColors.primary,
-            globalVars.mainColors.primary,
-            0.1,
-            true,
-        ).toString(),
-        hover: {
-            bg: getColorDependantOnLightness(
-                globalVars.mainColors.primary,
-                globalVars.mainColors.primary,
-                0.2,
-                true,
-            ).toString(),
-        },
-        ...themeVars.subComponentStyles("signIn"),
-    };
-
-    const resister = {
-        bg: globalVars.mainColors.bg,
-        hover: {
-            bg: globalVars.mainColors.bg.fade(0.9).toString(),
-        },
-        ...themeVars.subComponentStyles("register"),
-    };
-
-    const mobileDropDown = style({
-        height: px(sizing.mobile.height),
-        ...themeVars.subComponentStyles("mobileDropDown"),
     });
 
-    const meBox = {
+    const buttonContents = makeThemeVars("buttonContents", {
+        hover: {
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1, true),
+        },
+        active: {
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2, true),
+        },
+    });
+
+    const signIn = makeThemeVars("signIn", {
+        fg: colors.fg,
+        bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, globalVars.mainColors.primary, 0.1, true),
+        hover: {
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, globalVars.mainColors.primary, 0.2, true),
+        },
+    });
+
+    const resister = makeThemeVars("register", {
+        fg: colors.bg,
+        hover: {
+            bg: globalVars.mainColors.bg.fade(0.9),
+        },
+    });
+
+    const mobileDropDown = makeThemeVars("mobileDropdown", {
+        height: px(sizing.mobile.height),
+    });
+
+    const meBox = makeThemeVars("meBox", {
         sizing: {
             buttonContents: 32,
         },
-    };
+    });
 
     return {
         sizing,
@@ -150,38 +130,27 @@ export function vanillaHeaderVariables(theme?: object) {
         mobileDropDown,
         meBox,
     };
-}
+});
 
-export default function vanillaHeaderClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const vars = vanillaHeaderVariables(theme);
-    const formElementVars = formElementsVariables(theme);
+export const vanillaHeaderClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const vars = vanillaHeaderVariables();
+    const formElementVars = formElementsVariables();
     const headerColors = vars.colors;
-    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
-    const debug = debugHelper("vanillaHeader");
+    const style = styleFactory("vanillaHeader");
 
     const root = style(
         {
-            ...debug.name(),
             backgroundColor: headerColors.bg.toString(),
             color: headerColors.fg.toString(),
             $nest: {
-                "&.isFixed": {
-                    ...debug.name("fixed"),
-                    position: "fixed",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    zIndex: 1,
-                },
                 "& .searchBar__control": {
-                    ...debug.name("control"),
                     color: vars.colors.fg.toString(),
                     cursor: "pointer",
                 },
                 "&& .suggestedTextInput-clear.searchBar-clear": {
-                    ...debug.name("clear"),
                     color: vars.colors.fg.toString(),
                     $nest: {
                         "&:hover": {
@@ -196,7 +165,6 @@ export default function vanillaHeaderClasses(theme?: object) {
                     },
                 },
                 "& .searchBar__placeholder": {
-                    ...debug.name("placeholder"),
                     color: vars.colors.fg.fade(0.8).toString(),
                     cursor: "pointer",
                 },
@@ -208,9 +176,8 @@ export default function vanillaHeaderClasses(theme?: object) {
     );
 
     const spacer = style(
+        "spacer",
         {
-            ...debug.name("spacer"),
-            backgroundColor: headerColors.bg.toString(),
             height: px(vars.sizing.height),
         },
         mediaQueries.oneColumn({
@@ -219,8 +186,8 @@ export default function vanillaHeaderClasses(theme?: object) {
     );
 
     const bar = style(
+        "bar",
         {
-            ...debug.name("bar"),
             display: "flex",
             justifyContent: "space-between",
             flexWrap: "nowrap",
@@ -237,12 +204,12 @@ export default function vanillaHeaderClasses(theme?: object) {
     );
 
     const logoContainer = style(
+        "logoContainer",
         {
-            ...debug.name("logoContainer"),
             display: "inline-flex",
             alignSelf: "center",
             flexBasis: vars.endElements.flexBasis,
-            color: vars.colors.fg.toString(),
+            color: colorOut(vars.colors.fg),
             $nest: {
                 "&.focus-visible": {
                     $nest: {
@@ -258,13 +225,11 @@ export default function vanillaHeaderClasses(theme?: object) {
         mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }),
     );
 
-    const meBox = style({
-        ...debug.name("meBox"),
+    const meBox = style("meBox", {
         justifyContent: "flex-end",
     });
 
-    const nav = style({
-        ...debug.name("nav"),
+    const nav = style("nav", {
         display: "flex",
         flexWrap: "wrap",
         height: percent(100),
@@ -272,8 +237,8 @@ export default function vanillaHeaderClasses(theme?: object) {
     });
 
     const locales = style(
+        "locales",
         {
-            ...debug.name("locales"),
             height: px(vars.sizing.height),
             $nest: {
                 "&.buttonAsText": {
@@ -291,25 +256,22 @@ export default function vanillaHeaderClasses(theme?: object) {
         mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }),
     );
 
-    const messages = style({
-        ...debug.name("messages"),
+    const messages = style("messages", {
         color: vars.colors.fg.toString(),
     });
 
-    const notifications = style({
-        ...debug.name("notifications"),
+    const notifications = style("notifications", {
         color: "inherit",
     });
 
-    const compactSearch = style({
-        ...debug.name("compactSearch"),
+    const compactSearch = style("compactSearch", {
         marginLeft: "auto",
         maxWidth: px(vars.compactSearch.maxWidth),
     });
 
     const topElement = style(
+        "topElement",
         {
-            ...debug.name("topElement"),
             color: vars.colors.fg.toString(),
             padding: `0 ${px(vars.sizing.spacer / 2)}`,
             margin: `0 ${px(vars.sizing.spacer / 2)}`,
@@ -322,8 +284,8 @@ export default function vanillaHeaderClasses(theme?: object) {
     );
 
     const localeToggle = style(
+        "localeToggle",
         {
-            ...debug.name("localeToggle"),
             height: px(vars.sizing.height),
         },
         mediaQueries.oneColumn({
@@ -331,23 +293,21 @@ export default function vanillaHeaderClasses(theme?: object) {
         }),
     );
 
-    const languages = style({
-        ...debug.name("languages"),
+    const languages = style("languages", {
         marginLeft: "auto",
     });
 
-    const meBoxStateStyles = {
-        ...debug.name("meBoxStateStyles"),
+    const meBoxStateStyles = style("meBoxStateStyles", {
         borderRadius: px(vars.button.borderRadius),
         backgroundColor: vars.buttonContents.hover.bg.toString(),
-    };
+    });
 
     const button = style(
+        "button",
         {
-            ...debug.name("button"),
             color: vars.colors.fg.toString(),
             height: px(vars.sizing.height),
-            minWidth: px(vars.button.size),
+            minWidth: px(formElementVars.sizing.height),
             maxWidth: percent(100),
             padding: px(0),
             $nest: {
@@ -391,14 +351,13 @@ export default function vanillaHeaderClasses(theme?: object) {
         }),
     );
 
-    const centeredButtonClass = style({
+    const centeredButtonClass = style("centeredButtonClass", {
         ...flex.middle(),
     });
 
-    const searchCancel = style({
-        ...debug.name("searchCancel"),
+    const searchCancel = style("searchCancel", {
+        ...userSelect(),
         height: px(formElementVars.sizing.height),
-        userSelect: "none",
         $nest: {
             "&.focus-visible": {
                 $nest: {
@@ -411,20 +370,18 @@ export default function vanillaHeaderClasses(theme?: object) {
         },
     });
 
-    const tabButtonActive = {
-        ...debug.name("tabButtonActive"),
+    const tabButtonActive = style("tabButtonActive", {
         color: globalVars.mainColors.primary.toString(),
         $nest: {
             ".vanillaHeader-tabButtonContent": {
                 color: vars.colors.fg.toString(),
-                backgroundColor: getColorDependantOnLightness(vars.colors.fg, vars.colors.bg, 1).toString(),
+                backgroundColor: modifyColorBasedOnLightness(vars.colors.fg, vars.colors.bg, 1).toString(),
                 borderRadius: px(vars.button.borderRadius),
             },
         },
-    };
+    });
 
-    const tabButton = style({
-        ...debug.name("tabButton"),
+    const tabButton = style("tabButton", {
         display: "block",
         height: percent(100),
         padding: px(0),
@@ -435,25 +392,28 @@ export default function vanillaHeaderClasses(theme?: object) {
         },
     });
 
-    const dropDownContents = style({
-        ...debug.name("dropDownContents"),
-        minWidth: px(vars.dropDownContents.minWidth),
+    const dropDownContents = style("dropDownContents", {
+        $nest: {
+            "&&&": {
+                minWidth: px(vars.dropDownContents.minWidth),
+            },
+        },
     });
 
-    const count = {
+    const count = style("count", {
         height: px(vars.count.size),
         fontSize: px(vars.count.fontSize),
         backgroundColor: vars.count.bg.toString(),
         color: vars.count.fg.toString(),
-    };
+    });
 
-    const horizontalScroll = {
+    const horizontalScroll = style("horizontalScroll", {
         overflowX: "auto",
-    };
+    });
 
     const rightFlexBasis = style(
+        "rightFlexBasis",
         {
-            ...debug.name("rightFlexBasis"),
             display: "flex",
             height: px(vars.sizing.height),
             flexWrap: "nowrap",
@@ -469,8 +429,8 @@ export default function vanillaHeaderClasses(theme?: object) {
     );
 
     const leftFlexBasis = style(
+        "leftFlexBasis",
         {
-            ...debug.name("leftFlexBasis"),
             ...flex.middleLeft(),
             flexBasis: vars.endElements.flexBasis,
         },
@@ -483,74 +443,43 @@ export default function vanillaHeaderClasses(theme?: object) {
         }),
     );
 
-    const signIn = style({
-        ...debug.name("signIn"),
+    const signIn = style("signIn", {
+        marginLeft: unit(vars.guest.spacer),
+        marginRight: unit(vars.guest.spacer),
         $nest: {
-            "&:not([disabled])": {
-                color: vars.colors.fg.toString(),
-                backgroundColor: vars.signIn.bg.toString(),
-                border: `solid ${vars.colors.fg.toString()} 1px`,
-                marginLeft: unit(vars.guest.spacer * 1.5),
-                marginRight: unit(vars.guest.spacer),
-                $nest: {
-                    "&:hover": {
-                        border: `solid ${vars.colors.fg} 1px`,
-                        backgroundColor: vars.signIn.hover.bg.toString(),
-                        color: vars.colors.fg.toString(),
+            "&&&": {
+                color: colorOut(vars.signIn.fg),
+                borderColor: colorOut(vars.colors.fg),
+                ...states({
+                    allStates: {
+                        borderColor: colorOut(vars.colors.fg),
                     },
-                    "&.focus-visible": {
-                        fontWeight: globalVars.fonts.weights.semiBold,
-                    },
-                    "&:focus": {
-                        fontWeight: globalVars.fonts.weights.semiBold,
-                    },
-                },
-            },
-            ".vanillaHeaderNav-linkContent": {
-                $nest: {
-                    "&:after": {
-                        fontWeight: globalVars.fonts.weights.semiBold,
-                    },
-                },
+                }),
             },
         },
     });
 
-    const register = style({
-        ...debug.name("register"),
+    const register = style("register", {
+        marginLeft: unit(vars.guest.spacer),
+        marginRight: unit(vars.guest.spacer),
         $nest: {
-            "&:not([disabled])": {
-                color: vars.colors.bg.toString(),
-                backgroundColor: vars.colors.fg.toString(),
-                border: `solid ${vars.colors.fg} 1px;`,
-                marginLeft: unit(vars.guest.spacer),
-                $nest: {
-                    "&:hover": {
-                        color: vars.colors.bg.toString(),
-                        border: `solid ${vars.colors.fg} 1px;`,
-                        backgroundColor: vars.resister.hover.bg.toString(),
+            "&&&": {
+                backgroundColor: colorOut(vars.colors.fg),
+                color: colorOut(vars.resister.fg),
+                borderColor: colorOut(vars.colors.fg),
+                ...states({
+                    allStates: {
+                        backgroundColor: colorOut(vars.colors.fg.fade(0.9)),
+                        borderColor: colorOut(vars.colors.fg),
                     },
-                    "&.focus-visible": {
-                        fontWeight: globalVars.fonts.weights.semiBold,
-                    },
-                    "&:focus": {
-                        fontWeight: globalVars.fonts.weights.semiBold,
-                    },
-                },
-            },
-            ".vanillaHeaderNav-linkContent": {
-                $nest: {
-                    "&:after": {
-                        display: "none",
-                    },
-                },
+                }),
             },
         },
     });
 
     const compactSearchResults = style(
+        "compactSearchResults",
         {
-            ...debug.name("compactSearchResults"),
             top: (vars.sizing.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
             display: "flex",
             position: "relative",
@@ -562,11 +491,11 @@ export default function vanillaHeaderClasses(theme?: object) {
         }),
     );
 
-    const clearButtonClass = style({
+    const clearButtonClass = style("clearButtonClass", {
         color: vars.colors.fg.toString(),
     });
 
-    const guestButton = style({
+    const guestButton = style("guestButton", {
         minWidth: unit(vars.button.guest.minWidth),
     });
 
@@ -599,15 +528,14 @@ export default function vanillaHeaderClasses(theme?: object) {
         clearButtonClass,
         guestButton,
     };
-}
+});
 
-export function vanillaHeaderLogoClasses(theme?: object) {
-    const vars = vanillaHeaderVariables(theme);
-    const logoFrame = style({ display: "inline-flex" });
-    const debug = debugHelper("vanillaHeaderLogo");
+export const vanillaHeaderLogoClasses = useThemeCache(() => {
+    const vars = vanillaHeaderVariables();
+    const style = styleFactory("vanillaHeaderLogo");
+    const logoFrame = style("logoFrame", { display: "inline-flex" });
 
-    const logo = style({
-        ...debug.name("logo"),
+    const logo = style("logo", {
         display: "block",
         height: px(vars.sizing.height - 18),
         width: "auto",
@@ -618,35 +546,31 @@ export function vanillaHeaderLogoClasses(theme?: object) {
         },
     });
 
-    const link = style({
-        ...debug.name("link"),
+    const link = style("link", {
         textDecoration: "none",
     });
 
     return { logoFrame, logo, link };
-}
+});
 
-export function vanillaHeaderHomeClasses(theme?: object) {
-    const vars = vanillaHeaderVariables(theme);
-    const globalVars = globalVariables(theme);
-    const debug = debugHelper("vanillaHeaderHome");
+export const vanillaHeaderHomeClasses = useThemeCache(() => {
+    const vars = vanillaHeaderVariables();
+    const globalVars = globalVariables();
+    const style = styleFactory("vanillaHeaderHome");
 
     const root = style({
-        ...debug.name(),
         minHeight: vars.sizing.mobile.height * 2,
     });
 
-    const bottom = style({
-        ...debug.name("bottom"),
+    const bottom = style("bottom", {
         backgroundColor: globalVars.mainColors.fg.fade(0.1).toString(),
     });
 
-    const left = style({
-        ...debug.name("left"),
+    const left = style("left", {
         height: px(1),
         width: px(vars.button.size),
         flexBasis: vars.button.size,
     });
 
     return { root, bottom, left };
-}
+});

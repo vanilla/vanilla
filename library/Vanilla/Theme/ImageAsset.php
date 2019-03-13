@@ -15,7 +15,7 @@ class ImageAsset extends Asset {
     private $url;
 
     /** @var string Type of asset. */
-    private $type = "image";
+    protected $type = "image";
 
     /**
      * Configure the image asset.

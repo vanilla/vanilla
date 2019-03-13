@@ -5,7 +5,7 @@
  */
 
  namespace Vanilla\Theme;
- 
+
  /**
   * A collection of fonts for a theme.
   */
@@ -15,7 +15,7 @@ class FontsAsset extends Asset {
     private $data = [];
 
     /** @var string Type of asset. */
-    private $type = "data";
+    protected $type = "data";
 
     /**
      * Configure the font collection asset.

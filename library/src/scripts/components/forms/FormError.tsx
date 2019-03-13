@@ -4,13 +4,12 @@
  */
 
 import React from "react";
-import Button, { ButtonBaseClass } from "./Button";
+import Button from "./Button";
 import { t } from "@library/application";
 import { formErrorClasses } from "@library/components/forms/formElementStyles";
 import classNames from "classnames";
-import Paragraph from "@library/components/Paragraph";
 import ButtonLoader from "@library/components/ButtonLoader";
-import { buttonVariables } from "@library/styles/buttonStyles";
+import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps {
     children: React.ReactNode;
@@ -28,6 +27,7 @@ export default class FormError extends React.Component<IProps> {
     public render(): React.ReactNode {
         const { onRetryClick, onDismissClick, children } = this.props;
         const classes = formErrorClasses();
+        const classesButtons = buttonClasses();
 
         return (
             <div ref={this.selfRef} className={classes.root}>
@@ -36,17 +36,17 @@ export default class FormError extends React.Component<IProps> {
                     {onRetryClick && (
                         <Button
                             onClick={onRetryClick}
-                            baseClass={ButtonBaseClass.TEXT}
+                            baseClass={ButtonTypes.TEXT}
                             className={classNames(classes.actionButton, classes.activeButton)}
                         >
                             {this.props.isRetryLoading ? (
-                                <ButtonLoader buttonType={buttonVariables().standard} />
+                                <ButtonLoader buttonType={classesButtons.standard} />
                             ) : (
                                 t("Retry")
                             )}
                         </Button>
                     )}
-                    <Button onClick={onDismissClick} baseClass={ButtonBaseClass.TEXT} className={classes.actionButton}>
+                    <Button onClick={onDismissClick} baseClass={ButtonTypes.TEXT} className={classes.actionButton}>
                         {t("Dismiss")}
                     </Button>
                 </div>

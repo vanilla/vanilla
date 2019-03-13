@@ -8,6 +8,7 @@ import React from "react";
 import classNames from "classnames";
 import Heading, { ICommonHeadingProps, IHeadingProps } from "@library/components/Heading";
 import FrameHeader, { IFrameHeaderProps } from "@library/components/frame/FrameHeader";
+import { frameHeaderClasses } from "@library/styles/frameStyles";
 
 interface IProps extends ICommonHeadingProps {
     children: React.ReactNode;
@@ -18,9 +19,15 @@ interface IProps extends ICommonHeadingProps {
  */
 export default class FrameHeaderWithAction extends React.PureComponent<IFrameHeaderProps> {
     public render() {
+        const classes = frameHeaderClasses();
         return (
-            <FrameHeader {...this.props} className={classNames(this.props.className, "frameHeaderWithAction")}>
-                <span className="frameHeaderWithAction-action">{this.props.children}</span>
+            <FrameHeader
+                {...this.props}
+                className={classNames(this.props.className, "frameHeaderWithAction", classes.root)}
+            >
+                <span className={classNames("frameHeaderWithAction-action", classes.action)}>
+                    {this.props.children}
+                </span>
             </FrameHeader>
         );
     }

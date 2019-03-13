@@ -5,10 +5,11 @@
  */
 
 import { debugHelper } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { percent } from "csx";
+import { style } from "typestyle";
 
-export function smartAlignClasses(theme?: object) {
+export const smartAlignClasses = useThemeCache(() => {
     const debug = debugHelper("smartAlign");
 
     const root = style({
@@ -24,4 +25,4 @@ export function smartAlignClasses(theme?: object) {
     });
 
     return { root, inner };
-}
+});

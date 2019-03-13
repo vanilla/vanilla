@@ -15,6 +15,7 @@ import ProgressEventEmitter from "@library/ProgressEventEmitter";
 import { FOCUS_CLASS } from "@library/embeds";
 import { attachmentClasses } from "@library/styles/attachmentStyles";
 import { attachmentIconClasses } from "@library/styles/attachmentIconsStyles";
+import { metasClasses } from "@library/styles/metasStyles";
 
 interface IProps extends IFileAttachment {
     type: AttachmentType;
@@ -39,13 +40,21 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
         const label = title || name;
         const classes = attachmentClasses();
         const iconClasses = attachmentIconClasses();
+        const classesMetas = metasClasses();
         return (
             <div
                 className={classNames("attachment", "isLoading", this.props.className, FOCUS_CLASS, classes.root)}
                 tabIndex={0}
                 aria-label={t("Uploading...")}
             >
-                <div className={classNames("attachment-box", "attachment-loadingContent", classes.box)}>
+                <div
+                    className={classNames(
+                        "attachment-box",
+                        "attachment-loadingContent",
+                        classes.loadingContent,
+                        classes.box,
+                    )}
+                >
                     <div className={classNames("attachment-format", classes.format)}>
                         {getAttachmentIcon(type, iconClasses.root)}
                     </div>
@@ -55,20 +64,12 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
                         </div>
                         {label && (
                             <div className={classNames("attachment-metas", "metas", classes.metas)}>
-                                <span className="meta">{t("Uploading...")}</span>
+                                <span className={classesMetas.meta}>{t("Uploading...")}</span>
                             </div>
                         )}
                     </div>
-                    <CloseButton
-                        title={t("Cancel")}
-                        className={classNames("attachment-close", classes.close)}
-                        onClick={this.props.deleteAttachment}
-                    />
                 </div>
-                <div
-                    className="attachment-loadingProgress"
-                    style={{ width: `${Math.min(this.state.progress, 100)}%` }}
-                />
+                <div className={classes.loadingProgress} style={{ width: `${Math.min(this.state.progress, 100)}%` }} />
             </div>
         );
     }

@@ -5,15 +5,15 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, unit, componentThemeVariables, debugHelper, flexHelper } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
+import { absolutePosition, unit, componentThemeVariables, flexHelper } from "@library/styles/styleHelpers";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { calc, percent, px } from "csx";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 
-export function compactMeBoxVariables(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "compactMeBox");
+export const compactMeBoxVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const themeVars = componentThemeVariables("compactMeBox");
 
     const tab = {
         height: 44,
@@ -22,33 +22,29 @@ export function compactMeBoxVariables(theme?: object) {
     };
 
     return { tab };
-}
+});
 
-export function compactMeBoxClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const vars = compactMeBoxVariables(theme);
-    const debug = debugHelper("compactMeBox");
+export const compactMeBoxClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const vars = compactMeBoxVariables();
+    const style = styleFactory("compactMeBox");
 
     const root = style({
         display: "block",
-        ...debug.name(),
     });
 
-    const openButton = style({
+    const openButton = style("openButton", {
         color: globalVars.elementaryColors.white.toString(),
-        ...debug.name("openButton"),
     });
 
-    const contents = style({
+    const contents = style("contents", {
         position: "relative",
         display: "flex",
         flexDirection: "column",
         height: percent(100),
-        ...debug.name("contents"),
     });
 
-    const closeModal = style({
-        ...debug.name("closeModal"),
+    const closeModal = style("closeModal", {
         $nest: {
             "&&": {
                 ...absolutePosition.topRight(),
@@ -58,44 +54,38 @@ export function compactMeBoxClasses(theme?: object) {
         },
     });
 
-    const tabList = style({
+    const tabList = style("tabList", {
         marginRight: unit(vars.tab.width),
         height: unit(vars.tab.height),
         flexBasis: unit(vars.tab.width),
         color: globalVars.mainColors.fg.toString(),
-        ...debug.name("tabList"),
     });
 
-    const tabButtonContent = style({
+    const tabButtonContent = style("tabButtonContent", {
         ...flexHelper().middle(),
         position: "relative",
         width: unit(vars.tab.width),
         height: unit(vars.tab.height),
-        ...debug.name("tabButtonContent"),
     });
 
-    const tabPanels = style({
+    const tabPanels = style("tabPanels", {
         height: calc(`100vh - ${vars.tab.height}`),
         borderTop: `1px solid ${globalVars.overlay.border.color.toString()}`,
-        ...debug.name("tabPanels"),
     });
 
-    const tabButton = style({
+    const tabButton = style("tabButton", {
         ...flexHelper().middle(),
-        ...debug.name("tabButton"),
     });
 
-    const panel = style({
+    const panel = style("panel", {
         flexGrow: 1,
         borderTop: 0,
         borderRadius: 0,
-        ...debug.name("panel"),
     });
 
-    const body = style({
+    const body = style("body", {
         flexGrow: 1,
-        ...debug.name("body"),
     });
 
     return { root, openButton, contents, closeModal, tabList, tabPanels, tabButton, tabButtonContent, panel, body };
-}
+});

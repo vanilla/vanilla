@@ -13,6 +13,7 @@ import { t } from "@library/application";
 import { HumanFileSize, humanFileSize } from "@library/utils/fileUtils";
 import { attachmentClasses } from "@library/styles/attachmentStyles";
 import { attachmentIconClasses } from "@library/styles/attachmentIconsStyles";
+import { metasClasses } from "@library/styles/metasStyles";
 
 export interface IFileAttachment {
     name: string; // File name
@@ -35,6 +36,7 @@ export default class Attachment extends React.Component<IProps> {
         const label = title || name;
         const classes = attachmentClasses();
         const iconClasses = attachmentIconClasses();
+        const classesMetas = metasClasses();
 
         return (
             <div className={classNames("attachment", className, classes.root)}>
@@ -52,13 +54,13 @@ export default class Attachment extends React.Component<IProps> {
                     )}
                     <div className={classNames("attachment-main", classes.main)}>
                         <div className={classNames("attachment-title", classes.title)}>{label}</div>
-                        <div className={classNames("attachment-metas", "metas", classes.metas)}>
+                        <div className={classNames("attachment-metas", "metas", classes.metas, classesMetas.root)}>
                             {dateUploaded && (
-                                <span className="meta">
+                                <span className={classesMetas.meta}>
                                     <Translate source="Uploaded <0/>" c0={<DateTime timestamp={dateUploaded} />} />
                                 </span>
                             )}
-                            <span className="meta">
+                            <span className={classesMetas.meta}>
                                 <HumanFileSize numBytes={size} />
                             </span>
                         </div>

@@ -39,13 +39,15 @@ export default class Loader extends React.Component<IProps, IState> {
         if (this.props.minimumTime && this.props.minimumTime > 0 && !this.state.showLoader) {
             return null;
         }
+        const styleClass = this.props.loaderStyleClass || loaderClasses().fullPageLoader;
+
         return (
             <React.Fragment>
                 <ConditionalWrap
                     condition={!!this.props.padding}
                     className={style({ padding: unit(this.props.padding) })}
                 >
-                    <div className={this.props.loaderStyleClass} aria-hidden="true" />
+                    <div className={styleClass} aria-hidden="true" />
                     <ScreenReaderContent>
                         <p>{t("Loading")}</p>
                     </ScreenReaderContent>

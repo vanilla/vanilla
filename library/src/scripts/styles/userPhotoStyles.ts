@@ -1,5 +1,5 @@
-import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, debugHelper, objectFitWithFallback, unit } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
 
 /**
@@ -7,8 +7,8 @@ import { style } from "typestyle";
  * @license GPL-2.0-only
  */
 
-export const userPhotoVariables = (theme?: object) => {
-    const themeVars = componentThemeVariables(theme, "userPhoto");
+export const userPhotoVariables = useThemeCache(() => {
+    const themeVars = componentThemeVariables("userPhoto");
 
     const border = {
         radius: "50%",
@@ -23,10 +23,10 @@ export const userPhotoVariables = (theme?: object) => {
     };
 
     return { border, sizing };
-};
+});
 
-export const userPhotoClasses = (theme?: object) => {
-    const vars = userPhotoVariables(theme);
+export const userPhotoClasses = useThemeCache(() => {
+    const vars = userPhotoVariables();
     const debug = debugHelper("userPhoto");
 
     const root = style({
@@ -60,4 +60,4 @@ export const userPhotoClasses = (theme?: object) => {
     });
 
     return { root, small, medium, large, photo };
-};
+});

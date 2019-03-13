@@ -11,6 +11,9 @@ import EmojiPopover from "@rich-editor/components/popovers/EmojiPopover";
 import Permission from "@library/users/Permission";
 import EmbedPopover from "@rich-editor/components/popovers/EmbedPopover";
 import EditorUploadButton from "@rich-editor/components/editor/pieces/EditorUploadButton";
+import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
+import classNames from "classnames";
+import { richEditorFormClasses } from "@rich-editor/styles/richEditorStyles/richEditorFormClasses";
 
 interface IProps {
     isMobile: boolean;
@@ -22,36 +25,50 @@ interface IProps {
 export default function EmbedBar(props: IProps) {
     const { isMobile, isLoading, legacyMode } = props;
     const mimeTypes = getMeta("upload.allowedExtensions");
+    const classesRichEditor = richEditorClasses();
+    const classesRichEditorForm = richEditorFormClasses();
 
     return (
-        <div className="richEditor-embedBar" ref={props.barRef}>
+        <div className={classNames("richEditor-embedBar", classesRichEditor.embedBar)} ref={props.barRef}>
             <ul
-                className="richEditor-menuItems richEditor-inlineMenuItems"
+                className={classNames(
+                    "richEditor-menuItems",
+                    "richEditor-inlineMenuItems",
+                    classesRichEditor.menuItems,
+                    classesRichEditorForm.inlineMenuItems,
+                )}
                 role="menubar"
                 aria-label={t("Inline Level Formatting Menu")}
             >
                 {isMobile && (
-                    <li className="richEditor-menuItem" role="menuitem">
+                    <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
                         <ParagraphDropDown disabled={isLoading} />
                     </li>
                 )}
                 {!isMobile && (
-                    <li className="richEditor-menuItem u-richEditorHiddenOnMobile" role="menuitem">
+                    <li
+                        className={classNames(
+                            "richEditor-menuItem",
+                            "u-richEditorHiddenOnMobile",
+                            classesRichEditor.menuItem,
+                        )}
+                        role="menuitem"
+                    >
                         <EmojiPopover disabled={isLoading} renderAbove={legacyMode} />
                     </li>
                 )}
                 <Permission permission="uploads.add">
-                    <li className="richEditor-menuItem" role="menuitem">
+                    <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
                         <EditorUploadButton disabled={isLoading} type="image" allowedMimeTypes={mimeTypes} />
                     </li>
                 </Permission>
 
-                <li className="richEditor-menuItem" role="menuitem">
+                <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
                     <EmbedPopover disabled={isLoading} />
                 </li>
 
                 <Permission permission="uploads.add">
-                    <li className="richEditor-menuItem" role="menuitem">
+                    <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
                         <EditorUploadButton disabled={isLoading} type="file" allowedMimeTypes={mimeTypes} />
                     </li>
                 </Permission>

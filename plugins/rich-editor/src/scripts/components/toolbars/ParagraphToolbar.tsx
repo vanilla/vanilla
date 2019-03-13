@@ -15,6 +15,9 @@ import MenuItems from "@rich-editor/components/toolbars/pieces/MenuItems";
 import classNames from "classnames";
 import FocusWatcher from "@library/FocusWatcher";
 import ActiveFormatIcon from "@rich-editor/components/toolbars/pieces/ActiveFormatIcon";
+import { paragraphToolbarContainerClasses } from "@rich-editor/styles/richEditorStyles/paragraphToolbarClasses";
+import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 interface IProps extends IWithEditorProps {}
 
@@ -69,10 +72,13 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     }
 
     public render() {
+        const classesRichEditor = richEditorClasses({}, this.props.legacyMode);
         let pilcrowClasses = classNames(
             { isOpen: this.isMenuVisible },
             "richEditor-button",
             "richEditorParagraphMenu-handle",
+            classesRichEditor.paragraphMenuHandle,
+            classesRichEditor.button,
         );
 
         if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
@@ -83,7 +89,12 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
             <div
                 id={this.componentID}
                 style={this.pilcrowStyles}
-                className={classNames("richEditorParagraphMenu", { isMenuInset: !this.props.legacyMode })}
+                className={classNames(
+                    "richEditorParagraphMenu",
+                    classesRichEditor.paragraphMenu,
+                    { isMenuInset: !this.props.legacyMode },
+                    classesRichEditor.paragraphMenu,
+                )}
                 onKeyDown={this.handleKeyDown}
                 ref={this.selfRef}
             >
@@ -168,16 +179,23 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
             return "";
         }
         const bounds = this.quill.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
-        let classes = "richEditor-toolbarContainer richEditor-paragraphToolbarContainer";
+        const classesParagraphToolBar = paragraphToolbarContainerClasses();
+        const classesDropDown = dropDownClasses();
+        let classes = classNames(
+            "richEditor-toolbarContainer",
+            "richEditor-paragraphToolbarContainer",
+            classesParagraphToolBar.root,
+        );
 
         if (!this.props.legacyMode) {
             classes += " likeDropDownContent";
+            classes += " " + classesDropDown.likeDropDownContent;
         }
 
-        if (bounds.top > 30) {
-            classes += " isUp";
-        } else {
+        if (bounds.top <= 30) {
             classes += " isDown";
+        } else {
+            classes += " isUp";
         }
 
         return classes;

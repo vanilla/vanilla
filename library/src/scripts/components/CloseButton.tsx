@@ -8,13 +8,14 @@ import classNames from "classnames";
 import { close } from "@library/components/icons/common";
 import { t } from "@library/application";
 import { ILegacyProps } from "@library/@types/legacy";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends Partial<ILegacyProps> {
     className?: string;
     disabled?: boolean;
     onClick: any;
-    baseClass?: ButtonBaseClass;
+    baseClass?: ButtonTypes;
     title?: string;
 }
 
@@ -24,7 +25,7 @@ interface IProps extends Partial<ILegacyProps> {
 export default class CloseButton extends React.PureComponent<IProps> {
     public static defaultProps = {
         legacyMode: false,
-        baseClass: ButtonBaseClass.ICON,
+        baseClass: ButtonTypes.ICON,
     };
 
     /**
@@ -32,7 +33,7 @@ export default class CloseButton extends React.PureComponent<IProps> {
      */
     public render() {
         const closeLabel = this.props.title ? this.props.title : t("Close");
-        const componentClasses = classNames("buttonClose", this.props.className);
+        const componentClasses = classNames("buttonClose", "closeButton", this.props.className);
         return (
             <Button
                 disabled={this.props.disabled}

@@ -13,20 +13,24 @@ import SearchBar from "@library/components/forms/select/SearchBar";
 import { t } from "@library/application";
 import SearchOption from "@library/components/search/SearchOption";
 import { searchClasses } from "@library/styles/searchStyles";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 import { searchBarClasses } from "@library/styles/searchBarStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
     placeholder?: string;
     buttonClass?: string;
+    inputClass?: string;
+    iconClass?: string;
     showingSuggestions?: boolean;
     onOpenSuggestions?: () => void;
     onCloseSuggestions?: () => void;
-    buttonContentClass?: string;
+    buttonContentClassName?: string;
+    buttonLoaderClassName?: string;
     cancelContentClassName?: string;
+    hideSearchButton?: boolean;
     isLarge?: boolean;
-    theme?: object;
+    buttonBaseClass?: ButtonTypes;
 }
 
 interface IState {
@@ -47,7 +51,6 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
     public render() {
         const classes = searchClasses();
         const classesSearchBar = searchBarClasses();
-        const buttons = buttonClasses();
         return (
             <div className={classNames(classes.root, this.props.className)}>
                 <SearchBar
@@ -65,8 +68,11 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
                     onOpenSuggestions={this.props.onOpenSuggestions}
                     onCloseSuggestions={this.props.onCloseSuggestions}
                     buttonClassName={this.props.buttonClass}
+                    buttonBaseClass={this.props.buttonBaseClass}
                     className={classes.root}
                     isBigInput={this.props.isLarge}
+                    buttonLoaderClassName={this.props.buttonLoaderClassName}
+                    hideSearchButton={this.props.hideSearchButton}
                 />
                 <div ref={this.resultsRef} className={classNames("search-results", classesSearchBar.results)} />
             </div>

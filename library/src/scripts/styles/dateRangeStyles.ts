@@ -8,9 +8,10 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { percent } from "csx";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-export function dateRangeClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
+export const dateRangeClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
     const debug = debugHelper("dateRange");
 
     const root = style({
@@ -52,4 +53,4 @@ export function dateRangeClasses(theme?: object) {
     });
 
     return { root, boundary, label, input };
-}
+});

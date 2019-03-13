@@ -10,6 +10,8 @@ import { withRouter, RouteComponentProps } from "react-router-dom";
 import SmartLink from "@library/components/navigation/SmartLink";
 import VanillaHeaderListItem from "@library/components/mebox/pieces/VanillaHeaderListItem";
 import vanillaHeaderNavClasses from "@library/components/headers/VanillaHeaderNav";
+import { getDynamicClassFromButtonType } from "@library/components/forms/Button";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 export interface IHeaderNav {
     className?: string;
@@ -17,6 +19,7 @@ export interface IHeaderNav {
     children: React.ReactNode;
     linkClassName?: string;
     linkContentClassName?: string;
+    buttonType?: ButtonTypes;
 }
 
 interface IProps extends IHeaderNav, RouteComponentProps<{}> {}
@@ -30,7 +33,14 @@ export class VanillaHeaderNavItem extends React.Component<IProps> {
         const classes = vanillaHeaderNavClasses();
         return (
             <VanillaHeaderListItem className={classNames(this.props.className, classes.root, { isCurrent })}>
-                <SmartLink to={this.props.to} className={classNames(this.props.linkClassName, classes.link)}>
+                <SmartLink
+                    to={this.props.to}
+                    className={classNames(
+                        this.props.linkClassName,
+                        classes.link,
+                        this.props.buttonType ? getDynamicClassFromButtonType(this.props.buttonType) : "",
+                    )}
+                >
                     <div
                         className={classNames(this.props.linkContentClassName, classes.linkContent, {
                             isCurrent,

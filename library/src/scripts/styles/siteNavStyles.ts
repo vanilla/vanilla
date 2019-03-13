@@ -5,18 +5,16 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import { unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, px } from "csx";
 
-export function siteNavVariables(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "siteNav");
+export const siteNavVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const makeThemeVars = variableFactory("siteNav");
 
-    const node = {
+    const node = makeThemeVars("node", {
         fontSize: globalVars.fonts.size.medium,
         fg: globalVars.mainColors.fg,
         lineHeight: globalVars.lineHeights.condensed,
@@ -26,34 +24,32 @@ export function siteNavVariables(theme?: object) {
             fg: globalVars.links.colors.default,
             fontWeight: globalVars.fonts.weights.bold,
         },
-        ...themeVars.subComponentStyles("node"),
-    };
+    });
 
-    const title = {
+    const title = makeThemeVars("title", {
         fontSize: globalVars.fonts.size.large,
         fontWeight: globalVars.fonts.weights.bold,
-    };
+    });
 
-    const nodeToggle = {
+    const nodeToggle = makeThemeVars("nodeToggle", {
         height: node.fontSize * node.lineHeight,
         width: globalVars.gutter.size,
         iconWidth: 7,
-        ...themeVars.subComponentStyles("nodeToggle"),
-    };
+    });
 
-    const spacer = {
+    const spacer = makeThemeVars("spacer", {
         default: 7,
-    };
+    });
 
     return { node, title, nodeToggle, spacer };
-}
+});
 
-export function siteNavClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const vars = siteNavVariables(theme);
+export const siteNavClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const vars = siteNavVariables();
     const mediaQueries = layoutVariables().mediaQueries();
 
-    const debug = debugHelper("siteNav");
+    const style = styleFactory("siteNav");
 
     const root = style(
         {
@@ -61,20 +57,18 @@ export function siteNavClasses(theme?: object) {
             display: "block",
             zIndex: 1,
             marginTop: unit(vars.nodeToggle.height / 2 - vars.node.fontSize / 2),
-            ...debug.name(),
         },
         mediaQueries.noBleed({
             marginLeft: unit(vars.nodeToggle.width - vars.nodeToggle.iconWidth / 2 - vars.spacer.default),
         }),
     );
 
-    const title = style({
+    const title = style("title", {
         fontSize: unit(globalVars.fonts.size.large),
         fontWeight: globalVars.fonts.weights.bold,
-        ...debug.name("title"),
     });
 
-    const children = style({
+    const children = style("children", {
         position: "relative",
         display: "block",
         $nest: {
@@ -82,18 +76,17 @@ export function siteNavClasses(theme?: object) {
                 margin: `25px 0 0`,
             },
         },
-        ...debug.name("children"),
     });
 
     return { root, title, children };
-}
+});
 
-export function siteNavNodeClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const vars = siteNavVariables(theme);
+export const siteNavNodeClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const vars = siteNavVariables();
     const mediaQueries = layoutVariables().mediaQueries();
 
-    const debug = debugHelper("siteNavNode");
+    const style = styleFactory("siteNavNode");
 
     const root = style({
         position: "relative",
@@ -109,15 +102,13 @@ export function siteNavNodeClasses(theme?: object) {
                 fontWeight: vars.node.active.fontWeight,
             },
         },
-        ...debug.name(),
     });
 
-    const children = style({
+    const children = style("children", {
         marginLeft: unit(vars.spacer.default),
-        ...debug.name("children"),
     });
 
-    const contents = style({
+    const contents = style("contents", {
         display: "block",
         width: percent(100),
         $nest: {
@@ -125,10 +116,9 @@ export function siteNavNodeClasses(theme?: object) {
                 top: unit(15.5),
             },
         },
-        ...debug.name("contents"),
     });
 
-    const link = style({
+    const link = style("link", {
         display: "block",
         flexGrow: 1,
         color: "inherit",
@@ -136,6 +126,7 @@ export function siteNavNodeClasses(theme?: object) {
         minHeight: px(30),
         outline: 0,
         padding: 0,
+        width: percent(100),
         $nest: {
             "&:active, &:focus": {
                 outline: 0,
@@ -145,6 +136,7 @@ export function siteNavNodeClasses(theme?: object) {
             },
             "&.hasChildren": {
                 fontWeight: globalVars.fonts.weights.semiBold,
+                color: "inherit",
                 $nest: {
                     "&.isFirstLevel": {
                         fontSize: unit(globalVars.fonts.size.large),
@@ -153,10 +145,10 @@ export function siteNavNodeClasses(theme?: object) {
                 },
             },
         },
-        ...debug.name("link"),
     });
 
     const label = style(
+        "label",
         {
             position: "relative",
             display: "block",
@@ -168,22 +160,20 @@ export function siteNavNodeClasses(theme?: object) {
             paddingRight: unit(vars.node.padding),
             paddingBottom: unit(vars.node.padding + vars.node.borderWidth),
             paddingLeft: unit(vars.nodeToggle.width - vars.node.borderWidth),
-            ...debug.name("label"),
         },
         mediaQueries.oneColumn({
             fontSize: unit(globalVars.fonts.size.large),
         }),
     );
 
-    const spacer = style({
+    const spacer = style("spacer", {
         display: "block",
         height: unit(vars.nodeToggle.height),
         width: unit(vars.spacer.default),
         margin: `6px 0`,
-        ...debug.name("spacer"),
     });
 
-    const toggle = style({
+    const toggle = style("toggle", {
         margin: `6px 0`,
         padding: 0,
         zIndex: 1,
@@ -193,10 +183,9 @@ export function siteNavNodeClasses(theme?: object) {
         outline: 0,
         height: unit(vars.nodeToggle.height),
         width: unit(vars.nodeToggle.width),
-        ...debug.name("toggle"),
     });
 
-    const buttonOffset = style({
+    const buttonOffset = style("buttonOffset", {
         position: "relative",
         display: "flex",
         justifyContent: "flex-end",
@@ -204,8 +193,7 @@ export function siteNavNodeClasses(theme?: object) {
         marginLeft: unit(-vars.nodeToggle.width),
         top: px(16),
         transform: `translateY(-50%)`,
-        ...debug.name("buttonOffset"),
     });
 
     return { root, children, contents, link, label, spacer, toggle, buttonOffset };
-}
+});

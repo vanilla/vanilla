@@ -3,27 +3,58 @@
  * @license GPL-2.0-only
  */
 
-import { ColorHelper, important, percent, px, quote, viewHeight, viewWidth, color, deg } from "csx";
+import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { styleFactory } from "@library/styles/styleUtils";
 import {
+    AlignItemsProperty,
+    AppearanceProperty,
+    BackgroundAttachmentProperty,
+    BackgroundColorProperty,
     BackgroundImageProperty,
+    BackgroundOriginProperty,
+    BackgroundPositionProperty,
+    BackgroundRepeatProperty,
+    BackgroundSizeProperty,
+    BorderProperty,
     BorderRadiusProperty,
     BorderStyleProperty,
     BorderWidthProperty,
-    FlexWrapProperty,
-    LeftProperty,
-    RightProperty,
     BottomProperty,
-    PositionProperty,
-    DisplayProperty,
-    AlignItemsProperty,
-    JustifyContentProperty,
     ContentProperty,
+    DisplayProperty,
+    FlexWrapProperty,
+    FontSizeProperty,
+    FontWeightProperty,
+    JustifyContentProperty,
+    LeftProperty,
+    LineHeightProperty,
+    MaxWidthProperty,
     ObjectFitProperty,
+    OverflowXProperty,
+    PositionProperty,
+    RightProperty,
+    TextAlignLastProperty,
+    TextOverflowProperty,
+    TextShadowProperty,
+    UserSelectProperty,
+    WhiteSpaceProperty,
 } from "csstype";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { style, keyframes } from "typestyle";
+import { color, ColorHelper, deg, important, percent, px, quote, viewHeight, viewWidth, url } from "csx";
+import { keyframes } from "typestyle";
 import { TLength, NestedCSSProperties } from "typestyle/lib/types";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { getThemeVariables } from "@library/theming/ThemeProvider";
+import { isAllowedUrl, themeAsset, assetUrl } from "@library/application";
+import get from "lodash/get";
+import { ColorValues } from "@library/styles/buttonStyles";
+
+export const colorOut = (colorValue: ColorValues) => {
+    if (!colorValue) {
+        return undefined;
+    } else {
+        return typeof colorValue === "string" ? colorValue : colorValue.toString();
+    }
+};
 
 export function flexHelper() {
     const middle = (wrap = false) => {
@@ -75,8 +106,8 @@ export function fakeBackgroundFixed() {
 
 export function fullSizeOfParent() {
     return {
-        display: "block",
         position: "absolute",
+        display: "block",
         top: px(0),
         left: px(0),
         width: percent(100),
@@ -92,16 +123,46 @@ export function centeredBackgroundProps() {
 }
 
 export function centeredBackground() {
+    const style = styleFactory("centeredBackground");
     return style(centeredBackgroundProps());
 }
 
-export function backgroundCover(backgroundImage: BackgroundImageProperty) {
-    return style({
-        ...centeredBackgroundProps(),
-        backgroundSize: "cover",
-        backgroundImage: backgroundImage.toString(),
-    });
+export function inputLineHeight(height: number, paddingTop: number, fullBorderWidth: number) {
+    return unit(height - (2 * paddingTop + fullBorderWidth));
 }
+
+export const textInputSizing = (height: number, fontSize: number, paddingTop: number, fullBorderWidth: number) => {
+    return {
+        fontSize: unit(fontSize),
+        width: percent(100),
+        height: unit(height),
+        lineHeight: inputLineHeight(height, paddingTop, fullBorderWidth),
+        ...paddings({
+            top: unit(paddingTop),
+            bottom: unit(paddingTop),
+            left: unit(paddingTop * 2),
+            right: unit(paddingTop * 2),
+        }),
+    };
+};
+
+// must be nested
+export const placeholderStyles = (styles: NestedCSSProperties) => {
+    return {
+        "&::-webkit-input-placeholder": {
+            $unique: true,
+            ...styles,
+        },
+        "&::-moz-placeholder": {
+            $unique: true,
+            ...styles,
+        },
+        "&::-ms-input-placeholder": {
+            $unique: true,
+            ...styles,
+        },
+    };
+};
 
 /*
  * Helper to generate human readable classes generated from TypeStyle
@@ -119,40 +180,6 @@ export const debugHelper = (componentName: string) => {
     };
 };
 
-/**
- * A better helper to generate human readable classes generated from TypeStyle.
- *
- * This works like debugHelper but automatically. The generated function behaves just like `style()`
- * but can automatically adds a debug name & allows the first argument to be a string subcomponent name.
- *
- * @example
- * const style = styleFactory("myComponent");
- * const myClass = style({ color: "red" }); // .myComponent-sad421s
- * const mySubClass = style("subcomponent", { color: "red" }) // .myComponent-subcomponent-23sdaf43
- *
- */
-export function styleFactory(componentName: string) {
-    function styleCreator(subcomponentName: string, ...objects: Array<NestedCSSProperties | undefined>);
-    function styleCreator(...objects: Array<NestedCSSProperties | undefined>);
-    function styleCreator(...objects: Array<NestedCSSProperties | undefined | string>) {
-        if (objects.length === 0) {
-            return style();
-        }
-
-        let debugName = componentName;
-        let styleObjs: Array<NestedCSSProperties | undefined> = objects as any;
-        if (typeof objects[0] === "string") {
-            const [subcomponentName, ...restObjects] = styleObjs;
-            debugName += `-${subcomponentName}`;
-            styleObjs = restObjects;
-        }
-
-        return style({ $debugName: debugName }, ...styleObjs);
-    }
-
-    return styleCreator;
-}
-
 /*
  * Color modification based on colors lightness.
  * @param referenceColor - The reference colour to determine if we're in a dark or light context.
@@ -160,7 +187,7 @@ export function styleFactory(componentName: string) {
  * @param percentage - The amount you want to mix the two colors
  * @param flip - By default we darken light colours and lighten darks, but if you want to get the opposite result, use this param
  */
-export const getColorDependantOnLightness = (
+export const modifyColorBasedOnLightness = (
     referenceColor: ColorHelper,
     colorToModify: ColorHelper,
     weight: number,
@@ -169,13 +196,35 @@ export const getColorDependantOnLightness = (
     if (weight > 1 || weight < 0) {
         throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
     }
+    if (referenceColor.lightness() >= 0.5 && !flip) {
+        return colorToModify.darken(weight) as ColorHelper;
+    } else {
+        return colorToModify.lighten(weight) as ColorHelper;
+    }
+};
 
-    if (referenceColor.lightness() >= 0.5 || flip) {
-        // Lighten color
-        return colorToModify.mix(color("#000"), 1 - weight) as ColorHelper;
+/*
+ * Color modification based on saturation.
+ * @param referenceColor - The reference colour to determine if we're in a dark or light context.
+ * @param colorToModify - The color you wish to modify
+ * @param percentage - The amount you want to mix the two colors
+ * @param flip - By default we darken light colours and lighten darks, but if you want to get the opposite result, use this param
+ */
+export const modifyColorSaturationBasedOnLightness = (
+    referenceColor: ColorHelper,
+    colorToModify: ColorHelper,
+    weight: number,
+    flip: boolean = false,
+) => {
+    if (weight > 1 || weight < 0) {
+        throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
+    }
+    if (referenceColor.saturation() <= 0.5 && !flip) {
+        // Saturate
+        return colorToModify.desaturate(weight) as ColorHelper;
     } else {
         // Darken color
-        return colorToModify.mix(color("#fff"), 1 - weight) as ColorHelper;
+        return colorToModify.saturate(weight) as ColorHelper;
     }
 };
 
@@ -184,13 +233,12 @@ export const getColorDependantOnLightness = (
  * @param theme - The theme overwrites.
  * @param componentName - The name of the component to overwrite
  */
-export const componentThemeVariables = (theme: any | undefined, componentName: string) => {
-    // const themeVars = get(theme, componentName, {});
-    const themeVars = (theme && theme[componentName]) || {};
+export const componentThemeVariables = (componentName: string) => {
+    const themeVars = getThemeVariables();
+    const componentVars = (themeVars && themeVars[componentName]) || {};
 
     const subComponentStyles = (subElementName: string): object => {
-        return (themeVars && themeVars[subElementName]) || {};
-        // return get(themeVars, subElementName, {});
+        return (componentVars && componentVars[subElementName]) || {};
     };
 
     return {
@@ -199,6 +247,7 @@ export const componentThemeVariables = (theme: any | undefined, componentName: s
 };
 
 export const inheritHeightClass = () => {
+    const style = styleFactory("inheritHeight");
     return style({
         display: "flex",
         flexDirection: "column",
@@ -224,30 +273,61 @@ const spinnerLoaderAnimation = keyframes({
     "100%": { transform: `rotate(${deg(360 + spinnerOffset)})` },
 });
 
-interface IBorderStyles {
-    color?: ColorHelper | "transparent";
+interface ISingleBorderStyle {
+    color?: ColorValues;
     width?: BorderWidthProperty<TLength>;
     style?: BorderStyleProperty;
+}
+
+export interface IBorderStyles extends ISingleBorderStyle {
     radius?: BorderRadiusProperty<TLength>;
 }
 
-export const borderStyles = (styles: IBorderStyles) => {
+export const borders = (props: IBorderStyles = {}) => {
     const vars = globalVariables();
     return {
-        borderColor: styles.color ? styles.color.toString() : vars.border.color.toString(),
-        borderWidth: unit(styles.width),
-        borderStyle: styles.style ? styles.style : vars.border.style,
-        borderRadius: unit(styles.radius),
+        borderColor: props.color ? colorOut(props.color as any) : colorOut(vars.border.color),
+        borderWidth: props.width ? unit(props.width) : unit(vars.border.width),
+        borderStyle: props.style ? props.style : vars.border.style,
+        borderRadius: props.radius ? props.radius : vars.border.radius,
     };
 };
 
-export const allLinkStates = (styles: object) => {
+export const singleBorder = (styles: ISingleBorderStyle = {}) => {
+    const vars = globalVariables();
+    return `${styles.style ? styles.style : vars.border.style} ${
+        styles.color ? colorOut(styles.color) : colorOut(vars.border.color)
+    } ${styles.width ? unit(styles.width) : unit(vars.border.width)}` as any;
+};
+
+export interface ILinkStates {
+    allStates?: object; // Applies to all
+    noState?: object; // Applies to stateless link
+    hover?: object;
+    focus?: object;
+    accessibleFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
+    active?: object;
+    visited?: object;
+}
+
+export const allLinkStates = (styles: ILinkStates) => {
+    const allStates = get(styles, "allStates", {});
+    const noState = get(styles, "noState", {});
+    const hover = get(styles, "hover", {});
+    const focus = get(styles, "focus", {});
+    const accessibleFocus = get(styles, "accessibleFocus", focus);
+    const active = get(styles, "active", {});
+    const visited = get(styles, "visited", {});
+
     return {
-        ...styles,
+        ...allStates,
+        ...noState,
         $nest: {
-            "&:hover": styles,
-            "&:active": styles,
-            "&:visited": styles,
+            "&:hover": { ...allStates, ...hover },
+            "&:focus": { ...allStates, ...focus },
+            "&.focus-visible": { ...allStates, ...accessibleFocus },
+            "&:active": { ...allStates, ...active },
+            "&:visited": { ...allStates, ...visited },
         },
     };
 };
@@ -255,21 +335,21 @@ export const allLinkStates = (styles: object) => {
 export const unit = (val: string | number | undefined, unitFunction = px) => {
     if (typeof val === "string") {
         return val;
-    } else if (!!val && !isNaN(val)) {
+    } else if (val !== undefined && val !== null && !isNaN(val)) {
         return unitFunction(val as number);
     } else {
-        return undefined;
+        return val;
     }
 };
 
-interface IMargins {
+export interface IMargins {
     top?: string | number;
     right?: string | number;
     bottom?: string | number;
     left?: string | number;
 }
 
-export const margins = (styles: IMargins) => {
+export const margins = (styles: IMargins): NestedCSSProperties => {
     return {
         marginTop: unit(styles.top),
         marginRight: unit(styles.right),
@@ -278,7 +358,7 @@ export const margins = (styles: IMargins) => {
     };
 };
 
-interface IPaddings {
+export interface IPaddings {
     top?: string | number;
     right?: string | number;
     bottom?: string | number;
@@ -286,12 +366,25 @@ interface IPaddings {
 }
 
 export const paddings = (styles: IPaddings) => {
-    return {
-        paddingTop: unit(styles.top),
-        paddingRight: unit(styles.right),
-        paddingBottom: unit(styles.bottom),
-        paddingLeft: unit(styles.left),
-    };
+    const paddingVals = {} as NestedCSSProperties;
+
+    if (styles.top !== undefined) {
+        paddingVals.paddingTop = unit(styles.top);
+    }
+
+    if (styles.right !== undefined) {
+        paddingVals.paddingRight = unit(styles.right);
+    }
+
+    if (styles.bottom !== undefined) {
+        paddingVals.paddingBottom = unit(styles.bottom);
+    }
+
+    if (styles.left !== undefined) {
+        paddingVals.paddingLeft = unit(styles.left);
+    }
+
+    return paddingVals as NestedCSSProperties;
 };
 
 export interface ISpinnerProps {
@@ -303,12 +396,12 @@ export interface ISpinnerProps {
 }
 
 export const spinnerLoader = (props: ISpinnerProps) => {
-    const vars = globalVariables();
     const debug = debugHelper("spinnerLoader");
+    const globalVars = globalVariables();
     const spinnerVars = {
-        color: vars.mainColors.primary,
-        size: 18,
-        thickness: 3,
+        color: props.color || globalVars.mainColors.primary,
+        size: props.size || 18,
+        thickness: props.thickness || 3,
         speed: "0.7s",
         ...props,
     };
@@ -412,6 +505,12 @@ export const absolutePosition = {
     },
 };
 
+export function sticky(): NestedCSSProperties {
+    return {
+        position: ["-webkit-sticky", "sticky"],
+    };
+}
+
 export interface IDropShadowShorthand {
     nonColorProps: string;
     color: string;
@@ -445,7 +544,7 @@ export const disabledInput = () => {
     const formElementVars = formElementsVariables();
     return {
         pointerEvents: important("none"),
-        userSelect: important("none"),
+        ...userSelect("none", true),
         cursor: important("default"),
         opacity: important((formElementVars.disabled.opacity as any).toString()),
     };
@@ -468,11 +567,7 @@ export const objectFitWithFallback = () => {
                 height: percent(100),
             },
         },
-    };
-};
-
-export const toStringColor = (colorValue: ColorHelper | "transparent") => {
-    return typeof colorValue === "string" ? colorValue : colorValue.toString();
+    } as NestedCSSProperties;
 };
 
 export interface ILinkStates {
@@ -491,19 +586,19 @@ export const setAllLinkColors = (overwrites?: ILinkStates) => {
 
     const styles: ILinkStates = {
         default: {
-            color: toStringColor(linkColors.default),
+            color: colorOut(linkColors.default),
         },
         hover: {
-            color: toStringColor(linkColors.hover),
+            color: colorOut(linkColors.hover),
         },
         focus: {
-            color: toStringColor(linkColors.focus),
+            color: colorOut(linkColors.focus),
         },
         accessibleFocus: {
-            color: toStringColor(linkColors.accessibleFocus),
+            color: colorOut(linkColors.accessibleFocus),
         },
         active: {
-            color: toStringColor(linkColors.active),
+            color: colorOut(linkColors.active),
         },
         ...overwrites,
     };
@@ -517,5 +612,152 @@ export const setAllLinkColors = (overwrites?: ILinkStates) => {
             "&:active": styles.active,
             "&:visited": styles.visited,
         },
+    };
+};
+
+export const singleLineEllipsis = () => {
+    return {
+        whiteSpace: "nowrap" as WhiteSpaceProperty,
+        textOverflow: "ellipsis" as TextOverflowProperty,
+        overflowX: "hidden" as OverflowXProperty,
+        maxWidth: percent(100) as MaxWidthProperty<TLength>,
+    };
+};
+export const longWordEllipsis = () => {
+    return {
+        textOverflow: "ellipsis" as TextOverflowProperty,
+        overflowX: "hidden" as OverflowXProperty,
+        maxWidth: percent(100) as MaxWidthProperty<TLength>,
+    };
+};
+
+export const appearance = (value: AppearanceProperty = "none", isImportant: boolean = false) => {
+    const val = (isImportant ? important(value) : value) as any;
+    return {
+        "-webkit-appearance": val,
+        "-moz-appearance": val,
+        appearance: val,
+    };
+};
+
+export const userSelect = (value: UserSelectProperty = "none", isImportant: boolean = false) => {
+    const val = (isImportant ? important(value) : value) as any;
+    return {
+        "-webkit-user-select": val,
+        "-moz-user-select": val,
+        "-ms-user-select": val,
+        userSelect: val,
+    };
+};
+
+export interface IFont {
+    color?: ColorValues;
+    size?: FontSizeProperty<TLength>;
+    weight?: FontWeightProperty;
+    lineHeight?: LineHeightProperty<TLength>;
+    shadow?: TextShadowProperty;
+    align?: TextAlignLastProperty;
+}
+
+export const fonts = (props: IFont) => {
+    if (props) {
+        const size = get(props, "size", undefined);
+        const fontWeight = get(props, "weight", undefined);
+        const fg = get(props, "color", undefined);
+        const lineHeight = get(props, "lineHeight", undefined);
+        const textAlign = get(props, "align", undefined);
+        const textShadow = get(props, "shadow", undefined);
+        return {
+            color: fg ? colorOut(fg) : undefined,
+            fontSize: size ? unit(size) : undefined,
+            fontWeight,
+            lineHeight: lineHeight ? unit(lineHeight) : undefined,
+            textAlign,
+            textShadow,
+        } as NestedCSSProperties;
+    } else {
+        return {} as NestedCSSProperties;
+    }
+};
+
+export interface IBackground {
+    color: ColorValues;
+    attachment?: BackgroundAttachmentProperty;
+    position?: BackgroundPositionProperty<TLength>;
+    repeat?: BackgroundRepeatProperty;
+    size?: BackgroundSizeProperty<TLength>;
+    image?: BackgroundImageProperty;
+    fallbackImage?: BackgroundImageProperty;
+}
+
+export const getBackgroundImage = (image?: BackgroundImageProperty, fallbackImage?: BackgroundImageProperty) => {
+    // Get either image or fallback
+    const workingImage = image ? image : fallbackImage;
+    if (!workingImage) {
+        return;
+    }
+
+    if (workingImage.charAt(0) === "~") {
+        // Relative path to theme folder
+        return themeAsset(workingImage.substr(1, workingImage.length - 1));
+    }
+
+    if (workingImage.startsWith('"data:image/')) {
+        return workingImage;
+    }
+
+    // Fallback to a general asset URL.
+    const assetImage = assetUrl(workingImage);
+    return assetImage;
+};
+
+export const background = (props: IBackground) => {
+    const image = getBackgroundImage(props.image, props.fallbackImage);
+    return {
+        backgroundColor: props.color ? colorOut(props.color) : undefined,
+        backgroundAttachment: props.attachment || undefined,
+        backgroundPosition: props.position || `50% 50%`,
+        backgroundRepeat: props.repeat || "no-repeat",
+        backgroundSize: props.size || "cover",
+        backgroundImage: image ? url(image) : undefined,
+    };
+};
+
+export interface IStates {
+    hover?: object;
+    focus?: object;
+    active?: object;
+    accessibleFocus?: object;
+}
+
+export interface IStatesAll {
+    allStates?: object;
+}
+
+// Similar to ILinkStates, but can be button or link, so we don't have link specific states here and not specific to colors
+export interface IActionStates {
+    allStates?: object; // Applies to all
+    hover?: object;
+    focus?: object;
+    accessibleFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
+    active?: object;
+}
+
+/*
+ * Helper to write CSS state styles. Note this one is for buttons or links
+ * *** You must use this inside of a "$nest" ***
+ */
+export const states = (styles: IActionStates) => {
+    const allStates = get(styles, "allStates", {});
+    const hover = get(styles, "hover", {});
+    const focus = get(styles, "focus", {});
+    const accessibleFocus = get(styles, "accessibleFocus", focus);
+    const active = get(styles, "active", {});
+
+    return {
+        "&:hover": { ...allStates, ...hover },
+        "&:focus": { ...allStates, ...focus },
+        "&.focus-visible": { ...allStates, ...accessibleFocus },
+        "&:active": { ...allStates, ...active },
     };
 };

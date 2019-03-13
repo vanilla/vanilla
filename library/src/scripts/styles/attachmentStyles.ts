@@ -6,28 +6,31 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
-    borderStyles,
+    borders,
     componentThemeVariables,
-    debugHelper,
     allLinkStates,
     margins,
-    absolutePosition,
     unit,
+    userSelect,
+    absolutePosition,
+    IBorderStyles,
 } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { percent, px } from "csx";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { transparentColor } from "@library/styles/buttonStyles";
+import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 
-export function attachmentVariables(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "attachment");
+export const attachmentVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const themeVars = componentThemeVariables("attachment");
 
-    const border = {
+    const border: IBorderStyles = {
         color: globalVars.mixBgAndFg(0.2),
         style: "solid",
         width: formElementVars.border.width,
-        radius: 0,
+        radius: px(2),
         ...themeVars.subComponentStyles("border"),
     };
 
@@ -40,11 +43,6 @@ export function attachmentVariables(theme?: object) {
     const padding = {
         default: 12,
         ...themeVars.subComponentStyles("padding"),
-    };
-
-    const shadows = {
-        default: `0 1px 3px 0 ${globalVars.mainColors.fg.fade(0.3).toString()}`,
-        ...themeVars.subComponentStyles("shadows"),
     };
 
     const text = {
@@ -61,55 +59,68 @@ export function attachmentVariables(theme?: object) {
         opacity: 0.5,
     };
 
-    return { border, padding, shadows, text, title, loading, sizing };
-}
+    return { border, padding, text, title, loading, sizing };
+});
 
-export function attachmentClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const vars = attachmentVariables(theme);
-    const debug = debugHelper("attachment");
+export const attachmentClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const vars = attachmentVariables();
+    const style = styleFactory("attachment");
+
+    const hoverFocusStates = {
+        "&:hover": {
+            boxShadow: `0 0 0 ${px(globalVars.embed.select.borderWidth)} ${globalVars.embed.focus.color.fade(
+                0.5,
+            )} inset`,
+        },
+        "&:focus": {
+            boxShadow: `0 0 0 ${px(
+                globalVars.embed.select.borderWidth,
+            )} ${globalVars.embed.focus.color.toString()} inset`,
+        },
+    };
 
     const root = style({
         display: "block",
         position: "relative",
         textDecoration: "none",
         color: "inherit",
-        boxShadow: vars.shadows.default,
         width: px(globalVars.embed.sizing.width),
         maxWidth: percent(100),
         margin: "auto",
         overflow: "hidden",
-        userSelect: "none",
-        ...borderStyles(vars.border),
+        ...userSelect(),
+        ...borders(vars.border),
+        ...shadowOrBorderBasedOnLightness(
+            globalVars.body.backgroundImage.color,
+            borders({
+                color: vars.border.color,
+            }),
+            shadowHelper().embed(),
+        ),
         $nest: {
-            "&.isLoading, &.hasError": {
+            // These 2 can't be joined together or their pseudselectors don't get created properly.
+            "&.isLoading": {
                 cursor: "pointer",
-                $nest: {
-                    "&:hover": {
-                        boxShadow: `0 0 0 ${px(
-                            globalVars.embed.select.borderWidth,
-                        )} ${globalVars.embed.focus.color.fade(0.5)} inset`,
-                    },
-                    "&:focus": {
-                        boxShadow: `0 0 0 ${px(
-                            globalVars.embed.select.borderWidth,
-                        )} ${globalVars.embed.focus.color.toString()} inset`,
-                    },
-                },
+                $nest: hoverFocusStates,
+            },
+            "&.hasError": {
+                cursor: "pointer",
+                $nest: hoverFocusStates,
             },
         },
-        ...debug.name(),
     });
 
-    const link = style({
+    const link = style("link", {
         ...allLinkStates({
-            textDecoration: "none",
+            allStates: {
+                textDecoration: "none",
+            },
         }),
-        ...debug.name("link"),
     });
 
-    const box = style({
+    const box = style("box", {
         position: "relative",
         display: "flex",
         flexWrap: "nowrap",
@@ -117,66 +128,59 @@ export function attachmentClasses(theme?: object) {
         justifyContent: "space-between",
         padding: px(vars.padding.default),
         width: percent(100),
-        ...borderStyles({
-            color: "transparent",
+        ...borders({
+            color: transparentColor,
             width: 2,
             radius: 0,
         }),
-        ...debug.name("box"),
     });
 
-    const format = style({
+    const format = style("format", {
         flexBasis: px(globalVars.icon.sizes.small + vars.padding.default),
         height: unit(globalVars.icon.sizes.small),
         paddingRight: unit(vars.padding.default),
         flexShrink: 1,
-        ...debug.name("format"),
     });
 
-    const main = style({
+    const main = style("main", {
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-start",
         justifyContent: "flex-start",
         flexGrow: 1,
-        ...debug.name("main"),
     });
 
-    const title = style({
+    const title = style("title", {
         fontSize: px(vars.text.fontSize),
         color: vars.title.color.toString(),
         fontWeight: globalVars.fonts.weights.semiBold,
         lineHeight: px(globalVars.icon.sizes.small),
-        ...debug.name("title"),
     });
 
-    const metas = style({
+    const metas = style("metas", {
         marginBottom: px(0),
         lineHeight: globalVars.lineHeights.condensed,
-        ...debug.name("metas"),
     });
 
-    const close = style({
+    const close = style("close", {
         ...margins({
             top: px(-((formElementVars.sizing.height - globalVars.icon.sizes.default) / 2)),
             right: px(-((formElementVars.sizing.height - globalVars.icon.sizes.default) / 2)),
         }),
         pointerEvents: "all",
-        ...debug.name("close"),
     });
 
-    const loadingProgress = style({
+    const loadingProgress = style("loadingProgress", {
         ...absolutePosition.bottomLeft(),
         transition: `width ease-out .2s`,
         height: px(3),
-        marginBottom: px(-1),
+        marginBottom: px(0),
         width: 0,
         maxWidth: percent(100),
         backgroundColor: globalVars.mainColors.primary.toString(),
-        ...debug.name("loadingProgress"),
     });
 
-    const loadingContent = style({
+    const loadingContent = style("loadingContent", {
         $nest: {
             ".attachment-format": {
                 opacity: vars.loading.opacity,
@@ -185,8 +189,7 @@ export function attachmentClasses(theme?: object) {
                 opacity: vars.loading.opacity,
             },
         },
-        ...debug.name("loadingContent"),
     });
 
     return { root, link, box, format, main, title, metas, close, loadingProgress, loadingContent };
-}
+});

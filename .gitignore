@@ -64,6 +64,7 @@
 !/themes/mobile/
 !/themes/theme-boilerplate/
 !/themes/keystone/
+!/themes/theme-api-test/
 /uploads/*
 !/uploads/.gitkeep
 *vanillaforums*

@@ -5,11 +5,11 @@
 
 import { px } from "csx";
 import { media } from "typestyle";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, componentThemeVariables } from "@library/styles/styleHelpers";
+import { componentThemeVariables } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-export const layoutVariables = (theme?: object) => {
-    const themeVars = componentThemeVariables(theme, "globalVariables");
+export const layoutVariables = useThemeCache(() => {
+    const themeVars = componentThemeVariables("globalVariables");
 
     const gutterSize = 24;
     const gutter = {
@@ -76,4 +76,4 @@ export const layoutVariables = (theme?: object) => {
     };
 
     return { gutterSize, gutter, panelWidth, panel, middleColumnWidth, middleColumn, content, mediaQueries };
-};
+});

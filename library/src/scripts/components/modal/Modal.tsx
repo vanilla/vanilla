@@ -11,6 +11,8 @@ import TabHandler from "@library/TabHandler";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import classNames from "classnames";
 import ModalSizes from "@library/components/modal/ModalSizes";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { modalClasses } from "@library/styles/modalStyles";
 
 interface IHeadingDescription {
     titleID: string;
@@ -83,6 +85,7 @@ export default class Modal extends React.Component<IProps, IState> {
      */
     public render() {
         const { size } = this.props;
+        const classes = modalClasses();
         return ReactDOM.createPortal(
             <div className="overlay" onClick={this.handleScrimClick}>
                 <div
@@ -91,9 +94,9 @@ export default class Modal extends React.Component<IProps, IState> {
                     aria-modal={true}
                     className={classNames(
                         "modal",
+                        classes.root,
                         {
                             isFullScreen: size === ModalSizes.FULL_SCREEN || size === ModalSizes.MODAL_AS_SIDE_PANEL,
-                            inheritHeight: size === ModalSizes.FULL_SCREEN,
                             isSidePanel: size === ModalSizes.MODAL_AS_SIDE_PANEL,
                             isDropDown: size === ModalSizes.MODAL_AS_DROP_DOWN,
                             isLarge: size === ModalSizes.LARGE,
@@ -101,6 +104,7 @@ export default class Modal extends React.Component<IProps, IState> {
                             isSmall: size === ModalSizes.SMALL,
                             isShadowed: size === ModalSizes.LARGE || ModalSizes.MEDIUM || ModalSizes.SMALL,
                         },
+                        size === ModalSizes.FULL_SCREEN ? inheritHeightClass() : "",
                         this.props.className,
                     )}
                     ref={this.selfRef}

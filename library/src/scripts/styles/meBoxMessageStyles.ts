@@ -5,70 +5,79 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, toStringColor, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
-import { calc, percent, quote } from "csx";
-import { objectFitWithFallback } from "@library/styles/styleHelpers";
-import { absolutePosition } from "@library/styles/styleHelpers";
-import vanillaHeaderStyles, { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import {
+    objectFitWithFallback,
+    colorOut,
+    unit,
+    userSelect,
+    paddings,
+    allLinkStates,
+    absolutePosition,
+    states,
+} from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { calc, percent, px, quote } from "csx";
 
-export function meBoxMessageVariables(theme?: object) {
-    const themeVars = componentThemeVariables(theme, "meBoxMessage");
-    const spacing = {
-        padding: 8,
-        ...themeVars.subComponentStyles("spacing"),
-    };
+export const meBoxMessageVariables = useThemeCache(() => {
+    const makeThemeVars = variableFactory("meBoxMessage");
 
-    const imageContainer = {
+    const spacing = makeThemeVars("spacing", {
+        padding: {
+            top: 8,
+            right: 12,
+            bottom: 8,
+            left: 12,
+        },
+    });
+
+    const imageContainer = makeThemeVars("imageContainer", {
         width: 40,
-        ...themeVars.subComponentStyles("imageContainer"),
-    };
+    });
 
-    const unreadDot = {
+    const unreadDot = makeThemeVars("unreadDot", {
         width: 12,
-        ...themeVars.subComponentStyles("unreadDot"),
-    };
+    });
 
     return { spacing, imageContainer, unreadDot };
-}
+});
 
-export function meBoxMessageClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const vars = meBoxMessageVariables(theme);
-    const headerVars = vanillaHeaderVariables(theme);
-    const debug = debugHelper("meBoxMessage");
+export const meBoxMessageClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const vars = meBoxMessageVariables();
+    const style = styleFactory("meBoxMessage");
 
     const root = style({
-        ...debug.name(),
         display: "block",
         $nest: {
             "& + &": {
-                borderTop: `solid 1px ${globalVars.border.color.toString()}`,
+                borderTop: `solid 1px ${colorOut(globalVars.border.color)}`,
             },
         },
     });
 
-    const link = style({
+    const link = style("link", {
+        ...userSelect(),
         display: "flex",
         flexWrap: "nowrap",
-        padding: unit(vars.spacing.padding),
         color: "inherit",
-        userSelect: "none",
-        $nest: {
-            "&:active, &:focus, &:hover, &.focus-visible": {
-                backgroundColor: toStringColor(globalVars.states.active.color),
-                textDecoration: "none",
-                color: headerVars.colors.fg.toString(),
+        ...paddings(vars.spacing.padding),
+        ...states({
+            allStates: {
+                textShadow: "none",
             },
-            "&:active .meta, &:focus .meta, &:hover .meta, &.focus-visible .meta": {
-                color: headerVars.colors.fg.toString(),
-                opacity: 0.75,
+            hover: {
+                backgroundColor: colorOut(globalVars.states.hover.color),
             },
-        },
-        ...debug.name("link"),
+            focus: {
+                backgroundColor: colorOut(globalVars.states.focus.color),
+            },
+            active: {
+                backgroundColor: colorOut(globalVars.states.active.color),
+            },
+        }),
     });
 
-    const imageContainer = style({
+    const imageContainer = style("imageContainer", {
         position: "relative",
         width: unit(vars.imageContainer.width),
         height: unit(vars.imageContainer.width),
@@ -76,19 +85,18 @@ export function meBoxMessageClasses(theme?: object) {
         borderRadius: percent(50),
         overflow: "hidden",
         border: `solid 1px ${globalVars.border.color.toString()}`,
-        ...debug.name("imageContainer"),
     });
 
-    const image = style({
+    const image = style("image", {
+        width: unit(vars.imageContainer.width),
+        height: unit(vars.imageContainer.width),
         ...objectFitWithFallback(),
-        ...debug.name("image"),
     });
 
-    const status = style({
+    const status = style("status", {
         position: "relative",
         width: unit(vars.unreadDot.width),
         flexBasis: unit(vars.unreadDot.width),
-        ...debug.name("status"),
         $nest: {
             "&.isUnread": {
                 $nest: {
@@ -105,18 +113,19 @@ export function meBoxMessageClasses(theme?: object) {
         },
     });
 
-    const contents = style({
+    const contents = style("contents", {
         flexGrow: 1,
-        paddingLeft: vars.spacing.padding,
-        paddingRight: vars.spacing.padding,
+        ...paddings({
+            left: vars.spacing.padding.left,
+            right: vars.spacing.padding.right,
+        }),
         maxWidth: calc(`100% - ${unit(vars.unreadDot.width + vars.imageContainer.width)}`),
-        ...debug.name("contents"),
     });
 
-    const message = style({
+    const message = style("message", {
         lineHeight: globalVars.lineHeights.excerpt,
-        ...debug.name("message"),
+        color: colorOut(globalVars.mainColors.fg),
     });
 
     return { root, link, imageContainer, image, status, contents, message };
-}
+});

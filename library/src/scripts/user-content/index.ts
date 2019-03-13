@@ -18,10 +18,8 @@ import { initVideoEmbeds } from "@library/user-content/embeds/video";
 import { initEmojiSupport } from "@library/user-content/emoji";
 import { initSpoilers } from "@library/user-content/spoilers";
 import { initQuoteEmbeds, mountQuoteEmbeds } from "@library/user-content/embeds/quote";
-import { initCodeHighlighting } from "@library/user-content/code";
 import { initFileEmbeds, mountFileEmbeds } from "@library/user-content/embeds/file";
-
-let codeInitFunction: (() => void) | null = null;
+import { initCodeHighlighting } from "@library/user-content/code";
 
 export function initAllUserContent() {
     // User content
@@ -38,18 +36,8 @@ export function initAllUserContent() {
     initTwitterEmbeds();
     initVideoEmbeds();
     initQuoteEmbeds();
-    initCodeHighlighting();
     initFileEmbeds();
-
-    if (codeInitFunction === null) {
-        // Lazily initialize this because it can be rather heavy.
-        void import("@library/user-content/code" /* webpackChunkName: "codeBlockHighlighting" */).then(module => {
-            codeInitFunction = module.initCodeHighlighting;
-            codeInitFunction();
-        });
-    } else {
-        codeInitFunction();
-    }
+    initCodeHighlighting();
 }
 
 /**

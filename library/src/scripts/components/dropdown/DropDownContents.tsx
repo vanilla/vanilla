@@ -7,6 +7,7 @@
 import * as React from "react";
 import classNames from "classnames";
 import { flyoutPosition } from "@rich-editor/components/popovers/pieces/flyoutPosition";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 export interface IProps {
     id: string;
@@ -26,18 +27,18 @@ export interface IProps {
  */
 export default class DropDownContents extends React.Component<IProps> {
     public render() {
+        const classes = dropDownClasses();
+        const asDropDownClasses = !this.props.openAsModal
+            ? classNames("dropDown-contents", classes.contents)
+            : undefined;
+        const asModalClasses = this.props.openAsModal ? classNames("dropDown-asModal", classes.asModal) : undefined;
+
         if (this.props.isVisible) {
             return (
                 <div
                     id={this.props.id}
                     aria-labelledby={this.props.parentID}
-                    className={classNames(
-                        {
-                            "dropDown-contents": !this.props.openAsModal,
-                            "dropDown-asModal": this.props.openAsModal,
-                        },
-                        this.props.className,
-                    )}
+                    className={classNames(asDropDownClasses, asModalClasses, this.props.className)}
                     style={flyoutPosition(this.props.renderAbove, this.props.renderLeft, !!this.props.legacyMode)}
                     onClick={this.props.onClick}
                 >

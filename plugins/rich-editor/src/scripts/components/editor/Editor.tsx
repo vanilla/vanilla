@@ -21,7 +21,7 @@ import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import Quill, { DeltaOperation, Sources, QuillOptionsStatic } from "quill/core";
 import { hot } from "react-hot-loader";
 import registerQuill from "@rich-editor/quill/registerQuill";
-import { uniqueId } from "lodash";
+import uniqueId from "lodash/uniqueId";
 import classNames from "classnames";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import { Devices } from "@library/components/DeviceChecker";
@@ -29,6 +29,9 @@ import ParagraphToolbar from "@rich-editor/components/toolbars/ParagraphToolbar"
 import throttle from "lodash/throttle";
 import EmbedBar from "@rich-editor/components/editor/pieces/EmbedBar";
 import hljs from "highlight.js";
+import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
+import { richEditorFormClasses } from "@rich-editor/styles/richEditorStyles/richEditorFormClasses";
+import { userContentClasses } from "@library/user-content/userContentStyles";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -97,9 +100,16 @@ export class Editor extends React.Component<IProps> {
      */
     private renderModern(): React.ReactNode {
         const { className } = this.props as INewProps;
+        const classesRichEditor = richEditorClasses({}, this.props.legacyMode);
+        const classesRichEditorForm = richEditorFormClasses({}, this.props.legacyMode);
         return (
             <div
-                className={classNames("richEditor", className, { isDisabled: this.props.isLoading })}
+                className={classNames(
+                    "richEditor",
+                    className,
+                    { isDisabled: this.props.isLoading },
+                    classesRichEditor.root,
+                )}
                 aria-label={t("Type your message.")}
                 aria-describedby={this.descriptionID}
                 role="textbox"
@@ -109,15 +119,22 @@ export class Editor extends React.Component<IProps> {
                 {this.renderContexts(
                     <>
                         {this.renderEmbedBar()}
-                        <div className="richEditor-scrollFrame">
-                            <div className="richEditor-scrollContainer" ref={this.scrollContainerRef}>
-                                {/*<div className="richEditor-scrollable">*/}
-                                <div className={classNames("richEditor-frame InputBox isMenuInset")} id="testScroll">
+                        <div className={classNames("richEditor-scrollFrame", classesRichEditorForm.scrollFrame)}>
+                            <div
+                                className={classNames(
+                                    "richEditor-scrollContainer",
+                                    classesRichEditorForm.scrollContainer,
+                                )}
+                                ref={this.scrollContainerRef}
+                            >
+                                <div
+                                    className={classNames("richEditor-frame", "InputBox", "isMenuInset")}
+                                    id="testScroll"
+                                >
                                     {this.renderMountPoint()}
                                     {this.renderInlineToolbars()}
                                 </div>
                                 {this.renderParagraphToolbar()}
-                                {/*</div>*/}
                             </div>
                         </div>
                     </>,
@@ -130,8 +147,12 @@ export class Editor extends React.Component<IProps> {
      * The legacy rendering mode has everything at the bottom, and uses the document as it's scroll container.
      */
     private renderLegacy(): React.ReactNode {
+        const classesRichEditorForm = richEditorFormClasses({}, true);
         return this.renderContexts(
-            <div className={classNames("richEditor-frame", "InputBox")} id="testScroll">
+            <div
+                className={classNames("richEditor-frame", "InputBox", classesRichEditorForm.scrollFrame)}
+                id="testScroll"
+            >
                 {this.renderMountPoint()}
                 {this.renderParagraphToolbar()}
                 {this.renderInlineToolbars()}
@@ -147,7 +168,7 @@ export class Editor extends React.Component<IProps> {
         return (
             <div className="richEditor-textWrap" ref={this.quillMountRef}>
                 <div
-                    className="ql-editor richEditor-text userContent"
+                    className={this.contentClasses}
                     data-gramm="false"
                     contentEditable={this.props.isLoading}
                     data-placeholder="Create a new post..."
@@ -155,6 +176,15 @@ export class Editor extends React.Component<IProps> {
                 />
             </div>
         );
+    }
+
+    private get contentClasses() {
+        const classesRichEditor = richEditorClasses({}, this.props.legacyMode);
+        const classesUserContent = userContentClasses();
+        return classNames("ql-editor", "richEditor-text", "userContent", classesRichEditor.text, {
+            [classesUserContent.root]: !this.props.legacyMode,
+            // These classes shouln't be applied until the forum is converted to the new styles.
+        });
     }
 
     /**
@@ -248,6 +278,7 @@ export class Editor extends React.Component<IProps> {
             scrollingContainer: this.scrollContainerRef.current || document.documentElement!,
         };
         this.quill = new Quill(this.quillMountRef.current!, options);
+        this.quill.root.classList.value = this.contentClasses;
         if (this.props.initialValue) {
             this.quill.setContents(this.props.initialValue);
         }

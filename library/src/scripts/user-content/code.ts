@@ -4,15 +4,37 @@
  */
 
 import { onContent } from "@library/application";
-import hljs from "highlight.js";
-import "highlight.js/styles/github.css";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
 export function initCodeHighlighting() {
-    highlightCodeBlocks();
-    onContent(highlightCodeBlocks);
+    void highlightCodeBlocks();
+    onContent(() => void highlightCodeBlocks());
 }
 
-function highlightCodeBlocks() {
-    const blocks = document.querySelectorAll(".code.codeBlock");
-    blocks.forEach(hljs.highlightBlock);
+let wasRequested = false;
+let hljs: any;
+async function highlightCodeBlocks() {
+    if (!wasRequested) {
+        wasRequested = true;
+        // Lazily initialize this because it can be rather heavy.
+        hljs = await import("highlight.js" /* webpackChunkName: "highlightJs" */);
+
+        // Start fetching the styles.
+        const vars = globalVariables();
+        const useLight = vars.mainColors.bg.lightness() >= 0.5;
+        if (useLight) {
+            await import("./_codeLight.scss" /* webpackChunkName: "highlightJs-light" */ as any); // Sorry typescript.
+        } else {
+            await import("./_codeDark.scss" /* webpackChunkName: "highlightJs-dark" */ as any); // Sorry typescript.
+        }
+    }
+
+    doHighlighting();
+}
+
+function doHighlighting() {
+    if (hljs) {
+        const blocks = document.querySelectorAll(".code.codeBlock");
+        blocks.forEach(hljs.highlightBlock);
+    }
 }

@@ -14,6 +14,7 @@ import Translate from "@library/components/translation/Translate";
 import DateTime from "@library/components/DateTime";
 import SmartLink from "@library/components/navigation/SmartLink";
 import { meBoxMessageClasses } from "@library/styles/meBoxMessageStyles";
+import { metasClasses } from "@library/styles/metasStyles";
 
 export enum MeBoxItemType {
     NOTIFICATION = "notification",
@@ -50,6 +51,7 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
     public render() {
         const { unread, message, timestamp, to } = this.props;
         const classesMeBoxMessage = meBoxMessageClasses();
+        const classesMetas = metasClasses();
 
         let authors: JSX.Element[];
 
@@ -71,14 +73,11 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
         return (
             <li className={classNames("meBoxMessage", this.props.className, classesMeBoxMessage.root)}>
                 <SmartLink to={to} className={classNames("meBoxMessage-link", classesMeBoxMessage.link)} tabIndex={0}>
-                    <div className={classNames("meBoxMessage-imageContainer", classesMeBoxMessage.imageContainer)}>
+                    <div className={classesMeBoxMessage.imageContainer}>
                         {this.props.photo ? (
-                            <img
-                                className={classNames("meBoxMessage-image", classesMeBoxMessage.image)}
-                                src={this.props.photo}
-                            />
+                            <img className={classesMeBoxMessage.image} src={this.props.photo} />
                         ) : (
-                            noUserPhoto(classNames("meBoxMessage-image", classesMeBoxMessage.image))
+                            noUserPhoto(classesMeBoxMessage.image)
                         )}
                     </div>
                     <div className={classNames("meBoxMessage-contents", classesMeBoxMessage.contents)}>
@@ -92,10 +91,10 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
                             className={classNames("meBoxMessage-message", classesMeBoxMessage.message)}
                             dangerouslySetInnerHTML={{ __html: message }}
                         />
-                        <div className={classNames("meBoxMessage-metas", "metas", "isFlexed")}>
-                            {timestamp && <DateTime timestamp={timestamp} className="meta" />}
+                        <div className={classNames("meBoxMessage-metas", classesMetas.root, "isFlexed")}>
+                            {timestamp && <DateTime timestamp={timestamp} className={classesMetas.meta} />}
                             {this.props.type === MeBoxItemType.MESSAGE && (
-                                <span className="meta">
+                                <span className={classesMetas.meta}>
                                     {this.props.countMessages === 1 && <Translate source="<0/> message" c0={1} />}
                                     {this.props.countMessages > 1 && (
                                         <Translate source="<0/> messages" c0={this.props.countMessages} />

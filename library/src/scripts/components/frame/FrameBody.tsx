@@ -6,6 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
+import { frameBodyClasses } from "@library/styles/frameStyles";
 
 export interface IFrameBodyProps {
     className?: string;
@@ -18,6 +19,7 @@ export interface IFrameBodyProps {
  */
 export default class FrameBody extends React.PureComponent<IFrameBodyProps> {
     public render() {
-        return <div className={classNames("frameBody", this.props.className)}>{this.props.children}</div>;
+        const classes = frameBodyClasses();
+        return <div className={classNames("frameBody", this.props.className, classes.root)}>{this.props.children}</div>;
     }
 }

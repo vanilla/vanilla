@@ -340,76 +340,6 @@ export function ensureScript(scriptUrl: string) {
 }
 
 /**
- * Sticky header handling
- */
-function handleStickyHeaderState(element, data) {
-    const goingDown = data.lastScrollPos < data.currentScrollPos;
-    const isAtTopOfPage = data.currentScrollPos === 0;
-    const elementHeight = element.offsetHeight;
-    const isPastHeader =
-        element.style.position !== "fixed" && element.offsetTop + elementHeight <= data.currentScrollPos;
-    const elementTop = element.style.top !== "" ? parseInt(element.style.top, 10) : false;
-
-    element.classList.toggle("isScrollingDown", goingDown);
-    element.classList.toggle("isScrollingUp", !goingDown);
-    element.classList.toggle("isAtTop", isAtTopOfPage);
-
-    if (goingDown) {
-        element.style.position = "";
-        if (isPastHeader) {
-            element.style.top = `${data.currentScrollPos - elementHeight}px`;
-        } else {
-            if (!elementTop) {
-                element.style.top = `${data.currentScrollPos}px`;
-            }
-        }
-    } else {
-        // going UP
-        if (data.currentScrollPos <= elementTop) {
-            element.style.top = "";
-            element.style.position = "fixed";
-        }
-    }
-}
-
-/**
- * Vanilla's default way to handle sticky headers
- */
-export function stickyHeader() {
-    const header = document.querySelector(".stickyHeader");
-    if (header !== null) {
-        let currentScrollPos = Math.max(window.scrollY, 0);
-        let lastScrollPos = -1;
-
-        handleStickyHeaderState(header, {
-            currentScrollPos,
-            lastScrollPos,
-        });
-
-        window.addEventListener("scroll", e => {
-            debounce(
-                () => {
-                    window.requestAnimationFrame(data => {
-                        lastScrollPos = currentScrollPos;
-                        currentScrollPos = Math.max(window.scrollY, 0);
-                        handleStickyHeaderState(header, {
-                            currentScrollPos,
-                            lastScrollPos,
-                        });
-                    });
-                },
-                100,
-                {
-                    leading: true,
-                },
-            )();
-        });
-    } else {
-        log("No sticky header found");
-    }
-}
-
-/**
  * Handler for an file being dragged and dropped.
  *
  * @param event - https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
@@ -481,4 +411,52 @@ export function getElementHeight(
         height: finalHeight,
         bottomMargin: bottomHeight,
     };
+}
+
+/**
+ * Determine if the browser is escaping the inner contents of our <noscript /> browser.
+ */
+function browserEscapesNoScript(): boolean {
+    const ns = document.createElement("noscript");
+    ns.innerHTML = "<test></test>";
+    document.body.append(ns);
+    const result = ns.innerHTML.startsWith("&lt;");
+    ns.remove();
+    return result;
+}
+
+/**
+ * Prepare an element and it's contents for use in a shadow root.
+ *
+ * @param element
+ * @param cloneElement - If true, clone the element into a `newElementTag`. Preserves CSS classes and IDs.
+ *      Particularly useful for when the initial content is inside of a <noscript /> tag.
+ * @param newElementTag
+ */
+export function prepareShadowRoot(element: HTMLElement, cloneElement: boolean = false, newElementTag = "div") {
+    let html = element.innerHTML;
+    // This is likely a noscript tag.
+    if (browserEscapesNoScript()) {
+        html = unescapeHTML(html);
+    }
+    // Safari escapes the contents of the noscript.
+    if (cloneElement) {
+        const newElement = document.createElement(newElementTag);
+
+        // Clone various attributes.
+        newElement.classList.value = element.classList.value;
+        newElement.id = element.id;
+
+        // Insert the element & remove the old old.
+        element.parentNode!.insertBefore(newElement, element);
+        element.remove();
+        element = newElement;
+    } else {
+        // If we aren't making a new real root, we need to empty it out.
+        // Otherwise we'll have duplicate contents.
+        element.innerHTML = "";
+    }
+
+    const shadowHeader = element.attachShadow({ mode: "open" });
+    shadowHeader.innerHTML = html;
 }

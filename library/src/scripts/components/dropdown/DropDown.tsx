@@ -9,13 +9,14 @@ import { dropDownMenu } from "@library/components/icons/common";
 import { getRequiredID } from "@library/componentIDs";
 import PopoverController from "@library/components/PopoverController";
 import DropDownContents from "./DropDownContents";
-import { ButtonBaseClass } from "@library/components/forms/Button";
 import Heading from "@library/components/Heading";
 import SmartAlign from "@library/components/SmartAlign";
 import classNames from "classnames";
 import FlexSpacer from "@library/components/FlexSpacer";
 import CloseButton from "@library/components/CloseButton";
-import { Frame } from "@library/components/frame";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
+import { frameHeaderClasses } from "@library/styles/frameStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 export interface IProps {
     id?: string;
@@ -28,13 +29,14 @@ export interface IProps {
     contentsClassName?: string;
     buttonContents?: React.ReactNode;
     buttonClassName?: string;
-    buttonBaseClass?: ButtonBaseClass;
+    buttonBaseClass?: ButtonTypes;
     disabled?: boolean;
     toggleButtonClassName?: string;
     setExternalButtonRef?: (ref: React.RefObject<HTMLButtonElement>) => void;
     onVisibilityChange?: (isVisible: boolean) => void;
     openAsModal?: boolean;
     title?: string;
+    paddedList?: boolean;
 }
 
 export interface IState {
@@ -69,11 +71,14 @@ export default class DropDown extends React.Component<IProps, IState> {
 
     public render() {
         const { title } = this.props;
+        const classesDropDown = dropDownClasses();
+        const classesFrameHeader = frameHeaderClasses();
+        const classes = dropDownClasses();
         return (
             <PopoverController
                 id={this.id}
-                className={this.props.className}
-                buttonBaseClass={this.props.buttonBaseClass || ButtonBaseClass.CUSTOM}
+                className={classNames(this.props.className)}
+                buttonBaseClass={this.props.buttonBaseClass || ButtonTypes.CUSTOM}
                 name={this.props.name}
                 buttonContents={this.props.buttonContents || dropDownMenu()}
                 buttonClassName={this.props.buttonClassName}
@@ -90,28 +95,46 @@ export default class DropDown extends React.Component<IProps, IState> {
                             {...params}
                             id={this.id + "-handle"}
                             parentID={this.id}
-                            className={this.props.contentsClassName}
+                            className={classNames(
+                                this.props.contentsClassName,
+                                this.props.paddedList ? classesDropDown.paddedList : "",
+                            )}
                             onClick={this.doNothing}
                             renderLeft={!!this.props.renderLeft}
                             renderAbove={!!this.props.renderAbove}
                             openAsModal={this.props.openAsModal}
                         >
                             {title ? (
-                                <header className="frameHeader">
-                                    <FlexSpacer className="frameHeader-leftSpacer" />
+                                <header className={classNames("frameHeader", classesFrameHeader.root)}>
+                                    <FlexSpacer
+                                        className={classNames("frameHeader-leftSpacer", classesFrameHeader.leftSpacer)}
+                                    />
                                     <SmartAlign>
-                                        <Heading title={title} className="dropDown-title" />
+                                        <Heading
+                                            title={title}
+                                            className={classNames(
+                                                "dropDown-title",
+                                                classesDropDown.title,
+                                                classes.title,
+                                            )}
+                                        />
                                     </SmartAlign>
-                                    <div className="frameHeader-closePosition">
+                                    <div
+                                        className={classNames(
+                                            "frameHeader-closePosition",
+                                            classesFrameHeader.closePosition,
+                                            classesFrameHeader.action,
+                                        )}
+                                    >
                                         <CloseButton
                                             className="frameHeader-close"
                                             onClick={params.closeMenuHandler}
-                                            baseClass={ButtonBaseClass.CUSTOM}
+                                            baseClass={ButtonTypes.CUSTOM}
                                         />
                                     </div>
                                 </header>
                             ) : null}
-                            <ul className="dropDownItems">{this.props.children}</ul>
+                            <ul className={classNames("dropDownItems", classes.items)}>{this.props.children}</ul>
                         </DropDownContents>
                     );
                 }}

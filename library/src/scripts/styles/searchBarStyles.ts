@@ -4,74 +4,80 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { buttonClasses } from "@library/styles/buttonStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { layoutVariables } from "@library/styles/layoutStyles";
+import { borders, colorOut, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { calc, important, percent, px } from "csx";
-import { buttonVariables } from "@library/styles/buttonStyles";
-import { layoutVariables } from "@library/styles/layoutStyles";
+import get from "lodash/get";
 
-export function searchBarVariables(theme?: object) {
-    const formElementVars = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "searchBar");
+export const searchBarVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const themeVars = variableFactory("searchBar");
 
-    const search = {
+    const search = themeVars("search", {
         minWidth: 109,
-        ...themeVars.subComponentStyles("search"),
-    };
+    });
 
-    const searchIcon = {
+    const searchIcon = themeVars("searchIcon", {
         gap: 32,
         height: 13,
         width: 13,
-        ...themeVars.subComponentStyles("searchIcon"),
-    };
+    });
 
-    const sizing = {
+    const sizing = themeVars("sizing", {
         height: 40,
-        ...themeVars.subComponentStyles("sizing"),
-    };
+    });
 
-    const placeholder = {
+    const placeholder = themeVars("placeholder", {
         color: formElementVars.placeholder.color,
-        ...themeVars.subComponentStyles("placeholder"),
-    };
+    });
 
-    const heading = {
+    const heading = themeVars("heading", {
         margin: 5,
+    });
+
+    const input = themeVars("input", {
+        fg: globalVars.mainColors.fg,
+        bg: globalVars.mainColors.bg,
+        border: {
+            color: globalVars.mainColors.fg,
+        },
+    });
+
+    const results = themeVars("results", {
+        fg: globalVars.mainColors.fg,
+        bg: globalVars.mainColors.bg,
+    });
+
+    return {
+        search,
+        searchIcon,
+        sizing,
+        placeholder,
+        input,
+        heading,
+        results,
     };
+});
 
-    return { search, searchIcon, sizing, placeholder, heading };
-}
-
-export function searchBarClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const vars = searchBarVariables(theme);
-    const vanillaHeaderVars = vanillaHeaderVariables(theme);
-    const debug = debugHelper("searchBar");
-    const buttonVars = buttonVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const mediaQueries = layoutVariables(theme).mediaQueries();
+export const searchBarClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const vars = searchBarVariables();
+    const vanillaHeaderVars = vanillaHeaderVariables();
+    const classesButton = buttonClasses();
+    const formElementVars = formElementsVariables();
+    const mediaQueries = layoutVariables().mediaQueries();
+    const style = styleFactory("searchBar");
 
     const root = style(
         {
-            ...debug.name(),
             cursor: "pointer",
             $nest: {
-                "& .suggestedTextInput-inputText": {
-                    borderRight: 0,
-                    borderTopRightRadius: 0,
-                    borderBottomRightRadius: 0,
-                    $nest: {
-                        "&.inputText": {
-                            paddingTop: 0,
-                            paddingBottom: 0,
-                        },
-                    },
-                },
-
                 "& .suggestedTextInput-clear": {
                     $nest: {
                         "&, &.buttonIcon": {
@@ -83,7 +89,7 @@ export function searchBarClasses(theme?: object) {
                 },
 
                 "& .searchBar__placeholder": {
-                    color: vars.placeholder.color.toString(),
+                    color: colorOut(globalVars.mixBgAndFg(0.5)),
                     margin: "auto",
                 },
 
@@ -96,9 +102,9 @@ export function searchBarClasses(theme?: object) {
                 },
                 "& .searchBar-submitButton": {
                     position: "relative",
-                    borderTopLeftRadius: 0,
-                    borderBottomLeftRadius: 0,
-                    marginLeft: -1,
+                    borderTopLeftRadius: important(0),
+                    borderBottomLeftRadius: important(0),
+                    marginLeft: unit(-1),
                     minWidth: unit(vars.search.minWidth),
                     flexBasis: unit(vars.search.minWidth),
                     minHeight: unit(vars.sizing.height),
@@ -122,7 +128,7 @@ export function searchBarClasses(theme?: object) {
                                 "&.inputText": {
                                     borderTopRightRadius: 0,
                                     borderBottomRightRadius: 0,
-                                    borderColor: buttonVars.standard.focus.borderColor.toString(),
+                                    ...borders(get(classesButton.standard, "border")),
                                 },
                             },
                         },
@@ -140,6 +146,7 @@ export function searchBarClasses(theme?: object) {
                     display: "none",
                 },
                 "& .searchBar__input": {
+                    color: colorOut(globalVars.mainColors.fg),
                     width: percent(100),
                     display: important("block"),
                     $nest: {
@@ -163,10 +170,12 @@ export function searchBarClasses(theme?: object) {
         }),
     );
 
-    const results = style({
+    const results = style("results", {
+        backgroundColor: colorOut(vars.results.bg),
+        color: colorOut(vars.results.fg),
         $nest: {
             ".suggestedTextInput__placeholder": {
-                color: formElementVars.placeholder.color.toString(),
+                color: colorOut(formElementVars.placeholder.color),
             },
             ".suggestedTextInput-noOptions": {
                 padding: px(12),
@@ -197,12 +206,16 @@ export function searchBarClasses(theme?: object) {
                 },
             },
         },
-        ...debug.name("results"),
     });
 
-    const valueContainer = style({
+    const valueContainer = style("valueContainer", {
         display: "flex",
         alignItems: "center",
+        borderRight: 0,
+        paddingTop: 0,
+        paddingBottom: 0,
+        backgroundColor: colorOut(vars.input.bg),
+        color: colorOut(vars.input.fg),
         $nest: {
             "&&&": {
                 display: "flex",
@@ -212,10 +225,15 @@ export function searchBarClasses(theme?: object) {
                 paddingLeft: unit(vars.searchIcon.gap),
             },
         },
-        ...debug.name("valueContainer"),
     });
 
-    const actionButton = style({
+    // Has a search button attached.
+    const compoundValueContainer = style("compoundValueContainer", {
+        borderTopRightRadius: 0,
+        borderBottomRightRadius: 0,
+    });
+
+    const actionButton = style("actionButton", {
         marginLeft: "auto",
         marginRight: -(globalVars.buttonIcon.offset + 3), // the "3" is to offset the pencil
         opacity: 0.8,
@@ -224,51 +242,45 @@ export function searchBarClasses(theme?: object) {
                 opacity: 1,
             },
         },
-        ...debug.name("actionButton"),
     });
 
-    const label = style({
+    const label = style("label", {
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
-        ...debug.name("label"),
     });
 
-    const clear = style({
+    const clear = style("clear", {
         position: "relative",
         display: "flex",
         boxSizing: "border-box",
         height: unit(vars.sizing.height),
         width: unit(vars.sizing.height),
         color: vanillaHeaderVars.colors.fg.toString(),
-        ...debug.name("clear"),
     });
 
-    const form = style({
+    const form = style("form", {
         display: "block",
-        ...debug.name("form"),
     });
 
-    const content = style({
+    const content = style("content", {
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "flex-start",
         position: "relative",
         minHeight: unit(vars.sizing.height),
-        ...debug.name("content"),
     });
 
     // special selector
-    const heading = style({
+    const heading = style("heading", {
         $nest: {
             "&&": {
                 marginBottom: unit(vars.heading.margin),
             },
         },
-        ...debug.name("heading"),
     });
 
-    const iconContainer = style({
+    const iconContainer = style("iconContainer", {
         position: "absolute",
         top: 0,
         bottom: 0,
@@ -278,17 +290,18 @@ export function searchBarClasses(theme?: object) {
         alignItems: "center",
         justifyContent: "center",
         width: unit(vars.searchIcon.gap),
-        ...debug.name("iconContainer"),
+        color: colorOut(vars.input.fg),
     });
-    const icon = style({
+    const icon = style("icon", {
         width: unit(vars.searchIcon.width),
         height: unit(vars.searchIcon.height),
-        ...debug.name("icon"),
+        color: colorOut(vars.input.fg),
     });
 
     return {
         root,
         valueContainer,
+        compoundValueContainer,
         actionButton,
         label,
         clear,
@@ -299,4 +312,4 @@ export function searchBarClasses(theme?: object) {
         icon,
         results,
     };
-}
+});

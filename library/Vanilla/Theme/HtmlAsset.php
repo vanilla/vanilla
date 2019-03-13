@@ -15,7 +15,7 @@ class HtmlAsset extends Asset {
     private $data = "";
 
     /** @var string Type of asset. */
-    private $type = "html";
+    protected $type = "html";
 
     /**
      * Configure the HTML asset.
@@ -44,6 +44,15 @@ class HtmlAsset extends Asset {
      * @return string
      */
     public function getData(): string {
+        return $this->data;
+    }
+
+    /**
+     * Return the HTML string content of the asset.
+     *
+     * @return string
+     */
+    public function __toString() {
         return $this->data;
     }
 }

@@ -4,15 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { componentThemeVariables, debugHelper, unit, userSelect } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
+import { style } from "typestyle";
 
-export function tokensVariables(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const themeVars = componentThemeVariables(theme, "tokens");
+export const tokensVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const themeVars = componentThemeVariables("tokens");
 
     const token = {
         fontSize: globalVars.meta.text.fontSize,
@@ -31,12 +32,12 @@ export function tokensVariables(theme?: object) {
     };
 
     return { clearIcon, clear, token };
-}
+});
 
-export function tokensClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const vars = tokensVariables(theme);
-    const formElVars = formElementsVariables(theme);
+export const tokensClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const vars = tokensVariables();
+    const formElVars = formElementsVariables();
     const debug = debugHelper("tokens");
 
     const root = style({
@@ -75,7 +76,7 @@ export function tokensClasses(theme?: object) {
                 paddingRight: px(2),
                 margin: px(3),
                 backgroundColor: vars.token.bg.toString(),
-                userSelect: "none",
+                ...userSelect(),
             },
         },
     });
@@ -91,4 +92,4 @@ export function tokensClasses(theme?: object) {
     });
 
     return { root, removeIcon };
-}
+});

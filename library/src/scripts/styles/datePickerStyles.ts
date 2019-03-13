@@ -9,11 +9,12 @@ import { componentThemeVariables, debugHelper, unit } from "@library/styles/styl
 import { style } from "typestyle";
 import { percent, px } from "csx";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-export function dayPickerVariables(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "datePicker");
+export const dayPickerVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const themeVars = componentThemeVariables("datePicker");
 
     const spacing = {
         padding: 9,
@@ -27,7 +28,7 @@ export function dayPickerVariables(theme?: object) {
     const colors = {
         today: globalVars.mainColors.primary,
         selected: {
-            color: globalVars.states.active.color,
+            color: globalVars.states.selected.color,
         },
         hover: {
             bg: globalVars.states.hover.color,
@@ -39,11 +40,11 @@ export function dayPickerVariables(theme?: object) {
     };
 
     return { spacing, sizing, colors, border };
-}
+});
 
-export function dayPickerClasses(theme?: object) {
+export const dayPickerClasses = useThemeCache(() => {
     const debug = debugHelper("dayPicker");
-    const vars = dayPickerVariables(theme);
+    const vars = dayPickerVariables();
 
     // From third party, so we're targetting them this way
     const root = style({
@@ -102,4 +103,4 @@ export function dayPickerClasses(theme?: object) {
     });
 
     return { root, header, title, navigation };
-}
+});

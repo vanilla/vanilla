@@ -12,6 +12,7 @@ import * as icons from "@library/components/icons/editorIcons";
 import Formatter from "@rich-editor/quill/Formatter";
 import { IFormats, RangeStatic } from "quill/core";
 import classNames from "classnames";
+import { inlineToolbarClasses } from "@rich-editor/styles/richEditorStyles/inlineToolbarClasses";
 
 interface IProps {
     formatter: Formatter;
@@ -19,14 +20,20 @@ interface IProps {
     lastGoodSelection: RangeStatic;
     onLinkClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
     className?: string;
+    legacyMode?: boolean;
 }
 
 export default class InlineToolbarMenuItems extends React.PureComponent<IProps> {
     public render() {
+        const classesInlineToolbar = inlineToolbarClasses({}, !!this.props.legacyMode);
         return (
             <MenuItems
                 menuItemData={this.menuItemData}
-                className={classNames("richEditor-inlineToolbarContainer", this.props.className)}
+                className={classNames(
+                    "richEditor-inlineToolbarContainer",
+                    this.props.className,
+                    classesInlineToolbar.root,
+                )}
             />
         );
     }

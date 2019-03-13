@@ -7,7 +7,6 @@
 import editorReducer from "@rich-editor/state/editorReducer";
 import { registerReducer } from "@library/state/reducerRegistry";
 import { onReady, onContent } from "@library/application";
-import "../../scss/editor.scss";
 
 onReady(() => {
     registerReducer("editor", editorReducer);
@@ -27,6 +26,11 @@ async function setupEditor() {
         editorMountPoints.forEach(mountPoint => {
             if (!mountPoint.classList.contains(MOUNTED_CLASS)) {
                 mountPoint.classList.add(MOUNTED_CLASS);
+                const popup = mountPoint.closest(".Popup");
+                if (popup) {
+                    popup.classList.add("hasRichEditor");
+                }
+
                 mountEditor.default(mountPoint);
             }
         });

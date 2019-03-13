@@ -4,78 +4,84 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, styleFactory } from "@library/styles/styleHelpers";
-import { color } from "csx/lib/color";
-import { px } from "csx";
+import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { unit } from "@library/styles/styleHelpers";
 
-export function formElementsVariables(theme?: object) {
-    const vars = globalVariables(theme);
-    const varsLayouts = layoutVariables(theme);
+export const formElementsVariables = useThemeCache(() => {
+    const vars = globalVariables();
+    const varsLayouts = layoutVariables();
     const mixBgAndFg = vars.mixBgAndFg;
-    const themeVars = componentThemeVariables(theme, "formElements");
+    const makeThemeVars = variableFactory("formElements");
 
-    const sizing = {
+    const sizing = makeThemeVars("sizing", {
         height: 36,
         halfHeight: 18,
         maxWidth: 528,
-        ...themeVars.subComponentStyles("sizing"),
-    };
+    });
 
-    const spacing = {
+    const spacing = makeThemeVars("spacing", {
         margin: 12,
         horizontalPadding: 12,
         verticalPadding: 6,
-        ...themeVars.subComponentStyles("spacing"),
-    };
+    });
 
-    const border = {
+    const border = makeThemeVars("border", {
         width: 1,
         fullWidth: 2,
         color: vars.border.color,
         style: "solid",
         radius: vars.border.radius,
-        ...themeVars.subComponentStyles("border"),
-    };
+    });
 
-    const giantInput = {
+    const giantInput = makeThemeVars("giantInput", {
         height: 82,
         fontSize: 24,
-        ...themeVars.subComponentStyles("giantInput"),
-    };
+    });
 
-    const largeInput = {
+    const largeInput = makeThemeVars("largeInput", {
         height: 48,
         fontSize: 16,
-        ...themeVars.subComponentStyles("largeInput"),
-    };
+    });
 
-    const miniInput = {
+    const miniInput = makeThemeVars("miniInput", {
         width: 100,
-        ...themeVars.subComponentStyles("miniInput"),
-    };
+    });
 
-    const colors = {
-        fg: mixBgAndFg(0.8),
+    const colors = makeThemeVars("colors", {
+        fg: vars.mainColors.fg,
         bg: vars.mainColors.bg,
-        ...themeVars.subComponentStyles("colors"),
-    };
+    });
 
-    const errorSpacing = {
+    const errorSpacing = makeThemeVars("errorSpacing", {
         horizontalPadding: varsLayouts.gutter.size,
         verticalPadding: varsLayouts.gutter.size,
         verticalMargin: varsLayouts.gutter.halfSize,
-        ...themeVars.subComponentStyles("errorSpacing"),
-    };
+    });
 
-    const placeholder = {
+    const placeholder = makeThemeVars("placeholder", {
         color: mixBgAndFg(0.5),
-        ...themeVars.subComponentStyles("placeholder"),
-    };
+    });
 
-    const disabled = {
+    const disabled = makeThemeVars("disabled", {
         opacity: 0.5,
+    });
+
+    const buttonMarginAlignment = (size: IIconSizes = IIconSizes.DEFAULT) => {
+        const globalVars = globalVariables();
+        let iconSize = globalVars.icon.sizes.default;
+
+        switch (size) {
+            case IIconSizes.SMALL:
+                iconSize = globalVars.icon.sizes.small;
+                break;
+            case IIconSizes.LARGE:
+                iconSize = globalVars.icon.sizes.small;
+                break;
+        }
+
+        return (sizing.height - iconSize) / 2;
     };
 
     return {
@@ -89,18 +95,19 @@ export function formElementsVariables(theme?: object) {
         colors,
         placeholder,
         disabled,
+        buttonMarginAlignment,
     };
-}
+});
 
-export function formErrorClasses(theme?: object) {
+export const formErrorClasses = useThemeCache(() => {
     const style = styleFactory("formError");
-    const varsGlobal = globalVariables(theme);
-    const vars = formElementsVariables(theme);
+    const varsGlobal = globalVariables();
+    const vars = formElementsVariables();
 
     const root = style({
         backgroundColor: varsGlobal.feedbackColors.error.bg.toString(),
         color: varsGlobal.feedbackColors.error.fg.toString(),
-        marginBottom: px(16),
+        marginBottom: unit(16),
         paddingLeft: vars.errorSpacing.horizontalPadding,
         paddingRight: vars.errorSpacing.horizontalPadding,
         paddingTop: vars.errorSpacing.verticalPadding,
@@ -115,7 +122,7 @@ export function formErrorClasses(theme?: object) {
     });
 
     const actionButton = style("button", {
-        marginLeft: px(12),
+        marginLeft: unit(12),
     });
     const activeButton = style("activeButton", {
         fontWeight: "bold",
@@ -127,4 +134,4 @@ export function formErrorClasses(theme?: object) {
         activeButton,
         actions,
     };
-}
+});

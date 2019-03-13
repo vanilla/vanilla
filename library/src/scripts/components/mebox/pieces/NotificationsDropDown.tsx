@@ -7,11 +7,12 @@
 import { t } from "@library/application";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
 import DropDown from "@library/components/dropdown/DropDown";
-import { ButtonBaseClass } from "@library/components/forms/Button";
 import NotificationsContents, { INotificationsProps } from "@library/components/mebox/pieces/NotificationsContents";
 import NotificationsCounter from "@library/components/mebox/pieces/NotificationsCounter";
 import classNames from "classnames";
 import * as React from "react";
+import { vanillaHeaderClasses } from "@library/styles/vanillaHeaderStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends INotificationsProps {
     buttonClassName?: string;
@@ -43,16 +44,17 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
      */
     public render() {
         const { userSlug } = this.props;
+        const classesHeader = vanillaHeaderClasses();
 
         return (
             <DropDown
                 id={this.id}
                 name={t("Notifications")}
                 buttonClassName={classNames("vanillaHeader-notifications", this.props.buttonClassName)}
-                buttonBaseClass={ButtonBaseClass.CUSTOM}
+                buttonBaseClass={ButtonTypes.CUSTOM}
                 renderLeft={true}
                 toggleButtonClassName="vanillaHeader-button"
-                contentsClassName={this.props.contentsClassName}
+                contentsClassName={classNames(this.props.contentsClassName, classesHeader.dropDownContents)}
                 buttonContents={
                     <NotificationsCounter
                         open={this.state.open}

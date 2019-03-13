@@ -7,12 +7,12 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { percent } from "csx";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-export function drawerVariables(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const themeVars = componentThemeVariables(theme, "drawer");
+export const drawerVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const themeVars = componentThemeVariables("drawer");
 
     const spacing = {
         button: {
@@ -33,10 +33,10 @@ export function drawerVariables(theme?: object) {
     };
 
     return { spacing, fonts, sizing };
-}
+});
 
-export function drawerClasses(theme?: object) {
-    const vars = drawerVariables(theme);
+export const drawerClasses = useThemeCache(() => {
+    const vars = drawerVariables();
     const debug = debugHelper("drawer");
 
     const root = style({
@@ -66,4 +66,4 @@ export function drawerClasses(theme?: object) {
     });
 
     return { root, contents, toggle, icon };
-}
+});

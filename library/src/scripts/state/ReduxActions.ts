@@ -10,11 +10,12 @@ import { logError } from "@library/utility";
 import { ThunkDispatch, ThunkAction } from "redux-thunk";
 import { AnyAction } from "redux";
 import { AsyncActionCreators } from "typescript-fsa";
+import { ICoreStoreState } from "@library/state/reducerRegistry";
 
 /**
  * Base class for creating redux actions.
  */
-export default class ReduxActions {
+export default class ReduxActions<S extends ICoreStoreState = ICoreStoreState> {
     /**
      * Utility to create an action with our a without a payload of a given type.
      * The action generated can have its type narrowed in a reducer switch statement if the type T matches.
@@ -197,7 +198,7 @@ export default class ReduxActions {
         }
     }
 
-    protected getState<T>(): T {
+    protected getState(): S {
         return this.dispatch((c, getState) => {
             return getState();
         });

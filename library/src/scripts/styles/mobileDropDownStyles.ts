@@ -3,16 +3,16 @@
  * @license GPL-2.0-only
  */
 
-import { calc, percent, px } from "csx";
-import { flexHelper } from "@library/styles/styleHelpers";
-import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
-import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import { debugHelper, flexHelper, userSelect } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
+import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import { calc, percent, px } from "csx";
+import { style } from "typestyle";
 
-export const mobileDropDownVariables = (theme?: object) => {
-    const globalVars = globalVariables(theme);
+export const mobileDropDownVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
     const vanillaHeaderVars = vanillaHeaderVariables();
     const mixBgAndFg = globalVars.mixBgAndFg;
 
@@ -29,9 +29,9 @@ export const mobileDropDownVariables = (theme?: object) => {
         minHeight: 28,
     };
     return { title, chevron, header };
-};
+});
 
-export const mobileDropDownClasses = () => {
+export const mobileDropDownClasses = useThemeCache(() => {
     const vars = mobileDropDownVariables();
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();
@@ -76,11 +76,11 @@ export const mobileDropDownClasses = () => {
         {
             ...debug.name("toggleButton"),
             ...flex.middle(),
-            userSelect: "none",
+            ...userSelect(),
             flexGrow: 1,
-            maxWidth: calc(`100% - ${px(globalVars.spacer)}`),
-            marginLeft: px(globalVars.spacer / 2),
-            marginRight: px(globalVars.spacer / 2),
+            maxWidth: calc(`100% - ${px(globalVars.spacer.size)}`),
+            marginLeft: px(globalVars.spacer.size / 2),
+            marginRight: px(globalVars.spacer.size / 2),
         },
         mediaQueries.xs({
             ...debug.name("toggleButton-xs"),
@@ -176,4 +176,4 @@ export const mobileDropDownClasses = () => {
         closeModal,
         header,
     };
-};
+});

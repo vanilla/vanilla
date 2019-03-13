@@ -15,6 +15,9 @@ import MentionSuggestion, {
     MentionSuggestionSpacer,
 } from "@rich-editor/components/toolbars/pieces/MentionSuggestion";
 import ToolbarPositioner from "@rich-editor/components/toolbars/pieces/ToolbarPositioner";
+import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
+import { richEditorFlyoutClasses } from "@rich-editor/styles/richEditorStyles/flyoutClasses";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 interface IProps extends IWithEditorProps {
     mentionProps: Array<Partial<IMentionProps>>;
@@ -44,11 +47,18 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
     }
 
     public render() {
-        const { activeItemId, id, onItemClick, matchedString, mentionProps, showLoader } = this.props;
-        const { mentionSelection } = this.props;
+        const { activeItemId, id, onItemClick, matchedString, mentionProps, showLoader, mentionSelection } = this.props;
+        const classesRichEditor = richEditorClasses();
+        const classesDropDown = dropDownClasses();
 
         const hasResults = mentionProps.length > 0 || showLoader;
-        const classes = classNames("richEditor-menu", "atMentionList-items", "likeDropDownContent");
+        const classes = classNames(
+            "richEditor-menu",
+            classesRichEditor.menu,
+            "atMentionList-items",
+            "likeDropDownContent",
+            classesDropDown.likeDropDownContent,
+        );
         const isVisible = hasResults && (!!mentionSelection || this.hasFocusedElement);
 
         return (

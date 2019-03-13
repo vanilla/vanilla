@@ -6,6 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
+import { framePanelClasses } from "@library/styles/frameStyles";
 
 interface IProps {
     className?: string;
@@ -18,6 +19,9 @@ interface IProps {
  */
 export default class FramePanel extends React.PureComponent<IProps> {
     public render() {
-        return <div className={classNames("framePanel", this.props.className)}>{this.props.children}</div>;
+        const classes = framePanelClasses();
+        return (
+            <div className={classNames("framePanel", this.props.className, classes.root)}>{this.props.children}</div>
+        );
     }
 }

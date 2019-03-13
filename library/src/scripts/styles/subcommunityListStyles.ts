@@ -4,15 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { percent } from "csx";
+import { style } from "typestyle";
 
-export function subcommunityListVariables(theme?: object) {
-    const themeVars = componentThemeVariables(theme, "subcommunityList");
-    const globalVars = globalVariables(theme);
+export const subcommunityListVariables = useThemeCache(() => {
+    const themeVars = componentThemeVariables("subcommunityList");
     const spacing = {
         padding: 24,
         ...themeVars.subComponentStyles("spacing"),
@@ -24,13 +23,12 @@ export function subcommunityListVariables(theme?: object) {
     };
 
     return { spacing, sizing };
-}
+});
 
-export function subcommunityListClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const vars = subcommunityListVariables(theme);
+export const subcommunityListClasses = useThemeCache(() => {
+    const vars = subcommunityListVariables();
     const debug = debugHelper("subcommunityList");
-    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style(
         {
@@ -72,4 +70,4 @@ export function subcommunityListClasses(theme?: object) {
     );
 
     return { root, items, item };
-}
+});

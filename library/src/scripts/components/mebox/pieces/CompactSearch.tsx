@@ -7,7 +7,7 @@
 import * as React from "react";
 import SearchBar from "@library/components/forms/select/SearchBar";
 import { t } from "@library/application";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import classNames from "classnames";
 import { search } from "@library/components/icons/header";
 import { uniqueIDFromPrefix } from "@library/componentIDs";
@@ -15,9 +15,10 @@ import SearchOption from "@library/components/search/SearchOption";
 import { withSearch, IWithSearchProps } from "@library/contexts/SearchContext";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import FocusWatcher from "@library/FocusWatcher";
-import vanillaHeaderClasses from "@library/styles/vanillaHeaderStyles";
+import { vanillaHeaderClasses } from "@library/styles/vanillaHeaderStyles";
 import { compactSearchClasses } from "@library/styles/compactSearchStyles";
 import { searchBarClasses } from "@library/styles/searchBarStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
@@ -31,7 +32,7 @@ export interface ICompactSearchProps extends IWithSearchProps, RouteComponentPro
     onOpenSuggestions?: () => void;
     onCloseSuggestions?: () => void;
     focusOnMount?: boolean;
-    buttonContentClass?: string;
+    buttonContentClassName?: string;
     cancelContentClassName?: string;
     clearButtonClass?: string;
 }
@@ -69,11 +70,11 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                         title={t("Search")}
                         aria-expanded={false}
                         aria-haspopup="true"
-                        baseClass={ButtonBaseClass.CUSTOM}
+                        baseClass={ButtonTypes.CUSTOM}
                         aria-controls={this.id}
                         buttonRef={this.openSearchButton}
                     >
-                        <div className={classNames(this.props.buttonContentClass)}>{search()}</div>
+                        <div className={classNames(this.props.buttonContentClassName)}>{search()}</div>
                     </Button>
                 )}
                 {this.props.open && (
@@ -110,7 +111,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                             aria-expanded={true}
                             aria-haspopup="true"
                             aria-controls={this.id}
-                            baseClass={ButtonBaseClass.CUSTOM}
+                            baseClass={ButtonTypes.CUSTOM}
                         >
                             <div
                                 className={classNames(
@@ -151,7 +152,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
     }
 
     private handleFocusChange = (gainedFocus: boolean) => {
-        if (!gainedFocus && !this.selfRef.current!.contains(document.activeElement)) {
+        if (!gainedFocus && this.selfRef.current && !this.selfRef.current!.contains(document.activeElement)) {
             this.props.onCloseSearch();
         }
     };

@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="{{ locale }}">
     <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ title }}</title>
         <meta name="description" content="{{ description }}">
 
@@ -41,7 +44,12 @@
     </head>
     <body class="{{ cssClasses|join(' ') }}">
         <div id="page" class="page">
-            <div id="vanillaHeader"></div>
+            {%- if header -%}
+                <noscript id="themeHeader">
+                    {{ header|raw }}
+                </noscript>
+            {%- endif -%}
+            <header id="vanillaHeader"></header>
             <div id="app" class="page-minHeight">
             {%- if seoContent -%}
                 <noscript>
@@ -62,9 +70,9 @@
 
                 <div class="fullPageLoader"></div>
             </div>
-            <div id="footerContainer">
-                {#{{ include('partials/footer.twig') }}#}
-            </div>
+            {%- if footer -%}
+                <noscript id="themeFooter">{{ footer|raw }}</noscript>
+            {%- endif -%}
         </div>
         <div id="modals"></div>
         <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>

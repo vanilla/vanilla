@@ -5,22 +5,28 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import {
     absolutePosition,
+    borders,
     componentThemeVariables,
     debugHelper,
     defaultTransition,
+    modifyColorBasedOnLightness,
+    paddings,
+    colorOut,
     unit,
+    userSelect,
 } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { FontSizeProperty, HeightProperty, MarginProperty, PaddingProperty, WidthProperty } from "csstype";
-import { TLength } from "typestyle/lib/types";
 import { ColorHelper, percent } from "csx";
-import { shadowHelper } from "@library/styles/shadowHelpers";
+import { style } from "typestyle";
+import { TLength } from "typestyle/lib/types";
 
-export function subcommunityTileVariables(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const themeVars = componentThemeVariables(theme, "subcommunityTile");
+export const subcommunityTileVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const themeVars = componentThemeVariables("subcommunityTile");
 
     const spacing = {
         default: 24 as PaddingProperty<TLength>,
@@ -50,12 +56,15 @@ export function subcommunityTileVariables(theme?: object) {
     };
 
     const link = {
-        topPadding: 38 as PaddingProperty<TLength>,
-        bottomPadding: 24 as PaddingProperty<TLength>,
-        leftPadding: 24 as PaddingProperty<TLength>,
-        rightPadding: 24 as PaddingProperty<TLength>,
+        padding: {
+            top: 38,
+            bottom: 24,
+            left: 24,
+            right: 24,
+        },
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
+        minHeight: 280,
         ...themeVars.subComponentStyles("link"),
     };
 
@@ -67,12 +76,13 @@ export function subcommunityTileVariables(theme?: object) {
     };
 
     return { spacing, frame, title, description, link, fallBackIcon };
-}
+});
 
-export function subcommunityTileClasses(theme?: object) {
-    const vars = subcommunityTileVariables(theme);
+export const subcommunityTileClasses = useThemeCache(() => {
+    const vars = subcommunityTileVariables();
+    const globalVars = globalVariables();
     const debug = debugHelper("subcommunityTile");
-    const shadow = shadowHelper(theme);
+    const shadow = shadowHelper();
 
     const root = style({
         display: "flex",
@@ -80,27 +90,38 @@ export function subcommunityTileClasses(theme?: object) {
         alignItems: "stretch",
         width: percent(100),
         padding: unit(vars.spacing.default),
-        userSelect: "none",
+        ...userSelect(),
         flexGrow: 1,
         ...debug.name(),
     });
 
     const link = style({
-        ...shadow.embed(),
-        ...defaultTransition("box-shadow"),
+        ...defaultTransition("box-shadow", "border"),
+        ...paddings(vars.link.padding),
         display: "block",
         position: "relative",
         cursor: "pointer",
         flexGrow: 1,
         color: vars.link.fg.toString(),
-        backgroundColor: vars.link.bg.toString(),
-        paddingTop: unit(vars.link.topPadding),
-        paddingRight: unit(vars.link.rightPadding),
-        paddingBottom: unit(vars.link.bottomPadding),
-        paddingLeft: unit(vars.link.leftPadding),
+        backgroundColor: colorOut(vars.link.bg),
+        borderRadius: unit(2),
+        minHeight: unit(vars.link.minHeight),
+        ...shadowOrBorderBasedOnLightness(
+            globalVars.body.backgroundImage.color,
+            borders({
+                color: vars.link.fg.fade(0.3),
+            }),
+            shadow.embed(),
+        ),
         $nest: {
             "&:hover": {
-                ...shadow.embedHover(),
+                ...shadowOrBorderBasedOnLightness(
+                    globalVars.body.backgroundImage.color,
+                    borders({
+                        color: vars.link.fg.fade(0.5),
+                    }),
+                    shadow.embedHover(),
+                ),
             },
         },
         ...debug.name("link"),
@@ -165,4 +186,4 @@ export function subcommunityTileClasses(theme?: object) {
     });
 
     return { root, link, frame, icon, main, title, description, fallBackIcon };
-}
+});

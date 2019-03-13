@@ -11,6 +11,7 @@ import MessagesContents from "@library/components/mebox/pieces/MessagesContents"
 import MessagesCount from "@library/components/mebox/pieces/MessagesCount";
 import classNames from "classnames";
 import * as React from "react";
+import { vanillaHeaderClasses } from "@library/styles/vanillaHeaderStyles";
 
 interface IProps {
     buttonClassName?: string;
@@ -40,13 +41,14 @@ export default class MessagesDropDown extends React.Component<IProps, IState> {
      * @returns A DropDown component, configured to display notifications.
      */
     public render() {
+        const classesHeader = vanillaHeaderClasses();
         return (
             <DropDown
                 id={this.id}
                 name={t("Messages")}
                 buttonClassName={classNames("vanillaHeader-messages", this.props.buttonClassName)}
                 renderLeft={true}
-                contentsClassName={this.props.contentsClassName}
+                contentsClassName={classNames(this.props.contentsClassName, classesHeader.dropDownContents)}
                 toggleButtonClassName="vanillaHeader-button"
                 buttonContents={<MessagesCount open={this.state.open} className={this.props.toggleContentClassName} />}
                 onVisibilityChange={this.setOpen}

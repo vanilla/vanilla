@@ -7,10 +7,11 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { absolutePosition, componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
+import { useThemeCache } from "@library/styles/styleUtils";
 
-export function countVariables(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const themeVars = componentThemeVariables(theme, "count");
+export const countVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const themeVars = componentThemeVariables("count");
 
     const font = {
         size: 10,
@@ -28,11 +29,11 @@ export function countVariables(theme?: object) {
     };
 
     return { font, sizing, color };
-}
+});
 
-export function countClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const vars = countVariables(theme);
+export const countClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const vars = countVariables();
     const debug = debugHelper("count");
 
     const root = style({
@@ -57,4 +58,4 @@ export function countClasses(theme?: object) {
     });
 
     return { root, text };
-}
+});

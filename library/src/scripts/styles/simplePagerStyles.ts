@@ -4,12 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
 import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
 
-export function simplePagerVariables(theme?: object) {
-    const themeVars = componentThemeVariables(theme, "simplePager");
+export const simplePagerVariables = useThemeCache(() => {
+    const themeVars = componentThemeVariables("simplePager");
 
     const sizing = {
         minWidth: 208,
@@ -22,10 +22,10 @@ export function simplePagerVariables(theme?: object) {
     };
 
     return { spacing, sizing };
-}
+});
 
-export function simplePagerClasses(theme?: object) {
-    const vars = simplePagerVariables(theme);
+export const simplePagerClasses = useThemeCache(() => {
+    const vars = simplePagerVariables();
     const debug = debugHelper("simplePager");
 
     const root = style({
@@ -47,4 +47,4 @@ export function simplePagerClasses(theme?: object) {
     };
 
     return { root, button };
-}
+});

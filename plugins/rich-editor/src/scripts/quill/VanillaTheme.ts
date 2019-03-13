@@ -8,6 +8,7 @@
 import Quill, { QuillOptionsStatic } from "quill/core";
 import ThemeBase from "quill/core/theme";
 import KeyboardBindings from "@rich-editor/quill/KeyboardBindings";
+import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
 
 export default class VanillaTheme extends ThemeBase {
     /**
@@ -17,6 +18,7 @@ export default class VanillaTheme extends ThemeBase {
      * @param options - The current options for the instance.
      */
     constructor(quill: Quill, options: QuillOptionsStatic) {
+        const classesRichEditor = richEditorClasses();
         const themeOptions = {
             ...options,
             placeholder: "Create a new post...",
@@ -24,6 +26,7 @@ export default class VanillaTheme extends ThemeBase {
         };
 
         super(quill, themeOptions);
+        this.quill.root.classList.add(classesRichEditor.text);
         this.quill.root.classList.add("richEditor-text");
         this.quill.root.classList.add("userContent");
 

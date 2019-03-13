@@ -24,8 +24,9 @@ import { MenuProps } from "react-select/lib/components/Menu";
 import ReactDOM from "react-dom";
 import { LinkContext } from "@library/components/navigation/LinkContextProvider";
 import { RouteComponentProps } from "react-router";
-import { buttonVariables } from "@library/styles/buttonStyles";
+import { ButtonTypes, buttonVariables } from "@library/styles/buttonStyles";
 import { searchBarClasses } from "@library/styles/searchBarStyles";
+import { dropDownClasses } from "@library/styles/dropDownStyles";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;
@@ -60,6 +61,7 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     buttonText?: string;
     disableAutocomplete?: boolean;
     clearButtonClass?: string;
+    buttonBaseClass?: ButtonTypes;
 }
 
 interface IState {
@@ -238,7 +240,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * @param props
      */
     private SearchControl = props => {
-        const buttonVars = buttonVariables();
+        const buttonClasses = buttonVariables();
         const classes = searchBarClasses();
         return (
             <div className={classNames("searchBar", classes.root)}>
@@ -266,6 +268,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 "isClearable",
                                 classes.valueContainer,
                                 {
+                                    [classes.compoundValueContainer]: !this.props.hideSearchButton,
                                     isLarge: this.props.isBigInput,
                                 },
                             )}
@@ -282,6 +285,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                             <Button
                                 type="submit"
                                 id={this.searchButtonID}
+                                baseClass={this.props.buttonBaseClass}
                                 className={classNames("searchBar-submitButton", this.props.buttonClassName, {
                                     isLarge: this.props.isBigInput,
                                 })}
@@ -289,8 +293,8 @@ export default class SearchBar extends React.Component<IProps, IState> {
                             >
                                 {this.props.isLoading ? (
                                     <ButtonLoader
-                                        buttonType={buttonVars.primary}
                                         className={this.props.buttonLoaderClassName}
+                                        buttonType={this.props.buttonBaseClass}
                                     />
                                 ) : (
                                     this.props.buttonText
@@ -331,10 +335,19 @@ export default class SearchBar extends React.Component<IProps, IState> {
      */
 
     private Menu = (props: MenuProps<any>) => {
+        const classes = dropDownClasses();
         return (
             <React.Fragment>
                 {ReactDOM.createPortal(
-                    <components.Menu {...props} className="suggestedTextInput-menu dropDown-contents isParentWidth" />,
+                    <components.Menu
+                        {...props}
+                        className={classNames(
+                            "suggestedTextInput-menu",
+                            "dropDown-contents",
+                            "isParentWidth",
+                            classes.contents,
+                        )}
+                    />,
                     this.props.resultsRef!.current!,
                 )}
             </React.Fragment>

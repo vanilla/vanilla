@@ -6,27 +6,25 @@
 
 import { px } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, srOnly } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
+import { srOnly, userSelect } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import vanillaHeaderStyles, { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 
-export default function backLinkClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const mediaQueries = layoutVariables(theme).mediaQueries();
-    const debug = debugHelper("backLink");
+const backLinkClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const mediaQueries = layoutVariables().mediaQueries();
+    const style = styleFactory("backLink");
     const headerVars = vanillaHeaderVariables();
 
     const root = style({
+        ...userSelect(),
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "flex-start",
-        userSelect: "none",
-        ...debug.name(),
     });
 
-    const link = style({
-        ...debug.name("link"),
+    const link = style("link", {
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "flex-start",
@@ -41,8 +39,8 @@ export default function backLinkClasses(theme?: object) {
     });
 
     const label = style(
+        "label",
         {
-            ...debug.name("label"),
             lineHeight: px(globalVars.icon.sizes.default),
             fontWeight: globalVars.fonts.weights.semiBold,
             whiteSpace: "nowrap",
@@ -57,4 +55,6 @@ export default function backLinkClasses(theme?: object) {
         link,
         label,
     };
-}
+});
+
+export default backLinkClasses;

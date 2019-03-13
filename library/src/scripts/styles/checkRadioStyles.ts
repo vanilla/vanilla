@@ -8,23 +8,23 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     absolutePosition,
     unit,
-    borderStyles,
+    borders,
     componentThemeVariables,
-    debugHelper,
     defaultTransition,
     srOnly,
     disabledInput,
     flexHelper,
-    toStringColor,
+    colorOut,
+    userSelect,
 } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { em, important, percent, px } from "csx";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 
-export function checkRadioVariables(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const formElementVars = formElementsVariables(theme);
-    const themeVars = componentThemeVariables(theme, "checkRadio");
+export const checkRadioVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
+    const themeVars = componentThemeVariables("checkRadio");
 
     const border = {
         width: formElementVars.border.width,
@@ -79,18 +79,17 @@ export function checkRadioVariables(theme?: object) {
     };
 
     return { border, main, checkBox, radioButton, labelNote, sizing };
-}
+});
 
-export function checkRadioClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
-    const vars = checkRadioVariables(theme);
-    const debug = debugHelper("checkRadio");
+export const checkRadioClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const vars = checkRadioVariables();
+    const style = styleFactory("checkRadio");
     const flexes = flexHelper();
 
     //.radioButton,
     //.checkbox
     const root = style({
-        ...debug.name(),
         display: "flex",
         flexWrap: "wrap",
         alignItems: "center",
@@ -120,16 +119,14 @@ export function checkRadioClasses(theme?: object) {
 
     //.radioButton-label,
     // .checkbox-label
-    const label = style({
-        ...debug.name("label"),
+    const label = style("label", {
         lineHeight: unit(vars.sizing.width),
         marginLeft: unit(8),
         cursor: "pointer",
-        userSelect: "none",
+        ...userSelect(),
     });
 
-    const labelNote = style({
-        ...debug.name("labelNote"),
+    const labelNote = style("labelNote", {
         display: "inline-block",
         fontSize: unit(vars.labelNote.fontSize),
         marginLeft: unit(24),
@@ -139,8 +136,7 @@ export function checkRadioClasses(theme?: object) {
 
     // .radioButton-disk,
     // .checkbox-box
-    const iconContainer = style({
-        ...debug.name("iconContainer"),
+    const iconContainer = style("iconContainer", {
         ...defaultTransition("border", "background", "opacity"),
         position: "relative",
         display: "inline-block",
@@ -148,12 +144,11 @@ export function checkRadioClasses(theme?: object) {
         height: unit(vars.sizing.width),
         verticalAlign: em(-0.18),
         cursor: "pointer",
-        backgroundColor: toStringColor(vars.main.bg),
-        ...borderStyles(vars.border),
+        backgroundColor: colorOut(vars.main.bg),
+        ...borders(vars.border),
     });
 
-    const radioIcon = style({
-        ...debug.name("radioIcon"),
+    const radioIcon = style("radioIcon", {
         ...absolutePosition.middleLeftOfParent(),
         display: "none",
         width: unit(vars.radioButton.icon.width),
@@ -161,8 +156,7 @@ export function checkRadioClasses(theme?: object) {
         margin: "auto",
     });
 
-    const checkIcon = style({
-        ...debug.name("checkBoxIcon"),
+    const checkIcon = style("checkBoxIcon", {
         ...absolutePosition.middleOfParent(),
         display: "none",
         width: unit(vars.checkBox.check.width),
@@ -171,15 +165,13 @@ export function checkRadioClasses(theme?: object) {
         margin: "auto",
     });
 
-    const disk = style({
-        ...debug.name("disk"),
+    const disk = style("disk", {
         borderRadius: percent(50),
     });
 
     // .radioButton-state,
     // .checkbox-state
-    const state = style({
-        ...debug.name("state"),
+    const state = style("state", {
         ...absolutePosition.fullSizeOfParent(),
         color: vars.main.checked.fg.toString(),
     });
@@ -191,9 +183,8 @@ export function checkRadioClasses(theme?: object) {
 
     // .radioButton-input,
     // .checkbox-input
-    const input = style({
+    const input = style("input", {
         ...srOnly(),
-        ...debug.name("input"),
         $nest: {
             "&:not([disabled]):focus, &:not([disabled]):active, &:not([disabled]).focus-visible ": {
                 $nest: {
@@ -205,7 +196,6 @@ export function checkRadioClasses(theme?: object) {
                 },
             },
             "&:checked + .radioButton-disk, &:checked + .checkbox-box": {
-                ...debug.name("checked"),
                 backgroundColor: important(vars.main.checked.bg.toString()),
                 borderColor: vars.main.checked.fg.toString(),
                 $nest: {
@@ -243,4 +233,4 @@ export function checkRadioClasses(theme?: object) {
         diskIcon,
         input,
     };
-}
+});

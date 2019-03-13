@@ -10,8 +10,10 @@ import classNames from "classnames";
 import { t } from "@library/application";
 import CloseButton from "@library/components/CloseButton";
 import Heading, { ICommonHeadingProps } from "@library/components/Heading";
-import Button, { ButtonBaseClass } from "@library/components/forms/Button";
+import Button from "@library/components/forms/Button";
 import { leftChevron } from "@library/components/icons/common";
+import { frameFooterClasses, frameHeaderClasses } from "@library/styles/frameStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 export interface IFrameHeaderProps extends ICommonHeadingProps {
     closeFrame?: (e) => void; // Necessary when in modal, but not if in dropdown
@@ -32,6 +34,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
 
     public render() {
         const backTitle = t("Back");
+        const classes = frameHeaderClasses();
 
         let backLink;
         if (this.props.onBackClick) {
@@ -39,9 +42,9 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                 <Button
                     title={backTitle}
                     aria-label={backTitle}
-                    baseClass={ButtonBaseClass.ICON}
+                    baseClass={ButtonTypes.ICON}
                     onClick={this.props.onBackClick}
-                    className="frameHeader-backButton"
+                    className={classNames("frameHeader-backButton", classes.backButton)}
                 >
                     {leftChevron("frameHeader-backIcon isSmall", true)}
                 </Button>
@@ -51,19 +54,19 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
         let closeButton;
         if (this.props.closeFrame) {
             closeButton = (
-                <div className="frameHeader-closePosition">
+                <div className={classNames("frameHeader-closePosition", classes.closePosition, classes.action)}>
                     <CloseButton className="frameHeader-close" onClick={this.props.closeFrame} />
                 </div>
             );
         }
 
         return (
-            <header className={classNames("frameHeader", this.props.className)}>
+            <header className={classNames("frameHeader", this.props.className, classes.root)}>
                 <Heading
                     id={this.props.titleID}
                     title={this.props.title}
                     depth={this.props.depth}
-                    className={classNames("frameHeader-heading", {
+                    className={classNames("frameHeader-heading", classes.heading, {
                         "sr-only": this.props.srOnlyTitle,
                     })}
                 >

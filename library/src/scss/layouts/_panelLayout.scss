@@ -115,11 +115,13 @@ $panelLayout-panelAndSpacingWidth                                     : $global-
     position: relative;
     width: $global-panel_paddedWidth;
     flex-basis: $global-panel_paddedWidth;
+    min-width: $global-panel_paddedWidth;
 }
 
 .panelLayout-right {
     width: $global-panel_paddedWidth;
     flex-basis: $global-panel_paddedWidth;
+    min-width: $global-panel_paddedWidth;
 }
 
 // Middle Column
@@ -127,17 +129,9 @@ $panelLayout-panelAndSpacingWidth                                     : $global-
     justify-content: space-between;
     flex-grow: 1;
     width: 100%;
-
-    &.hasAdjacentPanel {
-        flex-basis: calc(100% - #{$panelLayout-panelAndSpacingWidth});
-        max-width: calc(100% - #{$panelLayout-panelAndSpacingWidth});
-
-        @include mediaQuery-panelLayout_oneColumn {
-            width: 100%;
-            max-width: 100%;
-            flex-basis: 100%;
-        }
-    }
+    width: 100%;
+    max-width: 100%;
+    flex-basis: 100%;
 
     @include mediaQuery-panelLayout_oneColumn {
         padding: {
@@ -158,6 +152,17 @@ $panelLayout-panelAndSpacingWidth                                     : $global-
             max-width: 100%;
         }
     }
+
+    &.hasTwoAdjacentPanels {
+        flex-basis: calc(100% - #{$panelLayout-panelAndSpacingWidth * 2});
+        max-width: calc(100% - #{$panelLayout-panelAndSpacingWidth * 2});
+
+        @include mediaQuery-panelLayout_oneColumn {
+            @include backLinkNoBleedStyles;
+            max-width: 100%;
+            flex-basis: 100%;
+        }
+    }
 }
 
 // Content section
@@ -170,6 +175,17 @@ $panelLayout-panelAndSpacingWidth                                     : $global-
     &.hasAdjacentPanel {
         flex-basis: calc(100% - #{$panelLayout-panelAndSpacingWidth});
         max-width: calc(100% - #{$panelLayout-panelAndSpacingWidth});
+
+        @include mediaQuery-panelLayout_oneColumn {
+            @include backLinkNoBleedStyles;
+            max-width: 100%;
+            flex-basis: 100%;
+        }
+    }
+
+    &.hasTwoAdjacentPanels {
+        flex-basis: calc(100% - #{$panelLayout-panelAndSpacingWidth * 2});
+        max-width: calc(100% - #{$panelLayout-panelAndSpacingWidth * 2});
 
         @include mediaQuery-panelLayout_oneColumn {
             @include backLinkNoBleedStyles;

@@ -24,6 +24,11 @@ use Vanilla\Theme\ImageAsset;
  * API Controller for the `/themes` resource.
  */
 class ThemesApiController extends AbstractApiController {
+
+    // Theming
+    const GET_THEME_ACTION = "@@themes/GET_DONE";
+    const GET_THEME_VARIABLES_ACTION = "@@themes/GET_VARIABLES_DONE";
+
     const ASSET_TYPES = ['html', 'js', 'json', 'css'];
 
     const ASSET_LIST = [

@@ -6,12 +6,12 @@
 
 import { percent, px, quote, calc } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
+import { unit } from "@library/styles/styleHelpers";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 import { flexHelper } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { styleFactory } from "@library/styles/styleUtils";
 
 export function vanillaHeaderNavigation() {
     const globalVars = globalVariables();
@@ -46,14 +46,13 @@ export default function vanillaHeaderNavClasses() {
     const vars = vanillaHeaderNavigation();
     const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
-    const debug = debugHelper("vanillaHeaderNav");
+    const style = styleFactory("vanillaHeaderNav");
 
     const root = style({
         position: "relative",
     });
 
     const navigation = style({
-        ...debug.name(),
         ...flex.middle(),
         height: percent(100),
         color: "inherit",
@@ -68,8 +67,8 @@ export default function vanillaHeaderNavClasses() {
     });
 
     const items = style(
+        "items",
         {
-            ...debug.name("items"),
             ...flex.middle(),
             height: unit(vars.item.size),
             $nest: {
@@ -93,8 +92,7 @@ export default function vanillaHeaderNavClasses() {
         }),
     );
 
-    const link = style({
-        ...debug.name("link"),
+    const link = style("link", {
         display: "flex",
         justifyContent: "center",
         alignItems: "stretch",
@@ -109,28 +107,9 @@ export default function vanillaHeaderNavClasses() {
         },
     });
 
-    const linkContent = style({
-        ...debug.name("linkContent"),
+    const linkContent = style("linkContent", {
         ...flex.middleLeft(),
         position: "relative",
-        $nest: {
-            "&:after": {
-                content: quote(""),
-                position: "absolute",
-                top: 0,
-                right: 0,
-                bottom: 0,
-                left: 0,
-                width: percent(100),
-                marginBottom: -vars.active.bottomOffset,
-                borderStyle: "solid",
-                borderColor: "transparent",
-                borderTopWidth: vars.border.verticalWidth,
-                borderRightWidth: 0,
-                borderBottomWidth: vars.border.verticalWidth,
-                borderLeftWidth: 0,
-            },
-        },
     });
 
     return {

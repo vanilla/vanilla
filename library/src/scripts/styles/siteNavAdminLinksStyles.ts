@@ -5,16 +5,16 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, unit } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import { colorOut, debugHelper, unit } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { px } from "csx";
+import { style } from "typestyle";
 
-export function siteNavAdminLinksClasses(theme?: object) {
-    const globalVars = globalVariables(theme);
+export const siteNavAdminLinksClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
     const debug = debugHelper("siteNavAdminLinks");
-    const mediaQueries = layoutVariables(theme).mediaQueries();
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style(
         {
@@ -29,6 +29,7 @@ export function siteNavAdminLinksClasses(theme?: object) {
 
     const item = style({
         display: "block",
+        color: colorOut(globalVars.mainColors.fg),
         ...debug.name("item"),
     });
 
@@ -46,4 +47,4 @@ export function siteNavAdminLinksClasses(theme?: object) {
     });
 
     return { root, item, divider, link };
-}
+});

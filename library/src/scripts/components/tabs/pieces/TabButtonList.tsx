@@ -6,10 +6,10 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { ButtonBaseClass } from "@library/components/forms/Button";
 import TabHandler from "@library/TabHandler";
 import TabButton from "@library/components/tabs/pieces/TabButton";
 import { tabButtonListClasses } from "@library/styles/tabButtonListStyles";
+import { ButtonTypes } from "@library/styles/buttonStyles";
 
 export interface ITabButton {
     buttonContent: React.ReactNode;
@@ -52,7 +52,7 @@ export default class TabButtonList extends React.Component<IProps, IState> {
                     ariaControls={getTabPanelID(index)}
                     ariaSelected={isSelected}
                     key={`tabButton-${index}`}
-                    baseClass={ButtonBaseClass.TAB}
+                    baseClass={ButtonTypes.TAB}
                     className={classNames("tabButton", "tabButtonList-button", isSelected, buttonClass, classes.button)}
                     tabIndex={isSelected || this.state.setAllTabIndexes ? 0 : -1}
                     index={index}

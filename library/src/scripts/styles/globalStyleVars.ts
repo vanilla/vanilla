@@ -265,7 +265,7 @@ export const globalVariables = useThemeCache(() => {
     });
 
     const separator = makeThemeVars("separator", {
-        color: colorOut(border.color),
+        color: border.color,
         size: 1,
     });
 

@@ -17,7 +17,7 @@ import {
     userSelect,
     IFont,
     IBorderStyles,
-    font,
+    fonts,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { BorderRadiusProperty, BorderStyleProperty, FontWeightProperty, WidthProperty } from "csstype";
@@ -42,7 +42,7 @@ export const buttonGlobalVariables = useThemeCache(() => {
         side: 12,
     });
 
-    const fonts = makeThemeVars("font", {
+    const font = makeThemeVars("font", {
         size: globalVars.fonts.size.medium,
     });
 
@@ -59,7 +59,7 @@ export const buttonGlobalVariables = useThemeCache(() => {
         padding,
         sizing,
         border,
-        fonts,
+        font,
         colors,
     };
 });
@@ -359,7 +359,7 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
                 ? buttonDimensions.minHeight
                 : buttonGlobals.sizing.minHeight,
             buttonDimensions && buttonDimensions.minWidth ? buttonDimensions.minWidth : buttonGlobals.sizing.minWidth,
-            buttonTypeVars.font && buttonTypeVars.font.size ? buttonTypeVars.font.size : buttonGlobals.fonts.size,
+            buttonTypeVars.font && buttonTypeVars.font.size ? buttonTypeVars.font.size : buttonGlobals.font.size,
             buttonTypeVars.padding && buttonTypeVars.padding.side
                 ? buttonTypeVars.padding.side
                 : buttonGlobals.padding.side,
@@ -391,7 +391,7 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
                         backgroundColor: colorOut(buttonTypeVars.hover.bg),
                         color: colorOut(buttonTypeVars.hover.fg),
                         ...borders(get(buttonTypeVars, "hover.border", {})),
-                        ...(font(
+                        ...(fonts(
                             buttonTypeVars.hover && buttonTypeVars.hover.font ? buttonTypeVars.hover.font : {},
                         ) as any),
                     },
@@ -400,7 +400,7 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
                         backgroundColor: colorOut(buttonTypeVars.focus.bg),
                         ...borders(get(buttonTypeVars, "focus.border", {})),
                         color: colorOut(buttonTypeVars.focus.fg),
-                        ...(font(
+                        ...(fonts(
                             buttonTypeVars.focus && buttonTypeVars.focus.font ? buttonTypeVars.focus.font : {},
                         ) as any),
                     },
@@ -409,7 +409,7 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
                         backgroundColor: colorOut(buttonTypeVars.active.bg),
                         ...borders(get(buttonTypeVars, "active.border", {})),
                         color: colorOut(buttonTypeVars.active.fg),
-                        ...(font(
+                        ...(fonts(
                             buttonTypeVars.active && buttonTypeVars.active.font ? buttonTypeVars.active.font : {},
                         ) as any),
                     },
@@ -418,7 +418,7 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
                         backgroundColor: colorOut(buttonTypeVars.focus.bg),
                         ...borders(get(buttonTypeVars, "accessibleFocus.border", {})),
                         color: colorOut(buttonTypeVars.focusAccessible.fg),
-                        ...(font(
+                        ...(fonts(
                             buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.font
                                 ? buttonTypeVars.focusAccessible.font
                                 : {},

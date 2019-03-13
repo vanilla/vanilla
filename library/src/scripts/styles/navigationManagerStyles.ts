@@ -25,7 +25,7 @@ export const navigationManagerVariables = useThemeCache(() => {
             radius: 2,
             color: globalVars.mixBgAndFg(0.9),
         },
-        bg: globalVars.mixPrimaryAndBg(0.1),
+        bg: globalVars.mixPrimaryAndBg(0.2),
     });
 
     const error = makeThemeVars("error", {
@@ -113,6 +113,7 @@ export const navigationManagerClasses = useThemeCache(() => {
 
     const item = style("item", {
         maxWidth: percent(100),
+        border: important(0),
         $nest: {
             "&.isDragging": {
                 minWidth: unit(300),
@@ -131,8 +132,10 @@ export const navigationManagerClasses = useThemeCache(() => {
             "&:hover .navigationManager-draggable": {
                 backgroundColor: colorOut(vars.dragging.bg.fade(0.4)),
             },
+
             "&.isActive .navigationManager-draggable": {
                 backgroundColor: colorOut(vars.dragging.bg),
+                ...borders(vars.dragging.border),
             },
             "&.isActive .navigationManager-action": {
                 display: "block",
@@ -140,13 +143,7 @@ export const navigationManagerClasses = useThemeCache(() => {
 
             "&:focus .navigationManager-draggable": {
                 backgroundColor: colorOut(vars.dragging.bg),
-                ...borders({
-                    color: globalVars.states.hover.color,
-                }),
-            },
-            "&:hover, &:focus": {
-                outlineWidth: 0,
-                backgroundColor: colorOut(globalVars.mainColors.primary),
+                ...borders(vars.dragging.border),
             },
             "&:focus .navigationManager-action": {
                 display: "block",
@@ -161,7 +158,8 @@ export const navigationManagerClasses = useThemeCache(() => {
     const draggable = style("draggable", {
         position: "relative",
         display: "flex",
-        alignItems: "flex-start",
+        alignItems: "center",
+        justifyContent: "flex-start",
         minHeight: unit(vars.item.height),
         lineHeight: unit(vars.dragging.lineHeight),
         fontSize: unit(globalVars.fonts.size.medium),
@@ -312,6 +310,10 @@ export const navigationManagerClasses = useThemeCache(() => {
         flexGrow: 1,
     });
 
+    const noBorder = style("noBorder", {
+        border: important(0),
+    });
+
     return {
         root,
         container,
@@ -334,5 +336,6 @@ export const navigationManagerClasses = useThemeCache(() => {
         folderIcon,
         editMode,
         text,
+        noBorder,
     };
 });

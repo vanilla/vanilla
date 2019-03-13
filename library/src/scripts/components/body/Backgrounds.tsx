@@ -13,7 +13,9 @@ import { bodyClasses, bodyCSS } from "@library/styles/bodyStyles";
 export default class Backgrounds extends React.Component {
     public render() {
         bodyCSS(); // set styles on body tag
-        const classes = bodyClasses(); //Sets styles on body tag
-        return null;
+
+        // Make a backwards compatible body background (absolute positioned).
+        const classes = bodyClasses();
+        return <div className={classes.root} />;
     }
 }

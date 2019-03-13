@@ -147,7 +147,7 @@ export const textInputSizing = (height: number, fontSize: number, paddingTop: nu
 };
 
 // must be nested
-export const placeholderStyles = (styles: object) => {
+export const placeholderStyles = (styles: NestedCSSProperties) => {
     return {
         "&::-webkit-input-placeholder": {
             $unique: true,

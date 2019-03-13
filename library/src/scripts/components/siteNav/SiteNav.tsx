@@ -17,7 +17,7 @@ import Heading from "@library/components/Heading";
 import ConditionalWrap from "@library/components/ConditionalWrap";
 import { siteNavClasses } from "@library/styles/siteNavStyles";
 
-interface IProps extends RouteComponentProps<{}> {
+interface IProps {
     activeRecord: IActiveRecord;
     id?: string;
     className?: string;
@@ -190,4 +190,4 @@ export class SiteNav extends React.Component<IProps> {
     };
 }
 
-export default withRouter<IProps>(SiteNav);
+export default SiteNav;

@@ -94,6 +94,9 @@ export function log(...value: any[]) {
  * @param value - The value to log.
  */
 export function logError(...value: any[]) {
+    if (!_debug && process.env.NODE_ENV === "test") {
+        return;
+    }
     // tslint:disable-next-line:no-console
     console.error(...value);
 }
@@ -104,6 +107,9 @@ export function logError(...value: any[]) {
  * @param value - The value to log.
  */
 export function logWarning(...value: any[]) {
+    if (!_debug && process.env.NODE_ENV === "test") {
+        return;
+    }
     // tslint:disable-next-line:no-console
     console.warn(...value);
 }

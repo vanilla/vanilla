@@ -19,15 +19,13 @@ export interface IWithLinkContext {
 export const LinkContext = React.createContext<IWithLinkContext>({
     linkContext: "https://testSite.com",
     pushSmartLocation: () => {
-        throw new Error("Be sure to declare the <LinkContextProvider />");
-        return {} as any;
+        return;
     },
     isDynamicNavigation: () => {
-        throw new Error("Be sure to declare the <LinkContextProvider />");
         return false;
     },
     makeHref: () => {
-        throw new Error("Be sure to declare the <LinkContextProvider />");
+        return "/";
     },
 });
 

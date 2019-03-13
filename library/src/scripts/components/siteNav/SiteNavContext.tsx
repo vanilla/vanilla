@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { logError } from "@library/utility";
+import { logWarning } from "@library/utility";
 
 type RecordToggle = (recordType: string, recordID: number) => void;
 
@@ -18,7 +18,7 @@ interface ISiteNavCtx {
 }
 
 const noop = () => {
-    logError("It looks like you forgot to initialize your SiteNavContext. Be sure to use `<SiteNavProvider />`");
+    logWarning("It looks like you forgot to initialize your SiteNavContext. Be sure to use `<SiteNavProvider />`");
 };
 
 const defaultContext: ISiteNavCtx = {

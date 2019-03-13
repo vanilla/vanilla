@@ -4,7 +4,6 @@
  * @license GPL-2.0-only
  */
 
-import { t } from "@library/application";
 import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
 import FlexSpacer from "@library/components/FlexSpacer";
 import { signIn } from "@library/components/icons";
@@ -22,7 +21,7 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
 import { ButtonTypes } from "@library/styles/buttonStyles";
 import { vanillaHeaderClasses, vanillaHeaderHomeClasses } from "@library/styles/vanillaHeaderStyles";
-import { getLogo, LogoType } from "@library/theming/ThemeProvider";
+import { LogoType } from "@library/theming/ThemeLogo";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import classNames from "classnames";
 import * as React from "react";
@@ -48,16 +47,6 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
         const headerClasses = vanillaHeaderClasses();
         const classes = vanillaHeaderHomeClasses();
 
-        const themeLogo = getLogo(LogoType.MOBILE);
-        let logoData = dummyLogoData;
-        if (themeLogo) {
-            logoData = {
-                ...logoData,
-                logoUrl: themeLogo,
-                alt: t("Vanilla"),
-            };
-        }
-
         return ReactDOM.createPortal(
             <header className={classNames(headerClasses.root, classes.root, this.props.className)}>
                 <Container className="vanillaHeaderHome-top">
@@ -65,9 +54,10 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                         <div className={classNames(headerClasses.bar, "isHome")}>
                             <FlexSpacer className={classes.left} />
                             <HeaderLogo
-                                {...logoData}
+                                {...dummyLogoData}
                                 className="vanillaHeader-logoContainer"
                                 logoClassName="vanillaHeader-logo isCentred"
+                                logoType={LogoType.MOBILE}
                             />
                             {isGuest ? (
                                 <VanillaHeaderNav className={classNames(headerClasses.nav, "vanillaHeader-guest")}>

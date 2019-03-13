@@ -9,13 +9,14 @@ import classNames from "classnames";
 import { vanillaLogo } from "@library/components/icons/header";
 import SmartLink from "@library/components/navigation/SmartLink";
 import { vanillaHeaderLogoClasses } from "@library/styles/vanillaHeaderStyles";
+import ThemeLogo, { LogoType } from "@library/theming/ThemeLogo";
+import { t } from "@library/application";
 
 export interface IHeaderLogo {
     className?: string;
     to: string;
-    logoUrl?: string;
     logoClassName?: string;
-    alt?: string;
+    logoType: LogoType;
     color?: string;
 }
 
@@ -23,24 +24,15 @@ export interface IHeaderLogo {
  * Implements Logo component
  */
 export default class HeaderLogo extends React.Component<IHeaderLogo> {
-    public constructor(props: IHeaderLogo) {
-        super(props);
-        if (props.logoUrl && !props.alt) {
-            throw Error("You need alt text if you are setting your own logo");
-        }
-    }
     public render() {
-        let contents;
         const classes = vanillaHeaderLogoClasses();
         const logoClassName = classNames("headerLogo-logo", this.props.logoClassName, classes.logo);
-        if (this.props.logoUrl) {
-            contents = <img src={this.props.logoUrl} alt={this.props.alt} className={logoClassName} />;
-        } else {
-            contents = vanillaLogo(logoClassName, this.props.color);
-        }
+
         return (
             <SmartLink to={this.props.to} className={classNames("headerLogo", classes.link, this.props.className)}>
-                <span className={classNames("headerLogo-logoFrame", classes.logoFrame)}>{contents}</span>
+                <span className={classNames("headerLogo-logoFrame", classes.logoFrame)}>
+                    <ThemeLogo alt={t("Vanilla")} className={logoClassName} type={this.props.logoType} />
+                </span>
             </SmartLink>
         );
     }

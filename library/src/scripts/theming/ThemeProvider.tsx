@@ -20,11 +20,6 @@ export interface IWithThemeProps {
     theme: IThemeVariables;
 }
 
-export enum LogoType {
-    DESKTOP = "logo",
-    MOBILE = "mobileLogo",
-}
-
 class BaseThemeProvider extends React.Component<IProps> {
     public render() {
         const { assets } = this.props;
@@ -63,24 +58,6 @@ class BaseThemeProvider extends React.Component<IProps> {
         if (themeFooter) {
             prepareShadowRoot(themeFooter, true);
         }
-    }
-}
-
-export function getLogo(logoType: LogoType): string | null {
-    const store = getStore<ICoreStoreState>();
-    const assets = store.getState().theme.assets.data || {};
-    let logo;
-
-    if (logoType === LogoType.DESKTOP) {
-        logo = assets.logo || null;
-    } else if (logoType === LogoType.MOBILE) {
-        logo = assets.mobileLogo || null;
-    }
-
-    if (!logo) {
-        return null;
-    } else {
-        return logo.url;
     }
 }
 

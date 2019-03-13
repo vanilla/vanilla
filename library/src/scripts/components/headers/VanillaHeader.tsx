@@ -23,17 +23,17 @@ import BackLink from "@library/components/navigation/BackLink";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { IWithPagesProps, withPages } from "@library/contexts/PagesContext";
 import { ScrollOffsetContext } from "@library/contexts/ScrollOffsetContext";
+import { ButtonTypes } from "@library/styles/buttonStyles";
+import { meBoxClasses } from "@library/styles/meBoxStyles";
+import { sticky } from "@library/styles/styleHelpers";
+import { vanillaHeaderClasses, vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import { LogoType } from "@library/theming/ThemeLogo";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import classNames from "classnames";
 import * as React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
-import { vanillaHeaderClasses, vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
-import { meBoxClasses } from "@library/styles/meBoxStyles";
 import { style } from "typestyle";
-import { sticky } from "@library/styles/styleHelpers";
-import { ButtonTypes } from "@library/styles/buttonStyles";
-import { getLogo, LogoType } from "@library/theming/ThemeProvider";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -95,16 +95,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const containerElement = this.props.container || document.getElementById("vanillaHeader")!;
         containerElement.classList.value = outerCssClasses;
 
-        const themeLogo = getLogo(LogoType.DESKTOP);
-        let logoData = dummyLogoData;
-        if (themeLogo) {
-            logoData = {
-                ...logoData,
-                logoUrl: themeLogo,
-                alt: t("Vanilla"),
-            };
-        }
-
         return ReactDOM.createPortal(
             <Container>
                 <Panel className="panelLayout-fullWidth">
@@ -125,9 +115,10 @@ export class VanillaHeader extends React.Component<IProps, IState> {
 
                             {!isMobile && (
                                 <HeaderLogo
-                                    {...logoData}
+                                    {...dummyLogoData}
                                     className={classNames("vanillaHeader-logoContainer", classes.logoContainer)}
                                     logoClassName="vanillaHeader-logo"
+                                    logoType={LogoType.DESKTOP}
                                 />
                             )}
                             {!this.state.openSearch &&

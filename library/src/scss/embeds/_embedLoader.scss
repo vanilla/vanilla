@@ -113,6 +113,7 @@ $embedLoader-closeButton_opacity: .7 !default;
 .userContent {
     .embedLoader-errorMessage {
         max-width: calc(100% - #{$icon-default_size * 3});
+        width: 100%;
         padding-left: $icon-default_size;
     }
 }

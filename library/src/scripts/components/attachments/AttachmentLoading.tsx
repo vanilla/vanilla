@@ -68,11 +68,6 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
                             </div>
                         )}
                     </div>
-                    <CloseButton
-                        title={t("Cancel")}
-                        className={classNames("attachment-close", classes.close)}
-                        onClick={this.props.deleteAttachment}
-                    />
                 </div>
                 <div className={classes.loadingProgress} style={{ width: `${Math.min(this.state.progress, 100)}%` }} />
             </div>

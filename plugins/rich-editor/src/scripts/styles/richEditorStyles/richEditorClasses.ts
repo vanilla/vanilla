@@ -15,7 +15,7 @@ import {
     userSelect,
 } from "@library/styles/styleHelpers";
 import { styleFactory } from "@library/styles/styleUtils";
-import { calc, important, percent } from "csx";
+import { calc, important, percent, px } from "csx";
 import memoize from "lodash/memoize";
 
 export const richEditorClasses = memoize((theme?: object, legacyMode: boolean = false) => {

@@ -33,7 +33,7 @@ export default class CloseButton extends React.PureComponent<IProps> {
      */
     public render() {
         const closeLabel = this.props.title ? this.props.title : t("Close");
-        const componentClasses = classNames("buttonClose", this.props.className);
+        const componentClasses = classNames("buttonClose", "closeButton", this.props.className);
         return (
             <Button
                 disabled={this.props.disabled}

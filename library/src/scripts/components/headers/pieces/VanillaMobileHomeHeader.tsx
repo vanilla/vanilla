@@ -15,7 +15,6 @@ import HeaderLogo from "@library/components/mebox/pieces/HeaderLogo";
 import VanillaHeaderListItem from "@library/components/mebox/pieces/VanillaHeaderListItem";
 import VanillaHeaderNav from "@library/components/mebox/pieces/VanillaHeaderNav";
 import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
-import { dummyLogoData } from "@library/components/mebox/state/dummyLogoData";
 import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
@@ -54,7 +53,6 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                         <div className={classNames(headerClasses.bar, "isHome")}>
                             <FlexSpacer className={classes.left} />
                             <HeaderLogo
-                                {...dummyLogoData}
                                 className="vanillaHeader-logoContainer"
                                 logoClassName="vanillaHeader-logo isCentred"
                                 logoType={LogoType.MOBILE}

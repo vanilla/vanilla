@@ -10,7 +10,7 @@ import { vanillaLogo } from "@library/components/icons/header";
 import SmartLink from "@library/components/navigation/SmartLink";
 import { vanillaHeaderLogoClasses } from "@library/styles/vanillaHeaderStyles";
 import ThemeLogo, { LogoType } from "@library/theming/ThemeLogo";
-import { t } from "@library/application";
+import { t, formatUrl } from "@library/application";
 
 export interface IHeaderLogo {
     className?: string;
@@ -24,6 +24,10 @@ export interface IHeaderLogo {
  * Implements Logo component
  */
 export default class HeaderLogo extends React.Component<IHeaderLogo> {
+    public static defaultProps: Partial<IHeaderLogo> = {
+        to: formatUrl("/"),
+    };
+
     public render() {
         const classes = vanillaHeaderLogoClasses();
         const logoClassName = classNames("headerLogo-logo", this.props.logoClassName, classes.logo);

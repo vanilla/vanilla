@@ -17,7 +17,6 @@ import CompactSearch from "@library/components/mebox/pieces/CompactSearch";
 import HeaderLogo from "@library/components/mebox/pieces/HeaderLogo";
 import VanillaHeaderNav from "@library/components/mebox/pieces/VanillaHeaderNav";
 import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
-import { dummyLogoData } from "@library/components/mebox/state/dummyLogoData";
 import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
 import BackLink from "@library/components/navigation/BackLink";
 import { withDevice } from "@library/contexts/DeviceContext";
@@ -115,7 +114,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
 
                             {!isMobile && (
                                 <HeaderLogo
-                                    {...dummyLogoData}
                                     className={classNames("vanillaHeader-logoContainer", classes.logoContainer)}
                                     logoClassName="vanillaHeader-logo"
                                     logoType={LogoType.DESKTOP}

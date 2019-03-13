@@ -80,7 +80,7 @@ const userContentVariables = useThemeCache(() => {
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-export const userContentStyles = useThemeCache(() => {
+export const userContentClasses = useThemeCache(() => {
     const style = styleFactory("userContent");
     const vars = userContentVariables();
     const globalVars = globalVariables();

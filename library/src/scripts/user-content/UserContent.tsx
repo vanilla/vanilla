@@ -7,7 +7,7 @@
 import * as React from "react";
 import className from "classnames";
 import { initAllUserContent } from "@library/user-content";
-import { userContentStyles } from "@library/user-content/userContentStyles";
+import { userContentClasses } from "@library/user-content/userContentStyles";
 
 interface IProps {
     className?: string;
@@ -26,7 +26,7 @@ export default class UserContent extends React.PureComponent<IProps> {
     };
 
     public render() {
-        const classes = userContentStyles();
+        const classes = userContentClasses();
 
         return (
             <div

@@ -31,7 +31,7 @@ import EmbedBar from "@rich-editor/components/editor/pieces/EmbedBar";
 import hljs from "highlight.js";
 import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
 import { richEditorFormClasses } from "@rich-editor/styles/richEditorStyles/richEditorFormClasses";
-import { userContentStyles } from "@library/user-content/userContentStyles";
+import { userContentClasses } from "@library/user-content/userContentStyles";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -180,7 +180,7 @@ export class Editor extends React.Component<IProps> {
 
     private get contentClasses() {
         const classesRichEditor = richEditorClasses({}, this.props.legacyMode);
-        const classesUserContent = userContentStyles();
+        const classesUserContent = userContentClasses();
         return classNames("ql-editor", "richEditor-text", "userContent", classesRichEditor.text, {
             [classesUserContent.root]: !this.props.legacyMode,
             // These classes shouln't be applied until the forum is converted to the new styles.

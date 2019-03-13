@@ -19,6 +19,12 @@
             <a href="{home_link format="%url"}" class="Header-logo mobile">
                 {mobile_logo}
             </a>
+            <nav class="Header-desktopNav">
+                {categories_link format=$linkFormat}
+                {discussions_link format=$linkFormat}
+                {custom_menu format=$linkFormat}
+            </nav>
+            <div class="Header-flexSpacer"></div>
             <div class="Header-right">
                 <div class="MeBox-header">
                     {module name="MeModule" CssClass="FlyoutRight"}

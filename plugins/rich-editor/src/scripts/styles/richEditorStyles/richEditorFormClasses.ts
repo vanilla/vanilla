@@ -8,7 +8,7 @@ import { paddings, placeholderStyles, textInputSizing, colorOut, unit } from "@l
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { calc, percent } from "csx";
+import { calc, percent, px } from "csx";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 
 export const richEditorFormClasses = useThemeCache((theme?: object, legacyMode: boolean = false) => {

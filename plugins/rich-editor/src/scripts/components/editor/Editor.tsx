@@ -31,6 +31,7 @@ import EmbedBar from "@rich-editor/components/editor/pieces/EmbedBar";
 import hljs from "highlight.js";
 import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
 import { richEditorFormClasses } from "@rich-editor/styles/richEditorStyles/richEditorFormClasses";
+import { userContentStyles } from "@library/user-content/userContentStyles";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -164,11 +165,10 @@ export class Editor extends React.Component<IProps> {
      * Render the elements that Quill will mount into.
      */
     private renderMountPoint(): React.ReactNode {
-        const classesRichEditor = richEditorClasses({}, this.props.legacyMode);
         return (
             <div className="richEditor-textWrap" ref={this.quillMountRef}>
                 <div
-                    className={classNames("ql-editor", "richEditor-text", "userContent", classesRichEditor.text)}
+                    className={this.contentClasses}
                     data-gramm="false"
                     contentEditable={this.props.isLoading}
                     data-placeholder="Create a new post..."
@@ -176,6 +176,15 @@ export class Editor extends React.Component<IProps> {
                 />
             </div>
         );
+    }
+
+    private get contentClasses() {
+        const classesRichEditor = richEditorClasses({}, this.props.legacyMode);
+        const classesUserContent = userContentStyles();
+        return classNames("ql-editor", "richEditor-text", "userContent", classesRichEditor.text, {
+            [classesUserContent.root]: !this.props.legacyMode,
+            // These classes shouln't be applied until the forum is converted to the new styles.
+        });
     }
 
     /**
@@ -269,6 +278,7 @@ export class Editor extends React.Component<IProps> {
             scrollingContainer: this.scrollContainerRef.current || document.documentElement!,
         };
         this.quill = new Quill(this.quillMountRef.current!, options);
+        this.quill.root.classList.value = this.contentClasses;
         if (this.props.initialValue) {
             this.quill.setContents(this.props.initialValue);
         }

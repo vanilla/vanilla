@@ -252,6 +252,12 @@ export const userContentStyles = useThemeCache(() => {
         "& .metaStyle": {
             opacity: 0.8,
         },
+        "& .embedLoader-box": {
+            background: colorOut(vars.embeds.bg),
+            ...borders({
+                color: vars.embeds.fg.fade(0.3),
+            }),
+        },
     };
 
     const root = style({

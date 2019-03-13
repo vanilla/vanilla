@@ -27,7 +27,7 @@ class ThemesApiController extends AbstractApiController {
 
     // Theming
     const GET_THEME_ACTION = "@@themes/GET_DONE";
-    const GET_THEME_VARIABLES_ACTION = "@@themes/GET_VARIABLES_DONE";
+    const GET_THEME_ASSETS_ACTION = "@@themes/GET_ASSETS_DONE";
 
     const ASSET_TYPES = ['html', 'js', 'json', 'css'];
 

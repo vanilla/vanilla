@@ -23,8 +23,8 @@ export interface IWithThemeProps {
 
 class BaseThemeProvider extends React.Component<IProps> {
     public render() {
-        const { variables } = this.props;
-        switch (variables.status) {
+        const { assets } = this.props;
+        switch (assets.status) {
             case LoadStatus.PENDING:
             case LoadStatus.LOADING:
                 return <Loader />;
@@ -32,7 +32,7 @@ class BaseThemeProvider extends React.Component<IProps> {
                 return this.props.errorComponent;
         }
 
-        if (!variables.data) {
+        if (!assets.data) {
             return null;
         }
 
@@ -64,7 +64,9 @@ class BaseThemeProvider extends React.Component<IProps> {
 
 export function getThemeVariables() {
     const store = getStore<ICoreStoreState>();
-    return store.getState().theme.variables.data || {};
+    const assets = store.getState().theme.assets.data || {};
+    const { variables } = assets;
+    return variables;
 }
 
 interface IOwnProps {
@@ -77,14 +79,14 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
 
 function mapStateToProps(state: ICoreStoreState, ownProps: IOwnProps) {
     return {
-        variables: state.theme.variables,
+        assets: state.theme.assets,
     };
 }
 
 function mapDispatchToProps(dispatch: any, ownProps: IOwnProps) {
     const themeActions = new ThemeActions(dispatch, apiv2);
     return {
-        requestData: () => themeActions.getVariables(ownProps.themeKey),
+        requestData: () => themeActions.getAssets(ownProps.themeKey),
     };
 }
 

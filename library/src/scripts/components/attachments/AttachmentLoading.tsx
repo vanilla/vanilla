@@ -47,7 +47,14 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
                 tabIndex={0}
                 aria-label={t("Uploading...")}
             >
-                <div className={classNames("attachment-box", "attachment-loadingContent", classes.box)}>
+                <div
+                    className={classNames(
+                        "attachment-box",
+                        "attachment-loadingContent",
+                        classes.loadingContent,
+                        classes.box,
+                    )}
+                >
                     <div className={classNames("attachment-format", classes.format)}>
                         {getAttachmentIcon(type, iconClasses.root)}
                     </div>
@@ -61,16 +68,8 @@ export default class AttachmentLoading extends React.Component<IProps, IState> {
                             </div>
                         )}
                     </div>
-                    <CloseButton
-                        title={t("Cancel")}
-                        className={classNames("attachment-close", classes.close)}
-                        onClick={this.props.deleteAttachment}
-                    />
                 </div>
-                <div
-                    className="attachment-loadingProgress"
-                    style={{ width: `${Math.min(this.state.progress, 100)}%` }}
-                />
+                <div className={classes.loadingProgress} style={{ width: `${Math.min(this.state.progress, 100)}%` }} />
             </div>
         );
     }

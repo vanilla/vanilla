@@ -4,10 +4,8 @@
  */
 
 import React from "react";
-import ReactDOM from "react-dom";
 import classNames from "classnames";
 import { FOCUS_CLASS } from "@library/embeds";
-import { uniqueId } from "lodash";
 import { userWarning } from "@library/components/icons/header";
 import CloseButton from "@library/components/CloseButton";
 import { t } from "@library/application";

@@ -13,22 +13,24 @@ import {
     unit,
     userSelect,
     absolutePosition,
+    IBorderStyles,
 } from "@library/styles/styleHelpers";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { percent, px } from "csx";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { transparentColor } from "@library/styles/buttonStyles";
+import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 
 export const attachmentVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const themeVars = componentThemeVariables("attachment");
 
-    const border = {
+    const border: IBorderStyles = {
         color: globalVars.mixBgAndFg(0.2),
         style: "solid",
         width: formElementVars.border.width,
-        radius: 0,
+        radius: px(2),
         ...themeVars.subComponentStyles("border"),
     };
 
@@ -41,11 +43,6 @@ export const attachmentVariables = useThemeCache(() => {
     const padding = {
         default: 12,
         ...themeVars.subComponentStyles("padding"),
-    };
-
-    const shadows = {
-        default: `0 1px 3px 0 ${globalVars.mainColors.fg.fade(0.3).toString()}`,
-        ...themeVars.subComponentStyles("shadows"),
     };
 
     const text = {
@@ -62,7 +59,7 @@ export const attachmentVariables = useThemeCache(() => {
         opacity: 0.5,
     };
 
-    return { border, padding, shadows, text, title, loading, sizing };
+    return { border, padding, text, title, loading, sizing };
 });
 
 export const attachmentClasses = useThemeCache(() => {
@@ -71,33 +68,46 @@ export const attachmentClasses = useThemeCache(() => {
     const vars = attachmentVariables();
     const style = styleFactory("attachment");
 
+    const hoverFocusStates = {
+        "&:hover": {
+            boxShadow: `0 0 0 ${px(globalVars.embed.select.borderWidth)} ${globalVars.embed.focus.color.fade(
+                0.5,
+            )} inset`,
+        },
+        "&:focus": {
+            boxShadow: `0 0 0 ${px(
+                globalVars.embed.select.borderWidth,
+            )} ${globalVars.embed.focus.color.toString()} inset`,
+        },
+    };
+
     const root = style({
         display: "block",
         position: "relative",
         textDecoration: "none",
         color: "inherit",
-        boxShadow: vars.shadows.default,
         width: px(globalVars.embed.sizing.width),
         maxWidth: percent(100),
         margin: "auto",
         overflow: "hidden",
         ...userSelect(),
         ...borders(vars.border),
+        ...shadowOrBorderBasedOnLightness(
+            globalVars.body.backgroundImage.color,
+            borders({
+                color: vars.border.color,
+            }),
+            shadowHelper().embed(),
+        ),
         $nest: {
-            "&.isLoading, &.hasError": {
+            // These 2 can't be joined together or their pseudselectors don't get created properly.
+            "&.isLoading": {
                 cursor: "pointer",
-                $nest: {
-                    "&:hover": {
-                        boxShadow: `0 0 0 ${px(
-                            globalVars.embed.select.borderWidth,
-                        )} ${globalVars.embed.focus.color.fade(0.5)} inset`,
-                    },
-                    "&:focus": {
-                        boxShadow: `0 0 0 ${px(
-                            globalVars.embed.select.borderWidth,
-                        )} ${globalVars.embed.focus.color.toString()} inset`,
-                    },
-                },
+                $nest: hoverFocusStates,
+            },
+            "&.hasError": {
+                cursor: "pointer",
+                $nest: hoverFocusStates,
             },
         },
     });
@@ -164,7 +174,7 @@ export const attachmentClasses = useThemeCache(() => {
         ...absolutePosition.bottomLeft(),
         transition: `width ease-out .2s`,
         height: px(3),
-        marginBottom: px(-1),
+        marginBottom: px(0),
         width: 0,
         maxWidth: percent(100),
         backgroundColor: globalVars.mainColors.primary.toString(),

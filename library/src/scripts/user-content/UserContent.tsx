@@ -7,6 +7,7 @@
 import * as React from "react";
 import className from "classnames";
 import { initAllUserContent } from "@library/user-content";
+import { userContentClasses } from "@library/user-content/userContentStyles";
 
 interface IProps {
     className?: string;
@@ -19,15 +20,17 @@ interface IProps {
  *
  * This will ensure that all embeds/etc are initialized.
  */
-export default class UserContent extends React.Component<IProps> {
+export default class UserContent extends React.PureComponent<IProps> {
     public static defaultProps: Partial<IProps> = {
         scrollToOffset: 0,
     };
 
     public render() {
+        const classes = userContentClasses();
+
         return (
             <div
-                className={className("userContent", this.props.className)}
+                className={className("userContent", this.props.className, classes.root)}
                 dangerouslySetInnerHTML={{ __html: this.props.content }}
             />
         );
@@ -40,6 +43,14 @@ export default class UserContent extends React.Component<IProps> {
         initAllUserContent();
         this.scrollToHash();
         window.addEventListener("hashchange", this.scrollToHash);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public componentDidUpdate() {
+        initAllUserContent();
+        this.scrollToHash();
     }
 
     /**

@@ -14,10 +14,6 @@ export default class Backgrounds extends React.Component {
     public render() {
         bodyCSS(); // set styles on body tag
         const classes = bodyClasses(); //Sets styles on body tag
-        return (
-            <>
-                <div className={classes.root} />
-            </>
-        );
+        return null;
     }
 }

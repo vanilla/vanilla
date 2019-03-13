@@ -58,7 +58,7 @@
 }
 
 
-// Many fonts don't set the capital letter to take the whole line height. This mixin is used to line up the top of the Text with the top of the container.
+//
 // $capitalLetterRatio: The ratio is a value from 0 to 1 to set how much of the line height the capital takes. Example, if it takes 3/4 of the line height, set .75
 // $baseLineOffset: Sometimes the base line isn't centered, 0 remove from top, .5 use font default, 1 remove from bottom
 // $bottomOffset: Also adjust bottom margin

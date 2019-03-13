@@ -262,10 +262,10 @@ export interface IBorderStyles extends ISingleBorderStyle {
 export const borders = (props: IBorderStyles = {}) => {
     const vars = globalVariables();
     return {
-        borderColor: get(props, "color") ? colorOut(props.color as any) : colorOut(vars.border.color),
-        borderWidth: get(props, "width") ? unit(props.width) : unit(vars.border.width),
-        borderStyle: get(props, "style") ? props.style : vars.border.style,
-        borderRadius: get(props, "radius") ? props.radius : vars.border.radius,
+        borderColor: props.color ? colorOut(props.color as any) : colorOut(vars.border.color),
+        borderWidth: props.width ? unit(props.width) : unit(vars.border.width),
+        borderStyle: props.style ? props.style : vars.border.style,
+        borderRadius: props.radius ? props.radius : vars.border.radius,
     };
 };
 
@@ -325,7 +325,7 @@ export interface IMargins {
     left?: string | number;
 }
 
-export const margins = (styles: IMargins) => {
+export const margins = (styles: IMargins): NestedCSSProperties => {
     return {
         marginTop: unit(styles.top),
         marginRight: unit(styles.right),

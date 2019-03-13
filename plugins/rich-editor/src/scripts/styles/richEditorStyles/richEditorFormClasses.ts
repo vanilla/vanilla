@@ -5,14 +5,13 @@
  */
 import { richEditorVariables } from "@rich-editor/styles/richEditorStyles/richEditorVariables";
 import { paddings, placeholderStyles, textInputSizing, colorOut, unit } from "@library/styles/styleHelpers";
-import { styleFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
-import { calc, percent, px, viewHeight } from "csx";
-import { memoize } from "lodash";
+import { calc, percent, px } from "csx";
 import { vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
 
-export const richEditorFormClasses = memoize((theme?: object, legacyMode: boolean = false) => {
+export const richEditorFormClasses = useThemeCache((theme?: object, legacyMode: boolean = false) => {
     const globalVars = globalVariables();
     const headerVars = vanillaHeaderVariables();
     const vars = richEditorVariables();

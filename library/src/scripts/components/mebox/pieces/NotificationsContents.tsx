@@ -49,7 +49,7 @@ export class NotificationsContents extends React.Component<IProps> {
                 <FrameHeaderWithAction className="hasAction" title={title}>
                     <LinkAsButton
                         title={t("Notification Preferences")}
-                        baseClass={buttonUtils.buttonIcon}
+                        baseClass={ButtonTypes.ICON}
                         className={classNames(buttonUtils.pushRight)}
                         to={`/profile/preferences/${userSlug}`}
                     >

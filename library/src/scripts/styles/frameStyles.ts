@@ -6,10 +6,11 @@
 
 import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { font, paddings, singleBorder, colorOut, unit } from "@library/styles/styleHelpers";
+import { fonts, paddings, singleBorder, colorOut, unit } from "@library/styles/styleHelpers";
 import { calc, important, percent, viewHeight } from "csx";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
 import { buttonUtilityClasses } from "@library/styles/buttonStyles";
+import { NestedCSSProperties, NestedCSSSelectors } from "typestyle/lib/types";
 
 export const frameVariables = useThemeCache(() => {
     const globalVars = globalVariables();

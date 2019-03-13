@@ -16,6 +16,7 @@ import {
     BackgroundPositionProperty,
     BackgroundRepeatProperty,
     BackgroundSizeProperty,
+    BorderProperty,
     BorderRadiusProperty,
     BorderStyleProperty,
     BorderWidthProperty,
@@ -105,8 +106,8 @@ export function fakeBackgroundFixed() {
 
 export function fullSizeOfParent() {
     return {
-        display: "block",
         position: "absolute",
+        display: "block",
         top: px(0),
         left: px(0),
         width: percent(100),
@@ -196,11 +197,34 @@ export const modifyColorBasedOnLightness = (
         throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
     }
     if (referenceColor.lightness() >= 0.5 && !flip) {
-        // Lighten color
-        return colorToModify.mix(color("#000"), 1 - weight) as ColorHelper;
+        return colorToModify.darken(weight) as ColorHelper;
+    } else {
+        return colorToModify.lighten(weight) as ColorHelper;
+    }
+};
+
+/*
+ * Color modification based on saturation.
+ * @param referenceColor - The reference colour to determine if we're in a dark or light context.
+ * @param colorToModify - The color you wish to modify
+ * @param percentage - The amount you want to mix the two colors
+ * @param flip - By default we darken light colours and lighten darks, but if you want to get the opposite result, use this param
+ */
+export const modifyColorSaturationBasedOnLightness = (
+    referenceColor: ColorHelper,
+    colorToModify: ColorHelper,
+    weight: number,
+    flip: boolean = false,
+) => {
+    if (weight > 1 || weight < 0) {
+        throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
+    }
+    if (referenceColor.saturation() <= 0.5 && !flip) {
+        // Saturate
+        return colorToModify.desaturate(weight) as ColorHelper;
     } else {
         // Darken color
-        return colorToModify.mix(color("#fff"), 1 - weight) as ColorHelper;
+        return colorToModify.saturate(weight) as ColorHelper;
     }
 };
 
@@ -273,7 +297,7 @@ export const singleBorder = (styles: ISingleBorderStyle = {}) => {
     const vars = globalVariables();
     return `${styles.style ? styles.style : vars.border.style} ${
         styles.color ? colorOut(styles.color) : colorOut(vars.border.color)
-    } ${styles.width ? unit(styles.width) : unit(vars.border.width)}`;
+    } ${styles.width ? unit(styles.width) : unit(vars.border.width)}` as any;
 };
 
 export interface ILinkStates {
@@ -342,7 +366,7 @@ export interface IPaddings {
 }
 
 export const paddings = (styles: IPaddings) => {
-    const paddingVals = {} as any;
+    const paddingVals = {} as NestedCSSProperties;
 
     if (styles.top !== undefined) {
         paddingVals.paddingTop = unit(styles.top);
@@ -360,7 +384,7 @@ export const paddings = (styles: IPaddings) => {
         paddingVals.paddingLeft = unit(styles.left);
     }
 
-    return paddingVals;
+    return paddingVals as NestedCSSProperties;
 };
 
 export interface ISpinnerProps {
@@ -543,7 +567,7 @@ export const objectFitWithFallback = () => {
                 height: percent(100),
             },
         },
-    };
+    } as NestedCSSProperties;
 };
 
 export interface ILinkStates {
@@ -635,7 +659,7 @@ export interface IFont {
     align?: TextAlignLastProperty;
 }
 
-export const font = (props: IFont) => {
+export const fonts = (props: IFont) => {
     if (props) {
         const size = get(props, "size", undefined);
         const fontWeight = get(props, "weight", undefined);
@@ -650,9 +674,9 @@ export const font = (props: IFont) => {
             lineHeight: lineHeight ? unit(lineHeight) : undefined,
             textAlign,
             textShadow,
-        };
+        } as NestedCSSProperties;
     } else {
-        return {};
+        return {} as NestedCSSProperties;
     }
 };
 

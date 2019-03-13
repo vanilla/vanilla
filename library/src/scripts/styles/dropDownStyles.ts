@@ -7,11 +7,12 @@
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { shadowHelper } from "@library/styles/shadowHelpers";
-import { borders, unit, paddings, states, font, userSelect, margins, colorOut } from "@library/styles/styleHelpers";
+import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
+import { borders, unit, paddings, states, fonts, userSelect, margins, colorOut } from "@library/styles/styleHelpers";
 import get from "lodash/get";
 import { important, percent } from "csx";
 import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const dropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -101,13 +102,12 @@ export const dropDownClasses = useThemeCache(() => {
     });
 
     const contents = style("contents", {
-        ...shadows.dropDown(),
         position: "absolute",
         minWidth: unit(vars.sizing.width),
         backgroundColor: colorOut(vars.contents.bg),
         color: colorOut(vars.contents.fg),
         overflow: "hidden",
-        ...borders(get(vars, "border", {})),
+        ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders({}), shadows.dropDown()),
         zIndex: 1,
         $nest: {
             "&.isParentWidth": {
@@ -143,10 +143,10 @@ export const dropDownClasses = useThemeCache(() => {
     const asModal = style("asModal", {
         $nest: {
             "&.hasVerticalPadding": {
-                ...paddings({
+                ...(paddings({
                     top: 12,
                     bottom: 12,
-                }),
+                }) as NestedCSSProperties),
             },
         },
     });
@@ -176,7 +176,7 @@ export const dropDownClasses = useThemeCache(() => {
                 paddingTop: unit(vars.metas.padding.top),
             },
         },
-        ...(font(vars.metas.font) as any),
+        ...fonts(vars.metas.font),
     });
 
     // wrapping element
@@ -258,8 +258,8 @@ export const dropDownClasses = useThemeCache(() => {
         fontSize: unit(globalVars.fonts.size.small),
         textTransform: "uppercase",
         textAlign: "center",
-        fontWeight: unit(globalVars.fonts.weights.semiBold),
-        ...paddings(vars.sectionTitle.padding),
+        fontWeight: globalVars.fonts.weights.semiBold,
+        ...(paddings(vars.sectionTitle.padding) as NestedCSSProperties),
     });
 
     const sectionContents = style("sectionContents", {
@@ -282,7 +282,7 @@ export const dropDownClasses = useThemeCache(() => {
     });
 
     const title = style("title", {
-        ...font({
+        ...fonts({
             weight: globalVars.fonts.weights.semiBold,
             size: globalVars.fonts.size.small,
             lineHeight: globalVars.lineHeights.condensed,

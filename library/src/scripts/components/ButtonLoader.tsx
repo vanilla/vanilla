@@ -6,12 +6,13 @@
 
 import * as React from "react";
 import { t } from "@library/application";
-import { buttonLoaderClasses, IButtonType, buttonVariables } from "@library/styles/buttonStyles";
+import { buttonLoaderClasses, ButtonTypes } from "@library/styles/buttonStyles";
 import classNames from "classnames";
+import ScreenReaderContent from "@library/components/ScreenReaderContent";
 
 interface IProps {
     className?: string;
-    buttonType?: IButtonType;
+    buttonType?: ButtonTypes;
 }
 
 /**
@@ -19,11 +20,11 @@ interface IProps {
  */
 export default class ButtonLoader extends React.Component<IProps> {
     public render() {
-        const classes = buttonLoaderClasses(this.props.buttonType || buttonVariables().primary);
+        const classes = buttonLoaderClasses(this.props.buttonType ? this.props.buttonType : ButtonTypes.STANDARD);
         return (
             <React.Fragment>
                 <div className={classNames(classes.root, this.props.className)} aria-hidden="true" />
-                <span className="sr-only">{t("Loading")}</span>
+                <ScreenReaderContent>{t("Loading")}</ScreenReaderContent>
             </React.Fragment>
         );
     }

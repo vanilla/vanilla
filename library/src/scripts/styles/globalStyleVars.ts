@@ -3,12 +3,17 @@
  * @license GPL-2.0-only
  */
 
-import { modifyColorBasedOnLightness, colorOut, IBackground } from "@library/styles/styleHelpers";
+import {
+    modifyColorBasedOnLightness,
+    colorOut,
+    IBackground,
+    modifyColorSaturationBasedOnLightness,
+} from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { color, ColorHelper, percent, viewHeight } from "csx";
 
 export const globalVariables = useThemeCache(() => {
-    const colorPrimary = color("#0291db");
+    let colorPrimary = color("#0291db");
     const makeThemeVars = variableFactory("global");
 
     const utility = {
@@ -24,12 +29,23 @@ export const globalVariables = useThemeCache(() => {
         transparent: `transparent`,
     };
 
-    const mainColors = makeThemeVars("mainColors", {
+    const initialMainColors = makeThemeVars("mainColors", {
         fg: color("#555a62"),
         bg: color("#fff"),
         primary: colorPrimary,
-        secondary: modifyColorBasedOnLightness(colorPrimary, colorPrimary, 0.1, true),
+        secondary: colorPrimary,
     });
+
+    colorPrimary = initialMainColors.primary;
+
+    const generatedMainColors = makeThemeVars("mainColors", {
+        secondary: colorPrimary.lightness() >= 0.5 ? colorPrimary.darken(0.05) : colorPrimary.lighten(0.05),
+    });
+
+    const mainColors = {
+        ...initialMainColors,
+        ...generatedMainColors,
+    };
 
     const mixBgAndFg = (weight: number) => {
         return mainColors.fg.mix(mainColors.bg, weight) as ColorHelper;
@@ -265,7 +281,7 @@ export const globalVariables = useThemeCache(() => {
     });
 
     const separator = makeThemeVars("separator", {
-        color: colorOut(border.color),
+        color: border.color,
         size: 1,
     });
 

@@ -13,7 +13,7 @@ import { withDevice } from "@library/contexts/DeviceContext";
 import { IDeviceProps, Devices } from "@library/components/DeviceChecker";
 import IndependentSearch from "@library/components/IndependentSearch";
 import { splashStyles, splashVariables } from "@library/styles/splashStyles";
-import { buttonClasses } from "@library/styles/buttonStyles";
+import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
 import { t } from "@library/application";
 
 interface IProps extends IDeviceProps {
@@ -39,7 +39,8 @@ export class Splash extends React.Component<IProps> {
                             <div className={classes.searchContainer}>
                                 <IndependentSearch
                                     className={classes.searchContainer}
-                                    buttonClass={classNames(buttons.transparent, classes.searchButton)}
+                                    buttonClass={classes.searchButton}
+                                    buttonBaseClass={ButtonTypes.TRANSPARENT}
                                     isLarge={true}
                                     placeholder={t("Search Articles")}
                                     inputClass={classes.input}

@@ -9,7 +9,6 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     background,
     centeredBackgroundProps,
-    font,
     getBackgroundImage,
     modifyColorBasedOnLightness,
     IFont,
@@ -17,6 +16,7 @@ import {
     colorOut,
     unit,
     IBackground,
+    fonts,
 } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { percent, px, url } from "csx";
@@ -183,7 +183,7 @@ export const splashStyles = useThemeCache(() => {
 
     const title = style("title", {
         display: "block",
-        ...font(vars.title.font as IFont),
+        ...fonts(vars.title.font as IFont),
         ...paddings({
             top: unit(vars.title.marginTop),
             bottom: unit(vars.title.marginBottom),
@@ -212,7 +212,7 @@ export const splashStyles = useThemeCache(() => {
         hoverBg = buttonFg ? buttonFg.fade(0.2) : buttonBorderColor ? buttonBorderColor.fade(0.2) : undefined;
     }
 
-    const searchButton = style("searchButton", {
+    const searchButton = style("splashSearchButton", {
         $nest: {
             "&&&&": {
                 backgroundColor: buttonBg ? colorOut(buttonBg) : undefined,

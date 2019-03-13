@@ -40,7 +40,7 @@ export class MessagesContents extends React.Component<IProps> {
                     <LinkAsButton
                         title={t("New Message")}
                         to={"/messages/inbox"}
-                        baseClass={buttonUtils.buttonIcon}
+                        baseClass={ButtonTypes.ICON}
                         className={classNames(buttonUtils.pushRight)}
                     >
                         {compose()}

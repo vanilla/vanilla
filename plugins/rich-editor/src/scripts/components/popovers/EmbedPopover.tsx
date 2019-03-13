@@ -124,6 +124,7 @@ export class EmbedPopover extends React.PureComponent<IProps, IState> {
                             ) : (
                                 <Button
                                     className={classNames("insertMedia-insert", classesInsertMedia.insert)}
+                                    baseClass={ButtonTypes.PRIMARY}
                                     disabled={!this.state.isInputValid}
                                     onClick={this.buttonClickHandler}
                                 >

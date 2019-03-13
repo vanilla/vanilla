@@ -5,7 +5,7 @@
 
 import { useThemeCache, variableFactory, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { px } from "csx";
+import { px, important } from "csx";
 import { colorOut, placeholderStyles, borders, IBorderStyles } from "@library/styles/styleHelpers";
 import { cssRule } from "typestyle";
 
@@ -44,7 +44,7 @@ export const inputClasses = useThemeCache(() => {
     const text = style("text", textStyles);
 
     // Use as a global selector. This should be refactored in the future.
-    cssRule(".inputText", textStyles);
+    const applyInputCSSRules = () => cssRule(".inputText", textStyles);
 
-    return { text };
+    return { text, applyInputCSSRules };
 });

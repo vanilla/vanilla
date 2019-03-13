@@ -15,6 +15,7 @@ import { connect } from "react-redux";
 import getStore from "@library/state/getStore";
 import Backgrounds from "@library/components/body/Backgrounds";
 import { prepareShadowRoot } from "@library/dom";
+import { inputClasses } from "@library/components/forms/inputStyles";
 
 export interface IWithThemeProps {
     theme: IThemeVariables;
@@ -34,6 +35,9 @@ class BaseThemeProvider extends React.Component<IProps> {
         if (!variables.data) {
             return null;
         }
+
+        // Apply kludged input text styling everywhere.
+        inputClasses().applyInputCSSRules();
 
         return (
             <>

@@ -5,20 +5,24 @@
 
 import { LoadStatus } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
-import { getMeta } from "@library/application";
+import Backgrounds from "@library/components/body/Backgrounds";
+import { inputClasses } from "@library/components/forms/inputStyles";
 import Loader from "@library/components/Loader";
+import { prepareShadowRoot } from "@library/dom";
+import getStore from "@library/state/getStore";
 import { ICoreStoreState } from "@library/state/reducerRegistry";
 import ThemeActions from "@library/theming/ThemeActions";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import React from "react";
 import { connect } from "react-redux";
-import getStore from "@library/state/getStore";
-import Backgrounds from "@library/components/body/Backgrounds";
-import { prepareShadowRoot } from "@library/dom";
-import { inputClasses } from "@library/components/forms/inputStyles";
 
 export interface IWithThemeProps {
     theme: IThemeVariables;
+}
+
+export enum LogoType {
+    DESKTOP = "logo",
+    MOBILE = "mobileLogo",
 }
 
 class BaseThemeProvider extends React.Component<IProps> {
@@ -62,10 +66,28 @@ class BaseThemeProvider extends React.Component<IProps> {
     }
 }
 
+export function getLogo(logoType: LogoType): string | undefined {
+    const store = getStore<ICoreStoreState>();
+    const assets = store.getState().theme.assets.data || {};
+    let logo;
+
+    if (logoType === LogoType.DESKTOP) {
+        logo = assets.logo || null;
+    } else if (logoType === LogoType.MOBILE) {
+        logo = assets.mobileLogo || null;
+    }
+
+    if (!logo) {
+        return undefined;
+    } else {
+        return logo.url;
+    }
+}
+
 export function getThemeVariables() {
     const store = getStore<ICoreStoreState>();
     const assets = store.getState().theme.assets.data || {};
-    const { variables } = assets;
+    const variables = assets.variables || {};
     return variables;
 }
 

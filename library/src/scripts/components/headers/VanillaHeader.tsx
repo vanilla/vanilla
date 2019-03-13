@@ -33,6 +33,7 @@ import { meBoxClasses } from "@library/styles/meBoxStyles";
 import { style } from "typestyle";
 import { sticky } from "@library/styles/styleHelpers";
 import { ButtonTypes } from "@library/styles/buttonStyles";
+import { getLogo, LogoType } from "@library/theming/ThemeProvider";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -94,6 +95,16 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         const containerElement = this.props.container || document.getElementById("vanillaHeader")!;
         containerElement.classList.value = outerCssClasses;
 
+        const themeLogo = getLogo(LogoType.DESKTOP);
+        let logoData = dummyLogoData;
+        if (themeLogo) {
+            logoData = {
+                ...logoData,
+                logoUrl: themeLogo,
+                alt: t("Vanilla"),
+            };
+        }
+
         return ReactDOM.createPortal(
             <Container>
                 <Panel className="panelLayout-fullWidth">
@@ -114,7 +125,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
 
                             {!isMobile && (
                                 <HeaderLogo
-                                    {...dummyLogoData}
+                                    {...logoData}
                                     className={classNames("vanillaHeader-logoContainer", classes.logoContainer)}
                                     logoClassName="vanillaHeader-logo"
                                 />

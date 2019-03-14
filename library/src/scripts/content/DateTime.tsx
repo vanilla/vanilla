@@ -4,9 +4,9 @@
  * @license GPL-2.0-only
  */
 
+import { t } from "@library/utility/appUtils";
 import React, { Component } from "react";
-import moment from "moment";
-import { t } from "../dom/appUtils";
+import moment = require("moment");
 
 interface IProps {
     /** The timestamp to format and display */

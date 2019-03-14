@@ -3,13 +3,10 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-
-import React from "react";
+import gdn from "@library/gdn";
+import { escapeHTML } from "@library/utility/domUtils";
+import Translate from "@library/content/Translate";
 import { render } from "enzyme";
-import Translate from "library/src/scripts/content/Translate";
-import { expect } from "chai";
-import gdn from "../gdn";
-import { escapeHTML } from "../utility/domUtils";
 
 // tslint:disable:jsx-use-translation-function
 

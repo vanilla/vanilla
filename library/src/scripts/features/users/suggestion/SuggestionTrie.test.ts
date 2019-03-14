@@ -3,10 +3,8 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-
-import { expect } from "chai";
-import { LoadStatus } from "../../../@types/api";
-import SuggestionTrie, { ISuggestionValue, ISuggestionNode } from "SuggestionTrie";
+import { LoadStatus } from "@library/@types/api";
+import SuggestionTrie, { ISuggestionNode, ISuggestionValue } from "@library/features/users/suggestion/SuggestionTrie";
 
 const LOADING_VALUE: ISuggestionValue = {
     status: LoadStatus.LOADING,

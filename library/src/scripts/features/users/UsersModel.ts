@@ -3,6 +3,12 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+import { ILoadable, IMe, LoadStatus } from "@library/@types/api";
+import UserSuggestionModel, { IUserSuggestionState } from "@library/features/users/suggestion/UserSuggestionModel";
+import NotificationsActions from "@library/features/notifications/NotificationsActions";
+import ReduxReducer from "@library/redux/ReduxReducer";
+import produce from "immer";
+import UsersActions from "@library/features/users/UsersActions";
 
 export interface IInjectableUserState {
     currentUser: ILoadable<IMe>;

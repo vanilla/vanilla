@@ -4,15 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import { formElementsVariables } from "../../forms/formElementStyles";
-import { buttonClasses } from "@library/styles/buttonStyles";
-import { globalVariables } from "../../styles/globalStyleVars";
-import { layoutVariables } from "../../styles/layoutStyles";
-import { borders, colorOut, unit } from "../../styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "../../styles/styleUtils";
-import { vanillaHeaderVariables } from "../../headers/vanillaHeaderStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { borders, colorOut, unit } from "@library/styles/styleHelpers";
 import { calc, important, percent, px } from "csx";
-import get from "lodash/get";
+import { layoutVariables } from "@library/styles/layoutStyles";
+import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { buttonClasses } from "@library/forms/buttonStyles";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();

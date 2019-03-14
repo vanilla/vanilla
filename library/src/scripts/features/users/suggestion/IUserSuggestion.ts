@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { IUserFragment } from "../../../@types/api";
+import { IUserFragment } from "@library/@types/api";
 
 export interface IUserSuggestion extends IUserFragment {
     domID: string;

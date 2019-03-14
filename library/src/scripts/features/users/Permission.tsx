@@ -3,14 +3,11 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-
-import React from "react";
-import { connect } from "react-redux";
-import UsersModel, { IInjectableUserState } from "UsersModel";
-import { LoadStatus } from "../../@types/api";
-import UsersActions from "UsersActions";
-import { logError } from "../../utility/utils";
-import apiv2 from "../../apiv2";
+import { logError } from "@library/utility/utils";
+import { LoadStatus } from "@library/@types/api";
+import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
+import apiv2 from "@library/apiv2";
+import UsersActions from "@library/features/users/UsersActions";
 
 interface IProps extends IInjectableUserState {
     permission: string | string[];

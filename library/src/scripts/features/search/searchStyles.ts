@@ -3,10 +3,10 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../../styles/globalStyleVars";
-import { componentThemeVariables, debugHelper } from "../../styles/styleHelpers";
-import { useThemeCache } from "../../styles/styleUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
+import { debugHelper } from "@library/styles/styleHelpers";
 
 export const searchVariables = useThemeCache(() => {
     const globalVars = globalVariables();

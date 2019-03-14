@@ -4,12 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import classNames from "classnames";
-import Paragraph from "../../layout/Paragraph";
-import SubcommunityTile from "library/src/scripts/features/subcommunities/SubcommunityTile";
-import { subcommunityListClasses } from "library/src/scripts/features/subcommunities/subcommunityListStyles";
-import { subcommunityTileClasses } from "library/src/scripts/features/subcommunities/subcommunityTitleStyles";
+import React from "react";
+import { subcommunityListClasses } from "@library/features/subcommunities/subcommunityListStyles";
+import { subcommunityTileClasses } from "@library/features/subcommunities/subcommunityTitleStyles";
+import SubcommunityTile from "@library/features/subcommunities/SubcommunityTile";
+import Paragraph from "@library/layout/Paragraph";
 
 interface ISubcommunity {
     icon: string;

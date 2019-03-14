@@ -4,12 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import { LoadStatus, ILoadable } from "../../../@types/api";
-import { IUserSuggestion } from "IUserSuggestion";
-import SuggestionTrie from "SuggestionTrie";
-import ReduxReducer from "../../../redux/ReduxReducer";
-import UserSuggestionActions from "UserSuggestionActions";
-import { IUsersStoreState } from "../UsersModel";
+import { ILoadable, LoadStatus } from "@library/@types/api";
+import { IUsersStoreState } from "@library/features/users/UsersModel";
+import SuggestionTrie from "@library/features/users/suggestion/SuggestionTrie";
+import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggestion";
+import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
+import ReduxReducer from "@library/redux/ReduxReducer";
 
 export interface IUserSuggestionState {
     lastSuccessfulUsername: string | null;

@@ -4,8 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import { ILoadable } from "../../../@types/api";
-import { IUserSuggestion } from "IUserSuggestion";
+import { ILoadable } from "@library/@types/api";
+import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggestion";
 
 export type ISuggestionValue = ILoadable<IUserSuggestion[]>;
 

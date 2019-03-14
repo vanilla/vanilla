@@ -4,25 +4,23 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../../styles/globalStyleVars";
-import { shadowHelper, shadowOrBorderBasedOnLightness } from "../../styles/shadowHelpers";
 import {
     absolutePosition,
     borders,
-    componentThemeVariables,
+    colorOut,
     debugHelper,
     defaultTransition,
-    modifyColorBasedOnLightness,
     paddings,
-    colorOut,
     unit,
     userSelect,
-} from "../../styles/styleHelpers";
-import { useThemeCache } from "../../styles/styleUtils";
-import { FontSizeProperty, HeightProperty, MarginProperty, PaddingProperty, WidthProperty } from "csstype";
-import { ColorHelper, percent } from "csx";
-import { style } from "typestyle";
+} from "@library/styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { TLength } from "typestyle/lib/types";
+import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
+import { ColorHelper, percent } from "csx";
+import { FontSizeProperty, HeightProperty, MarginProperty, PaddingProperty, WidthProperty } from "csstype";
+import { style } from "typestyle";
 
 export const subcommunityTileVariables = useThemeCache(() => {
     const globalVars = globalVariables();

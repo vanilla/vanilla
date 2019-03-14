@@ -5,10 +5,7 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-
-import React from "react";
-import ReactDOM from "react-dom";
-import { IDiscussionEmbed, ICommentEmbed, IScrapeData } from "@dashboard/@types/api";
+import { ICommentEmbed, IDiscussionEmbed, IScrapeData } from "@dashboard/@types/api";
 
 export const FOCUS_CLASS = "embed-focusableElement";
 

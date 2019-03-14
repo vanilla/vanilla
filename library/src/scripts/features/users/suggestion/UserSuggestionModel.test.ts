@@ -4,13 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { expect } from "chai";
-// import sinon, { SinonSandbox } from "sinon";
-import { IMentionSuggestionData } from "../../../../../../plugins/rich-editor/src/scripts/toolbars/pieces/MentionSuggestion";
-import { LoadStatus } from "../../../@types/api";
-import UserSuggestionModel from "UserSuggestionModel";
-import UserSuggestionActions from "UserSuggestionActions";
-import sinon from "sinon";
+import { IMentionSuggestionData } from "@rich-editor/toolbars/pieces/MentionSuggestion";
+import { LoadStatus } from "@library/@types/api";
+import UserSuggestionModel from "@library/features/users/suggestion/UserSuggestionModel";
+import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
 
 type SortProviderTuple = [string[], string, string[]];
 interface ISortTestData {

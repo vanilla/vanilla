@@ -4,13 +4,13 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { useThemeCache, variableFactory, styleFactory } from "@library/styles/styleUtils";
+import { borders, colorOut, margins, paddings, setAllLinkColors } from "@library/styles/styleHelpers";
+import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, NestedCSSSelectors, TLength } from "typestyle/lib/types";
-import { margins, allLinkStates, setAllLinkColors, paddings, colorOut, borders } from "@library/styles/styleHelpers";
-import { em, percent, px, important } from "csx";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { em, important, percent, px } from "csx";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { FontSizeProperty } from "csstype";
-import { shadowOrBorderBasedOnLightness, shadowHelper } from "@library/styles/shadowHelpers";
 
 const userContentVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("userContent");

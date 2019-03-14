@@ -4,9 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import { expect } from "chai";
-import { IUserSuggestion } from "IUserSuggestion";
-import UserSuggestionActions from "UserSuggestionActions";
+import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggestion";
+import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
 
 function makeMentionSuggestion(username: string): IUserSuggestion {
     return {

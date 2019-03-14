@@ -4,16 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import DateTime from "../../content/DateTime";
-import BreadCrumbString from "../../navigation/BreadCrumbString";
-import { OptionProps } from "react-select/lib/components/Option";
-import { SelectOption } from "../../forms/select/overwrites";
-import classNames from "classnames";
-import { IComboBoxOption } from "library/src/scripts/features/search/SearchBar";
-import { ICrumb } from "../../navigation/Breadcrumbs";
-import SmartLink from "../../routing/links/SmartLink";
-import { metasClasses } from "../../styles/metasStyles";
+import React from "react";
+import { SelectOption } from "@library/forms/select/overwrites";
+import { ICrumb } from "@library/navigation/Breadcrumbs";
+import SmartLink from "@library/routing/links/SmartLink";
+import BreadCrumbString from "@library/navigation/BreadCrumbString";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { metasClasses } from "@library/styles/metasStyles";
+import DateTime from "@library/content/DateTime";
 
 export interface ISearchOptionData {
     crumbs: ICrumb[];

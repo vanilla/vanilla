@@ -2,11 +2,10 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-
-import ReduxReducer from "../../redux/ReduxReducer";
+import { ILoadable, INotification, LoadStatus } from "@library/@types/api";
+import NotificationsActions from "@library/features/notifications/NotificationsActions";
+import ReduxReducer from "@library/redux/ReduxReducer";
 import produce from "immer";
-import { ILoadable, LoadStatus, INotification } from "../../@types/api";
-import NotificationsActions from "NotificationsActions";
 
 interface INotificationsState {
     notificationsByID: ILoadable<{ [key: number]: INotification }>;

@@ -4,11 +4,10 @@
  */
 
 import React from "react";
-import SmartLink from "../../routing/links/SmartLink";
-import Paragraph from "../../layout/Paragraph";
-import classNames from "classnames";
-import { t } from "../../dom/appUtils";
-import { subcommunityTileClasses } from "library/src/scripts/features/subcommunities/subcommunityTitleStyles";
+import { t } from "@library/utility/appUtils";
+import SmartLink from "@library/routing/links/SmartLink";
+import { subcommunityTileClasses } from "@library/features/subcommunities/subcommunityTitleStyles";
+import Paragraph from "@library/layout/Paragraph";
 
 interface IProps {
     icon: string;

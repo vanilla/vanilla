@@ -3,14 +3,16 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-
 import React from "react";
-import { connect } from "react-redux";
+import { t } from "@library/utility/appUtils";
+import { LoadStatus } from "@library/@types/api";
+import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
+import UserSuggestionModel, {
+    IInjectableSuggestionsProps,
+} from "@library/features/users/suggestion/UserSuggestionModel";
 import apiv2 from "@library/apiv2";
 import Tokens from "@library/forms/select/Tokens";
-import { t } from "@library/dom/appUtils";
-import { IComboBoxOption } from "@library/search/SearchBar";
-import { LoadStatus } from "@library/@types/api";
 
 interface IProps extends IInjectableSuggestionsProps {
     suggestionActions: UserSuggestionActions;

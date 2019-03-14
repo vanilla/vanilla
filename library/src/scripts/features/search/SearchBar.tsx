@@ -4,29 +4,23 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { components } from "react-select";
-import AsyncCreatableSelect from "react-select/lib/AsyncCreatable";
-import { getRequiredID, IOptionalComponentID } from "../../utility/idUtils";
-import classNames from "classnames";
-import { t } from "../../dom/appUtils";
-import Button from "../../forms/Button";
-import Heading from "../../layout/Heading";
-import { InputActionMeta, ActionMeta as SelectActionMeta } from "react-select/lib/types";
-import * as selectOverrides from "../../forms/select/overwrites";
-import ButtonLoader from "../../loaders/ButtonLoader";
-import { OptionProps } from "react-select/lib/components/Option";
-import Translate from "../../content/Translate";
-import { ClearButton } from "../../forms/select/ClearButton";
-import ConditionalWrap from "../../layout/ConditionalWrap";
-import { search } from "../../icons/header";
+import React from "react";
+import ButtonLoader from "@library/loaders/ButtonLoader";
+import Heading from "@library/layout/Heading";
+import { getRequiredID, IOptionalComponentID } from "@library/utility/idUtils";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { ClearButton } from "@library/forms/select/ClearButton";
+import { LinkContext } from "@library/routing/links/LinkContextProvider";
 import { MenuProps } from "react-select/lib/components/Menu";
-import ReactDOM from "react-dom";
-import { LinkContext } from "../../routing/links/LinkContextProvider";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { search } from "@library/icons/header";
+import { t } from "@library/utility/appUtils";
+import { ButtonTypes, buttonVariables } from "@library/forms/buttonStyles";
+import Button from "@library/forms/Button";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { InputActionMeta } from "react-select/lib/types";
 import { RouteComponentProps } from "react-router";
-import { ButtonTypes, buttonVariables } from "@library/styles/buttonStyles";
-import { searchBarClasses } from "library/src/scripts/features/search/searchBarStyles";
-import { dropDownClasses } from "../../flyouts/dropDownStyles";
+import Translate from "@library/content/Translate";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;

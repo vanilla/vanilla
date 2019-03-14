@@ -4,16 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import { Dispatch } from "redux";
-import { ActionsUnion } from "../../../redux/utility";
-import api from "../../../apiv2";
-import { LoadStatus } from "../../../@types/api";
-import { IUserSuggestion } from "IUserSuggestion";
-import ReduxActions from "../../../redux/ReduxActions";
-import UserSuggestionModel from "UserSuggestionModel";
-import { IUsersStoreState } from "../UsersModel";
-import debounce from "lodash/debounce";
-import { logError } from "../../../utility/utils";
+import { logError } from "@library/utility/utils";
+import { LoadStatus } from "@library/@types/api";
+import { IUsersStoreState } from "@library/features/users/UsersModel";
+import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
+import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggestion";
+import UserSuggestionModel from "@library/features/users/suggestion/UserSuggestionModel";
 
 interface ILookupUserOptions {
     username: string;

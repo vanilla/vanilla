@@ -4,17 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import classNames from "classnames";
-import { RouteComponentProps, withRouter } from "react-router-dom";
-import { IWithSearchProps, withSearch } from "../../contexts/SearchContext";
-import { uniqueIDFromPrefix } from "../../utility/idUtils";
-import SearchBar from "library/src/scripts/features/search/SearchBar";
-import { t } from "../../dom/appUtils";
-import SearchOption from "library/src/scripts/features/search/SearchOption";
-import { searchClasses } from "library/src/scripts/features/search/searchStyles";
-import { searchBarClasses } from "library/src/scripts/features/search/searchBarStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import React from "react";
+import SearchOption from "@library/features/search/SearchOption";
+import { t } from "@library/utility/appUtils";
+import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import SearchBar from "@library/features/search/SearchBar";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { searchClasses } from "@library/features/search/searchStyles";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { RouteComponentProps, withRouter } from "react-router";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;

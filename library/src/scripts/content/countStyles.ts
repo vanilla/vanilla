@@ -4,10 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../styles/globalStyleVars";
-import { absolutePosition, componentThemeVariables, debugHelper, unit } from "../styles/styleHelpers";
+import { absolutePosition, debugHelper, unit } from "@library/styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
-import { useThemeCache } from "../styles/styleUtils";
 
 export const countVariables = useThemeCache(() => {
     const globalVars = globalVariables();

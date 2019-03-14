@@ -4,22 +4,21 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../../styles/globalStyleVars";
 import {
-    borders,
-    componentThemeVariables,
+    absolutePosition,
     allLinkStates,
+    borders,
+    IBorderStyles,
     margins,
     unit,
     userSelect,
-    absolutePosition,
-    IBorderStyles,
-} from "../../styles/styleHelpers";
-import { formElementsVariables } from "../../forms/formElementStyles";
+} from "@library/styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
+import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
-import { styleFactory, useThemeCache } from "../../styles/styleUtils";
-import { transparentColor } from "@library/styles/buttonStyles";
-import { shadowHelper, shadowOrBorderBasedOnLightness } from "../../styles/shadowHelpers";
+import { transparentColor } from "@library/forms/buttonStyles";
 
 export const attachmentVariables = useThemeCache(() => {
     const globalVars = globalVariables();

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../../styles/globalStyleVars";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     colorOut,
     fonts,
@@ -13,12 +13,11 @@ import {
     paddings,
     singleBorder,
     unit,
-} from "../../styles/styleHelpers";
-import { calc, ColorHelper, percent, px } from "csx";
+} from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { metasVariables } from "@library/styles/metasStyles";
+import { calc, percent, px } from "csx";
 import { media } from "typestyle";
-import { styleFactory, useThemeCache, variableFactory } from "../../styles/styleUtils";
-import { NestedCSSProperties } from "typestyle/lib/types";
-import { metasVariables } from "../../styles/metasStyles";
 
 export const searchResultsVariables = useThemeCache(() => {
     const globalVars = globalVariables();

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { fileExcel, fileGeneric, fileImage, filePDF, filePowerPoint, fileWord, fileZip } from "../../icons/fileTypes";
+import { fileExcel, fileGeneric, fileImage, filePDF, filePowerPoint, fileWord, fileZip } from "@library/icons";
 
 export enum AttachmentType {
     FILE = "A file",

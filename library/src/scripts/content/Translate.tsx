@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import { t } from "../dom/appUtils";
-import { logError } from "../utility/utils";
+import { logError } from "@library/utility/utils";
+import { t } from "@library/utility/appUtils";
 
 type TranslateCallback = (contents: string) => React.ReactNode;
 

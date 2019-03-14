@@ -8,7 +8,7 @@
  * @license GPL-2.0-only
  */
 
-import gdn from "../../gdn";
+import gdn from "@library/gdn";
 
 /**
  * Determine if all of the provided permissions are present.

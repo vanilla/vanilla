@@ -4,10 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import ReduxActions, { ActionsUnion } from "../../redux/ReduxActions";
-import { IMe, LoadStatus } from "../../@types/api";
-import { IUsersStoreState } from "UsersModel";
-import { ICoreStoreState } from "../../redux/reducerRegistry";
+import { IMe, LoadStatus } from "@library/@types/api";
+import ReduxActions from "@library/redux/ReduxActions";
 
 /**
  * Redux actions for the users data.

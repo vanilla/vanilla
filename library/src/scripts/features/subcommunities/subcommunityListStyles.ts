@@ -4,11 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import { layoutVariables } from "../../styles/layoutStyles";
-import { componentThemeVariables, debugHelper, unit } from "../../styles/styleHelpers";
-import { useThemeCache } from "../../styles/styleUtils";
-import { percent } from "csx";
+import React from "react";
+import { debugHelper, unit } from "@library/styles/styleHelpers";
+import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
+import { percent } from "csx";
+import { layoutVariables } from "@library/styles/layoutStyles";
 
 export const subcommunityListVariables = useThemeCache(() => {
     const themeVars = componentThemeVariables("subcommunityList");

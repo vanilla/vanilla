@@ -9,9 +9,9 @@ restoreRootDir() {
     cd $PWD;
 }
 
-bash ./scripts/validateDeps.sh
-
 setRootDir
+
+bash bin/scripts/validateDeps.sh
 
 echo -e "\n==================== Preparing Command ===================="
 
@@ -20,7 +20,7 @@ echo -e "\n==================== Preparing Command ===================="
 # composer install
 
 # Bump versions
-node bin/scripts/setReleaseVersion.js
+node bin/scripts/setReleaseVersion.js 2>&1
 
 # Make the release
 restoreRootDir

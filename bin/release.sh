@@ -9,9 +9,8 @@ restoreRootDir() {
     cd $PWD;
 }
 
-bash ./scripts/validateDeps.sh
-
 setRootDir
+bash bin/validateDeps.sh
 
 echo -e "\n==================== Preparing Command ===================="
 

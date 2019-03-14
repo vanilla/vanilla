@@ -7,12 +7,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
-import TabHandler from "../utility/TabHandler";
-import { uniqueIDFromPrefix } from "../utility/idUtils";
 import classNames from "classnames";
 import ModalSizes from "ModalSizes";
-import { inheritHeightClass } from "../styles/styleHelpers";
-import { modalClasses } from "modalStyles";
 
 interface IHeadingDescription {
     titleID: string;

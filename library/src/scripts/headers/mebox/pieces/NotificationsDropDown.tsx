@@ -7,7 +7,9 @@
 import { t } from "../../../dom/appUtils";
 import { uniqueIDFromPrefix } from "../../../utility/idUtils";
 import DropDown from "../../../flyouts/DropDown";
-import NotificationsContents, { INotificationsProps } from "library/src/scripts/headers/mebox/pieces/NotificationsContents";
+import NotificationsContents, {
+    INotificationsProps,
+} from "library/src/scripts/headers/mebox/pieces/NotificationsContents";
 import NotificationsCounter from "library/src/scripts/headers/mebox/pieces/NotificationsCounter";
 import classNames from "classnames";
 import * as React from "react";

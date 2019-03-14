@@ -7,7 +7,7 @@
 import React from "react";
 import Quill from "quill/core";
 import classNames from "classnames";
-import { convertToSafeEmojiCharacters } from "../../../../../../library/src/scripts/utility/domUtils";
+import { convertToSafeEmojiCharacters } from "@library/utility/domUtils";
 import { withEditor, IWithEditorProps } from "../../editor/context";
 import { insertEmojiClasses } from "insertEmojiClasses";
 

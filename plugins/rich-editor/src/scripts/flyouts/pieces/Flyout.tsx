@@ -6,7 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import CloseButton from "../../../../../../library/src/scripts/navigation/CloseButton";
+import CloseButton from "@library/navigation/CloseButton";
 import { IWithEditorProps, withEditor } from "../../editor/context";
 import { flyoutPosition } from "./flyoutPosition";
 import { richEditorFlyoutClasses } from "flyoutClasses";

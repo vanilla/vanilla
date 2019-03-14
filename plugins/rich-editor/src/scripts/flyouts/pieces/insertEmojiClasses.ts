@@ -4,9 +4,9 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../../../../../../library/src/scripts/styles/globalStyleVars";
-import { appearance, unit } from "../../../../../../library/src/scripts/styles/styleHelpers";
-import { useThemeCache, styleFactory } from "../../../../../../library/src/scripts/styles/styleUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { appearance, unit } from "@library/styles/styleHelpers";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "../../editor/richEditorVariables";
 import { viewHeight } from "csx";
 

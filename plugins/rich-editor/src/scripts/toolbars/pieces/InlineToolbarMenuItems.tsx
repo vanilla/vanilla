@@ -7,8 +7,8 @@
 import React from "react";
 import MenuItems from "MenuItems";
 import { IMenuItemData } from "MenuItem";
-import { t } from "../../../../../../library/src/scripts/dom/appUtils";
-import * as icons from "../../../../../../library/src/scripts/icons/editorIcons";
+import { t } from "@library/dom/appUtils";
+import * as icons from "@library/icons/editorIcons";
 import Formatter from "../../quill/Formatter";
 import { IFormats, RangeStatic } from "quill/core";
 import classNames from "classnames";

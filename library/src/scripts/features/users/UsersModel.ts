@@ -4,14 +4,6 @@
  * @license GPL-2.0-only
  */
 
-import ReduxReducer from "../../redux/ReduxReducer";
-import produce from "immer";
-import { IMe } from "../../@types/api";
-import { ILoadable, LoadStatus } from "../../@types/api";
-import UsersActions from "UsersActions";
-import UserSuggestionModel, { IUserSuggestionState } from "suggestion/UserSuggestionModel";
-import NotificationsActions from "../notifications/NotificationsActions";
-
 export interface IInjectableUserState {
     currentUser: ILoadable<IMe>;
 }

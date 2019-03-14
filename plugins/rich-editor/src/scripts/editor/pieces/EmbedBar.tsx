@@ -5,10 +5,10 @@
  */
 
 import React from "react";
-import { t, getMeta } from "../../../../../../library/src/scripts/dom/appUtils";
+import { t, getMeta } from "@library/dom/appUtils";
 import ParagraphDropDown from "../../toolbars/ParagraphDropDown";
 import EmojiFlyout from "../../flyouts/EmojiFlyout";
-import Permission from "../../../../../../library/src/scripts/features/users/Permission";
+import Permission from "@library/features/users/Permission";
 import EmbedPopover from "../../flyouts/EmbedFlyout";
 import EditorUploadButton from "EditorUploadButton";
 import { richEditorClasses } from "../richEditorClasses";

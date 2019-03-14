@@ -5,15 +5,14 @@
  */
 
 import * as React from "react";
-import { t } from "../dom/appUtils";
+import { t } from "@library/dom/appUtils";
 import { style } from "typestyle";
-import classNames from "classnames";
-import { loaderClasses } from "loaderStyles";
 import { PaddingProperty } from "csstype";
 import { TLength } from "typestyle/lib/types";
-import ScreenReaderContent from "../utility/ScreenReaderContent";
-import ConditionalWrap from "../layout/ConditionalWrap";
-import { unit } from "../styles/styleHelpers";
+import ScreenReaderContent from "@library/utility/ScreenReaderContent";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { unit } from "@library/styles/styleHelpers";
+import { loaderClasses } from "@library/loaders/loaderStyles";
 
 interface IProps {
     minimumTime?: number;

@@ -3,13 +3,13 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { richEditorVariables } from "plugins/rich-editor/src/scripts/editor/richEditorVariables";
-import { paddings, placeholderStyles, textInputSizing, colorOut, unit } from "../../../../../library/src/scripts/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "../../../../../library/src/scripts/styles/styleUtils";
-import { globalVariables } from "../../../../../library/src/scripts/styles/globalStyleVars";
-import { formElementsVariables } from "../../../../../library/src/scripts/forms/formElementStyles";
+import { paddings, placeholderStyles, textInputSizing, colorOut, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 import { calc, percent, px } from "csx";
-import { vanillaHeaderVariables } from "../../../../../library/src/scripts/headers/vanillaHeaderStyles";
+import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
 export const richEditorFormClasses = useThemeCache((theme?: object, legacyMode: boolean = false) => {
     const globalVars = globalVariables();
@@ -18,7 +18,7 @@ export const richEditorFormClasses = useThemeCache((theme?: object, legacyMode: 
     const formElementVars = formElementsVariables();
     const style = styleFactory("richEditorForm");
     const overshoot = legacyMode ? 0 : vars.scrollContainer.overshoot;
-
+    w;
     const root = style({});
 
     const textWrap = style("textWrap", {

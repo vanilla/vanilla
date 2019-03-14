@@ -6,9 +6,9 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import TabPanel, { ITabPanel } from "pieces/TabPanel";
-import { uniqueIDFromPrefix } from "../../utility/idUtils";
-import TabButtonList, { ITabButton } from "pieces/TabButtonList";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { ITabPanel } from "@library/navigation/tabs/pieces/TabPanel";
+import { ITabButton } from "@library/navigation/tabs/pieces/TabButtonList";
 
 export interface ITab extends ITabPanel, ITabButton {}
 

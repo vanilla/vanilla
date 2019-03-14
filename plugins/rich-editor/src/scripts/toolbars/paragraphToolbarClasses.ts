@@ -3,9 +3,9 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { formElementsVariables } from "../../../../../library/src/scripts/forms/formElementStyles";
-import { unit } from "../../../../../library/src/scripts/styles/styleHelpers";
-import { useThemeCache, styleFactory } from "../../../../../library/src/scripts/styles/styleUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { unit } from "@library/styles/styleHelpers";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "../editor/richEditorVariables";
 import { calc } from "csx";
 

@@ -4,8 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import { unit } from "../../../../../../library/src/scripts/styles/styleHelpers";
-import { useThemeCache, styleFactory } from "../../../../../../library/src/scripts/styles/styleUtils";
+import { unit } from "@library/styles/styleHelpers";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "../../editor/richEditorVariables";
 import { calc, important, percent } from "csx";
 

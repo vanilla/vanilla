@@ -8,7 +8,7 @@ import Quill, { IFormats } from "quill/core";
 import React from "react";
 import { connect } from "react-redux";
 import { IStoreState, IEditorInstance } from "../@types/store";
-import { Omit } from "../../../../../library/src/scripts/@types/utils";
+import { Omit } from "@library/@types/utils";
 
 interface IContextProps {
     quill: Quill;

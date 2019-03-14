@@ -8,13 +8,10 @@ import React from "react";
 import Quill from "quill/core";
 
 import { withEditor, IWithEditorProps } from "../editor/context";
-import Formatter from "../quill/Formatter";
-import ParagraphToolbarMenuItems from "pieces/ParagraphToolbarMenuItems";
-import MenuItems from "pieces/MenuItems";
-import DropDown from "../../../../../library/src/scripts/flyouts/DropDown";
+import Formatter from "@rich-editor/quill/Formatter";
+import DropDown from "@library/flyouts/DropDown";
 
-import * as editorIcons from "../../../../../library/src/scripts/icons/editorIcons";
-import ActiveFormatIcon from "./pieces/ActiveFormatIcon";
+import * as editorIcons from "@library/icons/editorIcons";
 import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IWithEditorProps {

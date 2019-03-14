@@ -5,34 +5,34 @@
  */
 
 import { t } from "../dom/appUtils";
-import ConditionalWrap from "../layout/ConditionalWrap";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { Devices, IDeviceProps } from "../layout/DeviceChecker";
-import FlexSpacer from "../layout/FlexSpacer";
-import MobileDropDown from "pieces/MobileDropDown";
-import Container from "../layout/components/Container";
+import FlexSpacer from "@library/layout/FlexSpacer";
+import Container from "@library/layout/components/Container";
 import { Panel, PanelWidgetHorizontalPadding } from "../layout/PanelLayout";
-import MeBox from "./mebox/MeBox";
-import CompactMeBox from "./mebox/pieces/CompactMeBox";
-import CompactSearch from "./mebox/pieces/CompactSearch";
-import HeaderLogo from "./mebox/pieces/HeaderLogo";
-import VanillaHeaderNav from "./mebox/pieces/VanillaHeaderNav";
-import VanillaHeaderNavItem from "./mebox/pieces/VanillaHeaderNavItem";
-import { dummyNavigationData } from "./mebox/state/dummyNavigationData";
-import BackLink from "../routing/links/BackLink";
-import { withDevice } from "../layout/DeviceContext";
-import { IWithPagesProps, withPages } from "../routing/PagesContext";
-import { ScrollOffsetContext } from "../layout/ScrollOffsetContext";
+import MeBox from "@library/headers/mebox/MeBox";
+import CompactMeBox from "@library/headers/mebox/pieces/CompactMeBox";
+import CompactSearch from "@library/headers/mebox/pieces/CompactSearch";
+import HeaderLogo from "@library/headers/mebox/pieces/HeaderLogo";
+import VanillaHeaderNav from "@library/headers/mebox/pieces/VanillaHeaderNav";
+import VanillaHeaderNavItem from "@library/headers/mebox/pieces/VanillaHeaderNavItem";
+import { dummyNavigationData } from "@library/headers/mebox/state/dummyNavigationData";
+import BackLink from "@library/routing/links/BackLink";
+import { withDevice } from "@library/layout/DeviceContext";
+import { IWithPagesProps, withPages } from "@library/routing/PagesContext";
+import { ScrollOffsetContext } from "@library/layout/ScrollOffsetContext";
 import { ButtonTypes } from "@library/styles/buttonStyles";
 import { meBoxClasses } from "@library/headers/mebox/meBoxStyles";
-import { sticky } from "../styles/styleHelpers";
-import { vanillaHeaderClasses, vanillaHeaderVariables } from "vanillaHeaderStyles";
-import { LogoType } from "../theming/ThemeLogo";
-import UsersModel, { IInjectableUserState } from "../features/users/UsersModel";
+import { sticky } from "@library/styles/styleHelpers";
+import { LogoType } from "@library/theming/ThemeLogo";
+import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
 import classNames from "classnames";
 import * as React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import { style } from "typestyle";
+import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
+import MobileDropDown from "@library/headers/pieces/MobileDropDown";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.

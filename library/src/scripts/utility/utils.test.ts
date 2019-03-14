@@ -4,13 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import {
-    resolvePromisesSequentially,
-    matchAtMention,
-    hashString,
-    isInstanceOfOneOf,
-    splitStringLoosely,
-} from "";
+import { resolvePromisesSequentially, matchAtMention, hashString, isInstanceOfOneOf, splitStringLoosely } from "";
 import chai, { expect } from "chai";
 import asPromised from "chai-as-promised";
 chai.use(asPromised);

@@ -18,7 +18,7 @@ function importAll(r) {
     r.keys().forEach(r);
 }
 
-require("../../library/src/scripts/storybookConfig");
+require("@library/storybookConfig");
 
 function loadStories() {
     const storyFiles = require.context(

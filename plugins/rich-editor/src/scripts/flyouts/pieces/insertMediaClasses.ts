@@ -4,11 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { formElementsVariables } from "../../../../../../library/src/scripts/forms/formElementStyles";
-import { globalVariables } from "../../../../../../library/src/scripts/styles/globalStyleVars";
-import { layoutVariables } from "../../../../../../library/src/scripts/styles/layoutStyles";
-import { paddings, unit } from "../../../../../../library/src/scripts/styles/styleHelpers";
-import { useThemeCache, styleFactory } from "../../../../../../library/src/scripts/styles/styleUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { layoutVariables } from "@library/styles/layoutStyles";
+import { paddings, unit } from "@library/styles/styleHelpers";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "../../editor/richEditorVariables";
 
 export const insertMediaClasses = useThemeCache(() => {

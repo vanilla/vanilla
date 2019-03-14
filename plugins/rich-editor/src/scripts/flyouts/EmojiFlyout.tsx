@@ -5,13 +5,12 @@
  */
 
 import React from "react";
-import { getRequiredID, IOptionalComponentID, IRequiredComponentID } from "../../../../../library/src/scripts/utility/idUtils";
+import { getRequiredID, IOptionalComponentID, IRequiredComponentID } from "@library/utility/idUtils";
 import { forceSelectionUpdate } from "../quill/utility";
-import EmojiPicker from "pieces/EmojiPicker";
-import FlyoutToggle, { IFlyoutToggleChildParameters } from "../../../../../library/src/scripts/flyouts/FlyoutToggle";
-import { t } from "../../../../../library/src/scripts/dom/appUtils";
+import FlyoutToggle, { IFlyoutToggleChildParameters } from "@library/flyouts/FlyoutToggle";
+import { t } from "@library/dom/appUtils";
 
-import { emoji } from "../../../../../library/src/scripts/icons/editorIcons";
+import { emoji } from "@library/icons/editorIcons";
 import { richEditorClasses } from "../editor/richEditorClasses";
 import classNames from "classnames";
 import { ButtonTypes } from "@library/styles/buttonStyles";

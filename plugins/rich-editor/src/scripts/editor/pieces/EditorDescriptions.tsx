@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { t } from "../../../../../../library/src/scripts/dom/appUtils";
+import { t } from "@library/dom/appUtils";
 
 interface IProps {
     id: string;

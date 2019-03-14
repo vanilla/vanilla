@@ -3,9 +3,9 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { globalVariables } from "../../../../../../library/src/scripts/styles/globalStyleVars";
-import { singleBorder, colorOut, unit, userSelect } from "../../../../../../library/src/scripts/styles/styleHelpers";
-import { useThemeCache, styleFactory } from "../../../../../../library/src/scripts/styles/styleUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { singleBorder, colorOut, unit, userSelect } from "@library/styles/styleHelpers";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "../../editor/richEditorVariables";
 import { translateX } from "csx";
 

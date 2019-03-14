@@ -4,11 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { formElementsVariables } from "../../../../../library/src/scripts/forms/formElementStyles";
-import { standardAnimations } from "../../../../../library/src/scripts/styles/animationHelpers";
-import { globalVariables } from "../../../../../library/src/scripts/styles/globalStyleVars";
-import { componentThemeVariables } from "../../../../../library/src/scripts/styles/styleHelpers";
-import { useThemeCache } from "../../../../../library/src/scripts/styles/styleUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { standardAnimations } from "@library/styles/animationHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { componentThemeVariables } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { viewHeight } from "csx";
 
 export const richEditorVariables = useThemeCache(() => {

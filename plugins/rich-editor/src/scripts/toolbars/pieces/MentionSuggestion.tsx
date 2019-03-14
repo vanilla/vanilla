@@ -6,9 +6,9 @@
 
 import React from "react";
 import classNames from "classnames";
-import { t } from "../../../../../../library/src/scripts/dom/appUtils";
-import { splitStringLoosely } from "../../../../../../library/src/scripts/utility/utils";
-import { IUserFragment } from "../../../../../../library/src/scripts/@types/api";
+import { t } from "@library/dom/appUtils";
+import { splitStringLoosely } from "@library/utility/utils";
+import { IUserFragment } from "@library/@types/api";
 import { richEditorClasses } from "../../editor/richEditorClasses";
 
 export interface IMentionSuggestionData extends IUserFragment {

@@ -6,14 +6,14 @@
 
 import React from "react";
 import MenuItems from "MenuItems";
-import { t } from "../../../../../../library/src/scripts/dom/appUtils";
-import Formatter from "../../quill/Formatter";
+import { t } from "@library/dom/appUtils";
+import Formatter from "@rich-editor/quill/Formatter";
 import { IFormats, RangeStatic } from "quill/core";
-import { spoiler, codeBlock, blockquote, heading3, heading2, pilcrow } from "../../../../../../library/src/scripts/icons/editorIcons";
+import { spoiler, codeBlock, blockquote, heading3, heading2, pilcrow } from "@library/icons/editorIcons";
 import classNames from "classnames";
-import CodeBlockBlot from "../../quill/blots/blocks/CodeBlockBlot";
-import BlockquoteLineBlot from "../../quill/blots/blocks/BlockquoteBlot";
-import SpoilerLineBlot from "../../quill/blots/blocks/SpoilerBlot";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
+import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 
 interface IProps {
     formatter: Formatter;

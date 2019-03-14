@@ -6,13 +6,11 @@
 
 import React from "react";
 import { connect } from "react-redux";
-import UserSuggestionModel, { IInjectableSuggestionsProps } from "suggestion/UserSuggestionModel";
-import UserSuggestionActions from "suggestion/UserSuggestionActions";
-import apiv2 from "../../apiv2";
-import Tokens from "../../forms/select/Tokens";
-import { t } from "../../dom/appUtils";
-import { IComboBoxOption } from "../search/SearchBar";
-import { LoadStatus } from "../../@types/api";
+import apiv2 from "@library/apiv2";
+import Tokens from "@library/forms/select/Tokens";
+import { t } from "@library/dom/appUtils";
+import { IComboBoxOption } from "@library/search/SearchBar";
+import { LoadStatus } from "@library/@types/api";
 
 interface IProps extends IInjectableSuggestionsProps {
     suggestionActions: UserSuggestionActions;

@@ -6,18 +6,16 @@
 
 import React from "react";
 import KeyboardModule from "quill/modules/keyboard";
-import { isAllowedUrl, t } from "../../../../../library/src/scripts/dom/appUtils";
-import { getRequiredID, IRequiredComponentID } from "../../../../../library/src/scripts/utility/idUtils";
-import { IWithEditorProps, withEditor } from "../editor/context";
-import EmbedInsertionModule from "../quill/EmbedInsertionModule";
-import Popover from "pieces/Flyout";
-import FlyoutToggle, { IFlyoutToggleChildParameters } from "../../../../../library/src/scripts/flyouts/FlyoutToggle";
-import { forceSelectionUpdate } from "../quill/utility";
-import Button from "../../../../../library/src/scripts/forms/Button";
-import { embed } from "../../../../../library/src/scripts/icons/editorIcons";
+import { isAllowedUrl, t } from "@library/dom/appUtils";
+import { getRequiredID, IRequiredComponentID } from "@library/utility/idUtils";
+import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
+import FlyoutToggle, { IFlyoutToggleChildParameters } from "@library/flyouts/FlyoutToggle";
+import { forceSelectionUpdate } from "@rich-editor/quill/utility";
+import Button from "@library/forms/Button";
+import { embed } from "@library/icons/editorIcons";
 import classNames from "classnames";
-import { richEditorClasses } from "../editor/richEditorClasses";
-import { insertMediaClasses } from "pieces/insertMediaClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IWithEditorProps {
@@ -83,10 +81,7 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
                         <React.Fragment>
                             <p
                                 id={this.descriptionID}
-                                className={classNames(
-                                    "insertMedia-description",
-                                    classesRichEditor.popoverDescription,
-                                )}
+                                className={classNames("insertMedia-description", classesRichEditor.popoverDescription)}
                             >
                                 {t("Paste the URL of the media you want.")}
                             </p>

@@ -7,12 +7,12 @@
 import React from "react";
 import { Grid, AutoSizer } from "react-virtualized";
 import classNames from "classnames";
-import { t } from "../../../../../../library/src/scripts/dom/appUtils";
+import { t } from "@library/dom/appUtils";
 import { withEditor, IWithEditorProps } from "../../editor/context";
 import { EMOJIS, EMOJI_GROUPS } from "emojiData";
 import Popover from "Flyout";
 import EmojiButton from "EmojiButton";
-import { IFlyoutToggleChildParameters } from "../../../../../../library/src/scripts/flyouts/FlyoutToggle";
+import { IFlyoutToggleChildParameters } from "@library/flyouts/FlyoutToggle";
 import { EmojiGroupButton } from "EmojiGroupButton";
 import { emojiGroupsClasses } from "insertEmojiGroupClasses";
 import { insertEmojiClasses } from "insertEmojiClasses";

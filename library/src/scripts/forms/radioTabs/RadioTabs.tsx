@@ -8,7 +8,7 @@ import React from "react";
 import { uniqueIDFromPrefix } from "../utility/idUtils";
 import classNames from "classnames";
 import TabContext from "../contexts/TabContext";
-import { radioTabCss } from "radioTabStyles";
+import { radioTabCss } from "@library/forms/radioTabs/radioTabStyles";
 
 interface IProps {
     prefix: string;

@@ -22,7 +22,7 @@ import {
     emojiGroup_objects,
     emojiGroup_symbols,
     emojiGroup_flags,
-} from "../../../../../../library/src/scripts/icons/emojiGroups";
+} from "@library/icons/emojiGroups";
 
 export const EMOJI_GROUPS = [
     {

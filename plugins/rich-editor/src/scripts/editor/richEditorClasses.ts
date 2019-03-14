@@ -3,8 +3,7 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { richEditorVariables } from "plugins/rich-editor/src/scripts/editor/richEditorVariables";
-import { globalVariables } from "../../../../../library/src/scripts/styles/globalStyleVars";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     absolutePosition,
     appearance,
@@ -13,10 +12,11 @@ import {
     colorOut,
     unit,
     userSelect,
-} from "../../../../../library/src/scripts/styles/styleHelpers";
-import { styleFactory } from "../../../../../library/src/scripts/styles/styleUtils";
+} from "@library/styles/styleHelpers";
+import { styleFactory } from "@library/styles/styleUtils";
 import { calc, important, percent, px } from "csx";
 import memoize from "lodash/memoize";
+import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
 export const richEditorClasses = memoize((theme?: object, legacyMode: boolean = false) => {
     const globalVars = globalVariables();

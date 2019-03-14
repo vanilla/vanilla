@@ -6,17 +6,12 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { t } from "../../dom/appUtils";
-import { clear, close } from "../../icons";
 import { components } from "react-select";
-import ButtonLoader from "../../loaders/ButtonLoader";
 import { OptionProps } from "react-select/lib/components/Option";
 import { MenuProps, MenuListComponentProps } from "react-select/lib/components/Menu";
 import { ValueContainerProps } from "react-select/lib/components/containers";
 import { ControlProps } from "react-select/lib/components/Control";
 import { MultiValueRemoveProps } from "react-select/lib/components/MultiValue";
-import { tokensClasses } from "tokensStyles";
-import { dropDownClasses } from "../../flyouts/dropDownStyles";
 import { ButtonTypes } from "@library/styles/buttonStyles";
 
 /**

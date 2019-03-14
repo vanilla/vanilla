@@ -8,7 +8,7 @@ import LinkAsButton from "../routing/LinkAsButton";
 import { ILinkPages } from "SimplePagerModel";
 import classNames from "classnames";
 import * as React from "react";
-import { simplePagerClasses } from "simplePagerStyles";
+import { simplePagerClasses } from "@library/navigation/simplePagerStyles";
 
 interface IProps {
     url: string;

@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { ITabProps, withTabs } from "../contexts/TabContext";
+import { ITabProps, withTabs } from "@library/contexts/TabContext";
 
 interface IProps extends ITabProps {
     label: string;

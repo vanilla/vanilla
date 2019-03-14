@@ -9,16 +9,13 @@ import Quill from "quill/core";
 import Emitter from "quill/core/emitter";
 import Keyboard from "quill/modules/keyboard";
 import LinkBlot from "quill/formats/link";
-import { t, isAllowedUrl } from "../../../../../library/src/scripts/dom/appUtils";
-import ToolbarContainer from "pieces/ToolbarContainer";
-import { withEditor, IWithEditorProps } from "../editor/context";
-import InlineToolbarLinkInput from "pieces/InlineToolbarLinkInput";
-import { rangeContainsBlot } from "../quill/utility";
-import CodeBlockBlot from "../quill/blots/blocks/CodeBlockBlot";
-import Formatter from "../quill/Formatter";
-import InlineToolbarMenuItems from "pieces/InlineToolbarMenuItems";
-import FocusWatcher from "../../../../../library/src/scripts/utility/FocusWatcher";
-import { dropDownClasses } from "../../../../../library/src/scripts/flyouts/dropDownStyles";
+import { t, isAllowedUrl } from "@library/dom/appUtils";
+import { withEditor, IWithEditorProps } from "@rich-editor/editor/context";
+import { rangeContainsBlot } from "@rich-editor/quill/utility";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import Formatter from "@rich-editor/quill/Formatter";
+import FocusWatcher from "@library/utility/FocusWatcher";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import classNames from "classnames";
 
 interface IProps extends IWithEditorProps {}

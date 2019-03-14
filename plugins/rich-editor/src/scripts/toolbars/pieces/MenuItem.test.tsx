@@ -8,7 +8,7 @@ import React from "react";
 import { shallow } from "enzyme";
 import sinon from "sinon";
 import MenuItem from "MenuItem";
-import { bold } from "../../../../../../library/src/scripts/icons/editorIcons";
+import { bold } from "@library/icons/editorIcons";
 
 const noop = () => {
     return;

@@ -7,23 +7,18 @@
 import React from "react";
 import Quill, { Sources, DeltaStatic } from "quill/core";
 import uniqueId from "lodash/uniqueId";
-import debounce from "lodash/debounce";
 import isEqual from "lodash/isEqual";
 import Keyboard from "quill/modules/keyboard";
-import { withEditor, IWithEditorProps } from "../editor/context";
-import MentionSuggestionList from "pieces/MentionSuggestionList";
-import MentionAutoCompleteBlot from "../quill/blots/embeds/MentionAutoCompleteBlot";
-import { getBlotAtIndex } from "../quill/utility";
+import { withEditor, IWithEditorProps } from "@rich-editor/editor/context";
+import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
+import { getBlotAtIndex } from "@rich-editor/quill/utility";
 import { connect } from "react-redux";
-import { IMentionSuggestionData, IMentionProps } from "pieces/MentionSuggestion";
-import { IStoreState } from "../@types/store";
-import { LoadStatus } from "../../../../../library/src/scripts/@types/api";
+import { LoadStatus } from "@library/@types/api";
 import UserSuggestionModel, {
-    IUserSuggestionState,
     IInjectableSuggestionsProps,
-} from "../../../../../library/src/scripts/features/users/suggestion/UserSuggestionModel";
-import UserSuggestionActions from "../../../../../library/src/scripts/features/users/suggestion/UserSuggestionActions";
-import apiv2 from "../../../../../library/src/scripts/apiv2";
+} from "@library/features/users/suggestion/UserSuggestionModel";
+import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
+import apiv2 from "@library/apiv2";
 
 interface IProps extends IWithEditorProps, IInjectableSuggestionsProps {
     suggestionActions: UserSuggestionActions;

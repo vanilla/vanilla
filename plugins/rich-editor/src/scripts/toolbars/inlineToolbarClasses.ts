@@ -4,8 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import { styleFactory } from "../../../../../library/src/scripts/styles/styleUtils";
-import { unit } from "../../../../../library/src/scripts/styles/styleHelpers";
+import { styleFactory } from "@library/styles/styleUtils";
+import { unit } from "@library/styles/styleHelpers";
 import { richEditorVariables } from "../editor/richEditorVariables";
 import { percent } from "csx";
 import memoize from "lodash/memoize";

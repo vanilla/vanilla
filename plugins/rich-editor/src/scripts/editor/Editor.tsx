@@ -5,33 +5,31 @@
  */
 
 import React from "react";
-import { t } from "../../../../../library/src/scripts/dom/appUtils";
-import getStore from "../../../../../library/src/scripts/redux/getStore";
-import { debug, log } from "../../../../../library/src/scripts/utility/utils";
-import { delegateEvent, removeDelegatedEvent } from "../../../../../library/src/scripts/utility/domUtils";
-import MentionToolbar from "../toolbars/MentionToolbar";
-import InlineToolbar from "../toolbars/InlineToolbar";
+import { t } from "@library/dom/appUtils";
+import getStore from "@library/redux/getStore";
+import { debug, log } from "@library/utility/utils";
+import { delegateEvent, removeDelegatedEvent } from "@library/utility/domUtils";
+import MentionToolbar from "@rich-editor/toolbars/MentionToolbar";
+import InlineToolbar from "@rich-editor/toolbars/InlineToolbar";
 import { EditorProvider } from "./context";
-import EditorDescriptions from "pieces/EditorDescriptions";
+import EditorDescriptions from "@rich-editor/editor/pieces/EditorDescriptions";
 import { Provider as ReduxProvider } from "react-redux";
-import { actions } from "../state/instance/instanceActions";
-import { getIDForQuill, SELECTION_UPDATE } from "../quill/utility";
+import { actions } from "@rich-editor/state/instance/instanceActions";
+import { getIDForQuill, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import { IStoreState } from "../@types/store";
 import EmbedInsertionModule from "../quill/EmbedInsertionModule";
 import Quill, { DeltaOperation, Sources, QuillOptionsStatic } from "quill/core";
 import { hot } from "react-hot-loader";
-import registerQuill from "../quill/registerQuill";
+import registerQuill from "@rich-editor/quill/registerQuill";
 import uniqueId from "lodash/uniqueId";
 import classNames from "classnames";
-import HeaderBlot from "../quill/blots/blocks/HeaderBlot";
-import { Devices } from "../../../../../library/src/scripts/layout/DeviceChecker";
-import ParagraphToolbar from "../toolbars/ParagraphToolbar";
-import throttle from "lodash/throttle";
-import EmbedBar from "pieces/EmbedBar";
+import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
+import { Devices } from "@library/layout/DeviceChecker";
+import ParagraphToolbar from "@rich-editor/toolbars/ParagraphToolbar";
 import hljs from "highlight.js";
-import { richEditorClasses } from "richEditorClasses";
-import { richEditorFormClasses } from "richEditorFormClasses";
-import { userContentClasses } from "../../../../../library/src/scripts/content/userContentStyles";
+import { userContentClasses } from "@library/content/userContentStyles";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;

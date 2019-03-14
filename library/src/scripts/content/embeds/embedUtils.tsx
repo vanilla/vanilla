@@ -8,7 +8,7 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
-import { IDiscussionEmbed, ICommentEmbed, IScrapeData } from "../../../../../applications/dashboard/src/scripts/@types/api";
+import { IDiscussionEmbed, ICommentEmbed, IScrapeData } from "@dashboard/@types/api";
 
 export const FOCUS_CLASS = "embed-focusableElement";
 

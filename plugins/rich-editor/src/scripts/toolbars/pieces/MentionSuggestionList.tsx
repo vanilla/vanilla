@@ -7,17 +7,13 @@
 import React from "react";
 import classNames from "classnames";
 import { withEditor, IWithEditorProps } from "../../editor/context";
-import { t } from "../../../../../../library/src/scripts/dom/appUtils";
+import { t } from "@library/dom/appUtils";
 import { RangeStatic } from "quill/core";
-import MentionSuggestion, {
-    IMentionProps,
-    MentionSuggestionLoading,
-    MentionSuggestionSpacer,
-} from "MentionSuggestion";
+import MentionSuggestion, { IMentionProps, MentionSuggestionLoading, MentionSuggestionSpacer } from "MentionSuggestion";
 import ToolbarPositioner from "ToolbarPositioner";
 import { richEditorClasses } from "../../editor/richEditorClasses";
 import { richEditorFlyoutClasses } from "../../flyouts/pieces/flyoutClasses";
-import { dropDownClasses } from "../../../../../../library/src/scripts/flyouts/dropDownStyles";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
 interface IProps extends IWithEditorProps {
     mentionProps: Array<Partial<IMentionProps>>;

@@ -7,8 +7,8 @@
 import React, { MouseEvent } from "react";
 import EmbedInsertionModule from "../../quill/EmbedInsertionModule";
 import { withEditor, IWithEditorProps } from "../context";
-import { isFileImage } from "../../../../../../library/src/scripts/utility/utils";
-import { image, attachment } from "../../../../../../library/src/scripts/icons/editorIcons";
+import { isFileImage } from "@library/utility/utils";
+import { image, attachment } from "@library/icons/editorIcons";
 import classNames from "classnames";
 import { richEditorClasses } from "../richEditorClasses";
 

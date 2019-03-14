@@ -4,14 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { percent, px, quote, calc } from "csx";
-import { globalVariables } from "../styles/globalStyleVars";
-import { unit } from "../styles/styleHelpers";
-import { vanillaHeaderVariables } from "vanillaHeaderStyles";
-import { flexHelper } from "../styles/styleHelpers";
-import { layoutVariables } from "../styles/layoutStyles";
-import { formElementsVariables } from "../forms/formElementStyles";
-import { styleFactory } from "../styles/styleUtils";
+import { percent, px, calc } from "csx";
+import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { layoutVariables } from "@library/styles/layoutStyles";
+import { flexHelper } from "@library/styles/styleHelpers";
+import { styleFactory } from "@library/styles/styleUtils";
 
 export function vanillaHeaderNavigation() {
     const globalVars = globalVariables();

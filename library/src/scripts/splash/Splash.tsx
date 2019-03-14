@@ -6,15 +6,15 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import Heading from "../layout/Heading";
-import Container from "../layout/components/Container";
-import { PanelWidget, PanelWidgetHorizontalPadding } from "../layout/PanelLayout";
-import { withDevice } from "../layout/DeviceContext";
-import { IDeviceProps, Devices } from "../layout/DeviceChecker";
-import IndependentSearch from "../features/search/IndependentSearch";
-import { splashStyles, splashVariables } from "splashStyles";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
-import { t } from "../dom/appUtils";
+import { Devices, IDeviceProps } from "@library/layout/DeviceChecker";
+import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
+import { splashStyles } from "@library/splash/splashStyles";
+import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
+import Container from "@library/layout/components/Container";
+import Heading from "@library/layout/Heading";
+import IndependentSearch from "@library/features/search/IndependentSearch";
+import { t } from "@library/utility/appUtils";
+import { withDevice } from "@library/layout/DeviceContext";
 
 interface IProps extends IDeviceProps {
     title: string; // Often the message to display isn't the real H1

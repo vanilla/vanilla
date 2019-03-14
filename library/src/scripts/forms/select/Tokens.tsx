@@ -6,13 +6,12 @@
 
 import * as React from "react";
 import Select from "react-select";
-import { getRequiredID, IOptionalComponentID } from "../../utility/idUtils";
+import { getRequiredID, IOptionalComponentID } from "@library/utility/idUtils";
 import classNames from "classnames";
-import { t } from "../../dom/appUtils";
-import Paragraph from "../../layout/Paragraph";
-import * as selectOverrides from "./overwrites";
-import { IComboBoxOption } from "../../features/search/SearchBar";
-import { tokensClasses } from "tokensStyles";
+import { t } from "@library/dom/appUtils";
+import Paragraph from "@library/layout/Paragraph";
+import * as selectOverrides from "@library/overwrites";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
 
 interface IProps extends IOptionalComponentID {
     label: string;

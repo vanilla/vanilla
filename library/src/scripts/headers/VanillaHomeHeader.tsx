@@ -6,8 +6,7 @@
 
 import * as React from "react";
 import { Devices, IDeviceProps } from "../layout/DeviceChecker";
-import { withDevice } from "../layout/DeviceContext";
-import VanillaMobileHomeHeader from "pieces/VanillaMobileHomeHeader";
+import { withDevice } from "@library/layout/DeviceContext";
 import VanillaHeader from "VanillaHeader";
 
 interface IProps extends IDeviceProps {}

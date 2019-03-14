@@ -5,13 +5,13 @@
  */
 
 import React from "react";
-import { t } from "../../../../../../library/src/scripts/dom/appUtils";
-import CloseButton from "../../../../../../library/src/scripts/navigation/CloseButton";
+import { t } from "@library/dom/appUtils";
+import CloseButton from "@library/navigation/CloseButton";
 import { withEditor, IWithEditorProps } from "../../editor/context";
 import { richEditorClasses } from "../../editor/richEditorClasses";
 import classNames from "classnames";
 import { insertLinkClasses } from "insertLinkClasses";
-import { dropDownClasses } from "../../../../../../library/src/scripts/flyouts/dropDownStyles";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
 interface IProps extends IWithEditorProps {
     inputRef: React.RefObject<HTMLInputElement>;

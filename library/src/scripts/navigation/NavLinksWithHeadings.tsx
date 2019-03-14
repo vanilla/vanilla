@@ -6,13 +6,13 @@
 
 import React, { Component } from "react";
 
-import { t } from "../dom/appUtils";
-import Heading from "../layout/Heading";
+import { t } from "@library/dom/appUtils";
+import Heading from "@library/layout/Heading";
 import classNames from "classnames";
 import NavLinks from "NavLinks";
-import ScreenReaderContent from "../utility/ScreenReaderContent";
-import { ILinkListData } from "../@types/api";
-import { navLinksClasses } from "navLinksStyles";
+import ScreenReaderContent from "@library/utility/ScreenReaderContent";
+import { ILinkListData } from "@library/@types/api";
+import { navLinksClasses } from "@library/navigation/navLinksStyles";
 
 interface IProps {
     title: string; // For accessibility, title of group

@@ -18,7 +18,7 @@ import { dayPickerClasses } from "@library/forms/datePickerStyles";
 import classNames from "classnames";
 import { leftChevron, rightChevron } from "@library/icons/common";
 import { formatDate, parseDate } from "react-day-picker/moment";
-"";
+
 interface IProps {
     value: string; // ISO formatted date
     onChange: (value: string) => void;

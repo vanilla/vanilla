@@ -16,7 +16,7 @@ import {
 } from "@rich-editor/quill/utility";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import OpUtils from "@rich-editor/__tests__/OpUtils";
-import { _executeReady } from "@library/application";
+import { _executeReady } from "@library/dom/appUtils";
 
 const prettyNewline = (contents: string) => contents.replace(/\n/g, "↵ ");
 

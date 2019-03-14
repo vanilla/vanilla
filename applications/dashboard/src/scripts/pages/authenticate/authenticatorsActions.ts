@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { generateApiActionCreators, ActionsUnion, apiThunk } from "@library/state/utility";
+import { generateApiActionCreators, ActionsUnion, apiThunk } from "@library/redux/utility";
 import { IUserAuthenticator } from "@dashboard/@types/api";
 
 export const GET_USER_AUTHENTICATORS_REQUEST = "GET_USER_AUTHENTICATORS_REQUEST";

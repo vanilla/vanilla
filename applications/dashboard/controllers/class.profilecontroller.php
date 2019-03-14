@@ -391,7 +391,7 @@ class ProfileController extends Gdn_Controller {
         // Decide if we can *see* email
         $this->setData('_CanViewPersonalInfo', Gdn::session()->UserID == val('UserID', $user) || checkPermission('Garden.PersonalInfo.View') || checkPermission('Garden.Users.Edit'));
 
-        // Define gender dropdown options
+        // Define gender flyouts options
         $this->GenderOptions = [
             'u' => t('Unspecified'),
             'm' => t('Male'),

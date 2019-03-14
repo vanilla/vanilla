@@ -5,8 +5,8 @@
  */
 
 import editorReducer from "@rich-editor/state/editorReducer";
-import { registerReducer } from "@library/state/reducerRegistry";
-import { onReady, onContent } from "@library/application";
+import { registerReducer } from "@library/redux/reducerRegistry";
+import { onReady, onContent } from "@library/dom/appUtils";
 
 onReady(() => {
     registerReducer("editor", editorReducer);

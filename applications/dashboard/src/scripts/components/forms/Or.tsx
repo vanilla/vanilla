@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { t } from "@library/application";
+import { t } from "@library/dom/appUtils";
 
 interface IProps {
     visible: boolean;

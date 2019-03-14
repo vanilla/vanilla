@@ -277,7 +277,7 @@
   margin: 5px 0; }
 
 /**
- * Colors dropdown
+ * Colors flyouts
  */
 .editor-dropdown-color .editor-insert-dialog {
   width: 56px; }
@@ -322,7 +322,7 @@
   margin-left: 10px; }
 
 /**
- * Headers dropdown
+ * Headers flyouts
  */
 .editor-dd-format + .editor-insert-dialog {
   padding: 5px 0;
@@ -356,7 +356,7 @@
     vertical-align: middle; }
 
 /**
- * File and image dropdown
+ * File and image flyouts
  */
 .editor-file-image {
   padding: 0; }
@@ -685,7 +685,7 @@ directly on the iframe's bodybox contenteditable. */
 
 /**
  * These two are not actually inserted into the editor. They are only used for
- * the dropdown.
+ * the flyouts.
  */
 .post-font-size-h1 {
   font-size: 21px;
@@ -698,7 +698,7 @@ directly on the iframe's bodybox contenteditable. */
   line-height: 26px !important; }
 
 /* Colours based on http://clrs.cc/
-cell-* are used for the dropdown */
+cell-* are used for the flyouts */
 .post-color-black {
   color: #111111; }
 

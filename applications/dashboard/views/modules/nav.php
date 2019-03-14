@@ -34,7 +34,7 @@ if (!function_exists('renderNav')) {
 		    <?php echo '<span class="text">'.val('text', $item).'</span>'; ?>
 		</a>
             <?php }
-            if (val('type', $item) == 'dropdown') {
+            if (val('type', $item) == 'flyouts') {
 		echo val('dropdownmenu', $item);
 	    }
 	    if (val('type', $item) == 'divider') {

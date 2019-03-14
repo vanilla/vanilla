@@ -5,13 +5,13 @@
  * @license GPL-2.0-only
  */
 
-import { formatUrl, t, getMeta } from "@library/application";
-import { indexArrayByKey } from "@library/utility";
+import { formatUrl, t, getMeta } from "@library/dom/appUtils";
+import { indexArrayByKey } from "@library/utility/utils";
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 import qs from "qs";
 import { sprintf } from "sprintf-js";
 import { IFieldError, LoadStatus, ILoadable, IApiError } from "@library/@types/api";
-import { humanFileSize } from "@library/utils/fileUtils";
+import { humanFileSize } from "@library/utility/fileUtils";
 
 function fieldErrorTransformer(responseData) {
     if (responseData && responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {

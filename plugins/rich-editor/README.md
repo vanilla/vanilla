@@ -54,7 +54,7 @@ This plugin is primarily javascript based. The main entrypoint for the applicati
 
 The [`RichEditor` class](./src/scripts/RichEditor.js) is responsible for a single editor instance. It uses our extended [`Quill` class](./src/scripts/Quill.js) which loads all of our custom Blots from [/blots](./src/scripts/blots) and [/formats](.src/scripts/formats).
 
-A custom [Quill theme](./src/scripts/QuillTheme.jsx) is responsible for mounting the various React components that make up the editor's UI. These components can be found in [/components](./src/scripts/components) and primarily consist of
+A custom [Quill theme](./src/scripts/QuillTheme.jsx) is responsible for mounting the various React components that make up the editor's UI. These components can be found in [/components](src/scripts/ui) and primarily consist of
 
 -   An emoji picker.
 -   Block and inline formatting toolbars.

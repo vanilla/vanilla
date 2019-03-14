@@ -59,7 +59,7 @@ if (!function_exists('getOptions')):
      * Render options that the user has for this category. Returns an empty string if the session isn't valid.
      *
      * @param $category The category to render the options for.
-     * @return DropdownModule|string A dropdown with the category options or an empty string if the session is not valid.
+     * @return DropdownModule|string A flyouts with the category options or an empty string if the session is not valid.
      * @throws Exception
      */
     function getOptions($category) {
@@ -69,7 +69,7 @@ if (!function_exists('getOptions')):
         $sender = Gdn::controller();
         $categoryID = val('CategoryID', $category);
 
-        $dropdown = new DropdownModule('dropdown', '', 'OptionsMenu');
+        $dropdown = new DropdownModule('flyouts', '', 'OptionsMenu');
         $tk = urlencode(Gdn::session()->transientKey());
         $followed = val('Followed', $category);
 

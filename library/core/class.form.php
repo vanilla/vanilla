@@ -30,7 +30,7 @@ class Gdn_Form extends Gdn_Pluggable {
             'button' => 'Button',
             'button-element' => 'input',
             'checkbox' => 'CheckBoxLabel',
-            'dropdown' => '',
+            'flyouts' => '',
             'file' => '',
             'radio' => 'RadioLabel',
             'textarea' => 'TextBox',
@@ -56,7 +56,7 @@ class Gdn_Form extends Gdn_Pluggable {
             'radio-container' => 'radio',
             'smallbutton' => 'btn btn-sm',
             'textarea' => 'form-control',
-            'dropdown' => 'form-control',
+            'flyouts' => 'form-control',
             'input-wrap' => 'input-wrap',
             'form-group' => 'form-group',
             'form-footer' => 'js-modal-footer form-footer'
@@ -520,7 +520,7 @@ class Gdn_Form extends Gdn_Pluggable {
         unset($options['Filter'], $options['PermFilter'], $options['Context'], $options['CategoryData']);
 
         if (!isset($options['class'])) {
-            $options['class'] = $this->getStyle('dropdown');
+            $options['class'] = $this->getStyle('flyouts');
         }
 
         // Opening select tag
@@ -1390,7 +1390,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *               String to create disabled
      *               first option.
      *   InlineErrors  Show inline error message?   TRUE
-     *               Allows disabling per-dropdown
+     *               Allows disabling per-flyouts
      *               for multi-fields like date()
      *
      * @return string
@@ -1405,7 +1405,7 @@ class Gdn_Form extends Gdn_Pluggable {
         }
 
         if (!isset($attributes['class'])) {
-            $attributes['class'] = $this->getStyle('dropdown');
+            $attributes['class'] = $this->getStyle('flyouts');
         } else {
             $attributes['class'] = $this->translateClasses($attributes['class']);
         }
@@ -1495,7 +1495,7 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
-     * Returns the xhtml for a dropdown list with option groups.
+     * Returns the xhtml for a flyouts list with option groups.
      * @param string $fieldName
      * @param array $data
      * @param string $groupField
@@ -2107,7 +2107,7 @@ PASSWORDMETER;
      *   Value       A string or array of strings.  $this->_DataArray->$fieldName
      *   Default     The default value.             empty
      *   InlineErrors  Show inline error message?   TRUE
-     *               Allows disabling per-dropdown
+     *               Allows disabling per-flyouts
      *               for multi-fields like date()
      *
      * @return string
@@ -3021,7 +3021,7 @@ PASSWORDMETER;
                 case 'toggle':
                     $result .= $this->toggle($row['Name'], $labelCode, $row['Options'], $description);
                     break;
-                case 'dropdown':
+                case 'flyouts':
                     $row['Options']['Wrap'] = true;
                     $result .= $labelWrap
                         .$this->dropDown($row['Name'], $row['Items'], $row['Options']);

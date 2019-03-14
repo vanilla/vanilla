@@ -37,8 +37,8 @@ $enabled = c('Tagging.Discussions.Enabled');
 </div>
 <div class="tagging-settings js-foggy" <?php echo $enabled ? 'data-is-foggy="false"' : 'data-is-foggy="true"'; ?>>
     <?php
-    $tagTypesDropdown = new DropdownModule('', '', 'dropdown-filter');
-    $tagTypesDropdown->setView('dropdown-twbs');
+    $tagTypesDropdown = new DropdownModule('', '', 'flyouts-filter');
+    $tagTypesDropdown->setView('flyouts-twbs');
 
     foreach ($tagTypes as $tagTypeName => $tagMeta) {
         $tagName = ($tagMeta['key'] == '' || strtolower($tagMeta['key']) == 'tags') ? 'Tags' : $tagTypeName;
@@ -81,9 +81,9 @@ $enabled = c('Tagging.Discussions.Enabled');
             $dropdown = '';
 
             if ((val('Type', $tag, '') == '')) {
-                // add dropdown
-                $dropdown = new DropdownModule('dropdown', '', '', 'dropdown-menu-right');
-                $dropdown->setView('dropdown-twbs')
+                // add flyouts
+                $dropdown = new DropdownModule('flyouts', '', '', 'flyouts-menu-right');
+                $dropdown->setView('flyouts-twbs')
                     ->addLink(t('Edit'), "/settings/tags/edit/{$tag['TagID']}", 'edit', 'js-modal')
                     ->addDivider()
                     ->addLink(t('Delete'), "/settings/tags/delete/{$tag['TagID']}", 'delete', 'js-modal-confirm');

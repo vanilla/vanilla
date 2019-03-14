@@ -127,7 +127,7 @@ jQuery(document).ready(function($) {
    // Hack: When tokenLimit is reached, hintText will not go away after input is clicked
    // Force it to go away when we click the Body textarea
    $('#Form_Body').click(function() {
-      $('.token-input-dropdown').css('display', 'none');
+      $('.token-input-flyouts').css('display', 'none');
    });
 
    $('#Form_AddPeople :submit').click(function() {

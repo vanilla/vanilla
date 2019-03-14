@@ -5,8 +5,8 @@
  * @license GPL-2.0-only
  */
 
-import { formatUrl, getMeta } from "@library/application";
-import { log, matchAtMention as _matchAtMention } from "@library/utility";
+import { formatUrl, getMeta } from "@library/dom/appUtils";
+import { log, matchAtMention as _matchAtMention } from "@library/utility/utils";
 
 // Store cache results in an outer scoped variable., so all instances share the same data
 // and can build the cache together.
@@ -19,7 +19,7 @@ let rawMatch: string | undefined;
 // Set minimum characters to type for @mentions to fire
 const minCharacters = getMeta("mentionMinChars", 2);
 
-// Max suggestions to show in dropdown.
+// Max suggestions to show in flyouts.
 const maxSuggestions = getMeta("mentionSuggestionCount", 5);
 
 // Server response limit. This should match the limit set in

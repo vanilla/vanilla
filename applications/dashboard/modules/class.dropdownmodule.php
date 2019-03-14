@@ -1,7 +1,7 @@
 <?php
 
 /**
- * A dropdown menu module.
+ * A flyouts menu module.
  *
  * @author Becky Van Bussel <becky@vanillaforums.com>
  * @copyright 2015 Vanilla Forums, Inc
@@ -10,9 +10,9 @@
  */
 
 /**
- * A flawlessly configurable dropdown menu module.
+ * A flawlessly configurable flyouts menu module.
  *
- * The module includes a dropdown trigger and menu items. Menu items can be
+ * The module includes a flyouts trigger and menu items. Menu items can be
  *
  * **link**    - An link item.
  * **group**   - A group item to create a logical grouping of menu items
@@ -31,8 +31,8 @@
  *
  * Here is an example menu creation:
  *
- * $dropdown = new dropdownModule('my-dropdown');
- * $dropdown->setTrigger('A New Name')
+ * $flyouts = new dropdownModule('my-flyouts');
+ * $flyouts->setTrigger('A New Name')
  * ->addLink('Link 1', '#') // automatically creates key: item1
  * ->addDivider() // automatically creates key: item2
  * ->addLink('Link 2', '#', 'link2', 'danger') // creates item with key: link2
@@ -47,7 +47,7 @@
  * ->addLink('Link 8', '#', 'group2.link8', '', array(), array('icon' => 'flame')) // adds to Group 2
  * ->addLink('Link 9', '#', 'group1.link9') // adds to Group 1
  * ->addLink('Link 10', '#', 'group1.link10'); // adds to Group 1
- * echo $dropdown;
+ * echo $flyouts;
  *
  * Which results in a menu:
  *
@@ -79,7 +79,7 @@ class DropdownModule extends Gdn_Module {
     private $triggerId;
 
     /**
-     * @var array Collection of attributes for the dropdown menu trigger.
+     * @var array Collection of attributes for the flyouts menu trigger.
      * - **type**: string - One of the $triggerTypes.
      * - **text**: string - Text on the trigger.
      * - **cssClass**: string - CSS class for the trigger.
@@ -96,7 +96,7 @@ class DropdownModule extends Gdn_Module {
     private $triggerTypes = ['button', 'anchor'];
 
     /**
-     * @var string A potential CSS class of the dropdown menu wrapper container.
+     * @var string A potential CSS class of the flyouts menu wrapper container.
      */
     private $cssClass;
 
@@ -106,7 +106,7 @@ class DropdownModule extends Gdn_Module {
     private $listCssClass = '';
 
     /**
-     * @var string The dropdown menu wrapper container element tag.
+     * @var string The flyouts menu wrapper container element tag.
      */
     private $tag = 'div';
 
@@ -115,11 +115,11 @@ class DropdownModule extends Gdn_Module {
      *
      * @param string $triggerId The html id value of the trigger tag. Needs to be unique.
      * @param string $triggerText Text on the trigger.
-     * @param string $cssClass A potential CSS class of the dropdown menu wrapper container.
+     * @param string $cssClass A potential CSS class of the flyouts menu wrapper container.
      * @param string $listCssClass A potential CSS class of the list <ul> block.
      * @param bool $useCssPrefix Whether to use CSS prefixes on the dropmenu items.
      */
-    public function __construct($triggerId = 'dropdown', $triggerText = '', $cssClass = '', $listCssClass = '', $useCssPrefix = true) {
+    public function __construct($triggerId = 'flyouts', $triggerText = '', $cssClass = '', $listCssClass = '', $useCssPrefix = true) {
         parent::__construct();
         $this->flatten = true;
         $this->useCssPrefix = $useCssPrefix;
@@ -130,8 +130,8 @@ class DropdownModule extends Gdn_Module {
         $this->listCssClass = trim($listCssClass);
 
         if ($useCssPrefix) {
-            $this->headerCssClassPrefix = 'dropdown-header';
-            $this->linkCssClassPrefix = 'dropdown-menu-link';
+            $this->headerCssClassPrefix = 'flyouts-header';
+            $this->linkCssClassPrefix = 'flyouts-menu-link';
             $this->dividerCssClassPrefix = 'divider';
         }
     }

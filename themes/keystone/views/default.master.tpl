@@ -180,7 +180,7 @@
                                     </div>
                                 {/if}
                                 <div class="Frame-row SearchBoxMobile">
-                                    {if !$SectionGroups && !inSection(["SearchResults"])}
+                                    {if !$SectionGroups && !inSection(["ResultList"])}
                                         <div class="SearchBox js-sphinxAutoComplete" role="search">
                                             {module name="AdvancedSearchModule"}
                                         </div>

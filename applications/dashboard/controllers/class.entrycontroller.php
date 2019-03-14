@@ -1410,7 +1410,7 @@ class EntryController extends Gdn_Controller {
 
         $this->Form->setModel($this->UserModel);
 
-        // Define gender dropdown options
+        // Define gender flyouts options
         $this->GenderOptions = [
             'u' => t('Unspecified'),
             'm' => t('Male'),
@@ -1652,7 +1652,7 @@ class EntryController extends Gdn_Controller {
         $this->View = 'registerinvitation';
         $this->Form->setModel($this->UserModel);
 
-        // Define gender dropdown options
+        // Define gender flyouts options
         $this->GenderOptions = [
             'u' => t('Unspecified'),
             'm' => t('Male'),

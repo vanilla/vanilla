@@ -971,18 +971,18 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
-     * Puts together a dropdown for a category's settings.
+     * Puts together a flyouts for a category's settings.
      *
-     * @param object|array $category The category to get the settings dropdown for.
-     * @return DropdownModule The dropdown module for the settings.
+     * @param object|array $category The category to get the settings flyouts for.
+     * @return DropdownModule The flyouts module for the settings.
      */
     public static function getCategoryDropdown($category) {
 
         $triggerIcon = dashboardSymbol(self::displayAsIconName($category['DisplayAs']));
 
-        $cdd = new DropdownModule('', '', 'dropdown-category-options', 'dropdown-menu-right');
+        $cdd = new DropdownModule('', '', 'flyouts-category-options', 'flyouts-menu-right');
         $cdd->setTrigger($triggerIcon, 'button', 'btn', 'caret-down', '', ['data-id' => val('CategoryID', $category)]);
-        $cdd->setView('dropdown-twbs');
+        $cdd->setView('flyouts-twbs');
         $cdd->setForceDivider(true);
 
         $cdd->addGroup('', 'edit')

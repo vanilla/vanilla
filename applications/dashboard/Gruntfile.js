@@ -60,8 +60,8 @@ module.exports = function (grunt) {
             src: [
               'bootstrap/js/dist/collapse.js'
               , 'bootstrap/js/dist/collapse.js.map'
-              , 'bootstrap/js/dist/dropdown.js'
-              , 'bootstrap/js/dist/dropdown.js.map'
+              , 'bootstrap/js/dist/flyouts.js'
+              , 'bootstrap/js/dist/flyouts.js.map'
               , 'bootstrap/js/dist/modal.js'
               , 'bootstrap/js/dist/modal.js.map'
               , 'bootstrap/js/dist/tooltip.js'

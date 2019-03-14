@@ -4,14 +4,14 @@
  */
 
 import { getFieldErrors, getGlobalErrorMessage } from "@library/apiv2";
-import { t } from "@library/application";
+import { t } from "@library/dom/appUtils";
 import React from "react";
 import { withRouter, Link } from "react-router-dom";
-import InputTextBlock from "@library/components/forms/InputTextBlock";
-import Checkbox from "@library/components/forms/Checkbox";
-import ButtonSubmit from "@library/components/forms/ButtonSubmit";
-import Paragraph from "@library/components/Paragraph";
-import { IRequiredComponentID, getRequiredID } from "@library/componentIDs";
+import InputTextBlock from "@library/forms/InputTextBlock";
+import Checkbox from "@library/forms/Checkbox";
+import ButtonSubmit from "@library/forms/ButtonSubmit";
+import Paragraph from "@library/layout/Paragraph";
+import { IRequiredComponentID, getRequiredID } from "@library/utility/idUtils";
 import { IStoreState, IPasswordState } from "@dashboard/@types/state";
 import { IAuthenticatePasswordParams } from "@dashboard/@types/api";
 import { connect } from "react-redux";

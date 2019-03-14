@@ -17,7 +17,7 @@
  * **group**    - A group item to create a logical grouping of menu items
  *                for sorting purposes, and/or to create a heading.
  * **divider**  - A dividing line.
- * **dropdown** - A DropdownModule object.
+ * **flyouts** - A DropdownModule object.
  *
  * Each item must have a unique key. If not supplied, the class will generate
  * one in the format: 'item*', where * is an auto incrementing number.
@@ -39,14 +39,14 @@ class NavModule extends Gdn_Module {
 
 
     /**
-     * @var string CSS prefix for a dropdown item.
+     * @var string CSS prefix for a flyouts item.
      */
-    private $dropdownCssClassPrefix = 'nav-dropdown';
+    private $dropdownCssClassPrefix = 'nav-flyouts';
 
     /**
      *
      *
-     * @param string $cssClass A potential CSS class of the dropdown menu wrapper container.
+     * @param string $cssClass A potential CSS class of the flyouts menu wrapper container.
      * @param bool $useCssPrefix Whether to use CSS prefixes on the nav items.
      */
     public function __construct($cssClass = '', $useCssPrefix = true) {
@@ -64,14 +64,14 @@ class NavModule extends Gdn_Module {
     }
 
     /**
-     * @return string CSS prefix for a dropdown item.
+     * @return string CSS prefix for a flyouts item.
      */
     public function getDropdownCssClassPrefix() {
         return $this->dropdownCssClassPrefix;
     }
 
     /**
-     * @param string $dropdownCssClassPrefix CSS prefix for a dropdown item.
+     * @param string $dropdownCssClassPrefix CSS prefix for a flyouts item.
      * @return NavModule $this The calling object.
      */
     public function setDropdownCssClassPrefix($dropdownCssClassPrefix) {
@@ -96,13 +96,13 @@ class NavModule extends Gdn_Module {
     }
 
     /**
-     * Add a dropdown to the items array if it satisfies the $isAllowed condition.
+     * Add a flyouts to the items array if it satisfies the $isAllowed condition.
      *
      * @param bool|string|array $isAllowed Either a boolean to indicate whether to actually add the item
      * or a permission string or array of permission strings (full match) to check.
-     * @param DropdownModule $dropdown The dropdown menu to add.
+     * @param DropdownModule $dropdown The flyouts menu to add.
      * @param string $key The item's key (for sorting and CSS targeting).
-     * @param string $cssClass The dropdown wrapper's CSS class.
+     * @param string $cssClass The flyouts wrapper's CSS class.
      * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
      * @return NavModule $this The calling object.
      */
@@ -115,11 +115,11 @@ class NavModule extends Gdn_Module {
     }
 
     /**
-     * Add a dropdown menu to the items array.
+     * Add a flyouts menu to the items array.
      *
-     * @param DropdownModule $dropdown The dropdown menu to add.
+     * @param DropdownModule $dropdown The flyouts menu to add.
      * @param string $key The item's key (for sorting and CSS targeting).
-     * @param string $cssClass The dropdown wrapper's CSS class.
+     * @param string $cssClass The flyouts wrapper's CSS class.
      * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
      * @return NavModule $this The calling object.
      * @throws Exception
@@ -128,7 +128,7 @@ class NavModule extends Gdn_Module {
         if (is_a($dropdown, 'DropdownModule')) {
             $dropdown->setTag('li');
             $dropdown->prepare();
-            $dropdownItem = ['type' => 'dropdown'];
+            $dropdownItem = ['type' => 'flyouts'];
             if ($key) {
                 $dropdownItem['key'] = $key;
             }
@@ -137,7 +137,7 @@ class NavModule extends Gdn_Module {
             }
             $dropdownItem['dropdownmenu'] = $dropdown;
             $dropdownItem['cssClass'] = $cssClass.' '.$this->buildCssClass($this->dropdownCssClassPrefix, $dropdownItem);
-            $this->addItem('dropdown', $dropdownItem);
+            $this->addItem('flyouts', $dropdownItem);
         }
         return $this;
     }

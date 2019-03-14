@@ -5,12 +5,12 @@
 
 import { LoadStatus } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
-import Backgrounds from "@library/components/body/Backgrounds";
-import { inputClasses } from "@library/components/forms/inputStyles";
-import Loader from "@library/components/Loader";
-import { prepareShadowRoot } from "@library/dom";
-import getStore from "@library/state/getStore";
-import { ICoreStoreState } from "@library/state/reducerRegistry";
+import Backgrounds from "@library/layout/Backgrounds";
+import { inputClasses } from "@library/forms/inputStyles";
+import Loader from "@library/loaders/Loader";
+import { prepareShadowRoot } from "@library/utility/domUtils";
+import getStore from "@library/redux/getStore";
+import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import ThemeActions from "@library/theming/ThemeActions";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import React from "react";

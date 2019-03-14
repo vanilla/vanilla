@@ -1,4 +1,4 @@
-// The dropdown wrapper (`<div>`)
+// The flyouts wrapper (`<div>`)
 .dropup,
 .dropdown {
   position: relative;
@@ -19,7 +19,7 @@
     border-left: $caret-width solid transparent;
   }
 
-  // Prevent the focus on the dropdown toggle when closing dropdowns
+  // Prevent the focus on the flyouts toggle when closing dropdowns
   &:focus {
     outline: 0;
   }
@@ -34,7 +34,7 @@
   }
 }
 
-// The dropdown menu
+// The flyouts menu
 .dropdown-menu {
   position: absolute;
   top: 100%;
@@ -56,12 +56,12 @@
   @include box-shadow(0 6px 12px rgba(0,0,0,.175));
 }
 
-// Dividers (basically an `<hr>`) within the dropdown
+// Dividers (basically an `<hr>`) within the flyouts
 .dropdown-divider {
   @include nav-divider($dropdown-divider-bg);
 }
 
-// Links, buttons, and more within the dropdown menu
+// Links, buttons, and more within the flyouts menu
 //
 // `<button>`-specific styles are denoted with `// For <button>s`
 .dropdown-item {
@@ -112,7 +112,7 @@
   }
 }
 
-// Open state for the dropdown
+// Open state for the flyouts
 .open {
   // Show the menu
   > .dropdown-menu {
@@ -127,17 +127,17 @@
 
 // Menu positioning
 //
-// Add extra class to `.dropdown-menu` to flip the alignment of the dropdown
+// Add extra class to `.flyouts-menu` to flip the alignment of the flyouts
 // menu with the parent.
 .dropdown-menu-right {
   right: 0;
-  left: auto; // Reset the default from `.dropdown-menu`
+  left: auto; // Reset the default from `.flyouts-menu`
 }
-// With v3, we enabled auto-flipping if you have a dropdown within a right
+// With v3, we enabled auto-flipping if you have a flyouts within a right
 // aligned nav component. To enable the undoing of that, we provide an override
-// to restore the default dropdown menu alignment.
+// to restore the default flyouts menu alignment.
 //
-// This is only for left-aligning a dropdown menu within a `.navbar-right` or
+// This is only for left-aligning a flyouts menu within a `.navbar-right` or
 // `.pull-right` nav component.
 .dropdown-menu-left {
   right: auto;
@@ -172,7 +172,7 @@
 
 // Allow for dropdowns to go bottom up (aka, dropup-menu)
 //
-// Just add .dropup after the standard .dropdown class and you're set.
+// Just add .dropup after the standard .flyouts class and you're set.
 // TODO: abstract this so that the navbar fixed styles are not placed here?
 
 .dropup,

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { generateApiActionCreators, ActionsUnion, apiThunk, createAction } from "@library/state/utility";
+import { generateApiActionCreators, ActionsUnion, apiThunk, createAction } from "@library/redux/utility";
 import { IRequestPasswordOptions } from "@dashboard/@types/api";
 
 // Authenticating user /authenticate/password

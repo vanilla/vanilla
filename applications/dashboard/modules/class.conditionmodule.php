@@ -60,7 +60,7 @@ class ConditionModule extends Gdn_Module {
         $this->Types = array_merge(['' => '('.sprintf(t('Select a %s'), t('Condition Type', 'Type')).')'], Gdn_Condition::allTypes());
         //die(print_r($this->Types));
 
-        // Get all of the permissions that are valid for the permissions dropdown.
+        // Get all of the permissions that are valid for the permissions flyouts.
         $permissionModel = new PermissionModel();
         $permissions = $permissionModel->getGlobalPermissions(0);
         $permissions = array_keys($permissions);

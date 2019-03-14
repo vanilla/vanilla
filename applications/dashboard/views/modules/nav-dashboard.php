@@ -34,7 +34,7 @@ if (!function_exists('renderDashboardNav')) {
                     </a>
                 </li>
 		   <?php }
-		   if (val('type', $item) == 'dropdown') {
+		   if (val('type', $item) == 'flyouts') {
                 echo val('dropdownmenu', $item);
            }
            if (val('type', $item) == 'divider') { ?>

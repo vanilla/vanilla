@@ -10,7 +10,7 @@ import Quill, { DeltaStatic } from "quill/core";
 import { rangeContainsBlot, getIDForQuill } from "@rich-editor/quill/utility";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
-import getStore from "@library/state/getStore";
+import getStore from "@library/redux/getStore";
 import { IStoreState } from "@rich-editor/@types/store";
 
 export default class ClipboardModule extends ClipboardBase {

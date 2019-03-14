@@ -219,7 +219,7 @@ class CategoriesController extends VanillaController {
     /**
      * Endpoint that returns a flattened list of children categories in JSON format. Collapses the categories,
      * so we only retrieve the child categories that are not nested under a nested or flat category.
-     * Includes the category options that appear in the category settings dropdown in the response.
+     * Includes the category options that appear in the category settings flyouts in the response.
      *
      * @param int $parentID The ID of the parent to retrieve categories under.
      */
@@ -239,9 +239,9 @@ class CategoriesController extends VanillaController {
     }
 
     /**
-     * Returns an array representation of the dropdown object, ready to add to a data array.
+     * Returns an array representation of the flyouts object, ready to add to a data array.
      *
-     * @param array|object $category The category to retrieve the dropdown options for.
+     * @param array|object $category The category to retrieve the flyouts options for.
      * @return array
      */
     private function getOptions($category) {

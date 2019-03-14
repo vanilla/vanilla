@@ -32,7 +32,7 @@ foreach ($this->data('_EditorToolbar') as $button) {
 
         $html_toolbar .= wrap($buttonMarkup, 'span', $button['attr'] );
    } else {
-      // Else this button has dropdown options, so generate them
+      // Else this button has flyouts options, so generate them
       $html_button_dropdown_options = '';
 
       foreach ($button['type'] as $type_key => $button_option) {
@@ -42,7 +42,7 @@ foreach ($this->data('_EditorToolbar') as $button) {
             ? $button_option['text']
             : '';
 
-         // If the dropdown child elements require a different tag,
+         // If the flyouts child elements require a different tag,
          // specify it in the array, then grab it here, otherwise
          // use the default, being a span.
          $html_tag = (isset($button_option['html_tag']))
@@ -69,7 +69,7 @@ foreach ($this->data('_EditorToolbar') as $button) {
                       <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Flyout-Button Cancel editor-dialog-fire-close" value="'.t('Cancel').'"/>
                       </div>
                    </div>'
-               , 'div', ['class' => 'editor-dropdown editor-dropdown-link']);
+               , 'div', ['class' => 'editor-flyouts editor-flyouts-link']);
             break;
 
          case 'image':
@@ -80,7 +80,7 @@ foreach ($this->data('_EditorToolbar') as $button) {
                         <input class="InputBox editor-input-image" placeholder="'.t('Image URL').'" />
                      </div>
                   </div>'
-               , 'div', ['class' => 'editor-dropdown editor-dropdown-image']);
+               , 'div', ['class' => 'editor-flyouts editor-flyouts-image']);
             break;
 
          case 'fileupload':
@@ -96,7 +96,7 @@ foreach ($this->data('_EditorToolbar') as $button) {
                         <input type="file" name="'.$editor_file_input_name.'[]" multiple data-upload-type="file" accept="'.$accept.'" />
                      </div>
                   </div>'
-                , 'div', ['class' => 'editor-dropdown editor-dropdown-upload']);
+                , 'div', ['class' => 'editor-flyouts editor-flyouts-upload']);
             break;
 
          case 'imageupload':
@@ -116,7 +116,7 @@ foreach ($this->data('_EditorToolbar') as $button) {
                         <input class="InputBox editor-input-image" placeholder="'.t('Image URL').'" />
                      </div>
                   </div>'
-                , 'div', ['class' => 'editor-dropdown editor-dropdown-upload']);
+                , 'div', ['class' => 'editor-flyouts editor-flyouts-upload']);
             break;
 
          case 'color':
@@ -154,7 +154,7 @@ foreach ($this->data('_EditorToolbar') as $button) {
             $html_toolbar .= wrap(
                wrap($html_arrow_down.$screenReaderMarkup, 'span', $button['attr']).''.
                wrap($colorOptions, 'div', ['class' => 'editor-insert-dialog Flyout MenuItems', 'data-wysihtml5-dialog' => ''])
-               , 'div', ['class' => "editor-dropdown editor-dropdown-color $cssHasHighlight"]
+               , 'div', ['class' => "editor-flyouts editor-flyouts-color $cssHasHighlight"]
             );
             break;
 
@@ -163,7 +163,7 @@ foreach ($this->data('_EditorToolbar') as $button) {
             $html_toolbar .= wrap(
                wrap($html_arrow_down.$screenReaderMarkup, 'span', $button['attr']).''.
                wrap($html_button_dropdown_options, 'div', ['class' => 'editor-insert-dialog Flyout MenuItems', 'data-wysihtml5-dialog' => ''])
-               , 'div', ['class' => 'editor-dropdown editor-dropdown-default editor-action-'.$button['action']]);
+               , 'div', ['class' => 'editor-flyouts editor-flyouts-default editor-action-'.$button['action']]);
             break;
       }
    }

@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import { spoiler } from "@library/icons/editorIcons";
 
 export default class SpoilerButton extends React.Component<{}> {

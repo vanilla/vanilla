@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 import gdn from "@library/gdn";
-import { escapeHTML } from "@library/utility/domUtils";
+import { escapeHTML } from "@library/dom/domUtils";
 import Translate from "@library/content/Translate";
 import { render } from "enzyme";
 

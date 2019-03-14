@@ -4,11 +4,9 @@
  * @license GPL-2.0-only
  */
 
-import Quill, { IFormats } from "quill/core";
 import React from "react";
-import { connect } from "react-redux";
-import { IStoreState, IEditorInstance } from "../@types/store";
-import { Omit } from "@library/@types/utils";
+import Quill, { IFormats } from "quill/core";
+import { IEditorInstance } from "@rich-editor/@types/store";
 
 interface IContextProps {
     quill: Quill;

@@ -18,7 +18,6 @@ export const richEditorFormClasses = useThemeCache((theme?: object, legacyMode: 
     const formElementVars = formElementsVariables();
     const style = styleFactory("richEditorForm");
     const overshoot = legacyMode ? 0 : vars.scrollContainer.overshoot;
-    w;
     const root = style({});
 
     const textWrap = style("textWrap", {

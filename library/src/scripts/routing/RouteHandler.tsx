@@ -5,11 +5,11 @@
  */
 
 import React from "react";
-import Loadable, { LoadableComponent } from "react-loadable";
-import Loader from "../loaders/Loader";
-import { Route, NavLinkProps, NavLink } from "react-router-dom";
-import { Omit } from "react-redux";
-import Hoverable from "../utility/Hoverable";
+import { NavLink, NavLinkProps, Route } from "react-router-dom";
+import Hoverable from "@library/dom/Hoverable";
+import LoadableComponent = LoadableExport.LoadableComponent;
+import Loader, { Loadable } from "@library/loaders/Loader";
+import { Omit } from "@library/@types/utils";
 
 type LoadFunction = () => Promise<any>;
 

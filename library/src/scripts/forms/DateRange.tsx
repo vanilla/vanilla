@@ -3,14 +3,11 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
-import * as React from "react";
-import classNames from "classnames";
-import InputBlock, { InputTextBlockBaseClass } from "InputBlock";
-import { t } from "../dom/appUtils";
-import moment from "moment";
-import { style } from "typestyle";
-import { dateRangeClasses } from "@library/styles/dateRangeStyles";
-import DatePicker from "DatePicker";
+import React from "react";
+import { dateRangeClasses } from "@library/forms/dateRangeStyles";
+import { t } from "@library/utility/appUtils";
+import DatePicker from "@library/forms/DatePicker";
+import moment = require("moment");
 
 interface IProps {
     start: string | undefined;

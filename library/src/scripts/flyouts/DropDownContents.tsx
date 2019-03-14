@@ -6,8 +6,8 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { flyoutPosition } from "../../../../plugins/rich-editor/src/scripts/flyouts/pieces/flyoutPosition";
-import { dropDownClasses } from "dropDownStyles";
+import { flyoutPosition } from "@rich-editor/flyouts/pieces/flyoutPosition";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
 export interface IProps {
     id: string;

@@ -6,10 +6,10 @@
 
 import React from "react";
 import classNames from "classnames";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import { splitStringLoosely } from "@library/utility/utils";
 import { IUserFragment } from "@library/@types/api";
-import { richEditorClasses } from "../../editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 export interface IMentionSuggestionData extends IUserFragment {
     domID: string;

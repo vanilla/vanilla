@@ -4,13 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { uniqueIDFromPrefix } from "../../utility/idUtils";
-import Button from "../../forms/Button";
-import classNames from "classnames";
-import { rightChevron } from "../../icons/common";
-import { drawerClasses } from "@library/styles/drawerStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import React from "react";
+import { drawerClasses } from "@library/layout/drawer/drawerStyles";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 
 export interface IDrawerProps {
     title: string;

@@ -4,9 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import React, { ReactNode } from "react";
-import classNames from "classnames";
-import { frameClasses } from "library/src/scripts/layout/frame/frameStyles";
+import React from "react";
+import { frameClasses } from "@library/layout/frame/frameStyles";
 
 interface IProps {
     className?: string;

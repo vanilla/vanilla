@@ -4,11 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
+import React from "react";
 import classNames from "classnames";
+import TabPanel, { ITabPanel } from "@library/navigation/tabs/TabPanel";
+import TabButtonList, { ITabButton } from "@library/navigation/tabs/TabButtonList";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { ITabPanel } from "@library/navigation/tabs/pieces/TabPanel";
-import { ITabButton } from "@library/navigation/tabs/pieces/TabButtonList";
 
 export interface ITab extends ITabPanel, ITabButton {}
 

@@ -6,9 +6,9 @@
 
 import React from "react";
 import classNames from "classnames";
-import { t } from "../dom/appUtils";
-import SmartLink from "../routing/links/SmartLink";
-import { leftChevron, rightChevron } from "../icons";
+import { t } from "@library/utility/appUtils";
+import { leftChevron, rightChevron } from "@library/icons/common";
+import SmartLink from "@library/routing/links/SmartLink";
 
 export enum LeftRight {
     LEFT = "left",

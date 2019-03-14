@@ -4,13 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../../../styles/globalStyleVars";
-import { unit, colorOut } from "../../../styles/styleHelpers";
-import { formElementsVariables } from "../../../forms/formElementStyles";
-import { vanillaHeaderVariables } from "../../vanillaHeaderStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { colorOut, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
-import { styleFactory, useThemeCache } from "../../../styles/styleUtils";
-import { searchBarVariables } from "../../../features/search/searchBarStyles";
+import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { searchBarVariables } from "@library/features/search/searchBarStyles";
 
 export const compactSearchClasses = useThemeCache(() => {
     const globalVars = globalVariables();

@@ -4,14 +4,14 @@
  * @license Proprietary
  */
 
-import * as React from "react";
+import React from "react";
 import classNames from "classnames";
-import { t } from "../dom/appUtils";
-import Result, { IResult } from "./Result";
-import Paragraph from "../layout/Paragraph";
-import Translate from "../content/Translate";
-import { searchBarClasses } from "../features/search/searchBarStyles";
-import { searchResultClasses, searchResultsClasses } from "../features/search/searchResultsStyles";
+import { t } from "@library/utility/appUtils";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { searchResultsClasses } from "@library/features/search/searchResultsStyles";
+import Translate from "@library/content/Translate";
+import Result, { IResult } from "@library/result/Result";
+import Paragraph from "@library/layout/Paragraph";
 
 interface IProps {
     className?: string;

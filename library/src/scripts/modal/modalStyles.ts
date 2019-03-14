@@ -4,14 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "../styles/styleUtils";
-import { colorOut, margins, unit } from "../styles/styleHelpers";
-import { layoutVariables } from "../styles/layoutStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { borders, colorOut, margins, unit } from "@library/styles/styleHelpers";
+import { shadowHelper } from "@library/styles/shadowHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, viewHeight } from "csx";
-import { shadowHelper } from "../styles/shadowHelpers";
-import { borders } from "../styles/styleHelpers";
-import { vanillaHeaderVariables } from "../headers/vanillaHeaderStyles";
+import { layoutVariables } from "@library/styles/layoutStyles";
+import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 
 export const modalVariables = useThemeCache(() => {
     const globalVars = globalVariables();

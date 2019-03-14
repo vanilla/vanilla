@@ -5,8 +5,8 @@
  */
 
 import React from "react";
-import { t } from "../dom/appUtils";
 import classNames from "classnames";
+import { t } from "@library/appUtils";
 
 const currentColorFill = {
     fill: "currentColor",

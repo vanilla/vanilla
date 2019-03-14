@@ -9,12 +9,12 @@ import Quill from "quill/core";
 import Emitter from "quill/core/emitter";
 import Keyboard from "quill/modules/keyboard";
 import LinkBlot from "quill/formats/link";
-import { t, isAllowedUrl } from "@library/dom/appUtils";
+import { t, isAllowedUrl } from "@library/utility/appUtils";
 import { withEditor, IWithEditorProps } from "@rich-editor/editor/context";
 import { rangeContainsBlot } from "@rich-editor/quill/utility";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import Formatter from "@rich-editor/quill/Formatter";
-import FocusWatcher from "@library/utility/FocusWatcher";
+import FocusWatcher from "@library/dom/FocusWatcher";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import classNames from "classnames";
 

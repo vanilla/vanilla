@@ -3,8 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { logWarning } from "../utility/utils";
 import React from "react";
+import { logWarning } from "@library/utility/utils";
 import { style } from "typestyle";
 
 type ScollOffsetSetter = (offset: number) => void;

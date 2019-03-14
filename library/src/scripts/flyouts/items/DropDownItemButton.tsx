@@ -4,13 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import classNames from "classnames";
-import DropDownItem from "./DropDownItem";
-import Button from "../../forms/Button";
-import { ISelectBoxItem } from "../../forms/select/SelectBox";
-import { dropDownClasses } from "../dropDownStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import React from "react";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 
 export interface IDropDownItemButton {
     name: string;

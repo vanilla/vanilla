@@ -3,9 +3,9 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { LoadStatus } from "../@types/api";
-import Loader from "../loaders/Loader";
+import React from "react";
+import { LoadStatus } from "@library/@types/api/core";
+import Loader from "@library/loaders/Loader";
 
 interface IProps {
     children: React.ReactNode;

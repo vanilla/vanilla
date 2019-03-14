@@ -6,11 +6,11 @@
 
 import React from "react";
 import classNames from "classnames";
-import { IOptionalComponentID } from "../utility/idUtils";
-import { getDynamicClassFromButtonType } from "../forms/Button";
-import SmartLink from "links/SmartLink";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { getDynamicClassFromButtonType } from "@library/forms/Button";
+import SmartLink from "@library/routing/links/SmartLink";
+import { IOptionalComponentID } from "@library/utility/idUtils";
 import { LinkProps } from "react-router-dom";
-import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IOptionalComponentID, LinkProps {
     children: React.ReactNode;

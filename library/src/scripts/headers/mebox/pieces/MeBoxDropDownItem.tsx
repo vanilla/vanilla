@@ -4,17 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import classNames from "classnames";
-import { IUserFragment } from "../../../@types/api/users";
-import { noUserPhoto } from "../../../icons/header";
-import FlexSpacer from "../../../layout/FlexSpacer";
-import { t } from "../../../dom/appUtils";
-import Translate from "../../../content/Translate";
-import DateTime from "../../../content/DateTime";
-import SmartLink from "../../../routing/links/SmartLink";
-import { meBoxMessageClasses } from "@library/headers/mebox/meBoxMessageStyles";
-import { metasClasses } from "../../../styles/metasStyles";
+import React from "react";
+import { IUserFragment } from "@library/@types/api";
+import { t } from "@library/utility/appUtils";
+import { noUserPhoto } from "@library/icons/header";
+import FlexSpacer from "@library/layout/FlexSpacer";
+import SmartLink from "@library/routing/links/SmartLink";
+import { meBoxMessageClasses } from "@library/headers/mebox/pieces/meBoxMessageStyles";
+import { metasClasses } from "@library/styles/metasStyles";
+import Translate from "@library/content/Translate";
+import DateTime from "@library/content/DateTime";
 
 export enum MeBoxItemType {
     NOTIFICATION = "notification",

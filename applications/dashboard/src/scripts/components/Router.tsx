@@ -6,7 +6,7 @@
 import React from "react";
 import { BrowserRouter, Route, RouteProps, Switch } from "react-router-dom";
 import { Provider } from "react-redux";
-import { getRoutes, getMeta } from "@library/dom/appUtils";
+import { getRoutes, getMeta } from "@library/utility/appUtils";
 import NotFoundPage from "@library/routing/NotFoundPage";
 import getStore from "@library/redux/getStore";
 

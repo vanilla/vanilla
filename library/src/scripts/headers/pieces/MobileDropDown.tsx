@@ -5,21 +5,16 @@
  */
 
 import * as React from "react";
-import { t } from "../../dom/appUtils";
-import classNames from "classnames";
-import Modal from "../../modal/Modal";
-import ModalSizes from "../../modal/ModalSizes";
-import Button from "../../forms/Button";
-import { chevronUp, downTriangle } from "../../icons/common";
-import { Panel } from "../../layout/PanelLayout";
-import { Frame, FrameBody, FrameFooter } from "../../layout/frame";
-import SmartAlign from "../../utility/SmartAlign";
-import Heading from "../../layout/Heading";
-import CloseButton from "../../navigation/CloseButton";
-import FlexSpacer from "../../layout/FlexSpacer";
-import { mobileDropDownClasses } from "@library/headers/mobileDropDownStyles";
-import { frameHeaderClasses } from "../../layout/frame/frameStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import Heading from "@library/layout/Heading";
+import { chevronUp, downTriangle } from "@library/icons/common";
+import CloseButton from "@library/navigation/CloseButton";
+import { Panel } from "@library/layout/PanelLayout";
+import { frameHeaderClasses } from "@library/layout/frame/frameStyles";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import FlexSpacer from "@library/layout/FlexSpacer";
+import SmartAlign from "@library/layout/SmartAlign";
+import { mobileDropDownClasses } from "@library/headers/pieces/mobileDropDownStyles";
 
 export interface IProps {
     className?: string;

@@ -5,8 +5,8 @@
 
 import React from "react";
 import BaseEmbed from "@library/content/embeds/BaseEmbed";
-import { ensureScript } from "@library/utility/domUtils";
-import { onContent } from "@library/dom/appUtils";
+import { ensureScript } from "@library/dom/domUtils";
+import { onContent } from "@library/utility/appUtils";
 import { registerEmbedComponent } from "@library/content/embeds/embedUtils";
 
 export function initInstagramEmbeds() {

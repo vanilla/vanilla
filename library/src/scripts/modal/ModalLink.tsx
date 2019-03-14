@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { NavLinkProps, NavLink, withRouter, RouteComponentProps } from "react-router-dom";
+import { NavLink, NavLinkProps, RouteComponentProps, withRouter } from "react-router-dom";
 import { LocationDescriptor } from "history";
 
 interface IProps extends NavLinkProps, Partial<RouteComponentProps<{}>> {

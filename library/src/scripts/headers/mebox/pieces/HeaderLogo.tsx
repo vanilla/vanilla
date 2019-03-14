@@ -4,13 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import classNames from "classnames";
-import { vanillaLogo } from "../../../icons/header";
-import SmartLink from "../../../routing/links/SmartLink";
-import { vanillaHeaderLogoClasses } from "../../vanillaHeaderStyles";
-import ThemeLogo, { LogoType } from "../../../theming/ThemeLogo";
-import { t, formatUrl } from "../../../dom/appUtils";
+import React from "react";
+import ThemeLogo, { LogoType } from "@library/theming/ThemeLogo";
+import { formatUrl, t } from "@library/utility/appUtils";
+import SmartLink from "@library/routing/links/SmartLink";
+import { vanillaHeaderLogoClasses } from "@library/headers/vanillaHeaderStyles";
 
 export interface IHeaderLogo {
     className?: string;

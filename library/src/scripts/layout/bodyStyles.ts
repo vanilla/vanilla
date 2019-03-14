@@ -3,11 +3,11 @@
  * @license GPL-2.0-only
  */
 
-import { background, colorOut } from "../styles/styleHelpers";
-import { styleFactory, useThemeCache } from "../styles/styleUtils";
-import { cssRule } from "typestyle";
-import { globalVariables } from "../styles/globalStyleVars";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent, viewHeight } from "csx";
+import { cssRule } from "typestyle";
+import { colorOut } from "@library/styles/styleHelpers";
 
 export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();

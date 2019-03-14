@@ -4,13 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import React, { MouseEvent } from "react";
-import EmbedInsertionModule from "../../quill/EmbedInsertionModule";
-import { withEditor, IWithEditorProps } from "../context";
-import { isFileImage } from "@library/utility/utils";
-import { image, attachment } from "@library/icons/editorIcons";
+import React from "react";
 import classNames from "classnames";
-import { richEditorClasses } from "../richEditorClasses";
+import { attachment, image } from "@library/icons/editorIcons";
+import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
+import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import { isFileImage } from "@library/utility/utils";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;

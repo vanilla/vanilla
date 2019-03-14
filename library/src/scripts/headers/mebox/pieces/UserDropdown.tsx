@@ -4,30 +4,25 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { uniqueIDFromPrefix } from "../../../utility/idUtils";
-import DropDown from "../../../flyouts/DropDown";
-import { t } from "../../../dom/appUtils";
-import FrameBody from "../../../layout/frame/FrameBody";
-import Frame from "../../../layout/frame/Frame";
-import { IUserFragment } from "../../../@types/api/users";
-import { UserPhoto, UserPhotoSize } from "library/src/scripts/headers/mebox/pieces/UserPhoto";
-import { logError } from "../../../utility/utils";
-import { connect } from "react-redux";
-import UsersModel, { IInjectableUserState } from "../../../features/users/UsersModel";
-import get from "lodash/get";
-import { DropDownUserCard } from "../../../flyouts/items/DropDownUserCard";
-import DropDownItemSeparator from "../../../flyouts/items/DropDownItemSeparator";
-import DropDownItemLink from "../../../flyouts/items/DropDownItemLink";
-import DropDownSection from "../../../flyouts/items/DropDownSection";
-import DropDownItemLinkWithCount from "../../../flyouts/items/DropDownItemLinkWithCount";
-import Permission from "../../../features/users/Permission";
-import classNames from "classnames";
-import { dummyUserDropDownData } from "../state/dummyUserDropDownData";
-import { userDropDownClasses } from "library/src/scripts/headers/mebox/pieces/userDropDownStyles";
-import { dropDownClasses } from "../../../flyouts/dropDownStyles";
-import { frameBodyClasses } from "../../../layout/frame/frameStyles";
-import { vanillaHeaderClasses } from "../../vanillaHeaderStyles";
+import React from "react";
+import { IUserFragment } from "@library/@types/api";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
+import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
+import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
+import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
+import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
+import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWithCount";
+import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
+import DropDownSection from "@library/flyouts/items/DropDownSection";
+import { logError } from "@library/utility/utils";
+import { t } from "@library/utility/appUtils";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import Permission from "@library/features/users/Permission";
+import { frameBodyClasses } from "@library/layout/frame/frameStyles";
+import DropDown from "@library/flyouts/DropDown";
+import { dummyUserDropDownData } from "@library/headers/mebox/state/dummyUserDropDownData";
+import { userDropDownClasses } from "@library/headers/mebox/pieces/userDropDownStyles";
 
 export interface IUserDropDownProps extends IInjectableUserState {
     className?: string;

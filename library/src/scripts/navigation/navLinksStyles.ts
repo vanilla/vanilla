@@ -4,12 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../styles/globalStyleVars";
-import { layoutVariables } from "../styles/layoutStyles";
-import { componentThemeVariables, debugHelper, setAllLinkColors, unit } from "../styles/styleHelpers";
-import { useThemeCache, variableFactory } from "../styles/styleUtils";
-import { percent } from "csx";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { debugHelper, setAllLinkColors, unit } from "@library/styles/styleHelpers";
+import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { style } from "typestyle";
+import { percent } from "csx";
+import { layoutVariables } from "@library/styles/layoutStyles";
 
 export const navLinksVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("navLinks");

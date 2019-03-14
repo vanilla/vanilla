@@ -5,7 +5,7 @@
 
 import * as React from "react";
 import { connect } from "react-redux";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import { LoadStatus } from "@library/@types/api";
 import { getRequiredID, IRequiredComponentID } from "@library/utility/idUtils";
 import DocumentTitle from "@library/routing/DocumentTitle";

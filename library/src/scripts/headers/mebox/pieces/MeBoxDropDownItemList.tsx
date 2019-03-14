@@ -4,14 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import classNames from "classnames";
+import React from "react";
 import MeBoxDropDownItem, {
     IMeBoxMessageItem,
     IMeBoxNotificationItem,
     MeBoxItemType,
-} from "library/src/scripts/headers/mebox/pieces/MeBoxDropDownItem";
-import { frameBodyClasses } from "../../../layout/frame/frameStyles";
+} from "@library/headers/mebox/pieces/MeBoxDropDownItem";
+import { frameBodyClasses } from "@library/layout/frame/frameStyles";
 
 export interface IVanillaHeaderNavProps {
     className?: string;

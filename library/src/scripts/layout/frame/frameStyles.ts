@@ -4,13 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables, IIconSizes } from "../../styles/globalStyleVars";
-import { styleFactory, useThemeCache, variableFactory } from "../../styles/styleUtils";
-import { fonts, paddings, singleBorder, colorOut, unit } from "../../styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { colorOut, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 import { calc, important, percent, viewHeight } from "csx";
-import { formElementsVariables } from "../../forms/formElementStyles";
-import { buttonUtilityClasses } from "@library/styles/buttonStyles";
-import { NestedCSSProperties, NestedCSSSelectors } from "typestyle/lib/types";
 
 export const frameVariables = useThemeCache(() => {
     const globalVars = globalVariables();

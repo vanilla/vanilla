@@ -5,8 +5,7 @@
  */
 
 import React from "react";
-import classNames from "classnames";
-import { framePanelClasses } from "library/src/scripts/layout/frame/frameStyles";
+import { framePanelClasses } from "@library/layout/frame/frameStyles";
 
 interface IProps {
     className?: string;

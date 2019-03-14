@@ -4,10 +4,9 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import classNames from "classnames";
-import vanillaHeaderNavClasses from "../../VanillaHeaderNav";
-import VanillaHeaderNavItem, { IHeaderNav } from "library/src/scripts/headers/mebox/pieces/VanillaHeaderNavItem";
+import React from "react";
+import { IHeaderNav, VanillaHeaderNavItem } from "@library/headers/mebox/pieces/VanillaHeaderNavItem";
+import vanillaHeaderNavClasses from "@library/headers/VanillaHeaderNav";
 
 export interface IVanillaHeaderNavProps {
     className?: string;

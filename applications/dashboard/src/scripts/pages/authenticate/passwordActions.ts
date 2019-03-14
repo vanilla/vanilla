@@ -7,7 +7,7 @@ import { generateApiActionCreators, ActionsUnion, apiThunk } from "@library/redu
 import { IAuthenticatePasswordResponseData, IAuthenticatePasswordParams } from "@dashboard/@types/api";
 import apiv2 from "@library/apiv2";
 import { AxiosResponse, AxiosError } from "axios";
-import { formatUrl } from "@library/dom/appUtils";
+import { formatUrl } from "@library/utility/appUtils";
 
 // Authenticating user /authenticate/password
 export const POST_AUTHENTICATE_PASSWORD_REQUEST = "POST_AUTHENTICATE_PASSWORD_REQUEST";

@@ -4,19 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import DayPickerInput from "react-day-picker/DayPickerInput";
-import { formatDate, parseDate } from "react-day-picker/moment";
-import { guessOperatingSystem, OS } from "../utility/utils";
-import classNames from "classnames";
-import { t } from "../dom/appUtils";
-import Button from "Button";
-import { leftChevron, rightChevron } from "../icons";
-import { NullComponent } from "select/overwrites";
-import moment, { Moment } from "moment";
-import { dayPickerClasses } from "@library/styles/datePickerStyles";
+import React from "react";
+import { NullComponent } from "@library/forms/select/overwrites";
+import { DayPickerInput } from "react-day-picker/types/DayPickerInput";
+import moment = require("moment");
+import { t } from "@library/utility/appUtils";
+import { Moment } from "moment";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { guessOperatingSystem } from "@library/utility/utils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import { dayPickerClasses } from "@library/forms/datePickerStyles";
 
 interface IProps {
     value: string; // ISO formatted date

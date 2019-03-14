@@ -5,11 +5,10 @@
  */
 
 import React, { ReactNode } from "react";
-import classNames from "classnames";
-import Paragraph from "../layout/Paragraph";
-import { getRequiredID, IOptionalComponentID } from "../utility/idUtils";
-import { IFieldError } from "../@types/api/core";
-import ErrorMessages from "./ErrorMessages";
+import ErrorMessages from "@library/forms/ErrorMessages";
+import { getRequiredID, IOptionalComponentID } from "@library/utility/idUtils";
+import { IFieldError } from "@library/@types/api";
+import Paragraph from "@library/layout/Paragraph";
 
 export enum InputTextBlockBaseClass {
     STANDARD = "inputBlock",

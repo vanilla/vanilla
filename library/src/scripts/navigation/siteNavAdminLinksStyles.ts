@@ -4,12 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../styles/globalStyleVars";
-import { layoutVariables } from "../styles/layoutStyles";
-import { colorOut, debugHelper, unit } from "../styles/styleHelpers";
-import { useThemeCache } from "../styles/styleUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { colorOut, debugHelper, unit } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { px } from "csx";
 import { style } from "typestyle";
+import { layoutVariables } from "@library/styles/layoutStyles";
 
 export const siteNavAdminLinksClasses = useThemeCache(() => {
     const globalVars = globalVariables();

@@ -4,9 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import className from "classnames";
-import SmartLink from "library/src/scripts/routing/links/SmartLink";
+import React from "react";
+import SmartLink from "@library/routing/links/SmartLink";
 
 interface IProps {
     className?: string;

@@ -4,12 +4,12 @@
  * @license GPL-2.0-only
  */
 
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { srOnly, userSelect } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { px } from "csx";
-import { globalVariables } from "../../styles/globalStyleVars";
-import { srOnly, userSelect } from "../../styles/styleHelpers";
-import { layoutVariables } from "../../styles/layoutStyles";
-import { vanillaHeaderVariables } from "../../headers/vanillaHeaderStyles";
-import { styleFactory, useThemeCache } from "../../styles/styleUtils";
+import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { layoutVariables } from "@library/styles/layoutStyles";
 
 const backLinkClasses = useThemeCache(() => {
     const globalVars = globalVariables();

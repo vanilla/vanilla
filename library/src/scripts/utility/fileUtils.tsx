@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { t } from "../dom/appUtils";
+import { t } from "@library/utility/appUtils";
 
 interface IHumanFileSize {
     amount: number;

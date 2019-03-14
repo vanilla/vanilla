@@ -4,12 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
+import React from "react";
 import classNames from "classnames";
-import TabHandler from "../../../dom/TabHandler";
-import TabButton from "library/src/scripts/navigation/tabs/pieces/TabButton";
-import { tabButtonListClasses } from "../../../forms/radioTabs/tabButtonListStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { tabButtonListClasses } from "@library/forms/radioTabs/tabButtonListStyles";
+import TabButton from "@library/navigation/tabs/TabButton";
+import TabHandler from "@library/dom/TabHandler";
 
 export interface ITabButton {
     buttonContent: React.ReactNode;

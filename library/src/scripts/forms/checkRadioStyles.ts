@@ -4,22 +4,22 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../styles/globalStyleVars";
+import React from "react";
 import {
     absolutePosition,
-    unit,
     borders,
-    componentThemeVariables,
+    colorOut,
     defaultTransition,
-    srOnly,
     disabledInput,
     flexHelper,
-    colorOut,
+    srOnly,
+    unit,
     userSelect,
-} from "../styles/styleHelpers";
-import { formElementsVariables } from "formElementStyles";
+} from "@library/styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 import { em, important, percent, px } from "csx";
-import { styleFactory, useThemeCache } from "../styles/styleUtils";
 
 export const checkRadioVariables = useThemeCache(() => {
     const globalVars = globalVariables();

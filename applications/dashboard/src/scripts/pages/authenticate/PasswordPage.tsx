@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import PasswordForm from "@dashboard/pages/authenticate/components/PasswordForm";

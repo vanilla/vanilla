@@ -7,7 +7,7 @@
  * @license GPL-2.0-only
  */
 
-import { onReady } from "@library/dom/appUtils";
+import { onReady } from "@library/utility/appUtils";
 import { IThemeState, themeReducer } from "@library/theming/themeReducer";
 import UsersModel, { IUsersStoreState } from "@library/features/users/UsersModel";
 import { logError } from "@library/utility/utils";

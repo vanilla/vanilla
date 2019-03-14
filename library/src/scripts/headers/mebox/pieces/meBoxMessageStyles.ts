@@ -4,19 +4,18 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../../../styles/globalStyleVars";
 import {
-    objectFitWithFallback,
+    absolutePosition,
     colorOut,
+    objectFitWithFallback,
+    paddings,
+    states,
     unit,
     userSelect,
-    paddings,
-    allLinkStates,
-    absolutePosition,
-    states,
-} from "../../../styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "../../../styles/styleUtils";
-import { calc, percent, px, quote } from "csx";
+} from "@library/styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { calc, percent, quote } from "csx";
 
 export const meBoxMessageVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("meBoxMessage");

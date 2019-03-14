@@ -4,11 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../../styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, unit } from "../../styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { debugHelper, unit } from "@library/styles/styleHelpers";
+import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
 import { percent } from "csx";
-import { useThemeCache } from "../../styles/styleUtils";
 
 export const drawerVariables = useThemeCache(() => {
     const globalVars = globalVariables();

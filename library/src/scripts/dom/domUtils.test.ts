@@ -11,7 +11,7 @@ import {
     delegateEvent,
     removeDelegatedEvent,
     getFormData,
-} from "library/src/scripts/utility/domUtils";
+} from "library/src/scripts/dom/domUtils";
 import { expect } from "chai";
 import sinon from "sinon";
 

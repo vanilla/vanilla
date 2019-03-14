@@ -4,13 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../../../styles/globalStyleVars";
-import { layoutVariables } from "../../../styles/layoutStyles";
-import { debugHelper, flexHelper, unit } from "../../../styles/styleHelpers";
-import { useThemeCache } from "../../../styles/styleUtils";
-import { vanillaHeaderVariables } from "../../vanillaHeaderStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { debugHelper, flexHelper, unit } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { style } from "typestyle";
-import { formElementsVariables } from "../../../forms/formElementStyles";
+import { layoutVariables } from "@library/styles/layoutStyles";
 
 export const meBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();

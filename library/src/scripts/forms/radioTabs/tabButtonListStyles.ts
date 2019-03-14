@@ -4,9 +4,9 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../../styles/globalStyleVars";
-import { debugHelper, defaultTransition } from "../../styles/styleHelpers";
-import { useThemeCache } from "../../styles/styleUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { useThemeCache } from "@library/styles/styleUtils";
+import { debugHelper, defaultTransition } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 
 export const tabButtonListClasses = useThemeCache(() => {

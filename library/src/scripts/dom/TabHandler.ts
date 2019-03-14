@@ -6,7 +6,7 @@
  */
 
 import tabbable from "tabbable";
-import { logError } from "@library/utility/utils";
+import { logError } from "../utility/utils";
 
 /**
  * A class for handling tabbing inside of a container with various exclusions.

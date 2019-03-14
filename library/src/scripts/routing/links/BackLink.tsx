@@ -4,12 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
+import React from "react";
 import classNames from "classnames";
-import { t, formatUrl } from "../../dom/appUtils";
-import { leftChevronCompact } from "../../icons/common";
-import { Link, RouteComponentProps, withRouter } from "react-router-dom";
-import backLinkClasses from "library/src/scripts/routing/links/backLinkStyles";
+import backLinkClasses from "@library/routing/links/backLinkStyles";
+import { formatUrl, t } from "@library/utility/appUtils";
+import { RouteComponentProps, withRouter } from "react-router";
+import { leftChevronCompact } from "@library/icons/common";
+import { Link } from "react-router-dom";
 
 interface IProps extends RouteComponentProps<{}> {
     fallbackUrl?: string;

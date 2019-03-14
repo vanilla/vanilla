@@ -4,22 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { t } from "../../../dom/appUtils";
-import FrameBody from "../../../layout/frame/FrameBody";
-import Frame from "../../../layout/frame/Frame";
-import { DropDownUserCard } from "../../../flyouts/items/DropDownUserCard";
-import DropDownItemSeparator from "../../../flyouts/items/DropDownItemSeparator";
-import DropDownItemLink from "../../../flyouts/items/DropDownItemLink";
-import DropDownSection from "../../../flyouts/items/DropDownSection";
-import DropDownItemLinkWithCount from "../../../flyouts/items/DropDownItemLinkWithCount";
-import Permission from "../../../features/users/Permission";
-import { IInjectableUserState } from "../../../features/users/UsersModel";
-import { connect } from "react-redux";
-import UsersModel from "../../../features/users/UsersModel";
-import classNames from "classnames";
-import { dummyUserDropDownData } from "../state/dummyUserDropDownData";
-import { dropDownClasses } from "../../../flyouts/dropDownStyles";
+import React from "react";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
+import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
+import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
+import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
+import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWithCount";
+import DropDownSection from "@library/flyouts/items/DropDownSection";
+import { t } from "@library/utility/appUtils";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import Permission from "@library/features/users/Permission";
+import { dummyUserDropDownData } from "@library/headers/mebox/state/dummyUserDropDownData";
 
 export interface IUserDropDownContentsProps extends IInjectableUserState {
     countsClass?: string;

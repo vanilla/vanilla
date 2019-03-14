@@ -4,11 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { t } from "../dom/appUtils";
-import { buttonLoaderClasses, ButtonTypes } from "@library/styles/buttonStyles";
+import React from "react";
 import classNames from "classnames";
-import ScreenReaderContent from "../utility/ScreenReaderContent";
+import { t } from "@library/utility/appUtils";
+import { buttonLoaderClasses, ButtonTypes } from "@library/forms/buttonStyles";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 interface IProps {
     className?: string;

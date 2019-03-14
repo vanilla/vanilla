@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { formatUrl, t, getMeta } from "@library/dom/appUtils";
+import { formatUrl, t, getMeta } from "@library/utility/appUtils";
 import { indexArrayByKey } from "@library/utility/utils";
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 import qs from "qs";

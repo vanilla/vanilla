@@ -5,9 +5,9 @@
  */
 
 import React from "react";
-import { formatUrl } from "../../dom/appUtils";
-import { NavLinkProps, NavLink, RouteComponentProps, withRouter } from "react-router-dom";
-import { LocationDescriptor, createPath, createLocation, LocationDescriptorObject } from "history";
+import { formatUrl } from "@library/utility/appUtils";
+import { createPath, LocationDescriptor, LocationDescriptorObject } from "history";
+import { RouteComponentProps, withRouter } from "react-router";
 
 export interface IWithLinkContext {
     linkContext: string;

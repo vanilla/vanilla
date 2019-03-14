@@ -6,15 +6,18 @@
 
 import React from "react";
 import Quill from "quill/core";
-import { t } from "@library/dom/appUtils";
-import { isEmbedSelected, forceSelectionUpdate } from "@rich-editor/quill/utility";
+import { t } from "@library/utility/appUtils";
+import { forceSelectionUpdate, isEmbedSelected } from "@rich-editor/quill/utility";
 import Formatter from "@rich-editor/quill/Formatter";
 import classNames from "classnames";
-import FocusWatcher from "@library/utility/FocusWatcher";
+import FocusWatcher from "@library/dom/FocusWatcher";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { withEditor } from "@rich-editor/editor/context";
+import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
 import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
+import { paragraphToolbarContainerClasses } from "@rich-editor/toolbars/paragraphToolbarClasses";
+import MenuItems from "@rich-editor/toolbars/pieces/MenuItems";
+import ParagraphToolbarMenuItems from "@rich-editor/toolbars/pieces/ParagraphToolbarMenuItems";
 
 interface IProps extends IWithEditorProps {}
 

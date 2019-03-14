@@ -4,18 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import { INavigationTreeItem } from "../@types/api";
-import { getRequiredID } from "../utility/idUtils";
-import SiteNavNode, { IActiveRecord } from "library/src/scripts/navigation/SiteNavNode";
-import TabHandler from "../utility/TabHandler";
+import React from "react";
 import classNames from "classnames";
-import * as React from "react";
-import { RouteComponentProps, withRouter } from "react-router-dom";
-import { t } from "../dom/appUtils";
-import { PanelWidgetVerticalPadding } from "../layout/PanelLayout";
-import Heading from "../layout/Heading";
-import ConditionalWrap from "../layout/ConditionalWrap";
-import { siteNavClasses } from "library/src/scripts/navigation/siteNavStyles";
+import SiteNavNode, { IActiveRecord } from "@library/navigation/SiteNavNode";
+import { siteNavClasses } from "@library/navigation/siteNavStyles";
+import Heading from "@library/layout/Heading";
+import { PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
+import { t } from "@library/utility/appUtils";
+import { getRequiredID } from "@library/utility/idUtils";
+import TabHandler from "@library/dom/TabHandler";
+import { INavigationTreeItem } from "@library/@types/api/core";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
 
 interface IProps {
     activeRecord: IActiveRecord;

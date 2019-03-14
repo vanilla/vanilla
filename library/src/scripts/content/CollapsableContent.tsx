@@ -5,7 +5,7 @@
 
 import React from "react";
 import debounce from "lodash/debounce";
-import { getElementHeight } from "@library/utility/domUtils";
+import { getElementHeight } from "@library/dom/domUtils";
 
 interface IProps {
     id: string;

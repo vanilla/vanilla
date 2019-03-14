@@ -5,15 +5,14 @@
  */
 
 import React from "react";
-import { t, getMeta } from "@library/dom/appUtils";
-import ParagraphDropDown from "../../toolbars/ParagraphDropDown";
-import EmojiFlyout from "../../flyouts/EmojiFlyout";
-import Permission from "@library/features/users/Permission";
-import EmbedPopover from "../../flyouts/EmbedFlyout";
-import EditorUploadButton from "EditorUploadButton";
-import { richEditorClasses } from "../richEditorClasses";
 import classNames from "classnames";
-import { richEditorFormClasses } from "../richEditorFormClasses";
+import { ParagraphDropDown } from "@rich-editor/toolbars/ParagraphDropDown";
+import { getMeta, t } from "@library/utility/appUtils";
+import { Permission } from "@library/features/users/Permission";
+import EditorUploadButton from "@rich-editor/editor/pieces/EditorUploadButton";
+import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import EmojiFlyout from "@rich-editor/flyouts/EmojiFlyout";
 
 interface IProps {
     isMobile: boolean;

@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { makeProfileUrl } from "../dom/appUtils";
+import { makeProfileUrl } from "../utility/appUtils";
 import classNames from "classnames";
 
 interface IProps {

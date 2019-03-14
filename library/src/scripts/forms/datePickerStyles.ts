@@ -4,12 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, unit } from "../styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { debugHelper, unit } from "@library/styles/styleHelpers";
+import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 import { style } from "typestyle";
-import { percent, px } from "csx";
-import { formElementsVariables } from "formElementStyles";
-import { useThemeCache } from "../styles/styleUtils";
 
 export const dayPickerVariables = useThemeCache(() => {
     const globalVars = globalVariables();

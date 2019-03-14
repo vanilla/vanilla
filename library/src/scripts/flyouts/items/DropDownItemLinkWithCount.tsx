@@ -4,11 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import DropDownItemLink, { IDropDownItemLink } from "DropDownItemLink";
-import NumberFormatted from "../../content/NumberFormatted";
-import classNames from "classnames";
-import { dropDownClasses } from "../dropDownStyles";
+import React from "react";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { IDropDownItemLink } from "@library/flyouts/items/DropDownItemLink";
+import NumberFormatted from "@library/content/NumberFormatted";
 
 interface IProps extends IDropDownItemLink {
     count?: number;

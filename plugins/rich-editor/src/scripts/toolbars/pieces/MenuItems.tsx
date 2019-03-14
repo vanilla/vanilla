@@ -5,10 +5,10 @@
  */
 
 import React from "react";
-import MenuItem, { IMenuItemData } from "MenuItem";
 import classNames from "classnames";
-import { flyoutPosition } from "../../flyouts/pieces/flyoutPosition";
-import { richEditorClasses } from "../../editor/richEditorClasses";
+import { flyoutPosition } from "@rich-editor/flyouts/pieces/flyoutPosition";
+import MenuItem, { IMenuItemData } from "@rich-editor/toolbars/pieces/MenuItem";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 interface IProps {
     menuItemData: IMenuItemData[];

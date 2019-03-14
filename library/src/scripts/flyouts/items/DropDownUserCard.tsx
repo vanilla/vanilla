@@ -4,14 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import classNames from "classnames";
-import { UserPhoto, UserPhotoSize } from "../../headers/mebox/pieces/UserPhoto";
-import { IInjectableUserState } from "../../features/users/UsersModel";
+import React from "react";
+import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
+import SmartLink from "@library/routing/links/SmartLink";
+import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
+import { userDropDownClasses } from "@library/headers/mebox/pieces/userDropDownStyles";
 import { connect } from "react-redux";
-import UsersModel from "../../features/users/UsersModel";
-import SmartLink from "../../routing/links/SmartLink";
-import { userDropDownClasses } from "../../headers/mebox/pieces/userDropDownStyles";
+import { classNames } from "react-select/lib/utils";
 
 export interface IProps extends IInjectableUserState {
     className?: string;

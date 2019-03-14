@@ -4,10 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { debugHelper } from "../styles/styleHelpers";
-import { useThemeCache } from "../styles/styleUtils";
-import { percent } from "csx";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
+import { debugHelper } from "@library/styles/styleHelpers";
+import { percent } from "csx";
 
 export const smartAlignClasses = useThemeCache(() => {
     const debug = debugHelper("smartAlign");

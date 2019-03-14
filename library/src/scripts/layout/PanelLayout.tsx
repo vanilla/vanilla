@@ -3,15 +3,14 @@
  * @license GPL-2.0-only
  */
 
-import { Devices, IDeviceProps } from "./DeviceChecker";
-import { withDevice } from "./DeviceContext";
-import { ScrollOffsetContext } from "./ScrollOffsetContext";
-import { inheritHeightClass, sticky } from "../styles/styleHelpers";
-import { vanillaHeaderVariables } from "../headers/vanillaHeaderStyles";
+import React from "react";
 import classNames from "classnames";
-import { calc, px, percent } from "csx";
-import * as React from "react";
+import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
+import { ScrollOffsetContext } from "@library/layout/ScrollOffsetContext";
+import { inheritHeightClass, sticky } from "@library/styles/styleHelpers";
+import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { style } from "typestyle";
+import { percent } from "csx";
 
 interface IProps extends IDeviceProps {
     className?: string;

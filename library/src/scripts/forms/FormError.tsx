@@ -4,12 +4,11 @@
  */
 
 import React from "react";
-import Button from "./Button";
-import { t } from "../dom/appUtils";
-import { formErrorClasses } from "formElementStyles";
-import classNames from "classnames";
-import ButtonLoader from "../loaders/ButtonLoader";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
+import ButtonLoader from "@library/loaders/ButtonLoader";
+import { t } from "@library/utility/appUtils";
+import Button from "@library/forms/Button";
+import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
+import { formErrorClasses } from "@library/forms/formElementStyles";
 
 interface IProps {
     children: React.ReactNode;

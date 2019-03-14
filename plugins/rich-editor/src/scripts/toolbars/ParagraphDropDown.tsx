@@ -6,13 +6,14 @@
 
 import React from "react";
 import Quill from "quill/core";
-
-import { withEditor, IWithEditorProps } from "../editor/context";
 import Formatter from "@rich-editor/quill/Formatter";
 import DropDown from "@library/flyouts/DropDown";
-
 import * as editorIcons from "@library/icons/editorIcons";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import MenuItems from "@rich-editor/toolbars/pieces/MenuItems";
+import ParagraphToolbarMenuItems from "@rich-editor/toolbars/pieces/ParagraphToolbarMenuItems";
+import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;

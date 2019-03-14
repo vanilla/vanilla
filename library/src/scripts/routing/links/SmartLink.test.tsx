@@ -4,14 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import { LinkContextProvider } from "library/src/scripts/routing/links/LinkContextProvider";
-import { expect } from "chai";
-import { mount } from "enzyme";
-import { LocationDescriptor } from "history";
 import React from "react";
+import { LocationDescriptor } from "history";
+import SmartLink from "@library/routing/links/SmartLink";
 import { MemoryRouter, Route } from "react-router";
+import { mount } from "enzyme";
+import { LinkContextProvider } from "@library/routing/links/LinkContextProvider";
 import { Link } from "react-router-dom";
-import SmartLink from "./SmartLink";
 
 const DOMAIN = "https://mysite.com";
 const SUBPATH = "/test";

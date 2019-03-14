@@ -4,15 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
+import React from "react";
+import ErrorMessages from "@library/forms/ErrorMessages";
+import { getRequiredID, IOptionalComponentID } from "@library/utility/idUtils";
 import Select from "react-select";
-import { getRequiredID, IOptionalComponentID } from "../../utility/idUtils";
-import classNames from "classnames";
-import Paragraph from "../../layout/Paragraph";
-import { IFieldError } from "../../@types/api";
-import ErrorMessages from "../ErrorMessages";
-import * as selectOverrides from "./overwrites";
-import { IComboBoxOption } from "../../features/search/SearchBar";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { IFieldError } from "@library/@types/api";
+import Paragraph from "@library/layout/Paragraph";
 
 interface IProps extends IOptionalComponentID {
     label: string;

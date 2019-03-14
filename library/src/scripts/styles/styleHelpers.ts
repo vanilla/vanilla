@@ -10,13 +10,10 @@ import {
     AlignItemsProperty,
     AppearanceProperty,
     BackgroundAttachmentProperty,
-    BackgroundColorProperty,
     BackgroundImageProperty,
-    BackgroundOriginProperty,
     BackgroundPositionProperty,
     BackgroundRepeatProperty,
     BackgroundSizeProperty,
-    BorderProperty,
     BorderRadiusProperty,
     BorderStyleProperty,
     BorderWidthProperty,
@@ -40,13 +37,12 @@ import {
     UserSelectProperty,
     WhiteSpaceProperty,
 } from "csstype";
-import { color, ColorHelper, deg, important, percent, px, quote, viewHeight, viewWidth, url } from "csx";
+import { ColorHelper, deg, important, percent, px, quote, url, viewHeight, viewWidth } from "csx";
 import { keyframes } from "typestyle";
-import { TLength, NestedCSSProperties } from "typestyle/lib/types";
-import { getThemeVariables } from "@library/theming/ThemeProvider";
-import { isAllowedUrl, themeAsset, assetUrl } from "@library/dom/appUtils";
+import { NestedCSSProperties, TLength } from "typestyle/lib/types";
+import { assetUrl, themeAsset } from "@library/utility/appUtils";
 import get from "lodash/get";
-import { ColorValues } from "@library/styles/buttonStyles";
+import { ColorValues } from "@library/forms/buttonStyles";
 
 export const colorOut = (colorValue: ColorValues) => {
     if (!colorValue) {

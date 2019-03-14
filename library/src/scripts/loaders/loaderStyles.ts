@@ -4,20 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../styles/globalStyleVars";
-import {
-    absolutePosition,
-    componentThemeVariables,
-    debugHelper,
-    flexHelper,
-    ISpinnerProps,
-    spinnerLoader,
-    colorOut,
-    unit,
-} from "../styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "../styles/styleUtils";
-import { percent } from "csx";
+import { absolutePosition, flexHelper, ISpinnerProps, spinnerLoader, unit } from "@library/styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import { TLength } from "typestyle/lib/types";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { percent } from "csx";
 
 export const loaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();

@@ -4,15 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import { layoutVariables } from "../styles/layoutStyles";
-import { styleFactory, useThemeCache, variableFactory } from "../styles/styleUtils";
-import { globalVariables } from "../styles/globalStyleVars";
-import { shadowHelper, shadowOrBorderBasedOnLightness } from "../styles/shadowHelpers";
-import { borders, unit, paddings, states, fonts, userSelect, margins, colorOut } from "../styles/styleHelpers";
-import get from "lodash/get";
-import { important, percent } from "csx";
-import { formElementsVariables } from "../forms/formElementStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { borders, colorOut, fonts, margins, paddings, states, unit, userSelect } from "@library/styles/styleHelpers";
+import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { important, percent } from "csx";
+import { layoutVariables } from "@library/styles/layoutStyles";
 
 export const dropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();

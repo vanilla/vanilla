@@ -4,8 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { bodyClasses, bodyCSS } from "@library/styles/bodyStyles";
+import React from "react";
+import { bodyClasses, bodyCSS } from "@library/layout/bodyStyles";
 
 /**
  * Creates a drop down menu

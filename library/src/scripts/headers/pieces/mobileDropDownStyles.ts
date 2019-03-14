@@ -3,13 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../../styles/globalStyleVars";
-import { layoutVariables } from "../../styles/layoutStyles";
-import { debugHelper, flexHelper, userSelect } from "../../styles/styleHelpers";
-import { useThemeCache } from "../../styles/styleUtils";
-import { vanillaHeaderVariables } from "../vanillaHeaderStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { debugHelper, flexHelper, userSelect } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { calc, percent, px } from "csx";
+import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { style } from "typestyle";
+import { layoutVariables } from "@library/styles/layoutStyles";
 
 export const mobileDropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();

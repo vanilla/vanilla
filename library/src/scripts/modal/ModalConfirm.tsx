@@ -4,18 +4,22 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { t } from "../dom/appUtils";
-import Button from "../forms/Button";
-import { Frame, FrameBody, FrameFooter, FrameHeader, FramePanel } from "../layout/frame";
-import SmartAlign from "../utility/SmartAlign";
-import ModalSizes from "ModalSizes";
-import { getRequiredID } from "../utility/idUtils";
-import Modal from "Modal";
-import ButtonLoader from "../loaders/ButtonLoader";
-import { buttonClasses, ButtonTypes } from "@library/styles/buttonStyles";
-import { frameBodyClasses } from "../layout/frame/frameStyles";
+import React from "react";
 import classNames from "classnames";
+import FrameHeader from "@library/layout/frame/FrameHeader";
+import ButtonLoader from "@library/loaders/ButtonLoader";
+import FramePanel from "@library/layout/frame/FramePanel";
+import Frame from "@library/layout/frame/Frame";
+import { getRequiredID } from "@library/utility/idUtils";
+import ModalSizes from "@library/modal/ModalSizes";
+import FrameBody from "@library/layout/frame/FrameBody";
+import FrameFooter from "@library/layout/frame/FrameFooter";
+import { t } from "@library/utility/appUtils";
+import Button from "@library/forms/Button";
+import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
+import SmartAlign from "@library/layout/SmartAlign";
+import { frameBodyClasses } from "@library/layout/frame/frameStyles";
+import Modal from "@library/modal/Modal";
 
 interface IProps {
     title: string; // required for accessibility

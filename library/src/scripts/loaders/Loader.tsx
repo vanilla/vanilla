@@ -4,15 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { t } from "@library/dom/appUtils";
+import React from "react";
+import { unit } from "@library/styles/styleHelpers";
+import { TLength } from "typestyle/lib/types";
+import { t } from "@library/utility/appUtils";
+import { loaderClasses } from "@library/loaders/loaderStyles";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { style } from "typestyle";
 import { PaddingProperty } from "csstype";
-import { TLength } from "typestyle/lib/types";
-import ScreenReaderContent from "@library/utility/ScreenReaderContent";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
-import { unit } from "@library/styles/styleHelpers";
-import { loaderClasses } from "@library/loaders/loaderStyles";
 
 interface IProps {
     minimumTime?: number;

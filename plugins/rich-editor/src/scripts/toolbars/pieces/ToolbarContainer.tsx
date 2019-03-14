@@ -6,12 +6,12 @@
 
 import React from "react";
 import { RangeStatic } from "quill/core";
-import { withEditor, IWithEditorProps } from "../../editor/context";
-import ToolbarPositioner from "ToolbarPositioner";
 import classNames from "classnames";
-import { inlineToolbarClasses } from "../inlineToolbarClasses";
-import { nubClasses } from "nubClasses";
-import { richEditorVariables } from "../../editor/richEditorVariables";
+import ToolbarPositioner from "@rich-editor/toolbars/pieces/ToolbarPositioner";
+import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import { nubClasses } from "@rich-editor/toolbars/pieces/nubClasses";
+import { inlineToolbarClasses } from "@rich-editor/toolbars/inlineToolbarClasses";
+import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
 interface IProps extends IWithEditorProps {
     selection: RangeStatic;

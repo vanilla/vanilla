@@ -3,22 +3,21 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     absolutePosition,
     appearance,
+    colorOut,
     singleLineEllipsis,
     srOnly,
-    colorOut,
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
-import { styleFactory } from "@library/styles/styleUtils";
-import { calc, important, percent, px } from "csx";
-import memoize from "lodash/memoize";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { important, percent } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
-export const richEditorClasses = memoize((theme?: object, legacyMode: boolean = false) => {
+export const richEditorClasses = useThemeCache((legacyMode: boolean = false) => {
     const globalVars = globalVariables();
     const style = styleFactory("richEditor");
     const vars = richEditorVariables();

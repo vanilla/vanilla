@@ -5,10 +5,10 @@
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { borders, longWordEllipsis, paddings, colorOut, unit } from "@library/styles/styleHelpers";
-import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
-import { richEditorVariables } from "../../editor/richEditorVariables";
+import { borders, colorOut, longWordEllipsis, paddings, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { calc, percent } from "csx";
+import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
 export const richEditorFlyoutClasses = useThemeCache(() => {
     const vars = richEditorVariables();

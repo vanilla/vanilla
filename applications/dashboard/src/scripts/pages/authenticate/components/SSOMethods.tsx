@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import React from "react";
 import Paragraph from "@library/layout/Paragraph";
 import { IUserAuthenticator } from "@dashboard/@types/api";

@@ -4,13 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { t } from "../../../dom/appUtils";
-import { notifications } from "../../../icons/header";
-import Count from "library/src/scripts/content/Count";
-import classNames from "classnames";
-import { connect } from "react-redux";
-import { IUsersStoreState } from "../../../features/users/UsersModel";
+import React from "react";
+import { t } from "@library/utility/appUtils";
+import { IUsersStoreState } from "@library/features/users/UsersModel";
+import Count from "@library/content/Count";
+import { notifications } from "@library/icons/header";
 
 /**
  * Implements Notifications toggle contents

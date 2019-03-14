@@ -4,10 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { Optionalize } from "../@types/utils";
-import { ISearchOptionData } from "../features/search/SearchOption";
-import { IComboBoxOption } from "../features/search/SearchBar";
+import React from "react";
+import { Optionalize } from "@library/@types/utils";
+import { ISearchOptionData } from "@library/features/search/SearchOption";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
+
 const PageContext = React.createContext<IWithPagesProps>({ pages: {} });
 export default PageContext;
 

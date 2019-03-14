@@ -4,8 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import { componentThemeVariables, debugHelper, unit } from "../styles/styleHelpers";
-import { useThemeCache } from "../styles/styleUtils";
+import { debugHelper, unit } from "@library/styles/styleHelpers";
+import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
 
 export const simplePagerVariables = useThemeCache(() => {

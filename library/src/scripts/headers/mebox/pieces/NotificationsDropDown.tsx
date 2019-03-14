@@ -4,17 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import { t } from "../../../dom/appUtils";
-import { uniqueIDFromPrefix } from "../../../utility/idUtils";
-import DropDown from "../../../flyouts/DropDown";
-import NotificationsContents, {
-    INotificationsProps,
-} from "library/src/scripts/headers/mebox/pieces/NotificationsContents";
-import NotificationsCounter from "library/src/scripts/headers/mebox/pieces/NotificationsCounter";
-import classNames from "classnames";
-import * as React from "react";
-import { vanillaHeaderClasses } from "../../vanillaHeaderStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import React from "react";
+import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
+import NotificationsContents, { INotificationsProps } from "@library/headers/mebox/pieces/NotificationsContents";
+import { t } from "@library/utility/appUtils";
+import NotificationsCounter from "@library/headers/mebox/pieces/NotificationsCounter";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import DropDown from "@library/flyouts/DropDown";
 
 interface IProps extends INotificationsProps {
     buttonClassName?: string;

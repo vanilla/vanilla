@@ -5,11 +5,10 @@
 
 import React from "react";
 import classNames from "classnames";
-import { close } from "../icons/common";
-import { t } from "../dom/appUtils";
-import { ILegacyProps } from "../@types/legacy";
-import Button from "../forms/Button";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import { t } from "@library/utility/appUtils";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import Button from "@library/forms/Button";
+import { ILegacyProps } from "@library/@types/legacy";
 
 interface IProps extends Partial<ILegacyProps> {
     className?: string;

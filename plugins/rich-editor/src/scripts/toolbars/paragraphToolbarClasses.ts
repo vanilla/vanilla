@@ -6,8 +6,8 @@
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
-import { richEditorVariables } from "../editor/richEditorVariables";
 import { calc } from "csx";
+import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
 export const paragraphToolbarContainerClasses = useThemeCache(() => {
     const vars = richEditorVariables();

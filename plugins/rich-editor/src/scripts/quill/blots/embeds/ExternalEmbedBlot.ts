@@ -4,10 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { setData, getData, escapeHTML } from "@library/utility/domUtils";
+import { setData, getData, escapeHTML } from "@library/dom/domUtils";
 import uniqueId from "lodash/uniqueId";
 import { IEmbedData, renderEmbed, FOCUS_CLASS } from "@library/content/embeds/embedUtils";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import { logError, capitalizeFirstLetter } from "@library/utility/utils";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import ErrorBlot, { IErrorData, ErrorBlotType } from "@rich-editor/quill/blots/embeds/ErrorBlot";

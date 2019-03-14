@@ -5,17 +5,17 @@
  */
 
 import React from "react";
-import { Grid, AutoSizer } from "react-virtualized";
+import { AutoSizer, Grid } from "react-virtualized";
 import classNames from "classnames";
-import { t } from "@library/dom/appUtils";
-import { withEditor, IWithEditorProps } from "../../editor/context";
-import { EMOJIS, EMOJI_GROUPS } from "emojiData";
+import { t } from "@library/utility/appUtils";
+import { EMOJI_GROUPS, EMOJIS } from "emojiData";
 import Popover from "Flyout";
 import EmojiButton from "EmojiButton";
 import { IFlyoutToggleChildParameters } from "@library/flyouts/FlyoutToggle";
 import { EmojiGroupButton } from "EmojiGroupButton";
 import { emojiGroupsClasses } from "insertEmojiGroupClasses";
 import { insertEmojiClasses } from "insertEmojiClasses";
+import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
 
 const BUTTON_SIZE = 36;
 const COL_SIZE = 7;

@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { getMeta } from "../dom/appUtils";
+import { getMeta } from "@library/utility/appUtils";
 
 /**
  * A component for displaying and setting the document title.

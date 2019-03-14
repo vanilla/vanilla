@@ -6,9 +6,9 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { appearance, unit } from "@library/styles/styleHelpers";
-import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
-import { richEditorVariables } from "../../editor/richEditorVariables";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { viewHeight } from "csx";
+import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
 export const insertEmojiClasses = useThemeCache(() => {
     const globalVars = globalVariables();

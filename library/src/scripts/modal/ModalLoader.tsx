@@ -5,11 +5,11 @@
  */
 
 import React from "react";
-import { withRouter, RouteComponentProps } from "react-router-dom";
-import Loader from "../loaders/Loader";
-import ModalSizes from "ModalSizes";
-import Modal from "Modal";
-import { t } from "../dom/appUtils";
+import { t } from "@library/utility/appUtils";
+import ModalSizes from "@library/modal/ModalSizes";
+import Loader from "@library/loaders/Loader";
+import { RouteComponentProps, withRouter } from "react-router";
+import Modal from "@library/modal/Modal";
 
 interface IProps extends RouteComponentProps<{}> {}
 

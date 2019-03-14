@@ -5,15 +5,15 @@
  */
 
 import React from "react";
-import Translate from "../content/Translate";
-import DateTime from "../content/DateTime";
-import { IUserFragment } from "../@types/api";
-import BreadCrumbString, { ICrumbString } from "../navigation/BreadCrumbString";
-import { t } from "../dom/appUtils";
-import { ArticleStatus } from "../../../../plugins/knowledge/src/scripts/@types/api";
-import { capitalizeFirstLetter } from "../utility/utils";
 import classNames from "classnames";
-import { metasClasses } from "../styles/metasStyles";
+import { IUserFragment } from "@library/@types/api/users";
+import { capitalizeFirstLetter } from "@library/utility/utils";
+import { t } from "@library/utility/appUtils";
+import { ArticleStatus } from "@knowledge/@types/api/article";
+import BreadCrumbString, { ICrumbString } from "@library/navigation/BreadCrumbString";
+import { metasClasses } from "@library/styles/metasStyles";
+import Translate from "@library/content/Translate";
+import DateTime from "@library/content/DateTime";
 
 interface IProps {
     updateUser: IUserFragment;

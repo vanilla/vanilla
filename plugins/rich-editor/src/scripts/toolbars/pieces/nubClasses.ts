@@ -6,8 +6,8 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { singleBorder, colorOut, unit, userSelect } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
-import { richEditorVariables } from "../../editor/richEditorVariables";
 import { translateX } from "csx";
+import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
 export const nubClasses = useThemeCache(() => {
     const globalVars = globalVariables();

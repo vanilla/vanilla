@@ -5,7 +5,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { smartAlignClasses } from "./smartAlignStyles";
+import { smartAlignClasses } from "@library/layout/smartAlignStyles";
 
 interface IProps {
     className?: string;

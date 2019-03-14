@@ -4,17 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import React, { RefObject } from "react";
-import { getRequiredID } from "../utility/idUtils";
-import classNames from "classnames";
-import Button from "../forms/Button";
-import FocusWatcher from "../utility/FocusWatcher";
-import EscapeListener from "../utility/EscapeListener";
-import Modal from "../modal/Modal";
-import { t } from "../dom/appUtils";
-import ModalSizes from "../modal/ModalSizes";
-import { dropDownClasses } from "library/src/scripts/flyouts/dropDownStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import React from "react";
+import FocusWatcher from "@library/dom/FocusWatcher";
+import EscapeListener from "@library/dom/EscapeListener";
+import { t } from "@library/utility/appUtils";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { getRequiredID } from "@library/utility/idUtils";
+import Button from "@library/forms/Button";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
 export interface IFlyoutToggleChildParameters {
     id: string;

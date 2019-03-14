@@ -4,12 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import classNames from "classnames";
-import DropDownItem from "./DropDownItem";
-import Heading from "../../layout/Heading";
-import DropDownItemSeparator from "DropDownItemSeparator";
-import { dropDownClasses } from "../dropDownStyles";
+import React from "react";
+import DropDownItem from "@library/flyouts/items/DropDownItem";
+import Heading from "@library/layout/Heading";
+import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
 interface IProps {
     title: string;

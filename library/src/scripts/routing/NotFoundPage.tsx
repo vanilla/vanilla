@@ -4,9 +4,9 @@
  */
 
 import React from "react";
+import { t } from "@library/utility/appUtils";
+import DocumentTitle from "@library/routing/DocumentTitle";
 import { sprintf } from "sprintf-js";
-import { t } from "../dom/appUtils";
-import DocumentTitle from "./DocumentTitle";
 
 export default class NotFoundPage extends React.PureComponent<IProps> {
     public static defaultProps = {

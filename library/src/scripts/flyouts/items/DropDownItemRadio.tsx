@@ -4,10 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { check } from "../../icons/common";
+import React from "react";
 import classNames from "classnames";
-import DropDownItem from "./DropDownItem";
+import DropDownItem from "@library/flyouts/items/DropDownItem";
+import { check } from "@library/icons/common";
 
 export interface IMenuRadioOption {
     name: string;

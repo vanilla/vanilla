@@ -4,21 +4,20 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import SearchBar from "../../../features/search/SearchBar";
-import { t } from "../../../dom/appUtils";
-import Button from "../../../forms/Button";
-import classNames from "classnames";
-import { search } from "../../../icons/header";
-import { uniqueIDFromPrefix } from "../../../utility/idUtils";
-import SearchOption from "../../../features/search/SearchOption";
-import { withSearch, IWithSearchProps } from "../../../contexts/SearchContext";
-import { withRouter, RouteComponentProps } from "react-router-dom";
-import FocusWatcher from "../../../utility/FocusWatcher";
-import { vanillaHeaderClasses } from "../../vanillaHeaderStyles";
-import { compactSearchClasses } from "@library/styles/compactSearchStyles";
-import { searchBarClasses } from "../../../features/search/searchBarStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import React from "react";
+import { compactSearchClasses } from "@library/headers/mebox/pieces/compactSearchStyles";
+import FocusWatcher from "@library/dom/FocusWatcher";
+import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
+import SearchBar from "@library/features/search/SearchBar";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { RouteComponentProps, withRouter } from "react-router";
+import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
+import SearchOption from "@library/features/search/SearchOption";
+import { search } from "@library/icons/header";
+import { t } from "@library/utility/appUtils";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;

@@ -4,14 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { NavLink } from "react-router-dom";
-import classNames from "classnames";
-import { LocationDescriptor } from "history";
-import DropDownItem from "./DropDownItem";
-import { ModalLink } from "../../modal";
-import SmartLink from "../../routing/links/SmartLink";
-import { dropDownClasses } from "../dropDownStyles";
+import React from "react";
+import { History } from "history";
+import LocationDescriptor = History.LocationDescriptor;
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import SmartLink from "@library/routing/links/SmartLink";
 
 export interface IDropDownItemLink {
     to: LocationDescriptor;

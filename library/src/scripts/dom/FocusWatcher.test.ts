@@ -6,7 +6,7 @@
 
 import { expect } from "chai";
 import sinon from "sinon";
-import FocusWatcher from "FocusWatcher";
+import FocusWatcher from "library/src/scripts/dom/FocusWatcher";
 
 describe("FocusWatcher", () => {
     beforeEach(() => {

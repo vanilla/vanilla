@@ -6,8 +6,8 @@
 
 import { unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
-import { richEditorVariables } from "../../editor/richEditorVariables";
 import { calc, important, percent } from "csx";
+import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
 export const insertLinkClasses = useThemeCache(() => {
     const vars = richEditorVariables();

@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { formatUrl, getMeta } from "@library/dom/appUtils";
+import { formatUrl, getMeta } from "@library/utility/appUtils";
 import { log, matchAtMention as _matchAtMention } from "@library/utility/utils";
 
 // Store cache results in an outer scoped variable., so all instances share the same data

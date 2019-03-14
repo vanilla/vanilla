@@ -4,19 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { dropDownMenu } from "../icons/common";
-import { getRequiredID } from "../utility/idUtils";
-import FlyoutToggle from "FlyoutToggle";
-import DropDownContents from "./DropDownContents";
-import Heading from "../layout/Heading";
-import SmartAlign from "../utility/SmartAlign";
-import classNames from "classnames";
-import FlexSpacer from "../layout/FlexSpacer";
-import CloseButton from "../navigation/CloseButton";
-import { dropDownClasses } from "dropDownStyles";
-import { frameHeaderClasses } from "../layout/frame/frameStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import React from "react";
+import { frameHeaderClasses } from "@library/layout/frame/frameStyles";
+import Heading from "@library/layout/Heading";
+import DropDownContents from "@library/flyouts/DropDownContents";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { getRequiredID } from "@library/utility/idUtils";
+import FlexSpacer from "@library/layout/FlexSpacer";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import SmartAlign from "@library/layout/SmartAlign";
+import CloseButton from "@library/navigation/CloseButton";
+import FlyoutToggle from "@library/flyouts/FlyoutToggle";
 
 export interface IProps {
     id?: string;

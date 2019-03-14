@@ -3,11 +3,10 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, variableFactory } from "../../styles/styleUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { cssRule } from "typestyle";
-import { globalVariables } from "../../styles/globalStyleVars";
-import { frameVariables } from "../../layout/frame/frameStyles";
-import { colorOut } from "../../styles/styleHelpers";
+import { colorOut } from "@library/styles/styleHelpers";
 
 export const radioTabsVariables = useThemeCache(() => {
     const gVars = globalVariables();

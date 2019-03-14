@@ -5,10 +5,9 @@
  */
 
 import React from "react";
-import classNames from "classnames";
-import Heading, { ICommonHeadingProps, IHeadingProps } from "../Heading";
-import FrameHeader, { IFrameHeaderProps } from "library/src/scripts/layout/frame/FrameHeader";
-import { frameHeaderClasses } from "library/src/scripts/layout/frame/frameStyles";
+import FrameHeader, { IFrameHeaderProps } from "@library/layout/frame/FrameHeader";
+import { ICommonHeadingProps } from "@library/layout/Heading";
+import { frameHeaderClasses } from "@library/layout/frame/frameStyles";
 
 interface IProps extends ICommonHeadingProps {
     children: React.ReactNode;

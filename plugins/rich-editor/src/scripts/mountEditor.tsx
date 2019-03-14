@@ -6,7 +6,7 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
-import { ensureHtmlElement } from "@library/utility/domUtils";
+import { ensureHtmlElement } from "@library/dom/domUtils";
 import Editor from "@rich-editor/editor/Editor";
 import { hasPermission } from "@library/features/users/permissionUtils";
 

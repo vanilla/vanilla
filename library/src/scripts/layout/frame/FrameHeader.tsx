@@ -5,15 +5,13 @@
  */
 
 import React from "react";
-import classNames from "classnames";
-
-import { t } from "../../dom/appUtils";
-import CloseButton from "../../navigation/CloseButton";
-import Heading, { ICommonHeadingProps } from "../Heading";
-import Button from "../../forms/Button";
-import { leftChevron } from "../../icons/common";
-import { frameFooterClasses, frameHeaderClasses } from "library/src/scripts/layout/frame/frameStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import Heading, { ICommonHeadingProps } from "@library/layout/Heading";
+import { frameHeaderClasses } from "@library/layout/frame/frameStyles";
+import { t } from "@library/utility/appUtils";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { leftChevron } from "@library/icons/common";
+import CloseButton from "@library/navigation/CloseButton";
 
 export interface IFrameHeaderProps extends ICommonHeadingProps {
     closeFrame?: (e) => void; // Necessary when in modal, but not if in flyouts

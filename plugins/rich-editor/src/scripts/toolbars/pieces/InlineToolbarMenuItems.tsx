@@ -5,14 +5,13 @@
  */
 
 import React from "react";
-import MenuItems from "MenuItems";
-import { IMenuItemData } from "MenuItem";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import * as icons from "@library/icons/editorIcons";
-import Formatter from "../../quill/Formatter";
 import { IFormats, RangeStatic } from "quill/core";
 import classNames from "classnames";
-import { inlineToolbarClasses } from "../inlineToolbarClasses";
+import { inlineToolbarClasses } from "@rich-editor/toolbars/inlineToolbarClasses";
+import { IMenuItemData } from "@rich-editor/toolbars/pieces/MenuItem";
+import MenuItems from "@rich-editor/toolbars/pieces/MenuItems";
 
 interface IProps {
     formatter: Formatter;

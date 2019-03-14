@@ -4,11 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { t } from "../../../dom/appUtils";
-import { messages } from "../../../icons/header";
-import Count from "library/src/scripts/content/Count";
-import classNames from "classnames";
-import * as React from "react";
+import React from "react";
+import { t } from "@library/utility/appUtils";
+import { messages } from "@library/icons/header";
+import Count from "@library/content/Count";
 
 interface IProps {
     countClass?: string;

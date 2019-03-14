@@ -5,7 +5,7 @@
 
 import { getFieldErrors, getGlobalErrorMessage } from "@library/apiv2";
 import { LoadStatus } from "@library/@types/api";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import React from "react";
 import ButtonSubmit from "@library/forms/ButtonSubmit";

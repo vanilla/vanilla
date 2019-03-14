@@ -4,28 +4,26 @@
  * @license GPL-2.0-only
  */
 
-import { assetUrl, isAllowedUrl, themeAsset } from "../dom/appUtils";
-import { globalVariables } from "../styles/globalStyleVars";
-import {
-    background,
-    centeredBackgroundProps,
-    getBackgroundImage,
-    modifyColorBasedOnLightness,
-    IFont,
-    paddings,
-    colorOut,
-    unit,
-    IBackground,
-    fonts,
-} from "../styles/styleHelpers";
-import { useThemeCache, styleFactory, variableFactory } from "../styles/styleUtils";
-import { percent, px, url } from "csx";
-import { widgetVariables } from "../styles/widgetStyleVars";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 import { FontWeightProperty, PaddingProperty, TextAlignLastProperty, TextShadowProperty } from "csstype";
-import { formElementsVariables } from "../forms/formElementStyles";
+import { percent, px } from "csx";
+import {
+    centeredBackgroundProps,
+    colorOut,
+    fonts,
+    getBackgroundImage,
+    IBackground,
+    IFont,
+    modifyColorBasedOnLightness,
+    paddings,
+    unit,
+} from "@library/styles/styleHelpers";
+import { transparentColor } from "@library/forms/buttonStyles";
+import { assetUrl } from "@library/utility/appUtils";
 import { TLength } from "typestyle/lib/types";
-import get from "lodash/get";
-import { transparentColor } from "@library/styles/buttonStyles";
+import { widgetVariables } from "@library/styles/widgetStyleVars";
 
 export const splashVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("splash");

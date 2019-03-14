@@ -16,7 +16,7 @@ import {
     insertNewLineAtStartOfScroll,
     rangeContainsBlot,
 } from "@rich-editor/quill/utility";
-import { isAllowedUrl } from "@library/dom/appUtils";
+import { isAllowedUrl } from "@library/utility/appUtils";
 import LineBlot from "@rich-editor/quill/blots/abstract/LineBlot";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";

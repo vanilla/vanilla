@@ -5,9 +5,7 @@
  */
 
 import React from "react";
-import { uniqueIDFromPrefix } from "../utility/idUtils";
-import classNames from "classnames";
-import TabContext from "../contexts/TabContext";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { radioTabCss } from "@library/forms/radioTabs/radioTabStyles";
 
 interface IProps {

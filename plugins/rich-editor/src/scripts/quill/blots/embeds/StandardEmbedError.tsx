@@ -8,7 +8,7 @@ import classNames from "classnames";
 import { FOCUS_CLASS } from "@library/content/embeds/embedUtils";
 import { userWarning } from "@library/icons/header";
 import CloseButton from "@library/navigation/CloseButton";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 
 interface IProps {
     children: string;

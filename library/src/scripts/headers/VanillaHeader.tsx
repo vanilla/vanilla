@@ -4,9 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { t } from "../dom/appUtils";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
-import { Devices, IDeviceProps } from "../layout/DeviceChecker";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Container from "@library/layout/components/Container";
 import { Panel, PanelWidgetHorizontalPadding } from "../layout/PanelLayout";
@@ -31,8 +29,10 @@ import * as React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import { style } from "typestyle";
-import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
+import { vanillaHeaderClasses, vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
+import { t } from "@library/utility/appUtils";
+import { Devices, IDeviceProps } from "@library/layout/DeviceChecker";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.

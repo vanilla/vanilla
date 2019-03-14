@@ -6,8 +6,8 @@
 
 import React from "react";
 import classNames from "classnames";
-import { t } from "@library/dom/appUtils";
-import { richEditorClasses } from "../../editor/richEditorClasses";
+import { t } from "@library/utility/appUtils";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 interface IProps {
     name: string;

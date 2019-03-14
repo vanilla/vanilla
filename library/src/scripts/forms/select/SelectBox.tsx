@@ -4,13 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import { ButtonTypes } from "../buttonStyles";
-import { downTriangle } from "../../icons";
-import { t } from "../../dom/appUtils";
-import { getRequiredID } from "../../utility/idUtils";
+import React from "react";
+import { downTriangle } from "@library/icons/common";
+import { t } from "@library/utility/appUtils";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { getRequiredID } from "@library/utility/idUtils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { selectBoxClasses } from "selectBoxStyles";
-import { metasClasses } from "../../styles/metasStyles";
+import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
+import DropDown from "@library/flyouts/DropDown";
+import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
+import { metasClasses } from "@library/styles/metasStyles";
 
 export interface ISelectBoxItem {
     name: string;

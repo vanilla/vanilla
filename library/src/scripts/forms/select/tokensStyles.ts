@@ -4,10 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { formElementsVariables } from "../formElementStyles";
-import { globalVariables } from "../../styles/globalStyleVars";
-import { componentThemeVariables, debugHelper, unit, userSelect } from "../../styles/styleHelpers";
-import { useThemeCache } from "../../styles/styleUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { debugHelper, unit, userSelect } from "@library/styles/styleHelpers";
+import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
 import { style } from "typestyle";
 

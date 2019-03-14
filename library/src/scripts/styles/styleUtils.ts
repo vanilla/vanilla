@@ -6,13 +6,12 @@
 
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { style } from "typestyle";
-import getStore, { getDeferredStoreState } from "@library/redux/getStore";
-import { getMeta } from "@library/dom/appUtils";
+import { getDeferredStoreState } from "@library/redux/getStore";
+import { getMeta } from "@library/utility/appUtils";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import memoize from "lodash/memoize";
 import { getThemeVariables } from "@library/theming/ThemeProvider";
 import merge from "lodash/merge";
-import { px, ColorHelper, color } from "csx";
 
 /**
  * A better helper to generate human readable classes generated from TypeStyle.
@@ -32,6 +31,8 @@ export function styleFactory(componentName: string) {
         if (objects.length === 0) {
             return style();
         }
+
+        const thing: string = 1;
 
         let debugName = componentName;
         let styleObjs: Array<NestedCSSProperties | undefined> = objects as any;

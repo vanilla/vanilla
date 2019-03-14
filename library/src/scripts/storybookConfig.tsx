@@ -9,7 +9,7 @@ import Backgrounds from "@library/layout/Backgrounds";
 import { ThemeProvider } from "@library/theming/ThemeProvider";
 import { Provider } from "react-redux";
 import getStore from "@library/redux/getStore";
-import { ensureScript } from "@library/utility/domUtils";
+import { ensureScript } from "@library/dom/domUtils";
 import "../scss/_base.scss";
 
 const errorMessage = "There was an error fetching the theme.";

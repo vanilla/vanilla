@@ -4,26 +4,24 @@
  * @license GPL-2.0-only
  */
 
-import { formElementsVariables } from "formElementStyles";
-import { globalVariables } from "../styles/globalStyleVars";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import {
     borders,
-    componentThemeVariables,
+    colorOut,
+    defaultTransition,
     flexHelper,
+    fonts,
+    IBorderStyles,
+    IFont,
     modifyColorBasedOnLightness,
     spinnerLoader,
-    colorOut,
     unit,
     userSelect,
-    IFont,
-    IBorderStyles,
-    fonts,
-    defaultTransition,
-} from "../styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "../styles/styleUtils";
-import { ColorHelper, important, px, percent } from "csx";
+} from "@library/styles/styleHelpers";
 import { TLength } from "typestyle/lib/types";
-import get from "lodash/get";
+import { componentThemeVariables, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { ColorHelper, important, percent, px } from "csx";
 
 export const buttonGlobalVariables = useThemeCache(() => {
     const globalVars = globalVariables();

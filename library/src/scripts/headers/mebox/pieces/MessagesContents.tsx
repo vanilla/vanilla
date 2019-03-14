@@ -4,28 +4,21 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import classNames from "classnames";
-import { t } from "../../../dom/appUtils";
-import FrameBody from "../../../layout/frame/FrameBody";
-import FramePanel from "../../../layout/frame/FramePanel";
-import FrameFooter from "../../../layout/frame/FrameFooter";
-import LinkAsButton from "../../../routing/LinkAsButton";
-import Frame from "../../../layout/frame/Frame";
-import { compose } from "../../../icons/header";
-import { IMeBoxMessageItem, MeBoxItemType } from "library/src/scripts/headers/mebox/pieces/MeBoxDropDownItem";
-import MeBoxDropDownItemList from "library/src/scripts/headers/mebox/pieces/MeBoxDropDownItemList";
-import FrameHeaderWithAction from "../../../layout/frame/FrameHeaderWithAction";
-import { connect } from "react-redux";
-import ConversationsActions from "../../../features/conversations/ConversationsActions";
-import apiv2 from "../../../apiv2";
-import { IConversationsStoreState } from "../../../features/conversations/ConversationsModel";
-import { IUserFragment, IConversation, LoadStatus, GetConversationsExpand } from "../../../@types/api";
-import { withDevice } from "../../../layout/DeviceContext";
-import { IDeviceProps, Devices } from "../../../layout/DeviceChecker";
-import Loader from "../../../loaders/Loader";
-import { loaderClasses } from "../../../loaders/loaderStyles";
-import { ButtonTypes, buttonUtilityClasses } from "@library/styles/buttonStyles";
+import React from "react";
+import ConversationsActions from "@library/features/conversations/ConversationsActions";
+import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
+import { IConversationsStoreState } from "@library/features/conversations/ConversationsModel";
+import Loader from "@library/loaders/Loader";
+import { GetConversationsExpand, IConversation, IUserFragment, LoadStatus } from "@library/@types/api";
+import { Devices, IDeviceProps } from "@library/layout/DeviceChecker";
+import { loaderClasses } from "@library/loaders/loaderStyles";
+import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
+import apiv2 from "@library/apiv2";
+import { withDevice } from "@library/layout/DeviceContext";
+import { IMeBoxMessageItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
+import LinkAsButton from "@library/routing/LinkAsButton";
+import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
+import { t } from "@library/utility/appUtils";
 
 /**
  * Implements Messages Contents to be included in drop down or tabs

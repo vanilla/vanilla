@@ -4,7 +4,7 @@
  */
 
 import { getFieldErrors, getGlobalErrorMessage } from "@library/apiv2";
-import { t } from "@library/dom/appUtils";
+import { t } from "@library/utility/appUtils";
 import React from "react";
 import { withRouter, Link } from "react-router-dom";
 import InputTextBlock from "@library/forms/InputTextBlock";

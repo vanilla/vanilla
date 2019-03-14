@@ -5,11 +5,9 @@
  */
 
 import React from "react";
-import classNames from "classnames";
-import Button from "../Button";
-import { t } from "../../dom/appUtils";
-import { clear } from "../../icons/common";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import { t } from "@library/utility/appUtils";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps {
     onClick: (event: React.SyntheticEvent) => void;

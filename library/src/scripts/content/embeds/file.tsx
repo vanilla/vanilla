@@ -6,7 +6,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { registerEmbedComponent, IEmbedProps, IFileUploadData } from "@library/content/embeds/embedUtils";
-import { onContent, onReady } from "@library/dom/appUtils";
+import { onContent, onReady } from "@library/utility/appUtils";
 import Attachment from "@library/content/attachments/Attachment";
 import { AttachmentType, mimeTypeToAttachmentType } from "@library/content/attachments";
 import BaseEmbed from "@library/content/embeds/BaseEmbed";

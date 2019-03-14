@@ -4,11 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { t } from "../dom/appUtils";
+import React from "react";
 import classNames from "classnames";
+import { t } from "@library/utility/appUtils";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IState {
     id: string;

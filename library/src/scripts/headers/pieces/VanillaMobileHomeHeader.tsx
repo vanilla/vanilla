@@ -4,28 +4,24 @@
  * @license GPL-2.0-only
  */
 
-import { Devices, IDeviceProps } from "../../layout/DeviceChecker";
-import FlexSpacer from "../../layout/FlexSpacer";
-import { signIn } from "../../icons";
-import LanguagesDropDown from "../../layout/LanguagesDropDown";
-import Container from "../../layout/components/Container";
-import { PanelWidgetHorizontalPadding } from "../../layout/PanelLayout";
-import CompactMeBox from "../mebox/pieces/CompactMeBox";
-import HeaderLogo from "../mebox/pieces/HeaderLogo";
-import VanillaHeaderListItem from "../mebox/pieces/VanillaHeaderListItem";
-import VanillaHeaderNav from "../mebox/pieces/VanillaHeaderNav";
-import VanillaHeaderNavItem from "../mebox/pieces/VanillaHeaderNavItem";
-import { dummyNavigationData } from "../mebox/state/dummyNavigationData";
-import { withDevice } from "../../layout/DeviceContext";
-import { dummyOtherLanguagesData } from "../../redux/dummyOtherLanguages";
-import { ButtonTypes } from "@library/styles/buttonStyles";
-import { vanillaHeaderClasses, vanillaHeaderHomeClasses } from "../vanillaHeaderStyles";
-import { LogoType } from "../../theming/ThemeLogo";
-import UsersModel, { IInjectableUserState } from "../../features/users/UsersModel";
-import classNames from "classnames";
-import * as React from "react";
-import ReactDOM from "react-dom";
-import { connect } from "react-redux";
+import React from "react";
+import LanguagesDropDown from "@library/layout/LanguagesDropDown";
+import CompactMeBox from "@library/headers/mebox/pieces/CompactMeBox";
+import { VanillaHeaderNavItem } from "@library/headers/mebox/pieces/VanillaHeaderNavItem";
+import { withDevice } from "@library/layout/DeviceContext";
+import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
+import { Devices, IDeviceProps } from "@library/layout/DeviceChecker";
+import { dummyOtherLanguagesData } from "@library/redux/dummyOtherLanguages";
+import { vanillaHeaderClasses, vanillaHeaderHomeClasses } from "@library/headers/vanillaHeaderStyles";
+import { LogoType } from "@library/theming/ThemeLogo";
+import VanillaHeaderNav from "@library/headers/mebox/pieces/VanillaHeaderNav";
+import HeaderLogo from "@library/headers/mebox/pieces/HeaderLogo";
+import FlexSpacer from "@library/layout/FlexSpacer";
+import VanillaHeaderListItem from "@library/headers/mebox/pieces/VanillaHeaderListItem";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
+import { dummyNavigationData } from "@library/headers/mebox/state/dummyNavigationData";
+import { signIn } from "@library/icons/common";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.

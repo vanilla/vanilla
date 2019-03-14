@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
+import React from "react";
 import classNames from "classnames";
 import BackLink from "@library/routing/links/BackLink";
 import Heading from "@library/layout/Heading";

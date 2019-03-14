@@ -5,14 +5,14 @@
  */
 
 import React, { Component } from "react";
-import Heading from "../layout/Heading";
 import classNames from "classnames";
-import SmartLink from "library/src/scripts/routing/links/SmartLink";
-import { INavigationItem } from "../@types/api";
-import { t } from "../dom/appUtils";
-import ScreenReaderContent from "../utility/ScreenReaderContent";
-import Translate from "../content/Translate";
-import { navLinksClasses } from "navLinksStyles";
+import Heading from "@library/layout/Heading";
+import { t } from "@library/utility/appUtils";
+import { INavigationItem } from "@library/@types/api/core";
+import SmartLink from "@library/routing/links/SmartLink";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { navLinksClasses } from "@library/navigation/navLinksStyles";
+import Translate from "@library/content/Translate";
 
 interface IProps {
     classNames?: string;

@@ -3,8 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { ensureScript } from "@library/utility/domUtils";
-import { onContent } from "@library/dom/appUtils";
+import { ensureScript } from "@library/dom/domUtils";
+import { onContent } from "@library/utility/appUtils";
 import { IEmbedData, IEmbedElements, registerEmbedRenderer } from "@library/content/embeds/embedUtils";
 import { IScrapeData } from "@dashboard/@types/api";
 

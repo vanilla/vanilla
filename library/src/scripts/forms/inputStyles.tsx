@@ -3,10 +3,11 @@
  * @license GPL-2.0-only
  */
 
-import { useThemeCache, variableFactory, styleFactory } from "../styles/styleUtils";
-import { globalVariables } from "../styles/globalStyleVars";
-import { px, important } from "csx";
-import { colorOut, placeholderStyles, borders, IBorderStyles } from "../styles/styleHelpers";
+import React from "react";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { borders, colorOut, IBorderStyles, placeholderStyles } from "@library/styles/styleHelpers";
+import { px } from "csx";
 import { cssRule } from "typestyle";
 
 export const inputVariables = useThemeCache(() => {

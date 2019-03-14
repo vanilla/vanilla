@@ -6,7 +6,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { registerEmbedComponent, IEmbedProps, IEmbedData, IQuoteEmbedData } from "@library/content/embeds/embedUtils";
-import { onContent, t, formatUrl, makeProfileUrl } from "@library/dom/appUtils";
+import { onContent, t, formatUrl, makeProfileUrl } from "@library/utility/appUtils";
 import CollapsableUserContent from "@library/content/CollapsableContent";
 import uniqueId from "lodash/uniqueId";
 import classnames from "classnames";

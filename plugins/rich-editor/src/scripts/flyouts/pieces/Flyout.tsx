@@ -7,11 +7,10 @@
 import React from "react";
 import classNames from "classnames";
 import CloseButton from "@library/navigation/CloseButton";
-import { IWithEditorProps, withEditor } from "../../editor/context";
-import { flyoutPosition } from "./flyoutPosition";
-import { richEditorFlyoutClasses } from "flyoutClasses";
-import { richEditorClasses } from "../../editor/richEditorClasses";
-import { insertEmojiClasses } from "insertEmojiClasses";
+import { flyoutPosition } from "@rich-editor/flyouts/pieces/flyoutPosition";
+import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import { richEditorFlyoutClasses } from "@rich-editor/flyouts/pieces/flyoutClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 interface IState {
     id: string;

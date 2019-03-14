@@ -4,8 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import { componentThemeVariables, debugHelper, objectFitWithFallback, unit } from "../../../styles/styleHelpers";
-import { useThemeCache } from "../../../styles/styleUtils";
+import { debugHelper, objectFitWithFallback, unit } from "@library/styles/styleHelpers";
+import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
 
 /**

@@ -4,11 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { t } from "../dom/appUtils";
 import React from "react";
-import classNames from "classnames";
-import { IOptionalComponentID, getOptionalID, getRequiredID } from "../utility/idUtils";
-import { checkRadioClasses } from "@library/styles/checkRadioStyles";
+import { t } from "@library/utility/appUtils";
+import { getRequiredID, IOptionalComponentID } from "@library/utility/idUtils";
+import { checkRadioClasses } from "@library/forms/checkRadioStyles";
 
 interface IProps extends IOptionalComponentID {
     id?: string;

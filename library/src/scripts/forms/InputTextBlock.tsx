@@ -5,11 +5,10 @@
  */
 
 import React from "react";
-import classNames from "classnames";
-import { getRequiredID } from "../utility/idUtils";
-import InputBlock, { IInputBlockProps } from "InputBlock";
-import { Omit } from "../@types/utils";
-import { inputClasses } from "inputStyles";
+import { inputClasses } from "@library/forms/inputStyles";
+import InputBlock, { IInputBlockProps } from "@library/forms/InputBlock";
+import { getRequiredID } from "@library/utility/idUtils";
+import { Omit } from "@library/@types/utils";
 
 export enum InputTextBlockBaseClass {
     STANDARD = "inputBlock",

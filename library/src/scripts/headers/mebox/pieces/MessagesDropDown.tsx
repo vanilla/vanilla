@@ -4,14 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import { t } from "../../../dom/appUtils";
-import { uniqueIDFromPrefix } from "../../../utility/idUtils";
-import DropDown from "../../../flyouts/DropDown";
-import MessagesContents from "library/src/scripts/headers/mebox/pieces/MessagesContents";
-import MessagesCount from "library/src/scripts/headers/mebox/pieces/MessagesCount";
-import classNames from "classnames";
-import * as React from "react";
-import { vanillaHeaderClasses } from "../../vanillaHeaderStyles";
+import React from "react";
+import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
+import { t } from "@library/utility/appUtils";
+import MessagesCount from "@library/headers/mebox/pieces/MessagesCount";
+import MessagesContents from "@library/headers/mebox/pieces/MessagesContents";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import DropDown from "@library/flyouts/DropDown";
 
 interface IProps {
     buttonClassName?: string;

@@ -6,13 +6,12 @@
 
 import React from "react";
 import classNames from "classnames";
-import { globalVariables } from "../styles/globalStyleVars";
-import { componentThemeVariables } from "../styles/styleHelpers";
-import ScreenReaderContent from "../utility/ScreenReaderContent";
-import Heading from "../layout/Heading";
-import AdjacentLink, { LeftRight } from "library/src/scripts/navigation/AdjacentLink";
+import AdjacentLink, { LeftRight } from "@library/navigation/AdjacentLink";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import Heading from "@library/layout/Heading";
+import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { px } from "csx";
-import { styleFactory, useThemeCache } from "../styles/styleUtils";
 
 interface IUrlItem {
     name: string;

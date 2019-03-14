@@ -5,9 +5,8 @@
  */
 
 import React from "react";
-import { t } from "../dom/appUtils";
-import { richEditorClasses } from "../../../../plugins/rich-editor/src/scripts/editor/richEditorClasses";
-import classNames from "classnames";
+import { t } from "@library/utility/appUtils";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 const currentColorFill = {
     fill: "currentColor",

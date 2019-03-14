@@ -3,12 +3,11 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-
-import { globalVariables } from "../styles/globalStyleVars";
-import { debugHelper, unit } from "../styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { debugHelper, unit } from "@library/styles/styleHelpers";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { style } from "typestyle";
 import { percent } from "csx";
-import { useThemeCache } from "../styles/styleUtils";
 
 export const dateRangeClasses = useThemeCache(() => {
     const globalVars = globalVariables();

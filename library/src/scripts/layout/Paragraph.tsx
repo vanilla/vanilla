@@ -6,7 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { getOptionalID, IOptionalComponentID } from "../utility/idUtils";
+import { getOptionalID, IOptionalComponentID } from "@library/utility/idUtils";
 
 interface IProps extends IOptionalComponentID {
     className?: string;

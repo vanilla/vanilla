@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { dropDownClasses } from "../dropDownStyles";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
 export interface IProps {
     children: React.ReactNode;

@@ -4,15 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../../../styles/globalStyleVars";
-import { absolutePosition, unit, componentThemeVariables, flexHelper } from "../../../styles/styleHelpers";
-import { formElementsVariables } from "../../../forms/formElementStyles";
-import { calc, percent, px } from "csx";
-import { styleFactory, useThemeCache } from "../../../styles/styleUtils";
+import { absolutePosition, flexHelper, unit } from "@library/styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { calc, percent } from "csx";
 
 export const compactMeBoxVariables = useThemeCache(() => {
-    const globalVars = globalVariables();
-    const formElementVars = formElementsVariables();
     const themeVars = componentThemeVariables("compactMeBox");
 
     const tab = {

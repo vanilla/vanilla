@@ -4,11 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../styles/globalStyleVars";
-import { layoutVariables } from "../styles/layoutStyles";
-import { unit } from "../styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "../styles/styleUtils";
-import { calc, percent, px } from "csx";
+import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
 export const siteNavVariables = useThemeCache(() => {
     const globalVars = globalVariables();

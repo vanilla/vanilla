@@ -4,20 +4,18 @@
  * @license GPL-2.0-only
  */
 
-import { INavigationTreeItem } from "../@types/api";
-import { t } from "../dom/appUtils";
-import Button from "../forms/Button";
-import { downTriangle, rightTriangle } from "../icons/common";
-import SmartLink from "../routing/links/SmartLink";
-import TabHandler from "../utility/TabHandler";
+import React from "react";
 import classNames from "classnames";
-import * as React from "react";
-import Hoverable from "../utility/Hoverable";
-import { SiteNavContext } from "library/src/scripts/navigation/SiteNavContext";
-import { siteNavNodeClasses } from "library/src/scripts/navigation/siteNavStyles";
-import { ButtonTypes } from "@library/styles/buttonStyles";
-
-type RecordToggle = (recordType: string, recordID: number) => void;
+import { siteNavNodeClasses } from "@library/navigation/siteNavStyles";
+import { downTriangle, rightTriangle } from "@library/icons/common";
+import { t } from "@library/utility/appUtils";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import Hoverable from "@library/dom/Hoverable";
+import SmartLink from "@library/routing/links/SmartLink";
+import { SiteNavContext } from "@library/navigation/SiteNavContext";
+import TabHandler from "@library/dom/TabHandler";
+import { INavigationTreeItem } from "@library/@types/api/core";
 
 interface IProps extends INavigationTreeItem {
     activeRecord: IActiveRecord;

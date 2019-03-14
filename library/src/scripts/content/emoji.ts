@@ -3,8 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { onReady, onContent } from "@library/dom/appUtils";
-import { convertToSafeEmojiCharacters } from "@library/utility/domUtils";
+import { onReady, onContent } from "@library/utility/appUtils";
+import { convertToSafeEmojiCharacters } from "@library/dom/domUtils";
 
 export function initEmojiSupport() {
     // Emoji

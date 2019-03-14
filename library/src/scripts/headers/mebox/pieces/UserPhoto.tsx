@@ -4,11 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { user } from "../../../icons/header";
-import classNames from "classnames";
-import { IUserFragment } from "../../../@types/api";
-import { userPhotoClasses } from "library/src/scripts/headers/mebox/pieces/userPhotoStyles";
+import React from "react";
+import { IUserFragment } from "@library/@types/api";
+import { userPhotoClasses } from "@library/headers/mebox/pieces/userPhotoStyles";
+import { user } from "@library/icons/header";
 
 export enum UserPhotoSize {
     SMALL = "small",

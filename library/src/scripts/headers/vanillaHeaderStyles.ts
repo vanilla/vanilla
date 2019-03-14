@@ -4,20 +4,19 @@
  * @license GPL-2.0-only
  */
 
-import { formElementsVariables } from "../forms/formElementStyles";
-import { globalVariables } from "../styles/globalStyleVars";
-import { layoutVariables } from "../styles/layoutStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import {
-    debugHelper,
+    colorOut,
     flexHelper,
     modifyColorBasedOnLightness,
-    colorOut,
+    states,
     unit,
     userSelect,
-    states,
-} from "../styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "../styles/styleUtils";
-import { important, percent, px } from "csx";
+} from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { percent, px } from "csx";
+import { layoutVariables } from "@library/styles/layoutStyles";
 
 export const vanillaHeaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();

@@ -4,10 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables, IIconSizes } from "../styles/globalStyleVars";
-import { layoutVariables } from "../styles/layoutStyles";
-import { styleFactory, useThemeCache, variableFactory } from "../styles/styleUtils";
-import { unit } from "../styles/styleHelpers";
+import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
+import { unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { layoutVariables } from "@library/styles/layoutStyles";
 
 export const formElementsVariables = useThemeCache(() => {
     const vars = globalVariables();

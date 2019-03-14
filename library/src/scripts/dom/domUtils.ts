@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { log, hashString } from "./utils";
+import { log, hashString } from "../utility/utils";
 import twemoji from "twemoji";
 import debounce from "lodash/debounce";
 import "focus-visible";

@@ -4,10 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import { Devices, IDeviceProps } from "../layout/DeviceChecker";
+import React from "react";
+import VanillaHeader from "@library/headers/VanillaHeader";
+import { Devices, IDeviceProps } from "@library/layout/DeviceChecker";
+import VanillaMobileHomeHeader from "@library/headers/pieces/VanillaMobileHomeHeader";
 import { withDevice } from "@library/layout/DeviceContext";
-import VanillaHeader from "VanillaHeader";
 
 interface IProps extends IDeviceProps {}
 

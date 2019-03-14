@@ -4,15 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import classNames from "classnames";
-import { components } from "react-select";
-import { OptionProps } from "react-select/lib/components/Option";
-import { MenuProps, MenuListComponentProps } from "react-select/lib/components/Menu";
-import { ValueContainerProps } from "react-select/lib/components/containers";
-import { ControlProps } from "react-select/lib/components/Control";
+import React from "react";
+import ButtonLoader from "@library/loaders/ButtonLoader";
+import { tokensClasses } from "@library/forms/select/tokensStyles";
+import { t } from "@library/utility/appUtils";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { MultiValueRemoveProps } from "react-select/lib/components/MultiValue";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import { MenuListComponentProps, MenuProps } from "react-select/lib/components/Menu";
+import { ControlProps } from "react-select/lib/components/Control";
+import { ValueContainerProps } from "react-select/lib/components/containers";
 
 /**
  * Overwrite for the controlContainer component in React Select

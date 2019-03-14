@@ -4,15 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import { IMe, IUserFragment } from "../../@types/api/users";
-import classNames from "classnames";
-import * as React from "react";
-import MessagesDropDown from "./pieces/MessagesDropDown";
-import NotificationsDropdown from "./pieces/NotificationsDropDown";
-import UserDropdown from "./pieces/UserDropdown";
-import { IInjectableUserState } from "../../features/users/UsersModel";
-import get from "lodash/get";
-import { meBoxClasses } from "@library/headers/mebox/meBoxStyles";
+import React from "react";
+import { IMe } from "@library/@types/api";
+import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
+import UserDropdown from "@library/headers/mebox/pieces/UserDropdown";
+import MessagesDropDown from "@library/headers/mebox/pieces/MessagesDropDown";
+import { IInjectableUserState } from "@library/features/users/UsersModel";
 
 export interface IMeBoxProps extends IInjectableUserState {
     countClass?: string;

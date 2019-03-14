@@ -4,17 +4,16 @@
  * @license Proprietary
  */
 
-import * as React from "react";
+import React from "react";
 import classNames from "classnames";
-import { t } from "../dom/appUtils";
-import Paragraph from "../layout/Paragraph";
-import AttachmentIcons from "../content/attachments/AttachmentIcons";
-import { IKbCategoryFragment } from "../../../../plugins/knowledge/src/scripts/@types/api/kbCategory";
-import { ICrumb } from "../navigation/Breadcrumbs";
-import SmartLink from "../routing/links/SmartLink";
-import TruncatedText from "../content/TruncatedText";
-import { IAttachmentIcon } from "../content/attachments/AttachmentIcon";
-import { searchResultClasses, searchResultsClasses } from "../features/search/searchResultsStyles";
+import AttachmentIcons from "@library/content/attachments/AttachmentIcons";
+import { t } from "@library/utility/appUtils";
+import { ICrumb } from "@library/navigation/Breadcrumbs";
+import TruncatedText from "@library/content/TruncatedText";
+import SmartLink from "@library/routing/links/SmartLink";
+import { searchResultClasses, searchResultsClasses } from "@library/features/search/searchResultsStyles";
+import { IAttachmentIcon } from "@library/content/attachments/AttachmentIcon";
+import Paragraph from "@library/layout/Paragraph";
 
 export interface IResult {
     name: string;

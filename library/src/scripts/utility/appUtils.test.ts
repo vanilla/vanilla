@@ -5,8 +5,8 @@
  */
 
 import { expect } from "chai";
-import * as application from "library/src/scripts/dom/appUtils";
-import gdn from "@library/gdn";
+import * as application from "library/src/scripts/utility/appUtils";
+import gdn from "../gdn";
 
 describe("metaDataFunctions", () => {
     it("return a default value if the requested one can't be found", () => {

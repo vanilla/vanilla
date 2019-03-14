@@ -6,7 +6,7 @@
 
 import React from "react";
 import KeyboardModule from "quill/modules/keyboard";
-import { isAllowedUrl, t } from "@library/dom/appUtils";
+import { isAllowedUrl, t } from "@library/utility/appUtils";
 import { getRequiredID, IRequiredComponentID } from "@library/utility/idUtils";
 import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
@@ -16,7 +16,8 @@ import Button from "@library/forms/Button";
 import { embed } from "@library/icons/editorIcons";
 import classNames from "classnames";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { insertMediaClasses } from "@rich-editor/flyouts/pieces/insertMediaClasses";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;

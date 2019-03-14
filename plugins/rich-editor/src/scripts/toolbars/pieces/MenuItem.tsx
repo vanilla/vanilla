@@ -6,7 +6,7 @@
 
 import React from "react";
 import classnames from "classnames";
-import { richEditorClasses } from "../../editor/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 export interface IMenuItemData {
     icon: JSX.Element;

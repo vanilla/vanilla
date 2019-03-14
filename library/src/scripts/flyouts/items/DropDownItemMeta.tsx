@@ -4,9 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
-import classNames from "classnames";
-import { dropDownClasses } from "../dropDownStyles";
+import React from "react";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
 interface IProps {
     className?: string;

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { onContent } from "@library/dom/appUtils";
+import { onContent } from "@library/utility/appUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
 export function initCodeHighlighting() {

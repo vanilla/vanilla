@@ -4,11 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "../../styles/globalStyleVars";
-import { debugHelper } from "../../styles/styleHelpers";
-import { useThemeCache } from "../../styles/styleUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { useThemeCache } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
 import { style } from "typestyle";
+import { debugHelper } from "@library/styles/styleHelpers";
 
 export const selectBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();

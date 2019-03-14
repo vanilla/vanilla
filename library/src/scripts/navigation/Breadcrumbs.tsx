@@ -5,9 +5,8 @@
  */
 
 import React from "react";
-import className from "classnames";
-import { t } from "../dom/appUtils";
-import Breadcrumb from "Breadcrumb";
+import { t } from "@library/utility/appUtils";
+import Breadcrumb from "@library/navigation/Breadcrumb";
 import { style } from "typestyle";
 
 export interface ICrumb {

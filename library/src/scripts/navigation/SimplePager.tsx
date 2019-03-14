@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { t } from "../dom/appUtils";
+import { t } from "../utility/appUtils";
 import LinkAsButton from "../routing/LinkAsButton";
 import { ILinkPages } from "SimplePagerModel";
 import classNames from "classnames";

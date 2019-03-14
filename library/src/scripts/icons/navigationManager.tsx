@@ -5,9 +5,7 @@
  */
 
 import React from "react";
-import classNames from "classnames";
-import { t } from "../dom/appUtils";
-import { checkCompact } from "./common";
+import { t } from "@library/utility/appUtils";
 
 const currentColorFill = {
     fill: "currentColor",

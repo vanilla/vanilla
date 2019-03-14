@@ -8,9 +8,9 @@ import React from "react";
 import { IFormats } from "quill/core";
 import HeadingBlot from "quill/formats/header";
 import { heading2, heading3, blockquote, codeBlock, spoiler, pilcrow } from "@library/icons/editorIcons";
-import BlockquoteLineBlot from "../../quill/blots/blocks/BlockquoteBlot";
-import CodeBlockBlot from "../../quill/blots/blocks/CodeBlockBlot";
-import SpoilerLineBlot from "../../quill/blots/blocks/SpoilerBlot";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
+import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 
 interface IProps {
     activeFormats: IFormats;

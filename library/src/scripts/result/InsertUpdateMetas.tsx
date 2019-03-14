@@ -5,12 +5,13 @@
  */
 
 import React from "react";
-import { DropDownItemMetas, DropDownItemMeta } from "../flyouts";
-import Translate from "../content/Translate";
-import DateTime from "../content/DateTime";
-import ProfileLink from "../navigation/ProfileLink";
-import { IUserFragment } from "../@types/api";
-import { metasClasses } from "../styles/metasStyles";
+import { IUserFragment } from "@library/@types/api/users";
+import DropDownItemMetas from "@library/flyouts/items/DropDownItemMetas";
+import DropDownItemMeta from "@library/flyouts/items/DropDownItemMeta";
+import { metasClasses } from "@library/styles/metasStyles";
+import Translate from "@library/content/Translate";
+import DateTime from "@library/content/DateTime";
+import ProfileLink from "@library/navigation/ProfileLink";
 
 interface IProps {
     dateInserted: string;

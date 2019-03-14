@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { addRoutes, addComponent, onReady } from "@library/dom/appUtils";
+import { addRoutes, addComponent, onReady } from "@library/utility/appUtils";
 import React from "react";
 import { Route } from "react-router-dom";
 import Router from "@dashboard/components/Router";

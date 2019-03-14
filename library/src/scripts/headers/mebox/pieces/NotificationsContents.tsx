@@ -4,30 +4,23 @@
  * @license GPL-2.0-only
  */
 
-import { ILoadable, LoadStatus } from "../../../@types/api/core";
-import apiv2 from "../../../apiv2";
-import { t } from "../../../dom/appUtils";
-import Button from "../../../forms/Button";
-import Frame from "../../../layout/frame/Frame";
-import FrameBody from "../../../layout/frame/FrameBody";
-import FrameFooter from "../../../layout/frame/FrameFooter";
-import FrameHeaderWithAction from "../../../layout/frame/FrameHeaderWithAction";
-import FramePanel from "../../../layout/frame/FramePanel";
-import Loader from "../../../loaders/Loader";
-import { settings } from "../../../icons/header";
-import LinkAsButton from "../../../routing/LinkAsButton";
-import { IMeBoxNotificationItem, MeBoxItemType } from "library/src/scripts/headers/mebox/pieces/MeBoxDropDownItem";
-import NotificationsActions from "../../../features/notifications/NotificationsActions";
-import { INotificationsStoreState } from "../../../features/notifications/NotificationsModel";
-import classNames from "classnames";
-import * as React from "react";
-import { connect } from "react-redux";
-import MeBoxDropDownItemList from "./MeBoxDropDownItemList";
-import { withDevice } from "../../../layout/DeviceContext";
-import { IDeviceProps, Devices } from "../../../layout/DeviceChecker";
-import { loaderClasses } from "../../../loaders/loaderStyles";
-import { frameFooterClasses } from "../../../layout/frame/frameStyles";
-import { ButtonTypes, buttonUtilityClasses } from "@library/styles/buttonStyles";
+import React from "react";
+import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
+import Loader from "@library/loaders/Loader";
+import { Devices, IDeviceProps } from "@library/layout/DeviceChecker";
+import { ILoadable, LoadStatus } from "@library/@types/api";
+import { IMeBoxNotificationItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
+import Button from "@library/forms/Button";
+import { loaderClasses } from "@library/loaders/loaderStyles";
+import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
+import apiv2 from "@library/apiv2";
+import { INotificationsStoreState } from "@library/features/notifications/NotificationsModel";
+import { withDevice } from "@library/layout/DeviceContext";
+import LinkAsButton from "@library/routing/LinkAsButton";
+import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
+import { t } from "@library/utility/appUtils";
+import NotificationsActions from "@library/features/notifications/NotificationsActions";
+import { frameFooterClasses } from "@library/layout/frame/frameStyles";
 
 export interface INotificationsProps {
     countClass?: string;

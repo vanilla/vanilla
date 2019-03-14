@@ -565,8 +565,8 @@ class Gdn_Form extends Gdn_Pluggable {
         if (is_array($safeCategoryData)) {
             foreach ($safeCategoryData as $categoryID => $category) {
                 $depth = val('Depth', $category, 0);
-                $isHeading = ($depth == 1 && $doHeadings) || val('DisplayAs', $category) !== 'Discussions';
-                $disabled = ($isHeading && !$enableHeadings) && !$category['AllowDiscussions'];
+                $isHeading = ($depth == 1 && $doHeadings) || $category['DisplayAs'] !== 'Discussions' || !$category['AllowDiscussions'];
+                $disabled = $isHeading && !$enableHeadings ;
                 $selected = in_array($categoryID, $value) && $hasValue;
                 if ($forceCleanSelection && $depth > 1) {
                     $selected = true;

@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+import React from "react";
 import { HumanFileSize } from "@library/utility/fileUtils";
 import { AttachmentType, getAttachmentIcon } from "@library/content/attachments/attachmentUtils";
 import { attachmentClasses } from "@library/content/attachments/attachmentStyles";

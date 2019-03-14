@@ -4,33 +4,34 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import classNames from "classnames";
-import registerQuill from "@rich-editor/quill/registerQuill";
-import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
-import getStore from "@library/redux/getStore";
-import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import { userContentClasses } from "@library/content/userContentStyles";
-import { Devices } from "@library/layout/DeviceContext";
-import InlineToolbar from "@rich-editor/toolbars/InlineToolbar";
 import { delegateEvent, removeDelegatedEvent } from "@library/dom/domUtils";
-import EditorDescriptions from "@rich-editor/editor/pieces/EditorDescriptions";
-import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
-import { EditorProvider } from "@rich-editor/editor/context";
-import { getIDForQuill, SELECTION_UPDATE } from "@rich-editor/quill/utility";
-import EmbedBar from "@rich-editor/editor/pieces/EmbedBar";
+import { Devices } from "@library/layout/DeviceContext";
+import getStore from "@library/redux/getStore";
 import { t } from "@library/utility/appUtils";
-import { log, debug } from "@library/utility/utils";
-import ParagraphToolbar from "@rich-editor/toolbars/ParagraphToolbar";
-import { actions } from "@rich-editor/state/instance/instanceActions";
-import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
-import MentionToolbar from "@rich-editor/toolbars/MentionToolbar";
-import uniqueId from "lodash/uniqueId";
+import { debug, log } from "@library/utility/utils";
 import { IStoreState } from "@rich-editor/@types/store";
-import { Provider } from "react-redux";
+import { EditorProvider } from "@rich-editor/editor/context";
+import EditorDescriptions from "@rich-editor/editor/pieces/EditorDescriptions";
+import EmbedBar from "@rich-editor/editor/pieces/EmbedBar";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
+import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
+import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
+import registerQuill from "@rich-editor/quill/registerQuill";
+import { getIDForQuill, SELECTION_UPDATE } from "@rich-editor/quill/utility";
+import { actions } from "@rich-editor/state/instance/instanceActions";
+import InlineToolbar from "@rich-editor/toolbars/InlineToolbar";
+import MentionToolbar from "@rich-editor/toolbars/MentionToolbar";
+import ParagraphToolbar from "@rich-editor/toolbars/ParagraphToolbar";
+import classNames from "classnames";
 import throttle from "lodash/throttle";
+import uniqueId from "lodash/uniqueId";
+import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
+import React from "react";
 import { hot } from "react-hot-loader";
+import { Provider } from "react-redux";
+import hljs from "highlight.js";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -270,7 +271,9 @@ export class Editor extends React.Component<IProps> {
         const options: QuillOptionsStatic = {
             theme: "vanilla",
             modules: {
-                syntax: true,
+                syntax: {
+                    highlight: text => hljs.highlightAuto(text).value,
+                },
             },
             scrollingContainer: this.scrollContainerRef.current || document.documentElement!,
         };

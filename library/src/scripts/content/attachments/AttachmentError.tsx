@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+import React from "react";
 import { IFileAttachment } from "@library/content/attachments/Attachment";
 import { FOCUS_CLASS } from "@library/content/embeds/embedUtils";
 import { t } from "@library/utility/appUtils";

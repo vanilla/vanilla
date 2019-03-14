@@ -3,6 +3,8 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+
+import React from "react";
 import { AttachmentType, getAttachmentIcon } from "@library/content/attachments/attachmentUtils";
 import { t } from "@library/utility/appUtils";
 import Translate from "@library/content/Translate";

@@ -64,7 +64,7 @@ echo $Form->errors();
             case 'toggle':
                 echo $Form->toggle($Row['Name'], t($LabelCode), $Row['Options'], $Description);
                 break;
-            case 'flyouts':
+            case 'dropdown':
                 echo '<div class="label-wrap">';
                 echo $Form->label($LabelCode, $Row['Name']);
                 echo $Description;

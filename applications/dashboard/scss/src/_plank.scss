@@ -1,7 +1,7 @@
 // Planks
 //
 // Planks are long, thin item representations. Usually they have a short title, perhaps an icon,
-// perhaps a badge and usually a flyouts. Find them in the category and tag settings pages in the dashboard.
+// perhaps a badge and usually a dropdown. Find them in the category and tag settings pages in the dashboard.
 //
 // Styleguide 17
 
@@ -21,20 +21,20 @@
 //     <span class="badge badge-outline">42</span>
 //   </div>
 //   <div class="plank-options">
-//     <!- flyouts start ->
-//     <div class="flyouts">
-//       <button aria-expanded="false" aria-haspopup="true" class="flyouts-toggle btn" data-toggle="flyouts">
+//     <!- dropdown start ->
+//     <div class="dropdown">
+//       <button aria-expanded="false" aria-haspopup="true" class="dropdown-toggle btn" data-toggle="dropdown">
 //         <svg class="icon icon-svg-discussions" viewbox="0 0 17 17">
 //           <use xlink:href="#discussions" xmlns:xlink="http://www.w3.org/1999/xlink"></use>
 //         </svg>
 //       </button>
-//       <div class="flyouts-menu flyouts-menu-right" role="menu">
-//         <a class="flyouts-item" href="#" role="menuitem" tabindex="-1">Edit</a>
-//         <div class="flyouts-divider"></div>
-//         <a class="flyouts-item" href="#" role="menuitem" tabindex="-1">Delete</a>
+//       <div class="dropdown-menu dropdown-menu-right" role="menu">
+//         <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Edit</a>
+//         <div class="dropdown-divider"></div>
+//         <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Delete</a>
 //       </div>
 //     </div>
-//     <!- flyouts end ->
+//     <!- dropdown end ->
 //   </div>
 // </div>
 // <div class="plank">
@@ -50,20 +50,20 @@
 //     <span class="badge badge-outline">42</span>
 //   </div>
 //   <div class="plank-options">
-//     <!- flyouts start ->
-//     <div class="flyouts">
-//       <button aria-expanded="false" aria-haspopup="true" class="flyouts-toggle btn" data-toggle="flyouts">
+//     <!- dropdown start ->
+//     <div class="dropdown">
+//       <button aria-expanded="false" aria-haspopup="true" class="dropdown-toggle btn" data-toggle="dropdown">
 //         <svg class="icon icon-svg-discussions" viewbox="0 0 17 17">
 //           <use xlink:href="#discussions" xmlns:xlink="http://www.w3.org/1999/xlink"></use>
 //         </svg>
 //       </button>
-//       <div class="flyouts-menu flyouts-menu-right" role="menu">
-//         <a class="flyouts-item" href="#" role="menuitem" tabindex="-1">Edit</a>
-//         <div class="flyouts-divider"></div>
-//         <a class="flyouts-item" href="#" role="menuitem" tabindex="-1">Delete</a>
+//       <div class="dropdown-menu dropdown-menu-right" role="menu">
+//         <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Edit</a>
+//         <div class="dropdown-divider"></div>
+//         <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Delete</a>
 //       </div>
 //     </div>
-//     <!- flyouts end ->
+//     <!- dropdown end ->
 //   </div>
 // </div>
 //
@@ -125,17 +125,17 @@
 //         <span class="badge badge-outline">42</span>
 //       </div>
 //       <div class="plank-options">
-//         <!- flyouts start ->
-//         <div class="flyouts">
-//           <button aria-expanded="false" aria-haspopup="true" class="flyouts-toggle btn" data-toggle="flyouts">
+//         <!- dropdown start ->
+//         <div class="dropdown">
+//           <button aria-expanded="false" aria-haspopup="true" class="dropdown-toggle btn" data-toggle="dropdown">
 //           </button>
-//           <div class="flyouts-menu flyouts-menu-right" role="menu">
-//             <a class="flyouts-item" href="#" role="menuitem" tabindex="-1">Edit</a>
-//             <div class="flyouts-divider"></div>
-//             <a class="flyouts-item" href="#" role="menuitem" tabindex="-1">Delete</a>
+//           <div class="dropdown-menu dropdown-menu-right" role="menu">
+//             <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Edit</a>
+//             <div class="dropdown-divider"></div>
+//             <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Delete</a>
 //           </div>
 //         </div>
-//         <!- flyouts end ->
+//         <!- dropdown end ->
 //       </div>
 //     </div>
 //   </div>
@@ -146,17 +146,17 @@
 //         <span class="badge badge-outline">42</span>
 //       </div>
 //       <div class="plank-options">
-//         <!- flyouts start ->
-//         <div class="flyouts">
-//           <button aria-expanded="false" aria-haspopup="true" class="flyouts-toggle btn" data-toggle="flyouts">
+//         <!- dropdown start ->
+//         <div class="dropdown">
+//           <button aria-expanded="false" aria-haspopup="true" class="dropdown-toggle btn" data-toggle="dropdown">
 //           </button>
-//           <div class="flyouts-menu flyouts-menu-right" role="menu">
-//             <a class="flyouts-item" href="#" role="menuitem" tabindex="-1">Edit</a>
-//             <div class="flyouts-divider"></div>
-//             <a class="flyouts-item" href="#" role="menuitem" tabindex="-1">Delete</a>
+//           <div class="dropdown-menu dropdown-menu-right" role="menu">
+//             <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Edit</a>
+//             <div class="dropdown-divider"></div>
+//             <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Delete</a>
 //           </div>
 //         </div>
-//         <!- flyouts end ->
+//         <!- dropdown end ->
 //       </div>
 //     </div>
 //   </div>

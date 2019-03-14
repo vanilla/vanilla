@@ -40,8 +40,8 @@ class DiscussionsSortFilterModule extends Gdn_Module {
     /** @var int The ID of the category we're in. */
     protected $categoryID;
 
-    /** @var string The view of the flyouts module to render. */
-    protected $dropdownView = 'flyouts-navbutton';
+    /** @var string The view of the dropdown module to render. */
+    protected $dropdownView = 'dropdown-navbutton';
 
     /**
      * @param int $categoryID The ID of the category we're in.
@@ -102,7 +102,7 @@ class DiscussionsSortFilterModule extends Gdn_Module {
     }
 
     /**
-     * @param string $dropdownView The view of the flyouts module to render.
+     * @param string $dropdownView The view of the dropdown module to render.
      * @return DiscussionsSortFilterModule $this
      */
     public function setDropdownView($dropdownView) {
@@ -155,10 +155,10 @@ class DiscussionsSortFilterModule extends Gdn_Module {
     }
 
     /**
-     * Returns an array of flyouts menus with the data from the filters array or an array containing an empty string
+     * Returns an array of dropdown menus with the data from the filters array or an array containing an empty string
      * to make it safe for echoing out.
      *
-     * @return array An array of flyouts menus or an array containing an empty string.
+     * @return array An array of dropdown menus or an array containing an empty string.
      */
     protected function getFilterDropdowns() {
         if (!$this->filters) {

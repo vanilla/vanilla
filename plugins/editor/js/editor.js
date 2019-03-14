@@ -342,7 +342,7 @@
          * the areas below that are performing this function.
          */
         var editorDropdownsClose = function() {
-            $('.editor-flyouts').each(function(i, el) {
+            $('.editor-dropdown').each(function(i, el) {
                 $(el).removeClass('editor-dropdown-open');
                 $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
                 $(this).setFlyoutAttributes();
@@ -351,23 +351,23 @@
 
         /**
          * Deal with clashing JS for opening dialogs on click, and do not let
-         * more than one dialog/flyouts appear at once.
+         * more than one dialog/dropdown appear at once.
          */
         var editorSetupDropdowns = function(editorInstance) {
             $(document).on('click touchstart', function() {
                 editorDropdownsClose();
             });
 
-            $(document).on('click touchstart', '.editor-flyouts', function(e) {
+            $(document).on('click touchstart', '.editor-dropdown', function(e) {
                 e.stopPropagation();
             });
 
 
-            $('.editor-flyouts .editor-action')
+            $('.editor-dropdown .editor-action')
                 .off('click.dd')
                 .on('click.dd', function(e) {
 
-                    var $parentEl = $(e.target).closest('.editor-flyouts');
+                    var $parentEl = $(e.target).closest('.editor-dropdown');
 
                     // Again, tackling with clash from multiple codebases.
                     $('.editor-insert-dialog').each(function(i, el) {
@@ -376,12 +376,12 @@
                         }, 0);
                     });
 
-                    if ($parentEl.hasClass('editor-flyouts') && $parentEl.hasClass('editor-flyouts-open')) {
-                        $parentEl.removeClass('editor-flyouts-open');
+                    if ($parentEl.hasClass('editor-dropdown') && $parentEl.hasClass('editor-dropdown-open')) {
+                        $parentEl.removeClass('editor-dropdown-open');
                         //$($parentEl).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
                     } else {
                         // clear other opened dropdowns before opening this one
-                        $($parentEl).parent('.editor').find('.editor-flyouts-open').each(function(i, el) {
+                        $($parentEl).parent('.editor').find('.editor-dropdown-open').each(function(i, el) {
                             $(el).removeClass('editor-dropdown-open');
                             $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
                         });
@@ -391,7 +391,7 @@
                         // events should have taken care of this, but JS still fires the
                         // event regardless, so disable them here as well.
                         if (!$parentEl.hasClass('wysihtml5-commands-disabled')) {
-                            $parentEl.addClass('editor-flyouts-open');
+                            $parentEl.addClass('editor-dropdown-open');
 
                             // if has input, focus and move caret to end of text
                             var inputBox = $parentEl.find('.InputBox');
@@ -411,7 +411,7 @@
                 });
 
             // Handle Enter key
-            $('.editor-flyouts').find('.InputBox').on('keydown', function(e) {
+            $('.editor-dropdown').find('.InputBox').on('keydown', function(e) {
                 var key = e.keyCode || e.which;
                 if (key === 13 || key === 32) {
                     // Cancel enter key submissions on these values.
@@ -433,18 +433,18 @@
                 }
             });
 
-            // Clicking into an editor area should close the flyouts, but keep
+            // Clicking into an editor area should close the dropdown, but keep
             // it open for anything else.
             $('.TextBoxWrapper').add($('.wysihtml5-sandbox').contents().find('html')).each(function(i, el) {
                 $(el).addClass('editor-dialog-fire-close');
             });
 
-            // Target all elements in the document that fire the flyouts close
+            // Target all elements in the document that fire the dropdown close
             // from within the iframe, and attach the relevant callbacks to events.
             $('.wysihtml5-sandbox').contents().find('.editor-dialog-fire-close')
                 .off('mouseup.fireclose dragover.fireclose')
                 .on('mouseup.fireclose dragover.fireclose', function(e) {
-                    $('.editor-flyouts').each(function(i, el) {
+                    $('.editor-dropdown').each(function(i, el) {
                         $(el).removeClass('editor-dropdown-open');
                         $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
                         $(el).setFlyoutAttributes();
@@ -750,7 +750,7 @@
             });
 
             // If drag and drop unavailable, remove its cue from the attachment
-            // flyouts menu, so it will just have the file input and URL input.
+            // dropdown menu, so it will just have the file input and URL input.
             if (!window.FileReader) {
                 $('.js-can-drop').hide();
             }
@@ -1023,8 +1023,8 @@
                                 var allowedExtensions = JSON.parse(allowedFileExtensions);
 
                                 if (data.fileInput !== undefined) {
-                                    // We're using either the fileupload or imageupload flyouts to upload the file(s).
-                                    // Type hint which flyouts the user is using so we know whether to insert the
+                                    // We're using either the fileupload or imageupload dropdown to upload the file(s).
+                                    // Type hint which dropdown the user is using so we know whether to insert the
                                     // upload into the post (as an image) or attach it to the post.
                                     var uploadType = $(data.fileInput).data('uploadType');
                                     data.url = gdn.url('/post/editorupload/' + uploadType);
@@ -1067,7 +1067,7 @@
                                     data.submit();
 
                                     // If selecting a file through traditional file
-                                    // input, close the flyouts.
+                                    // input, close the dropdown.
                                     editorDropdownsClose();
                                 } else {
                                     // File dropped is not allowed!
@@ -1231,7 +1231,7 @@
         };
 
         /**
-         * Combine the image URL input box with the file uploader flyouts, so
+         * Combine the image URL input box with the file uploader dropdown, so
          * handle the event differently for wysi and non-wysi mode.
          */
         var insertImageUrl = function(editorInstance) {
@@ -1277,9 +1277,9 @@
                         $(editorInstance).replaceSelectedText(imgTag + '\n');
                     }
 
-                    // Now clear input and close flyouts
-                    var $dropDown = $(this).closest('.editor-flyouts-open');
-                    $dropDown.removeClass('editor-flyouts-open');
+                    // Now clear input and close dropdown
+                    var $dropDown = $(this).closest('.editor-dropdown-open');
+                    $dropDown.removeClass('editor-dropdown-open');
                     $dropDown.setFlyoutAttributes();
                     $(this).val('');
 

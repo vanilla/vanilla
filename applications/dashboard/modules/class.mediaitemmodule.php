@@ -4,7 +4,7 @@
  * A module for rendering a media item in the Vanilla Dashboard.
  *
  * A media item usually renders a item with an image, a title, and a description. This modules supports a media item
- * that may have one image, one flyouts menu, any number of buttons, and any number of meta items.
+ * that may have one image, one dropdown menu, any number of buttons, and any number of meta items.
  *
  * There are three views that you can choose to render: media-addon, media-callout, or media-sm. See these variants in
  * the dashboard styleguide.
@@ -47,7 +47,7 @@ class MediaItemModule extends Gdn_Module {
 
     private $toggle = [];
 
-    /** @var DropdownModule An optional flyouts menu. */
+    /** @var DropdownModule An optional dropdown menu. */
     private $dropdown = null;
 
     /** @var string The top-level HTML element for the Media Item. */

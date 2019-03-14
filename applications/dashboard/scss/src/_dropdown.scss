@@ -1,28 +1,28 @@
 // Dropdowns
 //
-// The flyouts uses twbs's scss.
+// The dropdown uses twbs's scss.
 //
-// PHP rendering: Use the `flyouts-twbs` view using the Dropdown Module.
+// PHP rendering: Use the `dropdown-twbs` view using the Dropdown Module.
 //
 // Styleguide 14.
 
 // Dropdown Menu
 //
-// Here's the default flyouts menu markup.
+// Here's the default dropdown menu markup.
 //
 // Markup:
-// <div class="flyouts">
-//   <button id="dropdownMenu" class="flyouts-toggle btn btn-icon-border" data-toggle="flyouts" aria-haspopup="true" aria-expanded="false">
+// <div class="dropdown">
+//   <button id="dropdownMenu" class="dropdown-toggle btn btn-icon-border" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 //     <svg class="icon icon-16" viewBox="0 0 16 16">
 //       <use xlink:href="#code-bubble"></use>
 //     </svg>
 //   </button>
-//   <div class="flyouts-menu role="menu" aria-labelledby="dropdownMenu" {{modifier_class}}">
-//     <a role="menuitem" class="flyouts-item" tabindex="-1" href="#">Option</a>
-//     <a role="menuitem" class="flyouts-item disabled" tabindex="-1" href="#">Disabled Option</a>
-//     <div class="flyouts-divider"></div>
-//     <div class="flyouts-header">Display as</div>
-//     <a role="menuitem" class="flyouts-item" tabindex="-1" href="#">
+//   <div class="dropdown-menu role="menu" aria-labelledby="dropdownMenu" {{modifier_class}}">
+//     <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">Option</a>
+//     <a role="menuitem" class="dropdown-item disabled" tabindex="-1" href="#">Disabled Option</a>
+//     <div class="dropdown-divider"></div>
+//     <div class="dropdown-header">Display as</div>
+//     <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">
 //       <svg class="icon icon-16 icon-discussions" viewBox="0 0 16 16">
 //         <use xlink:href="#question-mark"></use>
 //       </svg>
@@ -35,24 +35,24 @@
 
 // Dropdown Menu Right-aligned
 //
-// Opens with the right side of the flyouts menu aligned the right of the root flyouts div.
+// Opens with the right side of the dropdown menu aligned the right of the root dropdown div.
 //
-// PHP rendering: If you want the flyouts menu to open right, set the Dropdown Module's `listCssClass` to
-// `flyouts-menu-right`.
+// PHP rendering: If you want the dropdown menu to open right, set the Dropdown Module's `listCssClass` to
+// `dropdown-menu-right`.
 //
 // Markup:
-// <div class="flyouts clearfix">
-//   <button id="dropdownMenu" class="flyouts-toggle pull-right btn btn-icon-border" data-toggle="flyouts" aria-haspopup="true" aria-expanded="false">
+// <div class="dropdown clearfix">
+//   <button id="dropdownMenu" class="dropdown-toggle pull-right btn btn-icon-border" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 //     <svg class="icon icon-16" viewBox="0 0 16 16">
 //       <use xlink:href="#code-bubble"></use>
 //     </svg>
 //   </button>
-//   <div class="flyouts-menu flyouts-menu-right role="menu" aria-labelledby="dropdownMenu" {{modifier_class}}">
-//     <a role="menuitem" class="flyouts-item" tabindex="-1" href="#">Option</a>
-//     <a role="menuitem" class="flyouts-item disabled" tabindex="-1" href="#">Disabled Option</a>
-//     <div class="flyouts-divider"></div>
-//     <div class="flyouts-header">Display as</div>
-//     <a role="menuitem" class="flyouts-item" tabindex="-1" href="#">
+//   <div class="dropdown-menu dropdown-menu-right role="menu" aria-labelledby="dropdownMenu" {{modifier_class}}">
+//     <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">Option</a>
+//     <a role="menuitem" class="dropdown-item disabled" tabindex="-1" href="#">Disabled Option</a>
+//     <div class="dropdown-divider"></div>
+//     <div class="dropdown-header">Display as</div>
+//     <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">
 //       <svg class="icon icon-16 icon-discussions" viewBox="0 0 16 16">
 //         <use xlink:href="#question-mark"></use>
 //       </svg>
@@ -65,21 +65,21 @@
 
 // Dropup Variation
 //
-// PHP rendering: If you want the flyouts menu to open up, set the Dropdown Module's `cssClass` property to `dropup`.
+// PHP rendering: If you want the dropdown menu to open up, set the Dropdown Module's `cssClass` property to `dropup`.
 //
 // .dropup - Opens up instead of down.
 //
 // Markup:
-// <div class="flyouts {{modifier_class}}">
-//   <button id="dropdownMenu" class="flyouts-toggle btn btn-secondary" data-toggle="flyouts" aria-haspopup="true" aria-expanded="false">
+// <div class="dropdown {{modifier_class}}">
+//   <button id="dropdownMenu" class="dropdown-toggle btn btn-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 //     Trigger
 //   </button>
-//   <div class="flyouts-menu role="menu" aria-labelledby="dropdownMenu">
-//     <a role="menuitem" class="flyouts-item" tabindex="-1" href="#">Option</a>
-//     <a role="menuitem" class="flyouts-item disabled" tabindex="-1" href="#">Disabled Option</a>
-//     <div class="flyouts-divider"></div>
-//     <div class="flyouts-header">Display as</div>
-//     <a role="menuitem" class="flyouts-item" tabindex="-1" href="#">
+//   <div class="dropdown-menu role="menu" aria-labelledby="dropdownMenu">
+//     <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">Option</a>
+//     <a role="menuitem" class="dropdown-item disabled" tabindex="-1" href="#">Disabled Option</a>
+//     <div class="dropdown-divider"></div>
+//     <div class="dropdown-header">Display as</div>
+//     <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">
 //       <svg class="icon icon-16" viewBox="0 0 16 16">
 //         <use xlink:href="#question-mark"></use>
 //       </svg>
@@ -116,7 +116,7 @@
 }
 
 // btn-groups transform into dropdowns when they get too wide for their container.
-// This styles that specific flyouts trigger button.
+// This styles that specific dropdown trigger button.
 
 .dropdown-filter .btn {
   display: flex;

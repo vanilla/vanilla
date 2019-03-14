@@ -60,13 +60,13 @@
     @include border-right-radius(0);
   }
 }
-// Need .flyouts-toggle since :last-child doesn't apply given a .flyouts-menu immediately after it
+// Need .dropdown-toggle since :last-child doesn't apply given a .dropdown-menu immediately after it
 .btn-group > .btn:last-child:not(:first-child),
 .btn-group > .dropdown-toggle:not(:first-child) {
   @include border-left-radius(0);
 }
 
-// Custom edits for including btn-groups within btn-groups (useful for including flyouts buttons within a btn-group)
+// Custom edits for including btn-groups within btn-groups (useful for including dropdown buttons within a btn-group)
 .btn-group > .btn-group {
   float: left;
 }
@@ -154,7 +154,7 @@
     max-width: 100%;
   }
 
-  // Clear floats so flyouts menus can be properly placed
+  // Clear floats so dropdown menus can be properly placed
   > .btn-group {
     @include clearfix();
 

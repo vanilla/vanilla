@@ -25,7 +25,7 @@ class PostController extends VanillaController {
     /** @var array Models to include. */
     public $Uses = ['Form', 'Database', 'CommentModel', 'DiscussionModel', 'DraftModel'];
 
-    /** @var bool Whether or not to show the category flyouts. */
+    /** @var bool Whether or not to show the category dropdown. */
     public $ShowCategorySelector = true;
 
     /** @var int */
@@ -233,7 +233,7 @@ class PostController extends VanillaController {
                 }
                 $this->populateForm($this->Form);
             }
-
+            
             // Decode HTML entities escaped by DiscussionModel::calculate() here.
             $this->Form->setValue('Name', htmlspecialchars_decode($this->Form->getValue('Name')));
 
@@ -694,7 +694,7 @@ class PostController extends VanillaController {
             if ($formDiscussion && $formDiscussion->Closed === 1 && !CategoryModel::checkPermission($formDiscussion->CategoryID, 'Vanilla.Discussions.Close')) {
                 throw new Exception(t('You cannot comment in a closed discussion.'));
             }
-
+            
             if (!$Editing) {
                 unset($FormValues['CommentID']);
             }
@@ -1038,7 +1038,7 @@ class PostController extends VanillaController {
      * Pre-populate the form with values from the query string.
      *
      * @param Gdn_Form $form
-     * @param bool $LimitCategories Whether to turn off the category flyouts if there is only one category to show.
+     * @param bool $LimitCategories Whether to turn off the category dropdown if there is only one category to show.
      */
     protected function populateForm($form) {
         $get = $this->Request->get();

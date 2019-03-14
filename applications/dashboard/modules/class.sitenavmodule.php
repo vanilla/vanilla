@@ -18,7 +18,7 @@
  *
  * We can force the module to display any section menus by setting the currentSections property.
  *
- * TODO: Handle adding flyouts items to the SiteNavModule.
+ * TODO: Handle adding dropdown items to the SiteNavModule.
  */
 class SiteNavModule extends NavModule {
 

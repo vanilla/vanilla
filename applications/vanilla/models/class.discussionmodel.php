@@ -81,7 +81,7 @@ class DiscussionModel extends Gdn_Model {
      * - **setKey**: string - The key name of the filter set.
      * - **name**: string - The display name of the filter. Usually appears as an option in the UI.
      * - **where**: string - The where array query to execute for the filter. Uses
-     * - **group**: string - (optional) The flyouts module can group together any items with the same group name.
+     * - **group**: string - (optional) The dropdown module can group together any items with the same group name.
      */
     protected static $allowedFilters = [];
 

@@ -90,7 +90,7 @@ if (!function_exists('writeComment')) :
             $discussion = $discussionModel->getID($comment->DiscussionID);
             $sender->setData('Discussion', $discussion);
         }
-
+        
         if ($sender->data('Discussion.InsertUserID') === $comment->InsertUserID) {
             $cssClass .= ' isOriginalPoster';
         }
@@ -192,7 +192,7 @@ if (!function_exists('discussionOptionsToDropdown')):
      */
     function discussionOptionsToDropdown(array $options, $dropdown = null) {
         if (is_null($dropdown)) {
-            $dropdown = new DropdownModule('flyouts', '', 'OptionsMenu');
+            $dropdown = new DropdownModule('dropdown', '', 'OptionsMenu');
         }
 
         if (!empty($options)) {
@@ -308,14 +308,14 @@ endif;
 
 if (!function_exists('getDiscussionOptionsDropdown')):
     /**
-     * Constructs an options flyouts menu for a discussion.
+     * Constructs an options dropdown menu for a discussion.
      *
-     * @param object|array|null $discussion The discussion to get the flyouts options for.
-     * @return DropdownModule A flyouts consisting of discussion options.
+     * @param object|array|null $discussion The discussion to get the dropdown options for.
+     * @return DropdownModule A dropdown consisting of discussion options.
      * @throws Exception
      */
     function getDiscussionOptionsDropdown($discussion = null) {
-        $dropdown = new DropdownModule('flyouts', '', 'OptionsMenu');
+        $dropdown = new DropdownModule('dropdown', '', 'OptionsMenu');
         $sender = Gdn::controller();
         $session = Gdn::session();
 
@@ -370,7 +370,7 @@ if (!function_exists('getDiscussionOptionsDropdown')):
         // Backwards compatability
         $dropdown = discussionOptionsToDropdown($options, $dropdown);
 
-        // Allow plugins to edit the flyouts.
+        // Allow plugins to edit the dropdown.
         $sender->EventArguments['DiscussionOptionsDropdown'] = &$dropdown;
         $sender->EventArguments['Discussion'] = $discussion;
         $sender->fireEvent('DiscussionOptionsDropdown');

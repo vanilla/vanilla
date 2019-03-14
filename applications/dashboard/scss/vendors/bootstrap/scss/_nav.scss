@@ -156,7 +156,7 @@
 //
 
 .nav-tabs .dropdown-menu {
-  // Make flyouts border overlap tab border
+  // Make dropdown border overlap tab border
   margin-top: -1px;
   // Remove the top rounded corners here since there is a hard edge above the menu
   @include border-top-radius(0);

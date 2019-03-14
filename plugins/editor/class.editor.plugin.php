@@ -114,9 +114,9 @@ class EditorPlugin extends Gdn_Plugin {
     }
 
     /**
-     * To enable more colors in the flyouts, simply expand the array to include more human-readable font color names.
+     * To enable more colors in the dropdown, simply expand the array to include more human-readable font color names.
      *
-     * Note: in building the flyouts, each color is styled inline, but it will
+     * Note: in building the dropdown, each color is styled inline, but it will
      * still be required to add the appropriate post-color-* CSS class selectors
      * in the external stylesheet, so that when viewing a posted comment, the
      * color will appear. In addition, the class names must be whitelisted in
@@ -124,7 +124,7 @@ class EditorPlugin extends Gdn_Plugin {
      *
      * Note: use these http://clrs.cc/ and purple: #7b11d0
      *
-     * @return array Returns array of font colors to use in flyouts
+     * @return array Returns array of font colors to use in dropdown
      */
     protected function getFontColorList() {
         $fontColorList = [
@@ -230,7 +230,7 @@ class EditorPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Default formatting options available in the formatting flyouts.
+     * Default formatting options available in the formatting dropdown.
      *
      * Visit https://github.com/xing/wysihtml5/wiki/Supported-Commands for a
      * list of default commands and their allowed values. The array below has
@@ -296,7 +296,7 @@ class EditorPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Sort flyouts options by given weight.
+     * Sort dropdown options by given weight.
      *
      * Currently this is only in use for the formatting options.
      *
@@ -346,7 +346,7 @@ class EditorPlugin extends Gdn_Plugin {
         // Order the specified dropdowns.
         $this->sortWeightedOptions($fontFormatOptions);
 
-        // Build color flyouts from array
+        // Build color dropdown from array
         $toolbarColorGroups = [];
         $toolbarDropdownFontColor = [];
         $toolbarDropdownFontColorHighlight = [];
@@ -390,7 +390,7 @@ class EditorPlugin extends Gdn_Plugin {
             ];
         }
 
-        // Build emoji flyouts from array.
+        // Build emoji dropdown from array.
         // Using CSS background images instead of img tag, because CSS images
         // do not download until actually displayed on page. display:none prevents browsers from loading the resources.
         $toolbarDropdownEmoji = [];
@@ -433,7 +433,7 @@ class EditorPlugin extends Gdn_Plugin {
             ];
         }
 
-        // If enabled, just merge with current formatting flyouts.
+        // If enabled, just merge with current formatting dropdown.
         if ($allowedEditorActions['fontfamily']) {
             $toolbarFormatOptions = array_merge($toolbarFormatOptions, $toolbarFontFamilyOptions);
         }
@@ -999,7 +999,7 @@ class EditorPlugin extends Gdn_Plugin {
                 throw new Exception(t('You are not allowed to upload files in this category.'));
             }
         }
-
+        
         if (count($mediaIds)) {
             foreach ($mediaIds as $mediaId) {
                 $this->attachEditorUploads($mediaId, $id, $type);

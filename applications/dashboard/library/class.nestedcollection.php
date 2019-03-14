@@ -47,7 +47,7 @@ trait NestedCollection {
     private $dividerCssClassPrefix = 'divider';
 
     /**
-     * @var bool Whether to flatten the list (as with a flyouts menu) or allow nesting (as with a nav).
+     * @var bool Whether to flatten the list (as with a dropdown menu) or allow nesting (as with a nav).
      */
     private $flatten = false;
 
@@ -701,7 +701,7 @@ trait NestedCollection {
 
     /**
      * Creates a flattened array of menu items.
-     * Useful for lists like flyouts menu, where nesting lists is not necessary.
+     * Useful for lists like dropdown menu, where nesting lists is not necessary.
      *
      * @param array $items The item list to flatten.
      * @return array The flattened items list.

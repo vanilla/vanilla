@@ -101,7 +101,7 @@ class DashboardHooks extends Gdn_Plugin {
             $sender->addJsFile('vendors/daterangepicker.js', 'dashboard');
             $sender->addJsFile('vendors/bootstrap/tooltip.js', 'dashboard');
             $sender->addJsFile('vendors/clipboard.min.js', 'dashboard');
-            $sender->addJsFile('vendors/bootstrap/flyouts.js', 'dashboard');
+            $sender->addJsFile('vendors/bootstrap/dropdown.js', 'dashboard');
             $sender->addJsFile('vendors/bootstrap/collapse.js', 'dashboard');
             $sender->addJsFile('vendors/bootstrap/modal.js', 'dashboard');
             $sender->addJsFile('vendors/icheck.min.js', 'dashboard');

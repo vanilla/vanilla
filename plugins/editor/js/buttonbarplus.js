@@ -424,7 +424,7 @@
                             $(TextArea).surroundSelectedText('[url="' + currentText + '"]', '[/url]', 'select');
                         }
 
-                        // Hooking in to standardized flyouts for submitting links
+                        // Hooking in to standardized dropdown for submitting links
                         var inputBox = $('.editor-input-url');
                         $(inputBox).parent().find('.Button')
                             .off('click.insertData')
@@ -457,7 +457,7 @@
 
                     case 'image':
 
-                        // Hooking in to standardized flyouts for submitting links
+                        // Hooking in to standardized dropdown for submitting links
                         var inputBox = $('.editor-input-image');
                         $(inputBox).parent().find('.Button')
                             .off('click.insertData')
@@ -567,7 +567,7 @@
                             $(TextArea).surroundSelectedText('<a href="' + currentText + '">', '</a>', 'select');
                         }
 
-                        // Hooking in to standardized flyouts for submitting links
+                        // Hooking in to standardized dropdown for submitting links
                         var inputBox = $('.editor-input-url');
                         $(inputBox).parent().find('.Button')
                             .off('click.insertData')
@@ -601,7 +601,7 @@
 
                     case 'image':
 
-                        // Hooking in to standardized flyouts for submitting links
+                        // Hooking in to standardized dropdown for submitting links
                         var inputBox = $('.editor-input-image');
                         $(inputBox).parent().find('.Button')
                             .off('click.insertData')
@@ -756,7 +756,7 @@
                             $(TextArea).surroundSelectedText('[' + currentText + '](', ')', 'select');
                         }
 
-                        // Hooking in to standardized flyouts for submitting links
+                        // Hooking in to standardized dropdown for submitting links
                         var inputBox = $('.editor-input-url');
                         $(inputBox).parent().find('.Button')
                             .off('click.insertData')
@@ -789,7 +789,7 @@
                         // in a moment.
                         var currentText = $(TextArea).getSelection().text;
 
-                        // Hooking in to standardized flyouts for submitting links
+                        // Hooking in to standardized dropdown for submitting links
                         var inputBox = $('.editor-input-image');
                         $(inputBox).parent().find('.Button')
                             .off('click.insertData')

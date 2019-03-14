@@ -32,7 +32,7 @@
 
 /**
  * These two are not actually inserted into the editor. They are only used for
- * the flyouts.
+ * the dropdown.
  */
 .post-font-size-h1 {
   font-size: 21px;
@@ -45,7 +45,7 @@
   line-height: 26px !important; }
 
 /* Colours based on http://clrs.cc/
-cell-* are used for the flyouts */
+cell-* are used for the dropdown */
 .post-color-black {
   color: #111111; }
 

@@ -1055,7 +1055,7 @@ body > #Frame > .Head {
   width: 175px;
 }
 
-/* Option (flyouts) Menus, Bookmark stars, admin checkboxes */
+/* Option (dropdown) Menus, Bookmark stars, admin checkboxes */
 .ControlOptions,
 .Options {
   float: right;

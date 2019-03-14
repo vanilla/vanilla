@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import TabHandler from "../../../utility/TabHandler";
+import TabHandler from "../../../dom/TabHandler";
 import TabButton from "library/src/scripts/navigation/tabs/pieces/TabButton";
 import { tabButtonListClasses } from "../../../forms/radioTabs/tabButtonListStyles";
 import { ButtonTypes } from "@library/styles/buttonStyles";

@@ -30,11 +30,13 @@ async function run() {
             if ("version" in value) {
                 value.version = newVersion;
                 await writeFile(file, JSON.stringify(value, null, 4));
-                console.log(chalk.greenBright("✓"));
+                console.log(chalk.greenBright(`✓\n`));
             }
         } catch (e) {
             console.error(chalk.red("✖"));
         }
+
+        process.stdout.write("\n");
     }
 }
 

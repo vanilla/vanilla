@@ -12,11 +12,8 @@ restoreRootDir() {
 setRootDir
 bash bin/validateDeps.sh
 
-echo -e "\n==================== Preparing Command ===================="
+echo "\n==================== Running Command ===================="
 
-# Ensure dependencies
-# Composer install has everything else happening in a post-install script.
-# composer install
 
 # Bump versions
 node bin/scripts/buildRelease.js

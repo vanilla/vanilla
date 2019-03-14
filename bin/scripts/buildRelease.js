@@ -49,7 +49,7 @@ async function run() {
     shell.cd(buildDir);
     shell.exec(`env version=${newVersion} ${PHING_PATH}`);
 
-    printTitle("Cleanup")
+    printTitle("Copying & Cleanup")
     const builtFile = path.join(buildDir, "vanilla.zip");
     if (!fs.existsSync(builtFile)) {
         console.error(`Build failed. Unable to locate built file at ${builtFile}`);
@@ -62,13 +62,16 @@ async function run() {
     }
 
     const outFile = path.join(outDir, `vanilla-${newVersion}.zip`);
+    const prettyName = path.basename(outFile);
     if (fs.existsSync(outFile)) {
-        const prettyName = path.basename(outFile);
         console.log(`Release ${chalk.yellow(prettyName)} already exists. It will be overwritten.`);
         shell.rm(outFile);
     }
 
     shell.mv(builtFile, outFile);
+    console.log(chalk.greenBright(`✓ Successfully built ${prettyName} to:\n ${outFile}`));
+    process.stdout.write("\nCleaning up temporary directories... ");
+    console.log(chalk.greenBright("✓"));
 }
 
 run();

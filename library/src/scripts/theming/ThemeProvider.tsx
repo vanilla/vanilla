@@ -15,6 +15,14 @@ import ThemeActions from "@library/theming/ThemeActions";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import React from "react";
 import { connect } from "react-redux";
+import { Store } from "redux";
+import { onReady } from "@library/utility/appUtils";
+
+let store: Store | null = null;
+
+onReady(() => {
+    store = getStore<ICoreStoreState>();
+});
 
 export interface IWithThemeProps {
     theme: IThemeVariables;
@@ -62,10 +70,13 @@ class BaseThemeProvider extends React.Component<IProps> {
 }
 
 export function getThemeVariables() {
-    const store = getStore<ICoreStoreState>();
-    const assets = store.getState().theme.assets.data || {};
-    const variables = assets.variables || {};
-    return variables;
+    if (store !== null) {
+        const assets = store.getState().theme.assets.data || {};
+        const variables = assets.variables || {};
+        return variables;
+    } else {
+        return {};
+    }
 }
 
 interface IOwnProps {

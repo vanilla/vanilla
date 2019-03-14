@@ -56,7 +56,7 @@ export function useThemeCache<Cb>(callback: Cb): Cb {
     const makeCacheKey = () => {
         const storeState = getDeferredStoreState<ICoreStoreState, null>(null);
         const themeKey = getMeta("ui.themeKey", "default");
-        const status = storeState ? storeState.theme.variables.status : "not loaded yet";
+        const status = storeState ? storeState.theme.assets.status : "not loaded yet";
         const cacheKey = themeKey + status;
         return cacheKey;
     };

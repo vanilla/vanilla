@@ -5,17 +5,16 @@
 
 import { LoadStatus } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
-import { getMeta } from "@library/application";
+import Backgrounds from "@library/components/body/Backgrounds";
+import { inputClasses } from "@library/components/forms/inputStyles";
 import Loader from "@library/components/Loader";
+import { prepareShadowRoot } from "@library/dom";
+import getStore from "@library/state/getStore";
 import { ICoreStoreState } from "@library/state/reducerRegistry";
 import ThemeActions from "@library/theming/ThemeActions";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import React from "react";
 import { connect } from "react-redux";
-import getStore from "@library/state/getStore";
-import Backgrounds from "@library/components/body/Backgrounds";
-import { prepareShadowRoot } from "@library/dom";
-import { inputClasses } from "@library/components/forms/inputStyles";
 
 export interface IWithThemeProps {
     theme: IThemeVariables;
@@ -23,8 +22,8 @@ export interface IWithThemeProps {
 
 class BaseThemeProvider extends React.Component<IProps> {
     public render() {
-        const { variables } = this.props;
-        switch (variables.status) {
+        const { assets } = this.props;
+        switch (assets.status) {
             case LoadStatus.PENDING:
             case LoadStatus.LOADING:
                 return <Loader />;
@@ -32,7 +31,7 @@ class BaseThemeProvider extends React.Component<IProps> {
                 return this.props.errorComponent;
         }
 
-        if (!variables.data) {
+        if (!assets.data) {
             return null;
         }
 
@@ -64,7 +63,9 @@ class BaseThemeProvider extends React.Component<IProps> {
 
 export function getThemeVariables() {
     const store = getStore<ICoreStoreState>();
-    return store.getState().theme.variables.data || {};
+    const assets = store.getState().theme.assets.data || {};
+    const variables = assets.variables || {};
+    return variables;
 }
 
 interface IOwnProps {
@@ -77,14 +78,14 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
 
 function mapStateToProps(state: ICoreStoreState, ownProps: IOwnProps) {
     return {
-        variables: state.theme.variables,
+        assets: state.theme.assets,
     };
 }
 
 function mapDispatchToProps(dispatch: any, ownProps: IOwnProps) {
     const themeActions = new ThemeActions(dispatch, apiv2);
     return {
-        requestData: () => themeActions.getVariables(ownProps.themeKey),
+        requestData: () => themeActions.getAssets(ownProps.themeKey),
     };
 }
 

@@ -4,28 +4,28 @@
  * @license GPL-2.0-only
  */
 
+import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
+import FlexSpacer from "@library/components/FlexSpacer";
+import { signIn } from "@library/components/icons";
+import LanguagesDropDown from "@library/components/LanguagesDropDown";
+import Container from "@library/components/layouts/components/Container";
+import { PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
+import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
+import HeaderLogo from "@library/components/mebox/pieces/HeaderLogo";
+import VanillaHeaderListItem from "@library/components/mebox/pieces/VanillaHeaderListItem";
+import VanillaHeaderNav from "@library/components/mebox/pieces/VanillaHeaderNav";
+import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
+import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
+import { withDevice } from "@library/contexts/DeviceContext";
+import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
+import { ButtonTypes } from "@library/styles/buttonStyles";
+import { vanillaHeaderClasses, vanillaHeaderHomeClasses } from "@library/styles/vanillaHeaderStyles";
+import { LogoType } from "@library/theming/ThemeLogo";
+import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
+import classNames from "classnames";
 import * as React from "react";
 import ReactDOM from "react-dom";
-import classNames from "classnames";
 import { connect } from "react-redux";
-import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
-import { signIn } from "@library/components/icons";
-import VanillaHeaderListItem from "@library/components/mebox/pieces/VanillaHeaderListItem";
-import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
-import { vanillaHeaderClasses, vanillaHeaderHomeClasses } from "@library/styles/vanillaHeaderStyles";
-import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
-import { Devices, IDeviceProps } from "@library/components/DeviceChecker";
-import Container from "@library/components/layouts/components/Container";
-import FlexSpacer from "@library/components/FlexSpacer";
-import HeaderLogo from "@library/components/mebox/pieces/HeaderLogo";
-import { PanelWidgetHorizontalPadding } from "@library/components/layouts/PanelLayout";
-import { dummyLogoData } from "@library/components/mebox/state/dummyLogoData";
-import VanillaHeaderNav from "@library/components/mebox/pieces/VanillaHeaderNav";
-import CompactMeBox from "@library/components/mebox/pieces/CompactMeBox";
-import LanguagesDropDown from "@library/components/LanguagesDropDown";
-import { dummyOtherLanguagesData } from "@library/state/dummyOtherLanguages";
-import { withDevice } from "@library/contexts/DeviceContext";
-import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -53,9 +53,9 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                         <div className={classNames(headerClasses.bar, "isHome")}>
                             <FlexSpacer className={classes.left} />
                             <HeaderLogo
-                                {...dummyLogoData}
                                 className="vanillaHeader-logoContainer"
                                 logoClassName="vanillaHeader-logo isCentred"
+                                logoType={LogoType.MOBILE}
                             />
                             {isGuest ? (
                                 <VanillaHeaderNav className={classNames(headerClasses.nav, "vanillaHeader-guest")}>

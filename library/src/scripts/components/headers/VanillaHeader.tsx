@@ -17,22 +17,22 @@ import CompactSearch from "@library/components/mebox/pieces/CompactSearch";
 import HeaderLogo from "@library/components/mebox/pieces/HeaderLogo";
 import VanillaHeaderNav from "@library/components/mebox/pieces/VanillaHeaderNav";
 import VanillaHeaderNavItem from "@library/components/mebox/pieces/VanillaHeaderNavItem";
-import { dummyLogoData } from "@library/components/mebox/state/dummyLogoData";
 import { dummyNavigationData } from "@library/components/mebox/state/dummyNavigationData";
 import BackLink from "@library/components/navigation/BackLink";
 import { withDevice } from "@library/contexts/DeviceContext";
 import { IWithPagesProps, withPages } from "@library/contexts/PagesContext";
 import { ScrollOffsetContext } from "@library/contexts/ScrollOffsetContext";
+import { ButtonTypes } from "@library/styles/buttonStyles";
+import { meBoxClasses } from "@library/styles/meBoxStyles";
+import { sticky } from "@library/styles/styleHelpers";
+import { vanillaHeaderClasses, vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
+import { LogoType } from "@library/theming/ThemeLogo";
 import UsersModel, { IInjectableUserState } from "@library/users/UsersModel";
 import classNames from "classnames";
 import * as React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
-import { vanillaHeaderClasses, vanillaHeaderVariables } from "@library/styles/vanillaHeaderStyles";
-import { meBoxClasses } from "@library/styles/meBoxStyles";
 import { style } from "typestyle";
-import { sticky } from "@library/styles/styleHelpers";
-import { ButtonTypes } from "@library/styles/buttonStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -114,9 +114,9 @@ export class VanillaHeader extends React.Component<IProps, IState> {
 
                             {!isMobile && (
                                 <HeaderLogo
-                                    {...dummyLogoData}
                                     className={classNames("vanillaHeader-logoContainer", classes.logoContainer)}
                                     logoClassName="vanillaHeader-logo"
+                                    logoType={LogoType.DESKTOP}
                                 />
                             )}
                             {!this.state.openSearch &&

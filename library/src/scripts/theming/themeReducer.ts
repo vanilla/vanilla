@@ -8,40 +8,55 @@ import ThemeActions from "@library/theming/ThemeActions";
 import { ILoadable, LoadStatus } from "@library/@types/api";
 import produce from "immer";
 
+export interface ITheme {
+    assets: IThemeAssets;
+}
+
+export interface IThemeAssets {
+    logo?: IThemeExternalAsset;
+    mobileLogo?: IThemeExternalAsset;
+    variables?: IThemeVariables;
+}
+
+export interface IThemeExternalAsset {
+    type: string;
+    url: string;
+}
+
 export interface IThemeVariables {
     [key: string]: string;
 }
 
 export interface IThemeState {
-    variables: ILoadable<IThemeVariables>;
+    assets: ILoadable<IThemeAssets>;
 }
 
 export const INITIAL_STATE: IThemeState = {
-    variables: {
+    assets: {
         status: LoadStatus.PENDING,
     },
 };
 
 export const themeReducer = produce(
     reducerWithInitialState(INITIAL_STATE)
-        .case(ThemeActions.getVariables.started, state => {
-            state.variables.status = LoadStatus.LOADING;
+        .case(ThemeActions.getAssets.started, state => {
+            state.assets.status = LoadStatus.LOADING;
             return state;
         })
-        .case(ThemeActions.getVariables.done, (state, payload) => {
-            state.variables.status = LoadStatus.SUCCESS;
-            state.variables.data = payload.result;
+        .case(ThemeActions.getAssets.done, (state, payload) => {
+            state.assets.status = LoadStatus.SUCCESS;
+            state.assets.data = payload.result.assets;
             return state;
         })
-        .case(ThemeActions.getVariables.failed, (state, payload) => {
+        .case(ThemeActions.getAssets.failed, (state, payload) => {
             if (payload.error.response.status === 404) {
                 // This theme just doesn't have variables. Use the defaults.
-                state.variables.data = {};
-                state.variables.status = LoadStatus.SUCCESS;
+                state.assets.data = {};
+                state.assets.status = LoadStatus.SUCCESS;
                 return state;
             } else {
-                state.variables.status = LoadStatus.ERROR;
-                state.variables.error = payload.error;
+                state.assets.status = LoadStatus.ERROR;
+                state.assets.error = payload.error;
                 return state;
             }
         }),

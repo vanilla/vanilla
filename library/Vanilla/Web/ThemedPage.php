@@ -45,7 +45,7 @@ abstract class ThemedPage extends Page {
     protected function initAssets() {
         $themeKey = $this->siteMeta->getActiveTheme()->getKey();
         $themeData = $this->themesApi->get($themeKey);
-        $variables = [];
+        $assets = [];
 
         /** @var JsonAsset $variablesAsset */
         $variablesAsset = $themeData['assets']['variables'] ?? null;
@@ -56,6 +56,19 @@ abstract class ThemedPage extends Page {
                     "Failed to initialize theme data for theme $themeKey. Theme variables were not valid JSON"
                 );
             }
+            $assets["variables"] = $variables;
+        }
+
+        /** @var ImageAsset $logoAsset */
+        $logoAsset = $themeData["assets"]["logo"] ?? null;
+        if ($logoAsset) {
+            $assets["logo"] = $logoAsset;
+        }
+
+        /** @var ImageAsset $logoAsset */
+        $mobileLogoAsset = $themeData["assets"]["mobileLogo"] ?? null;
+        if ($mobileLogoAsset) {
+            $assets["mobileLogo"] = $mobileLogoAsset;
         }
 
         $styleSheet = $themeData['assets']['styles'] ?? null;
@@ -77,8 +90,8 @@ abstract class ThemedPage extends Page {
 
         // Preload the theme variables for the frontend.
         $this->addReduxAction(new ReduxAction(
-            \ThemesApiController::GET_THEME_VARIABLES_ACTION,
-            Data::box($variables),
+            \ThemesApiController::GET_THEME_ACTION,
+            Data::box(["assets" => $assets]),
             [ 'key' => $themeKey ]
         ));
     }

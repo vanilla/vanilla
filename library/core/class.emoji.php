@@ -585,7 +585,7 @@ class Emoji {
         // out of a loop.
         $emojiAliasList = $this->aliases;
 
-        // Loop through and apply changes to all visible aliases from flyouts
+        // Loop through and apply changes to all visible aliases from dropdown
         foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {
             $emojiFilePath = $this->getEmojiPath($emojiCanonical);
 

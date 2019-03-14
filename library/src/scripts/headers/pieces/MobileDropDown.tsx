@@ -15,7 +15,7 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import SmartAlign from "@library/layout/SmartAlign";
 import { mobileDropDownClasses } from "@library/headers/pieces/mobileDropDownStyles";
-import classNames from "classNames";
+import classNames from "classnames";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";

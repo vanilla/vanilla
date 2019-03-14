@@ -6,7 +6,7 @@
 
 import React from "react";
 import { NullComponent } from "@library/forms/select/overwrites";
-import { DayPickerInput } from "react-day-picker/types/DayPickerInput";
+import DayPickerInput from "react-day-picker/DayPickerInput";
 import moment from "moment";
 import { t } from "@library/utility/appUtils";
 import { Moment } from "moment";
@@ -15,10 +15,10 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { guessOperatingSystem, OS } from "@library/utility/utils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { dayPickerClasses } from "@library/forms/datePickerStyles";
-import classNames from "classNames";
+import classNames from "classnames";
 import { leftChevron, rightChevron } from "@library/icons/common";
 import { formatDate, parseDate } from "react-day-picker/moment";
-
+"";
 interface IProps {
     value: string; // ISO formatted date
     onChange: (value: string) => void;

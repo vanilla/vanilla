@@ -9,7 +9,7 @@ import DropDownItem from "@library/flyouts/items/DropDownItem";
 import Heading from "@library/layout/Heading";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import classNames from "classNames";
+import classNames from "classnames";
 
 interface IProps {
     title: string;

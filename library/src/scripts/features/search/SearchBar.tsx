@@ -21,7 +21,7 @@ import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { InputActionMeta, ActionMeta } from "react-select/lib/types";
 import { RouteComponentProps } from "react-router";
 import Translate from "@library/content/Translate";
-import classNames from "classNames";
+import classNames from "classnames";
 import { components } from "react-select";
 import ReactDOM from "react-dom";
 import * as selectOverrides from "@library/forms/select/overwrites";

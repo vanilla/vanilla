@@ -8,7 +8,7 @@ import React from "react";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import DropDownItemLink, { IDropDownItemLink } from "@library/flyouts/items/DropDownItemLink";
 import NumberFormatted from "@library/content/NumberFormatted";
-import classNames from "classNames";
+import classNames from "classnames";
 
 interface IProps extends IDropDownItemLink {
     count?: number;

@@ -11,7 +11,7 @@ import MeBoxDropDownItem, {
     MeBoxItemType,
 } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
 import { frameBodyClasses } from "@library/layout/frame/frameStyles";
-import classNames from "classNames";
+import classNames from "classnames";
 
 export interface IVanillaHeaderNavProps {
     className?: string;

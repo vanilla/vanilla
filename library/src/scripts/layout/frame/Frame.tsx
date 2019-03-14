@@ -6,7 +6,7 @@
 
 import React from "react";
 import { frameClasses } from "@library/layout/frame/frameStyles";
-import classNames from "classNames";
+import classNames from "classnames";
 
 interface IProps {
     className?: string;

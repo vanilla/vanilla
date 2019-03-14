@@ -8,7 +8,7 @@ import React from "react";
 import { t } from "@library/utility/appUtils";
 import { messages } from "@library/icons/header";
 import Count from "@library/content/Count";
-import classNames from "classNames";
+import classNames from "classnames";
 
 interface IProps {
     countClass?: string;

@@ -13,7 +13,7 @@ import { metasClasses } from "@library/styles/metasStyles";
 import CloseButton from "@library/navigation/CloseButton";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
 import { fileUploadError } from "@library/icons/fileTypes";
-import classNames from "classNames";
+import classNames from "classnames";
 
 interface IProps extends IFileAttachment {
     message: string;

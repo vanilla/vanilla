@@ -4,14 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { History } from "history";
-import LocationDescriptor = History.LocationDescriptor;
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import SmartLink from "@library/routing/links/SmartLink";
-import classNames from "classNames";
-import ModalLink from "@library/modal/ModalLink";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
+import ModalLink from "@library/modal/ModalLink";
+import SmartLink from "@library/routing/links/SmartLink";
+import classNames from "classnames";
+import { LocationDescriptor } from "history";
+import React from "react";
 
 export interface IDropDownItemLink {
     to: LocationDescriptor;

@@ -6,7 +6,7 @@
 
 import React from "react";
 import { frameBodyClasses } from "@library/layout/frame/frameStyles";
-import classNames from "classNames";
+import classNames from "classnames";
 
 export interface IFrameBodyProps {
     className?: string;

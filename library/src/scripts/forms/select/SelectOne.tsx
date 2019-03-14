@@ -9,7 +9,7 @@ import ErrorMessages from "@library/forms/ErrorMessages";
 import { getRequiredID, IOptionalComponentID } from "@library/utility/idUtils";
 import Select from "react-select";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import classNames from "classNames";
+import classNames from "classnames";
 import Paragraph from "@library/layout/Paragraph";
 import { IFieldError } from "@library/@types/api/core";
 import * as selectOverrides from "@library/forms/select/overwrites";

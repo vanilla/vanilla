@@ -7,7 +7,7 @@
 import React from "react";
 import { t } from "@library/utility/appUtils";
 import { emojiGroupsClasses } from "@rich-editor/flyouts/pieces/insertEmojiGroupClasses";
-import classNames from "classNames";
+import classNames from "classnames";
 
 export function emojiGroup_smileysPeople(group = "Smileys & People", className = "") {
     const classesEmojiGroup = emojiGroupsClasses();

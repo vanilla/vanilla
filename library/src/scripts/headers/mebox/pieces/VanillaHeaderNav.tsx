@@ -7,7 +7,7 @@
 import React from "react";
 import VanillaHeaderNavItem, { IHeaderNav } from "@library/headers/mebox/pieces/VanillaHeaderNavItem";
 import vanillaHeaderNavClasses from "@library/headers/VanillaHeaderNav";
-import classNames from "classNames";
+import classNames from "classnames";
 
 export interface IVanillaHeaderNavProps {
     className?: string;

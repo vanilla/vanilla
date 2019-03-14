@@ -8,7 +8,7 @@ import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import { t } from "@library/utility/appUtils";
 import DatePicker from "@library/forms/DatePicker";
 import moment from "moment";
-import classNames from "classNames";
+import classNames from "classnames";
 
 interface IProps {
     start: string | undefined;

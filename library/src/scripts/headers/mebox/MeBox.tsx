@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import classNames from "classNames";
+import classNames from "classnames";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import UserDropdown from "@library/headers/mebox/pieces/UserDropdown";
 import MessagesDropDown from "@library/headers/mebox/pieces/MessagesDropDown";

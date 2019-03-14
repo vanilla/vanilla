@@ -13,7 +13,7 @@ import { t } from "@library/utility/appUtils";
 import { attachmentClasses } from "@library/content/attachments/attachmentStyles";
 import { metasClasses } from "@library/styles/metasStyles";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
-import classNames from "classNames";
+import classNames from "classnames";
 
 interface IProps extends IFileAttachment {
     type: AttachmentType;

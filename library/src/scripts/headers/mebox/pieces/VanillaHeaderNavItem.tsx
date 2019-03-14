@@ -11,7 +11,7 @@ import vanillaHeaderNavClasses from "@library/headers/VanillaHeaderNav";
 import SmartLink from "@library/routing/links/SmartLink";
 import { getDynamicClassFromButtonType } from "@library/forms/Button";
 import { RouteComponentProps, withRouter } from "react-router";
-import classNames from "classNames";
+import classNames from "classnames";
 
 export interface IHeaderNav {
     className?: string;

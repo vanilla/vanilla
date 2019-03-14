@@ -6,7 +6,7 @@
 
 import React from "react";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import classNames from "classNames";
+import classNames from "classnames";
 
 interface IProps {
     className?: string;

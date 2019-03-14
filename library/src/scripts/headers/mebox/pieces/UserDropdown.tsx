@@ -22,7 +22,7 @@ import { frameBodyClasses } from "@library/layout/frame/frameStyles";
 import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { logError } from "@library/utility/utils";
-import classNames from "classNames";
+import classNames from "classnames";
 import React from "react";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";

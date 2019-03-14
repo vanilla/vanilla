@@ -8,7 +8,7 @@ import { t } from "@library/utility/appUtils";
 import Translate from "@library/content/Translate";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
 import Paragraph from "@library/layout/Paragraph";
-import classNames from "classNames";
+import classNames from "classnames";
 
 // Common to both attachment types
 export interface IAttachmentIcon {

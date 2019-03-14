@@ -9,7 +9,7 @@ import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
 import { formErrorClasses } from "@library/forms/formElementStyles";
-import classNames from "classNames";
+import classNames from "classnames";
 
 interface IProps {
     children: React.ReactNode;

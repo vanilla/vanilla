@@ -15,7 +15,7 @@ import { t } from "@library/utility/appUtils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Permission from "@library/features/users/Permission";
 import { dummyUserDropDownData } from "@library/headers/mebox/state/dummyUserDropDownData";
-import classNames from "classNames";
+import classNames from "classnames";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import { connect } from "react-redux";

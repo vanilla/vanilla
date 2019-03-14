@@ -11,7 +11,7 @@ import AttachmentIcon, { IAttachmentIcon } from "@library/content/attachments/At
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { metasClasses } from "@library/styles/metasStyles";
 import Translate from "@library/content/Translate";
-import classNames from "classNames";
+import classNames from "classnames";
 
 // Array of icon attachments
 interface IProps {

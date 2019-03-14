@@ -12,7 +12,7 @@ import NotificationsCounter from "@library/headers/mebox/pieces/NotificationsCou
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import DropDown from "@library/flyouts/DropDown";
-import classNames from "classNames";
+import classNames from "classnames";
 
 interface IProps extends INotificationsProps {
     buttonClassName?: string;

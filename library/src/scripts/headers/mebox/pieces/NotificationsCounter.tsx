@@ -9,7 +9,7 @@ import { t } from "@library/utility/appUtils";
 import { IUsersStoreState } from "@library/features/users/UsersModel";
 import Count from "@library/content/Count";
 import { notifications } from "@library/icons/header";
-import classNames from "classNames";
+import classNames from "classnames";
 import { connect } from "react-redux";
 
 /**

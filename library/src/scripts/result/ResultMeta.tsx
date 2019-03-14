@@ -9,7 +9,7 @@ import classNames from "classnames";
 import { IUserFragment } from "@library/@types/api/users";
 import { capitalizeFirstLetter } from "@library/utility/utils";
 import { t } from "@library/utility/appUtils";
-import { ArticleStatus } from "@knowledge/@types/api/article";
+import { PublishStatus } from "@library/@types/api/core";
 import BreadCrumbString, { ICrumbString } from "@library/navigation/BreadCrumbString";
 import { metasClasses } from "@library/styles/metasStyles";
 import Translate from "@library/content/Translate";
@@ -19,14 +19,14 @@ interface IProps {
     updateUser: IUserFragment;
     dateUpdated: string;
     crumbs?: ICrumbString[];
-    status?: ArticleStatus;
+    status?: PublishStatus;
     type?: string;
 }
 
 export class ResultMeta extends React.Component<IProps> {
     public render() {
         const { dateUpdated, updateUser, crumbs, status, type } = this.props;
-        const isDeleted = status === ArticleStatus.DELETED;
+        const isDeleted = status === PublishStatus.DELETED;
         const classesMetas = metasClasses();
         return (
             <React.Fragment>

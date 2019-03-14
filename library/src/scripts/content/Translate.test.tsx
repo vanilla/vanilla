@@ -3,6 +3,8 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+
+import React from "react";
 import gdn from "@library/gdn";
 import { escapeHTML } from "@library/dom/domUtils";
 import Translate from "@library/content/Translate";

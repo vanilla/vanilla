@@ -6,7 +6,7 @@
 
 const prompts = require("prompts");
 const path = require("path");
-const shell = require('shelljs');
+const shell = require("shelljs");
 const chalk = require("chalk").default;
 
 const ROOT = path.resolve(__dirname, "../../");
@@ -42,11 +42,15 @@ async function promptRequiredText(prompt) {
 }
 
 async function promptVersion() {
-    return promptRequiredText("What version would you like to use?")
+    return promptRequiredText("What version name do you want to use?");
 }
 
 async function promptBranch() {
-    return promptRequiredText("What branch would you like to build from?")
+    return promptRequiredText(
+        `What branch would you like to build from? This command works for all vanilla versions after ${chalk.bold(
+            "2.8+2019.003",
+        )}`,
+    );
 }
 
 module.exports = {
@@ -55,4 +59,4 @@ module.exports = {
     vanillaPath,
     printTitle,
     promptBranch,
-}
+};

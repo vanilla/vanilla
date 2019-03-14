@@ -380,39 +380,33 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
                         zIndex,
                         backgroundColor: colorOut(buttonTypeVars.hover.bg),
                         color: colorOut(buttonTypeVars.hover.fg),
-                        ...borders(get(buttonTypeVars, "hover.border", {})),
-                        ...(fonts(
-                            buttonTypeVars.hover && buttonTypeVars.hover.font ? buttonTypeVars.hover.font : {},
-                        ) as any),
+                        ...borders(buttonTypeVars.hover.border),
+                        ...fonts(buttonTypeVars.hover && buttonTypeVars.hover.font ? buttonTypeVars.hover.font : {}),
                     },
                     "&:focus": {
                         zIndex,
                         backgroundColor: colorOut(buttonTypeVars.focus.bg),
-                        ...borders(get(buttonTypeVars, "focus.border", {})),
+                        ...borders(buttonTypeVars.focus.border),
                         color: colorOut(buttonTypeVars.focus.fg),
-                        ...(fonts(
-                            buttonTypeVars.focus && buttonTypeVars.focus.font ? buttonTypeVars.focus.font : {},
-                        ) as any),
+                        ...fonts(buttonTypeVars.focus && buttonTypeVars.focus.font ? buttonTypeVars.focus.font : {}),
                     },
                     "&:active": {
                         zIndex,
                         backgroundColor: colorOut(buttonTypeVars.active.bg),
-                        ...borders(get(buttonTypeVars, "active.border", {})),
+                        ...borders(buttonTypeVars.active.border),
                         color: colorOut(buttonTypeVars.active.fg),
-                        ...(fonts(
-                            buttonTypeVars.active && buttonTypeVars.active.font ? buttonTypeVars.active.font : {},
-                        ) as any),
+                        ...fonts(buttonTypeVars.active && buttonTypeVars.active.font ? buttonTypeVars.active.font : {}),
                     },
                     "&.focus-visible": {
                         zIndex,
                         backgroundColor: colorOut(buttonTypeVars.focus.bg),
-                        ...borders(get(buttonTypeVars, "accessibleFocus.border", {})),
+                        ...borders(buttonTypeVars.focusAccessible.border),
                         color: colorOut(buttonTypeVars.focusAccessible.fg),
-                        ...(fonts(
+                        ...fonts(
                             buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.font
                                 ? buttonTypeVars.focusAccessible.font
                                 : {},
-                        ) as any),
+                        ),
                     },
                 },
             },

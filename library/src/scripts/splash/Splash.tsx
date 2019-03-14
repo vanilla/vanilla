@@ -11,8 +11,9 @@ import { t } from "@library/utility/appUtils";
 import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
-import { IndependentSearch } from "@library/features/search/IndependentSearch";
+import IndependentSearch from "@library/features/search/IndependentSearch";
 import { splashStyles } from "@library/splash/splashStyles";
+import Container from "@library/layout/components/Container";
 
 interface IProps extends IDeviceProps {
     title: string; // Often the message to display isn't the real H1

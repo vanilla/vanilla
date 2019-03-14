@@ -9,6 +9,7 @@ import ThemeLogo, { LogoType } from "@library/theming/ThemeLogo";
 import { formatUrl, t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
 import { vanillaHeaderLogoClasses } from "@library/headers/vanillaHeaderStyles";
+import classNames from "classNames";
 
 export interface IHeaderLogo {
     className?: string;

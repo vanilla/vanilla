@@ -6,6 +6,7 @@
 
 import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggestion";
 import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
+import { expect } from "chai";
 
 function makeMentionSuggestion(username: string): IUserSuggestion {
     return {

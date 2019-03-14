@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { IApiError, IApiResponse } from "@library/@types/api";
+import { IApiError, IApiResponse } from "@library/@types/api/core";
 import { AxiosResponse, AxiosInstance } from "axios";
 import { logError } from "@library/utility/utils";
 import { ThunkDispatch, ThunkAction } from "redux-thunk";

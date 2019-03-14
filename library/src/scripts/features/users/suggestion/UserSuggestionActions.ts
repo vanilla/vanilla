@@ -5,11 +5,14 @@
  */
 
 import { logError } from "@library/utility/utils";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 import { IUsersStoreState } from "@library/features/users/UsersModel";
 import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
 import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggestion";
 import UserSuggestionModel from "@library/features/users/suggestion/UserSuggestionModel";
+import { Dispatch } from "redux";
+import apiv2 from "@library/apiv2";
+import debounce from "lodash/debounce";
 
 interface ILookupUserOptions {
     username: string;
@@ -133,7 +136,7 @@ export default class UserSuggestionActions extends ReduxActions {
                 order: "mention",
                 limit: UserSuggestionActions.USER_LIMIT,
             };
-            return api
+            return apiv2
                 .get("/users/by-names/", { params /*, cancelToken: this.apiCancelSource.token*/ })
                 .then(response => {
                     if (response.status >= 500) {

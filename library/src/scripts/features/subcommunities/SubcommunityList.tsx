@@ -9,6 +9,7 @@ import { subcommunityListClasses } from "@library/features/subcommunities/subcom
 import { subcommunityTileClasses } from "@library/features/subcommunities/subcommunityTitleStyles";
 import SubcommunityTile from "@library/features/subcommunities/SubcommunityTile";
 import Paragraph from "@library/layout/Paragraph";
+import classNames from "classNames";
 
 interface ISubcommunity {
     icon: string;

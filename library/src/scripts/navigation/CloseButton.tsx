@@ -9,6 +9,7 @@ import { t } from "@library/utility/appUtils";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
 import { ILegacyProps } from "@library/@types/legacy";
+import { close } from "@library/icons/common";
 
 interface IProps extends Partial<ILegacyProps> {
     className?: string;

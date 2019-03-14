@@ -9,10 +9,10 @@ import React, { Component } from "react";
 import { t } from "@library/utility/appUtils";
 import Heading from "@library/layout/Heading";
 import classNames from "classnames";
-import NavLinks from "NavLinks";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { ILinkListData } from "@library/@types/api";
 import { navLinksClasses } from "@library/navigation/navLinksStyles";
+import { ILinkListData } from "@library/@types/api/core";
+import NavLinks from "@library/navigation/NavLinks";
 
 interface IProps {
     title: string; // For accessibility, title of group

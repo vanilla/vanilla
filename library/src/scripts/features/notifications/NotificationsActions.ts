@@ -3,8 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { INotification, INotificationWritable } from "@library/@types/api";
-import ReduxActions from "@library/redux/ReduxActions";
+import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
+import { INotification, INotificationWritable } from "@library/@types/api/notifications";
 
 /**
  * Redux actions for the current user's notification data.

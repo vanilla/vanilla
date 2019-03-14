@@ -14,6 +14,7 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { searchClasses } from "@library/features/search/searchStyles";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { RouteComponentProps, withRouter } from "react-router";
+import classNames from "classNames";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;

@@ -7,8 +7,10 @@
 import { percent, px, calc } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { flexHelper } from "@library/styles/styleHelpers";
+import { flexHelper, unit } from "@library/styles/styleHelpers";
 import { styleFactory } from "@library/styles/styleUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export function vanillaHeaderNavigation() {
     const globalVars = globalVariables();

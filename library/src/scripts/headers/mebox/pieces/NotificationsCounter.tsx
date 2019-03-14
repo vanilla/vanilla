@@ -9,6 +9,8 @@ import { t } from "@library/utility/appUtils";
 import { IUsersStoreState } from "@library/features/users/UsersModel";
 import Count from "@library/content/Count";
 import { notifications } from "@library/icons/header";
+import classNames from "classNames";
+import { connect } from "react-redux";
 
 /**
  * Implements Notifications toggle contents

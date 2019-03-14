@@ -4,7 +4,7 @@
  */
 
 import { generateApiActionCreators, ActionsUnion, apiThunk } from "@library/redux/utility";
-import { IAuthenticatePasswordResponseData, IAuthenticatePasswordParams } from "@dashboard/@types/api";
+import { IAuthenticatePasswordResponseData, IAuthenticatePasswordParams } from "@dashboard/@types/api/authenticate";
 import apiv2 from "@library/apiv2";
 import { AxiosResponse, AxiosError } from "axios";
 import { formatUrl } from "@library/utility/appUtils";

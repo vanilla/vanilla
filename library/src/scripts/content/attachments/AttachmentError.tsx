@@ -11,8 +11,9 @@ import { attachmentClasses } from "@library/content/attachments/attachmentStyles
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { metasClasses } from "@library/styles/metasStyles";
 import CloseButton from "@library/navigation/CloseButton";
-import { fileUploadError } from "@library/icons";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
+import { fileUploadError } from "@library/icons/fileTypes";
+import classNames from "classNames";
 
 interface IProps extends IFileAttachment {
     message: string;

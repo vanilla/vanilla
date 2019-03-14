@@ -127,7 +127,7 @@ export const searchBarClasses = useThemeCache(() => {
                                 "&.inputText": {
                                     borderTopRightRadius: 0,
                                     borderBottomRightRadius: 0,
-                                    ...borders(get(classesButton.standard, "border")),
+                                    ...borders(classesButton.standard.border),
                                 },
                             },
                         },

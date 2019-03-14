@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { IUserFragment } from "@library/@types/api";
+import { IUserFragment } from "@library/@types/api/users";
 import { t } from "@library/utility/appUtils";
 import { noUserPhoto } from "@library/icons/header";
 import FlexSpacer from "@library/layout/FlexSpacer";
@@ -14,6 +14,7 @@ import { meBoxMessageClasses } from "@library/headers/mebox/pieces/meBoxMessageS
 import { metasClasses } from "@library/styles/metasStyles";
 import Translate from "@library/content/Translate";
 import DateTime from "@library/content/DateTime";
+import classNames from "classnames";
 
 export enum MeBoxItemType {
     NOTIFICATION = "notification",

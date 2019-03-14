@@ -5,9 +5,10 @@
  */
 
 import React from "react";
-import { IUserFragment } from "@library/@types/api";
+import { IUserFragment } from "@library/@types/api/users";
 import { userPhotoClasses } from "@library/headers/mebox/pieces/userPhotoStyles";
 import { user } from "@library/icons/header";
+import classNames from "classNames";
 
 export enum UserPhotoSize {
     SMALL = "small",

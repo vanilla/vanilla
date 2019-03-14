@@ -3,10 +3,13 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { ILoadable, IMe, LoadStatus } from "@library/@types/api";
 import { Permission } from "@library/features/users/Permission";
 import { mount, shallow } from "enzyme";
 import UsersActions from "@library/features/users/UsersActions";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { IMe } from "@library/@types/api/users";
+import sinon from "sinon";
+import { assert } from "chai";
 
 // tslint:disable:jsx-use-translation-function
 

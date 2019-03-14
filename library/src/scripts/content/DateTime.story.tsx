@@ -7,7 +7,7 @@
 import React from "react";
 import { storiesOf } from "@storybook/react";
 import { select, date } from "@storybook/addon-knobs";
-import DateTime from "DateTime";
+import DateTime from "@library/content/DateTime";
 
 storiesOf("CoreComponents/DateTime", module).add("DateTime", () => {
     const mode = select(

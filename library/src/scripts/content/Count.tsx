@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { countClasses } from "@library/styles/countStyles";
+import { countClasses } from "@library/content/countStyles";
 
 export interface IProps {
     className?: string;

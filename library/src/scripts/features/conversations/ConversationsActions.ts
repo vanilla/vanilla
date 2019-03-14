@@ -3,8 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { IConversation, IGetConversationsRequest } from "@library/@types/api";
-import ReduxActions from "@library/redux/ReduxActions";
+import ReduxActions, { ActionsUnion } from "@library/redux/ReduxActions";
+import { IConversation, IGetConversationsRequest } from "@library/@types/api/conversations";
 
 /**
  * Redux actions for the current user's conversations.

@@ -6,6 +6,7 @@
 
 import React from "react";
 import SmartLink from "@library/routing/links/SmartLink";
+import classNames from "classnames";
 
 interface IProps {
     className?: string;
@@ -30,7 +31,7 @@ export default class Breadcrumb extends React.Component<IProps> {
                     to={this.props.url}
                     title={this.props.name}
                     aria-current={ariaCurrent}
-                    className={className("breadcrumb-link", this.props.className, { isCurrent: ariaCurrent })}
+                    className={classNames("breadcrumb-link", this.props.className, { isCurrent: ariaCurrent })}
                     itemScope
                     itemType="http://schema.org/Thing"
                     itemProp="item"

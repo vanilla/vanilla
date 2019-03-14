@@ -84,7 +84,7 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
     /**
      * Pass through our fake button to be a click on the file upload (which can't be styled).
      */
-    private onFakeButtonClick = (event: MouseEvent<any>) => {
+    private onFakeButtonClick = (event: React.MouseEvent<any>) => {
         if (this.inputRef && this.inputRef.current) {
             this.inputRef.current.click();
         }

@@ -7,14 +7,17 @@
 import React from "react";
 import { NullComponent } from "@library/forms/select/overwrites";
 import { DayPickerInput } from "react-day-picker/types/DayPickerInput";
-import moment = require("moment");
+import moment from "moment";
 import { t } from "@library/utility/appUtils";
 import { Moment } from "moment";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { guessOperatingSystem } from "@library/utility/utils";
+import { guessOperatingSystem, OS } from "@library/utility/utils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { dayPickerClasses } from "@library/forms/datePickerStyles";
+import classNames from "classNames";
+import { leftChevron, rightChevron } from "@library/icons/common";
+import { formatDate, parseDate } from "react-day-picker/moment";
 
 interface IProps {
     value: string; // ISO formatted date

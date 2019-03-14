@@ -6,6 +6,7 @@
 
 import React from "react";
 import { frameFooterClasses } from "@library/layout/frame/frameStyles";
+import classNames from "classNames";
 
 export interface IFrameFooterProps {
     className?: string;

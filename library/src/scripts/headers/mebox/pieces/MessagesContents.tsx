@@ -9,16 +9,24 @@ import ConversationsActions from "@library/features/conversations/ConversationsA
 import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
 import { IConversationsStoreState } from "@library/features/conversations/ConversationsModel";
 import Loader from "@library/loaders/Loader";
-import { GetConversationsExpand, IConversation, IUserFragment, LoadStatus } from "@library/@types/api";
-import { Devices, IDeviceProps } from "@library/layout/DeviceChecker";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import apiv2 from "@library/apiv2";
-import { withDevice } from "@library/layout/DeviceContext";
+import { withDevice, Devices, IDeviceProps } from "@library/layout/DeviceContext";
 import { IMeBoxMessageItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
 import { t } from "@library/utility/appUtils";
+import Frame from "@library/layout/frame/Frame";
+import classNames from "classnames";
+import { compose } from "redux";
+import FrameBody from "@library/layout/frame/FrameBody";
+import FramePanel from "@library/layout/frame/FramePanel";
+import FrameFooter from "@library/layout/frame/FrameFooter";
+import { LoadStatus } from "@library/@types/api/core";
+import { IConversation, GetConversationsExpand } from "@library/@types/api/conversations";
+import { IUserFragment } from "@library/@types/api/users";
+import { connect } from "react-redux";
 
 /**
  * Implements Messages Contents to be included in drop down or tabs

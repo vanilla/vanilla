@@ -6,7 +6,7 @@
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
 import { ITheme } from "@library/theming/themeReducer";
-import { IApiError } from "@library/@types/api";
+import { IApiError } from "@library/@types/api/core";
 
 const createAction = actionCreatorFactory("@@themes");
 

@@ -12,6 +12,7 @@ import classNames from "classnames";
 import { inlineToolbarClasses } from "@rich-editor/toolbars/inlineToolbarClasses";
 import { IMenuItemData } from "@rich-editor/toolbars/pieces/MenuItem";
 import MenuItems from "@rich-editor/toolbars/pieces/MenuItems";
+import Formatter from "@rich-editor/quill/Formatter";
 
 interface IProps {
     formatter: Formatter;
@@ -24,7 +25,7 @@ interface IProps {
 
 export default class InlineToolbarMenuItems extends React.PureComponent<IProps> {
     public render() {
-        const classesInlineToolbar = inlineToolbarClasses({}, !!this.props.legacyMode);
+        const classesInlineToolbar = inlineToolbarClasses(!!this.props.legacyMode);
         return (
             <MenuItems
                 menuItemData={this.menuItemData}

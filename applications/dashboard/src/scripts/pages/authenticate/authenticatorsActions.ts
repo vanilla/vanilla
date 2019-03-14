@@ -4,7 +4,7 @@
  */
 
 import { generateApiActionCreators, ActionsUnion, apiThunk } from "@library/redux/utility";
-import { IUserAuthenticator } from "@dashboard/@types/api";
+import { IUserAuthenticator } from "@dashboard/@types/api/authenticate";
 
 export const GET_USER_AUTHENTICATORS_REQUEST = "GET_USER_AUTHENTICATORS_REQUEST";
 export const GET_USER_AUTHENTICATORS_SUCCESS = "GET_USER_AUTHENTICATORS_SUCCESS";

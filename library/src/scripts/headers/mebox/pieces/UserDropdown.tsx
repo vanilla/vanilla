@@ -4,25 +4,29 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { IUserFragment } from "@library/@types/api";
-import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
-import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
-import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
-import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
-import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
-import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWithCount";
-import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
-import DropDownSection from "@library/flyouts/items/DropDownSection";
-import { logError } from "@library/utility/utils";
-import { t } from "@library/utility/appUtils";
-import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { IUserFragment } from "@library/@types/api/users";
 import Permission from "@library/features/users/Permission";
-import { frameBodyClasses } from "@library/layout/frame/frameStyles";
+import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
 import DropDown from "@library/flyouts/DropDown";
-import { dummyUserDropDownData } from "@library/headers/mebox/state/dummyUserDropDownData";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
+import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWithCount";
+import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
+import DropDownSection from "@library/flyouts/items/DropDownSection";
+import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
 import { userDropDownClasses } from "@library/headers/mebox/pieces/userDropDownStyles";
+import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
+import { dummyUserDropDownData } from "@library/headers/mebox/state/dummyUserDropDownData";
+import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
+import { frameBodyClasses } from "@library/layout/frame/frameStyles";
+import { t } from "@library/utility/appUtils";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { logError } from "@library/utility/utils";
+import classNames from "classNames";
+import React from "react";
+import Frame from "@library/layout/frame/Frame";
+import FrameBody from "@library/layout/frame/FrameBody";
+import { connect } from "react-redux";
 
 export interface IUserDropDownProps extends IInjectableUserState {
     className?: string;
@@ -47,11 +51,10 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
     };
 
     public render() {
-        const userInfo: IUserFragment = get(this.props, "currentUser.data", {
-            name: null,
-            userID: null,
-            photoUrl: null,
-        });
+        const userInfo = this.props.currentUser.data;
+        if (!userInfo) {
+            return null;
+        }
 
         const counts = dummyUserDropDownData;
         const classes = userDropDownClasses();
@@ -86,7 +89,7 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
             >
                 <Frame>
                     <FrameBody className={classNames(classesFrameBody.root, classesDropDown.verticalPadding)}>
-                        <DropDownUserCard currentUser={this.props.currentUser!} className="userDropDown-userCard" />
+                        <DropDownUserCard className="userDropDown-userCard" />
                         <DropDownItemSeparator />
                         <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
                         <DropDownSection title={t("Discussions")}>

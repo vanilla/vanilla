@@ -9,6 +9,7 @@ import { inputClasses } from "@library/forms/inputStyles";
 import InputBlock, { IInputBlockProps } from "@library/forms/InputBlock";
 import { getRequiredID } from "@library/utility/idUtils";
 import { Omit } from "@library/@types/utils";
+import classNames from "classNames";
 
 export enum InputTextBlockBaseClass {
     STANDARD = "inputBlock",

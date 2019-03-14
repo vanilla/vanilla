@@ -7,7 +7,8 @@ import React from "react";
 import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import { t } from "@library/utility/appUtils";
 import DatePicker from "@library/forms/DatePicker";
-import moment = require("moment");
+import moment from "moment";
+import classNames from "classNames";
 
 interface IProps {
     start: string | undefined;

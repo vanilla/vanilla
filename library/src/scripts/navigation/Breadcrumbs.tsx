@@ -8,6 +8,7 @@ import React from "react";
 import { t } from "@library/utility/appUtils";
 import Breadcrumb from "@library/navigation/Breadcrumb";
 import { style } from "typestyle";
+import classNames from "classnames";
 
 export interface ICrumb {
     name: string;
@@ -61,7 +62,7 @@ export default class Breadcrumbs extends React.Component<IProps> {
         return (
             <nav
                 aria-label={t("Breadcrumb")}
-                className={className("breadcrumbs", this.props.className)}
+                className={classNames("breadcrumbs", this.props.className)}
                 aria-hidden={hasForcedCrumb}
             >
                 <ol className="breadcrumbs-list">{content}</ol>

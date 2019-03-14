@@ -18,9 +18,15 @@ import { t } from "@library/utility/appUtils";
 import { ButtonTypes, buttonVariables } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { InputActionMeta } from "react-select/lib/types";
+import { InputActionMeta, ActionMeta } from "react-select/lib/types";
 import { RouteComponentProps } from "react-router";
 import Translate from "@library/content/Translate";
+import classNames from "classNames";
+import { components } from "react-select";
+import ReactDOM from "react-dom";
+import * as selectOverrides from "@library/forms/select/overwrites";
+import { OptionProps } from "react-select/lib/components/Option";
+import AsyncCreatable from "react-select/lib/AsyncCreatable";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;
@@ -89,7 +95,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
     private prefix = "searchBar";
     private searchButtonID: string;
     private searchInputID: string;
-    private inputRef: React.RefObject<AsyncCreatableSelect<any>> = React.createRef();
+    private inputRef: React.RefObject<AsyncCreatable<any>> = React.createRef();
 
     constructor(props: IProps) {
         super(props);
@@ -101,7 +107,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
     public render() {
         const { className, disabled, isLoading } = this.props;
         return (
-            <AsyncCreatableSelect
+            <AsyncCreatable
                 id={this.id}
                 value={undefined}
                 onChange={this.handleOptionChange}
@@ -156,7 +162,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * - Force the menu closed.
      * - Trigger a search.
      */
-    private handleOptionChange = (option: IComboBoxOption, actionMeta: SelectActionMeta) => {
+    private handleOptionChange = (option: IComboBoxOption, actionMeta: ActionMeta) => {
         if (option) {
             if (this.props.disableAutocomplete) {
                 this.props.onChange(option.label);

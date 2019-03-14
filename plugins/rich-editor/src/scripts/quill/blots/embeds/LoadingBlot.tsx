@@ -11,7 +11,7 @@ import { escapeHTML, setData, getData } from "@library/dom/domUtils";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 import AttachmentLoading from "@library/content/attachments/AttachmentLoading";
-import { mimeTypeToAttachmentType } from "@library/content/attachments";
+import { mimeTypeToAttachmentType } from "@library/content/attachments/attachmentUtils";
 
 const LOADER_DATA_KEY = "loadingDataKey";
 

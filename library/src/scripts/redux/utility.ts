@@ -5,9 +5,9 @@
  * @license GPL-2.0-only
  */
 
-import { IApiResponse, IApiError } from "@library/@types/api";
 import apiv2 from "@library/apiv2";
 import { AxiosResponse, AxiosError } from "axios";
+import { IApiResponse, IApiError } from "@library/@types/api/core";
 
 // Utility to pull a group of action types out of an actions object
 export type ActionsUnion<A extends IActionCreatorsMapObject> = ReturnType<A[keyof A]>;

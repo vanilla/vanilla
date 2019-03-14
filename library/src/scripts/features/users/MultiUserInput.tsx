@@ -5,7 +5,7 @@
  */
 import React from "react";
 import { t } from "@library/utility/appUtils";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import UserSuggestionModel, {
@@ -13,6 +13,7 @@ import UserSuggestionModel, {
 } from "@library/features/users/suggestion/UserSuggestionModel";
 import apiv2 from "@library/apiv2";
 import Tokens from "@library/forms/select/Tokens";
+import { connect } from "react-redux";
 
 interface IProps extends IInjectableSuggestionsProps {
     suggestionActions: UserSuggestionActions;

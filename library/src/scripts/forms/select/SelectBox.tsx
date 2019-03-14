@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { downTriangle } from "@library/icons/common";
+import { downTriangle, checkCompact } from "@library/icons/common";
 import { t } from "@library/utility/appUtils";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { getRequiredID } from "@library/utility/idUtils";
@@ -14,6 +14,9 @@ import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
 import DropDown from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { metasClasses } from "@library/styles/metasStyles";
+import classNames from "classNames";
+import Frame from "@library/layout/frame/Frame";
+import FrameBody from "@library/layout/frame/FrameBody";
 
 export interface ISelectBoxItem {
     name: string;

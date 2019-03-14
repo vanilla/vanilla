@@ -5,22 +5,25 @@
  */
 
 import React from "react";
-import { IMe } from "@library/@types/api";
-import { MessagesContents } from "@library/headers/mebox/pieces/MessagesContents";
+import MessagesContents from "@library/headers/mebox/pieces/MessagesContents";
 import { compactMeBoxClasses } from "@library/headers/mebox/pieces/compactMeBoxStyles";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import CloseButton from "@library/navigation/CloseButton";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
-import { NotificationsContents } from "@library/headers/mebox/pieces/NotificationsContents";
+import NotificationsContents from "@library/headers/mebox/pieces/NotificationsContents";
 import { t } from "@library/utility/appUtils";
-import { NotificationsCounter } from "@library/headers/mebox/pieces/NotificationsCounter";
+import NotificationsCounter from "@library/headers/mebox/pieces/NotificationsCounter";
 import MessagesCount from "@library/headers/mebox/pieces/MessagesCount";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { IMeBoxProps } from "@library/headers/mebox/MeBox";
 import Tabs from "@library/navigation/tabs/Tabs";
 import { IInjectableUserState } from "@library/features/users/UsersModel";
-import { UserDropdownContents } from "@library/headers/mebox/pieces/UserDropdownContents";
+import UserDropdownContents from "@library/headers/mebox/pieces/UserDropdownContents";
+import { IMe } from "@library/@types/api/users";
+import classNames from "classnames";
+import Modal from "@library/modal/Modal";
+import ModalSizes from "@library/modal/ModalSizes";
 
 export interface IUserDropDownProps extends IInjectableUserState, IMeBoxProps {
     buttonClass?: string;
@@ -42,12 +45,10 @@ export default class CompactMeBox extends React.Component<IUserDropDownProps, IS
     };
 
     public render() {
-        const userInfo: IMe = get(this.props, "currentUser.data", {
-            name: null,
-            userID: null,
-            photoUrl: null,
-            countUnreadNotifications: 0,
-        });
+        const userInfo = this.props.currentUser.data;
+        if (!userInfo) {
+            return null;
+        }
 
         const classes = compactMeBoxClasses();
         const countClass = this.props.countsClass;

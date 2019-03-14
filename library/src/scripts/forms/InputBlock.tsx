@@ -7,8 +7,9 @@
 import React, { ReactNode } from "react";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { getRequiredID, IOptionalComponentID } from "@library/utility/idUtils";
-import { IFieldError } from "@library/@types/api";
+import classNames from "classNames";
 import Paragraph from "@library/layout/Paragraph";
+import { IFieldError } from "@library/@types/api/core";
 
 export enum InputTextBlockBaseClass {
     STANDARD = "inputBlock",

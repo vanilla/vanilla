@@ -8,14 +8,14 @@ import React from "react";
 import { AutoSizer, Grid } from "react-virtualized";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
-import { EMOJI_GROUPS, EMOJIS } from "emojiData";
-import Popover from "Flyout";
-import EmojiButton from "EmojiButton";
 import { IFlyoutToggleChildParameters } from "@library/flyouts/FlyoutToggle";
-import { EmojiGroupButton } from "EmojiGroupButton";
-import { emojiGroupsClasses } from "insertEmojiGroupClasses";
-import { insertEmojiClasses } from "insertEmojiClasses";
 import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import { EMOJIS, EMOJI_GROUPS } from "@rich-editor/flyouts/pieces/emojiData";
+import { emojiGroupsClasses } from "@rich-editor/flyouts/pieces/insertEmojiGroupClasses";
+import { insertEmojiClasses } from "@rich-editor/flyouts/pieces/insertEmojiClasses";
+import { EmojiGroupButton } from "@rich-editor/flyouts/pieces/EmojiGroupButton";
+import EmojiButton from "@rich-editor/flyouts/pieces/EmojiButton";
+import Flyout from "@rich-editor/flyouts/pieces/Flyout";
 
 const BUTTON_SIZE = 36;
 const COL_SIZE = 7;
@@ -145,7 +145,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
         );
 
         return (
-            <Popover
+            <Flyout
                 id={this.state.id}
                 descriptionID={this.descriptionID}
                 titleID={this.titleID}

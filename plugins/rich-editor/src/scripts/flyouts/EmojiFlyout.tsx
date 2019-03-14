@@ -6,14 +6,14 @@
 
 import React from "react";
 import { getRequiredID, IOptionalComponentID, IRequiredComponentID } from "@library/utility/idUtils";
-import { forceSelectionUpdate } from "../quill/utility";
 import FlyoutToggle, { IFlyoutToggleChildParameters } from "@library/flyouts/FlyoutToggle";
 import { t } from "@library/utility/appUtils";
-
 import { emoji } from "@library/icons/editorIcons";
-import { richEditorClasses } from "../editor/richEditorClasses";
 import classNames from "classnames";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import EmojiPicker from "@rich-editor/flyouts/pieces/EmojiPicker";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { forceSelectionUpdate } from "@rich-editor/quill/utility";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps extends IOptionalComponentID {
     disabled?: boolean;

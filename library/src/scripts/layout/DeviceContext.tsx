@@ -6,6 +6,18 @@
 
 import React from "react";
 import { Optionalize } from "@library/@types/utils";
+import throttle from "lodash/throttle";
+
+export enum Devices {
+    MOBILE = "mobile",
+    TABLET = "tablet",
+    NO_BLEED = "no_bleed", // Not enough space for back link which goes outside the margin.
+    DESKTOP = "desktop",
+}
+
+export interface IDeviceProps {
+    device: Devices;
+}
 
 const DeviceContext = React.createContext<Devices>(Devices.DESKTOP);
 export default DeviceContext;
@@ -90,17 +102,6 @@ export class DeviceProvider extends React.Component<IProps, IState> {
     private throttledUpdateOnResize = throttle(() => {
         this.setState({ device: this.device });
     }, 100);
-}
-
-export enum Devices {
-    MOBILE = "mobile",
-    TABLET = "tablet",
-    NO_BLEED = "no_bleed", // Not enough space for back link which goes outside the margin.
-    DESKTOP = "desktop",
-}
-
-export interface IDeviceProps {
-    device: Devices;
 }
 
 /**

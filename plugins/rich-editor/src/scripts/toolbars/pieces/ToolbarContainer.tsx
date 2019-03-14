@@ -43,7 +43,7 @@ export class ToolbarContainer extends React.PureComponent<IProps, IState> {
 
     public render() {
         const { isVisible, selection } = this.props;
-        const classesInlineToolbar = inlineToolbarClasses({}, this.props.legacyMode);
+        const classesInlineToolbar = inlineToolbarClasses(this.props.legacyMode);
         return (
             <ToolbarPositioner
                 {...this.state}

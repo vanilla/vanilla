@@ -3,10 +3,11 @@
  * @license GPL-2.0-only
  */
 
-import { IConversation, ILoadable, LoadStatus } from "@library/@types/api";
 import ConversationsActions from "@library/features/conversations/ConversationsActions";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import produce from "immer";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { IConversation } from "@library/@types/api/conversations";
 
 interface IConversationsState {
     conversationsByID: ILoadable<{

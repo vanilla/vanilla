@@ -6,6 +6,7 @@
 
 import React from "react";
 import { RouteComponentProps, Switch, withRouter } from "react-router";
+import { Action, Location } from "history";
 
 interface IProps extends RouteComponentProps<{}> {
     modalRoutes: React.ReactNode[];

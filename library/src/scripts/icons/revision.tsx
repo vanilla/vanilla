@@ -7,6 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
+import { checkCompact } from "@library/icons/common";
 
 const currentColorFill = {
     fill: "currentColor",

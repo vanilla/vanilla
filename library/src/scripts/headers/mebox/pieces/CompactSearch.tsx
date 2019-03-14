@@ -18,6 +18,7 @@ import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import classNames from "classNames";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;

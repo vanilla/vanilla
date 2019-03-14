@@ -7,10 +7,9 @@
 import React from "react";
 import LanguagesDropDown from "@library/layout/LanguagesDropDown";
 import CompactMeBox from "@library/headers/mebox/pieces/CompactMeBox";
-import { VanillaHeaderNavItem } from "@library/headers/mebox/pieces/VanillaHeaderNavItem";
-import { withDevice } from "@library/layout/DeviceContext";
+import VanillaHeaderNavItem from "@library/headers/mebox/pieces/VanillaHeaderNavItem";
+import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
 import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
-import { Devices, IDeviceProps } from "@library/layout/DeviceChecker";
 import { dummyOtherLanguagesData } from "@library/redux/dummyOtherLanguages";
 import { vanillaHeaderClasses, vanillaHeaderHomeClasses } from "@library/headers/vanillaHeaderStyles";
 import { LogoType } from "@library/theming/ThemeLogo";
@@ -22,6 +21,10 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { dummyNavigationData } from "@library/headers/mebox/state/dummyNavigationData";
 import { signIn } from "@library/icons/common";
+import ReactDOM from "react-dom";
+import classNames from "classnames";
+import { connect } from "react-redux";
+import Container from "@library/layout/components/Container";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.

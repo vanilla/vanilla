@@ -5,11 +5,12 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { ComponentClass } from "react";
 import ReactDOM from "react-dom";
 import gdn from "@library/gdn";
 import { RouteProps } from "react-router";
 import { logError, PromiseOrNormalCallback } from "@library/utility/utils";
+import isUrl from "validator/lib/isURL";
 
 /**
  * Get a piece of metadata passed from the server.

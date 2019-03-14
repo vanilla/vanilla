@@ -12,7 +12,7 @@ import getStore from "@library/redux/getStore";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import { userContentClasses } from "@library/content/userContentStyles";
 import { Devices } from "@library/layout/DeviceContext";
-import { InlineToolbar } from "@rich-editor/toolbars/InlineToolbar";
+import InlineToolbar from "@rich-editor/toolbars/InlineToolbar";
 import { delegateEvent, removeDelegatedEvent } from "@library/dom/domUtils";
 import EditorDescriptions from "@rich-editor/editor/pieces/EditorDescriptions";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
@@ -20,11 +20,17 @@ import { EditorProvider } from "@rich-editor/editor/context";
 import { getIDForQuill, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import EmbedBar from "@rich-editor/editor/pieces/EmbedBar";
 import { t } from "@library/utility/appUtils";
+import { log, debug } from "@library/utility/utils";
 import ParagraphToolbar from "@rich-editor/toolbars/ParagraphToolbar";
 import { actions } from "@rich-editor/state/instance/instanceActions";
 import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
-import { MentionToolbar } from "@rich-editor/toolbars/MentionToolbar";
+import MentionToolbar from "@rich-editor/toolbars/MentionToolbar";
+import uniqueId from "lodash/uniqueId";
+import { IStoreState } from "@rich-editor/@types/store";
+import { Provider } from "react-redux";
+import throttle from "lodash/throttle";
+import { hot } from "react-hot-loader";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -93,8 +99,8 @@ export class Editor extends React.Component<IProps> {
      */
     private renderModern(): React.ReactNode {
         const { className } = this.props as INewProps;
-        const classesRichEditor = richEditorClasses({}, this.props.legacyMode);
-        const classesRichEditorForm = richEditorFormClasses({}, this.props.legacyMode);
+        const classesRichEditor = richEditorClasses(this.props.legacyMode);
+        const classesRichEditorForm = richEditorFormClasses(this.props.legacyMode);
         return (
             <div
                 className={classNames(
@@ -140,7 +146,7 @@ export class Editor extends React.Component<IProps> {
      * The legacy rendering mode has everything at the bottom, and uses the document as it's scroll container.
      */
     private renderLegacy(): React.ReactNode {
-        const classesRichEditorForm = richEditorFormClasses({}, true);
+        const classesRichEditorForm = richEditorFormClasses(true);
         return this.renderContexts(
             <div
                 className={classNames("richEditor-frame", "InputBox", classesRichEditorForm.scrollFrame)}
@@ -172,7 +178,7 @@ export class Editor extends React.Component<IProps> {
     }
 
     private get contentClasses() {
-        const classesRichEditor = richEditorClasses({}, this.props.legacyMode);
+        const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const classesUserContent = userContentClasses();
         return classNames("ql-editor", "richEditor-text", "userContent", classesRichEditor.text, {
             [classesUserContent.root]: !this.props.legacyMode,
@@ -226,7 +232,7 @@ export class Editor extends React.Component<IProps> {
         const { isLoading, legacyMode } = this.props;
 
         return (
-            <ReduxProvider store={this.store}>
+            <Provider store={this.store}>
                 <EditorProvider
                     value={{
                         quill: this.quill,
@@ -238,7 +244,7 @@ export class Editor extends React.Component<IProps> {
                     <EditorDescriptions id={this.descriptionID} />
                     {content}
                 </EditorProvider>
-            </ReduxProvider>
+            </Provider>
         );
     }
 
@@ -264,9 +270,7 @@ export class Editor extends React.Component<IProps> {
         const options: QuillOptionsStatic = {
             theme: "vanilla",
             modules: {
-                syntax: {
-                    highlight: text => hljs.highlightAuto(text).value,
-                },
+                syntax: true,
             },
             scrollingContainer: this.scrollContainerRef.current || document.documentElement!,
         };

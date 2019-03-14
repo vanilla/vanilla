@@ -7,8 +7,7 @@
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { standardAnimations } from "@library/styles/animationHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables } from "@library/styles/styleHelpers";
-import { useThemeCache } from "@library/styles/styleUtils";
+import { useThemeCache, componentThemeVariables } from "@library/styles/styleUtils";
 import { viewHeight } from "csx";
 
 export const richEditorVariables = useThemeCache(() => {

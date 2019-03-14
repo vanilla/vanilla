@@ -19,11 +19,13 @@ import {
     modifyColorBasedOnLightness,
     paddings,
     unit,
+    background,
 } from "@library/styles/styleHelpers";
 import { transparentColor } from "@library/forms/buttonStyles";
 import { assetUrl } from "@library/utility/appUtils";
 import { TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
+import get from "lodash/get";
 
 export const splashVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("splash");

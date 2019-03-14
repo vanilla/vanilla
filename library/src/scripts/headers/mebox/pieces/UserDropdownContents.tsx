@@ -15,6 +15,10 @@ import { t } from "@library/utility/appUtils";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Permission from "@library/features/users/Permission";
 import { dummyUserDropDownData } from "@library/headers/mebox/state/dummyUserDropDownData";
+import classNames from "classNames";
+import Frame from "@library/layout/frame/Frame";
+import FrameBody from "@library/layout/frame/FrameBody";
+import { connect } from "react-redux";
 
 export interface IUserDropDownContentsProps extends IInjectableUserState {
     countsClass?: string;
@@ -38,7 +42,7 @@ export class UserDropdownContents extends React.Component<IUserDropDownContentsP
                         this.props.panelBodyClass,
                     )}
                 >
-                    <DropDownUserCard currentUser={this.props.currentUser!} className="userDropDown-userCard" />
+                    <DropDownUserCard className="userDropDown-userCard" />
                     <DropDownItemSeparator />
                     <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
                     <DropDownSection title={t("Discussions")}>

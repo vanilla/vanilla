@@ -4,7 +4,7 @@
  */
 
 import { getFieldErrors, getGlobalErrorMessage } from "@library/apiv2";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 import { t } from "@library/utility/appUtils";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import React from "react";
@@ -13,13 +13,13 @@ import Paragraph from "@library/layout/Paragraph";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import uniqueId from "lodash/uniqueId";
 import { IStoreState, IRequestPasswordState } from "@dashboard/@types/state";
-import { IRequestPasswordOptions } from "@dashboard/@types/api";
 import { connect } from "react-redux";
 import {
     postRequestPassword,
     afterRequestPasswordSuccessNavigate,
 } from "@dashboard/pages/recoverPassword/recoverPasswordActions";
 import RememberPasswordLink from "@dashboard/pages/authenticate/components/RememberPasswordLink";
+import { IRequestPasswordOptions } from "@dashboard/@types/api/authenticate";
 
 interface IState {
     email: string;

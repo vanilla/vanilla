@@ -4,10 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import ConditionalWrap from "@library/layout/ConditionalWrap";
-import FlexSpacer from "@library/layout/FlexSpacer";
-import Container from "@library/layout/components/Container";
-import { Panel, PanelWidgetHorizontalPadding } from "../layout/PanelLayout";
+import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
 import MeBox from "@library/headers/mebox/MeBox";
 import CompactMeBox from "@library/headers/mebox/pieces/CompactMeBox";
 import CompactSearch from "@library/headers/mebox/pieces/CompactSearch";
@@ -15,24 +12,26 @@ import HeaderLogo from "@library/headers/mebox/pieces/HeaderLogo";
 import VanillaHeaderNav from "@library/headers/mebox/pieces/VanillaHeaderNav";
 import VanillaHeaderNavItem from "@library/headers/mebox/pieces/VanillaHeaderNavItem";
 import { dummyNavigationData } from "@library/headers/mebox/state/dummyNavigationData";
-import BackLink from "@library/routing/links/BackLink";
-import { withDevice } from "@library/layout/DeviceContext";
-import { IWithPagesProps, withPages } from "@library/routing/PagesContext";
+import MobileDropDown from "@library/headers/pieces/MobileDropDown";
+import { vanillaHeaderClasses, vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import Container from "@library/layout/components/Container";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
+import FlexSpacer from "@library/layout/FlexSpacer";
 import { ScrollOffsetContext } from "@library/layout/ScrollOffsetContext";
-import { ButtonTypes } from "@library/styles/buttonStyles";
-import { meBoxClasses } from "@library/headers/mebox/meBoxStyles";
+import BackLink from "@library/routing/links/BackLink";
+import { IWithPagesProps, withPages } from "@library/routing/PagesContext";
 import { sticky } from "@library/styles/styleHelpers";
 import { LogoType } from "@library/theming/ThemeLogo";
-import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
+import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import { style } from "typestyle";
-import { vanillaHeaderClasses, vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
-import MobileDropDown from "@library/headers/pieces/MobileDropDown";
-import { t } from "@library/utility/appUtils";
-import { Devices, IDeviceProps } from "@library/layout/DeviceChecker";
+import { Panel, PanelWidgetHorizontalPadding } from "../layout/PanelLayout";
+import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.

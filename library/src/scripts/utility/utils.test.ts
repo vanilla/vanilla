@@ -4,9 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import { resolvePromisesSequentially, matchAtMention, hashString, isInstanceOfOneOf, splitStringLoosely } from "";
 import chai, { expect } from "chai";
 import asPromised from "chai-as-promised";
+import {
+    resolvePromisesSequentially,
+    hashString,
+    splitStringLoosely,
+    isInstanceOfOneOf,
+    matchAtMention,
+} from "@library/utility/utils";
 chai.use(asPromised);
 
 describe("resolvePromisesSequentially()", () => {

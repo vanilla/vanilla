@@ -15,6 +15,13 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import SmartAlign from "@library/layout/SmartAlign";
 import { mobileDropDownClasses } from "@library/headers/pieces/mobileDropDownStyles";
+import classNames from "classNames";
+import Modal from "@library/modal/Modal";
+import ModalSizes from "@library/modal/ModalSizes";
+import { t } from "@library/utility/appUtils";
+import Frame from "@library/layout/frame/Frame";
+import FrameBody from "@library/layout/frame/FrameBody";
+import FrameFooter from "@library/layout/frame/FrameFooter";
 
 export interface IProps {
     className?: string;

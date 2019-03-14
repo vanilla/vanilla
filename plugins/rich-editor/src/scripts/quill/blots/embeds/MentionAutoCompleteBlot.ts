@@ -7,7 +7,7 @@
 import Quill from "quill/core";
 import Inline from "quill/blots/inline";
 import { t } from "@library/utility/appUtils";
-import { IUserFragment } from "@library/@types/api";
+import { IUserFragment } from "@library/@types/api/users";
 
 /**
  * A Blot to represent text that is being matched for an autocomplete.

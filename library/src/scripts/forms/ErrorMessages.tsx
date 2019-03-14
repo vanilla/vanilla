@@ -6,7 +6,8 @@
 
 import React from "react";
 import { getRequiredID, IRequiredComponentID } from "@library/utility/idUtils";
-import { IFieldError } from "@library/@types/api";
+import classNames from "classNames";
+import { IFieldError } from "@library/@types/api/core";
 
 interface IProps extends IRequiredComponentID {
     className?: string;

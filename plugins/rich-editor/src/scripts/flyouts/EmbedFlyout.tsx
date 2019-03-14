@@ -18,6 +18,7 @@ import classNames from "classnames";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { insertMediaClasses } from "@rich-editor/flyouts/pieces/insertMediaClasses";
+import Flyout from "@rich-editor/flyouts/pieces/Flyout";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -82,7 +83,7 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
                         <React.Fragment>
                             <p
                                 id={this.descriptionID}
-                                className={classNames("insertMedia-description", classesRichEditor.popoverDescription)}
+                                className={classNames("insertMedia-description", classesRichEditor.flyoutDescription)}
                             >
                                 {t("Paste the URL of the media you want.")}
                             </p>
@@ -130,7 +131,7 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
                     );
 
                     return (
-                        <Popover
+                        <Flyout
                             id={params.id}
                             descriptionID={this.descriptionID}
                             titleID={this.titleID}

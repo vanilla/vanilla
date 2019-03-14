@@ -8,6 +8,8 @@ import React from "react";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { clear } from "@library/icons/common";
+import classNames from "classNames";
 
 interface IProps {
     onClick: (event: React.SyntheticEvent) => void;

@@ -5,7 +5,12 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { ICommentEmbed, IDiscussionEmbed, IScrapeData } from "@dashboard/@types/api";
+
+import { IDiscussionEmbed } from "@dashboard/@types/api/discussion";
+import { ICommentEmbed } from "@dashboard/@types/api/comment";
+import { IScrapeData } from "@dashboard/@types/api/media";
+import ReactDOM from "react-dom";
+import React from "react";
 
 export const FOCUS_CLASS = "embed-focusableElement";
 

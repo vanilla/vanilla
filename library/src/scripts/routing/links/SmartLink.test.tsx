@@ -11,6 +11,7 @@ import { MemoryRouter, Route } from "react-router";
 import { mount } from "enzyme";
 import { LinkContextProvider } from "@library/routing/links/LinkContextProvider";
 import { Link } from "react-router-dom";
+import { expect } from "chai";
 
 const DOMAIN = "https://mysite.com";
 const SUBPATH = "/test";

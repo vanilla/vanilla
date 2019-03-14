@@ -11,6 +11,7 @@ import { metasClasses } from "@library/styles/metasStyles";
 import Translate from "@library/content/Translate";
 import DateTime from "@library/content/DateTime";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";
+import classNames from "classNames";
 
 export interface IFileAttachment {
     name: string; // File name

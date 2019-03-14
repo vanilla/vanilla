@@ -13,12 +13,14 @@ import { withEditor, IWithEditorProps } from "@rich-editor/editor/context";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
 import { getBlotAtIndex } from "@rich-editor/quill/utility";
 import { connect } from "react-redux";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 import UserSuggestionModel, {
     IInjectableSuggestionsProps,
 } from "@library/features/users/suggestion/UserSuggestionModel";
 import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
 import apiv2 from "@library/apiv2";
+import { IMentionSuggestionData, IMentionProps } from "@rich-editor/toolbars/pieces/MentionSuggestion";
+import MentionSuggestionList from "@rich-editor/toolbars/pieces/MentionSuggestionList";
 
 interface IProps extends IWithEditorProps, IInjectableSuggestionsProps {
     suggestionActions: UserSuggestionActions;

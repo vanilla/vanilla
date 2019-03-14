@@ -6,7 +6,7 @@
 
 import { t } from "@library/utility/appUtils";
 import React, { Component } from "react";
-import moment = require("moment");
+import moment from "moment";
 
 interface IProps {
     /** The timestamp to format and display */

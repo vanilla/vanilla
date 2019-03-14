@@ -7,20 +7,26 @@
 import React from "react";
 import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
 import Loader from "@library/loaders/Loader";
-import { Devices, IDeviceProps } from "@library/layout/DeviceChecker";
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IMeBoxNotificationItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
 import Button from "@library/forms/Button";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import apiv2 from "@library/apiv2";
 import { INotificationsStoreState } from "@library/features/notifications/NotificationsModel";
-import { withDevice } from "@library/layout/DeviceContext";
+import { withDevice, Devices, IDeviceProps } from "@library/layout/DeviceContext";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
 import { t } from "@library/utility/appUtils";
 import NotificationsActions from "@library/features/notifications/NotificationsActions";
 import { frameFooterClasses } from "@library/layout/frame/frameStyles";
+import Frame from "@library/layout/frame/Frame";
+import classNames from "classnames";
+import FrameBody from "@library/layout/frame/FrameBody";
+import FramePanel from "@library/layout/frame/FramePanel";
+import FrameFooter from "@library/layout/frame/FrameFooter";
+import { connect } from "react-redux";
+import { settings } from "@library/icons/header";
 
 export interface INotificationsProps {
     countClass?: string;

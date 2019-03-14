@@ -3,12 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import { t } from "../utility/appUtils";
-import LinkAsButton from "../routing/LinkAsButton";
-import { ILinkPages } from "SimplePagerModel";
 import classNames from "classnames";
 import * as React from "react";
 import { simplePagerClasses } from "@library/navigation/simplePagerStyles";
+import { ILinkPages } from "@library/navigation/SimplePagerModel";
+import LinkAsButton from "@library/routing/LinkAsButton";
+import { t } from "@library/utility/appUtils";
 
 interface IProps {
     url: string;

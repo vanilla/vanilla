@@ -72,7 +72,7 @@ export class ParagraphToolbar extends React.PureComponent<IProps, IState> {
     }
 
     public render() {
-        const classesRichEditor = richEditorClasses({}, this.props.legacyMode);
+        const classesRichEditor = richEditorClasses(this.props.legacyMode);
         let pilcrowClasses = classNames(
             { isOpen: this.isMenuVisible },
             "richEditor-button",

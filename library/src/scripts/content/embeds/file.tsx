@@ -3,13 +3,13 @@
  * @license GPL-2.0-only
  */
 
+import Attachment from "@library/content/attachments/Attachment";
+import BaseEmbed from "@library/content/embeds/BaseEmbed";
+import { IEmbedProps, IFileUploadData, registerEmbedComponent } from "@library/content/embeds/embedUtils";
+import { onContent } from "@library/utility/appUtils";
 import React from "react";
 import ReactDOM from "react-dom";
-import { registerEmbedComponent, IEmbedProps, IFileUploadData } from "@library/content/embeds/embedUtils";
-import { onContent, onReady } from "@library/utility/appUtils";
-import Attachment from "@library/content/attachments/Attachment";
-import { AttachmentType, mimeTypeToAttachmentType } from "@library/content/attachments";
-import BaseEmbed from "@library/content/embeds/BaseEmbed";
+import { mimeTypeToAttachmentType } from "@library/content/attachments/attachmentUtils";
 
 export function initFileEmbeds() {
     registerEmbedComponent("file", FileEmbed);

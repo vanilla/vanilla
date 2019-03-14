@@ -3,12 +3,15 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+
+import React from "react";
 import { attachmentIconsClasses } from "@library/content/attachments/attachmentIconsStyles";
 import { t } from "@library/utility/appUtils";
 import AttachmentIcon, { IAttachmentIcon } from "@library/content/attachments/AttachmentIcon";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { metasClasses } from "@library/styles/metasStyles";
 import Translate from "@library/content/Translate";
+import classNames from "classNames";
 
 // Array of icon attachments
 interface IProps {

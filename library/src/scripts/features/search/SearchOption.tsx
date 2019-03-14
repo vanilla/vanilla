@@ -12,6 +12,8 @@ import BreadCrumbString from "@library/navigation/BreadCrumbString";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { metasClasses } from "@library/styles/metasStyles";
 import DateTime from "@library/content/DateTime";
+import classNames from "classNames";
+import { OptionProps } from "react-select/lib/components/Option";
 
 export interface ISearchOptionData {
     crumbs: ICrumb[];

@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { ButtonTypes } from "@library/styles/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
 
 interface IProps {

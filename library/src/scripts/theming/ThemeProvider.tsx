@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import Backgrounds from "@library/layout/Backgrounds";
 import { inputClasses } from "@library/forms/inputStyles";

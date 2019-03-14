@@ -3,12 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import { INavigationTreeItem } from "../@types/api";
-import SiteNav from "library/src/scripts/navigation/SiteNav";
 import { expect } from "chai";
 import { mount } from "enzyme";
-import React, { ReactNode } from "react";
-import SiteNavNode, { IActiveRecord } from "./SiteNavNode";
+import SiteNav from "library/src/scripts/navigation/SiteNav";
+import React from "react";
+import SiteNavNode, { IActiveRecord } from "@library/navigation/SiteNavNode";
+import { INavigationTreeItem } from "@library/@types/api/core";
 
 function renderSiteNav(activeRecord: IActiveRecord) {
     return mount(

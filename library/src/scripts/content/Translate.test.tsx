@@ -7,6 +7,7 @@ import gdn from "@library/gdn";
 import { escapeHTML } from "@library/dom/domUtils";
 import Translate from "@library/content/Translate";
 import { render } from "enzyme";
+import { expect } from "chai";
 
 // tslint:disable:jsx-use-translation-function
 

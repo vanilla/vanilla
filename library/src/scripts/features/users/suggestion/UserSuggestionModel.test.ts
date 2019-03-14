@@ -5,9 +5,11 @@
  */
 
 import { IMentionSuggestionData } from "@rich-editor/toolbars/pieces/MentionSuggestion";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 import UserSuggestionModel from "@library/features/users/suggestion/UserSuggestionModel";
 import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
+import { expect } from "chai";
+import sinon from "sinon";
 
 type SortProviderTuple = [string[], string, string[]];
 interface ISortTestData {

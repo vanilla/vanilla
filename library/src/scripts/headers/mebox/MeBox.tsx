@@ -5,11 +5,12 @@
  */
 
 import React from "react";
-import { IMe } from "@library/@types/api";
+import classNames from "classNames";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import UserDropdown from "@library/headers/mebox/pieces/UserDropdown";
 import MessagesDropDown from "@library/headers/mebox/pieces/MessagesDropDown";
 import { IInjectableUserState } from "@library/features/users/UsersModel";
+import NotificationsDropDown from "@library/headers/mebox/pieces/NotificationsDropDown";
 
 export interface IMeBoxProps extends IInjectableUserState {
     countClass?: string;
@@ -25,17 +26,15 @@ export interface IMeBoxProps extends IInjectableUserState {
 export default class MeBox extends React.Component<IMeBoxProps> {
     public render() {
         const { buttonClassName, contentClassName, countsClass } = this.props;
-        const userInfo: IMe = get(this.props, "currentUser.data", {
-            countUnreadNotifications: 0,
-            name: null,
-            userID: null,
-            photoUrl: null,
-        });
+        const userInfo = this.props.currentUser.data;
+        if (!userInfo) {
+            return null;
+        }
         const classes = meBoxClasses();
 
         return (
             <div className={classNames("meBox", this.props.className, classes.root)}>
-                <NotificationsDropdown
+                <NotificationsDropDown
                     userSlug={userInfo.name}
                     countClass={countsClass}
                     buttonClassName={buttonClassName}

@@ -14,6 +14,10 @@ import { MultiValueRemoveProps } from "react-select/lib/components/MultiValue";
 import { MenuListComponentProps, MenuProps } from "react-select/lib/components/Menu";
 import { ControlProps } from "react-select/lib/components/Control";
 import { ValueContainerProps } from "react-select/lib/components/containers";
+import classNames from "classNames";
+import { OptionProps } from "react-select/lib/components/Option";
+import { close } from "@library/icons/common";
+import { components } from "react-select";
 
 /**
  * Overwrite for the controlContainer component in React Select

@@ -6,7 +6,7 @@
 import { IEmbedData, IEmbedElements, registerEmbedRenderer } from "@library/content/embeds/embedUtils";
 import { ensureScript } from "@library/dom/domUtils";
 import { onContent, onReady } from "@library/utility/appUtils";
-import { IScrapeData } from "@dashboard/@types/api";
+import { IScrapeData } from "@dashboard/@types/api/media";
 
 export function initGettyEmbeds() {
     registerEmbedRenderer("getty", renderGetty);

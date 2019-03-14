@@ -12,6 +12,7 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { leftChevron } from "@library/icons/common";
 import CloseButton from "@library/navigation/CloseButton";
+import classNames from "classNames";
 
 export interface IFrameHeaderProps extends ICommonHeadingProps {
     closeFrame?: (e) => void; // Necessary when in modal, but not if in flyouts

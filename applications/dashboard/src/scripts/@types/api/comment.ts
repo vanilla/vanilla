@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { IUserFragment } from "@library/@types/api";
+import { IUserFragment } from "@library/@types/api/users";
 
 export interface IComment {
     commentID: number;

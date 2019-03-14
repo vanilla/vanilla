@@ -6,7 +6,9 @@
 
 import React from "react";
 import Quill, { IFormats } from "quill/core";
-import { IEditorInstance } from "@rich-editor/@types/store";
+import { IEditorInstance, IStoreState } from "@rich-editor/@types/store";
+import { Omit } from "@library/@types/utils";
+import { connect } from "react-redux";
 
 interface IContextProps {
     quill: Quill;

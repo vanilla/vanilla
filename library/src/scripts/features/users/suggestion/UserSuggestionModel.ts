@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IUsersStoreState } from "@library/features/users/UsersModel";
 import SuggestionTrie from "@library/features/users/suggestion/SuggestionTrie";
 import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggestion";

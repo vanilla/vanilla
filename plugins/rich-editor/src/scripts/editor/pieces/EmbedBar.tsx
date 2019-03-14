@@ -6,13 +6,14 @@
 
 import React from "react";
 import classNames from "classnames";
-import { ParagraphDropDown } from "@rich-editor/toolbars/ParagraphDropDown";
+import ParagraphDropDown from "@rich-editor/toolbars/ParagraphDropDown";
 import { getMeta, t } from "@library/utility/appUtils";
-import { Permission } from "@library/features/users/Permission";
+import Permission from "@library/features/users/Permission";
 import EditorUploadButton from "@rich-editor/editor/pieces/EditorUploadButton";
 import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import EmojiFlyout from "@rich-editor/flyouts/EmojiFlyout";
+import EmbedFlyout from "@rich-editor/flyouts/EmbedFlyout";
 
 interface IProps {
     isMobile: boolean;
@@ -63,7 +64,7 @@ export default function EmbedBar(props: IProps) {
                 </Permission>
 
                 <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
-                    <EmbedPopover disabled={isLoading} />
+                    <EmbedFlyout disabled={isLoading} />
                 </li>
 
                 <Permission permission="uploads.add">

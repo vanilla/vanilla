@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+import ReactDOM from "react-dom";
 import React from "react";
 import classNames from "classnames";
 import ModalSizes from "@library/modal/ModalSizes";
@@ -11,6 +12,7 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { modalClasses } from "@library/modal/modalStyles";
 import TabHandler from "@library/dom/TabHandler";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 
 interface IHeadingDescription {
     titleID: string;

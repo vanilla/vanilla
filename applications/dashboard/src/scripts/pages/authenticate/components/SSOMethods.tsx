@@ -6,7 +6,7 @@
 import { t } from "@library/utility/appUtils";
 import React from "react";
 import Paragraph from "@library/layout/Paragraph";
-import { IUserAuthenticator } from "@dashboard/@types/api";
+import { IUserAuthenticator } from "@dashboard/@types/api/authenticate";
 
 interface IProps {
     ssoMethods?: IUserAuthenticator[];

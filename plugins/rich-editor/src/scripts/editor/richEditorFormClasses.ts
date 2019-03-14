@@ -11,7 +11,7 @@ import { calc, percent, px } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
-export const richEditorFormClasses = useThemeCache((theme?: object, legacyMode: boolean = false) => {
+export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false) => {
     const globalVars = globalVariables();
     const headerVars = vanillaHeaderVariables();
     const vars = richEditorVariables();

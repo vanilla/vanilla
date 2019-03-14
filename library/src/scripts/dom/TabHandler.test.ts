@@ -4,8 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import TabHandler from "library/src/scripts/dom/TabHandler";
 import { expect } from "chai";
+import TabHandler from "@library/dom/TabHandler";
 
 describe("TabHandler", () => {
     it("can find a tabbable element", () => {

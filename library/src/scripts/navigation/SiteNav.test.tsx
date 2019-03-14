@@ -5,7 +5,7 @@
 
 import { expect } from "chai";
 import { mount } from "enzyme";
-import SiteNav from "library/src/scripts/navigation/SiteNav";
+import SiteNav from "@library/navigation/SiteNav";
 import React from "react";
 import SiteNavNode, { IActiveRecord } from "@library/navigation/SiteNavNode";
 import { INavigationTreeItem } from "@library/@types/api/core";

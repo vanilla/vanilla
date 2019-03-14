@@ -1,4 +1,4 @@
-echo -e "\n==================== VERIFYING DEPENDENCIES ===================="
+echo -e "\n==================== Verifying Dependencies ===================="
 node_path="$(which node)"
 if [ -z $node_path ]; then
     echo "Node is not installed."

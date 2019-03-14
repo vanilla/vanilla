@@ -7,14 +7,13 @@
 
 const shell = require("shelljs");
 const fs = require("fs");
+const chalk = require("chalk").default;
 const path = require("path");
 const { promptVersion, vanillaPath, printTitle, promptBranch } = require("./utils");
 
 const VANILLA_REPO = "https://github.com/vanilla/vanilla.git";
 const PHING_PATH = vanillaPath("vendor/bin/phing");
 const BUILD_DIR = vanillaPath("build");
-const XML_PATH = "build/build.xml";
-const BUILD_XML = vanillaPath(XML_PATH);
 const TEMP_DIR = vanillaPath("build/temp");
 
 async function run() {
@@ -49,6 +48,27 @@ async function run() {
     const buildDir = path.join(TEMP_DIR, "vanilla/build");
     shell.cd(buildDir);
     shell.exec(`env version=${newVersion} ${PHING_PATH}`);
+
+    printTitle("Cleanup")
+    const builtFile = path.join(buildDir, "vanilla.zip");
+    if (!fs.existsSync(builtFile)) {
+        console.error(`Build failed. Unable to locate built file at ${builtFile}`);
+    }
+
+    const outDir = path.join(BUILD_DIR, "releases");
+    if (!outDir) {
+        console.log(`Creating release directory at\n${chalk.yellow(outDir)}`)
+        shell.mkdir(outDir);
+    }
+
+    const outFile = path.join(outDir, `vanilla-${newVersion}.zip`);
+    if (fs.existsSync(outFile)) {
+        const prettyName = path.basename(outFile);
+        console.log(`Release ${chalk.yellow(prettyName)} already exists. It will be overwritten.`);
+        shell.rm(outFile);
+    }
+
+    shell.mv(builtFile, outFile);
 }
 
 run();

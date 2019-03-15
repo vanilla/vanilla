@@ -73,32 +73,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean = false) => 
         position: "relative",
     });
 
-    const paragraphMenu = style("paragraphMenu", {
-        position: "absolute",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        top: unit(vars.pilcrow.offset),
-        left: 0,
-        marginLeft: unit(-globalVars.gutter.quarter + (!legacyMode ? -(globalVars.gutter.size + 6) : 0)),
-        transform: `translateX(-100%)`,
-        height: unit(vars.paragraphMenuHandle.size),
-        width: unit(globalVars.icon.sizes.default),
-        animationName: vars.pilcrow.animation.name,
-        animationDuration: vars.pilcrow.animation.duration,
-        animationTimingFunction: vars.pilcrow.animation.timing,
-        animationIterationCount: vars.pilcrow.animation.iterationCount,
-        zIndex: 1,
-        $nest: {
-            ".richEditor-button&.isActive:hover": {
-                cursor: "default",
-            },
-            "&.isMenuInset": {
-                transform: "none",
-            },
-        },
-    });
-
     const paragraphMenuHandle = style("paragraphMenuHandle", {
         width: unit(vars.paragraphMenuHandle.size),
         maxWidth: unit(vars.paragraphMenuHandle.size),
@@ -270,7 +244,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean = false) => 
     return {
         root,
         menu,
-        paragraphMenu,
         paragraphMenuHandle,
         text,
         menuItems,

@@ -27,7 +27,7 @@ interface IProps {
     className?: string;
 }
 
-export default class ParagraphToolbarMenuItems extends React.PureComponent<IProps> {
+export default class ParagraphMenuBarItems extends React.PureComponent<IProps> {
     public render() {
         return (
             <MenuItems

@@ -6,7 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import ParagraphDropDown from "@rich-editor/toolbars/ParagraphDropDown";
+import ParagraphDropDown from "@rich-editor/menuBar/paragraph/ParagraphMenuDropDown";
 import { getMeta, t } from "@library/utility/appUtils";
 import Permission from "@library/features/users/Permission";
 import EditorUploadButton from "@rich-editor/editor/pieces/EditorUploadButton";

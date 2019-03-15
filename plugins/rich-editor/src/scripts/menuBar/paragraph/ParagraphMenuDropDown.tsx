@@ -9,11 +9,11 @@ import Quill from "quill/core";
 import Formatter from "@rich-editor/quill/Formatter";
 import DropDown from "@library/flyouts/DropDown";
 import * as editorIcons from "@library/icons/editorIcons";
-import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import MenuItems from "@rich-editor/toolbars/pieces/MenuItems";
-import ParagraphToolbarMenuItems from "@rich-editor/toolbars/pieces/ParagraphToolbarMenuItems";
 import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
+import MenuItems from "@rich-editor/toolbars/pieces/MenuItems";
+import ParagraphMenuBarItems from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarItems";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -26,9 +26,9 @@ interface IState {
 }
 
 /**
- * Implemented ParagraphDropDown component, this is for mobile
+ * Implemented ParagraphMenuDropDown component, this is for mobile
  */
-export class ParagraphDropDown extends React.PureComponent<IProps, IState> {
+export class ParagraphMenuDropDown extends React.PureComponent<IProps, IState> {
     private quill: Quill;
     private ID: string;
     private menuRef: React.RefObject<MenuItems> = React.createRef();
@@ -58,7 +58,7 @@ export class ParagraphDropDown extends React.PureComponent<IProps, IState> {
                 renderLeft={this.props.renderLeft}
                 contentsClassName="noMinWidth"
             >
-                <ParagraphToolbarMenuItems
+                <ParagraphMenuBarItems
                     menuRef={this.menuRef}
                     formatter={this.formatter}
                     activeFormats={<ActiveFormatIcon activeFormats={this.props.activeFormats} />}
@@ -76,20 +76,52 @@ export class ParagraphDropDown extends React.PureComponent<IProps, IState> {
      */
     private handlePilcrowKeyDown = (event: React.KeyboardEvent<any>) => {
         switch (event.key) {
+            // Activates menu item, causing action to be executed, e.g., bold text, change font.
+            case "Space":
+            case "Enter":
+                break;
+            // Closes submenu.
+            // Moves focus to parent menubar item.
+            case "Escape":
+                break;
+            // Closes submenu.
+            // Moves focus to next item in the menubar.
+            // Opens submenu of newly focused menubar item, keeping focus on that parent menubar item.
+            case "ArrowRight":
+                break;
+            // Closes submenu.
+            // Moves focus to previous item in the menubar.
+            // Opens submenu of newly focused menubar item, keeping focus on that parent menubar item.
+            case "ArrowLeft":
+                break;
+            // Moves focus to previous item in the submenu.
+            // If focus is on the first item, moves focus to the last item.
             case "ArrowUp":
                 event.preventDefault();
                 this.setState({ hasFocus: true }, () => {
                     this.menuRef.current!.focusFirstItem();
                 });
                 break;
+            // Moves focus to the next item in the submenu.
+            // If focus is on the last item, moves focus to the first item.
             case "ArrowDown":
                 event.preventDefault();
                 this.setState({ hasFocus: true }, () => {
                     this.menuRef.current!.focusLastItem();
                 });
                 break;
+            // 	Moves focus to the first item in the submenu.
+            case "Home":
+                break;
+            // 	Moves focus to the last item in the submenu.
+            case "End":
+                break;
+            // Moves focus to the next item having a name that starts with the typed character.
+            // If none of the items have a name starting with the typed character, focus does not move.
+            default:
+                break;
         }
     };
 }
 
-export default withEditor<IProps>(ParagraphDropDown);
+export default withEditor<IProps>(ParagraphMenuDropDown);

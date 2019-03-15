@@ -10,13 +10,13 @@ import { unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc } from "csx";
 
-export const paragraphMenuBarToggleClasses = useThemeCache((legacyMode: boolean = false) => {
+export const paragraphMenuBarClasses = useThemeCache((legacyMode: boolean = false) => {
     const globalVars = globalVariables();
     const vars = richEditorVariables();
     const formVars = formElementsVariables();
-    const style = styleFactory("paragraphMenuBarToggle");
+    const style = styleFactory("paragraphMenuBar");
 
-    const root = style({
+    const toggle = style("toggle", {
         position: "absolute",
         display: "flex",
         alignItems: "center",
@@ -41,15 +41,8 @@ export const paragraphMenuBarToggleClasses = useThemeCache((legacyMode: boolean 
             },
         },
     });
-    return { root };
-});
 
-export const paragraphToolbarContainerClasses = useThemeCache(() => {
-    const vars = richEditorVariables();
-    const formVars = formElementsVariables();
-    const style = styleFactory("paragraphToolbarContainer");
-
-    const root = style({
+    const position = style("position", {
         position: "absolute",
         left: calc(`50% - ${unit(vars.spacing.paddingLeft / 2)}`),
         $nest: {
@@ -61,50 +54,6 @@ export const paragraphToolbarContainerClasses = useThemeCache(() => {
             },
         },
     });
-    return { root };
-});
 
-export const paragraphMenuDropDownClasses = useThemeCache(() => {
-    const vars = richEditorVariables();
-    const formVars = formElementsVariables();
-    const style = styleFactory("paragraphMenuDropDown");
-
-    const root = style({});
-    return { root };
-});
-
-export const paragraphMenuMultiItemsClasses = useThemeCache(() => {
-    const vars = richEditorVariables();
-    const formVars = formElementsVariables();
-    const style = styleFactory("paragraphMenuMultiItems");
-
-    const root = style({});
-    return { root };
-});
-
-export const paragraphMenuItemClasses = useThemeCache(() => {
-    const vars = richEditorVariables();
-    const formVars = formElementsVariables();
-    const style = styleFactory("paragraphMenuItem");
-
-    const root = style({});
-    return { root };
-});
-
-export const paragraphMenuRadioButtonClasses = useThemeCache(() => {
-    const vars = richEditorVariables();
-    const formVars = formElementsVariables();
-    const style = styleFactory("paragraphMenuRadioButton");
-
-    const root = style({});
-    return { root };
-});
-
-export const paragraphMenuCheckBoxClasses = useThemeCache(() => {
-    const vars = richEditorVariables();
-    const formVars = formElementsVariables();
-    const style = styleFactory("paragraphMenuCheckBox");
-
-    const root = style({});
-    return { root };
+    return { toggle, position };
 });

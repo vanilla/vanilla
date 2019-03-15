@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4d3bbffaecb6b1210211625d51b53537",
+    "content-hash": "2cdcdec35b48e8389c4eeb3e6b3d9f85",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -2953,16 +2953,16 @@
         },
         {
             "name": "voku/simple_html_dom",
-            "version": "4.3.3",
+            "version": "4.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "3084547002a84268033f2a1d1414c8cde0c388d7"
+                "reference": "935663ebc6917f4db45c7e613b5e8cb84cabac59"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/3084547002a84268033f2a1d1414c8cde0c388d7",
-                "reference": "3084547002a84268033f2a1d1414c8cde0c388d7",
+                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/935663ebc6917f4db45c7e613b5e8cb84cabac59",
+                "reference": "935663ebc6917f4db45c7e613b5e8cb84cabac59",
                 "shasum": ""
             },
             "require": {
@@ -2973,7 +2973,7 @@
                 "symfony/css-selector": "~3.0|~4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~6.0 || ~7.0"
+                "phpunit/phpunit": "~6.0"
             },
             "suggest": {
                 "voku/portable-utf8": "~4.0"
@@ -3008,7 +3008,7 @@
                 "dom",
                 "php dom"
             ],
-            "time": "2019-03-04T08:10:15+00:00"
+            "time": "2018-10-17T19:23:47+00:00"
         },
         {
             "name": "webmozart/assert",

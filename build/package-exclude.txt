@@ -10,7 +10,6 @@
 **/npm-shrinkwrap.json
 **/package.json
 **/*.scss
-**/*.map
 **/.yo-rc.json
 */**/*.dist
 */**/*.md

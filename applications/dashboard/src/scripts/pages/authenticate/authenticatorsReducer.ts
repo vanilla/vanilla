@@ -5,7 +5,7 @@
 
 import * as actions from "@dashboard/pages/authenticate/authenticatorsActions";
 import { IAuthenticatorState } from "@dashboard/@types/state";
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 
 const initialState: IAuthenticatorState = {
     status: LoadStatus.PENDING,

@@ -6,13 +6,13 @@
 
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { style } from "typestyle";
-import getStore, { getDeferredStoreState } from "@library/state/getStore";
-import { getMeta } from "@library/application";
-import { ICoreStoreState } from "@library/state/reducerRegistry";
+import { getDeferredStoreState } from "@library/redux/getStore";
+import { getMeta } from "@library/utility/appUtils";
+import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import memoize from "lodash/memoize";
-import { getThemeVariables } from "@library/theming/ThemeProvider";
 import merge from "lodash/merge";
-import { px, ColorHelper, color } from "csx";
+import { color } from "csx";
+import { getThemeVariables } from "@library/theming/getThemeVariables";
 
 /**
  * A better helper to generate human readable classes generated from TypeStyle.
@@ -129,3 +129,23 @@ function normalizeVariables(variables: any) {
 
     return variables;
 }
+
+/**
+ * Helper to overwrite styles
+ * @param theme - The theme overwrites.
+ * @param componentName - The name of the component to overwrite
+ *
+ * @deprecated
+ */
+export const componentThemeVariables = (componentName: string) => {
+    const themeVars = getThemeVariables();
+    const componentVars = (themeVars && themeVars[componentName]) || {};
+
+    const subComponentStyles = (subElementName: string): object => {
+        return (componentVars && componentVars[subElementName]) || {};
+    };
+
+    return {
+        subComponentStyles,
+    };
+};

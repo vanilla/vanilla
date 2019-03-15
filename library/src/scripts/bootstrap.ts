@@ -5,8 +5,8 @@
  * @license GPL-2.0-only
  */
 
-import { onContent, getMeta, _executeReady, _mountComponents } from "@library/application";
-import { log, logError, debug } from "@library/utility";
+import { onContent, getMeta, _executeReady, _mountComponents } from "@library/utility/appUtils";
+import { log, logError, debug } from "@library/utility/utils";
 import gdn from "@library/gdn";
 import apiv2 from "@library/apiv2";
 

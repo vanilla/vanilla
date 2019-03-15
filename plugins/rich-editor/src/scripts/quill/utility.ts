@@ -7,7 +7,7 @@
 import Emitter from "quill/core/emitter";
 import Quill, { RangeStatic, Blot } from "quill/core";
 import Delta from "quill-delta";
-import { matchAtMention } from "@library/utility";
+import { matchAtMention } from "@library/utility/utils";
 import uniqueId from "lodash/uniqueId";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import BlockBlot from "quill/blots/block";

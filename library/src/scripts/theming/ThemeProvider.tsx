@@ -3,26 +3,17 @@
  * @license GPL-2.0-only
  */
 
-import { LoadStatus } from "@library/@types/api";
+import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import { onReady } from "@library/application";
-import Backgrounds from "@library/components/body/Backgrounds";
-import { inputClasses } from "@library/components/forms/inputStyles";
-import Loader from "@library/components/Loader";
-import { prepareShadowRoot } from "@library/dom";
-import getStore from "@library/state/getStore";
-import { ICoreStoreState } from "@library/state/reducerRegistry";
+import Backgrounds from "@library/layout/Backgrounds";
+import { inputClasses } from "@library/forms/inputStyles";
+import Loader from "@library/loaders/Loader";
+import { prepareShadowRoot } from "@library/dom/domUtils";
+import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import ThemeActions from "@library/theming/ThemeActions";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import React from "react";
 import { connect } from "react-redux";
-import { Store } from "redux";
-
-let store: Store | null = null;
-
-onReady(() => {
-    store = getStore<ICoreStoreState>();
-});
 
 export interface IWithThemeProps {
     theme: IThemeVariables;
@@ -66,16 +57,6 @@ class BaseThemeProvider extends React.Component<IProps> {
         if (themeFooter) {
             prepareShadowRoot(themeFooter, true);
         }
-    }
-}
-
-export function getThemeVariables() {
-    if (store !== null) {
-        const assets = store.getState().theme.assets.data || {};
-        const variables = assets.variables || {};
-        return variables;
-    } else {
-        return {};
     }
 }
 

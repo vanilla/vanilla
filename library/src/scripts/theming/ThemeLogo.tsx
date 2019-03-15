@@ -3,8 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import { vanillaLogo } from "@library/components/icons/header";
-import { ICoreStoreState } from "@library/state/reducerRegistry";
+import { vanillaLogo } from "@library/icons/header";
+import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import React from "react";
 import { connect } from "react-redux";
 

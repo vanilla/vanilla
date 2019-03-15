@@ -74,3 +74,9 @@ export interface ILinkListData {
     groups: ILinkGroup[];
     ungroupedItems: INavigationItem[];
 }
+
+export enum PublishStatus {
+    DELETED = "deleted",
+    UNDELETED = "undeleted",
+    PUBLISHED = "published",
+}

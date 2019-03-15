@@ -3,20 +3,17 @@
  * @license GPL-2.0-only
  */
 
-import { formElementsVariables } from "@library/components/forms/formElementStyles";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory } from "@library/styles/styleUtils";
 import {
     AlignItemsProperty,
     AppearanceProperty,
     BackgroundAttachmentProperty,
-    BackgroundColorProperty,
     BackgroundImageProperty,
-    BackgroundOriginProperty,
     BackgroundPositionProperty,
     BackgroundRepeatProperty,
     BackgroundSizeProperty,
-    BorderProperty,
     BorderRadiusProperty,
     BorderStyleProperty,
     BorderWidthProperty,
@@ -40,13 +37,12 @@ import {
     UserSelectProperty,
     WhiteSpaceProperty,
 } from "csstype";
-import { color, ColorHelper, deg, important, percent, px, quote, viewHeight, viewWidth, url } from "csx";
+import { ColorHelper, deg, important, percent, px, quote, url, viewHeight, viewWidth } from "csx";
 import { keyframes } from "typestyle";
-import { TLength, NestedCSSProperties } from "typestyle/lib/types";
-import { getThemeVariables } from "@library/theming/ThemeProvider";
-import { isAllowedUrl, themeAsset, assetUrl } from "@library/application";
+import { NestedCSSProperties, TLength } from "typestyle/lib/types";
+import { assetUrl, themeAsset } from "@library/utility/appUtils";
 import get from "lodash/get";
-import { ColorValues } from "@library/styles/buttonStyles";
+import { ColorValues } from "@library/forms/buttonStyles";
 
 export const colorOut = (colorValue: ColorValues) => {
     if (!colorValue) {
@@ -226,24 +222,6 @@ export const modifyColorSaturationBasedOnLightness = (
         // Darken color
         return colorToModify.saturate(weight) as ColorHelper;
     }
-};
-
-/*
- * Helper to overwrite styles
- * @param theme - The theme overwrites.
- * @param componentName - The name of the component to overwrite
- */
-export const componentThemeVariables = (componentName: string) => {
-    const themeVars = getThemeVariables();
-    const componentVars = (themeVars && themeVars[componentName]) || {};
-
-    const subComponentStyles = (subElementName: string): object => {
-        return (componentVars && componentVars[subElementName]) || {};
-    };
-
-    return {
-        subComponentStyles,
-    };
 };
 
 export const inheritHeightClass = () => {

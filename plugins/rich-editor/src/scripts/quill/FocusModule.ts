@@ -9,8 +9,8 @@ import Parchment from "parchment";
 import KeyboardModule from "quill/modules/keyboard";
 import Module from "quill/core/module";
 import { RangeStatic } from "quill/core";
-import { delegateEvent } from "@library/dom";
-import TabHandler from "@library/TabHandler";
+import { delegateEvent } from "@library/dom/domUtils";
+import TabHandler from "@library/dom/TabHandler";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import {
     insertNewLineAtEndOfScroll,

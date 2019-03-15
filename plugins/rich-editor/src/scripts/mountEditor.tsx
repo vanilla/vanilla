@@ -6,9 +6,9 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
-import { ensureHtmlElement } from "@library/dom";
-import Editor from "@rich-editor/components/editor/Editor";
-import { hasPermission } from "@library/permissions";
+import { ensureHtmlElement } from "@library/dom/domUtils";
+import Editor from "@rich-editor/editor/Editor";
+import { hasPermission } from "@library/features/users/permissionUtils";
 
 /**
  * Mount the editor into a DOM Node.

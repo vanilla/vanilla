@@ -3,12 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import { ColorValues } from "@library/styles/buttonStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { BorderRadiusProperty } from "csstype";
 import { ColorHelper } from "csx";
 import { TLength } from "typestyle/lib/types";
+import { ColorValues } from "@library/forms/buttonStyles";
 
 export const shadowHelper = useThemeCache(() => {
     const globalVars = globalVariables();

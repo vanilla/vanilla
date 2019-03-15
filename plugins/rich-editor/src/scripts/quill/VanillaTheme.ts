@@ -8,7 +8,7 @@
 import Quill, { QuillOptionsStatic } from "quill/core";
 import ThemeBase from "quill/core/theme";
 import KeyboardBindings from "@rich-editor/quill/KeyboardBindings";
-import { richEditorClasses } from "@rich-editor/styles/richEditorStyles/richEditorClasses";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 export default class VanillaTheme extends ThemeBase {
     /**

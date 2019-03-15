@@ -5,7 +5,7 @@
  */
 
 import Embed from "quill/blots/embed";
-import { setData, getData, convertToSafeEmojiCharacters, isEmojiSupported } from "@library/dom";
+import { setData, getData, convertToSafeEmojiCharacters, isEmojiSupported } from "@library/dom/domUtils";
 
 export default class EmojiBlot extends Embed {
     public static className = "safeEmoji";

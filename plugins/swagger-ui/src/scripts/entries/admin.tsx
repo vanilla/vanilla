@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { onReady } from "@library/application";
+import { onReady } from "@library/utility/appUtils";
 
 onReady(async () => {
     const mountPoint = document.getElementById("swagger-ui");

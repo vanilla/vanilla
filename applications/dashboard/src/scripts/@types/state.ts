@@ -5,9 +5,9 @@
  * @license GPL-2.0-only
  */
 
-import { ILoadable } from "@library/@types/api";
-import { IUserFragment } from "@library/@types/api";
+import { IUserFragment } from "@library/@types/api/users";
 import { IUserAuthenticator } from "@dashboard/@types/api/authenticate";
+import { ILoadable } from "@library/@types/api/core";
 
 export type IAuthenticatorState = ILoadable<IUserAuthenticator[]>;
 export type IPasswordState = ILoadable<IUserFragment>;

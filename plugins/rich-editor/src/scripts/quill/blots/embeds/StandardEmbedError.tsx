@@ -5,10 +5,10 @@
 
 import React from "react";
 import classNames from "classnames";
-import { FOCUS_CLASS } from "@library/embeds";
-import { userWarning } from "@library/components/icons/header";
-import CloseButton from "@library/components/CloseButton";
-import { t } from "@library/application";
+import { FOCUS_CLASS } from "@library/content/embeds/embedUtils";
+import { userWarning } from "@library/icons/header";
+import CloseButton from "@library/navigation/CloseButton";
+import { t } from "@library/utility/appUtils";
 
 interface IProps {
     children: string;

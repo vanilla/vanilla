@@ -5,7 +5,7 @@
 
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import ThemeActions from "@library/theming/ThemeActions";
-import { ILoadable, LoadStatus } from "@library/@types/api";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import produce from "immer";
 
 export interface ITheme {

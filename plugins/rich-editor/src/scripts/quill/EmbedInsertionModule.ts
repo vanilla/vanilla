@@ -8,13 +8,13 @@ import Module from "quill/core/module";
 import Parchment from "parchment";
 import Quill from "quill/core";
 import api, { uploadFile } from "@library/apiv2";
-import { getPastedFile, getDraggedFile } from "@library/dom";
+import { getPastedFile, getDraggedFile } from "@library/dom/domUtils";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
-import getStore from "@library/state/getStore";
+import getStore from "@library/redux/getStore";
 import { getIDForQuill, insertBlockBlotAt } from "@rich-editor/quill/utility";
 import { IStoreState } from "@rich-editor/@types/store";
-import { isFileImage } from "@library/utility";
-import ProgressEventEmitter from "@library/ProgressEventEmitter";
+import { isFileImage } from "@library/utility/utils";
+import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
 
 /**
  * A Quill module for managing insertion of embeds/loading/error states.

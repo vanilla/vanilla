@@ -5,11 +5,11 @@
  */
 
 import editorReducer from "@rich-editor/state/editorReducer";
-import { registerReducer } from "@library/state/reducerRegistry";
-import { onReady, onContent } from "@library/application";
+import { registerReducer } from "@library/redux/reducerRegistry";
+import { onReady, onContent } from "@library/utility/appUtils";
 
+registerReducer("editor", editorReducer);
 onReady(() => {
-    registerReducer("editor", editorReducer);
     void setupEditor();
 });
 onContent(setupEditor);

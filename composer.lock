@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c6cb03997537b40140629a76eab97116",
+    "content-hash": "4d3bbffaecb6b1210211625d51b53537",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -870,16 +870,16 @@
         },
         {
             "name": "vanilla/garden-schema",
-            "version": "v1.10",
+            "version": "v1.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-schema.git",
-                "reference": "89fcb21ee27ff7dbe8ea85cee7ef38f572e51aa4"
+                "reference": "41376725dde90e8a83aeb3ade1d70851265166dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/89fcb21ee27ff7dbe8ea85cee7ef38f572e51aa4",
-                "reference": "89fcb21ee27ff7dbe8ea85cee7ef38f572e51aa4",
+                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/41376725dde90e8a83aeb3ade1d70851265166dc",
+                "reference": "41376725dde90e8a83aeb3ade1d70851265166dc",
                 "shasum": ""
             },
             "require": {
@@ -905,7 +905,7 @@
                 }
             ],
             "description": "A simple data validation and cleaning library based on JSON Schema.",
-            "time": "2018-11-08T18:07:38+00:00"
+            "time": "2019-03-14T22:30:40+00:00"
         },
         {
             "name": "vanilla/htmlawed",
@@ -1046,20 +1046,23 @@
         },
         {
             "name": "vanilla/nbbc",
-            "version": "v2.2.0",
+            "version": "v2.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/nbbc.git",
-                "reference": "ad4f7654b8950f190d326b8ffdcc3fa7d31a0b69"
+                "reference": "6a1ab1a7624dbb3c0b11ec5a8da766fdefbd9159"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/nbbc/zipball/ad4f7654b8950f190d326b8ffdcc3fa7d31a0b69",
-                "reference": "ad4f7654b8950f190d326b8ffdcc3fa7d31a0b69",
+                "url": "https://api.github.com/repos/vanilla/nbbc/zipball/6a1ab1a7624dbb3c0b11ec5a8da766fdefbd9159",
+                "reference": "6a1ab1a7624dbb3c0b11ec5a8da766fdefbd9159",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.8.35"
             },
             "type": "library",
             "autoload": {
@@ -1069,7 +1072,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "BSDv2"
+                "BSD-2-Clause"
             ],
             "authors": [
                 {
@@ -1078,7 +1081,7 @@
                 }
             ],
             "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
-            "time": "2016-04-26T18:19:47+00:00"
+            "time": "2019-03-15T04:17:08+00:00"
         },
         {
             "name": "vanilla/vanilla-connect",
@@ -2167,6 +2170,7 @@
                 "mock",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2018-08-09T05:50:03+00:00"
         },
         {
@@ -2900,25 +2904,25 @@
         },
         {
             "name": "voku/html-min",
-            "version": "3.1.6",
+            "version": "3.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/HtmlMin.git",
-                "reference": "5c618c662bc1c86dd2cf2291a85bec7372aac122"
+                "reference": "58d870b95ca52bc9f55f91baed784556c2ca4a13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/HtmlMin/zipball/5c618c662bc1c86dd2cf2291a85bec7372aac122",
-                "reference": "5c618c662bc1c86dd2cf2291a85bec7372aac122",
+                "url": "https://api.github.com/repos/voku/HtmlMin/zipball/58d870b95ca52bc9f55f91baed784556c2ca4a13",
+                "reference": "58d870b95ca52bc9f55f91baed784556c2ca4a13",
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
                 "php": ">=7.0.0",
-                "voku/simple_html_dom": "^4.3.3"
+                "voku/simple_html_dom": "^4.1.7"
             },
             "require-dev": {
-                "phpunit/phpunit": "~6.0 || ~7.0"
+                "phpunit/phpunit": "~6.0"
             },
             "type": "library",
             "autoload": {
@@ -2945,7 +2949,7 @@
                 "html",
                 "minifier"
             ],
-            "time": "2019-03-04T08:15:51+00:00"
+            "time": "2018-10-17T19:56:12+00:00"
         },
         {
             "name": "voku/simple_html_dom",

@@ -68,16 +68,29 @@ The `release/2.x.dev` branches are production-ready branches for our cloud produ
 Our open source release branches are named by version number, e.g. `release/2.6`.
 We begin release branches with a dev (`dev.#`) designation and progress them through release candidate to stable.
 
-All open source releases (included pre-releases) are tagged.
-
-|                     | Active OSS Release | LTS OSS Release | Active Cloud Release | LTS Cloud Release |
-| ------------------- | ------------------ | --------------- | -------------------- | ----------------- |
-| **Version**         | `2.6.x`            | `2.5.x`         | `2.8.dev.6`          | `2.7`             |
-| **Initial Release** | Aug 17, 2018       | Dec 23, 2017    | Jan 18, 2019         | Oct 28, 2018      |
-| **Last Updated**    | Oct 28, 2018       | Aug 17, 2018    | Jan 18, 2019         | Dec 12, 2018      |
-| **EOL**             | With 2.8 final     | With 2.8 final  | With 2.8 final       | With 2.8 final    |
+|                     | Active Release | Deprecated Release  |
+| ------------------- | -------------- | ------------------- |
+| **Version**         | `2.8`          | `2.6`               |
+| **Initial Release** | 8 Feb 2019     | 17 Aug 2018         |
+| **Last Updated**    | 8 Feb 2019     | 28 Oct 2018 (2.6.4) |
+| **EOL**             | Next release   | **8 Feb 2019**      |
 
 Refer to the [OSS changelog](https://docs.vanillaforums.com/developer/changelog/) and the [Vanilla Cloud changelog](https://docs.vanillaforums.com/help/releases/) to track active changes between releases.
+
+## Building Releases
+
+Vanilla releases are built using [Phing](https://www.phing.info/) to create a pre-built deploy-ready copies of Vanilla. To build these run the following in the root of the repository.
+
+```
+./bin/release
+```
+
+The following dependenies are all required for building a release.
+
+-   `node`
+-   `yarn`
+-   `php`
+-   `composer`
 
 ## License & Legal Stuff
 

@@ -12,11 +12,35 @@ use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Contracts;
 
 /**
  * Event handlers for the Dashboard application.
  */
 class DashboardHooks extends Gdn_Plugin {
+
+    /** @var string */
+    private $mobileThemeKey;
+
+    /** @var string */
+    private $desktopThemeKey;
+
+    /** @var \Vanilla\AddonManager */
+    private $addonManager;
+
+    /**
+     * Constructor for DI.
+     *
+     * @param \Vanilla\AddonManager $addonManager
+     * @param Contracts\ConfigurationInterface $config
+     */
+    public function __construct(\Vanilla\AddonManager $addonManager, Contracts\ConfigurationInterface $config) {
+        parent::__construct();
+        $this->addonManager = $addonManager;
+        $this->mobileThemeKey = $config->get('Garden.MobileTheme');
+        $this->desktopThemeKey = $config->get('Garden.Theme');
+    }
+
 
     /**
      * Install the formatter to the container.
@@ -278,8 +302,11 @@ class DashboardHooks extends Gdn_Plugin {
         $nav = $sender;
 
         $session = Gdn::session();
-        $hasThemeOptions = Gdn::themeManager()->hasThemeOptions(Gdn::themeManager()->getEnabledDesktopThemeKey());
-        $hasMobileThemeOptions = Gdn::themeManager()->hasThemeOptions(Gdn::themeManager()->getEnabledMobileThemeKey());
+        $desktopTheme = $this->addonManager->lookupTheme($this->desktopThemeKey);
+        $mobileTheme = $this->addonManager->lookupTheme($this->mobileThemeKey);
+        $isDistinctMobileTheme = $mobileTheme !== $desktopTheme;
+        $hasThemeOptions = count($desktopTheme->getInfoValue('options', [])) > 0;
+        $hasMobileThemeOptions = $isDistinctMobileTheme && count($mobileTheme->getInfoValue('options', [])) > 0;
 
         $sort = -1; // Ensure these nav items come before any plugin nav items.
 
@@ -476,7 +503,8 @@ class DashboardHooks extends Gdn_Plugin {
                     $sQL = Gdn::sql();
                     $sQL->delete('TagDiscussion', ['TagID' => $tagID]);
                     $sQL->delete('Tag', ['TagID' => $tagID]);
-
+                    $tag['Name'] = htmlspecialchars($tag['Name']);
+                    $tag['FullName'] = htmlspecialchars($tag['FullName']);
                     $sender->informMessage(formatString(t('<b>{Name}</b> deleted.'), $tag));
                     $sender->jsonTarget("#Tag_{$tag['TagID']}", null, 'Remove');
                 }
@@ -587,6 +615,10 @@ class DashboardHooks extends Gdn_Plugin {
             throw notFoundException('Discussion');
         }
 
+        $hasPermission = Gdn::session()->checkPermission('Garden.Moderation.Manage');
+        if (!$hasPermission && $discussion['InsertUserID'] !== GDN::session()->UserID) {
+            throw permissionException('Garden.Moderation.Manage');
+        }
         $sender->title('Add Tags');
 
         if ($sender->Form->authenticatedPostBack()) {

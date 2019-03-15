@@ -2,7 +2,7 @@
     "name": "Pockets",
     "description": "Administrators may add raw HTML to various places on the site. This plugin is very powerful, but can easily break your site if you make a mistake.",
     "version": "1.4",
-    "registerPermrissions": {
+    "registerPermissions": {
         "Plugins.Pockets.Manage": "Garden.Settings.Manage",
         "0": "Garden.NoAds.Allow"
     },

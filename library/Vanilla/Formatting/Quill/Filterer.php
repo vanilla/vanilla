@@ -26,7 +26,7 @@ class Filterer {
     public function filter(string $content): string {
         $operations = Parser::jsonToOperations($content);
         // Re-encode the value to escape unicode values.
-        $this->stripUselessEmbedData($operations);
+        $operations = $this->stripUselessEmbedData($operations);
         $operations = json_encode($operations);
         return $operations;
     }
@@ -40,7 +40,7 @@ class Filterer {
      *
      * @param array[] $operations The quill operations to loop through.
      */
-    private function stripUselessEmbedData(array &$operations) {
+    private function stripUselessEmbedData(array &$operations): array {
         foreach ($operations as $key => $op) {
             // If a dataPromise is still stored on the embed, that means it never loaded properly on the client.
             $dataPromise = $op['insert']['embed-external']['dataPromise'] ?? null;
@@ -63,5 +63,7 @@ class Filterer {
                 }
             }
         }
+
+        return array_values($operations);
     }
 }

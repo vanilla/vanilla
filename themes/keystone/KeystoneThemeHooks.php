@@ -6,14 +6,12 @@
  * @license GPL-2.0-only
  */
 
-if (!defined('APPLICATION')) {
-    exit();
-}
+namespace Vanilla\Themes\Keystone;
 
 /**
  * Class KeystoneThemeHooks
  */
-class KeystoneThemeHooks extends Gdn_Plugin {
+class KeystoneThemeHooks extends \Gdn_Plugin {
 
     /**
      * Run once on enable.
@@ -21,40 +19,13 @@ class KeystoneThemeHooks extends Gdn_Plugin {
      * @return void
      */
     public function setup() {
-        $this->structure();
-    }
-
-    /**
-     * Run on utility/update.
-     *
-     * @return void
-     */
-    public function structure() {
-        saveToConfig([
-            'Garden.MobileTheme' => 'keystone',
-            'Badges.BadgesModule.Target' => 'AfterUserInfo',
-            'Feature.NewFlyouts.Enabled' => true,
-            'Garden.ThemeOptions.Styles.Key' => 'Default',
-            'Garden.ThemeOptions.Styles.Value' => '%s_default',
-            'Garden.ThemeOptions.Options.hasHeroBanner' => false,
-            'Garden.ThemeOptions.Options.hasFeatureSearchbox' => false,
-            'Garden.ThemeOptions.Options.panelToLeft' => false,
-        ]);
-    }
-
-    /**
-     * Cleanup when the theme is turned off.
-     */
-    public function onDisable() {
-        saveToConfig([
-            'Feature.NewFlyouts.Enabled' => false,
-        ]);
+        saveToConfig([ 'Garden.MobileTheme' => 'keystone' ]);
     }
 
     /**
      * Runs every page load
      *
-     * @param Gdn_Controller $sender This could be any controller
+     * @param \Gdn_Controller $sender This could be any controller
      *
      * @return void
      */
@@ -65,7 +36,7 @@ class KeystoneThemeHooks extends Gdn_Plugin {
 
         // Set Data "heroImageUrl" to smarty
         if (class_exists('HeroImagePlugin')) {
-            $imageUrl = HeroImagePlugin::getCurrentHeroImageLink();
+            $imageUrl = \HeroImagePlugin::getCurrentHeroImageLink();
             $sender->setData('heroImageUrl', $imageUrl);
         }
 
@@ -85,7 +56,7 @@ class KeystoneThemeHooks extends Gdn_Plugin {
     /**
      * Add custom toggles "hasHeroBanner", "hasFeatureSearchbox", "panelToLeft" to Theme Options
      *
-     * @param settingsController $sender
+     * @param \SettingsController $sender
      *
      * @return void
      */
@@ -129,7 +100,7 @@ class KeystoneThemeHooks extends Gdn_Plugin {
     /**
      * Unset ThemeOptions.Options config related to HeroImagePlugin
      *
-     * @param gdn_pluginManager $sender
+     * @param \Gdn_PluginManager $sender
      * @param array $args
      *
      * @return void
@@ -146,7 +117,7 @@ class KeystoneThemeHooks extends Gdn_Plugin {
     /**
      * Add support to `hasHeroBanner`, `hasFeatureSearchbox` and `panelToLeft` custom fields
      *
-     * @param SettingsController $sender
+     * @param \SettingsController $sender
      */
     public function settingsController_themeOptions_create($sender) {
         $sender->permission('Garden.Settings.Manage');
@@ -155,7 +126,7 @@ class KeystoneThemeHooks extends Gdn_Plugin {
         $sender->addJsFile('addons.js');
         $sender->setHighlightRoute('dashboard/settings/themeoptions');
 
-        $themeManager = Gdn::themeManager();
+        $themeManager = \Gdn::themeManager();
         $sender->setData('ThemeInfo', $themeManager->enabledThemeInfo());
 
         // set hasHeroImagePlugin to view

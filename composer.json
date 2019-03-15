@@ -54,8 +54,10 @@
         "exussum12/coverage-checker": "~0.10",
         "phpunit/phpunit": "~6.0",
         "vanilla/standards": "~1.3",
-        "voku/html-min": "~3.0",
-        "mikey179/vfsStream": "~1.6"
+        "voku/html-min": "3.0.5",
+        "voku/simple_html_dom": "4.1.7",
+        "mikey179/vfsStream": "~1.6",
+        "phing/phing": "2.*"
     },
     "provide": {
         "ext-gd": "*"
@@ -73,8 +75,8 @@
             "library/core/functions.deprecated.php"
         ],
         "psr-4": {
-			"Vanilla\\": "library/Vanilla",
-			"Garden\\": "library/Garden"
+            "Vanilla\\": "library/Vanilla",
+            "Garden\\": "library/Garden"
         }
     },
     "scripts": {

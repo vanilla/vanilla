@@ -1046,16 +1046,16 @@
         },
         {
             "name": "vanilla/nbbc",
-            "version": "v2.2.2",
+            "version": "v2.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/nbbc.git",
-                "reference": "94c4fa93cc42216e0d1ef0cd56b754d560f981fc"
+                "reference": "6a1ab1a7624dbb3c0b11ec5a8da766fdefbd9159"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/nbbc/zipball/94c4fa93cc42216e0d1ef0cd56b754d560f981fc",
-                "reference": "94c4fa93cc42216e0d1ef0cd56b754d560f981fc",
+                "url": "https://api.github.com/repos/vanilla/nbbc/zipball/6a1ab1a7624dbb3c0b11ec5a8da766fdefbd9159",
+                "reference": "6a1ab1a7624dbb3c0b11ec5a8da766fdefbd9159",
                 "shasum": ""
             },
             "require": {
@@ -1081,7 +1081,7 @@
                 }
             ],
             "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
-            "time": "2019-03-14T20:57:36+00:00"
+            "time": "2019-03-15T04:17:08+00:00"
         },
         {
             "name": "vanilla/vanilla-connect",

@@ -27,16 +27,14 @@ async function run() {
         try {
             const fileContent = await readFile(file);
             const value = JSON.parse(fileContent.toString());
-            if ("version" in value) {
+            if (typeof value === "object") {
                 value.version = newVersion;
                 await writeFile(file, JSON.stringify(value, null, 4));
-                console.log(chalk.greenBright(`✓\n`));
+                console.log(chalk.greenBright(`✓`));
             }
         } catch (e) {
             console.error(chalk.red("✖"));
         }
-
-        process.stdout.write("\n");
     }
 }
 

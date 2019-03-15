@@ -233,7 +233,7 @@ if (!function_exists('validateWebAddress')) {
             return true; // Required picks up this error
         }
 
-        return filter_var($value, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED) !== false;
+        return filter_var($value, FILTER_VALIDATE_URL) !== false;
     }
 }
 

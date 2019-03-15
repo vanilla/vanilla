@@ -10,9 +10,9 @@ import { getDeferredStoreState } from "@library/redux/getStore";
 import { getMeta } from "@library/utility/appUtils";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import memoize from "lodash/memoize";
-import { getThemeVariables } from "@library/theming/ThemeProvider";
 import merge from "lodash/merge";
 import { color } from "csx";
+import { getThemeVariables } from "@library/theming/getThemeVariables";
 
 /**
  * A better helper to generate human readable classes generated from TypeStyle.

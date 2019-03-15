@@ -5,9 +5,9 @@
  */
 
 import React from "react";
-import { AttachmentType } from "@library/content/attachments/attachmentUtils";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
+import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 
 const currentColorFill = {
     fill: "currentColor",

@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { borders, colorOut, IBorderStyles, placeholderStyles } from "@library/styles/styleHelpers";

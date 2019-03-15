@@ -1,3 +1,9 @@
+/*
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 import {
     filePDF,
     fileExcel,
@@ -7,22 +13,7 @@ import {
     fileImage,
     fileGeneric,
 } from "@library/icons/fileTypes";
-
-/*
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-
-export enum AttachmentType {
-    FILE = "A file",
-    PDF = "Adobe Portable Document Format (PDF)",
-    EXCEL = "Microsoft Excel Spreadsheet",
-    WORD = "Microsoft Word Document",
-    PPT = "Microsoft PowerPoint Presentation",
-    ARCHIVE = "An archived file or files",
-    IMAGE = "An image file",
-}
+import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 
 /**
  * Map a mimeType into an AttachmentType.

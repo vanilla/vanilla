@@ -6,7 +6,8 @@
 
 import React from "react";
 import { HumanFileSize } from "@library/utility/fileUtils";
-import { AttachmentType, getAttachmentIcon } from "@library/content/attachments/attachmentUtils";
+import { getAttachmentIcon } from "@library/content/attachments/attachmentUtils";
+import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import { attachmentClasses } from "@library/content/attachments/attachmentStyles";
 import { metasClasses } from "@library/styles/metasStyles";
 import Translate from "@library/content/Translate";

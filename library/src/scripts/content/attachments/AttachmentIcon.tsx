@@ -5,7 +5,8 @@
  */
 
 import React from "react";
-import { AttachmentType, getAttachmentIcon } from "@library/content/attachments/attachmentUtils";
+import { getAttachmentIcon } from "@library/content/attachments/attachmentUtils";
+import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import { t } from "@library/utility/appUtils";
 import Translate from "@library/content/Translate";
 import { attachmentIconClasses } from "@library/content/attachments/attachmentIconsStyles";

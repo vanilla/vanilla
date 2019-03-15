@@ -7,7 +7,8 @@
 import * as React from "react";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
 import { IFileAttachment } from "@library/content/attachments/Attachment";
-import { AttachmentType, getAttachmentIcon } from "@library/content/attachments/attachmentUtils";
+import { getAttachmentIcon } from "@library/content/attachments/attachmentUtils";
+import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 import { FOCUS_CLASS } from "@library/content/embeds/embedUtils";
 import { t } from "@library/utility/appUtils";
 import { attachmentClasses } from "@library/content/attachments/attachmentStyles";

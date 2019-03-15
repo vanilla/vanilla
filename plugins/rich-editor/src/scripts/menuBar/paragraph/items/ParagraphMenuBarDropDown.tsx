@@ -7,13 +7,13 @@
 import React from "react";
 import { t } from "@library/utility/appUtils";
 import Formatter from "@rich-editor/quill/Formatter";
-import { IFormats, RangeStatic } from "quill/core";
+import Quill, { IFormats, RangeStatic } from "quill/core";
 import { spoiler, codeBlock, blockquote, heading3, heading2, pilcrow } from "@library/icons/editorIcons";
+import MenuItems from "@rich-editor/toolbars/pieces/MenuItems";
 import classNames from "classnames";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
-import MenuItems from "@rich-editor/toolbars/pieces/MenuItems";
 
 interface IProps {
     formatter: Formatter;
@@ -27,7 +27,7 @@ interface IProps {
     className?: string;
 }
 
-export default class ParagraphMenuBarItems extends React.PureComponent<IProps> {
+export default class ParagraphMenuBarDropDown extends React.PureComponent<IProps> {
     public render() {
         return (
             <MenuItems

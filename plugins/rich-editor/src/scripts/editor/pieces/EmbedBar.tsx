@@ -6,7 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import ParagraphDropDown from "@rich-editor/menuBar/paragraph/ParagraphMenuDropDown";
+import ParagraphDropDown from "@rich-editor/menuBar/paragraph/ParagraphMenuBar";
 import { getMeta, t } from "@library/utility/appUtils";
 import Permission from "@library/features/users/Permission";
 import EditorUploadButton from "@rich-editor/editor/pieces/EditorUploadButton";
@@ -14,6 +14,7 @@ import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import EmojiFlyout from "@rich-editor/flyouts/EmojiFlyout";
 import EmbedFlyout from "@rich-editor/flyouts/EmbedFlyout";
+import ParagraphMenuBarToggle from "@rich-editor/menuBar/paragraph/ParagraphMenuBarToggle";
 
 interface IProps {
     isMobile: boolean;
@@ -42,7 +43,7 @@ export default function EmbedBar(props: IProps) {
             >
                 {isMobile && (
                     <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
-                        <ParagraphDropDown disabled={isLoading} />
+                        <ParagraphMenuBarToggle disabled={isLoading} />
                     </li>
                 )}
                 {!isMobile && (

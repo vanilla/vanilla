@@ -1,303 +1,137 @@
-/**
- * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
+/*
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
-import Quill from "quill/core";
 import { t } from "@library/utility/appUtils";
-import { forceSelectionUpdate, isEmbedSelected } from "@rich-editor/quill/utility";
 import Formatter from "@rich-editor/quill/Formatter";
+import { IFormats, RangeStatic } from "quill/core";
+import { spoiler, codeBlock, blockquote, heading3, heading2, pilcrow } from "@library/icons/editorIcons";
 import classNames from "classnames";
-import FocusWatcher from "@library/dom/FocusWatcher";
-import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { paragraphMenusBarClasses } from "./paragraphMenuBarStyles";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
+import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import MenuItems from "@rich-editor/toolbars/pieces/MenuItems";
-import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
-import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
-import ParagraphMenuBarItems from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarItems";
 
-interface IProps extends IWithEditorProps {}
-
-interface IState {
-    hasFocus: boolean;
-    rovingTabIndex: number; // https://www.w3.org/TR/wai-aria-practices-1.1/#kbd_roving_tabindex
+interface IProps {
+    formatter: Formatter;
+    activeFormats: IFormats;
+    lastGoodSelection: RangeStatic;
+    afterClickHandler?: () => void;
+    menuRef?: React.RefObject<MenuItems>;
+    renderAbove?: boolean;
+    renderLeft?: boolean;
+    onKeyDown?: (e) => any;
+    className?: string;
 }
 
-export class ParagraphMenuBar extends React.PureComponent<IProps, IState> {
-    private quill: Quill;
-    private ID: string;
-    private componentID: string;
-    private menuID: string;
-    private buttonID: string;
-    private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
-    private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
-    private menuRef: React.RefObject<MenuItems> = React.createRef();
-    private formatter: Formatter;
-    private focusWatcher: FocusWatcher;
-
-    constructor(props: IProps) {
-        super(props);
-
-        // Quill can directly on the class as it won't ever change in a single instance.
-        this.quill = props.quill;
-        this.formatter = new Formatter(this.quill);
-        this.ID = this.props.editorID + "paragraphMenu";
-        this.componentID = this.ID + "-component";
-        this.menuID = this.ID + "-menu";
-        this.buttonID = this.ID + "-button";
-        this.state = {
-            hasFocus: true, // do not commit
-            rovingTabIndex: 0,
-        };
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public componentDidMount() {
-        this.focusWatcher = new FocusWatcher(this.selfRef.current!, newHasFocusState => {
-            if (!newHasFocusState) {
-                this.setState({ hasFocus: false });
-            }
-        });
-        this.focusWatcher.start();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public componentWillUnmount() {
-        this.focusWatcher.stop();
-    }
-
+export default class ParagraphMenuBar extends React.PureComponent<IProps> {
     public render() {
-        const classesRichEditor = richEditorClasses(this.props.legacyMode);
-        const classesParagraphMenuBar = paragraphMenusBarClasses(this.props.legacyMode);
-        let pilcrowClasses = classNames(
-            { isOpen: this.isMenuVisible },
-            "richEditor-button",
-            "richEditorParagraphMenu-handle",
-            classesRichEditor.paragraphMenuHandle,
-            classesRichEditor.button,
-        );
-
-        if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
-            pilcrowClasses += " isHidden";
-        }
-
         return (
-            <div
-                id={this.componentID}
-                style={this.pilcrowStyles}
-                className={classNames({ isMenuInset: !this.props.legacyMode }, classesParagraphMenuBar.root)}
-                onKeyDown={this.handleKeyDown}
-                ref={this.selfRef}
-            >
-                <button
-                    type="button"
-                    id={this.buttonID}
-                    ref={this.buttonRef}
-                    aria-label={t("Line Level Formatting Menu")}
-                    aria-controls={this.menuID}
-                    aria-expanded={this.isMenuVisible}
-                    disabled={!this.isPilcrowVisible}
-                    className={pilcrowClasses}
-                    aria-haspopup="menu"
-                    onClick={this.pilcrowClickHandler}
-                    onKeyDown={this.handlePilcrowKeyDown}
-                >
-                    <ActiveFormatIcon activeFormats={this.props.activeFormats} />
-                </button>
-                <div id={this.menuID} className={this.toolbarClasses} style={this.toolbarStyles} role="menu">
-                    <ParagraphMenuBarItems
-                        menuRef={this.menuRef}
-                        formatter={this.formatter}
-                        afterClickHandler={this.close}
-                        activeFormats={this.props.activeFormats}
-                        lastGoodSelection={this.props.lastGoodSelection}
-                    />
-                </div>
-            </div>
+            <MenuItems
+                itemRole="menuitemradio"
+                ref={this.props.menuRef}
+                menuItemData={this.menuItemData}
+                renderAbove={this.props.renderAbove}
+                renderLeft={this.props.renderLeft}
+                onKeyDown={this.props.onKeyDown}
+                className={classNames(this.props.className)}
+            />
         );
     }
 
-    /**
-     * Determine whether or not we should show pilcrow at all.
-     */
-    private get isPilcrowVisible() {
-        const { currentSelection } = this.props;
-        if (!currentSelection) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Show the menu if we have a valid selection, and a valid focus.
-     */
-    private get isMenuVisible() {
-        return !!this.props.lastGoodSelection; // do not commit
-    }
-
-    /**
-     * Get the inline styles for the pilcrow. This is mostly just positioning it on the Y access currently.
-     */
-    private get pilcrowStyles(): React.CSSProperties {
-        if (!this.props.lastGoodSelection) {
-            return {};
-        }
-        const bounds = this.quill.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
-
-        // This is the pixel offset from the top needed to make things align correctly.
-
-        return {
-            top: (bounds.top + bounds.bottom) / 2 - this.verticalOffset,
-        };
-    }
-
-    private static readonly DEFAULT_OFFSET = 2;
-    private static readonly LEGACY_EXTRA_OFFSET = 2;
-
-    private get verticalOffset(): number {
-        const calculatedOffset =
-            parseInt(window.getComputedStyle(this.quill.root).paddingTop!, 10) || ParagraphMenuBar.DEFAULT_OFFSET;
-        const extraOffset = this.props.legacyMode ? ParagraphMenuBar.LEGACY_EXTRA_OFFSET : 0;
-        return calculatedOffset + extraOffset;
-    }
-
-    /**
-     * Get the classes for the toolbar.
-     */
-    private get toolbarClasses(): string {
-        if (!this.props.lastGoodSelection) {
-            return "";
-        }
-        const bounds = this.quill.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
-        const classesParagraphToolBar = paragraphMenusBarClasses();
-        const classesDropDown = dropDownClasses();
-        let classes = classNames(classesParagraphToolBar.root);
-
-        if (!this.props.legacyMode) {
-            classes += " likeDropDownContent";
-            classes += " " + classesDropDown.likeDropDownContent;
-        }
-
-        if (bounds.top <= 30) {
-            classes += " isDown";
-        } else {
-            classes += " isUp";
-        }
-
-        return classes;
-    }
-
-    /**
-     * Get the inline styles for the toolbar. This just a matter of hiding it.
-     * This could likely be replaced by a CSS class in the future.
-     */
-    private get toolbarStyles(): React.CSSProperties {
-        if (this.isMenuVisible && !isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
-            return {};
-        } else {
-            // We hide the toolbar when its not visible.
-            return {
-                visibility: "hidden",
-                position: "absolute",
-                zIndex: -1,
-            };
-        }
-    }
-
-    /**
-     * Click handler for the Pilcrow
-     */
-    private pilcrowClickHandler = (event: React.MouseEvent<any>) => {
-        event.preventDefault();
-        this.setState({ hasFocus: true }, () => {
-            if (this.state.hasFocus) {
-                this.menuRef.current!.focusFirstItem();
-                forceSelectionUpdate();
+    private get menuItemData() {
+        const { activeFormats } = this.props;
+        let isParagraphEnabled = true;
+        ["header", BlockquoteLineBlot.blotName, CodeBlockBlot.blotName, SpoilerLineBlot.blotName].forEach(item => {
+            if (item in activeFormats) {
+                isParagraphEnabled = false;
             }
         });
-    };
 
-    /**
-     * Close the paragraph menu and place the selection at the end of the current selection if there is one.
-     */
-    private close = () => {
-        this.setState({ hasFocus: true });
-        const { lastGoodSelection } = this.props;
-        const newSelection = {
-            index: lastGoodSelection.index + lastGoodSelection.length,
-            length: 0,
-        };
-        this.quill.setSelection(newSelection);
-    };
+        const headerObjectLevel = typeof activeFormats.header === "object" ? activeFormats.header.level : null;
 
-    /**
-     * Handle the escape key. when the toolbar is open. Note that focus still goes back to the main button,
-     * but the selection is set to a 0 length selection at the end of the current selection before the
-     * focus is moved.
-     */
-    private handleKeyDown = (event: React.KeyboardEvent) => {
-        if (event.keyCode === 27 && this.state.hasFocus) {
-            event.preventDefault();
-            this.close();
-        }
-    };
+        return [
+            {
+                icon: pilcrow(),
+                label: t("Format as Paragraph"),
+                onClick: this.formatParagraph,
+                isActive: isParagraphEnabled,
+                isDisabled: isParagraphEnabled,
+            },
+            {
+                icon: heading2(),
+                label: t("Format as Title"),
+                onClick: this.formatH2,
+                isActive: activeFormats.header === 2 || headerObjectLevel === 2,
+                isDisabled: activeFormats.header === 2 || headerObjectLevel === 2,
+            },
+            {
+                icon: heading3(),
+                label: t("Format as Subtitle"),
+                onClick: this.formatH3,
+                isActive: activeFormats.header === 3 || headerObjectLevel === 3,
+                isDisabled: activeFormats.header === 3 || headerObjectLevel === 3,
+            },
+            {
+                icon: blockquote(),
+                label: t("Format as blockquote"),
+                onClick: this.formatBlockquote,
+                isActive: activeFormats[BlockquoteLineBlot.blotName] === true,
+                isDisabled: activeFormats[BlockquoteLineBlot.blotName] === true,
+            },
+            {
+                icon: codeBlock(),
+                label: t("Format as code block"),
+                onClick: this.formatCodeBlock,
+                isActive: activeFormats[CodeBlockBlot.blotName] === true,
+                isDisabled: activeFormats[CodeBlockBlot.blotName] === true,
+            },
+            {
+                icon: spoiler("richEditorButton-icon"),
+                label: t("Format as spoiler"),
+                onClick: this.formatSpoiler,
+                isActive: activeFormats[SpoilerLineBlot.blotName] === true,
+                isDisabled: activeFormats[SpoilerLineBlot.blotName] === true,
+            },
+        ];
+    }
 
-    /**
-     * From an accessibility point of view, this is a Editor Menubar. The only difference is it has a toggled visibility
-     *
-     * @see https://www.w3.org/TR/wai-aria-practices-1.1/examples/menubar/menubar-2/menubar-2.html
-     */
-    private handlePilcrowKeyDown = (event: React.KeyboardEvent<any>) => {
-        switch (event.key) {
-            // Opens submenu and moves focus to first item in the submenu.
-            case "Space":
-            case "Enter":
-                break;
-            // If a submenu is open, closes it. Otherwise, does nothing.
-            case "Escape":
-                break;
-            // Moves focus to first item in the menubar.
-            case "Home":
-                break;
-            // 	Moves focus to last item in the menubar.
-            case "End":
-                break;
-            // Moves focus to the next item in the menubar.
-            // If focus is on the last item, moves focus to the first item.
-            case "ArrowRight":
-                break;
-            // Moves focus to the previous item in the menubar.
-            // If focus is on the first item, moves focus to the last item.
-            case "ArrowLeft":
-                break;
-            // 	Opens submenu and moves focus to last item in the submenu.
-            case "ArrowUp":
-                event.preventDefault();
-                this.setState({ hasFocus: true }, () => {
-                    this.menuRef.current!.focusFirstItem();
-                });
-                break;
-            // Opens submenu and moves focus to first item in the submenu.
-            case "ArrowDown":
-                event.preventDefault();
-                this.setState({ hasFocus: true }, () => {
-                    this.menuRef.current!.focusLastItem();
-                });
-                break;
-            // Moves focus to next item in the menubar having a name that starts with the typed character.
-            // If none of the items have a name starting with the typed character, focus does not move.
-            default:
-                break;
-        }
+    //
+    // These are implicitly written out for performance reasons.
+    // Lambas or binding in the render method slows down renders significantly.
+    //
+
+    private formatParagraph = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        this.props.formatter.paragraph(this.props.lastGoodSelection);
+        this.props.afterClickHandler && this.props.afterClickHandler();
+    };
+    private formatH2 = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        this.props.formatter.h2(this.props.lastGoodSelection);
+        this.props.afterClickHandler && this.props.afterClickHandler();
+    };
+    private formatH3 = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        this.props.formatter.h3(this.props.lastGoodSelection);
+        this.props.afterClickHandler && this.props.afterClickHandler();
+    };
+    private formatBlockquote = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        this.props.formatter.blockquote(this.props.lastGoodSelection);
+        this.props.afterClickHandler && this.props.afterClickHandler();
+    };
+    private formatCodeBlock = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        this.props.formatter.codeBlock(this.props.lastGoodSelection);
+        this.props.afterClickHandler && this.props.afterClickHandler();
+    };
+    private formatSpoiler = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        this.props.formatter.spoiler(this.props.lastGoodSelection);
+        this.props.afterClickHandler && this.props.afterClickHandler();
     };
 }
-
-export default withEditor<IProps>(ParagraphMenuBar);

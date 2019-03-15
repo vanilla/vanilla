@@ -8,12 +8,13 @@ import { useThemeCache, styleFactory } from "@library//styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { calc } from "csx";
 
-export const paragraphMenusBarClasses = useThemeCache((legacyMode: boolean = false) => {
+export const paragraphMenuBarToggleClasses = useThemeCache((legacyMode: boolean = false) => {
     const globalVars = globalVariables();
     const vars = richEditorVariables();
     const formVars = formElementsVariables();
-    const style = styleFactory("paragraphMenusBarClasses");
+    const style = styleFactory("paragraphMenuBarToggle");
 
     const root = style({
         position: "absolute",
@@ -43,10 +44,30 @@ export const paragraphMenusBarClasses = useThemeCache((legacyMode: boolean = fal
     return { root };
 });
 
+export const paragraphToolbarContainerClasses = useThemeCache(() => {
+    const vars = richEditorVariables();
+    const formVars = formElementsVariables();
+    const style = styleFactory("paragraphToolbarContainer");
+
+    const root = style({
+        position: "absolute",
+        left: calc(`50% - ${unit(vars.spacing.paddingLeft / 2)}`),
+        $nest: {
+            "&.isUp": {
+                bottom: calc(`50% + ${unit(vars.spacing.paddingRight / 2 - formVars.border.width)}`),
+            },
+            "&.isDown": {
+                top: calc(`50% + ${unit(vars.spacing.paddingRight / 2 - formVars.border.width)}`),
+            },
+        },
+    });
+    return { root };
+});
+
 export const paragraphMenuDropDownClasses = useThemeCache(() => {
     const vars = richEditorVariables();
     const formVars = formElementsVariables();
-    const style = styleFactory("paragraphMenuDropDownClasses");
+    const style = styleFactory("paragraphMenuDropDown");
 
     const root = style({});
     return { root };
@@ -55,7 +76,7 @@ export const paragraphMenuDropDownClasses = useThemeCache(() => {
 export const paragraphMenuMultiItemsClasses = useThemeCache(() => {
     const vars = richEditorVariables();
     const formVars = formElementsVariables();
-    const style = styleFactory("paragraphMenuMultiItemsClasses");
+    const style = styleFactory("paragraphMenuMultiItems");
 
     const root = style({});
     return { root };
@@ -64,7 +85,7 @@ export const paragraphMenuMultiItemsClasses = useThemeCache(() => {
 export const paragraphMenuItemClasses = useThemeCache(() => {
     const vars = richEditorVariables();
     const formVars = formElementsVariables();
-    const style = styleFactory("paragraphMenuItemClasses");
+    const style = styleFactory("paragraphMenuItem");
 
     const root = style({});
     return { root };
@@ -73,7 +94,7 @@ export const paragraphMenuItemClasses = useThemeCache(() => {
 export const paragraphMenuRadioButtonClasses = useThemeCache(() => {
     const vars = richEditorVariables();
     const formVars = formElementsVariables();
-    const style = styleFactory("paragraphMenuRadioButtonClasses");
+    const style = styleFactory("paragraphMenuRadioButton");
 
     const root = style({});
     return { root };
@@ -82,7 +103,7 @@ export const paragraphMenuRadioButtonClasses = useThemeCache(() => {
 export const paragraphMenuCheckBoxClasses = useThemeCache(() => {
     const vars = richEditorVariables();
     const formVars = formElementsVariables();
-    const style = styleFactory("paragraphMenuCheckBoxClasses");
+    const style = styleFactory("paragraphMenuCheckBox");
 
     const root = style({});
     return { root };

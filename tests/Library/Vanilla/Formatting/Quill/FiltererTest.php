@@ -31,6 +31,10 @@ class FiltererTest extends TestCase {
         $filterer = new Filterer();
 
         $filteredOutput = $filterer->filter($input);
+
+        // Normalize inputted & outputter JSON
+        $output = json_encode(json_decode($output));
+        $filteredOutput = json_encode(json_decode($filteredOutput));
         $this->assertEquals($output, $filteredOutput);
     }
 
@@ -63,6 +67,41 @@ class FiltererTest extends TestCase {
    }
 JSON;
 
+        $codeBlock = <<<JSON
+[
+    {
+        "insert": ".TestClass {"
+    },
+    {
+        "attributes": {
+            "code-block": true
+        },
+        "insert": "\\n"
+    },
+    {
+        "insert": "   height: 24px"
+    },
+    {
+        "attributes": {
+            "code-block": true
+        },
+        "insert": "\\n"
+    },
+    {
+        "insert": "}"
+    },
+    {
+        "attributes": {
+            "code-block": true
+        },
+        "insert": "\\n"
+    },
+    {
+        "insert": "\\n"
+    }
+]
+JSON;
+
         return [
             [
                 "[$loadingEmbed, {\"insert\":\"\\n\"}]",
@@ -75,6 +114,11 @@ JSON;
             [
                 "[{\"insert\":\"Just a normal post\"}, {\"insert\":\"nothing special here\"}]",
                 "[{\"insert\":\"Just a normal post\"},{\"insert\":\"nothing special here\"}]"
+            ],
+            [
+                // This shouldn't be altered at all.
+                $codeBlock,
+                $codeBlock,
             ]
         ];
     }

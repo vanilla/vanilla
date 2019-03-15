@@ -68,12 +68,12 @@ The `release/2.x.dev` branches are production-ready branches for our cloud produ
 Our open source release branches are named by version number, e.g. `release/2.6`.
 We begin release branches with a dev (`dev.#`) designation and progress them through release candidate to stable.
 
-|                     | Active Release | Deprecated Release  |
-| ------------------- | -------------- | ------------------- |
-| **Version**         | `2.8`          | `2.6`               |
-| **Initial Release** | 8 Feb 2019     | 17 Aug 2018         |
-| **Last Updated**    | 8 Feb 2019     | 28 Oct 2018 (2.6.4) |
-| **EOL**             | Next release   | **8 Feb 2019**      |
+|                     | Active Release      | Deprecated Release  |
+| ------------------- | ------------------- | ------------------- |
+| **Version**         | `2.8`               | `2.6`               |
+| **Initial Release** | 8 Feb 2019          | 17 Aug 2018         |
+| **Last Updated**    | 15 Mar 2019 (2.8.1) | 28 Oct 2018 (2.6.4) |
+| **EOL**             | Next release        | **8 Feb 2019**      |
 
 Refer to the [OSS changelog](https://docs.vanillaforums.com/developer/changelog/) and the [Vanilla Cloud changelog](https://docs.vanillaforums.com/help/releases/) to track active changes between releases.
 

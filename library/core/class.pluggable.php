@@ -127,15 +127,7 @@ abstract class Gdn_Pluggable {
         }
 
         // Look to the PluginManager to see if there are related event handlers and call them
-        try {
-            return Gdn::pluginManager()->callEventHandlers($this, $fireClass, $eventName);
-        } catch (ArgumentCountError $ex) {
-            if (debug()) {
-                throw $ex;
-            }
-            Logger::event('arg_error', Logger::CRITICAL, $ex->getMessage());
-            return false;
-        }
+        return Gdn::pluginManager()->callEventHandlers($this, $fireClass, $eventName);
     }
 
     /**
@@ -202,52 +194,24 @@ abstract class Gdn_Pluggable {
         // Make sure the arguments get passed in the same way whether firing a custom event or a magic one.
         $this->EventArguments = $arguments;
 
-        // Call the "Before" event handlers.
-        try {
-            Gdn::pluginManager()->callEventHandlers($this, $className, $referenceMethodName, 'Before');
-        } catch (ArgumentCountError $ex) {
-            if (debug()) {
-                throw $ex;
-            }
-            Logger::event('arg_error', Logger::CRITICAL, $ex->getMessage());
-        }
+        // Call the "Before" event handlers
+        Gdn::pluginManager()->callEventHandlers($this, $className, $referenceMethodName, 'Before');
 
         // Call this object's method
         if (Gdn::pluginManager()->hasMethodOverride($className, $referenceMethodName)) {
             // The method has been overridden
             $this->HandlerType = HANDLER_TYPE_OVERRIDE;
-            try {
-                $return = Gdn::pluginManager()->callMethodOverride($this, $this->ClassName, $referenceMethodName);
-            } catch (ArgumentCountError $ex) {
-                if (debug()) {
-                    throw $ex;
-                }
-                Logger::event('arg_error', Logger::CRITICAL, $ex->getMessage());
-            }
+            $return = Gdn::pluginManager()->callMethodOverride($this, $this->ClassName, $referenceMethodName);
         } elseif (Gdn::pluginManager()->hasNewMethod($className, $referenceMethodName)) {
             $this->HandlerType = HANDLER_TYPE_NEW;
-            try {
-                $return = Gdn::pluginManager()->callNewMethod($this, $className, $referenceMethodName);
-            } catch (ArgumentCountError $ex) {
-                if (debug()) {
-                    throw $ex;
-                }
-                Logger::event('arg_error', Logger::CRITICAL, $ex->getMessage());
-            }
+            $return = Gdn::pluginManager()->callNewMethod($this, $className, $referenceMethodName);
         } else {
             // The method has not been overridden.
             $return = call_user_func_array([$this, $actualMethodName], $arguments);
         }
 
-        // Call the "After" event handlers.
-        try {
-            Gdn::pluginManager()->callEventHandlers($this, $className, $referenceMethodName, 'After');
-        } catch (ArgumentCountError $ex) {
-            if (debug()) {
-                throw $ex;
-            }
-            Logger::event('arg_error', Logger::CRITICAL, $ex->getMessage());
-        }
+        // Call the "After" event handlers
+        Gdn::pluginManager()->callEventHandlers($this, $className, $referenceMethodName, 'After');
 
         return $return;
     }

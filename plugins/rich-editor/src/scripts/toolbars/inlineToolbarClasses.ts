@@ -17,11 +17,11 @@ export const inlineToolbarClasses = useThemeCache((legacyMode: boolean = false) 
     const root = style({
         $nest: {
             "&.isUp": {
+                transform: `translateY(-12px)`,
                 $nest: {
                     ".richEditor-nubPosition": {
-                        transform: `translateY(${!legacyMode ? "-1px" : "9px"}) translateX(-50%)`,
-                        alignItems: "flex-end",
-                        bottom: percent(100),
+                        bottom: 0,
+                        zIndex: 10,
                     },
                     ".richEditor-nub": {
                         transform: `translateY(-50%) rotate(135deg)`,
@@ -30,8 +30,11 @@ export const inlineToolbarClasses = useThemeCache((legacyMode: boolean = false) 
                 },
             },
             "&.isDown": {
-                transform: `translateY(50%)`,
+                transform: `translateY(12px)`,
                 $nest: {
+                    ".richEditor-nubPosition": {
+                        bottom: percent(100),
+                    },
                     ".richEditor-nub": {
                         transform: `translateY(50%) rotate(-45deg)`,
                         marginTop: unit(offsetForNub),

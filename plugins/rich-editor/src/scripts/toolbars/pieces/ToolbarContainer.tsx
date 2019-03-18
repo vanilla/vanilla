@@ -12,6 +12,7 @@ import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
 import { nubClasses } from "@rich-editor/toolbars/pieces/nubClasses";
 import { inlineToolbarClasses } from "@rich-editor/toolbars/inlineToolbarClasses";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
+import { forceRenderStyles } from "typestyle";
 
 interface IProps extends IWithEditorProps {
     selection: RangeStatic;
@@ -102,6 +103,7 @@ export class ToolbarContainer extends React.PureComponent<IProps, IState> {
      * Mount quill listeners.
      */
     public componentDidMount() {
+        forceRenderStyles();
         const richEditorVars = richEditorVariables();
         this.setState({
             flyoutWidth: this.flyoutRef.current ? this.flyoutRef.current.offsetWidth : null,

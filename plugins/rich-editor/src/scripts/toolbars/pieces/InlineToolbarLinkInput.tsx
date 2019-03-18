@@ -64,7 +64,6 @@ export class InlineToolbarLinkInput extends React.PureComponent<IProps, {}> {
                 <CloseButton
                     className={classNames("richEditor-close", classesRichEditor.close)}
                     onClick={this.props.onCloseClick}
-                    legacyMode={this.props.legacyMode}
                 />
             </div>
         );

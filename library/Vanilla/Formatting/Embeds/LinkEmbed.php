@@ -63,41 +63,14 @@ class LinkEmbed extends Embed {
      */
     public function renderData(array $data): string {
 
-        $url = $data['url'] ?? null;
-        $name = $data['name'] ?? null;
-        $body = $data['body'] ?? null;
-        $photoUrl = $data['photoUrl'] ?? null;
-        $timestamp = $data['timestamp'] ?? null;
-        $humanTime = $data['humanTime'] ?? null;
+        $data['url'] = $data['url'] ?? null;
+        $data['name'] = $data['name'] ?? null;
+        $data['body'] = $data['body'] ?? null;
+        $data['photoUrl'] = $data['photoUrl'] ?? null;
+        $data['timestamp'] = $data['timestamp'] ?? null;
+        $data['humanTime'] = $data['humanTime'] ?? null;
 
-        if ($photoUrl) {
-            $photoUrlEncoded = htmlspecialchars($photoUrl);
-            $image = "<img src='$photoUrlEncoded' class='embedLink-image' aria-hidden='true'>";
-        } else {
-            $image = "";
-        }
-
-        if ($timestamp && $humanTime) {
-            $timestampAsMeta = "<time class=\"embedLink-dateTime metaStyle\" dateTime=\"$timestamp\">$humanTime</time>";
-        } else {
-            $timestampAsMeta = "";
-        }
-
-        $urlEncoded = htmlspecialchars(\Gdn_Format::sanitizeUrl($url));
-        $urlAsMeta = "<span class=\"embedLink-source metaStyle\">$urlEncoded</span>";
-        $nameEncoded = htmlspecialchars($name);
-        $bodyEncoded = htmlspecialchars($body);
-
-        $renderData['urlEncoded'] = $url;
-        $renderData['urlAsMeta'] = $urlAsMeta;
-        $renderData['bodyEncoded'] = $bodyEncoded;
-        $renderData['nameEncoded'] = $nameEncoded;
-        $renderData['photoUrl'] = $photoUrl;
-        $renderData['timestampAsMeta'] = $timestampAsMeta;
-        $renderData['image'] = $image;
-
-        $this->renderTwig('library/Vanilla/Formatting/Embeds/linkEmbed.twig', $renderData);
-
+        return $this->renderTwig('library/Vanilla/Formatting/Embeds/LinkEmbed.twig', $data);
 
     }
 }

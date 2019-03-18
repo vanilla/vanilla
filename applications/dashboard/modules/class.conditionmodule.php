@@ -108,7 +108,7 @@ class ConditionModule extends Gdn_Module {
                     $condition[1] = '';
                     break;
                 default:
-                    continue;
+                    continue 2;
             }
             $conditions[] = $condition;
         }

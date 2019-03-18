@@ -7,14 +7,14 @@
  namespace Vanilla\Theme;
 
  use JsonSerializable;
- 
+
  /**
   * Basic theme asset.
   */
 abstract class Asset implements \JsonSerializable {
 
     /** @var string Type of asset. */
-    private $type;
+    protected $type;
 
     /**
      * Represent the asset as an array.

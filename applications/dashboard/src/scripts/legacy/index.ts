@@ -7,7 +7,7 @@
  * @license GPL-2.0-only
  */
 
-import { onContent, onReady } from "@library/application";
+import { onContent, onReady } from "@library/utility/appUtils";
 import { initializeAtComplete } from "@dashboard/legacy/atwho";
 
 // Initialize legacy @mentions for all BodyBox elements.

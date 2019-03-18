@@ -8,9 +8,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 import FocusableEmbedBlot from "../abstract/FocusableEmbedBlot";
 import uniqueId from "lodash/uniqueId";
-import { FOCUS_CLASS } from "@library/embeds";
+import { FOCUS_CLASS } from "@library/content/embeds/embedUtils";
 import StandardEmbedError from "@rich-editor/quill/blots/embeds/StandardEmbedError";
-import AttachmentError from "@library/components/attachments/AttachmentError";
+import AttachmentError from "@library/content/attachments/AttachmentError";
 
 export enum ErrorBlotType {
     FILE = "file",

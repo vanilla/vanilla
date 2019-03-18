@@ -4,16 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import { setData, getData, escapeHTML } from "@library/dom";
+import { setData, getData, escapeHTML } from "@library/dom/domUtils";
 import uniqueId from "lodash/uniqueId";
-import { IEmbedData, renderEmbed, FOCUS_CLASS } from "@library/embeds";
-import { t } from "@library/application";
-import { logError, capitalizeFirstLetter } from "@library/utility";
+import { IEmbedData, renderEmbed, FOCUS_CLASS } from "@library/content/embeds/embedUtils";
+import { t } from "@library/utility/appUtils";
+import { logError, capitalizeFirstLetter } from "@library/utility/utils";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import ErrorBlot, { IErrorData, ErrorBlotType } from "@rich-editor/quill/blots/embeds/ErrorBlot";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
-import ProgressEventEmitter from "@library/ProgressEventEmitter";
+import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
 
 const DATA_KEY = "__embed-data__";
 
@@ -188,6 +188,11 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
 
         resolvedPromise
             .then(data => {
+                // DOM node has been removed from the document.
+                if (!document.contains(this.domNode)) {
+                    return;
+                }
+
                 const newValue: IEmbedValue = {
                     data,
                     loaderData: value.loaderData,
@@ -201,6 +206,10 @@ export default class ExternalEmbedBlot extends FocusableEmbedBlot {
             })
             .catch(e => {
                 logError(e);
+                // DOM node has been removed from the document.
+                if (!document.contains(this.domNode)) {
+                    return;
+                }
                 const errorData: IErrorData = {
                     error: e,
                     type: value.loaderData.type === "file" ? ErrorBlotType.FILE : ErrorBlotType.STANDARD,

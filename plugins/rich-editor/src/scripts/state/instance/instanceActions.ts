@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { ActionsUnion, createAction } from "@library/state/utility";
+import { ActionsUnion, createAction } from "@library/redux/utility";
 import Quill, { RangeStatic } from "quill/core";
 
 export const CREATE_INSTANCE = "[editorInstance] create";

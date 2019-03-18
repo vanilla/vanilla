@@ -56,11 +56,11 @@ $embedLoader-closeButton_opacity: .7 !default;
     cursor: pointer;
 
     &:hover {
-        box-shadow: 0 0 0 $embedded-select_borderWidth rgba($embed-focus-color, 0.5) inset;
+        box-shadow: 0 0 0 $embedded-select_borderWidth rgba($embed_focus_color, 0.5) inset;
     }
 
     &:focus {
-        box-shadow: 0 0 0 $embedded-select_borderWidth $embed-focus-color inset;
+        box-shadow: 0 0 0 $embedded-select_borderWidth $embed_focus_color inset;
     }
 
     + .embedLoader-error {
@@ -113,6 +113,7 @@ $embedLoader-closeButton_opacity: .7 !default;
 .userContent {
     .embedLoader-errorMessage {
         max-width: calc(100% - #{$icon-default_size * 3});
+        width: 100%;
         padding-left: $icon-default_size;
     }
 }

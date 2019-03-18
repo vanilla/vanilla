@@ -15,7 +15,7 @@ class JsonAsset extends Asset {
     private $data;
 
     /** @var string Type of asset. */
-    private $type = "json";
+    protected $type = "json";
 
     /**
      * Configure the JSON asset.

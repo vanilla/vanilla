@@ -215,6 +215,7 @@ class UserController extends DashboardController {
             }
         } catch (Exception $ex) {
             $this->Form->addError($ex);
+            $this->Form->clearInputs();
         }
 
         $this->setData('UserRoles', $userRoleData);

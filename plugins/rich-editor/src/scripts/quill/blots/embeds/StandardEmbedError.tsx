@@ -4,13 +4,11 @@
  */
 
 import React from "react";
-import ReactDOM from "react-dom";
 import classNames from "classnames";
-import { FOCUS_CLASS } from "@library/embeds";
-import { uniqueId } from "lodash";
-import { userWarning } from "@library/components/icons/header";
-import CloseButton from "@library/components/CloseButton";
-import { t } from "@library/application";
+import { FOCUS_CLASS } from "@library/content/embeds/embedUtils";
+import { userWarning } from "@library/icons/header";
+import CloseButton from "@library/navigation/CloseButton";
+import { t } from "@library/utility/appUtils";
 
 interface IProps {
     children: string;

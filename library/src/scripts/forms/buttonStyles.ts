@@ -18,7 +18,7 @@ import {
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
-import { TLength } from "typestyle/lib/types";
+import { TLength, NestedCSSProperties } from "typestyle/lib/types";
 import { componentThemeVariables, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { ColorHelper, important, percent, px } from "csx";
@@ -329,6 +329,16 @@ export const buttonSizing = (height, minWidth, fontSize, paddingHorizontal, form
     };
 };
 
+export const buttonResetMixin = (): NestedCSSProperties => ({
+    "-webkit-appearance": "none",
+    appearance: "none",
+    border: 0,
+    background: "none",
+    cursor: "pointer",
+    color: "inherit",
+    font: "inherit",
+});
+
 export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: string, setZIndexOnState = false) => {
     const globalVars = globalVariables();
     const formElVars = formElementsVariables();
@@ -337,7 +347,7 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
     const zIndex = setZIndexOnState ? 1 : undefined;
     const buttonDimensions = buttonTypeVars.sizing || false;
 
-    return style({
+    return style(buttonResetMixin(), {
         ...defaultTransition("border"),
         textOverflow: "ellipsis",
         overflow: "hidden",
@@ -445,7 +455,7 @@ export const buttonClasses = useThemeCache(() => {
         translucid: generateButtonClass(vars.translucid, ButtonTypes.TRANSLUCID),
         inverted: generateButtonClass(vars.inverted, ButtonTypes.INVERTED),
         tab: "buttonAsTab",
-        icon: "buttonAsIcon",
+        icon: buttonUtilityClasses().buttonIcon,
         text: "buttonAsText",
         custom: "",
     };
@@ -464,7 +474,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
         marginLeft: important("auto"),
     });
 
-    const buttonIcon = style("icon", {
+    const buttonIcon = style("icon", buttonResetMixin(), {
         alignItems: "center",
         display: "flex",
         height: unit(formElementVars.sizing.height),

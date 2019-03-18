@@ -6,7 +6,6 @@
 
 import Header from "quill/formats/header";
 import { slugify } from "@library/utility/utils";
-import { setData, getData } from "@library/dom/domUtils";
 
 interface IValue {
     level: 2;

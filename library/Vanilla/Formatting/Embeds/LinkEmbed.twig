@@ -1,0 +1,17 @@
+<div class="embedExternal embedText embedLink">
+    <div class="embedExternal-content embedText-content embedLink-content">
+        <a class="embedLink-link" href="{{ sanitizeUrl(url) }}"  rel="noopener noreferrer">
+            <article class="embedText-body">
+                <img src={{ photoUrl }} class='embedLink-image' aria-hidden='true'>
+                <div class="embedText-main">
+                    <div class="embedText-header">
+                        <h3 class="embedText-title">{{ name }}</h3>
+                        <time class="embedLink-dateTime metaStyle" dateTime={{ timestamp }}>{{ humanTime }}</time>";
+                        <span class="embedLink-source metaStyle">{{ sanitizeUrl(url) }}</span>
+                    </div>
+                    <div class="embedLink-excerpt">{{ body }}</div>
+                </div>
+            </article>
+        </a>
+    </div>
+</div>

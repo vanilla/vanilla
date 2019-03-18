@@ -6,13 +6,17 @@
 
 namespace Vanilla\Formatting\Embeds;
 
+use Garden\TwigTrait;
 use Gdn_Format;
 use Vanilla\PageScraper;
+use Vanilla\Web\TwigRenderTrait;
 
 /**
  * Generic link embed.
  */
 class LinkEmbed extends Embed {
+
+    use TwigRenderTrait;
 
     /** @var PageScraper */
     private $pageScraper;

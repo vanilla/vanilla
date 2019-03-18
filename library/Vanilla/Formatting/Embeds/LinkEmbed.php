@@ -6,13 +6,17 @@
 
 namespace Vanilla\Formatting\Embeds;
 
+use Garden\TwigTrait;
 use Gdn_Format;
 use Vanilla\PageScraper;
+use Vanilla\Web\TwigRenderTrait;
 
 /**
  * Generic link embed.
  */
 class LinkEmbed extends Embed {
+
+    use TwigRenderTrait;
 
     /** @var PageScraper */
     private $pageScraper;
@@ -58,6 +62,7 @@ class LinkEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
+
         $url = $data['url'] ?? null;
         $name = $data['name'] ?? null;
         $body = $data['body'] ?? null;
@@ -83,26 +88,16 @@ class LinkEmbed extends Embed {
         $nameEncoded = htmlspecialchars($name);
         $bodyEncoded = htmlspecialchars($body);
 
-        $result = <<<HTML
-<div class="embedExternal embedText embedLink">
-    <div class="embedExternal-content embedText-content embedLink-content">
-        <a class="embedLink-link" href="{$urlEncoded}" rel="noopener noreferrer">
-            <article class="embedText-body">
-                {$image}
-                <div class="embedText-main">
-                    <div class="embedText-header">
-                        <h3 class="embedText-title">{$nameEncoded}</h3>
-                        {$timestampAsMeta}
-                        {$urlAsMeta}
-                    </div>
-                    <div class="embedLink-excerpt">{$bodyEncoded}</div>
-                </div>
-            </article>
-        </a>
-    </div>
-</div>
-HTML;
+        $renderData['urlEncoded'] = $url;
+        $renderData['urlAsMeta'] = $urlAsMeta;
+        $renderData['bodyEncoded'] = $bodyEncoded;
+        $renderData['nameEncoded'] = $nameEncoded;
+        $renderData['photoUrl'] = $photoUrl;
+        $renderData['timestampAsMeta'] = $timestampAsMeta;
+        $renderData['image'] = $image;
 
-        return $result;
+        $this->renderTwig('library/Vanilla/Formatting/Embeds/linkEmbed.twig', $renderData);
+
+
     }
 }

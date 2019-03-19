@@ -27,15 +27,17 @@ interface IListItem {
     isChecked?: boolean;
 }
 
+type ListValue = IListItem | string;
+
 export class ListItem extends Block {
     public static blotName = "list-item";
     public static tagName = ListTag.LI;
 
-    static formats(domNode) {
+    public static formats(domNode) {
         return domNode.tagName === this.tagName ? undefined : super.formats(domNode);
     }
 
-    public constructor(domNode: HTMLElement, value: IListItem) {
+    public constructor(domNode: HTMLElement, value: ListValue) {
         super(domNode);
 
         console.log("List item with", value);
@@ -119,6 +121,15 @@ export class ListGroup extends Container {
         return undefined;
     }
 
+    private value: ListValue;
+
+    public constructor(node, value) {
+        super(node);
+        this.value = value;
+
+        console.log("List group with", value);
+    }
+
     public formats() {
         // We don't inherit from FormatBlot
         return { [this.statics.blotName]: this.statics.formats(this.domNode) };
@@ -126,7 +137,7 @@ export class ListGroup extends Container {
 
     public format(name, value) {
         if (this.children.length > 0) {
-            this.children.tail.format(name, value);
+            ((this.children.tail as any) as ListItem).format(name, value);
         }
     }
 
@@ -158,7 +169,7 @@ export class ListGroup extends Container {
 
     public replace(target) {
         if (target.statics.blotName !== this.statics.blotName) {
-            const item = Parchment.create(this.statics.defaultChild);
+            const item = Parchment.create(this.statics.defaultChild, this.value);
             target.moveChildren(item);
             this.appendChild(item);
         }

@@ -15,7 +15,7 @@
                         {% else %}
 
                         {% endif -%}
-                        <span class="embedLink-source metaStyle">{{ sanitizeUrl(url) }}</span>
+                        <span class="embedLink-source metaStyle">{{ sanitizeUrl(url ?? '') }}</span>
                     </div>
                     <div class="embedLink-excerpt">{{ body }}</div>
                 </div>

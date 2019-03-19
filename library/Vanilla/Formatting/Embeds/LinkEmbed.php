@@ -63,13 +63,6 @@ class LinkEmbed extends Embed {
      */
     public function renderData(array $data): string {
 
-        $data['url'] = $data['url'] ?? null;
-        $data['name'] = $data['name'] ?? null;
-        $data['body'] = $data['body'] ?? null;
-        $data['photoUrl'] = $data['photoUrl'] ?? null;
-        $data['timestamp'] = $data['timestamp'] ?? null;
-        $data['humanTime'] = $data['humanTime'] ?? null;
-
         return $this->renderTwig('library/Vanilla/Formatting/Embeds/LinkEmbed.twig', $data);
 
     }

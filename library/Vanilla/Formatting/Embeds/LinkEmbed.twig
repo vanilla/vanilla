@@ -10,10 +10,12 @@
                 <div class="embedText-main">
                     <div class="embedText-header">
                         <h3 class="embedText-title">{{ name }}</h3>
-                        {% if timestamp is not null -%}<time class="embedLink-dateTime metaStyle" dateTime="{{ timestamp }}">{{ humanTime }}</time>
+                        {% if timestamp is not null -%}
+                            <time class="embedLink-dateTime metaStyle" dateTime="{{ timestamp }}">{{ humanTime }}</time>
                         {% else %}
 
-                        {% endif -%}<span class="embedLink-source metaStyle">{{ sanitizeUrl(url) }}</span>
+                        {% endif -%}
+                        <span class="embedLink-source metaStyle">{{ sanitizeUrl(url) }}</span>
                     </div>
                     <div class="embedLink-excerpt">{{ body }}</div>
                 </div>

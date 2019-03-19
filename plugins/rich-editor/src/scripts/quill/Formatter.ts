@@ -101,6 +101,20 @@ export default class Formatter {
     };
 
     /**
+     * Apply the h4 line format to all lines in the range.
+     */
+    public h4 = (range: RangeStatic) => {
+        this.quill.formatLine(range.index, range.length, HeadingBlot.blotName, 4, Quill.sources.USER);
+    };
+
+    /**
+     * Apply the h5 line format to all lines in the range.
+     */
+    public h5 = (range: RangeStatic) => {
+        this.quill.formatLine(range.index, range.length, HeadingBlot.blotName, 5, Quill.sources.USER);
+    };
+
+    /**
      * Apply codeBlock line format to all lines in the range. This will strip all other formats.
      * Additionally it will convert inline embeds into text.
      */

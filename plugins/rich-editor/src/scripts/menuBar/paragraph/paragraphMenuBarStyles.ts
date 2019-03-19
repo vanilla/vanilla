@@ -55,5 +55,47 @@ export const paragraphMenuBarClasses = useThemeCache((legacyMode: boolean = fals
         },
     });
 
-    return { toggle, position };
+    const menuBar = style("menuBar", {
+        display: "flex",
+    });
+
+    const separator = style("separator", {});
+
+    return { toggle, position, menuBar, separator };
+});
+
+export const paragraphMenuCheckRadioClasses = useThemeCache((legacyMode: boolean = false) => {
+    const globalVars = globalVariables();
+    const vars = richEditorVariables();
+    const formVars = formElementsVariables();
+    const style = styleFactory("paragraphMenuRadioButtons");
+
+    const group = style("group", {});
+    const checkRadio = style("checkRadio", {});
+    const check = style("check", {});
+    const radio = style("radio", {});
+    const checked = style("checked", {});
+    const separator = style("checked", {});
+
+    return { group, checkRadio, check, radio, checked };
+});
+
+export const paragraphMenuTabsClasses = useThemeCache((legacyMode: boolean = false) => {
+    const globalVars = globalVariables();
+    const vars = richEditorVariables();
+    const formVars = formElementsVariables();
+    const style = styleFactory("paragraphMenuTabContent");
+    const root = style({});
+    const content = style("content", {});
+    return { root, content };
+});
+
+export const paragraphMenuGroupClasses = useThemeCache((legacyMode: boolean = false) => {
+    const globalVars = globalVariables();
+    const vars = richEditorVariables();
+    const formVars = formElementsVariables();
+    const style = styleFactory("paragraphMenuTabContent");
+    const root = style({});
+
+    return { root };
 });

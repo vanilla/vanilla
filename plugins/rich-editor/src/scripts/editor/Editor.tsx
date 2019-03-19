@@ -23,7 +23,7 @@ import { getIDForQuill, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import { actions } from "@rich-editor/state/instance/instanceActions";
 import InlineToolbar from "@rich-editor/toolbars/InlineToolbar";
 import MentionToolbar from "@rich-editor/toolbars/MentionToolbar";
-import ParagraphToolbar from "@rich-editor/menuBar/paragraph/ParagraphMenuBarToggle";
+import ParagraphToolbar from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
 import classNames from "classnames";
 import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";

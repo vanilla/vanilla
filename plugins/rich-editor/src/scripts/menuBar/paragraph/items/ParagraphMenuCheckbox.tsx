@@ -19,9 +19,9 @@ interface IProps {
 interface IState {}
 
 /**
- * Implemented ParagraphMenuDropDown component, this is for mobile
+ * Implemented ParagraphMenuCheckbox component, which behaves like checkboxes
  */
-export default class ParagraphMenuMultiItems extends React.Component<IProps, IState> {
+export default class ParagraphMenuCheckbox extends React.Component<IProps, IState> {
     public render() {
         return null;
     }

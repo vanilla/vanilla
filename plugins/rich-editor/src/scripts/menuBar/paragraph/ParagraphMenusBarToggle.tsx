@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { JSXElementConstructor } from "react";
 import Quill from "quill/core";
 import { t } from "@library/utility/appUtils";
 import { forceSelectionUpdate, isEmbedSelected } from "@rich-editor/quill/utility";
@@ -16,11 +16,23 @@ import MenuItems from "@rich-editor/toolbars/pieces/MenuItems";
 import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
-import ParagraphMenuBar from "@rich-editor/menuBar/paragraph/ParagraphMenuBar";
-import {
-    paragraphMenuBarClasses,
-    paragraphToolbarContainerClasses,
-} from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
+import { paragraphMenuBarClasses } from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
+import ParagraphMenuBarDropDown from "./tabs/ParagraphMenuBarTab";
+import ParagraphMenuCheckRadio from "@rich-editor/menuBar/paragraph/pieces/ParagraphMenuCheckRadio";
+
+export enum IMenuBarItemTypes {
+    CHECK = "checkbox",
+    RADIO = "radiobutton",
+    SEPARATOR = "separator",
+}
+
+export interface IMenuBarItem {
+    type: IMenuBarItemTypes.CHECK | IMenuBarItemTypes.RADIO;
+    checked: boolean;
+    icon: JSX.Element;
+    label: string;
+    formatFunction: () => void;
+}
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -31,9 +43,13 @@ interface IProps extends IWithEditorProps {
 interface IState {
     hasFocus: boolean;
     rovingTabIndex: number; // https://www.w3.org/TR/wai-aria-practices-1.1/#kbd_roving_tabindex
+    // itemCount: number;
+    // tabIcons: JSX.Element[];
+    // activeMenu: number | null;
 }
 
-export class ParagraphMenuBarToggle extends React.PureComponent<IProps, IState> {
+// Implements the paragraph menubar
+export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState> {
     private quill: Quill;
     private ID: string;
     private componentID: string;
@@ -51,13 +67,14 @@ export class ParagraphMenuBarToggle extends React.PureComponent<IProps, IState> 
         // Quill can directly on the class as it won't ever change in a single instance.
         this.quill = props.quill;
         this.formatter = new Formatter(this.quill);
-        this.ID = this.props.editorID + "paragraphMenu";
+        this.ID = this.props.editorID + "-formattingMenus";
         this.componentID = this.ID + "-component";
         this.menuID = this.ID + "-menu";
         this.buttonID = this.ID + "-button";
         this.state = {
             hasFocus: true, // do not commit
             rovingTabIndex: 0,
+            // activeMenu: null,
         };
     }
 
@@ -80,6 +97,9 @@ export class ParagraphMenuBarToggle extends React.PureComponent<IProps, IState> 
         this.focusWatcher.stop();
     }
 
+    /**
+     * @inheritDoc
+     */
     public render() {
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const classesParagraphMenuBarToggle = paragraphMenuBarClasses(this.props.legacyMode);
@@ -100,7 +120,7 @@ export class ParagraphMenuBarToggle extends React.PureComponent<IProps, IState> 
                 id={this.componentID}
                 style={this.pilcrowStyles}
                 className={classNames({ isMenuInset: !this.props.legacyMode }, classesParagraphMenuBarToggle.toggle)}
-                onKeyDown={this.handleKeyDown}
+                onKeyDown={this.handleMenuBarKeyDown}
                 ref={this.selfRef}
             >
                 <button
@@ -114,18 +134,37 @@ export class ParagraphMenuBarToggle extends React.PureComponent<IProps, IState> 
                     className={pilcrowClasses}
                     aria-haspopup="menu"
                     onClick={this.pilcrowClickHandler}
-                    onKeyDown={this.handlePilcrowKeyDown}
+                    onKeyDown={this.handleEscape}
                 >
                     <ActiveFormatIcon activeFormats={this.props.activeFormats} />
                 </button>
-                <div id={this.menuID} className={this.dropDownClasses} style={this.toolbarStyles} role="menu">
-                    <ParagraphMenuBar
-                        menuRef={this.menuRef}
-                        formatter={this.formatter}
-                        afterClickHandler={this.close}
-                        activeFormats={this.props.activeFormats}
-                        lastGoodSelection={this.props.lastGoodSelection}
-                    />
+                <div
+                    id={this.menuID}
+                    className={classNames(this.dropDownClasses, classesParagraphMenuBarToggle.menuBar)}
+                    style={this.toolbarStyles}
+                    role="menu"
+                >
+                    <>
+                        {/*{this.formattingTabs.map((item, index) => {*/}
+                        {/*const currentActiveMenu = this.state.activeMenu;*/}
+                        {/*const isOpen = currentActiveMenu === index;*/}
+                        {/*const toggleMenu = () => {*/}
+                        {/*this.setState({*/}
+                        {/*activeMenu: isOpen ? null : index,*/}
+                        {/*});*/}
+                        {/*};*/}
+                        {/*return (*/}
+                        {/*); })}*/}
+                        {/*<ParagraphMenuBar*/}
+                        {/*menuRef={this.menuRef}*/}
+                        {/*formatter={this.formatter}*/}
+                        {/*afterClickHandler={this.close}*/}
+                        {/*activeFormats={this.props.activeFormats}*/}
+                        {/*lastGoodSelection={this.props.lastGoodSelection}*/}
+                        {/*index={this.setItemIndex}*/}
+                        {/*rovingIndex={this.state.rovingTabIndex}*/}
+                        {/*/>*/}
+                    </>
                 </div>
             </div>
         );
@@ -135,11 +174,17 @@ export class ParagraphMenuBarToggle extends React.PureComponent<IProps, IState> 
      * Determine whether or not we should show pilcrow at all.
      */
     private get isPilcrowVisible() {
-        const { currentSelection } = this.props;
-        if (!currentSelection) {
-            return false;
-        }
-        return true;
+        return this.props.currentSelection;
+    }
+
+    /**
+     * For the "roving tab index" (https://www.w3.org/TR/wai-aria-practices-1.1/#kbd_roving_tabindex), we need to know the count. It'll be initialized when by the ParagraphMenuBar
+     * @param count
+     */
+    private setRovingIndex(index: number) {
+        this.setState({
+            rovingTabIndex: index,
+        });
     }
 
     /**
@@ -170,8 +215,9 @@ export class ParagraphMenuBarToggle extends React.PureComponent<IProps, IState> 
 
     private get verticalOffset(): number {
         const calculatedOffset =
-            parseInt(window.getComputedStyle(this.quill.root).paddingTop!, 10) || ParagraphMenuBarToggle.DEFAULT_OFFSET;
-        const extraOffset = this.props.legacyMode ? ParagraphMenuBarToggle.LEGACY_EXTRA_OFFSET : 0;
+            parseInt(window.getComputedStyle(this.quill.root).paddingTop!, 10) ||
+            ParagraphMenusBarToggle.DEFAULT_OFFSET;
+        const extraOffset = this.props.legacyMode ? ParagraphMenusBarToggle.LEGACY_EXTRA_OFFSET : 0;
         return calculatedOffset + extraOffset;
     }
 
@@ -243,8 +289,8 @@ export class ParagraphMenuBarToggle extends React.PureComponent<IProps, IState> 
      * but the selection is set to a 0 length selection at the end of the current selection before the
      * focus is moved.
      */
-    private handleKeyDown = (event: React.KeyboardEvent) => {
-        if (event.keyCode === 27 && this.state.hasFocus) {
+    private handleEscape = (event: React.KeyboardEvent) => {
+        if (event.key === "Escape" && this.state.hasFocus) {
             event.preventDefault();
             this.close();
         }
@@ -255,7 +301,7 @@ export class ParagraphMenuBarToggle extends React.PureComponent<IProps, IState> 
      *
      * @see https://www.w3.org/TR/wai-aria-practices-1.1/examples/menubar/menubar-2/menubar-2.html
      */
-    private handlePilcrowKeyDown = (event: React.KeyboardEvent<any>) => {
+    private handleMenuBarKeyDown = (event: React.KeyboardEvent<any>) => {
         switch (event.key) {
             // Opens submenu and moves focus to first item in the submenu.
             case "Space":
@@ -263,6 +309,11 @@ export class ParagraphMenuBarToggle extends React.PureComponent<IProps, IState> 
                 break;
             // If a submenu is open, closes it. Otherwise, does nothing.
             case "Escape":
+                event.preventDefault();
+                if (this.state.hasFocus) {
+                    event.preventDefault();
+                    this.close();
+                }
                 break;
             // Moves focus to first item in the menubar.
             case "Home":
@@ -300,4 +351,4 @@ export class ParagraphMenuBarToggle extends React.PureComponent<IProps, IState> 
     };
 }
 
-export default withEditor<IProps>(ParagraphMenuBarToggle);
+export default withEditor<IProps>(ParagraphMenusBarToggle);

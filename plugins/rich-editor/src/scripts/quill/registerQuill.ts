@@ -42,7 +42,13 @@ import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import SyntaxModule from "@rich-editor/quill/SyntaxModule";
 import { ListGroup, ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
 
+let wasRegistered = false;
+
 export default function registerQuill() {
+    if (wasRegistered) {
+        return;
+    }
+    wasRegistered = true;
     Quill.register(
         {
             // Block formats

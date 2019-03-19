@@ -6,16 +6,17 @@
 import Parchment from "parchment";
 import Block from "quill/blots/block";
 import Container from "quill/blots/container";
+import { List } from "react-virtualized";
 
 /* tslint:disable:max-classes-per-file */
 
-enum ListTag {
+export enum ListTag {
     OL = "OL",
     UL = "UL",
     LI = "LI",
 }
 
-enum ListType {
+export enum ListType {
     NUMBERED = "numbered",
     BULLETED = "bulleted",
     CHECKBOX = "checkbox",
@@ -27,7 +28,9 @@ interface IListItem {
     isChecked?: boolean;
 }
 
-type ListValue = IListItem | string;
+type ListStringValue = "ordered" | "bullet";
+
+export type ListValue = IListItem | ListStringValue;
 
 export class ListItem extends Block {
     public static blotName = "list-item";
@@ -39,8 +42,6 @@ export class ListItem extends Block {
 
     public constructor(domNode: HTMLElement, value: ListValue) {
         super(domNode);
-
-        console.log("List item with", value);
         // domNode.setAttribute("data-type", value.type);
         // domNode.setAttribute("data-index", value.type);
         // domNode.setAttribute("isChecked", value.type);
@@ -107,18 +108,30 @@ export class ListGroup extends Container {
         return node;
     }
 
-    public static formats(domNode) {
-        if (domNode.tagName === "OL") {
-            return "ordered";
+    /**
+     * Get the active format value for the blot.
+     *
+     * @param domNode
+     */
+    public static formats(domNode: HTMLElement): IListItem | undefined {
+        if (domNode.tagName === ListTag.OL) {
+            return {
+                type: ListType.NUMBERED,
+            };
         }
         if (domNode.tagName === "UL") {
-            if (domNode.hasAttribute("data-checked")) {
-                return domNode.getAttribute("data-checked") === "true" ? "checked" : "unchecked";
+            const isChecked = domNode.getAttribute("data-isChecked");
+            if (isChecked !== null) {
+                return {
+                    type: ListType.CHECKBOX,
+                    isChecked: isChecked === "true" ? true : false,
+                };
             } else {
-                return "bullet";
+                return {
+                    type: ListType.BULLETED,
+                };
             }
         }
-        return undefined;
     }
 
     private value: ListValue;
@@ -126,8 +139,6 @@ export class ListGroup extends Container {
     public constructor(node, value) {
         super(node);
         this.value = value;
-
-        console.log("List group with", value);
     }
 
     public formats() {

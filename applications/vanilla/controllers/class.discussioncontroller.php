@@ -154,8 +154,12 @@ class DiscussionController extends VanillaController {
         $this->setData('_LatestItem', $LatestItem);
 
         // Set the canonical url to have the proper page title.
-        $this->canonicalUrl(discussionUrl($this->Discussion, pageNumber($this->Offset, $Limit, 0, false)));
-
+        $canonicalUrl = ($this->Discussion->Attributes['CanonicalUrl'] ?? '');
+        if (empty($canonicalUrl)) {
+            $this->canonicalUrl(discussionUrl($this->Discussion, pageNumber($this->Offset, $Limit, 0, false)));
+        } else {
+            $this->canonicalUrl($canonicalUrl);
+        }
         $this->checkPageRange($this->Offset, $ActualResponses);
 
         // Load the comments
@@ -885,7 +889,12 @@ body { background: transparent !important; }
             }
 
             // Set the canonical url to have the proper page title.
-            $this->canonicalUrl(discussionUrl($discussion, pageNumber($this->Offset, $limit)));
+            $canonicalUrl = ($discussion->Attributes['CanonicalUrl'] ?? '');
+            if (empty($canonicalUrl)) {
+                $this->canonicalUrl(discussionUrl($discussion, pageNumber($this->Offset, $limit)));
+            } else {
+                $this->canonicalUrl($canonicalUrl);
+            }
 
             // Load the comments.
             $currentOrderBy = $this->CommentModel->orderBy();

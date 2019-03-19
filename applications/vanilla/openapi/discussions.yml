@@ -797,6 +797,57 @@ paths:
       tags:
       - Discussions
       summary: Remove a user's reaction.
+  '/discussions/{id}/canonical':
+    put:
+      parameters:
+      - description: The discussion ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Discussion'
+          description: Success
+        '404':
+          description: Not Found
+        '400':
+          description: Bad Request
+      tags:
+      - Discussions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                canonicalUrl:
+                  description: Canonical url for discussion.
+                  type: string
+              required:
+              - canonicalUrl
+              type: object
+        required: true
+      summary: Set custom canonical url for a discussion.
+    delete:
+      parameters:
+      - description: The discussion ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+        '404':
+          description: Not Found
+      tags:
+      - Discussions
+      summary: Remove custom canonical url for a discussion.
 components:
   schemas:
     CategoryFragment:

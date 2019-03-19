@@ -58,6 +58,7 @@ class LinkEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
+
         $data['url'] = $data['url'] ?? null;
         $data['name'] = $data['name'] ?? null;
         $data['body'] = $data['body'] ?? null;

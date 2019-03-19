@@ -674,7 +674,7 @@ class DiscussionsApiController extends AbstractApiController {
      * @param int $id The ID of the discussion.
      * @param array $body The request body.
      *       Ex: ["canonicalUrl" => "https://mydomain.com/some+path/"]
-     * @throws NotFoundException if unable to find the discussion.
+     * @throws NotFoundException If unable to find the discussion.
      * @return array
      */
     public function put_canonical($id, array $body) {
@@ -708,7 +708,7 @@ class DiscussionsApiController extends AbstractApiController {
      * Remove canonical url for a discussion.
      *
      * @param int $id The ID of the discussion.
-     * @throws NotFoundException if unable to find the discussion.
+     * @throws NotFoundException If unable to find the discussion.
      * @return array
      */
     public function delete_canonical($id) {
@@ -726,7 +726,7 @@ class DiscussionsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $categoryID);
         }
         $attributes = $row['Attributes'];
-        if(!empty($attributes['CanonicalUrl'] ?? '')) {
+        if (!empty($attributes['CanonicalUrl'] ?? '')) {
             unset($attributes['CanonicalUrl']);
             $this->discussionModel->setProperty($id, 'Attributes', dbencode($attributes));
         }

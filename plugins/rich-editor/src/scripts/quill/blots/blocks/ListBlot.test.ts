@@ -5,8 +5,17 @@
 
 import Parchment from "parchment";
 import Quill, { Blot } from "quill/core";
+import Delta from "quill-delta";
 import registerQuill from "@rich-editor/quill/registerQuill";
-import { ListGroup, ListValue, ListTag, ListType, ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
+import {
+    OrderedListGroup,
+    UnorderedListGroup,
+    ListValue,
+    ListTag,
+    ListType,
+    ListItem,
+    ListGroup,
+} from "@rich-editor/quill/blots/blocks/ListBlot";
 import { expect } from "chai";
 
 describe.only("ListBlot", () => {
@@ -24,18 +33,18 @@ describe.only("ListBlot", () => {
         quillNode = quill.scroll.domNode as HTMLDivElement;
     };
 
-    const insertListBlot = (listValue: ListValue, text: string = "list item", index: number = 0): ListGroup => {
-        let start = quill.scroll.length() - 1;
-        if (start > 0) {
-            quill.insertText(start, "\n", Quill.sources.USER);
-            quill.update();
-            start += 1;
+    const insertListBlot = (listValue: ListValue, text: string = "list item"): ListItem => {
+        let delta = new Delta();
+        if (quill.scroll.length() === 1) {
+            delta = delta.delete(1);
+        } else {
+            delta = delta.retain(quill.scroll.length());
         }
-        quill.insertText(start, text, Quill.sources.USER);
-        const length = text.length;
-        quill.formatLine(start, length, { [ListGroup.blotName]: listValue }, Quill.sources.API);
-        quill.update();
-        return quill.getLine(index)[0];
+
+        delta = delta.insert(text + "\n", { list: listValue });
+        quill.updateContents(delta, Quill.sources.USER);
+        const lastUL = quill.scroll.children.tail as UnorderedListGroup;
+        return lastUL.children.tail as any;
     };
 
     beforeEach(() => {
@@ -121,7 +130,7 @@ describe.only("ListBlot", () => {
                 insert: "\n",
             },
         ]);
-        quill.formatLine(0, 1, ListGroup.blotName, {
+        quill.formatLine(0, 1, ListItem.blotName, {
             type: ListType.NUMBERED,
             depth: 1,
         });
@@ -142,8 +151,9 @@ describe.only("ListBlot", () => {
         const testAutoJoining = (depth: number, type: ListType.BULLETED) => {
             insertListBlot({ type, depth });
             insertListBlot({ type, depth });
-            const lastItem = insertListBlot({ type, depth });
-            const listGroup = lastItem.parent;
+            insertListBlot({ type, depth });
+            const listGroup = quill.scroll.children.tail as ListGroup;
+            expect(quill.scroll.children.tail).eq(quill.scroll.children.head);
             expect(listGroup).instanceOf(ListGroup);
             expect(listGroup.children).has.length(3);
             resetQuill();
@@ -172,65 +182,11 @@ describe.only("ListBlot", () => {
         });
 
         it.only("different levels", () => {
-            // insertListBlot({ type: ListType.BULLETED, depth: 0 });
-            // insertListBlot({ type: ListType.BULLETED, depth: 0 });
-            // insertListBlot({ type: ListType.BULLETED, depth: 1 });
-            // insertListBlot({ type: ListType.BULLETED, depth: 1 });
-            // insertListBlot({ type: ListType.BULLETED, depth: 0 });
-
-            const expected = [
-                { insert: "list item" },
-                {
-                    attributes: {
-                        list: {
-                            type: ListType.BULLETED,
-                            depth: 0,
-                        },
-                    },
-                    insert: "\n",
-                },
-                { insert: "list item" },
-                {
-                    attributes: {
-                        list: {
-                            type: ListType.BULLETED,
-                            depth: 0,
-                        },
-                    },
-                    insert: "\n",
-                },
-                { insert: "list item" },
-                {
-                    attributes: {
-                        list: {
-                            type: ListType.BULLETED,
-                            depth: 1,
-                        },
-                    },
-                    insert: "\n",
-                },
-                { insert: "list item" },
-                {
-                    attributes: {
-                        list: {
-                            type: ListType.BULLETED,
-                            depth: 1,
-                        },
-                    },
-                    insert: "\n",
-                },
-                { insert: "list item" },
-                {
-                    attributes: {
-                        list: {
-                            type: ListType.BULLETED,
-                            depth: 0,
-                        },
-                    },
-                    insert: "\n",
-                },
-            ];
-            quill.setContents(expected);
+            insertListBlot({ type: ListType.BULLETED, depth: 0 });
+            insertListBlot({ type: ListType.BULLETED, depth: 0 });
+            insertListBlot({ type: ListType.BULLETED, depth: 1 });
+            insertListBlot({ type: ListType.BULLETED, depth: 1 });
+            insertListBlot({ type: ListType.BULLETED, depth: 0 });
 
             // The inner items should be
             // UL > LI

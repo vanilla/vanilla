@@ -40,7 +40,7 @@ import ClipboardModule from "@rich-editor/quill/ClipboardModule";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import SyntaxModule from "@rich-editor/quill/SyntaxModule";
-import { ListGroup, ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
+import { OrderedListGroup, UnorderedListGroup, ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
 
 let wasRegistered = false;
 
@@ -60,7 +60,8 @@ export default function registerQuill() {
             "formats/spoiler/wrapper": SpoilerWrapperBlot,
             "formats/codeBlock": CodeBlockBlot,
             "formats/header": HeaderBlot,
-            "formats/list": ListGroup,
+            "formats/list/unordedGroup": UnorderedListGroup,
+            "formats/list/orderedGroup": OrderedListGroup,
             "formats/list/item": ListItem,
             "formats/embed-error": EmbedErrorBlot,
             "formats/embed-loading": LoadingBlot,

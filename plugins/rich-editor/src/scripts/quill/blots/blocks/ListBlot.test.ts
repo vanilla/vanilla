@@ -6,7 +6,7 @@
 import Parchment from "parchment";
 import Quill, { Blot } from "quill/core";
 import registerQuill from "@rich-editor/quill/registerQuill";
-import { ListGroup, ListValue, ListTag, ListType } from "@rich-editor/quill/blots/blocks/ListBlot";
+import { ListGroup, ListValue, ListTag, ListType, ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
 import { expect } from "chai";
 
 describe.only("ListBlot", () => {
@@ -33,7 +33,7 @@ describe.only("ListBlot", () => {
         }
         quill.insertText(start, text, Quill.sources.USER);
         const length = text.length;
-        quill.formatLine(start, length, ListGroup.blotName, listValue, Quill.sources.API);
+        quill.formatLine(start, length, { [ListGroup.blotName]: listValue }, Quill.sources.API);
         quill.update();
         return quill.getLine(index)[0];
     };
@@ -55,6 +55,7 @@ describe.only("ListBlot", () => {
         resetQuill();
         testCreateUl({
             type: ListType.BULLETED,
+            depth: 0,
         });
     });
 
@@ -72,6 +73,7 @@ describe.only("ListBlot", () => {
         resetQuill();
         testCreateOl({
             type: ListType.NUMBERED,
+            depth: 0,
         });
     });
 
@@ -85,6 +87,7 @@ describe.only("ListBlot", () => {
                 attributes: {
                     list: {
                         type: ListType.NUMBERED,
+                        depth: 0,
                     },
                 },
                 insert: "\n",
@@ -94,6 +97,7 @@ describe.only("ListBlot", () => {
                 attributes: {
                     list: {
                         type: ListType.BULLETED,
+                        depth: 0,
                     },
                 },
                 insert: "\n",
@@ -103,11 +107,144 @@ describe.only("ListBlot", () => {
         expect(quill.getContents().ops).deep.equals(expected);
     });
 
-    it("can be updated with a new list type");
-    it("can be updated with a new depth value");
-    it("can be updated from the old simple value to the new value type");
-    it("can have its list formatting removed");
-    it("nested list blots are joined together");
+    it("can be update the depth through quill's formatLine API", () => {
+        insertListBlot({ type: ListType.NUMBERED, depth: 0 });
+        expect(quill.getContents().ops).deep.equals([
+            { insert: "list item" },
+            {
+                attributes: {
+                    list: {
+                        type: ListType.NUMBERED,
+                        depth: 0,
+                    },
+                },
+                insert: "\n",
+            },
+        ]);
+        quill.formatLine(0, 1, ListGroup.blotName, {
+            type: ListType.NUMBERED,
+            depth: 1,
+        });
+        expect(quill.getContents().ops).deep.equals([
+            { insert: "list item" },
+            {
+                attributes: {
+                    list: {
+                        type: ListType.NUMBERED,
+                        depth: 1,
+                    },
+                },
+                insert: "\n",
+            },
+        ]);
+    });
+    it("list blots of the same type & level are joined together", () => {
+        const testAutoJoining = (depth: number, type: ListType.BULLETED) => {
+            insertListBlot({ type, depth });
+            insertListBlot({ type, depth });
+            const lastItem = insertListBlot({ type, depth });
+            const listGroup = lastItem.parent;
+            expect(listGroup).instanceOf(ListGroup);
+            expect(listGroup.children).has.length(3);
+            resetQuill();
+        };
+
+        const depths = [1, 2, 3, 4];
+        const types = Object.values(ListType);
+        for (const depth of depths) {
+            for (const type of types) {
+                testAutoJoining(depth, type);
+            }
+        }
+    });
+
+    describe("list blots of different types & levels are separeted or nested properly", () => {
+        it("different types", () => {
+            insertListBlot({ type: ListType.CHECKBOX, depth: 0 });
+            insertListBlot({ type: ListType.NUMBERED, depth: 0 });
+
+            expect(quill.scroll.children).has.length(2);
+            quill.scroll.children.forEach((blot: ListGroup) => {
+                expect(blot).instanceOf(ListGroup);
+                expect(blot.children).has.length(1);
+                expect(blot.children.head).instanceOf(ListItem);
+            });
+        });
+
+        it.only("different levels", () => {
+            // insertListBlot({ type: ListType.BULLETED, depth: 0 });
+            // insertListBlot({ type: ListType.BULLETED, depth: 0 });
+            // insertListBlot({ type: ListType.BULLETED, depth: 1 });
+            // insertListBlot({ type: ListType.BULLETED, depth: 1 });
+            // insertListBlot({ type: ListType.BULLETED, depth: 0 });
+
+            const expected = [
+                { insert: "list item" },
+                {
+                    attributes: {
+                        list: {
+                            type: ListType.BULLETED,
+                            depth: 0,
+                        },
+                    },
+                    insert: "\n",
+                },
+                { insert: "list item" },
+                {
+                    attributes: {
+                        list: {
+                            type: ListType.BULLETED,
+                            depth: 0,
+                        },
+                    },
+                    insert: "\n",
+                },
+                { insert: "list item" },
+                {
+                    attributes: {
+                        list: {
+                            type: ListType.BULLETED,
+                            depth: 1,
+                        },
+                    },
+                    insert: "\n",
+                },
+                { insert: "list item" },
+                {
+                    attributes: {
+                        list: {
+                            type: ListType.BULLETED,
+                            depth: 1,
+                        },
+                    },
+                    insert: "\n",
+                },
+                { insert: "list item" },
+                {
+                    attributes: {
+                        list: {
+                            type: ListType.BULLETED,
+                            depth: 0,
+                        },
+                    },
+                    insert: "\n",
+                },
+            ];
+            quill.setContents(expected);
+
+            // The inner items should be
+            // UL > LI
+            //    > LI
+            //    > LI > UL > LI
+            //              > LI
+            //    > LI
+
+            expect(quill.scroll.children).has.length(1);
+            const outerUL = quill.scroll.children.head as ListGroup;
+
+            expect(outerUL.children).has.length(4);
+        });
+    });
     it("lists can only gain depth if there are other list items before them");
     it("properly reports if nesting is possible");
     it("different lists of increasingly nested depths are joined together");

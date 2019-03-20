@@ -6,7 +6,7 @@
 import Parchment from "parchment";
 import Block from "quill/blots/block";
 import Container from "quill/blots/container";
-import { List } from "react-virtualized";
+import { Blot } from "quill/core";
 
 /* tslint:disable:max-classes-per-file */
 
@@ -26,6 +26,7 @@ interface IListItem {
     type: ListType;
     index?: number;
     isChecked?: boolean;
+    depth: number;
 }
 
 type ListStringValue = "ordered" | "bullet";
@@ -36,15 +37,49 @@ export class ListItem extends Block {
     public static blotName = "list-item";
     public static tagName = ListTag.LI;
 
-    public static formats(domNode) {
-        return domNode.tagName === this.tagName ? undefined : super.formats(domNode);
+    public static create(value: IListItem) {
+        const element = super.create(value) as HTMLElement;
+        element.setAttribute("data-depth", value.depth);
+        element.setAttribute("data-type", value.type);
+        return element;
     }
 
-    public constructor(domNode: HTMLElement, value: ListValue) {
+    public static getValueFromElement(domNode: HTMLElement): IListItem {
+        const depthAttr = domNode.getAttribute("data-depth");
+        const typeAtrr = domNode.getAttribute("data-type");
+
+        let depth = 0;
+        if (depthAttr !== null) {
+            depth = parseInt(depthAttr, 10);
+        }
+
+        let type = ListType.BULLETED;
+        if (typeAtrr !== null) {
+            type = type;
+        }
+
+        return {
+            depth,
+            type,
+        };
+    }
+
+    public static formats(domNode: HTMLElement) {
+        // We want the List item to never match.
+        // It should always take it's format from the parent ListGroup.
+        // See bubbleFormats.
+        return undefined;
+    }
+
+    private value: IListItem;
+
+    public constructor(domNode: HTMLElement, value: IListItem) {
         super(domNode);
-        // domNode.setAttribute("data-type", value.type);
-        // domNode.setAttribute("data-index", value.type);
-        // domNode.setAttribute("isChecked", value.type);
+        this.value = this.statics.getValueFromElement(domNode);
+    }
+
+    public getValue(): IListItem {
+        return this.value;
     }
 
     public format(name, value) {
@@ -53,6 +88,10 @@ export class ListItem extends Block {
         } else {
             super.format(name, value);
         }
+    }
+
+    public clone() {
+        return super.clone();
     }
 
     public remove() {
@@ -75,17 +114,21 @@ export class ListItem extends Block {
     }
 }
 
+/**
+ * WARNING
+ * There are some simple rules to follow with this blot.
+ *
+ * 1. Don't mutate this.domNode outside of `syncDomNode`.
+ * 2. Mutate `this.value` instead.
+ */
 export class ListGroup extends Container {
     public static blotName = "list";
     public static scope = Parchment.Scope.BLOCK_BLOT;
     public static tagName = [ListTag.OL, ListTag.UL] as any;
-    public static defaultChild = "list-item";
-    public static allowedChildren = [ListItem, ListGroup];
+    public static allowedChildren = [ListItem];
 
-    public static create(value: IListItem | string) {
-        if (typeof value === "string") {
-            return ListGroup.legacyCreate(value);
-        }
+    public static create(value: ListValue) {
+        value = this.mapListValue(value);
 
         let tagName;
         switch (value.type) {
@@ -99,13 +142,36 @@ export class ListGroup extends Container {
             default:
                 throw new Error(`Error rendering ListItem. Invalid type: ${value.type}`);
         }
-        return document.createElement(tagName);
+        const element = document.createElement(tagName) as HTMLElement;
+        element.setAttribute("depth", value.depth);
+        if (value.isChecked) {
+            element.setAttribute("isChecked", value.isChecked);
+        }
+        return element;
     }
 
-    private static legacyCreate(value: string) {
-        const tagName = value === "ordered" ? ListTag.OL : ListTag.UL;
-        const node = super.create(tagName);
-        return node;
+    private static mapListValue(value: ListValue): IListItem {
+        if (typeof value === "object") {
+            return value;
+        } else {
+            switch (value) {
+                case "bullet":
+                    return {
+                        type: ListType.BULLETED,
+                        depth: 0,
+                    };
+                case "ordered":
+                    return {
+                        type: ListType.NUMBERED,
+                        depth: 0,
+                    };
+                default:
+                    return {
+                        type: ListType.BULLETED,
+                        depth: 0,
+                    };
+            }
+        }
     }
 
     /**
@@ -113,10 +179,16 @@ export class ListGroup extends Container {
      *
      * @param domNode
      */
-    public static formats(domNode: HTMLElement): IListItem | undefined {
+    private static getValueFromDomNode(domNode: HTMLElement): IListItem | undefined {
+        const depthAttr = domNode.getAttribute("depth");
+        let depth = 0;
+        if (depthAttr !== null) {
+            depth = parseInt(depthAttr, 10);
+        }
         if (domNode.tagName === ListTag.OL) {
             return {
                 type: ListType.NUMBERED,
+                depth,
             };
         }
         if (domNode.tagName === "UL") {
@@ -125,25 +197,30 @@ export class ListGroup extends Container {
                 return {
                     type: ListType.CHECKBOX,
                     isChecked: isChecked === "true" ? true : false,
+                    depth,
                 };
             } else {
                 return {
                     type: ListType.BULLETED,
+                    depth,
                 };
             }
         }
     }
 
-    private value: ListValue;
+    public static formats = ListGroup.getValueFromDomNode;
 
-    public constructor(node, value) {
-        super(node);
-        this.value = value;
+    public constructor(domNode: HTMLElement, private value: IListItem) {
+        super(domNode);
+    }
+
+    public get statics() {
+        return this.constructor as typeof ListGroup;
     }
 
     public formats() {
         // We don't inherit from FormatBlot
-        return { [this.statics.blotName]: this.statics.formats(this.domNode) };
+        return { [this.statics.blotName]: this.statics.getValueFromDomNode(this.domNode) };
     }
 
     public format(name, value) {
@@ -166,24 +243,64 @@ export class ListGroup extends Container {
         super.optimize(context);
         const next = this.next;
         if (
-            next instanceof Container &&
+            next instanceof ListGroup &&
             next.prev === this &&
             next.statics.blotName === this.statics.blotName &&
             next.domNode instanceof HTMLElement &&
-            next.domNode.tagName === this.domNode.tagName &&
-            next.domNode.getAttribute("data-checked") === this.domNode.getAttribute("data-checked")
+            next.domNode.tagName === this.domNode.tagName
         ) {
+            // Join similar groupings together.
             next.moveChildren(this);
             next.remove();
+
+            const value = this.statics.getValueFromDomNode(this.domNode);
+            if (!value) {
+                return;
+            }
+
+            console.log("optimize list children");
+            // Take children of depths that need to be nested and place them further inside.
+            this.children.forEach((listItem: Blot) => {
+                if (listItem instanceof ListItem) {
+                    const prevItem = (listItem.prev as any) as ListItem | null;
+                    // Wrap the blot and insert it deeper.
+                    const itemValue = listItem.getValue();
+                    if (!itemValue) {
+                        return;
+                    }
+
+                    // Bail out for item values that less than or the same as us.
+                    if (itemValue.depth <= value.depth) {
+                        return;
+                    }
+
+                    let cleanupRequired = false;
+                    let targetListGroup: ListGroup;
+                    if (prevItem && prevItem.children.length === 1 && prevItem.children.head instanceof ListGroup) {
+                        targetListGroup = prevItem.children.head;
+                    } else {
+                        cleanupRequired = true;
+                        const newWrapperListItem = Parchment.create(ListItem.blotName, value) as Container;
+                        targetListGroup = Parchment.create(this.statics.blotName, itemValue) as ListGroup;
+                        this.insertBefore(newWrapperListItem, listItem);
+                        newWrapperListItem.appendChild(targetListGroup);
+                    }
+
+                    const newListItem = Parchment.create(ListItem.blotName, itemValue) as Container;
+                    targetListGroup.appendChild(newListItem);
+                    listItem.moveChildren(newListItem);
+                    listItem.remove();
+                }
+            });
         }
     }
 
     public replace(target) {
-        if (target.statics.blotName !== this.statics.blotName) {
-            const item = Parchment.create(this.statics.defaultChild, this.value);
-            target.moveChildren(item);
-            this.appendChild(item);
-        }
+        const item = Parchment.create(ListItem.blotName, this.statics.getValueFromDomNode(this.domNode));
+        this.appendChild(item);
+        target.moveChildren(item);
         super.replace(target);
     }
 }
+
+ListItem.allowedChildren = [...Block.allowedChildren, ListGroup];

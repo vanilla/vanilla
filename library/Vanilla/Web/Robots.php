@@ -5,7 +5,7 @@
  * @license GPLv2.0-only
  */
 
-namespace Vanilla\Sitemap;
+namespace Vanilla\Web;
 
 /**
  * A data collector for robots.txt data.

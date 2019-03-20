@@ -7,7 +7,6 @@
 
 namespace Vanilla\Sitemap;
 
-
 /**
  * A data collector for robots.txt data.
  */
@@ -41,6 +40,7 @@ class Robots implements \JsonSerializable {
 
     /**
      * Specify data which should be serialized to JSON
+     *
      * @link https://php.net/manual/en/jsonserializable.jsonserialize.php
      * @return mixed data which can be serialized by <b>json_encode</b>,
      * which is a value of any type other than a resource.
@@ -68,4 +68,3 @@ class Robots implements \JsonSerializable {
         return $this->rules;
     }
 }
-

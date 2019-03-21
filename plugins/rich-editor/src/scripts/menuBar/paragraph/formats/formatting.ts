@@ -81,16 +81,16 @@ export const getActiveFormats = (activeFormats: IFormats) => {
             heading4: activeFormats.header === 4 || headerObjectLevel === 4,
             heading5: activeFormats.header === 5 || headerObjectLevel === 5,
         },
-        special: {
+        specialFormats: {
             blockQuote: activeFormats[BlockquoteLineBlot.blotName] === true,
             codeBlock: activeFormats[CodeBlockBlot.blotName] === true,
             spoiler: activeFormats[SpoilerLineBlot.blotName] === true,
         },
         lists: {
-            ordered: true,
+            ordered: false,
             unordered: true,
-            indent: true,
-            outdent: true,
+            indent: false,
+            outdent: false,
         },
     };
 

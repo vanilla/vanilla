@@ -269,7 +269,7 @@ export function listUnordered() {
             <title>{t("List Unordered")}</title>
             <path
                 fill="currentColor"
-                fill-rule="nonzero"
+                fillRule="nonzero"
                 d="M10.5 7a1 1 0 1 1 0-2h8a1 1 0 0 1 0 2h-8zm0 6a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2h-8zm0 6a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2h-8zM4.7 7c-.11 0-.2-.448-.2-1s.09-1 .2-1h1.6c.11 0 .2.448.2 1s-.09 1-.2 1H4.7zm0 6c-.11 0-.2-.448-.2-1s.09-1 .2-1h1.6c.11 0 .2.448.2 1s-.09 1-.2 1H4.7zm0 6c-.11 0-.2-.448-.2-1s.09-1 .2-1h1.6c.11 0 .2.448.2 1s-.09 1-.2 1H4.7z"
             />
         </svg>

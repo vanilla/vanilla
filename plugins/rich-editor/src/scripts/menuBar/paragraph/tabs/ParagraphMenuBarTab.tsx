@@ -5,7 +5,6 @@
  */
 
 import React from "react";
-import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { paragraphMenuBarClasses } from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
@@ -16,30 +15,27 @@ interface IProps {
     className?: string;
     index: number;
     parentID: string;
-    isMenuVisible: boolean;
-    toggleMenu: () => void;
+    isMenuVisible: boolean; // The whole paragraph menu, not just this one
+    toggleMenu: (callback?: () => void) => void;
     icon: JSX.Element;
     tabComponent: React.ReactNode;
-    rovingIndex: number;
-    setRovingIndex: (index: number) => void;
+    setRovingIndex: () => void;
     activeFormats: {} | boolean;
     legacyMode: boolean;
-}
-
-interface IState {
+    tabIndex: 0 | -1;
     open: boolean;
 }
 
 /**
  * Implemented generic tab component.
  */
-export default class ParagraphMenuBarTab extends React.Component<IProps, IState> {
+export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
     private ID;
     private componentID;
     private menuID;
     private buttonID;
     private selfRef;
-    private buttonRef;
+    private toggleButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
 
     constructor(props: IProps) {
         super(props);
@@ -53,31 +49,37 @@ export default class ParagraphMenuBarTab extends React.Component<IProps, IState>
     }
 
     public render() {
-        const { className, rovingIndex, index, isMenuVisible, toggleMenu, children, icon } = this.props;
+        const { className, isMenuVisible, toggleMenu, children, icon } = this.props;
         if (open) {
             const classes = paragraphMenuBarClasses();
             const classesRichEditor = richEditorClasses(this.props.legacyMode);
+            const handleClick = (event: React.MouseEvent) => {
+                this.props.toggleMenu(() => {
+                    this.props.setRovingIndex();
+                    this.toggleButtonRef.current && this.toggleButtonRef.current.focus();
+                });
+            };
             // If the roving index matches my index, or no roving index is set and we're on the first tab
-            const tabIndex = rovingIndex === index || (rovingIndex === null && index === 0) ? 0 : -1;
             return (
-                <div id={this.componentID} ref={this.selfRef} tabIndex={tabIndex} className={classNames(className)}>
+                <div id={this.componentID} ref={this.selfRef} className={classNames(className)}>
                     <button
                         type="button"
                         role="menuitem"
                         id={this.buttonID}
-                        ref={this.buttonRef}
                         aria-label={this.props.accessibleButtonLabel}
                         title={this.props.accessibleButtonLabel}
                         aria-controls={this.menuID}
                         aria-expanded={isMenuVisible}
                         aria-haspopup="menu"
-                        onClick={toggleMenu}
+                        onClick={handleClick}
                         className={classesRichEditor.button}
+                        tabIndex={this.props.tabIndex}
+                        ref={this.toggleButtonRef}
                     >
                         {icon}
                         <ScreenReaderContent>{this.props.accessibleButtonLabel}</ScreenReaderContent>
                     </button>
-                    {this.state.open && (
+                    {this.props.open && (
                         <div id={this.menuID} role="menu">
                             {children}
                         </div>

@@ -11,32 +11,42 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 
 interface IProps {
-    setRovingIndex: (index: number) => void;
     formatParagraphHandler: () => void;
     className?: string;
     isActive: boolean;
     isDisabled: boolean;
+    tabIndex: 0 | -1;
+    setRovingIndex: () => void;
+    closeAllSubMenus: () => void;
 }
 
 /**
  * Resets paragraph style to normal paragraph
  */
 export default class ParagraphMenuResetTab extends React.PureComponent<IProps> {
+    private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
+
     public render() {
         const title = t("Set style to plain paragraph");
         const classes = paragraphMenuTabsClasses();
+        const handleClick = (event: React.MouseEvent) => {
+            this.props.setRovingIndex();
+            this.props.formatParagraphHandler();
+            this.buttonRef.current && this.buttonRef.current.focus();
+        };
         return (
             <button
                 type="button"
                 disabled={this.props.isDisabled}
                 title={title}
                 aria-label={title}
-                onClick={this.props.formatParagraphHandler}
+                onClick={handleClick}
                 className={classNames(
                     this.props.className,
                     classes.tabHandle,
                     this.props.isActive ? classes.activeTabHandle : "",
                 )}
+                ref={this.buttonRef}
             >
                 {pilcrow()}
             </button>

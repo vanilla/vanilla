@@ -103,13 +103,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
     public render() {
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const classes = richEditorClasses(this.props.legacyMode);
-        let pilcrowClasses = classNames(
-            { isOpen: this.isMenuVisible },
-            "richEditor-button",
-            "richEditorParagraphMenu-handle",
-            classesRichEditor.paragraphMenuHandle,
-            classesRichEditor.button,
-        );
+        let pilcrowClasses = classNames({ isOpen: this.isMenuVisible }, classesRichEditor.paragraphMenuHandle);
 
         if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
             pilcrowClasses += " isHidden";

@@ -103,10 +103,14 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     });
 
     const paragraphMenuHandle = style("paragraphMenuHandle", {
-        width: unit(vars.paragraphMenuHandle.size),
-        maxWidth: unit(vars.paragraphMenuHandle.size),
-        minWidth: unit(vars.paragraphMenuHandle.size),
-        height: unit(vars.paragraphMenuHandle.size),
+        display: "block",
+        ...userSelect(),
+        cursor: "pointer",
+        width: unit(formVars.sizing.height),
+        height: unit(formVars.sizing.height),
+        padding: 0,
+        maxWidth: unit(formVars.sizing.height),
+        minWidth: unit(formVars.sizing.height),
     });
 
     const text = style("text", {
@@ -157,6 +161,9 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         display: "block",
         ...userSelect(),
         cursor: "pointer",
+        width: unit(vars.menuButton.size),
+        height: unit(vars.menuButton.size),
+        padding: 0,
         $nest: {
             "&.richEditor-formatButton, &.richEditor-embedButton": {
                 height: unit(vars.menuButton.size),

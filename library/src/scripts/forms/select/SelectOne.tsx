@@ -19,12 +19,14 @@ interface IProps extends IOptionalComponentID {
     disabled?: boolean;
     className?: string;
     placeholder?: string;
-    options: IComboBoxOption[];
+    options: IComboBoxOption[] | undefined;
     onChange: (data: IComboBoxOption) => void;
+    onInputChange?: (value: string) => void;
     labelNote?: string;
     noteAfterInput?: string;
     errors?: IFieldError[];
     searchable?: boolean;
+    value: IComboBoxOption | undefined;
 }
 
 /**
@@ -64,6 +66,7 @@ export default class SelectOne extends React.Component<IProps> {
                         options={options}
                         inputId={this.inputID}
                         onChange={this.props.onChange}
+                        onInputChange={this.props.onInputChange}
                         components={this.componentOverwrites}
                         isClearable={true}
                         isDisabled={disabled}
@@ -75,6 +78,7 @@ export default class SelectOne extends React.Component<IProps> {
                         aria-invalid={hasErrors}
                         aria-describedby={describedBy}
                         isSearchable={searchable}
+                        value={this.props.value}
                     />
                     <Paragraph className="inputBlock-labelNote" children={this.props.noteAfterInput} />
                     <ErrorMessages id={this.errorID} errors={this.props.errors} />

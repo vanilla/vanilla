@@ -4,21 +4,18 @@
  */
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import SelectOne from "@library/forms/select/SelectOne";
+import SelectOne, { ISelectOneProps } from "@library/forms/select/SelectOne";
 import React from "react";
 
-export interface ISelectLookupProps {
-    label: string;
+export interface ISelectLookupProps extends ISelectOneProps {
     lookup: (value: string) => {};
-    onChange: (category: IComboBoxOption) => void;
     suggestions: ILoadable<any>;
-    value: IComboBoxOption | undefined;
 }
 
 /**
  * Form component for searching/selecting a category.
  */
-export class SelectLookup<P extends ISelectLookupProps = ISelectLookupProps> extends React.Component<P> {
+export class SelectLookup extends React.Component<ISelectLookupProps> {
     public static defaultProps: Partial<ISelectLookupProps> = {
         suggestions: {
             status: LoadStatus.PENDING,
@@ -26,7 +23,7 @@ export class SelectLookup<P extends ISelectLookupProps = ISelectLookupProps> ext
     };
 
     public render() {
-        const { label, suggestions } = this.props;
+        const { suggestions } = this.props;
         let options: IComboBoxOption[] | undefined;
         if (suggestions.status === LoadStatus.SUCCESS && suggestions.data) {
             options = suggestions.data.map(suggestion => {
@@ -37,15 +34,7 @@ export class SelectLookup<P extends ISelectLookupProps = ISelectLookupProps> ext
             });
         }
 
-        return (
-            <SelectOne
-                label={label}
-                options={options}
-                onChange={this.props.onChange}
-                onInputChange={this.onInputChange}
-                value={this.props.value}
-            />
-        );
+        return <SelectOne {...this.props} options={options} onInputChange={this.onInputChange} />;
     }
 
     /**

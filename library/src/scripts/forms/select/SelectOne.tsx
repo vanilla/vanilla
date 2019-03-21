@@ -14,7 +14,7 @@ import Paragraph from "@library/layout/Paragraph";
 import { IFieldError } from "@library/@types/api/core";
 import * as selectOverrides from "@library/forms/select/overwrites";
 
-interface IProps extends IOptionalComponentID {
+export interface ISelectOneProps extends IOptionalComponentID {
     label: string;
     disabled?: boolean;
     className?: string;
@@ -32,7 +32,7 @@ interface IProps extends IOptionalComponentID {
 /**
  * Implements the search bar component
  */
-export default class SelectOne extends React.Component<IProps> {
+export default class SelectOne extends React.Component<ISelectOneProps> {
     private id: string;
     private prefix = "SelectOne";
     private inputID: string;

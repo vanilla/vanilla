@@ -40,7 +40,7 @@ class OpenGraphParser implements Parser {
                 case 'og:image':
                     // Only allow valid URLs.
                     if (filter_var($content, FILTER_VALIDATE_URL) === false) {
-                        continue;
+                        continue 2;
                     }
                     $images[] = $content;
                     break;

@@ -520,6 +520,10 @@ class ConversationModel extends ConversationsModel {
         if (!is_array($options)) {
             $options = [];
         }
+        // Remove any conversationID that might have been added to the form.
+        if (array_key_exists('ConversationID', $formPostValues)) {
+            unset($formPostValues['ConversationID']);
+        }
         $deprecated = $settings instanceof ConversationMessageModel;
         $createMessage =  $deprecated || empty($settings['ConversationOnly']);
 

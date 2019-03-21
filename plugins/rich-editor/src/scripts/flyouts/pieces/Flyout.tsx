@@ -112,7 +112,6 @@ export class Flyout extends React.Component<IProps, IState> {
                     <CloseButton
                         onClick={this.props.onCloseClick}
                         className={classNames("richEditor-close", classesRichEditor.close)}
-                        legacyMode={this.props.legacyMode}
                     />
 
                     {this.props.additionalHeaderContent && this.props.additionalHeaderContent}

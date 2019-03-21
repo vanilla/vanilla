@@ -227,9 +227,9 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
         const vars = richEditorVariables();
         const { flyoutHeight, nubHeight, verticalAlignment } = this.props;
 
-        const offset = 0;
-        let position = bounds.top - flyoutHeight - offset;
-        let nubPosition = flyoutHeight;
+        const offset = this.props.legacyMode ? 0 : vars.spacing.paddingTop;
+        let position = bounds.top - flyoutHeight + offset;
+        let nubPosition = flyoutHeight - 1;
         let nubPointsDown = true;
 
         const isNearStart = bounds.top <= vars.menuButton.size * 2;

@@ -695,7 +695,7 @@ class DiscussionsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $categoryID);
         }
 
-        $attributes = $row['Attributes'];
+        $attributes = $row['Attributes'] ?? [];
         $attributes['CanonicalUrl'] = $body['canonicalUrl'];
         $this->discussionModel->setProperty($id, 'Attributes', dbencode($attributes));
 

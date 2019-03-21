@@ -797,7 +797,7 @@ paths:
       tags:
       - Discussions
       summary: Remove a user's reaction.
-  '/discussions/{id}/canonical':
+  '/discussions/{id}/canonical-url':
     put:
       parameters:
       - description: The discussion ID.

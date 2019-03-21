@@ -677,7 +677,7 @@ class DiscussionsApiController extends AbstractApiController {
      * @throws NotFoundException If unable to find the discussion.
      * @return array
      */
-    public function put_canonical($id, array $body) {
+    public function put_canonicalUrl($id, array $body) {
         $this->permission('Garden.SignIn.Allow');
 
         $this->idParamSchema('in');
@@ -711,7 +711,7 @@ class DiscussionsApiController extends AbstractApiController {
      * @throws NotFoundException If unable to find the discussion.
      * @return array
      */
-    public function delete_canonical($id) {
+    public function delete_canonicalUrl($id) {
         $this->permission('Garden.SignIn.Allow');
 
         $in =$this->schema(

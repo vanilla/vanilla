@@ -226,7 +226,9 @@ class DiscussionsApiController extends AbstractApiController {
         $this->permission();
 
         $this->idParamSchema();
-        $in = $this->schema([], ['DiscussionGet', 'in'])->setDescription('Get a discussion.');
+        $in = $this->schema([
+            'expand?' => ApiUtils::getExpandDefinition([]) // Allow addons to expand additional fields.
+        ], ['DiscussionGet', 'in'])->setDescription('Get a discussion.');
         $out = $this->schema($this->discussionSchema(), 'out');
 
         $query = $in->validate($query);
@@ -241,7 +243,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
         $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID'], ['expand' => true]);
-        $row = $this->normalizeOutput($row);
+        $row = $this->normalizeOutput($row, $query["expand"] ?? []);
 
         $result = $out->validate($row);
 
@@ -278,7 +280,8 @@ class DiscussionsApiController extends AbstractApiController {
             $lastPost = [
                 'discussionID' => $dbRecord['DiscussionID'],
                 'dateInserted' => $dbRecord['DateLastComment'],
-                'insertUser' => $dbRecord['LastUser']
+                'insertUser' => $dbRecord['LastUser'],
+                "insertUserID" => $dbRecord["LastUserID"],
             ];
             if ($dbRecord['LastCommentID']) {
                 $lastPost['CommentID'] = $dbRecord['LastCommentID'];

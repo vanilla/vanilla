@@ -38,7 +38,7 @@ export default class SelectOne extends React.Component<ISelectOneProps> {
     private inputID: string;
     private errorID: string;
 
-    constructor(props: IProps) {
+    constructor(props: ISelectOneProps) {
         super(props);
         this.id = getRequiredID(props, this.prefix);
         this.inputID = this.id + "-input";

@@ -9,6 +9,7 @@ namespace VanillaTests\APIv2;
 
 use CategoryModel;
 use DiscussionModel;
+use Garden\Web\Exception\ClientException;
 
 /**
  * Test the /api/v2/discussions endpoints.
@@ -154,5 +155,24 @@ class DiscussionsTest extends AbstractResourceTest {
         }
 
         parent::testPatchSparse($field);
+    }
+
+    public function testPutCanonicalUrl() {
+        $row = $this->testPost();
+        $url = '/canonical/url/test';
+        $discussion = $this->api()->put($this->baseUrl.'/'.$row['discussionID'].'/canonical-url', ['canonicalUrl' => $url])->getBody();
+        $this->assertArrayHasKey('canonicalUrl', $discussion);
+        $this->assertEquals($url, $discussion['canonicalUrl']);
+    }
+
+    public function testOverwriteCanonicalUrl() {
+        $row = $this->testPost();
+        $url = '/canonical/url/test';
+        $discussion = $this->api()->put($this->baseUrl.'/'.$row['discussionID'].'/canonical-url', ['canonicalUrl' => $url])->getBody();
+        $this->assertArrayHasKey('canonicalUrl', $discussion);
+        $this->assertEquals($url, $discussion['canonicalUrl']);
+
+        $this->expectException();
+       $this->api()->put($this->baseUrl.'/'.$row['discussionID'].'/canonical-url', ['canonicalUrl' => $url.'overwrite']);
     }
 }

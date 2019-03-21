@@ -27,6 +27,7 @@ interface IProps extends IWithEditorProps {
     onItemClick: React.MouseEventHandler<any>;
     showLoader: boolean;
     mentionSelection: RangeStatic | null;
+    legacyMode: boolean;
 }
 
 interface IState {
@@ -47,7 +48,7 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
 
     public render() {
         const { activeItemId, id, onItemClick, matchedString, mentionProps, showLoader, mentionSelection } = this.props;
-        const classesRichEditor = richEditorClasses();
+        const classesRichEditor = richEditorClasses(false);
         const classesDropDown = dropDownClasses();
 
         const hasResults = mentionProps.length > 0 || showLoader;

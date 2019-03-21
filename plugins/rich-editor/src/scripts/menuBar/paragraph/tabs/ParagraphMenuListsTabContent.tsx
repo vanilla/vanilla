@@ -7,12 +7,7 @@
 import React from "react";
 import { paragraphMenuTabsClasses } from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
 import { IMenuBarItemTypes } from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
-
-export interface IMenuCheckRadio {
-    checked: boolean;
-    icon: JSX.Element;
-    text: string;
-}
+import { IMenuCheckRadio } from "@rich-editor/menuBar/paragraph/pieces/ParagraphMenuCheckRadio";
 
 interface IProps {
     items: IMenuCheckRadio[];

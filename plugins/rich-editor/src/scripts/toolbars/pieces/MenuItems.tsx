@@ -16,7 +16,7 @@ interface IProps {
     orientation?: "horizontal" | "vertical";
     renderAbove?: boolean;
     renderLeft?: boolean;
-    legacyMode?: boolean;
+    legacyMode: boolean;
     onKeyDown?: (e) => any;
     className?: string;
 }
@@ -38,7 +38,7 @@ export default class MenuItems extends React.Component<IProps, {}> {
         const { menuItemData } = this.props;
         const firstIndex = 0;
         const lastIndex = menuItemData.length - 1;
-        const classesRichEditor = richEditorClasses();
+        const classesRichEditor = richEditorClasses(this.props.legacyMode);
         return (
             <div
                 className={classNames("richEditor-menu", classesRichEditor.menu, this.props.className)}
@@ -67,6 +67,7 @@ export default class MenuItems extends React.Component<IProps, {}> {
                                 focusNextItem={focusNextItem}
                                 focusPrevItem={focusPrevItem}
                                 ref={ref => this.menuItemRefs.push(ref)}
+                                legacyMode={this.props.legacyMode}
                             />
                         );
                     })}
@@ -79,16 +80,16 @@ export default class MenuItems extends React.Component<IProps, {}> {
      * Focus the first menu item.
      */
     public focusFirstItem() {
-        const firstItem = this.menuItemRefs[0];
-        firstItem && firstItem.focus();
+        // const firstItem = this.menuItemRefs[0];
+        // firstItem && firstItem.focus();
     }
 
     /**
      * Focus the last menu item.
      */
     public focusLastItem() {
-        const lastIndex = this.menuItemRefs.length - 1;
-        const lastItem = this.menuItemRefs[lastIndex];
-        lastItem && lastItem.focus();
+        // const lastIndex = this.menuItemRefs.length - 1;
+        // const lastItem = this.menuItemRefs[lastIndex];
+        // lastItem && lastItem.focus();
     }
 }

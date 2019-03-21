@@ -25,6 +25,7 @@ interface IProps extends IWithEditorProps {
     renderAbove?: boolean;
     renderLeft?: boolean;
     openAsModal?: boolean;
+    legacyMode: boolean;
 }
 
 interface IState extends IRequiredComponentID {
@@ -58,7 +59,7 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
         const title = t("Insert Media");
         const Icon = embed();
         const legacyMode = this.props.legacyMode;
-        const classesRichEditor = richEditorClasses();
+        const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const classesInsertMedia = insertMediaClasses();
 
         return (

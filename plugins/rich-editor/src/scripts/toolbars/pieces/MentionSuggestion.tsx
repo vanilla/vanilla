@@ -38,7 +38,7 @@ export interface IMentionLoadingProps extends IGenericMentionProps {
 export default function MentionSuggestion(props: IMentionProps) {
     const { isActive, matchedString, mentionData, onClick, onMouseEnter } = props;
     const { photoUrl, name, domID } = mentionData;
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(this.props.legacyMode);
 
     const classes = classNames("richEditor-menuItem", "atMentionList-item", classesRichEditor.menuItem, {
         isActive,
@@ -91,7 +91,7 @@ export default function MentionSuggestion(props: IMentionProps) {
 export function MentionSuggestionLoading(props: IMentionLoadingProps) {
     const { loadingData, onMouseEnter, isActive } = props;
     const { domID } = loadingData;
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     const classes = classNames(
         "richEditor-menuItem",
         "atMentionList-item",
@@ -120,7 +120,7 @@ export function MentionSuggestionLoading(props: IMentionLoadingProps) {
  * We need a dummy "spacer" suggestion so that we can get our initial measurements.
  */
 export function MentionSuggestionSpacer() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     const classes = classNames(
         "richEditor-menuItem",
         "atMentionList-item",

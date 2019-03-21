@@ -5,26 +5,14 @@
  */
 
 import React from "react";
-import { paragraphMenuTabsClasses } from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
-import { IMenuBarItemTypes } from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
-
-export interface IMenuCheckRadio {
-    checked: boolean;
-    icon: JSX.Element;
-    text: string;
-}
+import ParagraphMenuBarRadioGroup, {
+    IMenuBarRadioButton,
+} from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
+import { t } from "@library/utility/appUtils";
 
 interface IProps {
-    items: IMenuCheckRadio[];
-    label: string;
-    activeIndex: number | null;
-    type: IMenuBarItemTypes;
+    items: IMenuBarRadioButton[];
     handleClick: () => void;
-    heading: 2 | 3 | 4 | 5 | null;
-}
-
-interface IState {
-    heading: 2 | 3 | 4 | 5 | null;
 }
 
 /**
@@ -32,11 +20,13 @@ interface IState {
  */
 export default class ParagraphMenuHeadingsTabContent extends React.Component<IProps> {
     public render() {
-        if (this.props.items.length > 0) {
-            const classes = paragraphMenuTabsClasses();
-            return <div className={classes.content} />;
-        } else {
-            return null;
-        }
+        return t("Hello, i'm here");
+        /*
+            <ParagraphMenuBarRadioGroup
+                handleClick={this.props.handleClick}
+                label={t("Headings")}
+                items={this.props.items}
+            />
+            */
     }
 }

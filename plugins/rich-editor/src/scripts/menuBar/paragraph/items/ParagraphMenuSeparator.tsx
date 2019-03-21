@@ -6,11 +6,12 @@
 
 import React from "react";
 import classNames from "classnames";
-import { paragraphMenuBarClasses } from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 interface IProps {
     className?: string;
+    legacyMode: boolean;
 }
 
 /**
@@ -18,7 +19,7 @@ interface IProps {
  */
 export default class DropDownItemSeparator extends React.Component<IProps> {
     public render() {
-        const classes = paragraphMenuBarClasses();
+        const classes = richEditorClasses(this.props.legacyMode);
         return (
             <div className={classNames(this.props.className, classes.separator)}>
                 <ScreenReaderContent>

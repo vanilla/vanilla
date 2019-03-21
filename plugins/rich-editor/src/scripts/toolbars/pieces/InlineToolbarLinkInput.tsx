@@ -19,6 +19,7 @@ interface IProps extends IWithEditorProps {
     onInputKeyDown: React.KeyboardEventHandler<any>;
     onInputChange: React.ChangeEventHandler<any>;
     onCloseClick: React.MouseEventHandler<any>;
+    legacyMode: boolean;
 }
 
 export class InlineToolbarLinkInput extends React.PureComponent<IProps, {}> {
@@ -37,7 +38,7 @@ export class InlineToolbarLinkInput extends React.PureComponent<IProps, {}> {
     }
 
     public render() {
-        const classesRichEditor = richEditorClasses();
+        const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const classesInsertLink = insertLinkClasses();
         const classesDropDown = dropDownClasses();
         return (

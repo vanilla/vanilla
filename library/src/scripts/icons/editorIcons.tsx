@@ -14,7 +14,7 @@ const currentColorFill = {
 };
 
 export function bold() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
             <title>{t("Bold")}</title>
@@ -27,7 +27,7 @@ export function bold() {
 }
 
 export function italic() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
             <title>{t("Italic")}</title>
@@ -40,7 +40,7 @@ export function italic() {
 }
 
 export function strike() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
             <title>{t("Strikethrough")}</title>
@@ -53,7 +53,7 @@ export function strike() {
 }
 
 export function code() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
             <title>{t("Paragraph Code Block")}</title>
@@ -67,7 +67,7 @@ export function code() {
 }
 
 export function link() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
             <title>{t("Link")}</title>
@@ -80,7 +80,7 @@ export function link() {
 }
 
 export function emoji() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
             <title>{t("Emoji")}</title>
@@ -93,7 +93,7 @@ export function emoji() {
 }
 
 export function embedError() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg
             className={classNames("richEditorButton-icon", classesRichEditor.icon)}
@@ -110,7 +110,7 @@ export function embedError() {
 }
 
 export function pilcrow() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
             <title>{t("Paragraph")}</title>
@@ -124,7 +124,7 @@ export function pilcrow() {
 }
 
 export function heading2() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
             <title>{t("H2")}</title>
@@ -137,7 +137,7 @@ export function heading2() {
 }
 
 export function heading3() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
             <title>{t("H3")}</title>
@@ -150,7 +150,7 @@ export function heading3() {
 }
 
 export function heading4() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
             <title>{t("H4")}</title>
@@ -163,7 +163,7 @@ export function heading4() {
 }
 
 export function heading5() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
             <title>{t("H5")}</title>
@@ -176,7 +176,7 @@ export function heading5() {
 }
 
 export function blockquote() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
             <title>{t("Quote")}</title>
@@ -189,7 +189,7 @@ export function blockquote() {
 }
 
 export function codeBlock() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
             <title>{t("Paragraph Code Block")}</title>
@@ -203,7 +203,7 @@ export function codeBlock() {
 }
 
 export function spoiler(extraClasses = "") {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     const spoilerClasses = classNames(extraClasses);
     return (
         <svg className={classNames(spoilerClasses, classesRichEditor.icon)} viewBox="0 0 24 24">
@@ -221,7 +221,7 @@ export function spoiler(extraClasses = "") {
 }
 
 export function embed() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
             <title>{t("Embed")}</title>
@@ -235,7 +235,7 @@ export function embed() {
 }
 
 export function image() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
             <title>{t("Image")}</title>
@@ -249,7 +249,7 @@ export function image() {
 }
 
 export function attachment() {
-    const classesRichEditor = richEditorClasses();
+    const classesRichEditor = richEditorClasses(false);
     return (
         <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
             <title>{t("Attachment")}</title>
@@ -257,6 +257,58 @@ export function attachment() {
                 fill="currentColor"
                 d="M17.25,9.045a.75.75,0,0,1,1.5,0v6.91A6.63,6.63,0,0,1,12,22.75a6.63,6.63,0,0,1-6.75-6.795V7.318A4.811,4.811,0,0,1,10.286,2.25a4.81,4.81,0,0,1,5.035,5.068v7.773c0,2.308-1.254,4.2-3.321,4.2s-3.321-1.9-3.321-4.2V9.045a.75.75,0,0,1,1.5,0v6.046c0,1.578.745,2.7,1.821,2.7s1.821-1.126,1.821-2.7V7.318A3.319,3.319,0,0,0,10.286,3.75,3.319,3.319,0,0,0,6.75,7.318v8.637A5.132,5.132,0,0,0,12,21.25a5.132,5.132,0,0,0,5.25-5.295Z"
                 style={currentColorFill}
+            />
+        </svg>
+    );
+}
+
+export function listUnordered() {
+    const classesRichEditor = richEditorClasses(false);
+    return (
+        <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
+            <title>{t("List Unordered")}</title>
+            <path
+                fill="currentColor"
+                fill-rule="nonzero"
+                d="M10.5 7a1 1 0 1 1 0-2h8a1 1 0 0 1 0 2h-8zm0 6a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2h-8zm0 6a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2h-8zM4.7 7c-.11 0-.2-.448-.2-1s.09-1 .2-1h1.6c.11 0 .2.448.2 1s-.09 1-.2 1H4.7zm0 6c-.11 0-.2-.448-.2-1s.09-1 .2-1h1.6c.11 0 .2.448.2 1s-.09 1-.2 1H4.7zm0 6c-.11 0-.2-.448-.2-1s.09-1 .2-1h1.6c.11 0 .2.448.2 1s-.09 1-.2 1H4.7z"
+            />
+        </svg>
+    );
+}
+
+export function listOrdered() {
+    const classesRichEditor = richEditorClasses(false);
+    return (
+        <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
+            <title>{t("List Ordered")}</title>
+            <path
+                fill="currentColor"
+                d="M10.5 7a1 1 0 1 1 0-2h8a1 1 0 0 1 0 2h-8zM6.479 8h-.906V5.521l.009-.407.015-.445c-.15.15-.255.249-.314.296l-.492.395-.437-.545 1.38-1.098h.745V8zm4.021 5a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2h-8zm-3.266 1H4.24v-.63l1.075-1.087a9.93 9.93 0 0 0 .624-.678c.098-.126.168-.243.211-.35a.891.891 0 0 0 .065-.334c0-.172-.048-.3-.142-.384a.551.551 0 0 0-.38-.126c-.166 0-.327.038-.483.114-.156.077-.32.185-.49.326l-.491-.583c.21-.18.385-.307.524-.381.139-.075.29-.132.454-.172.164-.04.348-.06.55-.06.268 0 .505.05.71.147.205.097.364.234.477.41.114.176.17.377.17.603 0 .198-.034.383-.104.556-.07.172-.177.35-.322.531-.146.182-.402.44-.77.777l-.55.518v.041h1.866V14zm3.266 5a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2h-8zm-3.433-2.325c0 .267-.08.495-.243.682-.162.188-.39.317-.682.387v.018c.345.043.607.148.785.315.177.167.266.392.266.675 0 .412-.15.733-.448.962-.299.23-.725.345-1.28.345-.465 0-.877-.078-1.236-.232v-.77c.166.084.348.152.547.205.2.052.397.079.592.079.299 0 .52-.051.662-.153.143-.101.214-.264.214-.489 0-.201-.082-.344-.246-.428-.164-.084-.426-.125-.785-.125h-.325v-.695h.33c.333 0 .575-.043.729-.13.153-.087.23-.236.23-.447 0-.324-.203-.486-.61-.486-.14 0-.283.023-.429.07a2.097 2.097 0 0 0-.485.243l-.419-.624c.391-.281.857-.422 1.398-.422.443 0 .793.09 1.05.27.257.18.385.43.385.75z"
+            />
+        </svg>
+    );
+}
+
+export function indent() {
+    const classesRichEditor = richEditorClasses(false);
+    return (
+        <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
+            <title>{t("Indent")}</title>
+            <path
+                fill="currentColor"
+                d="M10.5 11a1 1 0 1 1 0-2h8a1 1 0 1 1 0 2h-8zm0 4a1 1 0 1 1 0-2h8a1 1 0 1 1 0 2h-8zM5.438 19h13.125c.517 0 .937-.448.937-1s-.42-1-.938-1H5.438c-.517 0-.937.448-.937 1s.42 1 .938 1zM5.438 7h13.125c.517 0 .937-.448.937-1s-.42-1-.938-1H5.438C4.92 5 4.5 5.448 4.5 6s.42 1 .938 1zM8.5 12l-3 3V9z"
+            />
+        </svg>
+    );
+}
+export function outdent() {
+    const classesRichEditor = richEditorClasses(false);
+    return (
+        <svg className={classNames("richEditorButton-icon", classesRichEditor.icon)} viewBox="0 0 24 24">
+            <title>{t("Outdent")}</title>
+            <path
+                fill="currentColor"
+                d="M10.5 11a1 1 0 1 1 0-2h8a1 1 0 1 1 0 2h-8zm0 4a1 1 0 1 1 0-2h8a1 1 0 1 1 0 2h-8zM5.438 19h13.125c.517 0 .937-.448.937-1s-.42-1-.938-1H5.438c-.517 0-.937.448-.937 1s.42 1 .938 1zM5.438 7h13.125c.517 0 .937-.448.937-1s-.42-1-.938-1H5.438C4.92 5 4.5 5.448 4.5 6s.42 1 .938 1zM4.5 12l3-3v6z"
             />
         </svg>
     );

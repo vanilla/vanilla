@@ -7,7 +7,13 @@
 import React from "react";
 import { paragraphMenuCheckRadioClasses } from "../paragraphMenuBarStyles";
 import classNames from "classnames";
-import { IMenuBarItemTypes } from "../ParagraphMenusBarToggle";
+import { IMenuBarItemTypes } from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
+
+export interface IMenuCheckRadio {
+    checked: boolean;
+    icon: JSX.Element;
+    text: string;
+}
 
 interface IProps {
     checked: boolean;
@@ -27,7 +33,6 @@ export default class ParagraphMenuCheckRadio extends React.PureComponent<IProps>
         const classes = paragraphMenuCheckRadioClasses();
         const { checked, type, icon, text, handleClick } = this.props;
         const isRadio = type === IMenuBarItemTypes.RADIO;
-        const isCheck = !isRadio;
         return (
             <button
                 className={classNames(

@@ -8,18 +8,7 @@ import React from "react";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
-import {
-    blockquote,
-    codeBlock,
-    heading2,
-    heading3,
-    heading4,
-    heading5,
-    pilcrow,
-    spoiler,
-} from "@library/icons/editorIcons";
-import { t } from "@library/utility/appUtils";
-import { RangeStatic } from "quill/core";
+import { IFormats, RangeStatic } from "quill/core";
 import Formatter from "@rich-editor/quill/Formatter";
 
 export const paragraphFormats = (
@@ -74,8 +63,7 @@ export const paragraphFormats = (
     };
 };
 
-export const menuItemData = (formatter: Formatter, lastGoodSelection: RangeStatic, afterClickHandler?: () => void) => {
-    const { activeFormats } = this.props;
+export const getActiveFormats = (activeFormats: IFormats) => {
     let isParagraphEnabled = true;
     ["header", BlockquoteLineBlot.blotName, CodeBlockBlot.blotName, SpoilerLineBlot.blotName].forEach(item => {
         if (item in activeFormats) {
@@ -85,64 +73,107 @@ export const menuItemData = (formatter: Formatter, lastGoodSelection: RangeStati
 
     const headerObjectLevel = typeof activeFormats.header === "object" ? activeFormats.header.level : null;
 
-    const formats = paragraphFormats(formatter, lastGoodSelection, afterClickHandler);
+    return {
+        paragraph: isParagraphEnabled,
+        headings: {
+            heading2: activeFormats.header === 2 || headerObjectLevel === 2,
+            heading3: activeFormats.header === 3 || headerObjectLevel === 3,
+            heading4: activeFormats.header === 4 || headerObjectLevel === 4,
+            heading5: activeFormats.header === 5 || headerObjectLevel === 5,
+        },
+        special: {
+            blockQuote: activeFormats[BlockquoteLineBlot.blotName] === true,
+            codeBlock: activeFormats[CodeBlockBlot.blotName] === true,
+            spoiler: activeFormats[SpoilerLineBlot.blotName] === true,
+        },
+        lists: {
+            ordered: true,
+            unordered: true,
+            indent: true,
+            outdent: true,
+        },
+    };
 
-    return [
-        {
-            icon: pilcrow(),
-            label: t("Format as Paragraph"),
-            onClick: formats.formatParagraph,
-            isActive: isParagraphEnabled,
-            isDisabled: isParagraphEnabled,
-        },
-        {
-            icon: heading2(),
-            label: t("Format as title (heading 2)"),
-            onClick: this.formatH2,
-            isActive: activeFormats.header === 2 || headerObjectLevel === 2,
-            isDisabled: activeFormats.header === 2 || headerObjectLevel === 2,
-        },
-        {
-            icon: heading3(),
-            label: t("Format as title (heading 3)"),
-            onClick: this.formatH3,
-            isActive: activeFormats.header === 3 || headerObjectLevel === 3,
-            isDisabled: activeFormats.header === 3 || headerObjectLevel === 3,
-        },
-        {
-            icon: heading4(),
-            label: t("Format as title (heading 4)"),
-            onClick: this.formatH2,
-            isActive: activeFormats.header === 4 || headerObjectLevel === 4,
-            isDisabled: activeFormats.header === 4 || headerObjectLevel === 4,
-        },
-        {
-            icon: heading5(),
-            label: t("Format as title (heading 5)"),
-            onClick: this.formatH3,
-            isActive: activeFormats.header === 5 || headerObjectLevel === 5,
-            isDisabled: activeFormats.header === 5 || headerObjectLevel === 5,
-        },
-        {
-            icon: blockquote(),
-            label: t("Format as blockquote"),
-            onClick: formats.formatBlockquote,
-            isActive: activeFormats[BlockquoteLineBlot.blotName] === true,
-            isDisabled: activeFormats[BlockquoteLineBlot.blotName] === true,
-        },
-        {
-            icon: codeBlock(),
-            label: t("Format as code block"),
-            onClick: formats.formatCodeBlock,
-            isActive: activeFormats[CodeBlockBlot.blotName] === true,
-            isDisabled: activeFormats[CodeBlockBlot.blotName] === true,
-        },
-        {
-            icon: spoiler("richEditorButton-icon"),
-            label: t("Format as spoiler"),
-            onClick: formats.formatSpoiler,
-            isActive: activeFormats[SpoilerLineBlot.blotName] === true,
-            isDisabled: activeFormats[SpoilerLineBlot.blotName] === true,
-        },
-    ];
+    //
+    // const paragraphState = {
+    //     isActive: isParagraphEnabled,
+    //     isDisabled: isParagraphEnabled,
+    // };
+    //
+    // const heading2State = {
+    //     isActive: activeFormats.header === 2 || headerObjectLevel === 2,
+    //     isDisabled: activeFormats.header === 2 || headerObjectLevel === 2,
+    // };
+    //
+    // const heading3State = {
+    //     isActive: activeFormats.header === 3 || headerObjectLevel === 3,
+    //     isDisabled: activeFormats.header === 3 || headerObjectLevel === 3,
+    // };
+    //
+    // const heading4State = {
+    //     isActive: activeFormats.header === 4 || headerObjectLevel === 4,
+    //     isDisabled: activeFormats.header === 4 || headerObjectLevel === 4,
+    // };
+    // const heading5State = {
+    //     isActive: activeFormats.header === 5 || headerObjectLevel === 5,
+    //     isDisabled: activeFormats.header === 5 || headerObjectLevel === 5,
+    // };
+    //
+    // const blockQuoteState = {
+    //     isActive: activeFormats[BlockquoteLineBlot.blotName] === true,
+    //     isDisabled: activeFormats[BlockquoteLineBlot.blotName] === true,
+    // };
+    //
+    // const codeBlockState = {
+    //     isActive: activeFormats[CodeBlockBlot.blotName] === true,
+    //     isDisabled: activeFormats[CodeBlockBlot.blotName] === true,
+    // };
+    //
+    // const spoilerState = {
+    //     isActive: activeFormats[SpoilerLineBlot.blotName] === true,
+    //     isDisabled: activeFormats[SpoilerLineBlot.blotName] === true,
+    // };
+    //
+    // return [
+    //     {
+    //         // label: t("Format as Paragraph"),
+    //         isActive: isParagraphEnabled,
+    //         isDisabled: isParagraphEnabled,
+    //     },
+    //     {
+    //         // label: t("Format as title (heading 2)"),
+    //         isActive: activeFormats.header === 2 || headerObjectLevel === 2,
+    //         isDisabled: activeFormats.header === 2 || headerObjectLevel === 2,
+    //     },
+    //     {
+    //         // label: t("Format as title (heading 3)"),
+    //         isActive: activeFormats.header === 3 || headerObjectLevel === 3,
+    //         isDisabled: activeFormats.header === 3 || headerObjectLevel === 3,
+    //     },
+    //     {
+    //         // label: t("Format as title (heading 4)"),
+    //         isActive: activeFormats.header === 4 || headerObjectLevel === 4,
+    //         isDisabled: activeFormats.header === 4 || headerObjectLevel === 4,
+    //     },
+    //     {
+    //         // label: t("Format as title (heading 5)"),
+    //         isActive: activeFormats.header === 5 || headerObjectLevel === 5,
+    //         isDisabled: activeFormats.header === 5 || headerObjectLevel === 5,
+    //     },
+    //     {
+    //         // label: t("Format as blockquote"),
+    //         isActive: activeFormats[BlockquoteLineBlot.blotName] === true,
+    //         isDisabled: activeFormats[BlockquoteLineBlot.blotName] === true,
+    //     },
+    //     {
+    //         // label: t("Format as code block"),
+    //         isActive: activeFormats[CodeBlockBlot.blotName] === true,
+    //         isDisabled: activeFormats[CodeBlockBlot.blotName] === true,
+    //     },
+    //     {
+    //         // label: t("Format as spoiler"),
+    //         isActive: activeFormats[SpoilerLineBlot.blotName] === true,
+    //         isDisabled: activeFormats[SpoilerLineBlot.blotName] === true,
+    //     },
+    // ];
 };

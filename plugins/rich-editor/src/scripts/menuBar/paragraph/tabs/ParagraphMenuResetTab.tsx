@@ -6,38 +6,40 @@
 
 import React from "react";
 import { paragraphMenuTabsClasses } from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
-import { IMenuBarItemTypes } from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
-
-export interface IMenuCheckRadio {
-    checked: boolean;
-    icon: JSX.Element;
-    text: string;
-}
+import { pilcrow } from "@library/icons/editorIcons";
+import { t } from "@library/utility/appUtils";
+import classNames from "classnames";
 
 interface IProps {
-    items: IMenuCheckRadio[];
-    label: string;
-    activeIndex: number | null;
-    type: IMenuBarItemTypes;
-    handleClick: () => void;
-    heading: 1 | 2 | 3 | 4 | 5 | null;
-}
-
-interface IState {
-    heading: 1 | 2 | 3 | 4 | 5 | null;
+    setRovingIndex: (index: number) => void;
+    formatParagraphHandler: () => void;
+    className?: string;
+    isActive: boolean;
+    isDisabled: boolean;
 }
 
 /**
  * Resets paragraph style to normal paragraph
- * TODO
  */
-export default class ParagraphMenuResetTab extends React.Component<IProps> {
+export default class ParagraphMenuResetTab extends React.PureComponent<IProps> {
     public render() {
-        if (this.props.items.length > 0) {
-            const classes = paragraphMenuTabsClasses();
-            return <div className={classes.content} />;
-        } else {
-            return null;
-        }
+        const title = t("Set style to plain paragraph");
+        const classes = paragraphMenuTabsClasses();
+        return (
+            <button
+                type="button"
+                disabled={this.props.isDisabled}
+                title={title}
+                aria-label={title}
+                onClick={this.props.formatParagraphHandler}
+                className={classNames(
+                    this.props.className,
+                    classes.tabHandle,
+                    this.props.isActive ? classes.activeTabHandle : "",
+                )}
+            >
+                {pilcrow()}
+            </button>
+        );
     }
 }

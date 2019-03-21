@@ -6,8 +6,9 @@
 
 import React from "react";
 import classNames from "classnames";
-import { IMenuCheckRadio } from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuHeadingsTabContent";
-import ParagraphMenuCheckRadio from "@rich-editor/menuBar/paragraph/pieces/ParagraphMenuCheckRadio";
+import ParagraphMenuCheckRadio, {
+    IMenuCheckRadio,
+} from "@rich-editor/menuBar/paragraph/pieces/ParagraphMenuCheckRadio";
 import { IMenuBarItemTypes } from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
 import { paragraphMenuCheckRadioClasses } from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
 
@@ -19,7 +20,7 @@ export interface IParagraphMenuBarRadioGroupProps {
     label: string;
     classNames?: string;
     items: IMenuBarRadioButton[];
-    activeIndex: number | null;
+    activeIndex?: number | null;
     handleClick: (data: IMenuBarRadioButton, index: number) => void;
 }
 

@@ -8,35 +8,13 @@ import React from "react";
 import { paragraphMenuTabsClasses } from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
 import { IMenuBarItemTypes } from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
 
-export interface IMenuCheckRadio {
-    checked: boolean;
-    icon: JSX.Element;
-    text: string;
-}
-
-interface IProps {
-    items: IMenuCheckRadio[];
-    label: string;
-    activeIndex: number | null;
-    type: IMenuBarItemTypes;
-    handleClick: () => void;
-    heading: 1 | 2 | 3 | 4 | 5 | null;
-}
-
-interface IState {
-    heading: 1 | 2 | 3 | 4 | 5 | null;
-}
+interface IProps {}
 
 /**
  * Implemented tab content for block styles
  */
 export default class ParagraphMenuBlockTabContent extends React.Component<IProps> {
     public render() {
-        if (this.props.items.length > 0) {
-            const classes = paragraphMenuTabsClasses();
-            return <div className={classes.content} />;
-        } else {
-            return null;
-        }
+        return null;
     }
 }

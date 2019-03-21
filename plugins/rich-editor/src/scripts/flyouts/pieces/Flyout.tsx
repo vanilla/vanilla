@@ -53,7 +53,7 @@ export class Flyout extends React.Component<IProps, IState> {
 
     public render() {
         const { additionalClassRoot } = this.props;
-        const classesRichEditor = richEditorClasses();
+        const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const classesFlyout = richEditorFlyoutClasses();
 
         let classes = classNames("richEditor-menu", "richEditorFlyout", classesFlyout.root, {

@@ -14,13 +14,15 @@ import {
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { important, percent } from "csx";
+import { calc, important, percent } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 
-export const richEditorClasses = useThemeCache((legacyMode: boolean = false) => {
+export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     const globalVars = globalVariables();
     const style = styleFactory("richEditor");
     const vars = richEditorVariables();
+    const formVars = formElementsVariables();
 
     const root = style({
         position: "relative",
@@ -68,8 +70,35 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean = false) => 
         },
     });
 
-    const menu = style("menu", {
-        display: "inline-block",
+    const paragraphMenu = style("paragraphMenu", {
+        position: "absolute",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        top: unit(vars.pilcrow.offset),
+        left: 0,
+        marginLeft: unit(-globalVars.gutter.quarter + (!legacyMode ? -(globalVars.gutter.size + 6) : 0)),
+        transform: `translateX(-100%)`,
+        height: unit(vars.paragraphMenuHandle.size),
+        width: unit(globalVars.icon.sizes.default),
+        animationName: vars.pilcrow.animation.name,
+        animationDuration: vars.pilcrow.animation.duration,
+        animationTimingFunction: vars.pilcrow.animation.timing,
+        animationIterationCount: vars.pilcrow.animation.iterationCount,
+        zIndex: 1,
+        $nest: {
+            ".richEditor-button&.isActive:hover": {
+                cursor: "default",
+            },
+            "&.isMenuInset": {
+                transform: "none",
+            },
+        },
+    });
+
+    const menuBar = style("menuBar", {
+        display: "flex",
+        flexWrap: "nowrap",
         position: "relative",
     });
 
@@ -241,9 +270,27 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean = false) => 
         marginBottom: ".5em",
     });
 
+    const separator = style("separator", {});
+
+    const position = style("position", {
+        position: "absolute",
+        left: calc(`50% - ${unit(vars.spacing.paddingLeft / 2)}`),
+        $nest: {
+            "&.isUp": {
+                bottom: calc(`50% + ${unit(vars.spacing.paddingRight / 2 - formVars.border.width)}`),
+            },
+            "&.isDown": {
+                top: calc(`50% + ${unit(vars.spacing.paddingRight / 2 - formVars.border.width)}`),
+            },
+        },
+    });
+
+    // Sub menu in "menuBar"
+    const menu = style("menu", {});
+
     return {
         root,
-        menu,
+        menuBar,
         paragraphMenuHandle,
         text,
         menuItems,
@@ -254,5 +301,9 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean = false) => 
         icon,
         close,
         flyoutDescription,
+        paragraphMenu,
+        separator,
+        position,
+        menu,
     };
 });

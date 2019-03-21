@@ -13,7 +13,7 @@ import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import EmojiFlyout from "@rich-editor/flyouts/EmojiFlyout";
 import EmbedFlyout from "@rich-editor/flyouts/EmbedFlyout";
-import ParagraphMenuBarToggle from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
+import ParagraphMenusBarToggle from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
 
 interface IProps {
     isMobile: boolean;
@@ -25,8 +25,8 @@ interface IProps {
 export default function EmbedBar(props: IProps) {
     const { isMobile, isLoading, legacyMode } = props;
     const mimeTypes = getMeta("upload.allowedExtensions");
-    const classesRichEditor = richEditorClasses();
-    const classesRichEditorForm = richEditorFormClasses();
+    const classesRichEditor = richEditorClasses(props.legacyMode);
+    const classesRichEditorForm = richEditorFormClasses(props.legacyMode);
 
     return (
         <div className={classNames("richEditor-embedBar", classesRichEditor.embedBar)} ref={props.barRef}>
@@ -42,7 +42,7 @@ export default function EmbedBar(props: IProps) {
             >
                 {isMobile && (
                     <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
-                        <ParagraphMenuBarToggle disabled={isLoading} />
+                        <ParagraphMenusBarToggle disabled={isLoading} />
                     </li>
                 )}
                 {!isMobile && (
@@ -54,7 +54,7 @@ export default function EmbedBar(props: IProps) {
                         )}
                         role="menuitem"
                     >
-                        <EmojiFlyout disabled={isLoading} renderAbove={legacyMode} />
+                        <EmojiFlyout disabled={isLoading} renderAbove={legacyMode} legacyMode={props.legacyMode} />
                     </li>
                 )}
                 <Permission permission="uploads.add">

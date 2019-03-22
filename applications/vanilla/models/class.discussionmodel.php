@@ -1007,6 +1007,7 @@ class DiscussionModel extends Gdn_Model {
         $discussion->Name = htmlspecialchars($discussion->Name);
         $discussion->Attributes = dbdecode($discussion->Attributes);
         $discussion->Url = discussionUrl($discussion);
+        $discussion->CanonicalUrl = $discussion->Attributes['CanonicalUrl'] ?? $discussion->Url;
         $discussion->Tags = $this->formatTags($discussion->Tags);
 
         // Join in the category.
@@ -1107,7 +1108,6 @@ class DiscussionModel extends Gdn_Model {
         }
         $discussion->pinned = $pinned;
         $discussion->pinLocation = $pinLocation;
-
         $this->EventArguments['Discussion'] = &$discussion;
         $this->fireEvent('SetCalculatedFields');
     }

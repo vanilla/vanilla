@@ -30,6 +30,9 @@ class DiscussionsApiController extends AbstractApiController {
     private $discussionPostSchema;
 
     /** @var Schema */
+    private $discussionPutCanonicalSchema;
+
+    /** @var Schema */
     private $idParamSchema;
 
     /** @var UserModel */
@@ -163,6 +166,24 @@ class DiscussionsApiController extends AbstractApiController {
     }
 
     /**
+     * Get a discussion set canonical url schema.
+     *
+     * @param string $type The type of schema.
+     * @return Schema Returns a schema object.
+     */
+    public function discussionPutCanonicalSchema($type = '') {
+        if ($this->discussionPutCanonicalSchema === null) {
+            $this->discussionPutCanonicalSchema = $this->schema(
+                Schema::parse([
+                    'canonicalUrl',
+                ])->add($this->fullSchema()),
+                'DiscussionPutCanonical'
+            );
+        }
+        return $this->schema($this->discussionPutCanonicalSchema, $type);
+    }
+
+    /**
      * Get the full discussion schema.
      *
      * @param string $type The type of schema.
@@ -207,6 +228,7 @@ class DiscussionsApiController extends AbstractApiController {
             'countViews:i' => 'The number of views on the discussion.',
             'score:i|n' => 'Total points associated with this post.',
             'url:s?' => 'The full URL to the discussion.',
+            'canonicalUrl:s' => 'The full canonical URL to the discussion.',
             'lastPost?' => $this->getPostFragmentSchema(),
             'bookmarked:b' => 'Whether or not the discussion is bookmarked by the current user.',
             'unread:b' => 'Whether or not the discussion should have an unread indicator.',
@@ -644,5 +666,69 @@ class DiscussionsApiController extends AbstractApiController {
 
         $result = $this->discussionByID($id);
         return $out->validate($result);
+    }
+
+    /**
+     * Set canonical url for a discussion.
+     *
+     * @param int $id The ID of the discussion.
+     * @param array $body The request body.
+     *       Ex: ["canonicalUrl" => "https://mydomain.com/some+path/"]
+     * @throws NotFoundException If unable to find the discussion.
+     * @return array
+     */
+    public function put_canonicalUrl($id, array $body) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $this->idParamSchema('in');
+        $in = $this->discussionPutCanonicalSchema('in')->setDescription('Set canonical url for a discussion.');
+        $out = $this->schema($this->discussionSchema(), 'out');
+
+        $body = $in->validate($body);
+
+        $row = $this->discussionByID($id);
+        if (!empty($row['Attributes']['CanonicalUrl'] ?? '')) {
+            throw new \Garden\Web\Exception\ClientException('Canonical url already set for this discussion.', 409);
+        };
+        $categoryID = $row['CategoryID'];
+        if ($row['InsertUserID'] !== $this->getSession()->UserID) {
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $categoryID);
+        }
+
+        $attributes = $row['Attributes'] ?? [];
+        $attributes['CanonicalUrl'] = $body['canonicalUrl'];
+        $this->discussionModel->setProperty($id, 'Attributes', dbencode($attributes));
+
+        $result = $this->discussionByID($id);
+        $result = $this->normalizeOutput($result);
+        return $out->validate($result);
+    }
+
+    /**
+     * Remove canonical url for a discussion.
+     *
+     * @param int $id The ID of the discussion.
+     * @throws NotFoundException If unable to find the discussion.
+     * @return array
+     */
+    public function delete_canonicalUrl($id) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $in =$this->schema(
+            Schema::parse(['id:i' => 'The discussion ID.']),
+            'in'
+        );
+        $out = $this->schema([], 'out');
+
+        $row = $this->discussionByID($id);
+        $categoryID = $row['CategoryID'];
+        if ($row['InsertUserID'] !== $this->getSession()->UserID) {
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $categoryID);
+        }
+        $attributes = $row['Attributes'];
+        if (!empty($attributes['CanonicalUrl'] ?? '')) {
+            unset($attributes['CanonicalUrl']);
+            $this->discussionModel->setProperty($id, 'Attributes', dbencode($attributes));
+        }
     }
 }

@@ -155,4 +155,48 @@ class DiscussionsTest extends AbstractResourceTest {
 
         parent::testPatchSparse($field);
     }
+
+    /**
+     * Test PUT /discussions/{id}/canonical-url when not set
+     */
+    public function testPutCanonicalUrl() {
+        $row = $this->testPost();
+        $url = '/canonical/url/test';
+        $discussion = $this->api()->put($this->baseUrl.'/'.$row['discussionID'].'/canonical-url', ['canonicalUrl' => $url])->getBody();
+        $this->assertArrayHasKey('canonicalUrl', $discussion);
+        $this->assertEquals($url, $discussion['canonicalUrl']);
+    }
+
+    /**
+     * Test PUT /discussions/{id}/canonical-url when already set up
+     */
+    public function testOverwriteCanonicalUrl() {
+        $row = $this->testPost();
+        $url = '/canonical/url/test';
+        $discussion = $this->api()->put($this->baseUrl.'/'.$row['discussionID'].'/canonical-url', ['canonicalUrl' => $url])->getBody();
+        $this->assertArrayHasKey('canonicalUrl', $discussion);
+        $this->assertEquals($url, $discussion['canonicalUrl']);
+
+        $this->expectException(\Garden\Web\Exception\ClientException::class);
+        $this->api()->put($this->baseUrl.'/'.$row['discussionID'].'/canonical-url', ['canonicalUrl' => $url.'overwrite']);
+    }
+
+    /**
+     * Test DELETE /discussions/{id}/canonical-url
+     */
+    public function testDeleteCanonicalUrl() {
+        $row = $this->testPost();
+        $url = '/canonical/url/test';
+        $discussion = $this->api()->put($this->baseUrl.'/'.$row['discussionID'].'/canonical-url', ['canonicalUrl' => $url])->getBody();
+        $response = $this->api()->delete($this->baseUrl.'/'.$row['discussionID'].'/canonical-url');
+
+        $this->assertEquals('204 No Content', $response->getStatus());
+
+        $discussion = $response->getBody();
+        $this->assertTrue(empty($discussion));
+
+        $discussion = $this->api()->get($this->baseUrl.'/'.$row['discussionID'])->getBody();
+        $this->assertNotEquals($url, $discussion['canonicalUrl']);
+        $this->assertEquals($discussion['url'], $discussion['canonicalUrl']);
+    }
 }

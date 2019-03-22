@@ -233,7 +233,7 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
             },
         ];
 
-        const panelContent: JSX.Element[] = [];
+        let panelContent: JSX.Element | null = null;
 
         const menus = menuContents.map((menu, index) => {
             const setMyIndex = (callback?: () => void) => {
@@ -241,16 +241,14 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
             };
             const MyContent = menu.component;
 
-            panelContent.push(
-                <div
-                    id={MyContent.get}
-                    role="menu"
-                    key={`menuBarItem-${index}`}
-                    style={!menu.open ? srOnly() : undefined}
-                >
-                    {menu.open && <MyContent {...menu} closeMenuAndSetCursor={this.closeMenuAndSetCursor} />}
-                </div>,
-            );
+            if (menu.open) {
+                panelContent = (
+                    <div id={MyContent.get} role="menu" style={!menu.open ? srOnly() : undefined}>
+                        <MyContent {...menu} closeMenuAndSetCursor={this.closeMenuAndSetCursor} />
+                    </div>
+                );
+            }
+
             return (
                 <ParagraphMenuBarTab
                     accessibleButtonLabel={"Toggle Heading Menu"}

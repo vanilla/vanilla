@@ -7,6 +7,7 @@ import {
     absolutePosition,
     appearance,
     colorOut,
+    singleBorder,
     singleLineEllipsis,
     srOnly,
     unit,
@@ -284,7 +285,10 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         marginBottom: ".5em",
     });
 
-    const separator = style("separator", {});
+    const separator = style("separator", {
+        borderTop: singleBorder(),
+        marginBottom: unit(8),
+    });
 
     const position = style("position", {
         position: "absolute",

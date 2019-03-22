@@ -16,7 +16,9 @@ export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
     const formVars = formElementsVariables();
     const style = styleFactory("paragraphMenuCheckRadio");
 
-    const group = style("group", {});
+    const group = style("group", {
+        marginBottom: unit(9),
+    });
 
     const checkRadio = style("checkRadio", {
         display: "flex",
@@ -40,7 +42,7 @@ export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
     const check = style("check", {});
     const radio = style("radio", {});
     const checked = style("checked", {});
-    const separator = style("checked", {});
+    const separator = style("separator", {});
     const icon = style("icon", {
         width: unit(vars.menuButton.size),
         flexBasis: unit(vars.menuButton.size),

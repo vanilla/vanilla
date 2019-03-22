@@ -10,13 +10,16 @@ import { IMenuBarItemTypes } from "@rich-editor/menuBar/paragraph/ParagraphMenus
 import { IMenuCheckRadio } from "@rich-editor/menuBar/paragraph/pieces/ParagraphMenuCheckRadio";
 import { t } from "@library/utility/appUtils";
 
-interface IProps {}
+interface IProps {
+    closeMenuAndSetCursor: () => void;
+}
 
 /**
  * Implemented tab content for menu list
  */
 export default class ParagraphMenuListsTabContent extends React.Component<IProps> {
     public render() {
-        return <div>{t("Hola")}</div>;
+        const classes = paragraphMenuTabsClasses();
+        return <div className={classes.panel}>{t("Hola")}</div>;
     }
 }

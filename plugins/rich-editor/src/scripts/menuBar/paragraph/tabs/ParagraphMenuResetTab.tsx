@@ -14,7 +14,7 @@ interface IProps {
     formatParagraphHandler: () => void;
     className?: string;
     isActive: boolean;
-    isDisabled: boolean;
+    isDisabled?: boolean;
     tabIndex: 0 | -1;
     setRovingIndex: () => void;
     closeAllSubMenus: () => void;

@@ -9,10 +9,11 @@ import ParagraphMenuBarRadioGroup, {
     IMenuBarRadioButton,
 } from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
 import { t } from "@library/utility/appUtils";
+import { paragraphMenuTabsClasses } from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
 
 interface IProps {
     items: IMenuBarRadioButton[];
-    handleClick: () => void;
+    closeMenuAndSetCursor: () => void;
 }
 
 /**
@@ -20,13 +21,18 @@ interface IProps {
  */
 export default class ParagraphMenuHeadingsTabContent extends React.Component<IProps> {
     public render() {
-        return t("Hello, i'm here");
-        /*
+        const classes = paragraphMenuTabsClasses();
+        const handleClick = (data: IMenuBarRadioButton, index: number) => {
+            this.props.items[index].formatFunction();
+            this.props.closeMenuAndSetCursor();
+        };
+        return (
             <ParagraphMenuBarRadioGroup
-                handleClick={this.props.handleClick}
+                className={classes.panel}
+                handleClick={handleClick}
                 label={t("Headings")}
                 items={this.props.items}
             />
-            */
+        );
     }
 }

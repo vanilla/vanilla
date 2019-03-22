@@ -79,15 +79,14 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
                         {icon}
                         <ScreenReaderContent>{this.props.accessibleButtonLabel}</ScreenReaderContent>
                     </button>
-                    {this.props.open && (
-                        <div id={this.menuID} role="menu">
-                            {children}
-                        </div>
-                    )}
                 </div>
             );
         } else {
             return null;
         }
+    }
+
+    public getMenuContentsID() {
+        return this.menuID;
     }
 }

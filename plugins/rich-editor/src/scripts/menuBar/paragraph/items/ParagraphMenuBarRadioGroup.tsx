@@ -18,7 +18,7 @@ export interface IMenuBarRadioButton extends IMenuCheckRadio {
 
 export interface IParagraphMenuBarRadioGroupProps {
     label: string;
-    classNames?: string;
+    className?: string;
     items: IMenuBarRadioButton[];
     activeIndex?: number | null;
     handleClick: (data: IMenuBarRadioButton, index: number) => void;
@@ -30,12 +30,9 @@ export interface IParagraphMenuBarRadioGroupProps {
 export default class ParagraphMenuBarRadioGroup extends React.PureComponent<IParagraphMenuBarRadioGroupProps> {
     public render() {
         const classes = paragraphMenuCheckRadioClasses();
+
         return (
-            <div
-                aria-label={this.props.label}
-                role="group"
-                className={classNames(classes.group, this.props.classNames)}
-            >
+            <div aria-label={this.props.label} role="group" className={classNames(classes.group, this.props.className)}>
                 {this.props.items.map((item, index) => {
                     const onClick = (event: MouseEvent) => {
                         this.props.handleClick(item, index);
@@ -46,7 +43,7 @@ export default class ParagraphMenuBarRadioGroup extends React.PureComponent<IPar
                             icon={item.icon}
                             text={item.text}
                             type={IMenuBarItemTypes.RADIO}
-                            handleClick={onClick}
+                            onClick={onClick}
                             key={`checkRadio-${index}`}
                         />
                     );

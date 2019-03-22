@@ -7,6 +7,7 @@ import { formElementsVariables } from "@library//forms/formElementStyles";
 import { useThemeCache, styleFactory } from "@library//styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { percent } from "csx";
 
 export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -15,13 +16,27 @@ export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
     const style = styleFactory("paragraphMenuCheckRadio");
 
     const group = style("group", {});
-    const checkRadio = style("checkRadio", {});
+    const checkRadio = style("checkRadio", {
+        display: "flex",
+        width: percent(100),
+    });
     const check = style("check", {});
     const radio = style("radio", {});
     const checked = style("checked", {});
     const separator = style("checked", {});
+    const checkRadioWrap = style("checkRadioWrap", {});
+    const checkRadioLabel = style("checkRadioLabel", {});
 
-    return { group, checkRadio, check, radio, checked };
+    return {
+        group,
+        checkRadio,
+        check,
+        radio,
+        checked,
+        separator,
+        checkRadioWrap,
+        checkRadioLabel,
+    };
 });
 
 export const paragraphMenuTabsClasses = useThemeCache(() => {
@@ -33,7 +48,8 @@ export const paragraphMenuTabsClasses = useThemeCache(() => {
     const content = style("content", {});
     const tabHandle = style("tabHandle", {});
     const activeTabHandle = style("activeTabHandle", {});
-    return { root, content, tabHandle, activeTabHandle };
+    const panel = style("panel", {});
+    return { root, content, tabHandle, activeTabHandle, panel };
 });
 
 export const paragraphMenuGroupClasses = useThemeCache(() => {

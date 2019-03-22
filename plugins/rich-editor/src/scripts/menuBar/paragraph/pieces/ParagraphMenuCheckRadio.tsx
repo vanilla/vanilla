@@ -20,7 +20,7 @@ interface IProps {
     icon: JSX.Element;
     text: string;
     type: IMenuBarItemTypes;
-    handleClick: (event: any) => void;
+    onClick: (event: any) => void;
 }
 
 /**
@@ -31,7 +31,7 @@ interface IProps {
 export default class ParagraphMenuCheckRadio extends React.PureComponent<IProps> {
     public render() {
         const classes = paragraphMenuCheckRadioClasses();
-        const { checked, type, icon, text, handleClick } = this.props;
+        const { checked, type, icon, text, onClick } = this.props;
         const isRadio = type === IMenuBarItemTypes.RADIO;
         return (
             <button
@@ -42,11 +42,11 @@ export default class ParagraphMenuCheckRadio extends React.PureComponent<IProps>
                 )}
                 role={isRadio ? "menuitemradio" : "menuitemcheckbox"}
                 aria-checked={checked}
-                onClick={handleClick}
+                type="button"
+                onClick={onClick}
             >
-                <span />
-                {icon}
-                {text}
+                <span className={classes.checkRadioWrap}>{icon}</span>
+                <span className={classes.checkRadioLabel}>{text}</span>
             </button>
         );
     }

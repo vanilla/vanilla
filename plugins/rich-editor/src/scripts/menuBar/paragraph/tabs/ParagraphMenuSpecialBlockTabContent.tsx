@@ -9,13 +9,16 @@ import { paragraphMenuTabsClasses } from "@rich-editor/menuBar/paragraph/paragra
 import { IMenuBarItemTypes } from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
 import { t } from "@library/utility/appUtils";
 
-interface IProps {}
+interface IProps {
+    closeMenuAndSetCursor: () => void;
+}
 
 /**
  * Implemented tab content for block styles
  */
 export default class ParagraphMenuBlockTabContent extends React.Component<IProps> {
     public render() {
-        return <div>{t("Hola")}</div>;
+        const classes = paragraphMenuTabsClasses();
+        return <div className={classes.panel}>{t("Hola 3")}</div>;
     }
 }

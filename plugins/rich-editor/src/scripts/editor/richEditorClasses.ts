@@ -97,9 +97,15 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     });
 
     const menuBar = style("menuBar", {
+        position: "relative",
+        width: unit(vars.menuButton.size * 4),
+    });
+
+    const menuBarToggles = style("menuBarToggles", {
+        position: "relative",
         display: "flex",
         flexWrap: "nowrap",
-        position: "relative",
+        width: unit(vars.menuButton.size * 4),
     });
 
     const paragraphMenuHandle = style("paragraphMenuHandle", {
@@ -298,6 +304,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     return {
         root,
         menuBar,
+        menuBarToggles,
         paragraphMenuHandle,
         text,
         menuItems,

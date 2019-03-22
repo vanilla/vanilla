@@ -101,55 +101,59 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
      * @inheritDoc
      */
     public render() {
-        const classesRichEditor = richEditorClasses(this.props.legacyMode);
-        const classes = richEditorClasses(this.props.legacyMode);
-        let pilcrowClasses = classNames({ isOpen: this.isMenuVisible }, classesRichEditor.paragraphMenuHandle);
+        if (this.isMenuVisible) {
+            const classesRichEditor = richEditorClasses(this.props.legacyMode);
+            const classes = richEditorClasses(this.props.legacyMode);
+            let pilcrowClasses = classNames({ isOpen: this.isMenuVisible }, classesRichEditor.paragraphMenuHandle);
 
-        if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
-            pilcrowClasses += " isHidden";
-        }
-
-        return (
-            <div
-                id={this.componentID}
-                style={this.pilcrowStyles}
-                className={classNames({ isMenuInset: !this.props.legacyMode }, classes.paragraphMenu)}
-                onKeyDown={this.handleMenuBarKeyDown}
-                ref={this.selfRef}
-            >
-                <button
-                    type="button"
-                    id={this.buttonID}
-                    ref={this.buttonRef}
-                    aria-label={t("Toggle Paragraph Format Menu")}
-                    aria-controls={this.menuID}
-                    aria-expanded={this.isMenuVisible}
-                    disabled={!this.props.disabled && !this.isPilcrowVisible}
-                    className={pilcrowClasses}
-                    aria-haspopup="menu"
-                    onClick={this.pilcrowClickHandler}
-                    onKeyDown={this.handleEscape}
-                >
-                    <ActiveFormatIcon activeFormats={this.props.activeFormats} />
-                </button>
+            if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
+                pilcrowClasses += " isHidden";
+            }
+            return (
                 <div
-                    id={this.menuID}
-                    className={classNames(this.dropDownClasses, classes.menuBar)}
-                    style={this.toolbarStyles}
-                    role="menu"
+                    id={this.componentID}
+                    style={this.pilcrowStyles}
+                    className={classNames({ isMenuInset: !this.props.legacyMode }, classes.paragraphMenu)}
+                    onKeyDown={this.handleMenuBarKeyDown}
+                    ref={this.selfRef}
                 >
-                    <ParagraphMenuBar
-                        parentID={this.ID}
-                        label={"Paragraph Format Menu"}
-                        isMenuVisible={this.isMenuVisible}
-                        formatter={this.formatter}
-                        lastGoodSelection={this.props.lastGoodSelection}
-                        activeFormats={this.props.activeFormats}
-                        legacyMode={this.props.legacyMode}
-                    />
+                    <button
+                        type="button"
+                        id={this.buttonID}
+                        ref={this.buttonRef}
+                        aria-label={t("Toggle Paragraph Format Menu")}
+                        aria-controls={this.menuID}
+                        aria-expanded={this.isMenuVisible}
+                        disabled={!this.props.disabled && !this.isPilcrowVisible}
+                        className={pilcrowClasses}
+                        aria-haspopup="menu"
+                        onClick={this.pilcrowClickHandler}
+                        onKeyDown={this.handleEscape}
+                    >
+                        <ActiveFormatIcon activeFormats={this.props.activeFormats} />
+                    </button>
+                    <div
+                        id={this.menuID}
+                        className={classNames(this.dropDownClasses, classes.menuBar)}
+                        style={this.toolbarStyles}
+                        role="menu"
+                    >
+                        <ParagraphMenuBar
+                            parentID={this.ID}
+                            label={"Paragraph Format Menu"}
+                            isMenuVisible={this.isMenuVisible}
+                            formatter={this.formatter}
+                            lastGoodSelection={this.props.lastGoodSelection}
+                            activeFormats={this.props.activeFormats}
+                            legacyMode={this.props.legacyMode}
+                            close={this.close}
+                        />
+                    </div>
                 </div>
-            </div>
-        );
+            );
+        } else {
+            return null;
+        }
     }
 
     /**

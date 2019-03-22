@@ -10,10 +10,12 @@ import ParagraphMenuBarRadioGroup, {
 } from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
 import { t } from "@library/utility/appUtils";
 import { paragraphMenuTabsClasses } from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
+import classNames from "classnames";
 
 interface IProps {
     items: IMenuBarRadioButton[];
     closeMenuAndSetCursor: () => void;
+    className?: string;
 }
 
 /**
@@ -28,7 +30,7 @@ export default class ParagraphMenuHeadingsTabContent extends React.Component<IPr
         };
         return (
             <ParagraphMenuBarRadioGroup
-                className={classes.panel}
+                className={classNames(classes.panel, this.props.className)}
                 handleClick={handleClick}
                 label={t("Headings")}
                 items={this.props.items}

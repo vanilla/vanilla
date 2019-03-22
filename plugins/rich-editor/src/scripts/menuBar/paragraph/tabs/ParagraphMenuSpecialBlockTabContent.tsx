@@ -6,7 +6,6 @@
 
 import React from "react";
 import { paragraphMenuTabsClasses } from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
-import { IMenuBarItemTypes } from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
 import { t } from "@library/utility/appUtils";
 
 interface IProps {

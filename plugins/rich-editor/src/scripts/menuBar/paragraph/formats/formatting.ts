@@ -51,11 +51,35 @@ export const paragraphFormats = (
         afterClickHandler && afterClickHandler();
     };
 
+    const listUnordered = () => {
+        formatter.h5(lastGoodSelection); // TODO
+        afterClickHandler && afterClickHandler();
+    };
+
+    const listOrdered = () => {
+        formatter.h5(lastGoodSelection); // TODO
+        afterClickHandler && afterClickHandler();
+    };
+
+    const listIndent = () => {
+        formatter.h5(lastGoodSelection); // TODO
+        afterClickHandler && afterClickHandler();
+    };
+
+    const listOutdent = () => {
+        formatter.h5(lastGoodSelection); // TODO
+        afterClickHandler && afterClickHandler();
+    };
+
     return {
         formatParagraph,
         formatBlockquote,
         formatCodeBlock,
         formatSpoiler,
+        listUnordered,
+        listOrdered,
+        listIndent,
+        listOutdent,
         formatH2,
         formatH3,
         formatH4,

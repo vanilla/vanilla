@@ -65,6 +65,8 @@ interface IMenuBarContent {
     activeFormats: {} | boolean;
     open: boolean;
     items?: IMenuBarRadioButton[];
+    indent?: () => void;
+    outdent?: () => void;
 }
 
 /**
@@ -194,6 +196,22 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
                 icon: this.state.listMenuIcon,
                 activeFormats: formatsActive.lists,
                 open: this.state.listMenuOpen,
+                items: [
+                    {
+                        formatFunction: formats.listUnordered,
+                        icon: listUnordered(),
+                        text: t("Bulleted List"),
+                        checked: formatsActive.lists.ordered,
+                    },
+                    {
+                        formatFunction: formats.listUnordered,
+                        icon: listOrdered(),
+                        text: t("Ordered List"),
+                        checked: formatsActive.lists.unordered,
+                    },
+                ],
+                indent: formats.listIndent,
+                outdent: formats.listIndent,
             },
             {
                 component: ParagraphMenuBlockTabContent,

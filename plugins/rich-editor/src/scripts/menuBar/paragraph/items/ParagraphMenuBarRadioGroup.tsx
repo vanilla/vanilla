@@ -31,24 +31,32 @@ export default class ParagraphMenuBarRadioGroup extends React.PureComponent<IPar
     public render() {
         const classes = paragraphMenuCheckRadioClasses();
 
-        return (
-            <div aria-label={this.props.label} role="group" className={classNames(classes.group, this.props.className)}>
-                {this.props.items.map((item, index) => {
-                    const onClick = (event: MouseEvent) => {
-                        this.props.handleClick(item, index);
-                    };
-                    return (
-                        <ParagraphMenuCheckRadio
-                            checked={this.props.activeIndex === index}
-                            icon={item.icon}
-                            text={item.text}
-                            type={IMenuBarItemTypes.RADIO}
-                            onClick={onClick}
-                            key={`checkRadio-${index}`}
-                        />
-                    );
-                })}
-            </div>
-        );
+        if (this.props.items && this.props.items.length > 0) {
+            return (
+                <div
+                    aria-label={this.props.label}
+                    role="group"
+                    className={classNames(classes.group, this.props.className)}
+                >
+                    {this.props.items.map((item, index) => {
+                        const onClick = (event: MouseEvent) => {
+                            this.props.handleClick(item, index);
+                        };
+                        return (
+                            <ParagraphMenuCheckRadio
+                                checked={this.props.activeIndex === index}
+                                icon={item.icon}
+                                text={item.text}
+                                type={IMenuBarItemTypes.RADIO}
+                                onClick={onClick}
+                                key={`checkRadio-${index}`}
+                            />
+                        );
+                    })}
+                </div>
+            );
+        } else {
+            return null;
+        }
     }
 }

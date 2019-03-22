@@ -11,7 +11,7 @@ import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 interface IProps {
     className?: string;
-    legacyMode: boolean;
+    legacyMode?: boolean;
 }
 
 /**
@@ -19,7 +19,7 @@ interface IProps {
  */
 export default class DropDownItemSeparator extends React.Component<IProps> {
     public render() {
-        const classes = richEditorClasses(this.props.legacyMode);
+        const classes = richEditorClasses(!!this.props.legacyMode);
         return (
             <div className={classNames(this.props.className, classes.separator)}>
                 <ScreenReaderContent>

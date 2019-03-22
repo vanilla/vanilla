@@ -17,6 +17,8 @@ import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import HeadingBlot from "quill/formats/header";
 import { Blot, RangeStatic } from "quill/core";
 import Embed from "quill/blots/embed";
+import { ListItem, ListGroup } from "@rich-editor/quill/blots/blocks/ListBlot";
+import Delta from "quill-delta";
 
 export default class Formatter {
     public static INLINE_FORMAT_NAMES = [
@@ -136,6 +138,54 @@ export default class Formatter {
      */
     public spoiler = (range: RangeStatic) => {
         this.quill.formatLine(range.index, range.length, SpoilerLineBlot.blotName, true, Quill.sources.USER);
+    };
+
+    public bulletedList = (range: RangeStatic) => {};
+
+    public orderedList = (range: RangeStatic) => {};
+
+    private getListItems = (range: RangeStatic): ListItem[] => {
+        if (range.length === 0) {
+            const descendant = this.quill.scroll.descendant(
+                (blot: Blot) => blot instanceof ListItem,
+                range.index,
+            )[0] as ListItem;
+            if (descendant) {
+                return [descendant];
+            } else {
+                return [];
+            }
+        } else {
+            return this.quill.scroll.descendants(
+                (blot: Blot) => blot instanceof ListItem,
+                range.index,
+                range.length,
+            ) as ListItem[];
+        }
+    };
+
+    public indentList = (range: RangeStatic) => {
+        const listBlots = this.getListItems(range);
+        const selectionBefore = this.quill.getSelection();
+        this.quill.history.cutoff();
+        listBlots.forEach(blot => {
+            blot.indent();
+            this.quill.update(Quill.sources.USER);
+        });
+        this.quill.history.cutoff();
+        this.quill.setSelection(selectionBefore);
+    };
+
+    public outdentList = (range: RangeStatic) => {
+        const listBlots = this.getListItems(range);
+        const selectionBefore = this.quill.getSelection();
+        this.quill.history.cutoff();
+        listBlots.forEach(blot => {
+            blot.outdent();
+            this.quill.update(Quill.sources.USER);
+        });
+        this.quill.history.cutoff();
+        this.quill.setSelection(selectionBefore);
     };
 
     /**

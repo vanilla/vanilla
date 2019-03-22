@@ -21,7 +21,6 @@ import LineBlot from "@rich-editor/quill/blots/abstract/LineBlot";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
-import LinkBlot from "quill/formats/link";
 import BlockBlot from "quill/blots/block";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
@@ -264,6 +263,10 @@ export default class KeyboardBindings {
         this.bindings["outdent code-block"] = false;
         this.bindings["remove tab"] = false;
         this.bindings["code exit"] = false;
+        this.bindings["indent"] = false;
+        this.bindings["outdent"] = false;
+        this.bindings["list empty enter"] = false;
+        this.bindings["checklist enter"] = false;
     }
 
     private addLinkTransformKeyboardBindings() {
@@ -275,43 +278,13 @@ export default class KeyboardBindings {
     }
 
     /**
-     * Convert the last word of a line that is formatted like a link into an actual link.
-     */
-    private transformTextToLink = (range: RangeStatic) => {
-        const line: Blot = this.quill.getLine(range.index)[0];
-        const lineStart = line.offset();
-        const textUntilSpace = this.quill.getText(lineStart, range.index);
-        const results = textUntilSpace.match(/\s([^\s]+)$|^([^\s]+)$/);
-        if (!results) {
-            return true;
-        }
-
-        const lastWord = results[1] || results[2];
-        const lineIndex = results.index || 0;
-        let index = lineStart + lineIndex;
-        const length = lastWord.length;
-
-        if (results[1]) {
-            // Javascript has no lookbehinds so the space is part of the match. We need to adjust things to compensate.
-            index += 1;
-        }
-
-        const isAlreadyLink = this.quill.scroll.descendants(blot => blot instanceof LinkBlot, index, length).length > 0;
-
-        if (isAllowedUrl(lastWord) && !isAlreadyLink) {
-            this.quill.formatText(index, length, { link: lastWord }, Quill.sources.USER);
-        }
-        return true;
-    };
-
-    /**
      * Add keyboard options.bindings that allow the user to
      */
     private addBlockNewLineHandlers() {
         this.bindings["MutliLine Enter"] = {
             key: KeyboardModule.keys.ENTER,
             collapsed: true,
-            format: ["spoiler-line", "blockquote-line"],
+            format: ["spoiler-line", "blockquote-line", "list"],
             handler: this.handleMultilineEnter,
         };
 
@@ -422,6 +395,8 @@ export default class KeyboardBindings {
             handler: this.handleCodeBlockBackspace,
         };
     }
+
+    private addListHandlers() {}
 
     /**
      * Add keyboard options.bindings that allow the user to escape multi-line blocks with arrow keys.

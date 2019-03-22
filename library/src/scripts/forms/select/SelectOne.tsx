@@ -4,15 +4,18 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import ErrorMessages from "@library/forms/ErrorMessages";
-import { getRequiredID, IOptionalComponentID } from "@library/utility/idUtils";
-import Select from "react-select";
-import { IComboBoxOption } from "@library/features/search/SearchBar";
-import classNames from "classnames";
-import Paragraph from "@library/layout/Paragraph";
 import { IFieldError } from "@library/@types/api/core";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
+import ErrorMessages from "@library/forms/ErrorMessages";
 import * as selectOverrides from "@library/forms/select/overwrites";
+import Paragraph from "@library/layout/Paragraph";
+import { getRequiredID, IOptionalComponentID } from "@library/utility/idUtils";
+import classNames from "classnames";
+import React from "react";
+import Select from "react-select";
+import { OptionProps } from "react-select/lib/components/Option";
+import { styleFactory } from "@library/styles/styleUtils";
+import { style } from "typestyle";
 
 export interface ISelectOneProps extends IOptionalComponentID {
     label: string;
@@ -27,6 +30,8 @@ export interface ISelectOneProps extends IOptionalComponentID {
     errors?: IFieldError[];
     searchable?: boolean;
     value: IComboBoxOption | undefined;
+    noOptionsMessage?: ((props: OptionProps<any>) => JSX.Element | null);
+    isLoading?: boolean;
 }
 
 /**
@@ -53,6 +58,23 @@ export default class SelectOne extends React.Component<ISelectOneProps> {
             describedBy = this.errorID;
         }
 
+        const inputWrapClass = style({
+            $nest: {
+                ".inputBlock-inputText": {
+                    paddingRight: 30,
+                    position: "relative",
+                },
+                ".SelectOne__indicators": {
+                    position: "absolute",
+                    top: 0,
+                    right: 6,
+                    bottom: 0,
+                },
+                ".SelectOne__indicator": {
+                    cursor: "pointer",
+                },
+            },
+        });
         return (
             <div className={this.props.className}>
                 <label htmlFor={this.inputID} className="inputBlock-labelAndDescription">
@@ -60,7 +82,7 @@ export default class SelectOne extends React.Component<ISelectOneProps> {
                     <Paragraph className="inputBlock-labelNote" children={this.props.labelNote} />
                 </label>
 
-                <div className="inputBlock-inputWrap">
+                <div className={classNames("inputBlock-inputWrap", inputWrapClass)}>
                     <Select
                         id={this.id}
                         options={options}
@@ -79,6 +101,8 @@ export default class SelectOne extends React.Component<ISelectOneProps> {
                         aria-describedby={describedBy}
                         isSearchable={searchable}
                         value={this.props.value}
+                        placeholder={this.props.placeholder}
+                        isLoading={this.props.isLoading}
                     />
                     <Paragraph className="inputBlock-labelNote" children={this.props.noteAfterInput} />
                     <ErrorMessages id={this.errorID} errors={this.props.errors} />
@@ -91,12 +115,12 @@ export default class SelectOne extends React.Component<ISelectOneProps> {
     * Overwrite components in Select component
     */
     private componentOverwrites = {
-        IndicatorsContainer: selectOverrides.NullComponent,
         Menu: selectOverrides.Menu,
         MenuList: selectOverrides.MenuList,
         Option: selectOverrides.SelectOption,
         ValueContainer: selectOverrides.ValueContainer,
-        NoOptionsMessage: selectOverrides.NoOptionsMessage,
+        NoOptionsMessage: this.props.noOptionsMessage || selectOverrides.NoOptionsMessage,
+        LoadingMessage: selectOverrides.OptionLoader,
     };
 
     /**

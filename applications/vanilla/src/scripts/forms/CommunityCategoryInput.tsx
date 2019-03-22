@@ -9,22 +9,49 @@ import CategorySuggestionActions from "@vanilla/categories/CategorySuggestionAct
 import { IForumStoreState } from "@vanilla/redux/state";
 import React from "react";
 import { connect } from "react-redux";
+import { OptionProps } from "react-select/lib/components/Option";
+import { NoOptionsMessage } from "@library/forms/select/overwrites";
+import { LoadStatus } from "@library/@types/api/core";
+
+interface IProps extends ISelectLookupProps {
+    isLoading: boolean;
+}
 
 /**
  * Form component for searching/selecting a category.
  */
-export class CommunityCategoryInput extends React.Component<ISelectLookupProps> {
-    public static defaultProps: Partial<ISelectLookupProps> = {
+export class CommunityCategoryInput extends React.Component<IProps> {
+    public static defaultProps: Partial<IProps> = {
+        isLoading: false,
         label: t("Community Category"),
     };
 
     public render() {
-        return <SelectLookup {...this.props} label={this.props.label} />;
+        console.log(this.props.isLoading);
+        return (
+            <SelectLookup
+                {...this.props}
+                label={this.props.label}
+                noOptionsMessage={this.noOptionsMessage}
+                placeholder=""
+            />
+        );
+    }
+
+    private noOptionsMessage(props: OptionProps<any>): JSX.Element | null {
+        let text = "";
+        if (props.selectProps.inputValue === "") {
+            text = t("Search for a category");
+        } else {
+            text = t("No categories found");
+        }
+        return <NoOptionsMessage {...props}>{text}</NoOptionsMessage>;
     }
 }
 
 function mapStateToProps(state: IForumStoreState, ownProps: ISelectLookupProps) {
     return {
+        isLoading: state.forum.categories.suggestions.status === LoadStatus.LOADING,
         suggestions: state.forum.categories.suggestions,
     };
 }

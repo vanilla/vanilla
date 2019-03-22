@@ -22,6 +22,10 @@ const INITIAL_STATE: ICategoriesState = {
 
 export const categoriesReducer = produce(
     reducerWithInitialState(clone(INITIAL_STATE))
+        .case(CategorySuggestionActions.loadCategories.started, (nextState, payload) => {
+            nextState.suggestions.status = LoadStatus.LOADING;
+            return nextState;
+        })
         .case(CategorySuggestionActions.loadCategories.done, (nextState, payload) => {
             nextState.suggestions.status = LoadStatus.SUCCESS;
             nextState.suggestions.data = payload.result;

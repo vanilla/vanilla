@@ -170,6 +170,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         width: unit(vars.menuButton.size),
         height: unit(vars.menuButton.size),
         padding: 0,
+        overflow: "hidden",
         $nest: {
             "&.richEditor-formatButton, &.richEditor-embedButton": {
                 height: unit(vars.menuButton.size),

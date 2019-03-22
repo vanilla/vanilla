@@ -4,7 +4,6 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
@@ -20,15 +19,15 @@ export const paragraphFormats = (
         formatter.paragraph(lastGoodSelection);
         afterClickHandler && afterClickHandler();
     };
-    const blockquote = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const blockquote = () => {
         formatter.blockquote(lastGoodSelection);
         afterClickHandler && afterClickHandler();
     };
-    const codeBlock = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const codeBlock = () => {
         formatter.codeBlock(lastGoodSelection);
         afterClickHandler && afterClickHandler();
     };
-    const spoiler = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const spoiler = () => {
         formatter.spoiler(lastGoodSelection);
         afterClickHandler && afterClickHandler();
     };

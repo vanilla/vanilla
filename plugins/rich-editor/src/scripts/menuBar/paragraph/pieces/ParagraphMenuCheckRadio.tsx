@@ -8,6 +8,7 @@ import React from "react";
 import { paragraphMenuCheckRadioClasses } from "../paragraphMenuBarStyles";
 import classNames from "classnames";
 import { IMenuBarItemTypes } from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
+import { check } from "@library/icons/common";
 
 export interface IMenuCheckRadio {
     checked: boolean;
@@ -45,8 +46,9 @@ export default class ParagraphMenuCheckRadio extends React.PureComponent<IProps>
                 type="button"
                 onClick={onClick}
             >
-                <span className={classes.checkRadioWrap}>{icon}</span>
+                <span className={classes.icon}>{icon}</span>
                 <span className={classes.checkRadioLabel}>{text}</span>
+                {checked && <span className={classes.checkRadioSelected}>{check()}</span>}
             </button>
         );
     }

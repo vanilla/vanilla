@@ -17,6 +17,10 @@ import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
 import ParagraphMenuBar from "@rich-editor/menuBar/paragraph/ParagraphMenuBar";
+import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
+import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
+import { getActiveFormats, paragraphFormats } from "@rich-editor/menuBar/paragraph/formats/formatting";
 
 export enum IMenuBarItemTypes {
     CHECK = "checkbox",
@@ -109,6 +113,16 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
             if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
                 pilcrowClasses += " isHidden";
             }
+
+            let isParagraphEnabled = true;
+            ["header", BlockquoteLineBlot.blotName, CodeBlockBlot.blotName, SpoilerLineBlot.blotName].forEach(item => {
+                if (item && item in this.props.activeFormats) {
+                    isParagraphEnabled = false;
+                }
+            });
+            const textFormats = paragraphFormats(this.formatter, this.props.lastGoodSelection);
+            const formatsActive = getActiveFormats(this.props.activeFormats);
+
             return (
                 <div
                     id={this.componentID}
@@ -142,11 +156,12 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                             parentID={this.ID}
                             label={"Paragraph Format Menu"}
                             isMenuVisible={this.isMenuVisible}
-                            formatter={this.formatter}
                             lastGoodSelection={this.props.lastGoodSelection}
                             activeFormats={this.props.activeFormats}
                             legacyMode={this.props.legacyMode}
                             close={this.close}
+                            textFormats={textFormats}
+                            formatsActive={formatsActive}
                         />
                     </div>
                 </div>

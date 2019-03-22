@@ -45,11 +45,11 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
                 />
                 <ParagraphMenuSeparator />
                 <button className={classNames(checkRadioClasses.checkRadio)} type="button" onClick={this.props.indent}>
-                    <span className={checkRadioClasses.checkRadioWrap}>{indent()}</span>
+                    <span className={checkRadioClasses.icon}>{indent()}</span>
                     <span className={checkRadioClasses.checkRadioLabel}>{t("Indent")}</span>
                 </button>
                 <button className={classNames(checkRadioClasses.checkRadio)} type="button" onClick={this.props.outdent}>
-                    <span className={checkRadioClasses.checkRadioWrap}>{outdent()}</span>
+                    <span className={checkRadioClasses.icon}>{outdent()}</span>
                     <span className={checkRadioClasses.checkRadioLabel}>{t("Outdent")}</span>
                 </button>
             </>

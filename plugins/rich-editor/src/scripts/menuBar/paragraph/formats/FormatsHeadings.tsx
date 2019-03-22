@@ -44,25 +44,25 @@ export default class FormatsHeadings extends React.Component<IProps, IState> {
                         checked: false,
                         icon: heading2(),
                         text: t("Headings 2"),
-                        formatFunction: formats.formatH2,
+                        formatFunction: formats.h2,
                     },
                     {
                         checked: false,
                         icon: heading3(),
                         text: t("Headings 3"),
-                        formatFunction: formats.formatH3,
+                        formatFunction: formats.h3,
                     },
                     {
                         checked: false,
                         icon: heading4(),
                         text: t("Headings 4"),
-                        formatFunction: formats.formatH4,
+                        formatFunction: formats.h4,
                     },
                     {
                         checked: false,
                         icon: heading5(),
                         text: t("Headings 5"),
-                        formatFunction: formats.formatH5,
+                        formatFunction: formats.h5,
                     },
                 ]}
             />

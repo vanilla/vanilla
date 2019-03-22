@@ -11,7 +11,6 @@ import Formatter from "@rich-editor/quill/Formatter";
 import { RangeStatic } from "quill/core";
 import ParagraphMenuBarRadioGroup, {
     IMenuBarRadioButton,
-    IParagraphMenuBarRadioGroupProps,
 } from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
 import { paragraphFormats } from "@rich-editor/menuBar/paragraph/formats/formatting";
 

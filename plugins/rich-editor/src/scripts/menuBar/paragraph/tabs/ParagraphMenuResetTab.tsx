@@ -16,8 +16,8 @@ interface IProps {
     isActive: boolean;
     isDisabled?: boolean;
     tabIndex: 0 | -1;
-    setRovingIndex: () => void;
-    closeAllSubMenus: () => void;
+    setRovingIndex: (callback?: () => void) => void;
+    closeMenuAndSetCursor: () => void;
 }
 
 /**
@@ -30,9 +30,10 @@ export default class ParagraphMenuResetTab extends React.PureComponent<IProps> {
         const title = t("Set style to plain paragraph");
         const classes = paragraphMenuTabsClasses();
         const handleClick = (event: React.MouseEvent) => {
-            this.props.setRovingIndex();
-            this.props.formatParagraphHandler();
-            this.buttonRef.current && this.buttonRef.current.focus();
+            this.props.setRovingIndex(() => {
+                this.props.formatParagraphHandler();
+                this.props.closeMenuAndSetCursor();
+            });
         };
         return (
             <button

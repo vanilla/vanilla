@@ -16,37 +16,37 @@ export const paragraphFormats = (
     lastGoodSelection: RangeStatic,
     afterClickHandler?: () => void,
 ) => {
-    const formatParagraph = () => {
+    const paragraph = () => {
         formatter.paragraph(lastGoodSelection);
         afterClickHandler && afterClickHandler();
     };
-    const formatBlockquote = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const blockquote = (event: React.MouseEvent<HTMLButtonElement>) => {
         formatter.blockquote(lastGoodSelection);
         afterClickHandler && afterClickHandler();
     };
-    const formatCodeBlock = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const codeBlock = (event: React.MouseEvent<HTMLButtonElement>) => {
         formatter.codeBlock(lastGoodSelection);
         afterClickHandler && afterClickHandler();
     };
-    const formatSpoiler = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const spoiler = (event: React.MouseEvent<HTMLButtonElement>) => {
         formatter.spoiler(lastGoodSelection);
         afterClickHandler && afterClickHandler();
     };
 
-    const formatH2 = () => {
+    const h2 = () => {
         formatter.h2(lastGoodSelection);
         afterClickHandler && afterClickHandler();
     };
-    const formatH3 = () => {
+    const h3 = () => {
         formatter.h3(lastGoodSelection);
         afterClickHandler && afterClickHandler();
     };
 
-    const formatH4 = () => {
+    const h4 = () => {
         formatter.h4(lastGoodSelection);
         afterClickHandler && afterClickHandler();
     };
-    const formatH5 = () => {
+    const h5 = () => {
         formatter.h5(lastGoodSelection);
         afterClickHandler && afterClickHandler();
     };
@@ -72,18 +72,18 @@ export const paragraphFormats = (
     };
 
     return {
-        formatParagraph,
-        formatBlockquote,
-        formatCodeBlock,
-        formatSpoiler,
+        paragraph,
+        blockquote,
+        codeBlock,
+        spoiler,
         listUnordered,
         listOrdered,
         listIndent,
         listOutdent,
-        formatH2,
-        formatH3,
-        formatH4,
-        formatH5,
+        h2,
+        h3,
+        h4,
+        h5,
     };
 };
 

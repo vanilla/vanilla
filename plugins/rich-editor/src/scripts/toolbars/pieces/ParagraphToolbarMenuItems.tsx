@@ -14,6 +14,7 @@ import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import MenuItems from "@rich-editor/toolbars/pieces/MenuItems";
+import Button from "@library/forms/Button";
 
 interface IProps {
     formatter: Formatter;
@@ -55,11 +56,18 @@ export default class ParagraphToolbarMenuItems extends React.PureComponent<IProp
 
         return [
             {
-                icon: pilcrow(),
+                icon: "In",
                 label: t("Format as Paragraph"),
-                onClick: this.formatParagraph,
-                isActive: isParagraphEnabled,
-                isDisabled: isParagraphEnabled,
+                onClick: this.indent,
+                isActive: false,
+                isDisabled: false,
+            },
+            {
+                icon: "Out",
+                label: t("Format as Paragraph"),
+                onClick: this.outdent,
+                isActive: false,
+                isDisabled: false,
             },
             {
                 icon: heading2(),
@@ -107,6 +115,16 @@ export default class ParagraphToolbarMenuItems extends React.PureComponent<IProp
     private formatParagraph = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         this.props.formatter.paragraph(this.props.lastGoodSelection);
+        this.props.afterClickHandler && this.props.afterClickHandler();
+    };
+    private indent = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        this.props.formatter.indentList(this.props.lastGoodSelection);
+        this.props.afterClickHandler && this.props.afterClickHandler();
+    };
+    private outdent = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        this.props.formatter.outdentList(this.props.lastGoodSelection);
         this.props.afterClickHandler && this.props.afterClickHandler();
     };
     private formatH2 = (event: React.MouseEvent<HTMLButtonElement>) => {

@@ -909,9 +909,8 @@ class DashboardHooks extends Gdn_Plugin {
         if ($parsed['Type'] !== 'static' || $parsed['Domain'] !== 'v') {
             return;
         }
-
-        $remotePath = PATH_ROOT.'/'.$parsed['Name'];
-
+        // Sanitize $remotePath to prevent path traversal.
+        $remotePath = str_replace('..', '', PATH_ROOT.'/'.$parsed['Name']);
         // Since this is just a temp file we don't want to nest it in a bunch of subfolders.
         $localPath = paths(PATH_UPLOADS, 'tmp-static', str_replace('/', '-', $parsed['Name']));
 

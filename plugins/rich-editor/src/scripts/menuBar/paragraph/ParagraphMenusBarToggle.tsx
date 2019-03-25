@@ -12,18 +12,11 @@ import Formatter from "@rich-editor/quill/Formatter";
 import classNames from "classnames";
 import FocusWatcher from "@library/dom/FocusWatcher";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import MenuItems from "@rich-editor/toolbars/pieces/MenuItems";
 import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
 import ParagraphMenuBar from "@rich-editor/menuBar/paragraph/ParagraphMenuBar";
 import { menuState, paragraphFormats } from "@rich-editor/menuBar/paragraph/formats/formatting";
-import SpoilerLineBlot, { SpoilerWrapperBlot, SpoilerContentBlot } from "@rich-editor/quill/blots/blocks/SpoilerBlot";
-import BlockquoteLineBlot, {
-    BlockquoteWrapperBlot,
-    BlockquoteContentBlot,
-} from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
-import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 
 export enum IMenuBarItemTypes {
     CHECK = "checkbox",
@@ -31,28 +24,15 @@ export enum IMenuBarItemTypes {
     SEPARATOR = "separator",
 }
 
-export interface IMenuBarItem {
-    type: IMenuBarItemTypes.CHECK | IMenuBarItemTypes.RADIO;
-    checked: boolean;
-    icon: JSX.Element;
-    label: string;
-    formatFunction: () => void;
-}
-
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
-    // renderAbove?: boolean;
-    // renderLeft?: boolean;
-    // formatter: Formatter;
-    // lastGoodSelection: RangeStatic;
+    mobile?: boolean;
+    lastGoodSelection: RangeStatic;
 }
 
 interface IState {
     hasFocus: boolean;
     rovingTabIndex: number; // https://www.w3.org/TR/wai-aria-practices-1.1/#kbd_roving_tabindex
-    // itemCount: number;
-    // tabIcons: JSX.Element[];
-    // activeMenu: number | null;
 }
 
 // Implements the paragraph menubar
@@ -79,7 +59,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
         this.menuID = this.ID + "-menu";
         this.buttonID = this.ID + "-button";
         this.state = {
-            hasFocus: true, // do not commit
+            hasFocus: false,
             rovingTabIndex: 0,
             // activeMenu: null,
         };
@@ -108,66 +88,70 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
      * @inheritDoc
      */
     public render() {
-        if (this.isMenuVisible) {
-            const classesRichEditor = richEditorClasses(this.props.legacyMode);
-            const classes = richEditorClasses(this.props.legacyMode);
-            let pilcrowClasses = classNames({ isOpen: this.isMenuVisible }, classesRichEditor.paragraphMenuHandle);
+        const classesRichEditor = richEditorClasses(this.props.legacyMode);
+        const classes = richEditorClasses(this.props.legacyMode);
+        let pilcrowClasses = classNames(
+            { isOpen: this.isMenuVisible },
+            classesRichEditor.paragraphMenuHandle,
+            this.props.mobile ? classesRichEditor.paragraphMenuHandleMobile : "",
+        );
 
-            if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
-                pilcrowClasses += " isHidden";
-            }
-
-            const textFormats = paragraphFormats(this.formatter, this.props.lastGoodSelection);
-            const menuActiveFormats = menuState(this.props.activeFormats);
-
-            // console.log("menuActiveFormats: ", menuActiveFormats);
-
-            return (
-                <div
-                    id={this.componentID}
-                    style={this.pilcrowStyles}
-                    className={classNames({ isMenuInset: !this.props.legacyMode }, classes.paragraphMenu)}
-                    onKeyDown={this.handleMenuBarKeyDown}
-                    ref={this.selfRef}
-                >
-                    <button
-                        type="button"
-                        id={this.buttonID}
-                        ref={this.buttonRef}
-                        aria-label={t("Toggle Paragraph Format Menu")}
-                        aria-controls={this.menuID}
-                        aria-expanded={this.isMenuVisible}
-                        disabled={!this.props.disabled && !this.isPilcrowVisible}
-                        className={pilcrowClasses}
-                        aria-haspopup="menu"
-                        onClick={this.pilcrowClickHandler}
-                        onKeyDown={this.handleEscape}
-                    >
-                        <ActiveFormatIcon activeFormats={menuActiveFormats} />
-                    </button>
-                    <div
-                        id={this.menuID}
-                        className={classNames(this.dropDownClasses, classes.menuBar)}
-                        style={this.toolbarStyles}
-                        role="menu"
-                    >
-                        <ParagraphMenuBar
-                            parentID={this.ID}
-                            label={"Paragraph Format Menu"}
-                            isMenuVisible={this.isMenuVisible}
-                            lastGoodSelection={this.props.lastGoodSelection}
-                            legacyMode={this.props.legacyMode}
-                            close={this.close}
-                            textFormats={textFormats}
-                            menuActiveFormats={menuActiveFormats}
-                            rovingIndex={this.state.rovingTabIndex}
-                        />
-                    </div>
-                </div>
-            );
-        } else {
-            return null;
+        if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
+            pilcrowClasses += " isHidden";
         }
+
+        const textFormats = paragraphFormats(this.formatter, this.props.lastGoodSelection);
+        const menuActiveFormats = menuState(this.props.activeFormats);
+
+        return (
+            <div
+                id={this.componentID}
+                style={this.pilcrowStyles}
+                className={classNames(
+                    { isMenuInset: !this.props.legacyMode },
+                    !!this.props.mobile ? classes.paragraphMenuMobile : classes.paragraphMenu,
+                    !!this.props.mobile ? classes.menuItem : "",
+                    !!this.props.mobile ? classes.button : "",
+                    { isHidden: this.isMenuVisible },
+                )}
+                onKeyDown={this.handleMenuBarKeyDown}
+                ref={this.selfRef}
+            >
+                <button
+                    type="button"
+                    id={this.buttonID}
+                    ref={this.buttonRef}
+                    aria-label={t("Toggle Paragraph Format Menu")}
+                    aria-controls={this.menuID}
+                    aria-expanded={this.isMenuVisible}
+                    disabled={!this.props.disabled && !this.isPilcrowVisible}
+                    className={pilcrowClasses}
+                    aria-haspopup="menu"
+                    onClick={this.pilcrowClickHandler}
+                    onKeyDown={this.handleEscape}
+                >
+                    <ActiveFormatIcon activeFormats={menuActiveFormats} />
+                </button>
+                <div
+                    id={this.menuID}
+                    className={classNames(this.dropDownClasses, classes.menuBar)}
+                    style={this.toolbarStyles}
+                    role="menu"
+                >
+                    <ParagraphMenuBar
+                        parentID={this.ID}
+                        label={"Paragraph Format Menu"}
+                        isMenuVisible={this.isMenuVisible}
+                        lastGoodSelection={this.props.lastGoodSelection}
+                        legacyMode={this.props.legacyMode}
+                        close={this.close}
+                        textFormats={textFormats}
+                        menuActiveFormats={menuActiveFormats}
+                        rovingIndex={this.state.rovingTabIndex}
+                    />
+                </div>
+            </div>
+        );
     }
 
     /**
@@ -181,7 +165,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
      * Show the menu if we have a valid selection, and a valid focus.
      */
     private get isMenuVisible() {
-        return !!this.props.lastGoodSelection; // do not commit
+        return !!this.props.lastGoodSelection && this.state.hasFocus;
     }
 
     /**

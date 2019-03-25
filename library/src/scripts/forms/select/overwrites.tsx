@@ -18,6 +18,7 @@ import classNames from "classnames";
 import { OptionProps } from "react-select/lib/components/Option";
 import { close } from "@library/icons/common";
 import { components } from "react-select";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
 
 /**
  * Overwrite for the controlContainer component in React Select
@@ -50,7 +51,13 @@ export function Menu(props: MenuProps<any>) {
     return (
         <components.Menu
             {...props}
-            className={classNames("suggestedTextInput-menu", "dropDown-contents", "isParentWidth", classes.contents)}
+            className={classNames(
+                "suggestedTextInput-menu",
+                "dropDown-contents",
+                "isParentWidth",
+                classes.contents,
+                searchBarClasses().results,
+            )}
         />
     );
 }

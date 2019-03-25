@@ -20,7 +20,6 @@ export interface IParagraphMenuBarRadioGroupProps {
     label: string;
     className?: string;
     items: IMenuBarRadioButton[];
-    activeIndex?: number | null;
     handleClick: (data: IMenuBarRadioButton, index: number) => void;
 }
 
@@ -44,7 +43,7 @@ export default class ParagraphMenuBarRadioGroup extends React.PureComponent<IPar
                         };
                         return (
                             <ParagraphMenuCheckRadio
-                                checked={this.props.activeIndex === index}
+                                checked={item.checked}
                                 icon={item.icon}
                                 text={item.text}
                                 type={IMenuBarItemTypes.RADIO}

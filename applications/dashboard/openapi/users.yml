@@ -627,12 +627,26 @@ components:
   schemas:
     User:
       properties:
-        banned:
-          description: Is the user banned?
+        userID:
+          description: ID of the user.
           type: integer
-        bypassSpam:
-          description: Should submissions from this user bypass SPAM checks?
-          type: boolean
+        name:
+          description: Name of the user.
+          minLength: 1
+          type: string
+        photoUrl:
+          description: URL to the user photo.
+          minLength: 0
+          nullable: true
+          type: string
+        email:
+          description: Email address of the user.
+          minLength: 0
+          type: string
+        roles:
+          items:
+            $ref: 'schemas.yml#/components/schemas/RoleFragment'
+          type: array
         dateInserted:
           description: When the user was created.
           format: date-time
@@ -647,25 +661,22 @@ components:
           format: date-time
           nullable: true
           type: string
-        email:
-          description: Email address of the user.
-          minLength: 0
-          type: string
+        points:
+          description: The total number of points the user has accumulated.
+          type: integer
+          default: 0
         emailConfirmed:
-          description: Has the email address for this user been confirmed?
+          description: Has the email address for the user been confirmed?
           type: boolean
         hidden:
           description: Is this user hiding their online status?
           type: boolean
-        name:
-          description: Name of the user.
-          minLength: 1
-          type: string
-        photoUrl:
-          description: URL to the user photo.
-          minLength: 0
-          nullable: true
-          type: string
+        bypassSpam:
+          description: Should submissions from this user bypass SPAM checks?
+          type: boolean
+        banned:
+          description: Is the user banned?
+          type: integer
         rank:
           x-addon: ranks
           properties:
@@ -690,21 +701,15 @@ components:
           description: ID of the user rank.
           nullable: true
           type: integer
-        roles:
-          items:
-            $ref: 'schemas.yml#/components/schemas/RoleFragment'
-          type: array
         showEmail:
           description: Is the email address visible to other users?
           type: boolean
-        userID:
-          description: ID of the user.
-          type: integer
       required:
       - userID
       - name
       - email
       - photoUrl
+      - points
       - emailConfirmed
       - showEmail
       - bypassSpam

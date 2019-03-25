@@ -1111,6 +1111,23 @@ class VanillaHooks implements Gdn_IPlugin {
     }
 
     /**
+     * Hook in before a discussion is rendered and display a canonical notice, if relevant.
+     *
+     * @param mixed DiscussionController $sender
+     * @param array array $args
+     */
+    public function discussionController_beforeDiscussionDisplay_handler($sender, array $args) {
+        if (!is_object($sender) || !method_exists($sender, "getMessages")) {
+            return;
+        }
+
+        $messages = $sender->getMessages();
+        foreach ($messages as $message) {
+            echo $message;
+        }
+    }
+
+    /**
      * Automatically executed when application is enabled.
      *
      * @since 2.0.0

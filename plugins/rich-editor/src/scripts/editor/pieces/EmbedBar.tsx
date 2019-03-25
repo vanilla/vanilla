@@ -42,7 +42,7 @@ export default function EmbedBar(props: IProps) {
             >
                 {isMobile && (
                     <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
-                        <ParagraphMenusBarToggle disabled={isLoading} />
+                        <ParagraphMenusBarToggle disabled={isLoading} mobile={true} />
                     </li>
                 )}
                 {!isMobile && (

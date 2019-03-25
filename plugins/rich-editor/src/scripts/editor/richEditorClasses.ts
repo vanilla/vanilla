@@ -19,7 +19,7 @@ import { calc, important, percent } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
-export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
+export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: boolean) => {
     const globalVars = globalVariables();
     const style = styleFactory("richEditor");
     const vars = richEditorVariables();
@@ -97,6 +97,16 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         },
     });
 
+    const paragraphMenuMobile = style("paragraphMenu-mobile", {
+        position: "relative",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: unit(vars.paragraphMenuHandle.size),
+        width: unit(globalVars.icon.sizes.default),
+        top: important(0),
+    });
+
     const menuBar = style("menuBar", {
         position: "relative",
         width: unit(vars.menuButton.size * 4),
@@ -121,6 +131,13 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         minWidth: unit(formVars.sizing.height),
     });
 
+    const paragraphMenuHandleMobile = style("paragraphMenuHandleMobile", {
+        width: unit(vars.menuButton.size),
+        height: unit(vars.menuButton.size),
+        maxWidth: unit(vars.menuButton.size),
+        minWidth: unit(vars.menuButton.size),
+    });
+
     const text = style("text", {
         position: "relative",
         whiteSpace: important("pre-wrap"),
@@ -138,6 +155,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         padding: 0,
         margin: 0,
         zIndex: 1,
+        overflow: "visible",
         $nest: {
             ".richEditor-menuItem": {
                 display: "block",
@@ -225,6 +243,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         display: "block",
         padding: 0,
         margin: 0,
+        overflow: "visible",
         $nest: {
             "& .richEditor-button, &.richEditor-button": {
                 width: unit(vars.menuButton.size),
@@ -312,6 +331,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         menuBar,
         menuBarToggles,
         paragraphMenuHandle,
+        paragraphMenuHandleMobile,
         text,
         menuItems,
         upload,
@@ -322,6 +342,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
         close,
         flyoutDescription,
         paragraphMenu,
+        paragraphMenuMobile,
         separator,
         position,
         menu,

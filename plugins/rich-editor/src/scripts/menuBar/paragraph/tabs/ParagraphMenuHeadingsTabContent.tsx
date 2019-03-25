@@ -9,8 +9,8 @@ import ParagraphMenuBarRadioGroup, {
     IMenuBarRadioButton,
 } from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
 import { t } from "@library/utility/appUtils";
-import { paragraphMenuTabsClasses } from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
 import classNames from "classnames";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 interface IProps {
     items: IMenuBarRadioButton[];
@@ -19,18 +19,18 @@ interface IProps {
 }
 
 /**
- * Implemented tab content for the headings section
+ * Implemented contents of heading menu
  */
 export default class ParagraphMenuHeadingsTabContent extends React.Component<IProps> {
     public render() {
-        const classes = paragraphMenuTabsClasses();
+        const classes = richEditorClasses(false);
         const handleClick = (data: IMenuBarRadioButton, index: number) => {
             this.props.items[index].formatFunction();
             this.props.closeMenuAndSetCursor();
         };
         return (
             <ParagraphMenuBarRadioGroup
-                className={classNames(classes.panel, this.props.className)}
+                className={classNames(classes.paragraphMenuPanel, this.props.className)}
                 handleClick={handleClick}
                 label={t("Headings")}
                 items={this.props.items}

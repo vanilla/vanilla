@@ -39,6 +39,7 @@ export default class ParagraphMenuBarRadioGroup extends React.PureComponent<IPar
                 >
                     {this.props.items.map((item, index) => {
                         const onClick = (event: MouseEvent) => {
+                            event.stopImmediatePropagation();
                             this.props.handleClick(item, index);
                         };
                         return (

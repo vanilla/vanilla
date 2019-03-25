@@ -7,7 +7,6 @@
 import React from "react";
 import classNames from "classnames";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { paragraphMenuBarClasses } from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 interface IProps {
@@ -27,7 +26,7 @@ interface IProps {
 }
 
 /**
- * Implemented generic tab component.
+ * Implemented Paragraph menu bar "tab" component (which is really a menu, but looks visually mors like tabs
  */
 export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
     private ID;
@@ -51,8 +50,7 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
     public render() {
         const { className, isMenuVisible, toggleMenu, children, icon } = this.props;
         if (open) {
-            const classes = paragraphMenuBarClasses();
-            const classesRichEditor = richEditorClasses(this.props.legacyMode);
+            const classes = richEditorClasses(this.props.legacyMode);
             const handleClick = (event: React.MouseEvent) => {
                 this.props.toggleMenu(() => {
                     this.props.setRovingIndex();
@@ -72,7 +70,7 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
                         aria-expanded={isMenuVisible}
                         aria-haspopup="menu"
                         onClick={handleClick}
-                        className={classesRichEditor.button}
+                        className={classes.button}
                         tabIndex={this.props.tabIndex}
                         ref={this.toggleButtonRef}
                     >

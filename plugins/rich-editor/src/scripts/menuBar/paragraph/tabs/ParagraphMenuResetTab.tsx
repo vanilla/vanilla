@@ -5,7 +5,6 @@
  */
 
 import React from "react";
-import { paragraphMenuTabsClasses } from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
 import { pilcrow } from "@library/icons/editorIcons";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
@@ -30,8 +29,7 @@ export default class ParagraphMenuResetTab extends React.PureComponent<IProps> {
 
     public render() {
         const title = t("Set style to plain paragraph");
-        const classes = paragraphMenuTabsClasses();
-        const classesRichEditor = richEditorClasses(!!this.props.legacyMode);
+        const classes = richEditorClasses(!!this.props.legacyMode);
         const handleClick = (event: React.MouseEvent) => {
             this.props.setRovingIndex(() => {
                 this.props.formatParagraphHandler();
@@ -45,12 +43,7 @@ export default class ParagraphMenuResetTab extends React.PureComponent<IProps> {
                 title={title}
                 aria-label={title}
                 onClick={handleClick}
-                className={classNames(
-                    this.props.className,
-                    classesRichEditor.button,
-                    classes.tabHandle,
-                    this.props.isActive ? classes.activeTabHandle : "",
-                )}
+                className={classNames(this.props.className, classes.button)}
                 ref={this.buttonRef}
             >
                 {pilcrow()}

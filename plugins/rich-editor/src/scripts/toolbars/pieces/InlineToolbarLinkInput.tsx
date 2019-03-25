@@ -47,7 +47,6 @@ export class InlineToolbarLinkInput extends React.PureComponent<IProps, {}> {
                     "richEditor-menu",
                     "insertLink",
                     "likeDropDownContent",
-                    classesRichEditor.menu,
                     classesInsertLink.root,
                     classesDropDown.likeDropDownContent,
                 )}

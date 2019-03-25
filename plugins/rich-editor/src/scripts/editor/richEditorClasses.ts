@@ -323,8 +323,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         },
     });
 
-    // Sub menu in "menuBar"
-    const menu = style("menu", {});
+    const paragraphMenuPanel = style("paragraphMenuPanel", {});
 
     return {
         root,
@@ -345,6 +344,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         paragraphMenuMobile,
         separator,
         position,
-        menu,
+        paragraphMenuPanel,
     };
 });

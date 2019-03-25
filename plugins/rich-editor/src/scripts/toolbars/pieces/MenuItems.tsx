@@ -41,7 +41,7 @@ export default class MenuItems extends React.Component<IProps, {}> {
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
         return (
             <div
-                className={classNames("richEditor-menu", classesRichEditor.menu, this.props.className)}
+                className={classNames("richEditor-menu", this.props.className)}
                 role="menu"
                 style={flyoutPosition(!!this.props.renderAbove, !!this.props.renderLeft, !!this.props.legacyMode)}
                 aria-orientation={this.props.orientation!}

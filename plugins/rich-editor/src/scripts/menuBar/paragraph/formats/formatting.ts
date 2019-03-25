@@ -10,6 +10,12 @@ import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import { IFormats, RangeStatic } from "quill/core";
 import Formatter from "@rich-editor/quill/Formatter";
 
+/**
+ * Maps quill functions to functions
+ * @param formatter
+ * @param lastGoodSelection
+ * @param afterClickHandler
+ */
 export const paragraphFormats = (
     formatter: Formatter,
     lastGoodSelection: RangeStatic,
@@ -86,6 +92,10 @@ export const paragraphFormats = (
     };
 };
 
+/**
+ * Maps quill state to our format, in a simpler to use object
+ * @param activeFormats
+ */
 export const menuState = (activeFormats: IFormats) => {
     // console.log("activeFormats: ", activeFormats);
     let isParagraphEnabled = true;

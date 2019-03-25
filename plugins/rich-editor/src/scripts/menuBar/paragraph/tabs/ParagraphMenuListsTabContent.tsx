@@ -5,10 +5,7 @@
  */
 
 import React from "react";
-import {
-    paragraphMenuCheckRadioClasses,
-    paragraphMenuTabsClasses,
-} from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
+import { paragraphMenuCheckRadioClasses } from "@rich-editor/menuBar/paragraph/paragraphMenuBarStyles";
 import { t } from "@library/utility/appUtils";
 import ParagraphMenuBarRadioGroup, {
     IMenuBarRadioButton,
@@ -16,6 +13,7 @@ import ParagraphMenuBarRadioGroup, {
 import ParagraphMenuSeparator from "@rich-editor/menuBar/paragraph/items/ParagraphMenuSeparator";
 import classNames from "classnames";
 import { indent, outdent } from "@library/icons/editorIcons";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 interface IProps {
     closeMenuAndSetCursor: () => void;
@@ -29,7 +27,7 @@ interface IProps {
  */
 export default class ParagraphMenuListsTabContent extends React.Component<IProps> {
     public render() {
-        const classes = paragraphMenuTabsClasses();
+        const classes = richEditorClasses(false);
         const checkRadioClasses = paragraphMenuCheckRadioClasses();
         const handleClick = (data: IMenuBarRadioButton, index: number) => {
             this.props.items[index].formatFunction();
@@ -38,7 +36,7 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
         return (
             <>
                 <ParagraphMenuBarRadioGroup
-                    className={classes.panel}
+                    className={classes.paragraphMenuPanel}
                     label={t("List Types")}
                     items={this.props.items}
                     handleClick={handleClick}

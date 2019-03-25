@@ -96,8 +96,10 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
             this.props.mobile ? classesRichEditor.paragraphMenuHandleMobile : "",
         );
 
-        if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
-            pilcrowClasses += " isHidden";
+        if (!this.props.mobile) {
+            if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
+                pilcrowClasses += " isHidden";
+            }
         }
 
         const textFormats = paragraphFormats(this.formatter, this.props.lastGoodSelection);
@@ -112,7 +114,6 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                     !!this.props.mobile ? classes.paragraphMenuMobile : classes.paragraphMenu,
                     !!this.props.mobile ? classes.menuItem : "",
                     !!this.props.mobile ? classes.button : "",
-                    { isHidden: this.isMenuVisible },
                 )}
                 onKeyDown={this.handleMenuBarKeyDown}
                 ref={this.selfRef}
@@ -124,7 +125,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                     aria-label={t("Toggle Paragraph Format Menu")}
                     aria-controls={this.menuID}
                     aria-expanded={this.isMenuVisible}
-                    disabled={!this.props.disabled && !this.isPilcrowVisible}
+                    disabled={this.props.disabled}
                     className={pilcrowClasses}
                     aria-haspopup="menu"
                     onClick={this.pilcrowClickHandler}
@@ -132,24 +133,26 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                 >
                     <ActiveFormatIcon activeFormats={menuActiveFormats} />
                 </button>
-                <div
-                    id={this.menuID}
-                    className={classNames(this.dropDownClasses, classes.menuBar)}
-                    style={this.toolbarStyles}
-                    role="menu"
-                >
-                    <ParagraphMenuBar
-                        parentID={this.ID}
-                        label={"Paragraph Format Menu"}
-                        isMenuVisible={this.isMenuVisible}
-                        lastGoodSelection={this.props.lastGoodSelection}
-                        legacyMode={this.props.legacyMode}
-                        close={this.close}
-                        textFormats={textFormats}
-                        menuActiveFormats={menuActiveFormats}
-                        rovingIndex={this.state.rovingTabIndex}
-                    />
-                </div>
+                {this.isMenuVisible && (
+                    <div
+                        id={this.menuID}
+                        className={classNames(this.dropDownClasses, classes.menuBar)}
+                        style={this.toolbarStyles}
+                        role="menu"
+                    >
+                        <ParagraphMenuBar
+                            parentID={this.ID}
+                            label={"Paragraph Format Menu"}
+                            isMenuVisible={this.isMenuVisible}
+                            lastGoodSelection={this.props.lastGoodSelection}
+                            legacyMode={this.props.legacyMode}
+                            close={this.close}
+                            textFormats={textFormats}
+                            menuActiveFormats={menuActiveFormats}
+                            rovingIndex={this.state.rovingTabIndex}
+                        />
+                    </div>
+                )}
             </div>
         );
     }
@@ -238,7 +241,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
      */
     private pilcrowClickHandler = (event: React.MouseEvent<any>) => {
         event.preventDefault();
-        this.setState({ hasFocus: true }, () => {
+        this.setState({ hasFocus: !this.state.hasFocus }, () => {
             if (this.state.hasFocus) {
                 // this.menuRef.current!.focusFirstItem();
                 forceSelectionUpdate();

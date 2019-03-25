@@ -13,7 +13,6 @@ import { colorOut, unit } from "@library/styles/styleHelpers";
 export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = richEditorVariables();
-    const formVars = formElementsVariables();
     const style = styleFactory("paragraphMenuCheckRadio");
 
     const group = style("group", {
@@ -68,37 +67,4 @@ export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
         checkRadioLabel,
         checkRadioSelected,
     };
-});
-
-export const paragraphMenuTabsClasses = useThemeCache(() => {
-    const globalVars = globalVariables();
-    const vars = richEditorVariables();
-    const formVars = formElementsVariables();
-    const style = styleFactory("paragraphMenuTabs");
-    const root = style({});
-    const content = style("content", {});
-    const tabHandle = style("tabHandle", {});
-    const activeTabHandle = style("activeTabHandle", {});
-    const panel = style("panel", {});
-    return { root, content, tabHandle, activeTabHandle, panel };
-});
-
-export const paragraphMenuGroupClasses = useThemeCache(() => {
-    const globalVars = globalVariables();
-    const vars = richEditorVariables();
-    const formVars = formElementsVariables();
-    const style = styleFactory("paragraphMenuGroup");
-    const root = style({});
-
-    return { root };
-});
-
-export const paragraphMenuBarClasses = useThemeCache(() => {
-    const globalVars = globalVariables();
-    const vars = richEditorVariables();
-    const formVars = formElementsVariables();
-    const style = styleFactory("paragraphMenuBar");
-    const root = style({});
-
-    return { root };
 });

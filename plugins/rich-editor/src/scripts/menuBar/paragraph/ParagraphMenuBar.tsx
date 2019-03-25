@@ -57,7 +57,7 @@ interface IMenuBarContent {
 }
 
 /**
- * Implemented generic tab component.
+ * Implemented paragraph menu bar. Note that conceptually, it's a bar of menus, but visually it behaves like tabs.
  */
 export default class ParagraphMenuBar extends React.Component<IProps> {
     private menuCount;
@@ -144,31 +144,31 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
                     },
                 ],
             },
-            {
-                component: ParagraphMenuListsTabContent,
-                accessibleInstructions: t("Toggle Lists Menu"),
-                label: t("Lists"),
-                toggleMenu: this.toggleListsMenu,
-                icon: this.listMenuIcon,
-                activeFormats: menuActiveFormats.lists,
-                open: this.listMenuOpen,
-                items: [
-                    {
-                        formatFunction: textFormats.listUnordered,
-                        icon: listUnordered(),
-                        text: t("Bulleted List"),
-                        checked: menuActiveFormats.lists.ordered,
-                    },
-                    {
-                        formatFunction: textFormats.listUnordered,
-                        icon: listOrdered(),
-                        text: t("Ordered List"),
-                        checked: menuActiveFormats.lists.unordered,
-                    },
-                ],
-                indent: textFormats.listIndent,
-                outdent: textFormats.listIndent,
-            },
+            // {
+            //     component: ParagraphMenuListsTabContent,
+            //     accessibleInstructions: t("Toggle Lists Menu"),
+            //     label: t("Lists"),
+            //     toggleMenu: this.toggleListsMenu,
+            //     icon: this.listMenuIcon,
+            //     activeFormats: menuActiveFormats.lists,
+            //     open: this.listMenuOpen,
+            //     items: [
+            //         {
+            //             formatFunction: textFormats.listUnordered,
+            //             icon: listUnordered(),
+            //             text: t("Bulleted List"),
+            //             checked: menuActiveFormats.lists.ordered,
+            //         },
+            //         {
+            //             formatFunction: textFormats.listUnordered,
+            //             icon: listOrdered(),
+            //             text: t("Ordered List"),
+            //             checked: menuActiveFormats.lists.unordered,
+            //         },
+            //     ],
+            //     indent: textFormats.listIndent,
+            //     outdent: textFormats.listIndent,
+            // },
             {
                 component: ParagraphMenuSpecialBlockTabContent,
                 accessibleInstructions: t("Toggle Special Formats Menu"),

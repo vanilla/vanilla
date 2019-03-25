@@ -7,8 +7,8 @@
  * @license GPL-2.0-only
  */
 
-if (PHP_VERSION_ID < 70000) {
-    die('Vanilla requires PHP 7.0 or greater.');
+if (PHP_VERSION_ID < 71000) {
+    die('Vanilla requires PHP 7.1 or greater.');
 }
 
 // Define the constants we need to get going.

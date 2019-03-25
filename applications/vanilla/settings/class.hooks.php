@@ -1111,7 +1111,7 @@ class VanillaHooks implements Gdn_IPlugin {
     }
 
     /**
-     * Hook in before a discussion is rendered and display a canonical notice, if relevant.
+     * Hook in before a discussion is rendered and display any messages.
      *
      * @param mixed DiscussionController $sender
      * @param array array $args

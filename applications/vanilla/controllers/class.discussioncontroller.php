@@ -172,6 +172,14 @@ class DiscussionController extends VanillaController {
         if (empty($canonicalUrl)) {
             $this->canonicalUrl(discussionUrl($this->Discussion, pageNumber($this->Offset, $Limit, 0, false)));
         } else {
+            $canonicalMessage = new Message(
+                sprintf(
+                    \Gdn::locale()->translate('This discussion has a more <a href="%1$s">recent version</a>.'),
+                    htmlspecialchars(\Gdn::request()->url($canonicalUrl))
+                ),
+                Message::TYPE_INFORMATION
+            );
+            $this->addMessage($canonicalMessage);
             $this->canonicalUrl($canonicalUrl);
         }
         $this->checkPageRange($this->Offset, $ActualResponses);

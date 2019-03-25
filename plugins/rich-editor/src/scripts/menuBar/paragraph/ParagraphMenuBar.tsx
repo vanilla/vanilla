@@ -20,15 +20,14 @@ import {
     listUnordered,
     spoiler,
 } from "@library/icons/editorIcons";
-import Formatter from "@rich-editor/quill/Formatter";
 import { IFormats, RangeStatic } from "quill/core";
-import { getActiveFormats, paragraphFormats } from "@rich-editor/menuBar/paragraph/formats/formatting";
 import { t } from "@library/utility/appUtils";
 import ParagraphMenuListsTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuListsTabContent";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { srOnly } from "@library/styles/styleHelpers";
 import { IMenuBarRadioButton } from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
 import ParagraphMenuSpecialBlockTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuSpecialBlockTabContent";
+import { menuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
 
 interface IProps {
     className?: string;
@@ -36,22 +35,23 @@ interface IProps {
     parentID: string;
     isMenuVisible: boolean;
     lastGoodSelection: RangeStatic;
-    activeFormats: IFormats;
     legacyMode: boolean;
     close: () => void;
-    formatsActive: any;
     textFormats: any;
-}
-
-interface IState {
+    menuActiveFormats: any;
     rovingIndex: number;
-    headingMenuIcon: JSX.Element;
-    headingMenuOpen: boolean;
-    listMenuIcon: JSX.Element;
-    listMenuOpen: boolean;
-    specialBlockMenuIcon: JSX.Element;
-    specialBlockMenuOpen: boolean;
+    // rerender: () => void;
 }
+//
+// interface IState {
+//     rovingIndex: number;
+//     // headingMenuIcon: JSX.Element;
+//     // headingMenuOpen: boolean;
+//     // listMenuIcon: JSX.Element;
+//     // listMenuOpen: boolean;
+//     // specialBlockMenuIcon: JSX.Element;
+//     // specialBlockMenuOpen: boolean;
+// }
 
 interface IMenuBarContent {
     component: any;
@@ -60,86 +60,64 @@ interface IMenuBarContent {
     toggleMenu: () => void;
     icon: JSX.Element;
     accessibleInstructions: string;
-    activeFormats: {} | boolean;
     open: boolean;
     items?: IMenuBarRadioButton[];
     indent?: () => void;
     outdent?: () => void;
+    activeFormats: any;
 }
 
 /**
  * Implemented generic tab component.
  */
-export default class ParagraphMenuBar extends React.Component<IProps, IState> {
+export default class ParagraphMenuBar extends React.Component<IProps> {
     private menuCount;
-    public state = {
-        rovingIndex: 0,
-        headingMenuIcon: heading2(),
-        headingMenuOpen: false,
-        listMenuIcon: listUnordered(),
-        listMenuOpen: false,
-        specialBlockMenuIcon: blockquote(),
-        specialBlockMenuOpen: false,
-    };
+    private headingMenuOpen = false;
+    private headingMenuIcon = heading2();
+    private listMenuOpen = false;
+    private listMenuIcon = listUnordered();
+    private specialBlockMenuOpen = false;
+    private specialBlockMenuIcon = blockquote();
 
-    private setTopLevelIcons() {
-        const menuActiveFormats = getActiveFormats(this.props.activeFormats);
+    private topLevelIcons() {
+        const { menuActiveFormats } = this.props;
 
         let headingIcon = heading2();
-        for (const key in menuActiveFormats.headings) {
-            if (menuActiveFormats[key] === true) {
-                switch (key) {
-                    case "heading3":
-                        headingIcon = heading3();
-                        break;
-                    case "heading4":
-                        headingIcon = heading4();
-                        break;
-                    case "heading5":
-                        headingIcon = heading5();
-                        break;
-                }
-            }
+        if (menuActiveFormats.headings.heading2) {
+            headingIcon = heading2();
+        } else if (menuActiveFormats.headings.heading3) {
+            headingIcon = heading3();
+        } else if (menuActiveFormats.headings.heading4) {
+            headingIcon = heading4();
+        } else if (menuActiveFormats.headings.heading5) {
+            headingIcon = heading5();
         }
 
         let specialIcon = blockquote();
-        for (const key in menuActiveFormats.specialFormats) {
-            if (menuActiveFormats[key] === true) {
-                switch (key) {
-                    case "codeBlock":
-                        specialIcon = codeBlock();
-                        break;
-                    case "spoiler":
-                        specialIcon = spoiler();
-                        break;
-                }
-            }
+        if (menuActiveFormats.specialFormats.blockQuote) {
+            specialIcon = blockquote();
+        } else if (menuActiveFormats.specialFormats.codeBlock) {
+            specialIcon = codeBlock();
+        } else if (menuActiveFormats.specialFormats.spoiler) {
+            specialIcon = spoiler();
         }
 
         let listIcon = listUnordered();
-        for (const key in menuActiveFormats.lists) {
-            if (menuActiveFormats[key] === true) {
-                // TODO update to list
-                if (key === "ordered") {
-                    listIcon = listOrdered();
-                }
-            }
+        if (menuActiveFormats.lists.ordered) {
+            listIcon = listOrdered();
+        } else if (menuActiveFormats.lists.unordered) {
+            listIcon = listUnordered();
         }
 
-        this.setState({
-            headingMenuIcon: headingIcon,
-            listMenuIcon: listIcon,
-            specialBlockMenuIcon: specialIcon,
-        });
-    }
-
-    public componentDidMount() {
-        this.setTopLevelIcons();
+        this.headingMenuIcon = headingIcon;
+        this.specialBlockMenuIcon = specialIcon;
+        this.listMenuIcon = listIcon;
     }
 
     public render() {
-        const { formatsActive, textFormats } = this.props;
+        const { menuActiveFormats, textFormats } = this.props;
         const classes = richEditorClasses(this.props.legacyMode);
+        this.topLevelIcons();
 
         const menuContents: IMenuBarContent[] = [
             {
@@ -147,87 +125,87 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
                 accessibleInstructions: t("Toggle Heading Menu"),
                 label: t("Headings"),
                 toggleMenu: this.toggleHeadingsMenu,
-                icon: this.state.headingMenuIcon,
-                activeFormats: formatsActive.headings,
-                open: this.state.headingMenuOpen,
+                icon: this.headingMenuIcon,
+                activeFormats: menuActiveFormats.headings,
+                open: this.headingMenuOpen,
                 items: [
                     {
                         formatFunction: textFormats.h2,
                         icon: heading2(),
                         text: t("Heading 2"),
-                        checked: formatsActive.headings.heading2,
+                        checked: menuActiveFormats.headings.heading2,
                     },
                     {
                         formatFunction: textFormats.h3,
                         icon: heading3(),
                         text: t("Heading 3"),
-                        checked: formatsActive.headings.heading3,
+                        checked: menuActiveFormats.headings.heading3,
                     },
                     {
                         formatFunction: textFormats.h4,
                         icon: heading4(),
                         text: t("Heading 4"),
-                        checked: formatsActive.headings.heading4,
+                        checked: menuActiveFormats.headings.heading4,
                     },
                     {
                         formatFunction: textFormats.h5,
                         icon: heading5(),
                         text: t("Heading 5"),
-                        checked: formatsActive.headings.heading5,
+                        checked: menuActiveFormats.headings.heading5,
                     },
                 ],
             },
-            {
-                component: ParagraphMenuListsTabContent,
-                accessibleInstructions: t("Toggle Lists Menu"),
-                label: t("Lists"),
-                toggleMenu: this.toggleListsMenu,
-                icon: this.state.listMenuIcon,
-                activeFormats: formatsActive.lists,
-                open: this.state.listMenuOpen,
-                items: [
-                    {
-                        formatFunction: textFormats.listUnordered,
-                        icon: listUnordered(),
-                        text: t("Bulleted List"),
-                        checked: formatsActive.lists.ordered,
-                    },
-                    {
-                        formatFunction: textFormats.listUnordered,
-                        icon: listOrdered(),
-                        text: t("Ordered List"),
-                        checked: formatsActive.lists.unordered,
-                    },
-                ],
-                indent: textFormats.listIndent,
-                outdent: textFormats.listIndent,
-            },
+            // {
+            //     component: ParagraphMenuListsTabContent,
+            //     accessibleInstructions: t("Toggle Lists Menu"),
+            //     label: t("Lists"),
+            //     toggleMenu: this.toggleListsMenu,
+            //     icon: this.listMenuIcon,
+            //     activeFormats: menuActiveFormats.lists,
+            //     open: this.listMenuOpen,
+            //     items: [
+            //         {
+            //             formatFunction: textFormats.listUnordered,
+            //             icon: listUnordered(),
+            //             text: t("Bulleted List"),
+            //             checked: menuActiveFormats.lists.ordered,
+            //         },
+            //         {
+            //             formatFunction: textFormats.listUnordered,
+            //             icon: listOrdered(),
+            //             text: t("Ordered List"),
+            //             checked: menuActiveFormats.lists.unordered,
+            //         },
+            //     ],
+            //     indent: textFormats.listIndent,
+            //     outdent: textFormats.listIndent,
+            // },
             {
                 component: ParagraphMenuSpecialBlockTabContent,
                 accessibleInstructions: t("Toggle Special Formats Menu"),
                 label: t("Special Formats"),
                 toggleMenu: this.toggleSpecialBlockMenu,
-                icon: this.state.specialBlockMenuIcon,
-                activeFormats: formatsActive.specialFormats,
-                open: this.state.specialBlockMenuOpen,
+                icon: this.specialBlockMenuIcon,
+                activeFormats: menuActiveFormats.specialFormats,
+                open: this.specialBlockMenuOpen,
                 items: [
                     {
                         formatFunction: textFormats.blockquote,
                         icon: blockquote(),
                         text: t("Quote"),
-                        checked: formatsActive.specialFormats.blockQuote,
+                        checked: menuActiveFormats.specialFormats.blockQuote,
                     },
                     {
                         formatFunction: textFormats.codeBlock,
                         icon: codeBlock(),
                         text: t("Code Block"),
-                        checked: formatsActive.specialFormats.codeBlock,
+                        checked: menuActiveFormats.specialFormats.codeBlock,
                     },
                     {
                         formatFunction: textFormats.spoiler,
                         icon: spoiler(),
                         text: t("Spoiler"),
-                        checked: formatsActive.specialFormats.spoiler,
+                        checked: menuActiveFormats.specialFormats.spoiler,
                     },
                 ],
             },
@@ -284,7 +262,7 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
                     <div className={classes.menuBarToggles}>
                         {menus}
                         <ParagraphMenuResetTab
-                            isActive={formatsActive.paragraph}
+                            isActive={menuActiveFormats.paragraph}
                             formatParagraphHandler={textFormats.paragraph}
                             setRovingIndex={setParagraphIndex}
                             tabIndex={this.tabIndex(paragraphIndex)}
@@ -298,42 +276,21 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
     }
 
     private toggleHeadingsMenu = () => {
-        this.setState(
-            {
-                headingMenuOpen: !this.state.headingMenuOpen,
-                listMenuOpen: false,
-                specialBlockMenuOpen: false,
-            },
-            () => {
-                this.setTopLevelIcons();
-            },
-        );
+        this.headingMenuOpen = !this.headingMenuOpen;
+        this.listMenuOpen = false;
+        this.specialBlockMenuOpen = false;
     };
 
     private toggleListsMenu = () => {
-        this.setState(
-            {
-                headingMenuOpen: false,
-                listMenuOpen: !this.state.listMenuOpen,
-                specialBlockMenuOpen: false,
-            },
-            () => {
-                this.setTopLevelIcons();
-            },
-        );
+        this.headingMenuOpen = false;
+        this.listMenuOpen = !this.listMenuOpen;
+        this.specialBlockMenuOpen = false;
     };
 
     private toggleSpecialBlockMenu = () => {
-        this.setState(
-            {
-                headingMenuOpen: false,
-                listMenuOpen: false,
-                specialBlockMenuOpen: !this.state.specialBlockMenuOpen,
-            },
-            () => {
-                this.setTopLevelIcons();
-            },
-        );
+        this.headingMenuOpen = false;
+        this.listMenuOpen = false;
+        this.specialBlockMenuOpen = !this.specialBlockMenuOpen;
     };
 
     private closeMenuAndSetCursor = () => {
@@ -342,23 +299,16 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
     };
 
     private closeAllSubMenus = () => {
-        this.setState(
-            {
-                headingMenuOpen: false,
-                listMenuOpen: false,
-                specialBlockMenuOpen: false,
-            },
-            () => {
-                this.setTopLevelIcons();
-            },
-        );
+        this.headingMenuOpen = false;
+        this.listMenuOpen = false;
+        this.specialBlockMenuOpen = false;
     };
 
     private tabIndex = index => {
-        if (this.state.rovingIndex === null && index === 0) {
+        if (this.props.rovingIndex === null && index === 0) {
             return 0;
         } else {
-            return this.state.rovingIndex === index ? 0 : -1;
+            return this.props.rovingIndex === index ? 0 : -1;
         }
     };
 

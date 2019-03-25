@@ -5,7 +5,7 @@
  */
 
 import React, { JSXElementConstructor } from "react";
-import Quill, { RangeStatic } from "quill/core";
+import Quill, { IFormats, RangeStatic } from "quill/core";
 import { t } from "@library/utility/appUtils";
 import { forceSelectionUpdate, isEmbedSelected } from "@rich-editor/quill/utility";
 import Formatter from "@rich-editor/quill/Formatter";
@@ -17,10 +17,13 @@ import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
 import ParagraphMenuBar from "@rich-editor/menuBar/paragraph/ParagraphMenuBar";
-import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
+import { menuState, paragraphFormats } from "@rich-editor/menuBar/paragraph/formats/formatting";
+import SpoilerLineBlot, { SpoilerWrapperBlot, SpoilerContentBlot } from "@rich-editor/quill/blots/blocks/SpoilerBlot";
+import BlockquoteLineBlot, {
+    BlockquoteWrapperBlot,
+    BlockquoteContentBlot,
+} from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
-import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
-import { getActiveFormats, paragraphFormats } from "@rich-editor/menuBar/paragraph/formats/formatting";
 
 export enum IMenuBarItemTypes {
     CHECK = "checkbox",
@@ -61,7 +64,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
     private buttonID: string;
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
-    private menuRef: React.RefObject<MenuItems> = React.createRef();
+    // private menuRef: React.RefObject<MenuItems> = React.createRef();
     private formatter: Formatter;
     private focusWatcher: FocusWatcher;
 
@@ -114,14 +117,10 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                 pilcrowClasses += " isHidden";
             }
 
-            let isParagraphEnabled = true;
-            ["header", BlockquoteLineBlot.blotName, CodeBlockBlot.blotName, SpoilerLineBlot.blotName].forEach(item => {
-                if (item && item in this.props.activeFormats) {
-                    isParagraphEnabled = false;
-                }
-            });
             const textFormats = paragraphFormats(this.formatter, this.props.lastGoodSelection);
-            const formatsActive = getActiveFormats(this.props.activeFormats);
+            const menuActiveFormats = menuState(this.props.activeFormats);
+
+            // console.log("menuActiveFormats: ", menuActiveFormats);
 
             return (
                 <div
@@ -144,7 +143,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                         onClick={this.pilcrowClickHandler}
                         onKeyDown={this.handleEscape}
                     >
-                        <ActiveFormatIcon activeFormats={this.props.activeFormats} />
+                        <ActiveFormatIcon activeFormats={menuActiveFormats} />
                     </button>
                     <div
                         id={this.menuID}
@@ -157,11 +156,11 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                             label={"Paragraph Format Menu"}
                             isMenuVisible={this.isMenuVisible}
                             lastGoodSelection={this.props.lastGoodSelection}
-                            activeFormats={this.props.activeFormats}
                             legacyMode={this.props.legacyMode}
                             close={this.close}
                             textFormats={textFormats}
-                            formatsActive={formatsActive}
+                            menuActiveFormats={menuActiveFormats}
+                            rovingIndex={this.state.rovingTabIndex}
                         />
                     </div>
                 </div>
@@ -220,14 +219,16 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
             return "";
         }
         const bounds = this.quill.getBounds(this.props.lastGoodSelection.index, this.props.lastGoodSelection.length);
+        const scrollBounds = this.quill.scroll.domNode.getBoundingClientRect();
         const classes = richEditorClasses(this.props.legacyMode);
         const classesDropDown = dropDownClasses();
+
         return classNames(
             classes.position,
             classes.menuBar,
             { likeDropDownContent: !this.props.legacyMode },
             !this.props.legacyMode ? classesDropDown.likeDropDownContent : "",
-            bounds.top <= 30 ? "isDown" : "isUp",
+            scrollBounds.height - bounds.bottom <= 170 ? "isUp" : "isDown",
         );
     }
 

@@ -105,6 +105,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean) => {
     const menuBarToggles = style("menuBarToggles", {
         position: "relative",
         display: "flex",
+        justifyContent: "space-between",
         flexWrap: "nowrap",
         width: unit(vars.menuButton.size * 4),
     });

@@ -86,8 +86,10 @@ export const paragraphFormats = (
     };
 };
 
-export const getActiveFormats = (activeFormats: IFormats) => {
+export const menuState = (activeFormats: IFormats) => {
+    // console.log("activeFormats: ", activeFormats);
     let isParagraphEnabled = true;
+
     ["header", BlockquoteLineBlot.blotName, CodeBlockBlot.blotName, SpoilerLineBlot.blotName].forEach(item => {
         if (item in activeFormats) {
             isParagraphEnabled = false;
@@ -111,92 +113,9 @@ export const getActiveFormats = (activeFormats: IFormats) => {
         },
         lists: {
             ordered: false,
-            unordered: true,
+            unordered: false,
             indent: false,
             outdent: false,
         },
     };
-
-    //
-    // const paragraphState = {
-    //     isActive: isParagraphEnabled,
-    //     isDisabled: isParagraphEnabled,
-    // };
-    //
-    // const heading2State = {
-    //     isActive: activeFormats.header === 2 || headerObjectLevel === 2,
-    //     isDisabled: activeFormats.header === 2 || headerObjectLevel === 2,
-    // };
-    //
-    // const heading3State = {
-    //     isActive: activeFormats.header === 3 || headerObjectLevel === 3,
-    //     isDisabled: activeFormats.header === 3 || headerObjectLevel === 3,
-    // };
-    //
-    // const heading4State = {
-    //     isActive: activeFormats.header === 4 || headerObjectLevel === 4,
-    //     isDisabled: activeFormats.header === 4 || headerObjectLevel === 4,
-    // };
-    // const heading5State = {
-    //     isActive: activeFormats.header === 5 || headerObjectLevel === 5,
-    //     isDisabled: activeFormats.header === 5 || headerObjectLevel === 5,
-    // };
-    //
-    // const blockQuoteState = {
-    //     isActive: activeFormats[BlockquoteLineBlot.blotName] === true,
-    //     isDisabled: activeFormats[BlockquoteLineBlot.blotName] === true,
-    // };
-    //
-    // const codeBlockState = {
-    //     isActive: activeFormats[CodeBlockBlot.blotName] === true,
-    //     isDisabled: activeFormats[CodeBlockBlot.blotName] === true,
-    // };
-    //
-    // const spoilerState = {
-    //     isActive: activeFormats[SpoilerLineBlot.blotName] === true,
-    //     isDisabled: activeFormats[SpoilerLineBlot.blotName] === true,
-    // };
-    //
-    // return [
-    //     {
-    //         // label: t("Format as Paragraph"),
-    //         isActive: isParagraphEnabled,
-    //         isDisabled: isParagraphEnabled,
-    //     },
-    //     {
-    //         // label: t("Format as title (heading 2)"),
-    //         isActive: activeFormats.header === 2 || headerObjectLevel === 2,
-    //         isDisabled: activeFormats.header === 2 || headerObjectLevel === 2,
-    //     },
-    //     {
-    //         // label: t("Format as title (heading 3)"),
-    //         isActive: activeFormats.header === 3 || headerObjectLevel === 3,
-    //         isDisabled: activeFormats.header === 3 || headerObjectLevel === 3,
-    //     },
-    //     {
-    //         // label: t("Format as title (heading 4)"),
-    //         isActive: activeFormats.header === 4 || headerObjectLevel === 4,
-    //         isDisabled: activeFormats.header === 4 || headerObjectLevel === 4,
-    //     },
-    //     {
-    //         // label: t("Format as title (heading 5)"),
-    //         isActive: activeFormats.header === 5 || headerObjectLevel === 5,
-    //         isDisabled: activeFormats.header === 5 || headerObjectLevel === 5,
-    //     },
-    //     {
-    //         // label: t("Format as blockquote"),
-    //         isActive: activeFormats[BlockquoteLineBlot.blotName] === true,
-    //         isDisabled: activeFormats[BlockquoteLineBlot.blotName] === true,
-    //     },
-    //     {
-    //         // label: t("Format as code block"),
-    //         isActive: activeFormats[CodeBlockBlot.blotName] === true,
-    //         isDisabled: activeFormats[CodeBlockBlot.blotName] === true,
-    //     },
-    //     {
-    //         // label: t("Format as spoiler"),
-    //         isActive: activeFormats[SpoilerLineBlot.blotName] === true,
-    //         isDisabled: activeFormats[SpoilerLineBlot.blotName] === true,
-    //     },
-    // ];
 };

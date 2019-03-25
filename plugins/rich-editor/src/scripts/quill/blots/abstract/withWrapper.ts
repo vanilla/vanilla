@@ -96,17 +96,21 @@ export default function withWrapper(blotConstructor: typeof Block) {
          * @param value - The value for the replacement Blot.
          */
         public replaceWith(name: any, value?: any): any {
-            const topLevelWrapper = this.getWrapper(true);
-            const immediateWrapper = this.parent;
+            if (name === this.statics.blotName) {
+                super.replaceWith(name, value);
+            } else {
+                const topLevelWrapper = this.getWrapper(true);
+                const immediateWrapper = this.parent;
 
-            immediateWrapper.children.forEach(child => {
-                if (child === this) {
-                    (child as any).replaceWithIntoScroll(name, value, topLevelWrapper);
-                } else {
-                    child.insertInto(this.scroll, topLevelWrapper);
-                }
-            });
-            topLevelWrapper.remove();
+                immediateWrapper.children.forEach(child => {
+                    if (child === this) {
+                        (child as any).replaceWithIntoScroll(name, value, topLevelWrapper);
+                    } else {
+                        child.insertInto(this.scroll, topLevelWrapper);
+                    }
+                });
+                topLevelWrapper.remove();
+            }
         }
 
         /**

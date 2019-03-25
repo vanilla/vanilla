@@ -322,6 +322,7 @@ declare module "quill/modules/history" {
         };
         protected lastRecorded: number;
         protected ignoreChange: boolean;
+        public clear(): void;
         public undo(): void;
         public redo(): void;
         public cutoff(): void;

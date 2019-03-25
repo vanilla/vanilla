@@ -17,6 +17,7 @@ import {
     ListGroup,
 } from "@rich-editor/quill/blots/blocks/ListBlot";
 import { expect } from "chai";
+import Formatter from "@rich-editor/quill/Formatter";
 
 describe.only("ListBlot", () => {
     before(() => {
@@ -27,9 +28,26 @@ describe.only("ListBlot", () => {
     let quillNode: HTMLDivElement;
 
     const resetQuill = () => {
-        document.body.innerHTML = `<div id='quill' />`;
+        document.body.innerHTML = `
+            <div id='quill'></div>
+            <div>
+                <button id="indent">Indent</button>
+                <button id="outdent">Outdent</button>
+            </div>`;
         const mountPoint = document.getElementById("quill")!;
+        const indent = document.getElementById("indent")!;
+        const outdent = document.getElementById("outdent")!;
         quill = new Quill(mountPoint);
+        window.quill = quill;
+        const formatter = new Formatter(quill);
+        indent.addEventListener("click", e => {
+            e.preventDefault();
+            formatter.indentList(quill.getSelection());
+        });
+        outdent.addEventListener("click", e => {
+            e.preventDefault();
+            formatter.outdentList(quill.getSelection());
+        });
         quillNode = quill.scroll.domNode as HTMLDivElement;
     };
 
@@ -43,6 +61,7 @@ describe.only("ListBlot", () => {
 
         delta = delta.insert(text + "\n", { list: listValue });
         quill.updateContents(delta, Quill.sources.USER);
+        quill.history.clear();
         const lastUL = quill.scroll.children.tail as UnorderedListGroup;
         return lastUL.children.tail as any;
     };
@@ -286,6 +305,8 @@ describe.only("ListBlot", () => {
             expect(listItem.children, "List item should have 1 child to start").has.length(1);
 
             listItem.indent();
+            quill.update();
+
             // Refetch required due to the optimizations that may have occured on listItem.
             listItem = listGroup.children.tail as ListItem;
 
@@ -298,14 +319,15 @@ describe.only("ListBlot", () => {
         });
 
         it("can indent an item into it's own nest list of the same type", () => {
-            insertListBlot({ type: ListType.BULLETED, depth: 0 });
-            insertListBlot({ type: ListType.BULLETED, depth: 0 });
-            insertListBlot({ type: ListType.BULLETED, depth: 1 });
+            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1");
+            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1.1");
+            insertListBlot({ type: ListType.BULLETED, depth: 1 }, "1.2");
 
             const listGroup = quill.scroll.children.head as ListGroup;
             let listItem = listGroup.children.tail as ListItem;
 
             listItem.indent();
+            quill.update();
 
             // Expected
             // - listItem
@@ -321,20 +343,24 @@ describe.only("ListBlot", () => {
             expect(nestedListGroup.children, "There should be 2 nested list items").has.length(2);
         });
 
-        it("indenting and outdenting should leave the same dom structure", () => {
-            insertListBlot({ type: ListType.BULLETED, depth: 0 });
-            insertListBlot({ type: ListType.BULLETED, depth: 0 });
-            insertListBlot({ type: ListType.BULLETED, depth: 1 });
+        it.only("indenting and outdenting should leave the same dom structure", () => {
+            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1");
+            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "2");
+            insertListBlot({ type: ListType.BULLETED, depth: 1 }, "2.1");
 
-            const listGroup = quill.scroll.children.head as ListGroup;
-            const listItem = listGroup.children.tail as ListItem;
+            const get2 = () => {
+                const item: any = (document.querySelectorAll(".ql-editor li")[2] as any).__blot.blot as ListItem;
+                return item;
+            };
+
             const htmlBefore = quill.scroll.domNode.innerHTML;
 
-            listItem.indent();
-            const topListItem = listGroup.children.tail as ListItem;
-            const nestedListGroup = topListItem.children.tail as ListGroup;
-            const nestedListItem = nestedListGroup.children.head as ListItem;
-            nestedListItem.outdent();
+            const _2 = get2();
+            get2().indent();
+            quill.update();
+            get2().outdent();
+            quill.update();
+
             const htmlAfter = quill.scroll.domNode.innerHTML;
             expect(htmlBefore).equals(htmlAfter);
         });

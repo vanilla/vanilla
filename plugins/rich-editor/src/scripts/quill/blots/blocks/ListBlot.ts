@@ -10,6 +10,7 @@ import Quill, { Blot } from "quill/core";
 import Container from "quill/blots/container";
 import Block from "quill/blots/block";
 import Inline from "quill/blots/inline";
+import Scroll from "quill/blots/scroll";
 
 /* tslint:disable:max-classes-per-file */
 
@@ -71,24 +72,50 @@ export class ListGroup extends WrapperBlot {
     }
 
     public formatAt(index: number, length: number, name: string, value: any): void {
+        const [child] = this.children.find(index);
+        if (child instanceof ListItem) {
+            const nestedList = child.getNestedList();
+            if (nestedList) {
+                const offset = nestedList.offset(this);
+                if (offset < index) {
+                    nestedList.formatAt(index, length, name, value);
+                    return;
+                }
+            }
+        }
         super.formatAt(index, length, name, value);
     }
 
     public insertAt(index: number, value: string, def: any) {
-        if (value === "\n") {
-            const [child] = this.children.find(index);
-            if (child instanceof ListItem) {
-                const nestedList = child.getNestedList();
-                if (nestedList) {
-                    const offset = nestedList.offset(this);
-                    if (offset < index) {
-                        nestedList.insertAt(index - offset, value, def);
-                        return;
-                    }
+        // Pass things along to our nested list
+        const [child] = this.children.find(index);
+        if (child instanceof ListItem) {
+            const nestedList = child.getNestedList();
+            if (nestedList) {
+                const offset = nestedList.offset(this);
+                if (offset < index) {
+                    nestedList.insertAt(index - offset, value, def);
+                    return;
                 }
             }
         }
+
         super.insertAt(index, value, def);
+    }
+
+    public deleteAt(index: number, length: number) {
+        const [child] = this.children.find(index);
+        if (child instanceof ListItem) {
+            const nestedList = child.getNestedList();
+            if (nestedList) {
+                const offset = nestedList.offset(this);
+                if (offset < index) {
+                    nestedList.deleteAt(index, length);
+                    return;
+                }
+            }
+        }
+        super.deleteAt(index, length);
     }
 
     public descendant(criteria, index: number) {
@@ -138,7 +165,7 @@ export class ListGroup extends WrapperBlot {
     }
 
     public path(index: number, inclusive: boolean = false): Array<[Blot, number]> {
-        const childResult = this.children.find(index, false);
+        const childResult = this.children.find(index, inclusive);
         const [child, offset] = childResult;
         const position: Array<[any, number]> = [[this, index]];
         if (child instanceof Container || child instanceof ListItem) {
@@ -158,8 +185,12 @@ export class ListGroup extends WrapperBlot {
      * Join the children elements together where possible.
      */
     public optimize(context) {
-        const next = this.next;
+        this.optimizeAdjacentGroups();
+        super.optimize(context);
+    }
 
+    private optimizeAdjacentGroups() {
+        const next = this.next;
         if (next instanceof ListGroup && next.prev === this) {
             const ownValue = this.getValue();
             const nextValue = next.getValue();
@@ -202,8 +233,15 @@ export class ListGroup extends WrapperBlot {
                 }
             }
         }
+    }
 
-        super.optimize(context);
+    public insertInto(parentBlot: Container, ref?: Blot) {
+        if (!(parentBlot instanceof Scroll) && !(parentBlot instanceof ListItem)) {
+            // Move it into the scroll anyways;
+            super.insertInto(this.scroll, parentBlot.next);
+        } else {
+            super.insertInto(parentBlot, ref);
+        }
     }
 
     public getValue(): IListItem {
@@ -223,9 +261,9 @@ export class UnorderedListGroup extends ListGroup {
     public static tagName = ListTag.UL;
 }
 
-export class ListContent extends Block {
+export class ListContent extends Inline {
     public static blotName = "listContent";
-    public static clasSName = "listContent";
+    public static className = "listContent";
     public static tagName = "span";
 }
 
@@ -244,20 +282,87 @@ export class ListItem extends LineBlot {
         return element;
     }
 
-    public attach() {
-        super.attach();
-        // const contents =
-        //     this.children.head instanceof ListContent
-        //         ? this.children.head
-        //         : (Parchment.create(ListContent.blotName, "") as ListContent);
-        // this.children.forEach(child => {
-        //     if (child instanceof ListContent || child instanceof ListGroup) {
-        //         return;
-        //     } else {
-        //         contents.insertBefore(child);
-        //     }
-        // });
-        // contents.insertInto(this, this.children.head);
+    public constructor(domNode) {
+        super(domNode);
+        this.insertBefore(Parchment.create("text", ""));
+    }
+
+    /**
+     *
+     */
+    public optimize(context) {
+        this.optimizeNesting();
+        this.optimizeUnwraps();
+        super.optimize(context);
+    }
+
+    private optimizeNesting() {
+        const next = this.next;
+        if (next instanceof ListItem && next.prev === this) {
+            const ownValue = this.getValue();
+            const nextValue = next.getValue();
+
+            if (!ownValue || !nextValue) {
+                return;
+            }
+
+            if (nextValue.depth > ownValue.depth) {
+                if (this.children.tail instanceof ListGroup) {
+                    const targetGroup = this.children.tail;
+                    next.insertInto(targetGroup);
+
+                    // Adjust our list type to the target value.
+                    const newNextValue: IListItem = {
+                        ...nextValue,
+                        type: targetGroup.getValue().type,
+                    };
+                    next.format("list", newNextValue);
+                } else {
+                    // Just insert it directly into the end. It will create its own group.
+                    next.insertInto(this);
+                }
+            }
+        }
+    }
+
+    private optimizeUnwraps() {
+        if (this.children.length === 1 && this.children.head instanceof ListGroup) {
+            // If our only child is a list group (no text)
+            // Try to unwrap into the list group.
+            const onlyChildGroup = this.children.head;
+
+            if (this.parent instanceof ListGroup) {
+                onlyChildGroup.moveChildren(this.parent);
+            }
+        }
+
+        const parentGroup = this.parent;
+        const parentItem = parentGroup.parent;
+        const grandParentGroup = parentItem.parent;
+        if (
+            parentGroup instanceof ListGroup &&
+            parentItem instanceof ListItem &&
+            grandParentGroup instanceof ListGroup
+        ) {
+            const parentGroupValue = parentGroup.getValue();
+            const grandparentGroupValue = grandParentGroup.getValue();
+            const ownValue = this.getValue();
+
+            // We definitely don't belong here.
+            if (ownValue.depth < parentGroupValue.depth) {
+                this.insertInto(grandParentGroup, parentItem.next);
+
+                // Adjust our list type to the target value.
+                const newValue: IListItem = {
+                    ...ownValue,
+                    type: grandParentGroup.getValue().type,
+                };
+                this.format("list", newValue);
+            } else if (ownValue.depth === grandparentGroupValue.depth) {
+                // Try to merge into the the grandparent list group.
+                this.insertInto(grandParentGroup, parentItem.next);
+            }
+        }
     }
 
     private static mapListValue(value: ListValue): IListItem {
@@ -296,8 +401,16 @@ export class ListItem extends LineBlot {
         return listGroup;
     }
 
+    public length() {
+        if (this.getNestedList()) {
+            return super.length() - 1;
+        } else {
+            return super.length();
+        }
+    }
+
     public path(index: number, inclusive: boolean = false): Array<[Blot, number]> {
-        const childResult = this.children.find(index, true);
+        const childResult = this.children.find(index, inclusive);
         const [child, offset] = childResult;
         const position: Array<[any, number]> = [[this, index]];
         if (child instanceof Container || child instanceof ListItem) {
@@ -327,37 +440,11 @@ export class ListItem extends LineBlot {
             return;
         }
 
-        if (this.domNode.textContent === "") {
-            return;
-        }
-
         const newValue = {
             ...ownValue,
             depth: ownValue.depth + 1,
         };
-        let targetParent: ListItem | ListGroup = this.prev;
-        let targetRef: Blot | null = null;
-
-        if (this.children.tail instanceof ListGroup) {
-            // We have a nested list inside of us.
-            // Let's move it onto the previous list item.
-            const existingListGroup = this.children.tail;
-            const groupValue = existingListGroup.getValue();
-            newValue.type = groupValue.type;
-
-            // We want to insert it at the beginning of the list.
-            targetRef = existingListGroup.children.head as Blot;
-            targetParent = existingListGroup;
-
-            // Move the list group into our previous element.
-            existingListGroup.insertInto(this.prev);
-        }
-        const newListItem = Parchment.create(ListItem.blotName, newValue) as ListItem;
-        newListItem.insertInto(targetParent, targetRef);
-
-        // Move over the primary list contents & cleanup.
-        this.moveChildren(newListItem);
-        this.remove();
+        this.format(ListItem.blotName, newValue);
     }
 
     /**
@@ -374,30 +461,11 @@ export class ListItem extends LineBlot {
             return;
         }
 
-        // We need to have a parent list list to move into.
-        const directParentGroup = this.parent;
-        const parentListItem = directParentGroup.parent;
-        const targetParent = parentListItem.parent;
-        const targetRef = parentListItem;
-
-        // The previous item needs to be a list item to indent
-        // Otherwise we have nothing to nest into.
-        if (!(targetParent instanceof ListGroup)) {
-            return;
-        }
-
         const newValue = {
             ...ownValue,
             depth: ownValue.depth - 1,
         };
-
-        // const parentValue = targetParentGroup
-        // Make our new list item.
-
-        const newListItem = Parchment.create(ListItem.blotName, newValue) as ListItem;
-        this.moveChildren(newListItem);
-        newListItem.insertInto(targetParent, targetRef);
-        this.remove();
+        this.format(ListItem.blotName, newValue);
     }
 
     protected createWrapper() {

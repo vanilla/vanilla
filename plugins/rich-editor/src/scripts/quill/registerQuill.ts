@@ -41,7 +41,6 @@ import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import SyntaxModule from "@rich-editor/quill/SyntaxModule";
 import { OrderedListGroup, UnorderedListGroup, ListItem, ListContent } from "@rich-editor/quill/blots/blocks/ListBlot";
-import ScrollBlot from "@rich-editor/quill/blots/ScrollBlot";
 
 let wasRegistered = false;
 
@@ -52,7 +51,6 @@ export default function registerQuill() {
     wasRegistered = true;
     Quill.register(
         {
-            // "blots/scroll": ScrollBlot,
             // Block formats
             "formats/blockquote/line": BlockquoteLineBlot,
             "formats/blockquote/content": BlockquoteContentBlot,

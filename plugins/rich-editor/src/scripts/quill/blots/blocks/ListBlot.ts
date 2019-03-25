@@ -11,6 +11,8 @@ import Container from "quill/blots/container";
 import Block from "quill/blots/block";
 import Inline from "quill/blots/inline";
 import Scroll from "quill/blots/scroll";
+import Delta from "quill-delta";
+import LeafBlot from "parchment/dist/src/blot/abstract/leaf";
 
 /* tslint:disable:max-classes-per-file */
 
@@ -63,7 +65,7 @@ function syncValueToElement(element: HTMLElement, value: IListItem) {
 }
 
 export class ListGroup extends WrapperBlot {
-    public static scope = Parchment.Scope.BLOCK_BLOT;
+    public static scope = Parchment.Scope.BLOCK;
 
     public static create(value: IListItem) {
         const element = super.create(value);
@@ -118,7 +120,7 @@ export class ListGroup extends WrapperBlot {
         super.deleteAt(index, length);
     }
 
-    public descendant(criteria, index: number) {
+    public descendant(criteria, index: number = 0) {
         return super.descendant(blot => {
             const isCorrectListItem = this.isBlotCorrectListItem(blot, index);
             if (!isCorrectListItem) {
@@ -158,7 +160,7 @@ export class ListGroup extends WrapperBlot {
      *
      * This method filters out 1.0 if the range only contains text characters from 1.1.
      */
-    public descendants(criteria, index: number, length: number) {
+    public descendants(criteria, index: number = 0, length: number = Number.MAX_VALUE) {
         const descendants = super.descendants(criteria, index, length);
         const filtered = descendants.filter((blot: Blot) => this.isBlotCorrectListItem(blot, index));
         return filtered;
@@ -325,6 +327,32 @@ export class ListItem extends LineBlot {
         }
     }
 
+    public delta() {
+        const nestedList = this.getNestedList();
+        // if (this.cache.delta == null) {
+        const directContentLength = nestedList ? this.length() - nestedList.length() : this.length();
+        const descendants = this.descendants(Parchment.Leaf as any, 0, directContentLength) as LeafBlot[];
+        this.cache.delta = descendants
+            .reduce((delta, leaf) => {
+                if (leaf.length() === 0) {
+                    return delta;
+                } else {
+                    return delta.insert(leaf.value(), bubbleFormats(leaf));
+                }
+            }, new Delta())
+            .insert("\n", bubbleFormats(this));
+        // }
+
+        if (nestedList) {
+            const nestedDelta = nestedList.children.reduce((delta, listItem: ListItem) => {
+                const listDelta = listItem.delta();
+                return delta.concat(listDelta);
+            }, new Delta());
+            return this.cache.delta.concat(nestedDelta);
+        }
+        return this.cache.delta;
+    }
+
     private optimizeUnwraps() {
         if (this.children.length === 1 && this.children.head instanceof ListGroup) {
             // If our only child is a list group (no text)
@@ -485,3 +513,24 @@ export class ListItem extends LineBlot {
 
 OrderedListGroup.allowedChildren = [WrapperBlot, ListItem];
 UnorderedListGroup.allowedChildren = [WrapperBlot, ListItem];
+
+function bubbleFormats(blot, formats = {}, filter = true) {
+    if (blot == null) {
+        return formats;
+    }
+    if (typeof blot.formats === "function") {
+        formats = { ...formats, ...blot.formats() };
+        if (filter) {
+            // exclude syntax highlighting from deltas and getFormat()
+            delete formats["code-token"];
+        }
+    }
+    if (
+        blot.parent == null ||
+        blot.parent.statics.blotName === "scroll" ||
+        blot.parent.statics.scope !== blot.statics.scope
+    ) {
+        return formats;
+    }
+    return bubbleFormats(blot.parent, formats, filter);
+}

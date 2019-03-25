@@ -241,7 +241,10 @@ declare module "quill/blots/block" {
     import { Blot } from "quill/core";
 
     export class BlockEmbed extends Embed {}
-    export default Block;
+    export default class BlockBlot extends Block {
+        protected cache: any = {};
+        public delta(): [];
+    }
 }
 
 declare module "quill/blots/inline" {

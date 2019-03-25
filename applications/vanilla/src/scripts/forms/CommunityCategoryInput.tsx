@@ -27,7 +27,6 @@ export class CommunityCategoryInput extends React.Component<IProps> {
     };
 
     public render() {
-        console.log(this.props.isLoading);
         return (
             <SelectLookup
                 {...this.props}

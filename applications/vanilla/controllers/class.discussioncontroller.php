@@ -173,9 +173,10 @@ class DiscussionController extends VanillaController {
             $this->canonicalUrl(discussionUrl($this->Discussion, pageNumber($this->Offset, $Limit, 0, false)));
         } else {
             $canonicalMessage = new Message(
-                sprintf(
-                    \Gdn::translate('This discussion has a more <a href="%1$s">recent version</a>.'),
-                    htmlspecialchars(\Gdn::request()->url($canonicalUrl))
+                str_replace(
+                    ["<0>", "</0>"],
+                    ['<a href="' . htmlspecialchars(\Gdn::request()->url($canonicalUrl)) . '">', "</a>"],
+                    \Gdn::translate('This discussion has a more <0>recent version</0>.')
                 ),
                 Message::TYPE_WARNING
             );

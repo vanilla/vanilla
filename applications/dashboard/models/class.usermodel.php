@@ -1969,8 +1969,8 @@ class UserModel extends Gdn_Model {
     public function register($formPostValues, $options = []) {
         $formPostValues['LastIPAddress'] = ipEncode(Gdn::request()->ipAddress());
 
-        // Remove any Photo being maliciously added during registration.
-        if (isset($formPostValues['Photo'])) {
+        // If the Photo added is not a URL, remove it.
+        if (isset($formPostValues['Photo']) && !isUrl($formPostValues['Photo'])) {
             unset($formPostValues['Photo']);
         }
         // Check for banning first.

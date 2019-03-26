@@ -17,6 +17,12 @@ import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
 import ParagraphMenuBar from "@rich-editor/menuBar/paragraph/ParagraphMenuBar";
 import { menuState, paragraphFormats } from "@rich-editor/menuBar/paragraph/formats/formatting";
+import MenuItems from "@rich-editor/toolbars/pieces/MenuItems";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { srOnly } from "@library/styles/styleHelpers";
+import { style } from "typestyle";
+import tabbable from "tabbable";
+import TabHandler from "@library/dom/TabHandler";
 
 export enum IMenuBarItemTypes {
     CHECK = "checkbox",
@@ -44,7 +50,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
     private buttonID: string;
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
-    // private menuRef: React.RefObject<MenuItems> = React.createRef();
+    private menuRef: React.RefObject<HTMLDivElement> = React.createRef();
     private formatter: Formatter;
     private focusWatcher: FocusWatcher;
 
@@ -97,7 +103,10 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
         );
 
         if (!this.props.mobile) {
-            if (!this.isPilcrowVisible || isEmbedSelected(this.quill, this.props.lastGoodSelection)) {
+            if (
+                (!this.isPilcrowVisible && !this.isMenuVisible) ||
+                isEmbedSelected(this.quill, this.props.lastGoodSelection)
+            ) {
                 pilcrowClasses += " isHidden";
             }
         }
@@ -133,27 +142,30 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                 >
                     <ActiveFormatIcon activeFormats={menuActiveFormats} />
                 </button>
-                {this.isMenuVisible && (
-                    <div
-                        id={this.menuID}
-                        className={classNames(this.dropDownClasses, classes.menuBar)}
-                        style={this.toolbarStyles}
-                        role="menu"
-                    >
-                        <ParagraphMenuBar
-                            parentID={this.ID}
-                            label={"Paragraph Format Menu"}
-                            isMenuVisible={this.isMenuVisible}
-                            lastGoodSelection={this.props.lastGoodSelection}
-                            legacyMode={this.props.legacyMode}
-                            close={this.close}
-                            textFormats={textFormats}
-                            menuActiveFormats={menuActiveFormats}
-                            rovingIndex={this.state.rovingTabIndex}
-                            setRovingIndex={this.setRovingIndex}
-                        />
-                    </div>
-                )}
+                <div
+                    id={this.menuID}
+                    className={classNames(
+                        this.dropDownClasses,
+                        classes.menuBar,
+                        this.isMenuVisible ? "" : style(srOnly()),
+                    )}
+                    style={this.toolbarStyles}
+                    role="menu"
+                >
+                    <ParagraphMenuBar
+                        menuRef={this.menuRef}
+                        parentID={this.ID}
+                        label={"Paragraph Format Menu"}
+                        isMenuVisible={this.isMenuVisible}
+                        lastGoodSelection={this.props.lastGoodSelection}
+                        legacyMode={this.props.legacyMode}
+                        close={this.close}
+                        textFormats={textFormats}
+                        menuActiveFormats={menuActiveFormats}
+                        rovingIndex={this.state.rovingTabIndex}
+                        setRovingIndex={this.setRovingIndex}
+                    />
+                </div>
             </div>
         );
     }
@@ -254,9 +266,13 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
     private pilcrowClickHandler = (event: React.MouseEvent<any>) => {
         event.preventDefault();
         this.setState({ hasFocus: !this.state.hasFocus }, () => {
-            if (this.state.hasFocus) {
-                // this.menuRef.current!.focusFirstItem();
-                forceSelectionUpdate();
+            if (this.state.hasFocus && this.menuRef.current) {
+                const menu: HTMLElement = this.menuRef.current;
+                const tabHandler = new TabHandler(menu);
+                const nextEl = tabHandler.getInitial();
+                if (nextEl) {
+                    nextEl.focus();
+                }
             }
         });
     };

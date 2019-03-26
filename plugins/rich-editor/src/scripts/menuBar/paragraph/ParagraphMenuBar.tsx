@@ -41,6 +41,7 @@ interface IProps {
     menuActiveFormats: any;
     rovingIndex: number;
     setRovingIndex: (index: number, callback?: () => void) => void;
+    menuRef: React.RefObject<HTMLDivElement>;
 }
 
 interface IMenuBarContent {
@@ -254,6 +255,7 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
                     role="menubar"
                     aria-label={this.props.label}
                     className={classNames(classes.menuBar, this.props.className)}
+                    ref={this.props.menuRef}
                 >
                     <div className={classes.menuBarToggles}>
                         {menus}

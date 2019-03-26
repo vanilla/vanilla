@@ -237,8 +237,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
         return classNames(
             classes.position,
             classes.menuBar,
-            { likeDropDownContent: !this.props.legacyMode },
-            !this.props.legacyMode ? classesDropDown.likeDropDownContent : "",
+            classesDropDown.likeDropDownContent,
             scrollBounds.height - bounds.bottom <= 170 ? "isUp" : "isDown",
         );
     }

@@ -110,6 +110,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
     const menuBar = style("menuBar", {
         position: "relative",
         width: unit(vars.menuButton.size * 4),
+        overflow: "hidden",
     });
 
     const menuBarToggles = style("menuBarToggles", {
@@ -121,8 +122,11 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
     });
 
     const paragraphMenuHandle = style("paragraphMenuHandle", {
-        display: "block",
+        ...appearance(),
         ...userSelect(),
+        background: "transparent",
+        border: 0,
+        display: "block",
         cursor: "pointer",
         width: unit(formVars.sizing.height),
         height: unit(formVars.sizing.height),
@@ -186,9 +190,11 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
     const button = style("button", {
         display: "block",
         ...userSelect(),
+        ...appearance(),
         cursor: "pointer",
         width: unit(vars.menuButton.size),
         height: unit(vars.menuButton.size),
+        border: 0,
         padding: 0,
         overflow: "hidden",
         $nest: {

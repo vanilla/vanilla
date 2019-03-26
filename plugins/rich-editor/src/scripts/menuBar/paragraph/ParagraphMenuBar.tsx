@@ -28,6 +28,7 @@ import { srOnly } from "@library/styles/styleHelpers";
 import { IMenuBarRadioButton } from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
 import ParagraphMenuSpecialBlockTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuSpecialBlockTabContent";
 import { menuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
+import { style } from "typestyle";
 
 interface IProps {
     className?: string;
@@ -201,7 +202,7 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
             },
         ];
 
-        let panelContent: JSX.Element | null = null;
+        const panelContent: JSX.Element[] = [];
 
         const menus = menuContents.map((menu, index) => {
             const MyContent = menu.component;
@@ -209,17 +210,20 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
                 this.props.setRovingIndex(index);
             };
 
-            if (menu.open) {
-                panelContent = (
-                    <div id={MyContent.get} role="menu" style={!menu.open ? srOnly() : undefined}>
-                        <MyContent
-                            {...menu}
-                            setRovingIndex={myRovingIndex}
-                            closeMenuAndSetCursor={this.closeMenuAndSetCursor}
-                        />
-                    </div>
-                );
-            }
+            panelContent[index] = (
+                <div
+                    id={MyContent.get}
+                    role="menu"
+                    className={!menu.open ? style(srOnly()) : undefined}
+                    key={`menuBarPanel-${index}`}
+                >
+                    <MyContent
+                        {...menu}
+                        setRovingIndex={myRovingIndex}
+                        closeMenuAndSetCursor={this.closeMenuAndSetCursor}
+                    />
+                </div>
+            );
 
             const setMyParagraph = () => {
                 this.props.setRovingIndex(index);

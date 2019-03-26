@@ -8,7 +8,7 @@ import { useThemeCache, styleFactory } from "@library//styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, percent } from "csx";
-import { colorOut, unit } from "@library/styles/styleHelpers";
+import { appearance, colorOut, unit } from "@library/styles/styleHelpers";
 
 export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -20,6 +20,8 @@ export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
     });
 
     const checkRadio = style("checkRadio", {
+        ...appearance(),
+        border: 0,
         display: "flex",
         alignItems: "center",
         width: percent(100),

@@ -716,7 +716,7 @@ class CommentModel extends Gdn_Model {
 
         } else {
             // Make sure the discussion isn't archived.
-            $archiveDate = c('Vanilla.Archive.Date', false);
+            $archiveDate = Gdn::config('Vanilla.Archive.Date', false);
             if (!$archiveDate || (Gdn_Format::toTimestamp($discussion->DateLastComment) > Gdn_Format::toTimestamp($archiveDate))) {
                 $newComments = true;
 
@@ -741,7 +741,7 @@ class CommentModel extends Gdn_Model {
 
         // If this discussion is in a category that has been marked read,
         // check if reading this thread causes it to be completely read again.
-        $categoryID = val('CategoryID', $discussion);
+        $categoryID = $discussion->CategoryID;
         if (!$categoryID) {
             return;
         }
@@ -749,12 +749,12 @@ class CommentModel extends Gdn_Model {
         if (!$category) {
             return;
         }
-        $dateMarkedRead = val('DateMarkedRead', $category);
+        $dateMarkedRead = $category->DateMarkedRead;
         if (!$dateMarkedRead) {
             return;
         }
         // Fuzzy way of looking back about 2 pages into the past.
-        $lookBackCount = c('Vanilla.Discussions.PerPage', 50) * 2;
+        $lookBackCount = Gdn::config('Vanilla.Discussions.PerPage', 50) * 2;
 
         // Find all discussions with content from after DateMarkedRead.
         $discussionModel = new DiscussionModel();

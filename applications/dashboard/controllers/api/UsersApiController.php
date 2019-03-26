@@ -18,6 +18,9 @@ use Vanilla\UploadedFileSchema;
 use Vanilla\PermissionsTranslationTrait;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\DelimitedScheme;
+use Vanilla\Menu\CounterModel;
+use Vanilla\Utility\InstanceValidatorSchema;
+use Vanilla\Menu\Counter;
 
 /**
  * API Controller for the `/users` resource.
@@ -34,6 +37,9 @@ class UsersApiController extends AbstractApiController {
     /** @var Gdn_Configuration */
     private $configuration;
 
+    /** @var CounterModel */
+    private $counterModel;
+
     /** @var array */
     private $guestFragment;
 
@@ -49,6 +55,9 @@ class UsersApiController extends AbstractApiController {
     /** @var Schema */
     private $userSchema;
 
+    /** @var Schema */
+    private $menuCountsSchema;
+
     /**
      * UsersApiController constructor.
      *
@@ -59,10 +68,12 @@ class UsersApiController extends AbstractApiController {
     public function __construct(
         UserModel $userModel,
         Gdn_Configuration $configuration,
+        CounterModel $counterModel,
         ImageResizer $imageResizer,
         ActivityModel $activityModel
     ) {
         $this->configuration = $configuration;
+        $this->counterModel = $counterModel;
         $this->userModel = $userModel;
         $this->imageResizer = $imageResizer;
         $this->nameScheme =  new DelimitedScheme('.', new CamelCaseScheme());
@@ -159,6 +170,20 @@ class UsersApiController extends AbstractApiController {
             ], 'RoleFragment'),
         ]);
         return $schema;
+    }
+
+    /**
+     * Get the schema for menu item counts.
+     *
+     * @return Schema Returns a schema.
+     */
+    public function getMenuCountsSchema() {
+        if ($this->menuCountsSchema === null) {
+            $this->menuCountsSchema = $this->schema([
+                "counts:a?" => new InstanceValidatorSchema(Counter::class),
+            ], 'MenuCounts');
+        }
+        return $this->menuCountsSchema;
     }
 
     /**
@@ -357,6 +382,23 @@ class UsersApiController extends AbstractApiController {
         $user["countUnreadNotifications"] = $this->activityModel->getUserTotalUnread($this->getSession()->UserID);
 
         $result = $out->validate($user);
+        return $result;
+    }
+
+    /**
+     * Get all menu counts for current user.
+     *
+     * @return array
+     */
+    public function get_meCounts(): array {
+        $this->permission();
+
+        $in = $this->schema([], "in");
+        $out = $this->schema($this->getMenuCountsSchema(), "out");
+
+        $counters = $this->counterModel->getAllCounters();
+
+        $result = $out->validate([ 'counts' => $counters]);
         return $result;
     }
 
@@ -752,31 +794,6 @@ class UsersApiController extends AbstractApiController {
         $result = $out->validate($this->userByID($id));
         return $result;
     }
-
-    /**
-     * Verify a user.
-     *
-     * @param int $id The ID of the user.
-     * @param array $body The request body.
-     * @throws NotFoundException if unable to find the user.
-     * @return array
-     */
-//    public function put_verify($id, array $body) {
-//        $this->permission('Garden.Users.Edit');
-//
-//        $in = $this
-//            ->schema(['verified:b' => 'Pass true to flag as verified or false for unverified.'], 'in')
-//            ->setDescription('Verify a user.');
-//        $out = $this->schema(['verified:b' => 'The current verified value.'], 'out');
-//
-//        $row = $this->userByID($id);
-//        $body = $in->validate($body);
-//        $verify = intval($body['verified']);
-//        $this->userModel->setField($id, 'Verified', $verify);
-//
-//        $result = $this->userByID($id);
-//        return $out->validate($result);
-//    }
 
     /**
      * Normalize a Schema record to match the database definition.

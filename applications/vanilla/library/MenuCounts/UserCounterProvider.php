@@ -31,6 +31,7 @@ class UserCounterProvider implements CounterProviderInterface {
      */
     public function getMenuCounters(): array {
         $counters = [];
+        die(var_dump($this->session));
         if (is_object($this->session->User)) {
             $user = $this->session->User;
             $counters[] = new Counter("Bookmarks", $user->CountBookmarks ?? 0);

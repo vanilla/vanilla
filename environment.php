@@ -7,7 +7,7 @@
  * @license GPL-2.0-only
  */
 
-if (PHP_VERSION_ID < 71000) {
+if (PHP_VERSION_ID < 70100) {
     die('Vanilla requires PHP 7.1 or greater.');
 }
 

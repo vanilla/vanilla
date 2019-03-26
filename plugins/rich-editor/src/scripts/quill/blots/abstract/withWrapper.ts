@@ -24,6 +24,7 @@ export interface IWrappable extends Container {
 export default function withWrapper(blotConstructor: typeof Block) {
     class BlotWithWrapper extends blotConstructor {
         public parent: WrapperBlot;
+        protected useWrapperReplacement = true;
 
         public constructor(domNode) {
             super(domNode);
@@ -96,7 +97,9 @@ export default function withWrapper(blotConstructor: typeof Block) {
          * @param value - The value for the replacement Blot.
          */
         public replaceWith(name: any, value?: any): any {
-            if (name === this.statics.blotName) {
+            if (!this.useWrapperReplacement) {
+                super.replaceWith(name, value);
+            } else if (name === this.statics.blotName) {
                 super.replaceWith(name, value);
             } else {
                 const topLevelWrapper = this.getWrapper(true);

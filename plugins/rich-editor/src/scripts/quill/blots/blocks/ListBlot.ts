@@ -228,6 +228,7 @@ export class ListItemWrapper extends withWrapper(Container as any) {
         if (blot instanceof ListItem || blot instanceof ListGroup) {
             super.insertBefore(blot, ref);
         } else {
+            this.ensureListContent();
             this.getListContent()!.insertBefore(blot, ref);
         }
     }
@@ -239,7 +240,21 @@ export class ListItemWrapper extends withWrapper(Container as any) {
     public optimize(context) {
         this.optimizeNesting();
         this.optimizeUnwrapping();
+        this.ensureListContent();
         super.optimize(context);
+    }
+
+    private ensureListContent() {
+        if (!this.getListContent()) {
+            const listContent = (Parchment.create(ListItem.blotName, this.getValue()) as any) as ListItem;
+
+            this.children.forEach(child => {
+                if (!(child instanceof ListGroup)) {
+                    child.insertInto(listContent);
+                }
+            });
+            this.insertBefore(listContent, this.children.head);
+        }
     }
 
     /**
@@ -419,6 +434,8 @@ export class ListItem extends LineBlot {
      */
     public static formats = getValueFromElement;
 
+    protected useWrapperReplacement = false;
+
     /**
      * @override
      * Overridden to dynamically create the parent list wrapper with the item's value.
@@ -470,11 +487,12 @@ export class ListItem extends LineBlot {
         const ownValue = this.getValue();
 
         if (ownValue.depth === 0) {
-            return;
-        }
-
-        if (this.domNode.textContent === "") {
-            return;
+            const textContent = this.domNode.textContent || "";
+            if (textContent.length === 0) {
+                this.breakUpGroupAndMoveToScroll();
+            } else {
+                return;
+            }
         }
 
         const newValue = {
@@ -482,6 +500,40 @@ export class ListItem extends LineBlot {
             depth: ownValue.depth - 1,
         };
         this.format(ListItem.blotName, newValue);
+    }
+
+    public replaceWith(formatName, value?: any) {
+        if (formatName !== ListItem.blotName) {
+            const newValue = {
+                ...this.getValue,
+                depth: 0,
+            };
+            this.format(ListItem.blotName, newValue);
+            window.quill.update();
+            return this.breakUpGroupAndMoveToScroll(formatName, value);
+        } else {
+            return super.replaceWith(formatName, value);
+        }
+    }
+
+    public breakUpGroupAndMoveToScroll(formatName = "block", value: any = "") {
+        const parentWrapper = this.parent as ListItemWrapper;
+        const parentGroup = parentWrapper.parent as ListGroup;
+        const newBlock =
+            typeof formatName === "string"
+                ? (Parchment.create(formatName, value) as Container)
+                : (formatName as Container);
+        this.moveChildren(newBlock);
+        if (parentWrapper.prev === null) {
+            parentWrapper.remove();
+            this.scroll.insertBefore(newBlock, parentGroup);
+        } else if (parentGroup.children.length > 1) {
+            const after = parentGroup.split(this.offset(parentGroup)) as ListGroup;
+            this.scroll.insertBefore(newBlock, after);
+        }
+
+        this.remove();
+        return newBlock;
     }
 
     /**

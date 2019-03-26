@@ -315,6 +315,8 @@ export default class KeyboardBindings {
                 });
 
                 if (handled) {
+                    this.quill.update(Quill.sources.USER);
+                    this.quill.setSelection(range, Quill.sources.API);
                     return false;
                 } else {
                     return true;
@@ -422,8 +424,6 @@ export default class KeyboardBindings {
             handler: this.handleCodeBlockBackspace,
         };
     }
-
-    private addListHandlers() {}
 
     /**
      * Add keyboard options.bindings that allow the user to escape multi-line blocks with arrow keys.

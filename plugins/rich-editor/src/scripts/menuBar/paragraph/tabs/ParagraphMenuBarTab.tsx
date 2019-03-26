@@ -52,8 +52,8 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
         if (open) {
             const classes = richEditorClasses(this.props.legacyMode);
             const handleClick = (event: React.MouseEvent) => {
+                this.props.setRovingIndex();
                 this.props.toggleMenu(() => {
-                    this.props.setRovingIndex();
                     this.toggleButtonRef.current && this.toggleButtonRef.current.focus();
                 });
             };

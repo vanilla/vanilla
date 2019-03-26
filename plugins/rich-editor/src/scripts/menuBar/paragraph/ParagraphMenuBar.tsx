@@ -40,6 +40,7 @@ interface IProps {
     textFormats: any;
     menuActiveFormats: any;
     rovingIndex: number;
+    setRovingIndex: (index: number, callback?: () => void) => void;
 }
 
 interface IMenuBarContent {
@@ -60,7 +61,6 @@ interface IMenuBarContent {
  * Implemented paragraph menu bar. Note that conceptually, it's a bar of menus, but visually it behaves like tabs.
  */
 export default class ParagraphMenuBar extends React.Component<IProps> {
-    private menuCount;
     private headingMenuOpen = false;
     private headingMenuIcon = heading2();
     private listMenuOpen = false;
@@ -203,11 +203,7 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
         let panelContent: JSX.Element | null = null;
 
         const menus = menuContents.map((menu, index) => {
-            const setMyIndex = (callback?: () => void) => {
-                this.setRovingIndex(index, callback);
-            };
             const MyContent = menu.component;
-
             if (menu.open) {
                 panelContent = (
                     <div id={MyContent.get} role="menu" style={!menu.open ? srOnly() : undefined}>
@@ -215,6 +211,10 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
                     </div>
                 );
             }
+
+            const setMyRovingIndex = () => {
+                this.props.setRovingIndex(index);
+            };
 
             return (
                 <ParagraphMenuBarTab
@@ -226,9 +226,9 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
                     toggleMenu={menu.toggleMenu}
                     icon={menu.icon}
                     tabComponent={menu.component}
-                    setRovingIndex={setMyIndex}
                     key={`${menu.label}-${index}`}
                     activeFormats={menu.activeFormats}
+                    setRovingIndex={setMyRovingIndex}
                     legacyMode={this.props.legacyMode}
                     tabIndex={this.tabIndex(index)}
                     open={menu.open}
@@ -236,11 +236,10 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
             );
         });
 
-        const paragraphIndex = menuContents.length + 1;
-        const setParagraphIndex = (callback?: () => void) => {
-            this.setRovingIndex(paragraphIndex, callback);
+        const paragraphIndex = menuContents.length;
+        const setParagraphIndex = () => {
+            this.props.setRovingIndex(0);
         };
-        this.menuCount = paragraphIndex + 1;
         return (
             <>
                 <div
@@ -294,28 +293,8 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
     };
 
     private tabIndex = index => {
-        if (this.props.rovingIndex === null && index === 0) {
-            return 0;
-        } else {
-            return this.props.rovingIndex === index ? 0 : -1;
-        }
+        return this.props.rovingIndex === index ? 0 : -1;
     };
-
-    /**
-     * For the "roving tab index" (https://www.w3.org/TR/wai-aria-practices-1.1/#kbd_roving_tabindex), we need to know the count. It'll be initialized when by the ParagraphMenuBar
-     * @param index
-     * @param callback
-     */
-    private setRovingIndex(index: number, callback?: () => void) {
-        this.setState(
-            {
-                rovingIndex: index,
-            },
-            () => {
-                callback && callback();
-            },
-        );
-    }
 
     /**
      * From an accessibility point of view, this is a Editor Menubar. The only difference is it has a toggled visibility

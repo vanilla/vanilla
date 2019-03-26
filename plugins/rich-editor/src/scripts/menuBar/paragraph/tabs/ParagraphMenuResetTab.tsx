@@ -9,6 +9,7 @@ import { pilcrow } from "@library/icons/editorIcons";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 interface IProps {
     formatParagraphHandler: () => void;
@@ -28,13 +29,12 @@ export default class ParagraphMenuResetTab extends React.PureComponent<IProps> {
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
 
     public render() {
-        const title = t("Set style to plain paragraph");
+        const title = t("Removes paragraph style and sets to plain paragraph");
         const classes = richEditorClasses(!!this.props.legacyMode);
         const handleClick = (event: React.MouseEvent) => {
-            this.props.setRovingIndex(() => {
-                this.props.formatParagraphHandler();
-                this.props.closeMenuAndSetCursor();
-            });
+            this.props.setRovingIndex();
+            this.props.formatParagraphHandler();
+            this.props.closeMenuAndSetCursor();
         };
         return (
             <button
@@ -45,8 +45,10 @@ export default class ParagraphMenuResetTab extends React.PureComponent<IProps> {
                 onClick={handleClick}
                 className={classNames(this.props.className, classes.button)}
                 ref={this.buttonRef}
+                tabIndex={this.props.tabIndex}
             >
-                {pilcrow()}
+                <ScreenReaderContent>{t("Paragraph")}</ScreenReaderContent>
+                <span aria-hidden={true}>{pilcrow()}</span>
             </button>
         );
     }

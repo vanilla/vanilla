@@ -150,6 +150,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                             textFormats={textFormats}
                             menuActiveFormats={menuActiveFormats}
                             rovingIndex={this.state.rovingTabIndex}
+                            setRovingIndex={this.setRovingIndex}
                         />
                     </div>
                 )}
@@ -170,6 +171,17 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
     private get isMenuVisible() {
         return !!this.props.lastGoodSelection && this.state.hasFocus;
     }
+
+    private setRovingIndex = (index: number, callback?: () => void) => {
+        this.setState(
+            {
+                rovingTabIndex: index,
+            },
+            () => {
+                callback && callback();
+            },
+        );
+    };
 
     /**
      * Get the inline styles for the pilcrow. This is mostly just positioning it on the Y access currently.
@@ -252,14 +264,18 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
     /**
      * Close the paragraph menu and place the selection at the end of the current selection if there is one.
      */
-    private close = () => {
+    private close = (focusToggle: boolean = false) => {
         this.setState({ hasFocus: true });
         const { lastGoodSelection } = this.props;
-        const newSelection = {
-            index: lastGoodSelection.index + lastGoodSelection.length,
-            length: 0,
-        };
-        this.quill.setSelection(newSelection);
+        if (!focusToggle) {
+            const newSelection = {
+                index: lastGoodSelection.index + lastGoodSelection.length,
+                length: 0,
+            };
+            this.quill.setSelection(newSelection);
+        } else {
+            this.buttonRef && this.buttonRef.current && this.buttonRef.current.focus();
+        }
     };
 
     /**

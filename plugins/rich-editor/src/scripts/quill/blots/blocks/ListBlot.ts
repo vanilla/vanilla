@@ -275,19 +275,25 @@ export class ListItemWrapper extends withWrapper(Container as any) {
             }
 
             if (nextValue.depth > ownValue.depth) {
-                const nestedGroup = this.getListGroup();
-                if (nestedGroup) {
-                    next.insertInto(nestedGroup);
+                const ownNestedGroup = this.getListGroup();
+                const nextNestedGroup = next.getListGroup();
+                if (ownNestedGroup) {
+                    next.insertInto(ownNestedGroup);
 
                     // Adjust our list type to the target value.
                     const newNextValue: IListItem = {
                         ...nextValue,
-                        type: nestedGroup.getValue().type,
+                        type: ownNestedGroup.getValue().type,
                     };
                     next.getListContent()!.format("list", newNextValue);
                 } else {
                     // Just insert it directly into the end. It will create its own group.
                     next.insertInto(this);
+                }
+
+                if (nextNestedGroup) {
+                    nextNestedGroup.moveChildren(this.parent, this.next);
+                    nextNestedGroup.remove();
                 }
             }
         }

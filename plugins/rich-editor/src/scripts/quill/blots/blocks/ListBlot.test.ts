@@ -15,6 +15,7 @@ import {
     ListType,
     ListItem,
     ListGroup,
+    ListItemWrapper,
 } from "@rich-editor/quill/blots/blocks/ListBlot";
 import { expect } from "chai";
 import Formatter from "@rich-editor/quill/Formatter";
@@ -196,7 +197,7 @@ describe.only("ListBlot", () => {
             quill.scroll.children.forEach((blot: ListGroup) => {
                 expect(blot).instanceOf(ListGroup);
                 expect(blot.children).has.length(1);
-                expect(blot.children.head).instanceOf(ListItem);
+                expect(blot.children.head).instanceOf(ListItemWrapper);
             });
         });
 
@@ -218,8 +219,8 @@ describe.only("ListBlot", () => {
             const outerUL = quill.scroll.children.head as ListGroup;
             expect(outerUL).instanceOf(ListGroup);
             expect(outerUL.children).has.length(3);
-            const secondChild = outerUL.children.head!.next as ListItem;
-            expect(secondChild.children.tail).instanceOf(ListGroup);
+            const secondChild = outerUL.children.head!.next as ListItemWrapper;
+            expect(secondChild.getListGroup()).instanceOf(ListGroup);
         });
 
         it("can nest different types multiple levels deep", () => {
@@ -253,7 +254,7 @@ describe.only("ListBlot", () => {
             expect(depth1OL).instanceOf(OrderedListGroup);
             expect(depth1OL.children).has.length(2);
             const depth1LI = depth1OL.children.head!.next as ListItem;
-            expect(depth1LI).instanceOf(ListItem);
+            expect(depth1LI).instanceOf(ListItemWrapper);
 
             const depth2UL = depth1LI.children.tail as ListGroup;
             expect(depth2UL).instanceOf(UnorderedListGroup);
@@ -285,10 +286,10 @@ describe.only("ListBlot", () => {
             insertListBlot({ type: ListType.BULLETED, depth: 0 });
 
             const listGroup = quill.scroll.children.head as ListGroup;
-            const listItem = listGroup.children.head as ListItem;
+            const listItem = listGroup.children.head as ListItemWrapper;
             const contentBefore = quill.getContents().ops;
 
-            listItem.indent();
+            listItem.getListContent()!.indent();
             quill.update();
 
             expect(quill.getContents().ops).deep.equals(contentBefore);
@@ -299,16 +300,16 @@ describe.only("ListBlot", () => {
             insertListBlot({ type: ListType.BULLETED, depth: 0 });
 
             const listGroup = quill.scroll.children.head as ListGroup;
-            let listItem = listGroup.children.tail as ListItem;
+            let listItem = listGroup.children.tail as ListItemWrapper;
 
             expect(listGroup.children, "List group should have 2 children to start").has.length(2);
             expect(listItem.children, "List item should have 1 child to start").has.length(1);
 
-            listItem.indent();
+            listItem.getListContent()!.indent();
             quill.update();
 
             // Refetch required due to the optimizations that may have occured on listItem.
-            listItem = listGroup.children.tail as ListItem;
+            listItem = listGroup.children.tail as ListItemWrapper;
 
             expect(listGroup.children, "List group should have 1 child after").has.length(1);
             expect(listItem.children, "List item should have 2 children after").has.length(2);
@@ -318,15 +319,15 @@ describe.only("ListBlot", () => {
             expect(secondListItem.getValue().depth, "The first list item should contain a list group").eq(1);
         });
 
-        it("can indent an item into it's own nest list of the same type", () => {
+        it.only("can indent an item into it's own nest list of the same type", () => {
             insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1");
             insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1.1");
             insertListBlot({ type: ListType.BULLETED, depth: 1 }, "1.2");
 
             const listGroup = quill.scroll.children.head as ListGroup;
-            let listItem = listGroup.children.tail as ListItem;
+            let listItem = listGroup.children.tail as ListItemWrapper;
 
-            listItem.indent();
+            listItem.getListContent()!.indent();
             quill.update();
 
             // Expected
@@ -335,55 +336,12 @@ describe.only("ListBlot", () => {
             //   - listItem
 
             expect(listGroup.children, "Only top level list item should remain").has.length(1);
-            listItem = listGroup.children.head as ListItem;
+            listItem = listGroup.children.head as ListItemWrapper;
             expect(listItem.children.tail, "The first list item should contain a list group").instanceOf(
                 UnorderedListGroup,
             );
             const nestedListGroup = listItem.children.tail as UnorderedListGroup;
             expect(nestedListGroup.children, "There should be 2 nested list items").has.length(2);
-        });
-
-        it.only("indenting and outdenting should leave the same dom structure", () => {
-            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1");
-            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "2");
-            insertListBlot({ type: ListType.BULLETED, depth: 1 }, "2.1");
-
-            const get2 = () => {
-                const item: any = (document.querySelectorAll(".ql-editor li")[2] as any).__blot.blot as ListItem;
-                return item;
-            };
-
-            const htmlBefore = quill.scroll.domNode.innerHTML;
-
-            const _2 = get2();
-            get2().indent();
-            quill.update();
-            get2().outdent();
-            quill.update();
-
-            const htmlAfter = quill.scroll.domNode.innerHTML;
-            expect(htmlBefore).equals(htmlAfter);
-        });
-    });
-
-    describe("descendants", () => {
-        it("selects multiple descendant list items properly", () => {
-            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "item1");
-            insertListBlot({ type: ListType.BULLETED, depth: 1 }, "item1.1");
-            insertListBlot({ type: ListType.BULLETED, depth: 1 }, "item1.2");
-            const listGroup = quill.scroll.children.head as ListGroup;
-
-            const descendants = listGroup.descendants((blot: Blot) => blot instanceof ListItem, 6, 10);
-            expect(descendants).has.length(2);
-        });
-
-        it("selects a single descendant list item properly", () => {
-            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "item1");
-            insertListBlot({ type: ListType.BULLETED, depth: 1 }, "item1.1");
-
-            const listGroup = quill.scroll.children.head as ListGroup;
-            const descendants = listGroup.descendant((blot: Blot) => blot instanceof ListItem, 6);
-            expect(descendants).has.length(1);
         });
     });
 });

@@ -20,8 +20,8 @@ export enum ListTag {
 }
 
 export enum ListType {
-    NUMBERED = "numbered",
-    BULLETED = "bulleted",
+    ORDERED = "ordered",
+    BULLETED = "bullet",
     CHECKBOX = "checkbox",
 }
 
@@ -338,7 +338,7 @@ export class ListItemWrapper extends withWrapper(Container as any) {
     protected createWrapper() {
         const value = this.getValue();
         switch (value.type) {
-            case ListType.NUMBERED:
+            case ListType.ORDERED:
                 return Parchment.create(OrderedListGroup.blotName, value) as OrderedListGroup;
             default:
                 return Parchment.create(UnorderedListGroup.blotName, value) as UnorderedListGroup;
@@ -427,7 +427,7 @@ export class ListItem extends LineBlot {
                     };
                 case "ordered":
                     return {
-                        type: ListType.NUMBERED,
+                        type: ListType.ORDERED,
                         depth: 0,
                     };
                 default:

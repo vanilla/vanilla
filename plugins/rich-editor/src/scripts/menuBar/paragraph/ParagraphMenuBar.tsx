@@ -168,14 +168,14 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
                         checked: menuActiveFormats.lists.ordered,
                     },
                     {
-                        formatFunction: textFormats.listUnordered,
+                        formatFunction: textFormats.listOrdered,
                         icon: listOrdered(iconStyle),
                         text: t("Ordered List"),
                         checked: menuActiveFormats.lists.unordered,
                     },
                 ],
                 indent: textFormats.listIndent,
-                outdent: textFormats.listIndent,
+                outdent: textFormats.listOutdent,
             },
             {
                 component: ParagraphMenuSpecialBlockTabContent,

@@ -132,7 +132,7 @@ class RichFormat extends BaseFormat {
 
             /** @var Quill\BlotGroup $blotGroup */
             foreach ($blotGroups as $blotGroup) {
-                $blot = $blotGroup->getBlotForSurroundingTags();
+                $blot = $blotGroup->getMainBlot();
                 if ($blot instanceof ExternalBlot &&
                     ($blot->getEmbedData()['type'] ?? null) === FileEmbed::EMBED_TYPE
                 ) {
@@ -179,7 +179,7 @@ class RichFormat extends BaseFormat {
 
             /** @var Quill\BlotGroup $blotGroup */
             foreach ($blotGroups as $blotGroup) {
-                $blot = $blotGroup->getBlotForSurroundingTags();
+                $blot = $blotGroup->getMainBlot();
                 if ($blot instanceof HeadingTerminatorBlot && $blot->getReference()) {
                     $outline[] = new Heading(
                         $blotGroup->getUnsafeText(),

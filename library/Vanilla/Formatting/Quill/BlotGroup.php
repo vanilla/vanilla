@@ -13,6 +13,7 @@ use Vanilla\Formatting\Quill\Blots\Lines\AbstractLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\CodeLineBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\CodeLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
+use Vanilla\Formatting\Quill\Blots\Lines\ListLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\Lines\ParagraphLineTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
@@ -82,6 +83,41 @@ class BlotGroup {
         return count($this->blots) === 0;
     }
 
+    /** @var BlotGroup[] */
+    private $nestedGroups = [];
+
+    /**
+     * Determine if one group can nest another one inside of it.
+     *
+     * @param BlotGroup $otherGroup
+     * @return bool
+     */
+    public function canNest(BlotGroup $otherGroup): bool {
+        $otherMainBlot = $otherGroup->getMainBlot();
+        $ownMainBlot = $this->getMainBlot();
+        if ($otherMainBlot instanceof ListLineTerminatorBlot
+            && $ownMainBlot instanceof ListLineTerminatorBlot
+            && $otherMainBlot->getNestingDepth() > $ownMainBlot->getNestingDepth()
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Nest a blot group inside of this one.
+     *
+     * @param BlotGroup $blotGroup
+     */
+    public function nestGroup(BlotGroup $blotGroup) {
+        $lastNestedGroup = $this->nestedGroups[count($this->nestedGroups) - 1] ?? null;
+        if ($lastNestedGroup && $lastNestedGroup->canNest($blotGroup)) {
+            $lastNestedGroup->nestGroup($blotGroup);
+        } else {
+            $this->nestedGroups[] = $blotGroup;
+        }
+    }
 
     /**
      * Render the block.
@@ -102,7 +138,7 @@ class BlotGroup {
         }
 
         // Don't render empty groups.
-        $surroundTagBlot = $this->getBlotForSurroundingTags();
+        $surroundTagBlot = $this->getMainBlot();
         $result = $surroundTagBlot->getGroupOpeningTag();
 
         // Line blots have special rendering.
@@ -112,6 +148,10 @@ class BlotGroup {
             foreach ($this->blots as $blot) {
                 $result .= $blot->render();
             }
+        }
+
+        foreach ($this->nestedGroups as $nestedGroup) {
+            $result .= $nestedGroup->render();
         }
 
         $result .= $surroundTagBlot->getGroupClosingTag();
@@ -184,7 +224,7 @@ class BlotGroup {
      * @return string[]
      */
     public function getMentionUsernames() {
-        if ($this->getBlotForSurroundingTags() instanceof Blots\Lines\BlockquoteLineTerminatorBlot) {
+        if ($this->getMainBlot() instanceof Blots\Lines\BlockquoteLineTerminatorBlot) {
             return [];
         }
 
@@ -234,12 +274,12 @@ class BlotGroup {
      *
      * @return AbstractBlot|null
      */
-    public function getBlotForSurroundingTags() {
+    public function getMainBlot(): ?AbstractBlot {
         if (count($this->blots) === 0) {
             return null;
         }
         $blot = $this->blots[0];
-        $overridingBlot = $this->getPrimaryBlot();
+        $overridingBlot = $this->getOverrideBlot();
 
         return $overridingBlot ?? $blot;
     }
@@ -249,7 +289,7 @@ class BlotGroup {
      *
      * @return null|AbstractBlot
      */
-    public function getPrimaryBlot() {
+    public function getOverrideBlot(): ?AbstractBlot {
         foreach ($this->overridingBlots as $overridingBlot) {
             $index = $this->getIndexForBlotOfType($overridingBlot);
             if ($index >= 0) {

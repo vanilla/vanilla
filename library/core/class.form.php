@@ -371,9 +371,6 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string The form element for a color picker.
      */
     public function color($fieldName, $options = []) {
-
-        $allowEmpty = val('AllowEmpty', $options, false);
-
         Gdn::controller()->addJsFile('colorpicker.js');
 
         $valueAttributes['class'] = 'js-color-picker-value color-picker-value Hidden';
@@ -386,7 +383,13 @@ class Gdn_Form extends Gdn_Pluggable {
         $valueAttributes['value'] = $colorAttributes['value'];
 
         $cssClass = 'js-color-picker color-picker input-group';
-        $dataAttribute = $allowEmpty ? 'data-allow-empty="true"' : 'data-allow-empty="false"';
+
+        $allowEmpty = $options['AllowEmpty'] ?? false;
+        if ($allowEmpty) {
+            $dataAttribute = 'data-allow-empty="true"';
+        } else {
+            $dataAttribute = 'data-allow-empty="false"';
+        }
 
         return '<div id="'.$this->escapeFieldName($fieldName).'" class="'.$cssClass.'" '.$dataAttribute.'>'
         .$this->input($fieldName, 'text', $valueAttributes)

@@ -749,19 +749,17 @@ class CommentModel extends Gdn_Model {
         if (!$category) {
             return;
         }
+        $wheres = ['CategoryID' => $categoryID];
         $dateMarkedRead = $category->DateMarkedRead;
-        if (!$dateMarkedRead) {
-            return;
+        if ($dateMarkedRead) {
+            $wheres['DateLastComment>'] = $dateMarkedRead;
         }
         // Fuzzy way of looking back about 2 pages into the past.
         $lookBackCount = Gdn::config('Vanilla.Discussions.PerPage', 50) * 2;
 
         // Find all discussions with content from after DateMarkedRead.
         $discussionModel = new DiscussionModel();
-        $discussions = $discussionModel->get(0, $lookBackCount + 1, [
-            'CategoryID' => $categoryID,
-            'DateLastComment>' => $dateMarkedRead
-        ]);
+        $discussions = $discussionModel->get(0, $lookBackCount + 1, $wheres);
         unset($discussionModel);
 
         // Abort if we get back as many as we asked for, meaning a

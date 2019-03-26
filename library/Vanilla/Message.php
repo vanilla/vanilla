@@ -20,7 +20,7 @@ class Message {
     const TYPE_WARNING = "Warning";
 
     /** @var string */
-    private $body;
+    private $htmlBody;
 
     /** @var array */
     private $classes = ["DismissMessage"];
@@ -31,11 +31,11 @@ class Message {
     /**
      * Create a new message.
      *
-     * @param string $body
+     * @param string $htmlBody
      * @param string $type
      */
-    public function __construct(string $body, string $type) {
-        $this->setBody($body);
+    public function __construct(string $htmlBody, string $type) {
+        $this->setHtmlBody($htmlBody);
         $this->setType($type);
     }
 
@@ -47,16 +47,16 @@ class Message {
     public function __toString() {
         $classes = $this->classes;
         $classes[] = "{$this->type}Message";
-        return '<div class="' . implode(" ", $classes) . '">' . $this->body . '</div>';
+        return '<div class="' . implode(" ", $classes) . '">' . $this->htmlBody . '</div>';
     }
 
     /**
-     * Set the content of this message.
+     * Set the HTML content of this message.
      *
-     * @param string $body
+     * @param string $htmlBody
      */
-    public function setBody(string $body) {
-        $this->body = $body;
+    public function setHtmlBody(string $htmlBody) {
+        $this->htmlBody = $htmlBody;
     }
 
     /**

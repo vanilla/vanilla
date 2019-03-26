@@ -176,6 +176,36 @@ paths:
       tags:
       - Users
       summary: Get information about the current user.
+  /users/me-counts:
+      get:
+        responses:
+          '200':
+            content:
+              'application/json':
+                schema:
+                  properties:
+                    counts:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            description: Menu counter name
+                            type: string
+                          count:
+                            description: Counter value
+                            type: integer
+                      example:
+                        - name: UnreadNotifications
+                          count: 2
+                        - name: Bookmarks
+                          count: 3
+                  required:
+                  - counts
+            description: Success
+        tags:
+        - Users
+        summary: Get information about menu counts for current user.
   /users/register:
     post:
       responses:

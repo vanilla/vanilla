@@ -365,8 +365,9 @@ class Gdn_Form extends Gdn_Pluggable {
      * is set to true. The hex value to be saved is the value of the input with the color-picker-value class.
      *
      * @param string $fieldName Name of the field being posted with this input.
-     * @param array $options Currently supports a key of 'AllowEmpty' which signifies whether to accept empty
-     * values for the color picker
+     * @param array $options An array of options with the following keys:
+     *      'AllowEmpty' (bool) Whether to accept empty values for the color picker, defaults to false
+     *      'Value' (string) Hex color code for the color picker to start with, defaults to "#ffffff"
      * @return string The form element for a color picker.
      */
     public function color($fieldName, $options = []) {

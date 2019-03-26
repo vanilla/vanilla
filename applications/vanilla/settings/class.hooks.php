@@ -1117,7 +1117,7 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param array array $args
      */
     public function discussionController_beforeDiscussionDisplay_handler($sender, array $args) {
-        if (!is_object($sender) || !method_exists($sender, "getMessages")) {
+        if (!($sender instanceof DiscussionController)) {
             return;
         }
 

@@ -544,14 +544,14 @@ export class ListItem extends LineBlot {
                 : (formatName as Container);
         this.moveChildren(newBlock);
         if (parentWrapper.prev === null) {
-            parentWrapper.remove();
             this.scroll.insertBefore(newBlock, parentGroup);
-        } else if (parentGroup.children.length > 1) {
+            parentWrapper.remove();
+        } else {
             const after = parentGroup.split(this.offset(parentGroup)) as ListGroup;
             this.scroll.insertBefore(newBlock, after);
+            this.remove();
         }
 
-        this.remove();
         return newBlock;
     }
 

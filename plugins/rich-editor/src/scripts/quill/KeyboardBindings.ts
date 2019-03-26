@@ -404,12 +404,12 @@ export default class KeyboardBindings {
     private addBlockBackspaceHandlers() {
         const handleListBackspace = (range: RangeStatic) => {
             const listItem = this.formatter.getListItems(range)[0];
-
             listItem.replaceWith("block", "");
+            this.quill.setSelection(range, Quill.sources.SILENT);
             return true;
         };
 
-        this.bindings["a List Backspace"] = {
+        this.bindings["List Backspace"] = {
             key: KeyboardModule.keys.BACKSPACE,
             offset: 0,
             collapsed: true,

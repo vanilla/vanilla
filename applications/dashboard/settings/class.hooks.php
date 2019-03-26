@@ -879,6 +879,8 @@ class DashboardHooks extends Gdn_Plugin {
             return;
         }
 
+        // Sanitize $parsed['Name'] to prevent path traversal.
+        $parsed['Name'] = str_replace('..', '', $parsed['Name']);
         $remotePath = PATH_ROOT.'/'.$parsed['Name'];
 
         // Since this is just a temp file we don't want to nest it in a bunch of subfolders.

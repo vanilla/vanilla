@@ -42,9 +42,6 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
         this.componentID = this.ID + "-component";
         this.menuID = this.ID + "-menu";
         this.buttonID = this.ID + "-button";
-        this.state = {
-            open: false,
-        };
     }
 
     public render() {
@@ -70,7 +67,7 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
                         aria-expanded={isMenuVisible}
                         aria-haspopup="menu"
                         onClick={handleClick}
-                        className={classes.button}
+                        className={classNames(classes.button, this.props.open ? classes.topLevelButtonActive : "")}
                         tabIndex={this.props.tabIndex}
                         ref={this.toggleButtonRef}
                     >

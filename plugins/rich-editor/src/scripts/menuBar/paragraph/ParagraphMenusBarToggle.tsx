@@ -23,6 +23,17 @@ import { srOnly } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import tabbable from "tabbable";
 import TabHandler from "@library/dom/TabHandler";
+import {
+    blockquote,
+    codeBlock,
+    heading2,
+    heading3,
+    heading4,
+    heading5,
+    listOrdered,
+    listUnordered,
+    spoiler,
+} from "@library/icons/editorIcons";
 
 export enum IMenuBarItemTypes {
     CHECK = "checkbox",
@@ -50,7 +61,8 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
     private buttonID: string;
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
-    private menuRef: React.RefObject<HTMLDivElement> = React.createRef();
+    private menusRef: React.RefObject<HTMLDivElement> = React.createRef();
+    private panelsRef: React.RefObject<HTMLDivElement> = React.createRef();
     private formatter: Formatter;
     private focusWatcher: FocusWatcher;
 
@@ -113,6 +125,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
 
         const textFormats = paragraphFormats(this.formatter, this.props.lastGoodSelection);
         const menuActiveFormats = menuState(this.props.activeFormats);
+        const topLevelIcons = this.topLevelIcons(menuActiveFormats);
 
         return (
             <div
@@ -153,7 +166,8 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                     role="menu"
                 >
                     <ParagraphMenuBar
-                        menuRef={this.menuRef}
+                        menusRef={this.menusRef}
+                        panelsRef={this.panelsRef}
                         parentID={this.ID}
                         label={"Paragraph Format Menu"}
                         isMenuVisible={this.isMenuVisible}
@@ -164,6 +178,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                         menuActiveFormats={menuActiveFormats}
                         rovingIndex={this.state.rovingTabIndex}
                         setRovingIndex={this.setRovingIndex}
+                        topLevelIcons={topLevelIcons}
                     />
                 </div>
             </div>
@@ -176,6 +191,35 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
     private get isPilcrowVisible() {
         return this.props.currentSelection;
     }
+
+    private topLevelIcons = menuActiveFormats => {
+        let headingMenuIcon = heading2();
+        if (menuActiveFormats.headings.heading3) {
+            headingMenuIcon = heading3();
+        } else if (menuActiveFormats.headings.heading4) {
+            headingMenuIcon = heading4();
+        } else if (menuActiveFormats.headings.heading5) {
+            headingMenuIcon = heading5();
+        }
+
+        let specialBlockMenuIcon = blockquote();
+        if (menuActiveFormats.specialFormats.codeBlock) {
+            specialBlockMenuIcon = codeBlock();
+        } else if (menuActiveFormats.specialFormats.spoiler) {
+            specialBlockMenuIcon = spoiler();
+        }
+
+        let listMenuIcon = listUnordered();
+        if (menuActiveFormats.lists.ordered) {
+            listMenuIcon = listOrdered();
+        }
+
+        return {
+            headingMenuIcon,
+            listMenuIcon,
+            specialBlockMenuIcon,
+        };
+    };
 
     /**
      * Show the menu if we have a valid selection, and a valid focus.
@@ -265,8 +309,8 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
     private pilcrowClickHandler = (event: React.MouseEvent<any>) => {
         event.preventDefault();
         this.setState({ hasFocus: !this.state.hasFocus }, () => {
-            if (this.state.hasFocus && this.menuRef.current) {
-                const menu: HTMLElement = this.menuRef.current;
+            if (this.state.hasFocus && this.menusRef.current) {
+                const menu: HTMLElement = this.menusRef.current!;
                 const tabHandler = new TabHandler(menu);
                 const nextEl = tabHandler.getInitial();
                 if (nextEl) {

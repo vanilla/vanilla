@@ -27,7 +27,6 @@ class VanillaHooks implements Gdn_IPlugin {
         ;
 
         $dic->rule(\Vanilla\Menu\CounterModel::class)
-            ->addCall('addProvider', [new Reference(\Vanilla\Forum\Menu\DiscussionCounterProvider::class)])
             ->addCall('addProvider', [new Reference(\Vanilla\Forum\Menu\UserCounterProvider::class)])
         ;
     }

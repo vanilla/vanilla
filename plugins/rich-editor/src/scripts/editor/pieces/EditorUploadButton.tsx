@@ -16,13 +16,14 @@ interface IProps extends IWithEditorProps {
     disabled?: boolean;
     type: "file" | "image";
     allowedMimeTypes: string[];
+    legacyMode: boolean;
 }
 
 export class EditorUploadButton extends React.Component<IProps, {}> {
     private inputRef: React.RefObject<HTMLInputElement> = React.createRef();
 
     public render() {
-        const classesRichEditor = richEditorClasses();
+        const classesRichEditor = richEditorClasses(this.props.legacyMode);
         return (
             <button
                 className={classNames(

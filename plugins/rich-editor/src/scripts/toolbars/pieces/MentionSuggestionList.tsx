@@ -16,7 +16,6 @@ import MentionSuggestion, {
 } from "@rich-editor/toolbars/pieces/MentionSuggestion";
 import ToolbarPositioner from "@rich-editor/toolbars/pieces/ToolbarPositioner";
 import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 interface IProps extends IWithEditorProps {
     mentionProps: Array<Partial<IMentionProps>>;
@@ -27,6 +26,7 @@ interface IProps extends IWithEditorProps {
     onItemClick: React.MouseEventHandler<any>;
     showLoader: boolean;
     mentionSelection: RangeStatic | null;
+    legacyMode: boolean;
 }
 
 interface IState {
@@ -47,13 +47,11 @@ class MentionSuggestionList extends React.PureComponent<IProps, IState> {
 
     public render() {
         const { activeItemId, id, onItemClick, matchedString, mentionProps, showLoader, mentionSelection } = this.props;
-        const classesRichEditor = richEditorClasses();
         const classesDropDown = dropDownClasses();
 
         const hasResults = mentionProps.length > 0 || showLoader;
         const classes = classNames(
             "richEditor-menu",
-            classesRichEditor.menu,
             "atMentionList-items",
             "likeDropDownContent",
             classesDropDown.likeDropDownContent,

@@ -15,11 +15,12 @@ interface IProps {
     isSelected: boolean;
     groupIndex: number;
     navigateToGroup(groupIndex: number);
+    legacyMode: boolean;
 }
 
 export class EmojiGroupButton extends React.Component<IProps> {
     public render() {
-        const classesRichEditor = richEditorClasses();
+        const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const { name, icon, groupIndex, isSelected } = this.props;
         const buttonClasses = classNames("richEditor-button", "emojiGroup", { isSelected }, classesRichEditor.button);
 

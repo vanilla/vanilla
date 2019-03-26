@@ -20,6 +20,7 @@ export interface IProps extends IMenuItemData {
     role: "menuitem" | "menuitemradio";
     focusNextItem: () => void;
     focusPrevItem: () => void;
+    legacyMode: boolean;
 }
 
 /**
@@ -30,7 +31,7 @@ export interface IProps extends IMenuItemData {
 export default class MenuItem extends React.PureComponent<IProps> {
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
     public render() {
-        const classesRichEditor = richEditorClasses();
+        const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const { label, isDisabled, isActive, onClick, icon, role } = this.props;
         const buttonClasses = classnames(
             "richEditor-button",

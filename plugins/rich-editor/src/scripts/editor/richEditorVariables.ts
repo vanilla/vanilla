@@ -37,7 +37,7 @@ export const richEditorVariables = useThemeCache(() => {
     };
 
     const menuButton = {
-        size: varsFormElements.sizing.height,
+        size: 42,
         ...themeVars.subComponentStyles("menuButton"),
     };
 

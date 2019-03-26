@@ -26,6 +26,7 @@ describe("MenuItem", () => {
                 focusNextItem={noop}
                 focusPrevItem={noop}
                 isActive={true}
+                legacyMode={false}
             />,
         );
         item.find(".richEditor-button").simulate("click");

@@ -102,11 +102,11 @@ export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false)
         flexDirection: !legacyMode ? "column" : undefined,
         flexGrow: !legacyMode ? 1 : undefined,
         padding: 0,
-        overflow: !legacyMode ? "auto" : undefined,
         width: legacyMode ? percent(100) : calc(`100% + ${unit(overshoot * 2)}`),
         marginLeft: legacyMode ? undefined : unit(-overshoot),
         paddingLeft: legacyMode ? undefined : unit(overshoot),
         paddingRight: legacyMode ? undefined : unit(overshoot),
+        overflow: !legacyMode ? "auto" : undefined,
         $nest: {
             "&.isMenuInset": {
                 overflow: "initial",

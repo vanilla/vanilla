@@ -7,6 +7,7 @@ import {
     absolutePosition,
     appearance,
     colorOut,
+    singleBorder,
     singleLineEllipsis,
     srOnly,
     unit,
@@ -14,13 +15,15 @@ import {
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { important, percent } from "csx";
+import { calc, important, percent } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 
-export const richEditorClasses = useThemeCache((legacyMode: boolean = false) => {
+export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: boolean) => {
     const globalVars = globalVariables();
     const style = styleFactory("richEditor");
     const vars = richEditorVariables();
+    const formVars = formElementsVariables();
 
     const root = style({
         position: "relative",
@@ -68,11 +71,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean = false) => 
         },
     });
 
-    const menu = style("menu", {
-        display: "inline-block",
-        position: "relative",
-    });
-
     const paragraphMenu = style("paragraphMenu", {
         position: "absolute",
         display: "flex",
@@ -99,11 +97,49 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean = false) => 
         },
     });
 
-    const paragraphMenuHandle = style("paragraphMenuHandle", {
-        width: unit(vars.paragraphMenuHandle.size),
-        maxWidth: unit(vars.paragraphMenuHandle.size),
-        minWidth: unit(vars.paragraphMenuHandle.size),
+    const paragraphMenuMobile = style("paragraphMenu-mobile", {
+        position: "relative",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         height: unit(vars.paragraphMenuHandle.size),
+        width: unit(globalVars.icon.sizes.default),
+        top: important(0),
+    });
+
+    const menuBar = style("menuBar", {
+        position: "relative",
+        width: unit(vars.menuButton.size * 4),
+        overflow: "hidden",
+    });
+
+    const menuBarToggles = style("menuBarToggles", {
+        position: "relative",
+        display: "flex",
+        justifyContent: "space-between",
+        flexWrap: "nowrap",
+        width: unit(vars.menuButton.size * 4),
+    });
+
+    const paragraphMenuHandle = style("paragraphMenuHandle", {
+        ...appearance(),
+        ...userSelect(),
+        background: "transparent",
+        border: 0,
+        display: "block",
+        cursor: "pointer",
+        width: unit(formVars.sizing.height),
+        height: unit(formVars.sizing.height),
+        padding: 0,
+        maxWidth: unit(formVars.sizing.height),
+        minWidth: unit(formVars.sizing.height),
+    });
+
+    const paragraphMenuHandleMobile = style("paragraphMenuHandleMobile", {
+        width: unit(vars.menuButton.size),
+        height: unit(vars.menuButton.size),
+        maxWidth: unit(vars.menuButton.size),
+        minWidth: unit(vars.menuButton.size),
     });
 
     const text = style("text", {
@@ -123,6 +159,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean = false) => 
         padding: 0,
         margin: 0,
         zIndex: 1,
+        overflow: "visible",
         $nest: {
             ".richEditor-menuItem": {
                 display: "block",
@@ -153,7 +190,13 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean = false) => 
     const button = style("button", {
         display: "block",
         ...userSelect(),
+        ...appearance(),
         cursor: "pointer",
+        width: unit(vars.menuButton.size),
+        height: unit(vars.menuButton.size),
+        border: 0,
+        padding: 0,
+        overflow: "hidden",
         $nest: {
             "&.richEditor-formatButton, &.richEditor-embedButton": {
                 height: unit(vars.menuButton.size),
@@ -206,6 +249,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean = false) => 
         display: "block",
         padding: 0,
         margin: 0,
+        overflow: "visible",
         $nest: {
             "& .richEditor-button, &.richEditor-button": {
                 width: unit(vars.menuButton.size),
@@ -267,11 +311,32 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean = false) => 
         marginBottom: ".5em",
     });
 
+    const separator = style("separator", {
+        borderTop: singleBorder(),
+        marginBottom: unit(8),
+    });
+
+    const position = style("position", {
+        position: "absolute",
+        left: calc(`50% - ${unit(vars.spacing.paddingLeft / 2)}`),
+        $nest: {
+            "&.isUp": {
+                bottom: calc(`50% + ${unit(vars.spacing.paddingRight / 2 - formVars.border.width)}`),
+            },
+            "&.isDown": {
+                top: calc(`50% + ${unit(vars.spacing.paddingRight / 2 - formVars.border.width)}`),
+            },
+        },
+    });
+
+    const paragraphMenuPanel = style("paragraphMenuPanel", {});
+
     return {
         root,
-        menu,
-        paragraphMenu,
+        menuBar,
+        menuBarToggles,
         paragraphMenuHandle,
+        paragraphMenuHandleMobile,
         text,
         menuItems,
         upload,
@@ -281,5 +346,10 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean = false) => 
         icon,
         close,
         flyoutDescription,
+        paragraphMenu,
+        paragraphMenuMobile,
+        separator,
+        position,
+        paragraphMenuPanel,
     };
 });

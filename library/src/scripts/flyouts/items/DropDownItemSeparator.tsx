@@ -18,10 +18,6 @@ interface IProps {
 export default class DropDownItemSeparator extends React.Component<IProps> {
     public render() {
         const classes = dropDownClasses();
-        return (
-            <li className={classNames(this.props.className, classes.separator)}>
-                <hr className="sr-only" />
-            </li>
-        );
+        return <li role="separator" className={classNames(this.props.className, classes.separator)} />;
     }
 }

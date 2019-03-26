@@ -379,7 +379,7 @@ class Gdn_Form extends Gdn_Pluggable {
 
         // Default starting color for color input. Color inputs require one, Chrome will throw a warning if one
         // doesn't exist. The javascript will override this.
-        $colorAttributes['value'] = $options['value'] ?? '#ffffff';
+        $colorAttributes['value'] = $options['Value'] ?? '#ffffff';
         $valueAttributes['value'] = $colorAttributes['value'];
 
         $cssClass = 'js-color-picker color-picker input-group';

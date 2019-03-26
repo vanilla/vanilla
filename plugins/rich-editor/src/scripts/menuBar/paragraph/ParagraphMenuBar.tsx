@@ -24,11 +24,12 @@ import { IFormats, RangeStatic } from "quill/core";
 import { t } from "@library/utility/appUtils";
 import ParagraphMenuListsTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuListsTabContent";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
-import { srOnly } from "@library/styles/styleHelpers";
+import { colorOut, srOnly, unit } from "@library/styles/styleHelpers";
 import { IMenuBarRadioButton } from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
 import ParagraphMenuSpecialBlockTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuSpecialBlockTabContent";
 import { menuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
 import { style } from "typestyle";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
 interface IProps {
     className?: string;
@@ -109,6 +110,11 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
         const { menuActiveFormats, textFormats } = this.props;
         const classes = richEditorClasses(this.props.legacyMode);
         this.topLevelIcons();
+        const globalStyles = globalVariables();
+        const iconStyle = style({
+            width: unit(globalStyles.icon.sizes.default),
+            height: unit(globalStyles.icon.sizes.default),
+        });
 
         const menuContents: IMenuBarContent[] = [
             {
@@ -122,25 +128,25 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
                 items: [
                     {
                         formatFunction: textFormats.h2,
-                        icon: heading2(),
+                        icon: heading2(iconStyle),
                         text: t("Heading 2"),
                         checked: menuActiveFormats.headings.heading2,
                     },
                     {
                         formatFunction: textFormats.h3,
-                        icon: heading3(),
+                        icon: heading3(iconStyle),
                         text: t("Heading 3"),
                         checked: menuActiveFormats.headings.heading3,
                     },
                     {
                         formatFunction: textFormats.h4,
-                        icon: heading4(),
+                        icon: heading4(iconStyle),
                         text: t("Heading 4"),
                         checked: menuActiveFormats.headings.heading4,
                     },
                     {
                         formatFunction: textFormats.h5,
-                        icon: heading5(),
+                        icon: heading5(iconStyle),
                         text: t("Heading 5"),
                         checked: menuActiveFormats.headings.heading5,
                     },
@@ -157,13 +163,13 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
             //     items: [
             //         {
             //             formatFunction: textFormats.listUnordered,
-            //             icon: listUnordered(),
+            //             icon: listUnordered(iconStyle),
             //             text: t("Bulleted List"),
             //             checked: menuActiveFormats.lists.ordered,
             //         },
             //         {
             //             formatFunction: textFormats.listUnordered,
-            //             icon: listOrdered(),
+            //             icon: listOrdered(iconStyle),
             //             text: t("Ordered List"),
             //             checked: menuActiveFormats.lists.unordered,
             //         },
@@ -182,19 +188,19 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
                 items: [
                     {
                         formatFunction: textFormats.blockquote,
-                        icon: blockquote(),
+                        icon: blockquote(iconStyle),
                         text: t("Quote"),
                         checked: menuActiveFormats.specialFormats.blockQuote,
                     },
                     {
                         formatFunction: textFormats.codeBlock,
-                        icon: codeBlock(),
+                        icon: codeBlock(iconStyle),
                         text: t("Code Block"),
                         checked: menuActiveFormats.specialFormats.codeBlock,
                     },
                     {
                         formatFunction: textFormats.spoiler,
-                        icon: spoiler(),
+                        icon: spoiler(iconStyle),
                         text: t("Spoiler"),
                         checked: menuActiveFormats.specialFormats.spoiler,
                     },

@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+ use Vanilla\Message;
+
 /**
  * Handles accessing & displaying a single discussion via /discussion endpoint.
  */
@@ -25,6 +27,9 @@ class DiscussionController extends VanillaController {
     /** @var DiscussionModel */
     public $DiscussionModel;
 
+    /** @var Message[] */
+    private $messages = [];
+
     /**
      *
      *
@@ -40,6 +45,15 @@ class DiscussionController extends VanillaController {
                 break;
         }
         throw new Exception("DiscussionController->$name not found.", 400);
+    }
+
+    /**
+     * Add a message to be displayed on the discussion.
+     *
+     * @param Message $message
+     */
+    public function addMessage(Message $message) {
+        $this->messages[] = $message;
     }
 
     /**
@@ -158,6 +172,15 @@ class DiscussionController extends VanillaController {
         if (empty($canonicalUrl)) {
             $this->canonicalUrl(discussionUrl($this->Discussion, pageNumber($this->Offset, $Limit, 0, false)));
         } else {
+            $canonicalMessage = new Message(
+                str_replace(
+                    ["<0>", "</0>"],
+                    ['<a href="' . htmlspecialchars(\Gdn::request()->url($canonicalUrl)) . '">', "</a>"],
+                    \Gdn::translate('This discussion has a more <0>recent version</0>.')
+                ),
+                Message::TYPE_WARNING
+            );
+            $this->addMessage($canonicalMessage);
             $this->canonicalUrl($canonicalUrl);
         }
         $this->checkPageRange($this->Offset, $ActualResponses);
@@ -285,6 +308,15 @@ class DiscussionController extends VanillaController {
             $this->DiscussionModel->structuredData((array)$this->Discussion)
         );
         $this->render();
+    }
+
+    /**
+     * Get current messages.
+     *
+     * @return Messages[]
+     */
+    public function getMessages(): array {
+        return $this->messages;
     }
 
     /**

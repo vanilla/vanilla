@@ -18,6 +18,7 @@ import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 interface IProps {
     closeMenuAndSetCursor: () => void;
     items: IMenuBarRadioButton[];
+    setRovingIndex: () => void;
     indent: () => void;
     outdent: () => void;
 }
@@ -32,6 +33,7 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
         const handleClick = (data: IMenuBarRadioButton, index: number) => {
             this.props.items[index].formatFunction();
             this.props.closeMenuAndSetCursor();
+            this.props.setRovingIndex();
         };
         return (
             <>

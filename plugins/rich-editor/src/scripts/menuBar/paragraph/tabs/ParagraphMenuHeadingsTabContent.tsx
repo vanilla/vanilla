@@ -16,6 +16,7 @@ interface IProps {
     items: IMenuBarRadioButton[];
     closeMenuAndSetCursor: () => void;
     className?: string;
+    setRovingIndex: () => void;
 }
 
 /**
@@ -26,6 +27,7 @@ export default class ParagraphMenuHeadingsTabContent extends React.Component<IPr
         const classes = richEditorClasses(false);
         const handleClick = (data: IMenuBarRadioButton, index: number) => {
             this.props.items[index].formatFunction();
+            this.props.setRovingIndex();
             this.props.closeMenuAndSetCursor();
         };
         return (

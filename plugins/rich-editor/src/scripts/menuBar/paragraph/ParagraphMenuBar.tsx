@@ -204,15 +204,23 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
 
         const menus = menuContents.map((menu, index) => {
             const MyContent = menu.component;
+            const myRovingIndex = () => {
+                this.props.setRovingIndex(index);
+            };
+
             if (menu.open) {
                 panelContent = (
                     <div id={MyContent.get} role="menu" style={!menu.open ? srOnly() : undefined}>
-                        <MyContent {...menu} closeMenuAndSetCursor={this.closeMenuAndSetCursor} />
+                        <MyContent
+                            {...menu}
+                            setRovingIndex={myRovingIndex}
+                            closeMenuAndSetCursor={this.closeMenuAndSetCursor}
+                        />
                     </div>
                 );
             }
 
-            const setMyRovingIndex = () => {
+            const setMyParagraph = () => {
                 this.props.setRovingIndex(index);
             };
 
@@ -228,7 +236,7 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
                     tabComponent={menu.component}
                     key={`${menu.label}-${index}`}
                     activeFormats={menu.activeFormats}
-                    setRovingIndex={setMyRovingIndex}
+                    setRovingIndex={setMyParagraph}
                     legacyMode={this.props.legacyMode}
                     tabIndex={this.tabIndex(index)}
                     open={menu.open}

@@ -19,6 +19,7 @@ interface IProps extends IOptionalComponentID {
     disabled?: boolean;
     renderAbove?: boolean;
     renderLeft?: boolean;
+    legacyMode: boolean;
 }
 
 export default class EmojiFlyout extends React.Component<IProps, IRequiredComponentID> {
@@ -34,7 +35,7 @@ export default class EmojiFlyout extends React.Component<IProps, IRequiredCompon
      */
     public render() {
         const icon = emoji();
-        const classesRichEditor = richEditorClasses();
+        const classesRichEditor = richEditorClasses(this.props.legacyMode);
 
         return (
             <FlyoutToggle

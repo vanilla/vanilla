@@ -36,7 +36,7 @@ describe("FocusModule", () => {
     });
 
     beforeEach(() => {
-        const classesRichEditor = richEditorClasses();
+        const classesRichEditor = richEditorClasses(false);
         document.body.innerHTML = `<div>
             <div class="FormWrapper"><div id="quillNoEditor"></div></div>
             <div class=${classNames("richEditor", classesRichEditor.root)}><div id="quillNoForm"></div></div>

@@ -40,6 +40,7 @@ interface IProps extends IWithEditorProps, IFlyoutToggleChildParameters {
     contentID: string;
     renderAbove?: boolean;
     renderLeft?: boolean;
+    legacyMode: boolean;
 }
 
 interface IState {
@@ -110,6 +111,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                             isSelected={isSelected}
                             navigateToGroup={this.scrollToCategory}
                             groupIndex={groupIndex}
+                            legacyMode={this.props.legacyMode}
                         />
                     );
                 })}

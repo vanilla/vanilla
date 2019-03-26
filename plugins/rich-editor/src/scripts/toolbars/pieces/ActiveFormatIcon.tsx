@@ -7,7 +7,18 @@
 import React from "react";
 import { IFormats } from "quill/core";
 import HeadingBlot from "quill/formats/header";
-import { heading2, heading3, blockquote, codeBlock, spoiler, pilcrow } from "@library/icons/editorIcons";
+import {
+    heading2,
+    heading3,
+    blockquote,
+    codeBlock,
+    spoiler,
+    pilcrow,
+    heading4,
+    heading5,
+    listOrdered,
+    listUnordered,
+} from "@library/icons/editorIcons";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
@@ -19,32 +30,26 @@ interface IProps {
 export default class ActiveFormatIcon extends React.Component<IProps, {}> {
     public render() {
         const { activeFormats } = this.props;
-        const headingFormat = activeFormats[HeadingBlot.blotName];
-        if (typeof headingFormat === "object") {
-            if (headingFormat.level === 2) {
-                return heading2();
-            }
-            if (headingFormat.level === 3) {
-                return heading3();
-            }
+        let icon = pilcrow();
+        if (activeFormats.headings.heading2) {
+            icon = heading2();
+        } else if (activeFormats.headings.heading3) {
+            icon = heading3();
+        } else if (activeFormats.headings.heading4) {
+            icon = heading4();
+        } else if (activeFormats.headings.heading5) {
+            icon = heading5();
+        } else if (activeFormats.lists.ordered) {
+            icon = listOrdered();
+        } else if (activeFormats.lists.unordered) {
+            icon = listUnordered();
+        } else if (activeFormats.specialFormats.blockQuote) {
+            icon = blockquote();
+        } else if (activeFormats.specialFormats.codeBlock) {
+            icon = codeBlock();
+        } else if (activeFormats.specialFormats.spoiler) {
+            icon = spoiler();
         }
-        if (headingFormat === 2) {
-            return heading2();
-        }
-        if (headingFormat === 3) {
-            return heading3();
-        }
-        if (activeFormats[BlockquoteLineBlot.blotName] === true) {
-            return blockquote();
-        }
-        if (activeFormats[CodeBlockBlot.blotName] === true) {
-            return codeBlock();
-        }
-        if (activeFormats[SpoilerLineBlot.blotName] === true) {
-            return spoiler("richEditorButton-icon");
-        }
-
-        // Fallback to paragraph formatting.
-        return pilcrow();
+        return icon;
     }
 }

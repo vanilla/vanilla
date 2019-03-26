@@ -21,6 +21,8 @@ class RoleCounterProvider implements CounterProviderInterface {
     private $session;
 
     /**
+     * Initialize class with dependencies
+     *
      * @param \RoleModel $roleModel
      * @param \Gdn_Session $session
      */
@@ -39,7 +41,7 @@ class RoleCounterProvider implements CounterProviderInterface {
         $counters = [];
         $permissions = $this->session->getPermissions();
         if ($permissions->hasAny(['Garden.Users.Approve'])) {
-            $counters[] = new Counter("Applicants",$this->roleModel->getApplicantCount());
+            $counters[] = new Counter("Applicants", $this->roleModel->getApplicantCount());
         }
         return $counters;
     }

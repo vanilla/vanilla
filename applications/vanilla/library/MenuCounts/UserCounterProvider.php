@@ -18,6 +18,8 @@ class UserCounterProvider implements CounterProviderInterface {
     private $session;
 
     /**
+     * Initialize class with dependencies
+     *
      * @param \Gdn_Session $session
      */
     public function __construct(\Gdn_Session $session) {

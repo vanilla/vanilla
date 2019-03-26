@@ -18,6 +18,8 @@ class DiscussionCounterProvider implements CounterProviderInterface {
     private $discussionModel;
 
     /**
+     * Initialize class with dependencies
+     *
      * @param \DiscussionModel $discussionModel
      */
     public function __construct(\DiscussionModel $discussionModel) {

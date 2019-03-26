@@ -21,6 +21,8 @@ class ActivityCounterProvider implements CounterProviderInterface {
     private $session;
 
     /**
+     * Initialize class with dependencies
+     *
      * @param \ActivityModel $activityModel
      * @param \Gdn_Session $session
      */

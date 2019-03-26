@@ -21,6 +21,8 @@ class LogCounterProvider implements CounterProviderInterface {
     private $session;
 
     /**
+     * Initialize class with dependencies
+     *
      * @param \LogModel $logModel
      * @param \Gdn_Session $session
      */

@@ -8,6 +8,8 @@ import withWrapper from "@rich-editor/quill/blots/abstract/withWrapper";
 import WrapperBlot from "@rich-editor/quill/blots/abstract/WrapperBlot";
 import Parchment from "parchment";
 import Container from "quill/blots/container";
+import { Parent } from "parchment/dist/src/blot/abstract/blot";
+import Quill from "quill/core";
 
 /* tslint:disable:max-classes-per-file */
 
@@ -66,8 +68,10 @@ function getValueFromElement(domNode: HTMLElement): IListItem {
  * @param value The value to sync.
  */
 function syncValueToElement(element: HTMLElement, value: IListItem) {
-    element.setAttribute("data-depth", value.depth);
-    element.setAttribute("data-type", value.type);
+    if (value) {
+        element.setAttribute("data-depth", value.depth);
+        element.setAttribute("data-type", value.type);
+    }
 }
 
 /**
@@ -455,8 +459,10 @@ export class ListItem extends LineBlot {
         if (name === ListItem.blotName) {
             syncValueToElement(this.domNode, value);
             syncValueToElement(this.parent.domNode, value);
+            this.cache = {};
+        } else {
+            super.format(name, value);
         }
-        super.format(name, value);
     }
 
     /**
@@ -504,13 +510,20 @@ export class ListItem extends LineBlot {
 
     public replaceWith(formatName, value?: any) {
         if (formatName !== ListItem.blotName) {
-            const newValue = {
-                ...this.getValue,
-                depth: 0,
-            };
-            this.format(ListItem.blotName, newValue);
-            window.quill.update();
-            return this.breakUpGroupAndMoveToScroll(formatName, value);
+            const ownValue = this.getValue();
+            if (ownValue.depth > 0) {
+                // Force an update to our nesting.
+                const newValue = {
+                    ...this.getValue,
+                    depth: 0,
+                };
+                this.format(ListItem.blotName, newValue);
+                const quill = this.quill;
+                if (quill) {
+                    quill.update(Quill.sources.SILENT);
+                }
+            }
+            this.breakUpGroupAndMoveToScroll(formatName, value);
         } else {
             return super.replaceWith(formatName, value);
         }
@@ -541,6 +554,19 @@ export class ListItem extends LineBlot {
      */
     public getValue(): IListItem {
         return getValueFromElement(this.domNode);
+    }
+
+    /**
+     * Get the attached quill instance.
+     *
+     * This will _NOT_ work before attach() is called.
+     */
+    protected get quill(): Quill | null {
+        if (!this.scroll || !this.scroll.domNode.parentNode) {
+            return null;
+        }
+
+        return Quill.find(this.scroll.domNode.parentNode!);
     }
 }
 

@@ -29,7 +29,12 @@ import { ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
 import Formatter from "@rich-editor/quill/Formatter";
 
 export default class KeyboardBindings {
-    private static MULTI_LINE_BLOTS = [SpoilerLineBlot.blotName, BlockquoteLineBlot.blotName, CodeBlockBlot.blotName];
+    private static MULTI_LINE_BLOTS = [
+        SpoilerLineBlot.blotName,
+        BlockquoteLineBlot.blotName,
+        CodeBlockBlot.blotName,
+        ListItem.blotName,
+    ];
     public bindings: any = {};
 
     private formatter = new Formatter(this.quill);

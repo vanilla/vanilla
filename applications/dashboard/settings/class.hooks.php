@@ -60,9 +60,9 @@ class DashboardHooks extends Gdn_Plugin {
             ->addCall('passProperty', ['Menu', new Reference('MenuModule')])
 
             ->rule(\Vanilla\Menu\CounterModel::class)
-            ->addCall('addProvider', [new Reference(\Vanilla\Forum\Menu\ActivityCounterProvider::class)])
-            ->addCall('addProvider', [new Reference(\Vanilla\Forum\Menu\LogCounterProvider::class)])
-            ->addCall('addProvider', [new Reference(\Vanilla\Forum\Menu\RoleCounterProvider::class)])
+            ->addCall('addProvider', [new Reference(ActivityCounterProvider::class)])
+            ->addCall('addProvider', [new Reference(LogCounterProvider::class)])
+            ->addCall('addProvider', [new Reference(RoleCounterProvider::class)])
         ;
     }
 

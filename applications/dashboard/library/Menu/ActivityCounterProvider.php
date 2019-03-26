@@ -4,8 +4,6 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Forum\Menu;
-
 use Vanilla\Menu\CounterProviderInterface;
 use Vanilla\Menu\Counter;
 

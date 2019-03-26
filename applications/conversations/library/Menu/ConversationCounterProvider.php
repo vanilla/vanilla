@@ -4,15 +4,13 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Forum\Menu;
-
 use Vanilla\Menu\CounterProviderInterface;
 use Vanilla\Menu\Counter;
 
 /**
- * Menu counter provider for user.
+ * Menu counter provider for user conversations.
  */
-class UserCounterProvider implements CounterProviderInterface {
+class ConversationCounterProvider implements CounterProviderInterface {
 
     /** @var \Gdn_Session */
     private $session;
@@ -33,10 +31,7 @@ class UserCounterProvider implements CounterProviderInterface {
         $counters = [];
         if (is_object($this->session->User)) {
             $user = $this->session->User;
-            $counters[] = new Counter("Bookmarks", $user->CountBookmarks ?? 0);
-            $counters[] = new Counter("Discussions", $user->CountDiscussions ?? 0);
-            $counters[] = new Counter("UnreadDiscussions", $user->CountUnreadDiscussions ?? 0);
-            $counters[] = new Counter("Drafts", $user->CountDrafts ?? 0);
+            $counters[] = new Counter("Conversations", $user->CountUnreadConversations ?? 0);
         }
         return $counters;
     }

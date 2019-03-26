@@ -3,16 +3,11 @@
  * @license GPL-2.0-only
  */
 
-import Parchment from "parchment";
 import LineBlot from "@rich-editor/quill/blots/abstract/LineBlot";
+import withWrapper from "@rich-editor/quill/blots/abstract/withWrapper";
 import WrapperBlot from "@rich-editor/quill/blots/abstract/WrapperBlot";
-import Quill, { Blot } from "quill/core";
+import Parchment from "parchment";
 import Container from "quill/blots/container";
-import Block from "quill/blots/block";
-import Inline from "quill/blots/inline";
-import Scroll from "quill/blots/scroll";
-import Delta from "quill-delta";
-import LeafBlot from "parchment/dist/src/blot/abstract/leaf";
 
 /* tslint:disable:max-classes-per-file */
 
@@ -39,6 +34,11 @@ type ListStringValue = "ordered" | "bullet";
 
 export type ListValue = IListItem | ListStringValue;
 
+/**
+ * Utility function to sync a get a list item value from a domNode.
+ *
+ * @param domNode The domNode to set properties on.
+ */
 function getValueFromElement(domNode: HTMLElement): IListItem {
     const depthAttr = domNode.getAttribute("data-depth");
     const typeAtrr = domNode.getAttribute("data-type");
@@ -59,128 +59,33 @@ function getValueFromElement(domNode: HTMLElement): IListItem {
     };
 }
 
+/**
+ * Utility function to sync a set a list item value in a domNode.
+ *
+ * @param domNode The domNode to set properties on.
+ * @param value The value to sync.
+ */
 function syncValueToElement(element: HTMLElement, value: IListItem) {
     element.setAttribute("data-depth", value.depth);
     element.setAttribute("data-type", value.type);
 }
 
-export class ListGroup extends WrapperBlot {
-    public static scope = Parchment.Scope.BLOCK;
-
+/**
+ * The list wrapper. Either an <ol> or <ul>.
+ *
+ * - Never create this directly. This should only be created by a ListItemWrapper.
+ * - ListGroup itself should never be used. Use either the ordered or unordered sub classes.
+ */
+export abstract class ListGroup extends WrapperBlot {
+    /**
+     * Create the dom node for th item and
+     *
+     * @param value
+     */
     public static create(value: IListItem) {
         const element = super.create(value);
         syncValueToElement(element, value);
         return element;
-    }
-
-    public formatAt(index: number, length: number, name: string, value: any): void {
-        const [child] = this.children.find(index);
-        if (child instanceof ListItem) {
-            const nestedList = child.getNestedList();
-            if (nestedList) {
-                const offset = nestedList.offset(this);
-                if (offset < index) {
-                    nestedList.formatAt(index, length, name, value);
-                    return;
-                }
-            }
-        }
-        super.formatAt(index, length, name, value);
-    }
-
-    public insertAt(index: number, value: string, def: any) {
-        // Pass things along to our nested list
-        const [child] = this.children.find(index);
-        if (child instanceof ListItem) {
-            const nestedList = child.getNestedList();
-            if (nestedList) {
-                const offset = nestedList.offset(this);
-                if (offset < index) {
-                    nestedList.insertAt(index - offset, value, def);
-                    return;
-                }
-            }
-        }
-
-        super.insertAt(index, value, def);
-    }
-
-    public deleteAt(index: number, length: number) {
-        const [child] = this.children.find(index);
-        if (child instanceof ListItem) {
-            const nestedList = child.getNestedList();
-            if (nestedList) {
-                const offset = nestedList.offset(this);
-                if (offset < index) {
-                    nestedList.deleteAt(index, length);
-                    return;
-                }
-            }
-        }
-        super.deleteAt(index, length);
-    }
-
-    public descendant(criteria, index: number = 0) {
-        return super.descendant(blot => {
-            const isCorrectListItem = this.isBlotCorrectListItem(blot, index);
-            if (!isCorrectListItem) {
-                return false;
-            } else {
-                // Default check
-                return (
-                    (criteria.blotName == null && criteria(blot)) ||
-                    (criteria.blotName != null && blot instanceof criteria)
-                );
-            }
-        }, index);
-    }
-
-    private isBlotCorrectListItem = (blot: Blot, index: number) => {
-        if (blot instanceof ListItem) {
-            const nestedList = blot.getNestedList();
-            if (nestedList) {
-                const offset = nestedList.offset(this);
-                if (offset < index) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    };
-
-    /**
-     * @override
-     * So in this scenario
-     *
-     *- List 1.0
-     *  - List 1.1
-     *
-     * List 1.0 contains 1.2, so a naive search for a range only targetting 1.1 will
-     * include 1.0.
-     *
-     * This method filters out 1.0 if the range only contains text characters from 1.1.
-     */
-    public descendants(criteria, index: number = 0, length: number = Number.MAX_VALUE) {
-        const descendants = super.descendants(criteria, index, length);
-        const filtered = descendants.filter((blot: Blot) => this.isBlotCorrectListItem(blot, index));
-        return filtered;
-    }
-
-    public path(index: number, inclusive: boolean = false): Array<[Blot, number]> {
-        const childResult = this.children.find(index, inclusive);
-        const [child, offset] = childResult;
-        const position: Array<[any, number]> = [[this, index]];
-        if (child instanceof Container || child instanceof ListItem) {
-            // if (child instanceof ListGroup) {
-            //     // We need to offset our index by the list's offset.
-            //     index = index - child.offset(this);
-            // }
-            const childOffset = child.path(offset, true);
-            return position.concat(childOffset);
-        } else if (child != null) {
-            position.push([child, offset]);
-        }
-        return position;
     }
 
     /**
@@ -191,6 +96,12 @@ export class ListGroup extends WrapperBlot {
         super.optimize(context);
     }
 
+    /**
+     * Optimize together groups that are next to each other.
+     *
+     * - Groups with the same type and depth will be merged together.
+     * - If the next group has a greater depth it will be nested into the last item of the current group.
+     */
     private optimizeAdjacentGroups() {
         const next = this.next;
         if (next instanceof ListGroup && next.prev === this) {
@@ -209,7 +120,7 @@ export class ListGroup extends WrapperBlot {
                 // We have another list that is of a level deeper than our own.
                 // Let's try and join it if possible.
                 const targetListItem = this.children.tail;
-                if (!(targetListItem instanceof ListItem)) {
+                if (!(targetListItem instanceof ListItemWrapper)) {
                     return;
                 }
 
@@ -237,70 +148,106 @@ export class ListGroup extends WrapperBlot {
         }
     }
 
-    public insertInto(parentBlot: Container, ref?: Blot) {
-        if (!(parentBlot instanceof Scroll) && !(parentBlot instanceof ListItem)) {
-            // Move it into the scroll anyways;
-            super.insertInto(this.scroll, parentBlot.next);
-        } else {
-            super.insertInto(parentBlot, ref);
-        }
-    }
-
+    /**
+     * Utility for getting the value from the blot's domNode.
+     */
     public getValue(): IListItem {
         return getValueFromElement(this.domNode);
     }
 }
 
+/**
+ * ListGroup for <ul> tags.
+ */
 export class OrderedListGroup extends ListGroup {
     public static blotName = "orderedListGroup";
     public static className = "orderedListGroup";
     public static tagName = ListTag.OL;
 }
 
+/**
+ * ListGroup for <ol> tags.
+ */
 export class UnorderedListGroup extends ListGroup {
     public static blotName = "unorderedListGroup";
     public static className = "unorderedListGroup";
     public static tagName = ListTag.UL;
 }
 
-export class ListContent extends Inline {
-    public static blotName = "listContent";
-    public static className = "listContent";
-    public static tagName = "span";
-}
-
-export class ListItem extends LineBlot {
-    public static blotName = "list";
-    public static className = "listItem";
+/**
+ * The li in <ul><li><span /></li></ul>
+ *
+ * Although this blot represents the item itself, the actual format, value, & delta
+ * all come from the list content.
+ *
+ * This item is purely a wrapper so that nested list content can be included separately form the
+ */
+export class ListItemWrapper extends withWrapper(Container as any) {
+    public static scope = Parchment.Scope.BLOCK_BLOT;
+    public static blotName = "listItemWrapper";
+    public static className = "listItemWrapper";
     public static tagName = ListTag.LI;
     public static parentName = [UnorderedListGroup.blotName, OrderedListGroup.blotName];
-    public static allowedChildren = [...LineBlot.allowedChildren, ListGroup, ListContent];
 
-    public static create(value: ListValue) {
-        value = this.mapListValue(value);
+    /**
+     * @override
+     * To sync the element values into the items domNode.
+     */
+    public static create(value: IListItem) {
         const element = super.create(value) as HTMLElement;
-        element.setAttribute("data-depth", value.depth);
-        element.setAttribute("data-type", value.type);
+        syncValueToElement(element, value);
         return element;
     }
 
-    public constructor(domNode) {
-        super(domNode);
-        this.insertBefore(Parchment.create("text", ""));
+    /**
+     * @override
+     * Ensure line breaks are properly inserted and can separate the list wrapper properly.
+     */
+    public insertAt(index, value, def) {
+        if (value === "\n" && index < this.getListContent()!.length()) {
+            const originalListItem = this.getListContent()!;
+            const newWrapper = Parchment.create(ListItemWrapper.blotName, this.getValue()) as ListItemWrapper;
+            const secondHalfListItem = originalListItem.split(index);
+            secondHalfListItem.insertInto(newWrapper);
+            newWrapper.insertInto(this.parent, this.next);
+
+            const nestedGroup = this.getListGroup();
+            if (nestedGroup) {
+                nestedGroup.insertInto(newWrapper);
+            }
+        } else {
+            super.insertAt(index, value, def);
+        }
     }
 
     /**
-     *
+     * @override
+     * Ensure everything except ListItem and ListGroup are inserted into the ListItem.
+     */
+    public insertBefore(blot, ref) {
+        if (blot instanceof ListItem || blot instanceof ListGroup) {
+            super.insertBefore(blot, ref);
+        } else {
+            this.getListContent()!.insertBefore(blot, ref);
+        }
+    }
+
+    /**
+     * @override
+     * Overridden to implement list nesting.
      */
     public optimize(context) {
         this.optimizeNesting();
-        this.optimizeUnwraps();
+        this.optimizeUnwrapping();
         super.optimize(context);
     }
 
+    /**
+     * Merge the next item into this item's list group if it has a greater depth.
+     */
     private optimizeNesting() {
         const next = this.next;
-        if (next instanceof ListItem && next.prev === this) {
+        if (next instanceof ListItemWrapper && next.prev === this) {
             const ownValue = this.getValue();
             const nextValue = next.getValue();
 
@@ -309,16 +256,16 @@ export class ListItem extends LineBlot {
             }
 
             if (nextValue.depth > ownValue.depth) {
-                if (this.children.tail instanceof ListGroup) {
-                    const targetGroup = this.children.tail;
-                    next.insertInto(targetGroup);
+                const nestedGroup = this.getListGroup();
+                if (nestedGroup) {
+                    next.insertInto(nestedGroup);
 
                     // Adjust our list type to the target value.
                     const newNextValue: IListItem = {
                         ...nextValue,
-                        type: targetGroup.getValue().type,
+                        type: nestedGroup.getValue().type,
                     };
-                    next.format("list", newNextValue);
+                    next.getListContent()!.format("list", newNextValue);
                 } else {
                     // Just insert it directly into the end. It will create its own group.
                     next.insertInto(this);
@@ -327,72 +274,122 @@ export class ListItem extends LineBlot {
         }
     }
 
-    public delta() {
-        const nestedList = this.getNestedList();
-        // if (this.cache.delta == null) {
-        const directContentLength = nestedList ? this.length() - nestedList.length() : this.length();
-        const descendants = this.descendants(Parchment.Leaf as any, 0, directContentLength) as LeafBlot[];
-        this.cache.delta = descendants
-            .reduce((delta, leaf) => {
-                if (leaf.length() === 0) {
-                    return delta;
-                } else {
-                    return delta.insert(leaf.value(), bubbleFormats(leaf));
-                }
-            }, new Delta())
-            .insert("\n", bubbleFormats(this));
-        // }
-
-        if (nestedList) {
-            const nestedDelta = nestedList.children.reduce((delta, listItem: ListItem) => {
-                const listDelta = listItem.delta();
-                return delta.concat(listDelta);
-            }, new Delta());
-            return this.cache.delta.concat(nestedDelta);
-        }
-        return this.cache.delta;
-    }
-
-    private optimizeUnwraps() {
-        if (this.children.length === 1 && this.children.head instanceof ListGroup) {
-            // If our only child is a list group (no text)
-            // Try to unwrap into the list group.
-            const onlyChildGroup = this.children.head;
-
-            if (this.parent instanceof ListGroup) {
-                onlyChildGroup.moveChildren(this.parent);
-            }
-        }
-
+    /**
+     * Move this item up into it's parent if it's nested too far.
+     */
+    private optimizeUnwrapping() {
         const parentGroup = this.parent;
-        const parentItem = parentGroup.parent;
-        const grandParentGroup = parentItem.parent;
+        const parentWrapper = parentGroup.parent;
+        const grandParentGroup = parentWrapper.parent;
         if (
             parentGroup instanceof ListGroup &&
-            parentItem instanceof ListItem &&
+            parentWrapper instanceof ListItemWrapper &&
             grandParentGroup instanceof ListGroup
         ) {
             const parentGroupValue = parentGroup.getValue();
-            const grandparentGroupValue = grandParentGroup.getValue();
+            const grandParentGroupValue = grandParentGroup.getValue();
             const ownValue = this.getValue();
 
-            // We definitely don't belong here.
             if (ownValue.depth < parentGroupValue.depth) {
-                this.insertInto(grandParentGroup, parentItem.next);
-
-                // Adjust our list type to the target value.
-                const newValue: IListItem = {
+                // Insert into the next list group. First we match it's list type.
+                const newValue = {
                     ...ownValue,
-                    type: grandParentGroup.getValue().type,
+                    type: grandParentGroupValue.type,
                 };
-                this.format("list", newValue);
-            } else if (ownValue.depth === grandparentGroupValue.depth) {
-                // Try to merge into the the grandparent list group.
-                this.insertInto(grandParentGroup, parentItem.next);
+
+                this.insertInto(grandParentGroup, parentWrapper.next);
+                const listItem = this.getListContent();
+                if (listItem) {
+                    listItem.format(ListItem.blotName, newValue);
+                }
             }
         }
     }
 
+    /**
+     * @override
+     * Overriding the createWrapper to dynamically create the parent list group and pass it a value.
+     */
+    protected createWrapper() {
+        const value = this.getValue();
+        switch (value.type) {
+            case ListType.NUMBERED:
+                return Parchment.create(OrderedListGroup.blotName, value) as OrderedListGroup;
+            default:
+                return Parchment.create(UnorderedListGroup.blotName, value) as UnorderedListGroup;
+        }
+    }
+
+    /**
+     * Utility for getting the value from the blot's domNode.
+     */
+    public getValue(): IListItem {
+        return getValueFromElement(this.domNode);
+    }
+
+    /**
+     * Utility for getting a nested list blot from this blot's children.
+     *
+     * This _should_ be in the last position if it exists.
+     */
+    public getListGroup(): ListGroup | null {
+        const tail = this.children.tail;
+        if (tail instanceof ListGroup) {
+            return tail;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Utility for getting the content blot from this blot's children.
+     *
+     * This _should_ be in the first position.
+     */
+    public getListContent(): ListItem | null {
+        const item = this.children.head;
+        if (item instanceof ListItem) {
+            return item;
+        } else {
+            return null;
+        }
+    }
+}
+
+/**
+ * The content of a list.
+ * Eg. The span of <ul><li><span/></li></ul>.
+ *
+ * This blot maintains the actual value for the list item.
+ * It is also responsible for syncing that value up to the ListWrapper.
+ */
+export class ListItem extends LineBlot {
+    public static blotName = "list";
+    public static className = "listItem";
+    public static tagName = "span";
+    public static parentName = ListItemWrapper.blotName;
+
+    /**
+     * @override
+     * - To map the old type of list value into the new one.
+     * - To sync the element values into the items domNode.
+     */
+    public static create(value: ListValue) {
+        value = this.mapListValue(value);
+        const element = super.create(value) as HTMLElement;
+        syncValueToElement(element, value);
+        return element;
+    }
+
+    /**
+     * Map the old style list value to the new old.
+     *
+     * @param value Potentially an old or new style value.
+     *
+     * @example
+     * list: "bullet"
+     * list: { type: "bulleted", depth: 0 }
+     */
     private static mapListValue(value: ListValue): IListItem {
         if (typeof value === "object") {
             return value;
@@ -417,41 +414,32 @@ export class ListItem extends LineBlot {
         }
     }
 
+    /**
+     * The value of the blot's line.
+     */
     public static formats = getValueFromElement;
 
-    public getNestedList(): ListGroup | null {
-        let listGroup: ListGroup | null = null;
-        this.children.forEach(item => {
-            if (item instanceof ListGroup) {
-                listGroup = item;
-            }
-        });
-        return listGroup;
+    /**
+     * @override
+     * Overridden to dynamically create the parent list wrapper with the item's value.
+     */
+    protected createWrapper() {
+        const value = this.getValue();
+        return Parchment.create(ListItemWrapper.blotName, value) as WrapperBlot;
     }
 
-    public length() {
-        if (this.getNestedList()) {
-            return super.length() - 1;
-        } else {
-            return super.length();
+    /**
+     * @override
+     * Overridden to ensure changing the depth is immediately synced to the item's domNode.
+     * Also syncs to to the parent item's domNode.
+     */
+    public format(name, value) {
+        // Keep the parents value in sync.
+        if (name === ListItem.blotName) {
+            syncValueToElement(this.domNode, value);
+            syncValueToElement(this.parent.domNode, value);
         }
-    }
-
-    public path(index: number, inclusive: boolean = false): Array<[Blot, number]> {
-        const childResult = this.children.find(index, inclusive);
-        const [child, offset] = childResult;
-        const position: Array<[any, number]> = [[this, index]];
-        if (child instanceof Container || child instanceof ListItem) {
-            // if (child instanceof ListGroup) {
-            //     // We need to offset our index by the list's offset.
-            //     index = index - child.offset(this);
-            // }
-            const childOffset = child.path(offset, inclusive);
-            return position.concat(childOffset);
-        } else if (child != null) {
-            position.push([child, offset]);
-        }
-        return position;
+        super.format(name, value);
     }
 
     /**
@@ -464,7 +452,7 @@ export class ListItem extends LineBlot {
 
         // The previous item needs to be a list item to indent
         // Otherwise we have nothing to nest into.
-        if (!(this.prev instanceof ListItem)) {
+        if (!(this.parent.prev instanceof ListItemWrapper)) {
             return;
         }
 
@@ -481,7 +469,7 @@ export class ListItem extends LineBlot {
     public outdent() {
         const ownValue = this.getValue();
 
-        if (ownValue.depth <= 0) {
+        if (ownValue.depth === 0) {
             return;
         }
 
@@ -496,41 +484,14 @@ export class ListItem extends LineBlot {
         this.format(ListItem.blotName, newValue);
     }
 
-    protected createWrapper() {
-        const value = this.getValue();
-        switch (value.type) {
-            case ListType.NUMBERED:
-                return Parchment.create(OrderedListGroup.blotName, value) as OrderedListGroup;
-            default:
-                return Parchment.create(UnorderedListGroup.blotName, value) as UnorderedListGroup;
-        }
-    }
-
+    /**
+     * Utility for getting the value from the blot's domNode.
+     */
     public getValue(): IListItem {
         return getValueFromElement(this.domNode);
     }
 }
 
-OrderedListGroup.allowedChildren = [WrapperBlot, ListItem];
-UnorderedListGroup.allowedChildren = [WrapperBlot, ListItem];
-
-function bubbleFormats(blot, formats = {}, filter = true) {
-    if (blot == null) {
-        return formats;
-    }
-    if (typeof blot.formats === "function") {
-        formats = { ...formats, ...blot.formats() };
-        if (filter) {
-            // exclude syntax highlighting from deltas and getFormat()
-            delete formats["code-token"];
-        }
-    }
-    if (
-        blot.parent == null ||
-        blot.parent.statics.blotName === "scroll" ||
-        blot.parent.statics.scope !== blot.statics.scope
-    ) {
-        return formats;
-    }
-    return bubbleFormats(blot.parent, formats, filter);
-}
+OrderedListGroup.allowedChildren = [ListItemWrapper];
+UnorderedListGroup.allowedChildren = [ListItemWrapper];
+ListItemWrapper.allowedChildren = [ListGroup, ListItem];

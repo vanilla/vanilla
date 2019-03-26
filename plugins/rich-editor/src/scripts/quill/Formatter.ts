@@ -144,7 +144,7 @@ export default class Formatter {
 
     public orderedList = (range: RangeStatic) => {};
 
-    private getListItems = (range: RangeStatic): ListItem[] => {
+    public getListItems = (range: RangeStatic): ListItem[] => {
         if (range.length === 0) {
             const descendant = this.quill.scroll.descendant(
                 (blot: Blot) => blot instanceof ListItem,

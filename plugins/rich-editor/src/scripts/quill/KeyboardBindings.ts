@@ -25,10 +25,14 @@ import BlockBlot from "quill/blots/block";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
+import { ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
+import Formatter from "@rich-editor/quill/Formatter";
 
 export default class KeyboardBindings {
     private static MULTI_LINE_BLOTS = [SpoilerLineBlot.blotName, BlockquoteLineBlot.blotName, CodeBlockBlot.blotName];
     public bindings: any = {};
+
+    private formatter = new Formatter(this.quill);
 
     constructor(private quill: Quill) {
         // Keyboard behaviours
@@ -284,7 +288,7 @@ export default class KeyboardBindings {
         this.bindings["MutliLine Enter"] = {
             key: KeyboardModule.keys.ENTER,
             collapsed: true,
-            format: ["spoiler-line", "blockquote-line", "list"],
+            format: ["spoiler-line", "blockquote-line"],
             handler: this.handleMultilineEnter,
         };
 
@@ -293,6 +297,29 @@ export default class KeyboardBindings {
             collapsed: true,
             format: [CodeBlockBlot.blotName],
             handler: this.handleCodeBlockEnter,
+        };
+
+        this.bindings["List Enter"] = {
+            key: KeyboardModule.keys.ENTER,
+            collapsed: true,
+            format: [ListItem.blotName],
+            handler: (range: RangeStatic) => {
+                const listItems = this.formatter.getListItems(range);
+
+                let handled = false;
+                listItems.forEach(item => {
+                    if (item.domNode.textContent === "") {
+                        item.outdent();
+                        handled = true;
+                    }
+                });
+
+                if (handled) {
+                    return false;
+                } else {
+                    return true;
+                }
+            },
         };
     }
 

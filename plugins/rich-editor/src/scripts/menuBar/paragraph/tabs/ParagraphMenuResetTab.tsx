@@ -52,4 +52,16 @@ export default class ParagraphMenuResetTab extends React.PureComponent<IProps> {
             </button>
         );
     }
+
+    public componentDidMount() {
+        if (this.props.tabIndex === 0) {
+            this.buttonRef.current && this.buttonRef.current.focus();
+        }
+    }
+
+    public componentDidUpdate() {
+        if (this.props.tabIndex === 0) {
+            this.buttonRef.current && this.buttonRef.current.focus();
+        }
+    }
 }

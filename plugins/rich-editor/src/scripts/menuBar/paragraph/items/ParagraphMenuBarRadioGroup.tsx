@@ -21,6 +21,7 @@ export interface IParagraphMenuBarRadioGroupProps {
     className?: string;
     items: IMenuBarRadioButton[];
     handleClick: (data: IMenuBarRadioButton, index: number) => void;
+    disabled?: boolean;
 }
 
 /**
@@ -48,6 +49,7 @@ export default class ParagraphMenuBarRadioGroup extends React.PureComponent<IPar
                                 text={item.text}
                                 type={IMenuBarItemTypes.RADIO}
                                 onClick={onClick}
+                                disabled={item.disabled || !!this.props.disabled}
                                 key={`checkRadio-${index}`}
                             />
                         );

@@ -25,7 +25,7 @@ export enum ListType {
     CHECKBOX = "checkbox",
 }
 
-interface IListItem {
+interface IListObjectValue {
     type: ListType;
     index?: number;
     isChecked?: boolean;
@@ -34,14 +34,14 @@ interface IListItem {
 
 type ListStringValue = "ordered" | "bullet";
 
-export type ListValue = IListItem | ListStringValue;
+export type ListValue = IListObjectValue | ListStringValue;
 
 /**
  * Utility function to sync a get a list item value from a domNode.
  *
  * @param domNode The domNode to set properties on.
  */
-function getValueFromElement(domNode: HTMLElement): IListItem {
+function getValueFromElement(domNode: HTMLElement): IListObjectValue {
     const depthAttr = domNode.getAttribute("data-depth");
     const typeAtrr = domNode.getAttribute("data-type");
 
@@ -67,7 +67,7 @@ function getValueFromElement(domNode: HTMLElement): IListItem {
  * @param domNode The domNode to set properties on.
  * @param value The value to sync.
  */
-function syncValueToElement(element: HTMLElement, value: IListItem) {
+function syncValueToElement(element: HTMLElement, value: IListObjectValue) {
     if (value) {
         element.setAttribute("data-depth", value.depth);
         element.setAttribute("data-type", value.type);
@@ -86,7 +86,7 @@ export abstract class ListGroup extends WrapperBlot {
      *
      * @param value
      */
-    public static create(value: IListItem) {
+    public static create(value: IListObjectValue) {
         const element = super.create(value);
         syncValueToElement(element, value);
         return element;
@@ -155,7 +155,7 @@ export abstract class ListGroup extends WrapperBlot {
     /**
      * Utility for getting the value from the blot's domNode.
      */
-    public getValue(): IListItem {
+    public getValue(): IListObjectValue {
         return getValueFromElement(this.domNode);
     }
 }
@@ -197,7 +197,7 @@ export class ListItemWrapper extends withWrapper(Container as any) {
      * @override
      * To sync the element values into the items domNode.
      */
-    public static create(value: IListItem) {
+    public static create(value: IListObjectValue) {
         const element = super.create(value) as HTMLElement;
         syncValueToElement(element, value);
         return element;
@@ -281,7 +281,7 @@ export class ListItemWrapper extends withWrapper(Container as any) {
                     next.insertInto(ownNestedGroup);
 
                     // Adjust our list type to the target value.
-                    const newNextValue: IListItem = {
+                    const newNextValue: IListObjectValue = {
                         ...nextValue,
                         type: ownNestedGroup.getValue().type,
                     };
@@ -348,7 +348,7 @@ export class ListItemWrapper extends withWrapper(Container as any) {
     /**
      * Utility for getting the value from the blot's domNode.
      */
-    public getValue(): IListItem {
+    public getValue(): IListObjectValue {
         return getValueFromElement(this.domNode);
     }
 
@@ -415,7 +415,7 @@ export class ListItem extends LineBlot {
      * list: "bullet"
      * list: { type: "bulleted", depth: 0 }
      */
-    private static mapListValue(value: ListValue): IListItem {
+    private static mapListValue(value: ListValue): IListObjectValue {
         if (typeof value === "object") {
             return value;
         } else {
@@ -558,7 +558,7 @@ export class ListItem extends LineBlot {
     /**
      * Utility for getting the value from the blot's domNode.
      */
-    public getValue(): IListItem {
+    public getValue(): IListObjectValue {
         return getValueFromElement(this.domNode);
     }
 

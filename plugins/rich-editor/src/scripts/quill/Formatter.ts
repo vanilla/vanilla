@@ -17,8 +17,7 @@ import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import HeadingBlot from "quill/formats/header";
 import { Blot, RangeStatic } from "quill/core";
 import Embed from "quill/blots/embed";
-import { ListItem, ListGroup } from "@rich-editor/quill/blots/blocks/ListBlot";
-import Delta from "quill-delta";
+import { ListItem, ListValue, ListType } from "@rich-editor/quill/blots/blocks/ListBlot";
 
 export default class Formatter {
     public static INLINE_FORMAT_NAMES = [
@@ -154,9 +153,21 @@ export default class Formatter {
         this.quill.formatLine(range.index, range.length, SpoilerLineBlot.blotName, true, Quill.sources.USER);
     };
 
-    public bulletedList = (range: RangeStatic) => {};
+    public bulletedList = (range: RangeStatic) => {
+        const value: ListValue = {
+            type: ListType.BULLETED,
+            depth: 0,
+        };
+        this.quill.formatLine(range.index, range.length, ListItem.blotName, value, Quill.sources.USER);
+    };
 
-    public orderedList = (range: RangeStatic) => {};
+    public orderedList = (range: RangeStatic) => {
+        const value: ListValue = {
+            type: ListType.NUMBERED,
+            depth: 0,
+        };
+        this.quill.formatLine(range.index, range.length, ListItem.blotName, value, Quill.sources.USER);
+    };
 
     public getListItems = (range: RangeStatic): ListItem[] => {
         if (range.length === 0) {

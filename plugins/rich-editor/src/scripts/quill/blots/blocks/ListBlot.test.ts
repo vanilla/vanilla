@@ -20,7 +20,7 @@ import {
 import { expect } from "chai";
 import Formatter from "@rich-editor/quill/Formatter";
 
-describe.only("ListBlot", () => {
+describe("ListBlot", () => {
     before(() => {
         registerQuill();
     });
@@ -319,7 +319,7 @@ describe.only("ListBlot", () => {
             expect(secondListItem.getValue().depth, "The first list item should contain a list group").eq(1);
         });
 
-        it.only("can indent an item into it's own nest list of the same type", () => {
+        it("can indent an item into it's own nest list of the same type", () => {
             insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1");
             insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1.1");
             insertListBlot({ type: ListType.BULLETED, depth: 1 }, "1.2");

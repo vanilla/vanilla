@@ -274,6 +274,7 @@ export default class KeyboardBindings {
         this.bindings["code exit"] = false;
         this.bindings["indent"] = false;
         this.bindings["outdent"] = false;
+        this.bindings["outdent backspace"] = false;
         this.bindings["list empty enter"] = false;
         this.bindings["checklist enter"] = false;
     }
@@ -401,6 +402,20 @@ export default class KeyboardBindings {
      * Add custom handlers for backspace inside of Blots.
      */
     private addBlockBackspaceHandlers() {
+        const handleListBackspace = (range: RangeStatic) => {
+            const listItem = this.formatter.getListItems(range)[0];
+
+            listItem.replaceWith("block", "");
+            return true;
+        };
+
+        this.bindings["a List Backspace"] = {
+            key: KeyboardModule.keys.BACKSPACE,
+            offset: 0,
+            collapsed: true,
+            format: [ListItem.blotName],
+            handler: handleListBackspace,
+        };
         this.bindings["Block Backspace With Selection"] = {
             key: KeyboardModule.keys.BACKSPACE,
             collapsed: false,

@@ -9,6 +9,7 @@ import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import { IFormats, RangeStatic } from "quill/core";
 import Formatter from "@rich-editor/quill/Formatter";
+import { MenuState } from "react-select/lib/components/Menu";
 
 /**
  * Maps quill functions to functions
@@ -57,22 +58,22 @@ export const paragraphFormats = (
     };
 
     const listUnordered = () => {
-        formatter.h5(lastGoodSelection); // TODO
+        formatter.bulletedList(lastGoodSelection);
         afterClickHandler && afterClickHandler();
     };
 
     const listOrdered = () => {
-        formatter.h5(lastGoodSelection); // TODO
+        formatter.orderedList(lastGoodSelection);
         afterClickHandler && afterClickHandler();
     };
 
     const listIndent = () => {
-        formatter.h5(lastGoodSelection); // TODO
+        formatter.indentList(lastGoodSelection);
         afterClickHandler && afterClickHandler();
     };
 
     const listOutdent = () => {
-        formatter.h5(lastGoodSelection); // TODO
+        formatter.outdentList(lastGoodSelection);
         afterClickHandler && afterClickHandler();
     };
 
@@ -91,6 +92,8 @@ export const paragraphFormats = (
         h5,
     };
 };
+
+export type IParagraphFormatter = ReturnType<typeof paragraphFormats>;
 
 /**
  * Maps quill state to our format, in a simpler to use object
@@ -129,3 +132,5 @@ export const menuState = (activeFormats: IFormats) => {
         },
     };
 };
+
+export type IParagraphMenuState = ReturnType<typeof menuState>;

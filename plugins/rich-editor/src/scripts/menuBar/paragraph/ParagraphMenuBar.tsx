@@ -27,7 +27,7 @@ import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { colorOut, srOnly, unit } from "@library/styles/styleHelpers";
 import { IMenuBarRadioButton } from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
 import ParagraphMenuSpecialBlockTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuSpecialBlockTabContent";
-import { menuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
+import { menuState, IParagraphFormatter, IParagraphMenuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
 import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
@@ -39,8 +39,8 @@ interface IProps {
     lastGoodSelection: RangeStatic;
     legacyMode: boolean;
     close: () => void;
-    textFormats: any;
-    menuActiveFormats: any;
+    textFormats: IParagraphFormatter;
+    menuActiveFormats: IParagraphMenuState;
     rovingIndex: number;
     setRovingIndex: (index: number, callback?: () => void) => void;
     menuRef: React.RefObject<HTMLDivElement>;
@@ -152,31 +152,31 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
                     },
                 ],
             },
-            // {
-            //     component: ParagraphMenuListsTabContent,
-            //     accessibleInstructions: t("Toggle Lists Menu"),
-            //     label: t("Lists"),
-            //     toggleMenu: this.toggleListsMenu,
-            //     icon: this.listMenuIcon,
-            //     activeFormats: menuActiveFormats.lists,
-            //     open: this.listMenuOpen,
-            //     items: [
-            //         {
-            //             formatFunction: textFormats.listUnordered,
-            //             icon: listUnordered(iconStyle),
-            //             text: t("Bulleted List"),
-            //             checked: menuActiveFormats.lists.ordered,
-            //         },
-            //         {
-            //             formatFunction: textFormats.listUnordered,
-            //             icon: listOrdered(iconStyle),
-            //             text: t("Ordered List"),
-            //             checked: menuActiveFormats.lists.unordered,
-            //         },
-            //     ],
-            //     indent: textFormats.listIndent,
-            //     outdent: textFormats.listIndent,
-            // },
+            {
+                component: ParagraphMenuListsTabContent,
+                accessibleInstructions: t("Toggle Lists Menu"),
+                label: t("Lists"),
+                toggleMenu: this.toggleListsMenu,
+                icon: this.listMenuIcon,
+                activeFormats: menuActiveFormats.lists,
+                open: this.listMenuOpen,
+                items: [
+                    {
+                        formatFunction: textFormats.listUnordered,
+                        icon: listUnordered(iconStyle),
+                        text: t("Bulleted List"),
+                        checked: menuActiveFormats.lists.ordered,
+                    },
+                    {
+                        formatFunction: textFormats.listUnordered,
+                        icon: listOrdered(iconStyle),
+                        text: t("Ordered List"),
+                        checked: menuActiveFormats.lists.unordered,
+                    },
+                ],
+                indent: textFormats.listIndent,
+                outdent: textFormats.listIndent,
+            },
             {
                 component: ParagraphMenuSpecialBlockTabContent,
                 accessibleInstructions: t("Toggle Special Formats Menu"),

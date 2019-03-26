@@ -174,7 +174,7 @@ class DiscussionController extends VanillaController {
         } else {
             $canonicalMessage = new Message(
                 sprintf(
-                    \Gdn::locale()->translate('This discussion has a more <a href="%1$s">recent version</a>.'),
+                    \Gdn::translate('This discussion has a more <a href="%1$s">recent version</a>.'),
                     htmlspecialchars(\Gdn::request()->url($canonicalUrl))
                 ),
                 Message::TYPE_WARNING

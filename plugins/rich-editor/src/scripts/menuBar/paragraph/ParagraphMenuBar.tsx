@@ -291,12 +291,6 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
         );
     }
 
-    public componentDidUpdate(prevProps: IProps) {
-        if (this.hasMenuOpen()) {
-            this.selectFirstElementInOpenPanel();
-        }
-    }
-
     public hasMenuOpen = () => {
         return this.state.specialBlockMenuOpen || this.state.headingMenuOpen || this.state.listMenuOpen;
     };

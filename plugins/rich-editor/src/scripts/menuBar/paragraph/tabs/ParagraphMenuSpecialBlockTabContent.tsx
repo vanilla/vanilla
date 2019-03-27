@@ -14,8 +14,10 @@ import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 interface IProps {
     items: IMenuBarRadioButton[];
+    closeMenu: () => void;
     closeMenuAndSetCursor: () => void;
     className?: string;
+    disabled?: boolean;
 }
 
 /**
@@ -34,6 +36,7 @@ export default class ParagraphMenuBlockTabContent extends React.Component<IProps
                 handleClick={handleClick}
                 label={t("Special Formats")}
                 items={this.props.items}
+                disabled={this.props.disabled}
             />
         );
     }

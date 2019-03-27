@@ -14,9 +14,11 @@ import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 interface IProps {
     items: IMenuBarRadioButton[];
+    closeMenu: () => void;
     closeMenuAndSetCursor: () => void;
     className?: string;
     setRovingIndex: () => void;
+    disabled?: boolean;
 }
 
 /**
@@ -36,6 +38,7 @@ export default class ParagraphMenuHeadingsTabContent extends React.Component<IPr
                 handleClick={handleClick}
                 label={t("Headings")}
                 items={this.props.items}
+                disabled={this.props.disabled}
             />
         );
     }

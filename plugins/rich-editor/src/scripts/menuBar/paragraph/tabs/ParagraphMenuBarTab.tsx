@@ -35,6 +35,7 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
     private buttonID;
     private selfRef;
     private toggleButtonRef: React.RefObject<HTMLButtonElement> = React.createRef();
+    private handleClick;
 
     constructor(props: IProps) {
         super(props);
@@ -42,8 +43,12 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
         this.componentID = this.ID + "-component";
         this.menuID = this.ID + "-menu";
         this.buttonID = this.ID + "-button";
-        this.state = {
-            open: false,
+
+        this.handleClick = (event: React.MouseEvent) => {
+            this.props.setRovingIndex();
+            this.props.toggleMenu(() => {
+                this.toggleButtonRef.current && this.toggleButtonRef.current.focus();
+            });
         };
     }
 
@@ -51,12 +56,7 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
         const { className, isMenuVisible, toggleMenu, children, icon } = this.props;
         if (open) {
             const classes = richEditorClasses(this.props.legacyMode);
-            const handleClick = (event: React.MouseEvent) => {
-                this.props.setRovingIndex();
-                this.props.toggleMenu(() => {
-                    this.toggleButtonRef.current && this.toggleButtonRef.current.focus();
-                });
-            };
+
             // If the roving index matches my index, or no roving index is set and we're on the first tab
             return (
                 <div id={this.componentID} ref={this.selfRef} className={classNames(className)}>
@@ -69,10 +69,11 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
                         aria-controls={this.menuID}
                         aria-expanded={isMenuVisible}
                         aria-haspopup="menu"
-                        onClick={handleClick}
-                        className={classes.button}
+                        onClick={this.handleClick}
+                        className={classNames(classes.button, this.props.open ? classes.topLevelButtonActive : "")}
                         tabIndex={this.props.tabIndex}
                         ref={this.toggleButtonRef}
+                        onKeyDown={this.handleMenuBarKeyDown}
                     >
                         {icon}
                         <ScreenReaderContent>{this.props.accessibleButtonLabel}</ScreenReaderContent>
@@ -84,7 +85,36 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
         }
     }
 
+    public componentDidMount() {
+        if (!this.props.open && this.props.tabIndex === 0) {
+            this.toggleButtonRef.current && this.toggleButtonRef.current.focus();
+        }
+    }
+
+    public componentDidUpdate() {
+        if (!this.props.open && this.props.tabIndex === 0) {
+            this.toggleButtonRef.current && this.toggleButtonRef.current.focus();
+        }
+    }
+
     public getMenuContentsID() {
         return this.menuID;
     }
+
+    /**
+     * From an accessibility point of view, this is a Editor Menubar. The only difference is it has a toggled visibility
+     *
+     * @see https://www.w3.org/TR/wai-aria-practices-1.1/examples/menubar/menubar-2/menubar-2.html
+     */
+    private handleMenuBarKeyDown = (event: React.KeyboardEvent<any>) => {
+        switch (`${event.key}${event.shiftKey ? "-Shift" : ""}`) {
+            // Opens submenu and moves focus to first item in the submenu.
+            case "ArrowDown":
+                if (!this.props.open) {
+                    event.preventDefault();
+                    this.handleClick();
+                }
+                break;
+        }
+    };
 }

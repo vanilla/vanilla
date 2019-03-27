@@ -17,6 +17,7 @@ export interface IMenuCheckRadio {
     checked: boolean;
     icon: JSX.Element;
     text: string;
+    disabled?: boolean;
 }
 
 interface IProps {
@@ -25,6 +26,7 @@ interface IProps {
     text: string;
     type: IMenuBarItemTypes;
     onClick: (event: any) => void;
+    disabled?: boolean;
 }
 
 /**
@@ -56,6 +58,8 @@ export default class ParagraphMenuCheckRadio extends React.PureComponent<IProps>
                 aria-checked={checked}
                 type="button"
                 onClick={onClick}
+                disabled={!!this.props.disabled}
+                tabIndex={!!this.props.disabled ? -1 : 0}
             >
                 <span className={classes.icon}>{icon}</span>
                 <span className={classes.checkRadioLabel}>{text}</span>

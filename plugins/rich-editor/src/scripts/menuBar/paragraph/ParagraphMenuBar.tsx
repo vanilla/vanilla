@@ -386,10 +386,12 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
 
     private moveRovingIndexForward = (callback?: () => void) => {
         const targetIndex = (this.props.rovingIndex + 1) % this.itemCount;
+        console.log("target index: ", targetIndex);
         this.props.setRovingIndex(targetIndex, callback);
     };
     private moveRovingIndexBackwards = (callback?: () => void) => {
         const targetIndex = (this.props.rovingIndex - 1 + this.itemCount) % this.itemCount;
+        console.log("target index: ", targetIndex);
         this.props.setRovingIndex(targetIndex, callback);
     };
 
@@ -412,6 +414,7 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
                 if (!this.hasMenuOpen()) {
                     event.stopPropagation();
                     event.preventDefault();
+                    this.closeAllSubMenus();
                     this.props.setRovingIndex(0);
                 }
                 break;
@@ -420,6 +423,7 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
                 if (!this.hasMenuOpen()) {
                     event.stopPropagation();
                     event.preventDefault();
+                    this.closeAllSubMenus();
                     this.props.setRovingIndex(this.itemCount - 1);
                 }
                 break;
@@ -428,18 +432,26 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
             case "ArrowRight":
                 event.stopPropagation();
                 event.preventDefault();
-                this.moveRovingIndexForward(() => {
-                    this.openTabFunctions[this.props.rovingIndex]();
-                });
+                if (!this.hasMenuOpen()) {
+                    this.moveRovingIndexForward();
+                } else {
+                    this.moveRovingIndexForward(() => {
+                        this.openTabFunctions[this.props.rovingIndex]();
+                    });
+                }
                 break;
             // Moves focus to the previous item in the menubar.
             // If focus is on the first item, moves focus to the last item.
             case "ArrowLeft":
                 event.stopPropagation();
                 event.preventDefault();
-                this.moveRovingIndexBackwards(() => {
-                    this.openTabFunctions[this.props.rovingIndex]();
-                });
+                if (!this.hasMenuOpen()) {
+                    this.moveRovingIndexBackwards();
+                } else {
+                    this.moveRovingIndexBackwards(() => {
+                        this.openTabFunctions[this.props.rovingIndex]();
+                    });
+                }
                 break;
             // 	Opens submenu and moves focus to last item in the submenu.
             case "ArrowUp":
@@ -454,7 +466,6 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
             case "ArrowDown":
                 event.preventDefault();
                 event.stopPropagation();
-
                 this.openTabFunctions[this.props.rovingIndex](() => {
                     this.selectLastElementInOpenPanel();
                 });
@@ -474,30 +485,6 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
      */
     private handleMenuKeyDown = (event: React.KeyboardEvent<any>) => {
         switch (`${event.key}${event.shiftKey ? "-Shift" : ""}`) {
-            // Closes submenu.
-            // Moves focus to next item in the menubar.
-            // Opens submenu of newly focused menubar item, keeping focus on that parent menubar item.
-            case "ArrowRight":
-                // if (this.hasMenuOpen()) {
-                //     event.preventDefault();
-                //     this.closeAllSubMenus();
-                //     this.moveRovingIndexForward(() => {
-                //         this.openTabs[this.props.rovingIndex] && this.openTabs[this.props.rovingIndex]();
-                //     });
-                // }
-                break;
-            // Closes submenu.
-            // Moves focus to previous item in the menubar.
-            // Opens submenu of newly focused menubar item, keeping focus on that parent menubar item.
-            case "ArrowLeft":
-                // if (this.hasMenuOpen()) {
-                //     event.preventDefault();
-                //     this.closeAllSubMenus();
-                //     this.moveRovingIndexBackwards(() => {
-                //         this.openTabs[this.props.rovingIndex] && this.openTabs[this.props.rovingIndex]();
-                //     });
-                // }
-                break;
             // Opens submenu and moves focus to first item in the submenu.
             case "ArrowDown":
                 if (this.hasMenuOpen() && this.props.panelsRef.current) {

@@ -50,6 +50,8 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
             this.props.toggleMenu(() => {
                 if (!this.props.open) {
                     this.toggleButtonRef.current && this.toggleButtonRef.current.focus();
+                } else {
+                    this.props.selectFirstElement();
                 }
             });
         };

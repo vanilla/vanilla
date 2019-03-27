@@ -22,6 +22,8 @@ interface IProps {
     setRovingIndex: () => void;
     indent: () => void;
     outdent: () => void;
+    canIndent: boolean;
+    canOutdent: boolean;
     disabled?: boolean;
 }
 
@@ -37,6 +39,8 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
             this.props.setRovingIndex();
             this.props.closeMenuAndSetCursor();
         };
+        const indentDisabled = !!this.props.disabled || !this.props.canIndent;
+        const outdentDisabled = !!this.props.disabled || !this.props.canOutdent;
         const indentLabel = t("Indent");
         const outdentLabel = t("Outdent");
         return (
@@ -54,8 +58,8 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
                         className={classNames(checkRadioClasses.checkRadio)}
                         type="button"
                         onClick={this.props.indent}
-                        disabled={!!this.props.disabled}
-                        tabIndex={!!this.props.disabled ? -1 : 0}
+                        disabled={indentDisabled}
+                        tabIndex={indentDisabled ? -1 : 0}
                         data-firstletter={indentLabel.toLowerCase().substr(0, 1)}
                     >
                         <span className={checkRadioClasses.icon}>{indent()}</span>
@@ -65,8 +69,8 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
                         className={classNames(checkRadioClasses.checkRadio)}
                         type="button"
                         onClick={this.props.outdent}
-                        disabled={!!this.props.disabled}
-                        tabIndex={!!this.props.disabled ? -1 : 0}
+                        disabled={outdentDisabled}
+                        tabIndex={outdentDisabled ? -1 : 0}
                         data-firstletter={outdentLabel.toLowerCase().substr(0, 1)}
                     >
                         <span className={checkRadioClasses.icon}>{outdent()}</span>

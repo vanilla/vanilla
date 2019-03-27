@@ -65,6 +65,8 @@ interface IMenuBarContent {
     items?: IMenuBarRadioButton[];
     indent?: () => void;
     outdent?: () => void;
+    canIndent?: boolean;
+    canOutdent?: boolean;
     activeFormats: any;
     openMenu: (callback: () => void) => void;
 }
@@ -168,6 +170,8 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
                 ],
                 indent: formatter.indentList,
                 outdent: formatter.outdentList,
+                canIndent: menuActiveFormats.lists.canIndent,
+                canOutdent: menuActiveFormats.lists.canOutdent,
             },
             {
                 component: ParagraphMenuSpecialBlockTabContent,

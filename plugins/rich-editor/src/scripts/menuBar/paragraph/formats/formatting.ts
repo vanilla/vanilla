@@ -10,12 +10,13 @@ import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import { ListItem, ListType, ListValue } from "@rich-editor/quill/blots/blocks/ListBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import { IFormats } from "quill/core";
+import Formatter from "@rich-editor/quill/Formatter";
 
 /**
  * Maps quill state to our format, in a simpler to use object
  * @param activeFormats
  */
-export const menuState = (activeFormats: IFormats) => {
+export const menuState = (formatter: Formatter, activeFormats: IFormats) => {
     let isParagraphEnabled = true;
 
     [
@@ -37,7 +38,7 @@ export const menuState = (activeFormats: IFormats) => {
         return listValue && typeof listValue === "object" && listValue.type === type;
     };
 
-    const listDepth = listValue && typeof listValue === "object" ? listValue.depth : null;
+    const listItem = formatter.getListItems()[0];
 
     return {
         paragraph: isParagraphEnabled,
@@ -55,7 +56,9 @@ export const menuState = (activeFormats: IFormats) => {
         lists: {
             ordered: hasListFormat(ListType.ORDERED),
             unordered: hasListFormat(ListType.BULLETED),
-            depth: listDepth,
+            depth: listItem ? listItem.getValue().depth : null,
+            canIndent: !!listItem && listItem.canIndent(),
+            canOutdent: !!listItem && listItem.canOutdent(),
         },
     };
 };

@@ -11,12 +11,12 @@ use Vanilla\Formatting\Quill\BlotGroup;
 /**
  * Blot to represent heading line terminators.
  *
- * Currently only 2 levels are allowed.
+ * Levels 2-5 are allowed.
  */
 class HeadingTerminatorBlot extends AbstractLineTerminatorBlot {
 
     /** @var array Valid heading levels. */
-    const VALID_LEVELS = [2, 3];
+    const VALID_LEVELS = [2, 3, 4, 5];
 
     /** @var int the default heading level if a none is provided. */
     const DEFAULT_LEVEL = 2;

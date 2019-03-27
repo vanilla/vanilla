@@ -23,6 +23,7 @@ interface IProps {
     legacyMode: boolean;
     tabIndex: 0 | -1;
     open: boolean;
+    selectFirstElement: () => void;
 }
 
 /**
@@ -47,7 +48,11 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
         this.handleClick = (event: React.MouseEvent) => {
             this.props.setRovingIndex();
             this.props.toggleMenu(() => {
-                this.toggleButtonRef.current && this.toggleButtonRef.current.focus();
+                if (!this.props.open) {
+                    this.toggleButtonRef.current && this.toggleButtonRef.current.focus();
+                } else {
+                    this.props.selectFirstElement();
+                }
             });
         };
     }
@@ -73,7 +78,6 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
                         className={classNames(classes.button, this.props.open ? classes.topLevelButtonActive : "")}
                         tabIndex={this.props.tabIndex}
                         ref={this.toggleButtonRef}
-                        onKeyDown={this.handleMenuBarKeyDown}
                     >
                         {icon}
                         <ScreenReaderContent>{this.props.accessibleButtonLabel}</ScreenReaderContent>
@@ -100,21 +104,4 @@ export default class ParagraphMenuBarTab extends React.PureComponent<IProps> {
     public getMenuContentsID() {
         return this.menuID;
     }
-
-    /**
-     * From an accessibility point of view, this is a Editor Menubar. The only difference is it has a toggled visibility
-     *
-     * @see https://www.w3.org/TR/wai-aria-practices-1.1/examples/menubar/menubar-2/menubar-2.html
-     */
-    private handleMenuBarKeyDown = (event: React.KeyboardEvent<any>) => {
-        switch (`${event.key}${event.shiftKey ? "-Shift" : ""}`) {
-            // Opens submenu and moves focus to first item in the submenu.
-            case "ArrowDown":
-                if (!this.props.open) {
-                    event.preventDefault();
-                    this.handleClick();
-                }
-                break;
-        }
-    };
 }

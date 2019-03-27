@@ -6,10 +6,11 @@
 
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
+import { ListItem, ListType, ListValue } from "@rich-editor/quill/blots/blocks/ListBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
-import { IFormats, RangeStatic } from "quill/core";
 import Formatter from "@rich-editor/quill/Formatter";
-import { MenuState } from "react-select/lib/components/Menu";
+import { IFormats, RangeStatic } from "quill/core";
 
 /**
  * Maps quill functions to functions
@@ -103,13 +104,28 @@ export const menuState = (activeFormats: IFormats) => {
     // console.log("activeFormats: ", activeFormats);
     let isParagraphEnabled = true;
 
-    ["header", BlockquoteLineBlot.blotName, CodeBlockBlot.blotName, SpoilerLineBlot.blotName].forEach(item => {
+    [
+        HeaderBlot.blotName,
+        BlockquoteLineBlot.blotName,
+        CodeBlockBlot.blotName,
+        SpoilerLineBlot.blotName,
+        ListItem.blotName,
+    ].forEach(item => {
         if (item in activeFormats) {
             isParagraphEnabled = false;
         }
     });
 
     const headerObjectLevel = typeof activeFormats.header === "object" ? activeFormats.header.level : null;
+
+    const listValue: ListValue = activeFormats[ListItem.blotName];
+    const hasListFormat = (type: ListType) => {
+        return listValue && typeof listValue === "object" && listValue.type === type;
+    };
+
+    const canOutdent = () => {
+        return listValue && typeof listValue === "object" && listValue.depth > 0;
+    };
 
     return {
         paragraph: isParagraphEnabled,
@@ -125,10 +141,10 @@ export const menuState = (activeFormats: IFormats) => {
             spoiler: activeFormats[SpoilerLineBlot.blotName] === true,
         },
         lists: {
-            ordered: false,
-            unordered: false,
+            ordered: hasListFormat(ListType.ORDERED),
+            unordered: hasListFormat(ListType.BULLETED),
             indent: false,
-            outdent: false,
+            outdent: canOutdent(),
         },
     };
 };

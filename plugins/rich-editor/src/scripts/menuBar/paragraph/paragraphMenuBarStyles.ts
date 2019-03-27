@@ -31,12 +31,15 @@ export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
         $nest: {
             "&:hover": {
                 backgroundColor: colorOut(globalVars.states.hover.color),
+                zIndex: 1,
             },
             "&:active": {
                 backgroundColor: colorOut(globalVars.states.active.color),
+                zIndex: 1,
             },
             "&:focus": {
                 backgroundColor: colorOut(globalVars.states.focus.color),
+                zIndex: 1,
             },
         },
     });

@@ -5,6 +5,8 @@
 
 import { em } from "csx";
 import { NestedCSSSelectors, TLength } from "typestyle/lib/types";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { unit } from "@library/styles/styleHelpers";
 
 /**
  * Many fonts don't set the capital letter to take the whole line height. This mixin is used to line up the top of the Text with the top of the container.
@@ -54,4 +56,35 @@ export function lineHeightAdjustment(
     }
 
     return result;
+}
+
+export function defaultHyphenation() {
+    const vars = globalVariables().userContentHyphenation;
+    return {
+        "-ms-hyphens": "auto",
+        "-webkit-hyphens": "auto",
+        hyphens: "auto",
+        /* legacy properties */
+        "-webkit-hyphenate-limit-before": vars.minimumCharactersBeforeBreak,
+        "-webkit-hyphenate-limit-after": vars.minimumCharactersAfterBreak,
+        /* current proposal */
+        "-moz-hyphenate-limit-chars": `${vars.minimumCharactersToHyphenate} ${vars.minimumCharactersBeforeBreak} ${
+            vars.minimumCharactersAfterBreak
+        }` /* not yet supported */,
+        "-webkit-hyphenate-limit-chars": `${vars.minimumCharactersToHyphenate} ${vars.minimumCharactersBeforeBreak} ${
+            vars.minimumCharactersAfterBreak
+        }` /* not yet supported */,
+        "-ms-hyphenate-limit-chars": `${vars.minimumCharactersToHyphenate} ${vars.minimumCharactersBeforeBreak} ${
+            vars.minimumCharactersAfterBreak
+        }`,
+        "hyphenate-limit-chars": `${vars.minimumCharactersToHyphenate} ${vars.minimumCharactersBeforeBreak} ${
+            vars.minimumCharactersAfterBreak
+        }`,
+        // Maximum consecutive lines to have hyphenation
+        "-ms-hyphenate-limit-lines": vars.maximumConsecutiveBrokenLines,
+        "-webkit-hyphenate-limit-lines": vars.maximumConsecutiveBrokenLines,
+        "hyphenate-limit-lines": vars.maximumConsecutiveBrokenLines,
+        // Limit "zone" to hyphenate
+        "hyphenate-limit-zone": unit(vars.hyphenationZone),
+    };
 }

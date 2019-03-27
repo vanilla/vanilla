@@ -285,6 +285,17 @@ export const globalVariables = useThemeCache(() => {
         size: 1,
     });
 
+    // https://medium.com/@clagnut/all-you-need-to-know-about-hyphenation-in-css-2baee2d89179
+    // Requires language set on <html> tag
+    const userContentHyphenation = makeThemeVars("userContentHyphenation", {
+        minimumCharactersToHyphenate: 6,
+        minimumCharactersBeforeBreak: 3,
+        minimumCharactersAfterBreak: 3,
+        maximumConsecutiveBrokenLines: 2,
+        avoidLastWordToBeBroken: true,
+        hyphenationZone: "6em",
+    });
+
     return {
         utility,
         elementaryColors,
@@ -311,6 +322,7 @@ export const globalVariables = useThemeCache(() => {
         mixPrimaryAndFg,
         mixPrimaryAndBg,
         separator,
+        userContentHyphenation,
     };
 });
 

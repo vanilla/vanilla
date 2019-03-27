@@ -309,7 +309,7 @@ class ParserTest extends SharedBootstrapTestCase {
         $result = [[["class" => HeadingTerminatorBlot::class, "content" => ""]]];
         $this->assertParseResults($ops, $result);
 
-        $ops = [["attributes" => ["header" => 5], "content" => "\n"]];
+        $ops = [["attributes" => ["header" => 10], "content" => "\n"]];
         $result = [[["class" => NullBlot::class, "content" => ""]]];
         $this->assertParseResults($ops, $result);
     }

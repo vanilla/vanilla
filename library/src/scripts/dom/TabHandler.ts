@@ -76,6 +76,17 @@ export default class TabHandler {
     }
 
     /**
+     * Get all.
+     */
+    public getAll(from: Element | null = document.activeElement) {
+        if (!(from instanceof HTMLElement)) {
+            logError("Unable to tab to next element, `fromElement` given is not valid: ", from);
+            return null;
+        }
+        return this.tabbableElements.filter(this.createExcludeFilterWithExemption(from));
+    }
+
+    /**
      * Get the first focusable element.
      */
     public getInitial(): HTMLElement | null {

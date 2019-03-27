@@ -485,7 +485,6 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
                         return;
                     }
                 });
-
                 break;
         }
     };
@@ -543,7 +542,18 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
             // Moves focus to the next item having a name that starts with the typed character.
             // If none of the items have a name starting with the typed character, focus does not move.
             default:
-                // TODO
+                if (this.props.panelsRef.current) {
+                    const tabHandler = new TabHandler(this.props.panelsRef.current);
+                    const items = tabHandler.getAll(this.props.panelsRef.current);
+                    if (items && items.length > 0) {
+                        items.reverse().forEach(item => {
+                            const letter = item.dataset.firstletter || null;
+                            if (letter && letter === event.key.toLowerCase()) {
+                                item.focus();
+                            }
+                        });
+                    }
+                }
                 break;
         }
     };

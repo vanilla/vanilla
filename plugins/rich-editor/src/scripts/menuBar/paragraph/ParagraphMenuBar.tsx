@@ -65,7 +65,7 @@ interface IMenuBarContent {
     indent?: () => void;
     outdent?: () => void;
     activeFormats: any;
-    openMenu: () => void;
+    openMenu: (callback: () => void) => void;
 }
 
 interface IState {
@@ -85,6 +85,7 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
     };
 
     private itemCount: number;
+    private openTabFunctions;
 
     public render() {
         const { menuActiveFormats, textFormats } = this.props;
@@ -191,14 +192,16 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
         ];
 
         this.itemCount = menuContents.length + 1;
-
         const panelContent: JSX.Element[] = [];
+        this.openTabFunctions = [];
 
         const menus = menuContents.map((menu, index) => {
             const MyContent = menu.component;
             const myRovingIndex = () => {
                 this.props.setRovingIndex(index);
             };
+
+            this.openTabFunctions[index] = menu.openMenu;
 
             panelContent[index] = (
                 <div
@@ -238,6 +241,7 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
                     legacyMode={this.props.legacyMode}
                     tabIndex={this.tabIndex(index)}
                     open={menu.open}
+                    selectFirstElement={this.selectLastElementInOpenPanel}
                 />
             );
         });
@@ -246,8 +250,9 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
         const setParagraphIndex = () => {
             this.props.setRovingIndex(0);
         };
+        this.openTabFunctions[panelContent.length] = this.closeAllSubMenus;
         return (
-            <div onKeyDownCapture={this.handleMenuBarKeyDown}>
+            <div onKeyDown={this.handleMenuBarKeyDown}>
                 <div
                     role="menubar"
                     aria-label={this.props.label}
@@ -265,15 +270,11 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
                         />
                     </div>
                 </div>
-                <div ref={this.props.panelsRef}>{panelContent}</div>
+                <div ref={this.props.panelsRef} onKeyDownCapture={this.handleMenuKeyDown}>
+                    {panelContent}
+                </div>
             </div>
         );
-    }
-
-    public componentDidUpdate(prevProps: IProps) {
-        if (this.hasMenuOpen()) {
-            this.selectFirstElementInOpenPanel();
-        }
     }
 
     public hasMenuOpen = () => {
@@ -287,12 +288,15 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
             specialBlockMenuOpen: false,
         });
     };
-    private openHeadingsMenu = () => {
-        this.setState({
-            headingMenuOpen: true,
-            listMenuOpen: false,
-            specialBlockMenuOpen: false,
-        });
+    private openHeadingsMenu = (callback?: () => void) => {
+        this.setState(
+            {
+                headingMenuOpen: true,
+                listMenuOpen: false,
+                specialBlockMenuOpen: false,
+            },
+            callback,
+        );
     };
 
     private toggleListsMenu = () => {
@@ -303,12 +307,15 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
         });
     };
 
-    private openListsMenu = () => {
-        this.setState({
-            headingMenuOpen: false,
-            listMenuOpen: true,
-            specialBlockMenuOpen: false,
-        });
+    private openListsMenu = (callback?: () => void) => {
+        this.setState(
+            {
+                headingMenuOpen: false,
+                listMenuOpen: true,
+                specialBlockMenuOpen: false,
+            },
+            callback,
+        );
     };
 
     private toggleSpecialBlockMenu = () => {
@@ -319,12 +326,15 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
         });
     };
 
-    private openSpecialBlockMenu = () => {
-        this.setState({
-            headingMenuOpen: false,
-            listMenuOpen: false,
-            specialBlockMenuOpen: true,
-        });
+    private openSpecialBlockMenu = (callback?: () => void) => {
+        this.setState(
+            {
+                headingMenuOpen: false,
+                listMenuOpen: false,
+                specialBlockMenuOpen: true,
+            },
+            callback,
+        );
     };
 
     private closeMenuAndSetCursor = () => {
@@ -374,6 +384,15 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
         return this.props.rovingIndex === index ? 0 : -1;
     };
 
+    private moveRovingIndexForward = (callback?: () => void) => {
+        const targetIndex = (this.props.rovingIndex + 1) % this.itemCount;
+        this.props.setRovingIndex(targetIndex, callback);
+    };
+    private moveRovingIndexBackwards = (callback?: () => void) => {
+        const targetIndex = (this.props.rovingIndex - 1 + this.itemCount) % this.itemCount;
+        this.props.setRovingIndex(targetIndex, callback);
+    };
+
     /**
      * From an accessibility point of view, this is a Editor Menubar. The only difference is it has a toggled visibility
      *
@@ -407,30 +426,122 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
             // Moves focus to the next item in the menubar.
             // If focus is on the last item, moves focus to the first item.
             case "ArrowRight":
-                if (!this.hasMenuOpen()) {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    this.props.setRovingIndex((this.props.rovingIndex + 1) % this.itemCount);
-                }
+                event.stopPropagation();
+                event.preventDefault();
+                this.moveRovingIndexForward(() => {
+                    this.openTabFunctions[this.props.rovingIndex]();
+                });
                 break;
             // Moves focus to the previous item in the menubar.
             // If focus is on the first item, moves focus to the last item.
             case "ArrowLeft":
-                if (!this.hasMenuOpen()) {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    this.props.setRovingIndex((this.props.rovingIndex + (this.itemCount - 1)) % this.itemCount);
-                }
+                event.stopPropagation();
+                event.preventDefault();
+                this.moveRovingIndexBackwards(() => {
+                    this.openTabFunctions[this.props.rovingIndex]();
+                });
                 break;
             // 	Opens submenu and moves focus to last item in the submenu.
             case "ArrowUp":
-                if (this.hasMenuOpen()) {
-                    event.stopPropagation();
-                    this.closeAllSubMenus();
-                    this.selectCurrentTab();
-                }
+                event.preventDefault();
+                event.stopPropagation();
+
+                this.openTabFunctions[this.props.rovingIndex](() => {
+                    this.selectFirstElementInOpenPanel();
+                });
+                break;
+            // Opens submenu and moves focus to first item in the submenu.
+            case "ArrowDown":
+                event.preventDefault();
+                event.stopPropagation();
+
+                this.openTabFunctions[this.props.rovingIndex](() => {
+                    this.selectLastElementInOpenPanel();
+                });
                 break;
             // Moves focus to next item in the menubar having a name that starts with the typed character.
+            // If none of the items have a name starting with the typed character, focus does not move.
+            default:
+                // TODO
+                break;
+        }
+    };
+
+    /**
+     * From an accessibility point of view, this is a Editor Menubar. The only difference is it has a toggled visibility
+     *
+     * @see https://www.w3.org/TR/wai-aria-practices-1.1/examples/menubar/menubar-2/menubar-2.html
+     */
+    private handleMenuKeyDown = (event: React.KeyboardEvent<any>) => {
+        switch (`${event.key}${event.shiftKey ? "-Shift" : ""}`) {
+            // Closes submenu.
+            // Moves focus to next item in the menubar.
+            // Opens submenu of newly focused menubar item, keeping focus on that parent menubar item.
+            case "ArrowRight":
+                // if (this.hasMenuOpen()) {
+                //     event.preventDefault();
+                //     this.closeAllSubMenus();
+                //     this.moveRovingIndexForward(() => {
+                //         this.openTabs[this.props.rovingIndex] && this.openTabs[this.props.rovingIndex]();
+                //     });
+                // }
+                break;
+            // Closes submenu.
+            // Moves focus to previous item in the menubar.
+            // Opens submenu of newly focused menubar item, keeping focus on that parent menubar item.
+            case "ArrowLeft":
+                // if (this.hasMenuOpen()) {
+                //     event.preventDefault();
+                //     this.closeAllSubMenus();
+                //     this.moveRovingIndexBackwards(() => {
+                //         this.openTabs[this.props.rovingIndex] && this.openTabs[this.props.rovingIndex]();
+                //     });
+                // }
+                break;
+            // Opens submenu and moves focus to first item in the submenu.
+            case "ArrowDown":
+                if (this.hasMenuOpen() && this.props.panelsRef.current) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const tabHandler = new TabHandler(this.props.panelsRef.current);
+                    if (tabHandler) {
+                        const next = tabHandler.getNext(document.activeElement, false, true);
+                        if (next) {
+                            next.focus();
+                        }
+                    }
+                }
+                break;
+            // Moves focus to previous item in the submenu.
+            // If focus is on the first item, moves focus to the last item.
+            case "ArrowUp":
+                if (this.hasMenuOpen() && this.props.panelsRef.current) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const tabHandler = new TabHandler(this.props.panelsRef.current);
+                    if (tabHandler) {
+                        const previous = tabHandler.getNext(document.activeElement, true, true);
+                        if (previous) {
+                            previous.focus();
+                        }
+                    }
+                }
+                break;
+            // Moves focus to the first item in the submenu.
+            case "Home":
+                if (this.hasMenuOpen()) {
+                    event.preventDefault();
+                    this.selectFirstElementInOpenPanel();
+                }
+                break;
+            // Moves focus to the first item in the submenu.
+            case "End":
+                if (this.hasMenuOpen()) {
+                    event.preventDefault();
+                    this.selectLastElementInOpenPanel();
+                }
+                break;
+            // Moves focus to the next item having a name that starts with the typed character.
             // If none of the items have a name starting with the typed character, focus does not move.
             default:
                 // TODO

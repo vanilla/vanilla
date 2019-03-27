@@ -119,7 +119,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
         }
 
         const formatter = new Formatter(this.quill, this.props.lastGoodSelection);
-        const menuActiveFormats = menuState(this.props.activeFormats);
+        const menuActiveFormats = menuState(formatter, this.props.activeFormats);
         const topLevelIcons = this.topLevelIcons(menuActiveFormats);
 
         return (

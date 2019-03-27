@@ -471,29 +471,40 @@ export class ListItem extends LineBlot {
         this.cache = {};
     }
 
+    public canIndent() {
+        const hasPreviousItem = this.parent instanceof ListItemWrapper && this.parent.prev instanceof ListItemWrapper;
+        const hasPreviousGroup =
+            this.parent instanceof ListItemWrapper &&
+            this.parent.parent instanceof ListGroup &&
+            this.parent.parent.prev instanceof ListGroup;
+        const lessThanMaxDepth = this.getValue().depth < MAX_NESTING_DEPTH;
+        return (hasPreviousItem || hasPreviousGroup) && lessThanMaxDepth;
+    }
+
+    public canOutdent() {
+        return this.getValue().depth > 0 || this.domNode.textContent === "";
+    }
+
     /**
      * Increase the nesting level of this list item.
      *
      * @returns The recreated, newly indent list item.
      */
     public indent() {
-        const ownValue = this.getValue();
-
-        // The previous item needs to be a list item to indent
-        // Otherwise we have nothing to nest into.
-        if (!(this.parent.prev instanceof ListItemWrapper)) {
-            return;
+        if (this.canIndent()) {
+            this.updateIndentValue(this.getValue().depth + 1);
         }
-
-        this.updateIndentValue(ownValue.depth + 1);
     }
 
     /**
      * Decrease the nesting level of this list item.
      */
     public outdent() {
-        const ownValue = this.getValue();
+        if (!this.canOutdent()) {
+            return;
+        }
 
+        const ownValue = this.getValue();
         if (ownValue.depth === 0) {
             const textContent = this.domNode.textContent || "";
             if (textContent.length === 0) {

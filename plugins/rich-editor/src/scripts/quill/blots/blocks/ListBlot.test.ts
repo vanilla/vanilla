@@ -3,22 +3,21 @@
  * @license GPL-2.0-only
  */
 
-import Parchment from "parchment";
-import Quill, { Blot } from "quill/core";
-import Delta from "quill-delta";
-import registerQuill from "@rich-editor/quill/registerQuill";
 import {
-    OrderedListGroup,
-    UnorderedListGroup,
-    ListValue,
+    ListGroup,
+    ListItem,
+    ListItemWrapper,
     ListTag,
     ListType,
-    ListItem,
-    ListGroup,
-    ListItemWrapper,
+    ListValue,
+    OrderedListGroup,
+    UnorderedListGroup,
 } from "@rich-editor/quill/blots/blocks/ListBlot";
-import { expect } from "chai";
 import Formatter from "@rich-editor/quill/Formatter";
+import registerQuill from "@rich-editor/quill/registerQuill";
+import { expect } from "chai";
+import Delta from "quill-delta";
+import Quill from "quill/core";
 
 describe("ListBlot", () => {
     before(() => {
@@ -101,7 +100,7 @@ describe("ListBlot", () => {
         testCreateOl("ordered");
         resetQuill();
         testCreateOl({
-            type: ListType.NUMBERED,
+            type: ListType.ORDERED,
             depth: 0,
         });
     });
@@ -115,7 +114,7 @@ describe("ListBlot", () => {
             {
                 attributes: {
                     list: {
-                        type: ListType.NUMBERED,
+                        type: ListType.ORDERED,
                         depth: 0,
                     },
                 },
@@ -137,13 +136,13 @@ describe("ListBlot", () => {
     });
 
     it("can be update the depth through quill's formatLine API", () => {
-        insertListBlot({ type: ListType.NUMBERED, depth: 0 });
+        insertListBlot({ type: ListType.ORDERED, depth: 0 });
         expect(quill.getContents().ops).deep.equals([
             { insert: "list item" },
             {
                 attributes: {
                     list: {
-                        type: ListType.NUMBERED,
+                        type: ListType.ORDERED,
                         depth: 0,
                     },
                 },
@@ -151,7 +150,7 @@ describe("ListBlot", () => {
             },
         ]);
         quill.formatLine(0, 1, ListItem.blotName, {
-            type: ListType.NUMBERED,
+            type: ListType.ORDERED,
             depth: 1,
         });
         expect(quill.getContents().ops).deep.equals([
@@ -159,7 +158,7 @@ describe("ListBlot", () => {
             {
                 attributes: {
                     list: {
-                        type: ListType.NUMBERED,
+                        type: ListType.ORDERED,
                         depth: 1,
                     },
                 },
@@ -191,7 +190,7 @@ describe("ListBlot", () => {
     describe("nests items properly", () => {
         it("different types", () => {
             insertListBlot({ type: ListType.BULLETED, depth: 0 });
-            insertListBlot({ type: ListType.NUMBERED, depth: 0 });
+            insertListBlot({ type: ListType.ORDERED, depth: 0 });
 
             expect(quill.scroll.children).has.length(2);
             quill.scroll.children.forEach((blot: ListGroup) => {
@@ -225,13 +224,13 @@ describe("ListBlot", () => {
 
         it("can nest different types multiple levels deep", () => {
             insertListBlot({ type: ListType.BULLETED, depth: 0 });
-            insertListBlot({ type: ListType.NUMBERED, depth: 1 });
-            insertListBlot({ type: ListType.NUMBERED, depth: 1 });
+            insertListBlot({ type: ListType.ORDERED, depth: 1 });
+            insertListBlot({ type: ListType.ORDERED, depth: 1 });
             insertListBlot({ type: ListType.BULLETED, depth: 2 });
             insertListBlot({ type: ListType.BULLETED, depth: 3 });
-            insertListBlot({ type: ListType.NUMBERED, depth: 4 });
+            insertListBlot({ type: ListType.ORDERED, depth: 4 });
             insertListBlot({ type: ListType.BULLETED, depth: 2 });
-            insertListBlot({ type: ListType.NUMBERED, depth: 0 });
+            insertListBlot({ type: ListType.ORDERED, depth: 0 });
 
             // The inner items should be
             // - list item

@@ -163,7 +163,7 @@ export default class Formatter {
 
     public orderedList = (range: RangeStatic) => {
         const value: ListValue = {
-            type: ListType.NUMBERED,
+            type: ListType.ORDERED,
             depth: 0,
         };
         this.quill.formatLine(range.index, range.length, ListItem.blotName, value, Quill.sources.USER);

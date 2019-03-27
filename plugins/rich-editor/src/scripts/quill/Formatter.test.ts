@@ -10,6 +10,7 @@ import { expect } from "chai";
 import OpUtils, { inlineFormatOps, blockFormatOps } from "@rich-editor/__tests__/OpUtils";
 import registerQuill from "./registerQuill";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import { ListType, ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
 
 describe("Formatter", () => {
     let quill: Quill;
@@ -102,6 +103,20 @@ describe("Formatter", () => {
         testCodeBlockFormatStripping(formattingFunction);
     });
 
+    describe("orderedList()", () => {
+        const formattingFunction = (range = getFullRange()) => formatter.orderedList(range);
+        testLineFormatInlinePreservation("orderedList", formattingFunction, OpUtils.list(ListType.ORDERED));
+        testLineFormatExclusivity("orderedList", formattingFunction, OpUtils.list(ListType.ORDERED));
+        testMultiLineFormatting("orderedList", formattingFunction, OpUtils.list(ListType.ORDERED));
+    });
+
+    describe("bulletedList()", () => {
+        const formattingFunction = (range = getFullRange()) => formatter.bulletedList(range);
+        testLineFormatInlinePreservation("bulletedList", formattingFunction, OpUtils.list(ListType.BULLETED));
+        testLineFormatExclusivity("bulletedList", formattingFunction, OpUtils.list(ListType.BULLETED));
+        testMultiLineFormatting("bulletedList", formattingFunction, OpUtils.list(ListType.BULLETED));
+    });
+
     function assertQuillInputOutput(input: any[], expectedOutput: any[], formattingFunction: () => void) {
         quill.setContents(input, Quill.sources.USER);
         formattingFunction();
@@ -160,8 +175,8 @@ describe("Formatter", () => {
             { op: OpUtils.quoteLine(), name: "quote" },
             { op: OpUtils.heading(2), name: "h2" },
             { op: OpUtils.heading(3), name: "h3" },
-            { op: OpUtils.list("ordered"), name: "ordered list" },
-            { op: OpUtils.list("bullet"), name: "bulleted list" },
+            { op: OpUtils.list(ListType.ORDERED), name: "ordered list" },
+            { op: OpUtils.list(ListType.BULLETED), name: "bulleted list" },
         ];
         describe(`Add ${formatToTest} to line formats`, () => {
             testAgainst.forEach(({ op, name }) => {
@@ -257,12 +272,7 @@ describe("Formatter", () => {
         });
     }
 
-    function testMultiLineFormatting(
-        lineFormatName: string,
-        format: (range: RangeStatic) => void,
-        lineOp: any,
-        needsExtraNewLine: boolean = false,
-    ) {
+    function testMultiLineFormatting(lineFormatName: string, format: (range: RangeStatic) => void, lineOp: any) {
         it(`can apply the ${lineFormatName} format to multiple lines`, () => {
             const initial = [
                 OpUtils.op(),

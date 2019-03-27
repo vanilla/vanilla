@@ -272,8 +272,8 @@ export default class KeyboardBindings {
         this.bindings["outdent code-block"] = false;
         this.bindings["remove tab"] = false;
         this.bindings["code exit"] = false;
-        this.bindings["indent"] = false;
-        this.bindings["outdent"] = false;
+        this.bindings.indent = false;
+        this.bindings.outdent = false;
         this.bindings["outdent backspace"] = false;
         this.bindings["list empty enter"] = false;
         this.bindings["checklist enter"] = false;

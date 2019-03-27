@@ -9,99 +9,13 @@ import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import { ListItem, ListType, ListValue } from "@rich-editor/quill/blots/blocks/ListBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
-import Formatter from "@rich-editor/quill/Formatter";
-import { IFormats, RangeStatic } from "quill/core";
-
-/**
- * Maps quill functions to functions
- * @param formatter
- * @param lastGoodSelection
- * @param afterClickHandler
- */
-export const paragraphFormats = (
-    formatter: Formatter,
-    lastGoodSelection: RangeStatic,
-    afterClickHandler?: () => void,
-) => {
-    const paragraph = () => {
-        formatter.paragraph(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-    const blockquote = () => {
-        formatter.blockquote(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-    const codeBlock = () => {
-        formatter.codeBlock(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-    const spoiler = () => {
-        formatter.spoiler(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-
-    const h2 = () => {
-        formatter.h2(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-    const h3 = () => {
-        formatter.h3(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-
-    const h4 = () => {
-        formatter.h4(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-    const h5 = () => {
-        formatter.h5(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-
-    const listUnordered = () => {
-        formatter.bulletedList(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-
-    const listOrdered = () => {
-        formatter.orderedList(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-
-    const listIndent = () => {
-        formatter.indentList(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-
-    const listOutdent = () => {
-        formatter.outdentList(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-
-    return {
-        paragraph,
-        blockquote,
-        codeBlock,
-        spoiler,
-        listUnordered,
-        listOrdered,
-        listIndent,
-        listOutdent,
-        h2,
-        h3,
-        h4,
-        h5,
-    };
-};
-
-export type IParagraphFormatter = ReturnType<typeof paragraphFormats>;
+import { IFormats } from "quill/core";
 
 /**
  * Maps quill state to our format, in a simpler to use object
  * @param activeFormats
  */
 export const menuState = (activeFormats: IFormats) => {
-    // console.log("activeFormats: ", activeFormats);
     let isParagraphEnabled = true;
 
     [
@@ -123,9 +37,7 @@ export const menuState = (activeFormats: IFormats) => {
         return listValue && typeof listValue === "object" && listValue.type === type;
     };
 
-    const canOutdent = () => {
-        return listValue && typeof listValue === "object" && listValue.depth > 0;
-    };
+    const listDepth = listValue && typeof listValue === "object" ? listValue.depth : null;
 
     return {
         paragraph: isParagraphEnabled,
@@ -143,8 +55,7 @@ export const menuState = (activeFormats: IFormats) => {
         lists: {
             ordered: hasListFormat(ListType.ORDERED),
             unordered: hasListFormat(ListType.BULLETED),
-            indent: false,
-            outdent: canOutdent(),
+            depth: listDepth,
         },
     };
 };

@@ -4,25 +4,9 @@
  * @license GPL-2.0-only
  */
 
-import React, { JSXElementConstructor } from "react";
-import Quill, { IFormats, RangeStatic } from "quill/core";
-import { t } from "@library/utility/appUtils";
-import { forceSelectionUpdate, isEmbedSelected } from "@rich-editor/quill/utility";
-import Formatter from "@rich-editor/quill/Formatter";
-import classNames from "classnames";
 import FocusWatcher from "@library/dom/FocusWatcher";
-import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
-import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
-import ParagraphMenuBar from "@rich-editor/menuBar/paragraph/ParagraphMenuBar";
-import { menuState, paragraphFormats } from "@rich-editor/menuBar/paragraph/formats/formatting";
-import MenuItems from "@rich-editor/toolbars/pieces/MenuItems";
-import ConditionalWrap from "@library/layout/ConditionalWrap";
-import { srOnly } from "@library/styles/styleHelpers";
-import { style } from "typestyle";
-import tabbable from "tabbable";
 import TabHandler from "@library/dom/TabHandler";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import {
     blockquote,
     codeBlock,
@@ -34,6 +18,19 @@ import {
     listUnordered,
     spoiler,
 } from "@library/icons/editorIcons";
+import { srOnly } from "@library/styles/styleHelpers";
+import { t } from "@library/utility/appUtils";
+import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { menuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
+import ParagraphMenuBar from "@rich-editor/menuBar/paragraph/ParagraphMenuBar";
+import Formatter from "@rich-editor/quill/Formatter";
+import { isEmbedSelected } from "@rich-editor/quill/utility";
+import ActiveFormatIcon from "@rich-editor/toolbars/pieces/ActiveFormatIcon";
+import classNames from "classnames";
+import Quill, { RangeStatic } from "quill/core";
+import React from "react";
+import { style } from "typestyle";
 
 export enum IMenuBarItemTypes {
     CHECK = "checkbox",
@@ -123,7 +120,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
             }
         }
 
-        const textFormats = paragraphFormats(this.formatter, this.props.lastGoodSelection);
+        this.formatter.setPreselectedRange(this.props.lastGoodSelection);
         const menuActiveFormats = menuState(this.props.activeFormats);
         const topLevelIcons = this.topLevelIcons(menuActiveFormats);
 
@@ -174,7 +171,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                         lastGoodSelection={this.props.lastGoodSelection}
                         legacyMode={this.props.legacyMode}
                         close={this.close}
-                        textFormats={textFormats}
+                        formatter={this.formatter}
                         menuActiveFormats={menuActiveFormats}
                         rovingIndex={this.state.rovingTabIndex}
                         setRovingIndex={this.setRovingIndex}

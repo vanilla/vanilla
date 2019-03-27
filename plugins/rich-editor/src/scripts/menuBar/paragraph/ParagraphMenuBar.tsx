@@ -4,11 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import classNames from "classnames";
-import ParagraphMenuBarTab from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuBarTab";
-import ParagraphMenuResetTab from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuResetTab";
-import ParagraphMenuHeadingsTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuHeadingsTabContent";
+import TabHandler from "@library/dom/TabHandler";
 import {
     blockquote,
     codeBlock,
@@ -20,17 +16,22 @@ import {
     listUnordered,
     spoiler,
 } from "@library/icons/editorIcons";
-import { IFormats, RangeStatic } from "quill/core";
-import { t } from "@library/utility/appUtils";
-import ParagraphMenuListsTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuListsTabContent";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
-import { colorOut, srOnly, unit } from "@library/styles/styleHelpers";
-import { IMenuBarRadioButton } from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
-import ParagraphMenuSpecialBlockTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuSpecialBlockTabContent";
-import { menuState, IParagraphFormatter, IParagraphMenuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
-import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import TabHandler from "@library/dom/TabHandler";
+import { srOnly, unit } from "@library/styles/styleHelpers";
+import { t } from "@library/utility/appUtils";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { IParagraphMenuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
+import { IMenuBarRadioButton } from "@rich-editor/menuBar/paragraph/items/ParagraphMenuBarRadioGroup";
+import ParagraphMenuBarTab from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuBarTab";
+import ParagraphMenuHeadingsTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuHeadingsTabContent";
+import ParagraphMenuListsTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuListsTabContent";
+import ParagraphMenuResetTab from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuResetTab";
+import ParagraphMenuSpecialBlockTabContent from "@rich-editor/menuBar/paragraph/tabs/ParagraphMenuSpecialBlockTabContent";
+import classNames from "classnames";
+import { RangeStatic } from "quill/core";
+import React from "react";
+import { style } from "typestyle";
+import Formatter from "@rich-editor/quill/Formatter";
 
 interface IProps {
     className?: string;
@@ -40,7 +41,7 @@ interface IProps {
     lastGoodSelection: RangeStatic;
     legacyMode: boolean;
     close: () => void;
-    textFormats: IParagraphFormatter;
+    formatter: Formatter;
     menuActiveFormats: IParagraphMenuState;
     rovingIndex: number;
     setRovingIndex: (index: number, callback?: () => void) => void;
@@ -87,7 +88,7 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
     private itemCount: number;
 
     public render() {
-        const { menuActiveFormats, textFormats } = this.props;
+        const { menuActiveFormats, formatter } = this.props;
         const classes = richEditorClasses(this.props.legacyMode);
         const globalStyles = globalVariables();
         const iconStyle = style({
@@ -107,25 +108,25 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
                 openMenu: this.openHeadingsMenu,
                 items: [
                     {
-                        formatFunction: textFormats.h2,
+                        formatFunction: formatter.h2,
                         icon: heading2(iconStyle),
                         text: t("Heading 2"),
                         checked: menuActiveFormats.headings.heading2,
                     },
                     {
-                        formatFunction: textFormats.h3,
+                        formatFunction: formatter.h3,
                         icon: heading3(iconStyle),
                         text: t("Heading 3"),
                         checked: menuActiveFormats.headings.heading3,
                     },
                     {
-                        formatFunction: textFormats.h4,
+                        formatFunction: formatter.h4,
                         icon: heading4(iconStyle),
                         text: t("Heading 4"),
                         checked: menuActiveFormats.headings.heading4,
                     },
                     {
-                        formatFunction: textFormats.h5,
+                        formatFunction: formatter.h5,
                         icon: heading5(iconStyle),
                         text: t("Heading 5"),
                         checked: menuActiveFormats.headings.heading5,
@@ -143,20 +144,28 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
                 openMenu: this.openListsMenu,
                 items: [
                     {
-                        formatFunction: textFormats.listUnordered,
+                        formatFunction: formatter.bulletedList,
                         icon: listUnordered(iconStyle),
                         text: t("Bulleted List"),
                         checked: menuActiveFormats.lists.unordered,
+                        disabled:
+                            !!menuActiveFormats.lists.depth &&
+                            menuActiveFormats.lists.depth > 0 &&
+                            menuActiveFormats.lists.ordered,
                     },
                     {
-                        formatFunction: textFormats.listOrdered,
+                        formatFunction: formatter.orderedList,
                         icon: listOrdered(iconStyle),
                         text: t("Ordered List"),
                         checked: menuActiveFormats.lists.ordered,
+                        disabled:
+                            !!menuActiveFormats.lists.depth &&
+                            menuActiveFormats.lists.depth > 0 &&
+                            menuActiveFormats.lists.unordered,
                     },
                 ],
-                indent: textFormats.listIndent,
-                outdent: textFormats.listOutdent,
+                indent: formatter.indentList,
+                outdent: formatter.outdentList,
             },
             {
                 component: ParagraphMenuSpecialBlockTabContent,
@@ -169,19 +178,19 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
                 openMenu: this.openSpecialBlockMenu,
                 items: [
                     {
-                        formatFunction: textFormats.blockquote,
+                        formatFunction: formatter.blockquote,
                         icon: blockquote(iconStyle),
                         text: t("Quote"),
                         checked: menuActiveFormats.specialFormats.blockQuote,
                     },
                     {
-                        formatFunction: textFormats.codeBlock,
+                        formatFunction: formatter.codeBlock,
                         icon: codeBlock(iconStyle),
                         text: t("Code Block"),
                         checked: menuActiveFormats.specialFormats.codeBlock,
                     },
                     {
-                        formatFunction: textFormats.spoiler,
+                        formatFunction: formatter.spoiler,
                         icon: spoiler(iconStyle),
                         text: t("Spoiler"),
                         checked: menuActiveFormats.specialFormats.spoiler,
@@ -257,7 +266,7 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
                     <div className={classes.menuBarToggles}>
                         {menus}
                         <ParagraphMenuResetTab
-                            formatParagraphHandler={textFormats.paragraph}
+                            formatParagraphHandler={formatter.paragraph}
                             setRovingIndex={setParagraphIndex}
                             tabIndex={this.tabIndex(paragraphIndex)}
                             closeMenuAndSetCursor={this.closeMenuAndSetCursor}

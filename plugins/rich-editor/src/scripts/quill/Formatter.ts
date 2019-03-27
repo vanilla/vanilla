@@ -36,40 +36,46 @@ export default class Formatter {
         ListItem.blotName,
     ];
 
+    private preselectedRange: RangeStatic;
+
     constructor(private quill: Quill) {}
+
+    public setPreselectedRange = (range: RangeStatic) => {
+        this.preselectedRange = range;
+    };
 
     /**
      * Apply the bold format to a range.
      */
-    public bold = (range: RangeStatic) => {
+    public bold = (range: RangeStatic = this.preselectedRange) => {
         this.handleInlineFormat(range, BoldBlot.blotName);
     };
 
     /**
      * Apply the italic format to a range.
      */
-    public italic = (range: RangeStatic) => {
+    public italic = (range: RangeStatic = this.preselectedRange) => {
         this.handleInlineFormat(range, ItalicBlot.blotName);
     };
 
     /**
      * Apply the strike format to a range.
      */
-    public strike = (range: RangeStatic) => {
+    public strike = (range: RangeStatic = this.preselectedRange) => {
         this.handleInlineFormat(range, StrikeBlot.blotName);
     };
 
     /**
      * Apply the codeInline format to a range.
      */
-    public codeInline = (range: RangeStatic) => {
+    public codeInline = (range: RangeStatic = this.preselectedRange) => {
         this.handleInlineFormat(range, CodeBlot.blotName);
     };
 
     /**
      * Apply the link format to a range.
      */
-    public link = (range: RangeStatic, linkValue?: string) => {
+    public link = (range: RangeStatic = this.preselectedRange, linkValue?: string) => {
         const isEnabled = rangeContainsBlot(this.quill, LinkBlot, range);
         if (isEnabled) {
             disableAllBlotsInRange(this.quill, LinkBlot as any, range);
@@ -81,7 +87,7 @@ export default class Formatter {
     /**
      * Apply the paragraph line format to all lines in the range.
      */
-    public paragraph = (range: RangeStatic) => {
+    public paragraph = (range: RangeStatic = this.preselectedRange) => {
         Formatter.BLOCK_FORMAT_NAMES.forEach(name => {
             this.quill.formatLine(range.index, range.length, name, false, Quill.sources.API);
         });
@@ -91,28 +97,28 @@ export default class Formatter {
     /**
      * Apply the h2 line format to all lines in the range.
      */
-    public h2 = (range: RangeStatic) => {
+    public h2 = (range: RangeStatic = this.preselectedRange) => {
         this.quill.formatLine(range.index, range.length, HeadingBlot.blotName, 2, Quill.sources.USER);
     };
 
     /**
      * Apply the h3 line format to all lines in the range.
      */
-    public h3 = (range: RangeStatic) => {
+    public h3 = (range: RangeStatic = this.preselectedRange) => {
         this.quill.formatLine(range.index, range.length, HeadingBlot.blotName, 3, Quill.sources.USER);
     };
 
     /**
      * Apply the h4 line format to all lines in the range.
      */
-    public h4 = (range: RangeStatic) => {
+    public h4 = (range: RangeStatic = this.preselectedRange) => {
         this.quill.formatLine(range.index, range.length, HeadingBlot.blotName, 4, Quill.sources.USER);
     };
 
     /**
      * Apply the h5 line format to all lines in the range.
      */
-    public h5 = (range: RangeStatic) => {
+    public h5 = (range: RangeStatic = this.preselectedRange) => {
         this.quill.formatLine(range.index, range.length, HeadingBlot.blotName, 5, Quill.sources.USER);
     };
 
@@ -120,7 +126,7 @@ export default class Formatter {
      * Apply codeBlock line format to all lines in the range. This will strip all other formats.
      * Additionally it will convert inline embeds into text.
      */
-    public codeBlock = (range: RangeStatic) => {
+    public codeBlock = (range: RangeStatic = this.preselectedRange) => {
         let lines = this.quill.getLines(range.index, range.length) as Blot[];
         if (lines.length === 0) {
             lines = [this.quill.getLine(range.index)[0] as Blot];
@@ -143,18 +149,18 @@ export default class Formatter {
     /**
      * Apply the blockquote line format to all lines in the range.
      */
-    public blockquote = (range: RangeStatic) => {
+    public blockquote = (range: RangeStatic = this.preselectedRange) => {
         this.quill.formatLine(range.index, range.length, BlockquoteLineBlot.blotName, true, Quill.sources.USER);
     };
 
     /**
      * Apply the spoiler line format to all lines in the range.
      */
-    public spoiler = (range: RangeStatic) => {
+    public spoiler = (range: RangeStatic = this.preselectedRange) => {
         this.quill.formatLine(range.index, range.length, SpoilerLineBlot.blotName, true, Quill.sources.USER);
     };
 
-    public bulletedList = (range: RangeStatic) => {
+    public bulletedList = (range: RangeStatic = this.preselectedRange) => {
         const value: ListValue = {
             type: ListType.BULLETED,
             depth: 0,
@@ -162,7 +168,7 @@ export default class Formatter {
         this.quill.formatLine(range.index, range.length, ListItem.blotName, value, Quill.sources.USER);
     };
 
-    public orderedList = (range: RangeStatic) => {
+    public orderedList = (range: RangeStatic = this.preselectedRange) => {
         const value: ListValue = {
             type: ListType.ORDERED,
             depth: 0,
@@ -170,7 +176,7 @@ export default class Formatter {
         this.quill.formatLine(range.index, range.length, ListItem.blotName, value, Quill.sources.USER);
     };
 
-    public getListItems = (range: RangeStatic): ListItem[] => {
+    public getListItems = (range: RangeStatic = this.preselectedRange): ListItem[] => {
         if (range.length === 0) {
             const descendant = this.quill.scroll.descendant(
                 (blot: Blot) => blot instanceof ListItem,
@@ -190,7 +196,7 @@ export default class Formatter {
         }
     };
 
-    public indentList = (range: RangeStatic) => {
+    public indentList = (range: RangeStatic = this.preselectedRange) => {
         const listBlots = this.getListItems(range);
         const selectionBefore = this.quill.getSelection();
         this.quill.history.cutoff();
@@ -202,7 +208,7 @@ export default class Formatter {
         this.quill.setSelection(selectionBefore);
     };
 
-    public outdentList = (range: RangeStatic) => {
+    public outdentList = (range: RangeStatic = this.preselectedRange) => {
         const listBlots = this.getListItems(range);
         const selectionBefore = this.quill.getSelection();
         this.quill.history.cutoff();
@@ -220,7 +226,7 @@ export default class Formatter {
      * @param range - The Range to apply the format to.
      * @param formatKey - The key of the format. This is generally the blotName of a blot.
      */
-    private handleInlineFormat(range: RangeStatic, formatKey: string) {
+    private handleInlineFormat(range: RangeStatic = this.preselectedRange, formatKey: string) {
         const formats = this.quill.getFormat(range);
         const isEnabled = formats[formatKey] === true;
         this.quill.formatText(range.index, range.length, formatKey, !isEnabled, Quill.sources.USER);
@@ -230,7 +236,7 @@ export default class Formatter {
     /**
      * Replace all inline embeds within a blot with their plaintext equivalent.
      */
-    private replaceInlineEmbeds(range: RangeStatic): number {
+    private replaceInlineEmbeds(range: RangeStatic = this.preselectedRange): number {
         const embeds = this.quill.scroll.descendants(Embed as any, range.index, range.length);
         let lengthDifference = 0;
         embeds.forEach(embed => {

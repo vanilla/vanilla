@@ -33,6 +33,7 @@ export default class Formatter {
         BlockquoteLineBlot.blotName,
         SpoilerLineBlot.blotName,
         HeadingBlot.blotName,
+        ListItem.blotName,
     ];
 
     constructor(private quill: Quill) {}

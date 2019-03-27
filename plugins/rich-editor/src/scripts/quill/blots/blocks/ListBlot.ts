@@ -10,6 +10,7 @@ import Parchment from "parchment";
 import Container from "quill/blots/container";
 import { Parent } from "parchment/dist/src/blot/abstract/blot";
 import Quill from "quill/core";
+import { format } from "url";
 
 /* tslint:disable:max-classes-per-file */
 
@@ -456,19 +457,13 @@ export class ListItem extends LineBlot {
     }
 
     /**
-     * @override
-     * Overridden to ensure changing the depth is immediately synced to the item's domNode.
-     * Also syncs to to the parent item's domNode.
+     * Like a softer `format()`. The difference is we don't want to replace the item. We want to update it in place.
+     *
+     * @param newDepth
      */
-    public format(name, value) {
-        // Keep the parents value in sync.
-        if (name === ListItem.blotName) {
-            syncValueToElement(this.domNode, value);
-            syncValueToElement(this.parent.domNode, value);
-            this.cache = {};
-        } else {
-            super.format(name, value);
-        }
+    public updateIndentValue(newDepth: number) {
+        this.domNode.setAttribute("data-depth", newDepth);
+        this.parent.domNode.setAttribute("data-depth", newDepth);
     }
 
     /**
@@ -485,11 +480,7 @@ export class ListItem extends LineBlot {
             return;
         }
 
-        const newValue = {
-            ...ownValue,
-            depth: ownValue.depth + 1,
-        };
-        this.format(ListItem.blotName, newValue);
+        this.updateIndentValue(ownValue.depth + 1);
     }
 
     /**
@@ -506,35 +497,49 @@ export class ListItem extends LineBlot {
                 return;
             }
         }
-
-        const newValue = {
-            ...ownValue,
-            depth: ownValue.depth - 1,
-        };
-        this.format(ListItem.blotName, newValue);
+        this.updateIndentValue(ownValue.depth - 1);
     }
 
+    /**
+     * @override
+     * Overridden to safely handle list values changing.
+     */
     public replaceWith(formatName, value?: any) {
-        if (formatName !== ListItem.blotName) {
+        const ensureDepth0 = () => {
             const ownValue = this.getValue();
             if (ownValue.depth > 0) {
                 // Force an update to our nesting.
-                const newValue = {
-                    ...this.getValue,
-                    depth: 0,
-                };
-                this.format(ListItem.blotName, newValue);
+                this.updateIndentValue(0);
                 const quill = this.quill;
                 if (quill) {
                     quill.update(Quill.sources.SILENT);
                 }
             }
+        };
+        if (formatName !== ListItem.blotName) {
+            ensureDepth0();
             this.breakUpGroupAndMoveToScroll(formatName, value);
         } else {
+            if (!value) {
+                ensureDepth0();
+                return this.breakUpGroupAndMoveToScroll();
+            }
+
+            if (typeof value === "object" && (value as IListObjectValue).type !== this.getValue().type) {
+                ensureDepth0();
+                return this.breakUpGroupAndMoveToScroll(formatName, value);
+            }
+
             return super.replaceWith(formatName, value);
         }
     }
 
+    /**
+     * Break up the blot group and move it up into the scroll scroll container.
+     *
+     * @param formatName The new block format to use.
+     * @param value The value for the new block format.
+     */
     public breakUpGroupAndMoveToScroll(formatName = "block", value: any = "") {
         const parentWrapper = this.parent as ListItemWrapper;
         const parentGroup = parentWrapper.parent as ListGroup;
@@ -545,6 +550,10 @@ export class ListItem extends LineBlot {
         this.moveChildren(newBlock);
         if (parentWrapper.prev === null) {
             this.scroll.insertBefore(newBlock, parentGroup);
+            const listGroup = parentWrapper.getListGroup();
+            if (listGroup) {
+                this.scroll.insertBefore(listGroup, parentGroup);
+            }
             parentWrapper.remove();
         } else {
             const after = parentGroup.split(this.offset(parentGroup)) as ListGroup;

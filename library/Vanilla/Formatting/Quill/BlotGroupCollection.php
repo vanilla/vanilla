@@ -73,14 +73,33 @@ class BlotGroupCollection implements \IteratorAggregate {
     }
 
     /**
+     * Get the previous blot group.
+     *
+     * @return BlotGroup|null
+     */
+    private function getPreviousBlotGroup(): ?BlotGroup {
+        return $this->groups[count($this->groups) - 1] ?? null;
+    }
+
+    /**
      * Push the group into our groups array and start a new one.
      * Do not push an empty group.
      */
     private function clearBlotGroup() {
-        if (!$this->inProgressGroup->isEmpty()) {
-            $this->groups[] = $this->inProgressGroup;
-            $this->inProgressGroup = new BlotGroup();
+        if ($this->inProgressGroup->isEmpty()) {
+            return;
         }
+
+        $currentGroup = $this->inProgressGroup;
+        $prevGroup = $this->getPreviousBlotGroup();
+
+        if ($prevGroup && $prevGroup->canNest($currentGroup)) {
+            $prevGroup->nestGroup($currentGroup);
+        } else {
+            $this->groups[] = $this->inProgressGroup;
+        }
+
+        $this->inProgressGroup = new BlotGroup();
     }
 
     /**
@@ -132,7 +151,7 @@ class BlotGroupCollection implements \IteratorAggregate {
         // Iteration is done so we need to clear the line then the group.
         $this->clearLine();
         if (!$this->inProgressGroup->isEmpty()) {
-            $this->groups[] = $this->inProgressGroup;
+            $this->clearBlotGroup();
         }
     }
 

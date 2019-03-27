@@ -10,10 +10,10 @@ import { expect } from "chai";
 import OpUtils, { inlineFormatOps, blockFormatOps } from "@rich-editor/__tests__/OpUtils";
 import registerQuill from "./registerQuill";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import { ListType, ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
 
 describe("Formatter", () => {
     let quill: Quill;
-    let formatter: Formatter;
 
     before(() => {
         registerQuill();
@@ -24,32 +24,35 @@ describe("Formatter", () => {
             <div id="quill"></div>
         `;
         quill = new Quill("#quill");
-        formatter = new Formatter(quill);
     });
 
+    const makeFormatter = (range: RangeStatic = getFullRange()): Formatter => {
+        return new Formatter(quill, range);
+    };
+
     describe("bold()", () => {
-        const formattingFunction = () => formatter.bold(getFullRange());
+        const formattingFunction = (range?: RangeStatic) => makeFormatter(range).bold();
         testBasicInlineFormatting(formattingFunction, OpUtils.bold);
         testStackedInlineFormatting("bold", formattingFunction, ["italic", "strike", "link", "code"]);
         testInlineAgainstLineFormatting("bold", formattingFunction);
     });
 
     describe("italic()", () => {
-        const formattingFunction = () => formatter.italic(getFullRange());
+        const formattingFunction = (range?: RangeStatic) => makeFormatter(range).italic();
         testBasicInlineFormatting(formattingFunction, OpUtils.italic);
         testStackedInlineFormatting("italic", formattingFunction, ["bold", "strike", "link", "code"]);
         testInlineAgainstLineFormatting("italic", formattingFunction);
     });
 
     describe("strike()", () => {
-        const formattingFunction = () => formatter.strike(getFullRange());
+        const formattingFunction = (range?: RangeStatic) => makeFormatter(range).strike();
         testBasicInlineFormatting(formattingFunction, OpUtils.strike);
         testStackedInlineFormatting("strike", formattingFunction, ["bold", "italic", "link", "code"]);
         testInlineAgainstLineFormatting("strike", formattingFunction);
     });
 
     describe("link()", () => {
-        const formattingFunction = () => formatter.link(getFullRange(), OpUtils.DEFAULT_LINK);
+        const formattingFunction = (range?: RangeStatic) => makeFormatter(range).link(OpUtils.DEFAULT_LINK);
         testBasicInlineFormatting(formattingFunction, OpUtils.link);
         testStackedInlineFormatting(
             "link",
@@ -61,45 +64,59 @@ describe("Formatter", () => {
     });
 
     describe("codeInline()", () => {
-        const formattingFunction = () => formatter.codeInline(getFullRange());
+        const formattingFunction = (range?: RangeStatic) => makeFormatter(range).codeInline();
         testBasicInlineFormatting(formattingFunction, OpUtils.code);
         testStackedInlineFormatting("code", formattingFunction, ["bold", "italic", "strike", "link"]);
         testInlineAgainstLineFormatting("code", formattingFunction);
     });
 
     describe("h2()", () => {
-        const formattingFunction = (range = getFullRange()) => formatter.h2(range);
+        const formattingFunction = (range?: RangeStatic) => makeFormatter(range).h2();
         testLineFormatInlinePreservation("h2", formattingFunction, OpUtils.heading(2));
         testLineFormatExclusivity("h2", formattingFunction, OpUtils.heading(2));
         testMultiLineFormatting("h2", formattingFunction, OpUtils.heading(2));
     });
 
     describe("h3()", () => {
-        const formattingFunction = (range = getFullRange()) => formatter.h3(range);
+        const formattingFunction = (range?: RangeStatic) => makeFormatter(range).h3();
         testLineFormatInlinePreservation("h3", formattingFunction, OpUtils.heading(3));
         testLineFormatExclusivity("h3", formattingFunction, OpUtils.heading(3));
         testMultiLineFormatting("h3", formattingFunction, OpUtils.heading(3));
     });
 
     describe("blockquote()", () => {
-        const formattingFunction = (range = getFullRange()) => formatter.blockquote(range);
+        const formattingFunction = (range?: RangeStatic) => makeFormatter(range).blockquote();
         testLineFormatInlinePreservation("blockquote", formattingFunction, OpUtils.quoteLine());
         testLineFormatExclusivity("blockquote", formattingFunction, OpUtils.quoteLine());
         testMultiLineFormatting("blockquote-line", formattingFunction, OpUtils.quoteLine());
     });
 
     describe("spoiler()", () => {
-        const formattingFunction = (range = getFullRange()) => formatter.spoiler(range);
+        const formattingFunction = (range?: RangeStatic) => makeFormatter(range).spoiler();
         testLineFormatInlinePreservation("spoiler", formattingFunction, OpUtils.spoilerLine());
         testLineFormatExclusivity("spoiler", formattingFunction, OpUtils.spoilerLine());
         testMultiLineFormatting("spoiler-line", formattingFunction, OpUtils.spoilerLine());
     });
 
     describe("codeBlock()", () => {
-        const formattingFunction = (range = getFullRange()) => formatter.codeBlock(range);
+        const formattingFunction = (range?: RangeStatic) => makeFormatter(range).codeBlock();
         testNoLineFormatInlinePreservation(CodeBlockBlot.blotName, formattingFunction, OpUtils.codeBlock());
         testLineFormatExclusivity(CodeBlockBlot.blotName, formattingFunction, OpUtils.codeBlock());
         testCodeBlockFormatStripping(formattingFunction);
+    });
+
+    describe("orderedList()", () => {
+        const formattingFunction = (range?: RangeStatic) => makeFormatter(range).orderedList();
+        testLineFormatInlinePreservation("orderedList", formattingFunction, OpUtils.list(ListType.ORDERED));
+        testLineFormatExclusivity("orderedList", formattingFunction, OpUtils.list(ListType.ORDERED));
+        testMultiLineFormatting("orderedList", formattingFunction, OpUtils.list(ListType.ORDERED));
+    });
+
+    describe("bulletedList()", () => {
+        const formattingFunction = (range?: RangeStatic) => makeFormatter(range).bulletedList();
+        testLineFormatInlinePreservation("bulletedList", formattingFunction, OpUtils.list(ListType.BULLETED));
+        testLineFormatExclusivity("bulletedList", formattingFunction, OpUtils.list(ListType.BULLETED));
+        testMultiLineFormatting("bulletedList", formattingFunction, OpUtils.list(ListType.BULLETED));
     });
 
     function assertQuillInputOutput(input: any[], expectedOutput: any[], formattingFunction: () => void) {
@@ -160,8 +177,8 @@ describe("Formatter", () => {
             { op: OpUtils.quoteLine(), name: "quote" },
             { op: OpUtils.heading(2), name: "h2" },
             { op: OpUtils.heading(3), name: "h3" },
-            { op: OpUtils.list("ordered"), name: "ordered list" },
-            { op: OpUtils.list("bullet"), name: "bulleted list" },
+            { op: OpUtils.list(ListType.ORDERED), name: "ordered list" },
+            { op: OpUtils.list(ListType.BULLETED), name: "bulleted list" },
         ];
         describe(`Add ${formatToTest} to line formats`, () => {
             testAgainst.forEach(({ op, name }) => {
@@ -257,12 +274,7 @@ describe("Formatter", () => {
         });
     }
 
-    function testMultiLineFormatting(
-        lineFormatName: string,
-        format: (range: RangeStatic) => void,
-        lineOp: any,
-        needsExtraNewLine: boolean = false,
-    ) {
+    function testMultiLineFormatting(lineFormatName: string, format: (range: RangeStatic) => void, lineOp: any) {
         it(`can apply the ${lineFormatName} format to multiple lines`, () => {
             const initial = [
                 OpUtils.op(),

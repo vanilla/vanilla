@@ -6,6 +6,7 @@
 import WrapperBlot from "@rich-editor/quill/blots/abstract/WrapperBlot";
 import { Blot, Container } from "quill/core";
 import Parchment from "parchment";
+import Block from "quill/blots/block";
 
 export interface IWrappable extends Container {
     getWrapper(recursively?: boolean): WrapperBlot;
@@ -20,27 +21,36 @@ export interface IWrappable extends Container {
  *
  * @param blotConstructor - The Blot constructor to wrap.
  */
-export default function withWrapper(blotConstructor: typeof Container) {
+export default function withWrapper(blotConstructor: typeof Block) {
     class BlotWithWrapper extends blotConstructor {
         public parent: WrapperBlot;
+        protected useWrapperReplacement = true;
 
-        constructor(domNode) {
+        public constructor(domNode) {
             super(domNode);
             if (!this.statics.parentName) {
-                throw new Error("Attempted to instantiate wrapped Blot without setting static value parentName");
+                throw new Error("You must initialize with parentName");
             }
+        }
+
+        protected createWrapper(): WrapperBlot {
+            const wrapper = Parchment.create(this.statics.parentName);
+
+            if (!(wrapper instanceof WrapperBlot)) {
+                throw new Error("The provided static parentName did not instantiate an instance of a WrapperBlot.");
+            }
+
+            return wrapper;
         }
 
         public attach() {
             super.attach();
-            if ((this.parent as any).statics.blotName !== this.statics.parentName) {
-                const Wrapper = Parchment.create(this.statics.parentName);
-
-                if (!(Wrapper instanceof WrapperBlot)) {
-                    throw new Error("The provided static parentName did not instantiate an instance of a WrapperBlot.");
-                }
-
-                this.wrap(Wrapper);
+            const possibleParentNames: string[] = Array.isArray(this.statics.parentName)
+                ? this.statics.parentName
+                : [this.statics.parentName];
+            if (!possibleParentNames.includes((this.parent as any).statics.blotName)) {
+                const wrapper = this.createWrapper();
+                this.wrap(wrapper);
             }
         }
 
@@ -87,17 +97,23 @@ export default function withWrapper(blotConstructor: typeof Container) {
          * @param value - The value for the replacement Blot.
          */
         public replaceWith(name: any, value?: any): any {
-            const topLevelWrapper = this.getWrapper(true);
-            const immediateWrapper = this.parent;
+            if (!this.useWrapperReplacement) {
+                super.replaceWith(name, value);
+            } else if (name === this.statics.blotName) {
+                super.replaceWith(name, value);
+            } else {
+                const topLevelWrapper = this.getWrapper(true);
+                const immediateWrapper = this.parent;
 
-            immediateWrapper.children.forEach(child => {
-                if (child === this) {
-                    (child as any).replaceWithIntoScroll(name, value, topLevelWrapper);
-                } else {
-                    child.insertInto(this.scroll, topLevelWrapper);
-                }
-            });
-            topLevelWrapper.remove();
+                immediateWrapper.children.forEach(child => {
+                    if (child === this) {
+                        (child as any).replaceWithIntoScroll(name, value, topLevelWrapper);
+                    } else {
+                        child.insertInto(this.scroll, topLevelWrapper);
+                    }
+                });
+                topLevelWrapper.remove();
+            }
         }
 
         /**

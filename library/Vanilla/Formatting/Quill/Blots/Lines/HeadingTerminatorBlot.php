@@ -78,7 +78,7 @@ class HeadingTerminatorBlot extends AbstractLineTerminatorBlot {
      * @return bool
      */
     public function shouldClearCurrentGroup(BlotGroup $group): bool {
-        $overridingBlot = $group->getPrimaryBlot();
+        $overridingBlot = $group->getOverrideBlot();
         return !!$overridingBlot;
     }
 

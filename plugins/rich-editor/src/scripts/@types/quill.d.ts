@@ -7,6 +7,7 @@
 /* tslint:disable */
 
 declare module "quill/core" {
+    import HistoryModule from "@rich-editor/quill/HistoryModule";
     import Blot from "parchment/dist/src/blot/abstract/shadow";
     import Container from "parchment/dist/src/blot/abstract/container";
     import ClipboardModule from "quill/modules/clipboard";
@@ -166,6 +167,7 @@ declare module "quill/core" {
         scroll: Container;
         container: HTMLDivElement;
         options: AnyObject;
+        history: HistoryModule;
 
         constructor(container: string | Element, options?: QuillOptionsStatic);
         deleteText(index: number, length: number, source?: Sources): DeltaStatic;
@@ -239,7 +241,10 @@ declare module "quill/blots/block" {
     import { Blot } from "quill/core";
 
     export class BlockEmbed extends Embed {}
-    export default Block;
+    export default class BlockBlot extends Block {
+        protected cache: any = {};
+        public delta(): [];
+    }
 }
 
 declare module "quill/blots/inline" {
@@ -320,6 +325,7 @@ declare module "quill/modules/history" {
         };
         protected lastRecorded: number;
         protected ignoreChange: boolean;
+        public clear(): void;
         public undo(): void;
         public redo(): void;
         public cutoff(): void;

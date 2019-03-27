@@ -60,7 +60,6 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
     private menusRef: React.RefObject<HTMLDivElement> = React.createRef();
     private panelsRef: React.RefObject<HTMLDivElement> = React.createRef();
-    private formatter: Formatter;
     private focusWatcher: FocusWatcher;
 
     constructor(props: IProps) {
@@ -68,7 +67,6 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
 
         // Quill can directly on the class as it won't ever change in a single instance.
         this.quill = props.quill;
-        this.formatter = new Formatter(this.quill);
         this.ID = this.props.editorID + "-formattingMenus";
         this.componentID = this.ID + "-component";
         this.menuID = this.ID + "-menu";
@@ -120,7 +118,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
             }
         }
 
-        this.formatter.setPreselectedRange(this.props.lastGoodSelection);
+        const formatter = new Formatter(this.quill, this.props.lastGoodSelection);
         const menuActiveFormats = menuState(this.props.activeFormats);
         const topLevelIcons = this.topLevelIcons(menuActiveFormats);
 
@@ -171,7 +169,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                         lastGoodSelection={this.props.lastGoodSelection}
                         legacyMode={this.props.legacyMode}
                         close={this.close}
-                        formatter={this.formatter}
+                        formatter={formatter}
                         menuActiveFormats={menuActiveFormats}
                         rovingIndex={this.state.rovingTabIndex}
                         setRovingIndex={this.setRovingIndex}

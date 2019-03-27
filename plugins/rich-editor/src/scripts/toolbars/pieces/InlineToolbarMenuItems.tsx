@@ -82,18 +82,18 @@ export default class InlineToolbarMenuItems extends React.PureComponent<IProps> 
 
     private formatBold = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        this.props.formatter.bold(this.props.lastGoodSelection);
+        this.props.formatter.bold();
     };
     private formatItalic = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        this.props.formatter.italic(this.props.lastGoodSelection);
+        this.props.formatter.italic();
     };
     private formatStrike = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        this.props.formatter.strike(this.props.lastGoodSelection);
+        this.props.formatter.strike();
     };
     private formatCode = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        this.props.formatter.codeInline(this.props.lastGoodSelection);
+        this.props.formatter.codeInline();
     };
 }

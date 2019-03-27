@@ -39,14 +39,14 @@ describe("ListBlot", () => {
         const outdent = document.getElementById("outdent")!;
         quill = new Quill(mountPoint);
         window.quill = quill;
-        const formatter = new Formatter(quill);
+        const formatter = new Formatter(quill, quill.getSelection());
         indent.addEventListener("click", e => {
             e.preventDefault();
-            formatter.indentList(quill.getSelection());
+            formatter.indentList();
         });
         outdent.addEventListener("click", e => {
             e.preventDefault();
-            formatter.outdentList(quill.getSelection());
+            formatter.outdentList();
         });
         quillNode = quill.scroll.domNode as HTMLDivElement;
     };

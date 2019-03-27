@@ -37,8 +37,6 @@ export default class KeyboardBindings {
     ];
     public bindings: any = {};
 
-    private formatter = new Formatter(this.quill);
-
     constructor(private quill: Quill) {
         // Keyboard behaviours
         this.resetDefaultBindings();
@@ -310,7 +308,8 @@ export default class KeyboardBindings {
             collapsed: true,
             format: [ListItem.blotName],
             handler: (range: RangeStatic) => {
-                const listItems = this.formatter.getListItems(range);
+                const formatter = new Formatter(this.quill, range);
+                const listItems = formatter.getListItems();
 
                 let handled = false;
                 listItems.forEach(item => {
@@ -403,7 +402,8 @@ export default class KeyboardBindings {
      */
     private addBlockBackspaceHandlers() {
         const handleListBackspace = (range: RangeStatic) => {
-            const listItem = this.formatter.getListItems(range)[0];
+            const formatter = new Formatter(this.quill, range);
+            const listItem = formatter.getListItems()[0];
             listItem.replaceWith("block", "");
             this.quill.setSelection(range, Quill.sources.SILENT);
             return true;

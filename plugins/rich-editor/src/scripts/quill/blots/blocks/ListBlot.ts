@@ -471,7 +471,20 @@ export class ListItem extends LineBlot {
         this.cache = {};
     }
 
-    public canIndent() {
+    /**
+     * We can indent in the following scenarios
+     *
+     * <ul>
+     *   <li>item 1</li>
+     *   <li>[CURSOR]item 2</li>
+     * </ul>
+     *
+     * or
+     *
+     * <ol><li>Item 1</li></ol>
+     * <ul><li>[CURSOR]Item 2</li></ul>
+     */
+    public canIndent(): boolean {
         const hasPreviousItem = this.parent instanceof ListItemWrapper && this.parent.prev instanceof ListItemWrapper;
         const hasPreviousGroup =
             this.parent instanceof ListItemWrapper &&
@@ -481,7 +494,10 @@ export class ListItem extends LineBlot {
         return (hasPreviousItem || hasPreviousGroup) && lessThanMaxDepth;
     }
 
-    public canOutdent() {
+    /**
+     * Determine when we can outdent.
+     */
+    public canOutdent(): boolean {
         return this.getValue().depth > 0 || this.domNode.textContent === "";
     }
 

@@ -547,15 +547,16 @@ class ConversationModel extends ConversationsModel {
             $to = explode(',', $formPostValues['To']);
             $to = array_map('trim', $to);
 
-            $recipientUserIDs = $this->SQL
-                ->select('UserID')
-                ->from('User')
-                ->whereIn('Name', $to)
-                ->get()->resultArray();
-            $recipientUserIDs = array_column($recipientUserIDs, 'UserID');
-            $formPostValues['RecipientUserID'] = $recipientUserIDs;
-        }
-
+                $recipientUserIDs = $this->SQL
+                    ->select('UserID')
+                    ->from('User')
+                    ->where('Name <>', '')
+                    ->whereIn('Name', $to)
+                    ->get()->resultArray()
+                ;
+                $recipientUserIDs = array_column($recipientUserIDs, 'UserID');
+                $formPostValues['RecipientUserID'] = $recipientUserIDs;
+            }
         if (c('Garden.ForceInputFormatter')) {
             $formPostValues['Format'] = c('Garden.InputFormatter');
         }

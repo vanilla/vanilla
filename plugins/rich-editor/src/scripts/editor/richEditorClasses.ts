@@ -245,6 +245,10 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         },
     });
 
+    const topLevelButtonActive = style("topLevelButtonActive", {
+        color: colorOut(globalVars.mainColors.primary),
+    });
+
     const menuItem = style("menuItem", {
         display: "block",
         padding: 0,
@@ -343,6 +347,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         embedBar,
         menuItem,
         button,
+        topLevelButtonActive,
         icon,
         close,
         flyoutDescription,

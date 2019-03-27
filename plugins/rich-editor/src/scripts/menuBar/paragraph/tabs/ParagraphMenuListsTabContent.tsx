@@ -16,11 +16,13 @@ import { indent, outdent } from "@library/icons/editorIcons";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 interface IProps {
+    closeMenu: () => void;
     closeMenuAndSetCursor: () => void;
     items: IMenuBarRadioButton[];
     setRovingIndex: () => void;
     indent: () => void;
     outdent: () => void;
+    disabled?: boolean;
 }
 
 /**
@@ -32,8 +34,8 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
         const checkRadioClasses = paragraphMenuCheckRadioClasses();
         const handleClick = (data: IMenuBarRadioButton, index: number) => {
             this.props.items[index].formatFunction();
-            this.props.closeMenuAndSetCursor();
             this.props.setRovingIndex();
+            this.props.closeMenuAndSetCursor();
         };
         return (
             <>
@@ -42,6 +44,7 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
                     label={t("List Types")}
                     items={this.props.items}
                     handleClick={handleClick}
+                    disabled={!!this.props.disabled}
                 />
                 <ParagraphMenuSeparator />
                 <div className={checkRadioClasses.group}>
@@ -49,6 +52,8 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
                         className={classNames(checkRadioClasses.checkRadio)}
                         type="button"
                         onClick={this.props.indent}
+                        disabled={!!this.props.disabled}
+                        tabIndex={!!this.props.disabled ? -1 : 0}
                     >
                         <span className={checkRadioClasses.icon}>{indent()}</span>
                         <span className={checkRadioClasses.checkRadioLabel}>{t("Indent")}</span>
@@ -57,6 +62,8 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
                         className={classNames(checkRadioClasses.checkRadio)}
                         type="button"
                         onClick={this.props.outdent}
+                        disabled={!!this.props.disabled}
+                        tabIndex={!!this.props.disabled ? -1 : 0}
                     >
                         <span className={checkRadioClasses.icon}>{outdent()}</span>
                         <span className={checkRadioClasses.checkRadioLabel}>{t("Outdent")}</span>

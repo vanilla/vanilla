@@ -30,6 +30,7 @@ import ParagraphMenuSpecialBlockTabContent from "@rich-editor/menuBar/paragraph/
 import { menuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
 import { style } from "typestyle";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import TabHandler from "@library/dom/TabHandler";
 
 interface IProps {
     className?: string;
@@ -43,7 +44,13 @@ interface IProps {
     menuActiveFormats: any;
     rovingIndex: number;
     setRovingIndex: (index: number, callback?: () => void) => void;
-    menuRef: React.RefObject<HTMLDivElement>;
+    menusRef: React.RefObject<HTMLDivElement>;
+    panelsRef: React.RefObject<HTMLDivElement>;
+    topLevelIcons: {
+        headingMenuIcon: JSX.Element;
+        listMenuIcon: JSX.Element;
+        specialBlockMenuIcon: JSX.Element;
+    };
 }
 
 interface IMenuBarContent {
@@ -58,58 +65,30 @@ interface IMenuBarContent {
     indent?: () => void;
     outdent?: () => void;
     activeFormats: any;
+    openMenu: () => void;
+}
+
+interface IState {
+    headingMenuOpen: boolean;
+    listMenuOpen: boolean;
+    specialBlockMenuOpen: boolean;
 }
 
 /**
  * Implemented paragraph menu bar. Note that conceptually, it's a bar of menus, but visually it behaves like tabs.
  */
-export default class ParagraphMenuBar extends React.Component<IProps> {
-    private headingMenuOpen = false;
-    private headingMenuIcon = heading2();
-    private listMenuOpen = false;
-    private listMenuIcon = listUnordered();
-    private specialBlockMenuOpen = false;
-    private specialBlockMenuIcon = blockquote();
+export default class ParagraphMenuBar extends React.Component<IProps, IState> {
+    public state = {
+        headingMenuOpen: false,
+        listMenuOpen: false,
+        specialBlockMenuOpen: false,
+    };
 
-    private topLevelIcons() {
-        const { menuActiveFormats } = this.props;
-
-        let headingIcon = heading2();
-        if (menuActiveFormats.headings.heading2) {
-            headingIcon = heading2();
-        } else if (menuActiveFormats.headings.heading3) {
-            headingIcon = heading3();
-        } else if (menuActiveFormats.headings.heading4) {
-            headingIcon = heading4();
-        } else if (menuActiveFormats.headings.heading5) {
-            headingIcon = heading5();
-        }
-
-        let specialIcon = blockquote();
-        if (menuActiveFormats.specialFormats.blockQuote) {
-            specialIcon = blockquote();
-        } else if (menuActiveFormats.specialFormats.codeBlock) {
-            specialIcon = codeBlock();
-        } else if (menuActiveFormats.specialFormats.spoiler) {
-            specialIcon = spoiler();
-        }
-
-        let listIcon = listUnordered();
-        if (menuActiveFormats.lists.ordered) {
-            listIcon = listOrdered();
-        } else if (menuActiveFormats.lists.unordered) {
-            listIcon = listUnordered();
-        }
-
-        this.headingMenuIcon = headingIcon;
-        this.specialBlockMenuIcon = specialIcon;
-        this.listMenuIcon = listIcon;
-    }
+    private itemCount: number;
 
     public render() {
         const { menuActiveFormats, textFormats } = this.props;
         const classes = richEditorClasses(this.props.legacyMode);
-        this.topLevelIcons();
         const globalStyles = globalVariables();
         const iconStyle = style({
             width: unit(globalStyles.icon.sizes.default),
@@ -122,9 +101,10 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
                 accessibleInstructions: t("Toggle Heading Menu"),
                 label: t("Headings"),
                 toggleMenu: this.toggleHeadingsMenu,
-                icon: this.headingMenuIcon,
+                icon: this.props.topLevelIcons.headingMenuIcon,
                 activeFormats: menuActiveFormats.headings,
-                open: this.headingMenuOpen,
+                open: this.state.headingMenuOpen,
+                openMenu: this.openHeadingsMenu,
                 items: [
                     {
                         formatFunction: textFormats.h2,
@@ -152,39 +132,41 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
                     },
                 ],
             },
-            // {
-            //     component: ParagraphMenuListsTabContent,
-            //     accessibleInstructions: t("Toggle Lists Menu"),
-            //     label: t("Lists"),
-            //     toggleMenu: this.toggleListsMenu,
-            //     icon: this.listMenuIcon,
-            //     activeFormats: menuActiveFormats.lists,
-            //     open: this.listMenuOpen,
-            //     items: [
-            //         {
-            //             formatFunction: textFormats.listUnordered,
-            //             icon: listUnordered(iconStyle),
-            //             text: t("Bulleted List"),
-            //             checked: menuActiveFormats.lists.ordered,
-            //         },
-            //         {
-            //             formatFunction: textFormats.listUnordered,
-            //             icon: listOrdered(iconStyle),
-            //             text: t("Ordered List"),
-            //             checked: menuActiveFormats.lists.unordered,
-            //         },
-            //     ],
-            //     indent: textFormats.listIndent,
-            //     outdent: textFormats.listIndent,
-            // },
+            {
+                component: ParagraphMenuListsTabContent,
+                accessibleInstructions: t("Toggle Lists Menu"),
+                label: t("Lists"),
+                toggleMenu: this.toggleListsMenu,
+                icon: this.props.topLevelIcons.listMenuIcon,
+                activeFormats: menuActiveFormats.lists,
+                open: this.state.listMenuOpen,
+                openMenu: this.openListsMenu,
+                items: [
+                    {
+                        formatFunction: textFormats.listUnordered,
+                        icon: listUnordered(iconStyle),
+                        text: t("Bulleted List"),
+                        checked: menuActiveFormats.lists.ordered,
+                    },
+                    {
+                        formatFunction: textFormats.listUnordered,
+                        icon: listOrdered(iconStyle),
+                        text: t("Ordered List"),
+                        checked: menuActiveFormats.lists.unordered,
+                    },
+                ],
+                indent: textFormats.listIndent,
+                outdent: textFormats.listIndent,
+            },
             {
                 component: ParagraphMenuSpecialBlockTabContent,
                 accessibleInstructions: t("Toggle Special Formats Menu"),
                 label: t("Special Formats"),
                 toggleMenu: this.toggleSpecialBlockMenu,
-                icon: this.specialBlockMenuIcon,
+                icon: this.props.topLevelIcons.specialBlockMenuIcon,
                 activeFormats: menuActiveFormats.specialFormats,
-                open: this.specialBlockMenuOpen,
+                open: this.state.specialBlockMenuOpen,
+                openMenu: this.openSpecialBlockMenu,
                 items: [
                     {
                         formatFunction: textFormats.blockquote,
@@ -208,6 +190,8 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
             },
         ];
 
+        this.itemCount = menuContents.length + 1;
+
         const panelContent: JSX.Element[] = [];
 
         const menus = menuContents.map((menu, index) => {
@@ -221,11 +205,14 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
                     id={MyContent.get}
                     role="menu"
                     className={!menu.open ? style(srOnly()) : undefined}
+                    aria-hidden={!menu.open}
                     key={`menuBarPanel-${index}`}
                 >
                     <MyContent
                         {...menu}
                         setRovingIndex={myRovingIndex}
+                        disabled={!menu.open}
+                        closeMenu={this.props.close}
                         closeMenuAndSetCursor={this.closeMenuAndSetCursor}
                     />
                 </div>
@@ -260,45 +247,84 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
             this.props.setRovingIndex(0);
         };
         return (
-            <>
+            <div onKeyDownCapture={this.handleMenuBarKeyDown}>
                 <div
                     role="menubar"
                     aria-label={this.props.label}
                     className={classNames(classes.menuBar, this.props.className)}
-                    ref={this.props.menuRef}
+                    ref={this.props.menusRef}
                 >
                     <div className={classes.menuBarToggles}>
                         {menus}
                         <ParagraphMenuResetTab
-                            isActive={menuActiveFormats.paragraph}
                             formatParagraphHandler={textFormats.paragraph}
                             setRovingIndex={setParagraphIndex}
                             tabIndex={this.tabIndex(paragraphIndex)}
                             closeMenuAndSetCursor={this.closeMenuAndSetCursor}
+                            isMenuVisible={this.props.isMenuVisible}
                         />
                     </div>
                 </div>
-                {panelContent}
-            </>
+                <div ref={this.props.panelsRef}>{panelContent}</div>
+            </div>
         );
     }
 
+    public componentDidUpdate(prevProps: IProps) {
+        if (this.hasMenuOpen()) {
+            this.selectFirstElementInOpenPanel();
+        }
+    }
+
+    public hasMenuOpen = () => {
+        return this.state.specialBlockMenuOpen || this.state.headingMenuOpen || this.state.listMenuOpen;
+    };
+
     private toggleHeadingsMenu = () => {
-        this.headingMenuOpen = !this.headingMenuOpen;
-        this.listMenuOpen = false;
-        this.specialBlockMenuOpen = false;
+        this.setState({
+            headingMenuOpen: !this.state.headingMenuOpen,
+            listMenuOpen: false,
+            specialBlockMenuOpen: false,
+        });
+    };
+    private openHeadingsMenu = () => {
+        this.setState({
+            headingMenuOpen: true,
+            listMenuOpen: false,
+            specialBlockMenuOpen: false,
+        });
     };
 
     private toggleListsMenu = () => {
-        this.headingMenuOpen = false;
-        this.listMenuOpen = !this.listMenuOpen;
-        this.specialBlockMenuOpen = false;
+        this.setState({
+            headingMenuOpen: false,
+            listMenuOpen: !this.state.listMenuOpen,
+            specialBlockMenuOpen: false,
+        });
+    };
+
+    private openListsMenu = () => {
+        this.setState({
+            headingMenuOpen: false,
+            listMenuOpen: true,
+            specialBlockMenuOpen: false,
+        });
     };
 
     private toggleSpecialBlockMenu = () => {
-        this.headingMenuOpen = false;
-        this.listMenuOpen = false;
-        this.specialBlockMenuOpen = !this.specialBlockMenuOpen;
+        this.setState({
+            headingMenuOpen: false,
+            listMenuOpen: false,
+            specialBlockMenuOpen: !this.state.specialBlockMenuOpen,
+        });
+    };
+
+    private openSpecialBlockMenu = () => {
+        this.setState({
+            headingMenuOpen: false,
+            listMenuOpen: false,
+            specialBlockMenuOpen: true,
+        });
     };
 
     private closeMenuAndSetCursor = () => {
@@ -307,9 +333,41 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
     };
 
     private closeAllSubMenus = () => {
-        this.headingMenuOpen = false;
-        this.listMenuOpen = false;
-        this.specialBlockMenuOpen = false;
+        this.setState({
+            headingMenuOpen: false,
+            listMenuOpen: false,
+            specialBlockMenuOpen: false,
+        });
+    };
+
+    private selectFirstElementInOpenPanel = () => {
+        if (this.props.panelsRef && this.props.panelsRef.current) {
+            const tabHandler = new TabHandler(this.props.panelsRef.current);
+            const first = tabHandler.getInitial();
+            if (first) {
+                first.focus();
+            }
+        }
+    };
+
+    private selectLastElementInOpenPanel = () => {
+        if (this.props.panelsRef && this.props.panelsRef.current) {
+            const tabHandler = new TabHandler(this.props.panelsRef.current);
+            const last = tabHandler.getLast();
+            if (last) {
+                last.focus();
+            }
+        }
+    };
+
+    private selectCurrentTab = () => {
+        if (this.props.menusRef && this.props.menusRef.current) {
+            const tabHandler = new TabHandler(this.props.menusRef.current);
+            const activeTab = tabHandler.getInitial(); // will always be ok, since we have a rolling index
+            if (activeTab) {
+                activeTab.focus();
+            }
+        }
     };
 
     private tabIndex = index => {
@@ -323,53 +381,59 @@ export default class ParagraphMenuBar extends React.Component<IProps> {
      */
     private handleMenuBarKeyDown = (event: React.KeyboardEvent<any>) => {
         switch (`${event.key}${event.shiftKey ? "-Shift" : ""}`) {
-            // Opens submenu and moves focus to first item in the submenu.
-            case "Space":
-            case "Enter":
+            case "Escape":
+                if (this.hasMenuOpen()) {
+                    event.stopPropagation();
+                    this.closeAllSubMenus();
+                    this.selectCurrentTab();
+                }
                 break;
             // Moves focus to first item in the menubar.
             case "Home":
+                if (!this.hasMenuOpen()) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    this.props.setRovingIndex(0);
+                }
                 break;
             // 	Moves focus to last item in the menubar.
             case "End":
+                if (!this.hasMenuOpen()) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    this.props.setRovingIndex(this.itemCount - 1);
+                }
                 break;
             // Moves focus to the next item in the menubar.
             // If focus is on the last item, moves focus to the first item.
             case "ArrowRight":
+                if (!this.hasMenuOpen()) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    this.props.setRovingIndex((this.props.rovingIndex + 1) % this.itemCount);
+                }
                 break;
             // Moves focus to the previous item in the menubar.
             // If focus is on the first item, moves focus to the last item.
             case "ArrowLeft":
+                if (!this.hasMenuOpen()) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    this.props.setRovingIndex((this.props.rovingIndex + (this.itemCount - 1)) % this.itemCount);
+                }
                 break;
             // 	Opens submenu and moves focus to last item in the submenu.
             case "ArrowUp":
-                // event.preventDefault();
-                // this.setState({ hasFocus: true }, () => {
-                //     // this.menuRef.current!.focusFirstItem();
-                // });
-                break;
-            // Opens submenu and moves focus to first item in the submenu.
-            case "ArrowDown":
-                event.preventDefault();
-                // this.setState({ hasFocus: true }, () => {
-                //     // this.menuRef.current!.focusLastItem();
-                // });
-                break;
-            case "Tab": // handle tab because of roving index
-                event.preventDefault();
-                // this.setState({ hasFocus: true }, () => {
-                //     // this.menuRef.current!.focusLastItem();
-                // });
-                break;
-            case "Tab-Shift": // handle shift+tab because of roving index
-                event.preventDefault();
-                // this.setState({ hasFocus: true }, () => {
-                //     // this.menuRef.current!.focusLastItem();
-                // });
+                if (this.hasMenuOpen()) {
+                    event.stopPropagation();
+                    this.closeAllSubMenus();
+                    this.selectCurrentTab();
+                }
                 break;
             // Moves focus to next item in the menubar having a name that starts with the typed character.
             // If none of the items have a name starting with the typed character, focus does not move.
             default:
+                // TODO
                 break;
         }
     };

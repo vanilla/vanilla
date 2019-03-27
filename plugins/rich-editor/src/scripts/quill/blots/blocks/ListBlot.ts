@@ -8,9 +8,7 @@ import withWrapper from "@rich-editor/quill/blots/abstract/withWrapper";
 import WrapperBlot from "@rich-editor/quill/blots/abstract/WrapperBlot";
 import Parchment from "parchment";
 import Container from "quill/blots/container";
-import { Parent } from "parchment/dist/src/blot/abstract/blot";
 import Quill from "quill/core";
-import { format } from "url";
 
 /* tslint:disable:max-classes-per-file */
 
@@ -382,6 +380,8 @@ export class ListItemWrapper extends withWrapper(Container as any) {
     }
 }
 
+const MAX_NESTING_DEPTH = 4;
+
 /**
  * The content of a list.
  * Eg. The span of <ul><li><span/></li></ul>.
@@ -418,7 +418,10 @@ export class ListItem extends LineBlot {
      */
     private static mapListValue(value: ListValue): IListObjectValue {
         if (typeof value === "object") {
-            return value;
+            return {
+                ...value,
+                depth: Math.min(MAX_NESTING_DEPTH, value.depth),
+            };
         } else {
             switch (value) {
                 case "bullet":
@@ -462,8 +465,10 @@ export class ListItem extends LineBlot {
      * @param newDepth
      */
     public updateIndentValue(newDepth: number) {
+        newDepth = Math.min(MAX_NESTING_DEPTH, newDepth);
         this.domNode.setAttribute("data-depth", newDepth);
         this.parent.domNode.setAttribute("data-depth", newDepth);
+        this.cache = {};
     }
 
     /**

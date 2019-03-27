@@ -16,7 +16,7 @@ export default class WrapperBlot extends Container {
     // This cannot be Parchment.Scope.BLOCK or it will match and attributor and break pasting.
     public static scope = Parchment.Scope.BLOCK_BLOT;
     public static tagName = "div";
-    public static allowedChildren = [WrapperBlot];
+    public static allowedChildren: any[] = [WrapperBlot];
     public static className: string;
 
     /**

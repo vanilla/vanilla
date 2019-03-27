@@ -34,7 +34,6 @@ interface IState {
  */
 export class InlineToolbar extends React.PureComponent<IProps, IState> {
     private quill: Quill;
-    private formatter: Formatter;
     private linkInput: React.RefObject<HTMLInputElement> = React.createRef();
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
     private focusWatcher: FocusWatcher;
@@ -53,13 +52,16 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
 
         // Quill can directly on the class as it won't ever change in a single instance.
         this.quill = props.quill;
-        this.formatter = new Formatter(this.quill);
 
         this.state = {
             inputValue: "",
             isLinkMenuOpen: false,
             menuHasFocus: false,
         };
+    }
+
+    private get formatter(): Formatter {
+        return new Formatter(this.quill, this.props.lastGoodSelection);
     }
 
     /**
@@ -208,7 +210,7 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
         const inLinkBlot = rangeContainsBlot(this.quill, LinkBlot, lastGoodSelection);
 
         if (inLinkBlot) {
-            this.formatter.link(lastGoodSelection);
+            this.formatter.link();
             this.reset();
         } else {
             const currentText = this.quill.getText(lastGoodSelection.index, lastGoodSelection.length);
@@ -230,7 +232,7 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
         event && event.preventDefault();
         if (typeof this.props.activeFormats.link === "string") {
             this.setState({ isLinkMenuOpen: false });
-            this.formatter.link(this.props.lastGoodSelection);
+            this.formatter.link();
         } else {
             this.ignoreLinkToolbarFocusRequirement = true;
             this.setState({ isLinkMenuOpen: true }, () => {
@@ -301,7 +303,7 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
     private onInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (Keyboard.match(event.nativeEvent, "enter")) {
             event.preventDefault();
-            this.formatter.link(this.props.lastGoodSelection, this.state.inputValue);
+            this.formatter.link(this.state.inputValue);
             this.clearLinkInput();
         }
 

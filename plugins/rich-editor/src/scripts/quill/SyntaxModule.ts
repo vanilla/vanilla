@@ -14,7 +14,7 @@ import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 export default class SyntaxModule extends BaseSyntaxModule {
     public static register() {
         super.register();
-        Quill.register(CodeBlockBlot);
+        Quill.register(CodeBlockBlot, true);
     }
 
     /**

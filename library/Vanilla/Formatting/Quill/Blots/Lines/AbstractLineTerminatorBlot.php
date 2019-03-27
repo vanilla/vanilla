@@ -44,7 +44,7 @@ abstract class AbstractLineTerminatorBlot extends TextBlot {
      * @return bool
      */
     public function shouldClearCurrentGroup(BlotGroup $group): bool {
-        $overridingBlot = $group->getPrimaryBlot();
+        $overridingBlot = $group->getOverrideBlot();
         if ($overridingBlot) {
             return get_class($overridingBlot) !== get_class($this);
         } else {

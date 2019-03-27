@@ -6,107 +6,38 @@
 
 import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
+import { ListItem, ListType, ListValue } from "@rich-editor/quill/blots/blocks/ListBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
-import { IFormats, RangeStatic } from "quill/core";
-import Formatter from "@rich-editor/quill/Formatter";
-
-/**
- * Maps quill functions to functions
- * @param formatter
- * @param lastGoodSelection
- * @param afterClickHandler
- */
-export const paragraphFormats = (
-    formatter: Formatter,
-    lastGoodSelection: RangeStatic,
-    afterClickHandler?: () => void,
-) => {
-    const paragraph = () => {
-        formatter.paragraph(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-    const blockquote = () => {
-        formatter.blockquote(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-    const codeBlock = () => {
-        formatter.codeBlock(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-    const spoiler = () => {
-        formatter.spoiler(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-
-    const h2 = () => {
-        formatter.h2(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-    const h3 = () => {
-        formatter.h3(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-
-    const h4 = () => {
-        formatter.h4(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-    const h5 = () => {
-        formatter.h5(lastGoodSelection);
-        afterClickHandler && afterClickHandler();
-    };
-
-    const listUnordered = () => {
-        formatter.h5(lastGoodSelection); // TODO
-        afterClickHandler && afterClickHandler();
-    };
-
-    const listOrdered = () => {
-        formatter.h5(lastGoodSelection); // TODO
-        afterClickHandler && afterClickHandler();
-    };
-
-    const listIndent = () => {
-        formatter.h5(lastGoodSelection); // TODO
-        afterClickHandler && afterClickHandler();
-    };
-
-    const listOutdent = () => {
-        formatter.h5(lastGoodSelection); // TODO
-        afterClickHandler && afterClickHandler();
-    };
-
-    return {
-        paragraph,
-        blockquote,
-        codeBlock,
-        spoiler,
-        listUnordered,
-        listOrdered,
-        listIndent,
-        listOutdent,
-        h2,
-        h3,
-        h4,
-        h5,
-    };
-};
+import { IFormats } from "quill/core";
 
 /**
  * Maps quill state to our format, in a simpler to use object
  * @param activeFormats
  */
 export const menuState = (activeFormats: IFormats) => {
-    // console.log("activeFormats: ", activeFormats);
     let isParagraphEnabled = true;
 
-    ["header", BlockquoteLineBlot.blotName, CodeBlockBlot.blotName, SpoilerLineBlot.blotName].forEach(item => {
+    [
+        HeaderBlot.blotName,
+        BlockquoteLineBlot.blotName,
+        CodeBlockBlot.blotName,
+        SpoilerLineBlot.blotName,
+        ListItem.blotName,
+    ].forEach(item => {
         if (item in activeFormats) {
             isParagraphEnabled = false;
         }
     });
 
     const headerObjectLevel = typeof activeFormats.header === "object" ? activeFormats.header.level : null;
+
+    const listValue: ListValue = activeFormats[ListItem.blotName];
+    const hasListFormat = (type: ListType) => {
+        return listValue && typeof listValue === "object" && listValue.type === type;
+    };
+
+    const listDepth = listValue && typeof listValue === "object" ? listValue.depth : null;
 
     return {
         paragraph: isParagraphEnabled,
@@ -122,10 +53,11 @@ export const menuState = (activeFormats: IFormats) => {
             spoiler: activeFormats[SpoilerLineBlot.blotName] === true,
         },
         lists: {
-            ordered: false,
-            unordered: false,
-            indent: false,
-            outdent: false,
+            ordered: hasListFormat(ListType.ORDERED),
+            unordered: hasListFormat(ListType.BULLETED),
+            depth: listDepth,
         },
     };
 };
+
+export type IParagraphMenuState = ReturnType<typeof menuState>;

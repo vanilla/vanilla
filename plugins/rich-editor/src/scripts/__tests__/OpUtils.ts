@@ -15,6 +15,7 @@ import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import HeadingBlot from "quill/formats/header";
 import ListBlot from "quill/formats/list";
 import { StringMap } from "quill/core";
+import { ListType } from "@rich-editor/quill/blots/blocks/ListBlot";
 
 /**
  * Operation generation utilities for testing.
@@ -64,8 +65,13 @@ export default class OpUtils {
     public static spoilerLine(lineContent: string = "\n") {
         return OpUtils.op(lineContent, { [SpoilerLineBlot.blotName]: true });
     }
-    public static list(listType: "ordered" | "bullet" = "ordered", lineContent: string = "\n") {
-        return OpUtils.op(lineContent, { [ListBlot.blotName]: listType });
+    public static list(type: ListType = ListType.ORDERED, depth: number = 0, lineContent: string = "\n") {
+        return OpUtils.op(lineContent, {
+            [ListBlot.blotName]: {
+                type,
+                depth,
+            },
+        });
     }
 }
 
@@ -115,5 +121,13 @@ export const blockFormatOps = [
     {
         op: OpUtils.codeBlock(),
         name: "codeBlock",
+    },
+    {
+        op: OpUtils.list(ListType.ORDERED),
+        name: "orderedList",
+    },
+    {
+        op: OpUtils.list(ListType.BULLETED),
+        name: "bulletedList",
     },
 ];

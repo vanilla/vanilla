@@ -41,6 +41,8 @@ interface ICommonProps {
     device?: Devices;
     initialValue?: DeltaOperation[];
     reinitialize?: boolean;
+    operationsQueue?: EditorQueueItem[];
+    clearOperationsQueue?: () => void;
 }
 
 interface ILegacyProps extends ICommonProps {
@@ -54,6 +56,8 @@ interface INewProps extends ICommonProps {
 }
 
 type IProps = ILegacyProps | INewProps;
+
+export type EditorQueueItem = DeltaOperation[] | string;
 
 /**
  * React component for instantiating a rich editor.
@@ -323,6 +327,22 @@ export class Editor extends React.Component<IProps> {
             if (this.props.initialValue) {
                 this.skipCallback = true;
                 this.setEditorContent(this.props.initialValue);
+            }
+        }
+
+        if (this.props.operationsQueue && this.props.operationsQueue.length > 0) {
+            this.props.operationsQueue.forEach(operation => {
+                const scrollLength = this.quill.scroll.length();
+
+                if (typeof operation === "string") {
+                    this.quill.clipboard.dangerouslyPasteHTML(scrollLength, operation);
+                } else {
+                    const offsetOperations = scrollLength > 1 ? { retain: scrollLength } : { delete: 1 };
+                    this.quill.updateContents([offsetOperations, ...operation]);
+                }
+            });
+            if (this.props.clearOperationsQueue) {
+                this.props.clearOperationsQueue();
             }
         }
     }

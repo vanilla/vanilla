@@ -153,6 +153,11 @@ class BlotGroup {
         return $result;
     }
 
+    /**
+     * Render the content of a blot group.
+     *
+     * @return string
+     */
     public function renderContent(): string {
         $result = '';
         $surroundTagBlot = $this->getMainBlot();
@@ -169,16 +174,29 @@ class BlotGroup {
         return $result;
     }
 
+    /**
+     * @return string
+     */
     public function renderOpeningTag(): string {
         $surroundTagBlot = $this->getMainBlot();
         return $surroundTagBlot->getGroupOpeningTag();
     }
 
+    /**
+     * @return string
+     */
     public function renderClosingTag(): string {
         $surroundTagBlot = $this->getMainBlot();
         return $surroundTagBlot->getGroupClosingTag();
     }
 
+    /**
+     * Render any nested groups inside of this one.
+     *
+     * If there are multiple nested groups they will share the start/end tag of the first nested group.
+     *
+     * @return string
+     */
     private function renderNestedGroups(): string {
         $firstNestedGroup = $this->nestedGroups[0] ?? null;
         if (!$firstNestedGroup) {
@@ -222,6 +240,10 @@ class BlotGroup {
                 // Render out the content of the line terminator (maybe nothing, maybe extra newlines).
                 $result .= $terminator->render();
                 if ($isLast) {
+                    // render the nested groups inside of the last line, before it's closing tag. Eg.
+                    // <li>Line 1 <ul>
+                    //     <li>Line 1.1</li>
+                    // </ul></li>
                     $result .= $this->renderNestedGroups();
                 }
                 // End the line.

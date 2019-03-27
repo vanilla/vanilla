@@ -97,12 +97,20 @@ class BlotGroup {
         $ownMainBlot = $this->getMainBlot();
         if ($otherMainBlot instanceof ListLineTerminatorBlot
             && $ownMainBlot instanceof ListLineTerminatorBlot
-            && $otherMainBlot->getNestingDepth() > $ownMainBlot->getNestingDepth()
+            && $otherGroup->getNestingDepth() > $this->getNestingDepth()
         ) {
             return true;
         } else {
             return false;
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getNestingDepth(): int {
+        $ownMainBlot = $this->getMainBlot();
+        return $ownMainBlot->getNestingDepth();
     }
 
     /**
@@ -138,11 +146,19 @@ class BlotGroup {
         }
 
         // Don't render empty groups.
-        $surroundTagBlot = $this->getMainBlot();
-        $result = $surroundTagBlot->getGroupOpeningTag();
+        $result = '';
+        $result .= $this->renderOpeningTag();
+        $result .= $this->renderContent();
+        $result .= $this->renderClosingTag();
+        return $result;
+    }
 
-        // Line blots have special rendering.
+    public function renderContent(): string {
+        $result = '';
+        $surroundTagBlot = $this->getMainBlot();
+
         if ($surroundTagBlot instanceof AbstractLineTerminatorBlot) {
+            // Line blots have special rendering.
             $result .= $this->renderLineGroup();
         } else {
             foreach ($this->blots as $blot) {
@@ -150,11 +166,33 @@ class BlotGroup {
             }
         }
 
-        foreach ($this->nestedGroups as $nestedGroup) {
-            $result .= $nestedGroup->render();
+        return $result;
+    }
+
+    public function renderOpeningTag(): string {
+        $surroundTagBlot = $this->getMainBlot();
+        return $surroundTagBlot->getGroupOpeningTag();
+    }
+
+    public function renderClosingTag(): string {
+        $surroundTagBlot = $this->getMainBlot();
+        return $surroundTagBlot->getGroupClosingTag();
+    }
+
+    private function renderNestedGroups(): string {
+        $firstNestedGroup = $this->nestedGroups[0] ?? null;
+        if (!$firstNestedGroup) {
+            return "";
         }
 
-        $result .= $surroundTagBlot->getGroupClosingTag();
+        $result = "";
+        $result .= $firstNestedGroup->renderOpeningTag();
+
+        foreach ($this->nestedGroups as $nestedGroup) {
+            // Only the first group will be used for the group tags.
+            $result .= $nestedGroup->renderContent();
+        }
+        $result .= $firstNestedGroup->renderClosingTag();
         return $result;
     }
 
@@ -179,9 +217,13 @@ class BlotGroup {
         $result .= $terminator->renderLineStart();
 
         foreach ($this->blots as $index => $blot) {
+            $isLast = $index === count($this->blots) - 1;
             if ($blot instanceof AbstractLineTerminatorBlot) {
                 // Render out the content of the line terminator (maybe nothing, maybe extra newlines).
                 $result .= $terminator->render();
+                if ($isLast) {
+                    $result .= $this->renderNestedGroups();
+                }
                 // End the line.
                 $result .= $terminator->renderLineEnd();
 

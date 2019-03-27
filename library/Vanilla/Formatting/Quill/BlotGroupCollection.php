@@ -151,7 +151,7 @@ class BlotGroupCollection implements \IteratorAggregate {
         // Iteration is done so we need to clear the line then the group.
         $this->clearLine();
         if (!$this->inProgressGroup->isEmpty()) {
-            $this->groups[] = $this->inProgressGroup;
+            $this->clearBlotGroup();
         }
     }
 

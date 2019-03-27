@@ -552,8 +552,7 @@ class ConversationModel extends ConversationsModel {
                     ->from('User')
                     ->where('Name <>', '')
                     ->whereIn('Name', $to)
-                    ->get()->resultArray()
-                ;
+                    ->get()->resultArray();
                 $recipientUserIDs = array_column($recipientUserIDs, 'UserID');
                 $formPostValues['RecipientUserID'] = $recipientUserIDs;
             }

@@ -37,6 +37,8 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
             this.props.setRovingIndex();
             this.props.closeMenuAndSetCursor();
         };
+        const indentLabel = t("Indent");
+        const outdentLabel = t("Outdent");
         return (
             <>
                 <ParagraphMenuBarRadioGroup
@@ -54,9 +56,10 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
                         onClick={this.props.indent}
                         disabled={!!this.props.disabled}
                         tabIndex={!!this.props.disabled ? -1 : 0}
+                        data-firstletter={indentLabel.toLowerCase().substr(0, 1)}
                     >
                         <span className={checkRadioClasses.icon}>{indent()}</span>
-                        <span className={checkRadioClasses.checkRadioLabel}>{t("Indent")}</span>
+                        <span className={checkRadioClasses.checkRadioLabel}>{indentLabel}</span>
                     </button>
                     <button
                         className={classNames(checkRadioClasses.checkRadio)}
@@ -64,9 +67,10 @@ export default class ParagraphMenuListsTabContent extends React.Component<IProps
                         onClick={this.props.outdent}
                         disabled={!!this.props.disabled}
                         tabIndex={!!this.props.disabled ? -1 : 0}
+                        data-firstletter={outdentLabel.toLowerCase().substr(0, 1)}
                     >
                         <span className={checkRadioClasses.icon}>{outdent()}</span>
-                        <span className={checkRadioClasses.checkRadioLabel}>{t("Outdent")}</span>
+                        <span className={checkRadioClasses.checkRadioLabel}>{outdentLabel}</span>
                     </button>
                 </div>
             </>

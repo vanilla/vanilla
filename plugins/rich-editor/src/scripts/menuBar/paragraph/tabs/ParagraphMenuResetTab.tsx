@@ -20,6 +20,7 @@ interface IProps {
     closeMenuAndSetCursor: () => void;
     legacyMode?: boolean;
     isMenuVisible: boolean;
+    title: string;
 }
 
 /**
@@ -29,7 +30,6 @@ export default class ParagraphMenuResetTab extends React.PureComponent<IProps> {
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
 
     public render() {
-        const title = t("Removes paragraph style and sets to plain paragraph");
         const classes = richEditorClasses(!!this.props.legacyMode);
         const handleClick = (event: React.MouseEvent) => {
             this.props.setRovingIndex();
@@ -40,8 +40,8 @@ export default class ParagraphMenuResetTab extends React.PureComponent<IProps> {
             <button
                 type="button"
                 disabled={this.props.isDisabled}
-                title={title}
-                aria-label={title}
+                title={this.props.title}
+                aria-label={this.props.title}
                 onClick={handleClick}
                 className={classNames(this.props.className, classes.button)}
                 ref={this.buttonRef}

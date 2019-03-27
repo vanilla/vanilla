@@ -14,6 +14,7 @@ import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
 interface IProps {
     items: IMenuBarRadioButton[];
+    closeMenu: () => void;
     closeMenuAndSetCursor: () => void;
     className?: string;
     setRovingIndex: () => void;

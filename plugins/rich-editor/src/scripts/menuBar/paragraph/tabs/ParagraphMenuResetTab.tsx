@@ -14,12 +14,12 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 interface IProps {
     formatParagraphHandler: () => void;
     className?: string;
-    isActive: boolean;
     isDisabled?: boolean;
     tabIndex: 0 | -1;
     setRovingIndex: (callback?: () => void) => void;
     closeMenuAndSetCursor: () => void;
     legacyMode?: boolean;
+    isMenuVisible: boolean;
 }
 
 /**
@@ -54,13 +54,13 @@ export default class ParagraphMenuResetTab extends React.PureComponent<IProps> {
     }
 
     public componentDidMount() {
-        if (this.props.tabIndex === 0) {
+        if (this.props.isMenuVisible && this.props.tabIndex === 0) {
             this.buttonRef.current && this.buttonRef.current.focus();
         }
     }
 
     public componentDidUpdate() {
-        if (this.props.tabIndex === 0) {
+        if (this.props.isMenuVisible && this.props.tabIndex === 0) {
             this.buttonRef.current && this.buttonRef.current.focus();
         }
     }

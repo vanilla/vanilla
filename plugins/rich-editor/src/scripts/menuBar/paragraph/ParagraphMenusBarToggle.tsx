@@ -324,7 +324,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
      * Close the paragraph menu and place the selection at the end of the current selection if there is one.
      */
     private close = (focusToggle: boolean = false) => {
-        this.setState({ hasFocus: true });
+        this.setState({ hasFocus: false });
         const { lastGoodSelection } = this.props;
         if (!focusToggle) {
             const newSelection = {

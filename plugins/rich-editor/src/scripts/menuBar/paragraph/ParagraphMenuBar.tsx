@@ -212,6 +212,7 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
                         {...menu}
                         setRovingIndex={myRovingIndex}
                         disabled={!menu.open}
+                        closeMenu={this.props.close}
                         closeMenuAndSetCursor={this.closeMenuAndSetCursor}
                     />
                 </div>
@@ -256,11 +257,11 @@ export default class ParagraphMenuBar extends React.Component<IProps, IState> {
                     <div className={classes.menuBarToggles}>
                         {menus}
                         <ParagraphMenuResetTab
-                            isActive={menuActiveFormats.paragraph}
                             formatParagraphHandler={textFormats.paragraph}
                             setRovingIndex={setParagraphIndex}
                             tabIndex={this.tabIndex(paragraphIndex)}
                             closeMenuAndSetCursor={this.closeMenuAndSetCursor}
+                            isMenuVisible={this.props.isMenuVisible}
                         />
                     </div>
                 </div>

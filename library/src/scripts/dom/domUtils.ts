@@ -479,10 +479,6 @@ export function mountModal(element: ReactElement<any>) {
     if (!modals) {
         modals = document.createElement("div");
         modals.id = MODAL_CONTAINER_ID;
-        modals.style.position = "fixed"; // Workaround specifically for the forum.
-        modals.style.zIndex = "1";
-        modals.style.top = "0";
-        modals.style.left = "0";
         document.body.appendChild(modals);
     } else {
         ReactDOM.unmountComponentAtNode(modals);
@@ -492,5 +488,4 @@ export function mountModal(element: ReactElement<any>) {
         element,
         modals, // Who cares where we go. This is a portal anyways.
     );
-    forceRenderStyles();
 }

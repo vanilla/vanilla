@@ -77,7 +77,7 @@ export const modalClasses = useThemeCache(() => {
     const headerVars = vanillaHeaderVariables();
 
     const overlay = style("overlay", flexHelper().middle(), {
-        position: "absolute",
+        position: "fixed",
         height: viewHeight(100),
         width: viewWidth(100),
         top: 0,

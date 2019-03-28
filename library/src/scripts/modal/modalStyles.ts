@@ -5,10 +5,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, margins, unit } from "@library/styles/styleHelpers";
+import { borders, colorOut, margins, unit, flexHelper } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { percent, viewHeight } from "csx";
+import { percent, viewHeight, viewWidth } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 
@@ -16,9 +16,15 @@ export const modalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("modal");
 
+    const { elementaryColors } = globalVars;
+
     const colors = makeThemeVars("colors", {
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
+        overlayBg:
+            globalVars.mainColors.fg.lightness() > 0.5
+                ? elementaryColors.white.fade(0.4)
+                : elementaryColors.black.fade(0.4),
     });
 
     const sizing = makeThemeVars("sizing", {
@@ -69,6 +75,18 @@ export const modalClasses = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
     const shadows = shadowHelper();
     const headerVars = vanillaHeaderVariables();
+
+    const overlay = style("overlay", flexHelper().middle(), {
+        position: "absolute",
+        height: viewHeight(100),
+        width: viewWidth(100),
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: vars.colors.overlayBg.toString(),
+        zIndex: 10,
+    });
 
     const root = style({
         position: "relative",
@@ -156,5 +174,6 @@ export const modalClasses = useThemeCache(() => {
         scroll,
         content,
         pageHeader,
+        overlay,
     };
 });

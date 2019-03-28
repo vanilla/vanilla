@@ -464,28 +464,3 @@ export function prepareShadowRoot(element: HTMLElement, cloneElement: boolean = 
     const shadowHeader = element.attachShadow({ mode: "open" });
     shadowHeader.innerHTML = html;
 }
-
-/**
- * Mount a modal with ReactDOM. This is only needed at the top level context.
- *
- * If you are already in a react context, just use `<Modal />`.
- * Note: Using this will clear any other modals mounted with this component.
- *
- * @param element The <Modal /> element to render.
- */
-export function mountModal(element: ReactElement<any>) {
-    // Ensure we have our modal container.
-    let modals = document.getElementById(MODAL_CONTAINER_ID);
-    if (!modals) {
-        modals = document.createElement("div");
-        modals.id = MODAL_CONTAINER_ID;
-        document.body.appendChild(modals);
-    } else {
-        ReactDOM.unmountComponentAtNode(modals);
-    }
-
-    ReactDOM.render(
-        element,
-        modals, // Who cares where we go. This is a portal anyways.
-    );
-}

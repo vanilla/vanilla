@@ -25,7 +25,7 @@ interface IProps {
     title: string; // required for accessibility
     srOnlyTitle?: boolean;
     className?: string;
-    onCancel: () => void;
+    onCancel?: () => void;
     onConfirm: () => void;
     children: React.ReactNode;
     isConfirmLoading?: boolean;
@@ -33,7 +33,7 @@ interface IProps {
 }
 
 interface IState {
-    id: string;
+    cancelled: boolean;
 }
 
 /**
@@ -46,6 +46,9 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
 
     private cancelRef;
     private id;
+    public state: IState = {
+        cancelled: false,
+    };
 
     constructor(props) {
         super(props);
@@ -54,8 +57,11 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const { onCancel, onConfirm, srOnlyTitle, isConfirmLoading, title, children } = this.props;
-        const buttons = buttonClasses();
+        if (this.state.cancelled) {
+            return null;
+        }
+        const { onConfirm, srOnlyTitle, isConfirmLoading, title, children } = this.props;
+        const onCancel = this.handleCancel;
         const classesFrameBody = frameBodyClasses();
         return (
             <Modal
@@ -91,6 +97,11 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
             </Modal>
         );
     }
+
+    private handleCancel = () => {
+        this.setState({ cancelled: true });
+        this.props.onCancel && this.props.onCancel();
+    };
 
     public get titleID() {
         return this.id + "-title";

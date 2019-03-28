@@ -333,7 +333,9 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         },
     });
 
-    const paragraphMenuPanel = style("paragraphMenuPanel", {});
+    const publishButton = style("publishButton", {
+        whiteSpace: "nowrap",
+    });
 
     return {
         root,
@@ -355,6 +357,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         paragraphMenuMobile,
         separator,
         position,
-        paragraphMenuPanel,
+        publishButton,
     };
 });

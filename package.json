@@ -148,7 +148,7 @@
     "resolutions": {
         "@types/react": "16.7.20",
         "@types/react-dom": "16.0.11",
-        "js-yaml": "3.13.0"
+        "js-yaml": ">=3.13.0"
     },
     "scripts": {
         "pre-push": "yarn build && yarn test && yarn check-types",

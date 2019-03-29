@@ -199,7 +199,7 @@ export const searchResultClasses = useThemeCache(() => {
         ...fonts({
             color: vars.title.fg,
             size: globalVars.fonts.size.medium,
-            weight: globalVars.fonts.weights.bold,
+            weight: globalVars.fonts.weights.bold as 400,
         }),
         overflow: "hidden",
         flexGrow: 1,

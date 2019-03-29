@@ -10,7 +10,7 @@ import className from "classnames";
 export interface IContainer {
     className?: string;
     children?: React.ReactNode;
-    tag?: string;
+    tag?: keyof JSX.IntrinsicElements;
 }
 
 /*
@@ -23,7 +23,7 @@ export default class Container extends React.Component<IContainer> {
 
     public render() {
         if (this.props.children) {
-            const Tag = `${this.props.tag}`;
+            const Tag = this.props.tag || "div";
             return <Tag className={className("container", this.props.className)}>{this.props.children}</Tag>;
         } else {
             return null;

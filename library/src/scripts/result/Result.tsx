@@ -54,7 +54,7 @@ export default class Result extends React.Component<IResult> {
         if (hasAttachments && this.props.attachments) {
             attachmentOutput = <AttachmentIcons attachments={this.props.attachments} />;
         }
-        const HeadingTag = `h${this.props.headingLevel}`;
+        const HeadingTag = `h${this.props.headingLevel}` as "h1";
 
         const media = hasMedia ? (
             <div className={classNames("searchResult-media", classes.mediaElement, { hasImage: showImage })}>

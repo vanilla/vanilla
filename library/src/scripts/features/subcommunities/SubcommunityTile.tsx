@@ -30,7 +30,7 @@ export default class SubcommunityTile extends React.Component<IProps> {
     };
     public render() {
         const { icon, title, description, url, className, iconAltText, headingLevel } = this.props;
-        const H = `h${headingLevel}`;
+        const H = `h${headingLevel}` as "h1";
         const alt = iconAltText ? iconAltText : `${t("Icon for: ")} ${this.props.title}`;
         const classes = subcommunityTileClasses();
         return (

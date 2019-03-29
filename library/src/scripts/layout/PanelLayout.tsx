@@ -15,7 +15,7 @@ import { percent } from "csx";
 interface IProps extends IDeviceProps {
     className?: string;
     toggleMobileMenu?: (isOpen: boolean) => void;
-    contentTag?: string;
+    contentTag?: keyof JSX.IntrinsicElements;
     growMiddleBottom?: boolean;
     topPadding?: boolean;
     isFixed?: boolean;
@@ -62,7 +62,7 @@ class PanelLayout extends React.Component<IProps> {
     public static contextType = ScrollOffsetContext;
     public context!: React.ContextType<typeof ScrollOffsetContext>;
 
-    public static defaultProps = {
+    public static defaultProps: Partial<IProps> = {
         contentTag: "div",
         growMiddleBottom: false,
         topPadding: true,
@@ -106,7 +106,7 @@ class PanelLayout extends React.Component<IProps> {
         });
 
         // If applicable, set semantic tag, like "article"
-        const ContentTag = `${this.props.contentTag}`;
+        const ContentTag = this.props.contentTag as "div";
 
         return (
             <div className={panelClasses}>
@@ -138,26 +138,23 @@ class PanelLayout extends React.Component<IProps> {
                             this.props.growMiddleBottom ? inheritHeightClass() : "",
                         )}
                     >
-                        {!isMobile &&
-                            shouldRenderLeftPanel && (
-                                <Panel
-                                    className={classNames(
-                                        "panelLayout-left",
-                                        { [fixedPanelClass]: isFixed },
-                                        this.context.offsetClass,
-                                    )}
-                                    tag="aside"
-                                >
-                                    {childComponents.leftTop && (
-                                        <PanelArea className="panelArea-leftTop">{childComponents.leftTop}</PanelArea>
-                                    )}
-                                    {childComponents.leftBottom && (
-                                        <PanelArea className="panelArea-leftBottom">
-                                            {childComponents.leftBottom}
-                                        </PanelArea>
-                                    )}
-                                </Panel>
-                            )}
+                        {!isMobile && shouldRenderLeftPanel && (
+                            <Panel
+                                className={classNames(
+                                    "panelLayout-left",
+                                    { [fixedPanelClass]: isFixed },
+                                    this.context.offsetClass,
+                                )}
+                                tag="aside"
+                            >
+                                {childComponents.leftTop && (
+                                    <PanelArea className="panelArea-leftTop">{childComponents.leftTop}</PanelArea>
+                                )}
+                                {childComponents.leftBottom && (
+                                    <PanelArea className="panelArea-leftBottom">{childComponents.leftBottom}</PanelArea>
+                                )}
+                            </Panel>
+                        )}
 
                         <ContentTag
                             className={classNames("panelLayout-content", {
@@ -174,18 +171,16 @@ class PanelLayout extends React.Component<IProps> {
                                 {childComponents.middleTop && (
                                     <PanelArea className="panelAndNav-middleTop">{childComponents.middleTop}</PanelArea>
                                 )}
-                                {!shouldRenderLeftPanel &&
-                                    childComponents.leftTop && (
-                                        <PanelArea className="panelAndNav-mobileMiddle" tag="aside">
-                                            {childComponents.leftTop}
-                                        </PanelArea>
-                                    )}
-                                {!shouldRenderRightPanel &&
-                                    childComponents.rightTop && (
-                                        <PanelArea className="panelAndNav-tabletMiddle" tag="aside">
-                                            {childComponents.rightTop}
-                                        </PanelArea>
-                                    )}
+                                {!shouldRenderLeftPanel && childComponents.leftTop && (
+                                    <PanelArea className="panelAndNav-mobileMiddle" tag="aside">
+                                        {childComponents.leftTop}
+                                    </PanelArea>
+                                )}
+                                {!shouldRenderRightPanel && childComponents.rightTop && (
+                                    <PanelArea className="panelAndNav-tabletMiddle" tag="aside">
+                                        {childComponents.rightTop}
+                                    </PanelArea>
+                                )}
                                 <PanelArea
                                     className={classNames(
                                         "panelAndNav-middleBottom",
@@ -194,12 +189,11 @@ class PanelLayout extends React.Component<IProps> {
                                 >
                                     {childComponents.middleBottom}
                                 </PanelArea>
-                                {!shouldRenderRightPanel &&
-                                    childComponents.rightBottom && (
-                                        <PanelArea className="panelAndNav-tabletBottom" tag="aside">
-                                            {childComponents.rightBottom}
-                                        </PanelArea>
-                                    )}
+                                {!shouldRenderRightPanel && childComponents.rightBottom && (
+                                    <PanelArea className="panelAndNav-tabletBottom" tag="aside">
+                                        {childComponents.rightBottom}
+                                    </PanelArea>
+                                )}
                             </Panel>
                         </ContentTag>
                         {shouldRenderRightPanel && (
@@ -234,13 +228,13 @@ class PanelLayout extends React.Component<IProps> {
 interface IContainerProps {
     className?: string;
     children?: React.ReactNode;
-    tag?: string;
+    tag?: keyof JSX.IntrinsicElements;
     ariaHidden?: boolean;
-    innerRef?: React.RefObject<HTMLElement>;
+    innerRef?: React.RefObject<HTMLDivElement>;
 }
 
 export function Panel(props: IContainerProps) {
-    const Tag = `${props.tag ? props.tag : "div"}`;
+    const Tag = (props.tag as "div") || "div";
     return (
         <Tag
             className={classNames("panelLayout-panel", props.className)}
@@ -253,7 +247,7 @@ export function Panel(props: IContainerProps) {
 }
 
 export function PanelArea(props: IContainerProps) {
-    const Tag = `${props.tag ? props.tag : "div"}`;
+    const Tag = props.tag || "div";
     return <Tag className={classNames("panelArea", props.className)}>{props.children}</Tag>;
 }
 

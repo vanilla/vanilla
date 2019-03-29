@@ -8,7 +8,7 @@ import React from "react";
 
 interface IProps {
     children: React.ReactNode;
-    tag?: string;
+    tag?: keyof JSX.IntrinsicElements;
 }
 
 /**
@@ -16,7 +16,7 @@ interface IProps {
  */
 export default class ScreenReaderContent extends React.PureComponent<IProps> {
     public render() {
-        const Tag = this.props.tag ? `${this.props.tag}` : "div";
+        const Tag = this.props.tag || "div";
         return <Tag className="sr-only">{this.props.children}</Tag>;
     }
 }

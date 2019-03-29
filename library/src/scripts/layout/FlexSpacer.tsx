@@ -10,7 +10,7 @@ import classNames from "classnames";
 interface IProps {
     className: string;
     children?: React.ReactNode;
-    tag?: string;
+    tag?: keyof JSX.IntrinsicElements;
 }
 
 /**
@@ -19,7 +19,7 @@ interface IProps {
 export default class FlexSpacer extends React.Component<IProps> {
     public render() {
         const content = ` `;
-        const Tag = `${this.props.tag ? this.props.tag : "div"}`;
+        const Tag = this.props.tag || "div";
         return (
             <Tag className={classNames("u-flexSpacer", this.props.className)} aria-hidden={true} tabIndex={-1}>
                 {content}

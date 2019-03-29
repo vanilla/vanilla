@@ -82,6 +82,11 @@ class Bootstrap {
             ->setAliasOf(DateTimeImmutable::class)
             ->setConstructorArgs([null, null])
 
+            ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
+            ->setConstructorArgs([
+                'deploymentTime' => ContainerUtils::config('Garden.Deployed')
+            ])
+
             // Cache
             ->setInstance(NullCache::class, new NullCache())
 

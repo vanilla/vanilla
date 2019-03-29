@@ -171,9 +171,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 // Connect Redux to the React component.
-export default withDevice(
-    connect(
-        mapStateToProps,
-        mapDispatchToProps,
-    )(MessagesContents),
-);
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(withDevice(MessagesContents));

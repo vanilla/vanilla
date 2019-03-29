@@ -42,7 +42,8 @@ export function withPages<T extends IWithPagesProps = IWithPagesProps>(WrappedCo
             return (
                 <PageContext.Consumer>
                     {context => {
-                        return <WrappedComponent {...context} {...this.props} />;
+                        // https://github.com/Microsoft/TypeScript/issues/28938
+                        return <WrappedComponent {...context} {...this.props as T} />;
                     }}
                 </PageContext.Consumer>
             );

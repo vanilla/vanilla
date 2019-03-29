@@ -15,7 +15,7 @@ export enum WidgetContainerSize {
 export interface IContainer {
     className?: string;
     children?: React.ReactNode;
-    tag?: string;
+    tag?: keyof JSX.IntrinsicElements;
     size: WidgetContainerSize;
 }
 
@@ -30,7 +30,7 @@ export default class WidgetContainer extends React.Component<IContainer> {
 
     public render() {
         if (this.props.children) {
-            const Tag = `${this.props.tag}`;
+            const Tag = this.props.tag || "div";
             return (
                 <Tag
                     className={className("widgetContainer", this.props.className, {

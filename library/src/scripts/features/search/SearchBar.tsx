@@ -121,7 +121,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                 allowCreateWhileLoading={true}
                 controlShouldRenderValue={false}
                 isDisabled={disabled}
-                loadOptions={this.props.loadOptions}
+                loadOptions={this.props.loadOptions!}
                 menuIsOpen={this.isMenuVisible}
                 classNamePrefix={this.prefix}
                 className={classNames(this.prefix, className)}
@@ -355,8 +355,8 @@ export default class SearchBar extends React.Component<IProps, IState> {
     };
 
     /*
-    * Overwrite components in Select component
-    */
+     * Overwrite components in Select component
+     */
     private componentOverwrites = {
         Control: this.SearchControl,
         IndicatorSeparator: selectOverrides.NullComponent,

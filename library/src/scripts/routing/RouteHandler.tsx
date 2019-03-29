@@ -29,7 +29,7 @@ export default class RouteHandler<GeneratorProps> {
         key?: string,
     ) {
         this.loadable = Loadable({
-            loading: loadingComponent,
+            loading: loadingComponent as any,
             loader: componentPromise,
         });
         this.key = key || path;

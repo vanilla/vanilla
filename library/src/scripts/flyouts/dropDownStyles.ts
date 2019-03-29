@@ -7,10 +7,11 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { borders, colorOut, fonts, margins, paddings, states, unit, userSelect } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { important, percent } from "csx";
 import { layoutVariables } from "@library/styles/layoutStyles";
+import { FontSizeProperty } from "csstype";
 
 export const dropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -281,7 +282,7 @@ export const dropDownClasses = useThemeCache(() => {
 
     const title = style("title", {
         ...fonts({
-            weight: globalVars.fonts.weights.semiBold,
+            weight: globalVars.fonts.weights.semiBold as 400,
             size: globalVars.fonts.size.small,
             lineHeight: globalVars.lineHeights.condensed,
         }),

@@ -33,7 +33,7 @@ export default class Heading extends React.Component<IHeadingProps> {
 
     public render() {
         const { children, title } = this.props;
-        const Tag = `h${this.props.depth}`;
+        const Tag = `h${this.props.depth}` as "h1";
 
         return (
             <Tag

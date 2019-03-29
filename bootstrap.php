@@ -154,6 +154,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addAlias(Gdn::AliasDispatcher)
 
     ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
+    ->setShared(true)
     ->setConstructorArgs([
         'deploymentTime' => ContainerUtils::config('Garden.Deployed')
     ])

@@ -85,6 +85,7 @@ class Bootstrap {
             ->setConstructorArgs([null, null])
 
             ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
+            ->setShared(true)
             ->setConstructorArgs([
                 'deploymentTime' => ContainerUtils::config('Garden.Deployed')
             ])

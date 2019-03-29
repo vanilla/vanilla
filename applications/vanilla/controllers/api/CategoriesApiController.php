@@ -222,7 +222,7 @@ class CategoriesApiController extends AbstractApiController {
             $this->isExpandField('parent', $query['expand']),
             $limit,
             $offset,
-            $this->isExpandField('breadcrumbs',$query['expand']) ? ['breadcrumbs'] : []
+            $this->isExpandField('breadcrumbs', $query['expand']) ? ['breadcrumbs'] : []
         );
 
         foreach ($rows as &$row) {

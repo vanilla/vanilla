@@ -5060,11 +5060,6 @@ csso@^3.5.0, csso@^3.5.1:
   dependencies:
     css-tree "1.0.0-alpha.29"
 
-csstips@0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/csstips/-/csstips-0.3.0.tgz#e9a069363fbd53002ac4dd4221b5f4ad4e18f65c"
-  integrity sha512-Y9xM+P1ma92WZ9Czg3dKPJ96o5w5oc97R5iYTRojLGqorUPFgpkfofYJSoaSzaJTSB8SwU54jbwePhq1u3KXyw==
-
 csstype@^2.2.0:
   version "2.5.2"
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.5.2.tgz#4534308476ceede8fbe148b9b99f9baf1c80fa06"

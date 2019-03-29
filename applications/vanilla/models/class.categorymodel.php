@@ -85,9 +85,6 @@ class CategoryModel extends Gdn_Model {
      */
     private $joinUserCategory = false;
 
-    /** @var BreadcrumbModel */
-    private $breadcrumbModel;
-
     /**
      * Class constructor. Defines the related database table name.
      *

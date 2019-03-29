@@ -90,6 +90,7 @@
         "@types/validator": "10.9.0",
         "@types/webpack": "4.4.26",
         "@types/webpack-bundle-analyzer": "2.13.1",
+        "@types/webpack-dev-server": "3.1.4",
         "@types/webpack-serve": "2.0.1",
         "@types/webpackbar": "2.6.0",
         "@types/yargs": "12.0.10",
@@ -145,8 +146,8 @@
         "typescript-tslint-plugin": "0.3.1",
         "webpack": "4.29.6",
         "webpack-bundle-analyzer": "3.1.0",
+        "webpack-dev-server": "3.2.1",
         "webpack-merge": "4.2.1",
-        "webpack-serve": "2.0.2",
         "webpackbar": "3.1.5",
         "yargs": "13.2.2"
     },

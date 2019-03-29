@@ -9,7 +9,7 @@ import * as del from "del";
 import webpack, { Stats, Configuration } from "webpack";
 import { makeProdConfig } from "./configs/makeProdConfig";
 import { makeDevConfig } from "./configs/makeDevConfig";
-import serve, { InitializedKoa, Options } from "webpack-serve";
+// import serve, { InitializedKoa, Options } from "webpack-serve";
 import { getOptions, BuildMode, IBuildOptions } from "./options";
 import chalk from "chalk";
 import { installNodeModulesInDir } from "./utility/moduleUtils";
@@ -17,6 +17,7 @@ import { makePolyfillConfig } from "./configs/makePolyfillConfig";
 import { print, fail } from "./utility/utils";
 import { DIST_DIRECTORY, VANILLA_APPS } from "./env";
 import EntryModel from "./utility/EntryModel";
+import WebpackDevServer, { Configuration as DevServerConfiguration } from "webpack-dev-server";
 
 /**
  * A class to build frontend assets.
@@ -137,28 +138,27 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
         const sections = await this.entryModel.getSections();
         const config = await Promise.all(sections.map(section => makeDevConfig(this.entryModel, section)));
         const compiler = webpack(config) as any;
-        const argv = {};
-        const enhancer = (app: InitializedKoa) => {
-            app.use(async (context, next) => {
-                context.set("Access-Control-Allow-Origin", "*");
-                context.set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-                context.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
-                await next();
-            });
-        };
-
-        const options: Options = {
-            compiler,
+        // const argv = {};
+        const options: DevServerConfiguration = {
             host: this.options.devIp,
             port: 3030,
-            add: enhancer,
-            clipboard: false,
-            devMiddleware: {
-                publicPath: `http://${this.options.devIp}:3030/`,
-                stats: this.statOptions,
+            hot: true,
+            open: true,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
+                "Access-Control-Allow-Methods": "POST, GET, PUT, DELETE, OPTIONS",
             },
+            // clipboard: false,
+            publicPath: `http://${this.options.devIp}:3030/`,
+            stats: this.statOptions,
         };
 
-        await serve(argv, options);
+        const server = new WebpackDevServer(compiler, options);
+        server.listen(3030, options.host || "127.0.0.1", () => {
+            console.log("Starting dev server");
+        });
+
+        // await serve(argv, options);
     }
 }

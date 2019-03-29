@@ -11,8 +11,6 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
-use Vanilla\Forum\Navigation\ForumCategoryRecordType;
-use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Navigation\Breadcrumb;
 
 /**
@@ -22,9 +20,6 @@ class CategoriesApiController extends AbstractApiController {
 
     /** @var CategoryModel */
     private $categoryModel;
-
-    /** @var BreadcrumbModel */
-    private $breadcrumbModel;
 
     /** @var Schema */
     private $categoryPostSchema;
@@ -41,11 +36,10 @@ class CategoriesApiController extends AbstractApiController {
      * @param CategoryModel $categoryModel
      */
     public function __construct(
-        CategoryModel $categoryModel,
-        BreadcrumbModel $breadcrumbModel
+        CategoryModel $categoryModel
     ) {
         $this->categoryModel = $categoryModel;
-        $this->breadcrumbModel = $breadcrumbModel;
+
     }
 
     /**
@@ -64,19 +58,6 @@ class CategoriesApiController extends AbstractApiController {
             );
         }
         return $this->schema($this->categoryPostSchema, $type);
-    }
-
-    /**
-     * Get the full category schema.
-     *
-     * @param string $type The type of schema.
-     * @return Schema Returns a schema object.
-     */
-    public function categorySchema($type = '') {
-        if ($this->categorySchema === null) {
-            $this->categorySchema = $this->schema($this->fullSchema(), 'Category');
-        }
-        return $this->schema($this->categorySchema, $type);
     }
 
     /**
@@ -231,13 +212,11 @@ class CategoriesApiController extends AbstractApiController {
             $query['query'],
             $query['expand'],
             $limit,
-            $offset
+            $offset,
+            ($query['expand'] ?? true) ? ['breadcrumbs'] : []
         );
 
         foreach ($rows as &$row) {
-            if ($query['expand']) {
-                $row['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($row['CategoryID']));
-            }
             $row = $this->normalizeOutput($row);
         }
 

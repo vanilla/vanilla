@@ -431,6 +431,22 @@ paths:
                       description: The URL code of the category.
                       minLength: 1
                       type: string
+                    breadcrumbs:
+                      items:
+                        properties:
+                          name:
+                            description: Breadcrumb element name.
+                            minLength: 1
+                            type: string
+                          url:
+                            description: Breadcrumb element url.
+                            minLength: 1
+                            type: string
+                        required:
+                        - name
+                        - url
+                        type: object
+                      type: array
                   required:
                   - categoryID
                   - name

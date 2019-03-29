@@ -39,7 +39,6 @@ class CategoriesApiController extends AbstractApiController {
         CategoryModel $categoryModel
     ) {
         $this->categoryModel = $categoryModel;
-
     }
 
     /**

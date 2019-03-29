@@ -43,6 +43,8 @@ import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { assetUrl, themeAsset } from "@library/utility/appUtils";
 import get from "lodash/get";
 import { ColorValues } from "@library/forms/buttonStyles";
+import * as flex from "csstips";
+import { startJustified } from "csstips";
 
 export const colorOut = (colorValue: ColorValues) => {
     if (!colorValue) {
@@ -53,21 +55,27 @@ export const colorOut = (colorValue: ColorValues) => {
 };
 
 export function flexHelper() {
-    const middle = (wrap = false) => {
+    const nowrap: NestedCSSProperties = {
+        "-ms-flex-wrap": "nowrap",
+        "-webkit-flex-wrap": "nowrap",
+        flexWrap: "nowrap",
+    };
+
+    const middle = (wrap = false): NestedCSSProperties => {
         return {
-            display: "flex" as DisplayProperty,
-            alignItems: "center" as AlignItemsProperty,
-            justifyContent: "center" as JustifyContentProperty,
-            flexWrap: (wrap ? "wrap" : "nowrap") as FlexWrapProperty,
+            ...flex.flexRoot,
+            ...flex.center,
+            ...flex.centerJustified,
+            ...(wrap ? flex.wrap : nowrap),
         };
     };
 
-    const middleLeft = (wrap = false) => {
+    const middleLeft = (wrap = false): NestedCSSProperties => {
         return {
-            display: "flex" as DisplayProperty,
-            alignItems: "center" as AlignItemsProperty,
-            justifyContent: "flex-start" as JustifyContentProperty,
-            flexWrap: wrap ? "wrap" : ("nowrap" as FlexWrapProperty),
+            ...flex.flexRoot,
+            ...flex.center,
+            ...startJustified,
+            ...(wrap ? flex.wrap : nowrap),
         };
     };
 

@@ -121,7 +121,6 @@ export default class Modal extends React.Component<IProps, IState> {
                     role="dialog"
                     aria-modal={true}
                     className={classNames(
-                        "modal",
                         classes.root,
                         {
                             isFullScreen: size === ModalSizes.FULL_SCREEN || size === ModalSizes.MODAL_AS_SIDE_PANEL,

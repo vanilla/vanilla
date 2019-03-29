@@ -89,11 +89,16 @@ export const modalClasses = useThemeCache(() => {
     });
 
     const root = style({
+        display: "block",
         position: "relative",
         maxHeight: percent(100),
         zIndex: 1,
         backgroundColor: colorOut(vars.colors.bg),
+        boxSizing: "border-box",
         $nest: {
+            "*": {
+                boxSizing: "border-box",
+            },
             "&.isFullScreen": {
                 overflow: "auto",
                 width: percent(100),

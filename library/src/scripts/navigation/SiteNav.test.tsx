@@ -11,11 +11,12 @@ import SiteNavNode, { IActiveRecord } from "@library/navigation/SiteNavNode";
 import { INavigationTreeItem } from "@library/@types/api/core";
 
 function renderSiteNav(activeRecord: IActiveRecord) {
+    document.body.innerHTML = "<div id='sitenav'></div>";
     return mount(
         <SiteNav activeRecord={activeRecord} bottomCTA={null} collapsible={true}>
             {naviationItems}
         </SiteNav>,
-        { attachTo: document.body },
+        { attachTo: document.getElementById("siteNav") },
     );
 }
 

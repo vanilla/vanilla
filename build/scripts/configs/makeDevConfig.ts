@@ -28,9 +28,6 @@ export async function makeDevConfig(entryModel: EntryModel, section: string) {
         chunkFilename: `[name]-[chunkhash]-${section}.chunk.js`,
         publicPath: `http://${options.devIp}:3030/`,
     };
-    baseConfig.optimization = {
-        splitChunks: false,
-    };
 
     return baseConfig;
 }

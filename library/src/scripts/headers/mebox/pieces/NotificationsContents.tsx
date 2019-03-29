@@ -179,9 +179,7 @@ function mapStateToProps(state: INotificationsStoreState) {
 }
 
 // Connect Redux to the React component.
-export default withDevice(
-    connect(
-        mapStateToProps,
-        mapDispatchToProps,
-    )(NotificationsContents),
-);
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(withDevice(NotificationsContents));

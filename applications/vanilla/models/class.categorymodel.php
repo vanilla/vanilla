@@ -11,7 +11,6 @@
 use Garden\EventManager;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
-use \Vanilla\Forum\Navigation\ForumBreadcrumbProvider;
 
 /**
  * Manages discussion categories' data.
@@ -99,10 +98,6 @@ class CategoryModel extends Gdn_Model {
         parent::__construct('Category');
         $this->collection = $this->createCollection();
         $this->eventManager = Gdn::getContainer()->get(EventManager::class);
-
-        $container = Gdn::getContainer();
-        $this->breadcrumbModel = $container->get(BreadcrumbModel::class);
-        $this->breadcrumbModel->addProvider($container->get(ForumBreadcrumbProvider::class));
     }
 
     /**
@@ -3678,7 +3673,8 @@ SQL;
                 }
             }
             if (in_array('breadcrumbs', $expand)) {
-                $category['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($category['CategoryID']));
+                $breadcrumbModel = Gdn::getContainer()->get(BreadcrumbModel::class);
+                $category['breadcrumbs'] = $breadcrumbModel->getForRecord(new ForumCategoryRecordType($category['CategoryID']));
             }
 
             $result[] = $category;

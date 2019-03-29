@@ -78,6 +78,10 @@ class Bootstrap {
             ->rule(InjectableInterface::class)
             ->addCall('setDependencies')
 
+            ->rule(DateTimeInterface::class)
+            ->setAliasOf(DateTimeImmutable::class)
+            ->setConstructorArgs([null, null])
+
             // Cache
             ->setInstance(NullCache::class, new NullCache())
 

@@ -9,6 +9,9 @@
  */
 
 use Garden\EventManager;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Navigation\BreadcrumbModel;
+use \Vanilla\Forum\Navigation\ForumBreadcrumbProvider;
 
 /**
  * Manages discussion categories' data.
@@ -83,6 +86,9 @@ class CategoryModel extends Gdn_Model {
      */
     private $joinUserCategory = false;
 
+    /** @var BreadcrumbModel */
+    private $breadcrumbModel;
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -93,6 +99,10 @@ class CategoryModel extends Gdn_Model {
         parent::__construct('Category');
         $this->collection = $this->createCollection();
         $this->eventManager = Gdn::getContainer()->get(EventManager::class);
+
+        $container = Gdn::getContainer();
+        $this->breadcrumbModel = $container->get(BreadcrumbModel::class);
+        $this->breadcrumbModel->addProvider($container->get(ForumBreadcrumbProvider::class));
     }
 
     /**
@@ -3625,9 +3635,10 @@ SQL;
      * @param bool $expandParent Expand the parent category record.
      * @param int|null $limit Limit the total number of results.
      * @param int|null $offset Offset the results.
+     * @param array $expand List of data need to be expanded/joined.
      * @return array
      */
-    public function searchByName($name, $expandParent = false, $limit = null, $offset = null) {
+    public function searchByName($name, $expandParent = false, $limit = null, $offset = null, array $expand = []) {
         if ($limit !== null && filter_var($limit, FILTER_VALIDATE_INT) === false) {
             $limit = null;
         }
@@ -3665,6 +3676,9 @@ SQL;
 //                } else {
 //                    $parent = null;
                 }
+            }
+            if (in_array('breadcrumbs', $expand)) {
+                $category['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($category['CategoryID']));
             }
 
             $result[] = $category;

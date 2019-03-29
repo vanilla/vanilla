@@ -370,7 +370,7 @@ paths:
             - type: boolean
           items:
             enum:
-            - bredcrumbs
+            - breadcrumbs
             - parent
             - all
             type: string

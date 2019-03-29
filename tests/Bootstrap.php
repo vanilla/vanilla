@@ -24,6 +24,8 @@ use Vanilla\Models\SSOModel;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
+use Vanilla\Utility\ContainerUtils;
+
 
 /**
  * Run bootstrap code for Vanilla tests.
@@ -77,6 +79,15 @@ class Bootstrap {
             // Base classes that want to support DI without polluting their constructor implement this.
             ->rule(InjectableInterface::class)
             ->addCall('setDependencies')
+
+            ->rule(DateTimeInterface::class)
+            ->setAliasOf(DateTimeImmutable::class)
+            ->setConstructorArgs([null, null])
+
+            ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
+            ->setConstructorArgs([
+                'deploymentTime' => ContainerUtils::config('Garden.Deployed')
+            ])
 
             // Cache
             ->setInstance(NullCache::class, new NullCache())

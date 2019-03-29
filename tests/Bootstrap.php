@@ -26,7 +26,6 @@ use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
 use Vanilla\Utility\ContainerUtils;
 
-
 /**
  * Run bootstrap code for Vanilla tests.
  *

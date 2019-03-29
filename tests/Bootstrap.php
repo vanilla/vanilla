@@ -92,6 +92,7 @@ class Bootstrap {
             ->addCall('defaultPath', [$this->getConfigPath()])
             ->addCall('autoSave', [false])
             ->addCall('load', [PATH_ROOT.'/conf/config-defaults.php'])
+            ->addCall('set', ['Garden.Deployed', time()])
             ->addAlias('Config')
             ->addAlias(\Gdn_Configuration::class)
 

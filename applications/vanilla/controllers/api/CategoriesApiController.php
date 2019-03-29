@@ -61,6 +61,19 @@ class CategoriesApiController extends AbstractApiController {
     }
 
     /**
+     * Get the full category schema.
+     *
+     * @param string $type The type of schema.
+     * @return Schema Returns a schema object.
+     */
+    public function categorySchema($type = '') {
+        if ($this->categorySchema === null) {
+            $this->categorySchema = $this->schema($this->fullSchema(), 'Category');
+        }
+        return $this->schema($this->categorySchema, $type);
+    }
+
+    /**
      * Lookup a single category by its numeric ID or its URL code.
      *
      * @param int|string $id The category ID or URL code.

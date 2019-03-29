@@ -13,7 +13,7 @@ import { modalClasses } from "@library/modal/modalStyles";
 import TabHandler from "@library/dom/TabHandler";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
-import { logWarning } from "@library/utility/utils";
+import { logWarning, logError } from "@library/utility/utils";
 import { forceRenderStyles } from "typestyle";
 
 interface IHeadingDescription {
@@ -114,6 +114,14 @@ export default class Modal extends React.Component<IProps, IState> {
     public render() {
         const { size } = this.props;
         const classes = modalClasses();
+        const container = this.getModalContainer();
+        if (container === null) {
+            logError(
+                `The modal container could not be found.
+                An element with an ID of "${MODAL_CONTAINER_ID}" is required to render modals.`,
+            );
+            return;
+        }
         const portal = ReactDOM.createPortal(
             <div className={classes.overlay} onClick={this.handleScrimClick}>
                 <div
@@ -150,7 +158,7 @@ export default class Modal extends React.Component<IProps, IState> {
                     {this.props.children}
                 </div>
             </div>,
-            this.getModalContainer(),
+            container,
         );
         // We HAVE to render force the styles to render before componentDidMount
         // And our various focusing tricks or the page will jump.

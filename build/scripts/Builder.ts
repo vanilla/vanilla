@@ -5,7 +5,7 @@
  */
 
 import path from "path";
-import del from "del";
+import * as del from "del";
 import webpack, { Stats, Configuration } from "webpack";
 import { makeProdConfig } from "./configs/makeProdConfig";
 import { makeDevConfig } from "./configs/makeDevConfig";

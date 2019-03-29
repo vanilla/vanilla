@@ -5,11 +5,15 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Utility\InstanceValidatorSchema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Navigation\Breadcrumb;
 
 /**
  * API Controller for the `/categories` resource.
@@ -18,6 +22,9 @@ class CategoriesApiController extends AbstractApiController {
 
     /** @var CategoryModel */
     private $categoryModel;
+
+    /** @var BreadcrumbModel */
+    private $breadcrumbModel;
 
     /** @var Schema */
     private $categoryPostSchema;
@@ -33,8 +40,12 @@ class CategoriesApiController extends AbstractApiController {
      *
      * @param CategoryModel $categoryModel
      */
-    public function __construct(CategoryModel $categoryModel) {
+    public function __construct(
+        CategoryModel $categoryModel,
+        BreadcrumbModel $breadcrumbModel
+    ) {
         $this->categoryModel = $categoryModel;
+        $this->breadcrumbModel = $breadcrumbModel;
     }
 
     /**
@@ -136,7 +147,8 @@ class CategoriesApiController extends AbstractApiController {
             'countComments:i' => 'Total comments in the category.',
             'countAllDiscussions:i' => 'Total of all discussions in a category and its children.',
             'countAllComments:i' => 'Total of all comments in a category and its children.',
-            'followed:b?' => 'Is the category being followed by the current user?'
+            'followed:b?' => 'Is the category being followed by the current user?',
+            "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
         ]);
     }
 
@@ -223,6 +235,9 @@ class CategoriesApiController extends AbstractApiController {
         );
 
         foreach ($rows as &$row) {
+            if ($query['expand']) {
+                $row['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($row['CategoryID']));
+            }
             $row = $this->normalizeOutput($row);
         }
 

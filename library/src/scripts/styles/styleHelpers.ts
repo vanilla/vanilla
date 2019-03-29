@@ -278,24 +278,32 @@ export const singleBorder = (styles: ISingleBorderStyle = {}) => {
     } ${styles.width ? unit(styles.width) : unit(vars.border.width)}` as any;
 };
 
-export interface ILinkStates {
+export interface IButtonStates {
     allStates?: object; // Applies to all
     noState?: object; // Applies to stateless link
     hover?: object;
     focus?: object;
     accessibleFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
     active?: object;
+}
+export interface ILinkStates extends IButtonStates {
     visited?: object;
 }
 
 export const allLinkStates = (styles: ILinkStates) => {
+    const output = allButtonStates(styles);
+    const visited = get(styles, "visited", {});
+    output.$nest["&:visited"] = { ...styles.allStates, ...visited };
+    return output;
+};
+
+export const allButtonStates = (styles: IButtonStates) => {
     const allStates = get(styles, "allStates", {});
     const noState = get(styles, "noState", {});
     const hover = get(styles, "hover", {});
     const focus = get(styles, "focus", {});
     const accessibleFocus = get(styles, "accessibleFocus", focus);
     const active = get(styles, "active", {});
-    const visited = get(styles, "visited", {});
 
     return {
         ...allStates,
@@ -305,7 +313,6 @@ export const allLinkStates = (styles: ILinkStates) => {
             "&:focus": { ...allStates, ...focus },
             "&.focus-visible": { ...allStates, ...accessibleFocus },
             "&:active": { ...allStates, ...active },
-            "&:visited": { ...allStates, ...visited },
         },
     };
 };
@@ -341,10 +348,22 @@ export interface IPaddings {
     right?: string | number;
     bottom?: string | number;
     left?: string | number;
+    horizontal?: string | number;
+    vertical?: string | number;
 }
 
 export const paddings = (styles: IPaddings) => {
     const paddingVals = {} as NestedCSSProperties;
+
+    if (styles.vertical !== undefined) {
+        paddingVals.paddingTop = unit(styles.vertical);
+        paddingVals.paddingBottom = unit(styles.vertical);
+    }
+
+    if (styles.horizontal !== undefined) {
+        paddingVals.paddingLeft = unit(styles.horizontal);
+        paddingVals.paddingRight = unit(styles.horizontal);
+    }
 
     if (styles.top !== undefined) {
         paddingVals.paddingTop = unit(styles.top);

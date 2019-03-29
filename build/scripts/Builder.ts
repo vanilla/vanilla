@@ -9,7 +9,6 @@ import * as del from "del";
 import webpack, { Stats, Configuration } from "webpack";
 import { makeProdConfig } from "./configs/makeProdConfig";
 import { makeDevConfig } from "./configs/makeDevConfig";
-// import serve, { InitializedKoa, Options } from "webpack-serve";
 import { getOptions, BuildMode, IBuildOptions } from "./options";
 import chalk from "chalk";
 import { installNodeModulesInDir } from "./utility/moduleUtils";
@@ -138,7 +137,6 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
         const sections = await this.entryModel.getSections();
         const config = await Promise.all(sections.map(section => makeDevConfig(this.entryModel, section)));
         const compiler = webpack(config) as any;
-        // const argv = {};
         const options: DevServerConfiguration = {
             host: this.options.devIp,
             port: 3030,
@@ -149,16 +147,11 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
                 "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
                 "Access-Control-Allow-Methods": "POST, GET, PUT, DELETE, OPTIONS",
             },
-            // clipboard: false,
             publicPath: `http://${this.options.devIp}:3030/`,
             stats: this.statOptions,
         };
 
         const server = new WebpackDevServer(compiler, options);
-        server.listen(3030, options.host || "127.0.0.1", () => {
-            console.log("Starting dev server");
-        });
-
-        // await serve(argv, options);
+        server.listen(3030, options.host || "127.0.0.1");
     }
 }

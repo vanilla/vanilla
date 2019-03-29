@@ -19,6 +19,8 @@ use Vanilla\Web\Asset\DeploymentCacheBuster;
 class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggregate  {
     use MetaTrait;
 
+    const VANILLA_DEPLOYMENT_KEY = 'Vdk';
+
     private $data;
 
     /**
@@ -36,7 +38,7 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
             $this->meta = $meta;
         }
         $cacheBuster = \Gdn::getContainer()->get(DeploymentCacheBuster::class);
-        $this->setHeader('VDK', APPLICATION_VERSION.'-'.$cacheBuster->value());
+        $this->setHeader(self::VANILLA_DEPLOYMENT_KEY, APPLICATION_VERSION.'-'.$cacheBuster->value());
     }
 
     /**

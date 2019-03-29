@@ -239,7 +239,7 @@ class CategoriesApiController extends AbstractApiController {
     /**
      * Get an ID-only category record schema.
      *
-     * @param string $type The type of schema.ApiUtils::getExpandDefinition
+     * @param string $type The type of schema.
      * @return Schema Returns a schema object.
      */
     public function idParamSchema($type = 'in') {

@@ -5,15 +5,10 @@
  * @license GPL-2.0-only
  */
 
-import { ReactElement } from "react";
-import { log, hashString } from "../utility/utils";
-import twemoji from "twemoji";
-import debounce from "lodash/debounce";
 import "focus-visible";
 import smoothscroll from "smoothscroll-polyfill";
-import ReactDOM from "react-dom";
-import { forceRenderStyles } from "typestyle";
-import { MODAL_CONTAINER_ID } from "@library/modal/Modal";
+import twemoji from "twemoji";
+import { hashString } from "../utility/utils";
 smoothscroll.polyfill();
 
 /**

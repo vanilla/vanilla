@@ -219,10 +219,10 @@ class CategoriesApiController extends AbstractApiController {
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
         $rows = $this->categoryModel->searchByName(
             $query['query'],
-            $this->isExpandField('parent',$query['expand']),
+            $this->isExpandField('parent', $query['expand']),
             $limit,
             $offset,
-            $this->isExpandField('breadcrumbs',$query['expand']) ? ['breadcrumbs'] : []
+            $this->isExpandField('breadcrumbs', $query['expand']) ? ['breadcrumbs'] : []
         );
 
         foreach ($rows as &$row) {

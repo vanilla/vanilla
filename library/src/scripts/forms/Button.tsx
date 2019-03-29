@@ -39,9 +39,13 @@ export const getDynamicClassFromButtonType = (type: ButtonTypes | undefined) => 
         const classes = buttonClasses();
         switch (type) {
             case ButtonTypes.TEXT:
-                return buttonUtils.buttonAsText;
+                return classes.text;
+            case ButtonTypes.TEXT_PRIMARY:
+                return classes.textPrimary;
             case ButtonTypes.ICON:
                 return buttonUtils.buttonIcon;
+            case ButtonTypes.ICON_COMPACT:
+                return buttonUtils.buttonIconCompact;
             case ButtonTypes.COMPACT:
                 return classes.compact;
             case ButtonTypes.COMPACT_PRIMARY:

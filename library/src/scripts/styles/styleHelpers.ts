@@ -71,7 +71,13 @@ export function flexHelper() {
         };
     };
 
-    return { middle, middleLeft };
+    const spacer = () => {
+        return {
+            flex: 1,
+        };
+    };
+
+    return { middle, middleLeft, spacer };
 }
 
 export function srOnly() {

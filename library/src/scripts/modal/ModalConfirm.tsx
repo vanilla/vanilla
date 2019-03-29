@@ -16,10 +16,11 @@ import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
-import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import SmartAlign from "@library/layout/SmartAlign";
-import { frameBodyClasses } from "@library/layout/frame/frameStyles";
+import { frameBodyClasses, frameFooterClasses } from "@library/layout/frame/frameStyles";
 import Modal from "@library/modal/Modal";
+import { modalClasses } from "@library/modal/modalStyles";
 
 interface IProps {
     title: string; // required for accessibility
@@ -27,6 +28,7 @@ interface IProps {
     className?: string;
     onCancel?: () => void;
     onConfirm: () => void;
+    confirmTitle?: string;
     children: React.ReactNode;
     isConfirmLoading?: boolean;
     elementToFocusOnExit: HTMLElement;
@@ -40,8 +42,9 @@ interface IState {
  * Basic confirm dialogue.
  */
 export default class ModalConfirm extends React.Component<IProps, IState> {
-    public static defaultProps = {
+    public static defaultProps: Partial<IProps> = {
         srOnlyTitle: false,
+        confirmTitle: t("Ok"),
     };
 
     private cancelRef;
@@ -63,6 +66,7 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
         const { onConfirm, srOnlyTitle, isConfirmLoading, title, children } = this.props;
         const onCancel = this.handleCancel;
         const classesFrameBody = frameBodyClasses();
+        const classFrameFooter = frameFooterClasses();
         return (
             <Modal
                 size={ModalSizes.SMALL}
@@ -85,12 +89,22 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                             </SmartAlign>
                         </FramePanel>
                     </FrameBody>
-                    <FrameFooter selfPadded={true}>
-                        <Button baseClass={ButtonTypes.COMPACT} buttonRef={this.cancelRef} onClick={onCancel}>
+                    <FrameFooter>
+                        <Button
+                            className={classFrameFooter.actionButton}
+                            baseClass={ButtonTypes.TEXT}
+                            buttonRef={this.cancelRef}
+                            onClick={onCancel}
+                        >
                             {t("Cancel")}
                         </Button>
-                        <Button onClick={onConfirm} baseClass={ButtonTypes.COMPACT_PRIMARY} disabled={isConfirmLoading}>
-                            {isConfirmLoading ? <ButtonLoader /> : t("Ok")}
+                        <Button
+                            className={classFrameFooter.actionButton}
+                            onClick={onConfirm}
+                            baseClass={ButtonTypes.TEXT_PRIMARY}
+                            disabled={isConfirmLoading}
+                        >
+                            {isConfirmLoading ? <ButtonLoader /> : this.props.confirmTitle}
                         </Button>
                     </FrameFooter>
                 </Frame>

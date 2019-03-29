@@ -114,14 +114,6 @@ export default class Modal extends React.Component<IProps, IState> {
     public render() {
         const { size } = this.props;
         const classes = modalClasses();
-        const container = this.getModalContainer();
-        if (container === null) {
-            logError(
-                `The modal container could not be found.
-                An element with an ID of "${MODAL_CONTAINER_ID}" is required to render modals.`,
-            );
-            return;
-        }
         const portal = ReactDOM.createPortal(
             <div className={classes.overlay} onClick={this.handleScrimClick}>
                 <div
@@ -158,7 +150,7 @@ export default class Modal extends React.Component<IProps, IState> {
                     {this.props.children}
                 </div>
             </div>,
-            container,
+            this.getModalContainer(),
         );
         // We HAVE to render force the styles to render before componentDidMount
         // And our various focusing tricks or the page will jump.
@@ -235,8 +227,14 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         });
     }
 
-    private getModalContainer(): HTMLElement | null {
-        return document.getElementById(MODAL_CONTAINER_ID)!;
+    private getModalContainer(): HTMLElement {
+        let container = document.getElementById(MODAL_CONTAINER_ID)!;
+        if (container === null) {
+            container = document.createElement("div");
+            container.id = MODAL_CONTAINER_ID;
+            document.body.appendChild(container);
+        }
+        return container;
     }
 
     private getPageContainer(): HTMLElement | null {

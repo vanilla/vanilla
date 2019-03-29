@@ -211,10 +211,7 @@ class CategoriesApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 200
             ],
-            'expand:b?' => [
-                'default' => false,
-                'description' => 'Expand with the parent record.'
-            ]
+            'expand?' => ApiUtils::getExpandDefinition(['parent', 'breadcrumbs'])
         ])->setDescription('Search categories.');
         $out = $this->schema([':a' => $this->schemaWithParent($query['expand'])], 'out');
 
@@ -223,10 +220,10 @@ class CategoriesApiController extends AbstractApiController {
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
         $rows = $this->categoryModel->searchByName(
             $query['query'],
-            $query['expand'],
+            $this->isExpandField('parent',$query['expand']),
             $limit,
             $offset,
-            ($query['expand'] ?? true) ? ['breadcrumbs'] : []
+            $this->isExpandField('breadcrumbs',$query['expand']) ? ['breadcrumbs'] : []
         );
 
         foreach ($rows as &$row) {
@@ -243,7 +240,7 @@ class CategoriesApiController extends AbstractApiController {
     /**
      * Get an ID-only category record schema.
      *
-     * @param string $type The type of schema.
+     * @param string $type The type of schema.ApiUtils::getExpandDefinition
      * @return Schema Returns a schema object.
      */
     public function idParamSchema($type = 'in') {

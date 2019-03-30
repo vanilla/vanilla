@@ -516,7 +516,7 @@ BQ;
 
                     break;
                 case 'Wysiwyg':
-                    $attribution = sprintf(t('%s said:'), userAnchor($data, null, ['Px' => 'Insert']));
+                    $attribution = sprintf(t('%s said:'), userAnchor($data, null, ['Px' => 'Insert', 'Text' => '@'.$data->InsertName]));
                     $quoteBody = $data->Body;
 
                     // TODO: Strip inner quotes...

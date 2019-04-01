@@ -1448,7 +1448,7 @@ class EditorPlugin extends Gdn_Plugin {
         $form->setValue('Plugins.editor.ForceWysiwyg', c('Plugins.editor.ForceWysiwyg'));
         $formToggle = $form->toggle('Plugins.editor.ForceWysiwyg', $forceWysiwygLabel, [], $label);
 
-        $additionalFormItemHTML .= "<li class='form-group'>$formToggle</li>";
+        $additionalFormItemHTML .= "<div class='form-group forceWysiwyg'>$formToggle</div>";
         return $additionalFormItemHTML;
     }
 

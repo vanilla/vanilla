@@ -65,6 +65,7 @@ class VanillaSettingsController extends Gdn_Controller {
             'Garden.Html.AllowedElements',
             'Garden.EditContentTimeout',
             'Vanilla.AdminCheckboxes.Use',
+            'ImageUpload.Limits.Enabled',
             'Vanilla.Comment.MaxLength',
             'Vanilla.Comment.MinLength',
             'Garden.Format.DisableUrlEmbeds',

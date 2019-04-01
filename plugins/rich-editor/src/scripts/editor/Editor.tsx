@@ -32,6 +32,7 @@ import React from "react";
 import { hot } from "react-hot-loader";
 import { Provider } from "react-redux";
 import hljs from "highlight.js";
+import { LiveMessage } from "react-aria-live";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -43,6 +44,7 @@ interface ICommonProps {
     reinitialize?: boolean;
     operationsQueue?: EditorQueueItem[];
     clearOperationsQueue?: () => void;
+    error?: string;
 }
 
 interface ILegacyProps extends ICommonProps {
@@ -75,6 +77,9 @@ export class Editor extends React.Component<IProps> {
     /** The ID of the root rich editor node. */
     private domID: string = uniqueId("editor-");
 
+    /** The ID of error messages. */
+    private errorID: string = this.domID + "-errors";
+
     /** The redux store. */
     private store = getStore<IStoreState>();
 
@@ -106,6 +111,7 @@ export class Editor extends React.Component<IProps> {
         const { className } = this.props as INewProps;
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const classesRichEditorForm = richEditorFormClasses(this.props.legacyMode);
+        const hasError = !!this.props.error;
         return (
             <div
                 className={classNames(
@@ -116,12 +122,17 @@ export class Editor extends React.Component<IProps> {
                 )}
                 aria-label={t("Type your message.")}
                 aria-describedby={this.descriptionID}
+                aria-invalid={hasError}
                 role="textbox"
                 aria-multiline={true}
                 id={this.domID}
+                aria-errormessage={hasError ? this.errorID : undefined}
             >
                 {this.renderContexts(
                     <>
+                        {hasError && (
+                            <LiveMessage clearOnUnmount={true} message={this.props.error} aria-live="polite" />
+                        )}
                         {this.renderEmbedBar()}
                         <div className={classNames("richEditor-scrollFrame", classesRichEditorForm.scrollFrame)}>
                             <div

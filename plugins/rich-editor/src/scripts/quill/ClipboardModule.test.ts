@@ -215,6 +215,34 @@ describe("ClipboardModule", () => {
                 expect(quill.getContents().ops).deep.eq(ops);
             });
         });
+
+        describe("pasting images", () => {
+            it("can paste some images", () => {
+                const html = `
+                    <p><img src="/image1.png" alt="image-1"></p>
+                    <img src="/image-no-alt.jpg">
+                    <div class="js-embed embedResponsive" contenteditable="false">
+                        <div class="embedExternal embedImage">
+                            <div class="embed-focusableElement embedExternal-content" aria-label="External embed content - image" tabindex="-1">
+                                <a class="embedImage-link" href="/embed-image.jpg" rel="nofollow noopener">
+                                    <img class="embedImage-img" src="/embed-image.jpg" alt="image">
+                                </a>
+                            </div>
+                        </div>
+                        <span class="sr-only">Embed Description</span>
+                    </div>
+                `;
+                clipboard.dangerouslyPasteHTML(html);
+
+                expect(quill.getContents().ops).deep.eq([
+                    OpUtils.image("/image1.png", "image-1"),
+                    OpUtils.newline(),
+                    OpUtils.image("/image-no-alt.jpg", null),
+                    OpUtils.image("/embed-image.jpg", "image"),
+                    OpUtils.newline(),
+                ]);
+            });
+        });
     });
 
     describe("splitLinkOperationsOutOfText()", () => {

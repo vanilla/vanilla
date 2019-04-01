@@ -12,6 +12,7 @@ import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
 import getStore from "@library/redux/getStore";
 import { IStoreState } from "@rich-editor/@types/store";
+import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 
 export default class ClipboardModule extends ClipboardBase {
     /**
@@ -50,6 +51,10 @@ export default class ClipboardModule extends ClipboardBase {
     constructor(quill, options) {
         super(quill, options);
         this.addMatcher(Node.TEXT_NODE, this.linkMatcher);
+        this.addMatcher("img", this.imageMatcher);
+
+        // Skip screen reader only content.
+        this.addMatcher(".sr-only", () => new Delta());
     }
 
     /**
@@ -91,6 +96,31 @@ export default class ClipboardModule extends ClipboardBase {
             this.quill.focus();
         });
     }
+
+    /**
+     * A matcher for img tags. Converts `<img />` into an external embed (type image).
+     */
+    public imageMatcher = (node: HTMLImageElement, delta: DeltaStatic) => {
+        const src = node.getAttribute("src");
+        const alt = node.getAttribute("alt");
+        if (src) {
+            const imageData: IEmbedValue = {
+                loaderData: {
+                    type: "image",
+                },
+                data: {
+                    type: "image",
+                    url: src,
+                    name: alt,
+                    attributes: {},
+                },
+            };
+            return new Delta().insert({
+                [ExternalEmbedBlot.blotName]: imageData,
+            });
+        }
+        return delta;
+    };
 
     /**
      * A matcher to turn a pasted links into real links.

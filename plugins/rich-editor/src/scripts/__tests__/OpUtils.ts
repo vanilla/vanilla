@@ -16,6 +16,7 @@ import HeadingBlot from "quill/formats/header";
 import ListBlot from "quill/formats/list";
 import { StringMap, DeltaStatic, DeltaOperation } from "quill/core";
 import { ListType } from "@rich-editor/quill/blots/blocks/ListBlot";
+import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 
 /**
  * Operation generation utilities for testing.
@@ -23,7 +24,7 @@ import { ListType } from "@rich-editor/quill/blots/blocks/ListBlot";
 export default class OpUtils {
     public static DEFAULT_LINK = "http://link.com";
 
-    public static op(insert: string = "TEST", attributes?: StringMap): DeltaOperation {
+    public static op(insert: any = "TEST", attributes?: StringMap): DeltaOperation {
         const op: any = {
             insert,
         };
@@ -71,6 +72,23 @@ export default class OpUtils {
                 type,
                 depth,
             },
+        });
+    }
+
+    public static image(url: string, alt: string | null = null) {
+        const imageData: IEmbedValue = {
+            loaderData: {
+                type: "image",
+            },
+            data: {
+                type: "image",
+                url,
+                name: alt,
+                attributes: {},
+            },
+        };
+        return OpUtils.op({
+            [ExternalEmbedBlot.blotName]: imageData,
         });
     }
 }

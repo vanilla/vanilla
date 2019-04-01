@@ -35,7 +35,7 @@
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-    <div class="Frame">
+    <div class="Frame" id="page">
         <div class="Frame-top">
             <div class="Frame-header">
                 {include file="partials/header.tpl"}
@@ -100,6 +100,7 @@
             {include file="partials/footer.tpl"}
         </div>
     </div>
+    <div id="modals"></div>
 </body>
 
 </html>

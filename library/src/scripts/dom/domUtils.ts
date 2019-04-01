@@ -5,11 +5,10 @@
  * @license GPL-2.0-only
  */
 
-import { log, hashString } from "../utility/utils";
-import twemoji from "twemoji";
-import debounce from "lodash/debounce";
 import "focus-visible";
 import smoothscroll from "smoothscroll-polyfill";
+import twemoji from "twemoji";
+import { hashString } from "../utility/utils";
 smoothscroll.polyfill();
 
 /**

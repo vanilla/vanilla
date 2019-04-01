@@ -5,7 +5,7 @@
  */
 
 import ReactDOM from "react-dom";
-import React from "react";
+import React, { ReactElement } from "react";
 import classNames from "classnames";
 import ModalSizes from "@library/modal/ModalSizes";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
@@ -13,6 +13,8 @@ import { modalClasses } from "@library/modal/modalStyles";
 import TabHandler from "@library/dom/TabHandler";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
+import { logWarning, logError } from "@library/utility/utils";
+import { forceRenderStyles } from "typestyle";
 
 interface IHeadingDescription {
     titleID: string;
@@ -25,7 +27,7 @@ interface ITextDescription {
 interface IModalCommonProps {
     className?: string;
     exitHandler?: (event?: React.SyntheticEvent<any>) => void;
-    pageContainer?: Element;
+    pageContainer?: Element | null;
     container?: Element;
     description?: string;
     children: React.ReactNode;
@@ -45,6 +47,34 @@ interface IState {
     exitElementSet: boolean;
 }
 
+export const MODAL_CONTAINER_ID = "modals";
+export const PAGE_CONTAINER_ID = "page";
+
+/**
+ * Mount a modal with ReactDOM. This is only needed at the top level context.
+ *
+ * If you are already in a react context, just use `<Modal />`.
+ * Note: Using this will clear any other modals mounted with this component.
+ *
+ * @param element The <Modal /> element to render.
+ */
+export function mountModal(element: ReactElement<any>) {
+    // Ensure we have our modal container.
+    let modals = document.getElementById(MODAL_CONTAINER_ID);
+    if (!modals) {
+        modals = document.createElement("div");
+        modals.id = MODAL_CONTAINER_ID;
+        document.body.appendChild(modals);
+    } else {
+        ReactDOM.unmountComponentAtNode(modals);
+    }
+
+    ReactDOM.render(
+        element,
+        modals, // Who cares where we go. This is a portal anyways.
+    );
+}
+
 /**
  * An accessible Modal component.
  *
@@ -56,9 +86,7 @@ interface IState {
  * - Focuses the first focusable element in the Modal.
  */
 export default class Modal extends React.Component<IProps, IState> {
-    public static defaultProps = {
-        pageContainer: document.getElementById("page"),
-        container: document.getElementById("modals"),
+    public static defaultProps: Partial<IProps> = {
         isWholePage: false,
     };
 
@@ -86,14 +114,13 @@ export default class Modal extends React.Component<IProps, IState> {
     public render() {
         const { size } = this.props;
         const classes = modalClasses();
-        return ReactDOM.createPortal(
-            <div className="overlay" onClick={this.handleScrimClick}>
+        const portal = ReactDOM.createPortal(
+            <div className={classes.overlay} onClick={this.handleScrimClick}>
                 <div
                     id={this.modalID}
                     role="dialog"
                     aria-modal={true}
                     className={classNames(
-                        "modal",
                         classes.root,
                         {
                             isFullScreen: size === ModalSizes.FULL_SCREEN || size === ModalSizes.MODAL_AS_SIDE_PANEL,
@@ -122,8 +149,12 @@ export default class Modal extends React.Component<IProps, IState> {
                     {this.props.children}
                 </div>
             </div>,
-            this.props.container!,
+            this.getModalContainer(),
         );
+        // We HAVE to render force the styles to render before componentDidMount
+        // And our various focusing tricks or the page will jump.
+        forceRenderStyles();
+        return portal;
     }
 
     /**
@@ -142,8 +173,16 @@ export default class Modal extends React.Component<IProps, IState> {
      * Everything here should be torn down in componentWillUnmount
      */
     public componentDidMount() {
+        const pageContainer = this.getPageContainer();
+        if (!pageContainer) {
+            logWarning(`
+A modal was mounted, but the page container could not be found.
+Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it can be hidden to screenreaders.
+            `);
+        }
+
         this.focusInitialElement();
-        this.props.pageContainer!.setAttribute("aria-hidden", true);
+        pageContainer && pageContainer.setAttribute("aria-hidden", true);
         disableBodyScroll(this.selfRef.current!);
 
         // Add the escape keyboard listener only on the first modal in the stack.
@@ -167,23 +206,38 @@ export default class Modal extends React.Component<IProps, IState> {
      * Tear down setup from componentDidMount
      */
     public componentWillUnmount() {
+        const pageContainer = this.getPageContainer();
         // Set aria-hidden on page and reenable scrolling if we're removing the last modal
         Modal.stack.pop();
         if (Modal.stack.length === 0) {
-            this.props.pageContainer!.removeAttribute("aria-hidden");
+            pageContainer && pageContainer.removeAttribute("aria-hidden");
             enableBodyScroll(this.selfRef.current!);
 
             // This event listener is only added once (on the top modal).
             // So we only remove when clearing the last one.
             document.removeEventListener("keydown", this.handleDocumentEscapePress);
         } else {
-            this.props.pageContainer!.setAttribute("aria-hidden", true);
+            pageContainer && pageContainer.setAttribute("aria-hidden", true);
         }
         const prevFocussedElement = Modal.focusHistory.pop() || document.body;
         prevFocussedElement.focus();
         setImmediate(() => {
             prevFocussedElement.focus();
         });
+    }
+
+    private getModalContainer(): HTMLElement {
+        let container = document.getElementById(MODAL_CONTAINER_ID)!;
+        if (container === null) {
+            container = document.createElement("div");
+            container.id = MODAL_CONTAINER_ID;
+            document.body.appendChild(container);
+        }
+        return container;
+    }
+
+    private getPageContainer(): HTMLElement | null {
+        return document.getElementById(PAGE_CONTAINER_ID);
     }
 
     /**

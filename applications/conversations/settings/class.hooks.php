@@ -10,7 +10,6 @@
 
 use Garden\Container\Container;
 use Garden\Container\Reference;
-use ConversationCounterProvider;
 
 /**
  * Handles hooks into Dashboard and Vanilla.

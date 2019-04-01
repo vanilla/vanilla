@@ -28,7 +28,8 @@ class ImgurEmbed extends Embed {
      */
     public function matchUrl(string $url) {
         $data = [];
-
+        // Strip image extensions. URLs with image extensions are not supported.
+        $url = str_replace(['.jpg', '.jpeg', '.png'], '', $url);
         if ($this->isNetworkEnabled()) {
             preg_match('/https?:\/\/(?:m.)?imgur\.com\/(?:(?<album>a|gallery)\/)?(?<postID>[a-z0-9]+)/i', $url, $matches);
 

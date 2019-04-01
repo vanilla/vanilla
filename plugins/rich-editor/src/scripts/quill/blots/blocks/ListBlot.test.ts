@@ -106,6 +106,23 @@ describe("ListBlot", () => {
         });
     });
 
+    it("deeply nested list items can be created", () => {
+        const nestedDelta = [
+            OpUtils.op("Line 1"),
+            OpUtils.list(ListType.BULLETED, 0),
+            OpUtils.op("Line 1.1"),
+            OpUtils.list(ListType.ORDERED, 1),
+            OpUtils.op("Line 1.1.1"),
+            OpUtils.list(ListType.BULLETED, 2),
+            OpUtils.op("Line 1.1.1.1"),
+            OpUtils.list(ListType.ORDERED, 3),
+        ];
+
+        quill.setContents(nestedDelta);
+
+        expect(quill.getContents().ops).deep.eq(nestedDelta);
+    });
+
     it("always reports it's value in the new object style", () => {
         insertListBlot("ordered");
         insertListBlot("bullet");

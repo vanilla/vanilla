@@ -11,7 +11,6 @@ use Traversable;
 use Garden\MetaTrait;
 use DateTime;
 use DateTimeInterface;
-use Vanilla\Web\Asset\DeploymentCacheBuster;
 
 /**
  * Represents the data in a web response.
@@ -37,8 +36,6 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
         } else {
             $this->meta = $meta;
         }
-        $cacheBuster = \Gdn::getContainer()->get(DeploymentCacheBuster::class);
-        $this->setHeader(self::VANILLA_DEPLOYMENT_KEY, APPLICATION_VERSION.'-'.$cacheBuster->value());
     }
 
     /**

@@ -14,7 +14,7 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 
 export interface IMessageAndRefreshProps {
     className?: string;
-    message?: string;
+    message: string;
     clearOnUnmount?: boolean; // reannounces the message if the page gets rerendered. This is an important message, so we want this by default.
 }
 
@@ -44,7 +44,7 @@ export default class MessageAndRefresh extends React.PureComponent<IMessageAndRe
                 </div>
                 {/* Does not visually render, but sends message to screen reader users*/}
                 <LiveMessage
-                    clearOnUnmount={this.props.clearOnUnmount}
+                    clearOnUnmount={!!this.props.clearOnUnmount}
                     message={this.props.message}
                     aria-live="polite"
                 />

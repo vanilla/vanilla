@@ -15,10 +15,11 @@ import { isArray } from "util";
 describe("ClipboardModule", () => {
     let quill: Quill;
     let clipboard: ClipboardModule;
-    beforeEach(() => {
+    const reset = () => {
         quill = setupTestQuill();
         clipboard = quill.clipboard as ClipboardModule;
-    });
+    };
+    beforeEach(reset);
 
     describe("pasteHtml", () => {
         describe("simple values", () => {
@@ -193,6 +194,25 @@ describe("ClipboardModule", () => {
                     clipboard.dangerouslyPasteHTML(item.in);
                     expect(quill.getContents().ops).deep.eq(item.out);
                 });
+            });
+
+            it("can paste it's own type of list blot", () => {
+                const ops = [
+                    OpUtils.op("Line 1"),
+                    OpUtils.list(ListType.BULLETED, 0),
+                    OpUtils.op("Line 1.1"),
+                    OpUtils.list(ListType.ORDERED, 1),
+                    OpUtils.op("Line 1.1.1"),
+                    OpUtils.list(ListType.BULLETED, 2),
+                    OpUtils.op("Line 1.1.1.1"),
+                    OpUtils.list(ListType.ORDERED, 3),
+                ];
+                quill.setContents(ops);
+                const html = quill.scroll.domNode.innerHTML;
+                reset();
+
+                clipboard.dangerouslyPasteHTML(html);
+                expect(quill.getContents().ops).deep.eq(ops);
             });
         });
     });

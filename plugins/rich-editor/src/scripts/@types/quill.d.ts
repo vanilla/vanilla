@@ -8,6 +8,7 @@
 
 declare module "quill/core" {
     import HistoryModule from "@rich-editor/quill/HistoryModule";
+    import SelectionModule from "quill/modules/selection";
     import Blot from "parchment/dist/src/blot/abstract/shadow";
     import Container from "parchment/dist/src/blot/abstract/container";
     import ClipboardModule from "quill/modules/clipboard";
@@ -164,6 +165,7 @@ declare module "quill/core" {
     class Quill extends EventEmitter {
         root: HTMLDivElement;
         clipboard: ClipboardModule;
+        selection: SelectionModule;
         scroll: Container;
         container: HTMLDivElement;
         options: AnyObject;

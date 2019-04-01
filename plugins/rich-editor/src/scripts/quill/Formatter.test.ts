@@ -290,33 +290,35 @@ describe("Formatter", () => {
         });
 
         describe(`can apply the ${lineFormatName} format to single line of all other multiline blots`, () => {
-            blockFormatOps.filter(({ name }) => name !== lineFormatName).forEach(({ op, name }) => {
-                const one = OpUtils.op("1");
-                const two = OpUtils.op("2");
-                const three = OpUtils.op("3");
-                const initial = [one, op, two, op, three, op];
+            blockFormatOps
+                .filter(({ name }) => name !== lineFormatName)
+                .forEach(({ op, name }) => {
+                    const one = OpUtils.op("1");
+                    const two = OpUtils.op("2");
+                    const three = OpUtils.op("3");
+                    const initial = [one, op, two, op, three, op];
 
-                it(`can apply the ${lineFormatName} format to the 1st line of 3 lines of the ${name} format`, () => {
-                    const expected = [one, lineOp, two, op, three, op];
-                    const range: RangeStatic = { index: 0, length: 0 };
-                    const formatterFunction = () => format(range);
-                    assertQuillInputOutput(initial, expected, formatterFunction);
-                });
+                    it(`can apply the ${lineFormatName} format to the 1st line of 3 lines of the ${name} format`, () => {
+                        const expected = [one, lineOp, two, op, three, op];
+                        const range: RangeStatic = { index: 0, length: 0 };
+                        const formatterFunction = () => format(range);
+                        assertQuillInputOutput(initial, expected, formatterFunction);
+                    });
 
-                it(`can apply the ${lineFormatName} format to the 2nd line of 3 lines of the ${name} format`, () => {
-                    const expected = [one, op, two, lineOp, three, op];
-                    const range: RangeStatic = { index: 2, length: 0 };
-                    const formatterFunction = () => format(range);
-                    assertQuillInputOutput(initial, expected, formatterFunction);
-                });
+                    it(`can apply the ${lineFormatName} format to the 2nd line of 3 lines of the ${name} format`, () => {
+                        const expected = [one, op, two, lineOp, three, op];
+                        const range: RangeStatic = { index: 2, length: 0 };
+                        const formatterFunction = () => format(range);
+                        assertQuillInputOutput(initial, expected, formatterFunction);
+                    });
 
-                it(`can apply the ${lineFormatName} format to the 3rd line of 3 lines of the ${name} format`, () => {
-                    const expected = [one, op, two, op, three, lineOp];
-                    const range: RangeStatic = { index: 4, length: 0 };
-                    const formatterFunction = () => format(range);
-                    assertQuillInputOutput(initial, expected, formatterFunction);
+                    it(`can apply the ${lineFormatName} format to the 3rd line of 3 lines of the ${name} format`, () => {
+                        const expected = [one, op, two, op, three, lineOp];
+                        const range: RangeStatic = { index: 4, length: 0 };
+                        const formatterFunction = () => format(range);
+                        assertQuillInputOutput(initial, expected, formatterFunction);
+                    });
                 });
-            });
         });
 
         // Check formatting over multiple lines (splitting things properly as well).

@@ -11,7 +11,6 @@ import { LiveMessage, LiveMessenger } from "react-aria-live";
 import { messagesClasses } from "@library/messages/messageStyles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import Container from "@library/layout/components/Container";
 
 export interface IMessageAndRefreshProps {
     className?: string;
@@ -31,7 +30,7 @@ export default class MessageAndRefresh extends React.PureComponent<IMessageAndRe
     public render() {
         const classes = messagesClasses();
         const refresh = () => {
-            window.location.reload(true);
+            window.location.href = window.location.href;
         };
         return (
             <>

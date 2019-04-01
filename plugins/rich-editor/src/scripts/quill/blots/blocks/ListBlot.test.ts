@@ -18,6 +18,8 @@ import registerQuill from "@rich-editor/quill/registerQuill";
 import { expect } from "chai";
 import Delta from "quill-delta";
 import Quill from "quill/core";
+import { setupTestQuill } from "@rich-editor/__tests__/quillUtils";
+import OpUtils from "@rich-editor/__tests__/OpUtils";
 
 describe("ListBlot", () => {
     before(() => {
@@ -28,17 +30,16 @@ describe("ListBlot", () => {
     let quillNode: HTMLDivElement;
 
     const resetQuill = () => {
-        document.body.innerHTML = `
-            <div id='quill'></div>
+        quill = setupTestQuill();
+        const buttonCont = document.createElement("div");
+        buttonCont.innerHTML = `
             <div>
                 <button id="indent">Indent</button>
                 <button id="outdent">Outdent</button>
             </div>`;
-        const mountPoint = document.getElementById("quill")!;
+        document.body.appendChild(buttonCont);
         const indent = document.getElementById("indent")!;
         const outdent = document.getElementById("outdent")!;
-        quill = new Quill(mountPoint);
-        window.quill = quill;
         const formatter = new Formatter(quill, quill.getSelection());
         indent.addEventListener("click", e => {
             e.preventDefault();

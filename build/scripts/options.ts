@@ -14,6 +14,7 @@ yargs
     .option("verbose", {
         alias: "v",
         default: false,
+        boolean: true,
     })
     .options("mode", {
         default: BuildMode.PRODUCTION,
@@ -24,13 +25,16 @@ yargs
     .options("fix", {
         alias: "f",
         default: false,
+        boolean: true,
     })
     .options("low-memory", {
         default: false,
+        boolean: true,
     })
     .options("install", {
         alias: "i",
         default: false,
+        boolean: true,
     });
 
 export interface IBuildOptions {

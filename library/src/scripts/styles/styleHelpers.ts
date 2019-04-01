@@ -283,6 +283,7 @@ export interface IButtonStates {
     noState?: object; // Applies to stateless link
     hover?: object;
     focus?: object;
+    focusNotKeyboard?: object; // Focused, not through keyboard
     accessibleFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
     active?: object;
 }
@@ -302,6 +303,7 @@ export const allButtonStates = (styles: IButtonStates) => {
     const noState = get(styles, "noState", {});
     const hover = get(styles, "hover", {});
     const focus = get(styles, "focus", {});
+    const focusNotKeyboard = get(styles, "focusNotKeyboard", {});
     const accessibleFocus = get(styles, "accessibleFocus", focus);
     const active = get(styles, "active", {});
 
@@ -311,7 +313,8 @@ export const allButtonStates = (styles: IButtonStates) => {
         $nest: {
             "&:hover": { ...allStates, ...hover },
             "&:focus": { ...allStates, ...focus },
-            "&.focus-visible": { ...allStates, ...accessibleFocus },
+            "&:focus:not(.focus-visible)": { ...allStates, ...focusNotKeyboard },
+            "&&.focus-visible": { ...allStates, ...accessibleFocus },
             "&:active": { ...allStates, ...active },
         },
     };
@@ -736,6 +739,7 @@ export interface IActionStates {
     allStates?: object; // Applies to all
     hover?: object;
     focus?: object;
+    focusNotKeyboard?: object; // Focused, not through keyboard?: object;
     accessibleFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
     active?: object;
 }
@@ -748,12 +752,14 @@ export const states = (styles: IActionStates) => {
     const allStates = get(styles, "allStates", {});
     const hover = get(styles, "hover", {});
     const focus = get(styles, "focus", {});
+    const focusNotKeyboard = get(styles, "focusNotKeyboard", focus);
     const accessibleFocus = get(styles, "accessibleFocus", focus);
     const active = get(styles, "active", {});
 
     return {
         "&:hover": { ...allStates, ...hover },
         "&:focus": { ...allStates, ...focus },
+        "&:focus:not(.focus-visible)": { ...allStates, ...focusNotKeyboard },
         "&.focus-visible": { ...allStates, ...accessibleFocus },
         "&:active": { ...allStates, ...active },
     };

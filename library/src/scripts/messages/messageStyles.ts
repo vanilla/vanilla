@@ -55,12 +55,11 @@ export const messagesVariables = useThemeCache(() => {
             size: globalVars.fonts.size.medium,
             weight: globalVars.fonts.weights.semiBold,
         },
-        paddingRight: spacing.padding.horizontal / 2,
     });
 
     const actionButton = themeVars("actionButton", {
         padding: {
-            vertical: 8,
+            vertical: spacing.padding.vertical,
             horizontal: spacing.padding.horizontal / 2,
         },
         font: {
@@ -86,7 +85,6 @@ export const messagesClasses = useThemeCache(() => {
     const shadows = shadowHelper();
 
     const root = style({
-        ...userSelect(),
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
@@ -107,22 +105,24 @@ export const messagesClasses = useThemeCache(() => {
     });
 
     const message = style("message", {
+        ...userSelect(),
         ...fonts(vars.text.font),
-        paddingRight: unit(vars.text.paddingRight),
         flexGrow: 1,
     });
 
     const actionButton = style("actionButton", {
         ...paddings(vars.actionButton.padding),
         minHeight: unit(vars.actionButton.minHeight),
-        ...allLinkStates({
-            allStates: vars.colors.fg,
-            noState: vars.colors.states.fg,
-        }),
         ...fonts(vars.actionButton.font),
         ...allButtonStates({
+            noState: {
+                color: colorOut(vars.colors.fg),
+            },
             allStates: {
                 color: colorOut(vars.colors.states.fg),
+            },
+            focusNotKeyboard: {
+                outline: 0,
             },
         }),
     });

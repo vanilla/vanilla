@@ -30,8 +30,7 @@ export function withTabs<T extends ITabProps = ITabProps>(WrappedComponent: Reac
             return (
                 <TabContext.Consumer>
                     {context => {
-                        // https://github.com/Microsoft/TypeScript/issues/28938
-                        return <WrappedComponent {...context} {...this.props as T} />;
+                        return <WrappedComponent {...context} {...this.props} />;
                     }}
                 </TabContext.Consumer>
             );

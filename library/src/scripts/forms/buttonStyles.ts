@@ -475,6 +475,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
     });
 
     const buttonIcon = style("icon", buttonResetMixin(), {
+        ...userSelect(),
         alignItems: "center",
         display: "flex",
         height: unit(formElementVars.sizing.height),
@@ -486,8 +487,9 @@ export const buttonUtilityClasses = useThemeCache(() => {
     });
 
     const buttonAsText = style("asText", {
-        minWidth: important(0),
-        padding: important(0),
+        ...userSelect(),
+        minWidth: unit(0),
+        padding: unit(0),
         overflow: "hidden",
         textAlign: "left",
         lineHeight: globalVars.lineHeights.base,

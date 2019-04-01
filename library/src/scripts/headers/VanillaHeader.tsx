@@ -98,17 +98,18 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                 <Panel className="panelLayout-fullWidth">
                     <PanelWidgetHorizontalPadding>
                         <div className={classNames("vanillaHeader-bar", classes.bar)}>
-                            {!this.state.openSearch && isMobile && (
-                                <BackLink
-                                    className={classNames(
-                                        "vanillaHeader-leftFlexBasis",
-                                        "vanillaHeader-backLink",
-                                        classes.leftFlexBasis,
-                                    )}
-                                    linkClassName={classes.button}
-                                    fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
-                                />
-                            )}
+                            {!this.state.openSearch &&
+                                isMobile && (
+                                    <BackLink
+                                        className={classNames(
+                                            "vanillaHeader-leftFlexBasis",
+                                            "vanillaHeader-backLink",
+                                            classes.leftFlexBasis,
+                                        )}
+                                        linkClassName={classes.button}
+                                        fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
+                                    />
+                                )}
 
                             {!isMobile && (
                                 <HeaderLogo
@@ -117,14 +118,15 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                     logoType={LogoType.DESKTOP}
                                 />
                             )}
-                            {!this.state.openSearch && !isMobile && (
-                                <VanillaHeaderNav
-                                    {...dummyNavigationData}
-                                    className={classNames("vanillaHeader-nav", classes.nav)}
-                                    linkClassName={classNames("vanillaHeader-navLink", classes.topElement)}
-                                    linkContentClassName="vanillaHeader-navLinkContent"
-                                />
-                            )}
+                            {!this.state.openSearch &&
+                                !isMobile && (
+                                    <VanillaHeaderNav
+                                        {...dummyNavigationData}
+                                        className={classNames("vanillaHeader-nav", classes.nav)}
+                                        linkClassName={classNames("vanillaHeader-navLink", classes.topElement)}
+                                        linkContentClassName="vanillaHeader-navLinkContent"
+                                    />
+                                )}
                             {showMobileDropDown && (
                                 <MobileDropDown
                                     title={this.props.title!}
@@ -197,14 +199,18 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                                 )}
                                             />
                                         )}
-                                        {isMobile && !this.state.openSearch && (
-                                            <CompactMeBox
-                                                className={classNames("vanillaHeader-button", classes.button)}
-                                                buttonClass={classNames(classes.centeredButtonClass, classes.button)}
-                                                userPhotoClass="headerDropDown-user"
-                                                currentUser={this.props.currentUser}
-                                            />
-                                        )}
+                                        {isMobile &&
+                                            !this.state.openSearch && (
+                                                <CompactMeBox
+                                                    className={classNames("vanillaHeader-button", classes.button)}
+                                                    buttonClass={classNames(
+                                                        classes.centeredButtonClass,
+                                                        classes.button,
+                                                    )}
+                                                    userPhotoClass="headerDropDown-user"
+                                                    currentUser={this.props.currentUser}
+                                                />
+                                            )}
                                     </React.Fragment>
                                 )}
                             </ConditionalWrap>

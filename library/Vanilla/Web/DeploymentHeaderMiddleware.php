@@ -27,9 +27,9 @@ class DeploymentHeaderMiddleware {
         $response = Data::box($next($request));
         $cacheBuster = \Gdn::getContainer()->get(DeploymentCacheBuster::class);
         $response->setHeader(
-                self::VANILLA_DEPLOYMENT_KEY,
+            self::VANILLA_DEPLOYMENT_KEY,
             APPLICATION_VERSION.'-'.$cacheBuster->value()
-            );
+        );
         return $response;
     }
 }

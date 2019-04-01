@@ -53,33 +53,37 @@ export default class ClipboardModule extends ClipboardBase {
     }
 
     /**
-     * Override the paste event to not jump around on paste in a cross-browser manor.
-     *
-     * Override https://github.com/quilljs/quill/blob/master/modules/clipboard.js#L108-L123
-     * Because of https://github.com/quilljs/quill/issues/1374
-     *
-     * Hopefully this will be fixed in Quill 2.0
+     * @override
+     * Override the paste handler to
+     * - Prevent jumping on paste.
+     * - Ensure current selection is deleted before a paste.
      */
     public onPaste(e: Event) {
         if (e.defaultPrevented || !(this.quill as any).isEnabled()) {
             return;
         }
         const range = this.quill.getSelection();
-        let delta = new Delta().retain(range.index);
         const container = this.options.scrollingContainer;
 
-        // THIS IS WHAT IS DIFFERENT
+        // Get our scroll positions
         const scrollTop = document.documentElement!.scrollTop || document.body.scrollTop;
         const containerTop = container ? container.scrollTop : 0;
         this.container.focus();
-        (this.quill as any).selection.update(Quill.sources.SILENT);
-        setImmediate(() => {
-            delta = delta.concat((this as any).convert()).delete(range.length);
-            this.quill.updateContents(delta, Quill.sources.USER);
-            // range.length contributes to delta.length()
-            this.quill.setSelection((delta.length() - range.length) as any, Quill.sources.SILENT);
+        this.quill.selection.update(Quill.sources.SILENT);
 
-            // THIS IS WHAT IS DIFFERENT
+        // Delete text if any is currently selected.
+        if (range.length) {
+            this.quill.deleteText(range.index, range.length, Quill.sources.SILENT);
+        }
+
+        // Settimeout so that the paste goes into `this.container`.
+        setImmediate(() => {
+            // Insert the pasted content.
+            const delta = new Delta().retain(range.index).concat(this.convert());
+            this.quill.updateContents(delta, Quill.sources.USER);
+
+            // Fix our selection & scroll position.
+            this.quill.setSelection(delta.length(), 0, Quill.sources.SILENT);
             document.documentElement!.scrollTop = document.body.scrollTop = scrollTop;
             if (container) {
                 container.scrollTop = containerTop;

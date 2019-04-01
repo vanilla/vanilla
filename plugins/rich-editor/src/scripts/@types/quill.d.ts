@@ -238,7 +238,7 @@ declare module "quill/core" {
 declare module "quill/blots/block" {
     import Block from "parchment/dist/src/blot/block";
     import Embed from "parchment/dist/src/blot/embed";
-    import { Blot } from "quill/core";
+    import { Blot, DeltaOperation } from "quill/core";
 
     export class BlockEmbed extends Embed {}
     export default class BlockBlot extends Block {
@@ -306,6 +306,7 @@ declare module "quill/modules/clipboard" {
         ): void;
         dangerouslyPasteHTML(html: string, source?: Sources): void;
         dangerouslyPasteHTML(index: number, html: string, source?: Sources): void;
+        convert(html?: string): DeltaStatic;
     }
 }
 declare module "quill/modules/formula";

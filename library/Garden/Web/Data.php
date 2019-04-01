@@ -18,8 +18,6 @@ use DateTimeInterface;
 class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggregate  {
     use MetaTrait;
 
-    const VANILLA_DEPLOYMENT_KEY = 'Vdk';
-
     private $data;
 
     /**

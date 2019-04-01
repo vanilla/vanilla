@@ -1,24 +1,11 @@
-import { componentThemeVariables, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { formElementsVariables } from "@library/forms/formElementStyles";
-import {
-    IBorderStyles,
-    modifyColorBasedOnLightness,
-    srOnly,
-    unit,
-    userSelect,
-    colorOut,
-    paddings,
-    borders,
-    allLinkStates,
-    fonts,
-    allButtonStates,
-} from "@library/styles/styleHelpers";
-import { percent, px } from "csx";
-import { FontWeightProperty, TextAlignLastProperty, TextShadowProperty } from "csstype";
+import { unit, userSelect, colorOut, paddings, borders, fonts, allButtonStates } from "@library/styles/styleHelpers";
+import { percent, viewWidth } from "csx";
+import { FontWeightProperty } from "csstype";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
+import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
@@ -32,6 +19,7 @@ export const messagesVariables = useThemeCache(() => {
 
     const sizing = themeVars("sizing", {
         minHeight: 54,
+        width: 900, // only applies to "fixed" style
     });
 
     const spacing = themeVars("spacing", {
@@ -53,7 +41,7 @@ export const messagesVariables = useThemeCache(() => {
         font: {
             color: colors.fg,
             size: globalVars.fonts.size.medium,
-            weight: globalVars.fonts.weights.semiBold,
+            weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
         },
     });
 
@@ -64,7 +52,7 @@ export const messagesVariables = useThemeCache(() => {
         },
         font: {
             size: globalVars.fonts.size.medium,
-            weight: globalVars.fonts.weights.bold,
+            weight: globalVars.fonts.weights.bold as FontWeightProperty,
         },
         minHeight: 36,
     });
@@ -82,27 +70,55 @@ export const messagesClasses = useThemeCache(() => {
     const vars = messagesVariables();
     const globalVars = globalVariables();
     const style = styleFactory("messages");
+    const headerVars = vanillaHeaderVariables();
     const shadows = shadowHelper();
+    const mediaQueries = layoutVariables().mediaQueries();
+
+    // Fixed wrapper
+    const fixed = style("fixed", {
+        position: "fixed",
+        left: 0,
+        top: unit(headerVars.sizing.height - 8),
+        minHeight: unit(vars.sizing.minHeight),
+        width: percent(100),
+        maxWidth: viewWidth(100),
+        zIndex: 20,
+    });
 
     const root = style({
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        minHeight: unit(vars.sizing.minHeight),
-        backgroundColor: colorOut(vars.colors.bg),
-        color: colorOut(vars.colors.fg),
-        ...paddings({
-            ...vars.spacing.padding,
-            right: vars.spacing.padding.horizontal / 2,
-        }),
-        ...shadowOrBorderBasedOnLightness(
-            globalVars.body.backgroundImage.color,
-            borders({
-                color: globalVars.mainColors.fg,
-            }),
-            shadows.embed(),
-        ),
+        position: "relative",
+        margin: "auto",
+        width: percent(100),
     });
+
+    const wrap = style(
+        "wrap",
+        {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            minHeight: unit(vars.sizing.minHeight),
+            backgroundColor: colorOut(vars.colors.bg),
+            width: percent(100),
+            ...shadowOrBorderBasedOnLightness(
+                globalVars.body.backgroundImage.color,
+                borders({
+                    color: globalVars.mainColors.fg,
+                }),
+                shadows.embed(),
+            ),
+            margin: "auto",
+            color: colorOut(vars.colors.fg),
+            ...paddings({
+                ...vars.spacing.padding,
+                right: vars.spacing.padding.horizontal / 2,
+            }),
+        },
+        mediaQueries.xs({
+            flexWrap: "wrap",
+            paddingLeft: unit(vars.spacing.padding.horizontal / 2),
+        }),
+    );
 
     const message = style("message", {
         ...userSelect(),
@@ -110,26 +126,43 @@ export const messagesClasses = useThemeCache(() => {
         flexGrow: 1,
     });
 
-    const actionButton = style("actionButton", {
-        ...paddings(vars.actionButton.padding),
-        minHeight: unit(vars.actionButton.minHeight),
-        ...fonts(vars.actionButton.font),
-        ...allButtonStates({
-            noState: {
-                color: colorOut(vars.colors.fg),
-            },
-            allStates: {
-                color: colorOut(vars.colors.states.fg),
-            },
-            focusNotKeyboard: {
-                outline: 0,
-            },
-        }),
+    const setWidth = style("setWidth", {
+        width: unit(vars.sizing.width),
+        maxWidth: percent(100),
     });
+
+    const actionButton = style(
+        "actionButton",
+        {
+            ...paddings(vars.actionButton.padding),
+            minHeight: unit(vars.actionButton.minHeight),
+            whiteSpace: "nowrap",
+            ...fonts(vars.actionButton.font),
+            ...allButtonStates({
+                noState: {
+                    color: colorOut(vars.colors.fg),
+                },
+                allStates: {
+                    color: colorOut(vars.colors.states.fg),
+                },
+                focusNotKeyboard: {
+                    outline: 0,
+                },
+            }),
+        },
+        mediaQueries.xs({
+            padding: 0,
+            width: percent(100),
+            textAlign: "center",
+        }),
+    );
 
     return {
         root,
+        wrap,
         actionButton,
         message,
+        fixed,
+        setWidth,
     };
 });

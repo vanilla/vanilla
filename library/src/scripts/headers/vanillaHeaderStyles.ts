@@ -142,6 +142,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
 
     const root = style(
         {
+            maxWidth: percent(100),
             backgroundColor: headerColors.bg.toString(),
             color: headerColors.fg.toString(),
             $nest: {

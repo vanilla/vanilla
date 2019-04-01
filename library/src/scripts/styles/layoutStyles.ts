@@ -75,5 +75,15 @@ export const layoutVariables = useThemeCache(() => {
         return { noBleed, twoColumns, oneColumn, xs };
     };
 
-    return { gutterSize, gutter, panelWidth, panel, middleColumnWidth, middleColumn, content, mediaQueries };
+    return {
+        gutterSize,
+        gutter,
+        panelWidth,
+        panel,
+        middleColumnWidth,
+        middleColumn,
+        content,
+        globalBreakPoints,
+        mediaQueries,
+    };
 });

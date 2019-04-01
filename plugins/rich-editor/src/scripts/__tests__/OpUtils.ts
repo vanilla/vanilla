@@ -14,7 +14,7 @@ import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import HeadingBlot from "quill/formats/header";
 import ListBlot from "quill/formats/list";
-import { StringMap } from "quill/core";
+import { StringMap, DeltaStatic, DeltaOperation } from "quill/core";
 import { ListType } from "@rich-editor/quill/blots/blocks/ListBlot";
 
 /**
@@ -23,7 +23,7 @@ import { ListType } from "@rich-editor/quill/blots/blocks/ListBlot";
 export default class OpUtils {
     public static DEFAULT_LINK = "http://link.com";
 
-    public static op(insert: string = "TEST", attributes?: StringMap) {
+    public static op(insert: string = "TEST", attributes?: StringMap): DeltaOperation {
         const op: any = {
             insert,
         };

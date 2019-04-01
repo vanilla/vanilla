@@ -34,7 +34,8 @@ export function withSearch<T extends IWithSearchProps = IWithSearchProps>(Wrappe
             return (
                 <SearchContext.Consumer>
                     {context => {
-                        return <WrappedComponent {...context} {...this.props} />;
+                        // https://github.com/Microsoft/TypeScript/issues/28938
+                        return <WrappedComponent {...context} {...this.props as T} />;
                     }}
                 </SearchContext.Consumer>
             );

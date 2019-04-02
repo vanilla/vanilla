@@ -115,38 +115,21 @@ export abstract class ListGroup extends WrapperBlot {
                 return;
             }
 
-            if (nextValue.depth === ownValue.depth && nextValue.type === ownValue.type) {
+            if (nextValue.depth === ownValue.depth && (nextValue.type === ownValue.type || ownValue.depth > 0)) {
                 // Simple same level, same type join.
                 next.moveChildren(this);
                 next.remove();
             } else if (nextValue.depth > ownValue.depth) {
                 // We have another list that is of a level deeper than our own.
                 // Let's try and join it if possible.
-                const targetListItem = this.children.tail;
-                if (!(targetListItem instanceof ListItemWrapper)) {
+                const targetListWrapper = this.children.tail;
+                if (!(targetListWrapper instanceof ListItemWrapper)) {
                     return;
                 }
 
-                const hasNestedList = targetListItem.children.tail && targetListItem.children.tail instanceof ListGroup;
-                if (hasNestedList) {
-                    // Try to merge the lists if possible.
-                    const existingListGroup = targetListItem.children.tail as ListGroup;
-                    const existingListGroupValue = existingListGroup.getValue();
-                    if (
-                        existingListGroupValue.type === nextValue.type &&
-                        existingListGroupValue.depth === nextValue.depth
-                    ) {
-                        // We can only merge them if they are the same type. Otherwise we put the different lists next to each other an do another optimization pass afterwards.
-                        next.moveChildren(existingListGroup);
-                        next.remove();
-                    } else {
-                        // They are different types so they need to get different list groups.
-                        next.insertInto(targetListItem);
-                    }
-                } else {
-                    // We don't have an existing nested list, so we can move it entirely.
-                    next.insertInto(targetListItem);
-                }
+                next.children.forEach((child: ListItemWrapper) => {
+                    targetListWrapper.addNestedChild(child, "end");
+                });
             }
         }
     }
@@ -237,6 +220,26 @@ export class ListItemWrapper extends withWrapper(Container as any) {
     }
 
     /**
+     * Nest a ListItemWrapper inside of this one.
+     *
+     * @param blot The item to wrap.
+     */
+    public addNestedChild(blot: ListItemWrapper, target: "start" | "end") {
+        const group = this.getListGroup();
+        if (group) {
+            if (group.getValue().depth < blot.getValue().depth && group.children.tail instanceof ListItemWrapper) {
+                group.children.tail.addNestedChild(blot, target);
+            } else if (target === "start") {
+                blot.insertInto(group, group.children.head);
+            } else if (target === "end") {
+                blot.insertInto(group);
+            }
+        } else {
+            blot.insertInto(this);
+        }
+    }
+
+    /**
      * @override
      * Overridden to implement list nesting.
      */
@@ -247,6 +250,9 @@ export class ListItemWrapper extends withWrapper(Container as any) {
         super.optimize(context);
     }
 
+    /**
+     * Ensure that all text content is wrapped in a `ListBlot`.
+     */
     private ensureListContent() {
         if (!this.getListContent()) {
             const listContent = (Parchment.create(ListItem.blotName, this.getValue()) as any) as ListItem;
@@ -392,8 +398,12 @@ const MAX_NESTING_DEPTH = 4;
 export class ListItem extends LineBlot {
     public static blotName = "list";
     public static className = "listItem";
-    public static tagName = "span";
     public static parentName = ListItemWrapper.blotName;
+
+    // This is not the actual tag name we build with (the parent has that)
+    // It needs to be set so that pasting works properly though.
+    // We actually create a <span> and wrap in an <li>.
+    public static tagName = ListTag.LI;
 
     /**
      * @override
@@ -402,9 +412,46 @@ export class ListItem extends LineBlot {
      */
     public static create(value: ListValue) {
         value = this.mapListValue(value);
-        const element = super.create(value) as HTMLElement;
+        // Ignore the super create.
+        const element = document.createElement("p");
+        element.classList.add(this.className);
         syncValueToElement(element, value);
         return element;
+    }
+
+    /**
+     * Get the depth a list item based on the it's parent HTML elements.
+     *
+     * @param listElement The HTML element to check.
+     */
+    private static getListDepth(listElement: HTMLElement): number {
+        let depth = 0;
+        let parent = listElement.parentElement;
+        while (parent && Object.values(ListTag).includes(parent.tagName)) {
+            if (parent.tagName === ListTag.LI) {
+                depth++;
+            }
+            parent = parent.parentElement;
+        }
+        return depth;
+    }
+
+    /**
+     * Get the format value for a list item if it matches.
+     *
+     * @param domNode The element to check.
+     */
+    public static formats(domNode: HTMLElement): IListObjectValue | undefined {
+        if (domNode.tagName === ListTag.LI) {
+            const parentTag = (domNode.parentElement && domNode.parentElement.tagName) || ListTag.UL;
+            return {
+                depth: this.getListDepth(domNode),
+                type: parentTag === ListTag.OL ? ListType.ORDERED : ListType.BULLETED,
+            };
+        } else if (domNode.classList.contains(this.className)) {
+            // Also handle our in built in lists.
+            return getValueFromElement(domNode);
+        }
     }
 
     /**
@@ -442,11 +489,6 @@ export class ListItem extends LineBlot {
             }
         }
     }
-
-    /**
-     * The value of the blot's line.
-     */
-    public static formats = getValueFromElement;
 
     protected useWrapperReplacement = false;
 

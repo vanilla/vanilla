@@ -5,7 +5,7 @@
  */
 
 import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
-import { unit } from "@library/styles/styleHelpers";
+import {colorOut, unit} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/styles/layoutStyles";
 
@@ -96,6 +96,19 @@ export const formElementsVariables = useThemeCache(() => {
         placeholder,
         disabled,
         buttonMarginAlignment,
+    };
+});
+
+export const AccessibleErrorClasses = useThemeCache(() => {
+    const style = styleFactory("accessibleError");
+    const varsGlobal = globalVariables();
+    const vars = formElementsVariables();
+    const root = style({
+        color: colorOut(varsGlobal.feedbackColors.error.fg),
+    });
+
+    return {
+        root,
     };
 });
 

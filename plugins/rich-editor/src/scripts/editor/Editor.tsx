@@ -33,6 +33,7 @@ import { hot } from "react-hot-loader";
 import { Provider } from "react-redux";
 import hljs from "highlight.js";
 import { LiveMessage } from "react-aria-live";
+import AccessibleError from "@library/forms/AccessibleError";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;
@@ -130,9 +131,6 @@ export class Editor extends React.Component<IProps> {
             >
                 {this.renderContexts(
                     <>
-                        {hasError && (
-                            <LiveMessage clearOnUnmount={true} message={this.props.error} aria-live="polite" />
-                        )}
                         {this.renderEmbedBar()}
                         <div className={classNames("richEditor-scrollFrame", classesRichEditorForm.scrollFrame)}>
                             <div
@@ -182,6 +180,7 @@ export class Editor extends React.Component<IProps> {
     private renderMountPoint(): React.ReactNode {
         return (
             <div className="richEditor-textWrap" ref={this.quillMountRef}>
+                {/*{this.error && <AccessibleError id={} error={} renderAsBlock={}/>}*/}
                 <div
                     className={this.contentClasses}
                     data-gramm="false"

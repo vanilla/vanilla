@@ -1,6 +1,5 @@
 <?php
 /**
- * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
@@ -9,12 +8,22 @@ namespace Vanilla\Web;
 
 use Garden\Web\Data;
 use Garden\Web\RequestInterface;
+use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 
 /**
  * Dispatcher middleware for handling content-security headers.
  */
 class ContentSecurityPolicyMiddleware {
     const CONTENT_SECURITY_POLICY = 'Content-Security-Policy';
+
+    /**
+     * @var ContentSecurityPolicyModel
+     */
+    private $contentSecurityPolicyModel;
+
+    public function __construct(ContentSecurityPolicyModel $contentSecurityPolicyModel) {
+        $this->contentSecurityPolicyModel = $contentSecurityPolicyModel;
+    }
 
     /**
      * Invoke the smart ID middleware on a request.
@@ -28,7 +37,7 @@ class ContentSecurityPolicyMiddleware {
         $response->setHeader(
             self::CONTENT_SECURITY_POLICY,
             implode('; ', [
-                'script-src '.$this->getTrustedScriptSources().';',
+                'script-src '.$this->getTrustedScriptSources(),
                 'form-action \'self\''
             ])
         );
@@ -41,8 +50,12 @@ class ContentSecurityPolicyMiddleware {
             [
                 '\'self\'',
                 '\'unsafe-inline\'',
-                //'http://127.0.0.1',
-                '\'nonce-EDNnf03nceIOfn39fn3e9h3sdfa\'',
+                '\'unsafe-eval\'',
+                'http://127.0.0.1:3030',
+                'http://localhost:3030',
+                'https://ajax.googleapis.com',
+                //'http://127.0.0.1:3030/knowledge-hot-bundle.js',
+                //'\'nonce-EDNnf03nceIOfn39fn3e9h3sdfa\'',
             ]
         );
     }

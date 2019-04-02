@@ -1,4 +1,4 @@
-<?php
+ <?php
 /**
  * Manages users manually authenticating (signing in).
  *
@@ -1919,6 +1919,13 @@ class EntryController extends Gdn_Controller {
 
         $emailConfirmed = $this->UserModel->confirmEmail($user, $emailKey);
         $this->Form->setValidationResults($this->UserModel->validationResults());
+
+        $userMatch = ($userID === Gdn::session()->UserID) ? true : false;
+
+        if(!$userMatch) {
+            Gdn::session()->end();
+            redirectTo('/entry/signin');
+        }
 
         if ($emailConfirmed) {
             $userID = val('UserID', $user);

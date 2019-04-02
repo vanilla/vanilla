@@ -829,6 +829,15 @@ class EditorPlugin extends Gdn_Plugin {
                 if ($uploadType === 'unknown') {
                     $uploadType = 'image';
                 }
+
+                // image dimensions are higher than limit, it needs resizing
+                if (c("ImageUpload.Limits.Enabled")) {
+                    if ($tmpwidth > c("ImageUpload.Limits.Width") || $tmpheight > c("ImageUpload.Limits.Height")) {
+                        $imageResizer = new \Vanilla\ImageResizer();
+                        $imageResizer->resize($tmpFilePath, null, ["height"=>c("ImageUpload.Limits.Height"), "width"=>c("ImageUpload.Limits.Width"), "crop"=>true]);
+                    }
+                }
+
                 $filePathParsed = Gdn_UploadImage::saveImageAs(
                     $tmpFilePath,
                     $absoluteFileDestination,
@@ -1443,6 +1452,17 @@ class EditorPlugin extends Gdn_Plugin {
         Gdn_Form $form,
         Gdn_ConfigurationModel $configModel
     ): string {
+        //WYSWYG form items
+        $forceWysiwygLabel = 'Reinterpret All Posts As Wysiwyg';
+        $forceWysiwygNote1 =  t('ForceWysiwyg.Notes1', 'Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.');
+        $forceWysiwygNote2 = t('ForceWysiwyg.Notes2', 'This setting will only take effect if Wysiwyg was chosen as the Post Format above. The purpose of this option is to normalize the editor format. If older posts edited with another format, such as markdown or BBCode, are loaded, this option will force Wysiwyg.');
+        $label = '<p class="info">'.$forceWysiwygNote1.'</p><p class="info"><strong>'.t('Note:').' </strong>'.$forceWysiwygNote2.'</p>';
+        $configModel->setField('Plugins.editor.ForceWysiwyg');
+        $form->setValue('Plugins.editor.ForceWysiwyg', c('Plugins.editor.ForceWysiwyg'));
+        $formToggle = $form->toggle('Plugins.editor.ForceWysiwyg', $forceWysiwygLabel, [], $label);
+
+        $additionalFormItemHTML .= "<div class='form-group forceWysiwyg'>$formToggle</div>";
+
         //Image Upload form items
         $imageUploadLimitLabel = t('ImageUploadLimits.Notes1', 'Enable Image Upload Limit');
         $ImageUploadDesc = t('ImageUploadLimits.Notes2', 'Add limits to image upload dimensions in discussions and comments.');
@@ -1451,11 +1471,11 @@ class EditorPlugin extends Gdn_Plugin {
 
         $widthLabel = $form->label('Max Image Width', 'ImageUpload.Limits.Width');
         $widthInfo = wrap(t('Images will be scaled down if they exceed this width.'), 'div', ['class' => 'info']);
-        $widthField = $form->textBox('ImageUpload.Limits.Width', ["class" => "form-control", "value" => 1400]);
+        $widthField = $form->textBox('ImageUpload.Limits.Width', ["class" => "form-control", "value" => c("ImageUpload.Limits.Width", 1400)]);
 
         $heightLabel = $form->label('Max Image Height', 'ImageUpload.Limits.Height');
         $heightInfo = wrap(t('Images will be scaled down if they exceed this height.'), 'div', ['class' => 'info']);
-        $heightField = $form->textBox('ImageUpload.Limits.Height', ["class" => "form-control", "value" => 1000]);
+        $heightField = $form->textBox('ImageUpload.Limits.Height', ["class" => "form-control", "value" => c("ImageUpload.Limits.Height", 1000)]);
 
         $imageUploadLimitsDimensions = <<<EOT
 <div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
@@ -1486,18 +1506,6 @@ EOT;
         $configModel->setField('ImageUpload.Limits.Height');
 
         $additionalFormItemHTML .= $imageUploadLimitsDimensions;
-
-
-        //WYSWYG form items
-        $forceWysiwygLabel = 'Reinterpret All Posts As Wysiwyg';
-        $forceWysiwygNote1 =  t('ForceWysiwyg.Notes1', 'Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.');
-        $forceWysiwygNote2 = t('ForceWysiwyg.Notes2', 'This setting will only take effect if Wysiwyg was chosen as the Post Format above. The purpose of this option is to normalize the editor format. If older posts edited with another format, such as markdown or BBCode, are loaded, this option will force Wysiwyg.');
-        $label = '<p class="info">'.$forceWysiwygNote1.'</p><p class="info"><strong>'.t('Note:').' </strong>'.$forceWysiwygNote2.'</p>';
-        $configModel->setField('Plugins.editor.ForceWysiwyg');
-        $form->setValue('Plugins.editor.ForceWysiwyg', c('Plugins.editor.ForceWysiwyg'));
-        $formToggle = $form->toggle('Plugins.editor.ForceWysiwyg', $forceWysiwygLabel, [], $label);
-
-        $additionalFormItemHTML .= "<div class='form-group forceWysiwyg'>$formToggle</div>";
 
         return $additionalFormItemHTML;
     }

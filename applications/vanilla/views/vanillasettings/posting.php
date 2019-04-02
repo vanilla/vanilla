@@ -30,38 +30,6 @@ echo $form->errors();
         echo $form->toggle('Garden.Format.DisableUrlEmbeds', $embedsLabel, [], $embedsDesc, true);
         ?>
     </div>
-    <div class="form-group ImageUploadLimitsEnabled">
-        <?php
-        $ImageUploadLabel = t('ImageUploadLimits.Notes1', 'Enable image upload dimensions limit');
-        $ImageUploadDesc = t('ImageUploadLimits.Notes2', 'Add limits to image upload dimensions in discussions and comments. Images exceeding the limits will be resized.');
-        echo $form->toggle('ImageUpload.Limits.Enabled', $ImageUploadLabel, [], $ImageUploadDesc, false);
-        ?>
-    </div>
-
-    <div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
-        <div class="label-wrap-wide">
-            <?php
-            echo $form->label('Max Image Width', 'ImageUpload.Limits.Width');
-            echo wrap(t('Images will be scaled down if they exceed this width.'), 'div', ['class' => 'info']); ?>
-        </div>
-        <div class="input-wrap-right">
-            <div class="textbox-suffix" data-suffix="<?php echo t('px'); ?>">
-                <?php echo $form->textBox('ImageUpload.Limits.Width'); ?>
-            </div>
-        </div>
-    </div>
-    <div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
-        <div class="label-wrap-wide">
-            <?php
-            echo $form->label('Max Image Height', 'ImageUpload.Limits.Height');
-            echo wrap(t('Images will be scaled down if they exceed this height.'), 'div', ['class' => 'info']); ?>
-        </div>
-        <div class="input-wrap-right">
-            <div class="textbox-suffix" data-suffix="<?php echo t('px'); ?>">
-                <?php echo $form->textBox('ImageUpload.Limits.Height'); ?>
-            </div>
-        </div>
-    </div>
 
     <div class="form-group">
         <?php

@@ -28,6 +28,10 @@
         var imageUploadEnabled = $('#Form_ImageUpload-dot-Limits-dot-Enabled');
         var imageUploadDimensions = $('.ImageUploadLimitsDimensions');
 
+        if (imageUploadEnabled.prop("checked") === true ) {
+            imageUploadDimensions.removeClass('dimensionsDisabled');
+        }
+
         imageUploadEnabled.on('click', function (e) {
             if (imageUploadEnabled.prop("checked") === true ) {
                 imageUploadDimensions.removeClass('dimensionsDisabled');

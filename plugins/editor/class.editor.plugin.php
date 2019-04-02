@@ -670,6 +670,8 @@ class EditorPlugin extends Gdn_Plugin {
             $sender->setValue('Format', $this->Format);
         }
 
+
+
         // If force Wysiwyg enabled in settings
         $needsConversion = (!in_array($this->Format, ['Wysiwyg']));
         if (c('Garden.InputFormatter', 'Wysiwyg') == 'Wysiwyg' && $this->ForceWysiwyg == true && $needsConversion) {
@@ -1427,6 +1429,7 @@ class EditorPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add additional Image Upload specific form items to the dashboard posting page.
      * Add additional WYSIWYG specific form item to the dashboard posting page.
      *
      * @param string $additionalFormItemHTML
@@ -1440,6 +1443,52 @@ class EditorPlugin extends Gdn_Plugin {
         Gdn_Form $form,
         Gdn_ConfigurationModel $configModel
     ): string {
+        //Image Upload form items
+        $imageUploadLimitLabel = t('ImageUploadLimits.Notes1', 'Enable Image Upload Limit');
+        $ImageUploadDesc = t('ImageUploadLimits.Notes2', 'Add limits to image upload dimensions in discussions and comments.');
+        $formToggleImageUpload = $form->toggle('ImageUpload.Limits.Enabled', $imageUploadLimitLabel, [], $ImageUploadDesc, false);
+        $additionalFormItemHTML .= "<div class='form-group ImageUploadLimitsEnabled'>$formToggleImageUpload</div>";
+
+        $widthLabel = $form->label('Max Image Width', 'ImageUpload.Limits.Width');
+        $widthInfo = wrap(t('Images will be scaled down if they exceed this width.'), 'div', ['class' => 'info']);
+        $widthField = $form->textBox('ImageUpload.Limits.Width', ["class" => "form-control", "value" => 1400]);
+
+        $heightLabel = $form->label('Max Image Height', 'ImageUpload.Limits.Height');
+        $heightInfo = wrap(t('Images will be scaled down if they exceed this height.'), 'div', ['class' => 'info']);
+        $heightField = $form->textBox('ImageUpload.Limits.Height', ["class" => "form-control", "value" => 1000]);
+
+        $imageUploadLimitsDimensions = <<<EOT
+<div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
+    <div class="label-wrap-wide">
+        $widthLabel
+        $widthInfo
+    </div>
+    <div class="input-wrap-right">
+        <div class="textbox-suffix" data-suffix="px">
+            $widthField
+        </div>
+    </div>
+</div>
+<div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
+    <div class="label-wrap-wide">
+        $heightLabel
+        $heightInfo
+    </div>
+    <div class="input-wrap-right">
+        <div class="textbox-suffix" data-suffix="px">
+            $heightField
+        </div>
+    </div>
+</div>
+EOT;
+        $configModel->setField('ImageUpload.Limits.Enabled');
+        $configModel->setField('ImageUpload.Limits.Width');
+        $configModel->setField('ImageUpload.Limits.Height');
+
+        $additionalFormItemHTML .= $imageUploadLimitsDimensions;
+
+
+        //WYSWYG form items
         $forceWysiwygLabel = 'Reinterpret All Posts As Wysiwyg';
         $forceWysiwygNote1 =  t('ForceWysiwyg.Notes1', 'Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.');
         $forceWysiwygNote2 = t('ForceWysiwyg.Notes2', 'This setting will only take effect if Wysiwyg was chosen as the Post Format above. The purpose of this option is to normalize the editor format. If older posts edited with another format, such as markdown or BBCode, are loaded, this option will force Wysiwyg.');
@@ -1449,6 +1498,7 @@ class EditorPlugin extends Gdn_Plugin {
         $formToggle = $form->toggle('Plugins.editor.ForceWysiwyg', $forceWysiwygLabel, [], $label);
 
         $additionalFormItemHTML .= "<div class='form-group forceWysiwyg'>$formToggle</div>";
+
         return $additionalFormItemHTML;
     }
 

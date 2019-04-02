@@ -1,3 +1,9 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { unit, userSelect, colorOut, paddings, borders, fonts, allButtonStates } from "@library/styles/styleHelpers";
@@ -6,12 +12,6 @@ import { FontWeightProperty } from "csstype";
 import { layoutVariables } from "@library/styles/layoutStyles";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
-
-/**
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
 
 export const messagesVariables = useThemeCache(() => {
     const globalVars = globalVariables();

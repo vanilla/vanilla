@@ -65,11 +65,14 @@ class VanillaSettingsController extends Gdn_Controller {
             'Garden.Html.AllowedElements',
             'Garden.EditContentTimeout',
             'Vanilla.AdminCheckboxes.Use',
-            'ImageUpload.Limits.Enabled',
             'Vanilla.Comment.MaxLength',
             'Vanilla.Comment.MinLength',
             'Garden.Format.DisableUrlEmbeds',
             'Plugins.editor.ForceWysiwyg',
+            'ImageUpload.Limits.Enabled',
+            'ImageUpload.Limits.Width',
+            'ImageUpload.Limits.Height'
+
         ]);
 
         // Fire an filter event gather extra form HTML for specific format items.

@@ -834,7 +834,7 @@ class EditorPlugin extends Gdn_Plugin {
                 if (c("ImageUpload.Limits.Enabled")) {
                     if ($tmpwidth > c("ImageUpload.Limits.Width") || $tmpheight > c("ImageUpload.Limits.Height")) {
                         $imageResizer = new \Vanilla\ImageResizer();
-                        $imageResizer->resize($tmpFilePath, null, ["height"=>c("ImageUpload.Limits.Height"), "width"=>c("ImageUpload.Limits.Width"), "crop"=>true]);
+                        $imageResizer->resize($tmpFilePath, null, ["height"=>c("ImageUpload.Limits.Height"), "width"=>c("ImageUpload.Limits.Width"), "crop"=>false]);
                     }
                 }
 
@@ -1466,16 +1466,21 @@ class EditorPlugin extends Gdn_Plugin {
         //Image Upload form items
         $imageUploadLimitLabel = t('ImageUploadLimits.Notes1', 'Enable Image Upload Limit');
         $ImageUploadDesc = t('ImageUploadLimits.Notes2', 'Add limits to image upload dimensions in discussions and comments.');
-        $formToggleImageUpload = $form->toggle('ImageUpload.Limits.Enabled', $imageUploadLimitLabel, [], $ImageUploadDesc, false);
+        $formToggleImageUpload = $form->toggle('ImageUpload.Limits.Enabled', $imageUploadLimitLabel, [], $ImageUploadDesc);
         $additionalFormItemHTML .= "<div class='form-group ImageUploadLimitsEnabled'>$formToggleImageUpload</div>";
+        $configModel->setField('ImageUpload.Limits.Enabled');
 
         $widthLabel = $form->label('Max Image Width', 'ImageUpload.Limits.Width');
         $widthInfo = wrap(t('Images will be scaled down if they exceed this width.'), 'div', ['class' => 'info']);
-        $widthField = $form->textBox('ImageUpload.Limits.Width', ["class" => "form-control", "value" => c("ImageUpload.Limits.Width", 1400)]);
+        $widthField = $form->textBox('ImageUpload.Limits.Width', ["class" => "form-control"]);
+        $form->setValue('ImageUpload.Limits.Width', c("ImageUpload.Limits.Width", 1400));
+        $configModel->setField('ImageUpload.Limits.Width');
 
         $heightLabel = $form->label('Max Image Height', 'ImageUpload.Limits.Height');
         $heightInfo = wrap(t('Images will be scaled down if they exceed this height.'), 'div', ['class' => 'info']);
-        $heightField = $form->textBox('ImageUpload.Limits.Height', ["class" => "form-control", "value" => c("ImageUpload.Limits.Height", 1000)]);
+        $heightField = $form->textBox('ImageUpload.Limits.Height', ["class" => "form-control"]);
+        $form->setValue('ImageUpload.Limits.Width', c("ImageUpload.Limits.Height", 1000));
+        $configModel->setField('ImageUpload.Limits.Height');
 
         $imageUploadLimitsDimensions = <<<EOT
 <div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
@@ -1501,10 +1506,6 @@ class EditorPlugin extends Gdn_Plugin {
     </div>
 </div>
 EOT;
-        $configModel->setField('ImageUpload.Limits.Enabled');
-        $configModel->setField('ImageUpload.Limits.Width');
-        $configModel->setField('ImageUpload.Limits.Height');
-
         $additionalFormItemHTML .= $imageUploadLimitsDimensions;
 
         return $additionalFormItemHTML;

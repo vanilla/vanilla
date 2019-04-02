@@ -336,20 +336,60 @@ export const unit = (val: string | number | undefined, unitFunction = px) => {
     }
 };
 
+export const negative = (val) => {
+    if (typeof val === "string") {
+        val = val.trim();
+        if (val.startsWith("-")) {
+            return val.substring(1, val.length).trim();
+        } else {
+            return `-${val}`;
+        }
+    } else if (!!val && !isNaN(val)) {
+        return val * -1;
+    } else {
+        return val;
+    }
+};
+
 export interface IMargins {
     top?: string | number;
     right?: string | number;
     bottom?: string | number;
     left?: string | number;
+    horizontal?: string | number;
+    vertical?: string | number;
 }
 
 export const margins = (styles: IMargins): NestedCSSProperties => {
-    return {
-        marginTop: unit(styles.top),
-        marginRight: unit(styles.right),
-        marginBottom: unit(styles.bottom),
-        marginLeft: unit(styles.left),
-    };
+    const marginVals = {} as NestedCSSProperties;
+
+    if (styles.vertical !== undefined) {
+        marginVals.marginTop = unit(styles.vertical);
+        marginVals.marginBottom = unit(styles.vertical);
+    }
+
+    if (styles.horizontal !== undefined) {
+        marginVals.marginLeft = unit(styles.horizontal);
+        marginVals.marginRight = unit(styles.horizontal);
+    }
+
+    if (styles.top !== undefined) {
+        marginVals.marginTop = unit(styles.top);
+    }
+
+    if (styles.right !== undefined) {
+        marginVals.marginRight = unit(styles.right);
+    }
+
+    if (styles.bottom !== undefined) {
+        marginVals.marginBottom = unit(styles.bottom);
+    }
+
+    if (styles.left !== undefined) {
+        marginVals.marginLeft = unit(styles.left);
+    }
+
+    return marginVals as NestedCSSProperties;
 };
 
 export interface IPaddings {

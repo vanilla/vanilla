@@ -9,7 +9,7 @@ import {
     textInputSizing,
     colorOut,
     unit,
-    absolutePosition,
+    absolutePosition, pointerEvents, margins, negative,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -134,8 +134,26 @@ export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false)
         }),
     });
 
-    const errorMessage = style("errorMessage", {
+    const bodyErrorMessage = style("bodyErrorMessage", {
         ...absolutePosition.topLeft(),
+    });
+
+    const titleErrorMessage = style("titleErrorMessage", {
+        ...pointerEvents(),
+        ...margins({
+            top: unit(negative(globalVars.spacer.size)),
+            bottom: globalVars.spacer.size,
+        }),
+    });
+
+    const categoryErrorParagraph = style("categoryErrorParagraph", {
+        ...margins({
+            vertical: 8,
+        }),
+    });
+
+    const titleErrorParagraph = style("titleErrorParagraph", {
+        lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.large + 2),
     });
 
     return {
@@ -148,6 +166,9 @@ export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false)
         body,
         inlineMenuItems,
         formContent,
-        errorMessage,
+        bodyErrorMessage,
+        titleErrorMessage,
+        categoryErrorParagraph,
+        titleErrorParagraph,
     };
 });

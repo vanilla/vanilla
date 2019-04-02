@@ -8,14 +8,15 @@ import React from "react";
 import classNames from "classnames";
 import { LiveMessage } from "react-aria-live";
 import { AccessibleErrorClasses } from "@library/forms/formElementStyles";
-import { t } from "@library/utility/appUtils";
 import { userContentClasses } from "@library/content/userContentStyles";
 
 interface IProps {
     id: string;
     className?: string;
+    paragraphClassName?: string;
+    wrapClassName?: string;
     error: string;
-    ariaHidden?: boolean;
+    ariaHidden?: boolean; // Optionally hide visual message. There will still be a message sent through LiveMessage
 }
 
 export default class AccessibleError extends React.PureComponent<IProps> {
@@ -35,8 +36,8 @@ export default class AccessibleError extends React.PureComponent<IProps> {
                     className={classNames(this.props.className, classes.root)}
                     aria-hidden={this.props.ariaHidden}
                 >
-                    <span className={classesUserContent.root}>
-                        <p className={classes.paragraph}>{error}</p>
+                    <span className={this.props.wrapClassName} aria-hidden={this.props.ariaHidden}>
+                        <p className={classNames(classes.paragraph, this.props.paragraphClassName)}>{error}</p>
                     </span>
                 </span>
             </>

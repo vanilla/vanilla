@@ -109,7 +109,6 @@ export const AccessibleErrorClasses = useThemeCache(() => {
     const paragraph = style("paragraph",{
         color: colorOut(globalVars.feedbackColors.error.fg),
         fontSize: unit(globalVars.fonts.size.small),
-        lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.large + 3),
     });
 
     return {

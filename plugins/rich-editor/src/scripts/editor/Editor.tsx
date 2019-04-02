@@ -111,6 +111,7 @@ export class Editor extends React.Component<IProps> {
         const { className } = this.props as INewProps;
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const classesRichEditorForm = richEditorFormClasses(this.props.legacyMode);
+        const classesUserContent = userContentClasses();
         const hasError = !!this.props.error;
 
         return (
@@ -144,9 +145,11 @@ export class Editor extends React.Component<IProps> {
                                     {this.props.error && (
                                         <AccessibleError
                                             id={this.errorID}
-                                            error={this.props.error}
-                                            className={classesRichEditorForm.errorMessage}
                                             ariaHidden={true}
+                                            error={this.props.error}
+                                            className={classesRichEditorForm.bodyErrorMessage}
+                                            paragraphClassName={classesRichEditorForm.categoryErrorParagraph}
+                                            wrapClassName={classesUserContent.root}
                                         />
                                     )}
                                     {this.renderMountPoint()}

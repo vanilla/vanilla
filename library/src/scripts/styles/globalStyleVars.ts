@@ -59,18 +59,21 @@ export const globalVariables = useThemeCache(() => {
         return mainColors.primary.mix(mainColors.bg, weight) as ColorHelper;
     };
 
-    const errorFg = color("#555A62");
-    const warning = color("#ffce00");
-    const deleted = color("#D0021B");
     const feedbackColors = makeThemeVars("feedbackColors", {
-        warning,
+        warning: {
+            fg: color("#4b5057"),
+            bg: color("#fff1ce"),
+            state: color("#e55a1c"),
+        },
         error: {
-            fg: errorFg,
+            fg: color("#555A62"),
             bg: color("#FFF3D4"),
         },
         confirm: color("#60bd68"),
-        unresolved: warning.mix(mainColors.fg, 10),
-        deleted,
+        deleted: {
+            fg: color("#D0021B"),
+            bg: color("#D0021B"),
+        },
     });
 
     const links = makeThemeVars("links", {

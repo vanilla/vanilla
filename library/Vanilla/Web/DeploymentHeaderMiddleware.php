@@ -23,8 +23,7 @@ class DeploymentHeaderMiddleware {
      * DeploymentHeaderMiddleware constructor.
      * @param DeploymentCacheBuster $deploymentCacheBuster
      */
-    public function __construct(DeploymentCacheBuster $deploymentCacheBuster)
-    {
+    public function __construct(DeploymentCacheBuster $deploymentCacheBuster) {
         $this->deploymentCacheBuster = $deploymentCacheBuster;
     }
 

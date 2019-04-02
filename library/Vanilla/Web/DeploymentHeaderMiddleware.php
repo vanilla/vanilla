@@ -16,6 +16,18 @@ use Vanilla\Web\Asset\DeploymentCacheBuster;
 class DeploymentHeaderMiddleware {
     const VANILLA_DEPLOYMENT_KEY = 'Vdk';
 
+    /** @var DeploymentCacheBuster */
+    public $deploymentCacheBuster;
+
+    /**
+     * DeploymentHeaderMiddleware constructor.
+     * @param DeploymentCacheBuster $deploymentCacheBuster
+     */
+    public function __construct(DeploymentCacheBuster $deploymentCacheBuster)
+    {
+        $this->deploymentCacheBuster = $deploymentCacheBuster;
+    }
+
     /**
      * Invoke the deployment key on a request.
      *
@@ -25,10 +37,10 @@ class DeploymentHeaderMiddleware {
      */
     public function __invoke(RequestInterface $request, callable $next) {
         $response = Data::box($next($request));
-        $cacheBuster = \Gdn::getContainer()->get(DeploymentCacheBuster::class);
+
         $response->setHeader(
             self::VANILLA_DEPLOYMENT_KEY,
-            APPLICATION_VERSION.'-'.$cacheBuster->value()
+            $this->deploymentCacheBuster->value()
         );
         return $response;
     }

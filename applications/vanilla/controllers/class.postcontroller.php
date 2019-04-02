@@ -178,7 +178,13 @@ class PostController extends VanillaController {
         } else {
             // New discussion? Make sure a discussion ID didn't sneak in.
             $this->Form->removeFormValue('DiscussionID');
-
+            // Make sure a group discussion doesn't get announced outside the groups category.
+            $formAnnounce = $this->Form->_FormValues['Announce'];
+            if (isset($formAnnounce) && $formAnnounce === '1') {
+                if (isset($this->Data['Group'])) {
+                    $this->Form->setFormValue('Announce', '2');
+                }
+            }
             // Permission to add.
             if ($this->Category) {
                 $this->categoryPermission($this->Category, 'Vanilla.Discussions.Add');

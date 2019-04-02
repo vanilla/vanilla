@@ -32,7 +32,6 @@ import React from "react";
 import { hot } from "react-hot-loader";
 import { Provider } from "react-redux";
 import hljs from "highlight.js";
-import { LiveMessage } from "react-aria-live";
 import AccessibleError from "@library/forms/AccessibleError";
 
 interface ICommonProps {
@@ -113,6 +112,7 @@ export class Editor extends React.Component<IProps> {
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const classesRichEditorForm = richEditorFormClasses(this.props.legacyMode);
         const hasError = !!this.props.error;
+
         return (
             <div
                 className={classNames(
@@ -123,11 +123,11 @@ export class Editor extends React.Component<IProps> {
                 )}
                 aria-label={t("Type your message.")}
                 aria-describedby={this.descriptionID}
-                aria-invalid={hasError}
                 role="textbox"
                 aria-multiline={true}
                 id={this.domID}
                 aria-errormessage={hasError ? this.errorID : undefined}
+                aria-invalid={hasError}
             >
                 {this.renderContexts(
                     <>
@@ -140,10 +140,15 @@ export class Editor extends React.Component<IProps> {
                                 )}
                                 ref={this.scrollContainerRef}
                             >
-                                <div
-                                    className={classNames("richEditor-frame", "InputBox", "isMenuInset")}
-                                    id="testScroll"
-                                >
+                                <div className={classNames("richEditor-frame", "InputBox", "isMenuInset")}>
+                                    {this.props.error && (
+                                        <AccessibleError
+                                            id={this.errorID}
+                                            error={this.props.error}
+                                            className={classesRichEditorForm.errorMessage}
+                                            ariaHidden={true}
+                                        />
+                                    )}
                                     {this.renderMountPoint()}
                                     {this.renderInlineToolbars()}
                                 </div>
@@ -162,10 +167,7 @@ export class Editor extends React.Component<IProps> {
     private renderLegacy(): React.ReactNode {
         const classesRichEditorForm = richEditorFormClasses(true);
         return this.renderContexts(
-            <div
-                className={classNames("richEditor-frame", "InputBox", classesRichEditorForm.scrollFrame)}
-                id="testScroll"
-            >
+            <div className={classNames("richEditor-frame", "InputBox", classesRichEditorForm.scrollFrame)}>
                 {this.renderMountPoint()}
                 {this.renderParagraphToolbar()}
                 {this.renderInlineToolbars()}
@@ -178,18 +180,7 @@ export class Editor extends React.Component<IProps> {
      * Render the elements that Quill will mount into.
      */
     private renderMountPoint(): React.ReactNode {
-        return (
-            <div className="richEditor-textWrap" ref={this.quillMountRef}>
-                {/*{this.error && <AccessibleError id={} error={} renderAsBlock={}/>}*/}
-                <div
-                    className={this.contentClasses}
-                    data-gramm="false"
-                    contentEditable={this.props.isLoading}
-                    data-placeholder="Create a new post..."
-                    tabIndex={0}
-                />
-            </div>
-        );
+        return <div className="richEditor-textWrap" ref={this.quillMountRef} />;
     }
 
     private get contentClasses() {

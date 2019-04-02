@@ -28,7 +28,7 @@ import {
     LineHeightProperty,
     MaxWidthProperty,
     ObjectFitProperty,
-    OverflowXProperty,
+    OverflowXProperty, PointerEventsProperty,
     PositionProperty,
     RightProperty,
     TextAlignLastProperty,
@@ -769,4 +769,16 @@ export const states = (styles: IActionStates) => {
         "&.focus-visible": { ...allStates, ...accessibleFocus },
         "&:active": { ...allStates, ...active },
     };
+};
+
+
+export const pointerEvents = (value: PointerEventsProperty = "none") => {
+    return {
+        pointerEvents: important(value),
+    };
+};
+
+export const pointerEventsClass = (value: PointerEventsProperty = "none") => {
+    const style = styleFactory("pointerEvents");
+    return style(pointerEvents(value));
 };

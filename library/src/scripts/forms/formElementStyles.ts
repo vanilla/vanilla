@@ -5,7 +5,7 @@
  */
 
 import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
-import {colorOut, unit} from "@library/styles/styleHelpers";
+import {absolutePosition, colorOut, unit} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/styles/layoutStyles";
 
@@ -101,14 +101,20 @@ export const formElementsVariables = useThemeCache(() => {
 
 export const AccessibleErrorClasses = useThemeCache(() => {
     const style = styleFactory("accessibleError");
-    const varsGlobal = globalVariables();
-    const vars = formElementsVariables();
+    const globalVars = globalVariables();
     const root = style({
-        color: colorOut(varsGlobal.feedbackColors.error.fg),
+        display: "flex",
+        alignItems: "center",
+    });
+    const paragraph = style("paragraph",{
+        color: colorOut(globalVars.feedbackColors.error.fg),
+        fontSize: unit(globalVars.fonts.size.small),
+        lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.large + 3),
     });
 
     return {
         root,
+        paragraph,
     };
 });
 
@@ -118,8 +124,8 @@ export const formErrorClasses = useThemeCache(() => {
     const vars = formElementsVariables();
 
     const root = style({
-        backgroundColor: varsGlobal.feedbackColors.error.bg.toString(),
-        color: varsGlobal.feedbackColors.error.fg.toString(),
+        backgroundColor: colorOut(varsGlobal.feedbackColors.error.fg),
+        color: colorOut(varsGlobal.feedbackColors.error.fg),
         marginBottom: unit(16),
         paddingLeft: vars.errorSpacing.horizontalPadding,
         paddingRight: vars.errorSpacing.horizontalPadding,

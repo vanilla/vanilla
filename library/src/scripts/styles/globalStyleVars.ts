@@ -66,7 +66,7 @@ export const globalVariables = useThemeCache(() => {
             state: color("#e55a1c"),
         },
         error: {
-            fg: color("#555A62"),
+            fg: color("#d0021b"),
             bg: color("#FFF3D4"),
         },
         confirm: color("#60bd68"),

@@ -46,7 +46,7 @@ export default class MessageAndRefresh extends React.PureComponent<IMessageAndRe
                 <LiveMessage
                     clearOnUnmount={!!this.props.clearOnUnmount}
                     message={this.props.message}
-                    aria-live="polite"
+                    aria-live="assertive"
                 />
             </>
         );

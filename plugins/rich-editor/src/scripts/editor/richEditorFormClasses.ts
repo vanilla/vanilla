@@ -3,7 +3,14 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { paddings, placeholderStyles, textInputSizing, colorOut, unit } from "@library/styles/styleHelpers";
+import {
+    paddings,
+    placeholderStyles,
+    textInputSizing,
+    colorOut,
+    unit,
+    absolutePosition,
+} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
@@ -127,6 +134,10 @@ export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false)
         }),
     });
 
+    const errorMessage = style("errorMessage", {
+        ...absolutePosition.topLeft(),
+    });
+
     return {
         root,
         textWrap,
@@ -137,5 +148,6 @@ export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false)
         body,
         inlineMenuItems,
         formContent,
+        errorMessage,
     };
 });

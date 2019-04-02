@@ -30,9 +30,9 @@
 
         imageUploadEnabled.on('click', function (e) {
             if (imageUploadEnabled.prop("checked") === true ) {
-                imageUploadDimensions.removeClass('isHidden');
+                imageUploadDimensions.removeClass('dimensionsDisabled');
             } else {
-                imageUploadDimensions.addClass('isHidden');
+                imageUploadDimensions.addClass('dimensionsDisabled');
             }
         });
     });

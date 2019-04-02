@@ -1,12 +1,13 @@
+.ImageUploadLimitsDimensions,
 .forceWysiwyg {
   opacity: 1;
   transition: all 0.3s ease;
 }
 
-.isHidden,
+.dimensionsDisabled,
 .forceWysiwygDisabled {
   opacity: 0;
-  height: 0px;
+  height: 0;
   pointer-events: none;
   overflow: hidden;
   padding: 0 !important;

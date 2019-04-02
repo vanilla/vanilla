@@ -38,7 +38,7 @@ echo $form->errors();
         ?>
     </div>
 
-    <div class="form-group ImageUploadLimitsDimensions isHidden">
+    <div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
         <div class="label-wrap-wide">
             <?php
             echo $form->label('Max Image Width', 'ImageUpload.Limits.Width');
@@ -50,7 +50,7 @@ echo $form->errors();
             </div>
         </div>
     </div>
-    <div class="form-group ImageUploadLimitsDimensions isHidden">
+    <div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
         <div class="label-wrap-wide">
             <?php
             echo $form->label('Max Image Height', 'ImageUpload.Limits.Height');

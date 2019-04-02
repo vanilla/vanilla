@@ -111,6 +111,14 @@ class MediaApiController extends AbstractApiController {
                 }
         }
 
+        // image dimensions are higher than limit, it needs resizing
+        if (c("ImageUpload.Limits.Enabled")) {
+            if ($media['ImageWidth'] > c("ImageUpload.Limits.Width") || $media['ImageHeight'] > c("ImageUpload.Limits.Height")) {
+                $imageResizer = new \Vanilla\ImageResizer();
+                $imageResizer->resize($file, null, ["height"=>c("ImageUpload.Limits.Height"), "width"=>c("ImageUpload.Limits.Width"), "crop"=>false]);
+            }
+        }
+
         $ext = pathinfo(strtolower($upload->getClientFilename()), PATHINFO_EXTENSION);
         $destination = $this->generateUploadPath($ext, true);
         $uploadResult = $this->saveUpload($upload, $destination);

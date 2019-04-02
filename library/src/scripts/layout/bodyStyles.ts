@@ -29,6 +29,7 @@ export const bodyClasses = useThemeCache(() => {
             left: 0,
             width: percent(100),
             height: viewHeight(100),
+            zIndex: -1,
         },
         background(image),
     );

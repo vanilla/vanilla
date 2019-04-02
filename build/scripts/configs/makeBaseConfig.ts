@@ -159,13 +159,11 @@ ${chalk.green(aliases)}`;
     }
 
     // This is the only flag we are given by infrastructure to indicate we are in a lower memory environment.
-    if (!options.lowMemory) {
-        config.plugins.push(
-            new WebpackBar({
-                name: section,
-            }),
-        );
-    }
+    config.plugins.push(
+        new WebpackBar({
+            name: section,
+        }),
+    );
 
     return config;
 }

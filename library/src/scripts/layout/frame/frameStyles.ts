@@ -30,24 +30,18 @@ export const frameVariables = useThemeCache(() => {
     });
 
     const spacing = makeThemeVars("spacing", {
-        padding: 36,
+        padding: 16,
     });
 
     const header = makeThemeVars("header", {
+        spacing: spacing.padding,
         minHeight: 44,
-        spacing: 12,
         fontSize: globalVars.fonts.size.subTitle,
     });
 
     const footer = makeThemeVars("footer", {
-        spacing: header.spacing,
+        spacing: spacing.padding,
         minHeight: header.minHeight,
-        padding: {
-            top: 0,
-            right: 12,
-            bottom: 0,
-            left: 12,
-        },
     });
 
     return {
@@ -109,9 +103,7 @@ export const frameHeaderClasses = useThemeCache(() => {
         justifyContent: "center",
         alignItems: "flex-end",
         flexShrink: 1,
-        minWidth: unit(globalVars.icon.sizes.large),
-        width: unit(globalVars.icon.sizes.large),
-        transform: `translateX(-4px)`,
+        marginLeft: unit(-6),
     });
 
     const heading = style("heading", {
@@ -151,7 +143,7 @@ export const frameHeaderClasses = useThemeCache(() => {
         justifyContent: "center",
         flexShrink: 1,
         height: unit(formElVars.sizing.height),
-        transform: `translateX(6px)`,
+        marginRight: unit(-6),
         color: colorOut(vars.colors.fg),
     });
 
@@ -172,8 +164,8 @@ export const frameBodyClasses = useThemeCache(() => {
         maxHeight: percent(100),
         overflow: "auto",
         ...paddings({
-            left: 12,
-            right: 12,
+            left: vars.spacing.padding,
+            right: vars.spacing.padding,
         }),
         $nest: {
             "&.isSelfPadded": {
@@ -202,9 +194,9 @@ export const frameBodyClasses = useThemeCache(() => {
     });
     const contents = style("contents", {
         ...paddings({
-            top: vars.header.spacing / 2,
+            top: vars.spacing.padding,
             right: 0,
-            bottom: vars.header.spacing / 2,
+            bottom: vars.spacing.padding,
             left: 0,
         }),
         minHeight: unit(50),
@@ -224,7 +216,6 @@ export const framePanelClasses = useThemeCache(() => {
         backgroundColor: colorOut(vars.colors.bg),
         overflow: "auto",
         maxHeight: calc(`100vh - ${unit(vars.header.minHeight + vars.footer.minHeight + vars.spacing.padding * 2)}`),
-        minHeight: 56,
 
         $nest: {
             "& > .inputBlock": {
@@ -256,7 +247,12 @@ export const frameFooterClasses = useThemeCache(() => {
         borderTop: singleBorder(),
         flexWrap: "wrap",
         justifyContent: "flex-end",
-        ...paddings(vars.footer.padding),
+        ...paddings({
+            top: 0,
+            bottom: 0,
+            left: vars.footer.spacing,
+            right: vars.footer.spacing,
+        }),
     });
 
     const markRead = style("markRead", {
@@ -268,10 +264,14 @@ export const frameFooterClasses = useThemeCache(() => {
         },
     });
 
+    const actionButton = style("actionButton", {
+        marginLeft: unit(24),
+    });
+
     const selfPadded = style({
         paddingLeft: important(0),
         paddingRight: important(0),
     });
 
-    return { root, markRead, selfPadded };
+    return { root, markRead, selfPadded, actionButton };
 });

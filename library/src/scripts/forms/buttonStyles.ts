@@ -19,7 +19,7 @@ import {
     userSelect,
 } from "@library/styles/styleHelpers";
 import { TLength, NestedCSSProperties } from "typestyle/lib/types";
-import { componentThemeVariables, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { ColorHelper, important, percent, px } from "csx";
 
@@ -46,6 +46,7 @@ export const buttonGlobalVariables = useThemeCache(() => {
     const sizing = makeThemeVars("sizing", {
         minHeight: formElVars.sizing.height,
         minWidth: 96,
+        compactHeight: 24,
     });
 
     const border = makeThemeVars("border", {
@@ -330,6 +331,7 @@ export const buttonSizing = (height, minWidth, fontSize, paddingHorizontal, form
 };
 
 export const buttonResetMixin = (): NestedCSSProperties => ({
+    ...userSelect(),
     "-webkit-appearance": "none",
     appearance: "none",
     border: 0,
@@ -441,7 +443,9 @@ export enum ButtonTypes {
     CUSTOM = "custom",
     TAB = "tab",
     TEXT = "text",
+    TEXT_PRIMARY = "textPrimary",
     ICON = "icon",
+    ICON_COMPACT = "iconCompact",
 }
 
 export const buttonClasses = useThemeCache(() => {
@@ -456,12 +460,15 @@ export const buttonClasses = useThemeCache(() => {
         inverted: generateButtonClass(vars.inverted, ButtonTypes.INVERTED),
         tab: "buttonAsTab",
         icon: buttonUtilityClasses().buttonIcon,
-        text: "buttonAsText",
+        iconCompact: buttonUtilityClasses().buttonIconCompact,
+        text: buttonUtilityClasses().buttonAsText,
+        textPrimary: buttonUtilityClasses().buttonAsTextPrimary,
         custom: "",
     };
 });
 
 export const buttonUtilityClasses = useThemeCache(() => {
+    const vars = buttonGlobalVariables();
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
     const style = styleFactory("buttonUtils");
@@ -474,36 +481,51 @@ export const buttonUtilityClasses = useThemeCache(() => {
         marginLeft: important("auto"),
     });
 
-    const buttonIcon = style("icon", buttonResetMixin(), {
+    const iconMixin = (dimension: number): NestedCSSProperties => ({
+        ...buttonResetMixin(),
         alignItems: "center",
         display: "flex",
-        height: unit(formElementVars.sizing.height),
-        minWidth: unit(formElementVars.sizing.height),
-        width: unit(formElementVars.sizing.height),
+        height: unit(dimension),
+        minWidth: unit(dimension),
+        width: unit(dimension),
         justifyContent: "center",
         padding: 0,
         color: "inherit",
     });
 
-    const buttonAsText = style("asText", {
+    const buttonIcon = style("icon", iconMixin(formElementVars.sizing.height));
+
+    const buttonIconCompact = style("iconCompact", iconMixin(vars.sizing.compactHeight));
+
+    const asTextStyles: NestedCSSProperties = {
+        ...buttonResetMixin(),
         minWidth: important(0),
-        padding: important(0),
+        padding: 0,
         overflow: "hidden",
         textAlign: "left",
         lineHeight: globalVars.lineHeights.base,
+        fontWeight: globalVars.fonts.weights.semiBold,
+    };
+
+    const buttonAsText = style("asText", asTextStyles, {
         color: "inherit",
+    });
+
+    const buttonAsTextPrimary = style("asTextPrimary", asTextStyles, {
+        color: colorOut(globalVars.mainColors.primary),
     });
 
     return {
         pushLeft,
         buttonAsText,
+        buttonAsTextPrimary,
         pushRight,
+        buttonIconCompact,
         buttonIcon,
     };
 });
 
 export const buttonLoaderClasses = (buttonType: ButtonTypes) => {
-    const themeVars = componentThemeVariables("buttonLoader");
     const globalVars = globalVariables();
     const flexUtils = flexHelper();
     const style = styleFactory("buttonLoader");
@@ -530,7 +552,6 @@ export const buttonLoaderClasses = (buttonType: ButtonTypes) => {
                 dimensions: 20,
             }),
         },
-        ...themeVars.subComponentStyles("root"),
     });
     return { root };
 };

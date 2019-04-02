@@ -8,6 +8,7 @@
 
 declare module "quill/core" {
     import HistoryModule from "@rich-editor/quill/HistoryModule";
+    import SelectionModule from "quill/modules/selection";
     import Blot from "parchment/dist/src/blot/abstract/shadow";
     import Container from "parchment/dist/src/blot/abstract/container";
     import ClipboardModule from "quill/modules/clipboard";
@@ -164,6 +165,7 @@ declare module "quill/core" {
     class Quill extends EventEmitter {
         root: HTMLDivElement;
         clipboard: ClipboardModule;
+        selection: SelectionModule;
         scroll: Container;
         container: HTMLDivElement;
         options: AnyObject;
@@ -238,7 +240,7 @@ declare module "quill/core" {
 declare module "quill/blots/block" {
     import Block from "parchment/dist/src/blot/block";
     import Embed from "parchment/dist/src/blot/embed";
-    import { Blot } from "quill/core";
+    import { Blot, DeltaOperation } from "quill/core";
 
     export class BlockEmbed extends Embed {}
     export default class BlockBlot extends Block {
@@ -306,6 +308,7 @@ declare module "quill/modules/clipboard" {
         ): void;
         dangerouslyPasteHTML(html: string, source?: Sources): void;
         dangerouslyPasteHTML(index: number, html: string, source?: Sources): void;
+        convert(html?: string): DeltaStatic;
     }
 }
 declare module "quill/modules/formula";

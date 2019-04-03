@@ -31,6 +31,7 @@ import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import React from "react";
 import { Provider } from "react-redux";
 import hljs from "highlight.js";
+import AccessibleError from "@library/forms/AccessibleError";
 import { hot } from "react-hot-loader";
 
 interface ICommonProps {
@@ -43,6 +44,7 @@ interface ICommonProps {
     reinitialize?: boolean;
     operationsQueue?: EditorQueueItem[];
     clearOperationsQueue?: () => void;
+    error?: string;
 }
 
 interface ILegacyProps extends ICommonProps {
@@ -75,6 +77,9 @@ export class Editor extends React.Component<IProps> {
     /** The ID of the root rich editor node. */
     private domID: string = uniqueId("editor-");
 
+    /** The ID of error messages. */
+    private errorID: string = this.domID + "-errors";
+
     /** The redux store. */
     private store = getStore<IStoreState>();
 
@@ -106,6 +111,9 @@ export class Editor extends React.Component<IProps> {
         const { className } = this.props as INewProps;
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const classesRichEditorForm = richEditorFormClasses(this.props.legacyMode);
+        const classesUserContent = userContentClasses();
+        const hasError = !!this.props.error;
+
         return (
             <div
                 className={classNames(
@@ -119,6 +127,8 @@ export class Editor extends React.Component<IProps> {
                 role="textbox"
                 aria-multiline={true}
                 id={this.domID}
+                aria-errormessage={hasError ? this.errorID : undefined}
+                aria-invalid={hasError}
             >
                 {this.renderContexts(
                     <>
@@ -131,10 +141,17 @@ export class Editor extends React.Component<IProps> {
                                 )}
                                 ref={this.scrollContainerRef}
                             >
-                                <div
-                                    className={classNames("richEditor-frame", "InputBox", "isMenuInset")}
-                                    id="testScroll"
-                                >
+                                <div className={classNames("richEditor-frame", "InputBox", "isMenuInset")}>
+                                    {this.props.error && (
+                                        <AccessibleError
+                                            id={this.errorID}
+                                            ariaHidden={true}
+                                            error={this.props.error}
+                                            className={classesRichEditorForm.bodyErrorMessage}
+                                            paragraphClassName={classesRichEditorForm.categoryErrorParagraph}
+                                            wrapClassName={classesUserContent.root}
+                                        />
+                                    )}
                                     {this.renderMountPoint()}
                                     {this.renderInlineToolbars()}
                                 </div>
@@ -153,10 +170,7 @@ export class Editor extends React.Component<IProps> {
     private renderLegacy(): React.ReactNode {
         const classesRichEditorForm = richEditorFormClasses(true);
         return this.renderContexts(
-            <div
-                className={classNames("richEditor-frame", "InputBox", classesRichEditorForm.scrollFrame)}
-                id="testScroll"
-            >
+            <div className={classNames("richEditor-frame", "InputBox", classesRichEditorForm.scrollFrame)}>
                 {this.renderMountPoint()}
                 {this.renderParagraphToolbar()}
                 {this.renderInlineToolbars()}
@@ -169,17 +183,7 @@ export class Editor extends React.Component<IProps> {
      * Render the elements that Quill will mount into.
      */
     private renderMountPoint(): React.ReactNode {
-        return (
-            <div className="richEditor-textWrap" ref={this.quillMountRef}>
-                <div
-                    className={this.contentClasses}
-                    data-gramm="false"
-                    contentEditable={this.props.isLoading}
-                    data-placeholder="Create a new post..."
-                    tabIndex={0}
-                />
-            </div>
-        );
+        return <div className="richEditor-textWrap" ref={this.quillMountRef} />;
     }
 
     private get contentClasses() {

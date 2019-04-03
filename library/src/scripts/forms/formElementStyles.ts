@@ -5,7 +5,7 @@
  */
 
 import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
-import { unit } from "@library/styles/styleHelpers";
+import { absolutePosition, colorOut, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/layout/layoutStyles";
 
@@ -99,14 +99,32 @@ export const formElementsVariables = useThemeCache(() => {
     };
 });
 
+export const accessibleErrorClasses = useThemeCache(() => {
+    const style = styleFactory("accessibleError");
+    const globalVars = globalVariables();
+    const root = style({
+        display: "flex",
+        alignItems: "center",
+    });
+    const paragraph = style("paragraph", {
+        color: colorOut(globalVars.feedbackColors.error.fg),
+        fontSize: unit(globalVars.fonts.size.small),
+    });
+
+    return {
+        root,
+        paragraph,
+    };
+});
+
 export const formErrorClasses = useThemeCache(() => {
     const style = styleFactory("formError");
     const varsGlobal = globalVariables();
     const vars = formElementsVariables();
 
     const root = style({
-        backgroundColor: varsGlobal.feedbackColors.error.bg.toString(),
-        color: varsGlobal.feedbackColors.error.fg.toString(),
+        backgroundColor: colorOut(varsGlobal.feedbackColors.error.fg),
+        color: colorOut(varsGlobal.feedbackColors.error.fg),
         marginBottom: unit(16),
         paddingLeft: vars.errorSpacing.horizontalPadding,
         paddingRight: vars.errorSpacing.horizontalPadding,

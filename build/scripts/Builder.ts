@@ -134,14 +134,13 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
             fail(message);
         }
 
-        const sections = await this.entryModel.getSections();
-        const config = await Promise.all(sections.map(section => makeDevConfig(this.entryModel, section)));
-        const compiler = webpack(config) as any;
-        const options: DevServerConfiguration = {
+        const devServerOptions: DevServerConfiguration = {
             host: this.options.devIp,
             port: 3030,
             hot: true,
             open: true,
+            https: false,
+            disableHostCheck: true,
             headers: {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
@@ -151,7 +150,17 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
             stats: this.statOptions,
         };
 
-        const server = new WebpackDevServer(compiler, options);
-        server.listen(3030, options.host || "127.0.0.1");
+        const sections = await this.entryModel.getSections();
+        const config = await Promise.all(
+            sections.map(async section => {
+                const sectionConfig = await makeDevConfig(this.entryModel, section);
+                WebpackDevServer.addDevServerEntrypoints(sectionConfig as any, devServerOptions);
+                return sectionConfig;
+            }),
+        );
+        const compiler = webpack(config) as any;
+
+        const server = new WebpackDevServer(compiler, devServerOptions);
+        server.listen(3030, devServerOptions.host || "127.0.0.1");
     }
 }

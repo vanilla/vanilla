@@ -5,7 +5,7 @@
  */
 
 import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
-import {absolutePosition, colorOut, unit} from "@library/styles/styleHelpers";
+import { absolutePosition, colorOut, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { layoutVariables } from "@library/styles/layoutStyles";
 
@@ -106,7 +106,7 @@ export const AccessibleErrorClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
     });
-    const paragraph = style("paragraph",{
+    const paragraph = style("paragraph", {
         color: colorOut(globalVars.feedbackColors.error.fg),
         fontSize: unit(globalVars.fonts.size.small),
     });

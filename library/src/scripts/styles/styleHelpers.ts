@@ -28,7 +28,8 @@ import {
     LineHeightProperty,
     MaxWidthProperty,
     ObjectFitProperty,
-    OverflowXProperty, PointerEventsProperty,
+    OverflowXProperty,
+    PointerEventsProperty,
     PositionProperty,
     RightProperty,
     TextAlignLastProperty,
@@ -336,7 +337,7 @@ export const unit = (val: string | number | undefined, unitFunction = px) => {
     }
 };
 
-export const negative = (val) => {
+export const negative = val => {
     if (typeof val === "string") {
         val = val.trim();
         if (val.startsWith("-")) {
@@ -810,7 +811,6 @@ export const states = (styles: IActionStates) => {
         "&:active": { ...allStates, ...active },
     };
 };
-
 
 export const pointerEvents = (value: PointerEventsProperty = "none") => {
     return {

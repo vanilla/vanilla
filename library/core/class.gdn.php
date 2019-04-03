@@ -102,6 +102,7 @@ class Gdn {
      * Get the application manager
      *
      * @return Gdn_ApplicationManager
+     * @deprecated 3.0 - Use Vanilla\AddonManager.
      */
     public static function applicationManager() {
         return self::factory(self::AliasApplicationManager);
@@ -431,6 +432,7 @@ class Gdn {
      * Get the plugin manager for the application.
      *
      * @return Gdn_PluginManager
+     * @deprecated 3.0 - Use Garden\EventManager or Vanilla\AddonManager.
      */
     public static function pluginManager() {
         if (self::$_PluginManager === null) {
@@ -538,6 +540,7 @@ class Gdn {
      * Get the plugin manager for the application.
      *
      * @return Gdn_ThemeManager
+     * @deprecated 3.0 - Use Vanilla\AddonManager.
      */
     public static function themeManager() {
         return self::factory(self::AliasThemeManager);

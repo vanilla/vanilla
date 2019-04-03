@@ -14,6 +14,8 @@ use Vanilla\AddonManager;
 
 /**
  * Manages available applications, enabling and disabling them.
+ *
+ * @deprecated 3.0 Use Vanilla\AddonManager.
  */
 class Gdn_ApplicationManager {
 

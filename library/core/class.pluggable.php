@@ -17,7 +17,7 @@
  * has the ability to throw custom events at any time, which can then be
  * handled by plugins.
  *
- * @abstract
+ * @deprecated 3.0 - Use Garden\EventManager
  */
 abstract class Gdn_Pluggable {
 
@@ -94,6 +94,9 @@ abstract class Gdn_Pluggable {
      * Fire the next event off a custom parent class
      *
      * @param mixed $options Either the parent class, or an option array
+     *
+     * @return $this
+     * @deprecated 3.0 - Use Garden\EventManager::fire()
      */
     public function fireAs($options) {
         if (!is_array($options)) {
@@ -111,6 +114,10 @@ abstract class Gdn_Pluggable {
      *  public function senderClassName_EventName_Handler($Sender) {}
      *
      * @param string $eventName The name of the event being fired.
+     * @param mixed $arguments Arguemnts to pass through to the event handlers.
+     *
+     * @return mixed
+     * @deprecated 3.0 - Use Garden\EventManager::fire()
      */
     public function fireEvent($eventName, $arguments = null) {
         if (!$this->ClassName) {

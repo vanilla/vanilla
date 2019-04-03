@@ -10,7 +10,7 @@ import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/sh
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { important, percent } from "csx";
-import { layoutVariables } from "@library/styles/layoutStyles";
+import {layoutVariables} from "@library/layout/layoutStyles";
 import { FontSizeProperty } from "csstype";
 
 export const dropDownVariables = useThemeCache(() => {

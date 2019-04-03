@@ -9,7 +9,7 @@ import { debugHelper, setAllLinkColors, unit } from "@library/styles/styleHelper
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { style } from "typestyle";
 import { percent } from "csx";
-import { layoutVariables } from "@library/styles/layoutStyles";
+import {layoutVariables} from "@library/layout/layoutStyles";
 
 export const navLinksVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("navLinks");

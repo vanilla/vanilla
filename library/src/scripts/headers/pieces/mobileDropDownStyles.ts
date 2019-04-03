@@ -9,7 +9,7 @@ import { useThemeCache } from "@library/styles/styleUtils";
 import { calc, percent, px } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { style } from "typestyle";
-import { layoutVariables } from "@library/styles/layoutStyles";
+import {layoutVariables} from "@library/layout/layoutStyles";
 
 export const mobileDropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();

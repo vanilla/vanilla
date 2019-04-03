@@ -10,7 +10,7 @@ import { useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { style } from "typestyle";
-import { layoutVariables } from "@library/styles/layoutStyles";
+import {layoutVariables} from "@library/layout/layoutStyles";
 
 export const meBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();

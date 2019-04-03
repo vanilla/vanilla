@@ -291,19 +291,18 @@ class PagerModule extends Gdn_Module {
     }
 
     /**
+     * Get the rel attribute for a pager element.
      *
+     * @param int $page
+     * @param int $currentPage
      *
-     * @param $page
-     * @param $currentPage
      * @return null|string
+     *
+     * @deprecated 3.0
      */
     public static function rel($page, $currentPage) {
-        if ($page == $currentPage - 1) {
-            return 'prev';
-        } elseif ($page == $currentPage + 1)
-            return 'next';
-
-        return null;
+        deprecated(__FUNCTION__, "PagerModule::makeAttributes()", "April 3, 2019");
+        return self::makeAttributes($page, $currentPage)['rel'] ?? null;
     }
 
     /**
@@ -456,7 +455,8 @@ class PagerModule extends Gdn_Module {
             $pager .= '<span class="Ellipsis">'.$separator.'</span>';
 
             for ($i = $currentPage - $range; $i <= $currentPage + $range; $i++) {
-                $pager .= anchor($i,
+                $pager .= anchor(
+                    $i,
                     $this->pageUrl($i),
                     $this->_GetCssClass($i, $currentPage),
                     self::makeAttributes($i, $currentPage)
@@ -508,7 +508,8 @@ class PagerModule extends Gdn_Module {
                         ' ',
                         $this->CssClass,
                         'PagerLinkCount-' . $linkCount,
-                        static::NUMBERED_CLASS)
+                        static::NUMBERED_CLASS
+                    ),
                 ]),
                 $pager
             );

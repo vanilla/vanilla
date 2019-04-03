@@ -19,7 +19,6 @@ class OpenAPIBuilderTest extends TestCase {
 
     /**
      * The OpenAPI build should validate against the OpenAPI spec.
-     *
      */
     public function testValidOpenAPI() {
         $am = new AddonManager(

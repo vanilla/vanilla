@@ -577,6 +577,7 @@ export const objectFitWithFallback = () => {
 };
 
 export interface ILinkStates {
+    allStates?: object; // Applies to all
     default?: object;
     hover?: object;
     focus?: object;
@@ -589,6 +590,16 @@ export const setAllLinkColors = (overwrites?: ILinkStates) => {
     const vars = globalVariables();
     // We want to default to the standard styles and only overwrite what we want/need
     const linkColors = vars.links.colors;
+
+    if (overwrites) {
+        overwrites = {
+            default: overwrites.default ? overwrites.default : (overwrites.allStates ? overwrites.allStates : undefined),
+            hover: overwrites.hover ? overwrites.hover : (overwrites.allStates ? overwrites.allStates : undefined),
+            focus: overwrites.focus ? overwrites.focus : (overwrites.allStates ? overwrites.allStates : undefined),
+            accessibleFocus: overwrites.accessibleFocus ? overwrites.accessibleFocus : (overwrites.allStates ? overwrites.allStates : undefined),
+            active: overwrites.accessibleFocus ? overwrites.active : (overwrites.allStates ? overwrites.allStates : undefined),
+        };
+    }
 
     const styles: ILinkStates = {
         default: {

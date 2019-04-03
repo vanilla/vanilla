@@ -32,7 +32,7 @@ export const navLinksVariables = useThemeCache(() => {
     });
 
     const link = makeThemeVars("link", {
-        color: globalVars.mainColors.fg,
+        fg: globalVars.mainColors.fg,
         fontWeight: globalVars.fonts.weights.semiBold,
         lineHeight: globalVars.lineHeights.condensed,
         width: 203,
@@ -44,7 +44,7 @@ export const navLinksVariables = useThemeCache(() => {
         fontWeight: globalVars.fonts.weights.semiBold,
         fontSize: globalVars.fonts.size.medium,
         margins: {
-            top: globalVars.gutter.size,
+            top: "auto",
             bottom: 10,
         },
         ...setAllLinkColors(),
@@ -135,7 +135,11 @@ export const navLinksClasses = useThemeCache(() => {
         display: "block",
         fontSize: unit(vars.link.fontSize),
         lineHeight: vars.link.lineHeight,
-        ...setAllLinkColors(),
+        ...setAllLinkColors({
+            default: {
+                color: colorOut(vars.link.fg)
+            },
+        }),
     });
 
     const viewAllitem = style("viewAllItem", {

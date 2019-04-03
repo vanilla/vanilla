@@ -34,11 +34,7 @@ export default class NavLinks extends Component<IProps> {
             const contents = this.props.items.map((item, i) => {
                 return (
                     <li className={classNames("navLinks-item", classes.item)} key={i}>
-                        <SmartLink
-                            to={item.url}
-                            className={classNames("navLinks-link", classes.link)}
-                            title={item.name}
-                        >
+                        <SmartLink to={item.url} className={classNames(classes.link)} title={item.name}>
                             {item.name}
                         </SmartLink>
                     </li>

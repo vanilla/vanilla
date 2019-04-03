@@ -315,21 +315,19 @@ class PagerModule extends Gdn_Module {
      * @return array An array of HTML attributes to apply to a link.
      */
     private static function makeAttributes(int $page, int $currentPage): array {
+        $attrs = [
+            'aria-label' => sprintf(t('Page %s'), $page),
+        ];
+
         if ($page === $currentPage - 1) {
-            return [
-                'rel' => 'prev',
-            ];
+            $attrs['rel'] = 'prev';
         } elseif ($page === $currentPage + 1) {
-            return [
-                'rel' => 'next',
-            ];
+            $attrs['rel'] = 'next';
         } elseif ($page === $currentPage) {
-            return [
-                'aria-current' => 'page',
-            ];
+            $attrs['aria-current'] = 'page';
         }
 
-        return null;
+        return $attrs;
     }
 
     /**

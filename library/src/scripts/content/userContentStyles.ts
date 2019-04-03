@@ -261,13 +261,13 @@ export const userContentClasses = useThemeCache(() => {
     };
 
     const root = style({
-        fontSize: vars.fonts.size,
         // These CAN'T be flexed. That breaks margin collapsing.
         display: important("block"),
         position: "relative",
         width: percent(100),
         wordBreak: "break-word",
         lineHeight: globalVars.lineHeights.base,
+        fontSize: vars.fonts.size,
         $nest: {
             ...headings,
             ...lists,

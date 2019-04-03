@@ -99,7 +99,7 @@ export const formElementsVariables = useThemeCache(() => {
     };
 });
 
-export const AccessibleErrorClasses = useThemeCache(() => {
+export const accessibleErrorClasses = useThemeCache(() => {
     const style = styleFactory("accessibleError");
     const globalVars = globalVariables();
     const root = style({

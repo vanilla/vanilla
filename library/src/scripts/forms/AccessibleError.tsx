@@ -26,7 +26,7 @@ export default class AccessibleError extends React.PureComponent<IProps> {
 
     public render() {
         const { error, id } = this.props;
-        const classes = AccessibleErrorClasses();
+        const classes = accessibleErrorClasses();
         const classesUserContent = userContentClasses();
         return (
             <>

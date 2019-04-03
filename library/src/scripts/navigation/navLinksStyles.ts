@@ -16,7 +16,14 @@ export const navLinksVariables = useThemeCache(() => {
     const globalVars = globalVariables();
 
     const linksWithHeadings = makeThemeVars("linksWithHeadings", {
-        padding: 20,
+        paddings: {
+            all: 20,
+        },
+        mobile: {
+            paddings: {
+                all: 0,
+            },
+        },
     });
 
     const item = makeThemeVars("item", {
@@ -24,10 +31,17 @@ export const navLinksVariables = useThemeCache(() => {
     });
 
     const title = makeThemeVars("title", {
-        fontSize: 20,
+        fontSize: globalVars.fonts.size.smallTitle,
         fontWeight: globalVars.fonts.weights.semiBold,
         lineHeight: globalVars.lineHeights.condensed,
         maxWidth: percent(100),
+        margins: {
+            bottom: 8,
+        },
+        mobile: {
+            fontSize: globalVars.fonts.size.large,
+            fontWeight: globalVars.fonts.weights.bold,
+        },
     });
 
     const link = makeThemeVars("link", {
@@ -40,21 +54,34 @@ export const navLinksVariables = useThemeCache(() => {
     });
 
     const viewAll = makeThemeVars("viewAll", {
+        ...setAllLinkColors(),
         fontWeight: globalVars.fonts.weights.semiBold,
         fontSize: globalVars.fonts.size.medium,
         margins: {
             top: "auto",
-            bottom: 10,
         },
         paddings: {
             top: 20,
         },
-        ...setAllLinkColors(),
+        mobile: {
+            paddings: {
+                top: 8,
+            },
+        },
     });
 
     const spacing = makeThemeVars("spacing", {
-        padding: 24,
+        paddings: {
+            vertical: 34,
+            horizontal: 40,
+        },
         margin: 6,
+        mobile: {
+            paddings: {
+                vertical: 22,
+                horizontal: 8,
+            },
+        },
     });
 
     const columns = makeThemeVars("columns", {
@@ -99,14 +126,15 @@ export const navLinksClasses = useThemeCache(() => {
 
     const root = style(
         {
+            ...paddings(vars.spacing.paddings),
             display: "flex",
             flexDirection: "column",
-            padding: unit(vars.spacing.padding),
             maxWidth: percent(100),
             width: percent(100 / vars.columns.desktop),
         },
         mediaQueries.oneColumn({
             width: percent(100),
+            ...paddings(vars.spacing.mobile.paddings),
         }),
     );
 
@@ -123,14 +151,21 @@ export const navLinksClasses = useThemeCache(() => {
         marginBottom: unit(vars.spacing.margin),
     });
 
-    const title = style("title", {
-        display: "block",
-        fontSize: unit(vars.title.fontSize),
-        lineHeight: globalVars.lineHeights.condensed,
-        fontWeight: globalVars.fonts.weights.semiBold,
-        maxWidth: percent(100),
-        marginBottom: unit(vars.spacing.margin),
-    });
+    const title = style(
+        "title",
+        {
+            display: "block",
+            fontSize: unit(vars.title.fontSize),
+            lineHeight: globalVars.lineHeights.condensed,
+            fontWeight: globalVars.fonts.weights.semiBold,
+            maxWidth: percent(100),
+            ...margins(vars.title.margins),
+        },
+        mediaQueries.oneColumn({
+            fontSize: unit(vars.title.mobile.fontSize),
+            fontWeight: vars.title.mobile.fontWeight,
+        }),
+    );
 
     const link = style("link", {
         display: "block",
@@ -143,14 +178,21 @@ export const navLinksClasses = useThemeCache(() => {
         }),
     });
 
-    const viewAllitem = style("viewAllItem", {
-        display: "block",
-        fontSize: unit(vars.item.fontSize),
-        ...margins(vars.viewAll.margins),
-        ...paddings(vars.viewAll.paddings),
-    });
+    const viewAllitem = style(
+        "viewAllItem",
+        {
+            display: "block",
+            fontSize: unit(vars.item.fontSize),
+            ...margins(vars.viewAll.margins),
+            ...paddings(vars.viewAll.paddings),
+        },
+        mediaQueries.oneColumn({
+            ...paddings(vars.viewAll.mobile.paddings),
+        }),
+    );
 
     const viewAll = style("viewAll", {
+        display: "block",
         fontWeight: vars.viewAll.fontWeight,
         fontSize: vars.viewAll.fontSize,
         ...setAllLinkColors({
@@ -163,14 +205,14 @@ export const navLinksClasses = useThemeCache(() => {
     const linksWithHeadings = style(
         "linksWithHeadings",
         {
-            padding: unit(vars.linksWithHeadings.padding),
+            ...paddings(vars.linksWithHeadings.paddings),
             display: "flex",
             flexWrap: "wrap",
             alignItems: "stretch",
             justifyContent: "space-between",
         },
         mediaQueries.oneColumn({
-            padding: 0,
+            ...paddings(vars.linksWithHeadings.mobile.paddings),
         }),
     );
 

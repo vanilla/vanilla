@@ -36,7 +36,7 @@ export default class NavLinksWithHeadings extends Component<IProps> {
             const ungroupedContent = <NavLinks title={t("Overview")} items={ungrouped} />;
             const groupedContent = grouped.map((group, i) => {
                 return (
-                    <>
+                    <React.Fragment key={i}>
                         <NavLinks
                             items={group.items}
                             title={group.category.name}
@@ -44,10 +44,9 @@ export default class NavLinksWithHeadings extends Component<IProps> {
                             depth={groupLevel as 1 | 2 | 3 | 4 | 5 | 6}
                             accessibleViewAllMessage={this.props.accessibleViewAllMessage}
                             classNames={grouped.length - 1 === i ? "isLast" : ""}
-                            key={i}
                         />
                         {this.separator(i % 2 === 0 ? classes.separatorOdd : "")}
-                    </>
+                    </React.Fragment>
                 );
             });
 

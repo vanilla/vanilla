@@ -359,10 +359,18 @@ export interface IMargins {
     left?: string | number;
     horizontal?: string | number;
     vertical?: string | number;
+    all?: string | number;
 }
 
 export const margins = (styles: IMargins): NestedCSSProperties => {
     const marginVals = {} as NestedCSSProperties;
+
+    if (styles.all !== undefined) {
+        marginVals.paddingTop = unit(styles.all);
+        marginVals.paddingRight = unit(styles.all);
+        marginVals.paddingBottom = unit(styles.all);
+        marginVals.paddingLeft = unit(styles.all);
+    }
 
     if (styles.vertical !== undefined) {
         marginVals.marginTop = unit(styles.vertical);
@@ -400,10 +408,18 @@ export interface IPaddings {
     left?: string | number;
     horizontal?: string | number;
     vertical?: string | number;
+    all?: string | number;
 }
 
 export const paddings = (styles: IPaddings) => {
     const paddingVals = {} as NestedCSSProperties;
+
+    if (styles.all !== undefined) {
+        paddingVals.paddingTop = unit(styles.all);
+        paddingVals.paddingRight = unit(styles.all);
+        paddingVals.paddingBottom = unit(styles.all);
+        paddingVals.paddingLeft = unit(styles.all);
+    }
 
     if (styles.vertical !== undefined) {
         paddingVals.paddingTop = unit(styles.vertical);

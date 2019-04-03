@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import { LiveMessage } from "react-aria-live";
-import { AccessibleErrorClasses } from "@library/forms/formElementStyles";
+import { accessibleErrorClasses } from "@library/forms/formElementStyles";
 import { userContentClasses } from "@library/content/userContentStyles";
 
 interface IProps {

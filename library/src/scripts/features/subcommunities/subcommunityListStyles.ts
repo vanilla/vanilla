@@ -6,17 +6,17 @@
 
 import React from "react";
 import { unit } from "@library/styles/styleHelpers";
-import {styleFactory, useThemeCache, variableFactory} from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
-import {layoutVariables} from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const subcommunityListVariables = useThemeCache(() => {
     const themeVars = variableFactory("subcommunityList");
-    const spacing = themeVars("spacing",{
+    const spacing = themeVars("spacing", {
         padding: 24,
     });
 
-    const sizing = themeVars("sizing",{
+    const sizing = themeVars("sizing", {
         columnWidth: "50%",
         columnsWidth: 912,
     });
@@ -30,16 +30,19 @@ export const subcommunityListClasses = useThemeCache(() => {
     const mediaQueries = layoutVariables().mediaQueries();
     const layoutVars = layoutVariables();
 
-    const root = style({
+    const root = style(
+        {
             maxWidth: unit(vars.sizing.columnsWidth),
             padding: unit(vars.spacing.padding),
             margin: "auto",
-        }, mediaQueries.oneColumn({
+        },
+        mediaQueries.oneColumn({
             padding: 0,
         }),
     );
 
-    const items = style("items",
+    const items = style(
+        "items",
         {
             position: "relative",
             display: "flex",
@@ -52,7 +55,8 @@ export const subcommunityListClasses = useThemeCache(() => {
         }),
     );
 
-    const item = style("item",
+    const item = style(
+        "item",
         {
             display: "flex",
             flexDirection: "column",

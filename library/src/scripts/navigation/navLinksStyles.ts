@@ -5,18 +5,18 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {colorOut, debugHelper, margins, setAllLinkColors, unit} from "@library/styles/styleHelpers";
-import {styleFactory, useThemeCache, variableFactory} from "@library/styles/styleUtils";
-import {percent, px} from "csx";
-import {layoutVariables} from "@library/layout/layoutStyles";
-import {media} from "typestyle";
+import { colorOut, debugHelper, margins, paddings, setAllLinkColors, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { percent, px } from "csx";
+import { layoutVariables } from "@library/layout/layoutStyles";
+import { media } from "typestyle";
 
 export const navLinksVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("navLinks");
     const globalVars = globalVariables();
 
     const linksWithHeadings = makeThemeVars("linksWithHeadings", {
-        padding: 16,
+        padding: 20,
     });
 
     const item = makeThemeVars("item", {
@@ -27,7 +27,6 @@ export const navLinksVariables = useThemeCache(() => {
         fontSize: 20,
         fontWeight: globalVars.fonts.weights.semiBold,
         lineHeight: globalVars.lineHeights.condensed,
-        width: 203,
         maxWidth: percent(100),
     });
 
@@ -47,6 +46,9 @@ export const navLinksVariables = useThemeCache(() => {
             top: "auto",
             bottom: 10,
         },
+        paddings: {
+            top: 20,
+        },
         ...setAllLinkColors(),
     });
 
@@ -61,10 +63,10 @@ export const navLinksVariables = useThemeCache(() => {
 
     const separator = makeThemeVars("separator", {
         height: 1,
-        bg: globalVars.mixBgAndFg(.5),
+        bg: globalVars.mixBgAndFg(0.5),
     });
 
-    const breakPoints = makeThemeVars("breakPoints",{
+    const breakPoints = makeThemeVars("breakPoints", {
         oneColumn: 750,
     });
 
@@ -101,43 +103,42 @@ export const navLinksClasses = useThemeCache(() => {
             flexDirection: "column",
             padding: unit(vars.spacing.padding),
             maxWidth: percent(100),
-            width: percent(100/vars.columns.desktop),
+            width: percent(100 / vars.columns.desktop),
         },
         mediaQueries.oneColumn({
             width: percent(100),
         }),
     );
 
-    const items = style("items",{
+    const items = style("items", {
         display: "flex",
         flexDirection: "column",
         flexGrow: 1,
     });
 
-    const item = style("item",{
+    const item = style("item", {
         display: "block",
         fontSize: unit(vars.item.fontSize),
         marginTop: unit(vars.spacing.margin),
         marginBottom: unit(vars.spacing.margin),
     });
 
-    const title = style("title",{
+    const title = style("title", {
         display: "block",
         fontSize: unit(vars.title.fontSize),
         lineHeight: globalVars.lineHeights.condensed,
         fontWeight: globalVars.fonts.weights.semiBold,
-        width: unit(vars.title.width),
         maxWidth: percent(100),
         marginBottom: unit(vars.spacing.margin),
     });
 
-    const link = style("link",{
+    const link = style("link", {
         display: "block",
         fontSize: unit(vars.link.fontSize),
         lineHeight: vars.link.lineHeight,
         ...setAllLinkColors({
             default: {
-                color: colorOut(vars.link.fg)
+                color: colorOut(vars.link.fg),
             },
         }),
     });
@@ -146,6 +147,7 @@ export const navLinksClasses = useThemeCache(() => {
         display: "block",
         fontSize: unit(vars.item.fontSize),
         ...margins(vars.viewAll.margins),
+        ...paddings(vars.viewAll.paddings),
     });
 
     const viewAll = style("viewAll", {
@@ -158,7 +160,8 @@ export const navLinksClasses = useThemeCache(() => {
         }),
     });
 
-    const linksWithHeadings = style("linksWithHeadings",
+    const linksWithHeadings = style(
+        "linksWithHeadings",
         {
             padding: unit(vars.linksWithHeadings.padding),
             display: "flex",
@@ -178,12 +181,15 @@ export const navLinksClasses = useThemeCache(() => {
         backgroundColor: colorOut(vars.separator.bg),
     });
 
-
-    const separatorOdd = style("separatorOdd", {
-        display: "none",
-    }, mediaQueries.oneColumn({
-        display: "block",
-    }));
+    const separatorOdd = style(
+        "separatorOdd",
+        {
+            display: "none",
+        },
+        mediaQueries.oneColumn({
+            display: "block",
+        }),
+    );
 
     return {
         root,

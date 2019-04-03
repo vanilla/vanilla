@@ -9,7 +9,7 @@ import { colorOut, debugHelper, unit } from "@library/styles/styleHelpers";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { px } from "csx";
 import { style } from "typestyle";
-import {layoutVariables} from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const siteNavAdminLinksClasses = useThemeCache(() => {
     const globalVars = globalVariables();

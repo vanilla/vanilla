@@ -12,7 +12,7 @@ import { calc, important, percent, px } from "csx";
 
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { buttonClasses } from "@library/forms/buttonStyles";
-import {layoutVariables} from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();

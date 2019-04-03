@@ -593,11 +593,19 @@ export const setAllLinkColors = (overwrites?: ILinkStates) => {
 
     if (overwrites) {
         overwrites = {
-            default: overwrites.default ? overwrites.default : (overwrites.allStates ? overwrites.allStates : undefined),
-            hover: overwrites.hover ? overwrites.hover : (overwrites.allStates ? overwrites.allStates : undefined),
-            focus: overwrites.focus ? overwrites.focus : (overwrites.allStates ? overwrites.allStates : undefined),
-            accessibleFocus: overwrites.accessibleFocus ? overwrites.accessibleFocus : (overwrites.allStates ? overwrites.allStates : undefined),
-            active: overwrites.accessibleFocus ? overwrites.active : (overwrites.allStates ? overwrites.allStates : undefined),
+            default: overwrites.default ? overwrites.default : overwrites.allStates ? overwrites.allStates : undefined,
+            hover: overwrites.hover ? overwrites.hover : overwrites.allStates ? overwrites.allStates : undefined,
+            focus: overwrites.focus ? overwrites.focus : overwrites.allStates ? overwrites.allStates : undefined,
+            accessibleFocus: overwrites.accessibleFocus
+                ? overwrites.accessibleFocus
+                : overwrites.allStates
+                ? overwrites.allStates
+                : undefined,
+            active: overwrites.accessibleFocus
+                ? overwrites.active
+                : overwrites.allStates
+                ? overwrites.allStates
+                : undefined,
         };
     }
 

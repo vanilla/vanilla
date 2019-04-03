@@ -9,7 +9,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { unit, userSelect, colorOut, paddings, borders, fonts, allButtonStates } from "@library/styles/styleHelpers";
 import { percent, viewWidth } from "csx";
 import { FontWeightProperty } from "csstype";
-import {layoutVariables} from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 

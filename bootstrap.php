@@ -7,6 +7,7 @@ use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Utility\ContainerUtils;
 use \Vanilla\Formatting\Formats;
+use Firebase\JWT\JWT;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -422,6 +423,9 @@ register_shutdown_function(function () use ($dic) {
 $dic->get('Gdn_Locale');
 
 require_once PATH_LIBRARY_CORE.'/functions.validation.php';
+
+// Configure JWT library to allow for five seconds of leeway.
+JWT::$leeway = 5;
 
 // Start Authenticators
 $dic->get('Authenticator')->startAuthenticator();

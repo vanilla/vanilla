@@ -140,7 +140,7 @@ ${chalk.green(aliases)}`;
             // - node_modules/quill/node_modules/parchment
             // - node_modules/parchment
             // The quill one is a symlinked one so we need webpack to resolve these to the same filepath.
-            symlinks: false,
+            symlinks: true,
         },
         /**
          * We need to manually tell webpack where to resolve our loaders.

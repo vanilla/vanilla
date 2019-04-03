@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {colorOut, debugHelper, setAllLinkColors, unit} from "@library/styles/styleHelpers";
+import {colorOut, debugHelper, margins, setAllLinkColors, unit} from "@library/styles/styleHelpers";
 import {styleFactory, useThemeCache, variableFactory} from "@library/styles/styleUtils";
 import {percent, px} from "csx";
 import {layoutVariables} from "@library/layout/layoutStyles";
@@ -43,7 +43,10 @@ export const navLinksVariables = useThemeCache(() => {
     const viewAll = makeThemeVars("viewAll", {
         fontWeight: globalVars.fonts.weights.semiBold,
         fontSize: globalVars.fonts.size.medium,
-        marginTop: "auto",
+        margins: {
+            top: globalVars.gutter.size,
+            bottom: 10,
+        },
         ...setAllLinkColors(),
     });
 
@@ -116,11 +119,6 @@ export const navLinksClasses = useThemeCache(() => {
         fontSize: unit(vars.item.fontSize),
         marginTop: unit(vars.spacing.margin),
         marginBottom: unit(vars.spacing.margin),
-        $nest: {
-            "&.isViewAll": {
-                marginTop: "auto",
-            },
-        },
     });
 
     const title = style("title",{
@@ -138,6 +136,12 @@ export const navLinksClasses = useThemeCache(() => {
         fontSize: unit(vars.link.fontSize),
         lineHeight: vars.link.lineHeight,
         ...setAllLinkColors(),
+    });
+
+    const viewAllitem = style("viewAllItem", {
+        display: "block",
+        fontSize: unit(vars.item.fontSize),
+        ...margins(vars.viewAll.margins),
     });
 
     const viewAll = style("viewAll", {
@@ -183,6 +187,7 @@ export const navLinksClasses = useThemeCache(() => {
         item,
         title,
         link,
+        viewAllitem,
         viewAll,
         linksWithHeadings,
         separator,

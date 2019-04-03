@@ -54,14 +54,8 @@ export default class NavLinks extends Component<IProps> {
                     <ul className={classNames("navLinks-items", classes.items)}>
                         {contents}
                         {this.props.url && this.props.accessibleViewAllMessage && (
-                            <li
-                                className={classNames("navLinks-item", "isViewAll", classes.item)}
-                                key={this.props.items.length}
-                            >
-                                <SmartLink
-                                    to={this.props.url}
-                                    className={classNames("navLinks-viewAll", classes.viewAll)}
-                                >
+                            <li className={classNames(classes.viewAllitem)} key={this.props.items.length}>
+                                <SmartLink to={this.props.url} className={classNames(classes.viewAll)}>
                                     <span aria-hidden={true}>{viewAll}</span>
                                     <ScreenReaderContent>
                                         <Translate source={this.props.accessibleViewAllMessage} c0={this.props.title} />

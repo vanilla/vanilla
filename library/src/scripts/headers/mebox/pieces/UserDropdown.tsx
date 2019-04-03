@@ -94,36 +94,42 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                         <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
                         <DropDownSection title={t("Discussions")}>
                             <DropDownItemLinkWithCount
-                                to={`${window.location.origin}/discussions/bookmarked`}
+                                to={"/discussions/bookmarked"}
                                 name={t("Bookmarks")}
                                 count={counts.bookmarkCount}
                             />
-                            <DropDownItemLinkWithCount to="/kb/drafts" name={t("Drafts")} count={counts.draftsCount} />
+                            <Permission permission="articles.add">
+                                <DropDownItemLinkWithCount
+                                    to="/kb/drafts"
+                                    name={t("Drafts")}
+                                    count={counts.draftsCount}
+                                />
+                            </Permission>
                             <DropDownItemLink to="/discussions/mine" name={t("My Discussions")} />
                             <DropDownItemLink to="/activity" name={t("Participated")} />
                         </DropDownSection>
                         <Permission permission={["community.moderate"]}>
                             <DropDownSection title={t("Moderation")}>
                                 <DropDownItemLinkWithCount
-                                    to={`${window.location.origin}/dashboard/user/applicants`}
+                                    to={"/dashboard/user/applicants"}
                                     name={t("Applicants")}
                                     count={counts.applicantsCount}
                                     countsClass={this.props.countsClass}
                                 />
                                 <DropDownItemLinkWithCount
-                                    to={`${window.location.origin}/dashboard/log/spam`}
+                                    to={"/dashboard/log/spam"}
                                     name={t("Spam Queue")}
                                     count={counts.spamQueueCount}
                                     countsClass={this.props.countsClass}
                                 />
                                 <DropDownItemLinkWithCount
-                                    to={`${window.location.origin}/dashboard/log/moderation`}
+                                    to={"/dashboard/log/moderation"}
                                     name={t("Moderation Queue")}
                                     count={counts.moderationQueueCount}
                                     countsClass={this.props.countsClass}
                                 />
                                 <DropDownItemLinkWithCount
-                                    to={`${window.location.origin}/badge/requests`}
+                                    to={"/badge/requests"}
                                     name={t("Badge Requests")}
                                     count={counts.badgeRequestCount}
                                     countsClass={this.props.countsClass}
@@ -131,8 +137,10 @@ export class UserDropDown extends React.Component<IUserDropDownProps, IState> {
                             </DropDownSection>
                         </Permission>
                         <DropDownItemSeparator />
-                        <DropDownItemLink to={`${window.location.origin}/dashboard/settings`} name={t("Dashboard")} />
-                        <DropDownItemLink to={`${window.location.origin}/entry/signout`} name={t("Sign Out")} />
+                        <Permission permission={["site.manage", "settings.view"]}>
+                            <DropDownItemLink to={"/dashboard/settings"} name={t("Dashboard")} />
+                        </Permission>
+                        <DropDownItemLink to={`/entry/signout?target=${window.location.href}`} name={t("Sign Out")} />
                     </FrameBody>
                 </Frame>
             </DropDown>

@@ -7,6 +7,7 @@ use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Utility\ContainerUtils;
 use \Vanilla\Formatting\Formats;
+use Firebase\JWT\JWT;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -154,6 +155,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addAlias(Gdn::AliasDispatcher)
 
     ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
+    ->setShared(true)
     ->setConstructorArgs([
         'deploymentTime' => ContainerUtils::config('Garden.Deployed')
     ])
@@ -178,6 +180,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('setAllowedOrigins', ['isTrustedDomain'])
     ->addCall('addMiddleware', [new Reference('@smart-id-middleware')])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\CacheControlMiddleware::class)])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\DeploymentHeaderMiddleware::class)])
 
     ->rule('@smart-id-middleware')
     ->setClass(\Vanilla\Web\SmartIDMiddleware::class)
@@ -420,6 +423,9 @@ register_shutdown_function(function () use ($dic) {
 $dic->get('Gdn_Locale');
 
 require_once PATH_LIBRARY_CORE.'/functions.validation.php';
+
+// Configure JWT library to allow for five seconds of leeway.
+JWT::$leeway = 5;
 
 // Start Authenticators
 $dic->get('Authenticator')->startAuthenticator();

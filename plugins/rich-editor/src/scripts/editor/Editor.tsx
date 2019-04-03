@@ -29,10 +29,10 @@ import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import React from "react";
-import { hot } from "react-hot-loader";
 import { Provider } from "react-redux";
 import hljs from "highlight.js";
 import AccessibleError from "@library/forms/AccessibleError";
+import { hot } from "react-hot-loader";
 
 interface ICommonProps {
     isPrimaryEditor: boolean;

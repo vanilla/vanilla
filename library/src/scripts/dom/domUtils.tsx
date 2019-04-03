@@ -9,6 +9,10 @@ import "focus-visible";
 import smoothscroll from "smoothscroll-polyfill";
 import twemoji from "twemoji";
 import { hashString } from "../utility/utils";
+import React from "react";
+import ReactDOM from "react-dom";
+import { forceRenderStyles } from "typestyle";
+
 smoothscroll.polyfill();
 
 /**
@@ -458,4 +462,16 @@ export function prepareShadowRoot(element: HTMLElement, cloneElement: boolean = 
 
     const shadowHeader = element.attachShadow({ mode: "open" });
     shadowHeader.innerHTML = html;
+}
+
+/**
+ * Mount a root component of a React tree.
+ *
+ * - ReactDOM render.
+ * - Typestyle render.
+ */
+export function mountReact(component: React.ReactElement, target: HTMLElement, callback?: () => void) {
+    const result = ReactDOM.render(component, target, callback);
+    forceRenderStyles();
+    return result;
 }

@@ -20,6 +20,8 @@ use Vanilla\AddonManager;
  *
  * A singleton class used to identify extensions, register them in a central
  * location, and instantiate/call them when necessary.
+ *
+ * @deprecated 3.0 - Use Vanilla\AddonManager.
  */
 class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
 

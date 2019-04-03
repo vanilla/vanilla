@@ -33,7 +33,7 @@ export default class NavLinks extends Component<IProps> {
             const classes = navLinksClasses();
             const contents = this.props.items.map((item, i) => {
                 return (
-                    <li className={classNames("navLinks-item", classes.item)} key={i}>
+                    <li className={classNames(classes.item)} key={i}>
                         <SmartLink to={item.url} className={classNames(classes.link)} title={item.name}>
                             {item.name}
                         </SmartLink>
@@ -41,13 +41,13 @@ export default class NavLinks extends Component<IProps> {
                 );
             });
             return (
-                <article className={classNames(this.props.classNames, classes.root)}>
+                <article className={classNames("navLinks", this.props.classNames, classes.root)}>
                     <Heading
                         title={this.props.title}
                         className={classNames("navLinks-title", classes.title)}
                         depth={this.props.depth}
                     />
-                    <ul className={classNames("navLinks-items", classes.items)}>
+                    <ul className={classNames(classes.items)}>
                         {contents}
                         {this.props.url && this.props.accessibleViewAllMessage && (
                             <li className={classNames(classes.viewAllitem)} key={this.props.items.length}>

@@ -1226,13 +1226,6 @@
   dependencies:
     regenerator-runtime "^0.12.0"
 
-"@babel/runtime@^7.3.1":
-  version "7.4.3"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.4.3.tgz#79888e452034223ad9609187a0ad1fe0d2ad4bdc"
-  integrity sha512-9lsJwJLxDh/T3Q3SZszfWOTkk3pHbkmH+3KY+zwIDmsNlxsumuhS2TH3NIpktU4kNvfzy+k3eLT7aTJSPTo0OA==
-  dependencies:
-    regenerator-runtime "^0.13.2"
-
 "@babel/template@^7.1.0", "@babel/template@^7.2.2":
   version "7.2.2"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.2.2.tgz#005b3fdf0ed96e88041330379e0da9a708eb2907"
@@ -1488,6 +1481,16 @@
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.2.tgz#63985d3d8b02530e0869962f4da09142ee8e200e"
   integrity sha512-n/VQ4mbfr81aqkx/XmVicOLjviMuy02eenSdJY33SVA7S2J42EU0P1H0mOogfYedb3wXA0d/LVtBrgTSm04WEA==
+
+"@hot-loader/react-dom@16.8.6":
+  version "16.8.6"
+  resolved "https://registry.yarnpkg.com/@hot-loader/react-dom/-/react-dom-16.8.6.tgz#7923ba27db1563a7cc48d4e0b2879a140df461ea"
+  integrity sha512-+JHIYh33FVglJYZAUtRjfT5qZoT2mueJGNzU5weS2CVw26BgbxGKSujlJhO85BaRbg8sqNWyW1hYBILgK3ZCgA==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
+    scheduler "^0.13.6"
 
 "@icons/material@^0.2.4":
   version "0.2.4"
@@ -2537,10 +2540,10 @@
   resolved "https://registry.yarnpkg.com/@types/yargs/-/yargs-12.0.10.tgz#17a8ec65cd8e88f51b418ceb271af18d3137df67"
   integrity sha512-WsVzTPshvCSbHThUduGGxbmnwcpkgSctHGHTqzWyFg4lYAuV5qXlyFPOsP3OWqCINfmg/8VXP+zJaa4OxEsBQQ==
 
-"@vanillaforums/babel-preset@2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@vanillaforums/babel-preset/-/babel-preset-2.1.1.tgz#64be2a55413a7b951a184c8131870f3a39e91170"
-  integrity sha512-Lbj0TEzVTkm0o0h9JUmhoqkyY9n2kJiv88TGSY2CpPu9+Yy1RRJ8HeFWw8esQdZX1fLFxOME7lGgC8U9EeKNgA==
+"@vanillaforums/babel-preset@2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@vanillaforums/babel-preset/-/babel-preset-2.1.2.tgz#bbbe8dd2887d7db644321b799c1b98fe9f7610e3"
+  integrity sha512-vDit8IMRCF4q+dpuJ/N8b4Wl4DbpC+V68mblZG9IvOgg3DPY9Q1kvdReATpMjllkD2+xlF4I31olqus8g5pwVA==
   dependencies:
     "@babel/core" "^7.4.0"
     "@babel/plugin-proposal-class-properties" "^7.4.0"
@@ -10681,13 +10684,6 @@ react-select@^2.3.0:
     raf "^3.4.0"
     react-input-autosize "^2.2.1"
     react-transition-group "^2.2.1"
-
-react-spring@8.0.19:
-  version "8.0.19"
-  resolved "https://registry.yarnpkg.com/react-spring/-/react-spring-8.0.19.tgz#62f4f396b4b73fa402838200a1c80374338cb12e"
-  integrity sha512-DjrwjXqqVEitj6e6GqdW5dUp1BoVyeFQhEcXvPfoQxwyIVSJ9smNt8CNjSvoQqRujVllE7XKaJRWSZO/ewd1/A==
-  dependencies:
-    "@babel/runtime" "^7.3.1"
 
 react-syntax-highlighter@^8.0.1:
   version "8.1.0"

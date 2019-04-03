@@ -5,8 +5,7 @@
  */
 
 import React from "react";
-import ReactDOM from "react-dom";
-import { ensureHtmlElement } from "@library/dom/domUtils";
+import { ensureHtmlElement, mountReact } from "@library/dom/domUtils";
 import Editor from "@rich-editor/editor/Editor";
 import { hasPermission } from "@library/features/users/permissionUtils";
 
@@ -26,7 +25,7 @@ export default function mountEditor(containerSelector: string | Element) {
     const initialFormat = bodybox.getAttribute("format") || "Rich";
 
     if (initialFormat === "Rich") {
-        ReactDOM.render(
+        mountReact(
             <Editor
                 legacyTextArea={bodybox as HTMLInputElement}
                 isPrimaryEditor={true}
@@ -34,8 +33,10 @@ export default function mountEditor(containerSelector: string | Element) {
                 allowUpload={hasPermission("uploads.add")}
             />,
             container,
+            () => {
+                container.classList.remove("isDisabled");
+            },
         );
-        container.classList.remove("isDisabled");
     } else {
         throw new Error(`Unsupported initial editor format ${initialFormat}`);
     }

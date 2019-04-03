@@ -29,7 +29,6 @@ import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import React from "react";
-import { hot } from "react-hot-loader";
 import { Provider } from "react-redux";
 import hljs from "highlight.js";
 
@@ -537,4 +536,4 @@ export class Editor extends React.Component<IProps> {
     }
 }
 
-export default hot(module)(Editor);
+export default Editor;

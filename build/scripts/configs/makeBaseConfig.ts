@@ -35,8 +35,12 @@ ${chalk.green(aliases)}`;
     printVerbose(message);
 
     const babelPlugins: string[] = [];
+    const hotLoaders: any[] = [];
+    const hotAliases: any = {};
     if (options.mode === BuildMode.DEVELOPMENT) {
         babelPlugins.push(require.resolve("react-hot-loader/babel"));
+        hotLoaders.push(require.resolve("react-hot-loader/webpack"));
+        hotAliases["react-dom"] = require.resolve("@hot-loader/react-dom");
     }
 
     const storybookLoaders = section === "storybook" ? [require.resolve("react-docgen-typescript-loader")] : [];
@@ -57,6 +61,7 @@ ${chalk.green(aliases)}`;
                         return /node_modules/.test(modulePath) && !exlusionRegex.test(modulePath);
                     },
                     use: [
+                        ...hotLoaders,
                         {
                             loader: "babel-loader",
                             options: {
@@ -125,6 +130,7 @@ ${chalk.green(aliases)}`;
         resolve: {
             modules: modulePaths,
             alias: {
+                ...hotAliases,
                 ...entryModel.aliases,
                 "library-scss": path.resolve(VANILLA_ROOT, "library/src/scss"),
             },
@@ -134,7 +140,7 @@ ${chalk.green(aliases)}`;
             // - node_modules/quill/node_modules/parchment
             // - node_modules/parchment
             // The quill one is a symlinked one so we need webpack to resolve these to the same filepath.
-            symlinks: true,
+            symlinks: false,
         },
         /**
          * We need to manually tell webpack where to resolve our loaders.

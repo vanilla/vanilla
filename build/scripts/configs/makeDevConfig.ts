@@ -4,8 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import path from "path";
-import { Configuration } from "webpack";
+import webpack, { Configuration } from "webpack";
 import { makeBaseConfig } from "./makeBaseConfig";
 import EntryModel from "../utility/EntryModel";
 import { getOptions } from "../options";
@@ -27,7 +26,15 @@ export async function makeDevConfig(entryModel: EntryModel, section: string) {
         filename: `${section}-hot-bundle.js`,
         chunkFilename: `[name]-[chunkhash]-${section}.chunk.js`,
         publicPath: `http://${options.devIp}:3030/`,
+        hotUpdateChunkFilename: "hot/hot-update.js",
+        hotUpdateMainFilename: "hot/hot-update.json",
     };
+    baseConfig.optimization = {
+        namedModules: true,
+        namedChunks: true,
+        splitChunks: false,
+    };
+    baseConfig.plugins!.push(new webpack.HotModuleReplacementPlugin());
 
     return baseConfig;
 }

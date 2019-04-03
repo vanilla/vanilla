@@ -36,14 +36,18 @@ export default class NavLinksWithHeadings extends Component<IProps> {
             const ungroupedContent = <NavLinks title={t("Overview")} items={ungrouped} />;
             const groupedContent = grouped.map((group, i) => {
                 return (
-                    <NavLinks
-                        items={group.items}
-                        title={group.category.name}
-                        url={group.category.url}
-                        depth={groupLevel as 1 | 2 | 3 | 4 | 5 | 6}
-                        accessibleViewAllMessage={this.props.accessibleViewAllMessage}
-                        key={i}
-                    />
+                    <>
+                        <NavLinks
+                            items={group.items}
+                            title={group.category.name}
+                            url={group.category.url}
+                            depth={groupLevel as 1 | 2 | 3 | 4 | 5 | 6}
+                            accessibleViewAllMessage={this.props.accessibleViewAllMessage}
+                            classNames={grouped.length - 1 === i ? "isLast" : ""}
+                            key={i}
+                        />
+                        {this.separator(i % 2 === 0 ? classes.separatorOdd : "")}
+                    </>
                 );
             });
 
@@ -59,5 +63,11 @@ export default class NavLinksWithHeadings extends Component<IProps> {
         } else {
             return null;
         }
+    }
+
+    private separator(classes?: string) {
+        return (
+            <hr className={classNames(navLinksClasses().separator, classes)} aria-hidden={true} role="presentation" />
+        );
     }
 }

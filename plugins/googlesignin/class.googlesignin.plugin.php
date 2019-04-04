@@ -4,6 +4,7 @@
  * @license Proprietary
  */
 
+
 /**
  * Class GoogleSignInPlugin
  *
@@ -11,12 +12,32 @@
  */
 
 class GoogleSignInPlugin extends Gdn_OAuth2 {
+    CONST AUTHORIZEURL = 'https://accounts.google.com/o/oauth2/v2/auth';
+    CONST TOKENURL = 'https://oauth2.googleapis.com/token';
+    CONST PROFILEURL = 'https://openidconnect.googleapis.com/v1/userinfo';
+
     /**
      * Set the key for saving OAuth settings in GDN_UserAuthenticationProvider
      */
     public function __construct() {
         $this->setProviderKey('googlesignin');
         $this->settingsView = 'plugins/settings/googlesignin';
+    }
+
+    /**
+     *  Return all the information saved in provider table.
+     *
+     * @return array Stored provider data (secret, client_id, etc.).
+     */
+    public function provider() {
+        if (!$this->provider) {
+            $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($this->providerKey);
+            $this->provider['AuthorizeUrl'] = AUTHORIZEURL;
+            $this->provider['TokenUrl'] = TOKENURL;
+            $this->provider['ProfileUrl'] = PROFILEURL;
+        }
+
+        return $this->provider;
     }
 
     /**

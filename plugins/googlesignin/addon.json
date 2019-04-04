@@ -3,7 +3,7 @@
     "description": "Users may sign into your site using their Google account.",
     "version": "1.0.0",
     "mobileFriendly": true,
-    "settingsUrl": "/dashboard/social/googlesignin",
+    "settingsUrl": "/settings/googlesignin",
     "settingsPermission": "Garden.Settings.Manage",
     "hidden": false,
     "socialConnect": true,

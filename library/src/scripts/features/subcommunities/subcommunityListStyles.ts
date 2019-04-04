@@ -5,36 +5,36 @@
  */
 
 import React from "react";
-import { debugHelper, unit } from "@library/styles/styleHelpers";
-import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
-import { style } from "typestyle";
+import { unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
-import { layoutVariables } from "@library/styles/layoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const subcommunityListVariables = useThemeCache(() => {
-    const themeVars = componentThemeVariables("subcommunityList");
-    const spacing = {
+    const themeVars = variableFactory("subcommunityList");
+    const spacing = themeVars("spacing", {
         padding: 24,
-        ...themeVars.subComponentStyles("spacing"),
-    };
+    });
 
-    const sizing = {
-        width: 432,
-        ...themeVars.subComponentStyles("sizing"),
-    };
+    const sizing = themeVars("sizing", {
+        columnWidth: "50%",
+        columnsWidth: 912,
+    });
 
     return { spacing, sizing };
 });
 
 export const subcommunityListClasses = useThemeCache(() => {
     const vars = subcommunityListVariables();
-    const debug = debugHelper("subcommunityList");
+    const style = styleFactory("subcommunityList");
     const mediaQueries = layoutVariables().mediaQueries();
+    const layoutVars = layoutVariables();
 
     const root = style(
         {
+            maxWidth: unit(vars.sizing.columnsWidth),
             padding: unit(vars.spacing.padding),
-            ...debug.name(),
+            margin: "auto",
         },
         mediaQueries.oneColumn({
             padding: 0,
@@ -42,13 +42,13 @@ export const subcommunityListClasses = useThemeCache(() => {
     );
 
     const items = style(
+        "items",
         {
             position: "relative",
             display: "flex",
             flexWrap: "wrap",
             alignItems: "stretch",
             justifyContent: "space-between",
-            ...debug.name("items"),
         },
         mediaQueries.oneColumn({
             display: "block",
@@ -56,13 +56,13 @@ export const subcommunityListClasses = useThemeCache(() => {
     );
 
     const item = style(
+        "item",
         {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "stretch",
-            width: unit(vars.sizing.width),
-            ...debug.name("item"),
+            width: unit(vars.sizing.columnWidth),
         },
         mediaQueries.oneColumn({
             display: "block",

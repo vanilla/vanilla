@@ -9,7 +9,7 @@ import { srOnly, userSelect } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { px } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
-import { layoutVariables } from "@library/styles/layoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 const backLinkClasses = useThemeCache(() => {
     const globalVars = globalVariables();

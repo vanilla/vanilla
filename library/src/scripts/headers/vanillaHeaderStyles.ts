@@ -16,7 +16,7 @@ import {
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
-import { layoutVariables } from "@library/styles/layoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const vanillaHeaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();

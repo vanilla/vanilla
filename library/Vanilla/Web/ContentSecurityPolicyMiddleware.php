@@ -49,7 +49,7 @@ class ContentSecurityPolicyMiddleware {
     }
 
     /**
-     * Compose conetnt security header string from policies list
+     * Compose content security header string from policies list
      *
      * @return string
      */

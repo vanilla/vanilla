@@ -206,8 +206,6 @@ export const navLinksClasses = useThemeCache(() => {
         default: globalVars.mainColors.primary,
     });
 
-    console.log("viewAllLinkColors:::", viewAllLinkColors);
-
     const viewAll = style("viewAll", {
         display: "block",
         fontWeight: vars.viewAll.fontWeight,

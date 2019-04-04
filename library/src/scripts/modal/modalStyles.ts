@@ -100,7 +100,7 @@ export const modalClasses = useThemeCache(() => {
                 boxSizing: "border-box",
             },
             "&.isFullScreen": {
-                overflow: "auto",
+                overflow: "hidden",
                 width: percent(100),
                 height: viewHeight(100),
                 maxHeight: viewHeight(100),

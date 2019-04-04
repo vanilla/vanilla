@@ -83,6 +83,7 @@ export const globalVariables = useThemeCache(() => {
             focus: mainColors.secondary,
             accessibleFocus: mainColors.secondary,
             active: mainColors.secondary,
+            visited: undefined,
         },
     });
 

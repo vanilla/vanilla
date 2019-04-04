@@ -9,7 +9,7 @@ import { borders, colorOut, margins, unit, flexHelper } from "@library/styles/st
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, viewHeight, viewWidth } from "csx";
-import { layoutVariables } from "@library/styles/layoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 
 export const modalVariables = useThemeCache(() => {

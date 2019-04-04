@@ -5,18 +5,33 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, setAllLinkColors, unit } from "@library/styles/styleHelpers";
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { style } from "typestyle";
-import { percent } from "csx";
-import { layoutVariables } from "@library/styles/layoutStyles";
+import {
+    allLinkStates,
+    colorOut,
+    debugHelper,
+    margins,
+    paddings,
+    setAllLinkColors,
+    unit,
+} from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { percent, px } from "csx";
+import { layoutVariables } from "@library/layout/layoutStyles";
+import { media } from "typestyle";
 
 export const navLinksVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("navLinks");
     const globalVars = globalVariables();
 
     const linksWithHeadings = makeThemeVars("linksWithHeadings", {
-        padding: 16,
+        paddings: {
+            all: 20,
+        },
+        mobile: {
+            paddings: {
+                all: 0,
+            },
+        },
     });
 
     const item = makeThemeVars("item", {
@@ -24,15 +39,21 @@ export const navLinksVariables = useThemeCache(() => {
     });
 
     const title = makeThemeVars("title", {
-        fontSize: 20,
+        fontSize: globalVars.fonts.size.smallTitle,
         fontWeight: globalVars.fonts.weights.semiBold,
         lineHeight: globalVars.lineHeights.condensed,
-        width: 203,
         maxWidth: percent(100),
+        margins: {
+            bottom: 8,
+        },
+        mobile: {
+            fontSize: globalVars.fonts.size.large,
+            fontWeight: globalVars.fonts.weights.bold,
+        },
     });
 
     const link = makeThemeVars("link", {
-        color: globalVars.mainColors.fg,
+        fg: globalVars.mainColors.fg,
         fontWeight: globalVars.fonts.weights.semiBold,
         lineHeight: globalVars.lineHeights.condensed,
         width: 203,
@@ -40,107 +61,200 @@ export const navLinksVariables = useThemeCache(() => {
         fontSize: 16,
     });
 
+    const viewAllLinkColors = setAllLinkColors();
     const viewAll = makeThemeVars("viewAll", {
+        color: viewAllLinkColors.color,
         fontWeight: globalVars.fonts.weights.semiBold,
         fontSize: globalVars.fonts.size.medium,
-        marginTop: "auto",
-        ...setAllLinkColors(),
+        margins: {
+            top: "auto",
+        },
+        paddings: {
+            top: 20,
+        },
+        mobile: {
+            paddings: {
+                top: 8,
+            },
+        },
+        $nest: viewAllLinkColors.nested,
     });
 
     const spacing = makeThemeVars("spacing", {
-        padding: 24,
+        paddings: {
+            vertical: 34,
+            horizontal: 40,
+        },
         margin: 6,
+        mobile: {
+            paddings: {
+                vertical: 22,
+                horizontal: 8,
+            },
+        },
     });
 
-    const sizing = makeThemeVars("sizing", {
-        width: 250,
+    const columns = makeThemeVars("columns", {
+        desktop: 2,
     });
 
-    return { linksWithHeadings, item, title, sizing, link, viewAll, spacing };
+    const separator = makeThemeVars("separator", {
+        height: 1,
+        bg: globalVars.mixBgAndFg(0.3),
+    });
+
+    const breakPoints = makeThemeVars("breakPoints", {
+        oneColumn: 750,
+    });
+
+    const mediaQueries = () => {
+        const oneColumn = styles => {
+            return media({ maxWidth: px(breakPoints.oneColumn) }, styles);
+        };
+
+        return { oneColumn };
+    };
+
+    return {
+        linksWithHeadings,
+        item,
+        title,
+        columns,
+        link,
+        viewAll,
+        spacing,
+        separator,
+        mediaQueries,
+    };
 });
 
 export const navLinksClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = navLinksVariables();
-    const debug = debugHelper("navLinks");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const style = styleFactory("navLinks");
+    const mediaQueries = vars.mediaQueries();
 
     const root = style(
         {
-            ...debug.name(),
+            ...paddings(vars.spacing.paddings),
             display: "flex",
             flexDirection: "column",
-            padding: unit(vars.spacing.padding),
-            width: unit(vars.sizing.width),
+            maxWidth: percent(100),
+            width: percent(100 / vars.columns.desktop),
         },
-        mediaQueries.xs({
+        mediaQueries.oneColumn({
             width: percent(100),
+            ...paddings(vars.spacing.mobile.paddings),
         }),
     );
 
-    const items = style({
-        ...debug.name("items"),
+    const items = style("items", {
         display: "flex",
         flexDirection: "column",
         flexGrow: 1,
     });
 
-    const item = style({
-        ...debug.name("item"),
+    const item = style("item", {
         display: "block",
         fontSize: unit(vars.item.fontSize),
         marginTop: unit(vars.spacing.margin),
         marginBottom: unit(vars.spacing.margin),
-        $nest: {
-            "&.isViewAll": {
-                marginTop: "auto",
-            },
+    });
+
+    const title = style(
+        "title",
+        {
+            display: "block",
+            fontSize: unit(vars.title.fontSize),
+            lineHeight: globalVars.lineHeights.condensed,
+            fontWeight: globalVars.fonts.weights.semiBold,
+            maxWidth: percent(100),
+            ...margins(vars.title.margins),
         },
+        mediaQueries.oneColumn({
+            fontSize: unit(vars.title.mobile.fontSize),
+            fontWeight: vars.title.mobile.fontWeight,
+        }),
+    );
+
+    const linkColors = setAllLinkColors({
+        default: globalVars.mainColors.fg,
     });
 
-    const title = style({
-        ...debug.name("title"),
-        display: "block",
-        fontSize: unit(vars.title.fontSize),
-        lineHeight: globalVars.lineHeights.condensed,
-        fontWeight: globalVars.fonts.weights.semiBold,
-        width: unit(vars.title.width),
-        maxWidth: percent(100),
-        marginBottom: unit(vars.spacing.margin),
-    });
-
-    const link = style({
-        ...debug.name("link"),
+    const link = style("link", {
         display: "block",
         fontSize: unit(vars.link.fontSize),
         lineHeight: vars.link.lineHeight,
-        ...setAllLinkColors(),
+        color: linkColors.color,
+        $nest: linkColors.nested,
     });
 
-    const viewAll = style({
-        ...debug.name("viewAll"),
+    const viewAllitem = style(
+        "viewAllItem",
+        {
+            display: "block",
+            fontSize: unit(vars.item.fontSize),
+            ...margins(vars.viewAll.margins),
+            ...paddings(vars.viewAll.paddings),
+        },
+        mediaQueries.oneColumn({
+            ...paddings(vars.viewAll.mobile.paddings),
+        }),
+    );
+
+    const viewAllLinkColors = setAllLinkColors({
+        default: globalVars.mainColors.primary,
+    });
+
+    const viewAll = style("viewAll", {
+        display: "block",
         fontWeight: vars.viewAll.fontWeight,
         fontSize: vars.viewAll.fontSize,
-        ...setAllLinkColors({
-            default: {
-                color: globalVars.mainColors.primary.toString(),
-            },
-        }),
+        color: viewAllLinkColors.color,
+        $nest: viewAllLinkColors.nested,
     });
 
     const linksWithHeadings = style(
+        "linksWithHeadings",
         {
-            padding: unit(vars.linksWithHeadings.padding),
+            ...paddings(vars.linksWithHeadings.paddings),
             display: "flex",
             flexWrap: "wrap",
             alignItems: "stretch",
             justifyContent: "space-between",
-            ...debug.name("linksWithHeadings"),
         },
-        mediaQueries.xs({
-            padding: 0,
+        mediaQueries.oneColumn({
+            ...paddings(vars.linksWithHeadings.mobile.paddings),
         }),
     );
 
-    return { root, items, item, title, link, viewAll, linksWithHeadings };
+    const separator = style("separator", {
+        display: "block",
+        width: percent(100),
+        height: unit(vars.separator.height),
+        backgroundColor: colorOut(vars.separator.bg),
+    });
+
+    const separatorOdd = style(
+        "separatorOdd",
+        {
+            display: "none",
+        },
+        mediaQueries.oneColumn({
+            display: "block",
+        }),
+    );
+
+    return {
+        root,
+        items,
+        item,
+        title,
+        link,
+        viewAllitem,
+        viewAll,
+        linksWithHeadings,
+        separator,
+        separatorOdd,
+    };
 });

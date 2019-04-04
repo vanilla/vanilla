@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, margins, unit, flexHelper } from "@library/styles/styleHelpers";
+import { borders, colorOut, margins, unit, flexHelper, sticky } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, viewHeight, viewWidth } from "csx";
@@ -159,15 +159,17 @@ export const modalClasses = useThemeCache(() => {
 
     const pageHeader = style(
         "pageHeader",
+        sticky(),
         {
             ...shadows.embed(),
-            position: "relative",
+            top: 0,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             height: unit(headerVars.sizing.height),
             minHeight: unit(headerVars.sizing.height),
             zIndex: 1,
+            background: colorOut(vars.colors.bg),
         },
         mediaQueries.oneColumn({
             minHeight: unit(headerVars.sizing.mobile.height),

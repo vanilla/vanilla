@@ -12,6 +12,7 @@ import {
     srOnly,
     unit,
     userSelect,
+    sticky,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
@@ -151,7 +152,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
 
     const menuItems = style("menuItems", {
         "-ms-overflow-style": "-ms-autohiding-scrollbar",
-        position: "relative",
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
@@ -281,6 +281,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
     const embedBar = style("embedBar", {
         display: "block",
         width: percent(100),
+        background: colorOut(vars.colors.bg),
         padding: unit(vars.embedMenu.padding),
     });
 

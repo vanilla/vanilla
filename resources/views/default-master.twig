@@ -18,7 +18,7 @@
         {% endfor %}
 
         {% for script in scripts -%}
-            <script nonce=EDNnf03nceIOfn39fn3e9h3sdfa defer src="{{ script.getWebPath() }}"></script>
+            <script nonce={{ nonce }} defer src="{{ script.getWebPath() }}"></script>
         {% endfor %}
 
         {%- if breadcrumbsJson -%}

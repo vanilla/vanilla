@@ -71,7 +71,7 @@ export const modalVariables = useThemeCache(() => {
 export const modalClasses = useThemeCache(() => {
     const vars = modalVariables();
     const globalVars = globalVariables();
-    const style = styleFactory("frame");
+    const style = styleFactory("modal");
     const mediaQueries = layoutVariables().mediaQueries();
     const shadows = shadowHelper();
     const headerVars = vanillaHeaderVariables();
@@ -168,7 +168,7 @@ export const modalClasses = useThemeCache(() => {
             justifyContent: "center",
             height: unit(headerVars.sizing.height),
             minHeight: unit(headerVars.sizing.height),
-            zIndex: 1,
+            zIndex: 2,
             background: colorOut(vars.colors.bg),
         },
         mediaQueries.oneColumn({

@@ -15,6 +15,7 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
     CONST AUTHORIZEURL = 'https://accounts.google.com/o/oauth2/v2/auth';
     CONST TOKENURL = 'https://oauth2.googleapis.com/token';
     CONST PROFILEURL = 'https://openidconnect.googleapis.com/v1/userinfo';
+    CONST PROFILENAME = 'name';
 
     /**
      * Set the key for saving OAuth settings in GDN_UserAuthenticationProvider
@@ -32,9 +33,13 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
     public function provider() {
         if (!$this->provider) {
             $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($this->providerKey);
-            $this->provider['AuthorizeUrl'] = AUTHORIZEURL;
-            $this->provider['TokenUrl'] = TOKENURL;
-            $this->provider['ProfileUrl'] = PROFILEURL;
+            $this->provider['AuthorizeUrl'] = self::AUTHORIZEURL;
+            $this->provider['TokenUrl'] = self::TOKENURL;
+            $this->provider['ProfileUrl'] = self::PROFILEURL;
+            $this->provider['ProfileKeyName'] = self::PROFILENAME;
+            $this->provider['AcceptedScope'] = 'email openid';
+            $this->provider['ProfileKeyUniqueID'] = 'sub';
+            $this->provider['ProfileKeyFullName'] = null;
         }
 
         return $this->provider;
@@ -101,6 +106,5 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
 
         $sender->render('settings', '', $view);
     }
-
 
 }

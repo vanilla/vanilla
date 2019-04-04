@@ -3,17 +3,17 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { EditorParagraphMenu } from "@rich-editor/editor/EditorParagraphMenu";
-import { Editor } from "@rich-editor/editor/context";
 import { hasPermission } from "@library/features/users/permissionUtils";
-import classNames from "classnames";
-import { EditorInlineMenus } from "@rich-editor/editor/EditorInlineMenus";
-import { EditorEmbedBar } from "@rich-editor/editor/pieces/EmbedBar";
-import { Provider } from "react-redux";
 import getStore from "@library/redux/getStore";
+import { Editor } from "@rich-editor/editor/context";
 import EditorContent from "@rich-editor/editor/EditorContent";
-import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
+import { EditorInlineMenus } from "@rich-editor/editor/EditorInlineMenus";
+import { EditorParagraphMenu } from "@rich-editor/editor/EditorParagraphMenu";
+import { EditorEmbedBar } from "@rich-editor/editor/pieces/EmbedBar";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import classNames from "classnames";
+import React from "react";
+import { Provider } from "react-redux";
 
 interface IProps {
     legacyTextArea: HTMLInputElement;
@@ -21,11 +21,11 @@ interface IProps {
 
 export function LegacyEditor(props: IProps) {
     const store = getStore();
-    const classesRichEditorForm = richEditorFormClasses();
+    const classes = richEditorClasses(true);
     return (
         <Provider store={store}>
             <Editor isPrimaryEditor={true} legacyMode={true} allowUpload={hasPermission("uploads.add")}>
-                <div className={classNames("richEditor-frame", "InputBox", classesRichEditorForm.scrollFrame)}>
+                <div className={classNames("richEditor-frame", "InputBox", classes.legacyFrame)}>
                     <EditorContent legacyTextArea={props.legacyTextArea} />
                     <EditorParagraphMenu />
                     <EditorInlineMenus />

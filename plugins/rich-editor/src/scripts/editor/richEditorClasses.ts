@@ -293,6 +293,21 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         opacity: globalVars.states.icon.opacity,
     });
 
+    const legacyFrame = style("legacyFrame", {
+        margin: "auto",
+        height: "initial",
+        minHeight: unit(vars.sizing.minHeight + vars.menuButton.size),
+        position: "relative",
+        backgroundColor: colorOut(vars.colors.bg),
+        padding: 0,
+        $nest: {
+            "&.isMenuInset": {
+                overflow: "initial",
+                position: "relative",
+            },
+        },
+    });
+
     const close = style("close", {
         ...absolutePosition.middleRightOfParent(),
         ...userSelect(),
@@ -357,6 +372,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         paragraphMenuMobile,
         separator,
         position,
+        legacyFrame,
         paragraphMenuPanel,
     };
 });

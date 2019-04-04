@@ -9,12 +9,11 @@ import classNames from "classnames";
 import { getMeta, t } from "@library/utility/appUtils";
 import Permission from "@library/features/users/Permission";
 import EditorUploadButton from "@rich-editor/editor/pieces/EditorUploadButton";
-import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import EmojiFlyout from "@rich-editor/flyouts/EmojiFlyout";
 import EmbedFlyout from "@rich-editor/flyouts/EmbedFlyout";
 import ParagraphMenusBarToggle from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
-import { EditorContext, useEditor } from "@rich-editor/editor/context";
+import { useEditor } from "@rich-editor/editor/context";
 
 interface IProps {
     className?: string;
@@ -27,7 +26,6 @@ export function EditorEmbedBar(props: IProps) {
     }
     const mimeTypes = getMeta("upload.allowedExtensions");
     const classesRichEditor = richEditorClasses(legacyMode);
-    const classesRichEditorForm = richEditorFormClasses(legacyMode);
 
     return (
         <div className={classNames("richEditor-embedBar", props.className, classesRichEditor.embedBar)}>
@@ -36,7 +34,6 @@ export function EditorEmbedBar(props: IProps) {
                     "richEditor-menuItems",
                     "richEditor-inlineMenuItems",
                     classesRichEditor.menuItems,
-                    classesRichEditorForm.inlineMenuItems,
                 )}
                 role="menubar"
                 aria-label={t("Inline Level Formatting Menu")}

@@ -14,6 +14,16 @@ class ContentSecurityPolicyModel {
     /** @var array List of providers. */
     private $providers = [];
 
+    /** @var string Nonce value to embed for all inlined scripts */
+    private $nonce;
+
+    /**
+     * ContentSecurityPolicyModel constructor.
+     */
+    public function __construct() {
+        $this->nonce = md5(base64_encode(APPLICATION_VERSION.rand(1, 1000000)));
+    }
+
     /**
      * @param ContentSecurityPolicyProviderInterface $provider
      */
@@ -26,11 +36,18 @@ class ContentSecurityPolicyModel {
      *
      * @return Policy[]
      */
-    public function getDirectives(): array {
-        $counters = [];
+    public function getPolicies(): array {
+        $policies[] = new Policy(Policy::SCRIPT_SRC, '\'nonce-'.$this->getNonce().'\'');
         foreach ($this->providers as $provider) {
-            $counters = array_merge($counters, $provider->getPolicies());
+            $policies = array_merge($policies, $provider->getPolicies());
         }
-        return $counters;
+        return $policies;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNonce(): string {
+        return $this->nonce;
     }
 }

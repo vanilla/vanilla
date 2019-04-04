@@ -33,6 +33,10 @@ $Configuration['Garden']['ContentType'] = 'text/html';
 $Configuration['Garden']['Locale'] = 'en';
 $Configuration['Garden']['LocaleCodeset'] = 'UTF8';
 
+$Configuration['HotReload']['IP'] = '127.0.0.1';
+
+$Configuration['ContentSecurityPolicy']['ScriptSrc']['AllowedDomains'] = ['https://ajax.googleapis.com/'];
+
 // Site specifics.
 $Configuration['Garden']['Installed'] = false; // Has Garden been installed yet? This blocks setup when true.
 $Configuration['Garden']['Title'] = 'Vanilla';

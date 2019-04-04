@@ -16,6 +16,8 @@ use Vanilla\Models\SiteMeta;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
+use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
+use Vanilla\Web\ContentSecurityPolicy\DefaultContentSecurityPolicyProvider;
 use Vanilla\Web\JsInterpop\PhpAsJsVariable;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\JsInterpop\ReduxErrorAction;
@@ -95,6 +97,11 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     protected $footerHtml = '';
 
     /**
+     * @var ContentSecurityPolicyModel
+     */
+    protected $cspModel;
+
+    /**
      * Dependendency Injection.
      *
      * @param SiteMeta $siteMeta
@@ -102,20 +109,22 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @param \Gdn_Session $session
      * @param WebpackAssetProvider $assetProvider
      * @param BreadcrumbModel $breadcrumbModel
-
+     * @param ContentSecurityPolicyModel $cspModel
      */
     public function setDependencies(
         SiteMeta $siteMeta,
         \Gdn_Request $request,
         \Gdn_Session $session,
         WebpackAssetProvider $assetProvider,
-        BreadcrumbModel $breadcrumbModel
+        BreadcrumbModel $breadcrumbModel,
+        ContentSecurityPolicyModel $cspModel
     ) {
         $this->siteMeta = $siteMeta;
         $this->request = $request;
         $this->session = $session;
         $this->assetProvider = $assetProvider;
         $this->breadcrumbModel = $breadcrumbModel;
+        $this->cspModel = $cspModel;
     }
 
     /**
@@ -132,6 +141,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->inlineScripts[] = new PhpAsJsVariable('__ACTIONS__', $this->reduxActions);
         $this->addMetaTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
         $viewData = [
+            'nonce' => $this->cspModel->getNonce(),
             'title' => $this->seoTitle,
             'description' => $this->seoDescription,
             'canonicalUrl' => $this->canonicalUrl,

@@ -643,58 +643,81 @@ export interface ILinkStates {
     visited?: object;
 }
 
-export const setAllLinkColors = (overwrites?: ILinkStates) => {
+const linkStyleFallbacks = (
+    specificOverwrite: undefined | ColorHelper | string,
+    defaultOverwrite: undefined | ColorHelper | string,
+    globalDefault: undefined | ColorHelper | string,
+) => {
+    if (specificOverwrite) {
+        return specificOverwrite as ColorValues;
+    } else if (defaultOverwrite) {
+        return defaultOverwrite as ColorValues;
+    } else {
+        return globalDefault as ColorValues;
+    }
+};
+
+interface ILinkColorOverwrites {
+    default?: ColorValues;
+    hover?: ColorValues;
+    focus?: ColorValues;
+    accessibleFocus?: ColorValues;
+    active?: ColorValues;
+    visited?: ColorValues;
+    allStates?: ColorValues;
+}
+
+export const setAllLinkColors = (overwriteValues?: ILinkColorOverwrites) => {
     const vars = globalVariables();
     // We want to default to the standard styles and only overwrite what we want/need
     const linkColors = vars.links.colors;
-
-    if (overwrites) {
-        overwrites = {
-            default: overwrites.default ? overwrites.default : overwrites.allStates ? overwrites.allStates : undefined,
-            hover: overwrites.hover ? overwrites.hover : overwrites.allStates ? overwrites.allStates : undefined,
-            focus: overwrites.focus ? overwrites.focus : overwrites.allStates ? overwrites.allStates : undefined,
-            accessibleFocus: overwrites.accessibleFocus
-                ? overwrites.accessibleFocus
-                : overwrites.allStates
-                ? overwrites.allStates
-                : undefined,
-            active: overwrites.accessibleFocus
-                ? overwrites.active
-                : overwrites.allStates
-                ? overwrites.allStates
-                : undefined,
-        };
-    }
-
-    const styles: ILinkStates = {
-        default: {
-            color: colorOut(linkColors.default),
-        },
-        hover: {
-            color: colorOut(linkColors.hover),
-        },
-        focus: {
-            color: colorOut(linkColors.focus),
-        },
-        accessibleFocus: {
-            color: colorOut(linkColors.accessibleFocus),
-        },
-        active: {
-            color: colorOut(linkColors.active),
-        },
-        ...overwrites,
+    const overwrites = overwriteValues ? overwriteValues : {};
+    const mergedColors = {
+        default: linkStyleFallbacks(overwrites.default, overwrites.allStates, linkColors.default),
+        hover: linkStyleFallbacks(overwrites.hover, overwrites.allStates, linkColors.hover),
+        focus: linkStyleFallbacks(overwrites.focus, overwrites.allStates, linkColors.focus),
+        accessibleFocus: linkStyleFallbacks(
+            overwrites.accessibleFocus,
+            overwrites.allStates,
+            linkColors.accessibleFocus,
+        ),
+        active: linkStyleFallbacks(overwrites.active, overwrites.allStates, linkColors.active),
+        visited: linkStyleFallbacks(overwrites.visited, overwrites.allStates, linkColors.visited),
     };
 
-    return {
-        ...styles.default,
-        $nest: {
-            "&:hover": styles.hover,
-            "&:focus": styles.focus,
-            "&.focus-visible": styles.accessibleFocus,
-            "&:active": styles.active,
+    const styles = {
+        default: {
+            color: colorOut(mergedColors.default),
+        },
+        hover: {
+            color: colorOut(mergedColors.hover),
+        },
+        focus: {
+            color: colorOut(mergedColors.focus),
+        },
+        accessibleFocus: {
+            color: colorOut(mergedColors.accessibleFocus),
+        },
+        active: {
+            color: colorOut(mergedColors.active),
+        },
+        visited: {
+            color: colorOut(mergedColors.visited),
+        },
+    };
+
+    const final = {
+        color: styles.default.color,
+        nested: {
+            "&&:hover": styles.hover,
+            "&&:focus": styles.focus,
+            "&&.focus-visible": styles.accessibleFocus,
+            "&&:active": styles.active,
             "&:visited": styles.visited,
         },
     };
+
+    return final;
 };
 
 export const singleLineEllipsis = () => {

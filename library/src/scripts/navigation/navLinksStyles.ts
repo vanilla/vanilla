@@ -5,7 +5,15 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, debugHelper, margins, paddings, setAllLinkColors, unit } from "@library/styles/styleHelpers";
+import {
+    allLinkStates,
+    colorOut,
+    debugHelper,
+    margins,
+    paddings,
+    setAllLinkColors,
+    unit,
+} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
 import { layoutVariables } from "@library/layout/layoutStyles";
@@ -53,8 +61,9 @@ export const navLinksVariables = useThemeCache(() => {
         fontSize: 16,
     });
 
+    const viewAllLinkColors = setAllLinkColors();
     const viewAll = makeThemeVars("viewAll", {
-        ...setAllLinkColors(),
+        color: viewAllLinkColors.color,
         fontWeight: globalVars.fonts.weights.semiBold,
         fontSize: globalVars.fonts.size.medium,
         margins: {
@@ -68,6 +77,7 @@ export const navLinksVariables = useThemeCache(() => {
                 top: 8,
             },
         },
+        $nest: viewAllLinkColors.nested,
     });
 
     const spacing = makeThemeVars("spacing", {
@@ -90,7 +100,7 @@ export const navLinksVariables = useThemeCache(() => {
 
     const separator = makeThemeVars("separator", {
         height: 1,
-        bg: globalVars.mixBgAndFg(0.5),
+        bg: globalVars.mixBgAndFg(0.3),
     });
 
     const breakPoints = makeThemeVars("breakPoints", {
@@ -167,15 +177,16 @@ export const navLinksClasses = useThemeCache(() => {
         }),
     );
 
+    const linkColors = setAllLinkColors({
+        default: globalVars.mainColors.fg,
+    });
+
     const link = style("link", {
         display: "block",
         fontSize: unit(vars.link.fontSize),
         lineHeight: vars.link.lineHeight,
-        ...setAllLinkColors({
-            default: {
-                color: colorOut(vars.link.fg),
-            },
-        }),
+        color: linkColors.color,
+        $nest: linkColors.nested,
     });
 
     const viewAllitem = style(
@@ -191,15 +202,18 @@ export const navLinksClasses = useThemeCache(() => {
         }),
     );
 
+    const viewAllLinkColors = setAllLinkColors({
+        default: globalVars.mainColors.primary,
+    });
+
+    console.log("viewAllLinkColors:::", viewAllLinkColors);
+
     const viewAll = style("viewAll", {
         display: "block",
         fontWeight: vars.viewAll.fontWeight,
         fontSize: vars.viewAll.fontSize,
-        ...setAllLinkColors({
-            default: {
-                color: colorOut(globalVars.mainColors.primary),
-            },
-        }),
+        color: viewAllLinkColors.color,
+        $nest: viewAllLinkColors.nested,
     });
 
     const linksWithHeadings = style(

@@ -154,11 +154,16 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
-    const linkStyle = setAllLinkColors({
-        hover: {
-            textDecoration: "underline",
+    const linkColors = setAllLinkColors();
+    const linkStyle = {
+        color: linkColors.color,
+        $nest: {
+            ...linkColors.nested,
+            "&:hover, &:focus": {
+                textDecoration: "underline",
+            },
         },
-    });
+    };
 
     const linkStyles: NestedCSSSelectors = {
         "p a": linkStyle,

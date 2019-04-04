@@ -17,6 +17,7 @@ import { useEditor } from "@rich-editor/editor/context";
 
 interface IProps {
     className?: string;
+    contentRef: React.RefObject<HTMLDivElement>;
 }
 
 export function EditorEmbedBar(props: IProps) {
@@ -28,7 +29,10 @@ export function EditorEmbedBar(props: IProps) {
     const classesRichEditor = richEditorClasses(legacyMode);
 
     return (
-        <div className={classNames("richEditor-embedBar", props.className, classesRichEditor.embedBar)}>
+        <div
+            ref={props.contentRef}
+            className={classNames("richEditor-embedBar", props.className, classesRichEditor.embedBar)}
+        >
             <ul
                 className={classNames(
                     "richEditor-menuItems",

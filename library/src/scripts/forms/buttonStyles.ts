@@ -240,51 +240,51 @@ export const buttonVariables = useThemeCache(() => {
             bg: transparentColor,
         },
         border: {
-            color: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.fg, 1, true),
+            color: modifyColorBasedOnLightness(globalVars.mainColors.fg, 1, true),
         },
         hover: {
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.fg, 0.9),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, 0.9),
         },
         active: {
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.fg, 0.9),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, 0.9),
         },
         focus: {
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.fg, 0.9),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, 0.9),
         },
         focusAccessible: {
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.fg, 0.9),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, 0.9),
         },
     });
 
     const translucid: IButtonType = makeThemeVars("translucid", {
         colors: {
             fg: globalVars.mainColors.bg,
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, globalVars.mainColors.bg, 1).fade(0.1),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, 1).fade(0.1),
         },
         spinnerColor: globalVars.mainColors.bg,
         border: {
             color: globalVars.mainColors.bg,
         },
         hover: {
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, globalVars.mainColors.bg, 1).fade(0.2),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, 1).fade(0.2),
             border: {
                 color: globalVars.mainColors.bg,
             },
         },
         active: {
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, globalVars.mainColors.bg, 1).fade(0.2),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, 1).fade(0.2),
             border: {
                 color: globalVars.mainColors.bg,
             },
         },
         focus: {
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, globalVars.mainColors.bg, 1).fade(0.2),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, 1).fade(0.2),
             border: {
                 color: globalVars.mainColors.bg,
             },
         },
         focusAccessible: {
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, globalVars.mainColors.bg, 1).fade(0.2),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.bg, 1).fade(0.2),
             border: {
                 color: globalVars.mainColors.bg,
             },

@@ -3,12 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import {
-    modifyColorBasedOnLightness,
-    colorOut,
-    IBackground,
-    modifyColorSaturationBasedOnLightness,
-} from "@library/styles/styleHelpers";
+import { modifyColorBasedOnLightness, colorOut, IBackground } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { color, ColorHelper, percent, viewHeight } from "csx";
 
@@ -246,7 +241,7 @@ export const globalVariables = useThemeCache(() => {
         },
     });
 
-    const overlayBg = modifyColorBasedOnLightness(mainColors.fg, mainColors.fg, 0.5, true);
+    const overlayBg = modifyColorBasedOnLightness(mainColors.fg, 0.5);
     const overlay = makeThemeVars("overlay", {
         dropShadow: `2px -2px 5px ${colorOut(overlayBg.fade(0.3))}`,
         bg: overlayBg,

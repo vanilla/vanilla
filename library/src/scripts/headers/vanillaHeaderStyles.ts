@@ -12,10 +12,11 @@ import {
     states,
     unit,
     userSelect,
+    emphasizeLightness,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { percent, px } from "csx";
+import { ColorHelper, percent, px, color } from "csx";
 import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const vanillaHeaderVariables = useThemeCache(() => {
@@ -53,6 +54,9 @@ export const vanillaHeaderVariables = useThemeCache(() => {
             fontSize: 16,
             width: buttonMobileSize,
         },
+        state: {
+            bg: emphasizeLightness(colors.bg, 0.04),
+        },
     });
 
     const count = makeThemeVars("count", {
@@ -81,19 +85,16 @@ export const vanillaHeaderVariables = useThemeCache(() => {
     });
 
     const buttonContents = makeThemeVars("buttonContents", {
-        hover: {
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1, true),
-        },
-        active: {
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2, true),
+        state: {
+            bg: button.state.bg,
         },
     });
 
     const signIn = makeThemeVars("signIn", {
         fg: colors.fg,
-        bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, globalVars.mainColors.primary, 0.1, true),
+        bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, 0.1, true),
         hover: {
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, globalVars.mainColors.primary, 0.2, true),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, 0.2, true),
         },
     });
 
@@ -214,8 +215,8 @@ export const vanillaHeaderClasses = useThemeCache(() => {
                 "&.focus-visible": {
                     $nest: {
                         "&.headerLogo-logoFrame": {
-                            outline: `5px solid ${vars.buttonContents.hover.bg}`,
-                            background: vars.buttonContents.hover.bg.toString(),
+                            outline: `5px solid ${vars.buttonContents.state.bg}`,
+                            background: colorOut(vars.buttonContents.state.bg),
                             borderRadius: vars.button.borderRadius,
                         },
                     },
@@ -299,7 +300,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
 
     const meBoxStateStyles = style("meBoxStateStyles", {
         borderRadius: px(vars.button.borderRadius),
-        backgroundColor: vars.buttonContents.hover.bg.toString(),
+        backgroundColor: colorOut(vars.buttonContents.state.bg),
     });
 
     const button = style(
@@ -335,10 +336,10 @@ export const vanillaHeaderClasses = useThemeCache(() => {
                 "&.isOpen": {
                     $nest: {
                         ".meBox-contentHover": {
-                            backgroundColor: vars.buttonContents.active.bg.toString(),
+                            backgroundColor: colorOut(vars.buttonContents.state.bg),
                         },
                         ".meBox-buttonContent": {
-                            backgroundColor: vars.buttonContents.active.bg.toString(),
+                            backgroundColor: colorOut(vars.buttonContents.state.bg),
                         },
                     },
                 },
@@ -363,7 +364,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
                 $nest: {
                     "&.meBox-contentHover": {
                         borderRadius: px(vars.button.borderRadius),
-                        backgroundColor: vars.buttonContents.hover.bg.toString(),
+                        backgroundColor: vars.buttonContents.state.bg.toString(),
                     },
                 },
             },
@@ -375,7 +376,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         $nest: {
             ".vanillaHeader-tabButtonContent": {
                 color: vars.colors.fg.toString(),
-                backgroundColor: modifyColorBasedOnLightness(vars.colors.fg, vars.colors.bg, 1).toString(),
+                backgroundColor: colorOut(modifyColorBasedOnLightness(vars.colors.fg, 1)),
                 borderRadius: px(vars.button.borderRadius),
             },
         },

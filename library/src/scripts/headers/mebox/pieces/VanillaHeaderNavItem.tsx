@@ -39,10 +39,15 @@ export class VanillaHeaderNavItem extends React.Component<IProps> {
                         this.props.linkClassName,
                         classes.link,
                         this.props.buttonType ? getDynamicClassFromButtonType(this.props.buttonType) : "",
-                        isCurrent ? classes.linkActive : "",
                     )}
                 >
-                    <div className={classNames(this.props.linkContentClassName, classes.linkContent)}>
+                    <div
+                        className={classNames(
+                            this.props.linkContentClassName,
+                            classes.linkContent,
+                            isCurrent ? classes.linkActive : "",
+                        )}
+                    >
                         {this.props.children}
                     </div>
                 </SmartLink>

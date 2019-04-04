@@ -7,7 +7,7 @@
 namespace Vanilla\Web\ContentSecurityPolicy;
 
 /**
- * Default content security policy provider.
+ * Embeds domains whitelist content security policy provider
  */
 class EmbedWhitelistContentSecurityPolicyProvider implements ContentSecurityPolicyProviderInterface {
     const EMBED_WHITELIST = [

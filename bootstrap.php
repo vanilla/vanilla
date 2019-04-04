@@ -173,7 +173,6 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('addProvider', [new Reference(\Vanilla\Web\ContentSecurityPolicy\DefaultContentSecurityPolicyProvider::class)])
     ->addCall('addProvider', [new Reference(\Vanilla\Web\Asset\WebpackContentSecurityPolicyProvider::class)])
 
-
     ->rule(\Vanilla\Web\Asset\LegacyAssetModel::class)
     ->setConstructorArgs([ContainerUtils::cacheBuster()])
 

@@ -32,7 +32,7 @@ class ContentSecurityPolicyModel {
     }
 
     /**
-     * Get all policies grouped by directive type.
+     * Get all policies.
      *
      * @return Policy[]
      */

@@ -116,21 +116,34 @@ class Model implements InjectableInterface {
         $limit = $options["limit"] ?? false;
         $offset = $options["offset"] ?? 0;
         $selects =  $options["select"] ?? [];
+        $validation =  $options["validation"] ?? true;
 
         $sqlDriver = $this->sql();
 
         if (!empty($selects)) {
-            $sqlDriver->select($selects);
+            if (is_array($selects)) {
+                foreach ($selects as $select) {
+                    if (is_array($select)) {
+                        $sqlDriver->select($select[0], $select[1] ?? '', $select[2] ?? '');
+                    } else {
+                        $sqlDriver->select($select);
+                    }
+                }
+            } else {
+                $sqlDriver->select($selects);
+            }
         }
         $result = $sqlDriver->getWhere($this->table, $where, $orderFields, $orderDirection, $limit, $offset)
             ->resultArray();
 
-        if (empty($selects)) {
-            $schema = Schema::parse([":a" => $this->readSchema]);
-        } else {
-            $schema = Schema::parse([":a" =>  Schema::parse($selects)->add($this->readSchema)]);
+        if ($validation) {
+            if (empty($selects)) {
+                $schema = Schema::parse([":a" => $this->readSchema]);
+            } else {
+                $schema = Schema::parse([":a" =>  Schema::parse($selects)->add($this->readSchema)]);
+            }
+            $result = $schema->validate($result);
         }
-        $result = $schema->validate($result);
 
         return $result;
     }

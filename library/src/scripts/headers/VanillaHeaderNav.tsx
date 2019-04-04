@@ -7,42 +7,46 @@
 import { percent, px, calc } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { layoutVariables } from "@library/styles/layoutStyles";
-import { flexHelper, unit } from "@library/styles/styleHelpers";
-import { styleFactory } from "@library/styles/styleUtils";
+import { absolutePosition, flexHelper, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
-export function vanillaHeaderNavigation() {
+export const vanillaHeaderNavigationVariables = useThemeCache(() => {
+    const makeThemeVars = variableFactory("vanillaHeaderNavigation");
     const globalVars = globalVariables();
     const varsFormElements = formElementsVariables();
 
-    const border = {
+    const border = makeThemeVars("border", {
         verticalWidth: 3,
         active: {
             border: {
                 color: globalVars.mainColors.bg.fade(0.9),
             },
         },
-    };
+    });
 
-    const active = {
+    const active = makeThemeVars("active", {
         bottomOffset: 8,
-    };
+    });
 
-    const item = {
+    const item = makeThemeVars("item", {
         size: varsFormElements.sizing.height,
-    };
+    });
+
+    const linkActive = makeThemeVars("linkActive", {});
 
     return {
         border,
         active,
         item,
+        linkActive,
     };
-}
+});
 
 export default function vanillaHeaderNavClasses() {
     const headerVars = vanillaHeaderVariables();
-    const vars = vanillaHeaderNavigation();
+    const vars = vanillaHeaderNavigationVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
     const style = styleFactory("vanillaHeaderNav");
@@ -106,6 +110,16 @@ export default function vanillaHeaderNavClasses() {
         },
     });
 
+    const linkActive = style("linkActive", {
+        $nest: {
+            "&::after": {
+                content: "",
+                ...absolutePosition.topLeft("100%"),
+                marginLeft: unit(-2),
+            },
+        },
+    });
+
     const linkContent = style("linkContent", {
         ...flex.middleLeft(),
         position: "relative",
@@ -116,6 +130,7 @@ export default function vanillaHeaderNavClasses() {
         navigation,
         items,
         link,
+        linkActive,
         linkContent,
     };
 }

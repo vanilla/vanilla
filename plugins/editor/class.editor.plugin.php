@@ -834,7 +834,15 @@ class EditorPlugin extends Gdn_Plugin {
                 if (c("ImageUpload.Limits.Enabled")) {
                     if ($tmpwidth > c("ImageUpload.Limits.Width") || $tmpheight > c("ImageUpload.Limits.Height")) {
                         $imageResizer = new \Vanilla\ImageResizer();
-                        $imageResizer->resize($tmpFilePath, null, ["height"=>c("ImageUpload.Limits.Height"), "width"=>c("ImageUpload.Limits.Width"), "crop"=>false]);
+                        $imageResizer->resize(
+                            $tmpFilePath,
+                            null,
+                            [
+                                "height"=>c("ImageUpload.Limits.Height"),
+                                "width"=>c("ImageUpload.Limits.Width"),
+                                "crop"=>false
+                            ]
+                        );
                     }
                 }
 
@@ -1472,14 +1480,12 @@ class EditorPlugin extends Gdn_Plugin {
 
         $widthLabel = $form->label('Max Image Width', 'ImageUpload.Limits.Width');
         $widthInfo = wrap(t('Images will be scaled down if they exceed this width.'), 'div', ['class' => 'info']);
-        $widthField = $form->textBox('ImageUpload.Limits.Width', ["class" => "form-control"]);
-        $form->setValue('ImageUpload.Limits.Width', c("ImageUpload.Limits.Width", 1400));
+        $widthField = $form->textBox('ImageUpload.Limits.Width', ["class" => "form-control", "value" => c("ImageUpload.Limits.Width")]);
         $configModel->setField('ImageUpload.Limits.Width');
 
         $heightLabel = $form->label('Max Image Height', 'ImageUpload.Limits.Height');
         $heightInfo = wrap(t('Images will be scaled down if they exceed this height.'), 'div', ['class' => 'info']);
-        $heightField = $form->textBox('ImageUpload.Limits.Height', ["class" => "form-control"]);
-        $form->setValue('ImageUpload.Limits.Width', c("ImageUpload.Limits.Height", 1000));
+        $heightField = $form->textBox('ImageUpload.Limits.Height', ["class" => "form-control", "value" => c("ImageUpload.Limits.Height")]);
         $configModel->setField('ImageUpload.Limits.Height');
 
         $imageUploadLimitsDimensions = <<<EOT
@@ -1525,7 +1531,10 @@ EOT;
     public function setup() {
         \Gdn::config()->touch([
             'Garden.MobileInputFormatter' => 'TextEx',
-            'Plugins.editor.ForceWysiwyg' => false
+            'Plugins.editor.ForceWysiwyg' => false,
+            'ImageUpload.Limits.Enabled' => false,
+            'ImageUpload.Limits.Width' => 1400,
+            'ImageUpload.Limits.Height' => 1000
         ]);
         $this->structure();
     }

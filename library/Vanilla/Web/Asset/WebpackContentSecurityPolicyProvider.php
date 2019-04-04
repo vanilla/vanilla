@@ -41,6 +41,7 @@ class WebpackContentSecurityPolicyProvider implements ContentSecurityPolicyProvi
      * @return Policy[]
      */
     private function getScriptSources(): array {
+        $scriptSrcPolicies = [];
         if ($this->webpack->isHotReloadEnabled()) {
             $scriptSrcPolicies[] = new Policy(Policy::SCRIPT_SRC, '\'unsafe-eval\'');
             $scriptSrcPolicies[] = new Policy(Policy::SCRIPT_SRC, $this->webpack->getHotReloadSocketAddress());

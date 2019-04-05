@@ -26,6 +26,8 @@ class TickApiController extends AbstractApiController {
 
     /**
      * Collect an analytics tick.
+     * @param array $body
+     * @throws \Garden\Schema\ValidationException
      * @return Data
      */
     public function post(array $body = []): Data {

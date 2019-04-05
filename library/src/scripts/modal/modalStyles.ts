@@ -174,6 +174,11 @@ export const modalClasses = useThemeCache(() => {
             minHeight: unit(headerVars.sizing.height),
             zIndex: 2,
             background: colorOut(vars.colors.bg),
+            $nest: {
+                "&.noShadow": {
+                    boxShadow: "none",
+                },
+            },
         },
         mediaQueries.oneColumn({
             minHeight: unit(headerVars.sizing.mobile.height),

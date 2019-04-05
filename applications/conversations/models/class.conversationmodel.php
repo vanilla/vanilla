@@ -550,6 +550,7 @@ class ConversationModel extends ConversationsModel {
             $recipientUserIDs = $this->SQL
                 ->select('UserID')
                 ->from('User')
+                ->where('Name <>', '')
                 ->whereIn('Name', $to)
                 ->get()->resultArray();
             $recipientUserIDs = array_column($recipientUserIDs, 'UserID');

@@ -3,7 +3,17 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { paddings, placeholderStyles, textInputSizing, colorOut, unit } from "@library/styles/styleHelpers";
+import {
+    paddings,
+    placeholderStyles,
+    textInputSizing,
+    colorOut,
+    unit,
+    absolutePosition,
+    pointerEvents,
+    margins,
+    negative,
+} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
@@ -127,6 +137,28 @@ export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false)
         }),
     });
 
+    const bodyErrorMessage = style("bodyErrorMessage", {
+        ...absolutePosition.topLeft(),
+    });
+
+    const titleErrorMessage = style("titleErrorMessage", {
+        ...pointerEvents(),
+        ...margins({
+            top: unit(negative(globalVars.spacer.size)),
+            bottom: globalVars.spacer.size,
+        }),
+    });
+
+    const categoryErrorParagraph = style("categoryErrorParagraph", {
+        ...margins({
+            vertical: 8,
+        }),
+    });
+
+    const titleErrorParagraph = style("titleErrorParagraph", {
+        lineHeight: unit(globalVars.lineHeights.base * globalVars.fonts.size.large + 2),
+    });
+
     return {
         root,
         textWrap,
@@ -137,5 +169,9 @@ export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false)
         body,
         inlineMenuItems,
         formContent,
+        bodyErrorMessage,
+        titleErrorMessage,
+        categoryErrorParagraph,
+        titleErrorParagraph,
     };
 });

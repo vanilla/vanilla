@@ -6,6 +6,7 @@
 
 import React from "react";
 import className from "classnames";
+import { containerClasses } from "@library/layout/components/containerStyles";
 
 export interface IContainer {
     className?: string;
@@ -23,8 +24,9 @@ export default class Container extends React.Component<IContainer> {
 
     public render() {
         if (this.props.children) {
+            const classes = containerClasses();
             const Tag = this.props.tag || "div";
-            return <Tag className={className("container", this.props.className)}>{this.props.children}</Tag>;
+            return <Tag className={className(classes.root, this.props.className)}>{this.props.children}</Tag>;
         } else {
             return null;
         }

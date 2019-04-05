@@ -19,7 +19,7 @@ import {
     userSelect,
 } from "@library/styles/styleHelpers";
 import { TLength, NestedCSSProperties } from "typestyle/lib/types";
-import { componentThemeVariables, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { ColorHelper, important, percent, px } from "csx";
 
@@ -331,6 +331,7 @@ export const buttonSizing = (height, minWidth, fontSize, paddingHorizontal, form
 };
 
 export const buttonResetMixin = (): NestedCSSProperties => ({
+    ...userSelect(),
     "-webkit-appearance": "none",
     appearance: "none",
     border: 0,
@@ -525,7 +526,6 @@ export const buttonUtilityClasses = useThemeCache(() => {
 });
 
 export const buttonLoaderClasses = (buttonType: ButtonTypes) => {
-    const themeVars = componentThemeVariables("buttonLoader");
     const globalVars = globalVariables();
     const flexUtils = flexHelper();
     const style = styleFactory("buttonLoader");
@@ -552,7 +552,6 @@ export const buttonLoaderClasses = (buttonType: ButtonTypes) => {
                 dimensions: 20,
             }),
         },
-        ...themeVars.subComponentStyles("root"),
     });
     return { root };
 };

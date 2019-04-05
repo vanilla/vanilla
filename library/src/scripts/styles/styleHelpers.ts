@@ -29,6 +29,7 @@ import {
     MaxWidthProperty,
     ObjectFitProperty,
     OverflowXProperty,
+    PointerEventsProperty,
     PositionProperty,
     RightProperty,
     TextAlignLastProperty,
@@ -284,24 +285,34 @@ export const singleBorder = (styles: ISingleBorderStyle = {}) => {
     } ${styles.width ? unit(styles.width) : unit(vars.border.width)}` as any;
 };
 
-export interface ILinkStates {
+export interface IButtonStates {
     allStates?: object; // Applies to all
     noState?: object; // Applies to stateless link
     hover?: object;
     focus?: object;
+    focusNotKeyboard?: object; // Focused, not through keyboard
     accessibleFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
     active?: object;
+}
+export interface ILinkStates extends IButtonStates {
     visited?: object;
 }
 
 export const allLinkStates = (styles: ILinkStates) => {
+    const output = allButtonStates(styles);
+    const visited = get(styles, "visited", {});
+    output.$nest["&:visited"] = { ...styles.allStates, ...visited };
+    return output;
+};
+
+export const allButtonStates = (styles: IButtonStates) => {
     const allStates = get(styles, "allStates", {});
     const noState = get(styles, "noState", {});
     const hover = get(styles, "hover", {});
     const focus = get(styles, "focus", {});
+    const focusNotKeyboard = get(styles, "focusNotKeyboard", {});
     const accessibleFocus = get(styles, "accessibleFocus", focus);
     const active = get(styles, "active", {});
-    const visited = get(styles, "visited", {});
 
     return {
         ...allStates,
@@ -309,9 +320,9 @@ export const allLinkStates = (styles: ILinkStates) => {
         $nest: {
             "&:hover": { ...allStates, ...hover },
             "&:focus": { ...allStates, ...focus },
-            "&.focus-visible": { ...allStates, ...accessibleFocus },
+            "&:focus:not(.focus-visible)": { ...allStates, ...focusNotKeyboard },
+            "&&.focus-visible": { ...allStates, ...accessibleFocus },
             "&:active": { ...allStates, ...active },
-            "&:visited": { ...allStates, ...visited },
         },
     };
 };
@@ -326,20 +337,68 @@ export const unit = (val: string | number | undefined, unitFunction = px) => {
     }
 };
 
+export const negative = val => {
+    if (typeof val === "string") {
+        val = val.trim();
+        if (val.startsWith("-")) {
+            return val.substring(1, val.length).trim();
+        } else {
+            return `-${val}`;
+        }
+    } else if (!!val && !isNaN(val)) {
+        return val * -1;
+    } else {
+        return val;
+    }
+};
+
 export interface IMargins {
     top?: string | number;
     right?: string | number;
     bottom?: string | number;
     left?: string | number;
+    horizontal?: string | number;
+    vertical?: string | number;
+    all?: string | number;
 }
 
 export const margins = (styles: IMargins): NestedCSSProperties => {
-    return {
-        marginTop: unit(styles.top),
-        marginRight: unit(styles.right),
-        marginBottom: unit(styles.bottom),
-        marginLeft: unit(styles.left),
-    };
+    const marginVals = {} as NestedCSSProperties;
+
+    if (styles.all !== undefined) {
+        marginVals.paddingTop = unit(styles.all);
+        marginVals.paddingRight = unit(styles.all);
+        marginVals.paddingBottom = unit(styles.all);
+        marginVals.paddingLeft = unit(styles.all);
+    }
+
+    if (styles.vertical !== undefined) {
+        marginVals.marginTop = unit(styles.vertical);
+        marginVals.marginBottom = unit(styles.vertical);
+    }
+
+    if (styles.horizontal !== undefined) {
+        marginVals.marginLeft = unit(styles.horizontal);
+        marginVals.marginRight = unit(styles.horizontal);
+    }
+
+    if (styles.top !== undefined) {
+        marginVals.marginTop = unit(styles.top);
+    }
+
+    if (styles.right !== undefined) {
+        marginVals.marginRight = unit(styles.right);
+    }
+
+    if (styles.bottom !== undefined) {
+        marginVals.marginBottom = unit(styles.bottom);
+    }
+
+    if (styles.left !== undefined) {
+        marginVals.marginLeft = unit(styles.left);
+    }
+
+    return marginVals as NestedCSSProperties;
 };
 
 export interface IPaddings {
@@ -347,10 +406,30 @@ export interface IPaddings {
     right?: string | number;
     bottom?: string | number;
     left?: string | number;
+    horizontal?: string | number;
+    vertical?: string | number;
+    all?: string | number;
 }
 
 export const paddings = (styles: IPaddings) => {
     const paddingVals = {} as NestedCSSProperties;
+
+    if (styles.all !== undefined) {
+        paddingVals.paddingTop = unit(styles.all);
+        paddingVals.paddingRight = unit(styles.all);
+        paddingVals.paddingBottom = unit(styles.all);
+        paddingVals.paddingLeft = unit(styles.all);
+    }
+
+    if (styles.vertical !== undefined) {
+        paddingVals.paddingTop = unit(styles.vertical);
+        paddingVals.paddingBottom = unit(styles.vertical);
+    }
+
+    if (styles.horizontal !== undefined) {
+        paddingVals.paddingLeft = unit(styles.horizontal);
+        paddingVals.paddingRight = unit(styles.horizontal);
+    }
 
     if (styles.top !== undefined) {
         paddingVals.paddingTop = unit(styles.top);
@@ -555,6 +634,7 @@ export const objectFitWithFallback = () => {
 };
 
 export interface ILinkStates {
+    allStates?: object; // Applies to all
     default?: object;
     hover?: object;
     focus?: object;
@@ -563,40 +643,81 @@ export interface ILinkStates {
     visited?: object;
 }
 
-export const setAllLinkColors = (overwrites?: ILinkStates) => {
+const linkStyleFallbacks = (
+    specificOverwrite: undefined | ColorHelper | string,
+    defaultOverwrite: undefined | ColorHelper | string,
+    globalDefault: undefined | ColorHelper | string,
+) => {
+    if (specificOverwrite) {
+        return specificOverwrite as ColorValues;
+    } else if (defaultOverwrite) {
+        return defaultOverwrite as ColorValues;
+    } else {
+        return globalDefault as ColorValues;
+    }
+};
+
+interface ILinkColorOverwrites {
+    default?: ColorValues;
+    hover?: ColorValues;
+    focus?: ColorValues;
+    accessibleFocus?: ColorValues;
+    active?: ColorValues;
+    visited?: ColorValues;
+    allStates?: ColorValues;
+}
+
+export const setAllLinkColors = (overwriteValues?: ILinkColorOverwrites) => {
     const vars = globalVariables();
     // We want to default to the standard styles and only overwrite what we want/need
     const linkColors = vars.links.colors;
-
-    const styles: ILinkStates = {
-        default: {
-            color: colorOut(linkColors.default),
-        },
-        hover: {
-            color: colorOut(linkColors.hover),
-        },
-        focus: {
-            color: colorOut(linkColors.focus),
-        },
-        accessibleFocus: {
-            color: colorOut(linkColors.accessibleFocus),
-        },
-        active: {
-            color: colorOut(linkColors.active),
-        },
-        ...overwrites,
+    const overwrites = overwriteValues ? overwriteValues : {};
+    const mergedColors = {
+        default: linkStyleFallbacks(overwrites.default, overwrites.allStates, linkColors.default),
+        hover: linkStyleFallbacks(overwrites.hover, overwrites.allStates, linkColors.hover),
+        focus: linkStyleFallbacks(overwrites.focus, overwrites.allStates, linkColors.focus),
+        accessibleFocus: linkStyleFallbacks(
+            overwrites.accessibleFocus,
+            overwrites.allStates,
+            linkColors.accessibleFocus,
+        ),
+        active: linkStyleFallbacks(overwrites.active, overwrites.allStates, linkColors.active),
+        visited: linkStyleFallbacks(overwrites.visited, overwrites.allStates, linkColors.visited),
     };
 
-    return {
-        ...styles.default,
-        $nest: {
-            "&:hover": styles.hover,
-            "&:focus": styles.focus,
-            "&.focus-visible": styles.accessibleFocus,
-            "&:active": styles.active,
+    const styles = {
+        default: {
+            color: colorOut(mergedColors.default),
+        },
+        hover: {
+            color: colorOut(mergedColors.hover),
+        },
+        focus: {
+            color: colorOut(mergedColors.focus),
+        },
+        accessibleFocus: {
+            color: colorOut(mergedColors.accessibleFocus),
+        },
+        active: {
+            color: colorOut(mergedColors.active),
+        },
+        visited: {
+            color: colorOut(mergedColors.visited),
+        },
+    };
+
+    const final = {
+        color: styles.default.color,
+        nested: {
+            "&&:hover": styles.hover,
+            "&&:focus": styles.focus,
+            "&&.focus-visible": styles.accessibleFocus,
+            "&&:active": styles.active,
             "&:visited": styles.visited,
         },
     };
+
+    return final;
 };
 
 export const singleLineEllipsis = () => {
@@ -723,6 +844,7 @@ export interface IActionStates {
     allStates?: object; // Applies to all
     hover?: object;
     focus?: object;
+    focusNotKeyboard?: object; // Focused, not through keyboard?: object;
     accessibleFocus?: object; // Optionally different state for keyboard accessed element. Will default to "focus" state if not set.
     active?: object;
 }
@@ -735,13 +857,26 @@ export const states = (styles: IActionStates) => {
     const allStates = get(styles, "allStates", {});
     const hover = get(styles, "hover", {});
     const focus = get(styles, "focus", {});
+    const focusNotKeyboard = get(styles, "focusNotKeyboard", focus);
     const accessibleFocus = get(styles, "accessibleFocus", focus);
     const active = get(styles, "active", {});
 
     return {
         "&:hover": { ...allStates, ...hover },
         "&:focus": { ...allStates, ...focus },
+        "&:focus:not(.focus-visible)": { ...allStates, ...focusNotKeyboard },
         "&.focus-visible": { ...allStates, ...accessibleFocus },
         "&:active": { ...allStates, ...active },
     };
+};
+
+export const pointerEvents = (value: PointerEventsProperty = "none") => {
+    return {
+        pointerEvents: important(value),
+    };
+};
+
+export const pointerEventsClass = (value: PointerEventsProperty = "none") => {
+    const style = styleFactory("pointerEvents");
+    return style(pointerEvents(value));
 };

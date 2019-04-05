@@ -55,8 +55,8 @@ echo $form->errors();
     <div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
         <div class="label-wrap-wide">
             <?php
-            echo $form->label('Max Image Height', 'ImageUpload.Limits.Height');
-            echo wrap(t('Images will be scaled down if they exceed this height.'), 'div', ['class' => 'info']);
+                echo $form->label('Max Image Height', 'ImageUpload.Limits.Height');
+                echo wrap(t('Images will be scaled down if they exceed this height.'), 'div', ['class' => 'info']);
             ?>
         </div>
         <div class="input-wrap-right">

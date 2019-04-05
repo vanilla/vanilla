@@ -35,7 +35,6 @@ export default class SubcommunityList extends React.Component<IProps> {
     public render() {
         const { className, items } = this.props;
         const classes = subcommunityListClasses();
-        const classesSubCommunityTile = subcommunityTileClasses();
 
         if (items.length === 0) {
             return (

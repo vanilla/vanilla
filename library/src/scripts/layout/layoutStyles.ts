@@ -1,59 +1,55 @@
-/**
+/*
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { px } from "csx";
 import { media } from "typestyle";
-import { componentThemeVariables } from "@library/styles/styleUtils";
-import { useThemeCache } from "@library/styles/styleUtils";
+import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 
 export const layoutVariables = useThemeCache(() => {
-    const themeVars = componentThemeVariables("globalVariables");
+    const makeThemeVars = variableFactory("globalVariables");
 
     const gutterSize = 24;
-    const gutter = {
-        size: px(gutterSize),
-        halfSize: px(gutterSize / 2),
-        quarterSize: px(gutterSize / 4),
-        ...themeVars.subComponentStyles("gutter"),
-    };
+    const gutter = makeThemeVars("gutter", {
+        size: gutterSize,
+        halfSize: gutterSize / 2,
+        quarterSize: gutterSize / 4,
+    });
 
     const panelWidth = 216;
     const panelPaddedWidth = panelWidth + gutterSize * 2;
-    const panel = {
-        width: px(216),
+    const panel = makeThemeVars("panel", {
+        width: 216,
         paddedWidth: panelPaddedWidth,
-        ...themeVars.subComponentStyles("panel"),
-    };
+    });
 
     const middleColumnWidth = 672;
-    const middleColumn = {
-        width: px(middleColumnWidth),
-        paddedWidth: px(middleColumnWidth + gutterSize),
-        ...themeVars.subComponentStyles("middleColumn"),
-    };
+    const middleColumn = makeThemeVars("middleColumn", {
+        width: middleColumnWidth,
+        paddedWidth: middleColumnWidth + gutterSize,
+    });
 
     const globalContentWidth = (middleColumnWidth + gutterSize) * 2 + gutterSize * 3;
-    const content = {
-        width: px(globalContentWidth),
-        ...themeVars.subComponentStyles("content"),
-    };
+    const mediumWidth = 900;
+    const contentSizes = makeThemeVars("content", {
+        full: globalContentWidth,
+        widgets: mediumWidth < globalContentWidth ? mediumWidth : globalContentWidth,
+    });
 
     const twoColumnBreak = 1200;
-    const panelLayoutBreakPoints = {
+    const panelLayoutBreakPoints = makeThemeVars("panelLayoutBreakPoints", {
         noBleed: globalContentWidth,
         twoColumn: twoColumnBreak,
         oneColumn: twoColumnBreak - panelPaddedWidth,
         xs: 500,
-        ...themeVars.subComponentStyles("panelLayoutBreakPoints"),
-    };
+    });
 
-    const globalBreakPoints = {
-        twoColumn: px(1200),
-        oneColumn: px(500),
-        ...themeVars.subComponentStyles("globalBreakPoints"),
-    };
+    const globalBreakPoints = makeThemeVars("globalBreakPoints", {
+        twoColumn: 1200,
+        oneColumn: 500,
+    });
 
     const mediaQueries = () => {
         const noBleed = styles => {
@@ -75,5 +71,15 @@ export const layoutVariables = useThemeCache(() => {
         return { noBleed, twoColumns, oneColumn, xs };
     };
 
-    return { gutterSize, gutter, panelWidth, panel, middleColumnWidth, middleColumn, content, mediaQueries };
+    return {
+        gutterSize,
+        gutter,
+        panelWidth,
+        panel,
+        middleColumnWidth,
+        middleColumn,
+        contentSizes,
+        globalBreakPoints,
+        mediaQueries,
+    };
 });

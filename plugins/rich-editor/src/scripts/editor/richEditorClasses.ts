@@ -40,6 +40,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
                 display: "flex",
                 flexDirection: "column",
                 flexGrow: 1,
+                position: "relative",
             },
             ".ql-clipboard": {
                 ...srOnly(),

@@ -6,7 +6,7 @@
 
 import { useThemeCache, variableFactory, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutVariables } from "@library/styles/layoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { unit } from "@library/styles/styleHelpers";
 import { percent, px, calc } from "csx";
 

@@ -33,12 +33,8 @@ export default class NavLinks extends Component<IProps> {
             const classes = navLinksClasses();
             const contents = this.props.items.map((item, i) => {
                 return (
-                    <li className={classNames("navLinks-item", classes.item)} key={i}>
-                        <SmartLink
-                            to={item.url}
-                            className={classNames("navLinks-link", classes.link)}
-                            title={item.name}
-                        >
+                    <li className={classNames(classes.item)} key={i}>
+                        <SmartLink to={item.url} className={classNames(classes.link)} title={item.name}>
                             {item.name}
                         </SmartLink>
                     </li>
@@ -51,28 +47,18 @@ export default class NavLinks extends Component<IProps> {
                         className={classNames("navLinks-title", classes.title)}
                         depth={this.props.depth}
                     />
-                    <ul className={classNames("navLinks-items", classes.items)}>
+                    <ul className={classNames(classes.items)}>
                         {contents}
-                        {this.props.url &&
-                            this.props.accessibleViewAllMessage && (
-                                <li
-                                    className={classNames("navLinks-item", "isViewAll", classes.item)}
-                                    key={this.props.items.length}
-                                >
-                                    <SmartLink
-                                        to={this.props.url}
-                                        className={classNames("navLinks-viewAll", classes.viewAll)}
-                                    >
-                                        <span aria-hidden={true}>{viewAll}</span>
-                                        <ScreenReaderContent>
-                                            <Translate
-                                                source={this.props.accessibleViewAllMessage}
-                                                c0={this.props.title}
-                                            />
-                                        </ScreenReaderContent>
-                                    </SmartLink>
-                                </li>
-                            )}
+                        {this.props.url && this.props.accessibleViewAllMessage && (
+                            <li className={classNames(classes.viewAllitem)}>
+                                <SmartLink to={this.props.url} className={classNames(classes.viewAll)}>
+                                    <span aria-hidden={true}>{viewAll}</span>
+                                    <ScreenReaderContent>
+                                        <Translate source={this.props.accessibleViewAllMessage} c0={this.props.title} />
+                                    </ScreenReaderContent>
+                                </SmartLink>
+                            </li>
+                        )}
                     </ul>
                 </article>
             );

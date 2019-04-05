@@ -15,6 +15,8 @@ use Vanilla\AddonManager;
 
 /**
  * Manages available themes, enabling and disabling them.
+ *
+ * @deprecated 3.0 Use Vanilla\AddonManager.
  */
 class Gdn_ThemeManager extends Gdn_Pluggable {
 

@@ -16,7 +16,7 @@ export function useMeasure(ref: RefObject<HTMLElement | null>) {
         let animationFrameId: number | null = null;
         const measure: ResizeObserverCallback = ([entry]) => {
             animationFrameId = window.requestAnimationFrame(() => {
-                setContentRect(entry.contentRect as any);
+                setContentRect(ref.current!.getBoundingClientRect() as any);
             });
         };
 

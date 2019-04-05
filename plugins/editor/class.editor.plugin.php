@@ -1460,7 +1460,7 @@ class EditorPlugin extends Gdn_Plugin {
         Gdn_Form $form,
         Gdn_ConfigurationModel $configModel
     ): string {
-        //WYSWYG form items
+        //WYSIWYG form items
         $forceWysiwygLabel = 'Reinterpret All Posts As Wysiwyg';
         $forceWysiwygNote1 =  t('ForceWysiwyg.Notes1', 'Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.');
         $forceWysiwygNote2 = t('ForceWysiwyg.Notes2', 'This setting will only take effect if Wysiwyg was chosen as the Post Format above. The purpose of this option is to normalize the editor format. If older posts edited with another format, such as markdown or BBCode, are loaded, this option will force Wysiwyg.');
@@ -1488,10 +1488,7 @@ class EditorPlugin extends Gdn_Plugin {
     public function setup() {
         \Gdn::config()->touch([
             'Garden.MobileInputFormatter' => 'TextEx',
-            'Plugins.editor.ForceWysiwyg' => false,
-            'ImageUpload.Limits.Enabled' => false,
-            'ImageUpload.Limits.Width' => 1400,
-            'ImageUpload.Limits.Height' => 1000
+            'Plugins.editor.ForceWysiwyg' => false
         ]);
         $this->structure();
     }

@@ -4,53 +4,187 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { cssRule } from "typestyle";
-import { colorOut } from "@library/styles/styleHelpers";
+import {
+    colorOut,
+    unit,
+    fonts,
+    paddings,
+    borders,
+    negative,
+    srOnly,
+    IFont,
+    borderRadii,
+} from "@library/styles/styleHelpers";
+import { userSelect } from "@library/styles/styleHelpers";
+import { layoutVariables } from "@library/layout/layoutStyles";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { percent } from "csx";
 
 export const radioTabsVariables = useThemeCache(() => {
-    const gVars = globalVariables();
+    const globalVars = globalVariables();
     const makeVars = variableFactory("radioTabs");
 
     const colors = makeVars("colors", {
-        bg: gVars.mainColors.bg,
-        fg: gVars.mainColors.fg,
-        active: {
-            border: gVars.mixPrimaryAndBg(0.5),
-        },
-        hover: {
-            bg: gVars.mixPrimaryAndBg(0.1),
-            fg: gVars.mainColors.fg,
+        bg: globalVars.mainColors.bg,
+        fg: globalVars.mainColors.fg,
+        state: {
+            border: {
+                color: globalVars.mixPrimaryAndBg(0.5),
+            },
+            fg: globalVars.mainColors.primary,
         },
         selected: {
-            bg: gVars.mixBgAndFg(0.2),
-            fg: gVars.mainColors.fg,
+            bg: globalVars.mainColors.primary.desaturate(0.3).fade(0.05),
+            fg: globalVars.mainColors.fg,
         },
     });
 
-    return { colors };
+    const sizing = makeVars("sizing", {
+        minWidth: 93,
+        height: 24,
+    });
+
+    const font: IFont = makeVars("font", {
+        size: globalVars.fonts.size.small,
+        align: "center",
+        lineHeight: sizing.height,
+    });
+
+    const spacing = makeVars("spacing", {
+        paddings: {
+            horizontal: 6,
+        },
+    });
+
+    const border = makeVars("border", {
+        width: globalVars.border.width,
+        color: globalVars.border.color,
+        radius: 0,
+        style: globalVars.border.style,
+        active: {
+            color: globalVars.mixPrimaryAndBg(0.5),
+        },
+    });
+
+    const leftTab = makeVars("leftTab", {
+        radii: {
+            left: 3,
+        },
+    });
+
+    const rightTab = makeVars("rightTab", {
+        radii: {
+            right: 3,
+        },
+    });
+
+    return {
+        colors,
+        sizing,
+        font,
+        spacing,
+        border,
+        leftTab,
+        rightTab,
+    };
 });
 
-export const radioTabCss = useThemeCache(() => {
+export const radioTabClasses = useThemeCache(() => {
     const vars = radioTabsVariables();
+    const style = styleFactory("radioTab");
+    const mediaQueries = layoutVariables().mediaQueries();
+    const formElementVariables = formElementsVariables();
 
-    cssRule(".radioButtonsAsTabs-input + .radioButtonsAsTabs-label", {
+    const root = style({
+        display: "block",
+    });
+
+    const tabs = style("tabs", {
+        display: "flex",
+        position: "relative",
+        flexWrap: "wrap",
+        alignItems: "center",
+        justifyContent: "center",
+    });
+
+    const tab = style(
+        "tab",
+        {
+            ...userSelect(),
+            position: "relative",
+            display: "inline-block",
+            flexGrow: 1,
+            $nest: {
+                "& + &": {
+                    marginLeft: unit(negative(vars.border.width)),
+                },
+                "&:hover, &:focus, &:active": {
+                    color: colorOut(vars.colors.state.fg),
+                },
+            },
+        },
+        mediaQueries.oneColumn({
+            flexGrow: 0,
+            $nest: {
+                label: {
+                    minHeight: formElementVariables.sizing.height,
+                    lineHeight: formElementVariables.sizing.height,
+                },
+            },
+        }),
+    );
+
+    const leftTab = style("leftTab", borderRadii(vars.leftTab.radii));
+    const rightTab = style("rightTab", borderRadii(vars.rightTab.radii));
+
+    const label = style("label", {
+        ...userSelect(),
+        display: "inline-block",
+        position: "relative",
+        cursor: "pointer",
+        textAlign: "center",
+        width: percent(100),
+        minHeight: unit(vars.sizing.height),
+        lineHeight: unit(vars.sizing.height),
+        minWidth: unit(vars.sizing.minWidth),
+        backgroundColor: colorOut(vars.colors.bg),
+        ...fonts(vars.font),
+        ...paddings(vars.spacing.paddings),
+        borderColor: colorOut(vars.border.color),
+        borderWidth: unit(vars.border.width),
+        borderStyle: vars.border.style,
+    });
+
+    const input = style("input", {
+        ...srOnly(),
         $nest: {
-            "&:hover, &:focus": {
-                backgroundColor: colorOut(vars.colors.hover.bg),
-                color: colorOut(vars.colors.hover.fg),
-                borderColor: colorOut(vars.colors.active.border),
+            "&:hover, &:focus + .radioButtonsAsTabs-label": {
+                borderColor: colorOut(vars.border.active.color),
+                zIndex: 1,
+                color: colorOut(vars.colors.state.fg),
+            },
+            "&:checked": {
+                $nest: {
+                    "& + .radioButtonsAsTabs-label": {
+                        backgroundColor: colorOut(vars.colors.selected.bg),
+                    },
+                    "&:hover, &:focus": {
+                        color: colorOut(vars.colors.state.fg),
+                    },
+                },
             },
         },
     });
 
-    cssRule(".radioButtonsAsTabs-input:checked + .radioButtonsAsTabs-label", {
-        backgroundColor: colorOut(vars.colors.selected.bg),
-        $nest: {
-            "&:hover, &:focus": {
-                backgroundColor: colorOut(vars.colors.hover.bg),
-                color: colorOut(vars.colors.hover.fg),
-            },
-        },
-    });
+    return {
+        root,
+        tabs,
+        tab,
+        label,
+        input,
+        leftTab,
+        rightTab,
+    };
 });

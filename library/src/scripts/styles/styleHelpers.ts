@@ -16,6 +16,7 @@ import {
     BackgroundSizeProperty,
     BorderRadiusProperty,
     BorderStyleProperty,
+    BorderTopLeftRadiusProperty,
     BorderWidthProperty,
     BottomProperty,
     ContentProperty,
@@ -307,6 +308,42 @@ interface ISingleBorderStyle {
 export interface IBorderStyles extends ISingleBorderStyle {
     radius?: BorderRadiusProperty<TLength>;
 }
+
+interface IBorderRadii {
+    all?: BorderRadiusProperty<TLength>;
+    top?: BorderRadiusProperty<TLength>;
+    bottom?: BorderRadiusProperty<TLength>;
+    left?: BorderRadiusProperty<TLength>;
+    right?: BorderRadiusProperty<TLength>;
+    topRight?: BorderRadiusProperty<TLength>;
+    topLeft?: BorderRadiusProperty<TLength>;
+    bottomLeft?: BorderRadiusProperty<TLength>;
+    bottomRight?: BorderRadiusProperty<TLength>;
+}
+
+const ifExistsWithFallback = checkProp => {
+    if (checkProp && checkProp.length > 0) {
+        const next = checkProp.pop();
+        return next ? next : ifExistsWithFallback(checkProp);
+    } else {
+        return undefined;
+    }
+};
+
+export const borderRadii = (props: IBorderRadii) => {
+    return {
+        borderTopLeftRadius: unit(ifExistsWithFallback([props.all, props.top, props.left, props.topLeft, undefined])),
+        borderTopRightRadius: unit(
+            ifExistsWithFallback([props.all, props.top, props.right, props.topRight, undefined]),
+        ),
+        borderBottomLeftRadius: unit(
+            ifExistsWithFallback([props.all, props.bottom, props.left, props.bottomLeft, undefined]),
+        ),
+        borderBottomRightRadius: unit(
+            ifExistsWithFallback([props.all, props.bottom, props.right, props.bottomRight, undefined]),
+        ),
+    };
+};
 
 export const borders = (props: IBorderStyles = {}) => {
     const vars = globalVariables();
@@ -806,14 +843,14 @@ export interface IFont {
 
 export const fonts = (props: IFont) => {
     if (props) {
-        const size = get(props, "size", undefined);
-        const fontWeight = get(props, "weight", undefined);
-        const fg = get(props, "color", undefined);
-        const lineHeight = get(props, "lineHeight", undefined);
-        const textAlign = get(props, "align", undefined);
-        const textShadow = get(props, "shadow", undefined);
+        const size = props.size ? props.size : undefined;
+        const fontWeight = props.weight ? props.weight : undefined;
+        const color = props.color ? props.color : undefined;
+        const lineHeight = props.lineHeight ? props.lineHeight : undefined;
+        const textAlign = props.align ? props.align : undefined;
+        const textShadow = props.shadow ? props.shadow : undefined;
         return {
-            color: fg ? colorOut(fg) : undefined,
+            color: colorOut(color),
             fontSize: size ? unit(size) : undefined,
             fontWeight,
             lineHeight: lineHeight ? unit(lineHeight) : undefined,

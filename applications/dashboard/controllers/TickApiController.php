@@ -17,7 +17,7 @@ class TickApiController extends AbstractApiController {
 
     /**
      * TickApiController constructor.
-     * @param Gdn_Statistics $statisticss
+     * @param Statistics $statistics
      */
     public function __construct(Statistics $statistics) {
         $this->statistics = $statistics;

@@ -21,14 +21,16 @@ function handleImageUploadInputDisplay() {
             });
         }
 
-        imageUploadDimensions.forEach((input) => {
-            input.addEventListener("click", () => {
-                if (imageUploadEnabled.checked) {
+        imageUploadEnabled.addEventListener("click", () => {
+            if (imageUploadEnabled.checked) {
+                imageUploadDimensions.forEach((input) => {
                     input.classList.remove(displayClass);
-                } else {
+                });
+            } else {
+                imageUploadDimensions.forEach((input) => {
                     input.classList.add(displayClass);
-                }
-            });
+                });
+            }
         });
     }
 }

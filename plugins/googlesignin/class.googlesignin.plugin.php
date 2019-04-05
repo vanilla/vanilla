@@ -16,7 +16,7 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
     CONST TOKENURL = 'https://oauth2.googleapis.com/token';
     CONST PROFILEURL = 'https://openidconnect.googleapis.com/v1/userinfo';
     CONST PROFILENAME = 'name';
-
+    CONST ACCEPTEDSCOPE = 'email openid profile';
     /**
      * Set the key for saving OAuth settings in GDN_UserAuthenticationProvider
      */
@@ -37,7 +37,7 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
             $this->provider['TokenUrl'] = self::TOKENURL;
             $this->provider['ProfileUrl'] = self::PROFILEURL;
             $this->provider['ProfileKeyName'] = self::PROFILENAME;
-            $this->provider['AcceptedScope'] = 'email openid';
+            $this->provider['AcceptedScope'] = self::ACCEPTEDSCOPE;
             $this->provider['ProfileKeyUniqueID'] = 'sub';
             $this->provider['ProfileKeyFullName'] = null;
         }
@@ -90,7 +90,10 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
 
         $formFields['IsDefault'] = ['LabelCode' => 'Make this connection your default signin method.', 'Control' => 'checkbox'];
 
-        $sender->setData('_Form', $formFields);
+        $sender->setData([
+            'formData' => $formFields,
+            'form' => $sender->Form
+        ]);
 
         $sender->setHighlightRoute();
         if (!$sender->data('Title')) {
@@ -102,7 +105,7 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
         // Create and send the possible redirect URLs that will be required by the authenticating server and display them in the dashboard.
         // Use Gdn::Request instead of convience function so that we can return http and https.
         $redirectUrls = Gdn::request()->url('/entry/'. $this->getProviderKey(), true, true);
-        $sender->setData('redirectUrls', $redirectUrls);
+        $sender->setData('Instructions', sprintf(t('oauth2Instructions'), $redirectUrls));
 
         $sender->render('settings', '', $view);
     }

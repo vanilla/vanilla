@@ -158,6 +158,8 @@ export const globalVariables = useThemeCache(() => {
             semiBold: 600,
             bold: 700,
         },
+
+        families: [],
     });
 
     const icon = makeThemeVars("icon", {

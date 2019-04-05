@@ -44,6 +44,7 @@ import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { assetUrl, themeAsset } from "@library/utility/appUtils";
 import get from "lodash/get";
 import { ColorValues } from "@library/forms/buttonStyles";
+import { string } from "prop-types";
 
 export const colorOut = (colorValue: ColorValues) => {
     if (!colorValue) {
@@ -105,6 +106,14 @@ export function fakeBackgroundFixed() {
         width: viewWidth(100),
         height: viewHeight(100),
     };
+}
+
+export function fontFamilyWithDefaults(fontFamilies: string[]): string {
+    const defaults = ["Open Sans", "Segoe UI", "Helvetica Neue", "Helvetica", "Raleway", "Arial", "sans-serif"];
+    return fontFamilies
+        .concat(defaults)
+        .map(font => (font.indexOf('"') >= 0 || font.indexOf("'") >= 0 ? font : `"${font}"`))
+        .join(", ");
 }
 
 export function fullSizeOfParent() {

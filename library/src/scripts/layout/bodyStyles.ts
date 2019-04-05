@@ -7,13 +7,14 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent, viewHeight } from "csx";
 import { cssRule } from "typestyle";
-import { colorOut, background } from "@library/styles/styleHelpers";
+import { colorOut, background, fontFamilyWithDefaults } from "@library/styles/styleHelpers";
 
 export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();
     cssRule("html, body", {
         backgroundColor: colorOut(globalVars.body.backgroundImage.color),
         color: colorOut(globalVars.mainColors.fg),
+        fontFamily: fontFamilyWithDefaults(globalVars.fonts.families),
     });
 });
 

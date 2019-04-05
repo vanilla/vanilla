@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { borders, colorOut, margins, unit, flexHelper, sticky } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { percent, viewHeight, viewWidth } from "csx";
+import { important, percent, viewHeight, viewWidth } from "csx";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 
@@ -139,6 +139,9 @@ export const modalClasses = useThemeCache(() => {
             "&.isShadowed": {
                 ...shadows.dropDown(),
                 ...borders(),
+            },
+            "&.hasNoScroll": {
+                overflow: important("hidden"),
             },
         },
     });

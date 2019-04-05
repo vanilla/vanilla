@@ -25,7 +25,7 @@ export function LegacyEditor(props: IProps) {
     return (
         <Provider store={store}>
             <Editor isPrimaryEditor={true} legacyMode={true} allowUpload={hasPermission("uploads.add")}>
-                <div className={classNames("richEditor-frame", "InputBox", classes.legacyFrame)}>
+                <div className={classNames("richEditor-frame", "InputBox", classes.legacyFrame, classes.root)}>
                     <EditorContent legacyTextArea={props.legacyTextArea} />
                     <EditorParagraphMenu />
                     <EditorInlineMenus />

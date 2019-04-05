@@ -281,8 +281,8 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
     const embedBar = style("embedBar", {
         display: "block",
         width: percent(100),
-        background: colorOut(vars.colors.bg),
         padding: unit(vars.embedMenu.padding),
+        background: legacyMode ? undefined : colorOut(vars.colors.bg),
     });
 
     const icon = style("icon", {

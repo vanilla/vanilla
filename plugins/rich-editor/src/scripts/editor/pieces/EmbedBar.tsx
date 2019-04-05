@@ -17,7 +17,7 @@ import { useEditor } from "@rich-editor/editor/context";
 
 interface IProps {
     className?: string;
-    contentRef: React.RefObject<HTMLDivElement>;
+    contentRef?: React.RefObject<HTMLDivElement>;
 }
 
 export function EditorEmbedBar(props: IProps) {

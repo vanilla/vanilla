@@ -6,6 +6,7 @@
 
 use Garden\Web\Data;
 use Gdn_Statistics as Statistics;
+use Garden\Schema\Schema;
 
 /**
  * API Controller for site analytics.
@@ -27,7 +28,12 @@ class TickApiController extends AbstractApiController {
      * Collect an analytics tick.
      * @return Data
      */
-    public function post(): Data {
+    public function post(array $body = []): Data {
+        $in = Schema::parse([
+            'Path:s?',
+            'ResolvedPath:s?'
+        ]);
+        $in = $in->validate($body);
         $this->statistics->tick();
         $this->statistics->fireEvent("AnalyticsTick");
         return new Data('');

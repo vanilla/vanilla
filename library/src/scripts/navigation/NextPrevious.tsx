@@ -9,9 +9,10 @@ import classNames from "classnames";
 import AdjacentLink, { LeftRight } from "@library/navigation/AdjacentLink";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import Heading from "@library/layout/Heading";
-import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { px } from "csx";
+import { colorOut, paddings } from "@library/styles/styleHelpers";
 
 interface IUrlItem {
     name: string;
@@ -68,26 +69,23 @@ export default class NextPrevious extends React.Component<IProps> {
 
     public nextPreviousVariables = useThemeCache(() => {
         const globalVars = globalVariables();
-        const themeVars = componentThemeVariables("nextPreviousVars");
+        const themeVars = variableFactory("nextPreviousVars");
 
-        const fonts = {
+        const fonts = themeVars("fonts", {
             label: globalVars.fonts.size.small,
             title: globalVars.fonts.size.medium,
-            ...themeVars.subComponentStyles("fonts"),
-        };
+        });
 
-        const lineHeights = {
+        const lineHeights = themeVars("lineHeights", {
             label: globalVars.lineHeights.condensed,
             title: globalVars.lineHeights.condensed,
-            ...themeVars.subComponentStyles("lineHeights"),
-        };
+        });
 
-        const colors = {
+        const colors = themeVars("colors", {
             title: globalVars.mixBgAndFg(0.9),
             label: globalVars.mixBgAndFg(0.85),
             hover: globalVars.mainColors.primary,
-            ...themeVars.subComponentStyles("colors"),
-        };
+        });
         return { lineHeights, fonts, colors };
     });
 
@@ -95,28 +93,20 @@ export default class NextPrevious extends React.Component<IProps> {
         const globalVars = globalVariables();
         const vars = this.nextPreviousVariables();
         const style = styleFactory("nextPrevious");
-        const activeStyles = {
-            color: vars.colors.title.toString(),
-            $nest: {
-                ".adjacentLinks-icon": {
-                    color: globalVars.mainColors.primary.toString(),
-                },
-            },
-        };
 
         const root = style({
             display: "flex",
             alignItems: "flex-start",
             flexWrap: "wrap",
             justifyContent: "space-between",
-            color: globalVars.mainColors.fg.toString(),
+            color: colorOut(globalVars.mainColors.fg),
         });
 
-        const directionLabel = style("label", {
+        const directionLabel = style("directionLabel", {
             display: "block",
             fontSize: px(globalVars.fonts.size.small),
             lineHeight: globalVars.lineHeights.condensed,
-            color: vars.colors.label.toString(),
+            color: colorOut(vars.colors.label),
             marginBottom: px(2),
         });
 
@@ -126,6 +116,7 @@ export default class NextPrevious extends React.Component<IProps> {
             fontSize: px(globalVars.fonts.size.medium),
             lineHeight: globalVars.lineHeights.condensed,
             fontWeight: globalVars.fonts.weights.semiBold,
+            color: globalVars.mainColors.fg,
         });
 
         const chevron = style("chevron", {
@@ -145,15 +136,25 @@ export default class NextPrevious extends React.Component<IProps> {
             marginRight: px(-globalVars.icon.sizes.default),
         });
 
+        const activeStyles = {
+            $nest: {
+                "& .adjacentLinks-icon, & .adjacentLinks-title": {
+                    color: colorOut(globalVars.mainColors.primary),
+                },
+            },
+        };
+
         // Common to both left and right
         const adjacent = style("adjacent", {
             display: "block",
-            marginTop: px(8),
-            marginBottom: px(8),
-            color: vars.colors.title.toString(),
+            ...paddings({
+                vertical: 8,
+            }),
+            color: colorOut(vars.colors.title),
             $nest: {
                 "&.focus-visible": activeStyles,
                 "&:hover": activeStyles,
+                "&:focus": activeStyles,
                 "&:active": activeStyles,
             },
         });
@@ -170,6 +171,16 @@ export default class NextPrevious extends React.Component<IProps> {
             paddingLeft: px(globalVars.icon.sizes.default / 2),
         });
 
-        return { root, adjacent, previous, next, title, chevron, directionLabel, chevronLeft, chevronRight };
+        return {
+            root,
+            adjacent,
+            previous,
+            next,
+            title,
+            chevron,
+            directionLabel,
+            chevronLeft,
+            chevronRight,
+        };
     });
 }

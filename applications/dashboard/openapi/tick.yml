@@ -9,7 +9,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TickRequest'
-      required: false
+        required: false
       responses:
         '201':
           description: Success

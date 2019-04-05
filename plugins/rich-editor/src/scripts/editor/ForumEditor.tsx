@@ -9,7 +9,7 @@ import { Editor } from "@rich-editor/editor/context";
 import EditorContent from "@rich-editor/editor/EditorContent";
 import { EditorInlineMenus } from "@rich-editor/editor/EditorInlineMenus";
 import { EditorParagraphMenu } from "@rich-editor/editor/EditorParagraphMenu";
-import { EditorEmbedBar } from "@rich-editor/editor/pieces/EmbedBar";
+import { EditorEmbedBar } from "@rich-editor/editor/EditorEmbedBar";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import classNames from "classnames";
 import React from "react";
@@ -19,7 +19,12 @@ interface IProps {
     legacyTextArea: HTMLInputElement;
 }
 
-export function LegacyEditor(props: IProps) {
+/**
+ * The full editor UI for the forum.
+ *
+ * Brings along it's own Redux Context.
+ */
+export function ForumEditor(props: IProps) {
     const store = getStore();
     const classes = richEditorClasses(true);
     return (

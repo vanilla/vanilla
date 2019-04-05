@@ -9,7 +9,7 @@ import Quill, { IFormats, DeltaOperation } from "quill/core";
 import { IEditorInstance, IStoreState } from "@rich-editor/@types/store";
 import { Omit } from "@library/@types/utils";
 import { connect } from "react-redux";
-import { Devices, useDevice, IDeviceProps } from "@library/layout/DeviceContext";
+import { Devices, useDevice } from "@library/layout/DeviceContext";
 import uniqueId from "lodash/uniqueId";
 import { getIDForQuill } from "@rich-editor/quill/utility";
 
@@ -43,16 +43,23 @@ interface IEditorReduxValue extends IEditorInstance {
 
 export interface IWithEditorProps extends IEditorReduxValue, IContextProps {}
 
-export const EditorContext = React.createContext<IContextProps>({} as any);
-const { Consumer, Provider } = EditorContext;
+const EditorContext = React.createContext<IContextProps>({} as any);
 
-export { Consumer as EditorConsumer };
-
+/**
+ * Hook for using the editor context.
+ */
 export function useEditor() {
     const editorContext = useContext(EditorContext);
     return editorContext;
 }
 
+/**
+ * The editor root.
+ *
+ * This doesn't actually render any HTML instead.
+ * It maintains the context for the rest of the editor pieces.
+ * @see EditorContent, EditorInlineMenus, EditorParagraphMenu, etc.
+ */
 export const Editor = (props: IEditorProps) => {
     const [quill, setQuillInstance] = useState<Quill | null>(null);
     const quillID = quill ? getIDForQuill(quill) : null;
@@ -62,7 +69,7 @@ export const Editor = (props: IEditorProps) => {
     const descriptionID = ID + "-description";
 
     return (
-        <Provider
+        <EditorContext.Provider
             value={{
                 ...props,
                 quill,
@@ -74,7 +81,7 @@ export const Editor = (props: IEditorProps) => {
             }}
         >
             {props.children}
-        </Provider>
+        </EditorContext.Provider>
     );
 };
 

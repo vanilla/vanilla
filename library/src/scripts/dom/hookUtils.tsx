@@ -6,6 +6,10 @@
 import { useState, RefObject, useLayoutEffect } from "react";
 import ResizeObserver from "resize-observer-polyfill";
 
+/**
+ * Utility hook for measuring a dom element.
+ * Will return back measurements as a bounding rectangle for the element contained in a ref.
+ */
 export function useMeasure(ref: RefObject<HTMLElement | null>) {
     const [bounds, setContentRect] = useState<DOMRectReadOnly>(
         // DOMRectReadOnly.fromRect()
@@ -33,5 +37,3 @@ export function useMeasure(ref: RefObject<HTMLElement | null>) {
 
     return bounds;
 }
-
-export function useOffsetFromScroll(ref: RefObject<HTMLElement | null>) {}

@@ -28,7 +28,7 @@ interface IProps extends IWithEditorProps {
 }
 
 /**
- * React component for instantiating a rich editor.
+ * The content area of the RichEditor. This mounts the quill instance.
  */
 export class EditorContent extends React.Component<IProps> {
     /** Ref for a dom node for quill to mount into. */

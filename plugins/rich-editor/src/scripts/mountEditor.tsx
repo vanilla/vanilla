@@ -5,7 +5,7 @@
  */
 
 import { ensureHtmlElement, mountReact } from "@library/dom/domUtils";
-import { LegacyEditor } from "@rich-editor/editor/LegacyEditor";
+import { ForumEditor } from "@rich-editor/editor/ForumEditor";
 import React from "react";
 
 /**
@@ -24,7 +24,7 @@ export default function mountEditor(containerSelector: string | Element) {
     const initialFormat = bodybox.getAttribute("format") || "Rich";
 
     if (initialFormat === "Rich") {
-        mountReact(<LegacyEditor legacyTextArea={bodybox as HTMLInputElement} />, container, () => {
+        mountReact(<ForumEditor legacyTextArea={bodybox as HTMLInputElement} />, container, () => {
             container.classList.remove("isDisabled");
         });
     } else {

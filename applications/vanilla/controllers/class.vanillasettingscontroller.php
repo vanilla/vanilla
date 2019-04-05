@@ -66,6 +66,8 @@ class VanillaSettingsController extends Gdn_Controller {
             'Garden.EditContentTimeout',
             'Vanilla.AdminCheckboxes.Use',
             'ImageUpload.Limits.Enabled',
+            'ImageUpload.Limits.Width',
+            'ImageUpload.Limits.Height',
             'Vanilla.Comment.MaxLength',
             'Vanilla.Comment.MinLength',
             'Garden.Format.DisableUrlEmbeds',
@@ -106,6 +108,8 @@ class VanillaSettingsController extends Gdn_Controller {
             $configurationModel->Validation->applyRule('Garden.EditContentTimeout', 'Integer');
             $configurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Required');
             $configurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Integer');
+            $configurationModel->Validation->applyRule('ImageUpload.Limits.Width', 'Integer');
+            $configurationModel->Validation->applyRule('ImageUpload.Limits.Height', 'Integer');
 
             // Save new settings
             $saved = $this->Form->save();

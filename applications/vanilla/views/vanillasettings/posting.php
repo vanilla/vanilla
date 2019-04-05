@@ -33,6 +33,41 @@ echo $form->errors();
 
     <div class="form-group">
         <?php
+            $imageUploadLimitLabel = t('ImageUploadLimits.Notes1', 'Enable Image Upload Limit');
+            $ImageUploadDesc = t('ImageUploadLimits.Notes2', 'Add limits to image upload dimensions in discussions and comments.');
+            echo $form->toggle('ImageUpload.Limits.Enabled', $imageUploadLimitLabel, [], $ImageUploadDesc, false);
+        ?>
+    </div>
+
+    <div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
+        <div class="label-wrap-wide">
+            <?php
+            echo $form->label('Max Image Width', 'ImageUpload.Limits.Width');
+            echo wrap(t('Images will be scaled down if they exceed this width.'), 'div', ['class' => 'info']);
+            ?>
+        </div>
+        <div class="input-wrap-right">
+            <div class="textbox-suffix" data-suffix="px">
+                <?php echo $form->textBox('ImageUpload.Limits.Width', ["class" => "form-control", "value" => c("ImageUpload.Limits.Width", 1400)]); ?>
+            </div>
+        </div>
+    </div>
+    <div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
+        <div class="label-wrap-wide">
+            <?php
+            echo $form->label('Max Image Height', 'ImageUpload.Limits.Height');
+            echo wrap(t('Images will be scaled down if they exceed this height.'), 'div', ['class' => 'info']);
+            ?>
+        </div>
+        <div class="input-wrap-right">
+            <div class="textbox-suffix" data-suffix="px">
+                <?php echo $form->textBox('ImageUpload.Limits.Height', ["class" => "form-control", "value" => c("ImageUpload.Limits.Height", 1000)]); ?>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <?php
         $formatNotes1 = t('InputFormatter.Notes1', 'Select the default format of the editor for posts in the community.');
         $formatNotes2 = t('InputFormatter.Notes2', 'The editor will auto-detect the format of old posts when editing them and load their 
         original formatting rules. Aside from this exception, the selected post format below will take precedence.');

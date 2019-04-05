@@ -99,12 +99,13 @@ export const modalClasses = useThemeCache(() => {
             "*": {
                 boxSizing: "border-box",
             },
-            "&.isFullScreen": {
+            "&&.isFullScreen": {
                 overflow: "hidden",
                 width: percent(100),
                 height: viewHeight(100),
                 maxHeight: viewHeight(100),
                 borderRadius: 0,
+                border: "none",
             },
             "&.isLarge": {
                 width: unit(vars.sizing.large),

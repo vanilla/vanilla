@@ -15,7 +15,7 @@ import { getIDForQuill } from "@rich-editor/quill/utility";
 
 interface IEditorProps {
     isPrimaryEditor: boolean;
-    isLoading?: boolean;
+    isLoading: boolean;
     onChange?: (newContent: DeltaOperation[]) => void;
     allowUpload: boolean;
     initialValue?: DeltaOperation[];
@@ -32,8 +32,6 @@ interface IContextProps extends IEditorProps {
     quill: Quill | null;
     isMobile: boolean;
     setQuillInstance: (quill: Quill) => void;
-    editorID: string;
-    descriptionID: string;
     quillID: string;
 }
 

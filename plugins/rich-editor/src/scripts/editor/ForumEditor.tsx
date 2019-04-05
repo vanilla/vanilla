@@ -29,7 +29,12 @@ export function ForumEditor(props: IProps) {
     const classes = richEditorClasses(true);
     return (
         <Provider store={store}>
-            <Editor isPrimaryEditor={true} legacyMode={true} allowUpload={hasPermission("uploads.add")}>
+            <Editor
+                isPrimaryEditor={true}
+                legacyMode={true}
+                allowUpload={hasPermission("uploads.add")}
+                isLoading={false}
+            >
                 <div className={classNames("richEditor-frame", "InputBox", classes.legacyFrame, classes.root)}>
                     <EditorContent legacyTextArea={props.legacyTextArea} />
                     <EditorParagraphMenu />

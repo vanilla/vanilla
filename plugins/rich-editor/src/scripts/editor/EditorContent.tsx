@@ -330,10 +330,6 @@ export class EditorContent extends React.Component<IProps> {
             });
         }
     }
-
-    private get descriptionID(): string {
-        return this.domID + "-description";
-    }
 }
 
 export default hot(module)(withEditor(EditorContent));

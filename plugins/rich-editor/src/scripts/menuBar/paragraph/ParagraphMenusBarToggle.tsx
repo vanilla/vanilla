@@ -31,6 +31,7 @@ import classNames from "classnames";
 import Quill, { RangeStatic } from "quill/core";
 import React from "react";
 import { style } from "typestyle";
+import uniqueId from "lodash/uniqueId";
 
 export enum IMenuBarItemTypes {
     CHECK = "checkbox",
@@ -66,8 +67,8 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
         super(props);
 
         // Quill can directly on the class as it won't ever change in a single instance.
-        this.quill = props.quill;
-        this.ID = this.props.editorID + "-formattingMenus";
+        this.quill = props.quill!;
+        this.ID = uniqueId("paragraphMenu") + "-formattingMenus";
         this.componentID = this.ID + "-component";
         this.menuID = this.ID + "-menu";
         this.buttonID = this.ID + "-button";

@@ -8,21 +8,24 @@ paths:
         content:
           application/json:
             schema:
-              properties:
-                Path:
-                  description: Page path
-                  minLength: 1
-                  type: string
-                ResolvedPath:
-                  description: Fully resolved path to the application/controller/method.
-                  minLength: 1
-                  type: string
-              required:
-              type: object
+              $ref: '#/components/schemas/TickRequest'
         required: false
       responses:
         '201':
           description: Success
       tags:
       - Statistics
+components:
+  schemas:
+    TickRequest:
+      properties:
+        Path:
+          description: Page path
+          minLength: 1
+          type: string
+          example: /discussions/123
+        ResolvedPath:
+          description: Fully resolved path to the application/controller/method.
+          minLength: 1
+          type: string
 

@@ -26,20 +26,29 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
     }
 
     /**
-     *  Return all the information saved in provider table.
+     *  Return all the information saved in provider table, add hardcoded values.
      *
      * @return array Stored provider data (secret, client_id, etc.).
      */
     public function provider() {
         if (!$this->provider) {
             $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($this->providerKey);
+
+            // These URLs are added here instead of being stored in the DB in case they ever change, we will not have to update the DB.
             $this->provider['AuthorizeUrl'] = self::AUTHORIZEURL;
             $this->provider['TokenUrl'] = self::TOKENURL;
             $this->provider['ProfileUrl'] = self::PROFILEURL;
-            $this->provider['ProfileKeyName'] = self::PROFILENAME;
+
+            // Scope
             $this->provider['AcceptedScope'] = self::ACCEPTEDSCOPE;
+
+            // Translate claims coming back from Google.
+            $this->provider['ProfileKeyName'] = self::PROFILENAME;
             $this->provider['ProfileKeyUniqueID'] = 'sub';
             $this->provider['ProfileKeyFullName'] = null;
+
+            // provider Name is what puts the text on the button and determines the CSS class.
+            $this->provider['Name'] = 'Google';
         }
 
         return $this->provider;

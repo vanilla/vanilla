@@ -834,7 +834,15 @@ class EditorPlugin extends Gdn_Plugin {
                 if (c("ImageUpload.Limits.Enabled")) {
                     if ($tmpwidth > c("ImageUpload.Limits.Width") || $tmpheight > c("ImageUpload.Limits.Height")) {
                         $imageResizer = new \Vanilla\ImageResizer();
-                        $imageResizer->resize($tmpFilePath, null, ["height"=>c("ImageUpload.Limits.Height"), "width"=>c("ImageUpload.Limits.Width"), "crop"=>true]);
+                        $imageResizer->resize(
+                            $tmpFilePath,
+                            null,
+                            [
+                                "height"=>c("ImageUpload.Limits.Height"),
+                                "width"=>c("ImageUpload.Limits.Width"),
+                                "crop"=>false
+                            ]
+                        );
                     }
                 }
 
@@ -1462,7 +1470,7 @@ class EditorPlugin extends Gdn_Plugin {
         $formToggle = $form->toggle('Plugins.editor.ForceWysiwyg', $forceWysiwygLabel, [], $label);
 
         $additionalFormItemHTML .= "<div class='form-group forceWysiwyg'>$formToggle</div>";
-
+        
         return $additionalFormItemHTML;
     }
 
@@ -1480,7 +1488,10 @@ class EditorPlugin extends Gdn_Plugin {
     public function setup() {
         \Gdn::config()->touch([
             'Garden.MobileInputFormatter' => 'TextEx',
-            'Plugins.editor.ForceWysiwyg' => false
+            'Plugins.editor.ForceWysiwyg' => false,
+            'ImageUpload.Limits.Enabled' => false,
+            'ImageUpload.Limits.Width' => 1400,
+            'ImageUpload.Limits.Height' => 1000
         ]);
         $this->structure();
     }

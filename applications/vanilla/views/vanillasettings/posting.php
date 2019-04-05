@@ -42,8 +42,8 @@ echo $form->errors();
     <div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
         <div class="label-wrap-wide">
             <?php
-            echo $form->label('Max Image Width', 'ImageUpload.Limits.Width');
-            echo wrap(t('Images will be scaled down if they exceed this width.'), 'div', ['class' => 'info']);
+            echo $form->label(t('ImageUploadLimits.Width1', 'Max Image Width'), 'ImageUpload.Limits.Width');
+            echo wrap(t('ImageUploadLimits.Width2', 'Images will be scaled down if they exceed this width.'), 'div', ['class' => 'info']);
             ?>
         </div>
         <div class="input-wrap-right">
@@ -55,8 +55,8 @@ echo $form->errors();
     <div class="form-group ImageUploadLimitsDimensions dimensionsDisabled">
         <div class="label-wrap-wide">
             <?php
-                echo $form->label('Max Image Height', 'ImageUpload.Limits.Height');
-                echo wrap(t('Images will be scaled down if they exceed this height.'), 'div', ['class' => 'info']);
+                echo $form->label(t('ImageUploadLimits.Height1', 'Max Image Height'), 'ImageUpload.Limits.Height');
+                echo wrap(t('ImageUploadLimits.Height2', 'Images will be scaled down if they exceed this height.'), 'div', ['class' => 'info']);
             ?>
         </div>
         <div class="input-wrap-right">

@@ -39,6 +39,7 @@ class VanillaSettingsController extends Gdn_Controller {
     public function posting() {
         // Check permission
         $this->permission('Garden.Settings.Manage');
+        $this->addJsFile('admin.ts');
 
         /** @var \Garden\EventManager $eventManager */
         $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);

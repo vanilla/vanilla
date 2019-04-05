@@ -44,6 +44,8 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
 
             // Translate claims coming back from Google.
             $this->provider['ProfileKeyName'] = self::PROFILENAME;
+            $this->provider['AcceptedScope'] = 'email openid profile';
+
             $this->provider['ProfileKeyUniqueID'] = 'sub';
             $this->provider['ProfileKeyFullName'] = null;
 

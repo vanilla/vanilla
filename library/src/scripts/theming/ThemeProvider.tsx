@@ -15,6 +15,7 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 import React from "react";
 import { connect } from "react-redux";
 import WebFont from "webfontloader";
+import { loadThemeFonts } from "./loadThemeFonts";
 
 export interface IWithThemeProps {
     theme: IThemeVariables;
@@ -59,19 +60,7 @@ class BaseThemeProvider extends React.Component<IProps> {
             prepareShadowRoot(themeFooter, true);
         }
 
-        if (this.props.assets.status === LoadStatus.SUCCESS && this.props.assets.data && this.props.assets.data.fonts) {
-            const webFontConfig: WebFont.Config = {
-                custom: {
-                    families: [],
-                    urls: [],
-                },
-            };
-            this.props.assets.data.fonts.forEach(font => {
-                webFontConfig.custom!.families!.push(font.name);
-                webFontConfig.custom!.urls!.push(font.url);
-            });
-            WebFont.load(webFontConfig);
-        }
+        loadThemeFonts();
     }
 }
 

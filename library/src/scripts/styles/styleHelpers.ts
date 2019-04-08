@@ -3,9 +3,11 @@
  * @license GPL-2.0-only
  */
 
+import { ColorValues } from "@library/forms/buttonStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory } from "@library/styles/styleUtils";
+import { assetUrl, themeAsset } from "@library/utility/appUtils";
 import {
     AlignItemsProperty,
     AppearanceProperty,
@@ -39,12 +41,22 @@ import {
     WhiteSpaceProperty,
 } from "csstype";
 import { ColorHelper, deg, important, percent, px, quote, url, viewHeight, viewWidth } from "csx";
+import get from "lodash/get";
 import { keyframes } from "typestyle";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
-import { assetUrl, themeAsset } from "@library/utility/appUtils";
-import get from "lodash/get";
-import { ColorValues } from "@library/forms/buttonStyles";
-import { string } from "prop-types";
+
+const fontFallbacks = [
+    "-apple-system",
+    "BlinkMacSystemFont",
+    "Segoe UI",
+    "Roboto",
+    "Helvetica",
+    "Arial",
+    "sans-serif",
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol",
+];
 
 export const colorOut = (colorValue: ColorValues) => {
     if (!colorValue) {
@@ -109,10 +121,9 @@ export function fakeBackgroundFixed() {
 }
 
 export function fontFamilyWithDefaults(fontFamilies: string[]): string {
-    const defaults = ["Open Sans", "Segoe UI", "Helvetica Neue", "Helvetica", "Raleway", "Arial", "sans-serif"];
     return fontFamilies
-        .concat(defaults)
-        .map(font => (font.indexOf('"') >= 0 || font.indexOf("'") >= 0 ? font : `"${font}"`))
+        .concat(fontFallbacks)
+        .map(font => (font.includes(" ") && !font.includes('"') ? `"${font}"` : font))
         .join(", ");
 }
 

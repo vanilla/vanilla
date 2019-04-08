@@ -14,7 +14,7 @@ export const bodyCSS = useThemeCache(() => {
     cssRule("html, body", {
         backgroundColor: colorOut(globalVars.body.backgroundImage.color),
         color: colorOut(globalVars.mainColors.fg),
-        fontFamily: fontFamilyWithDefaults(globalVars.fonts.families),
+        fontFamily: fontFamilyWithDefaults(globalVars.fonts.families.body),
     });
 });
 

@@ -7,14 +7,39 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent, viewHeight } from "csx";
 import { cssRule } from "typestyle";
-import { colorOut, background, fontFamilyWithDefaults } from "@library/styles/styleHelpers";
+import { colorOut, background, fontFamilyWithDefaults, margins, paddings, fonts } from "@library/styles/styleHelpers";
 
 export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();
     cssRule("html, body", {
         backgroundColor: colorOut(globalVars.body.backgroundImage.color),
         color: colorOut(globalVars.mainColors.fg),
-        fontFamily: fontFamilyWithDefaults(globalVars.fonts.families.body),
+        ...fonts({
+            size: globalVars.fonts.size.medium,
+            family: globalVars.fonts.families.body,
+        }),
+        wordBreak: "break-word",
+        overscrollBehavior: "none", // For IE -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
+    });
+
+    cssRule("h1, h2, h3, h4, h5, h6", {
+        display: "block",
+        lineHeight: globalVars.lineHeights.condensed,
+        ...margins({
+            all: 0,
+        }),
+        ...paddings({
+            all: 0,
+        }),
+    });
+
+    cssRule("p", {
+        ...margins({
+            all: 0,
+        }),
+        ...paddings({
+            all: 0,
+        }),
     });
 });
 

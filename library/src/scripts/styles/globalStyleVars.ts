@@ -161,7 +161,6 @@ export const globalVariables = useThemeCache(() => {
 
         families: {
             body: ["Open Sans"],
-            heading: ["Open Sans"],
         },
     });
 

@@ -23,6 +23,7 @@ import {
     ContentProperty,
     DisplayProperty,
     FlexWrapProperty,
+    FontFamilyProperty,
     FontSizeProperty,
     FontWeightProperty,
     JustifyContentProperty,
@@ -48,9 +49,11 @@ import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 const fontFallbacks = [
     "-apple-system",
     "BlinkMacSystemFont",
+    "HelveticaNeue-Light",
     "Segoe UI",
-    "Roboto",
+    "Helvetica Neue",
     "Helvetica",
+    "Raleway",
     "Arial",
     "sans-serif",
     "Apple Color Emoji",
@@ -782,23 +785,19 @@ export interface IFont {
     lineHeight?: LineHeightProperty<TLength>;
     shadow?: TextShadowProperty;
     align?: TextAlignLastProperty;
+    family?: FontFamilyProperty[];
 }
 
 export const fonts = (props: IFont) => {
     if (props) {
-        const size = get(props, "size", undefined);
-        const fontWeight = get(props, "weight", undefined);
-        const fg = get(props, "color", undefined);
-        const lineHeight = get(props, "lineHeight", undefined);
-        const textAlign = get(props, "align", undefined);
-        const textShadow = get(props, "shadow", undefined);
         return {
-            color: fg ? colorOut(fg) : undefined,
-            fontSize: size ? unit(size) : undefined,
-            fontWeight,
-            lineHeight: lineHeight ? unit(lineHeight) : undefined,
-            textAlign,
-            textShadow,
+            color: props.color ? colorOut(props.color) : undefined,
+            fontSize: props.size ? unit(props.size) : undefined,
+            fontWeight: props.weight ? props.weight : undefined,
+            lineHeight: props.lineHeight ? unit(props.lineHeight) : undefined,
+            textAlign: props.align ? props.align : undefined,
+            textShadow: props.shadow ? props.shadow : undefined,
+            fontFamily: props.family ? fontFamilyWithDefaults(props.family) : undefined,
         } as NestedCSSProperties;
     } else {
         return {} as NestedCSSProperties;

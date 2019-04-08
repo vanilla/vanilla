@@ -603,6 +603,20 @@ export const buttonUtilityClasses = useThemeCache(() => {
         justifyContent: "center",
         padding: 0,
         color: "inherit",
+        $nest: {
+            "&:not(.focus-visible)": {
+                outline: 0,
+            },
+            "&:hover": {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+            "&:focus": {
+                color: colorOut(globalVars.mainColors.secondary),
+            },
+            "&.focus-visible": {
+                color: colorOut(globalVars.mainColors.secondary),
+            },
+        },
     });
 
     const buttonIcon = style("icon", iconMixin(formElementVars.sizing.height));
@@ -633,6 +647,14 @@ export const buttonUtilityClasses = useThemeCache(() => {
 
     const buttonAsTextPrimary = style("asTextPrimary", asTextStyles, {
         color: colorOut(globalVars.mainColors.primary),
+        $nest: {
+            "&:not(.focus-visible)": {
+                outline: 0,
+            },
+            "&:hover, &:focus": {
+                color: colorOut(globalVars.mainColors.secondary),
+            },
+        },
     });
 
     return {

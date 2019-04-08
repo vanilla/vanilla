@@ -303,13 +303,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         background: "transparent",
         cursor: "pointer",
         opacity: globalVars.states.icon.opacity,
-        $nest: {
-            "&:hover, &:focus, &.focus-visible, &:active": {
-                opacity: 1,
-                cursor: "pointer",
-                color: colorOut(globalVars.mainColors.primary),
-            },
-        },
     });
 
     const flyoutDescription = style("flyoutDescription", {

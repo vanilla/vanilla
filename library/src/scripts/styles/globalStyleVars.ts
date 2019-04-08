@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { modifyColorBasedOnLightness, colorOut, IBackground } from "@library/styles/styleHelpers";
+import { modifyColorBasedOnLightness, colorOut, IBackground, emphasizeLightness } from "@library/styles/styleHelpers";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { color, ColorHelper, percent, viewHeight } from "csx";
 
@@ -34,7 +34,7 @@ export const globalVariables = useThemeCache(() => {
     colorPrimary = initialMainColors.primary;
 
     const generatedMainColors = makeThemeVars("mainColors", {
-        secondary: colorPrimary.lightness() >= 0.5 ? colorPrimary.darken(0.05) : colorPrimary.lighten(0.05),
+        secondary: emphasizeLightness(colorPrimary, 0.05),
     });
 
     const mainColors = {

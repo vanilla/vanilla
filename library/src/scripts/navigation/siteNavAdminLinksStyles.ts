@@ -42,12 +42,10 @@ export const siteNavAdminLinksClasses = useThemeCache(() => {
     const link = style({
         color: "inherit",
         fontWeight: globalVars.fonts.weights.semiBold,
-        marginLeft: px(6),
         ...debug.name("link"),
     });
 
     const linkIcon = style({
-        marginLeft: px(-6),
         marginRight: px(6),
         ...debug.name("linkIcon"),
     });

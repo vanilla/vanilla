@@ -134,5 +134,4 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
 
         $sender->render('settings', '', $view);
     }
-
 }

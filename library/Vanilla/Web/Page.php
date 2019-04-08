@@ -7,6 +7,7 @@
 
 namespace Vanilla\Web;
 
+use Gdn_Upload;
 use Garden\CustomExceptionHandler;
 use Garden\Web\Data;
 use Garden\Web\Exception\ServerException;
@@ -17,10 +18,10 @@ use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
-use Vanilla\Web\ContentSecurityPolicy\DefaultContentSecurityPolicyProvider;
 use Vanilla\Web\JsInterpop\PhpAsJsVariable;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\JsInterpop\ReduxErrorAction;
+use Vanilla\Contracts\ConfigurationInterface;
 
 /**
  * Class representing a single page in the application.
@@ -31,6 +32,12 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
 
     /** @var string */
     private $canonicalUrl;
+
+    /** @var string */
+    private $favIcon;
+
+    /** @var string */
+    private $mobileAddressBarColor;
 
     /** @var string */
     private $seoTitle;
@@ -110,6 +117,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @param WebpackAssetProvider $assetProvider
      * @param BreadcrumbModel $breadcrumbModel
      * @param ContentSecurityPolicyModel $cspModel
+     * @param ConfigurationInterface $config
      */
     public function setDependencies(
         SiteMeta $siteMeta,
@@ -117,7 +125,8 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         \Gdn_Session $session,
         WebpackAssetProvider $assetProvider,
         BreadcrumbModel $breadcrumbModel,
-        ContentSecurityPolicyModel $cspModel
+        ContentSecurityPolicyModel $cspModel,
+        ConfigurationInterface $config
     ) {
         $this->siteMeta = $siteMeta;
         $this->request = $request;
@@ -125,6 +134,15 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->assetProvider = $assetProvider;
         $this->breadcrumbModel = $breadcrumbModel;
         $this->cspModel = $cspModel;
+        $this->config = $config;
+
+        if ($favIcon = $this->config->get("Garden.FavIcon")) {
+            $this->setFavIcon(Gdn_Upload::url($favIcon));
+        }
+
+        if ($mobileAddressBarColor = $this->config->get("Garden.MobileAddressBarColor")) {
+            $this->setMobileAddressBarColor($mobileAddressBarColor);
+        }
     }
 
     /**
@@ -159,6 +177,8 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             'breadcrumbsJson' => $this->seoBreadcrumbs ?
                 $this->breadcrumbModel->crumbsAsJsonLD($this->seoBreadcrumbs) :
                 null,
+            'favIcon' => $this->favIcon,
+            'mobileAddressBarColor' => $this->mobileAddressBarColor,
         ];
         $viewContent = $this->renderTwig('resources/views/default-master.twig', $viewData);
 
@@ -208,6 +228,46 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     protected function addReduxAction(ReduxAction $action): self {
         $this->reduxActions[] = $action;
 
+        return $this;
+    }
+
+    /**
+     * Get the page's "favorite icon".
+     *
+     * @return string|null
+     */
+    protected function getFavIcon() {
+        return $this->favIcon;
+    }
+
+    /**
+     * Set the "favorite icon" for the page.
+     *
+     * @param string $favIcon
+     * @return self
+     */
+    protected function setFavIcon(string $favIcon): self {
+        $this->favIcon = $favIcon;
+        return $this;
+    }
+
+    /**
+     * Get the page's theme color.
+     *
+     * @return string|null
+     */
+    protected function getMobileAddressBarColor() {
+        return $this->mobileAddressBarColor;
+    }
+
+    /**
+     * Set the theme color for the page.
+     *
+     * @param string $mobileAddressBarColor
+     * @return self
+     */
+    protected function setMobileAddressBarColor(string $mobileAddressBarColor): self {
+        $this->mobileAddressBarColor = $mobileAddressBarColor;
         return $this;
     }
 

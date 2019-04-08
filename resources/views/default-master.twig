@@ -11,6 +11,14 @@
             <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
         {% endfor %}
 
+        {% if favIcon %}
+            <link rel="shortcut icon" href="{{ favIcon }}" type="image/x-icon" />
+        {% endif %}
+
+        {% if mobileAddressBarColor %}
+            <meta name="theme-color" content="{{ mobileAddressBarColor }}" />
+        {% endif %}
+
         {% for script in inlineScripts -%}
             <script nonce="{{ nonce }}">
                 {{- script|raw -}}

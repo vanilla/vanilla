@@ -11,10 +11,10 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Theme\JsonAsset;
-use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\JsInterpop\ReduxAction;
+use Vanilla\Contracts\ConfigurationInterface;
 
 /**
  * A Web\Page that makes use of custom theme data from the theming API.
@@ -34,9 +34,10 @@ abstract class ThemedPage extends Page {
         WebpackAssetProvider $assetProvider,
         BreadcrumbModel $breadcrumbModel,
         \ThemesApiController $themesApi = null, // Default required to conform to interface
-        ContentSecurityPolicyModel $cspModel
+        ContentSecurityPolicyModel $cspModel,
+        ConfigurationInterface $config
     ) {
-        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel);
+        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $config);
         $this->themesApi = $themesApi;
         $this->initAssets();
     }

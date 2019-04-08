@@ -28,7 +28,7 @@ export function loadThemeFonts() {
                 },
             };
 
-            if (webFontConfig.custom!.urls) {
+            if (webFontConfig.custom && webFontConfig.custom.urls && webFontConfig.custom.urls.length > 0) {
                 WebFont.load(webFontConfig);
             } else {
                 // Default font loading

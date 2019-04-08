@@ -141,7 +141,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         }
 
         if ($mobileAddressBarColor = $this->config->get("Garden.MobileAddressBarColor")) {
-            $this->setMobileAddressBarColor($mobileAddressBarColor);
+            $this->addMetaTag("theme-color", ["content" => $mobileAddressBarColor, "name" => "theme-color"]);
         }
     }
 
@@ -178,7 +178,6 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
                 $this->breadcrumbModel->crumbsAsJsonLD($this->seoBreadcrumbs) :
                 null,
             'favIcon' => $this->favIcon,
-            'mobileAddressBarColor' => $this->mobileAddressBarColor,
         ];
         $viewContent = $this->renderTwig('resources/views/default-master.twig', $viewData);
 
@@ -248,26 +247,6 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      */
     protected function setFavIcon(string $favIcon): self {
         $this->favIcon = $favIcon;
-        return $this;
-    }
-
-    /**
-     * Get the page's theme color.
-     *
-     * @return string|null
-     */
-    protected function getMobileAddressBarColor() {
-        return $this->mobileAddressBarColor;
-    }
-
-    /**
-     * Set the theme color for the page.
-     *
-     * @param string $mobileAddressBarColor
-     * @return self
-     */
-    protected function setMobileAddressBarColor(string $mobileAddressBarColor): self {
-        $this->mobileAddressBarColor = $mobileAddressBarColor;
         return $this;
     }
 

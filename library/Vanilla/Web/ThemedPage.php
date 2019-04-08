@@ -13,6 +13,7 @@ use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Theme\JsonAsset;
 use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Web\Asset\WebpackAssetProvider;
+use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\JsInterpop\ReduxAction;
 
 /**
@@ -32,9 +33,10 @@ abstract class ThemedPage extends Page {
         \Gdn_Session $session,
         WebpackAssetProvider $assetProvider,
         BreadcrumbModel $breadcrumbModel,
-        \ThemesApiController $themesApi = null // Default required to conform to interface
+        \ThemesApiController $themesApi = null, // Default required to conform to interface
+        ContentSecurityPolicyModel $cspModel
     ) {
-        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel);
+        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel);
         $this->themesApi = $themesApi;
         $this->initAssets();
     }

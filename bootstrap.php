@@ -168,6 +168,12 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('setLocaleKey', [ContainerUtils::currentLocale()])
     ->addCall('setCacheBusterKey', [ContainerUtils::cacheBuster()])
 
+    ->rule(\Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel::class)
+    ->setShared(true)
+    ->addCall('addProvider', [new Reference(\Vanilla\Web\ContentSecurityPolicy\DefaultContentSecurityPolicyProvider::class)])
+    ->addCall('addProvider', [new Reference(\Vanilla\Web\ContentSecurityPolicy\EmbedWhitelistContentSecurityPolicyProvider::class)])
+    ->addCall('addProvider', [new Reference(\Vanilla\Web\Asset\WebpackContentSecurityPolicyProvider::class)])
+
     ->rule(\Vanilla\Web\Asset\LegacyAssetModel::class)
     ->setConstructorArgs([ContainerUtils::cacheBuster()])
 
@@ -181,6 +187,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('addMiddleware', [new Reference('@smart-id-middleware')])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\CacheControlMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\DeploymentHeaderMiddleware::class)])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
 
     ->rule('@smart-id-middleware')
     ->setClass(\Vanilla\Web\SmartIDMiddleware::class)

@@ -89,7 +89,6 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
             $provider = $this->provider();
             $form->setData($provider);
         } else {
-
             $form->setFormValue('AuthenticationKey', $this->getProviderKey());
 
             $sender->Form->validateRule('AssociationKey', 'ValidateRequired', t('You must provide a unique AccountID.'));

@@ -4,12 +4,6 @@ paths:
   /tick:
     post:
       summary: Register a page view for statistical and analytical purpose.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TickRequest'
-        required: false
       responses:
         '201':
           description: Success
@@ -17,16 +11,3 @@ paths:
       - Statistics
 components:
   schemas:
-    TickRequest:
-      description: Both body request parameters are optional
-      properties:
-        Path:
-          description: Page path
-          minLength: 1
-          type: string
-          example: /discussions/123
-        ResolvedPath:
-          description: Fully resolved path to the application/controller/method.
-          minLength: 1
-          type: string
-

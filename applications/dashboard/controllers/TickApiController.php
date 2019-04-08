@@ -27,15 +27,9 @@ class TickApiController extends AbstractApiController {
     /**
      * Collect an analytics tick.
      *
-     * @param array $body
      * @return Data
      */
-    public function post(array $body = []): Data {
-        $in = Schema::parse([
-            'Path:s?',
-            'ResolvedPath:s?'
-        ]);
-        $in = $in->validate($body);
+    public function post(): Data {
         $this->statistics->tick();
         $this->statistics->fireEvent("AnalyticsTick");
         return new Data('');

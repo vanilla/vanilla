@@ -29,6 +29,9 @@ class MediaApiController extends AbstractApiController {
     /** @var EmbedManager */
     private $embedManager;
 
+    /** @var ImageResizer */
+    private $imageResizer;
+
     /** @var Config */
     private $config;
 
@@ -38,9 +41,10 @@ class MediaApiController extends AbstractApiController {
      * @param MediaModel $mediaModel
      * @param EmbedManager $embedManager
      */
-    public function __construct(MediaModel $mediaModel, EmbedManager $embedManager, Gdn_Configuration $config) {
+    public function __construct(MediaModel $mediaModel, EmbedManager $embedManager, ImageResizer $imageResizer, Gdn_Configuration $config) {
         $this->mediaModel = $mediaModel;
         $this->embedManager = $embedManager;
+        $this->imageResizer = $imageResizer;
         $this->config =  $config;
     }
 
@@ -109,6 +113,22 @@ class MediaApiController extends AbstractApiController {
                     $media['ImageWidth'] = $imageSize[0];
                     $media['ImageHeight'] = $imageSize[1];
                 }
+        }
+
+        // image dimensions are higher than limit, it needs resizing
+        if ($this->config->get("ImageUpload.Limits.Enabled")) {
+            if ($media['ImageWidth'] > $this->config->get("ImageUpload.Limits.Width") ||
+                $media['ImageHeight'] > $this->config->get("ImageUpload.Limits.Height")
+            ) {
+                $this->imageResizer->resize(
+                    $file,
+                    null,
+                    [
+                        "height" => $this->config->get("ImageUpload.Limits.Height"),
+                        "width" => $this->config->get("ImageUpload.Limits.Width"), "crop" => false
+                    ]
+                );
+            }
         }
 
         $ext = pathinfo(strtolower($upload->getClientFilename()), PATHINFO_EXTENSION);

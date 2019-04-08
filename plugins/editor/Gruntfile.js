@@ -7,19 +7,12 @@ module.exports = function(grunt) {
     // Time how long tasks take. Can help when optimizing build times
     require('time-grunt')(grunt);
 
-    // Load Bower dependencies
-    var dependencies = require('wiredep')();
-
     grunt.initConfig({
 
         pkg: grunt.file.readJSON('package.json'),
 
         watch: {
-            bower: {
-                files: ['bower.json']
-                , tasks: ['wiredep']
-            }
-            , gruntfile: {
+            gruntfile: {
                 files: ['Gruntfile.js']
             }
             , sass: {
@@ -72,19 +65,12 @@ module.exports = function(grunt) {
                     dest: 'design/images'
                 }]
             }
-        },
-
-        wiredep: {
-            dist: {
-                src: ['scss/**/*.scss']
-            }
         }
 
     });
 
     grunt.registerTask('default', [
-        'wiredep'
-        , 'sass'
+        'sass'
         , 'autoprefixer'
         , 'imagemin'
     ]);

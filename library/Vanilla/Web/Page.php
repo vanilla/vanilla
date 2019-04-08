@@ -232,7 +232,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      *
      * @return string|null
      */
-    protected function getFavIcon() {
+    protected function getFavIcon(): ?string {
         return $this->favIcon;
     }
 

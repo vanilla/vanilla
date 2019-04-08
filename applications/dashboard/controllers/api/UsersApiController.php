@@ -29,7 +29,7 @@ class UsersApiController extends AbstractApiController {
 
     use PermissionsTranslationTrait;
 
-    const ME_ACTION_CONSTANT = "@@users/GET_ME_RESPONSE";
+    const ME_ACTION_CONSTANT = "@@users/GET_ME_DONE";
 
     /** @var ActivityModel */
     private $activityModel;

@@ -8,7 +8,7 @@ import React from "react";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
-import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
+import { IInjectableUserState, mapUsersStoreState } from "@library/features/users/userModel";
 import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWithCount";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import { t } from "@library/utility/appUtils";
@@ -92,5 +92,5 @@ export class UserDropdownContents extends React.Component<IUserDropDownContentsP
     }
 }
 
-const withRedux = connect(UsersModel.mapStateToProps);
+const withRedux = connect(mapUsersStoreState);
 export default withRedux(UserDropdownContents);

@@ -9,7 +9,7 @@ import LanguagesDropDown from "@library/layout/LanguagesDropDown";
 import CompactMeBox from "@library/headers/mebox/pieces/CompactMeBox";
 import VanillaHeaderNavItem from "@library/headers/mebox/pieces/VanillaHeaderNavItem";
 import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
-import UsersModel, { IInjectableUserState } from "@library/features/users/UsersModel";
+import { IInjectableUserState, mapUsersStoreState, isUserGuest } from "@library/features/users/userModel";
 import { dummyOtherLanguagesData } from "@library/redux/dummyOtherLanguages";
 import { vanillaHeaderClasses, vanillaHeaderHomeClasses } from "@library/headers/vanillaHeaderStyles";
 import { LogoType } from "@library/theming/ThemeLogo";
@@ -41,7 +41,7 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
     public render() {
         const currentUser = this.props.currentUser.data;
         const isMobile = this.props.device === Devices.MOBILE;
-        const isGuest = currentUser && UsersModel && currentUser.userID === UsersModel.GUEST_ID;
+        const isGuest = isUserGuest(currentUser);
         const headerClasses = vanillaHeaderClasses();
         const classes = vanillaHeaderHomeClasses();
 
@@ -100,5 +100,5 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
     }
 }
 
-const withRedux = connect(UsersModel.mapStateToProps);
+const withRedux = connect(mapUsersStoreState);
 export default withRedux(withDevice(VanillaMobileHomeHeader));

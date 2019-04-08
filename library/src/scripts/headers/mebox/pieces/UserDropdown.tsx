@@ -105,7 +105,6 @@ function UserDropDown(props: IProps) {
                             name={t("My Discussions")}
                             count={getCountByName("Discussions")}
                         />
-                        <DropDownItemLink to="/activity" name={t("Participated")} />
                     </DropDownSection>
                     <Permission permission={["community.moderate"]}>
                         <DropDownSection title={t("Moderation")}>

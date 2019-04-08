@@ -93,7 +93,7 @@ export const globalVariables = useThemeCache(() => {
     });
 
     const border = makeThemeVars("border", {
-        color: mixBgAndFg(0.24),
+        color: mixBgAndFg(0.15),
         width: 1,
         style: "solid",
         radius: 6,

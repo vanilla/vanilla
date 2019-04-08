@@ -621,6 +621,14 @@ export const buttonUtilityClasses = useThemeCache(() => {
 
     const buttonAsText = style("asText", asTextStyles, {
         color: "inherit",
+        $nest: {
+            "&:not(.focus-visible)": {
+                outline: 0,
+            },
+            "&:hover, &:focus": {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+        },
     });
 
     const buttonAsTextPrimary = style("asTextPrimary", asTextStyles, {

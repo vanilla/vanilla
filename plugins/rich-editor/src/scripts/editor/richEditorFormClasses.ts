@@ -53,8 +53,9 @@ export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false)
                 position: "relative",
                 fontWeight: globalVars.fonts.weights.semiBold,
                 border: 0,
+                borderBottom: `solid transparent 2px`,
                 borderRadius: 0,
-                marginBottom: unit(globalVars.spacer.size),
+                marginBottom: unit(6),
                 ...paddings({
                     left: 0,
                     right: 0,
@@ -62,6 +63,9 @@ export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false)
             },
             "&:not(.focus-visible)": {
                 outline: "none",
+            },
+            "&:focus": {
+                borderBottomColor: colorOut(globalVars.mainColors.primary),
             },
             ...placeholderStyles({
                 lineHeight: "inherit",

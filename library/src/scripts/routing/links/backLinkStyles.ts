@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { srOnly, userSelect } from "@library/styles/styleHelpers";
+import { colorOut, srOnly, userSelect } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { px } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
@@ -32,8 +32,9 @@ const backLinkClasses = useThemeCache(() => {
         minWidth: globalVars.icon.sizes.default,
         maxHeight: px(headerVars.sizing.height),
         $nest: {
-            "&:hover": {
-                color: globalVars.mainColors.primary.toString(),
+            "&:hover, &:focus": {
+                color: colorOut(globalVars.mainColors.primary),
+                outline: 0,
             },
         },
     });

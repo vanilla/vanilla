@@ -35,6 +35,7 @@ interface IModalCommonProps {
     size: ModalSizes;
     elementToFocusOnExit: HTMLElement; // Should either be a specific element or use document.activeElement
     isWholePage?: boolean;
+    allowScroll?: boolean;
 }
 
 interface IModalTextDescription extends IModalCommonProps, ITextDescription {}
@@ -88,6 +89,7 @@ export function mountModal(element: ReactElement<any>) {
 export default class Modal extends React.Component<IProps, IState> {
     public static defaultProps: Partial<IProps> = {
         isWholePage: false,
+        allowScroll: true,
     };
 
     public static focusHistory: HTMLElement[] = [];
@@ -112,7 +114,7 @@ export default class Modal extends React.Component<IProps, IState> {
      * Render the contents into a portal.
      */
     public render() {
-        const { size } = this.props;
+        const { size, allowScroll } = this.props;
         const classes = modalClasses();
         const portal = ReactDOM.createPortal(
             <div className={classes.overlay} onClick={this.handleScrimClick}>
@@ -130,6 +132,7 @@ export default class Modal extends React.Component<IProps, IState> {
                             isMedium: size === ModalSizes.MEDIUM,
                             isSmall: size === ModalSizes.SMALL,
                             isShadowed: size === ModalSizes.LARGE || ModalSizes.MEDIUM || ModalSizes.SMALL,
+                            hasNoScroll: allowScroll,
                         },
                         size === ModalSizes.FULL_SCREEN ? inheritHeightClass() : "",
                         this.props.className,

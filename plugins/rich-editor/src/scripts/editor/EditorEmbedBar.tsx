@@ -9,33 +9,35 @@ import classNames from "classnames";
 import { getMeta, t } from "@library/utility/appUtils";
 import Permission from "@library/features/users/Permission";
 import EditorUploadButton from "@rich-editor/editor/pieces/EditorUploadButton";
-import { richEditorFormClasses } from "@rich-editor/editor/richEditorFormClasses";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import EmojiFlyout from "@rich-editor/flyouts/EmojiFlyout";
 import EmbedFlyout from "@rich-editor/flyouts/EmbedFlyout";
 import ParagraphMenusBarToggle from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
+import { useEditor } from "@rich-editor/editor/context";
 
 interface IProps {
-    isMobile: boolean;
-    isLoading: boolean;
-    legacyMode: boolean;
-    barRef?: React.RefObject<HTMLDivElement>;
+    className?: string;
+    contentRef?: React.RefObject<HTMLDivElement>;
 }
 
-export default function EmbedBar(props: IProps) {
-    const { isMobile, isLoading, legacyMode } = props;
+export function EditorEmbedBar(props: IProps) {
+    const { isMobile, isLoading, legacyMode, quill } = useEditor();
+    if (!quill) {
+        return null;
+    }
     const mimeTypes = getMeta("upload.allowedExtensions");
-    const classesRichEditor = richEditorClasses(props.legacyMode);
-    const classesRichEditorForm = richEditorFormClasses(props.legacyMode);
+    const classesRichEditor = richEditorClasses(legacyMode);
 
     return (
-        <div className={classNames("richEditor-embedBar", classesRichEditor.embedBar)} ref={props.barRef}>
+        <div
+            ref={props.contentRef}
+            className={classNames("richEditor-embedBar", props.className, classesRichEditor.embedBar)}
+        >
             <ul
                 className={classNames(
                     "richEditor-menuItems",
                     "richEditor-inlineMenuItems",
                     classesRichEditor.menuItems,
-                    classesRichEditorForm.inlineMenuItems,
                 )}
                 role="menubar"
                 aria-label={t("Inline Level Formatting Menu")}
@@ -54,7 +56,7 @@ export default function EmbedBar(props: IProps) {
                         )}
                         role="menuitem"
                     >
-                        <EmojiFlyout disabled={isLoading} renderAbove={legacyMode} legacyMode={props.legacyMode} />
+                        <EmojiFlyout disabled={isLoading} renderAbove={legacyMode} legacyMode={legacyMode} />
                     </li>
                 )}
                 <Permission permission="uploads.add">

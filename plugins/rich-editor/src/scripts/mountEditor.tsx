@@ -4,10 +4,9 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
 import { ensureHtmlElement, mountReact } from "@library/dom/domUtils";
-import Editor from "@rich-editor/editor/Editor";
-import { hasPermission } from "@library/features/users/permissionUtils";
+import { ForumEditor } from "@rich-editor/editor/ForumEditor";
+import React from "react";
 
 /**
  * Mount the editor into a DOM Node.
@@ -25,18 +24,9 @@ export default function mountEditor(containerSelector: string | Element) {
     const initialFormat = bodybox.getAttribute("format") || "Rich";
 
     if (initialFormat === "Rich") {
-        mountReact(
-            <Editor
-                legacyTextArea={bodybox as HTMLInputElement}
-                isPrimaryEditor={true}
-                legacyMode={true}
-                allowUpload={hasPermission("uploads.add")}
-            />,
-            container,
-            () => {
-                container.classList.remove("isDisabled");
-            },
-        );
+        mountReact(<ForumEditor legacyTextArea={bodybox as HTMLInputElement} />, container, () => {
+            container.classList.remove("isDisabled");
+        });
     } else {
         throw new Error(`Unsupported initial editor format ${initialFormat}`);
     }

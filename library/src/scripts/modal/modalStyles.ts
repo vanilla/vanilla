@@ -5,10 +5,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, margins, unit, flexHelper } from "@library/styles/styleHelpers";
+import { borders, colorOut, margins, unit, flexHelper, sticky } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { percent, viewHeight, viewWidth } from "csx";
+import { important, percent, viewHeight, viewWidth } from "csx";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 
@@ -71,7 +71,7 @@ export const modalVariables = useThemeCache(() => {
 export const modalClasses = useThemeCache(() => {
     const vars = modalVariables();
     const globalVars = globalVariables();
-    const style = styleFactory("frame");
+    const style = styleFactory("modal");
     const mediaQueries = layoutVariables().mediaQueries();
     const shadows = shadowHelper();
     const headerVars = vanillaHeaderVariables();
@@ -99,12 +99,13 @@ export const modalClasses = useThemeCache(() => {
             "*": {
                 boxSizing: "border-box",
             },
-            "&.isFullScreen": {
-                overflow: "auto",
+            "&&.isFullScreen": {
+                overflow: "hidden",
                 width: percent(100),
                 height: viewHeight(100),
                 maxHeight: viewHeight(100),
                 borderRadius: 0,
+                border: "none",
             },
             "&.isLarge": {
                 width: unit(vars.sizing.large),
@@ -140,6 +141,9 @@ export const modalClasses = useThemeCache(() => {
                 ...shadows.dropDown(),
                 ...borders(),
             },
+            "&.hasNoScroll": {
+                overflow: important("hidden"),
+            },
         },
     });
 
@@ -159,15 +163,22 @@ export const modalClasses = useThemeCache(() => {
 
     const pageHeader = style(
         "pageHeader",
+        sticky(),
         {
             ...shadows.embed(),
-            position: "relative",
+            top: 0,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             height: unit(headerVars.sizing.height),
             minHeight: unit(headerVars.sizing.height),
-            zIndex: 1,
+            zIndex: 2,
+            background: colorOut(vars.colors.bg),
+            $nest: {
+                "&.noShadow": {
+                    boxShadow: "none",
+                },
+            },
         },
         mediaQueries.oneColumn({
             minHeight: unit(headerVars.sizing.mobile.height),

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useContext } from "react";
 import { Optionalize } from "@library/@types/utils";
 import throttle from "lodash/throttle";
 
@@ -21,6 +21,11 @@ export interface IDeviceProps {
 
 const DeviceContext = React.createContext<Devices>(Devices.DESKTOP);
 export default DeviceContext;
+
+export function useDevice() {
+    const device = useContext(DeviceContext);
+    return device;
+}
 
 interface IProps {
     children: React.ReactNode;

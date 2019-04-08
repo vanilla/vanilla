@@ -117,7 +117,7 @@ class MediaApiController extends AbstractApiController {
 
         // image dimensions are higher than limit, it needs resizing
         if ($this->config->get("ImageUpload.Limits.Enabled")) {
-            if ($media['ImageWidth'] > c("ImageUpload.Limits.Width") || $media['ImageHeight'] > c("ImageUpload.Limits.Height")) {
+            if ($media['ImageWidth'] > $this->config->get("ImageUpload.Limits.Width") || $media['ImageHeight'] > $this->config->get("ImageUpload.Limits.Height")) {
                 $this->imageResizer->resize($file, null, ["height" => $this->config->get("ImageUpload.Limits.Height"), "width" => $this->config->get("ImageUpload.Limits.Width"), "crop" => false]);
             }
         }

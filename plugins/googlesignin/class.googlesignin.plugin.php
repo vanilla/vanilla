@@ -73,8 +73,8 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
     /**
      * Create a controller to deal with plugin settings in dashboard.
      *
-     * @param Gdn_Controller $sender.
-     * @param Gdn_Controller $args.
+     * @param Gdn_Controller $sender
+     * @param Gdn_Controller $args
      */
     public function settingsEndpoint($sender, $args) {
         $sender->permission('Garden.Settings.Manage');

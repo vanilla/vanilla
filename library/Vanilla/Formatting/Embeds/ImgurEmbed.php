@@ -31,7 +31,7 @@ class ImgurEmbed extends Embed {
         // Strip image extensions. URLs with image extensions are not supported.
         $url = str_replace(['.jpg', '.jpeg', '.png'], '', $url);
         if ($this->isNetworkEnabled()) {
-              preg_match('/https?:\/\/(?:m.)?(i\.)?imgur\.com\/(?:(?<album>a|gallery)\/)?(?<postID>[a-z0-9]+)/i', $url, $matches);
+            preg_match('/https?:\/\/(?:m.)?(i\.)?imgur\.com\/(?:(?<album>a|gallery)\/)?(?<postID>[a-z0-9]+)/i', $url, $matches);
             if (array_key_exists('postID', $matches)) {
                 if (!array_key_exists('attributes', $data)) {
                     $data['attributes'] = [];

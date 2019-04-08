@@ -55,7 +55,6 @@ export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false)
                 border: 0,
                 borderBottom: `solid transparent 2px`,
                 borderRadius: 0,
-                marginBottom: unit(6),
                 ...paddings({
                     left: 0,
                     right: 0,

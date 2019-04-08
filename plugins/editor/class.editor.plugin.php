@@ -838,9 +838,9 @@ class EditorPlugin extends Gdn_Plugin {
                             $tmpFilePath,
                             null,
                             [
-                                "height"=>c("ImageUpload.Limits.Height"),
-                                "width"=>c("ImageUpload.Limits.Width"),
-                                "crop"=>false
+                                "height" => c("ImageUpload.Limits.Height"),
+                                "width" => c("ImageUpload.Limits.Width"),
+                                "crop" => false
                             ]
                         );
                     }

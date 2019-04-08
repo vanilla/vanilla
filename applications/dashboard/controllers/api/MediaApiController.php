@@ -44,7 +44,7 @@ class MediaApiController extends AbstractApiController {
     public function __construct(MediaModel $mediaModel, EmbedManager $embedManager, ImageResizer $imageResizer, Gdn_Configuration $config) {
         $this->mediaModel = $mediaModel;
         $this->embedManager = $embedManager;
-        $this->imageResizer =  $imageResizer;
+        $this->imageResizer = $imageResizer;
         $this->config =  $config;
     }
 

@@ -1,0 +1,13 @@
+openapi: 3.0.2
+info:
+paths:
+  /tick:
+    post:
+      summary: Register a page view for statistical and analytical purpose.
+      responses:
+        '201':
+          description: Success
+      tags:
+      - Statistics
+components:
+  schemas:

@@ -46,5 +46,11 @@ export const siteNavAdminLinksClasses = useThemeCache(() => {
         ...debug.name("link"),
     });
 
-    return { root, item, divider, link };
+    const linkIcon = style({
+        marginLeft: px(-6),
+        marginRight: px(6),
+        ...debug.name("linkIcon"),
+    });
+
+    return { root, item, divider, link, linkIcon };
 });

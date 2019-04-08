@@ -116,34 +116,21 @@ class Model implements InjectableInterface {
         $limit = $options["limit"] ?? false;
         $offset = $options["offset"] ?? 0;
         $selects =  $options["select"] ?? [];
-        $validation =  $options["validation"] ?? true;
 
         $sqlDriver = $this->sql();
 
         if (!empty($selects)) {
-            if (is_array($selects)) {
-                foreach ($selects as $select) {
-                    if (is_array($select)) {
-                        $sqlDriver->select($select[0], $select[1] ?? '', $select[2] ?? '');
-                    } else {
-                        $sqlDriver->select($select);
-                    }
-                }
-            } else {
-                $sqlDriver->select($selects);
-            }
+            $sqlDriver->select($selects);
         }
         $result = $sqlDriver->getWhere($this->table, $where, $orderFields, $orderDirection, $limit, $offset)
             ->resultArray();
 
-        if ($validation) {
-            if (empty($selects)) {
-                $schema = Schema::parse([":a" => $this->readSchema]);
-            } else {
-                $schema = Schema::parse([":a" =>  Schema::parse($selects)->add($this->readSchema)]);
-            }
-            $result = $schema->validate($result);
+        if (empty($selects)) {
+            $schema = Schema::parse([":a" => $this->readSchema]);
+        } else {
+            $schema = Schema::parse([":a" =>  Schema::parse($selects)->add($this->readSchema)]);
         }
+        $result = $schema->validate($result);
 
         return $result;
     }
@@ -177,6 +164,50 @@ class Model implements InjectableInterface {
             throw new NoResultsException("No rows matched the provided criteria.");
         }
         $result = reset($rows);
+        return $result;
+    }
+
+    /**
+     * Select aggregated data.
+     *
+     * @param array $selects List of columns to select.
+     *        Each element either just column name (string) or (array) structure of [column, function, alias]
+     * @param array $groupBy List of columns to apply aggregation.
+     * @param array $where Conditions for the select query.
+     * @param array $options Options for the select query.
+     *    - orderFields (string, array): Fields to sort the result by.
+     *    - orderDirection (string): Sort direction for the order fields.
+     *    - limit (int): Limit on the total results returned.
+     *    - offset (int): Row offset before capturing the result.
+     * @return array
+     * @throws ValidationException If a row fails to validate against the schema.
+     * @throws NoResultsException If no rows could be found.
+     */
+    public function selectAggregated(array $selects, array $groupBy = [], array $where = [], array $options = []): array {
+        $orderFields = $options["orderFields"] ?? "";
+        $orderDirection = $options["orderDirection"] ?? "asc";
+        $limit = $options["limit"] ?? false;
+        $offset = $options["offset"] ?? 0;
+
+        $sqlDriver = $this->sql();
+
+        if (is_array($selects)) {
+            foreach ($selects as $select) {
+                if (is_array($select)) {
+                    $sqlDriver->select($select[0], $select[1] ?? '', $select[2] ?? '');
+                } else {
+                    $sqlDriver->select($select);
+                }
+            }
+        } else {
+            $sqlDriver->select($selects);
+        }
+
+        $sqlDriver->groupBy($groupBy);
+
+        $result = $sqlDriver->getWhere($this->table, $where, $orderFields, $orderDirection, $limit, $offset)
+            ->resultArray();
+
         return $result;
     }
 

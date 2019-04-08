@@ -116,7 +116,7 @@ export default class NextPrevious extends React.Component<IProps> {
             fontSize: px(globalVars.fonts.size.medium),
             lineHeight: globalVars.lineHeights.condensed,
             fontWeight: globalVars.fonts.weights.semiBold,
-            color: globalVars.mainColors.fg,
+            color: colorOut(globalVars.mainColors.fg),
         });
 
         const chevron = style("chevron", {

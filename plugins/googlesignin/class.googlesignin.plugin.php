@@ -12,11 +12,11 @@
  */
 
 class GoogleSignInPlugin extends Gdn_OAuth2 {
-    CONST AUTHORIZEURL = 'https://accounts.google.com/o/oauth2/v2/auth';
-    CONST TOKENURL = 'https://oauth2.googleapis.com/token';
-    CONST PROFILEURL = 'https://openidconnect.googleapis.com/v1/userinfo';
-    CONST PROFILENAME = 'name';
-    CONST ACCEPTEDSCOPE = 'email openid profile';
+    const AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+    const TOKEN_URL = 'https://oauth2.googleapis.com/token';
+    const PROFILE_URL = 'https://openidconnect.googleapis.com/v1/userinfo';
+    const PROFILE_NAME = 'name';
+    const ACCEPTED_SCOPE = 'email openid profile';
     /**
      * Set the key for saving OAuth settings in GDN_UserAuthenticationProvider
      */
@@ -35,17 +35,15 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
             $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($this->providerKey);
 
             // These URLs are added here instead of being stored in the DB in case they ever change, we will not have to update the DB.
-            $this->provider['AuthorizeUrl'] = self::AUTHORIZEURL;
-            $this->provider['TokenUrl'] = self::TOKENURL;
-            $this->provider['ProfileUrl'] = self::PROFILEURL;
+            $this->provider['AuthorizeUrl'] = self::AUTHORIZE_URL;
+            $this->provider['TokenUrl'] = self::TOKEN_URL;
+            $this->provider['ProfileUrl'] = self::PROFILE_URL;
 
             // Scope
-            $this->provider['AcceptedScope'] = self::ACCEPTEDSCOPE;
+            $this->provider['AcceptedScope'] = self::ACCEPTED_SCOPE;
 
             // Translate claims coming back from Google.
-            $this->provider['ProfileKeyName'] = self::PROFILENAME;
-            $this->provider['AcceptedScope'] = 'email openid profile';
-
+            $this->provider['ProfileKeyName'] = self::PROFILE_NAME;
             $this->provider['ProfileKeyUniqueID'] = 'sub';
             $this->provider['ProfileKeyFullName'] = null;
 
@@ -54,6 +52,22 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
         }
 
         return $this->provider;
+    }
+
+    /**
+     * Extract base url from url
+     *
+     * @param string $url
+     * @return boolean|string
+     */
+    public function getBaseUrl(string $url) {
+        $baseUrlParts = parse_url($url);
+        if (($baseUrlParts['scheme'] ?? false) && ($baseUrlParts['host'] ?? false)) {
+            $baseUrl = $baseUrlParts['scheme'].'://'.$baseUrlParts['host'];
+        } else {
+            $baseUrl = false;
+        }
+        return $baseUrl;
     }
 
     /**
@@ -78,12 +92,12 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
 
             $form->setFormValue('AuthenticationKey', $this->getProviderKey());
 
-            $sender->Form->validateRule('AssociationKey', 'ValidateRequired', 'You must provide a unique AccountID.');
-            $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');
+            $sender->Form->validateRule('AssociationKey', 'ValidateRequired', t('You must provide a unique AccountID.'));
+            $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', t('You must provide a Secret'));
 
             // To satisfy the AuthenticationProviderModel, create a BaseUrl.
-            $baseUrlParts = parse_url($form->getValue('AuthorizeUrl'));
-            $baseUrl = (val('scheme', $baseUrlParts) && val('host', $baseUrlParts)) ? val('scheme', $baseUrlParts).'://'.val('host', $baseUrlParts) : null;
+            $baseUrl = $this->getBaseUrl($form->getValue('AuthorizeUrl'));
+
             if ($baseUrl) {
                 $form->setFormValue('BaseUrl', $baseUrl);
                 $form->setFormValue('SignInUrl', $baseUrl); // kludge for default provider
@@ -95,11 +109,11 @@ class GoogleSignInPlugin extends Gdn_OAuth2 {
 
         // Set up the form.
         $formFields = [
-            'AssociationKey' =>  ['LabelCode' => 'Client ID', 'Description' => 'Unique ID of the authentication application.'],
-            'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Secret provided by the authentication provider.'],
+            'AssociationKey' =>  ['LabelCode' => 'Client ID', 'Description' => t('Unique ID of the authentication application.')],
+            'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => t('Secret provided by the authentication provider.')],
         ];
 
-        $formFields['IsDefault'] = ['LabelCode' => 'Make this connection your default signin method.', 'Control' => 'checkbox'];
+        $formFields['IsDefault'] = ['LabelCode' => t('Make this connection your default signin method.'), 'Control' => 'checkbox'];
 
         $sender->setData([
             'formData' => $formFields,

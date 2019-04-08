@@ -17,8 +17,9 @@ import CloseButton from "@library/navigation/CloseButton";
 import FlyoutToggle from "@library/flyouts/FlyoutToggle";
 import classNames from "classnames";
 import { dropDownMenu } from "@library/icons/common";
+import { IDeviceProps, withDevice, Devices } from "@library/layout/DeviceContext";
 
-export interface IProps {
+export interface IProps extends IDeviceProps {
     id?: string;
     name?: string;
     children: React.ReactNode;
@@ -46,11 +47,8 @@ export interface IState {
 /**
  * Creates a drop down menu
  */
-export default class DropDown extends React.Component<IProps, IState> {
+class DropDown extends React.Component<IProps, IState> {
     private id;
-    public static defaultProps = {
-        openAsModal: false,
-    };
     public constructor(props) {
         super(props);
         this.id = getRequiredID(props, "dropDown");
@@ -74,6 +72,8 @@ export default class DropDown extends React.Component<IProps, IState> {
         const classesDropDown = dropDownClasses();
         const classesFrameHeader = frameHeaderClasses();
         const classes = dropDownClasses();
+
+        const openAsModal = this.props.openAsModal || this.props.device === Devices.MOBILE;
         return (
             <FlyoutToggle
                 id={this.id}
@@ -87,7 +87,7 @@ export default class DropDown extends React.Component<IProps, IState> {
                 setExternalButtonRef={this.props.setExternalButtonRef}
                 toggleButtonClassName={this.props.toggleButtonClassName}
                 onVisibilityChange={this.props.onVisibilityChange}
-                openAsModal={!!this.props.openAsModal}
+                openAsModal={openAsModal}
             >
                 {params => {
                     return (
@@ -102,7 +102,7 @@ export default class DropDown extends React.Component<IProps, IState> {
                             onClick={this.doNothing}
                             renderLeft={!!this.props.renderLeft}
                             renderAbove={!!this.props.renderAbove}
-                            openAsModal={this.props.openAsModal}
+                            openAsModal={openAsModal}
                         >
                             {title ? (
                                 <header className={classNames("frameHeader", classesFrameHeader.root)}>
@@ -146,3 +146,5 @@ export default class DropDown extends React.Component<IProps, IState> {
         e.stopPropagation();
     };
 }
+
+export default withDevice(DropDown);

@@ -14,6 +14,8 @@ export const shadowHelper = useThemeCache(() => {
     const globalVars = globalVariables();
     const shadowBaseColor = globalVars.elementaryColors.grey;
 
+    const makeShadow = (opacity: number = 0.3) => `0 1px 3px 0 ${shadowBaseColor.fade(opacity)}`;
+
     const embed = (baseColor: ColorHelper = shadowBaseColor) => {
         return {
             boxShadow: `0 1px 3px 0 ${baseColor.fade(0.3)}`,
@@ -59,7 +61,7 @@ export const shadowHelper = useThemeCache(() => {
         };
     };
 
-    return { embed, embedHover, dropDown, modal, contrast };
+    return { embed, embedHover, dropDown, modal, contrast, makeShadow };
 });
 
 export const shadowOrBorderBasedOnLightness = (

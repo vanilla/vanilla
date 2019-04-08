@@ -12,6 +12,7 @@ import {
     srOnly,
     unit,
     userSelect,
+    sticky,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
@@ -151,7 +152,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
 
     const menuItems = style("menuItems", {
         "-ms-overflow-style": "-ms-autohiding-scrollbar",
-        position: "relative",
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
@@ -282,6 +282,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         display: "block",
         width: percent(100),
         padding: unit(vars.embedMenu.padding),
+        background: legacyMode ? undefined : colorOut(vars.colors.bg),
     });
 
     const icon = style("icon", {
@@ -290,6 +291,21 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         height: unit(globalVars.icon.sizes.default),
         width: unit(globalVars.icon.sizes.default),
         opacity: globalVars.states.icon.opacity,
+    });
+
+    const legacyFrame = style("legacyFrame", {
+        margin: "auto",
+        height: "initial",
+        minHeight: unit(vars.sizing.minHeight + vars.menuButton.size),
+        position: "relative",
+        backgroundColor: colorOut(vars.colors.bg),
+        padding: 0,
+        $nest: {
+            "&.isMenuInset": {
+                overflow: "initial",
+                position: "relative",
+            },
+        },
     });
 
     const close = style("close", {
@@ -356,6 +372,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         paragraphMenuMobile,
         separator,
         position,
+        legacyFrame,
         paragraphMenuPanel,
     };
 });

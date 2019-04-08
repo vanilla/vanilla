@@ -59,6 +59,7 @@ export class ToolbarContainer extends React.PureComponent<IProps, IState> {
                     let toolbarStyles: React.CSSProperties = {
                         visibility: "hidden",
                         position: "absolute",
+                        top: 0,
                     };
                     let nubStyles = {};
                     let classes = classNames(

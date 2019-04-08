@@ -37,9 +37,6 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     private $favIcon;
 
     /** @var string */
-    private $mobileAddressBarColor;
-
-    /** @var string */
     private $seoTitle;
 
     /** @var string */

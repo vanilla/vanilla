@@ -9,6 +9,11 @@ $Configuration['EnabledPlugins']['swagger-ui'] = true;
 $Configuration['EnabledApplications']['Dashboard'] = 'dashboard';
 $Configuration['EnabledPlugins']['rich-editor'] = true;
 
+// ImageUpload
+$Configuration['ImageUpload']['Limits']['Enabled'] = false;
+$Configuration['ImageUpload']['Limits']['Width'] = '1000';
+$Configuration['ImageUpload']['Limits']['Height'] = '1400';
+
 // Database defaults.
 $Configuration['Database']['Engine'] = 'MySQL';
 $Configuration['Database']['Host'] = 'dbhost';
@@ -32,6 +37,10 @@ $Configuration['Cache']['Filecache']['Store']  = PATH_CACHE.'/Filecache';
 $Configuration['Garden']['ContentType'] = 'text/html';
 $Configuration['Garden']['Locale'] = 'en';
 $Configuration['Garden']['LocaleCodeset'] = 'UTF8';
+
+$Configuration['HotReload']['IP'] = '127.0.0.1';
+
+$Configuration['ContentSecurityPolicy']['ScriptSrc']['AllowedDomains'] = ['https://ajax.googleapis.com/'];
 
 // Site specifics.
 $Configuration['Garden']['Installed'] = false; // Has Garden been installed yet? This blocks setup when true.

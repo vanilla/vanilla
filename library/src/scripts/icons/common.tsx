@@ -164,18 +164,13 @@ export function newFolder(className?: string, title: string = t("New Folder")) {
         <svg
             xmlns="http://www.w3.org/2000/svg"
             className={classNames("icon", "icon-dropDownMenu", className)}
-            viewBox="0 0 24 24"
+            viewBox="0 0 22 19"
             aria-hidden="true"
         >
             <title>{title}</title>
-            <path
-                d="M12.25,11.438a.5.5,0,0,0-1,0v2.75H8.5a.5.5,0,0,0,0,1h2.75v2.75a.5.5,0,0,0,1,0v-2.75H15a.5.5,0,0,0,0-1H12.25Z"
-                fill="currentColor"
-            />
-            <path
-                d="M21,7.823H13.825L12.457,4.735a.5.5,0,0,0-.457-.3H3a.5.5,0,0,0-.5.5v16a.5.5,0,0,0,.5.5H21a.5.5,0,0,0,.5-.5V8.323A.5.5,0,0,0,21,7.823Zm-.5,12.615H3.5v-15h8.175l1.368,3.087a.5.5,0,0,0,.457.3h7Z"
-                fill="currentColor"
-            />
+            <path d="M1,15.066V3.77Q1,1,3.548,1H9.12L11.3,3.769h7.286q2.372-.083,2.372,2.6v8.7q0,3.205-2.372,3.206H3.548Q1,18.272,1,15.066Z" style={{fill: "none", stroke: "currentColor", strokeWidth: "1.2px"}}/>
+            <path d="M10.5,8v6m3-3h-6" style={{fill: "none", stroke: "currentColor", strokeLinecap: "round", strokeWidth: "1.2px"}}/>
+
         </svg>
     );
 }

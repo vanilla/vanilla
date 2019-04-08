@@ -491,6 +491,10 @@ export interface IPaddings {
 export const paddings = (styles: IPaddings) => {
     const paddingVals = {} as NestedCSSProperties;
 
+    if (!styles) {
+        return paddingVals;
+    }
+
     if (styles.all !== undefined) {
         paddingVals.paddingTop = unit(styles.all);
         paddingVals.paddingRight = unit(styles.all);

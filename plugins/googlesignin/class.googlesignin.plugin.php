@@ -4,7 +4,6 @@
  * @license Proprietary
  */
 
-
 /**
  * Class GoogleSignInPlugin
  *

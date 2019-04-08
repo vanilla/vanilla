@@ -9,6 +9,11 @@ $Configuration['EnabledPlugins']['swagger-ui'] = true;
 $Configuration['EnabledApplications']['Dashboard'] = 'dashboard';
 $Configuration['EnabledPlugins']['rich-editor'] = true;
 
+// ImageUpload
+$Configuration['ImageUpload']['Limits']['Enabled'] = false;
+$Configuration['ImageUpload']['Limits']['Width'] = '1000';
+$Configuration['ImageUpload']['Limits']['Height'] = '1400';
+
 // Database defaults.
 $Configuration['Database']['Engine'] = 'MySQL';
 $Configuration['Database']['Host'] = 'dbhost';

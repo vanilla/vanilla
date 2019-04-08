@@ -10993,4 +10993,18 @@ img.jcrop-preview {
   z-index: 1;
   content: '';
 }
+
+.ImageUploadLimitsDimensions {
+  opacity: 1;
+  -webkit-transition: all 0.3s ease;
+          transition: all 0.3s ease;
+}
+
+.dimensionsDisabled {
+  opacity: 0;
+  height: 0;
+  pointer-events: none;
+  overflow: hidden;
+  padding: 0 !important;
+}
 /*# sourceMappingURL=admin.css.map */

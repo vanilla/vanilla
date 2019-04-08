@@ -2003,6 +2003,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 .userContent .embedLoader-errorMessage {
   max-width: -webkit-calc(100% - 72px);
   max-width: calc(100% - 72px);
+  width: 100%;
   padding-left: 24px;
 }
 

@@ -11,7 +11,7 @@
             <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
         {% endfor %}
 
-        {% if favIcon %}
+        {% if favIcon -%}
             <link rel="shortcut icon" href="{{ favIcon }}" type="image/x-icon" />
         {% endif %}
 

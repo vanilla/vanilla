@@ -19,13 +19,12 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { IMeBoxProps } from "@library/headers/mebox/MeBox";
 import Tabs from "@library/navigation/tabs/Tabs";
 import { IInjectableUserState } from "@library/features/users/userModel";
-import UserDropdownContents from "@library/headers/mebox/pieces/UserDropdownContents";
-import { IMe } from "@library/@types/api/users";
+import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
 import classNames from "classnames";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 
-export interface IUserDropDownProps extends IInjectableUserState, IMeBoxProps {
+interface IProps extends IInjectableUserState, IMeBoxProps {
     buttonClass?: string;
     userPhotoClass?: string;
 }
@@ -37,7 +36,7 @@ interface IState {
 /**
  * Implements User Drop down for header
  */
-export default class CompactMeBox extends React.Component<IUserDropDownProps, IState> {
+export default class CompactMeBox extends React.Component<IProps, IState> {
     private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
 
     public state = {
@@ -129,12 +128,7 @@ export default class CompactMeBox extends React.Component<IUserDropDownProps, IS
                                                 />
                                             </div>
                                         ),
-                                        panelContent: (
-                                            <UserDropdownContents
-                                                className={panelContentClass}
-                                                panelBodyClass={panelBodyClass}
-                                            />
-                                        ),
+                                        panelContent: <UserDropDownContents className={panelContentClass} />,
                                     },
                                     {
                                         buttonContent: (

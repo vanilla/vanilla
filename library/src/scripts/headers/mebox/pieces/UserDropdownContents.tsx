@@ -4,93 +4,117 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
-import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
-import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
-import { IInjectableUserState, mapUsersStoreState } from "@library/features/users/userModel";
-import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWithCount";
-import DropDownSection from "@library/flyouts/items/DropDownSection";
-import { t } from "@library/utility/appUtils";
-import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import apiv2 from "@library/apiv2";
 import Permission from "@library/features/users/Permission";
-import { dummyUserDropDownData } from "@library/headers/mebox/state/dummyUserDropDownData";
-import classNames from "classnames";
+import UserActions from "@library/features/users/UserActions";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
+import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWithCount";
+import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
+import DropDownSection from "@library/flyouts/items/DropDownSection";
+import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
+import { frameBodyClasses } from "@library/layout/frame/frameStyles";
+import { ICoreStoreState } from "@library/redux/reducerRegistry";
+import { t } from "@library/utility/appUtils";
+import classNames from "classnames";
+import React from "react";
 import { connect } from "react-redux";
-
-export interface IUserDropDownContentsProps extends IInjectableUserState {
-    countsClass?: string;
-    panelBodyClass?: string;
-    className?: string;
-}
 
 /**
  * Implements User Drop down for header
  */
-export class UserDropdownContents extends React.Component<IUserDropDownContentsProps> {
-    public render() {
-        const counts = dummyUserDropDownData;
-        const classesDropDown = dropDownClasses();
-        return (
-            <Frame className={this.props.className}>
-                <FrameBody
-                    className={classNames(
-                        "dropDownItem-verticalPadding",
-                        classesDropDown.verticalPadding,
-                        this.props.panelBodyClass,
-                    )}
-                >
-                    <DropDownUserCard className="userDropDown-userCard" />
-                    <DropDownItemSeparator />
-                    <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
-                    <DropDownSection title={t("Discussions")}>
-                        <DropDownItemLinkWithCount
-                            to={`${window.location.origin}/discussions/bookmarked`}
-                            name={t("Bookmarks")}
-                            count={counts.bookmarkCount}
-                        />
-                        <DropDownItemLinkWithCount to="/drafts" name={t("Drafts")} count={counts.draftsCount} />
-                        <DropDownItemLink to="/discussions/mine" name={t("My Discussions")} />
-                        <DropDownItemLink to="/activity" name={t("Participated")} />
-                    </DropDownSection>
-                    <Permission permission={["community.moderate"]}>
-                        <DropDownSection title={t("Moderation")}>
-                            <DropDownItemLinkWithCount
-                                to={`${window.location.origin}/dashboard/user/applicants`}
-                                name={t("Applicants")}
-                                count={counts.applicantsCount}
-                                countsClass={this.props.countsClass}
-                            />
-                            <DropDownItemLinkWithCount
-                                to={`${window.location.origin}/dashboard/log/spam`}
-                                name={t("Spam Queue")}
-                                count={counts.spamQueueCount}
-                                countsClass={this.props.countsClass}
-                            />
-                            <DropDownItemLinkWithCount
-                                to={`${window.location.origin}/dashboard/log/moderation`}
-                                name={t("Moderation Queue")}
-                                count={counts.moderationQueueCount}
-                                countsClass={this.props.countsClass}
-                            />
-                            <DropDownItemLinkWithCount
-                                to={`${window.location.origin}/badge/requests`}
-                                name={t("Badge Requests")}
-                                count={counts.badgeRequestCount}
-                                countsClass={this.props.countsClass}
-                            />
-                        </DropDownSection>
-                    </Permission>
-                    <DropDownItemSeparator />
-                    <DropDownItemLink to={`${window.location.origin}/dashboard/settings`} name={t("Dashboard")} />
-                    <DropDownItemLink to={`${window.location.origin}/entry/signout`} name={t("Sign Out")} />
-                </FrameBody>
-            </Frame>
-        );
+function UserDropDownContents(props: IProps) {
+    const { userInfo } = props;
+    if (!userInfo) {
+        return null;
     }
+
+    const getCountByName = (countName: string): number => {
+        const found = props.counts.find(count => count.name === countName);
+        return found ? found.count : 0;
+    };
+
+    const classesDropDown = dropDownClasses();
+    const classesFrameBody = frameBodyClasses();
+
+    return (
+        <Frame className={props.className}>
+            <FrameBody className={classNames(classesFrameBody.root, classesDropDown.verticalPadding)}>
+                <DropDownUserCard className="userDropDown-userCard" />
+                <DropDownItemSeparator />
+                <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
+                <DropDownSection title={t("Discussions")}>
+                    <DropDownItemLinkWithCount
+                        to={"/discussions/bookmarked"}
+                        name={t("Bookmarks")}
+                        count={getCountByName("Bookmarks")}
+                    />
+                    <Permission permission="articles.add">
+                        <DropDownItemLinkWithCount
+                            to="/kb/drafts"
+                            name={t("Drafts")}
+                            count={getCountByName("Drafts")}
+                        />
+                    </Permission>
+                    <DropDownItemLinkWithCount
+                        to="/discussions/mine"
+                        name={t("My Discussions")}
+                        count={getCountByName("Discussions")}
+                    />
+                </DropDownSection>
+                <Permission permission={["community.moderate"]}>
+                    <DropDownSection title={t("Moderation")}>
+                        <DropDownItemLinkWithCount
+                            to={"/dashboard/user/applicants"}
+                            name={t("Applicants")}
+                            count={getCountByName("Applications")}
+                        />
+                        <DropDownItemLinkWithCount
+                            to={"/dashboard/log/spam"}
+                            name={t("Spam Queue")}
+                            count={getCountByName("SpamQueue")}
+                        />
+                        <DropDownItemLinkWithCount
+                            to={"/dashboard/log/moderation"}
+                            name={t("Moderation Queue")}
+                            count={getCountByName("ModerationQueue")}
+                        />
+                    </DropDownSection>
+                </Permission>
+                <DropDownItemSeparator />
+                <Permission permission={["site.manage", "settings.view"]}>
+                    <DropDownItemLink to={"/dashboard/settings"} name={t("Dashboard")} />
+                </Permission>
+                <DropDownItemLink to={`/entry/signout?target=${window.location.href}`} name={t("Sign Out")} />
+            </FrameBody>
+        </Frame>
+    );
 }
 
-const withRedux = connect(mapUsersStoreState);
-export default withRedux(UserDropdownContents);
+interface IOwnProps {
+    className?: string;
+}
+
+type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
+
+function mapStateToProps(state: ICoreStoreState, ownProps: IOwnProps) {
+    return {
+        userInfo: state.users.current.data ? state.users.current.data : null,
+        counts: state.users.countInformation.counts,
+    };
+}
+
+function mapDispatchToProps(dispatch: any) {
+    const userActions = new UserActions(dispatch, apiv2);
+    const { checkCountData } = userActions;
+    return {
+        checkCountData,
+    };
+}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+)(UserDropDownContents);

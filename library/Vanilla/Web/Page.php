@@ -21,7 +21,6 @@ use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\JsInterpop\PhpAsJsVariable;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\JsInterpop\ReduxErrorAction;
-use Vanilla\Contracts\ConfigurationInterface;
 
 /**
  * Class representing a single page in the application.
@@ -114,7 +113,6 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
      * @param WebpackAssetProvider $assetProvider
      * @param BreadcrumbModel $breadcrumbModel
      * @param ContentSecurityPolicyModel $cspModel
-     * @param ConfigurationInterface $config
      */
     public function setDependencies(
         SiteMeta $siteMeta,
@@ -122,8 +120,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         \Gdn_Session $session,
         WebpackAssetProvider $assetProvider,
         BreadcrumbModel $breadcrumbModel,
-        ContentSecurityPolicyModel $cspModel,
-        ConfigurationInterface $config
+        ContentSecurityPolicyModel $cspModel
     ) {
         $this->siteMeta = $siteMeta;
         $this->request = $request;
@@ -131,14 +128,13 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->assetProvider = $assetProvider;
         $this->breadcrumbModel = $breadcrumbModel;
         $this->cspModel = $cspModel;
-        $this->config = $config;
 
-        if ($favIcon = $this->config->get("Garden.FavIcon")) {
-            $this->setFavIcon(Gdn_Upload::url($favIcon));
+        if ($favIcon = $this->siteMeta->getFavIcon()) {
+            $this->setFavIcon($favIcon);
         }
 
-        if ($mobileAddressBarColor = $this->config->get("Garden.MobileAddressBarColor")) {
-            $this->addMetaTag("theme-color", ["content" => $mobileAddressBarColor, "name" => "theme-color"]);
+        if ($mobileAddressBarColor = $this->siteMeta->getMobileAddressBarColor()) {
+            $this->addMetaTag("theme-color", ["name" => "theme-color", "content" => $mobileAddressBarColor]);
         }
     }
 

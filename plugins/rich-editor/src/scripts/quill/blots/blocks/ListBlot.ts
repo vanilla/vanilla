@@ -177,16 +177,6 @@ export class ListItemWrapper extends withWrapper(Container as any) {
 
     /**
      * @override
-     * To sync the element values into the items domNode.
-     */
-    public static create(value: IListObjectValue) {
-        const element = super.create(value) as HTMLElement;
-        syncValueToElement(element, value);
-        return element;
-    }
-
-    /**
-     * @override
      */
     public split(index: number, force?: boolean) {
         if ((!force && index === this.length() - 1) || index === 0) {
@@ -393,7 +383,15 @@ export class ListItemWrapper extends withWrapper(Container as any) {
      * Utility for getting the value from the blot's domNode.
      */
     public getValue(): IListObjectValue {
-        return getValueFromElement(this.domNode);
+        const content = this.getListContent();
+        if (content) {
+            return content.getValue();
+        } else {
+            return {
+                type: ListType.BULLETED,
+                depth: 0,
+            };
+        }
     }
 
     /**
@@ -408,6 +406,44 @@ export class ListItemWrapper extends withWrapper(Container as any) {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Lower the indentation level of the blot and all of it's children.
+     */
+    public flattenSelfAndSiblings(targetGroup = this.parent, ref?: any) {
+        const content = this.getListContent();
+        const sibling = this.next;
+        if (content && content.getValue().depth > 0) {
+            content.updateIndentValue(0);
+            this.insertInto(targetGroup, ref);
+        }
+        const group = this.getListGroup();
+        if (group) {
+            group.children.forEach(child => {
+                if (child instanceof ListItemWrapper) {
+                    child.flattenSelfAndSiblings(targetGroup, ref);
+                }
+            });
+            group.remove();
+        }
+
+        if (sibling instanceof ListItemWrapper) {
+            sibling.flattenSelfAndSiblings(targetGroup, ref);
+        }
+        // if (group && group.children.head instanceof ListItemWrapper) {
+        //     group.children.head.flattenSelfAndSiblings(targetGroup, ref);
+        //     group.children.head.insertInto(targetGroup, ref);
+        //     group.remove();
+        // }
+
+        // let next = this.next;
+        // while (next instanceof ListItemWrapper) {
+        //     const upcoming = next.next;
+        //     next.flattenSelfAndSiblings(targetGroup, ref);
+        //     next.insertInto(targetGroup, ref);
+        //     next = upcoming;
+        // }
     }
 
     /**
@@ -548,7 +584,8 @@ export class ListItem extends LineBlot {
     public updateIndentValue(newDepth: number) {
         newDepth = Math.min(MAX_NESTING_DEPTH, newDepth);
         this.domNode.setAttribute("data-depth", newDepth);
-        this.parent.domNode.setAttribute("data-depth", newDepth);
+        const updateID = Math.random() * 10000;
+        this.parent.domNode.setAttribute("data-update-id", updateID.toString(16));
         this.cache = {};
     }
 
@@ -580,6 +617,30 @@ export class ListItem extends LineBlot {
      */
     public canOutdent(): boolean {
         return this.getValue().depth > 0 || this.domNode.textContent === "";
+    }
+
+    /**
+     * @override
+     * Extended to keep our type value in sync with the parent we're closest too.
+     */
+    public attach() {
+        super.attach();
+        // Sync up our list type.
+        const listNode = this.domNode.closest("ul, ol");
+        if (!listNode) {
+            return;
+        }
+        const currentType = this.getValue().type;
+        let newType = currentType;
+        if (listNode.tagName === ListTag.OL) {
+            newType = ListType.ORDERED;
+        } else if (listNode.tagName === ListTag.UL) {
+            newType = ListType.BULLETED;
+        }
+
+        if (newType !== currentType) {
+            this.domNode.setAttribute("data-type", newType);
+        }
     }
 
     /**
@@ -636,15 +697,25 @@ export class ListItem extends LineBlot {
     /**
      * FIX THIS AND DO IT PROPERLY.
      */
-    private ensureDepth0 = () => {
-        const ownValue = this.getValue();
-        if (ownValue.depth > 0) {
-            // Force an update to our nesting.
-            this.updateIndentValue(0);
-            const quill = this.quill;
-            if (quill) {
-                quill.update(Quill.sources.SILENT);
+    private flattenSelfAndSiblings = () => {
+        if (this.parent instanceof ListItemWrapper) {
+            let parent: any = this.parent;
+            let topListWrapper: ListItemWrapper | undefined;
+            let topListGroup: ListGroup | undefined;
+            while (parent !== this.scroll) {
+                if (parent instanceof ListGroup) {
+                    topListGroup = parent;
+                }
+
+                if (parent instanceof ListItemWrapper) {
+                    topListWrapper = parent;
+                }
+                parent = parent.parent;
             }
+            const ref = topListWrapper ? topListWrapper.next : undefined;
+            this.parent.flattenSelfAndSiblings(topListGroup, ref);
+
+            // this.quill && this.quill.update(Quill.sources.API);
         }
     };
 
@@ -663,8 +734,11 @@ export class ListItem extends LineBlot {
         this.children.forEach(blot => {
             newBlock.appendChild(blot.clone());
         });
-        this.ensureDepth0();
-        const parentWrapper = this.parent as ListItemWrapper;
+        let parentWrapper = this.parent as ListItemWrapper;
+
+        this.flattenSelfAndSiblings();
+
+        parentWrapper = this.parent as ListItemWrapper;
         const parentGroup = parentWrapper.parent as ListGroup;
 
         if (parentWrapper.prev === null) {

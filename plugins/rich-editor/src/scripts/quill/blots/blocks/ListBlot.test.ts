@@ -20,6 +20,7 @@ import Delta from "quill-delta";
 import Quill from "quill/core";
 import { setupTestQuill } from "@rich-editor/__tests__/quillUtils";
 import OpUtils from "@rich-editor/__tests__/OpUtils";
+import Parchment from "parchment";
 
 describe("ListBlot", () => {
     before(() => {
@@ -362,8 +363,55 @@ describe("ListBlot", () => {
         });
     });
 
+    describe("replacement", () => {
+        it("can have it's format replaced", () => {
+            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1");
+            insertListBlot({ type: ListType.BULLETED, depth: 1 }, "1.1");
+            insertListBlot({ type: ListType.BULLETED, depth: 1 }, "1.2");
+
+            quill.formatLine(0, 1, ListItem.blotName, false, Quill.sources.USER);
+            expect(quill.getContents().ops).deep.eq([
+                OpUtils.op("1\n1.1"),
+                OpUtils.list(ListType.BULLETED),
+                OpUtils.op("1.2"),
+                OpUtils.list(ListType.BULLETED),
+            ]);
+        });
+
+        it.only("propert outdents nested children when it's format is replaced", () => {
+            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1");
+            insertListBlot({ type: ListType.BULLETED, depth: 1 }, "1.1");
+            insertListBlot({ type: ListType.BULLETED, depth: 1 }, "1.2");
+            insertListBlot({ type: ListType.BULLETED, depth: 2 }, "1.2.1");
+            insertListBlot({ type: ListType.BULLETED, depth: 2 }, "1.2.2");
+            insertListBlot({ type: ListType.BULLETED, depth: 1 }, "1.3");
+
+            // The inner items should be
+            // - 1
+            //  - 1.1
+            //  - 1.2
+            //    - 1.2.1
+            //    - 1.2.2
+            //  - 1.3
+
+            quill.formatLine(6, 8, ListItem.blotName, false, Quill.sources.USER);
+            expect(quill.getContents().ops).deep.eq([
+                OpUtils.op("1"),
+                OpUtils.list(ListType.BULLETED),
+                OpUtils.op("1.1"),
+                OpUtils.list(ListType.BULLETED, 1),
+                OpUtils.op("1.2\n1.2.1"),
+                OpUtils.list(ListType.BULLETED, 1),
+                OpUtils.op("1.2.2"),
+                OpUtils.list(ListType.BULLETED, 1),
+                OpUtils.op("1.3"),
+                OpUtils.list(ListType.BULLETED, 1),
+            ]);
+        });
+    });
+
     describe("insertion", () => {
-        it.only("can insert newlines", () => {
+        it("can insert newlines", () => {
             insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1");
             quill.updateContents([{ retain: 1 }, OpUtils.op("test\ntest")]);
         });

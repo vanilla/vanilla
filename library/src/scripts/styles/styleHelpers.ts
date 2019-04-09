@@ -6,6 +6,7 @@
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory } from "@library/styles/styleUtils";
+import { log } from "@library/utility/utils";
 import {
     AlignItemsProperty,
     AppearanceProperty,
@@ -16,7 +17,6 @@ import {
     BackgroundSizeProperty,
     BorderRadiusProperty,
     BorderStyleProperty,
-    BorderTopLeftRadiusProperty,
     BorderWidthProperty,
     BottomProperty,
     ContentProperty,
@@ -345,14 +345,16 @@ export const borderRadii = (props: IBorderRadii) => {
     };
 };
 
-export const borders = (props: IBorderStyles = {}) => {
+export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
     const vars = globalVariables();
-    return {
-        borderColor: props.color ? colorOut(props.color as any) : colorOut(vars.border.color),
-        borderWidth: props.width ? unit(props.width) : unit(vars.border.width),
-        borderStyle: props.style ? props.style : vars.border.style,
-        borderRadius: props.radius ? props.radius : vars.border.radius,
+
+    const values = {
+        borderColor: props.color !== undefined ? colorOut(props.color as any) : colorOut(vars.border.color),
+        borderWidth: props.width !== undefined ? unit(props.width) : unit(vars.border.width),
+        borderStyle: props.style !== undefined ? props.style : vars.border.style,
+        borderRadius: props.radius !== undefined ? unit(props.radius) : unit(vars.border.radius),
     };
+    return values;
 };
 
 export const singleBorder = (styles: ISingleBorderStyle = {}) => {
@@ -922,6 +924,7 @@ export interface IStatesAll {
 
 // Similar to ILinkStates, but can be button or link, so we don't have link specific states here and not specific to colors
 export interface IActionStates {
+    noState?: object;
     allStates?: object; // Applies to all
     hover?: object;
     focus?: object;
@@ -934,20 +937,22 @@ export interface IActionStates {
  * Helper to write CSS state styles. Note this one is for buttons or links
  * *** You must use this inside of a "$nest" ***
  */
-export const states = (styles: IActionStates) => {
+export const buttonStates = (styles: IActionStates) => {
     const allStates = get(styles, "allStates", {});
     const hover = get(styles, "hover", {});
     const focus = get(styles, "focus", {});
     const focusNotKeyboard = get(styles, "focusNotKeyboard", focus);
     const accessibleFocus = get(styles, "accessibleFocus", focus);
     const active = get(styles, "active", {});
+    const noState = get(styles, "noState", {});
 
     return {
+        "&": { ...allStates, ...noState },
         "&:hover": { ...allStates, ...hover },
         "&:focus": { ...allStates, ...focus },
         "&:focus:not(.focus-visible)": { ...allStates, ...focusNotKeyboard },
         "&.focus-visible": { ...allStates, ...accessibleFocus },
-        "&:active": { ...allStates, ...active },
+        "&&:active": { ...allStates, ...active },
     };
 };
 

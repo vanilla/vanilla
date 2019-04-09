@@ -639,8 +639,11 @@ export const buttonUtilityClasses = useThemeCache(() => {
             "&:not(.focus-visible)": {
                 outline: 0,
             },
-            "&:hover, &:focus": {
+            "&:hover": {
                 color: colorOut(globalVars.mainColors.primary),
+            },
+            "&:focus, &:active": {
+                color: colorOut(globalVars.mainColors.secondary),
             },
         },
     });
@@ -651,7 +654,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
             "&:not(.focus-visible)": {
                 outline: 0,
             },
-            "&:hover, &:focus": {
+            "&:hover, &:focus, &:active": {
                 color: colorOut(globalVars.mainColors.secondary),
             },
         },

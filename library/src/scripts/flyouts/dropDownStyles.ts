@@ -5,13 +5,21 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, fonts, margins, paddings, states, unit, userSelect } from "@library/styles/styleHelpers";
+import {
+    borders,
+    colorOut,
+    fonts,
+    margins,
+    paddings,
+    buttonStates,
+    unit,
+    userSelect,
+} from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { important, percent } from "csx";
 import { layoutVariables } from "@library/layout/layoutStyles";
-import { FontSizeProperty } from "csstype";
 
 export const dropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -91,19 +99,12 @@ export const dropDownVariables = useThemeCache(() => {
 export const dropDownClasses = useThemeCache(() => {
     const vars = dropDownVariables();
     const globalVars = globalVariables();
-    const layoutVars = layoutVariables();
     const style = styleFactory("dropDown");
     const shadows = shadowHelper();
     const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style({
         position: "relative",
-    });
-
-    const paddedList = style("paddedList", {
-        ...paddings({
-            vertical: layoutVars.gutter.quarterSize,
-        }),
     });
 
     const contents = style("contents", {
@@ -115,7 +116,6 @@ export const dropDownClasses = useThemeCache(() => {
         ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders({}), shadows.dropDown()),
         ...borders(vars.contents.border),
         zIndex: 1,
-        ...paddings(vars.contents.padding),
         $nest: {
             "&.isParentWidth": {
                 minWidth: "initial",
@@ -199,7 +199,7 @@ export const dropDownClasses = useThemeCache(() => {
 
     const toggleButtonIcon = style("toggleButtonIcon", {
         $nest: {
-            ...states({
+            ...buttonStates({
                 allStates: {
                     color: colorOut(globalVars.mainColors.primary),
                 },
@@ -226,7 +226,7 @@ export const dropDownClasses = useThemeCache(() => {
             }),
             ...userSelect("none"),
             $nest: {
-                ...states({
+                ...buttonStates({
                     allStates: {
                         backgroundColor: colorOut(globalVars.states.hover.color),
                     },
@@ -294,7 +294,6 @@ export const dropDownClasses = useThemeCache(() => {
 
     return {
         root,
-        paddedList,
         contents,
         asModal,
         likeDropDownContent,

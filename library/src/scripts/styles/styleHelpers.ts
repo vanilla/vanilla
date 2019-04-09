@@ -385,23 +385,16 @@ export const allLinkStates = (styles: ILinkStates) => {
 };
 
 export const allButtonStates = (styles: IButtonStates) => {
-    const allStates = get(styles, "allStates", {});
-    const noState = get(styles, "noState", {});
-    const hover = get(styles, "hover", {});
-    const focus = get(styles, "focus", {});
-    const focusNotKeyboard = get(styles, "focusNotKeyboard", {});
-    const accessibleFocus = get(styles, "accessibleFocus", focus);
-    const active = get(styles, "active", {});
-
+    const allStates = styles.allStates !== undefined ? styles.allStates : {};
     return {
         ...allStates,
-        ...noState,
+        ...(styles.noState !== undefined ? styles.noState : {}),
         $nest: {
-            "&:hover": { ...allStates, ...hover },
-            "&:focus": { ...allStates, ...focus },
-            "&:focus:not(.focus-visible)": { ...allStates, ...focusNotKeyboard },
-            "&&.focus-visible": { ...allStates, ...accessibleFocus },
-            "&:active": { ...allStates, ...active },
+            "&:hover": { ...allStates, ...styles.hover },
+            "&:focus": { ...allStates, ...styles.focus },
+            "&:focus:not(.focus-visible)": { ...allStates, ...styles.focusNotKeyboard },
+            "&&.focus-visible": { ...allStates, ...styles.accessibleFocus },
+            "&:active": { ...allStates, ...styles.active },
         },
     };
 };

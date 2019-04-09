@@ -6,10 +6,10 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
+    buttonStates,
     colorOut,
     flexHelper,
     modifyColorBasedOnLightness,
-    states,
     unit,
     userSelect,
     emphasizeLightness,
@@ -451,11 +451,6 @@ export const vanillaHeaderClasses = useThemeCache(() => {
             "&&&": {
                 color: colorOut(vars.signIn.fg),
                 borderColor: colorOut(vars.colors.fg),
-                ...states({
-                    allStates: {
-                        borderColor: colorOut(vars.colors.fg),
-                    },
-                }),
             },
         },
     });
@@ -468,12 +463,6 @@ export const vanillaHeaderClasses = useThemeCache(() => {
                 backgroundColor: colorOut(vars.colors.fg),
                 color: colorOut(vars.resister.fg),
                 borderColor: colorOut(vars.colors.fg),
-                ...states({
-                    allStates: {
-                        backgroundColor: colorOut(vars.colors.fg.fade(0.9)),
-                        borderColor: colorOut(vars.colors.fg),
-                    },
-                }),
             },
         },
     });

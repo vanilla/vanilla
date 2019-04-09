@@ -6,6 +6,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
+    allButtonStates,
     borders,
     colorOut,
     defaultTransition,
@@ -602,21 +603,24 @@ export const buttonUtilityClasses = useThemeCache(() => {
         width: unit(dimension),
         justifyContent: "center",
         padding: 0,
-        color: "inherit",
-        $nest: {
-            "&:not(.focus-visible)": {
-                outline: 0,
-            },
-            "&:hover": {
+        ...allButtonStates({
+            hover: {
                 color: colorOut(globalVars.mainColors.primary),
             },
-            "&:focus": {
+            focusNotKeyboard: {
+                outline: 0,
                 color: colorOut(globalVars.mainColors.secondary),
             },
-            "&.focus-visible": {
+            focus: {
                 color: colorOut(globalVars.mainColors.secondary),
             },
-        },
+            accessibleFocus: {
+                color: colorOut(globalVars.mainColors.secondary),
+            },
+            active: {
+                color: colorOut(globalVars.mainColors.secondary),
+            },
+        }),
     });
 
     const buttonIcon = style("icon", iconMixin(formElementVars.sizing.height));

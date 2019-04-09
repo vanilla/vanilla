@@ -224,14 +224,29 @@ export const dropDownClasses = useThemeCache(() => {
                 vertical: 4,
                 horizontal: 14,
             }),
+            ...borders({
+                color: "transparent",
+                radius: 0,
+            }),
             ...userSelect("none"),
-            $nest: {
-                ...buttonStates({
-                    allStates: {
-                        backgroundColor: colorOut(globalVars.states.hover.color),
-                    },
-                }),
-            },
+            ...buttonStates({
+                allStates: {
+                    textShadow: "none",
+                    outline: 0,
+                },
+                hover: {
+                    backgroundColor: colorOut(globalVars.states.active.color),
+                },
+                focus: {
+                    backgroundColor: colorOut(globalVars.states.focus.color),
+                },
+                active: {
+                    backgroundColor: colorOut(globalVars.states.active.color),
+                },
+                accessibleFocus: {
+                    borderColor: colorOut(globalVars.mainColors.primary),
+                },
+            }),
         },
         mediaQueries.oneColumn({
             fontSize: unit(vars.item.mobile.fontSize),

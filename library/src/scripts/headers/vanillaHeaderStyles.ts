@@ -13,10 +13,13 @@ import {
     unit,
     userSelect,
     emphasizeLightness,
+    allButtonStates,
+    borders,
+    allLinkStates,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { ColorHelper, percent, px, color } from "csx";
+import { ColorHelper, percent, px, color, important } from "csx";
 import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const vanillaHeaderVariables = useThemeCache(() => {
@@ -100,8 +103,10 @@ export const vanillaHeaderVariables = useThemeCache(() => {
 
     const resister = makeThemeVars("register", {
         fg: colors.bg,
-        hover: {
-            bg: globalVars.mainColors.bg.fade(0.9),
+        bg: colors.fg,
+        borderColor: colors.bg,
+        states: {
+            bg: colors.fg.fade(0.9),
         },
     });
 
@@ -298,11 +303,6 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         marginLeft: "auto",
     });
 
-    const meBoxStateStyles = style("meBoxStateStyles", {
-        borderRadius: px(vars.button.borderRadius),
-        backgroundColor: colorOut(vars.buttonContents.state.bg),
-    });
-
     const button = style(
         "button",
         {
@@ -311,39 +311,50 @@ export const vanillaHeaderClasses = useThemeCache(() => {
             minWidth: px(formElementVars.sizing.height),
             maxWidth: percent(100),
             padding: px(0),
-            $nest: {
-                "&:active": {
-                    color: vars.colors.fg.toString(),
-                    $nest: {
-                        ".meBox-contentHover": meBoxStateStyles,
-                        ".meBox-buttonContent": meBoxStateStyles,
-                    },
-                },
-                "&:hover": {
-                    color: vars.colors.fg.toString(),
-                    $nest: {
-                        ".meBox-contentHover": meBoxStateStyles,
-                        ".meBox-buttonContent": meBoxStateStyles,
-                    },
-                },
-                "&.focus-visible": {
-                    color: vars.colors.fg.toString(),
-                    $nest: {
-                        ".meBox-contentHover": meBoxStateStyles,
-                        ".meBox-buttonContent": meBoxStateStyles,
-                    },
-                },
-                "&.isOpen": {
-                    $nest: {
-                        ".meBox-contentHover": {
-                            backgroundColor: colorOut(vars.buttonContents.state.bg),
+            ...allButtonStates(
+                {
+                    active: {
+                        // color: vars.colors.fg.toString(),
+                        $nest: {
+                            "& .meBox-buttonContent": {
+                                backgroundColor: colorOut(vars.buttonContents.state.bg),
+                            },
                         },
-                        ".meBox-buttonContent": {
-                            backgroundColor: colorOut(vars.buttonContents.state.bg),
+                    },
+                    hover: {
+                        // color: vars.colors.fg.toString(),
+                        $nest: {
+                            "& .meBox-buttonContent": {
+                                backgroundColor: colorOut(vars.buttonContents.state.bg),
+                            },
+                        },
+                    },
+                    accessibleFocus: {
+                        outline: 0,
+                        $nest: {
+                            "& .meBox-buttonContent": {
+                                borderColor: colorOut(vars.colors.fg),
+                                backgroundColor: colorOut(vars.buttonContents.state.bg),
+                            },
                         },
                     },
                 },
-            },
+                {
+                    "& .meBox-buttonContent": {
+                        ...borders({
+                            width: 1,
+                            color: "transparent",
+                        }),
+                    },
+                    "&.isOpen": {
+                        $nest: {
+                            "& .meBox-buttonContent": {
+                                backgroundColor: colorOut(vars.buttonContents.state.bg),
+                            },
+                        },
+                    },
+                },
+            ),
         },
         mediaQueries.oneColumn({
             height: px(vars.sizing.mobile.height),
@@ -362,7 +373,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         $nest: {
             "&.focus-visible": {
                 $nest: {
-                    "&.meBox-contentHover": {
+                    "&.meBox-buttonContent": {
                         borderRadius: px(vars.button.borderRadius),
                         backgroundColor: vars.buttonContents.state.bg.toString(),
                     },
@@ -458,13 +469,28 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     const register = style("register", {
         marginLeft: unit(vars.guest.spacer),
         marginRight: unit(vars.guest.spacer),
-        $nest: {
-            "&&&": {
-                backgroundColor: colorOut(vars.colors.fg),
-                color: colorOut(vars.resister.fg),
-                borderColor: colorOut(vars.colors.fg),
+        backgroundColor: colorOut(vars.resister.bg),
+        // Ugly solution, but not much choice until: https://github.com/vanilla/knowledge/issues/778
+        ...allButtonStates({
+            allStates: {
+                borderColor: colorOut(vars.resister.borderColor, true),
             },
-        },
+            noState: {
+                backgroundColor: colorOut(vars.resister.bg, true),
+            },
+            hover: {
+                color: colorOut(vars.resister.fg),
+                backgroundColor: colorOut(vars.resister.states.bg, true),
+            },
+            focus: {
+                color: colorOut(vars.resister.fg),
+                backgroundColor: colorOut(vars.resister.states.bg, true),
+            },
+            active: {
+                color: colorOut(vars.resister.fg),
+                backgroundColor: colorOut(vars.resister.states.bg, true),
+            },
+        }),
     });
 
     const compactSearchResults = style(

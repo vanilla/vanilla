@@ -46,11 +46,12 @@ import { assetUrl, themeAsset } from "@library/utility/appUtils";
 import get from "lodash/get";
 import { ColorValues } from "@library/forms/buttonStyles";
 
-export const colorOut = (colorValue: ColorValues) => {
+export const colorOut = (colorValue: ColorValues, makeImportant = false) => {
     if (!colorValue) {
         return undefined;
     } else {
-        return typeof colorValue === "string" ? colorValue : colorValue.toString();
+        const output = typeof colorValue === "string" ? colorValue : colorValue.toString();
+        return makeImportant ? important(output) : output;
     }
 };
 
@@ -384,17 +385,19 @@ export const allLinkStates = (styles: ILinkStates) => {
     return output;
 };
 
-export const allButtonStates = (styles: IButtonStates) => {
+export const allButtonStates = (styles: IButtonStates, nested?: object) => {
     const allStates = styles.allStates !== undefined ? styles.allStates : {};
+    const noState = styles.noState !== undefined ? styles.noState : {};
     return {
         ...allStates,
-        ...(styles.noState !== undefined ? styles.noState : {}),
+        ...noState,
         $nest: {
             "&:hover": { ...allStates, ...styles.hover },
             "&:focus": { ...allStates, ...styles.focus },
             "&:focus:not(.focus-visible)": { ...allStates, ...styles.focusNotKeyboard },
             "&&.focus-visible": { ...allStates, ...styles.accessibleFocus },
             "&:active": { ...allStates, ...styles.active },
+            ...nested,
         },
     };
 };

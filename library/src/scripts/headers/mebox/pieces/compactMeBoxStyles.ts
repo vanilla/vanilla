@@ -84,5 +84,16 @@ export const compactMeBoxClasses = useThemeCache(() => {
         flexGrow: 1,
     });
 
-    return { root, openButton, contents, closeModal, tabList, tabPanels, tabButton, tabButtonContent, panel, body };
+    return {
+        root,
+        openButton,
+        contents,
+        closeModal,
+        tabList,
+        tabPanels,
+        tabButton,
+        tabButtonContent,
+        panel,
+        body,
+    };
 });

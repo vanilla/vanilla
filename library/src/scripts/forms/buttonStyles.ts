@@ -9,7 +9,6 @@ import {
     allButtonStates,
     borders,
     colorOut,
-    defaultTransition,
     flexHelper,
     fonts,
     IBorderStyles,
@@ -450,7 +449,6 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
     const buttonDimensions = buttonTypeVars.sizing || false;
 
     return style(buttonResetMixin(), {
-        ...defaultTransition("border"),
         textOverflow: "ellipsis",
         overflow: "hidden",
         maxWidth: percent(100),

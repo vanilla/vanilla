@@ -273,4 +273,18 @@ describe("ClipboardModule", () => {
             expect(ClipboardModule.splitLinkOperationsOutOfText(input)).equals(null);
         });
     });
+
+    describe("Pasting into lists", () => {
+        it("can paste content into a list item", () => {
+            quill.setContents([OpUtils.op("1"), OpUtils.list()]);
+            quill.clipboard.dangerouslyPasteHTML(1, "line");
+            expect(quill.getContents().ops).deep.eq([OpUtils.op("1line"), OpUtils.list()]);
+        });
+
+        it("can paste contents into an empty list item", () => {
+            quill.setContents([OpUtils.list()]);
+            quill.clipboard.dangerouslyPasteHTML(0, "line");
+            expect(quill.getContents().ops).deep.eq([OpUtils.op("line"), OpUtils.list()]);
+        });
+    });
 });

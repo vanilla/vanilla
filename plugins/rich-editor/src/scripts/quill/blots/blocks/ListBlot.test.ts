@@ -361,4 +361,11 @@ describe("ListBlot", () => {
             expect(nestedListGroup.children, "There should be 2 nested list items").has.length(2);
         });
     });
+
+    describe("insertion", () => {
+        it.only("can insert newlines", () => {
+            insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1");
+            quill.updateContents([{ retain: 1 }, OpUtils.op("test\ntest")]);
+        });
+    });
 });

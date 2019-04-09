@@ -187,20 +187,59 @@ export class ListItemWrapper extends withWrapper(Container as any) {
 
     /**
      * @override
+     */
+    public split(index: number, force?: boolean) {
+        if ((!force && index === this.length() - 1) || index === 0) {
+            return this;
+        }
+        const ownItem = this.getListContent();
+        const ownGroup = this.getListGroup();
+        if (ownItem && index < ownItem.length()) {
+            const after = ownItem.split(index, force) as ListItem;
+            if (after instanceof ListItem) {
+                const wrapper = Parchment.create(ListItemWrapper.blotName, this.getValue()) as ListItemWrapper;
+                after.insertInto(wrapper);
+                wrapper.insertInto(this.parent, this.next);
+                if (ownGroup) {
+                    ownGroup.insertInto(wrapper);
+                }
+                return wrapper;
+            }
+            return this;
+        } else {
+            return super.split(index, force);
+        }
+    }
+
+    /**
+     * @override
      * Ensure line breaks are properly inserted and can separate the list wrapper properly.
      */
-    public insertAt(index, value, def) {
-        if (value === "\n" && index < this.getListContent()!.length()) {
-            const originalListItem = this.getListContent()!;
-            const newWrapper = Parchment.create(ListItemWrapper.blotName, this.getValue()) as ListItemWrapper;
-            const secondHalfListItem = originalListItem.split(index);
-            secondHalfListItem.insertInto(newWrapper);
-            newWrapper.insertInto(this.parent, this.next);
+    public insertAt(index, value: string, def) {
+        const isInListContent = this.getListContent() && index < this.getListContent()!.length();
 
-            const nestedGroup = this.getListGroup();
-            if (nestedGroup) {
-                nestedGroup.insertInto(newWrapper);
+        if (value.includes("\n") && isInListContent) {
+            const after = this.split(index, false);
+            const targetNext = after === this ? this.next : after;
+
+            const inserts = value === "\n" ? [""] : value.split("\n");
+            if (inserts[0] && inserts[0] !== "") {
+                this.getListContent()!.insertAt(index, inserts.shift()!);
             }
+
+            const listItems = inserts.map((insert, inc) => {
+                const item = Parchment.create(ListItem.blotName, this.getValue()) as ListItem;
+                if (insert !== "") {
+                    item.insertAt(0, insert, undefined);
+                }
+                return item;
+            });
+
+            listItems.forEach(item => {
+                const clone = this.clone() as ListItemWrapper;
+                clone.appendChild(item);
+                this.parent.insertBefore(clone, targetNext);
+            });
         } else {
             super.insertAt(index, value, def);
         }
@@ -579,28 +618,14 @@ export class ListItem extends LineBlot {
      * Overridden to safely handle list values changing.
      */
     public replaceWith(formatName, value?: any) {
-        const ensureDepth0 = () => {
-            const ownValue = this.getValue();
-            if (ownValue.depth > 0) {
-                // Force an update to our nesting.
-                this.updateIndentValue(0);
-                const quill = this.quill;
-                if (quill) {
-                    quill.update(Quill.sources.SILENT);
-                }
-            }
-        };
         if (formatName !== ListItem.blotName) {
-            ensureDepth0();
             this.breakUpGroupAndMoveToScroll(formatName, value);
         } else {
             if (!value) {
-                ensureDepth0();
                 return this.breakUpGroupAndMoveToScroll();
             }
 
             if (typeof value === "object" && (value as IListObjectValue).type !== this.getValue().type) {
-                ensureDepth0();
                 return this.breakUpGroupAndMoveToScroll(formatName, value);
             }
 
@@ -609,19 +634,39 @@ export class ListItem extends LineBlot {
     }
 
     /**
+     * FIX THIS AND DO IT PROPERLY.
+     */
+    private ensureDepth0 = () => {
+        const ownValue = this.getValue();
+        if (ownValue.depth > 0) {
+            // Force an update to our nesting.
+            this.updateIndentValue(0);
+            const quill = this.quill;
+            if (quill) {
+                quill.update(Quill.sources.SILENT);
+            }
+        }
+    };
+
+    /**
      * Break up the blot group and move it up into the scroll scroll container.
      *
      * @param formatName The new block format to use.
      * @param value The value for the new block format.
      */
     public breakUpGroupAndMoveToScroll(formatName = "block", value: any = "") {
-        const parentWrapper = this.parent as ListItemWrapper;
-        const parentGroup = parentWrapper.parent as ListGroup;
         const newBlock =
             typeof formatName === "string"
                 ? (Parchment.create(formatName, value) as Container)
                 : (formatName as Container);
-        this.moveChildren(newBlock);
+        // Clone the children.
+        this.children.forEach(blot => {
+            newBlock.appendChild(blot.clone());
+        });
+        this.ensureDepth0();
+        const parentWrapper = this.parent as ListItemWrapper;
+        const parentGroup = parentWrapper.parent as ListGroup;
+
         if (parentWrapper.prev === null) {
             this.scroll.insertBefore(newBlock, parentGroup);
             const listGroup = parentWrapper.getListGroup();
@@ -630,9 +675,9 @@ export class ListItem extends LineBlot {
             }
             parentWrapper.remove();
         } else {
-            const after = parentGroup.split(this.offset(parentGroup)) as ListGroup;
+            const after = parentGroup.split(parentWrapper.offset(parentGroup)) as ListGroup;
             this.scroll.insertBefore(newBlock, after);
-            this.remove();
+            parentWrapper.getListContent()!.remove();
         }
 
         return newBlock;

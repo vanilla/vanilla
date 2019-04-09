@@ -6,7 +6,6 @@
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory } from "@library/styles/styleUtils";
-import { log } from "@library/utility/utils";
 import {
     AlignItemsProperty,
     AppearanceProperty,
@@ -22,6 +21,7 @@ import {
     ContentProperty,
     DisplayProperty,
     FlexWrapProperty,
+    FontFamilyProperty,
     FontSizeProperty,
     FontWeightProperty,
     JustifyContentProperty,
@@ -43,8 +43,22 @@ import { ColorHelper, deg, important, percent, px, quote, url, viewHeight, viewW
 import { keyframes } from "typestyle";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { assetUrl, themeAsset } from "@library/utility/appUtils";
-import get from "lodash/get";
 import { ColorValues } from "@library/forms/buttonStyles";
+
+const fontFallbacks = [
+    "-apple-system",
+    "BlinkMacSystemFont",
+    "HelveticaNeue-Light",
+    "Segoe UI",
+    "Helvetica Neue",
+    "Helvetica",
+    "Raleway",
+    "Arial",
+    "sans-serif",
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol",
+];
 
 export const colorOut = (colorValue: ColorValues, makeImportant = false) => {
     if (!colorValue) {
@@ -107,6 +121,13 @@ export function fakeBackgroundFixed() {
         width: viewWidth(100),
         height: viewHeight(100),
     };
+}
+
+export function fontFamilyWithDefaults(fontFamilies: string[]): string {
+    return fontFamilies
+        .concat(fontFallbacks)
+        .map(font => (font.includes(" ") && !font.includes('"') ? `"${font}"` : font))
+        .join(", ");
 }
 
 export function fullSizeOfParent() {
@@ -380,7 +401,7 @@ export interface ILinkStates extends IButtonStates {
 
 export const allLinkStates = (styles: ILinkStates) => {
     const output = allButtonStates(styles);
-    const visited = get(styles, "visited", {});
+    const visited = styles.visited !== undefined ? styles.visited : {};
     output.$nest["&:visited"] = { ...styles.allStates, ...visited };
     return output;
 };
@@ -841,23 +862,26 @@ export interface IFont {
     lineHeight?: LineHeightProperty<TLength>;
     shadow?: TextShadowProperty;
     align?: TextAlignLastProperty;
+    family?: FontFamilyProperty[];
 }
 
 export const fonts = (props: IFont) => {
     if (props) {
-        const size = props.size ? props.size : undefined;
-        const fontWeight = props.weight ? props.weight : undefined;
-        const color = props.color ? props.color : undefined;
-        const lineHeight = props.lineHeight ? props.lineHeight : undefined;
-        const textAlign = props.align ? props.align : undefined;
-        const textShadow = props.shadow ? props.shadow : undefined;
+        const fontSize = props.size !== undefined ? unit(props.size) : undefined;
+        const fontWeight = props.weight !== undefined ? props.weight : undefined;
+        const color = props.color !== undefined ? colorOut(props.color) : undefined;
+        const lineHeight = props.lineHeight !== undefined ? props.lineHeight : undefined;
+        const textAlign = props.align !== undefined ? props.align : undefined;
+        const textShadow = props.shadow !== undefined ? props.shadow : undefined;
+        const fontFamily = props.family !== undefined ? fontFamilyWithDefaults(props.family) : undefined;
         return {
-            color: colorOut(color),
-            fontSize: size ? unit(size) : undefined,
+            color,
+            fontSize,
             fontWeight,
-            lineHeight: lineHeight ? unit(lineHeight) : undefined,
+            lineHeight,
             textAlign,
             textShadow,
+            fontFamily,
         } as NestedCSSProperties;
     } else {
         return {} as NestedCSSProperties;
@@ -934,13 +958,13 @@ export interface IActionStates {
  * *** You must use this inside of a "$nest" ***
  */
 export const buttonStates = (styles: IActionStates) => {
-    const allStates = get(styles, "allStates", {});
-    const hover = get(styles, "hover", {});
-    const focus = get(styles, "focus", {});
-    const focusNotKeyboard = get(styles, "focusNotKeyboard", focus);
-    const accessibleFocus = get(styles, "accessibleFocus", focus);
-    const active = get(styles, "active", {});
-    const noState = get(styles, "noState", {});
+    const allStates = styles.allStates !== undefined ? styles.allStates : {};
+    const hover = styles.hover !== undefined ? styles.hover : {};
+    const focus = styles.focus !== undefined ? styles.focus : {};
+    const focusNotKeyboard = styles.focusNotKeyboard !== undefined ? styles.focusNotKeyboard : {};
+    const accessibleFocus = styles.accessibleFocus !== undefined ? styles.accessibleFocus : {};
+    const active = styles.active !== undefined ? styles.active : {};
+    const noState = styles.noState !== undefined ? styles.noState : {};
 
     return {
         "&": { ...allStates, ...noState },

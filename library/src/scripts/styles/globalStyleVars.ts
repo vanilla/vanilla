@@ -153,6 +153,10 @@ export const globalVariables = useThemeCache(() => {
             semiBold: 600,
             bold: 700,
         },
+
+        families: {
+            body: ["Open Sans"],
+        },
     });
 
     const icon = makeThemeVars("icon", {

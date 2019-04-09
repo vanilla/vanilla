@@ -7,6 +7,7 @@
 import React from "react";
 import { NavLink, NavLinkProps } from "react-router-dom";
 import { makeLocationDescriptorObject, LinkContext } from "@library/routing/links/LinkContextProvider";
+import { sanitizeUrl } from "@library/utility/utils";
 
 interface IProps extends NavLinkProps {
     tabIndex?: number;
@@ -46,7 +47,7 @@ export default function SmartLink(props: IProps) {
                         />
                     );
                 } else {
-                    return <a {...passthru} href={href} tabIndex={props.tabIndex ? props.tabIndex : 0} />;
+                    return <a {...passthru} href={sanitizeUrl(href)} tabIndex={props.tabIndex ? props.tabIndex : 0} />;
                 }
             }}
         </LinkContext.Consumer>

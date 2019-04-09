@@ -5,16 +5,14 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
-import { style } from "typestyle";
-import { debugHelper } from "@library/styles/styleHelpers";
 
 export const selectBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const debug = debugHelper("selectBox");
+    const style = styleFactory("selectBox");
 
-    const toggle = style({
+    const toggle = style("toggle", {
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
@@ -31,10 +29,9 @@ export const selectBoxClasses = useThemeCache(() => {
                 },
             },
         },
-        ...debug.name("toggle"),
     });
 
-    const buttonItem = style({
+    const buttonItem = style("buttonItem", {
         display: "flex",
         overflow: "hidden",
         alignItems: "center",
@@ -48,29 +45,25 @@ export const selectBoxClasses = useThemeCache(() => {
                 opacity: 1,
             },
         },
-        ...debug.name("buttonItem"),
     });
 
-    const buttonIcon = style({
+    const buttonIcon = style("buttonIcon", {
         marginLeft: px(6),
         marginRight: "auto",
-        ...debug.name("buttonIcon"),
     });
 
-    const outdated = style({
+    const outdated = style("outdated", {
         marginLeft: "auto",
         lineHeight: "inherit",
         whiteSpace: "nowrap",
-        ...debug.name("outdated"),
     });
 
-    const dropDownContents = style({
+    const dropDownContents = style("dropDownContents", {
         paddingTop: px(6),
         paddingBottom: px(6),
-        ...debug.name("dropDownContents"),
     });
 
-    const checkContainer = style({
+    const checkContainer = style("checkContainer", {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -79,19 +72,16 @@ export const selectBoxClasses = useThemeCache(() => {
         height: px(18),
         flexBasis: px(18),
         marginRight: px(9),
-        ...debug.name("checkContainer"),
     });
 
-    const spacer = style({
+    const spacer = style("spacer", {
         display: "block",
         width: px(18),
         height: px(18),
-        ...debug.name("spacer"),
     });
 
-    const itemLabel = style({
+    const itemLabel = style("itemLabel", {
         width: percent(100),
-        ...debug.name("itemLabel"),
     });
 
     return {

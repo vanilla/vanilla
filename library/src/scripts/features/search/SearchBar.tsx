@@ -66,6 +66,7 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
 
 interface IState {
     forceMenuClosed: boolean;
+    focus: boolean;
 }
 
 /**
@@ -90,6 +91,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
 
     public state: IState = {
         forceMenuClosed: false,
+        focus: false,
     };
     private id: string;
     private prefix = "searchBar";
@@ -138,6 +140,8 @@ export default class SearchBar extends React.Component<IProps, IState> {
                 onKeyDown={this.props.handleOnKeyDown}
                 onMenuOpen={this.props.onOpenSuggestions}
                 onMenuClose={this.props.onCloseSuggestions}
+                onFocus={this.onFocus}
+                onBlur={this.onBlur}
             />
         );
     }
@@ -259,7 +263,10 @@ export default class SearchBar extends React.Component<IProps, IState> {
                             </label>
                         </Heading>
                     )}
-                    <div onClick={this.focus} className={classNames("searchBar-content", classes.content)}>
+                    <div
+                        onClick={this.focus}
+                        className={classNames("searchBar-content", classes.content, { hasFocus: this.state.focus })}
+                    >
                         <div
                             className={classNames(
                                 `${this.prefix}-valueContainer`,
@@ -371,5 +378,23 @@ export default class SearchBar extends React.Component<IProps, IState> {
 
     public focus = () => {
         this.inputRef.current!.focus();
+    };
+
+    /**
+     * Set class for focus
+     */
+    private onFocus = () => {
+        this.setState({
+            focus: true,
+        });
+    };
+
+    /**
+     * Set class for blur
+     */
+    private onBlur = () => {
+        this.setState({
+            focus: false,
+        });
     };
 }

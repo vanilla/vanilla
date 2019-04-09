@@ -37,7 +37,7 @@ export interface IProps extends IDeviceProps {
     onVisibilityChange?: (isVisible: boolean) => void;
     openAsModal?: boolean;
     title?: string;
-    paddedList?: boolean;
+    selfPadded?: boolean;
 }
 
 export interface IState {
@@ -95,14 +95,12 @@ class DropDown extends React.Component<IProps, IState> {
                             {...params}
                             id={this.id + "-handle"}
                             parentID={this.id}
-                            className={classNames(
-                                this.props.contentsClassName,
-                                this.props.paddedList ? classesDropDown.paddedList : "",
-                            )}
+                            className={classNames(this.props.contentsClassName)}
                             onClick={this.doNothing}
                             renderLeft={!!this.props.renderLeft}
                             renderAbove={!!this.props.renderAbove}
                             openAsModal={openAsModal}
+                            selfPadded={this.props.selfPadded}
                         >
                             {title ? (
                                 <header className={classNames("frameHeader", classesFrameHeader.root)}>

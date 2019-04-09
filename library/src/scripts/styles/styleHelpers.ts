@@ -6,6 +6,7 @@
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory } from "@library/styles/styleUtils";
+import { log } from "@library/utility/utils";
 import {
     AlignItemsProperty,
     AppearanceProperty,
@@ -45,11 +46,12 @@ import { assetUrl, themeAsset } from "@library/utility/appUtils";
 import get from "lodash/get";
 import { ColorValues } from "@library/forms/buttonStyles";
 
-export const colorOut = (colorValue: ColorValues) => {
+export const colorOut = (colorValue: ColorValues, makeImportant = false) => {
     if (!colorValue) {
         return undefined;
     } else {
-        return typeof colorValue === "string" ? colorValue : colorValue.toString();
+        const output = typeof colorValue === "string" ? colorValue : colorValue.toString();
+        return makeImportant ? important(output) : output;
     }
 };
 
@@ -184,25 +186,67 @@ export const debugHelper = (componentName: string) => {
 };
 
 /*
- * Color modification based on colors lightness.
- * @param referenceColor - The reference colour to determine if we're in a dark or light context.
- * @param colorToModify - The color you wish to modify
- * @param percentage - The amount you want to mix the two colors
- * @param flip - By default we darken light colours and lighten darks, but if you want to get the opposite result, use this param
+ * Check if it's a light color or dark color based on lightness
+ * @param color - The color we're checking
  */
-export const modifyColorBasedOnLightness = (
-    referenceColor: ColorHelper,
-    colorToModify: ColorHelper,
-    weight: number,
-    flip: boolean = false,
-) => {
+export const isLightColor = (color: ColorHelper) => {
+    return color.lightness() >= 0.5;
+};
+
+/*
+ * Color modification based on colors lightness.
+ * @param color - The color we're checking and modifying
+ * @param weight - The amount you want to mix the two colors (value from 0 to 1)
+ * @param flip - By default we darken light colours and lighten dark colors, but if you want to get the opposite result, use this param
+ * Note, however, that we do not check if you've reached a maximum. Example: If you want to darken pure black, you get back pure black.
+ */
+export const modifyColorBasedOnLightness = (color: ColorHelper, weight: number, flip: boolean = false) => {
+    let output;
     if (weight > 1 || weight < 0) {
         throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
     }
-    if (referenceColor.lightness() >= 0.5 && !flip) {
-        return colorToModify.darken(weight) as ColorHelper;
+    const isLight = isLightColor(color);
+    if ((isLight && !flip) || (!isLight && flip)) {
+        output = color.darken(weight) as ColorHelper;
     } else {
-        return colorToModify.lighten(weight) as ColorHelper;
+        output = color.lighten(weight) as ColorHelper;
+    }
+    return output;
+};
+
+/*
+ * Color modification based on colors lightness. This function will make darks darker and lights lighter. Note, however, that if we pass
+ * pure white or pure black, the modification goes in the opposite direction, to maintain contrast if "flipIfMax" is true.
+ * This function is meant for smart defaults and works best with smaller weights. Not really meant for theming. There is a curve
+ * to the weight compensate for the fact that subtle weights works well for light colors, but not for dark ones (roughly 10 times
+ * less for pure black). This curve starts with colors .4 lightness or less and is accentuated more as we get closer to pure black.
+ * @param color - The color we're checking and modifying
+ * @param weight - The amount you want to mix the two colors (value from 0 to 1)
+ * @param flipIfMax - Modify in the opposite direction if we're darker than black or whiter than white.
+ */
+export const emphasizeLightness = (color: ColorHelper, weight: number, flipIfMax: boolean = true) => {
+    const colorLightness = color.lightness();
+    let weightOffset = 1;
+    if (colorLightness < 0.4) {
+        weightOffset = Math.abs(colorLightness - 0.5) * 20;
+    }
+
+    const weightCurved = weight * weightOffset;
+    const colorDarker = color.darken(weightCurved) as ColorHelper;
+    const colorLighter = color.lighten(weightCurved) as ColorHelper;
+
+    if (isLightColor(color)) {
+        if (colorLightness + weightCurved > 1 && flipIfMax) {
+            return colorDarker;
+        } else {
+            return colorLighter;
+        }
+    } else {
+        if (colorLightness - weightCurved > 0 && flipIfMax) {
+            return colorDarker;
+        } else {
+            return colorLighter;
+        }
     }
 };
 
@@ -213,21 +257,19 @@ export const modifyColorBasedOnLightness = (
  * @param percentage - The amount you want to mix the two colors
  * @param flip - By default we darken light colours and lighten darks, but if you want to get the opposite result, use this param
  */
-export const modifyColorSaturationBasedOnLightness = (
-    referenceColor: ColorHelper,
-    colorToModify: ColorHelper,
-    weight: number,
-    flip: boolean = false,
-) => {
+export const modifyColorSaturationBasedOnLightness = (color: ColorHelper, weight: number, flip: boolean = false) => {
     if (weight > 1 || weight < 0) {
         throw new Error("mixAmount must be a value between 0 and 1 inclusively.");
     }
-    if (referenceColor.saturation() <= 0.5 && !flip) {
-        // Saturate
-        return colorToModify.desaturate(weight) as ColorHelper;
+
+    const isSaturated = color.lightness() >= 0.5;
+
+    if ((isSaturated && !flip) || (!isSaturated && flip)) {
+        // Desaturate
+        return color.desaturate(weight) as ColorHelper;
     } else {
-        // Darken color
-        return colorToModify.saturate(weight) as ColorHelper;
+        // Saturate
+        return color.saturate(weight) as ColorHelper;
     }
 };
 
@@ -268,14 +310,52 @@ export interface IBorderStyles extends ISingleBorderStyle {
     radius?: BorderRadiusProperty<TLength>;
 }
 
-export const borders = (props: IBorderStyles = {}) => {
-    const vars = globalVariables();
+interface IBorderRadii {
+    all?: BorderRadiusProperty<TLength>;
+    top?: BorderRadiusProperty<TLength>;
+    bottom?: BorderRadiusProperty<TLength>;
+    left?: BorderRadiusProperty<TLength>;
+    right?: BorderRadiusProperty<TLength>;
+    topRight?: BorderRadiusProperty<TLength>;
+    topLeft?: BorderRadiusProperty<TLength>;
+    bottomLeft?: BorderRadiusProperty<TLength>;
+    bottomRight?: BorderRadiusProperty<TLength>;
+}
+
+const ifExistsWithFallback = checkProp => {
+    if (checkProp && checkProp.length > 0) {
+        const next = checkProp.pop();
+        return next ? next : ifExistsWithFallback(checkProp);
+    } else {
+        return undefined;
+    }
+};
+
+export const borderRadii = (props: IBorderRadii) => {
     return {
-        borderColor: props.color ? colorOut(props.color as any) : colorOut(vars.border.color),
-        borderWidth: props.width ? unit(props.width) : unit(vars.border.width),
-        borderStyle: props.style ? props.style : vars.border.style,
-        borderRadius: props.radius ? props.radius : vars.border.radius,
+        borderTopLeftRadius: unit(ifExistsWithFallback([props.all, props.top, props.left, props.topLeft, undefined])),
+        borderTopRightRadius: unit(
+            ifExistsWithFallback([props.all, props.top, props.right, props.topRight, undefined]),
+        ),
+        borderBottomLeftRadius: unit(
+            ifExistsWithFallback([props.all, props.bottom, props.left, props.bottomLeft, undefined]),
+        ),
+        borderBottomRightRadius: unit(
+            ifExistsWithFallback([props.all, props.bottom, props.right, props.bottomRight, undefined]),
+        ),
     };
+};
+
+export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
+    const vars = globalVariables();
+
+    const values = {
+        borderColor: props.color !== undefined ? colorOut(props.color as any) : colorOut(vars.border.color),
+        borderWidth: props.width !== undefined ? unit(props.width) : unit(vars.border.width),
+        borderStyle: props.style !== undefined ? props.style : vars.border.style,
+        borderRadius: props.radius !== undefined ? unit(props.radius) : unit(vars.border.radius),
+    };
+    return values;
 };
 
 export const singleBorder = (styles: ISingleBorderStyle = {}) => {
@@ -305,24 +385,19 @@ export const allLinkStates = (styles: ILinkStates) => {
     return output;
 };
 
-export const allButtonStates = (styles: IButtonStates) => {
-    const allStates = get(styles, "allStates", {});
-    const noState = get(styles, "noState", {});
-    const hover = get(styles, "hover", {});
-    const focus = get(styles, "focus", {});
-    const focusNotKeyboard = get(styles, "focusNotKeyboard", {});
-    const accessibleFocus = get(styles, "accessibleFocus", focus);
-    const active = get(styles, "active", {});
-
+export const allButtonStates = (styles: IButtonStates, nested?: object) => {
+    const allStates = styles.allStates !== undefined ? styles.allStates : {};
+    const noState = styles.noState !== undefined ? styles.noState : {};
     return {
         ...allStates,
         ...noState,
         $nest: {
-            "&:hover": { ...allStates, ...hover },
-            "&:focus": { ...allStates, ...focus },
-            "&:focus:not(.focus-visible)": { ...allStates, ...focusNotKeyboard },
-            "&&.focus-visible": { ...allStates, ...accessibleFocus },
-            "&:active": { ...allStates, ...active },
+            "&:hover": { ...allStates, ...styles.hover },
+            "&:focus": { ...allStates, ...styles.focus },
+            "&:focus:not(.focus-visible)": { ...allStates, ...styles.focusNotKeyboard },
+            "&&.focus-visible": { ...allStates, ...styles.accessibleFocus },
+            "&:active": { ...allStates, ...styles.active },
+            ...nested,
         },
     };
 };
@@ -413,6 +488,10 @@ export interface IPaddings {
 
 export const paddings = (styles: IPaddings) => {
     const paddingVals = {} as NestedCSSProperties;
+
+    if (!styles) {
+        return paddingVals;
+    }
 
     if (styles.all !== undefined) {
         paddingVals.paddingTop = unit(styles.all);
@@ -766,14 +845,14 @@ export interface IFont {
 
 export const fonts = (props: IFont) => {
     if (props) {
-        const size = get(props, "size", undefined);
-        const fontWeight = get(props, "weight", undefined);
-        const fg = get(props, "color", undefined);
-        const lineHeight = get(props, "lineHeight", undefined);
-        const textAlign = get(props, "align", undefined);
-        const textShadow = get(props, "shadow", undefined);
+        const size = props.size ? props.size : undefined;
+        const fontWeight = props.weight ? props.weight : undefined;
+        const color = props.color ? props.color : undefined;
+        const lineHeight = props.lineHeight ? props.lineHeight : undefined;
+        const textAlign = props.align ? props.align : undefined;
+        const textShadow = props.shadow ? props.shadow : undefined;
         return {
-            color: fg ? colorOut(fg) : undefined,
+            color: colorOut(color),
             fontSize: size ? unit(size) : undefined,
             fontWeight,
             lineHeight: lineHeight ? unit(lineHeight) : undefined,
@@ -841,6 +920,7 @@ export interface IStatesAll {
 
 // Similar to ILinkStates, but can be button or link, so we don't have link specific states here and not specific to colors
 export interface IActionStates {
+    noState?: object;
     allStates?: object; // Applies to all
     hover?: object;
     focus?: object;
@@ -853,20 +933,22 @@ export interface IActionStates {
  * Helper to write CSS state styles. Note this one is for buttons or links
  * *** You must use this inside of a "$nest" ***
  */
-export const states = (styles: IActionStates) => {
+export const buttonStates = (styles: IActionStates) => {
     const allStates = get(styles, "allStates", {});
     const hover = get(styles, "hover", {});
     const focus = get(styles, "focus", {});
     const focusNotKeyboard = get(styles, "focusNotKeyboard", focus);
     const accessibleFocus = get(styles, "accessibleFocus", focus);
     const active = get(styles, "active", {});
+    const noState = get(styles, "noState", {});
 
     return {
+        "&": { ...allStates, ...noState },
         "&:hover": { ...allStates, ...hover },
         "&:focus": { ...allStates, ...focus },
         "&:focus:not(.focus-visible)": { ...allStates, ...focusNotKeyboard },
         "&.focus-visible": { ...allStates, ...accessibleFocus },
-        "&:active": { ...allStates, ...active },
+        "&&:active": { ...allStates, ...active },
     };
 };
 

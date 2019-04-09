@@ -92,7 +92,7 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                     <FrameFooter>
                         <Button
                             className={classFrameFooter.actionButton}
-                            baseClass={ButtonTypes.TEXT}
+                            baseClass={ButtonTypes.TEXT_PRIMARY}
                             buttonRef={this.cancelRef}
                             onClick={onCancel}
                         >
@@ -101,7 +101,7 @@ export default class ModalConfirm extends React.Component<IProps, IState> {
                         <Button
                             className={classFrameFooter.actionButton}
                             onClick={onConfirm}
-                            baseClass={ButtonTypes.TEXT_PRIMARY}
+                            baseClass={ButtonTypes.TEXT}
                             disabled={isConfirmLoading}
                         >
                             {isConfirmLoading ? <ButtonLoader /> : this.props.confirmTitle}

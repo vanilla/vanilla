@@ -79,11 +79,17 @@ export const searchBarClasses = useThemeCache(() => {
             cursor: "pointer",
             $nest: {
                 "& .suggestedTextInput-clear": {
+                    color: colorOut(globalVars.mainColors.fg),
                     $nest: {
                         "&, &.buttonIcon": {
                             border: "none",
                             boxShadow: "none",
-                            color: globalVars.mainColors.primary.toString(),
+                        },
+                        "&:hover": {
+                            color: colorOut(globalVars.mainColors.primary),
+                        },
+                        "&:focus": {
+                            color: colorOut(globalVars.mainColors.primary),
                         },
                     },
                 },
@@ -269,6 +275,11 @@ export const searchBarClasses = useThemeCache(() => {
         justifyContent: "flex-start",
         position: "relative",
         minHeight: unit(vars.sizing.height),
+        $nest: {
+            "&.hasFocus .searchBar-valueContainer": {
+                borderColor: colorOut(globalVars.mainColors.primary),
+            },
+        },
     });
 
     // special selector

@@ -20,6 +20,7 @@ export interface IProps {
     onClick: (event: React.MouseEvent) => void;
     legacyMode?: boolean;
     openAsModal?: boolean;
+    selfPadded?: boolean;
 }
 /**
  * The contents of the flyouts (not the wrapper and not the button to toggle it).
@@ -38,7 +39,12 @@ export default class DropDownContents extends React.Component<IProps> {
                 <div
                     id={this.props.id}
                     aria-labelledby={this.props.parentID}
-                    className={classNames(asDropDownClasses, asModalClasses, this.props.className)}
+                    className={classNames(
+                        asDropDownClasses,
+                        asModalClasses,
+                        this.props.className,
+                        !this.props.selfPadded ? classes.verticalPadding : "",
+                    )}
                     style={flyoutPosition(this.props.renderAbove, this.props.renderLeft, !!this.props.legacyMode)}
                     onClick={this.props.onClick}
                 >

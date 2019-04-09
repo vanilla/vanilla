@@ -145,6 +145,14 @@ export const frameHeaderClasses = useThemeCache(() => {
         height: unit(formElVars.sizing.height),
         marginRight: unit(-6),
         color: colorOut(vars.colors.fg),
+        $nest: {
+            "&:not(.focus-visible)": {
+                outline: 0,
+            },
+            "&:hover, &:focus, &.focus-visible": {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+        },
     });
 
     const closePosition = style("closePosition", {

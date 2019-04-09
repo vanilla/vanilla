@@ -166,6 +166,7 @@ export const userContentClasses = useThemeCache(() => {
     };
 
     const linkStyles: NestedCSSSelectors = {
+        a: linkStyle,
         "p a": linkStyle,
         "li a": linkStyle,
     };

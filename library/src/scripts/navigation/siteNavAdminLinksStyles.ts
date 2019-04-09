@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, debugHelper, unit } from "@library/styles/styleHelpers";
+import {allLinkStates, colorOut, debugHelper, unit} from "@library/styles/styleHelpers";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { px } from "csx";
 import { style } from "typestyle";
@@ -40,11 +40,25 @@ export const siteNavAdminLinksClasses = useThemeCache(() => {
     });
 
     const link = style({
-        color: "inherit",
         fontWeight: globalVars.fonts.weights.semiBold,
-        marginLeft: px(6),
+        ...allLinkStates({
+            noState: {
+                color: colorOut(globalVars.mainColors.fg),
+            },
+            hover: {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+            focus: {
+                color: colorOut(globalVars.mainColors.secondary),
+            },
+        }),
         ...debug.name("link"),
     });
 
-    return { root, item, divider, link };
+    const linkIcon = style({
+        marginRight: px(6),
+        ...debug.name("linkIcon"),
+    });
+
+    return { root, item, divider, link, linkIcon };
 });

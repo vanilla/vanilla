@@ -14,7 +14,7 @@ use Exception;
 class ImgurEmbed extends Embed {
 
     /** @inheritdoc */
-    protected $domains = ['imgur.com'];
+    protected $domains = ['imgur.com', 'i.imgur.com'];
 
     /**
      * ImgurEmbed constructor.
@@ -28,11 +28,11 @@ class ImgurEmbed extends Embed {
      */
     public function matchUrl(string $url) {
         $data = [];
+
         // Strip image extensions. URLs with image extensions are not supported.
         $url = str_replace(['.jpg', '.jpeg', '.png'], '', $url);
         if ($this->isNetworkEnabled()) {
-            preg_match('/https?:\/\/(?:m.)?imgur\.com\/(?:(?<album>a|gallery)\/)?(?<postID>[a-z0-9]+)/i', $url, $matches);
-
+            preg_match('/.*\/(?:(?<album>a|gallery)\/)?(?<postID>[a-z0-9]+)/i', $url, $matches);
             if (array_key_exists('postID', $matches)) {
                 if (!array_key_exists('attributes', $data)) {
                     $data['attributes'] = [];

@@ -6,16 +6,20 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
+    buttonStates,
     colorOut,
     flexHelper,
     modifyColorBasedOnLightness,
-    states,
     unit,
     userSelect,
+    emphasizeLightness,
+    allButtonStates,
+    borders,
+    allLinkStates,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { percent, px } from "csx";
+import { ColorHelper, percent, px, color, important } from "csx";
 import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const vanillaHeaderVariables = useThemeCache(() => {
@@ -53,6 +57,9 @@ export const vanillaHeaderVariables = useThemeCache(() => {
             fontSize: 16,
             width: buttonMobileSize,
         },
+        state: {
+            bg: emphasizeLightness(colors.bg, 0.04),
+        },
     });
 
     const count = makeThemeVars("count", {
@@ -81,26 +88,25 @@ export const vanillaHeaderVariables = useThemeCache(() => {
     });
 
     const buttonContents = makeThemeVars("buttonContents", {
-        hover: {
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.1, true),
-        },
-        active: {
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.fg, globalVars.mainColors.primary, 0.2, true),
+        state: {
+            bg: button.state.bg,
         },
     });
 
     const signIn = makeThemeVars("signIn", {
         fg: colors.fg,
-        bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, globalVars.mainColors.primary, 0.1, true),
+        bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, 0.1, true),
         hover: {
-            bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, globalVars.mainColors.primary, 0.2, true),
+            bg: modifyColorBasedOnLightness(globalVars.mainColors.primary, 0.2, true),
         },
     });
 
     const resister = makeThemeVars("register", {
         fg: colors.bg,
-        hover: {
-            bg: globalVars.mainColors.bg.fade(0.9),
+        bg: colors.fg,
+        borderColor: colors.bg,
+        states: {
+            bg: colors.fg.fade(0.9),
         },
     });
 
@@ -214,8 +220,8 @@ export const vanillaHeaderClasses = useThemeCache(() => {
                 "&.focus-visible": {
                     $nest: {
                         "&.headerLogo-logoFrame": {
-                            outline: `5px solid ${vars.buttonContents.hover.bg}`,
-                            background: vars.buttonContents.hover.bg.toString(),
+                            outline: `5px solid ${vars.buttonContents.state.bg}`,
+                            background: colorOut(vars.buttonContents.state.bg),
                             borderRadius: vars.button.borderRadius,
                         },
                     },
@@ -297,11 +303,6 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         marginLeft: "auto",
     });
 
-    const meBoxStateStyles = style("meBoxStateStyles", {
-        borderRadius: px(vars.button.borderRadius),
-        backgroundColor: vars.buttonContents.hover.bg.toString(),
-    });
-
     const button = style(
         "button",
         {
@@ -310,39 +311,50 @@ export const vanillaHeaderClasses = useThemeCache(() => {
             minWidth: px(formElementVars.sizing.height),
             maxWidth: percent(100),
             padding: px(0),
-            $nest: {
-                "&:active": {
-                    color: vars.colors.fg.toString(),
-                    $nest: {
-                        ".meBox-contentHover": meBoxStateStyles,
-                        ".meBox-buttonContent": meBoxStateStyles,
-                    },
-                },
-                "&:hover": {
-                    color: vars.colors.fg.toString(),
-                    $nest: {
-                        ".meBox-contentHover": meBoxStateStyles,
-                        ".meBox-buttonContent": meBoxStateStyles,
-                    },
-                },
-                "&.focus-visible": {
-                    color: vars.colors.fg.toString(),
-                    $nest: {
-                        ".meBox-contentHover": meBoxStateStyles,
-                        ".meBox-buttonContent": meBoxStateStyles,
-                    },
-                },
-                "&.isOpen": {
-                    $nest: {
-                        ".meBox-contentHover": {
-                            backgroundColor: vars.buttonContents.active.bg.toString(),
+            ...allButtonStates(
+                {
+                    active: {
+                        // color: vars.colors.fg.toString(),
+                        $nest: {
+                            "& .meBox-buttonContent": {
+                                backgroundColor: colorOut(vars.buttonContents.state.bg),
+                            },
                         },
-                        ".meBox-buttonContent": {
-                            backgroundColor: vars.buttonContents.active.bg.toString(),
+                    },
+                    hover: {
+                        // color: vars.colors.fg.toString(),
+                        $nest: {
+                            "& .meBox-buttonContent": {
+                                backgroundColor: colorOut(vars.buttonContents.state.bg),
+                            },
+                        },
+                    },
+                    accessibleFocus: {
+                        outline: 0,
+                        $nest: {
+                            "& .meBox-buttonContent": {
+                                borderColor: colorOut(vars.colors.fg),
+                                backgroundColor: colorOut(vars.buttonContents.state.bg),
+                            },
                         },
                     },
                 },
-            },
+                {
+                    "& .meBox-buttonContent": {
+                        ...borders({
+                            width: 1,
+                            color: "transparent",
+                        }),
+                    },
+                    "&.isOpen": {
+                        $nest: {
+                            "& .meBox-buttonContent": {
+                                backgroundColor: colorOut(vars.buttonContents.state.bg),
+                            },
+                        },
+                    },
+                },
+            ),
         },
         mediaQueries.oneColumn({
             height: px(vars.sizing.mobile.height),
@@ -361,9 +373,9 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         $nest: {
             "&.focus-visible": {
                 $nest: {
-                    "&.meBox-contentHover": {
+                    "&.meBox-buttonContent": {
                         borderRadius: px(vars.button.borderRadius),
-                        backgroundColor: vars.buttonContents.hover.bg.toString(),
+                        backgroundColor: vars.buttonContents.state.bg.toString(),
                     },
                 },
             },
@@ -375,7 +387,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         $nest: {
             ".vanillaHeader-tabButtonContent": {
                 color: vars.colors.fg.toString(),
-                backgroundColor: modifyColorBasedOnLightness(vars.colors.fg, vars.colors.bg, 1).toString(),
+                backgroundColor: colorOut(modifyColorBasedOnLightness(vars.colors.fg, 1)),
                 borderRadius: px(vars.button.borderRadius),
             },
         },
@@ -450,11 +462,6 @@ export const vanillaHeaderClasses = useThemeCache(() => {
             "&&&": {
                 color: colorOut(vars.signIn.fg),
                 borderColor: colorOut(vars.colors.fg),
-                ...states({
-                    allStates: {
-                        borderColor: colorOut(vars.colors.fg),
-                    },
-                }),
             },
         },
     });
@@ -462,19 +469,28 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     const register = style("register", {
         marginLeft: unit(vars.guest.spacer),
         marginRight: unit(vars.guest.spacer),
-        $nest: {
-            "&&&": {
-                backgroundColor: colorOut(vars.colors.fg),
-                color: colorOut(vars.resister.fg),
-                borderColor: colorOut(vars.colors.fg),
-                ...states({
-                    allStates: {
-                        backgroundColor: colorOut(vars.colors.fg.fade(0.9)),
-                        borderColor: colorOut(vars.colors.fg),
-                    },
-                }),
+        backgroundColor: colorOut(vars.resister.bg),
+        // Ugly solution, but not much choice until: https://github.com/vanilla/knowledge/issues/778
+        ...allButtonStates({
+            allStates: {
+                borderColor: colorOut(vars.resister.borderColor, true),
             },
-        },
+            noState: {
+                backgroundColor: colorOut(vars.resister.bg, true),
+            },
+            hover: {
+                color: colorOut(vars.resister.fg),
+                backgroundColor: colorOut(vars.resister.states.bg, true),
+            },
+            focus: {
+                color: colorOut(vars.resister.fg),
+                backgroundColor: colorOut(vars.resister.states.bg, true),
+            },
+            active: {
+                color: colorOut(vars.resister.fg),
+                backgroundColor: colorOut(vars.resister.states.bg, true),
+            },
+        }),
     });
 
     const compactSearchResults = style(

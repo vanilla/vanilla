@@ -151,12 +151,15 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                         classes.topElement,
                                         classes.searchCancel,
                                     )}
-                                    cancelContentClassName="meBox-contentHover"
+                                    cancelContentClassName="meBox-buttonContent"
                                     buttonClass={classes.button}
                                     showingSuggestions={this.state.showingSuggestions}
                                     onOpenSuggestions={this.setOpenSuggestions}
                                     onCloseSuggestions={this.setCloseSuggestions}
-                                    buttonContentClassName={classNames(classesMeBox.buttonContent)}
+                                    buttonContentClassName={classNames(
+                                        classesMeBox.buttonContent,
+                                        "meBox-buttonContent",
+                                    )}
                                     clearButtonClass={classes.clearButtonClass}
                                 />
 

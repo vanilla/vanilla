@@ -5,11 +5,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, unit, userSelect } from "@library/styles/styleHelpers";
-import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
+import { colorOut, debugHelper, unit, userSelect } from "@library/styles/styleHelpers";
+import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
-import { style } from "typestyle";
 
 export const tokensVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -38,10 +37,9 @@ export const tokensClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = tokensVariables();
     const formElVars = formElementsVariables();
-    const debug = debugHelper("tokens");
+    const style = styleFactory("tokens");
 
     const root = style({
-        ...debug.name(),
         $nest: {
             ".tokens-clear": {
                 height: unit(vars.clear.width),
@@ -59,9 +57,9 @@ export const tokensClasses = useThemeCache(() => {
             ".tokens__value-container": {
                 minHeight: unit(formElVars.sizing.height),
                 paddingTop: 0,
-                paddingRight: px(3),
+                paddingRight: px(12),
                 paddingBottom: 0,
-                paddingLeft: px(3),
+                paddingLeft: px(12),
                 $nest: {
                     "&.tokens__value-container--has-value": {
                         padding: px(3),
@@ -72,24 +70,34 @@ export const tokensClasses = useThemeCache(() => {
                 fontSize: unit(vars.token.fontSize),
                 fontWeight: globalVars.fonts.weights.bold,
                 textShadow: vars.token.textShadow,
-                paddingLeft: px(6),
+                paddingLeft: px(3),
                 paddingRight: px(2),
                 margin: px(3),
                 backgroundColor: vars.token.bg.toString(),
                 ...userSelect(),
             },
+            "& .tokens__multi-value__label": {
+                paddingLeft: px(3),
+            },
         },
     });
 
-    const removeIcon = style({
+    const inputWrap = style("inputWrarp", {
+        $nest: {
+            "&.hasFocus .inputBlock-inputText": {
+                borderColor: colorOut(globalVars.mainColors.primary),
+            },
+        },
+    });
+
+    const removeIcon = style("removeIcon", {
         $nest: {
             "&.icon": {
                 width: unit(vars.clearIcon.width),
                 height: unit(vars.clearIcon.width),
             },
         },
-        ...debug.name("removeIcon"),
     });
 
-    return { root, removeIcon };
+    return { root, removeIcon, inputWrap };
 });

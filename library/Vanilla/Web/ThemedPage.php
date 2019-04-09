@@ -11,10 +11,10 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Theme\JsonAsset;
-use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\JsInterpop\ReduxAction;
+use Vanilla\Theme\FontsAsset;
 
 /**
  * A Web\Page that makes use of custom theme data from the theming API.
@@ -61,7 +61,13 @@ abstract class ThemedPage extends Page {
             $assets["variables"] = $variables;
         }
 
-        /** @var ImageAsset $logoAsset */
+        /** @var FontsAsset $fontsAsset */
+        $fontsAsset = $themeData["assets"]["fonts"] ?? null;
+        if ($fontsAsset) {
+            $assets["fonts"] = $fontsAsset->getData();
+        }
+
+                /** @var ImageAsset $logoAsset */
         $logoAsset = $themeData["assets"]["logo"] ?? null;
         if ($logoAsset) {
             $assets["logo"] = $logoAsset;

@@ -15,7 +15,9 @@ import React from "react";
 import Select from "react-select";
 import { OptionProps } from "react-select/lib/components/Option";
 import { styleFactory } from "@library/styles/styleUtils";
-import { style } from "typestyle";
+import { calc } from "csx";
+import { colorOut, unit } from "@library/styles/styleHelpers";
+import { globalVariables } from "@library/styles/globalStyleVars";
 
 export interface ISelectOneProps extends IOptionalComponentID {
     label: string;
@@ -30,38 +32,52 @@ export interface ISelectOneProps extends IOptionalComponentID {
     errors?: IFieldError[];
     searchable?: boolean;
     value: IComboBoxOption | undefined;
-    noOptionsMessage?: ((props: OptionProps<any>) => JSX.Element | null);
+    noOptionsMessage?: (props: OptionProps<any>) => JSX.Element | null;
     isLoading?: boolean;
+}
+
+interface IState {
+    focus: boolean;
 }
 
 /**
  * Implements the search bar component
  */
-export default class SelectOne extends React.Component<ISelectOneProps> {
+export default class SelectOne extends React.Component<ISelectOneProps, IState> {
     private id: string;
     private prefix = "SelectOne";
     private inputID: string;
     private errorID: string;
+    private focus: boolean;
 
     constructor(props: ISelectOneProps) {
         super(props);
         this.id = getRequiredID(props, this.prefix);
         this.inputID = this.id + "-input";
         this.errorID = this.id + "-errors";
+        this.focus = false;
+        this.state = {
+            focus: false,
+        };
     }
 
     public render() {
         const { className, disabled, options, searchable } = this.props;
+        const style = styleFactory("SelectOne");
         let describedBy;
         const hasErrors = this.props.errors && this.props.errors!.length > 0;
         if (hasErrors) {
             describedBy = this.errorID;
         }
 
-        const inputWrapClass = style({
+        const rightPadding = 30;
+        const inputWrapClass = style("inputWrarp", {
             $nest: {
+                "&.hasFocus .inputBlock-inputText": {
+                    borderColor: colorOut(globalVariables().mainColors.primary),
+                },
                 ".inputBlock-inputText": {
-                    paddingRight: 30,
+                    paddingRight: unit(rightPadding),
                     position: "relative",
                 },
                 ".SelectOne__indicators": {
@@ -73,6 +89,10 @@ export default class SelectOne extends React.Component<ISelectOneProps> {
                 ".SelectOne__indicator": {
                     cursor: "pointer",
                 },
+                "& .SelectOne__single-value": {
+                    textOverflow: "ellipsis",
+                    maxWidth: calc(`100% - ${unit(rightPadding + 26)}`),
+                },
             },
         });
         return (
@@ -82,7 +102,7 @@ export default class SelectOne extends React.Component<ISelectOneProps> {
                     <Paragraph className="inputBlock-labelNote" children={this.props.labelNote} />
                 </label>
 
-                <div className={classNames("inputBlock-inputWrap", inputWrapClass)}>
+                <div className={classNames("inputBlock-inputWrap", inputWrapClass, { hasFocus: this.state.focus })}>
                     <Select
                         id={this.id}
                         options={options}
@@ -103,6 +123,8 @@ export default class SelectOne extends React.Component<ISelectOneProps> {
                         value={this.props.value}
                         placeholder={this.props.placeholder}
                         isLoading={this.props.isLoading}
+                        onFocus={this.onFocus}
+                        onBlur={this.onBlur}
                     />
                     <Paragraph className="inputBlock-labelNote" children={this.props.noteAfterInput} />
                     <ErrorMessages id={this.errorID} errors={this.props.errors} />
@@ -112,8 +134,8 @@ export default class SelectOne extends React.Component<ISelectOneProps> {
     }
 
     /*
-    * Overwrite components in Select component
-    */
+     * Overwrite components in Select component
+     */
     private componentOverwrites = {
         Menu: selectOverrides.Menu,
         MenuList: selectOverrides.MenuList,
@@ -121,6 +143,24 @@ export default class SelectOne extends React.Component<ISelectOneProps> {
         ValueContainer: selectOverrides.ValueContainer,
         NoOptionsMessage: this.props.noOptionsMessage || selectOverrides.NoOptionsMessage,
         LoadingMessage: selectOverrides.OptionLoader,
+    };
+
+    /**
+     * Set class for focus
+     */
+    private onFocus = () => {
+        this.setState({
+            focus: true,
+        });
+    };
+
+    /**
+     * Set class for blur
+     */
+    private onBlur = () => {
+        this.setState({
+            focus: false,
+        });
     };
 
     /**

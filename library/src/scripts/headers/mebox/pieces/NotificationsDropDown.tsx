@@ -63,6 +63,7 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
                     />
                 }
                 onVisibilityChange={this.setOpen}
+                selfPadded={true}
             >
                 <NotificationsContents countClass={this.props.countClass} userSlug={userSlug} />
             </DropDown>

@@ -6,9 +6,10 @@
 
 import React from "react";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { radioTabCss } from "@library/forms/radioTabs/radioTabStyles";
 import TabContext from "@library/contexts/TabContext";
 import classNames from "classnames";
+import { radioTabClasses } from "@library/forms/radioTabs/radioTabStyles";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 interface IProps {
     prefix: string;
@@ -32,8 +33,7 @@ export default class RadioTabs extends React.Component<IProps> {
     }
 
     public render() {
-        radioTabCss();
-
+        const classes = radioTabClasses();
         return (
             <TabContext.Provider
                 value={{
@@ -45,12 +45,14 @@ export default class RadioTabs extends React.Component<IProps> {
             >
                 <fieldset
                     className={classNames(
-                        "inputBlock radioButtonsAsTabs _searchBarAdvanced-searchIn",
+                        "_searchBarAdvanced-searchIn",
+                        "inputBlock",
+                        classes.root,
                         this.props.className,
                     )}
                 >
-                    <legend className="sr-only">{this.props.accessibleTitle}</legend>
-                    <div className="radioButtonsAsTabs-tabs">{this.props.children}</div>
+                    <ScreenReaderContent tag="legend">{this.props.accessibleTitle}</ScreenReaderContent>
+                    <div className={classes.tabs}>{this.props.children}</div>
                 </fieldset>
             </TabContext.Provider>
         );

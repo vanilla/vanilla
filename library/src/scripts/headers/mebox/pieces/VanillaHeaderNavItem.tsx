@@ -42,9 +42,11 @@ export class VanillaHeaderNavItem extends React.Component<IProps> {
                     )}
                 >
                     <div
-                        className={classNames(this.props.linkContentClassName, classes.linkContent, {
-                            isCurrent,
-                        })}
+                        className={classNames(
+                            this.props.linkContentClassName,
+                            classes.linkContent,
+                            isCurrent ? classes.linkActive : "",
+                        )}
                     >
                         {this.props.children}
                     </div>

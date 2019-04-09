@@ -72,6 +72,7 @@ function UserDropDown(props: IProps) {
                     />
                 </div>
             }
+            selfPadded={true}
             onVisibilityChange={setOpen}
         >
             <UserDropDownContents />

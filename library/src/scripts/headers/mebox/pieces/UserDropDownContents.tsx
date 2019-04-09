@@ -41,7 +41,7 @@ function UserDropDownContents(props: IProps) {
 
     return (
         <Frame className={props.className}>
-            <FrameBody className={classNames(classesFrameBody.root, classesDropDown.verticalPadding)}>
+            <FrameBody className={classNames(classesFrameBody.root, classesDropDown.verticalPadding)} selfPadded={true}>
                 <DropDownUserCard className="userDropDown-userCard" />
                 <DropDownItemSeparator />
                 <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />

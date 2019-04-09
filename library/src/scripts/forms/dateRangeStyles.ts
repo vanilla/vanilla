@@ -5,27 +5,24 @@
  */
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, unit } from "@library/styles/styleHelpers";
-import { useThemeCache } from "@library/styles/styleUtils";
-import { style } from "typestyle";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { percent } from "csx";
 
 export const dateRangeClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const debug = debugHelper("dateRange");
+    const style = styleFactory("dateRange");
 
     const root = style({
         display: "block",
         position: "relative",
         width: percent(100),
-        ...debug.name(),
     });
 
-    const boundary = style({
-        ...debug.name("boundary"),
+    const boundary = style("boundary", {
         display: "flex",
         flexWrap: "wrap",
         alignItems: "center",
-        justifyContent: "flex-start",
+        justifyContent: "space-between",
         width: percent(100),
         $nest: {
             "& + &": {
@@ -34,22 +31,24 @@ export const dateRangeClasses = useThemeCache(() => {
         },
     });
 
-    const label = style({
-        ...debug.name("label"),
-        width: percent(100),
+    const label = style("label", {
         overflow: "hidden",
         fontWeight: globalVars.fonts.weights.semiBold,
         wordBreak: "break-word",
         textOverflow: "ellipsis",
         maxWidth: percent(100),
+        paddingLeft: unit(8),
     });
 
-    const input = style({
-        ...debug.name("input"),
-        minWidth: unit(136),
+    const input = style("input", {
+        width: unit(136),
         maxWidth: percent(100),
-        flexGrow: 1,
     });
 
-    return { root, boundary, label, input };
+    return {
+        root,
+        boundary,
+        label,
+        input,
+    };
 });

@@ -13,9 +13,16 @@ export interface ITheme {
 }
 
 export interface IThemeAssets {
+    fonts?: IThemeFont[];
     logo?: IThemeExternalAsset;
     mobileLogo?: IThemeExternalAsset;
     variables?: IThemeVariables;
+}
+
+export interface IThemeFont {
+    name: string;
+    url: string;
+    fallbacks: string[];
 }
 
 export interface IThemeExternalAsset {

@@ -34,11 +34,3 @@ const styleDecorator = storyFn => {
 };
 
 addDecorator(styleDecorator);
-
-void ensureScript("https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js").then(() => {
-    window.WebFont.load({
-        google: {
-            families: ["Open Sans:400,400italic,600,700"], // Will be dynamic at some point
-        },
-    });
-});

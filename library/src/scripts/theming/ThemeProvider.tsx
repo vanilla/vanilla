@@ -14,6 +14,8 @@ import ThemeActions from "@library/theming/ThemeActions";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import React from "react";
 import { connect } from "react-redux";
+import WebFont from "webfontloader";
+import { loadThemeFonts } from "./loadThemeFonts";
 
 export interface IWithThemeProps {
     theme: IThemeVariables;
@@ -57,6 +59,8 @@ class BaseThemeProvider extends React.Component<IProps> {
         if (themeFooter) {
             prepareShadowRoot(themeFooter, true);
         }
+
+        loadThemeFonts();
     }
 }
 

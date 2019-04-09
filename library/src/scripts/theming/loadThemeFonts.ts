@@ -29,10 +29,10 @@ export function loadThemeFonts() {
 
             if (webFontConfig.custom && webFontConfig.custom.urls && webFontConfig.custom.urls.length > 0) {
                 WebFont.load(webFontConfig);
-            } else {
-                // Default font loading
-                WebFont.load(defaultFontConfig);
             }
+        } else {
+            // If the theme has no font config of its own, load the default.
+            WebFont.load(defaultFontConfig);
         }
     }
 }

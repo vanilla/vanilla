@@ -10,19 +10,19 @@ import { px } from "csx";
 import { cssRule } from "typestyle";
 
 export const inputVariables = useThemeCache(() => {
-    const gVars = globalVariables();
+    const globalVars = globalVariables();
     const makeThemeVars = variableFactory("input");
 
     const colors = makeThemeVars("colors", {
-        placeholder: gVars.mixBgAndFg(0.5),
-        fg: gVars.mixBgAndFg(0.8),
-        bg: gVars.mainColors.bg,
+        placeholder: globalVars.mixBgAndFg(0.5),
+        fg: globalVars.mixBgAndFg(0.8),
+        bg: globalVars.mainColors.bg,
+        state: {
+            fg: globalVars.mainColors.primary,
+        },
     });
 
-    const border: IBorderStyles = makeThemeVars("borders", {
-        ...gVars.border,
-        width: px(1),
-    });
+    const border: IBorderStyles = makeThemeVars("borders", globalVars.border);
 
     return { colors, border };
 });
@@ -35,9 +35,15 @@ export const inputClasses = useThemeCache(() => {
         backgroundColor: colorOut(vars.colors.bg),
         color: colorOut(vars.colors.fg),
         ...borders(vars.border),
-        $nest: placeholderStyles({
-            color: colorOut(vars.colors.placeholder),
-        }),
+        outline: 0,
+        $nest: {
+            ...placeholderStyles({
+                color: colorOut(vars.colors.placeholder),
+            }),
+            "&:focus, &.focus-visible": {
+                borderColor: colorOut(vars.colors.state.fg),
+            },
+        },
     };
 
     // Use as assignable unique style.

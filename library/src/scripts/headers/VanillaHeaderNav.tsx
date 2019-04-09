@@ -4,45 +4,53 @@
  * @license GPL-2.0-only
  */
 
-import { percent, px, calc } from "csx";
+import { percent, px, calc, quote } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
-import { layoutVariables } from "@library/layout/layoutStyles";
-import { flexHelper, unit } from "@library/styles/styleHelpers";
-import { styleFactory } from "@library/styles/styleUtils";
+import {
+    absolutePosition,
+    colorOut,
+    flexHelper,
+    modifyColorBasedOnLightness,
+    negative,
+    unit,
+    userSelect,
+} from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
+import { userContentClasses } from "@library/content/userContentStyles";
 
-export function vanillaHeaderNavigation() {
+export const vanillaHeaderNavigationVariables = useThemeCache(() => {
+    const makeThemeVars = variableFactory("vanillaHeaderNavigation");
     const globalVars = globalVariables();
     const varsFormElements = formElementsVariables();
 
-    const border = {
+    const border = makeThemeVars("border", {
         verticalWidth: 3,
-        active: {
-            border: {
-                color: globalVars.mainColors.bg.fade(0.9),
-            },
-        },
-    };
+    });
 
-    const active = {
-        bottomOffset: 8,
-    };
-
-    const item = {
+    const item = makeThemeVars("item", {
         size: varsFormElements.sizing.height,
-    };
+    });
+
+    const linkActive = makeThemeVars("linkActive", {
+        offset: 2,
+        height: 3,
+        bg: globalVars.mainColors.bg.fade(0.9),
+        bottomSpace: 1,
+    });
 
     return {
         border,
-        active,
         item,
+        linkActive,
     };
-}
+});
 
 export default function vanillaHeaderNavClasses() {
     const headerVars = vanillaHeaderVariables();
-    const vars = vanillaHeaderNavigation();
+    const vars = vanillaHeaderNavigationVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
     const style = styleFactory("vanillaHeaderNav");
@@ -70,21 +78,6 @@ export default function vanillaHeaderNavClasses() {
         {
             ...flex.middle(),
             height: unit(vars.item.size),
-            $nest: {
-                "&.isCurrent": {
-                    $nest: {
-                        "&.vanillaHeaderNav-linkContent": {
-                            $nest: {
-                                "&:after": {
-                                    marginLeft: px(-2),
-                                    width: calc(`100% + 4px`),
-                                    borderBottomColor: vars.border.active.border.color.toString(),
-                                },
-                            },
-                        },
-                    },
-                },
-            },
         },
         mediaQueries.oneColumn({
             height: px(headerVars.sizing.mobile.height),
@@ -92,16 +85,33 @@ export default function vanillaHeaderNavClasses() {
     );
 
     const link = style("link", {
+        ...userSelect(),
         display: "flex",
         justifyContent: "center",
         alignItems: "stretch",
         height: unit(vars.item.size),
         $nest: {
             "&.focus-visible": {
-                backgroundColor: headerVars.buttonContents.hover.bg.toString(),
+                backgroundColor: colorOut(headerVars.buttonContents.state.bg),
             },
             "&:hover": {
-                backgroundColor: headerVars.buttonContents.hover.bg.toString(),
+                backgroundColor: colorOut(headerVars.buttonContents.state.bg),
+            },
+        },
+    });
+
+    const linkActive = style("linkActive", {
+        $nest: {
+            "&:after": {
+                ...absolutePosition.topLeft(
+                    `calc(50% - ${unit(vars.linkActive.height + vars.linkActive.bottomSpace)})`,
+                ),
+                content: quote(""),
+                height: unit(vars.linkActive.height),
+                marginLeft: unit(negative(vars.linkActive.offset)),
+                width: calc(`100% + ${unit(vars.linkActive.offset * 2)}`),
+                backgroundColor: colorOut(vars.linkActive.bg),
+                transform: `translateY(${unit(headerVars.sizing.height / 2)})`,
             },
         },
     });
@@ -116,6 +126,7 @@ export default function vanillaHeaderNavClasses() {
         navigation,
         items,
         link,
+        linkActive,
         linkContent,
     };
 }

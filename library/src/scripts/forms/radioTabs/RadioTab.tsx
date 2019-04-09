@@ -7,12 +7,14 @@
 import * as React from "react";
 import classNames from "classnames";
 import { ITabProps, withTabs } from "@library/contexts/TabContext";
+import { radioTabClasses } from "@library/forms/radioTabs/radioTabStyles";
 
 interface IProps extends ITabProps {
     label: string;
     className?: string;
     data: string | number;
     activeTab: string | number;
+    position?: "left" | "right";
 }
 
 /**
@@ -20,10 +22,18 @@ interface IProps extends ITabProps {
  */
 class RadioTab extends React.Component<IProps> {
     public render() {
+        const classes = radioTabClasses();
         return (
-            <label className={classNames("radioButtonsAsTabs-tab", this.props.childClass, this.props.className)}>
+            <label
+                className={classNames(
+                    "radioButtonsAsTabs-tab",
+                    this.props.childClass,
+                    this.props.className,
+                    classes.tab,
+                )}
+            >
                 <input
-                    className="radioButtonsAsTabs-input sr-only"
+                    className={classNames("radioButtonsAsTabs-input", "sr-only", classes.input)}
                     type="radio"
                     onClick={this.onClick}
                     onKeyDown={this.onKeyDown}
@@ -32,7 +42,16 @@ class RadioTab extends React.Component<IProps> {
                     name={this.props.groupID}
                     value={this.props.label}
                 />
-                <span className="radioButtonsAsTabs-label">{this.props.label}</span>
+                <span
+                    className={classNames(
+                        "radioButtonsAsTabs-label",
+                        classes.label,
+                        this.props.position === "left" ? classes.leftTab : undefined,
+                        this.props.position === "right" ? classes.rightTab : undefined,
+                    )}
+                >
+                    {this.props.label}
+                </span>
             </label>
         );
     }

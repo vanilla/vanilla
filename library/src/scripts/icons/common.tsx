@@ -168,9 +168,14 @@ export function newFolder(className?: string, title: string = t("New Folder")) {
             aria-hidden="true"
         >
             <title>{title}</title>
-            <path d="M1,15.066V3.77Q1,1,3.548,1H9.12L11.3,3.769h7.286q2.372-.083,2.372,2.6v8.7q0,3.205-2.372,3.206H3.548Q1,18.272,1,15.066Z" style={{fill: "none", stroke: "currentColor", strokeWidth: "1.2px"}}/>
-            <path d="M10.5,8v6m3-3h-6" style={{fill: "none", stroke: "currentColor", strokeLinecap: "round", strokeWidth: "1.2px"}}/>
-
+            <path
+                d="M1,15.066V3.77Q1,1,3.548,1H9.12L11.3,3.769h7.286q2.372-.083,2.372,2.6v8.7q0,3.205-2.372,3.206H3.548Q1,18.272,1,15.066Z"
+                style={{ fill: "none", stroke: "currentColor", strokeWidth: "1.2px" }}
+            />
+            <path
+                d="M10.5,8v6m3-3h-6"
+                style={{ fill: "none", stroke: "currentColor", strokeLinecap: "round", strokeWidth: "1.2px" }}
+            />
         </svg>
     );
 }

@@ -7,6 +7,7 @@
 
 namespace Vanilla\Web;
 
+use Gdn_Upload;
 use Garden\CustomExceptionHandler;
 use Garden\Web\Data;
 use Garden\Web\Exception\ServerException;
@@ -17,7 +18,6 @@ use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
-use Vanilla\Web\ContentSecurityPolicy\DefaultContentSecurityPolicyProvider;
 use Vanilla\Web\JsInterpop\PhpAsJsVariable;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\JsInterpop\ReduxErrorAction;
@@ -31,6 +31,9 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
 
     /** @var string */
     private $canonicalUrl;
+
+    /** @var string */
+    private $favIcon;
 
     /** @var string */
     private $seoTitle;
@@ -125,6 +128,14 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
         $this->assetProvider = $assetProvider;
         $this->breadcrumbModel = $breadcrumbModel;
         $this->cspModel = $cspModel;
+
+        if ($favIcon = $this->siteMeta->getFavIcon()) {
+            $this->setFavIcon($favIcon);
+        }
+
+        if ($mobileAddressBarColor = $this->siteMeta->getMobileAddressBarColor()) {
+            $this->addMetaTag("theme-color", ["name" => "theme-color", "content" => $mobileAddressBarColor]);
+        }
     }
 
     /**
@@ -159,6 +170,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
             'breadcrumbsJson' => $this->seoBreadcrumbs ?
                 $this->breadcrumbModel->crumbsAsJsonLD($this->seoBreadcrumbs) :
                 null,
+            'favIcon' => $this->favIcon,
         ];
         $viewContent = $this->renderTwig('resources/views/default-master.twig', $viewData);
 
@@ -208,6 +220,26 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler {
     protected function addReduxAction(ReduxAction $action): self {
         $this->reduxActions[] = $action;
 
+        return $this;
+    }
+
+    /**
+     * Get the page's "favorite icon".
+     *
+     * @return string|null
+     */
+    protected function getFavIcon(): ?string {
+        return $this->favIcon;
+    }
+
+    /**
+     * Set the "favorite icon" for the page.
+     *
+     * @param string $favIcon
+     * @return self
+     */
+    protected function setFavIcon(string $favIcon): self {
+        $this->favIcon = $favIcon;
         return $this;
     }
 

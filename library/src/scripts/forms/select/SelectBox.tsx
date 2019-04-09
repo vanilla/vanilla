@@ -153,6 +153,7 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         renderAbove={this.props.renderAbove}
                         renderLeft={this.props.renderLeft}
                         openAsModal={this.props.openAsModal}
+                        selfPadded={true}
                     >
                         <Frame>
                             <FrameBody

@@ -10,6 +10,7 @@ import classNames from "classnames";
 
 export interface IFrameBodyProps {
     className?: string;
+    selfPadded?: boolean;
     children: React.ReactNode;
 }
 
@@ -20,6 +21,14 @@ export interface IFrameBodyProps {
 export default class FrameBody extends React.PureComponent<IFrameBodyProps> {
     public render() {
         const classes = frameBodyClasses();
-        return <div className={classNames("frameBody", this.props.className, classes.root)}>{this.props.children}</div>;
+        return (
+            <div
+                className={classNames("frameBody", this.props.className, classes.root, {
+                    isSelfPadded: this.props.selfPadded,
+                })}
+            >
+                {this.props.children}
+            </div>
+        );
     }
 }

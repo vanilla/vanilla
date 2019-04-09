@@ -29,6 +29,7 @@ interface IProps extends IOptionalComponentID {
 
 interface IState {
     inputValue: string;
+    focus: boolean;
 }
 
 /**
@@ -40,6 +41,7 @@ export default class Tokens extends React.Component<IProps, IState> {
     private inputID: string = this.id + "-tokenInput";
     public state: IState = {
         inputValue: "",
+        focus: false,
     };
 
     public render() {
@@ -53,7 +55,7 @@ export default class Tokens extends React.Component<IProps, IState> {
                     <Paragraph className="inputBlock-labelNote" children={this.props.labelNote} />
                 </label>
 
-                <div className="inputBlock-inputWrap">
+                <div className={classNames("inputBlock-inputWrap", classes.inputWrap, { hasFocus: this.state.focus })}>
                     <Select
                         id={this.id}
                         inputId={this.inputID}
@@ -76,6 +78,8 @@ export default class Tokens extends React.Component<IProps, IState> {
                         styles={this.getStyles()}
                         backspaceRemovesValue={true}
                         isMulti={true}
+                        onFocus={this.onFocus}
+                        onBlur={this.onBlur}
                     />
                 </div>
             </div>
@@ -92,8 +96,8 @@ export default class Tokens extends React.Component<IProps, IState> {
     };
 
     /*
-    * Overwrite components in Select component
-    */
+     * Overwrite components in Select component
+     */
     private get componentOverwrites() {
         return {
             ClearIndicator: selectOverrides.NullComponent,
@@ -108,8 +112,8 @@ export default class Tokens extends React.Component<IProps, IState> {
             NoOptionsMessage: this.showLoader
                 ? selectOverrides.OptionLoader
                 : this.state.inputValue.length > 0
-                    ? selectOverrides.NoOptionsMessage
-                    : selectOverrides.NullComponent,
+                ? selectOverrides.NoOptionsMessage
+                : selectOverrides.NullComponent,
             LoadingIndicator: selectOverrides.NullComponent,
         };
     }
@@ -124,6 +128,24 @@ export default class Tokens extends React.Component<IProps, IState> {
             colors: {},
             spacing: {},
         };
+    };
+
+    /**
+     * Set class for focus
+     */
+    private onFocus = () => {
+        this.setState({
+            focus: true,
+        });
+    };
+
+    /**
+     * Set class for blur
+     */
+    private onBlur = () => {
+        this.setState({
+            focus: false,
+        });
     };
 
     /**

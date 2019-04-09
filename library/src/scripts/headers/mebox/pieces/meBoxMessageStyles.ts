@@ -9,7 +9,7 @@ import {
     colorOut,
     objectFitWithFallback,
     paddings,
-    states,
+    buttonStates,
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
@@ -60,7 +60,7 @@ export const meBoxMessageClasses = useThemeCache(() => {
         flexWrap: "nowrap",
         color: "inherit",
         ...paddings(vars.spacing.padding),
-        ...states({
+        ...buttonStates({
             allStates: {
                 textShadow: "none",
             },

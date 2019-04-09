@@ -5,13 +5,21 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, fonts, margins, paddings, states, unit, userSelect } from "@library/styles/styleHelpers";
+import {
+    borders,
+    colorOut,
+    fonts,
+    margins,
+    paddings,
+    buttonStates,
+    unit,
+    userSelect,
+} from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { important, percent } from "csx";
 import { layoutVariables } from "@library/layout/layoutStyles";
-import { FontSizeProperty } from "csstype";
 
 export const dropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -23,12 +31,9 @@ export const dropDownVariables = useThemeCache(() => {
     });
 
     const spacer = makeThemeVars("spacer", {
-        margin: 6,
-    });
-
-    // Defaults to globals, but here in case we want to overwrite it
-    const border = makeThemeVars("border", {
-        color: globalVars.border.color,
+        margin: {
+            vertical: 8,
+        },
     });
 
     const metas = makeThemeVars("metas", {
@@ -37,10 +42,8 @@ export const dropDownVariables = useThemeCache(() => {
             color: globalVars.meta.text.color,
         },
         padding: {
-            top: 6,
-            right: 18,
-            bottom: 6,
-            left: 18,
+            vertical: 6,
+            horizontal: 14,
         },
     });
 
@@ -52,6 +55,10 @@ export const dropDownVariables = useThemeCache(() => {
         mobile: {
             minHeight: 44,
             fontSize: 16,
+        },
+
+        padding: {
+            top: 6,
         },
     });
 
@@ -69,11 +76,17 @@ export const dropDownVariables = useThemeCache(() => {
     const contents = makeThemeVars("contents", {
         bg: globalVars.mainColors.bg,
         fg: globalVars.mainColors.fg,
+        border: {
+            radius: globalVars.border.radius,
+            color: globalVars.border.color,
+        },
+        padding: {
+            vertical: 9,
+        },
     });
 
     return {
         sizing,
-        border,
         metas,
         item,
         sectionTitle,
@@ -86,18 +99,12 @@ export const dropDownVariables = useThemeCache(() => {
 export const dropDownClasses = useThemeCache(() => {
     const vars = dropDownVariables();
     const globalVars = globalVariables();
-    const layoutVars = layoutVariables();
     const style = styleFactory("dropDown");
     const shadows = shadowHelper();
     const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style({
         position: "relative",
-    });
-
-    const paddedList = style("paddedList", {
-        paddingTop: layoutVars.gutter.quarterSize,
-        paddingBottom: layoutVars.gutter.quarterSize,
     });
 
     const contents = style("contents", {
@@ -107,6 +114,7 @@ export const dropDownClasses = useThemeCache(() => {
         color: colorOut(vars.contents.fg),
         overflow: "hidden",
         ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders({}), shadows.dropDown()),
+        ...borders(vars.contents.border),
         zIndex: 1,
         $nest: {
             "&.isParentWidth": {
@@ -127,10 +135,8 @@ export const dropDownClasses = useThemeCache(() => {
             },
             "&.hasVerticalPadding": {
                 ...paddings({
-                    top: 12,
-                    left: important(0),
-                    bottom: 12,
-                    right: important(0),
+                    vertical: 12,
+                    horizontal: important(0),
                 }),
             },
             "&:empty": {
@@ -141,12 +147,9 @@ export const dropDownClasses = useThemeCache(() => {
 
     const asModal = style("asModal", {
         $nest: {
-            "&.hasVerticalPadding": {
-                ...(paddings({
-                    top: 12,
-                    bottom: 12,
-                }) as NestedCSSProperties),
-            },
+            "&.hasVerticalPadding": paddings({
+                vertical: 12,
+            }),
         },
     });
 
@@ -172,7 +175,7 @@ export const dropDownClasses = useThemeCache(() => {
     const metaItem = style("metaItem", {
         $nest: {
             "& + &": {
-                paddingTop: unit(vars.metas.padding.top),
+                paddingTop: unit(vars.item.padding.top),
             },
         },
         ...fonts(vars.metas.font),
@@ -196,7 +199,7 @@ export const dropDownClasses = useThemeCache(() => {
 
     const toggleButtonIcon = style("toggleButtonIcon", {
         $nest: {
-            ...states({
+            ...buttonStates({
                 allStates: {
                     color: colorOut(globalVars.mainColors.primary),
                 },
@@ -218,19 +221,32 @@ export const dropDownClasses = useThemeCache(() => {
             minHeight: unit(vars.item.minHeight),
             lineHeight: unit(globalVars.lineHeights.condensed),
             ...paddings({
-                top: 4,
-                right: 18,
-                bottom: 4,
-                left: 18,
+                vertical: 4,
+                horizontal: 14,
+            }),
+            ...borders({
+                color: "transparent",
+                radius: 0,
             }),
             ...userSelect("none"),
-            $nest: {
-                ...states({
-                    allStates: {
-                        backgroundColor: colorOut(globalVars.states.hover.color),
-                    },
-                }),
-            },
+            ...buttonStates({
+                allStates: {
+                    textShadow: "none",
+                    outline: 0,
+                },
+                hover: {
+                    backgroundColor: colorOut(globalVars.states.active.color),
+                },
+                focus: {
+                    backgroundColor: colorOut(globalVars.states.focus.color),
+                },
+                active: {
+                    backgroundColor: colorOut(globalVars.states.active.color),
+                },
+                accessibleFocus: {
+                    borderColor: colorOut(globalVars.mainColors.primary),
+                },
+            }),
         },
         mediaQueries.oneColumn({
             fontSize: unit(vars.item.mobile.fontSize),
@@ -245,11 +261,8 @@ export const dropDownClasses = useThemeCache(() => {
 
     const separator = style("separator", {
         height: unit(globalVars.separator.size),
-        backgroundColor: colorOut(vars.border.color),
-        ...margins({
-            top: vars.spacer.margin,
-            bottom: vars.spacer.margin,
-        }),
+        backgroundColor: colorOut(globalVars.separator.color),
+        ...margins(vars.spacer.margin),
     });
 
     const sectionHeading = style("sectionHeading", {
@@ -273,10 +286,8 @@ export const dropDownClasses = useThemeCache(() => {
 
     const verticalPadding = style("verticalPadding", {
         ...paddings({
-            top: vars.spacer.margin,
-            right: important(0),
-            bottom: vars.spacer.margin,
-            left: important(0),
+            vertical: vars.contents.padding.vertical,
+            horizontal: 0,
         }),
     });
 
@@ -290,7 +301,7 @@ export const dropDownClasses = useThemeCache(() => {
             top: 0,
             right: 0,
             bottom: 0,
-            left: vars.spacer.margin,
+            left: unit(6),
         }),
         textTransform: "uppercase",
         color: colorOut(vars.title.color),
@@ -298,7 +309,6 @@ export const dropDownClasses = useThemeCache(() => {
 
     return {
         root,
-        paddedList,
         contents,
         asModal,
         likeDropDownContent,

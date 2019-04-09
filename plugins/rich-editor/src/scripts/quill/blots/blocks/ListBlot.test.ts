@@ -20,7 +20,6 @@ import Delta from "quill-delta";
 import Quill from "quill/core";
 import { setupTestQuill } from "@rich-editor/__tests__/quillUtils";
 import OpUtils from "@rich-editor/__tests__/OpUtils";
-import Parchment from "parchment";
 
 describe("ListBlot", () => {
     before(() => {
@@ -259,7 +258,7 @@ describe("ListBlot", () => {
             //         - list item
             //           - list item
             //      - list item
-            // - list item
+            // 1. list item
 
             expect(quill.scroll.children).has.length(2);
 

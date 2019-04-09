@@ -176,6 +176,17 @@ export class ListItemWrapper extends withWrapper(Container as any) {
     public static parentName = [UnorderedListGroup.blotName, OrderedListGroup.blotName];
 
     /**
+     * Create the dom node for th item and
+     *
+     * @param value
+     */
+    public static create(value: IListObjectValue) {
+        const element = super.create(value) as HTMLElement;
+        syncValueToElement(element, value);
+        return element;
+    }
+
+    /**
      * @override
      */
     public split(index: number, force?: boolean) {
@@ -383,15 +394,7 @@ export class ListItemWrapper extends withWrapper(Container as any) {
      * Utility for getting the value from the blot's domNode.
      */
     public getValue(): IListObjectValue {
-        const content = this.getListContent();
-        if (content) {
-            return content.getValue();
-        } else {
-            return {
-                type: ListType.BULLETED,
-                depth: 0,
-            };
-        }
+        return getValueFromElement(this.domNode);
     }
 
     /**
@@ -571,8 +574,7 @@ export class ListItem extends LineBlot {
     public updateIndentValue(newDepth: number) {
         newDepth = Math.min(MAX_NESTING_DEPTH, newDepth);
         this.domNode.setAttribute("data-depth", newDepth);
-        const updateID = Math.random() * 10000;
-        this.parent.domNode.setAttribute("data-update-id", updateID.toString(16));
+        this.parent.domNode.setAttribute("data-depth", newDepth);
         this.cache = {};
     }
 
@@ -604,30 +606,6 @@ export class ListItem extends LineBlot {
      */
     public canOutdent(): boolean {
         return this.getValue().depth > 0 || this.domNode.textContent === "";
-    }
-
-    /**
-     * @override
-     * Extended to keep our type value in sync with the parent we're closest too.
-     */
-    public attach() {
-        super.attach();
-        // Sync up our list type.
-        const listNode = this.domNode.closest("ul, ol");
-        if (!listNode) {
-            return;
-        }
-        const currentType = this.getValue().type;
-        let newType = currentType;
-        if (listNode.tagName === ListTag.OL) {
-            newType = ListType.ORDERED;
-        } else if (listNode.tagName === ListTag.UL) {
-            newType = ListType.BULLETED;
-        }
-
-        if (newType !== currentType) {
-            this.domNode.setAttribute("data-type", newType);
-        }
     }
 
     /**

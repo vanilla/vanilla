@@ -112,7 +112,7 @@ export function article(className?: string, fillClass?: string) {
 export function organize(className?: string) {
     const rectStyle: React.CSSProperties = {
         fill: "none",
-        stroke: "#777a80",
+        stroke: "currentColor",
     };
     return (
         <svg

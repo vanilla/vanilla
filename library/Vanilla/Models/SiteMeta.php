@@ -44,6 +44,12 @@ class SiteMeta implements \JsonSerializable {
     /** @var Addon */
     private $activeTheme;
 
+    /** @var string */
+    private $favIcon;
+
+    /** @var string */
+    private $mobileAddressBarColor;
+
     /**
      * SiteMeta constructor.
      *
@@ -76,6 +82,12 @@ class SiteMeta implements \JsonSerializable {
 
         // Theming
         $this->activeTheme = $activeTheme;
+
+        if ($favIcon = $config->get("Garden.FavIcon")) {
+            $this->favIcon = \Gdn_Upload::url($favIcon);
+        }
+
+        $this->mobileAddressBarColor = $config->get("Garden.MobileAddressBarColor", null);
     }
 
     /**
@@ -100,6 +112,8 @@ class SiteMeta implements \JsonSerializable {
                 'siteName' => $this->siteTitle,
                 'localeKey' => $this->localeKey,
                 'themeKey' => $this->activeTheme->getKey(),
+                'favIcon' => $this->favIcon,
+                'mobileAddressBarColor' => $this->mobileAddressBarColor,
             ],
             'upload' => [
                 'maxSize' => $this->maxUploadSize,
@@ -169,5 +183,23 @@ class SiteMeta implements \JsonSerializable {
      */
     public function getActiveTheme(): Addon {
         return $this->activeTheme;
+    }
+
+    /**
+     * Get the configured "favorite icon" for the site.
+     *
+     * @return string|null
+     */
+    public function getFavIcon(): ?string {
+        return $this->favIcon;
+    }
+
+    /**
+     * Get the configured "theme color" for the site.
+     *
+     * @return string|null
+     */
+    public function getMobileAddressBarColor(): ?string {
+        return $this->mobileAddressBarColor;
     }
 }

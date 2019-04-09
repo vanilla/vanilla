@@ -34,10 +34,9 @@ abstract class ThemedPage extends Page {
         WebpackAssetProvider $assetProvider,
         BreadcrumbModel $breadcrumbModel,
         \ThemesApiController $themesApi = null, // Default required to conform to interface
-        ContentSecurityPolicyModel $cspModel,
-        ConfigurationInterface $config
+        ContentSecurityPolicyModel $cspModel
     ) {
-        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $config);
+        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel);
         $this->themesApi = $themesApi;
         $this->initAssets();
     }

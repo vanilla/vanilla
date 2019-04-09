@@ -378,7 +378,14 @@ describe("ListBlot", () => {
             ]);
         });
 
-        it.only("propert outdents nested children when it's format is replaced", () => {
+        it("propert outdents nested children when it's format is replaced", () => {
+            // Before
+            // - 1
+            //   - 1.1
+            //   - 1.2
+            //     - 1.2.1
+            //     - 1.2.2
+            //   - 1.3
             insertListBlot({ type: ListType.BULLETED, depth: 0 }, "1");
             insertListBlot({ type: ListType.BULLETED, depth: 1 }, "1.1");
             insertListBlot({ type: ListType.BULLETED, depth: 1 }, "1.2");
@@ -386,26 +393,26 @@ describe("ListBlot", () => {
             insertListBlot({ type: ListType.BULLETED, depth: 2 }, "1.2.2");
             insertListBlot({ type: ListType.BULLETED, depth: 1 }, "1.3");
 
-            // The inner items should be
+            quill.formatLine(6, 2, ListItem.blotName, false, Quill.sources.USER);
+            // After
             // - 1
-            //  - 1.1
-            //  - 1.2
-            //    - 1.2.1
-            //    - 1.2.2
-            //  - 1.3
+            //   - 1.1
+            // 1.2
+            // - 1.2.1
+            // - 1.2.2
+            // - 1.3
 
-            quill.formatLine(6, 8, ListItem.blotName, false, Quill.sources.USER);
             expect(quill.getContents().ops).deep.eq([
                 OpUtils.op("1"),
                 OpUtils.list(ListType.BULLETED),
                 OpUtils.op("1.1"),
                 OpUtils.list(ListType.BULLETED, 1),
                 OpUtils.op("1.2\n1.2.1"),
-                OpUtils.list(ListType.BULLETED, 1),
+                OpUtils.list(ListType.BULLETED, 0),
                 OpUtils.op("1.2.2"),
-                OpUtils.list(ListType.BULLETED, 1),
+                OpUtils.list(ListType.BULLETED, 0),
                 OpUtils.op("1.3"),
-                OpUtils.list(ListType.BULLETED, 1),
+                OpUtils.list(ListType.BULLETED, 0),
             ]);
         });
     });

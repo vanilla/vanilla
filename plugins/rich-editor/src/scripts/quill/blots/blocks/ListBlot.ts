@@ -431,19 +431,6 @@ export class ListItemWrapper extends withWrapper(Container as any) {
         if (sibling instanceof ListItemWrapper) {
             sibling.flattenSelfAndSiblings(targetGroup, ref);
         }
-        // if (group && group.children.head instanceof ListItemWrapper) {
-        //     group.children.head.flattenSelfAndSiblings(targetGroup, ref);
-        //     group.children.head.insertInto(targetGroup, ref);
-        //     group.remove();
-        // }
-
-        // let next = this.next;
-        // while (next instanceof ListItemWrapper) {
-        //     const upcoming = next.next;
-        //     next.flattenSelfAndSiblings(targetGroup, ref);
-        //     next.insertInto(targetGroup, ref);
-        //     next = upcoming;
-        // }
     }
 
     /**
@@ -695,7 +682,29 @@ export class ListItem extends LineBlot {
     }
 
     /**
-     * FIX THIS AND DO IT PROPERLY.
+     * Flatten the item and all of it's sibling list items into the top level scroll.
+     *
+     * @example
+     * Before
+     * - Item 1
+     *   - Item 1.1
+     *   - Item 1.2
+     *     - Item 1.2.1
+     *     - Item 1.2.2
+     *   - Item 1.3
+     * - Item 2
+     *
+     * Call this method on Item 1.1
+     *
+     * After
+     * - Item 1
+     *   - Item 1.1
+     * - Item 1.2
+     * - Item 1.2.1
+     * - Item 1.2.2
+     * - Item 1.3
+     * - Item 2
+     *
      */
     private flattenSelfAndSiblings = () => {
         if (this.parent instanceof ListItemWrapper) {
@@ -714,8 +723,6 @@ export class ListItem extends LineBlot {
             }
             const ref = topListWrapper ? topListWrapper.next : undefined;
             this.parent.flattenSelfAndSiblings(topListGroup, ref);
-
-            // this.quill && this.quill.update(Quill.sources.API);
         }
     };
 
@@ -762,19 +769,6 @@ export class ListItem extends LineBlot {
      */
     public getValue(): IListObjectValue {
         return getValueFromElement(this.domNode);
-    }
-
-    /**
-     * Get the attached quill instance.
-     *
-     * This will _NOT_ work before attach() is called.
-     */
-    protected get quill(): Quill | null {
-        if (!this.scroll || !this.scroll.domNode.parentNode) {
-            return null;
-        }
-
-        return Quill.find(this.scroll.domNode.parentNode!);
     }
 }
 

@@ -6,7 +6,7 @@
 
 import React from "react";
 import { t } from "@library/utility/appUtils";
-import { IUsersStoreState } from "@library/features/users/UsersModel";
+import { IUsersStoreState } from "@library/features/users/userModel";
 import Count from "@library/content/Count";
 import { notifications } from "@library/icons/header";
 import classNames from "classnames";

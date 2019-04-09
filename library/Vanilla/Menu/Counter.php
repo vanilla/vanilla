@@ -13,7 +13,7 @@ class Counter implements \JsonSerializable {
     /** @var string */
     private $name;
 
-    /** @var integer */
+    /** @var int */
     private $count;
 
     /**
@@ -44,7 +44,7 @@ class Counter implements \JsonSerializable {
     /**
      * @return string
      */
-    public function getCount(): string {
+    public function getCount(): int {
         return $this->count;
     }
 

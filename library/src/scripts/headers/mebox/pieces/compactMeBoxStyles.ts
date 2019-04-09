@@ -66,7 +66,8 @@ export const compactMeBoxClasses = useThemeCache(() => {
     });
 
     const tabPanels = style("tabPanels", {
-        height: calc(`100vh - ${vars.tab.height}`),
+        height: calc(`100vh - ${unit(vars.tab.height)}`),
+        overflow: "auto",
         borderTop: `1px solid ${globalVars.overlay.border.color.toString()}`,
     });
 

@@ -5,7 +5,7 @@
  */
 
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import { IUsersStoreState } from "@library/features/users/UsersModel";
+import { IUsersStoreState } from "@library/features/users/userModel";
 import SuggestionTrie from "@library/features/users/suggestion/SuggestionTrie";
 import { IUserSuggestion } from "@library/features/users/suggestion/IUserSuggestion";
 import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
@@ -57,7 +57,7 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
     private static stateSlice(state: IUsersStoreState): IUserSuggestionState {
         if (!state.users || !state.users.suggestions) {
             throw new Error(
-                `Could not find users.suggestions in state ${state}. Be sure to initialize the UsersModel.reducer()`,
+                `Could not find users.suggestions in state ${state}. Be sure to initialize the usersReducer()`,
             );
         }
 
@@ -95,7 +95,10 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
         activeSuggestionIndex: 0,
     };
 
-    public reducer(state = this.initialState, action: typeof UserSuggestionActions.ACTION_TYPES): IUserSuggestionState {
+    public reducer = (
+        state = this.initialState,
+        action: typeof UserSuggestionActions.ACTION_TYPES,
+    ): IUserSuggestionState => {
         switch (action.type) {
             case UserSuggestionActions.LOAD_USERS_REQUEST: {
                 const { username } = action.meta;
@@ -159,5 +162,5 @@ export default class UserSuggestionModel implements ReduxReducer<IUserSuggestion
             default:
                 return state;
         }
-    }
+    };
 }

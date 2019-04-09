@@ -8,9 +8,8 @@ import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import WebFont from "webfontloader";
 
 const defaultFontConfig: WebFont.Config = {
-    custom: {
-        families: ["Open Sans"],
-        urls: ["https://fonts.googleapis.com/css?family=Open+Sans"],
+    google: {
+        families: ["Open Sans:400,400italic,600,700"],
     },
 };
 

@@ -54,7 +54,7 @@ export const radioTabsVariables = useThemeCache(() => {
 
     const spacing = makeVars("spacing", {
         paddings: {
-            horizontal: 6,
+            horizontal: 8,
         },
     });
 

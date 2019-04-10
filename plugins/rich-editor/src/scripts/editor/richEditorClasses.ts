@@ -13,10 +13,14 @@ import {
     unit,
     userSelect,
     sticky,
+    pointerEvents,
+    allButtonStates,
+    borders,
+    negative,
 } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { calc, important, percent } from "csx";
+import { calc, important, percent, quote } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 
@@ -58,7 +62,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
             },
             ".Close-x": {
                 display: "block",
-                opacity: globalVars.states.icon.opacity,
                 cursor: "pointer",
             },
             ".content-wrapper": {
@@ -71,6 +74,18 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
                 minWidth: unit(252),
             },
         },
+    });
+
+    const iconWrap = style("iconWrap", {
+        ...pointerEvents(),
+        content: quote(``),
+        ...absolutePosition.middleOfParent(),
+        width: unit(vars.iconWrap.width),
+        height: unit(vars.iconWrap.height),
+        ...borders({
+            radius: 3,
+            color: "transparent",
+        }),
     });
 
     const paragraphMenu = style("paragraphMenu", {
@@ -135,6 +150,14 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         padding: 0,
         maxWidth: unit(formVars.sizing.height),
         minWidth: unit(formVars.sizing.height),
+        $nest: {
+            "&:focus, &:hover": {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+            [`&.isOpen .${iconWrap}`]: {
+                backgroundColor: colorOut(vars.buttonContents.state.bg),
+            },
+        },
     });
 
     const paragraphMenuHandleMobile = style("paragraphMenuHandleMobile", {
@@ -198,7 +221,21 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         border: 0,
         padding: 0,
         overflow: "hidden",
+        position: "relative",
+        outline: 0,
         $nest: {
+            "&:hover": {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+            "&:focus": {
+                color: colorOut(globalVars.mainColors.secondary),
+            },
+            "&:active": {
+                color: colorOut(globalVars.mainColors.secondary),
+            },
+            [`&.isOpen .${iconWrap}`]: {
+                backgroundColor: colorOut(vars.buttonContents.state.bg),
+            },
             "&.richEditor-formatButton, &.richEditor-embedButton": {
                 height: unit(vars.menuButton.size),
                 color: "inherit",
@@ -208,46 +245,23 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
                 width: unit(vars.menuButton.size),
                 height: unit(vars.menuButton.size),
                 textAlign: "center",
-                $nest: {
-                    "&.isSelected": {
-                        opacity: 1,
-                    },
-                },
             },
             "&:not(:disabled)": {
                 cursor: "pointer",
             },
-            "&:hover": {
-                opacity: 1,
-                cursor: "pointer",
-            },
-            "&:hover .Close-X, &:hover .richEditorButton-icon": {
-                opacity: 1,
-            },
-            "&:focus": {
-                opacity: 1,
-                zIndex: 2,
-            },
-            "&:focus .Close-X, &:focus .richEditorButton-icon": {
-                opacity: 1,
-            },
-            "&.isActive": {
-                opacity: 1,
-            },
-            "&.isActive .Close-X, .isActive .richEditorButton-icon": {
-                opacity: 1,
-            },
-            "&.isOpen": {
-                opacity: 1,
-            },
-            "&.richEditor-formatButton:focus": {
-                opacity: 1,
+            [`&.isActive .${iconWrap}`]: {
+                backgroundColor: colorOut(vars.buttonContents.state.bg),
             },
         },
     });
 
     const topLevelButtonActive = style("topLevelButtonActive", {
         color: colorOut(globalVars.mainColors.primary),
+        $nest: {
+            [`& .${iconWrap}`]: {
+                backgroundColor: colorOut(vars.buttonContents.state.bg),
+            },
+        },
     });
 
     const menuItem = style("menuItem", {
@@ -290,7 +304,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         margin: "auto",
         height: unit(globalVars.icon.sizes.default),
         width: unit(globalVars.icon.sizes.default),
-        opacity: globalVars.states.icon.opacity,
     });
 
     const legacyFrame = style("legacyFrame", {
@@ -309,7 +322,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
     });
 
     const close = style("close", {
-        ...absolutePosition.middleRightOfParent(),
+        ...absolutePosition.middleRightOfParent(6),
         ...userSelect(),
         width: unit(vars.menuButton.size),
         height: unit(vars.menuButton.size),
@@ -318,7 +331,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         textAlign: "center",
         background: "transparent",
         cursor: "pointer",
-        opacity: globalVars.states.icon.opacity,
     });
 
     const flyoutDescription = style("flyoutDescription", {
@@ -345,6 +357,18 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
 
     const paragraphMenuPanel = style("paragraphMenuPanel", {});
 
+    const emojiGroup = style("emojiGroup", {
+        $nest: {
+            [`&.isSelected .${iconWrap}`]: {
+                backgroundColor: colorOut(vars.buttonContents.state.bg),
+            },
+        },
+    });
+
+    const flyoutOffset = style("flyoutOffset", {
+        marginTop: unit((vars.menuButton.size - vars.iconWrap.width) / -2 + 1),
+    });
+
     return {
         root,
         menuBar,
@@ -367,5 +391,8 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         position,
         legacyFrame,
         paragraphMenuPanel,
+        iconWrap,
+        flyoutOffset,
+        emojiGroup,
     };
 });

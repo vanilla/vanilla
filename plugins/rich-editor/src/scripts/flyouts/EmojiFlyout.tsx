@@ -8,12 +8,13 @@ import React from "react";
 import { getRequiredID, IOptionalComponentID, IRequiredComponentID } from "@library/utility/idUtils";
 import FlyoutToggle, { IFlyoutToggleChildParameters } from "@library/flyouts/FlyoutToggle";
 import { t } from "@library/utility/appUtils";
-import { emoji } from "@library/icons/editorIcons";
+import { embed, emoji } from "@library/icons/editorIcons";
 import classNames from "classnames";
 import EmojiPicker from "@rich-editor/flyouts/pieces/EmojiPicker";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 
 interface IProps extends IOptionalComponentID {
     disabled?: boolean;
@@ -34,7 +35,6 @@ export default class EmojiFlyout extends React.Component<IProps, IRequiredCompon
      * @inheritDoc
      */
     public render() {
-        const icon = emoji();
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
 
         return (
@@ -45,7 +45,7 @@ export default class EmojiFlyout extends React.Component<IProps, IRequiredCompon
                 onVisibilityChange={forceSelectionUpdate}
                 disabled={this.props.disabled}
                 name={t("Emoji Picker")}
-                buttonContents={icon}
+                buttonContents={<IconForButtonWrap icon={emoji()} />}
                 buttonBaseClass={ButtonTypes.ICON}
                 renderAbove={this.props.renderAbove}
                 renderLeft={this.props.renderLeft}

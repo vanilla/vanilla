@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {allLinkStates, colorOut, debugHelper, unit} from "@library/styles/styleHelpers";
+import { allLinkStates, colorOut, debugHelper, unit } from "@library/styles/styleHelpers";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { px } from "csx";
 import { style } from "typestyle";

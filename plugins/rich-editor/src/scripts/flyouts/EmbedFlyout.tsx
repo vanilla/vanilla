@@ -13,12 +13,13 @@ import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import FlyoutToggle, { IFlyoutToggleChildParameters } from "@library/flyouts/FlyoutToggle";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import Button from "@library/forms/Button";
-import { embed } from "@library/icons/editorIcons";
+import { embed, emoji } from "@library/icons/editorIcons";
 import classNames from "classnames";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { insertMediaClasses } from "@rich-editor/flyouts/pieces/insertMediaClasses";
 import Flyout from "@rich-editor/flyouts/pieces/Flyout";
+import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -57,9 +58,8 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
 
     public render() {
         const title = t("Insert Media");
-        const Icon = embed();
-        const legacyMode = this.props.legacyMode;
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
+        const legacyMode = this.props.legacyMode;
         const classesInsertMedia = insertMediaClasses();
 
         return (
@@ -71,7 +71,7 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
                 onVisibilityChange={forceSelectionUpdate}
                 disabled={this.props.disabled}
                 name={t("Embed")}
-                buttonContents={Icon}
+                buttonContents={<IconForButtonWrap icon={embed()} />}
                 buttonBaseClass={ButtonTypes.CUSTOM}
                 renderAbove={!!this.props.renderAbove}
                 renderLeft={!!this.props.renderLeft}

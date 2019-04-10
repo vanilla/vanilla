@@ -19,9 +19,9 @@ export const insertMediaClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "flex-end",
         ...paddings({
-            left: vars.flyout.padding.left,
-            right: vars.flyout.padding.left,
-            bottom: vars.flyout.padding.bottom,
+            left: vars.flyout.padding.horizontal,
+            right: vars.flyout.padding.horizontal,
+            bottom: vars.flyout.padding.vertical,
         }),
     });
 

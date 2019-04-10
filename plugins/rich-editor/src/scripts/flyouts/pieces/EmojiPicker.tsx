@@ -16,10 +16,11 @@ import { insertEmojiClasses } from "@rich-editor/flyouts/pieces/insertEmojiClass
 import { EmojiGroupButton } from "@rich-editor/flyouts/pieces/EmojiGroupButton";
 import EmojiButton from "@rich-editor/flyouts/pieces/EmojiButton";
 import Flyout from "@rich-editor/flyouts/pieces/Flyout";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 
-const BUTTON_SIZE = 36;
-const COL_SIZE = 7;
-const ROW_SIZE = 7;
+const BUTTON_SIZE = 40;
+const COL_SIZE = 8;
+const ROW_SIZE = 8;
 const rowIndexesByGroupId = {};
 const cellIndexesByGroupId = {};
 
@@ -85,6 +86,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
         const description = [t("Insert an emoji in your message."), t("richEditor.emoji.pagingInstructions")].join(" ");
         const emojiClasses = emojiGroupsClasses();
         const classesInsertEmoji = insertEmojiClasses();
+        const classesRichEditor = richEditorClasses(this.props.legacyMode);
 
         const extraHeadingContent = (
             <button type="button" className="accessibility-jumpTo" onClick={this.focusOnCategories}>
@@ -164,6 +166,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 renderAbove={this.props.renderAbove}
                 renderLeft={this.props.renderLeft}
                 bodyClass={classesInsertEmoji.body}
+                className={!this.props.legacyMode ? classesRichEditor.flyoutOffset : ""}
             />
         );
     }
@@ -225,7 +228,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 activeIndex={this.state.activeIndex}
                 style={style}
                 closeMenuHandler={this.props.closeMenuHandler}
-                key={"emoji-" + emojiData.emoji}
+                key={`emoji-${pos}-${emojiData.emoji}`}
                 emojiData={emojiData}
                 index={pos}
                 onKeyUp={this.jumpRowUp}

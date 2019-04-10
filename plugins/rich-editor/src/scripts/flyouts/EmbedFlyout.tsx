@@ -31,7 +31,6 @@ interface IProps extends IWithEditorProps, IDeviceProps {
     renderAbove?: boolean;
     renderLeft?: boolean;
     legacyMode: boolean;
-    closeMenuHandler: () => void;
 }
 
 interface IState extends IRequiredComponentID {
@@ -91,7 +90,7 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
                 >
                     <Frame>
                         <FrameBody>
-                            <p class={style({ marginTop: 6, marginBottom: 6 })}>
+                            <p className={style({ marginTop: 6, marginBottom: 6 })}>
                                 {t("Paste the URL of the media you want.")}
                             </p>
                             <input

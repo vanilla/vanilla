@@ -14,8 +14,6 @@ import api from "@library/apiv2";
 import DateTime from "@library/content/DateTime";
 import SmartLink from "@library/routing/links/SmartLink";
 
-
-
 export function initQuoteEmbeds() {
     registerEmbedComponent("quote", QuoteEmbed as any);
     onContent(mountQuoteEmbeds);

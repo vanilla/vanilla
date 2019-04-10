@@ -483,6 +483,7 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
         textAlign: "center",
         whiteSpace: "nowrap",
         verticalAlign: "middle",
+        justifyContent: "center",
         touchAction: "manipulation",
         cursor: "pointer",
         minWidth: buttonGlobals.sizing.minWidth,

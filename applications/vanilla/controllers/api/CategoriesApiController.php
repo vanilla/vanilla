@@ -225,8 +225,12 @@ class CategoriesApiController extends AbstractApiController {
             $this->isExpandField('breadcrumbs', $query['expand']) ? ['breadcrumbs'] : []
         );
 
-        foreach ($rows as &$row) {
+        foreach ($rows as $key => &$row) {
             $row = $this->normalizeOutput($row);
+            $hasPermission = categoryModel::checkPermission($row['categoryID'], 'Vanilla.Discussions.View');
+            if (!$hasPermission) {
+                unset($rows[$key]);
+            }
         }
 
         $result = $out->validate($rows);

@@ -10,6 +10,7 @@ import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 
 interface IProps {
     formatParagraphHandler: () => void;
@@ -48,7 +49,7 @@ export default class ParagraphMenuResetTab extends React.PureComponent<IProps> {
                 tabIndex={this.props.tabIndex}
             >
                 <ScreenReaderContent>{t("Paragraph")}</ScreenReaderContent>
-                <span aria-hidden={true}>{pilcrow()}</span>
+                <IconForButtonWrap icon={<span aria-hidden={true}>{pilcrow()}</span>} />
             </button>
         );
     }

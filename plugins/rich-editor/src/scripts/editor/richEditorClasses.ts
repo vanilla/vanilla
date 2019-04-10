@@ -150,6 +150,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         padding: 0,
         maxWidth: unit(formVars.sizing.height),
         minWidth: unit(formVars.sizing.height),
+        outline: 0,
         $nest: {
             "&:focus, &:hover": {
                 color: colorOut(globalVars.mainColors.primary),
@@ -234,6 +235,9 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
                 color: colorOut(globalVars.mainColors.secondary),
             },
             [`&.isOpen .${iconWrap}`]: {
+                backgroundColor: colorOut(vars.buttonContents.state.bg),
+            },
+            [`&.focus-visible .${iconWrap}`]: {
                 backgroundColor: colorOut(vars.buttonContents.state.bg),
             },
             "&.richEditor-formatButton, &.richEditor-embedButton": {

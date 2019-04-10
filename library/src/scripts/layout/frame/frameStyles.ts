@@ -152,11 +152,7 @@ export const frameHeaderClasses = useThemeCache(() => {
         },
     });
 
-    const closePosition = style("closePosition", {
-        marginLeft: "auto",
-    });
-
-    return { root, backButton, heading, left, centred, leftSpacer, action, closePosition };
+    return { root, backButton, heading, left, centred, leftSpacer, action };
 });
 
 export const frameBodyClasses = useThemeCache(() => {

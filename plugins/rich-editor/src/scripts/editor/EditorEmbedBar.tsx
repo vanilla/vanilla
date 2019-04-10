@@ -66,7 +66,7 @@ export function EditorEmbedBar(props: IProps) {
                 </Permission>
 
                 <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
-                    <EmbedFlyout disabled={isLoading} />
+                    <EmbedFlyout disabled={isLoading} renderAbove={legacyMode} />
                 </li>
 
                 <Permission permission="uploads.add">

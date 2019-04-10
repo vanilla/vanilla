@@ -96,7 +96,6 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                                         <div
                                             className={classNames(
                                                 "frameHeader-closePosition",
-                                                classesFrameHeader.closePosition,
                                                 classesFrameHeader.action,
                                             )}
                                         >

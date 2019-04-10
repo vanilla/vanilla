@@ -53,7 +53,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
         let closeButton;
         if (this.props.closeFrame) {
             closeButton = (
-                <div className={classNames("frameHeader-closePosition", classes.closePosition, classes.action)}>
+                <div className={classNames("frameHeader-closePosition", classes.action)}>
                     <CloseButton className="frameHeader-close" onClick={this.props.closeFrame} />
                 </div>
             );

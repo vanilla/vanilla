@@ -615,6 +615,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
         minWidth: unit(dimension),
         width: unit(dimension),
         justifyContent: "center",
+        border: "none",
         padding: 0,
         ...allButtonStates({
             hover: {

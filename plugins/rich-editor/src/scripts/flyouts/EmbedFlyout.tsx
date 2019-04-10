@@ -105,25 +105,14 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
                             />
                         </FrameBody>
                         <FrameFooter>
-                            {legacyMode ? (
-                                <input
-                                    type="button"
-                                    className={classNames("Button Primary", "insertMedia-insert")}
-                                    value={"Insert"}
-                                    disabled={!this.state.isInputValid}
-                                    aria-label={"Insert Media"}
-                                    onClick={this.buttonClickHandler}
-                                />
-                            ) : (
-                                <Button
-                                    className={classNames("insertMedia-insert", classesInsertMedia.button)}
-                                    baseClass={ButtonTypes.TEXT_PRIMARY}
-                                    disabled={!this.state.isInputValid}
-                                    onClick={this.buttonClickHandler}
-                                >
-                                    {t("Insert")}
-                                </Button>
-                            )}
+                            <Button
+                                className={classNames("insertMedia-insert", classesInsertMedia.button)}
+                                baseClass={ButtonTypes.TEXT_PRIMARY}
+                                disabled={!this.state.isInputValid}
+                                onClick={this.buttonClickHandler}
+                            >
+                                {t("Insert")}
+                            </Button>
                         </FrameFooter>
                     </Frame>
                 </DropDown>

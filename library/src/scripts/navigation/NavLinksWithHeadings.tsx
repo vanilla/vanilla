@@ -20,6 +20,7 @@ interface IProps {
     classNames?: string;
     data: ILinkListData;
     accessibleViewAllMessage?: string;
+    ungroupedViewAllUrl?: string;
 }
 
 /**
@@ -33,7 +34,14 @@ export default class NavLinksWithHeadings extends Component<IProps> {
         const classes = navLinksClasses();
 
         if (ungrouped.length !== 0 || grouped.length !== 0) {
-            const ungroupedContent = <NavLinks title={t("Overview")} items={ungrouped} />;
+            const ungroupedContent = (
+                <NavLinks
+                    title={t("Overview")}
+                    items={ungrouped}
+                    accessibleViewAllMessage={this.props.accessibleViewAllMessage}
+                    url={this.props.ungroupedViewAllUrl}
+                />
+            );
             const groupedContent = grouped.map((group, i) => {
                 return (
                     <React.Fragment key={i}>

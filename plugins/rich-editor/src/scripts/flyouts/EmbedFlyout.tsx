@@ -62,11 +62,9 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
     }
 
     public render() {
-        const title = t("Insert Media");
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const legacyMode = this.props.legacyMode;
         const classesInsertMedia = insertMediaClasses();
-        const isMobile = this.props.device === Devices.MOBILE;
         return (
             <>
                 <DropDown

@@ -14,10 +14,9 @@ export function flyoutPosition(renderAbove: boolean, renderLeft: boolean, ignore
     if (!ignore) {
         const top = !renderAbove ? "100%" : undefined;
         const bottom = renderAbove ? "100%" : undefined;
-        const transform = renderAbove ? "translateY(-100%)" : undefined;
         const left = !renderLeft ? "0" : undefined;
         const right = renderLeft ? "0" : undefined;
-        return { top, right, bottom, left, transform };
+        return { top, right, bottom, left };
     } else {
         return undefined;
     }

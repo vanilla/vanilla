@@ -483,6 +483,7 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
         textAlign: "center",
         whiteSpace: "nowrap",
         verticalAlign: "middle",
+        justifyContent: "center",
         touchAction: "manipulation",
         cursor: "pointer",
         minWidth: buttonGlobals.sizing.minWidth,
@@ -615,6 +616,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
         minWidth: unit(dimension),
         width: unit(dimension),
         justifyContent: "center",
+        border: "none",
         padding: 0,
         ...allButtonStates({
             hover: {

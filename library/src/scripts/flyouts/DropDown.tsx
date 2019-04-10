@@ -137,9 +137,8 @@ class DropDown extends React.Component<IProps, IState> {
                                     )}
 
                                     <CloseButton
-                                        className="frameHeader-close"
+                                        className={classesFrameHeader.action}
                                         onClick={params.closeMenuHandler}
-                                        baseClass={ButtonTypes.CUSTOM}
                                     />
                                 </header>
                             ) : null}

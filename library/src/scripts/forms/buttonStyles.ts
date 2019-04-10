@@ -144,7 +144,7 @@ export const buttonVariables = useThemeCache(() => {
                 bg: globalVars.mainColors.primary,
             },
             borders: {
-                color: globalVars.mainColors.bg,
+                color: globalVars.mainColors.primary,
             },
             fonts: {
                 color: globalVars.mainColors.bg,
@@ -155,7 +155,7 @@ export const buttonVariables = useThemeCache(() => {
                 bg: globalVars.mainColors.primary,
             },
             borders: {
-                color: globalVars.mainColors.bg,
+                color: globalVars.mainColors.primary,
             },
             fonts: {
                 color: globalVars.mainColors.bg,
@@ -166,7 +166,7 @@ export const buttonVariables = useThemeCache(() => {
                 bg: globalVars.mainColors.primary,
             },
             borders: {
-                color: globalVars.mainColors.fg,
+                color: globalVars.mainColors.primary,
             },
             fonts: {
                 color: globalVars.mainColors.bg,
@@ -223,9 +223,15 @@ export const buttonVariables = useThemeCache(() => {
             fonts: {
                 color: globalVars.mainColors.primary,
             },
+            borders: {
+                color: globalVars.mainColors.primary,
+            },
         },
         active: {
             fonts: {
+                color: globalVars.mainColors.primary,
+            },
+            borders: {
                 color: globalVars.mainColors.primary,
             },
         },
@@ -233,9 +239,15 @@ export const buttonVariables = useThemeCache(() => {
             fonts: {
                 color: globalVars.mainColors.primary,
             },
+            borders: {
+                color: globalVars.mainColors.primary,
+            },
         },
         focusAccessible: {
             fonts: {
+                color: globalVars.mainColors.primary,
+            },
+            borders: {
                 color: globalVars.mainColors.primary,
             },
         },
@@ -465,7 +477,8 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
                 : buttonGlobals.padding.side,
             formElVars,
         ),
-        display: "inline-block",
+        display: "inline-flex",
+        alignItems: "center",
         position: "relative",
         textAlign: "center",
         whiteSpace: "nowrap",
@@ -492,7 +505,7 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
                                 ? buttonTypeVars.hover.colors.bg
                                 : undefined,
                         ),
-                        ...borders(buttonTypeVars.hover.borders),
+                        ...borders(buttonTypeVars.hover.borders ? buttonTypeVars.hover.borders : undefined),
                         ...fonts(buttonTypeVars.hover && buttonTypeVars.hover.fonts ? buttonTypeVars.hover.fonts : {}),
                     },
                     "&:focus": {
@@ -503,7 +516,7 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
                                 : undefined,
                         ),
                         color: colorOut(buttonTypeVars.focus.fg),
-                        ...borders(buttonTypeVars.focus.borders),
+                        ...borders(buttonTypeVars.focus.borders ? buttonTypeVars.focus.borders : undefined),
                         ...fonts(buttonTypeVars.focus && buttonTypeVars.focus.fonts ? buttonTypeVars.focus.fonts : {}),
                     },
                     "&:active": {
@@ -514,7 +527,7 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
                                 : undefined,
                         ),
                         color: colorOut(buttonTypeVars.active.fg),
-                        ...borders(buttonTypeVars.active.borders),
+                        ...borders(buttonTypeVars.active.borders ? buttonTypeVars.active.borders : undefined),
                         ...fonts(
                             buttonTypeVars.active && buttonTypeVars.active.fonts ? buttonTypeVars.active.fonts : {},
                         ),
@@ -527,7 +540,9 @@ export const generateButtonClass = (buttonTypeVars: IButtonType, buttonName: str
                                 : undefined,
                         ),
                         color: colorOut(buttonTypeVars.focusAccessible.fg),
-                        ...borders(buttonTypeVars.focusAccessible.borders),
+                        ...borders(
+                            buttonTypeVars.focusAccessible.borders ? buttonTypeVars.focusAccessible.borders : undefined,
+                        ),
                         ...fonts(
                             buttonTypeVars.focusAccessible && buttonTypeVars.focusAccessible.fonts
                                 ? buttonTypeVars.focusAccessible.fonts

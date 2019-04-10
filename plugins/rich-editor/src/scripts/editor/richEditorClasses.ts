@@ -223,6 +223,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         padding: 0,
         overflow: "hidden",
         position: "relative",
+        color: colorOut(globalVars.mainColors.fg),
         outline: 0,
         $nest: {
             "&:hover": {
@@ -242,7 +243,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
             },
             "&.richEditor-formatButton, &.richEditor-embedButton": {
                 height: unit(vars.menuButton.size),
-                color: "inherit",
             },
             "&.emojiGroup": {
                 display: "block",

@@ -85,9 +85,9 @@ export const frameHeaderClasses = useThemeCache(() => {
         zIndex: 1,
         borderBottom: singleBorder(),
         ...paddings({
-            top: 0,
+            top: 4,
             right: vars.footer.spacing,
-            bottom: 0,
+            bottom: 4,
             left: vars.footer.spacing,
         }),
         $nest: {
@@ -110,13 +110,10 @@ export const frameHeaderClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         flexGrow: 1,
+        margin: 0,
         textOverflow: "ellipsis",
         fontWeight: globalVars.fonts.weights.semiBold,
         fontSize: unit(globalVars.fonts.size.large),
-        ...paddings({
-            top: unit(4),
-            bottom: unit(4),
-        }),
     });
 
     const left = style("left", {

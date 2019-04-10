@@ -49,7 +49,7 @@ export const radioTabsVariables = useThemeCache(() => {
     const font: IFont = makeVars("font", {
         size: globalVars.fonts.size.small,
         align: "center",
-        lineHeight: sizing.height,
+        lineHeight: unit(sizing.height),
     });
 
     const spacing = makeVars("spacing", {
@@ -129,8 +129,8 @@ export const radioTabClasses = useThemeCache(() => {
             flexGrow: 0,
             $nest: {
                 label: {
-                    minHeight: formElementVariables.sizing.height,
-                    lineHeight: formElementVariables.sizing.height,
+                    minHeight: unit(formElementVariables.sizing.height),
+                    lineHeight: unit(formElementVariables.sizing.height),
                 },
             },
         }),
@@ -147,7 +147,6 @@ export const radioTabClasses = useThemeCache(() => {
         textAlign: "center",
         width: percent(100),
         minHeight: unit(vars.sizing.height),
-        lineHeight: unit(vars.sizing.height),
         minWidth: unit(vars.sizing.minWidth),
         backgroundColor: colorOut(vars.colors.bg),
         ...fonts(vars.font),

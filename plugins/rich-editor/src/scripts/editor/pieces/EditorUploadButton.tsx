@@ -6,11 +6,12 @@
 
 import React from "react";
 import classNames from "classnames";
-import { attachment, image } from "@library/icons/editorIcons";
+import { attachment, emoji, image } from "@library/icons/editorIcons";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
 import { isFileImage } from "@library/utility/utils";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 
 interface IProps extends IWithEditorProps {
     disabled?: boolean;
@@ -37,7 +38,7 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
                 disabled={this.props.disabled}
                 onClick={this.onFakeButtonClick}
             >
-                {this.icon}
+                <IconForButtonWrap icon={this.icon} />
                 <input
                     ref={this.inputRef}
                     onChange={this.onInputChange}
@@ -57,7 +58,7 @@ export class EditorUploadButton extends React.Component<IProps, {}> {
     /**
      * Get the icon to display for the input.
      */
-    private get icon(): React.ReactNode {
+    private get icon(): JSX.Element {
         switch (this.props.type) {
             case "file":
                 return attachment();

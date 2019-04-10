@@ -7,6 +7,7 @@
 import React from "react";
 import classnames from "classnames";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 
 export interface IMenuItemData {
     icon: JSX.Element;
@@ -64,7 +65,7 @@ export default class MenuItem extends React.PureComponent<IProps> {
                 onKeyDown={this.handleKeyPress}
                 ref={this.buttonRef}
             >
-                {icon}
+                <IconForButtonWrap icon={icon} />
             </button>
         );
     }

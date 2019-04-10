@@ -28,6 +28,7 @@ export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
         minHeight: unit(30),
         userSelect: "none",
         padding: 0,
+        outline: 0,
         $nest: {
             "&:hover": {
                 backgroundColor: colorOut(globalVars.states.hover.color),

@@ -32,6 +32,7 @@ import Quill, { RangeStatic } from "quill/core";
 import React from "react";
 import { style } from "typestyle";
 import uniqueId from "lodash/uniqueId";
+import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 
 export enum IMenuBarItemTypes {
     CHECK = "checkbox",
@@ -149,7 +150,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                     onClick={this.pilcrowClickHandler}
                     onKeyDown={this.handleEscape}
                 >
-                    <ActiveFormatIcon activeFormats={menuActiveFormats} />
+                    <IconForButtonWrap icon={<ActiveFormatIcon activeFormats={menuActiveFormats} />} />
                 </button>
                 <div
                     id={this.menuID}

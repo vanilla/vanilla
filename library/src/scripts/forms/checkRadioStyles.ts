@@ -94,7 +94,9 @@ export const checkRadioClasses = useThemeCache(() => {
         flexWrap: "wrap",
         alignItems: "center",
         whiteSpace: "nowrap",
+        outline: 0,
         $nest: {
+            "&.focus-accessible": {},
             "&:hover": {
                 $nest: {
                     "& .radioButton-input:not([disabled]), & .checkbox-input:not([disabled])": {

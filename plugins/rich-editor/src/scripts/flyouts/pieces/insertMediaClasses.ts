@@ -8,6 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { paddings, unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
+import { percent, px } from "csx";
 
 export const insertMediaClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -31,8 +32,13 @@ export const insertMediaClasses = useThemeCache(() => {
     });
 
     const insert = style("insert", {
-        width: "auto",
+        width: percent(100),
         position: "relative",
+        marginBottom: px(10),
+    });
+    const button = style("button", {
+        position: "relative",
+        marginLeft: "auto",
     });
 
     const footer = style("footer", {
@@ -42,5 +48,5 @@ export const insertMediaClasses = useThemeCache(() => {
         padding: 0,
     });
 
-    return { root, help, insert, footer };
+    return { root, help, insert, footer, button };
 });

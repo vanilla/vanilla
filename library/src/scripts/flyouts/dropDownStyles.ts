@@ -70,7 +70,7 @@ export const dropDownVariables = useThemeCache(() => {
     });
 
     const title = makeThemeVars("title", {
-        color: globalVars.mixBgAndFg(0.15),
+        color: globalVars.mainColors.fg,
     });
 
     const contents = makeThemeVars("contents", {
@@ -294,16 +294,15 @@ export const dropDownClasses = useThemeCache(() => {
     const title = style("title", {
         ...fonts({
             weight: globalVars.fonts.weights.semiBold as 400,
-            size: globalVars.fonts.size.small,
+            size: globalVars.fonts.size.medium,
             lineHeight: globalVars.lineHeights.condensed,
         }),
         ...paddings({
             top: 0,
             right: 0,
             bottom: 0,
-            left: unit(6),
         }),
-        textTransform: "uppercase",
+        flexGrow: 1,
         color: colorOut(vars.title.color),
     });
 

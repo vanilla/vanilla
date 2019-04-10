@@ -104,10 +104,28 @@ class DropDown extends React.Component<IProps, IState> {
                         >
                             {title ? (
                                 <header className={classNames("frameHeader", classesFrameHeader.root)}>
-                                    <FlexSpacer
-                                        className={classNames("frameHeader-leftSpacer", classesFrameHeader.leftSpacer)}
-                                    />
-                                    <SmartAlign>
+                                    {openAsModal && (
+                                        <FlexSpacer
+                                            className={classNames(
+                                                "frameHeader-leftSpacer",
+                                                classesFrameHeader.leftSpacer,
+                                            )}
+                                        />
+                                    )}
+                                    {openAsModal && (
+                                        <SmartAlign>
+                                            <Heading
+                                                title={title}
+                                                className={classNames(
+                                                    "dropDown-title",
+                                                    classesDropDown.title,
+                                                    classes.title,
+                                                )}
+                                            />
+                                        </SmartAlign>
+                                    )}
+
+                                    {!openAsModal && (
                                         <Heading
                                             title={title}
                                             className={classNames(
@@ -116,20 +134,13 @@ class DropDown extends React.Component<IProps, IState> {
                                                 classes.title,
                                             )}
                                         />
-                                    </SmartAlign>
-                                    <div
-                                        className={classNames(
-                                            "frameHeader-closePosition",
-                                            classesFrameHeader.closePosition,
-                                            classesFrameHeader.action,
-                                        )}
-                                    >
-                                        <CloseButton
-                                            className="frameHeader-close"
-                                            onClick={params.closeMenuHandler}
-                                            baseClass={ButtonTypes.CUSTOM}
-                                        />
-                                    </div>
+                                    )}
+
+                                    <CloseButton
+                                        className="frameHeader-close"
+                                        onClick={params.closeMenuHandler}
+                                        baseClass={ButtonTypes.CUSTOM}
+                                    />
                                 </header>
                             ) : null}
                             <ul className={classNames("dropDownItems", classes.items)}>{this.props.children}</ul>

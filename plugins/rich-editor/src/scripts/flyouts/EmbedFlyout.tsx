@@ -63,7 +63,6 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
 
     public render() {
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
-        const legacyMode = this.props.legacyMode;
         const classesInsertMedia = insertMediaClasses();
         return (
             <>

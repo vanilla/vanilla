@@ -5565,21 +5565,27 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   background-color: $twitter-hover;
 }
 
-.SocialIcon-Google .Icon {
-  background-position: 0 -72px;
-}
+.SocialIcon:not(.SocialIcon-OpenID).SocialIcon-Google,
+.SocialIcon-Google {
+    background-color: $google;
+    &:hover {
+        background-color: $google-hover;
+    }
 
-.SocialIcon-Google.HasText .Icon {
-  background-position: 0 -96px;
-}
+    &:not(.SocialIcon-OpenID) .Icon,
+    .Icon {
+        background-position: center;
+        background-color: $white;
+        &:before {
+            content: '';
+        }
+        background-size: cover;
+        background-image: url(https://images.v-cdn.net/sso/google-border.svg);
+    }
 
-.SocialIcon-Google,
-.SocialIcon-Google.HasText .Icon {
-  background-color: $google;
-}
-
-.SocialIcon-Google:hover {
-  background-color: $google-hover;
+    .Text {
+        border: none;
+    }
 }
 
 .SocialIcon-OpenID .Icon {

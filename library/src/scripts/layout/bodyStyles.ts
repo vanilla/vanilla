@@ -13,10 +13,10 @@ export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();
     cssRule("html, body", {
         backgroundColor: colorOut(globalVars.body.backgroundImage.color),
-        color: colorOut(globalVars.mainColors.fg),
         ...fonts({
             size: globalVars.fonts.size.medium,
             family: globalVars.fonts.families.body,
+            color: globalVars.mainColors.fg,
         }),
         wordBreak: "break-word",
         overscrollBehavior: "none", // For IE -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior

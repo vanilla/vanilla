@@ -6,7 +6,16 @@
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { unit, userSelect, colorOut, paddings, borders, fonts, allButtonStates } from "@library/styles/styleHelpers";
+import {
+    unit,
+    userSelect,
+    colorOut,
+    paddings,
+    borders,
+    fonts,
+    allButtonStates,
+    margins,
+} from "@library/styles/styleHelpers";
 import { percent, viewWidth } from "csx";
 import { FontWeightProperty } from "csstype";
 import { layoutVariables } from "@library/layout/layoutStyles";
@@ -85,11 +94,13 @@ export const messagesClasses = useThemeCache(() => {
         zIndex: 20,
     });
 
-    const root = style({
-        position: "relative",
-        margin: "auto",
-        width: percent(100),
-    });
+    const root = style(
+        {
+            position: "relative",
+            width: percent(100),
+        },
+        margins({ horizontal: "auto" }),
+    );
 
     const wrap = style(
         "wrap",
@@ -123,7 +134,7 @@ export const messagesClasses = useThemeCache(() => {
     const message = style("message", {
         ...userSelect(),
         ...fonts(vars.text.font),
-        flexGrow: 1,
+        flex: 1,
     });
 
     const setWidth = style("setWidth", {

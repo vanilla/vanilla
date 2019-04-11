@@ -40,7 +40,7 @@ export default class FormError extends React.Component<IProps> {
                             className={classNames(classes.actionButton, classes.activeButton)}
                         >
                             {this.props.isRetryLoading ? (
-                                <ButtonLoader buttonType={classesButtons.standard} />
+                                <ButtonLoader buttonType={ButtonTypes.STANDARD} />
                             ) : (
                                 t("Retry")
                             )}

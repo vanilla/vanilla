@@ -11,7 +11,7 @@ import { borders, colorOut, unit } from "@library/styles/styleHelpers";
 import { calc, important, percent, px } from "csx";
 
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
-import { buttonClasses } from "@library/forms/buttonStyles";
+import { buttonClasses, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const searchBarVariables = useThemeCache(() => {
@@ -134,7 +134,7 @@ export const searchBarClasses = useThemeCache(() => {
                                 "&.inputText": {
                                     borderTopRightRadius: 0,
                                     borderBottomRightRadius: 0,
-                                    ...borders(classesButton.standard.border),
+                                    ...borders(buttonVariables().standard.borders),
                                 },
                             },
                         },

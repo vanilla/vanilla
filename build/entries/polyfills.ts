@@ -48,12 +48,12 @@ export function polyfillClosest() {
 
     if (!Element.prototype.closest) {
         Element.prototype.closest = function closest(s) {
-            let el = this;
+            let el: Node | null = this;
             if (document.documentElement && !document.documentElement.contains(el)) {
                 return null;
             }
             do {
-                if (el.matches && el.matches(s)) {
+                if (el instanceof Element && el.matches && el.matches(s)) {
                     return el;
                 }
                 el = el.parentElement || el.parentNode;

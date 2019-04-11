@@ -114,23 +114,22 @@ export default class FlyoutToggle extends React.PureComponent<
                     {this.props.buttonContents}
                 </Button>
 
-                {!this.props.disabled &&
-                    this.state.isVisible && (
-                        <React.Fragment>
-                            {this.props.openAsModal ? (
-                                <Modal
-                                    label={t("title")}
-                                    size={ModalSizes.SMALL}
-                                    exitHandler={this.closeMenuHandler}
-                                    elementToFocusOnExit={this.buttonRef.current!}
-                                >
-                                    {this.props.children(childrenData)}
-                                </Modal>
-                            ) : (
-                                this.props.children(childrenData)
-                            )}
-                        </React.Fragment>
-                    )}
+                {!this.props.disabled && this.state.isVisible && (
+                    <React.Fragment>
+                        {this.props.openAsModal ? (
+                            <Modal
+                                label={t("title")}
+                                size={ModalSizes.SMALL}
+                                exitHandler={this.closeMenuHandler}
+                                elementToFocusOnExit={this.buttonRef.current!}
+                            >
+                                {this.props.children(childrenData)}
+                            </Modal>
+                        ) : (
+                            this.props.children(childrenData)
+                        )}
+                    </React.Fragment>
+                )}
             </div>
         );
     }

@@ -2,11 +2,8 @@
     "compilerOptions": {
         "allowJs": true,
         "jsx": "react",
-        "lib": [
-            "es2018",
-            "dom",
-            "dom.iterable"
-        ],
+        "lib": ["es2018", "dom", "dom.iterable"],
+        "noImplicitThis": true,
         "allowSyntheticDefaultImports": true,
         "moduleResolution": "node",
         "strictNullChecks": true,
@@ -22,24 +19,15 @@
             "@knowledge/*": ["./plugins/knowledge/src/scripts/*"],
             "@testroot/*": ["./tests/javascript/*"]
         },
-        "typeRoots": [
-            "@types",
-            "./node_modules/@types"
-        ],
+        "typeRoots": ["@types", "./node_modules/@types"],
         "skipLibCheck": true,
         "sourceMap": true,
         "plugins": [
             {
-                "name": "typescript-tslint-plugin",
+                "name": "typescript-tslint-plugin"
             }
         ]
     },
-    "include": [
-        "**/*.ts",
-        "**/*.tsx"
-    ],
-    "exclude": [
-        "**/*.js",
-        "**/*.jsx"
-    ]
+    "include": ["**/*.ts", "**/*.tsx"],
+    "exclude": ["**/*.js", "**/*.jsx"]
 }

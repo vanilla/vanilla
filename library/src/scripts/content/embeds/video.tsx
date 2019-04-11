@@ -119,9 +119,9 @@ function PlayIcon() {
 /**
  * Handle a click on a video.
  */
-function handlePlayVideo() {
+function handlePlayVideo(event: MouseEvent, triggeringElement: HTMLElement) {
     // Inside of delegate event `this` is the current target of the event.
-    const playButton: HTMLElement = this;
+    const playButton: HTMLElement = triggeringElement;
     const container = playButton.closest(".embedVideo-ratio");
     if (container) {
         const url = playButton.dataset.url as string;

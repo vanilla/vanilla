@@ -12,7 +12,7 @@ import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import memoize from "lodash/memoize";
 import merge from "lodash/merge";
 import { color } from "csx";
-import { log } from "@library/utility/utils";
+import { log, logWarning } from "@library/utility/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 
 /**
@@ -30,14 +30,10 @@ import { getThemeVariables } from "@library/theming/getThemeVariables";
  * const withDebugMode = style(true, "subcomponent", {color: "red"}).
  */
 export function styleFactory(componentName: string) {
-    function styleCreator(subcomponentName: string, ...objects: Array<NestedCSSProperties | undefined>): string;
-    function styleCreator(
-        debug: true,
-        subcomponentName: string,
-        ...objects: Array<NestedCSSProperties | undefined>
-    ): string;
-    function styleCreator(...objects: Array<NestedCSSProperties | undefined>): string;
-    function styleCreator(...objects: Array<NestedCSSProperties | undefined | string | boolean>): string {
+    function styleCreator(subcomponentName: string, ...objects: NestedCSSProperties[]): string;
+    function styleCreator(debug: true, subcomponentName: string, ...objects: NestedCSSProperties[]): string;
+    function styleCreator(...objects: NestedCSSProperties[]): string;
+    function styleCreator(...objects: Array<NestedCSSProperties | string | boolean>): string {
         if (objects.length === 0) {
             return style();
         }
@@ -56,7 +52,7 @@ export function styleFactory(componentName: string) {
         }
 
         if (shouldLogDebug) {
-            log(`Debug component ${debugName}`);
+            logWarning(`Debugging component ${debugName}`);
             log(styleObjs);
         }
 

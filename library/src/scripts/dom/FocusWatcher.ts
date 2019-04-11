@@ -2,6 +2,27 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+import { useEffect } from "react";
+
+/**
+ * React hook for creating and destroying a FocusWatcher. See FocusWatcher documentation.
+ */
+export function useFocusWatcher(
+    rootNode: Element | null,
+    changeHandler: (hasFocus: boolean) => void,
+    bypass?: boolean,
+) {
+    useEffect(() => {
+        if (bypass) {
+            return;
+        }
+        if (rootNode !== null) {
+            const focusWatcher = new FocusWatcher(rootNode, changeHandler);
+            focusWatcher.start();
+            return focusWatcher.stop;
+        }
+    }, [rootNode, changeHandler, bypass]);
+}
 
 /**
  * Register a callback for focusin and focusin out events. The main improvement here over registering
@@ -21,20 +42,20 @@ export default class FocusWatcher {
     /**
      * Register the event listeners from this class.
      */
-    public start() {
+    public start = () => {
         this.rootNode.addEventListener("focusout", this.handleFocusOut, true);
         this.rootNode.addEventListener("focusin", this.handleFocusIn, true);
         document.addEventListener("click", this.handleClick);
-    }
+    };
 
     /**
      * Remove the event listeners from this class.
      */
-    public stop() {
+    public stop = () => {
         this.rootNode.removeEventListener("focusout", this.handleFocusOut, true);
         this.rootNode.removeEventListener("focusin", this.handleFocusIn, true);
         document.removeEventListener("click", this.handleClick);
-    }
+    };
 
     /**
      * Handle when an element loses focus.

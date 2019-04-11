@@ -12,6 +12,7 @@ import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import memoize from "lodash/memoize";
 import merge from "lodash/merge";
 import { color } from "csx";
+import { log } from "@library/utility/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 
 /**
@@ -20,25 +21,43 @@ import { getThemeVariables } from "@library/theming/getThemeVariables";
  * This works like debugHelper but automatically. The generated function behaves just like `style()`
  * but can automatically adds a debug name & allows the first argument to be a string subcomponent name.
  *
+ * Additionally passing the first parameter as true will log out out debug information about the styles.
+ *
  * @example
  * const style = styleFactory("myComponent");
  * const myClass = style({ color: "red" }); // .myComponent-sad421s
  * const mySubClass = style("subcomponent", { color: "red" }) // .myComponent-subcomponent-23sdaf43
+ * const withDebugMode = style(true, "subcomponent", {color: "red"}).
  */
 export function styleFactory(componentName: string) {
-    function styleCreator(subcomponentName: string, ...objects: Array<NestedCSSProperties | undefined>);
-    function styleCreator(...objects: Array<NestedCSSProperties | undefined>);
-    function styleCreator(...objects: Array<NestedCSSProperties | undefined | string>) {
+    function styleCreator(subcomponentName: string, ...objects: Array<NestedCSSProperties | undefined>): string;
+    function styleCreator(
+        debug: true,
+        subcomponentName: string,
+        ...objects: Array<NestedCSSProperties | undefined>
+    ): string;
+    function styleCreator(...objects: Array<NestedCSSProperties | undefined>): string;
+    function styleCreator(...objects: Array<NestedCSSProperties | undefined | string | boolean>): string {
         if (objects.length === 0) {
             return style();
         }
 
         let debugName = componentName;
+        let shouldLogDebug = false;
         let styleObjs: Array<NestedCSSProperties | undefined> = objects as any;
+        if (typeof objects[0] === "boolean" && objects[0] === true) {
+            styleObjs.shift();
+            shouldLogDebug = true;
+        }
         if (typeof objects[0] === "string") {
             const [subcomponentName, ...restObjects] = styleObjs;
             debugName += `-${subcomponentName}`;
             styleObjs = restObjects;
+        }
+
+        if (shouldLogDebug) {
+            log(`Debug component ${debugName}`);
+            log(styleObjs);
         }
 
         return style({ $debugName: debugName }, ...styleObjs);

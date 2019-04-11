@@ -5,7 +5,12 @@
  */
 
 import React from "react";
-import { getRequiredID, IOptionalComponentID, IRequiredComponentID } from "@library/utility/idUtils";
+import {
+    getRequiredID,
+    IOptionalComponentID,
+    IRequiredComponentID,
+    uniqueIDFromPrefix,
+} from "@library/utility/idUtils";
 import FlyoutToggle, { IFlyoutToggleChildParameters } from "@library/flyouts/FlyoutToggle";
 import { t } from "@library/utility/appUtils";
 import { embed, emoji } from "@library/icons/editorIcons";
@@ -16,20 +21,16 @@ import { forceSelectionUpdate } from "@rich-editor/quill/utility";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 
-interface IProps extends IOptionalComponentID {
+interface IProps {
     disabled?: boolean;
     renderAbove?: boolean;
     renderLeft?: boolean;
     legacyMode: boolean;
 }
 
-export default class EmojiFlyout extends React.Component<IProps, IRequiredComponentID> {
-    public constructor(props) {
-        super(props);
-        this.state = {
-            id: getRequiredID(props, "emojiPopover"),
-        };
-    }
+export default class EmojiFlyout extends React.Component<IProps> {
+    private titleRef = React.createRef<HTMLElement>();
+    private id = uniqueIDFromPrefix("emojiPopover");
 
     /**
      * @inheritDoc
@@ -39,7 +40,7 @@ export default class EmojiFlyout extends React.Component<IProps, IRequiredCompon
 
         return (
             <FlyoutToggle
-                id={this.state.id}
+                id={this.id}
                 className="emojiPicker"
                 buttonClassName={classNames("richEditor-button", "richEditor-embedButton", classesRichEditor.button)}
                 onVisibilityChange={forceSelectionUpdate}
@@ -50,11 +51,13 @@ export default class EmojiFlyout extends React.Component<IProps, IRequiredCompon
                 renderAbove={this.props.renderAbove}
                 renderLeft={this.props.renderLeft}
                 openAsModal={false}
+                initialFocusElement={this.titleRef.current}
             >
                 {(options: IFlyoutToggleChildParameters) => {
                     return (
                         <EmojiPicker
                             {...options}
+                            titleRef={this.titleRef}
                             renderAbove={this.props.renderAbove}
                             renderLeft={this.props.renderLeft}
                             contentID={options.id}

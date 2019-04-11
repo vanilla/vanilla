@@ -4,21 +4,21 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import FocusWatcher from "@library/dom/FocusWatcher";
-import EscapeListener from "@library/dom/EscapeListener";
+import React, { useRef, useMemo, useState, useCallback, useEffect, useLayoutEffect } from "react";
+import FocusWatcher, { useFocusWatcher } from "@library/dom/FocusWatcher";
+import EscapeListener, { useEscapeListener } from "@library/dom/EscapeListener";
 import { t } from "@library/utility/appUtils";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { getRequiredID } from "@library/utility/idUtils";
+import { getRequiredID, uniqueIDFromPrefix } from "@library/utility/idUtils";
 import Button from "@library/forms/Button";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import classNames from "classnames";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
+import { forceRenderStyles } from "typestyle";
 
 export interface IFlyoutToggleChildParameters {
     id: string;
-    initialFocusRef?: React.RefObject<any>;
     isVisible: boolean;
     closeMenuHandler(event?: React.SyntheticEvent<any>);
     renderAbove?: boolean;
@@ -40,6 +40,7 @@ export interface IFlyoutToggleProps {
     toggleButtonClassName?: string;
     setExternalButtonRef?: (ref: React.RefObject<HTMLButtonElement>) => void;
     openAsModal: boolean;
+    initialFocusElement?: HTMLElement | null;
 }
 
 export interface IFlyoutTogglePropsWithIcon extends IFlyoutToggleProps {
@@ -50,199 +51,156 @@ export interface IFlyoutTogglePropsWithTextLabel extends IFlyoutToggleProps {
     selectedItemLabel: string;
 }
 
-interface IState {
-    id: string;
-    isVisible: boolean;
-}
+type IProps = IFlyoutTogglePropsWithIcon | IFlyoutTogglePropsWithTextLabel;
 
-export default class FlyoutToggle extends React.PureComponent<
-    IFlyoutTogglePropsWithIcon | IFlyoutTogglePropsWithTextLabel,
-    IState
-> {
-    public state = {
-        id: getRequiredID(this.props, "flyout"),
-        isVisible: false,
-    };
-    private initalFocusRef: React.RefObject<any> = React.createRef();
-    private buttonRef: React.RefObject<HTMLButtonElement> = React.createRef();
-    private controllerRef: React.RefObject<HTMLDivElement> = React.createRef();
-    private focusWatcher: FocusWatcher;
-    private escapeListener: EscapeListener;
+export default function FlyoutToggle(props: IProps) {
+    const { initialFocusElement } = props;
+    const title = "name" in props ? props.name : props.selectedItemLabel;
 
-    public render() {
-        const classes = dropDownClasses();
-        const buttonClasses = classNames(this.props.buttonClassName, this.props.toggleButtonClassName, {
-            isOpen: this.state.isVisible,
-        });
+    // IDs unique to the component instance.
+    const ID = useMemo(() => uniqueIDFromPrefix("flyout"), []);
+    const buttonID = ID + "-handle";
+    const contentID = ID + "-contents";
 
-        const title = "name" in this.props ? this.props.name : this.props.selectedItemLabel;
-
-        const childrenData = {
-            id: this.contentID,
-            initialFocusRef: this.initalFocusRef,
-            isVisible: this.state.isVisible,
-            closeMenuHandler: this.closeMenuHandler,
-            renderAbove: this.props.renderAbove,
-            renderLeft: this.props.renderLeft,
-            openAsModal: this.props.openAsModal,
-        };
-
-        const classesDropDown = !this.props.openAsModal ? classNames("flyouts", classes.root) : null;
-        return (
-            <div
-                id={this.state.id}
-                className={classNames(classesDropDown, this.props.className, {
-                    asModal: this.props.openAsModal,
-                })}
-                ref={this.controllerRef}
-                onClick={this.stopPropagation}
-            >
-                <Button
-                    id={this.buttonID}
-                    onClick={this.toggleFlyout}
-                    className={buttonClasses}
-                    type="button"
-                    title={title}
-                    aria-label={"name" in this.props ? this.props.name : undefined}
-                    aria-controls={this.contentID}
-                    aria-expanded={this.state.isVisible}
-                    aria-haspopup="true"
-                    disabled={this.props.disabled}
-                    baseClass={this.props.buttonBaseClass}
-                    buttonRef={this.buttonRef}
-                >
-                    {this.props.buttonContents}
-                </Button>
-
-                {!this.props.disabled && this.state.isVisible && (
-                    <React.Fragment>
-                        {this.props.openAsModal ? (
-                            <Modal
-                                label={t("title")}
-                                size={ModalSizes.SMALL}
-                                exitHandler={this.closeMenuHandler}
-                                elementToFocusOnExit={this.buttonRef.current!}
-                            >
-                                {this.props.children(childrenData)}
-                            </Modal>
-                        ) : (
-                            this.props.children(childrenData)
-                        )}
-                    </React.Fragment>
-                )}
-            </div>
-        );
-    }
-
-    public componentDidUpdate(
-        prevProps: IFlyoutTogglePropsWithIcon | IFlyoutTogglePropsWithTextLabel,
-        prevState: IState,
-    ) {
-        if (!prevState.isVisible && this.state.isVisible) {
-            if (this.props.onVisibilityChange) {
-                this.props.onVisibilityChange(this.state.isVisible);
-            }
-            if (this.initalFocusRef.current) {
-                this.initalFocusRef.current.focus();
-            } else if (this.buttonRef.current) {
-                this.buttonRef.current.focus();
-            }
-        } else if (prevState.isVisible && !this.state.isVisible && this.props.onVisibilityChange) {
-            this.props.onVisibilityChange(this.state.isVisible);
-        }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public componentDidMount() {
-        this.focusWatcher = new FocusWatcher(this.controllerRef.current!, this.handleFocusChange);
-        this.focusWatcher.start();
-
-        this.escapeListener = new EscapeListener(
-            this.controllerRef.current!,
-            this.buttonRef.current!,
-            this.closeMenuHandler,
-        );
-        this.escapeListener.start();
-        if (this.props.setExternalButtonRef) {
-            this.props.setExternalButtonRef(this.buttonRef);
-        }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public componentWillUnmount() {
-        this.focusWatcher.stop();
-        this.escapeListener.stop();
-    }
-
-    private handleFocusChange = hasFocus => {
-        if (!hasFocus) {
-            this.setState({ isVisible: false });
-            if (this.props.onVisibilityChange) {
-                this.props.onVisibilityChange(false);
+    // Focus management & visibility
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    const controllerRef = useRef<HTMLDivElement>(null);
+    const [isVisible, setVisibility] = useState(false);
+    useEffect(() => {
+        if (isVisible && initialFocusElement) {
+            // Focus the inital focusable element when we gain visibility.
+            if (initialFocusElement) {
+                initialFocusElement.focus();
             }
         }
-    };
-
-    private get buttonID(): string {
-        return this.state.id + "-handle";
-    }
-
-    private get contentID(): string {
-        return this.state.id + "-contents";
-    }
+        props.onVisibilityChange && props.onVisibilityChange(isVisible);
+    }, [isVisible, initialFocusElement, props.onVisibilityChange]);
 
     /**
      * Toggle Menu menu
      */
-    private toggleFlyout = e => {
-        e.stopPropagation();
-        this.setState((prevState: IState) => {
-            return { isVisible: !prevState.isVisible };
-        });
-        if (this.props.onVisibilityChange) {
-            this.props.onVisibilityChange(this.state.isVisible);
-        }
-    };
-
-    /**
-     * Closes menu
-     * @param event - The fired event. This could be a custom event.
-     */
-    private closeMenuHandler = event => {
-        if (event.detail && event.detail.firingKey && event.detail.firingKey === this.constructor.name) {
-            return;
-        }
-        event.stopPropagation();
-        event.preventDefault();
-
-        this.props.onClose && this.props.onClose();
-
-        const { activeElement } = document;
-        const parentElement = this.controllerRef.current;
-
-        this.setState({
-            isVisible: false,
-        });
-
-        if (parentElement && parentElement.contains(activeElement)) {
-            if (this.buttonRef.current) {
-                this.buttonRef.current.focus();
-                this.buttonRef.current.classList.add("focus-visible");
+    const buttonClickHandler = useCallback(
+        (e: React.MouseEvent) => {
+            e.stopPropagation();
+            setVisibility(!isVisible);
+            if (props.onVisibilityChange) {
+                props.onVisibilityChange(isVisible);
             }
-        }
-        if (this.props.onVisibilityChange) {
-            this.props.onVisibilityChange(false);
-        }
-    };
+        },
+        [isVisible, setVisibility, props.onVisibilityChange],
+    );
+
+    const closeMenuHandler = useCallback(
+        event => {
+            event.stopPropagation();
+            event.preventDefault();
+
+            props.onClose && props.onClose();
+
+            const { activeElement } = document;
+            const parentElement = controllerRef.current;
+
+            setVisibility(false);
+
+            if (parentElement && parentElement.contains(activeElement)) {
+                if (buttonRef.current) {
+                    buttonRef.current.focus();
+                    buttonRef.current.classList.add("focus-visible");
+                }
+            }
+            if (props.onVisibilityChange) {
+                props.onVisibilityChange(false);
+            }
+        },
+        [props.onClose, controllerRef.current, buttonRef.current, props.onVisibilityChange],
+    );
 
     /**
      * Stop click propagation outside the flyout
      */
-    private stopPropagation = e => {
+    const handleBlockEventPropogation = useCallback((e: React.SyntheticEvent) => {
         e.stopPropagation();
+    }, []);
+
+    const handleFocusChange = (hasFocus: boolean) => {
+        if (!hasFocus) {
+            setVisibility(false);
+            if (props.onVisibilityChange) {
+                props.onVisibilityChange(false);
+            }
+        }
     };
+
+    // Focus handling
+    useFocusWatcher(controllerRef.current, handleFocusChange, props.openAsModal);
+    useEscapeListener({
+        root: controllerRef.current,
+        returnElement: buttonRef.current,
+        callback: closeMenuHandler,
+    });
+    if (props.setExternalButtonRef) {
+        props.setExternalButtonRef(buttonRef);
+    }
+
+    const classes = dropDownClasses();
+    const buttonClasses = classNames(props.buttonClassName, props.toggleButtonClassName, {
+        isOpen: isVisible,
+    });
+    // Prevent flashing of content sometimes.
+    forceRenderStyles();
+
+    const childrenData = {
+        id: contentID,
+        isVisible,
+        closeMenuHandler,
+        renderAbove: props.renderAbove,
+        renderLeft: props.renderLeft,
+        openAsModal: props.openAsModal,
+    };
+
+    const classesDropDown = !props.openAsModal ? classNames("flyouts", classes.root) : null;
+    return (
+        <div
+            id={ID}
+            className={classNames(classesDropDown, props.className, {
+                asModal: props.openAsModal,
+            })}
+            ref={controllerRef}
+            onClick={handleBlockEventPropogation}
+        >
+            <Button
+                id={buttonID}
+                onClick={buttonClickHandler}
+                className={buttonClasses}
+                type="button"
+                title={title}
+                aria-label={"name" in props ? props.name : undefined}
+                aria-controls={contentID}
+                aria-expanded={isVisible}
+                aria-haspopup="true"
+                disabled={props.disabled}
+                baseClass={props.buttonBaseClass}
+                buttonRef={buttonRef}
+            >
+                {props.buttonContents}
+            </Button>
+
+            {!props.disabled && isVisible && (
+                <React.Fragment>
+                    {props.openAsModal ? (
+                        <Modal
+                            label={t("title")}
+                            size={ModalSizes.SMALL}
+                            exitHandler={closeMenuHandler}
+                            elementToFocusOnExit={buttonRef.current!}
+                        >
+                            {props.children(childrenData)}
+                        </Modal>
+                    ) : (
+                        props.children(childrenData)
+                    )}
+                </React.Fragment>
+            )}
+        </div>
+    );
 }

@@ -32,9 +32,14 @@ export const insertMediaClasses = useThemeCache(() => {
     });
 
     const insert = style("insert", {
-        width: percent(100),
-        position: "relative",
-        marginBottom: px(10),
+        $nest: {
+            "&&": {
+                // Nest deeper to override margins from the forum.
+                width: percent(100),
+                position: "relative",
+                marginBottom: px(10),
+            },
+        },
     });
     const button = style("button", {
         position: "relative",

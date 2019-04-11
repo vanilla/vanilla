@@ -14,6 +14,7 @@ import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import classNames from "classnames";
 import React from "react";
 import { Provider } from "react-redux";
+import { DeviceProvider } from "@library/layout/DeviceContext";
 
 interface IProps {
     legacyTextArea: HTMLInputElement;
@@ -29,19 +30,21 @@ export function ForumEditor(props: IProps) {
     const classes = richEditorClasses(true);
     return (
         <Provider store={store}>
-            <Editor
-                isPrimaryEditor={true}
-                legacyMode={true}
-                allowUpload={hasPermission("uploads.add")}
-                isLoading={false}
-            >
-                <div className={classNames("richEditor-frame", "InputBox", classes.legacyFrame, classes.root)}>
-                    <EditorContent legacyTextArea={props.legacyTextArea} />
-                    <EditorParagraphMenu />
-                    <EditorInlineMenus />
-                    <EditorEmbedBar />
-                </div>
-            </Editor>
+            <DeviceProvider>
+                <Editor
+                    isPrimaryEditor={true}
+                    legacyMode={true}
+                    allowUpload={hasPermission("uploads.add")}
+                    isLoading={false}
+                >
+                    <div className={classNames("richEditor-frame", "InputBox", classes.legacyFrame, classes.root)}>
+                        <EditorContent legacyTextArea={props.legacyTextArea} />
+                        <EditorParagraphMenu />
+                        <EditorInlineMenus />
+                        <EditorEmbedBar />
+                    </div>
+                </Editor>
+            </DeviceProvider>
         </Provider>
     );
 }

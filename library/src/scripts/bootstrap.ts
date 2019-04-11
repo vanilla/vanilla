@@ -11,7 +11,8 @@ import gdn from "@library/gdn";
 import apiv2 from "@library/apiv2";
 
 // Inject the debug flag into the utility.
-debug(getMeta("debug", false));
+const debugValue = getMeta("context.debug", getMeta("debug", false));
+debug(debugValue);
 
 // Export the API to the global object.
 gdn.apiv2 = apiv2;

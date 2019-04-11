@@ -12,7 +12,10 @@ import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import memoize from "lodash/memoize";
 import merge from "lodash/merge";
 import { color } from "csx";
+import { log, logWarning } from "@library/utility/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
+
+export const DEBUG_STYLES = Symbol.for("Debug");
 
 /**
  * A better helper to generate human readable classes generated from TypeStyle.
@@ -20,25 +23,39 @@ import { getThemeVariables } from "@library/theming/getThemeVariables";
  * This works like debugHelper but automatically. The generated function behaves just like `style()`
  * but can automatically adds a debug name & allows the first argument to be a string subcomponent name.
  *
+ * Additionally passing the first parameter as true will log out out debug information about the styles.
+ *
  * @example
  * const style = styleFactory("myComponent");
  * const myClass = style({ color: "red" }); // .myComponent-sad421s
  * const mySubClass = style("subcomponent", { color: "red" }) // .myComponent-subcomponent-23sdaf43
+ * const withDebugMode = style(true, "subcomponent", {color: "red"}).
  */
 export function styleFactory(componentName: string) {
-    function styleCreator(subcomponentName: string, ...objects: Array<NestedCSSProperties | undefined>);
-    function styleCreator(...objects: Array<NestedCSSProperties | undefined>);
-    function styleCreator(...objects: Array<NestedCSSProperties | undefined | string>) {
+    function styleCreator(subcomponentName: string, ...objects: NestedCSSProperties[]): string;
+    function styleCreator(debug: symbol, subcomponentName: string, ...objects: NestedCSSProperties[]): string;
+    function styleCreator(...objects: NestedCSSProperties[]): string;
+    function styleCreator(...objects: Array<NestedCSSProperties | string | symbol>): string {
         if (objects.length === 0) {
             return style();
         }
 
         let debugName = componentName;
+        let shouldLogDebug = false;
         let styleObjs: Array<NestedCSSProperties | undefined> = objects as any;
+        if (objects[0] === DEBUG_STYLES) {
+            styleObjs.shift();
+            shouldLogDebug = true;
+        }
         if (typeof objects[0] === "string") {
             const [subcomponentName, ...restObjects] = styleObjs;
             debugName += `-${subcomponentName}`;
             styleObjs = restObjects;
+        }
+
+        if (shouldLogDebug) {
+            logWarning(`Debugging component ${debugName}`);
+            log(styleObjs);
         }
 
         return style({ $debugName: debugName }, ...styleObjs);

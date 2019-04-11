@@ -6,7 +6,6 @@
 
 import { unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { NestedCSSProperties } from "typestyle/lib/types";
 import { percent } from "csx";
 import { containerVariables } from "@library/layout/components/containerStyles";
 
@@ -14,7 +13,7 @@ export const widgetContainerClasses = useThemeCache(() => {
     const style = styleFactory("widgetContainerClasses");
     const vars = containerVariables();
 
-    const root: NestedCSSProperties = style({
+    const root = style({
         position: "relative",
         maxWidth: percent(100),
         margin: "auto",

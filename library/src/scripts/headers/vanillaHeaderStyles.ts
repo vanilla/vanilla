@@ -382,7 +382,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         },
     });
 
-    const tabButtonActive = style("tabButtonActive", {
+    const tabButtonActive = {
         color: globalVars.mainColors.primary.toString(),
         $nest: {
             ".vanillaHeader-tabButtonContent": {
@@ -391,7 +391,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
                 borderRadius: px(vars.button.borderRadius),
             },
         },
-    });
+    };
 
     const tabButton = style("tabButton", {
         display: "block",

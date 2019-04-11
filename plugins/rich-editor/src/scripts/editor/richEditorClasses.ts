@@ -119,8 +119,6 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        height: unit(vars.paragraphMenuHandle.size),
-        width: unit(globalVars.icon.sizes.default),
         top: important(0),
     });
 

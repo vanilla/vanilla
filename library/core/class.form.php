@@ -373,25 +373,25 @@ class Gdn_Form extends Gdn_Pluggable {
     public function color($fieldName, $options = []) {
         Gdn::controller()->addJsFile('colorpicker.js');
 
-        $valueAttributes['class'] = 'js-color-picker-value color-picker-value Hidden';
-        $textAttributes['class'] = 'js-color-picker-text color-picker-text';
-        $colorAttributes['class'] = 'js-color-picker-color color-picker-color';
-
-        // Default starting color for color input. Color inputs require one, Chrome will throw a warning if one
-        // doesn't exist. The javascript will override this.
-        $colorAttributes['value'] = $options['Value'] ?? '#ffffff';
-        $valueAttributes['value'] = $colorAttributes['value'];
-
         $cssClass = 'js-color-picker color-picker input-group';
+        $allowEmpty = $options['AllowEmpty'] ?? '';
+        $dataAttribute = $allowEmpty ? ' data-allow-empty="true"' : ' data-allow-empty="false"';
 
-        $allowEmpty = $options['AllowEmpty'] ?? false;
-        if ($allowEmpty) {
-            $dataAttribute = 'data-allow-empty="true"';
-        } else {
-            $dataAttribute = 'data-allow-empty="false"';
+        $valueAttributes['class'] = 'js-color-picker-value color-picker-value Hidden';
+        if (isset($options['Value'])) {
+            $valueAttributes['value'] = $options['Value'];
         }
 
-        return '<div id="'.$this->escapeFieldName($fieldName).'" class="'.$cssClass.'" '.$dataAttribute.'>'
+        $textAttributes['class'] = 'js-color-picker-text color-picker-text';
+
+        // Default dummy starting color for color input. Color inputs require one, Chrome will throw a warning if one
+        // doesn't exist. The javascript will ignore this.
+        $colorAttributes = [
+            'class' => 'js-color-picker-color color-picker-color',
+            'value' => '#ffffff'
+        ];
+
+        return '<div id="'.$this->escapeFieldName($fieldName).'" class="'.$cssClass.'"'.$dataAttribute.'>'
         .$this->input($fieldName, 'text', $valueAttributes)
         .$this->input($fieldName.'-text', 'text', $textAttributes)
         .'<span class="js-color-picker-preview color-picker-preview"></span>'

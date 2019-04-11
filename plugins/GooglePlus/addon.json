@@ -1,6 +1,6 @@
 {
     "name": "Google+ Social Connect",
-    "description": "Users may sign into your site using their Google Plus account.",
+    "description": "This plugin is deprecated. <a href='https://support.google.com/plus/answer/9217723'>Google is no longer supporting Google+ user authentication</a>. Please use the Google Sign In plugin.",
     "version": "1.1.0",
     "mobileFriendly": true,
     "settingsUrl": "/dashboard/social/googleplus",

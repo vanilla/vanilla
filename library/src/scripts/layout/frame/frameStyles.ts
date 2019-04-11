@@ -134,7 +134,7 @@ export const frameHeaderClasses = useThemeCache(() => {
         width: unit(formElVars.sizing.height),
     });
 
-    const action = style(true, "action", {
+    const action = style("action", {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

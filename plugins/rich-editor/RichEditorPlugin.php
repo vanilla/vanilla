@@ -32,8 +32,8 @@ class RichEditorPlugin extends Gdn_Plugin {
     }
 
     public function onDisable() {
-        removeFromConfig('Garden.InputFormatter');
-        removeFromConfig('Garden.MobileInputFormatter');
+        Gdn::config()->saveToConfig('Garden.InputFormatter', 'Markdown');
+        Gdn::config()->saveToConfig('Garden.MobileInputFormatter', 'Markdown');
     }
 
     /**

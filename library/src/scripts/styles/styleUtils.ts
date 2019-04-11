@@ -15,6 +15,8 @@ import { color } from "csx";
 import { log, logWarning } from "@library/utility/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 
+export const DEBUG_STYLES = Symbol.for("Debug");
+
 /**
  * A better helper to generate human readable classes generated from TypeStyle.
  *
@@ -31,9 +33,9 @@ import { getThemeVariables } from "@library/theming/getThemeVariables";
  */
 export function styleFactory(componentName: string) {
     function styleCreator(subcomponentName: string, ...objects: NestedCSSProperties[]): string;
-    function styleCreator(debug: true, subcomponentName: string, ...objects: NestedCSSProperties[]): string;
+    function styleCreator(debug: symbol, subcomponentName: string, ...objects: NestedCSSProperties[]): string;
     function styleCreator(...objects: NestedCSSProperties[]): string;
-    function styleCreator(...objects: Array<NestedCSSProperties | string | boolean>): string {
+    function styleCreator(...objects: Array<NestedCSSProperties | string | symbol>): string {
         if (objects.length === 0) {
             return style();
         }
@@ -41,7 +43,7 @@ export function styleFactory(componentName: string) {
         let debugName = componentName;
         let shouldLogDebug = false;
         let styleObjs: Array<NestedCSSProperties | undefined> = objects as any;
-        if (typeof objects[0] === "boolean" && objects[0] === true) {
+        if (objects[0] === DEBUG_STYLES) {
             styleObjs.shift();
             shouldLogDebug = true;
         }

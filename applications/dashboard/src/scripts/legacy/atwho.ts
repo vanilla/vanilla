@@ -261,6 +261,9 @@ export function initializeAtComplete(editorElement, iframe?: any) {
         // be false most of the time; the exception is when
         // it's true.
         if (!atQuote) {
+            // Supressing this error because this is legacy that is complicated to refactor.
+            // In the case here `this` is the atwho library which we don't have types.
+            // @ts-ignore
             insert = this.at + insert;
         }
 

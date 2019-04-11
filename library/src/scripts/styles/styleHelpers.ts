@@ -705,11 +705,11 @@ export const dropShadow = (vals: IDropShadowShorthand | IDropShadow | "none" | "
     } else if ("nonColorProps" in vals) {
         return { dropShadow: `${vals.nonColorProps} ${vals.color.toString()}` };
     } else {
-        const { x, y, blur, spread, inset, shadowColor } = this.props;
+        const { x, y, blur, spread, inset, color } = vals;
         return {
             dropShadow: `${x ? x + " " : ""}${y ? y + " " : ""}${blur ? blur + " " : ""}${
                 spread ? spread + " " : ""
-            }${shadowColor}${inset ? " inset" : ""}`,
+            }${color}${inset ? " inset" : ""}`,
         };
     }
 };

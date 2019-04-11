@@ -38,7 +38,7 @@ export interface IFlyoutToggleProps {
     renderAbove?: boolean;
     renderLeft?: boolean;
     toggleButtonClassName?: string;
-    setExternalButtonRef?: (ref: React.RefObject<HTMLButtonElement>) => void;
+    buttonRef?: React.RefObject<HTMLButtonElement>;
     openAsModal: boolean;
     initialFocusElement?: HTMLElement | null;
 }
@@ -63,7 +63,9 @@ export default function FlyoutToggle(props: IProps) {
     const contentID = ID + "-contents";
 
     // Focus management & visibility
-    const buttonRef = useRef<HTMLButtonElement>(null);
+    const ownButtonRef = useRef<HTMLButtonElement>(null);
+    const buttonRef = props.buttonRef || ownButtonRef;
+
     const controllerRef = useRef<HTMLDivElement>(null);
     const [isVisible, setVisibility] = useState(false);
     useEffect(() => {
@@ -138,9 +140,6 @@ export default function FlyoutToggle(props: IProps) {
         returnElement: buttonRef.current,
         callback: closeMenuHandler,
     });
-    if (props.setExternalButtonRef) {
-        props.setExternalButtonRef(buttonRef);
-    }
 
     const classes = dropDownClasses();
     const buttonClasses = classNames(props.buttonClassName, props.toggleButtonClassName, {

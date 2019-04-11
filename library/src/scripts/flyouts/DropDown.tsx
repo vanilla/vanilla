@@ -34,7 +34,7 @@ export interface IProps extends IDeviceProps {
     disabled?: boolean;
     toggleButtonClassName?: string;
     initialFocusElement?: HTMLElement | null;
-    setExternalButtonRef?: (ref: React.RefObject<HTMLButtonElement>) => void;
+    buttonRef?: React.RefObject<HTMLButtonElement>;
     onVisibilityChange?: (isVisible: boolean) => void;
     openAsModal?: boolean;
     title?: string;
@@ -85,7 +85,7 @@ class DropDown extends React.Component<IProps, IState> {
                 buttonClassName={this.props.buttonClassName}
                 selectedItemLabel={this.selectedText}
                 disabled={this.props.disabled}
-                setExternalButtonRef={this.props.setExternalButtonRef}
+                buttonRef={this.props.buttonRef}
                 toggleButtonClassName={this.props.toggleButtonClassName}
                 onVisibilityChange={this.props.onVisibilityChange}
                 openAsModal={openAsModal}

@@ -291,19 +291,42 @@ class PagerModule extends Gdn_Module {
     }
 
     /**
+     * Get the rel attribute for a pager element.
      *
+     * @param int $page
+     * @param int $currentPage
      *
-     * @param $page
-     * @param $currentPage
      * @return null|string
+     *
+     * @deprecated 3.0
      */
     public static function rel($page, $currentPage) {
-        if ($page == $currentPage - 1) {
-            return 'prev';
-        } elseif ($page == $currentPage + 1)
-            return 'next';
+        deprecated(__FUNCTION__, "PagerModule::makeAttributes()", "April 3, 2019");
+        return self::makeAttributes($page, $currentPage)['rel'] ?? null;
+    }
 
-        return null;
+    /**
+     * Get the attributes for a pagination element.
+     *
+     * @param int $page The page number to get attributes for.
+     * @param int $currentPage The current page number.
+     *
+     * @return array An array of HTML attributes to apply to a link.
+     */
+    private static function makeAttributes(int $page, int $currentPage): array {
+        $attrs = [
+            'aria-label' => sprintf(t('Page %s'), $page),
+        ];
+
+        if ($page === $currentPage - 1) {
+            $attrs['rel'] = 'prev';
+        } elseif ($page === $currentPage + 1) {
+            $attrs['rel'] = 'next';
+        } elseif ($page === $currentPage) {
+            $attrs['aria-current'] = 'page';
+        }
+
+        return $attrs;
     }
 
     /**
@@ -376,7 +399,7 @@ class PagerModule extends Gdn_Module {
 
         // Previous
         if ($currentPage == 1) {
-            $pager = '<span class="Previous Pager-nav">'.$previousText.'</span>';
+            $pager = '<span class="Previous Pager-nav" aria-disabled="true">'.$previousText.'</span>';
         } else {
             $pager .= anchor($previousText, $this->pageUrl($currentPage - 1), 'Previous Pager-nav', ['rel' => 'prev']);
         }
@@ -388,14 +411,23 @@ class PagerModule extends Gdn_Module {
         } elseif ($pageCount <= $pagesToDisplay) {
             // We don't need elipsis (ie. 1 2 3 4 5 6 7)
             for ($i = 1; $i <= $pageCount; $i++) {
-                $pager .= anchor($i, $this->pageUrl($i), $this->_GetCssClass($i, $currentPage), ['rel' => self::rel($i, $currentPage)]);
+                $pager .= anchor(
+                    $i,
+                    $this->pageUrl($i),
+                    $this->_GetCssClass($i, $currentPage),
+                    self::makeAttributes($i, $currentPage)
+                );
             }
 
         } elseif ($currentPage + $range <= $pagesToDisplay + 1) { // +1 prevents 1 ... 2
             // We're on a page that is before the first elipsis (ex: 1 2 3 4 5 6 7 ... 81)
             for ($i = 1; $i <= $pagesToDisplay; $i++) {
-                $pageParam = 'p'.$i;
-                $pager .= anchor($i, $this->pageUrl($i), $this->_GetCssClass($i, $currentPage), ['rel' => self::rel($i, $currentPage)]);
+                $pager .= anchor(
+                    $i,
+                    $this->pageUrl($i),
+                    $this->_GetCssClass($i, $currentPage),
+                    self::makeAttributes($i, $currentPage)
+                );
             }
 
             $pager .= '<span class="Ellipsis">'.$separator.'</span>';
@@ -408,8 +440,12 @@ class PagerModule extends Gdn_Module {
             $pager .= '<span class="Ellipsis">'.$separator.'</span>';
 
             for ($i = $pageCount - ($pagesToDisplay - 1); $i <= $pageCount; $i++) {
-                $pageParam = 'p'.$i;
-                $pager .= anchor($i, $this->pageUrl($i), $this->_GetCssClass($i, $currentPage), ['rel' => self::rel($i, $currentPage)]);
+                $pager .= anchor(
+                    $i,
+                    $this->pageUrl($i),
+                    $this->_GetCssClass($i, $currentPage),
+                    self::makeAttributes($i, $currentPage)
+                );
             }
             $linkCount = $linkCount + 2;
 
@@ -419,8 +455,12 @@ class PagerModule extends Gdn_Module {
             $pager .= '<span class="Ellipsis">'.$separator.'</span>';
 
             for ($i = $currentPage - $range; $i <= $currentPage + $range; $i++) {
-                $pageParam = 'p'.$i;
-                $pager .= anchor($i, $this->pageUrl($i), $this->_GetCssClass($i, $currentPage), ['rel' => self::rel($i, $currentPage)]);
+                $pager .= anchor(
+                    $i,
+                    $this->pageUrl($i),
+                    $this->_GetCssClass($i, $currentPage),
+                    self::makeAttributes($i, $currentPage)
+                );
             }
 
             $pager .= '<span class="Ellipsis">'.$separator.'</span>';
@@ -430,10 +470,14 @@ class PagerModule extends Gdn_Module {
 
         // Next
         if ($currentPage == $pageCount) {
-            $pager .= '<span class="Next Pager-nav">'.$nextText.'</span>';
+            $pager .= '<span class="Next Pager-nav" aria-disabled="true">'.$nextText.'</span>';
         } else {
-            $pageParam = 'p'.($currentPage + 1);
-            $pager .= anchor($nextText, $this->pageUrl($currentPage + 1), 'Next Pager-nav', ['rel' => 'next']); // extra sprintf parameter in case old url style is set
+            $pager .= anchor(
+                $nextText,
+                $this->pageUrl($currentPage + 1),
+                'Next Pager-nav',
+                ['rel' => 'next']
+            ); // extra sprintf parameter in case old url style is set
         }
         if ($pageCount <= 1) {
             $pager = '';
@@ -451,7 +495,25 @@ class PagerModule extends Gdn_Module {
             }
         }
 
-        return $pager == '' ? '' : sprintf($this->Wrapper, attribute(['id' => $clientID, 'class' => concatSep(' ', $this->CssClass, 'PagerLinkCount-' . $linkCount, static::NUMBERED_CLASS)]), $pager);
+        if ($pager === '') {
+            return $pager;
+        } else {
+            return sprintf(
+                $this->Wrapper,
+                attribute([
+                    'role' => 'navigation',
+                    'aria-label' => 'pagination',
+                    'id' => $clientID,
+                    'class' => concatSep(
+                        ' ',
+                        $this->CssClass,
+                        'PagerLinkCount-' . $linkCount,
+                        static::NUMBERED_CLASS
+                    ),
+                ]),
+                $pager
+            );
+        }
     }
 
     /**

@@ -157,6 +157,7 @@ class UsersApiController extends AbstractApiController {
                 'minLength' => 0,
                 'description' => 'URL to the user photo.'
             ],
+            'points:i',
             'emailConfirmed:b' => 'Has the email address for this user been confirmed?',
             'showEmail:b' => 'Is the email address visible to other users?',
             'bypassSpam:b' => 'Should submissions from this user bypass SPAM checks?',
@@ -933,7 +934,7 @@ class UsersApiController extends AbstractApiController {
      */
     public function userSchema($type = '') {
         if ($this->userSchema === null) {
-            $schema = Schema::parse(['userID', 'name', 'email', 'photoUrl', 'emailConfirmed',
+            $schema = Schema::parse(['userID', 'name', 'email', 'photoUrl', 'points', 'emailConfirmed',
                 'showEmail', 'bypassSpam', 'banned', 'dateInserted', 'dateLastActive', 'dateUpdated', 'roles?']);
             $schema = $schema->add($this->fullSchema());
             $this->userSchema = $this->schema($schema, 'User');

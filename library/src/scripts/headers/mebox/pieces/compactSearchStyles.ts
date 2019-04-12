@@ -23,6 +23,9 @@ export const compactSearchClasses = useThemeCache(() => {
             ".searchBar": {
                 flexGrow: 1,
             },
+            ".searchBar__input": {
+                color: colorOut(vanillaHeaderVars.colors.fg),
+            },
             ".searchBar-valueContainer.suggestedTextInput-inputText": {
                 height: unit(searchBarVariables().sizing.height),
                 backgroundColor: colorOut(vanillaHeaderVars.colors.bg.darken(0.05)),
@@ -33,14 +36,6 @@ export const compactSearchClasses = useThemeCache(() => {
             },
             ".searchBar-icon": {
                 color: colorOut(vanillaHeaderVars.colors.fg),
-            },
-            ".searchBar__control": {
-                opacity: 0.8,
-                $nest: {
-                    "&.searchBar__control--isFocused": {
-                        opacity: 1,
-                    },
-                },
             },
             "&.isOpen": {
                 width: percent(100),

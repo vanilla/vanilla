@@ -260,6 +260,22 @@ class ThemesApiController extends AbstractApiController {
             $res["assets"][$assetKey] = $this->generateAsset($assetKey, $asset, $theme);
         }
 
+        // Allow addons to add their own variable overrides. Should be moved into the model when the asset generation is refactored.
+        $additionalVariables = [];
+        foreach ($this->themeModel->getVariableProviders() as $variableProvider) {
+            $additionalVariables = $variableProvider->getVariables() + $additionalVariables;
+        }
+        if ($additionalVariables) {
+            if (!array_key_exists("variables", $res["assets"]) || !($res["assets"]["variables"] instanceof JsonAsset)) {
+                $variables = [];
+            } else {
+                $variables = json_decode($res["assets"]["variables"]->getData(), true) ?? [];
+            }
+
+            $variables = $additionalVariables + $variables;
+            $res["assets"]["variables"] = new JsonAsset(json_encode($variables));
+        }
+
         $secondaryAssets = array_intersect_key(
             $assets,
             array_flip(["javascript", "styles"])

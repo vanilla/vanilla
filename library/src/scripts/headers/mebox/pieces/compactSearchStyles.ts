@@ -17,6 +17,7 @@ export const compactSearchClasses = useThemeCache(() => {
     const formElementVars = formElementsVariables();
     const vanillaHeaderVars = vanillaHeaderVariables();
     const style = styleFactory("compactSearch");
+    const backgroundColor = vanillaHeaderVars.colors.bg.darken(0.05);
 
     const root = style({
         $nest: {
@@ -26,10 +27,13 @@ export const compactSearchClasses = useThemeCache(() => {
             ".searchBar__input": {
                 color: colorOut(vanillaHeaderVars.colors.fg),
             },
-            ".searchBar-valueContainer.suggestedTextInput-inputText": {
+            ".searchBar-valueContainer": {
                 height: unit(searchBarVariables().sizing.height),
-                backgroundColor: colorOut(vanillaHeaderVars.colors.bg.darken(0.05)),
+                backgroundColor: colorOut(backgroundColor.fade(0.8)),
                 border: 0,
+            },
+            ".hasFocus .searchBar-valueContainer": {
+                backgroundColor: colorOut(backgroundColor),
             },
             ".searchBar__placeholder": {
                 color: globalVars.mainColors.bg.toString(),

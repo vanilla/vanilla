@@ -7,6 +7,8 @@
 import React, { useContext } from "react";
 import { Optionalize } from "@library/@types/utils";
 import throttle from "lodash/throttle";
+import { deviceCheckerClasses } from "@library/layout/deviceCheckerStyles";
+import { forceRenderStyles } from "typestyle";
 
 export enum Devices {
     MOBILE = "mobile",
@@ -41,9 +43,11 @@ export class DeviceProvider extends React.Component<IProps, IState> {
     private deviceChecker: React.RefObject<HTMLDivElement> = React.createRef();
 
     public render() {
+        const classes = deviceCheckerClasses();
+        forceRenderStyles();
         return (
             <>
-                <div ref={this.deviceChecker} className="deviceChecker" />
+                <div ref={this.deviceChecker} className={classes.root} />
                 <DeviceContext.Provider value={this.state.device}>{this.props.children}</DeviceContext.Provider>
             </>
         );

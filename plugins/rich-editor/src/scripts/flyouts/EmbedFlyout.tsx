@@ -41,7 +41,7 @@ interface IState extends IRequiredComponentID {
 
 export class EmbedFlyout extends React.PureComponent<IProps, IState> {
     private embedModule: EmbedInsertionModule;
-    private initalFocusRef: React.RefObject<any> = React.createRef();
+    private inputRef = React.createRef<HTMLInputElement>();
 
     public constructor(props) {
         super(props);
@@ -84,6 +84,7 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
                     renderAbove={!!this.props.renderAbove}
                     renderLeft={!!this.props.renderLeft}
                     selfPadded={true}
+                    initialFocusElement={this.inputRef.current}
                 >
                     <Frame>
                         <FrameBody>
@@ -100,7 +101,7 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
                                 onKeyDown={this.buttonKeyDownHandler}
                                 aria-labelledby={this.titleID}
                                 aria-describedby={this.descriptionID}
-                                ref={this.initalFocusRef}
+                                ref={this.inputRef}
                             />
                         </FrameBody>
                         <FrameFooter>

@@ -44,6 +44,7 @@ interface IProps extends IWithEditorProps {
     disabled?: boolean;
     mobile?: boolean;
     lastGoodSelection: RangeStatic;
+    renderAbove?: boolean;
 }
 
 interface IState {
@@ -131,8 +132,6 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                 className={classNames(
                     { isMenuInset: !this.props.legacyMode },
                     !!this.props.mobile ? classes.paragraphMenuMobile : classes.paragraphMenu,
-                    !!this.props.mobile ? classes.menuItem : "",
-                    !!this.props.mobile ? classes.button : "",
                 )}
                 onKeyDown={this.handleMenuBarKeyDown}
                 ref={this.selfRef}
@@ -145,7 +144,10 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
                     aria-controls={this.menuID}
                     aria-expanded={this.isMenuVisible}
                     disabled={this.props.disabled}
-                    className={pilcrowClasses}
+                    className={classNames(pilcrowClasses, {
+                        [classes.button]: this.props.mobile,
+                        [classes.menuItem]: this.props.mobile,
+                    })}
                     aria-haspopup="menu"
                     onClick={this.pilcrowClickHandler}
                     onKeyDown={this.handleEscape}
@@ -279,7 +281,7 @@ export class ParagraphMenusBarToggle extends React.PureComponent<IProps, IState>
             classes.position,
             classes.menuBar,
             classesDropDown.likeDropDownContent,
-            scrollBounds.height - bounds.bottom <= 170 ? "isUp" : "isDown",
+            this.props.renderAbove || scrollBounds.height - bounds.bottom <= 170 ? "isUp" : "isDown",
         );
     }
 

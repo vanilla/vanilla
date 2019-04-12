@@ -42,6 +42,7 @@ interface IProps extends IWithEditorProps, IFlyoutToggleChildParameters {
     renderAbove?: boolean;
     renderLeft?: boolean;
     legacyMode: boolean;
+    titleRef?: React.RefObject<HTMLElement | null>;
 }
 
 interface IState {
@@ -154,7 +155,7 @@ export class EmojiPicker extends React.PureComponent<IProps, IState> {
                 descriptionID={this.descriptionID}
                 titleID={this.titleID}
                 title={this.state.title}
-                titleRef={this.props.initialFocusRef}
+                titleRef={this.props.titleRef}
                 accessibleDescription={description}
                 alertMessage={this.state.alertMessage}
                 additionalHeaderContent={extraHeadingContent}

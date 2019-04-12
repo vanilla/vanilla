@@ -132,7 +132,7 @@ export default class Modal extends React.Component<IProps, IState> {
                             isMedium: size === ModalSizes.MEDIUM,
                             isSmall: size === ModalSizes.SMALL,
                             isShadowed: size === ModalSizes.LARGE || ModalSizes.MEDIUM || ModalSizes.SMALL,
-                            hasNoScroll: allowScroll,
+                            allowsScroll: allowScroll,
                         },
                         size === ModalSizes.FULL_SCREEN ? inheritHeightClass() : "",
                         this.props.className,

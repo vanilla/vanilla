@@ -473,10 +473,10 @@ export const margins = (styles: IMargins): NestedCSSProperties => {
     const marginVals = {} as NestedCSSProperties;
 
     if (styles.all !== undefined) {
-        marginVals.paddingTop = unit(styles.all);
-        marginVals.paddingRight = unit(styles.all);
-        marginVals.paddingBottom = unit(styles.all);
-        marginVals.paddingLeft = unit(styles.all);
+        marginVals.marginTop = unit(styles.all);
+        marginVals.marginRight = unit(styles.all);
+        marginVals.marginBottom = unit(styles.all);
+        marginVals.marginLeft = unit(styles.all);
     }
 
     if (styles.vertical !== undefined) {

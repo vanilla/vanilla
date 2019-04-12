@@ -4,21 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
-import NotificationsContents, { INotificationsProps } from "@library/headers/mebox/pieces/NotificationsContents";
-import { t } from "@library/utility/appUtils";
-import NotificationsCounter from "@library/headers/mebox/pieces/NotificationsCounter";
-import { ButtonTypes } from "@library/forms/buttonStyles";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import DropDown from "@library/flyouts/DropDown";
-import classNames from "classnames";
+import NotificationsContents, { INotificationsProps } from "@library/headers/mebox/pieces/NotificationsContents";
+import NotificationsCount from "@library/headers/mebox/pieces/NotificationsCount";
+import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
+import { t } from "@library/utility/appUtils";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import React from "react";
 
 interface IProps extends INotificationsProps {
-    buttonClassName?: string;
-    className?: string;
-    toggleContentClassName?: string;
-    contentsClassName?: string;
     countUnread: number;
     userSlug: string;
 }
@@ -50,22 +44,14 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
             <DropDown
                 id={this.id}
                 name={t("Notifications")}
-                buttonClassName={classNames("vanillaHeader-notifications", this.props.buttonClassName)}
-                buttonBaseClass={ButtonTypes.CUSTOM}
                 renderLeft={true}
-                toggleButtonClassName="vanillaHeader-button"
-                contentsClassName={classNames(this.props.contentsClassName, classesHeader.dropDownContents)}
-                buttonContents={
-                    <NotificationsCounter
-                        open={this.state.open}
-                        className={this.props.toggleContentClassName}
-                        countClass={this.props.countClass}
-                    />
-                }
+                buttonClassName={classesHeader.button}
+                contentsClassName={classesHeader.dropDownContents}
+                buttonContents={<NotificationsCount open={this.state.open} compact={false} />}
                 onVisibilityChange={this.setOpen}
                 selfPadded={true}
             >
-                <NotificationsContents countClass={this.props.countClass} userSlug={userSlug} />
+                <NotificationsContents userSlug={userSlug} />
             </DropDown>
         );
     }

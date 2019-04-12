@@ -22,6 +22,11 @@ export const bodyCSS = useThemeCache(() => {
         overscrollBehavior: "none", // For IE -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
     });
 
+    cssRule("*", {
+        // For Mobile Safari -> https://developer.mozilla.org/en-US/docs/Web/CSS/overscroll-behavior
+        "-webkit-overflow-scrolling": "touch",
+    });
+
     cssRule("h1, h2, h3, h4, h5, h6", {
         display: "block",
         lineHeight: globalVars.lineHeights.condensed,

@@ -12,7 +12,7 @@ import CloseButton from "@library/navigation/CloseButton";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import NotificationsContents from "@library/headers/mebox/pieces/NotificationsContents";
 import { t } from "@library/utility/appUtils";
-import NotificationsCounter from "@library/headers/mebox/pieces/NotificationsCounter";
+import NotificationsCount from "@library/headers/mebox/pieces/NotificationsCount";
 import MessagesCount from "@library/headers/mebox/pieces/MessagesCount";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
@@ -23,11 +23,11 @@ import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownCont
 import classNames from "classnames";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
+import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
+import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
+import { user } from "@library/icons/header";
 
-interface IProps extends IInjectableUserState, IMeBoxProps {
-    buttonClass?: string;
-    userPhotoClass?: string;
-}
+interface IProps extends IInjectableUserState, IMeBoxProps {}
 
 interface IState {
     open: boolean;
@@ -50,8 +50,7 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
         }
 
         const classes = compactMeBoxClasses();
-        const countClass = this.props.countsClass;
-        const buttonClass = this.props.buttonClass;
+        const headerClasses = vanillaHeaderClasses();
         const panelContentClass = classNames("compactMeBox-panel", classes.panel);
         const panelBodyClass = classNames("compactMeBox-body", classes.body);
 
@@ -59,7 +58,7 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
             <div className={classNames("compactMeBox", this.props.className, classes.root)}>
                 <Button
                     title={t("My Account")}
-                    className={classNames("compactMeBox-openButton", this.props.buttonClass, classes.openButton)}
+                    className={classNames(classes.openButton, headerClasses.centeredButtonClass, headerClasses.button)}
                     onClick={this.open}
                     buttonRef={this.buttonRef}
                     baseClass={ButtonTypes.CUSTOM}
@@ -76,122 +75,40 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
                         size={ModalSizes.MODAL_AS_SIDE_PANEL}
                         label={t("Article Revisions")}
                         elementToFocusOnExit={this.buttonRef.current!}
-                        className="compactMeBox-modal"
                         exitHandler={this.close}
+                        allowScroll={true}
                     >
-                        <div className={classNames("compactMeBox-contents", classes.contents)}>
-                            <CloseButton
-                                onClick={this.close}
-                                className={classNames("compactMeBox-closeModal", classes.closeModal)}
-                                baseClass={ButtonTypes.CUSTOM}
-                            />
-                            <Tabs
-                                label={t("My Account Tab")}
-                                className={classNames("compactMeBox-tabs", inheritHeightClass())}
-                                tabListClass={classNames("compactMeBox-tabList", classes.tabList)}
-                                tabPanelsClass={classNames(
-                                    "compactMeBox-tabPanels",
-                                    inheritHeightClass(),
-                                    classes.tabPanels,
-                                )}
-                                tabPanelClass={classNames("compactMeBox-tabPanel", inheritHeightClass(), classes.panel)}
-                                buttonClass={classNames(buttonClass, "compactMeBox-tabButton", classes.tabButton)}
-                                tabs={[
-                                    {
-                                        buttonContent: (
-                                            <div
-                                                className={classNames(
-                                                    "compactMeBox-tabButtonContent",
-                                                    classes.tabButtonContent,
-                                                )}
-                                            >
-                                                <UserPhoto
-                                                    userInfo={userInfo}
-                                                    open={this.state.open}
-                                                    className="compactMeBox-tabButtonContent"
-                                                    size={UserPhotoSize.SMALL}
-                                                />
-                                            </div>
-                                        ),
-                                        openButtonContent: (
-                                            <div
-                                                className={classNames(
-                                                    "compactMeBox-tabButtonContent",
-                                                    classes.tabButtonContent,
-                                                )}
-                                            >
-                                                <UserPhoto
-                                                    userInfo={userInfo}
-                                                    open={this.state.open}
-                                                    className="compactMeBox-tabButtonContent"
-                                                    size={UserPhotoSize.SMALL}
-                                                />
-                                            </div>
-                                        ),
-                                        panelContent: <UserDropDownContents className={panelContentClass} />,
-                                    },
-                                    {
-                                        buttonContent: (
-                                            <NotificationsCounter
-                                                open={false}
-                                                className={classNames(
-                                                    "compactMeBox-tabButtonContent",
-                                                    classes.tabButtonContent,
-                                                )}
-                                                countClass="vanillaHeader-count vanillaHeader-notificationsCount"
-                                            />
-                                        ),
-                                        openButtonContent: (
-                                            <NotificationsCounter
-                                                open={true}
-                                                className={classNames(
-                                                    "compactMeBox-tabButtonContent",
-                                                    classes.tabButtonContent,
-                                                )}
-                                                countClass="vanillaHeader-count vanillaHeader-notificationsCount"
-                                            />
-                                        ),
-                                        panelContent: (
-                                            <NotificationsContents
-                                                countClass={countClass}
-                                                className={panelContentClass}
-                                                panelBodyClass={panelBodyClass}
-                                                userSlug={userInfo.name}
-                                            />
-                                        ),
-                                    },
-                                    {
-                                        buttonContent: (
-                                            <MessagesCount
-                                                open={false}
-                                                className={classNames(
-                                                    "compactMeBox-tabButtonContent",
-                                                    classes.tabButtonContent,
-                                                )}
-                                                countClass={this.props.countClass}
-                                            />
-                                        ),
-                                        openButtonContent: (
-                                            <MessagesCount
-                                                open={true}
-                                                className={classNames(
-                                                    "compactMeBox-tabButtonContent",
-                                                    classes.tabButtonContent,
-                                                )}
-                                                countClass={this.props.countClass}
-                                            />
-                                        ),
-                                        panelContent: (
-                                            <MessagesContents
-                                                countClass={this.props.countsClass}
-                                                className={panelContentClass}
-                                                panelBodyClass={panelBodyClass}
-                                            />
-                                        ),
-                                    },
-                                ]}
-                            />
-                        </div>
+                        <Tabs
+                            label={t("My Account Tab")}
+                            tabListClass={classNames(classes.tabList)}
+                            tabPanelsClass={classNames(classes.tabPanels)}
+                            buttonClass={classNames(classes.tabButton)}
+                            extraTabContent={
+                                <CloseButton onClick={this.close} className={classNames(classes.closeModal)} />
+                            }
+                            tabs={[
+                                {
+                                    buttonContent: <MeBoxIcon compact={true}>{user(false)}</MeBoxIcon>,
+                                    openButtonContent: <MeBoxIcon compact={true}>{user(true)}</MeBoxIcon>,
+                                    panelContent: <UserDropDownContents />,
+                                },
+                                {
+                                    buttonContent: <NotificationsCount open={false} compact={true} />,
+                                    openButtonContent: <NotificationsCount open={true} compact={true} />,
+                                    panelContent: (
+                                        <NotificationsContents
+                                            panelBodyClass={panelBodyClass}
+                                            userSlug={userInfo.name}
+                                        />
+                                    ),
+                                },
+                                {
+                                    buttonContent: <MessagesCount open={false} compact={true} />,
+                                    openButtonContent: <MessagesCount open={true} compact={true} />,
+                                    panelContent: <MessagesContents className={panelBodyClass} />,
+                                },
+                            ]}
+                        />
                     </Modal>
                 )}
             </div>

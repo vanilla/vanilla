@@ -106,6 +106,11 @@ export const modalClasses = useThemeCache(() => {
                 maxHeight: viewHeight(100),
                 borderRadius: 0,
                 border: "none",
+                $nest: {
+                    ["@supports(padding: max(0px))"]: {
+                        paddingBottom: "env(safe-area-inset-bottom)",
+                    },
+                },
             },
             "&.isLarge": {
                 width: unit(vars.sizing.large),
@@ -141,8 +146,8 @@ export const modalClasses = useThemeCache(() => {
                 ...shadows.dropDown(),
                 ...borders(),
             },
-            "&.hasNoScroll": {
-                overflow: important("hidden"),
+            "&.allowsScroll": {
+                overflow: important("auto"),
             },
         },
     });

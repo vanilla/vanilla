@@ -34,27 +34,9 @@ export default class MeBox extends React.Component<IMeBoxProps> {
 
         return (
             <div className={classNames("meBox", this.props.className, classes.root)}>
-                <NotificationsDropDown
-                    userSlug={userInfo.name}
-                    countClass={countsClass}
-                    buttonClassName={buttonClassName}
-                    contentsClassName={contentClassName}
-                    countUnread={userInfo.countUnreadNotifications}
-                    toggleContentClassName={classNames("meBox-buttonContent", classes.buttonContent)}
-                />
-                <MessagesDropDown
-                    countClass={countsClass}
-                    buttonClassName={buttonClassName}
-                    contentsClassName={contentClassName}
-                    toggleContentClassName={classNames("meBox-buttonContent", classes.buttonContent)}
-                />
-                <UserDropdown
-                    className="meBox-userDropdown"
-                    countsClass={countsClass}
-                    buttonClassName={buttonClassName}
-                    contentsClassName={contentClassName}
-                    toggleContentClassName={classNames("meBox-buttonContent", classes.buttonContent)}
-                />
+                <NotificationsDropDown userSlug={userInfo.name} countUnread={userInfo.countUnreadNotifications} />
+                <MessagesDropDown />
+                <UserDropdown />
             </div>
         );
     }

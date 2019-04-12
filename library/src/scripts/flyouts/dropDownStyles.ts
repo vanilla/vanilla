@@ -235,7 +235,7 @@ export const dropDownClasses = useThemeCache(() => {
                     outline: 0,
                 },
                 hover: {
-                    backgroundColor: colorOut(globalVars.states.active.color),
+                    backgroundColor: colorOut(globalVars.states.hover.color),
                 },
                 focus: {
                     backgroundColor: colorOut(globalVars.states.focus.color),

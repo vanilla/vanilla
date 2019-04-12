@@ -17,7 +17,7 @@ use Vanilla\Theme\VariablesProviderInterface;
 class ThemeModel extends PipelineModel {
 
     /** @var VariablesProviderInterface[] */
-    private $variableProviders;
+    private $variableProviders = [];
 
     /** @var Gdn_Session */
     private $session;

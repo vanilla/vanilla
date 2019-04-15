@@ -91,6 +91,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Vanilla\\Scheduler\\Test\\": "tests\\Library\\Vanilla\\Scheduler\\src",
             "VanillaTests\\": "tests",
             "VanillaTests\\Fixtures\\": "tests\\fixtures\\src",
             "GardenTests\\": "tests",

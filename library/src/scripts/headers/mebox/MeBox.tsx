@@ -25,7 +25,6 @@ export interface IMeBoxProps extends IInjectableUserState {
  */
 export default class MeBox extends React.Component<IMeBoxProps> {
     public render() {
-        const { buttonClassName, contentClassName, countsClass } = this.props;
         const userInfo = this.props.currentUser.data;
         if (!userInfo) {
             return null;

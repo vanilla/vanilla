@@ -7,8 +7,15 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { FontWeightProperty, PaddingProperty, TextAlignLastProperty, TextShadowProperty } from "csstype";
-import { percent, px } from "csx";
+import {
+    BackgroundColorProperty,
+    BoxShadowProperty,
+    FontWeightProperty,
+    PaddingProperty,
+    TextAlignLastProperty,
+    TextShadowProperty,
+} from "csstype";
+import { percent, px, quote, translateX } from "csx";
 import {
     centeredBackgroundProps,
     colorOut,
@@ -20,6 +27,7 @@ import {
     paddings,
     unit,
     background,
+    absolutePosition,
 } from "@library/styles/styleHelpers";
 import { transparentColor } from "@library/forms/buttonStyles";
 import { assetUrl } from "@library/utility/appUtils";
@@ -139,6 +147,16 @@ export const splashVariables = useThemeCache(() => {
         },
     });
 
+    const shadow = makeThemeVars("shadow", {
+        color: modifyColorBasedOnLightness(text.fg, text.shadowMix).fade(text.shadowOpacity),
+        full: "none" as BoxShadowProperty,
+        background: modifyColorBasedOnLightness(text.fg, text.shadowMix).fade(
+            text.shadowOpacity,
+        ) as BackgroundColorProperty,
+    });
+    shadow.full = `0 1px 15px ${colorOut(shadow.color)}`;
+    shadow.background = shadow.color.fade(0.3);
+
     return {
         outerBackground,
         spacing,
@@ -151,6 +169,7 @@ export const splashVariables = useThemeCache(() => {
         search,
         searchDrawer,
         searchBar,
+        shadow,
     };
 });
 
@@ -250,11 +269,26 @@ export const splashStyles = useThemeCache(() => {
         width: unit(vars.searchContainer.width),
         margin: "auto",
     });
+
     const titleFlexSpacer = style("titleFlexSpacer", {
+        position: "relative",
         height: unit(formElementVars.sizing.height),
         width: unit(formElementVars.sizing.height),
         flexBasis: unit(formElementVars.sizing.height),
-        paddingLeft: unit((formElementVars.sizing.height - globalVars.icon.sizes.default) / 2),
+        transform: translateX(px(formElementVars.sizing.height - globalVars.icon.sizes.default / 2 - 13)),
+        $nest: {
+            ".searchBar-actionButton:after": {
+                content: quote(""),
+                ...absolutePosition.middleOfParent(),
+                width: px(20),
+                height: px(20),
+                backgroundColor: colorOut(vars.shadow.background),
+                boxShadow: vars.shadow.full,
+            },
+            ".icon-compose": {
+                zIndex: 1,
+            },
+        },
     });
 
     return {

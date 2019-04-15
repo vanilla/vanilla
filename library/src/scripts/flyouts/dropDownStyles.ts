@@ -115,7 +115,7 @@ export const dropDownClasses = useThemeCache(() => {
         overflow: "hidden",
         ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders({}), shadows.dropDown()),
         ...borders(vars.contents.border),
-        zIndex: 1,
+        zIndex: 3,
         $nest: {
             "&.isParentWidth": {
                 minWidth: "initial",

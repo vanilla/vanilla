@@ -22,9 +22,8 @@ export default class FlexSpacer extends React.Component<IProps> {
     public render() {
         const content = ` `;
         const Tag = this.props.tag || "div";
-        const flexSpacerClass = style(flexHelper().spacer());
         return (
-            <Tag className={classNames(flexSpacerClass, this.props.className)} aria-hidden={true} tabIndex={-1}>
+            <Tag className={classNames(this.props.className)} aria-hidden={true} tabIndex={-1}>
                 {content}
                 {this.props.children && <span className="sr-only">{this.props.children}</span>}
             </Tag>

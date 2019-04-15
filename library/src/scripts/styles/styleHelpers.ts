@@ -37,6 +37,7 @@ import {
     TextAlignLastProperty,
     TextOverflowProperty,
     TextShadowProperty,
+    TextTransformProperty,
     UserSelectProperty,
     WhiteSpaceProperty,
 } from "csstype";
@@ -89,13 +90,7 @@ export function flexHelper() {
         };
     };
 
-    const spacer = () => {
-        return {
-            flex: 1,
-        };
-    };
-
-    return { middle, middleLeft, spacer };
+    return { middle, middleLeft };
 }
 
 export function srOnly() {
@@ -380,11 +375,12 @@ export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
     return values;
 };
 
-export const singleBorder = (styles: ISingleBorderStyle = {}) => {
+export const singleBorder = (styles?: ISingleBorderStyle) => {
     const vars = globalVariables();
-    return `${styles.style ? styles.style : vars.border.style} ${
-        styles.color ? colorOut(styles.color) : colorOut(vars.border.color)
-    } ${styles.width ? unit(styles.width) : unit(vars.border.width)}` as any;
+    const borderStyles = styles !== undefined ? styles : {};
+    return `${borderStyles.style ? borderStyles.style : vars.border.style} ${
+        borderStyles.color ? colorOut(borderStyles.color) : colorOut(vars.border.color)
+    } ${borderStyles.width ? unit(borderStyles.width) : unit(vars.border.width)}` as any;
 };
 
 export interface IButtonStates {
@@ -473,10 +469,10 @@ export const margins = (styles: IMargins): NestedCSSProperties => {
     const marginVals = {} as NestedCSSProperties;
 
     if (styles.all !== undefined) {
-        marginVals.paddingTop = unit(styles.all);
-        marginVals.paddingRight = unit(styles.all);
-        marginVals.paddingBottom = unit(styles.all);
-        marginVals.paddingLeft = unit(styles.all);
+        marginVals.marginTop = unit(styles.all);
+        marginVals.marginRight = unit(styles.all);
+        marginVals.marginBottom = unit(styles.all);
+        marginVals.marginLeft = unit(styles.all);
     }
 
     if (styles.vertical !== undefined) {
@@ -874,6 +870,7 @@ export interface IFont {
     shadow?: TextShadowProperty;
     align?: TextAlignLastProperty;
     family?: FontFamilyProperty[];
+    transform?: TextTransformProperty;
 }
 
 export const fonts = (props: IFont) => {
@@ -885,6 +882,7 @@ export const fonts = (props: IFont) => {
         const textAlign = props.align !== undefined ? props.align : undefined;
         const textShadow = props.shadow !== undefined ? props.shadow : undefined;
         const fontFamily = props.family !== undefined ? fontFamilyWithDefaults(props.family) : undefined;
+        const textTransform = props.transform !== undefined ? props.transform : undefined;
         return {
             color,
             fontSize,
@@ -893,6 +891,7 @@ export const fonts = (props: IFont) => {
             textAlign,
             textShadow,
             fontFamily,
+            textTransform,
         } as NestedCSSProperties;
     } else {
         return {} as NestedCSSProperties;

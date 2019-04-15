@@ -164,6 +164,7 @@ export const globalVariables = useThemeCache(() => {
             large: 32,
             default: 24,
             small: 16,
+            xSmall: 9.5,
         },
         color: mixBgAndFg(0.18),
     });

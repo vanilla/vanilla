@@ -79,7 +79,7 @@ export const modalClasses = useThemeCache(() => {
     const overlay = style("overlay", flexHelper().middle(), {
         position: "fixed",
         height: viewHeight(100),
-        width: viewWidth(100),
+        width: percent(100),
         top: 0,
         left: 0,
         right: 0,
@@ -91,6 +91,9 @@ export const modalClasses = useThemeCache(() => {
     const root = style({
         display: "block",
         position: "relative",
+        top: 0,
+        left: 0,
+        width: percent(100),
         maxHeight: percent(100),
         zIndex: 1,
         backgroundColor: colorOut(vars.colors.bg),
@@ -143,6 +146,7 @@ export const modalClasses = useThemeCache(() => {
             },
             "&.hasNoScroll": {
                 overflow: important("hidden"),
+                height: viewHeight(100),
             },
         },
     });

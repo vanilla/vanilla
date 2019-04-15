@@ -4,50 +4,79 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { debugHelper, flexHelper, userSelect } from "@library/styles/styleHelpers";
-import { useThemeCache } from "@library/styles/styleUtils";
-import { calc, percent, px } from "csx";
+import {
+    absolutePosition,
+    borders,
+    colorOut,
+    flexHelper,
+    paddings,
+    singleBorder,
+    unit,
+    userSelect,
+    fonts,
+} from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { border, calc, percent, px, translateX, viewHeight } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
-import { style } from "typestyle";
 import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const mobileDropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const vanillaHeaderVars = vanillaHeaderVariables();
     const mixBgAndFg = globalVars.mixBgAndFg;
+    const vars = variableFactory("mobileDropDown");
 
-    const title = {
+    const title = vars("title", {
         letterSpacing: -0.26,
         maxWidth: calc(`100% - ${px(vanillaHeaderVars.endElements.flexBasis * 2)}`),
-    };
-    const chevron = {
+    });
+    const chevron = vars("chevron", {
         width: 8,
         height: 8,
         color: mixBgAndFg(0.7),
+    });
+
+    const header = vars("header", {
+        minHeight: vanillaHeaderVars.sizing.height,
+    });
+
+    const padding = vars("padding", {
+        horizontal: 2,
+    });
+
+    const side = vars("side", {
+        width: globalVars.icon.sizes.default + padding.horizontal,
+    });
+
+    return {
+        title,
+        chevron,
+        header,
+        padding,
+        side,
     };
-    const header = {
-        minHeight: 28,
-    };
-    return { title, chevron, header };
 });
 
 export const mobileDropDownClasses = useThemeCache(() => {
     const vars = mobileDropDownVariables();
     const globalVars = globalVariables();
+    const vanillaHeaderVars = vanillaHeaderVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
-    const debug = debugHelper("mobileDropDown");
+    const style = styleFactory("mobileDropDown");
 
     const root = style({
-        ...debug.name(),
         ...flex.middle(),
         position: "relative",
         flexGrow: 1,
         overflow: "hidden",
     });
 
-    const modal = style({
-        ...debug.name("modal"),
+    const modal = style("modal", {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "flex-start",
         $nest: {
             ".siteNav": {
                 paddingLeft: px(globalVars.gutter.half),
@@ -59,39 +88,41 @@ export const mobileDropDownClasses = useThemeCache(() => {
         },
     });
 
-    const panel = style({
-        ...debug.name("panel"),
+    const panel = style("panel", {
         position: "relative",
         maxHeight: percent(100),
         padding: px(0),
     });
 
-    const content = style({
-        ...debug.name("content"),
+    const content = style("content", {
         position: "relative",
-        maxHeight: percent(100),
+        display: "flex",
+        flexDirection: "column",
+        maxHeight: viewHeight(100),
+        minHeight: viewHeight(100),
+        width: percent(100),
+        margin: "auto",
     });
 
     const toggleButton = style(
+        "toggleButton",
         {
-            ...debug.name("toggleButton"),
             ...flex.middle(),
             ...userSelect(),
             flexGrow: 1,
             maxWidth: calc(`100% - ${px(globalVars.spacer.size)}`),
             marginLeft: px(globalVars.spacer.size / 2),
             marginRight: px(globalVars.spacer.size / 2),
+            outline: 0,
         },
         mediaQueries.xs({
-            ...debug.name("toggleButton-xs"),
             maxWidth: percent(100),
             margin: 0,
             padding: px(0),
         }),
     );
 
-    const buttonContents = style({
-        ...debug.name("buttonContents"),
+    const buttonContents = style("buttonContents", {
         display: "inline-block",
         position: "relative",
         paddingRight: vars.chevron.width * 2,
@@ -101,8 +132,8 @@ export const mobileDropDownClasses = useThemeCache(() => {
     });
 
     const title = style(
+        "title",
         {
-            ...debug.name("title"),
             display: "inline",
             letterSpacing: vars.title.letterSpacing,
             fontWeight: globalVars.fonts.weights.semiBold,
@@ -113,8 +144,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
         }),
     );
 
-    const icon = style({
-        ...debug.name("icon"),
+    const icon = style("icon", {
         position: "absolute",
         display: "block",
         top: 0,
@@ -127,40 +157,68 @@ export const mobileDropDownClasses = useThemeCache(() => {
         width: vars.chevron.width,
     });
 
-    const closeModalIcon = style({
-        ...debug.name("closeModalIcon"),
+    const closeModalIcon = style("closeModalIcon", {
         padding: px(0),
         margin: "auto",
         color: vars.chevron.color.toString(),
         $nest: {
-            "&:hover": { color: globalVars.mainColors.primary.toString() },
-            "&:active": { color: globalVars.mainColors.primary.toString() },
-            "&:focus": { color: globalVars.mainColors.primary.toString() },
+            "&:hover": {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+            "&:active": { color: colorOut(globalVars.mainColors.primary) },
+            "&:focus": { color: colorOut(globalVars.mainColors.primary) },
         },
     });
 
-    const closeModal = style({
+    const closeModal = style("closeModal", {
         width: percent(100),
         height: percent(100),
     });
 
-    const headerElementDimensions = {
-        height: px(vars.header.minHeight),
-        width: px(vars.header.minHeight),
-    };
+    const header = style("header", {
+        borderBottom: singleBorder(),
+    });
 
-    const header = style({
-        ...debug.name("header"),
-        $nest: {
-            ".frameHeaderWithAction-action": headerElementDimensions,
-            ".frameHeader-closePosition": headerElementDimensions,
-            ".frameHeader-close": headerElementDimensions,
-            ".frameHeader-leftSpacer": {
-                flexBasis: px(vars.header.minHeight),
-                height: px(vars.header.minHeight),
-                width: px(vars.header.minHeight),
-            },
-        },
+    const headerContent = style("headerContent", {
+        display: "flex",
+        flexWrap: "nowrap",
+        alignItems: "center",
+        height: unit(vars.header.minHeight - globalVars.border.width * 6),
+        margin: "auto",
+        width: percent(100),
+    });
+
+    const closeWidth =
+        Math.floor(globalVars.icon.sizes.xSmall) + 2 * (globalVars.gutter.half + globalVars.gutter.quarter);
+    const closeButton = style("closeButton", {
+        ...absolutePosition.middleLeftOfParent(),
+        height: unit(closeWidth),
+        width: unit(closeWidth),
+        minWidth: unit(closeWidth),
+        padding: 0,
+        transform: translateX("-50%"),
+    });
+
+    const subTitle = style("subTitle", {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        textTransform: "uppercase",
+        minHeight: unit(vanillaHeaderVars.sizing.height - 4),
+        fontSize: unit(globalVars.fonts.size.small),
+        textOverflow: "ellipsis",
+        ...paddings({
+            vertical: unit(4),
+        }),
+        ...fonts({
+            size: globalVars.fonts.size.small,
+            transform: "uppercase",
+            color: globalVars.mixBgAndFg(0.6),
+        }),
+    });
+
+    const listContainer = style("listContainer", {
+        borderBottom: singleBorder(),
     });
 
     return {
@@ -170,10 +228,14 @@ export const mobileDropDownClasses = useThemeCache(() => {
         content,
         toggleButton,
         buttonContents,
+        closeButton,
         title,
         icon,
         closeModalIcon,
         closeModal,
         header,
+        headerContent,
+        listContainer,
+        subTitle,
     };
 });

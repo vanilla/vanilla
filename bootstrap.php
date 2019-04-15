@@ -357,6 +357,13 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addCall('setDispatchEventName', ['SchedulerDispatch'])
     ->addCall('setDispatchedEventName', ['SchedulerDispatched'])
     ->setShared(true)
+
+    ->rule(Vanilla\Scheduler\SchedulerInterface::class)
+    ->setClass(Vanilla\Scheduler\DummyScheduler::class)
+    ->addCall('addDriver', [Vanilla\Scheduler\Driver\LocalDriver::class])
+    ->addCall('setDispatchEventName', ['SchedulerDispatch'])
+    ->addCall('setDispatchedEventName', ['SchedulerDispatched'])
+    ->setShared(true)
 ;
 
 // Run through the bootstrap with dependencies.

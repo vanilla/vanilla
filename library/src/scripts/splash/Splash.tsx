@@ -8,6 +8,7 @@ import IndependentSearch from "@library/features/search/IndependentSearch";
 import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
 import Container from "@library/layout/components/Container";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
+import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { splashStyles } from "@library/splash/splashStyles";
@@ -35,8 +36,11 @@ export class Splash extends React.Component<IProps> {
                 <Container>
                     <div className={classes.innerContainer}>
                         <PanelWidgetHorizontalPadding>
-                            {title && <Heading title={title} className={classes.title} />}
-                            {action}
+                            <div className={classes.titleWrap}>
+                                <FlexSpacer className={classes.titleFlexSpacer} />
+                                {title && <Heading title={title} className={classes.title} />}
+                                <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
+                            </div>
                             <div className={classes.searchContainer}>
                                 <IndependentSearch
                                     className={classes.searchContainer}

@@ -157,6 +157,8 @@ export const splashVariables = useThemeCache(() => {
 export const splashStyles = useThemeCache(() => {
     const vars = splashVariables();
     const style = styleFactory("splash");
+    const formElementVars = formElementsVariables();
+    const globalVars = globalVariables();
 
     const root = style({
         position: "relative",
@@ -188,20 +190,11 @@ export const splashStyles = useThemeCache(() => {
             top: unit(vars.title.marginTop),
             bottom: unit(vars.title.marginBottom),
         }),
+        flexGrow: 1,
     });
 
     const text = style("text", {
-        display: "block",
         color: colorOut(vars.text.fg),
-        width: unit(vars.title.maxWidth),
-        maxWidth: percent(100),
-        margin: `auto auto 0`,
-        textAlign: "center",
-        $nest: {
-            "& + .splash-p": {
-                marginTop: unit(vars.search.margin),
-            },
-        },
     });
 
     const buttonBorderColor = get(vars, "searchBar.button.borderColor", false);
@@ -247,6 +240,23 @@ export const splashStyles = useThemeCache(() => {
 
     const buttonLoader = style("buttonLoader", {});
 
+    const titleAction = style("titleAction", {
+        color: colorOut(vars.text.fg),
+    });
+    const titleWrap = style("titleWrap", {
+        display: "flex",
+        flexWrap: "nowrap",
+        alignItems: "center",
+        width: unit(vars.searchContainer.width),
+        margin: "auto",
+    });
+    const titleFlexSpacer = style("titleFlexSpacer", {
+        height: unit(formElementVars.sizing.height),
+        width: unit(formElementVars.sizing.height),
+        flexBasis: unit(formElementVars.sizing.height),
+        paddingLeft: unit((formElementVars.sizing.height - globalVars.icon.sizes.default) / 2),
+    });
+
     return {
         root,
         outerBackground,
@@ -258,5 +268,8 @@ export const splashStyles = useThemeCache(() => {
         searchContainer,
         input,
         buttonLoader,
+        titleAction,
+        titleFlexSpacer,
+        titleWrap,
     };
 });

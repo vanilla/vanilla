@@ -19,7 +19,6 @@ import classNames from "classnames";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
-import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import Container from "@library/layout/components/Container";
@@ -74,8 +73,6 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                         exitHandler={this.close}
                     >
                         <div className={classes.content}>
-                            {/*<Panel className={classes.panel}>*/}
-                            {/*    <Frame className={this.props.frameClassName}>*/}
                             <header className={classes.header}>
                                 <Container>
                                     <PanelWidgetHorizontalPadding>
@@ -123,8 +120,6 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                                     {chevronUp(classes.closeModalIcon)}
                                 </Button>
                             </FrameFooter>
-                            {/*    </Frame>*/}
-                            {/*</Panel>*/}
                         </div>
                     </Modal>
                 )}

@@ -66,21 +66,26 @@ export const compactMeBoxClasses = useThemeCache(() => {
         height: unit(vars.tab.height),
     });
 
-    const tabPanels = style("tabPanels", {});
+    const tabPanels = style("tabPanels", {
+        height: calc(`100% - ${vars.tab.height}px`),
+    });
 
     const tabButton = style("tabButton", {
         ...flexHelper().middle(),
     });
 
     const panel = style("panel", {
-        minHeight: percent(100),
+        maxHeight: percent(100),
         borderTop: 0,
         borderRadius: 0,
     });
 
     const body = style("body", {
         flexGrow: 1,
-        minHeight: calc(`100vh - ${vars.tab.height}px`),
+    });
+
+    const scrollContainer = style("scrollContainer", {
+        overflow: "auto",
     });
 
     return {
@@ -94,5 +99,6 @@ export const compactMeBoxClasses = useThemeCache(() => {
         tabButtonContent,
         panel,
         body,
+        scrollContainer,
     };
 });

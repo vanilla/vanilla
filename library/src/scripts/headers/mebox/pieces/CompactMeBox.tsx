@@ -26,6 +26,7 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
 import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
 import { user } from "@library/icons/header";
+import { TouchScrollable } from "react-scrolllock";
 
 interface IProps extends IInjectableUserState, IMeBoxProps {}
 
@@ -76,12 +77,12 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
                         label={t("Article Revisions")}
                         elementToFocusOnExit={this.buttonRef.current!}
                         exitHandler={this.close}
-                        allowScroll={true}
                     >
                         <Tabs
                             label={t("My Account Tab")}
                             tabListClass={classNames(classes.tabList)}
-                            tabPanelsClass={classNames(classes.tabPanels)}
+                            tabPanelsClass={classNames(classes.tabPanels, inheritHeightClass())}
+                            tabPanelClass={classNames(inheritHeightClass(), classes.panel)}
                             buttonClass={classNames(classes.tabButton)}
                             extraTabContent={
                                 <CloseButton onClick={this.close} className={classNames(classes.closeModal)} />
@@ -90,7 +91,11 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
                                 {
                                     buttonContent: <MeBoxIcon compact={true}>{user(false)}</MeBoxIcon>,
                                     openButtonContent: <MeBoxIcon compact={true}>{user(true)}</MeBoxIcon>,
-                                    panelContent: <UserDropDownContents />,
+                                    panelContent: (
+                                        <TouchScrollable>
+                                            <UserDropDownContents className={classes.scrollContainer} />
+                                        </TouchScrollable>
+                                    ),
                                 },
                                 {
                                     buttonContent: <NotificationsCount open={false} compact={true} />,

@@ -12,9 +12,9 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { modalClasses } from "@library/modal/modalStyles";
 import TabHandler from "@library/dom/TabHandler";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
-import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
-import { logWarning, logError } from "@library/utility/utils";
+import { logWarning } from "@library/utility/utils";
 import { forceRenderStyles } from "typestyle";
+import ScrollLock from "react-scrolllock";
 
 interface IHeadingDescription {
     titleID: string;
@@ -34,8 +34,6 @@ interface IModalCommonProps {
     elementToFocus?: HTMLElement;
     size: ModalSizes;
     elementToFocusOnExit: HTMLElement; // Should either be a specific element or use document.activeElement
-    isWholePage?: boolean;
-    allowScroll?: boolean;
 }
 
 interface IModalTextDescription extends IModalCommonProps, ITextDescription {}
@@ -87,11 +85,6 @@ export function mountModal(element: ReactElement<any>) {
  * - Focuses the first focusable element in the Modal.
  */
 export default class Modal extends React.Component<IProps, IState> {
-    public static defaultProps: Partial<IProps> = {
-        isWholePage: false,
-        allowScroll: true,
-    };
-
     public static focusHistory: HTMLElement[] = [];
     public static stack: Modal[] = [];
 
@@ -114,44 +107,46 @@ export default class Modal extends React.Component<IProps, IState> {
      * Render the contents into a portal.
      */
     public render() {
-        const { size, allowScroll } = this.props;
+        const { size } = this.props;
         const classes = modalClasses();
         const portal = ReactDOM.createPortal(
-            <div className={classes.overlay} onClick={this.handleScrimClick}>
-                <div
-                    id={this.modalID}
-                    role="dialog"
-                    aria-modal={true}
-                    className={classNames(
-                        classes.root,
-                        {
-                            isFullScreen: size === ModalSizes.FULL_SCREEN || size === ModalSizes.MODAL_AS_SIDE_PANEL,
-                            isSidePanel: size === ModalSizes.MODAL_AS_SIDE_PANEL,
-                            isDropDown: size === ModalSizes.MODAL_AS_DROP_DOWN,
-                            isLarge: size === ModalSizes.LARGE,
-                            isMedium: size === ModalSizes.MEDIUM,
-                            isSmall: size === ModalSizes.SMALL,
-                            isShadowed: size === ModalSizes.LARGE || ModalSizes.MEDIUM || ModalSizes.SMALL,
-                            hasNoScroll: allowScroll,
-                        },
-                        size === ModalSizes.FULL_SCREEN ? inheritHeightClass() : "",
-                        this.props.className,
-                    )}
-                    ref={this.selfRef}
-                    onKeyDown={this.handleTabbing}
-                    onClick={this.handleModalClick}
-                    aria-label={"label" in this.props ? this.props.label : undefined}
-                    aria-labelledby={"titleID" in this.props ? this.props.titleID : undefined}
-                    aria-describedby={this.props.description ? this.descriptionID : undefined}
-                >
-                    {this.props.description && (
-                        <div id={this.descriptionID} className="sr-only">
-                            {this.props.description}
-                        </div>
-                    )}
-                    {this.props.children}
+            <ScrollLock>
+                <div className={classes.overlay} onClick={this.handleScrimClick}>
+                    <div
+                        id={this.modalID}
+                        role="dialog"
+                        aria-modal={true}
+                        className={classNames(
+                            classes.root,
+                            {
+                                isFullScreen:
+                                    size === ModalSizes.FULL_SCREEN || size === ModalSizes.MODAL_AS_SIDE_PANEL,
+                                isSidePanel: size === ModalSizes.MODAL_AS_SIDE_PANEL,
+                                isDropDown: size === ModalSizes.MODAL_AS_DROP_DOWN,
+                                isLarge: size === ModalSizes.LARGE,
+                                isMedium: size === ModalSizes.MEDIUM,
+                                isSmall: size === ModalSizes.SMALL,
+                                isShadowed: size === ModalSizes.LARGE || ModalSizes.MEDIUM || ModalSizes.SMALL,
+                            },
+                            size === ModalSizes.FULL_SCREEN ? inheritHeightClass() : "",
+                            this.props.className,
+                        )}
+                        ref={this.selfRef}
+                        onKeyDown={this.handleTabbing}
+                        onClick={this.handleModalClick}
+                        aria-label={"label" in this.props ? this.props.label : undefined}
+                        aria-labelledby={"titleID" in this.props ? this.props.titleID : undefined}
+                        aria-describedby={this.props.description ? this.descriptionID : undefined}
+                    >
+                        {this.props.description && (
+                            <div id={this.descriptionID} className="sr-only">
+                                {this.props.description}
+                            </div>
+                        )}
+                        {this.props.children}
+                    </div>
                 </div>
-            </div>,
+            </ScrollLock>,
             this.getModalContainer(),
         );
         // We HAVE to render force the styles to render before componentDidMount
@@ -186,7 +181,6 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
 
         this.focusInitialElement();
         pageContainer && pageContainer.setAttribute("aria-hidden", true);
-        disableBodyScroll(this.selfRef.current!);
 
         // Add the escape keyboard listener only on the first modal in the stack.
         if (Modal.stack.length === 0) {
@@ -214,7 +208,6 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         Modal.stack.pop();
         if (Modal.stack.length === 0) {
             pageContainer && pageContainer.removeAttribute("aria-hidden");
-            enableBodyScroll(this.selfRef.current!);
 
             // This event listener is only added once (on the top modal).
             // So we only remove when clearing the last one.
@@ -294,7 +287,7 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         if ("keyCode" in event && event.keyCode === escKey) {
             event.preventDefault();
             event.stopPropagation();
-            if (Modal.stack.length === 1 && this.props.isWholePage) {
+            if (Modal.stack.length === 1 && this.props.size === ModalSizes.FULL_SCREEN) {
                 return;
             } else {
                 if (topModal.props.exitHandler) {

@@ -22,6 +22,7 @@ import { TLength, NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { ColorHelper, important, percent, px } from "csx";
+import { tabButtonListClasses } from "@library/forms/radioTabs/tabButtonListStyles";
 
 export const buttonGlobalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -568,7 +569,6 @@ export enum ButtonTypes {
     TRANSLUCID = "translucid",
     INVERTED = "inverted",
     CUSTOM = "custom",
-    TAB = "tab",
     TEXT = "text",
     TEXT_PRIMARY = "textPrimary",
     ICON = "icon",
@@ -585,7 +585,6 @@ export const buttonClasses = useThemeCache(() => {
         compactPrimary: generateButtonClass(vars.compactPrimary, ButtonTypes.COMPACT_PRIMARY),
         translucid: generateButtonClass(vars.translucid, ButtonTypes.TRANSLUCID),
         inverted: generateButtonClass(vars.inverted, ButtonTypes.INVERTED),
-        tab: "buttonAsTab",
         icon: buttonUtilityClasses().buttonIcon,
         iconCompact: buttonUtilityClasses().buttonIconCompact,
         text: buttonUtilityClasses().buttonAsText,

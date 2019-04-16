@@ -115,7 +115,7 @@ export const dropDownClasses = useThemeCache(() => {
         overflow: "hidden",
         ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders({}), shadows.dropDown()),
         ...borders(vars.contents.border),
-        zIndex: 1,
+        zIndex: 3,
         $nest: {
             "&.isParentWidth": {
                 minWidth: "initial",
@@ -235,7 +235,7 @@ export const dropDownClasses = useThemeCache(() => {
                     outline: 0,
                 },
                 hover: {
-                    backgroundColor: colorOut(globalVars.states.active.color),
+                    backgroundColor: colorOut(globalVars.states.hover.color),
                 },
                 focus: {
                     backgroundColor: colorOut(globalVars.states.focus.color),

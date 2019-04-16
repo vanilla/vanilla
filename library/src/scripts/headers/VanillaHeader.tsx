@@ -32,6 +32,8 @@ import { style } from "typestyle";
 import { Panel, PanelWidgetHorizontalPadding } from "../layout/PanelLayout";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import { signIn } from "@library/icons/common";
+import SmartLink from "@library/routing/links/SmartLink";
 
 interface IProps extends IDeviceProps, IInjectableUserState, IWithPagesProps {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -68,9 +70,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
     };
     public render() {
         const { isFixed } = this.props;
-        const currentUser = this.props.currentUser.data;
         const isMobile = this.props.device === Devices.MOBILE;
-        const isGuest = isUserGuest(currentUser);
         const classes = vanillaHeaderClasses();
         const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
         const classesMeBox = meBoxClasses();
@@ -162,54 +162,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                     )}
                                     clearButtonClass={classes.clearButtonClass}
                                 />
-
-                                {isGuest ? (
-                                    (!this.state.openSearch || !isMobile) && (
-                                        <VanillaHeaderNav
-                                            className={classNames(
-                                                "vanillaHeader-nav vanillaHeader-guestNav",
-                                                classes.nav,
-                                            )}
-                                        >
-                                            <VanillaHeaderNavItem
-                                                buttonType={ButtonTypes.TRANSLUCID}
-                                                linkClassName={classNames(classes.signIn, classes.guestButton)}
-                                                to={`/entry/signin?target=${window.location.pathname}`}
-                                            >
-                                                {t("Sign in")}
-                                            </VanillaHeaderNavItem>
-                                            <VanillaHeaderNavItem
-                                                buttonType={ButtonTypes.INVERTED}
-                                                linkClassName={classNames(classes.register, classes.guestButton)}
-                                                to={`/entry/register?target=${window.location.pathname}`}
-                                            >
-                                                {t("Register")}
-                                            </VanillaHeaderNavItem>
-                                        </VanillaHeaderNav>
-                                    )
-                                ) : (
-                                    <React.Fragment>
-                                        {!isMobile && (
-                                            <MeBox
-                                                currentUser={this.props.currentUser}
-                                                className={classNames("vanillaHeader-meBox", classes.meBox)}
-                                                buttonClassName={classes.button}
-                                                contentClassName={classNames(
-                                                    "vanillaHeader-dropDownContents",
-                                                    classes.dropDownContents,
-                                                )}
-                                            />
-                                        )}
-                                        {isMobile && !this.state.openSearch && (
-                                            <CompactMeBox
-                                                className={classNames("vanillaHeader-button", classes.button)}
-                                                buttonClass={classNames(classes.centeredButtonClass, classes.button)}
-                                                userPhotoClass="headerDropDown-user"
-                                                currentUser={this.props.currentUser}
-                                            />
-                                        )}
-                                    </React.Fragment>
-                                )}
+                                {isMobile ? this.renderMobileMeBox() : this.renderDesktopMeBox()}
                             </ConditionalWrap>
                         </div>
                     </PanelWidgetHorizontalPadding>
@@ -226,6 +179,64 @@ export class VanillaHeader extends React.Component<IProps, IState> {
 
     public componentWillUnmount() {
         this.context.resetScrollOffset();
+    }
+
+    private renderMobileMeBox() {
+        if (this.state.openSearch) {
+            // We don't display when search is open.
+            return null;
+        }
+        const classes = vanillaHeaderClasses();
+        if (this.isGuest) {
+            return (
+                <SmartLink
+                    className={classNames(classes.centeredButtonClass, classes.button)}
+                    to={`/entry/signin?target=${window.location.pathname}`}
+                >
+                    {signIn("vanillaHeader-signInIcon")}
+                </SmartLink>
+            );
+        } else {
+            return (
+                <CompactMeBox
+                    className={classNames("vanillaHeader-button", classes.button)}
+                    currentUser={this.props.currentUser}
+                />
+            );
+        }
+    }
+
+    private renderDesktopMeBox() {
+        const classes = vanillaHeaderClasses();
+        if (this.isGuest) {
+            return (
+                <VanillaHeaderNav className={classNames("vanillaHeader-nav vanillaHeader-guestNav", classes.nav)}>
+                    <VanillaHeaderNavItem
+                        buttonType={ButtonTypes.TRANSLUCID}
+                        linkClassName={classNames(classes.signIn, classes.guestButton)}
+                        to={`/entry/signin?target=${window.location.pathname}`}
+                    >
+                        {t("Sign in")}
+                    </VanillaHeaderNavItem>
+                    <VanillaHeaderNavItem
+                        buttonType={ButtonTypes.INVERTED}
+                        linkClassName={classNames(classes.register, classes.guestButton)}
+                        to={`/entry/register?target=${window.location.pathname}`}
+                    >
+                        {t("Register")}
+                    </VanillaHeaderNavItem>
+                </VanillaHeaderNav>
+            );
+        } else {
+            return (
+                <MeBox
+                    currentUser={this.props.currentUser}
+                    className={classNames("vanillaHeader-meBox", classes.meBox)}
+                    buttonClassName={classes.button}
+                    contentClassName={classNames("vanillaHeader-dropDownContents", classes.dropDownContents)}
+                />
+            );
+        }
     }
 
     public openSearch = () => {
@@ -261,6 +272,11 @@ export class VanillaHeader extends React.Component<IProps, IState> {
             showingSuggestions: false,
         });
     };
+
+    private get isGuest(): boolean {
+        const currentUser = this.props.currentUser.data;
+        return !!isUserGuest(currentUser);
+    }
 }
 
 const withRedux = connect(mapUsersStoreState);

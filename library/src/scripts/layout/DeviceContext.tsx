@@ -45,10 +45,13 @@ export class DeviceProvider extends React.Component<IProps, IState> {
     public render() {
         const classes = deviceCheckerClasses();
         forceRenderStyles();
+        const children = (
+            <DeviceContext.Provider value={this.state.device}>{this.props.children}</DeviceContext.Provider>
+        );
         return (
             <>
                 <div ref={this.deviceChecker} className={classes.root} />
-                <DeviceContext.Provider value={this.state.device}>{this.props.children}</DeviceContext.Provider>
+                {this.deviceChecker.current && children}
             </>
         );
     }

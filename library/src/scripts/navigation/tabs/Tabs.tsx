@@ -20,6 +20,7 @@ interface IProps {
     tabPanelsClass?: string;
     tabPanelClass?: string;
     tabs: ITab[];
+    extraTabContent?: React.ReactNode;
 }
 
 interface IState {
@@ -41,7 +42,7 @@ export default class Tabs extends React.PureComponent<IProps, IState> {
     public render() {
         const { tabs, className } = this.props;
         return (
-            <div className={classNames("tabs", className)}>
+            <>
                 <TabButtonList
                     tabs={this.props.tabs}
                     selectedTab={this.state.selectedTab}
@@ -52,6 +53,7 @@ export default class Tabs extends React.PureComponent<IProps, IState> {
                     parentID={this.id}
                     buttonClass={this.props.buttonClass}
                     className={this.props.tabListClass}
+                    extraContent={this.props.extraTabContent}
                 />
                 <TabPanel
                     tabs={this.props.tabs}
@@ -62,7 +64,7 @@ export default class Tabs extends React.PureComponent<IProps, IState> {
                     tabPanelClass={this.props.tabPanelClass}
                     className={this.props.tabPanelsClass}
                 />
-            </div>
+            </>
         );
     }
 

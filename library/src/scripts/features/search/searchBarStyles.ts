@@ -78,22 +78,6 @@ export const searchBarClasses = useThemeCache(() => {
         {
             cursor: "pointer",
             $nest: {
-                "& .suggestedTextInput-clear": {
-                    color: colorOut(globalVars.mainColors.fg),
-                    $nest: {
-                        "&, &.buttonIcon": {
-                            border: "none",
-                            boxShadow: "none",
-                        },
-                        "&:hover": {
-                            color: colorOut(globalVars.mainColors.primary),
-                        },
-                        "&:focus": {
-                            color: colorOut(globalVars.mainColors.primary),
-                        },
-                    },
-                },
-
                 "& .searchBar__placeholder": {
                     color: colorOut(globalVars.mixBgAndFg(0.5)),
                     margin: "auto",
@@ -262,7 +246,19 @@ export const searchBarClasses = useThemeCache(() => {
         boxSizing: "border-box",
         height: unit(vars.sizing.height),
         width: unit(vars.sizing.height),
-        color: vanillaHeaderVars.colors.fg.toString(),
+        color: colorOut(globalVars.mixBgAndFg(0.78)),
+        $nest: {
+            "&, &.buttonIcon": {
+                border: "none",
+                boxShadow: "none",
+            },
+            "&:hover": {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+            "&:focus": {
+                color: colorOut(globalVars.mainColors.primary),
+            },
+        },
     });
 
     const form = style("form", {

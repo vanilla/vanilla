@@ -15,7 +15,7 @@ import {
     TextAlignLastProperty,
     TextShadowProperty,
 } from "csstype";
-import { percent, px, quote, translateX } from "csx";
+import {important, percent, px, quote,translateX} from "csx";
 import {
     centeredBackgroundProps,
     colorOut,
@@ -77,7 +77,8 @@ export const splashVariables = useThemeCache(() => {
         fg: globalVars.elementaryColors.white,
         align: "center",
         shadowMix: 1,
-        shadowOpacity: 1,
+        innerShadowOpacity: 0.25,
+        outerShadowOpacity: 0.75,
     });
 
     const title = makeThemeVars("title", {
@@ -88,9 +89,7 @@ export const splashVariables = useThemeCache(() => {
             size: globalVars.fonts.size.title,
             weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
             align: text.align as TextAlignLastProperty,
-            shadow: `0 1px 15px ${modifyColorBasedOnLightness(text.fg, text.shadowMix).fade(
-                text.shadowOpacity,
-            )}` as TextShadowProperty,
+            shadow: `0 1px 1px ${colorOut(modifyColorBasedOnLightness(text.fg, text.shadowMix).fade(text.innerShadowOpacity))}, 0 1px 25px ${colorOut(modifyColorBasedOnLightness(text.fg, text.shadowMix).fade(text.outerShadowOpacity))}` as TextShadowProperty,
         },
         marginTop: 28,
         marginBottom: 40,
@@ -148,14 +147,12 @@ export const splashVariables = useThemeCache(() => {
     });
 
     const shadow = makeThemeVars("shadow", {
-        color: modifyColorBasedOnLightness(text.fg, text.shadowMix).fade(text.shadowOpacity),
-        full: "none" as BoxShadowProperty,
+        color: modifyColorBasedOnLightness(text.fg, text.shadowMix).fade(.05),
+        full: `0 1px 15px ${colorOut(modifyColorBasedOnLightness(text.fg, text.shadowMix).fade(0.3))}`,
         background: modifyColorBasedOnLightness(text.fg, text.shadowMix).fade(
-            text.shadowOpacity,
+            0.1,
         ) as BackgroundColorProperty,
     });
-    shadow.full = `0 1px 15px ${colorOut(shadow.color)}`;
-    shadow.background = shadow.color.fade(0.3);
 
     return {
         outerBackground,
@@ -284,6 +281,14 @@ export const splashStyles = useThemeCache(() => {
                 height: px(20),
                 backgroundColor: colorOut(vars.shadow.background),
                 boxShadow: vars.shadow.full,
+            },
+            ".searchBar-actionButton": {
+                color: important("inherit"),
+                $nest: {
+                    "&:not(.focus-visible)": {
+                        outline: 0,
+                    },
+                },
             },
             ".icon-compose": {
                 zIndex: 1,

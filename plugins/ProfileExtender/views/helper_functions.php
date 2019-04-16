@@ -21,7 +21,7 @@ if (!function_exists('extendedProfileFields')) {
             }
 
             $class = 'Profile'.Gdn_Format::alphaNumeric($name);
-            $label = Gdn_Format::text($allFields[$name]['Label']);
+            $label = Gdn_Format::text(Gdn::translate($allFields[$name]['Label']));
             $filteredVal = Gdn_Format::htmlFilter($value);
 
             echo " <dt class=\"ProfileExtend {$class}\">{$label}</dt> ";

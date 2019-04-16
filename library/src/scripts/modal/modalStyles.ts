@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { borders, colorOut, margins, unit, flexHelper, sticky } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { important, percent, viewHeight, viewWidth } from "csx";
+import {important, percent, viewHeight, viewWidth, calc, translateY, translate, translateX} from "csx";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 
@@ -34,7 +34,7 @@ export const modalVariables = useThemeCache(() => {
     });
 
     const spacing = makeThemeVars("spacing", {
-        horizontalMargin: globalVars.spacer.size / 2,
+        horizontalMargin: 16,
     });
 
     const border = makeThemeVars("border", {
@@ -76,89 +76,72 @@ export const modalClasses = useThemeCache(() => {
     const shadows = shadowHelper();
     const headerVars = vanillaHeaderVariables();
 
-    const overlay = style("overlay", flexHelper().middle(), {
-        position: "fixed",
-        height: viewHeight(100),
+    const overlay = style("overlay", {
+        position: "absolute",
+        height: percent(100),
         width: percent(100),
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        background: vars.colors.overlayBg.toString(),
+        background: colorOut(vars.colors.overlayBg),
         zIndex: 10,
     });
 
     const root = style({
         display: "block",
-        position: "relative",
-        top: 0,
-        left: 0,
+        left: percent(50),
         width: percent(100),
-        maxHeight: percent(100),
+        maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
+        maxHeight: percent(90),
         zIndex: 1,
         backgroundColor: colorOut(vars.colors.bg),
-        boxSizing: "border-box",
+        position: "fixed",
+        top: percent(50),
+        right: 0,
+        bottom: "initial",
+        overflow: "hidden",
+        transform: translate(`-50%`, `-50%`),
+        ...margins({ all: "auto" }),
+
         $nest: {
-            "*": {
-                boxSizing: "border-box",
-            },
             "&&.isFullScreen": {
-                overflow: "hidden",
                 width: percent(100),
-                height: viewHeight(100),
-                maxHeight: viewHeight(100),
+                height: percent(100),
+                maxHeight: percent(100),
+                maxWidth: percent(100),
                 borderRadius: 0,
                 border: "none",
+                top: 0,
+                bottom: 0,
+                transform: translateX(`-50%`),
             },
             "&.isLarge": {
                 width: unit(vars.sizing.large),
-                ...margins({
-                    left: vars.spacing.horizontalMargin,
-                    right: vars.spacing.horizontalMargin,
-                }),
             },
             "&.isMedium": {
                 width: unit(vars.sizing.medium),
-                ...margins({
-                    left: vars.spacing.horizontalMargin,
-                    right: vars.spacing.horizontalMargin,
-                }),
             },
             "&.isSmall": {
                 width: unit(vars.sizing.small),
-                ...margins({
-                    left: vars.spacing.horizontalMargin,
-                    right: vars.spacing.horizontalMargin,
-                }),
             },
-            "&.isSidePanel": {
-                marginLeft: unit(vars.dropDown.padding),
+            "&&&.isSidePanel": {
+                left: unit(vars.dropDown.padding),
+                width: calc(`100% - ${vars.dropDown.padding}px`),
+                display: "flex",
+                flexDirection: "column",
+                top: 0,
+                bottom: 0,
+                transform: "none",
             },
             "&.isDropDown": {
                 overflow: "auto",
                 width: percent(100),
                 marginBottom: "auto",
-                maxHeight: viewHeight(100),
             },
             "&.isShadowed": {
                 ...shadows.dropDown(),
                 ...borders(),
-            },
-            "&.hasNoScroll": {
-                overflow: important("hidden"),
-                height: viewHeight(100),
-            },
-        },
-    });
-
-    const scroll = style("scroll", {
-        overflow: "auto",
-        $nest: {
-            "& > .container": {
-                paddingTop: unit(globalVars.overlay.fullPageHeadingSpacer),
-            },
-            "&.hasError > .container": {
-                paddingTop: 0,
             },
         },
     });

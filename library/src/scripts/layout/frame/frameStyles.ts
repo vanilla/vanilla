@@ -82,7 +82,6 @@ export const frameHeaderClasses = useThemeCache(() => {
         alignItems: "center",
         flexWrap: "nowrap",
         width: percent(100),
-        minHeight: unit(vars.header.minHeight),
         color: colorOut(vars.colors.fg),
         zIndex: 1,
         borderBottom: singleBorder(),
@@ -222,7 +221,7 @@ export const framePanelClasses = useThemeCache(() => {
         height: percent(100),
         backgroundColor: colorOut(vars.colors.bg),
         maxHeight: calc(`100vh - ${unit(vars.header.minHeight + vars.footer.minHeight + vars.spacing.padding * 2)}`),
-
+        overflow: "auto",
         $nest: {
             "& > .inputBlock": {
                 $nest: {

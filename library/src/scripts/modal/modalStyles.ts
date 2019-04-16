@@ -70,7 +70,6 @@ export const modalVariables = useThemeCache(() => {
 
 export const modalClasses = useThemeCache(() => {
     const vars = modalVariables();
-    const globalVars = globalVariables();
     const style = styleFactory("modal");
     const mediaQueries = layoutVariables().mediaQueries();
     const shadows = shadowHelper();
@@ -147,6 +146,9 @@ export const modalClasses = useThemeCache(() => {
                 ...shadows.dropDown(),
                 ...borders(),
             },
+            "&.isScrollable": {
+                overflow: "auto",
+            },
         },
     });
 
@@ -178,7 +180,6 @@ export const modalClasses = useThemeCache(() => {
 
     return {
         root,
-        scroll,
         content,
         pageHeader,
         overlay,

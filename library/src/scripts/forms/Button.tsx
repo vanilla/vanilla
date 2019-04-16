@@ -56,8 +56,6 @@ export const getDynamicClassFromButtonType = (type: ButtonTypes | undefined) => 
                 return classes.translucid;
             case ButtonTypes.INVERTED:
                 return classes.inverted;
-            case ButtonTypes.TAB:
-                return classes.tab;
             case ButtonTypes.CUSTOM:
                 return classes.custom;
             default:

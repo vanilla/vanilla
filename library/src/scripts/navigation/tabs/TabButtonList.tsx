@@ -26,6 +26,7 @@ interface IProps {
     getTabButtonID: (index: number) => string;
     getTabPanelID: (index: number) => string;
     buttonClass?: string;
+    extraContent?: React.ReactNode;
 }
 
 interface IState {
@@ -52,8 +53,8 @@ export default class TabButtonList extends React.Component<IProps, IState> {
                     ariaControls={getTabPanelID(index)}
                     ariaSelected={isSelected}
                     key={`tabButton-${index}`}
-                    baseClass={ButtonTypes.TAB}
-                    className={classNames("tabButton", "tabButtonList-button", isSelected, buttonClass, classes.button)}
+                    baseClass={ButtonTypes.CUSTOM}
+                    className={classNames(isSelected, buttonClass, classes.button)}
                     tabIndex={isSelected || this.state.setAllTabIndexes ? 0 : -1}
                     index={index}
                     setTab={this.props.setTab}
@@ -72,6 +73,7 @@ export default class TabButtonList extends React.Component<IProps, IState> {
                 ref={this.tabButtons}
             >
                 {content}
+                {this.props.extraContent}
             </div>
         );
     }

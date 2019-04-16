@@ -63,11 +63,7 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                                     </VanillaHeaderNavItem>
                                 </VanillaHeaderNav>
                             ) : (
-                                <CompactMeBox
-                                    buttonClass={headerClasses.button}
-                                    userPhotoClass="headerDropDown-user"
-                                    currentUser={this.props.currentUser}
-                                />
+                                <CompactMeBox currentUser={this.props.currentUser} />
                             )}
                         </div>
                     </PanelWidgetHorizontalPadding>

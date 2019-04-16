@@ -13,8 +13,6 @@ import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWi
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
-import Frame from "@library/layout/frame/Frame";
-import FrameBody from "@library/layout/frame/FrameBody";
 import { frameBodyClasses } from "@library/layout/frame/frameStyles";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { t } from "@library/utility/appUtils";
@@ -37,59 +35,52 @@ function UserDropDownContents(props: IProps) {
     };
 
     const classesDropDown = dropDownClasses();
-    const classesFrameBody = frameBodyClasses();
 
     return (
-        <Frame className={props.className}>
-            <FrameBody className={classNames(classesFrameBody.root, classesDropDown.verticalPadding)} selfPadded={true}>
-                <DropDownUserCard className="userDropDown-userCard" />
-                <DropDownItemSeparator />
-                <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
-                <DropDownSection title={t("Discussions")}>
+        <div className={classNames(classesDropDown.verticalPadding, props.className)}>
+            <DropDownUserCard className="userDropDown-userCard" />
+            <DropDownItemSeparator />
+            <DropDownItemLink to="/profile/edit" name={t("Edit Profile")} />
+            <DropDownSection title={t("Discussions")}>
+                <DropDownItemLinkWithCount
+                    to={"/discussions/bookmarked"}
+                    name={t("Bookmarks")}
+                    count={getCountByName("Bookmarks")}
+                />
+                <Permission permission="articles.add">
+                    <DropDownItemLinkWithCount to="/kb/drafts" name={t("Drafts")} count={getCountByName("Drafts")} />
+                </Permission>
+                <DropDownItemLinkWithCount
+                    to="/discussions/mine"
+                    name={t("My Discussions")}
+                    count={getCountByName("Discussions")}
+                />
+            </DropDownSection>
+            <Permission permission={["community.moderate"]}>
+                <DropDownSection title={t("Moderation")}>
                     <DropDownItemLinkWithCount
-                        to={"/discussions/bookmarked"}
-                        name={t("Bookmarks")}
-                        count={getCountByName("Bookmarks")}
+                        to={"/dashboard/user/applicants"}
+                        name={t("Applicants")}
+                        count={getCountByName("Applications")}
                     />
-                    <Permission permission="articles.add">
-                        <DropDownItemLinkWithCount
-                            to="/kb/drafts"
-                            name={t("Drafts")}
-                            count={getCountByName("Drafts")}
-                        />
-                    </Permission>
                     <DropDownItemLinkWithCount
-                        to="/discussions/mine"
-                        name={t("My Discussions")}
-                        count={getCountByName("Discussions")}
+                        to={"/dashboard/log/spam"}
+                        name={t("Spam Queue")}
+                        count={getCountByName("SpamQueue")}
+                    />
+                    <DropDownItemLinkWithCount
+                        to={"/dashboard/log/moderation"}
+                        name={t("Moderation Queue")}
+                        count={getCountByName("ModerationQueue")}
                     />
                 </DropDownSection>
-                <Permission permission={["community.moderate"]}>
-                    <DropDownSection title={t("Moderation")}>
-                        <DropDownItemLinkWithCount
-                            to={"/dashboard/user/applicants"}
-                            name={t("Applicants")}
-                            count={getCountByName("Applications")}
-                        />
-                        <DropDownItemLinkWithCount
-                            to={"/dashboard/log/spam"}
-                            name={t("Spam Queue")}
-                            count={getCountByName("SpamQueue")}
-                        />
-                        <DropDownItemLinkWithCount
-                            to={"/dashboard/log/moderation"}
-                            name={t("Moderation Queue")}
-                            count={getCountByName("ModerationQueue")}
-                        />
-                    </DropDownSection>
-                </Permission>
-                <DropDownItemSeparator />
-                <Permission permission={["site.manage", "settings.view"]}>
-                    <DropDownItemLink to={"/dashboard/settings"} name={t("Dashboard")} />
-                </Permission>
-                <DropDownItemLink to={`/entry/signout?target=${window.location.href}`} name={t("Sign Out")} />
-            </FrameBody>
-        </Frame>
+            </Permission>
+            <DropDownItemSeparator />
+            <Permission permission={["site.manage", "settings.view"]}>
+                <DropDownItemLink to={"/dashboard/settings"} name={t("Dashboard")} />
+            </Permission>
+            <DropDownItemLink to={`/entry/signout?target=${window.location.href}`} name={t("Sign Out")} />
+        </div>
     );
 }
 

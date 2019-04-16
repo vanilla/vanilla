@@ -27,6 +27,7 @@ import FramePanel from "@library/layout/frame/FramePanel";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { connect } from "react-redux";
 import { settings } from "@library/icons/header";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
 
 export interface INotificationsProps {
     countClass?: string;
@@ -44,7 +45,7 @@ export class NotificationsContents extends React.Component<IProps> {
         const buttonUtils = buttonUtilityClasses();
 
         return (
-            <Frame className={this.props.className}>
+            <Frame className={classNames(this.props.className, inheritHeightClass())}>
                 <FrameHeaderWithAction className="hasAction" title={title}>
                     <LinkAsButton
                         title={t("Notification Preferences")}

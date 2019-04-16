@@ -22,6 +22,7 @@ import { TLength, NestedCSSProperties } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { ColorHelper, important, percent, px } from "csx";
+import { tabButtonListClasses } from "@library/forms/radioTabs/tabButtonListStyles";
 
 export const buttonGlobalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -260,7 +261,7 @@ export const buttonVariables = useThemeCache(() => {
         fonts: {
             color: globalVars.mainColors.bg,
         },
-        spinnerColor: globalVars.elementaryColors.white,
+        spinnerColor: globalVars.mainColors.bg,
         borders: {
             color: globalVars.mainColors.primary,
         },
@@ -272,7 +273,7 @@ export const buttonVariables = useThemeCache(() => {
                 bg: globalVars.mainColors.secondary,
             },
             borders: {
-                color: globalVars.mainColors.primary,
+                color: globalVars.mainColors.secondary,
             },
         },
         active: {
@@ -283,7 +284,7 @@ export const buttonVariables = useThemeCache(() => {
                 bg: globalVars.mainColors.secondary,
             },
             borders: {
-                color: globalVars.mainColors.primary,
+                color: globalVars.mainColors.secondary,
             },
         },
         focus: {
@@ -294,7 +295,7 @@ export const buttonVariables = useThemeCache(() => {
                 bg: globalVars.mainColors.secondary,
             },
             borders: {
-                color: globalVars.mainColors.primary,
+                color: globalVars.mainColors.secondary,
             },
         },
         focusAccessible: {
@@ -305,7 +306,7 @@ export const buttonVariables = useThemeCache(() => {
                 bg: globalVars.mainColors.secondary,
             },
             borders: {
-                color: globalVars.mainColors.primary,
+                color: globalVars.mainColors.secondary,
             },
         },
     });
@@ -568,7 +569,6 @@ export enum ButtonTypes {
     TRANSLUCID = "translucid",
     INVERTED = "inverted",
     CUSTOM = "custom",
-    TAB = "tab",
     TEXT = "text",
     TEXT_PRIMARY = "textPrimary",
     ICON = "icon",
@@ -585,7 +585,6 @@ export const buttonClasses = useThemeCache(() => {
         compactPrimary: generateButtonClass(vars.compactPrimary, ButtonTypes.COMPACT_PRIMARY),
         translucid: generateButtonClass(vars.translucid, ButtonTypes.TRANSLUCID),
         inverted: generateButtonClass(vars.inverted, ButtonTypes.INVERTED),
-        tab: "buttonAsTab",
         icon: buttonUtilityClasses().buttonIcon,
         iconCompact: buttonUtilityClasses().buttonIconCompact,
         text: buttonUtilityClasses().buttonAsText,

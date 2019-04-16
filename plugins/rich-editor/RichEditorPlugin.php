@@ -27,7 +27,7 @@ class RichEditorPlugin extends Gdn_Plugin {
     public function setup() {
         saveToConfig('Garden.InputFormatter', self::FORMAT_NAME);
         saveToConfig('Garden.MobileInputFormatter', self::FORMAT_NAME);
-        saveToConfig('RichEditor.Quotes.Enable', true);
+        saveToConfig(self::QUOTE_CONFIG_ENABLE, true);
         saveToConfig('EnabledPlugins.Quotes', false);
     }
 

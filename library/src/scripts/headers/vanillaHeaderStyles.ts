@@ -4,23 +4,21 @@
  * @license GPL-2.0-only
  */
 
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
-    buttonStates,
+    allButtonStates,
+    borders,
     colorOut,
+    emphasizeLightness,
     flexHelper,
     modifyColorBasedOnLightness,
     unit,
     userSelect,
-    emphasizeLightness,
-    allButtonStates,
-    borders,
-    allLinkStates,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { formElementsVariables } from "@library/forms/formElementStyles";
-import { ColorHelper, percent, px, color, important } from "csx";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { percent, px } from "csx";
 
 export const vanillaHeaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -45,8 +43,7 @@ export const vanillaHeaderVariables = useThemeCache(() => {
         spacer: 8,
     });
 
-    const buttonSize = 40;
-    const buttonMobileSize = formElementVars.sizing.height;
+    const buttonSize = formElementVars.sizing.height;
     const button = makeThemeVars("button", {
         borderRadius: 3,
         size: buttonSize,
@@ -55,7 +52,7 @@ export const vanillaHeaderVariables = useThemeCache(() => {
         },
         mobile: {
             fontSize: 16,
-            width: buttonMobileSize,
+            width: buttonSize,
         },
         state: {
             bg: emphasizeLightness(colors.bg, 0.04),
@@ -76,14 +73,14 @@ export const vanillaHeaderVariables = useThemeCache(() => {
     const endElements = makeThemeVars("endElements", {
         flexBasis: buttonSize * 4,
         mobile: {
-            flexBasis: buttonMobileSize * 2,
+            flexBasis: button.mobile.width * 2,
         },
     });
 
     const compactSearch = makeThemeVars("compactSearch", {
         maxWidth: 672,
         mobile: {
-            width: buttonMobileSize,
+            width: button.mobile.width,
         },
     });
 
@@ -308,7 +305,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         {
             color: vars.colors.fg.toString(),
             height: px(vars.sizing.height),
-            minWidth: px(formElementVars.sizing.height),
+            minWidth: px(vars.button.size),
             maxWidth: percent(100),
             padding: px(0),
             ...allButtonStates(

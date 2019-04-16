@@ -96,7 +96,7 @@ export function close(className?: string) {
         <svg
             className={classNames("icon", "icon-close", className)}
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 9.5 9.5"
+            viewBox="-1 -1 12 12"
             aria-hidden="true"
         >
             <title>{title}</title>
@@ -301,15 +301,19 @@ export function signIn(className?: string) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
+            viewBox="-4 0 24 18"
             className={classNames("icon", "icon-signIn", className)}
             role="img"
         >
             <title>{title}</title>
-            <path
-                fill="currentColor"
-                d="M20.25,5.5H16A.75.75,0,0,1,16,4h5a.75.75,0,0,1,.75.75v15a.75.75,0,0,1-.75.75H16A.75.75,0,0,1,16,19h4.25ZM10.574,17.722l0-.005a.5.5,0,0,1,.01-.707l4.395-4.275H3.5a.5.5,0,0,1-.5-.5v-.741a.5.5,0,0,1,.5-.5H14.974l-4.4-4.361v0a.5.5,0,0,1,0-.707l.523-.523a.5.5,0,0,1,.707,0l6.066,6.067a.5.5,0,0,1,0,.707L11.8,18.241a.5.5,0,0,1-.707,0Z"
-            />
+            <g fill="none" fillRule="evenodd" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5">
+                <path strokeLinejoin="round" d="M7.243 12.417L10.92 8.74 7.243 5.063" />
+                <path d="M10.617 8.74H.843" />
+                <path
+                    strokeLinejoin="round"
+                    d="M2 5.07V1.235C2.051.411 2.451 0 3.2 0h11.507C15.57.033 16 .593 16 1.681v15.136c-.058.789-.346 1.183-.865 1.183H3.2c-.8-.01-1.2-.404-1.2-1.183v-4.12"
+                />
+            </g>
         </svg>
     );
 }

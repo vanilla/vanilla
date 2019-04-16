@@ -5,28 +5,19 @@
  */
 
 import apiv2 from "@library/apiv2";
-import Permission from "@library/features/users/Permission";
 import UserActions from "@library/features/users/UserActions";
 import DropDown from "@library/flyouts/DropDown";
-import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
-import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWithCount";
-import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
-import DropDownSection from "@library/flyouts/items/DropDownSection";
-import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
+import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
 import { userDropDownClasses } from "@library/headers/mebox/pieces/userDropDownStyles";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
-import Frame from "@library/layout/frame/Frame";
-import FrameBody from "@library/layout/frame/FrameBody";
-import { frameBodyClasses } from "@library/layout/frame/frameStyles";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import classNames from "classnames";
 import React, { useEffect, useMemo, useState } from "react";
 import { connect } from "react-redux";
-import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
+import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
 
 /**
  * Implements User Drop down for header
@@ -53,23 +44,19 @@ function UserDropDown(props: IProps) {
         <DropDown
             id={ID}
             name={t("My Account")}
-            className={classNames("userDropDown", props.className)}
-            buttonClassName={classNames("vanillaHeader-account", props.buttonClassName)}
-            contentsClassName={classNames(
-                "userDropDown-contents",
-                props.contentsClassName,
-                classes.contents,
-                classesHeader.dropDownContents,
-            )}
+            buttonClassName={classNames(classesHeader.button)}
+            contentsClassName={classNames(classes.contents, classesHeader.dropDownContents)}
             renderLeft={true}
             buttonContents={
-                <div className={classNames("meBox-buttonContent", props.toggleContentClassName)}>
-                    <UserPhoto
-                        userInfo={userInfo}
-                        open={isOpen}
-                        className="headerDropDown-user meBox-user"
-                        size={UserPhotoSize.SMALL}
-                    />
+                <div className="meBox-buttonContent">
+                    <MeBoxIcon compact={false}>
+                        <UserPhoto
+                            userInfo={userInfo}
+                            open={isOpen}
+                            className="headerDropDown-user meBox-user"
+                            size={UserPhotoSize.SMALL}
+                        />
+                    </MeBoxIcon>
                 </div>
             }
             selfPadded={true}
@@ -80,13 +67,7 @@ function UserDropDown(props: IProps) {
     );
 }
 
-interface IOwnProps {
-    className?: string;
-    countsClass?: string;
-    buttonClassName?: string;
-    contentsClassName?: string;
-    toggleContentClassName?: string;
-}
+interface IOwnProps {}
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 

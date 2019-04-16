@@ -7,6 +7,7 @@
 import React from "react";
 import { frameBodyClasses } from "@library/layout/frame/frameStyles";
 import classNames from "classnames";
+import { TouchScrollable } from "react-scrolllock";
 
 export interface IFrameBodyProps {
     className?: string;
@@ -22,13 +23,15 @@ export default class FrameBody extends React.PureComponent<IFrameBodyProps> {
     public render() {
         const classes = frameBodyClasses();
         return (
-            <div
-                className={classNames("frameBody", this.props.className, classes.root, {
-                    isSelfPadded: this.props.selfPadded,
-                })}
-            >
-                {this.props.children}
-            </div>
+            <TouchScrollable>
+                <div
+                    className={classNames("frameBody", this.props.className, classes.root, {
+                        isSelfPadded: this.props.selfPadded,
+                    })}
+                >
+                    {this.props.children}
+                </div>
+            </TouchScrollable>
         );
     }
 }

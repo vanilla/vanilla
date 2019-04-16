@@ -94,6 +94,7 @@ export const splashVariables = useThemeCache(() => {
         },
         marginTop: 28,
         marginBottom: 40,
+        text: "How can we help you?",
     });
 
     const border = makeThemeVars("border", {

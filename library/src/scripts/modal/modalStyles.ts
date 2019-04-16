@@ -92,8 +92,8 @@ export const modalClasses = useThemeCache(() => {
         display: "block",
         left: percent(50),
         width: percent(100),
-        maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
-        maxHeight: percent(90),
+        maxWidth: percent(100),
+        maxHeight: percent(100),
         zIndex: 1,
         backgroundColor: colorOut(vars.colors.bg),
         position: "fixed",
@@ -118,12 +118,15 @@ export const modalClasses = useThemeCache(() => {
             },
             "&.isLarge": {
                 width: unit(vars.sizing.large),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
             },
             "&.isMedium": {
                 width: unit(vars.sizing.medium),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
             },
             "&.isSmall": {
                 width: unit(vars.sizing.small),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
             },
             "&&&.isSidePanel": {
                 left: unit(vars.dropDown.padding),

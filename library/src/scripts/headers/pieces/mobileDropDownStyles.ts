@@ -16,7 +16,7 @@ import {
     fonts,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { border, calc, percent, px, translateX, viewHeight } from "csx";
+import { border, calc, percent, px, translateX } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";
 
@@ -98,8 +98,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
         position: "relative",
         display: "flex",
         flexDirection: "column",
-        maxHeight: viewHeight(100),
-        minHeight: viewHeight(100),
+        maxHeight: percent(100),
         width: percent(100),
         margin: "auto",
     });

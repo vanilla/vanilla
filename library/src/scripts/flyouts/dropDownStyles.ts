@@ -289,7 +289,11 @@ export const dropDownClasses = useThemeCache(() => {
             vertical: vars.contents.padding.vertical,
             horizontal: 0,
         }),
-    });
+    }, mediaQueries.oneColumn({
+        ...paddings({
+            vertical: 0,
+        }),
+    }));
 
     const title = style("title", {
         ...fonts({

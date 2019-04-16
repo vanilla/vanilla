@@ -267,6 +267,7 @@ export const splashStyles = useThemeCache(() => {
         flexWrap: "nowrap",
         alignItems: "center",
         width: unit(vars.searchContainer.width),
+        maxWidth: percent(100),
         margin: "auto",
     });
 

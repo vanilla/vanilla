@@ -65,6 +65,7 @@ export const frameClasses = useThemeCache(() => {
         maxHeight: percent(100),
         height: percent(100),
         borderRadius: unit(vars.border.radius),
+        width: percent(100),
     });
     return { root };
 });
@@ -81,7 +82,6 @@ export const frameHeaderClasses = useThemeCache(() => {
         alignItems: "center",
         flexWrap: "nowrap",
         width: percent(100),
-        minHeight: unit(vars.header.minHeight),
         color: colorOut(vars.colors.fg),
         zIndex: 1,
         borderBottom: singleBorder(),
@@ -126,21 +126,25 @@ export const frameHeaderClasses = useThemeCache(() => {
         textTransform: "uppercase",
         fontSize: unit(globalVars.fonts.size.small),
         color: colorOut(globalVars.mixBgAndFg(0.6)),
+        fontWeight: globalVars.fonts.weights.semiBold,
     });
 
+    const spacerWidth = globalVars.icon.sizes.large - (globalVars.gutter.half + globalVars.gutter.quarter);
     const leftSpacer = style("leftSpacer", {
         display: "block",
-        height: unit(formElVars.sizing.height),
-        flexBasis: unit(formElVars.sizing.height),
-        width: unit(formElVars.sizing.height),
+        height: unit(spacerWidth),
+        flexBasis: unit(spacerWidth),
+        width: unit(spacerWidth),
     });
 
     const action = style("action", {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        position: "relative",
         flexShrink: 1,
         height: unit(formElVars.sizing.height),
+        width: unit(spacerWidth),
         marginRight: unit(-6),
         color: colorOut(vars.colors.fg),
         $nest: {
@@ -153,7 +157,15 @@ export const frameHeaderClasses = useThemeCache(() => {
         },
     });
 
-    return { root, backButton, heading, left, centred, leftSpacer, action };
+    return {
+        root,
+        backButton,
+        heading,
+        left,
+        centred,
+        leftSpacer,
+        action,
+    };
 });
 
 export const frameBodyClasses = useThemeCache(() => {
@@ -209,7 +221,7 @@ export const framePanelClasses = useThemeCache(() => {
         height: percent(100),
         backgroundColor: colorOut(vars.colors.bg),
         maxHeight: calc(`100vh - ${unit(vars.header.minHeight + vars.footer.minHeight + vars.spacing.padding * 2)}`),
-
+        overflow: "auto",
         $nest: {
             "& > .inputBlock": {
                 $nest: {

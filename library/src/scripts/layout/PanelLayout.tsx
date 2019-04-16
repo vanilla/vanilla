@@ -11,6 +11,7 @@ import { inheritHeightClass, sticky } from "@library/styles/styleHelpers";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { style } from "typestyle";
 import { percent } from "csx";
+import { panelLayoutClasses } from "@library/layout/panelLayoutStyles";
 
 interface IProps extends IDeviceProps {
     className?: string;
@@ -235,9 +236,10 @@ interface IContainerProps {
 
 export function Panel(props: IContainerProps) {
     const Tag = (props.tag as "div") || "div";
+    const classes = panelLayoutClasses();
     return (
         <Tag
-            className={classNames("panelLayout-panel", props.className)}
+            className={classNames("panelLayout-panel", classes.panel, props.className)}
             aria-hidden={props.ariaHidden}
             ref={props.innerRef}
         >

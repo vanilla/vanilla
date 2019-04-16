@@ -8,7 +8,7 @@ import * as React from "react";
 import Heading from "@library/layout/Heading";
 import { chevronUp, downTriangle } from "@library/icons/common";
 import CloseButton from "@library/navigation/CloseButton";
-import { Panel } from "@library/layout/PanelLayout";
+import { Panel, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { frameHeaderClasses } from "@library/layout/frame/frameStyles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
@@ -19,9 +19,10 @@ import classNames from "classnames";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
-import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
+import Container from "@library/layout/components/Container";
+import { TouchScrollable } from "react-scrolllock";
 
 export interface IProps {
     className?: string;
@@ -73,51 +74,55 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                         exitHandler={this.close}
                     >
                         <div className={classes.content}>
-                            <Panel className={classes.panel}>
-                                <Frame className={this.props.frameClassName}>
-                                    <header className={classes.header}>
-                                        <FlexSpacer
-                                            className={classNames(
-                                                "frameHeader-leftSpacer",
-                                                classesFrameHeader.leftSpacer,
-                                            )}
-                                        />
-                                        <Heading
-                                            title={title}
-                                            className={classNames(
-                                                "frameHeader-heading",
-                                                "frameHeader-centred",
-                                                classesFrameHeader.centred,
-                                                classesFrameHeader.heading,
-                                            )}
-                                        >
-                                            <SmartAlign>{title}</SmartAlign>
-                                        </Heading>
-                                        <div
-                                            className={classNames(
-                                                "frameHeader-closePosition",
-                                                classesFrameHeader.action,
-                                            )}
-                                        >
-                                            <CloseButton
-                                                className="frameHeader-close"
-                                                onClick={this.close}
-                                                baseClass={ButtonTypes.CUSTOM}
+                            <header className={classes.header}>
+                                <Container>
+                                    <PanelWidgetHorizontalPadding>
+                                        <div className={classes.headerContent}>
+                                            <FlexSpacer
+                                                className={classNames(
+                                                    "frameHeader-leftSpacer",
+                                                    classesFrameHeader.leftSpacer,
+                                                )}
                                             />
+                                            <Heading
+                                                title={title}
+                                                className={classNames(
+                                                    "frameHeader-heading",
+                                                    "frameHeader-centred",
+                                                    classesFrameHeader.centred,
+                                                    classesFrameHeader.heading,
+                                                )}
+                                            >
+                                                <SmartAlign>{title}</SmartAlign>
+                                            </Heading>
+                                            <div
+                                                className={classNames(
+                                                    "frameHeader-closePosition",
+                                                    classesFrameHeader.action,
+                                                )}
+                                            >
+                                                <CloseButton
+                                                    className={classNames(classes.closeButton)}
+                                                    onClick={this.close}
+                                                    compact={true}
+                                                />
+                                            </div>
                                         </div>
-                                    </header>
-                                    <FrameBody className={this.props.frameBodyClassName}>{children}</FrameBody>
-                                    <FrameFooter>
-                                        <Button
-                                            onClick={this.close}
-                                            baseClass={ButtonTypes.CUSTOM}
-                                            className={classes.closeModal}
-                                        >
-                                            {chevronUp(classes.closeModalIcon)}
-                                        </Button>
-                                    </FrameFooter>
-                                </Frame>
-                            </Panel>
+                                    </PanelWidgetHorizontalPadding>
+                                </Container>
+                            </header>
+                            <TouchScrollable>
+                                <FrameBody className={this.props.frameBodyClassName}>{children}</FrameBody>
+                            </TouchScrollable>
+                            <FrameFooter>
+                                <Button
+                                    onClick={this.close}
+                                    baseClass={ButtonTypes.CUSTOM}
+                                    className={classes.closeModal}
+                                >
+                                    {chevronUp(classes.closeModalIcon)}
+                                </Button>
+                            </FrameFooter>
                         </div>
                     </Modal>
                 )}

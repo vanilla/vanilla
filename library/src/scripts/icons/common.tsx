@@ -109,6 +109,10 @@ export function close(className?: string) {
     );
 }
 
+export function closeCompact(className?: string) {
+    return close(classNames(className, "icon-closeCompact"));
+}
+
 export function clear(className?: string, noPadding: boolean = false) {
     const title = t("Clear");
     return (

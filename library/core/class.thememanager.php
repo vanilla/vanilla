@@ -431,7 +431,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         }
 
         if ($callback && !empty($pluginClass) && class_exists($pluginClass)) {
-            $plugin = new $pluginClass();
+            $plugin = Gdn::getContainer()->get($pluginClass);
             if (method_exists($pluginClass, $methodName)) {
                 $plugin->$methodName();
             }

@@ -87,12 +87,6 @@ $panelLayout-panelAndSpacingWidth                                     : $global-
     width: 100%;
 }
 
-.panelLayout-panel {
-    padding: {
-        left: $global-gutter_halfSize;
-        right: $global-gutter_halfSize;
-    }
-}
 
 .panelLayout-container {
     display: flex;
@@ -135,8 +129,8 @@ $panelLayout-panelAndSpacingWidth                                     : $global-
 
     @include mediaQuery-panelLayout_oneColumn {
         padding: {
-            left: 0;
-            right: 0;
+            left: 0 !important;
+            right: 0 !important;
         }
     }
 }

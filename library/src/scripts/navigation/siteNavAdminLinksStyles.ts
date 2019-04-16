@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { allLinkStates, colorOut, debugHelper, unit } from "@library/styles/styleHelpers";
+import {allLinkStates, colorOut, debugHelper, margins, unit} from "@library/styles/styleHelpers";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { px } from "csx";
 import { style } from "typestyle";
@@ -19,11 +19,15 @@ export const siteNavAdminLinksClasses = useThemeCache(() => {
     const root = style(
         {
             display: "block",
-            margin: 0,
+            ...margins({
+                all: 0,
+            }),
             ...debug.name(),
         },
         mediaQueries.oneColumn({
-            marginBottom: unit(25),
+            ...margins({
+                vertical: 16,
+            }),
         }),
     );
 

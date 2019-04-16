@@ -18,6 +18,7 @@ import FlyoutToggle from "@library/flyouts/FlyoutToggle";
 import classNames from "classnames";
 import { dropDownMenu } from "@library/icons/common";
 import { IDeviceProps, withDevice, Devices } from "@library/layout/DeviceContext";
+import { Panel, PanelWidgetHorizontalPadding, PanelArea } from "@library/layout/PanelLayout";
 
 export interface IProps extends IDeviceProps {
     id?: string;

@@ -12,7 +12,8 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { modalClasses } from "@library/modal/modalStyles";
 import TabHandler from "@library/dom/TabHandler";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
-import { logWarning } from "@library/utility/utils";
+import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
+import { logWarning, logError } from "@library/utility/utils";
 import { forceRenderStyles } from "typestyle";
 import ScrollLock, { TouchScrollable } from "react-scrolllock";
 
@@ -35,6 +36,8 @@ interface IModalCommonProps {
     size: ModalSizes;
     scrollable?: boolean;
     elementToFocusOnExit: HTMLElement; // Should either be a specific element or use document.activeElement
+    isWholePage?: boolean;
+    allowScroll?: boolean;
 }
 
 interface IModalTextDescription extends IModalCommonProps, ITextDescription {}
@@ -86,6 +89,11 @@ export function mountModal(element: ReactElement<any>) {
  * - Focuses the first focusable element in the Modal.
  */
 export default class Modal extends React.Component<IProps, IState> {
+    public static defaultProps: Partial<IProps> = {
+        isWholePage: false,
+        allowScroll: true,
+    };
+
     public static focusHistory: HTMLElement[] = [];
     public static stack: Modal[] = [];
 
@@ -108,7 +116,7 @@ export default class Modal extends React.Component<IProps, IState> {
      * Render the contents into a portal.
      */
     public render() {
-        const { size } = this.props;
+        const { size, allowScroll } = this.props;
         const classes = modalClasses();
         const portal = ReactDOM.createPortal(
             <ScrollLock>
@@ -185,6 +193,7 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
 
         this.focusInitialElement();
         pageContainer && pageContainer.setAttribute("aria-hidden", true);
+        disableBodyScroll(this.selfRef.current!);
 
         // Add the escape keyboard listener only on the first modal in the stack.
         if (Modal.stack.length === 0) {
@@ -212,6 +221,7 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         Modal.stack.pop();
         if (Modal.stack.length === 0) {
             pageContainer && pageContainer.removeAttribute("aria-hidden");
+            enableBodyScroll(this.selfRef.current!);
 
             // This event listener is only added once (on the top modal).
             // So we only remove when clearing the last one.
@@ -291,7 +301,7 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         if ("keyCode" in event && event.keyCode === escKey) {
             event.preventDefault();
             event.stopPropagation();
-            if (Modal.stack.length === 1 && this.props.size === ModalSizes.FULL_SCREEN) {
+            if (Modal.stack.length === 1 && this.props.isWholePage) {
                 return;
             } else {
                 if (topModal.props.exitHandler) {

@@ -95,78 +95,73 @@ export class VanillaHeader extends React.Component<IProps, IState> {
 
         return ReactDOM.createPortal(
             <Container>
-                <Panel className="panelLayout-fullWidth">
-                    <PanelWidgetHorizontalPadding>
-                        <div className={classNames("vanillaHeader-bar", classes.bar)}>
-                            {!this.state.openSearch && isMobile && (
-                                <BackLink
-                                    className={classNames(
-                                        "vanillaHeader-leftFlexBasis",
-                                        "vanillaHeader-backLink",
-                                        classes.leftFlexBasis,
-                                    )}
-                                    linkClassName={classes.button}
-                                    fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
-                                />
-                            )}
+                <PanelWidgetHorizontalPadding>
+                    <div className={classNames("vanillaHeader-bar", classes.bar)}>
+                        {!this.state.openSearch && isMobile && (
+                            <BackLink
+                                className={classNames(
+                                    "vanillaHeader-leftFlexBasis",
+                                    "vanillaHeader-backLink",
+                                    classes.leftFlexBasis,
+                                )}
+                                linkClassName={classes.button}
+                                fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
+                            />
+                        )}
 
-                            {!isMobile && (
-                                <HeaderLogo
-                                    className={classNames("vanillaHeader-logoContainer", classes.logoContainer)}
-                                    logoClassName="vanillaHeader-logo"
-                                    logoType={LogoType.DESKTOP}
-                                />
-                            )}
-                            {!this.state.openSearch && !isMobile && (
-                                <VanillaHeaderNav
-                                    {...dummyNavigationData}
-                                    className={classNames("vanillaHeader-nav", classes.nav)}
-                                    linkClassName={classNames("vanillaHeader-navLink", classes.topElement)}
-                                    linkContentClassName="vanillaHeader-navLinkContent"
-                                />
-                            )}
-                            {showMobileDropDown && (
-                                <MobileDropDown
-                                    title={this.props.title!}
-                                    buttonClass={classNames("vanillaHeader-mobileDropDown", classes.topElement)}
-                                >
-                                    {this.props.mobileDropDownContent}
-                                </MobileDropDown>
-                            )}
-
-                            <ConditionalWrap
-                                className={classNames("vanillaHeader-rightFlexBasis", classes.rightFlexBasis)}
-                                condition={!!showMobileDropDown}
+                        {!isMobile && (
+                            <HeaderLogo
+                                className={classNames("vanillaHeader-logoContainer", classes.logoContainer)}
+                                logoClassName="vanillaHeader-logo"
+                                logoType={LogoType.DESKTOP}
+                            />
+                        )}
+                        {!this.state.openSearch && !isMobile && (
+                            <VanillaHeaderNav
+                                {...dummyNavigationData}
+                                className={classNames("vanillaHeader-nav", classes.nav)}
+                                linkClassName={classNames("vanillaHeader-navLink", classes.topElement)}
+                                linkContentClassName="vanillaHeader-navLinkContent"
+                            />
+                        )}
+                        {showMobileDropDown && (
+                            <MobileDropDown
+                                title={this.props.title!}
+                                buttonClass={classNames("vanillaHeader-mobileDropDown", classes.topElement)}
                             >
-                                <CompactSearch
-                                    className={classNames("vanillaHeader-compactSearch", classes.compactSearch, {
-                                        isCentered: this.state.openSearch,
-                                    })}
-                                    focusOnMount
-                                    open={this.state.openSearch}
-                                    onSearchButtonClick={this.openSearch}
-                                    onCloseSearch={this.closeSearch}
-                                    cancelButtonClassName={classNames(
-                                        "vanillaHeader-searchCancel",
-                                        classes.topElement,
-                                        classes.searchCancel,
-                                    )}
-                                    cancelContentClassName="meBox-buttonContent"
-                                    buttonClass={classes.button}
-                                    showingSuggestions={this.state.showingSuggestions}
-                                    onOpenSuggestions={this.setOpenSuggestions}
-                                    onCloseSuggestions={this.setCloseSuggestions}
-                                    buttonContentClassName={classNames(
-                                        classesMeBox.buttonContent,
-                                        "meBox-buttonContent",
-                                    )}
-                                    clearButtonClass={classes.clearButtonClass}
-                                />
-                                {isMobile ? this.renderMobileMeBox() : this.renderDesktopMeBox()}
-                            </ConditionalWrap>
-                        </div>
-                    </PanelWidgetHorizontalPadding>
-                </Panel>
+                                {this.props.mobileDropDownContent}
+                            </MobileDropDown>
+                        )}
+
+                        <ConditionalWrap
+                            className={classNames("vanillaHeader-rightFlexBasis", classes.rightFlexBasis)}
+                            condition={!!showMobileDropDown}
+                        >
+                            <CompactSearch
+                                className={classNames("vanillaHeader-compactSearch", classes.compactSearch, {
+                                    isCentered: this.state.openSearch,
+                                })}
+                                focusOnMount
+                                open={this.state.openSearch}
+                                onSearchButtonClick={this.openSearch}
+                                onCloseSearch={this.closeSearch}
+                                cancelButtonClassName={classNames(
+                                    "vanillaHeader-searchCancel",
+                                    classes.topElement,
+                                    classes.searchCancel,
+                                )}
+                                cancelContentClassName="meBox-buttonContent"
+                                buttonClass={classes.button}
+                                showingSuggestions={this.state.showingSuggestions}
+                                onOpenSuggestions={this.setOpenSuggestions}
+                                onCloseSuggestions={this.setCloseSuggestions}
+                                buttonContentClassName={classNames(classesMeBox.buttonContent, "meBox-buttonContent")}
+                                clearButtonClass={classes.clearButtonClass}
+                            />
+                            {isMobile ? this.renderMobileMeBox() : this.renderDesktopMeBox()}
+                        </ConditionalWrap>
+                    </div>
+                </PanelWidgetHorizontalPadding>
             </Container>,
             containerElement,
         );

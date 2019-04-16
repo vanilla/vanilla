@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { borders, colorOut, margins, unit, flexHelper, sticky } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { important, percent, viewHeight, viewWidth, calc, translateY } from "csx";
+import {important, percent, viewHeight, viewWidth, calc, translateY, translate, translateX} from "csx";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 
@@ -75,58 +75,57 @@ export const modalClasses = useThemeCache(() => {
     const shadows = shadowHelper();
     const headerVars = vanillaHeaderVariables();
 
-    const overlay = style("overlay", flexHelper().middle(), {
-        position: "fixed",
+    const overlay = style("overlay", {
+        position: "absolute",
         height: percent(100),
-        width: viewWidth(100),
+        width: percent(100),
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        background: vars.colors.overlayBg.toString(),
+        background: colorOut(vars.colors.overlayBg),
         zIndex: 10,
     });
 
     const root = style({
         display: "block",
-        // position: "relative",
-        maxHeight: percent(90),
+        left: percent(50),
+        width: percent(100),
+        maxWidth: percent(100),
+        maxHeight: percent(100),
         zIndex: 1,
         backgroundColor: colorOut(vars.colors.bg),
-        boxSizing: "border-box",
         position: "fixed",
         top: percent(50),
-        left: 0,
         right: 0,
         bottom: "initial",
         overflow: "hidden",
-        transform: translateY(`-50%`),
+        transform: translate(`-50%`, `-50%`),
         ...margins({ all: "auto" }),
+
         $nest: {
             "&&.isFullScreen": {
                 width: percent(100),
                 height: percent(100),
                 maxHeight: percent(100),
+                maxWidth: percent(100),
                 borderRadius: 0,
                 border: "none",
                 top: 0,
                 bottom: 0,
-                transform: "none",
+                transform: translateX(`-50%`),
             },
             "&.isLarge": {
-                maxWidth: unit(vars.sizing.large),
-                left: vars.spacing.horizontalMargin,
-                right: vars.spacing.horizontalMargin,
+                width: unit(vars.sizing.large),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
             },
             "&.isMedium": {
-                maxWidth: unit(vars.sizing.medium),
-                left: vars.spacing.horizontalMargin,
-                right: vars.spacing.horizontalMargin,
+                width: unit(vars.sizing.medium),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
             },
             "&.isSmall": {
-                maxWidth: unit(vars.sizing.small),
-                left: vars.spacing.horizontalMargin,
-                right: vars.spacing.horizontalMargin,
+                width: unit(vars.sizing.small),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
             },
             "&&&.isSidePanel": {
                 left: unit(vars.dropDown.padding),
@@ -138,9 +137,12 @@ export const modalClasses = useThemeCache(() => {
                 transform: "none",
             },
             "&.isDropDown": {
+                top: 0,
                 overflow: "auto",
                 width: percent(100),
                 marginBottom: "auto",
+                transform: translateX(`-50%`),
+                maxHeight: percent(100),
             },
             "&.isShadowed": {
                 ...shadows.dropDown(),

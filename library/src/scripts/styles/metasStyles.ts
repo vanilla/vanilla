@@ -118,9 +118,15 @@ export const metasClasses = useThemeCache(() => {
         color: colorOut(vars.colors.fg),
     });
 
+    const draftStatus = style("draftStatus", {
+        flexGrow: 1,
+        textAlign: "left",
+    });
+
     return {
         root,
         meta,
         metaStyle,
+        draftStatus,
     };
 });

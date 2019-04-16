@@ -6,18 +6,34 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
-import { searchBarVariables, searchBarClasses } from "@library/features/search/searchBarStyles";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
 
+export const compactSearchVariables = useThemeCache(() => {
+    const makeVars = variableFactory("compactSearch");
+    const vanillaHeaderVars = vanillaHeaderVariables();
+    const globalVars = globalVariables();
+
+    const baseColor = vanillaHeaderVars.colors.bg.darken(0.05);
+    const colors = makeVars("colors", {
+        bg: baseColor.fade(0.8),
+        fg: vanillaHeaderVars.colors.fg,
+        placeholder: globalVars.mainColors.bg,
+        active: {
+            bg: baseColor,
+        },
+    });
+
+    return { colors };
+});
 export const compactSearchClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const vanillaHeaderVars = vanillaHeaderVariables();
     const formElementsVars = formElementsVariables();
+    const vars = compactSearchVariables();
     const style = styleFactory("compactSearch");
-    const backgroundColor = vanillaHeaderVars.colors.bg.darken(0.05);
 
     const root = style({
         $nest: {
@@ -25,21 +41,21 @@ export const compactSearchClasses = useThemeCache(() => {
                 flexGrow: 1,
             },
             "& .searchBar__input": {
-                color: colorOut(vanillaHeaderVars.colors.fg),
+                color: colorOut(vars.colors.fg),
             },
             ".searchBar-valueContainer": {
                 height: unit(formElementsVars.sizing.height),
-                backgroundColor: colorOut(backgroundColor.fade(0.8)),
+                backgroundColor: colorOut(vars.colors.bg),
                 border: 0,
             },
             ".hasFocus .searchBar-valueContainer": {
-                backgroundColor: colorOut(backgroundColor),
+                backgroundColor: colorOut(vars.colors.active.bg),
             },
             ".searchBar__placeholder": {
-                color: globalVars.mainColors.bg.toString(),
+                color: colorOut(vars.colors.placeholder),
             },
             ".searchBar-icon": {
-                color: colorOut(vanillaHeaderVars.colors.fg),
+                color: colorOut(vars.colors.placeholder),
             },
             "&.isOpen": {
                 width: percent(100),

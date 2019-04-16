@@ -1012,7 +1012,7 @@ class Gdn_Format {
      */
     public static function plainText($body, $format = 'Html', $collapse = false) {
         if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
-            return self::getRichFormatter()->renderPlainText($body);
+            return htmlspecialchars(self::getRichFormatter()->renderPlainText($body));
         }
 
         if (strcasecmp($format, 'text') === 0) {

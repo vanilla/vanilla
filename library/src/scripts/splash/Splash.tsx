@@ -4,18 +4,20 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import classNames from "classnames";
-import Heading from "@library/layout/Heading";
-import { t } from "@library/utility/appUtils";
-import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
-import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
-import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import IndependentSearch from "@library/features/search/IndependentSearch";
-import { splashStyles } from "@library/splash/splashStyles";
+import { buttonClasses, ButtonTypes } from "@library/forms/buttonStyles";
 import Container from "@library/layout/components/Container";
+import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
+import FlexSpacer from "@library/layout/FlexSpacer";
+import Heading from "@library/layout/Heading";
+import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
+import { splashStyles } from "@library/splash/splashStyles";
+import { t } from "@library/utility/appUtils";
+import classNames from "classnames";
+import React from "react";
 
 interface IProps extends IDeviceProps {
+    action?: React.ReactNode;
     title: string; // Often the message to display isn't the real H1
     className?: string;
 }
@@ -27,14 +29,18 @@ export class Splash extends React.Component<IProps> {
     public render() {
         const classes = splashStyles();
         const buttons = buttonClasses();
-        const { title, className } = this.props;
+        const { action, title, className } = this.props;
         return (
             <div className={classNames(className, classes.root)}>
                 <div className={classes.outerBackground} />
                 <Container>
                     <div className={classes.innerContainer}>
                         <PanelWidgetHorizontalPadding>
-                            {title && <Heading title={title} className={classes.title} />}
+                            <div className={classes.titleWrap}>
+                                <FlexSpacer className={classes.titleFlexSpacer} />
+                                {title && <Heading title={title} className={classes.title} />}
+                                <div className={classNames(classes.text, classes.titleFlexSpacer)}>{action}</div>
+                            </div>
                             <div className={classes.searchContainer}>
                                 <IndependentSearch
                                     className={classes.searchContainer}

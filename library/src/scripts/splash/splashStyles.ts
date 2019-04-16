@@ -7,8 +7,15 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { FontWeightProperty, PaddingProperty, TextAlignLastProperty, TextShadowProperty } from "csstype";
-import { percent, px } from "csx";
+import {
+    BackgroundColorProperty,
+    BoxShadowProperty,
+    FontWeightProperty,
+    PaddingProperty,
+    TextAlignLastProperty,
+    TextShadowProperty,
+} from "csstype";
+import { percent, px, quote, translateX } from "csx";
 import {
     centeredBackgroundProps,
     colorOut,
@@ -20,6 +27,7 @@ import {
     paddings,
     unit,
     background,
+    absolutePosition,
 } from "@library/styles/styleHelpers";
 import { transparentColor } from "@library/forms/buttonStyles";
 import { assetUrl } from "@library/utility/appUtils";
@@ -139,6 +147,16 @@ export const splashVariables = useThemeCache(() => {
         },
     });
 
+    const shadow = makeThemeVars("shadow", {
+        color: modifyColorBasedOnLightness(text.fg, text.shadowMix).fade(text.shadowOpacity),
+        full: "none" as BoxShadowProperty,
+        background: modifyColorBasedOnLightness(text.fg, text.shadowMix).fade(
+            text.shadowOpacity,
+        ) as BackgroundColorProperty,
+    });
+    shadow.full = `0 1px 15px ${colorOut(shadow.color)}`;
+    shadow.background = shadow.color.fade(0.3);
+
     return {
         outerBackground,
         spacing,
@@ -151,12 +169,15 @@ export const splashVariables = useThemeCache(() => {
         search,
         searchDrawer,
         searchBar,
+        shadow,
     };
 });
 
 export const splashStyles = useThemeCache(() => {
     const vars = splashVariables();
     const style = styleFactory("splash");
+    const formElementVars = formElementsVariables();
+    const globalVars = globalVariables();
 
     const root = style({
         position: "relative",
@@ -188,20 +209,11 @@ export const splashStyles = useThemeCache(() => {
             top: unit(vars.title.marginTop),
             bottom: unit(vars.title.marginBottom),
         }),
+        flexGrow: 1,
     });
 
     const text = style("text", {
-        display: "block",
         color: colorOut(vars.text.fg),
-        width: unit(vars.title.maxWidth),
-        maxWidth: percent(100),
-        margin: `auto auto 0`,
-        textAlign: "center",
-        $nest: {
-            "& + .splash-p": {
-                marginTop: unit(vars.search.margin),
-            },
-        },
     });
 
     const buttonBorderColor = get(vars, "searchBar.button.borderColor", false);
@@ -247,6 +259,38 @@ export const splashStyles = useThemeCache(() => {
 
     const buttonLoader = style("buttonLoader", {});
 
+    const titleAction = style("titleAction", {
+        color: colorOut(vars.text.fg),
+    });
+    const titleWrap = style("titleWrap", {
+        display: "flex",
+        flexWrap: "nowrap",
+        alignItems: "center",
+        width: unit(vars.searchContainer.width),
+        margin: "auto",
+    });
+
+    const titleFlexSpacer = style("titleFlexSpacer", {
+        position: "relative",
+        height: unit(formElementVars.sizing.height),
+        width: unit(formElementVars.sizing.height),
+        flexBasis: unit(formElementVars.sizing.height),
+        transform: translateX(px(formElementVars.sizing.height - globalVars.icon.sizes.default / 2 - 13)),
+        $nest: {
+            ".searchBar-actionButton:after": {
+                content: quote(""),
+                ...absolutePosition.middleOfParent(),
+                width: px(20),
+                height: px(20),
+                backgroundColor: colorOut(vars.shadow.background),
+                boxShadow: vars.shadow.full,
+            },
+            ".icon-compose": {
+                zIndex: 1,
+            },
+        },
+    });
+
     return {
         root,
         outerBackground,
@@ -258,5 +302,8 @@ export const splashStyles = useThemeCache(() => {
         searchContainer,
         input,
         buttonLoader,
+        titleAction,
+        titleFlexSpacer,
+        titleWrap,
     };
 });

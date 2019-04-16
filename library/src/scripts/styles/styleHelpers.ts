@@ -62,7 +62,7 @@ const fontFallbacks = [
     "Segoe UI Symbol",
 ];
 
-export const colorOut = (colorValue: ColorValues, makeImportant = false) => {
+export const colorOut = (colorValue: ColorValues | string, makeImportant = false) => {
     if (!colorValue) {
         return undefined;
     } else {

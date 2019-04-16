@@ -6,16 +6,33 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut, unit } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
-import { searchBarVariables } from "@library/features/search/searchBarStyles";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
 
+export const compactSearchVariables = useThemeCache(() => {
+    const makeVars = variableFactory("compactSearch");
+    const vanillaHeaderVars = vanillaHeaderVariables();
+    const globalVars = globalVariables();
+
+    const baseColor = vanillaHeaderVars.colors.bg.darken(0.05);
+    const colors = makeVars("colors", {
+        bg: baseColor.fade(0.8),
+        fg: vanillaHeaderVars.colors.fg,
+        placeholder: globalVars.mainColors.bg,
+        active: {
+            bg: baseColor,
+        },
+    });
+
+    return { colors };
+});
 export const compactSearchClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const formElementVars = formElementsVariables();
-    const vanillaHeaderVars = vanillaHeaderVariables();
+    const formElementsVars = formElementsVariables();
+    const vars = compactSearchVariables();
     const style = styleFactory("compactSearch");
 
     const root = style({
@@ -23,24 +40,22 @@ export const compactSearchClasses = useThemeCache(() => {
             ".searchBar": {
                 flexGrow: 1,
             },
-            ".searchBar-valueContainer.suggestedTextInput-inputText": {
-                height: unit(searchBarVariables().sizing.height),
-                backgroundColor: colorOut(vanillaHeaderVars.colors.bg.darken(0.05)),
+            "& .searchBar__input": {
+                color: colorOut(vars.colors.fg),
+            },
+            ".searchBar-valueContainer": {
+                height: unit(formElementsVars.sizing.height),
+                backgroundColor: colorOut(vars.colors.bg),
                 border: 0,
             },
+            ".hasFocus .searchBar-valueContainer": {
+                backgroundColor: colorOut(vars.colors.active.bg),
+            },
             ".searchBar__placeholder": {
-                color: globalVars.mainColors.bg.toString(),
+                color: colorOut(vars.colors.placeholder),
             },
             ".searchBar-icon": {
-                color: colorOut(vanillaHeaderVars.colors.fg),
-            },
-            ".searchBar__control": {
-                opacity: 0.8,
-                $nest: {
-                    "&.searchBar__control--isFocused": {
-                        opacity: 1,
-                    },
-                },
+                color: colorOut(vars.colors.placeholder),
             },
             "&.isOpen": {
                 width: percent(100),
@@ -59,6 +74,11 @@ export const compactSearchClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         flexWrap: "nowrap",
+        $nest: {
+            ["& ." + searchBarClasses().content]: {
+                minHeight: "initial",
+            },
+        },
     });
 
     const close = style("close", {

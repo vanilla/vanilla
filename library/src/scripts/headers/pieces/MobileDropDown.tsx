@@ -22,6 +22,7 @@ import { t } from "@library/utility/appUtils";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import Container from "@library/layout/components/Container";
+import { TouchScrollable } from "react-scrolllock";
 
 export interface IProps {
     className?: string;
@@ -110,7 +111,9 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                                     </PanelWidgetHorizontalPadding>
                                 </Container>
                             </header>
-                            <FrameBody className={this.props.frameBodyClassName}>{children}</FrameBody>
+                            <TouchScrollable>
+                                <FrameBody className={this.props.frameBodyClassName}>{children}</FrameBody>
+                            </TouchScrollable>
                             <FrameFooter>
                                 <Button
                                     onClick={this.close}

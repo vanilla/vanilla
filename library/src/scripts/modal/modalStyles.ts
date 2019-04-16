@@ -138,9 +138,11 @@ export const modalClasses = useThemeCache(() => {
                 transform: "none",
             },
             "&.isDropDown": {
+                top: 0,
                 overflow: "auto",
                 width: percent(100),
                 marginBottom: "auto",
+                transform: translateX(`-50%`),
             },
             "&.isShadowed": {
                 ...shadows.dropDown(),

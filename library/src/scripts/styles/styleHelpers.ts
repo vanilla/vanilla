@@ -1001,7 +1001,7 @@ export const userSelect = (value: UserSelectProperty = "none", isImportant: bool
 export interface IFont {
     color?: ColorValues;
     size?: FontSizeProperty<TLength>;
-    weight?: FontWeightProperty;
+    weight?: FontWeightProperty | number;
     lineHeight?: LineHeightProperty<TLength>;
     shadow?: TextShadowProperty;
     align?: TextAlignLastProperty;

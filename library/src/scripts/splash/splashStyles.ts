@@ -60,6 +60,7 @@ export const splashVariables = useThemeCache(() => {
     // Main colors
     const colors = makeThemeVars("colors", {
         primary: globalVars.mainColors.primary,
+        secondary: globalVars.mainColors.secondary,
         contrast: globalVars.elementaryColors.white,
         input: globalVars.mainColors.fg,
     });
@@ -162,14 +163,16 @@ export const splashVariables = useThemeCache(() => {
         },
         fonts: {
             color: colors.input,
+            size: globalVars.fonts.size.large,
+            weight: globalVars.fonts.weights.semiBold,
         },
         hover: {
             colors: {
                 fg: colors.contrast,
-                bg: colors.primary,
+                bg: colors.secondary,
             },
             borders: {
-                color: colors.primary,
+                color: colors.secondary,
             },
             fonts: {
                 color: colors.contrast,
@@ -178,10 +181,10 @@ export const splashVariables = useThemeCache(() => {
         active: {
             colors: {
                 fg: colors.contrast,
-                bg: colors.primary,
+                bg: colors.secondary,
             },
             borders: {
-                color: colors.primary,
+                color: colors.secondary,
             },
             fonts: {
                 color: colors.contrast,
@@ -190,10 +193,10 @@ export const splashVariables = useThemeCache(() => {
         focus: {
             colors: {
                 fg: colors.contrast,
-                bg: colors.primary,
+                bg: colors.secondary,
             },
             borders: {
-                color: colors.primary,
+                color: colors.secondary,
             },
             fonts: {
                 color: colors.contrast,
@@ -202,10 +205,10 @@ export const splashVariables = useThemeCache(() => {
         focusAccessible: {
             colors: {
                 fg: colors.contrast,
-                bg: colors.primary,
+                bg: colors.secondary,
             },
             borders: {
-                color: colors.primary,
+                color: colors.secondary,
             },
             fonts: {
                 color: colors.contrast,
@@ -376,6 +379,8 @@ export const splashStyles = useThemeCache(() => {
         $nest: {
             "&&.hasFocus .searchBar-valueContainer": {
                 borderColor: colorOut(vars.colors.contrast),
+                boxShadow: `0 0 0 ${unit(globalVars.border.width)} ${colorOut(vars.colors.primary)} inset`,
+                zIndex: 1,
             },
         },
     });

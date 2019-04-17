@@ -97,7 +97,7 @@ export const searchBarClasses = useThemeCache(() => {
                     position: "relative",
                     borderTopLeftRadius: important(0),
                     borderBottomLeftRadius: important(0),
-                    marginLeft: unit(-1),
+                    marginLeft: unit(-globalVars.border.width * 2),
                     minWidth: unit(vars.search.minWidth),
                     flexBasis: unit(vars.search.minWidth),
                     minHeight: unit(vars.sizing.height),
@@ -302,6 +302,7 @@ export const searchBarClasses = useThemeCache(() => {
         justifyContent: "center",
         width: unit(vars.searchIcon.gap),
         color: colorOut(vars.input.fg),
+        zIndex: 1,
     });
     const icon = style("icon", {
         width: unit(vars.searchIcon.width),

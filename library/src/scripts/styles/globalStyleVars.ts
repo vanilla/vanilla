@@ -8,7 +8,7 @@ import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { color, ColorHelper, percent, viewHeight } from "csx";
 
 export const globalVariables = useThemeCache(() => {
-    let colorPrimary = color("#0291db");;
+    let colorPrimary = color("#0291db");
     const makeThemeVars = variableFactory("global");
 
     const utility = {

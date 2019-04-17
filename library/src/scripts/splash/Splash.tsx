@@ -30,7 +30,7 @@ export class Splash extends React.Component<IProps> {
         const classes = splashStyles();
         const vars = splashVariables();
         const { action, className } = this.props;
-        const title = this.props.title || vars.title.text;
+        const title = this.props.title;
 
         return (
             <div className={classNames(className, classes.root)}>
@@ -46,7 +46,7 @@ export class Splash extends React.Component<IProps> {
                             <div className={classes.searchContainer}>
                                 <IndependentSearch
                                     className={classes.searchContainer}
-                                    buttonClass={classes.searchButton}
+                                    buttonClass={classNames(classes.searchButton, classes.buttonOverwrite)}
                                     buttonBaseClass={ButtonTypes.CUSTOM}
                                     isLarge={true}
                                     placeholder={t("Search Articles")}
@@ -54,6 +54,8 @@ export class Splash extends React.Component<IProps> {
                                     iconClass={classes.icon}
                                     buttonLoaderClassName={classes.buttonLoader}
                                     hideSearchButton={this.props.device === Devices.MOBILE}
+                                    contentClass={classes.content}
+                                    valueContainerClasses={classes.valueContainer}
                                 />
                             </div>
                         </PanelWidgetHorizontalPadding>

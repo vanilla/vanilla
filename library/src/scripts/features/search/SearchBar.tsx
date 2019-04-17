@@ -61,7 +61,9 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     buttonText?: string;
     disableAutocomplete?: boolean;
     clearButtonClass?: string;
+    contentClass?: string;
     buttonBaseClass?: ButtonTypes;
+    valueContainerClasses?: string;
 }
 
 interface IState {
@@ -244,7 +246,6 @@ export default class SearchBar extends React.Component<IProps, IState> {
      * @param props
      */
     private SearchControl = props => {
-        const buttonClasses = buttonVariables();
         const classes = searchBarClasses();
         return (
             <div className={classNames("searchBar", classes.root)}>
@@ -265,7 +266,9 @@ export default class SearchBar extends React.Component<IProps, IState> {
                     )}
                     <div
                         onClick={this.focus}
-                        className={classNames("searchBar-content", classes.content, { hasFocus: this.state.focus })}
+                        className={classNames("searchBar-content", classes.content, this.props.contentClass, {
+                            hasFocus: this.state.focus,
+                        })}
                     >
                         <div
                             className={classNames(
@@ -274,6 +277,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 "inputText",
                                 "isClearable",
                                 classes.valueContainer,
+                                this.props.valueContainerClasses,
                                 {
                                     [classes.compoundValueContainer]: !this.props.hideSearchButton,
                                     isLarge: this.props.isBigInput,
@@ -293,9 +297,14 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                 type="submit"
                                 id={this.searchButtonID}
                                 baseClass={this.props.buttonBaseClass}
-                                className={classNames("searchBar-submitButton", this.props.buttonClassName, {
-                                    isLarge: this.props.isBigInput,
-                                })}
+                                className={classNames(
+                                    "searchBar-submitButton",
+                                    classes.actionButton,
+                                    this.props.buttonClassName,
+                                    {
+                                        isLarge: this.props.isBigInput,
+                                    },
+                                )}
                                 tabIndex={!!this.props.hideSearchButton ? -1 : 0}
                             >
                                 {this.props.isLoading ? (

@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { borders, colorOut, unit } from "@library/styles/styleHelpers";
+import {borderRadii, borders, colorOut, unit} from "@library/styles/styleHelpers";
 import { calc, important, percent, px } from "csx";
 
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
@@ -41,12 +41,14 @@ export const searchBarVariables = useThemeCache(() => {
         margin: 5,
     });
 
+    const border = themeVars("border", {
+        radius: globalVars.border.radius,
+        width: globalVars.border.width,
+    });
+
     const input = themeVars("input", {
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
-        border: {
-            color: globalVars.mainColors.fg,
-        },
     });
 
     const results = themeVars("results", {
@@ -62,6 +64,7 @@ export const searchBarVariables = useThemeCache(() => {
         input,
         heading,
         results,
+        border,
     };
 });
 
@@ -206,6 +209,10 @@ export const searchBarClasses = useThemeCache(() => {
         paddingBottom: 0,
         backgroundColor: colorOut(vars.input.bg),
         color: colorOut(vars.input.fg),
+        ...borderRadii({
+            right: 0,
+            left: vars.border.radius,
+        }),
         $nest: {
             "&&&": {
                 display: "flex",
@@ -224,14 +231,11 @@ export const searchBarClasses = useThemeCache(() => {
     });
 
     const actionButton = style("actionButton", {
-        marginLeft: "auto",
-        marginRight: -(globalVars.buttonIcon.offset + 3), // the "3" is to offset the pencil
-        opacity: 0.8,
-        $nest: {
-            "&:hover": {
-                opacity: 1,
-            },
-        },
+        marginLeft: -(vars.border.width),
+        ...borderRadii({
+            left: 0,
+            right: vars.border.radius,
+        }),
     });
 
     const label = style("label", {
@@ -307,8 +311,8 @@ export const searchBarClasses = useThemeCache(() => {
 
     return {
         root,
-        valueContainer,
         compoundValueContainer,
+        valueContainer,
         actionButton,
         label,
         clear,

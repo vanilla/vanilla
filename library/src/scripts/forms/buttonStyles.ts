@@ -11,7 +11,7 @@ import {
     colorOut,
     flexHelper,
     fonts,
-    IBorderStyles,
+    IBordersSameAllSidesStyles,
     IFont,
     modifyColorBasedOnLightness,
     spinnerLoader,
@@ -79,13 +79,13 @@ export interface IButtonType {
         side?: TLength;
     };
     fonts?: IFont;
-    borders?: IBorderStyles;
+    borders?: IBordersSameAllSidesStyles;
     hover: {
         fg?: ColorValues;
         colors?: {
             bg?: ColorValues;
         };
-        borders?: IBorderStyles;
+        borders?: IBordersSameAllSidesStyles;
         fonts?: IFont;
     };
     focus: {
@@ -93,7 +93,7 @@ export interface IButtonType {
         colors?: {
             bg?: ColorValues;
         };
-        borders?: IBorderStyles;
+        borders?: IBordersSameAllSidesStyles;
         fonts?: IFont;
     };
     active: {
@@ -101,7 +101,7 @@ export interface IButtonType {
         colors?: {
             bg?: ColorValues;
         };
-        borders?: IBorderStyles;
+        borders?: IBordersSameAllSidesStyles;
         fonts?: IFont;
     };
     focusAccessible: {
@@ -109,7 +109,7 @@ export interface IButtonType {
         colors?: {
             bg?: ColorValues;
         };
-        borders?: IBorderStyles;
+        borders?: IBordersSameAllSidesStyles;
         fonts?: IFont;
     };
 }

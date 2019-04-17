@@ -9,10 +9,8 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import {
     BackgroundColorProperty,
-    BoxShadowProperty,
     FontWeightProperty,
     PaddingProperty,
-    TextAlignLastProperty,
     TextShadowProperty,
 } from "csstype";
 import {important, percent, px, quote,translateX} from "csx";
@@ -27,7 +25,7 @@ import {
     paddings,
     unit,
     background,
-    absolutePosition,
+    absolutePosition, borders,
 } from "@library/styles/styleHelpers";
 import {
     transparentColor,
@@ -35,9 +33,9 @@ import {
     generateButtonClass,
 } from "@library/forms/buttonStyles";
 import { assetUrl } from "@library/utility/appUtils";
-import { TLength } from "typestyle/lib/types";
+import {TLength} from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
-import get from "lodash/get";
+import {searchBarClasses} from "@library/features/search/searchBarStyles";
 
 export const splashVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("splash");
@@ -59,13 +57,15 @@ export const splashVariables = useThemeCache(() => {
         },
     });
 
+    // Main colors
     const colors = makeThemeVars("colors", {
-        bg: globalVars.elementaryColors.white,
-        fg: globalVars.mainColors.fg,
+        primary: globalVars.mainColors.primary,
+        contrast: globalVars.elementaryColors.white,
+        input: globalVars.mainColors.fg,
     });
 
     const outerBackground: IBackground = makeThemeVars("outerBackground", {
-        color: globalVars.mainColors.primary,
+        color: colors.primary,
         backgroundPosition: "50% 50%",
         backgroundSize: "cover",
         image: assetUrl("/resources/design/fallbackSplashBackground.svg"),
@@ -83,29 +83,26 @@ export const splashVariables = useThemeCache(() => {
     });
 
     const text = makeThemeVars("text", {
-        align: "center",
-        shadowMix: 1,
+        shadowMix: 1, // We want to get the most extreme lightness contrast with text color (i.e. black or white)
         innerShadowOpacity: 0.25,
         outerShadowOpacity: 0.75,
     });
 
     const title = makeThemeVars("title", {
-        align: "center",
         maxWidth: 700,
         font: {
-            color: colors.fg,
+            color: colors.contrast,
             size: globalVars.fonts.size.title,
             weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
-            align: text.align as TextAlignLastProperty,
-            shadow: `0 1px 1px ${colorOut(modifyColorBasedOnLightness(colors.fg, text.shadowMix).fade(text.innerShadowOpacity))}, 0 1px 25px ${colorOut(modifyColorBasedOnLightness(colors.fg, text.shadowMix).fade(text.outerShadowOpacity))}` as TextShadowProperty,
+            align: "center",
+            shadow: `0 1px 1px ${colorOut(modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(text.innerShadowOpacity))}, 0 1px 25px ${colorOut(modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(text.outerShadowOpacity))}` as TextShadowProperty,
         },
         marginTop: 28,
         marginBottom: 40,
-        text: "How can we help you?",
     });
 
     const border = makeThemeVars("border", {
-        color: globalVars.mainColors.fg,
+        color: colors.contrast,
     });
 
     const searchContainer = makeThemeVars("searchContainer", {
@@ -122,12 +119,12 @@ export const splashVariables = useThemeCache(() => {
 
     const search = makeThemeVars("search", {
         margin: 30,
-        fg: globalVars.mainColors.fg,
-        bg: globalVars.mainColors.bg,
+        fg: colors.contrast,
+        bg: colors.contrast,
     });
 
     const searchDrawer = makeThemeVars("searchDrawer", {
-        bg: globalVars.mainColors.bg,
+        bg: colors.contrast,
     });
 
     const searchBar = makeThemeVars("searchBar", {
@@ -136,93 +133,88 @@ export const splashVariables = useThemeCache(() => {
             width: 705,
         },
         font: {
-            color: globalVars.elementaryColors.white,
+            color: colors.input,
             size: formElVars.giantInput.fontSize,
         },
-        button: {
-            minWidth: 130,
-            font: {
-                size: globalVars.fonts.size.medium,
-            },
-            icon: {
-                color: globalVars.mixBgAndFg(0.4),
-            },
-            input: {
-                font: {
-                    size: globalVars.fonts.size.subTitle,
-                },
-            },
+        border: {
+            leftColor: colors.input.fade(.4),
+            radius: globalVars.border.radius,
         },
     });
 
     const shadow = makeThemeVars("shadow", {
-        color: modifyColorBasedOnLightness(text.fg, text.shadowMix).fade(.05),
-        full: `0 1px 15px ${colorOut(modifyColorBasedOnLightness(text.fg, text.shadowMix).fade(0.3))}`,
-        background: modifyColorBasedOnLightness(text.fg, text.shadowMix).fade(
+        color: modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(.05),
+        full: `0 1px 15px ${colorOut(modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(0.3))}`,
+        background: modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(
             0.1,
         ) as BackgroundColorProperty,
     });
 
 
     const searchButtonType: IButtonType = makeThemeVars("buttonTypeSplash", {
-        spinnerColor: text.bg,
+        spinnerColor: colors.contrast,
         colors: {
-            bg: text.bg,
+            bg: colors.contrast,
         },
         borders: {
-            color: text.bg,
+            color: transparentColor,
+            width: 0,
         },
         fonts: {
-            color: text.fg,
+            color: colors.input,
         },
         hover: {
             colors: {
-                bg: globalVars.mainColors.primary,
+                fg: colors.contrast,
+                bg: colors.primary,
             },
             borders: {
-                color: globalVars.mainColors.primary,
+                color: colors.primary,
             },
             fonts: {
-                color: text.bg,
+                color: colors.contrast,
             },
         },
         active: {
             colors: {
-                bg: globalVars.mainColors.primary,
+                fg: colors.contrast,
+                bg: colors.primary,
             },
             borders: {
-                color: globalVars.mainColors.primary,
+                color: colors.primary,
             },
             fonts: {
-                color: text.bg,
+                color: colors.contrast,
             },
         },
         focus: {
             colors: {
-                bg: globalVars.mainColors.primary,
+                fg: colors.contrast,
+                bg: colors.primary,
             },
             borders: {
-                color: globalVars.mainColors.primary,
+                color: colors.primary,
             },
             fonts: {
-                color: text.bg,
+                color: colors.contrast,
             },
         },
         focusAccessible: {
             colors: {
-                bg: globalVars.mainColors.primary,
+                fg: colors.contrast,
+                bg: colors.primary,
             },
             borders: {
-                color: globalVars.mainColors.primary,
+                color: colors.primary,
             },
             fonts: {
-                color: text.bg,
+                color: colors.contrast,
             },
         },
     });
 
     const searchButton = makeThemeVars("searchButton", {
-
+        borderRadius: searchBar.border.radius,
     });
 
     return {
@@ -240,6 +232,7 @@ export const splashVariables = useThemeCache(() => {
         shadow,
         searchButtonType,
         searchButton,
+        colors,
     };
 });
 
@@ -283,32 +276,41 @@ export const splashStyles = useThemeCache(() => {
     });
 
     const text = style("text", {
-        color: colorOut(vars.text.fg),
+        color: colorOut(vars.colors.contrast),
     });
 
-    const buttonBorderColor = get(vars, "searchBar.button.borderColor", false);
-    const buttonBg = get(vars, "searchBar.button.bg", false);
-    const buttonFg = get(vars, "searchBar.button.fg", false);
-    let hoverBg = get(vars, "searchBar.button.hoverBg", false);
-    if (!hoverBg || buttonBg === transparentColor) {
-        hoverBg = buttonFg ? buttonFg.fade(0.2) : buttonBorderColor ? buttonBorderColor.fade(0.2) : undefined;
-    }
-
     const searchButton = generateButtonClass(vars.searchButtonType, "splashSearchButton");
-    //     // $nest: {
-    //     //     "&": {
-    //     //         backgroundColor: buttonBg ? colorOut(buttonBg) : undefined,
-    //     //         borderColor: buttonBorderColor ? colorOut(buttonBorderColor) : undefined,
-    //     //         color: buttonFg ? colorOut(buttonFg) : undefined,
-    //     //
-    //     //         $nest: {
-    //     //             "&:hover, &:focus, &:active, &.focus-visible": {
-    //     //                 backgroundColor: colorOut(hoverBg),
-    //     //             },
-    //     //         },
-    //     //     },
-    //     // },
-    // });
+
+    const valueContainer = style("valueContainer", {
+        $nest: {
+            [`&, &.${searchBarClasses().valueContainer}`]: {
+                ...borders({
+                    color: vars.colors.contrast,
+                    radius: {
+                        right: 0,
+                        left: vars.searchBar.border.radius,
+                    },
+                }),
+            },
+        },
+    });
+
+    const buttonOverwrite = style("buttonOverwrite", {
+        color: vars.colors.input,
+        $nest: {
+            [`&, &.${searchBarClasses().actionButton}`]: {
+                ...borders({
+                    left: {
+                        color: vars.searchBar.border.leftColor,
+                    },
+                    radius: {
+                        right: vars.searchButton.borderRadius,
+                        left: 0,
+                    },
+                }),
+            },
+        },
+    } as any);
 
     const searchContainer = style("searchContainer", {
         position: "relative",
@@ -330,7 +332,7 @@ export const splashStyles = useThemeCache(() => {
     const buttonLoader = style("buttonLoader", {});
 
     const titleAction = style("titleAction", {
-        color: colorOut(vars.text.fg),
+        // color: colorOut(vars.colors.fg),
     });
     const titleWrap = style("titleWrap", {
         display: "flex",
@@ -370,6 +372,14 @@ export const splashStyles = useThemeCache(() => {
         },
     });
 
+    const content = style("content", {
+        $nest: {
+            "&&.hasFocus .searchBar-valueContainer": {
+                borderColor: colorOut(vars.colors.contrast),
+            },
+        },
+    });
+
     return {
         root,
         outerBackground,
@@ -377,6 +387,7 @@ export const splashStyles = useThemeCache(() => {
         title,
         text,
         icon,
+        buttonOverwrite,
         searchButton,
         searchContainer,
         input,
@@ -384,5 +395,7 @@ export const splashStyles = useThemeCache(() => {
         titleAction,
         titleFlexSpacer,
         titleWrap,
+        content,
+        valueContainer,
     };
 });

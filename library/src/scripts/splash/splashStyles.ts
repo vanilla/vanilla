@@ -29,7 +29,11 @@ import {
     background,
     absolutePosition,
 } from "@library/styles/styleHelpers";
-import { transparentColor } from "@library/forms/buttonStyles";
+import {
+    transparentColor,
+    IButtonType,
+    generateButtonClass,
+} from "@library/forms/buttonStyles";
 import { assetUrl } from "@library/utility/appUtils";
 import { TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
@@ -55,6 +59,11 @@ export const splashVariables = useThemeCache(() => {
         },
     });
 
+    const colors = makeThemeVars("colors", {
+        bg: globalVars.elementaryColors.white,
+        fg: globalVars.mainColors.fg,
+    });
+
     const outerBackground: IBackground = makeThemeVars("outerBackground", {
         color: globalVars.mainColors.primary,
         backgroundPosition: "50% 50%",
@@ -74,7 +83,6 @@ export const splashVariables = useThemeCache(() => {
     });
 
     const text = makeThemeVars("text", {
-        fg: globalVars.elementaryColors.white,
         align: "center",
         shadowMix: 1,
         innerShadowOpacity: 0.25,
@@ -85,11 +93,11 @@ export const splashVariables = useThemeCache(() => {
         align: "center",
         maxWidth: 700,
         font: {
-            color: text.fg,
+            color: colors.fg,
             size: globalVars.fonts.size.title,
             weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
             align: text.align as TextAlignLastProperty,
-            shadow: `0 1px 1px ${colorOut(modifyColorBasedOnLightness(text.fg, text.shadowMix).fade(text.innerShadowOpacity))}, 0 1px 25px ${colorOut(modifyColorBasedOnLightness(text.fg, text.shadowMix).fade(text.outerShadowOpacity))}` as TextShadowProperty,
+            shadow: `0 1px 1px ${colorOut(modifyColorBasedOnLightness(colors.fg, text.shadowMix).fade(text.innerShadowOpacity))}, 0 1px 25px ${colorOut(modifyColorBasedOnLightness(colors.fg, text.shadowMix).fade(text.outerShadowOpacity))}` as TextShadowProperty,
         },
         marginTop: 28,
         marginBottom: 40,
@@ -154,6 +162,68 @@ export const splashVariables = useThemeCache(() => {
         ) as BackgroundColorProperty,
     });
 
+
+    const searchButtonType: IButtonType = makeThemeVars("buttonTypeSplash", {
+        spinnerColor: text.bg,
+        colors: {
+            bg: text.bg,
+        },
+        borders: {
+            color: text.bg,
+        },
+        fonts: {
+            color: text.fg,
+        },
+        hover: {
+            colors: {
+                bg: globalVars.mainColors.primary,
+            },
+            borders: {
+                color: globalVars.mainColors.primary,
+            },
+            fonts: {
+                color: text.bg,
+            },
+        },
+        active: {
+            colors: {
+                bg: globalVars.mainColors.primary,
+            },
+            borders: {
+                color: globalVars.mainColors.primary,
+            },
+            fonts: {
+                color: text.bg,
+            },
+        },
+        focus: {
+            colors: {
+                bg: globalVars.mainColors.primary,
+            },
+            borders: {
+                color: globalVars.mainColors.primary,
+            },
+            fonts: {
+                color: text.bg,
+            },
+        },
+        focusAccessible: {
+            colors: {
+                bg: globalVars.mainColors.primary,
+            },
+            borders: {
+                color: globalVars.mainColors.primary,
+            },
+            fonts: {
+                color: text.bg,
+            },
+        },
+    });
+
+    const searchButton = makeThemeVars("searchButton", {
+
+    });
+
     return {
         outerBackground,
         spacing,
@@ -167,6 +237,8 @@ export const splashVariables = useThemeCache(() => {
         searchDrawer,
         searchBar,
         shadow,
+        searchButtonType,
+        searchButton,
     };
 });
 
@@ -221,21 +293,21 @@ export const splashStyles = useThemeCache(() => {
         hoverBg = buttonFg ? buttonFg.fade(0.2) : buttonBorderColor ? buttonBorderColor.fade(0.2) : undefined;
     }
 
-    const searchButton = style("splashSearchButton", {
-        $nest: {
-            "&&&&": {
-                backgroundColor: buttonBg ? colorOut(buttonBg) : undefined,
-                borderColor: buttonBorderColor ? colorOut(buttonBorderColor) : undefined,
-                color: buttonFg ? colorOut(buttonFg) : undefined,
-
-                $nest: {
-                    "&:hover, &:focus, &:active, &.focus-visible": {
-                        backgroundColor: colorOut(hoverBg),
-                    },
-                },
-            },
-        },
-    });
+    const searchButton = generateButtonClass(vars.searchButtonType, "splashSearchButton");
+    //     // $nest: {
+    //     //     "&": {
+    //     //         backgroundColor: buttonBg ? colorOut(buttonBg) : undefined,
+    //     //         borderColor: buttonBorderColor ? colorOut(buttonBorderColor) : undefined,
+    //     //         color: buttonFg ? colorOut(buttonFg) : undefined,
+    //     //
+    //     //         $nest: {
+    //     //             "&:hover, &:focus, &:active, &.focus-visible": {
+    //     //                 backgroundColor: colorOut(hoverBg),
+    //     //             },
+    //     //         },
+    //     //     },
+    //     // },
+    // });
 
     const searchContainer = style("searchContainer", {
         position: "relative",

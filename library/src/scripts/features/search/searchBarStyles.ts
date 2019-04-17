@@ -23,11 +23,7 @@ export const searchBarVariables = useThemeCache(() => {
         minWidth: 109,
     });
 
-    const searchIcon = themeVars("searchIcon", {
-        gap: 32,
-        height: 13,
-        width: 13,
-    });
+
 
     const sizing = themeVars("sizing", {
         height: 40,
@@ -49,6 +45,13 @@ export const searchBarVariables = useThemeCache(() => {
     const input = themeVars("input", {
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
+    });
+
+    const searchIcon = themeVars("searchIcon", {
+        gap: 32,
+        height: 13,
+        width: 13,
+        fg: input.fg.fade(0.7),
     });
 
     const results = themeVars("results", {
@@ -301,13 +304,12 @@ export const searchBarClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "center",
         width: unit(vars.searchIcon.gap),
-        color: colorOut(vars.input.fg),
         zIndex: 1,
     });
     const icon = style("icon", {
         width: unit(vars.searchIcon.width),
         height: unit(vars.searchIcon.height),
-        color: colorOut(vars.input.fg),
+        color: colorOut(vars.searchIcon.fg),
     });
 
     return {

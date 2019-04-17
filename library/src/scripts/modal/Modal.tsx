@@ -37,7 +37,6 @@ interface IModalCommonProps {
     scrollable?: boolean;
     elementToFocusOnExit: HTMLElement; // Should either be a specific element or use document.activeElement
     isWholePage?: boolean;
-    allowScroll?: boolean;
 }
 
 interface IModalTextDescription extends IModalCommonProps, ITextDescription {}
@@ -91,7 +90,6 @@ export function mountModal(element: ReactElement<any>) {
 export default class Modal extends React.Component<IProps, IState> {
     public static defaultProps: Partial<IProps> = {
         isWholePage: false,
-        allowScroll: true,
     };
 
     public static focusHistory: HTMLElement[] = [];
@@ -116,47 +114,57 @@ export default class Modal extends React.Component<IProps, IState> {
      * Render the contents into a portal.
      */
     public render() {
-        const { size, allowScroll } = this.props;
+        const { size } = this.props;
         const classes = modalClasses();
+
+        let innerContent = (
+            <>
+                {this.props.description && (
+                    <div id={this.descriptionID} className="sr-only">
+                        {this.props.description}
+                    </div>
+                )}
+                {this.props.children}
+            </>
+        );
+
+        if (this.props.scrollable) {
+            innerContent = (
+                <TouchScrollable>
+                    <div className={classes.scroll}>{innerContent}</div>
+                </TouchScrollable>
+            );
+        }
         const portal = ReactDOM.createPortal(
             <ScrollLock>
                 <div className={classes.overlay} onClick={this.handleScrimClick}>
-                    <TouchScrollable>
-                        <div
-                            id={this.modalID}
-                            role="dialog"
-                            aria-modal={true}
-                            className={classNames(
-                                classes.root,
-                                {
-                                    isFullScreen:
-                                        size === ModalSizes.FULL_SCREEN || size === ModalSizes.MODAL_AS_SIDE_PANEL,
-                                    isSidePanel: size === ModalSizes.MODAL_AS_SIDE_PANEL,
-                                    isDropDown: size === ModalSizes.MODAL_AS_DROP_DOWN,
-                                    isLarge: size === ModalSizes.LARGE,
-                                    isMedium: size === ModalSizes.MEDIUM,
-                                    isSmall: size === ModalSizes.SMALL,
-                                    isShadowed: size === ModalSizes.LARGE || ModalSizes.MEDIUM || ModalSizes.SMALL,
-                                    isScrollable: this.props.scrollable,
-                                },
-                                size === ModalSizes.FULL_SCREEN ? inheritHeightClass() : "",
-                                this.props.className,
-                            )}
-                            ref={this.selfRef}
-                            onKeyDown={this.handleTabbing}
-                            onClick={this.handleModalClick}
-                            aria-label={"label" in this.props ? this.props.label : undefined}
-                            aria-labelledby={"titleID" in this.props ? this.props.titleID : undefined}
-                            aria-describedby={this.props.description ? this.descriptionID : undefined}
-                        >
-                            {this.props.description && (
-                                <div id={this.descriptionID} className="sr-only">
-                                    {this.props.description}
-                                </div>
-                            )}
-                            {this.props.children}
-                        </div>
-                    </TouchScrollable>
+                    <div
+                        id={this.modalID}
+                        role="dialog"
+                        aria-modal={true}
+                        className={classNames(
+                            classes.root,
+                            {
+                                isFullScreen:
+                                    size === ModalSizes.FULL_SCREEN || size === ModalSizes.MODAL_AS_SIDE_PANEL,
+                                isSidePanel: size === ModalSizes.MODAL_AS_SIDE_PANEL,
+                                isDropDown: size === ModalSizes.MODAL_AS_DROP_DOWN,
+                                isLarge: size === ModalSizes.LARGE,
+                                isMedium: size === ModalSizes.MEDIUM,
+                                isSmall: size === ModalSizes.SMALL,
+                                isShadowed: size === ModalSizes.LARGE || ModalSizes.MEDIUM || ModalSizes.SMALL,
+                            },
+                            this.props.className,
+                        )}
+                        ref={this.selfRef}
+                        onKeyDown={this.handleTabbing}
+                        onClick={this.handleModalClick}
+                        aria-label={"label" in this.props ? this.props.label : undefined}
+                        aria-labelledby={"titleID" in this.props ? this.props.titleID : undefined}
+                        aria-describedby={this.props.description ? this.descriptionID : undefined}
+                    >
+                        {innerContent}
+                    </div>
                 </div>
             </ScrollLock>,
             this.getModalContainer(),

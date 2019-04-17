@@ -4,13 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, margins, unit, flexHelper, sticky } from "@library/styles/styleHelpers";
-import { shadowHelper } from "@library/styles/shadowHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import {important, percent, viewHeight, viewWidth, calc, translateY, translate, translateX} from "csx";
-import { layoutVariables } from "@library/layout/layoutStyles";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { shadowHelper } from "@library/styles/shadowHelpers";
+import { borders, colorOut, fullSizeOfParent, margins, sticky, unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { calc, percent, translate, translateX, viewHeight } from "csx";
 
 export const modalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -69,6 +69,7 @@ export const modalVariables = useThemeCache(() => {
 });
 
 export const modalClasses = useThemeCache(() => {
+    const globalVars = globalVariables();
     const vars = modalVariables();
     const style = styleFactory("modal");
     const mediaQueries = layoutVariables().mediaQueries();
@@ -92,7 +93,7 @@ export const modalClasses = useThemeCache(() => {
         left: percent(50),
         width: percent(100),
         maxWidth: percent(100),
-        maxHeight: percent(100),
+        maxHeight: viewHeight(80),
         zIndex: 1,
         backgroundColor: colorOut(vars.colors.bg),
         position: "fixed",
@@ -113,7 +114,9 @@ export const modalClasses = useThemeCache(() => {
                 border: "none",
                 top: 0,
                 bottom: 0,
-                transform: translateX(`-50%`),
+                transform: "none",
+                left: 0,
+                right: 0,
             },
             "&.isLarge": {
                 width: unit(vars.sizing.large),
@@ -136,23 +139,31 @@ export const modalClasses = useThemeCache(() => {
                 bottom: 0,
                 transform: "none",
             },
-            "&.isDropDown": {
+            "&&.isDropDown": {
                 top: 0,
+                bottom: globalVars.gutter.size,
                 overflow: "auto",
                 width: percent(100),
                 marginBottom: "auto",
                 transform: translateX(`-50%`),
                 maxHeight: percent(100),
+                borderTopLeftRadius: 0,
+                borderTopRightRadius: 0,
             },
             "&.isShadowed": {
                 ...shadows.dropDown(),
                 ...borders(),
             },
-            "&.isScrollable": {
-                overflow: "auto",
-            },
         },
     });
+
+    const scroll = style(
+        "scroll",
+        {
+            overflow: "auto",
+        },
+        fullSizeOfParent(),
+    );
 
     const content = style("content", shadows.modal());
 
@@ -185,5 +196,6 @@ export const modalClasses = useThemeCache(() => {
         content,
         pageHeader,
         overlay,
+        scroll,
     };
 });

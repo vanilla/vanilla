@@ -100,6 +100,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
         flexDirection: "column",
         maxHeight: percent(100),
         width: percent(100),
+        height: percent(100),
         margin: "auto",
     });
 

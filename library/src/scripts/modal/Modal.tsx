@@ -12,7 +12,6 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { modalClasses } from "@library/modal/modalStyles";
 import TabHandler from "@library/dom/TabHandler";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
-import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 import { logWarning, logError } from "@library/utility/utils";
 import { forceRenderStyles } from "typestyle";
 import ScrollLock, { TouchScrollable } from "react-scrolllock";
@@ -201,7 +200,6 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
 
         this.focusInitialElement();
         pageContainer && pageContainer.setAttribute("aria-hidden", true);
-        disableBodyScroll(this.selfRef.current!);
 
         // Add the escape keyboard listener only on the first modal in the stack.
         if (Modal.stack.length === 0) {
@@ -229,7 +227,6 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         Modal.stack.pop();
         if (Modal.stack.length === 0) {
             pageContainer && pageContainer.removeAttribute("aria-hidden");
-            enableBodyScroll(this.selfRef.current!);
 
             // This event listener is only added once (on the top modal).
             // So we only remove when clearing the last one.

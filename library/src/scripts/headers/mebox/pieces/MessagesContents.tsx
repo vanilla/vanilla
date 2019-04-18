@@ -21,7 +21,6 @@ import Frame from "@library/layout/frame/Frame";
 import classNames from "classnames";
 import { compose } from "redux";
 import FrameBody from "@library/layout/frame/FrameBody";
-import FramePanel from "@library/layout/frame/FramePanel";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { LoadStatus } from "@library/@types/api/core";
 import { IConversation, GetConversationsExpand } from "@library/@types/api/conversations";
@@ -36,30 +35,34 @@ export class MessagesContents extends React.Component<IProps> {
         const buttonUtils = buttonUtilityClasses();
         const title = t("Messages");
         return (
-            <Frame className={this.props.className}>
-                <FrameHeaderWithAction title={title}>
-                    <LinkAsButton
-                        title={t("New Message")}
-                        to={"/messages/inbox"}
-                        baseClass={ButtonTypes.ICON}
-                        className={classNames(buttonUtils.pushRight)}
-                    >
-                        {compose()}
-                    </LinkAsButton>
-                </FrameHeaderWithAction>
-                <FrameBody className={classNames("isSelfPadded")}>
-                    <FramePanel>{this.renderContents()}</FramePanel>
-                </FrameBody>
-                <FrameFooter>
-                    <LinkAsButton
-                        className={classNames(buttonUtils.pushLeft)}
-                        to={"/messages/inbox"}
-                        baseClass={ButtonTypes.TEXT}
-                    >
-                        {t("All Messages")}
-                    </LinkAsButton>
-                </FrameFooter>
-            </Frame>
+            <Frame
+                className={this.props.className}
+                canGrow={true}
+                header={
+                    <FrameHeaderWithAction title={title}>
+                        <LinkAsButton
+                            title={t("New Message")}
+                            to={"/messages/inbox"}
+                            baseClass={ButtonTypes.ICON}
+                            className={classNames(buttonUtils.pushRight)}
+                        >
+                            {compose()}
+                        </LinkAsButton>
+                    </FrameHeaderWithAction>
+                }
+                body={<FrameBody className={classNames("isSelfPadded")}>{this.renderContents()}</FrameBody>}
+                footer={
+                    <FrameFooter>
+                        <LinkAsButton
+                            className={classNames(buttonUtils.pushLeft)}
+                            to={"/messages/inbox"}
+                            baseClass={ButtonTypes.TEXT}
+                        >
+                            {t("All Messages")}
+                        </LinkAsButton>
+                    </FrameFooter>
+                }
+            />
         );
     }
 

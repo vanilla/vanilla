@@ -8,7 +8,15 @@ import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { borders, colorOut, fullSizeOfParent, margins, sticky, unit } from "@library/styles/styleHelpers";
+import {
+    borders,
+    colorOut,
+    fullSizeOfParent,
+    margins,
+    sticky,
+    unit,
+    absolutePosition,
+} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, translate, translateX, viewHeight } from "csx";
 
@@ -91,7 +99,8 @@ export const modalClasses = useThemeCache(() => {
     });
 
     const root = style({
-        display: "block",
+        display: "flex",
+        flexDirection: "column",
         width: percent(100),
         maxWidth: percent(100),
         maxHeight: viewHeight(80),
@@ -150,7 +159,6 @@ export const modalClasses = useThemeCache(() => {
                 left: 0,
                 right: 0,
                 bottom: globalVars.gutter.size,
-                overflow: "auto",
                 width: percent(100),
                 marginBottom: "auto",
                 transform: "none",
@@ -162,10 +170,14 @@ export const modalClasses = useThemeCache(() => {
                 ...shadows.dropDown(),
                 ...borders(),
             },
-            "&.isScrollable": {
-                overflow: "auto",
-            },
         },
+    });
+
+    const scroll = style("scroll", {
+        // ...absolutePosition.fullSizeOfParent(),
+        width: percent(100),
+        maxHeight: percent(100),
+        overflow: "auto",
     });
 
     const content = style("content", shadows.modal());
@@ -196,9 +208,9 @@ export const modalClasses = useThemeCache(() => {
 
     return {
         root,
+        scroll,
         content,
         pageHeader,
         overlay,
-        scroll,
     };
 });

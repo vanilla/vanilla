@@ -4,30 +4,28 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
-import Loader from "@library/loaders/Loader";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import { IMeBoxNotificationItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
-import Button from "@library/forms/Button";
-import { loaderClasses } from "@library/loaders/loaderStyles";
-import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
 import apiv2 from "@library/apiv2";
-import { INotificationsStoreState } from "@library/features/notifications/NotificationsModel";
-import { withDevice, Devices, IDeviceProps } from "@library/layout/DeviceContext";
-import LinkAsButton from "@library/routing/LinkAsButton";
-import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
-import { t } from "@library/utility/appUtils";
 import NotificationsActions from "@library/features/notifications/NotificationsActions";
-import { frameFooterClasses } from "@library/layout/frame/frameStyles";
-import Frame from "@library/layout/frame/Frame";
-import classNames from "classnames";
-import FrameBody from "@library/layout/frame/FrameBody";
-import FramePanel from "@library/layout/frame/FramePanel";
-import FrameFooter from "@library/layout/frame/FrameFooter";
-import { connect } from "react-redux";
+import { INotificationsStoreState } from "@library/features/notifications/NotificationsModel";
+import Button from "@library/forms/Button";
+import { ButtonTypes, buttonUtilityClasses } from "@library/forms/buttonStyles";
+import { IMeBoxNotificationItem, MeBoxItemType } from "@library/headers/mebox/pieces/MeBoxDropDownItem";
+import MeBoxDropDownItemList from "@library/headers/mebox/pieces/MeBoxDropDownItemList";
 import { settings } from "@library/icons/header";
-import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
+import Frame from "@library/layout/frame/Frame";
+import FrameBody from "@library/layout/frame/FrameBody";
+import FrameFooter from "@library/layout/frame/FrameFooter";
+import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
+import { frameFooterClasses } from "@library/layout/frame/frameStyles";
+import Loader from "@library/loaders/Loader";
+import { loaderClasses } from "@library/loaders/loaderStyles";
+import LinkAsButton from "@library/routing/LinkAsButton";
+import { t } from "@library/utility/appUtils";
+import classNames from "classnames";
+import React from "react";
+import { connect } from "react-redux";
 
 export interface INotificationsProps {
     countClass?: string;
@@ -45,37 +43,44 @@ export class NotificationsContents extends React.Component<IProps> {
         const buttonUtils = buttonUtilityClasses();
 
         return (
-            <Frame className={classNames(this.props.className, inheritHeightClass())}>
-                <FrameHeaderWithAction className="hasAction" title={title}>
-                    <LinkAsButton
-                        title={t("Notification Preferences")}
-                        baseClass={ButtonTypes.ICON}
-                        className={classNames(buttonUtils.pushRight)}
-                        to={`/profile/preferences/${userSlug}`}
-                    >
-                        {settings()}
-                    </LinkAsButton>
-                </FrameHeaderWithAction>
-                <FrameBody className={classNames("isSelfPadded", this.props.panelBodyClass)}>
-                    <FramePanel>{this.bodyContent()}</FramePanel>
-                </FrameBody>
-                <FrameFooter>
-                    <LinkAsButton
-                        className={classNames(buttonUtils.pushLeft)}
-                        to={"/profile/notifications"}
-                        baseClass={ButtonTypes.TEXT}
-                    >
-                        {t("All Notifications")}
-                    </LinkAsButton>
-                    <Button
-                        onClick={this.markAllRead}
-                        baseClass={ButtonTypes.TEXT}
-                        className={classNames("frameFooter-markRead", classesFrameFooter.markRead)}
-                    >
-                        {t("Mark All Read")}
-                    </Button>
-                </FrameFooter>
-            </Frame>
+            <Frame
+                className={classNames(this.props.className)}
+                canGrow={true}
+                header={
+                    <FrameHeaderWithAction className="hasAction" title={title}>
+                        <LinkAsButton
+                            title={t("Notification Preferences")}
+                            baseClass={ButtonTypes.ICON}
+                            to={`/profile/preferences/${userSlug}`}
+                        >
+                            {settings()}
+                        </LinkAsButton>
+                    </FrameHeaderWithAction>
+                }
+                body={
+                    <FrameBody className={classNames("isSelfPadded", this.props.panelBodyClass)}>
+                        {this.bodyContent()}
+                    </FrameBody>
+                }
+                footer={
+                    <FrameFooter>
+                        <LinkAsButton
+                            className={classNames(buttonUtils.pushLeft)}
+                            to={"/profile/notifications"}
+                            baseClass={ButtonTypes.TEXT}
+                        >
+                            {t("All Notifications")}
+                        </LinkAsButton>
+                        <Button
+                            onClick={this.markAllRead}
+                            baseClass={ButtonTypes.TEXT}
+                            className={classNames("frameFooter-markRead", classesFrameFooter.markRead)}
+                        >
+                            {t("Mark All Read")}
+                        </Button>
+                    </FrameFooter>
+                }
+            />
         );
     }
 

@@ -28,6 +28,8 @@ export interface ICompactSearchProps extends IWithSearchProps, RouteComponentPro
     buttonContentClassName?: string;
     buttonLoaderClassName?: string;
     cancelContentClassName?: string;
+    contentClass?: string;
+    valueContainerClasses?: string;
     hideSearchButton?: boolean;
     isLarge?: boolean;
     buttonBaseClass?: ButtonTypes;
@@ -73,6 +75,8 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
                     isBigInput={this.props.isLarge}
                     buttonLoaderClassName={this.props.buttonLoaderClassName}
                     hideSearchButton={this.props.hideSearchButton}
+                    contentClass={this.props.contentClass}
+                    valueContainerClasses={this.props.valueContainerClasses}
                 />
                 <div ref={this.resultsRef} className={classNames("search-results", classesSearchBar.results)} />
             </div>

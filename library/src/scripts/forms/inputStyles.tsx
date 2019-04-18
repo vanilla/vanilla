@@ -5,7 +5,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { borders, colorOut, IBorderStyles, placeholderStyles } from "@library/styles/styleHelpers";
+import { borders, colorOut, IBordersSameAllSidesStyles, placeholderStyles } from "@library/styles/styleHelpers";
 import { px } from "csx";
 import { cssRule } from "typestyle";
 
@@ -22,7 +22,7 @@ export const inputVariables = useThemeCache(() => {
         },
     });
 
-    const border: IBorderStyles = makeThemeVars("borders", globalVars.border);
+    const border: IBordersSameAllSidesStyles = makeThemeVars("borders", globalVars.border);
 
     return { colors, border };
 });

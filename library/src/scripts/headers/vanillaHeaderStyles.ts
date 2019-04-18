@@ -154,7 +154,6 @@ export const vanillaHeaderClasses = useThemeCache(() => {
                     cursor: "pointer",
                 },
                 "&& .suggestedTextInput-clear.searchBar-clear": {
-                    color: vars.colors.fg.toString(),
                     $nest: {
                         "&:hover": {
                             color: vars.colors.fg.toString(),

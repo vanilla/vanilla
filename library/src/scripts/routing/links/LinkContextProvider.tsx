@@ -94,17 +94,17 @@ export function makeLocationDescriptorObject(initial: LocationDescriptor, newHre
     const link = new URL(newHref, window.location.href);
     const { search, pathname } = link;
 
-    const finalPathName = pathname.replace(formatUrl("/"), "/");
+    const appRelativeLink = pathname.replace(formatUrl("/"), "/");
 
     if (typeof initial === "string") {
         return {
-            pathname: finalPathName,
+            pathname: appRelativeLink,
             search,
         };
     } else {
         return {
             ...initial,
-            pathname: finalPathName,
+            pathname: appRelativeLink,
             search,
         };
     }

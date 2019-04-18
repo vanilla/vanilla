@@ -44,6 +44,7 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
         const isGuest = isUserGuest(currentUser);
         const headerClasses = vanillaHeaderClasses();
         const classes = vanillaHeaderHomeClasses();
+        const classesVanillaHeader = vanillaHeaderClasses();
 
         return ReactDOM.createPortal(
             <header className={classNames(headerClasses.root, classes.root, this.props.className)}>
@@ -52,7 +53,10 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                         <div className={classNames(headerClasses.bar, "isHome")}>
                             <FlexSpacer className={classes.left} />
                             <HeaderLogo
-                                className="vanillaHeader-logoContainer"
+                                className={classNames(
+                                    "vanillaHeader-logoContainer",
+                                    classesVanillaHeader.logoContainer,
+                                )}
                                 logoClassName="vanillaHeader-logo isCentred"
                                 logoType={LogoType.MOBILE}
                             />

@@ -19,6 +19,7 @@ import {
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
+import backLinkClasses from "@library/routing/links/backLinkStyles";
 
 export const vanillaHeaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -170,6 +171,13 @@ export const vanillaHeaderClasses = useThemeCache(() => {
                     color: vars.colors.fg.fade(0.8).toString(),
                     cursor: "pointer",
                 },
+                [`.${backLinkClasses().link}`]: {
+                    $nest: {
+                        "&, &:hover, &:focus, &:active": {
+                            color: colorOut(vars.colors.fg),
+                        },
+                    },
+                },
             },
         },
         mediaQueries.oneColumn({
@@ -210,7 +218,6 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         {
             display: "inline-flex",
             alignSelf: "center",
-            flexBasis: vars.endElements.flexBasis,
             color: colorOut(vars.colors.fg),
             $nest: {
                 "&.focus-visible": {
@@ -226,6 +233,10 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         },
         mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }),
     );
+
+    const logoFlexBasis = style("logoFlexBasis", {
+        flexBasis: vars.endElements.flexBasis,
+    });
 
     const meBox = style("meBox", {
         justifyContent: "flex-end",
@@ -539,6 +550,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         compactSearchResults,
         clearButtonClass,
         guestButton,
+        logoFlexBasis,
     };
 });
 

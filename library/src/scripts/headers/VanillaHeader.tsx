@@ -111,7 +111,11 @@ export class VanillaHeader extends React.Component<IProps, IState> {
 
                         {!isMobile && (
                             <HeaderLogo
-                                className={classNames("vanillaHeader-logoContainer", classes.logoContainer)}
+                                className={classNames(
+                                    "vanillaHeader-logoContainer",
+                                    classes.logoContainer,
+                                    classes.logoFlexBasis,
+                                )}
                                 logoClassName="vanillaHeader-logo"
                                 logoType={LogoType.DESKTOP}
                             />

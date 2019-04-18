@@ -11,10 +11,10 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { modalClasses } from "@library/modal/modalStyles";
 import TabHandler from "@library/dom/TabHandler";
-import { inheritHeightClass } from "@library/styles/styleHelpers";
-import { logWarning, logError } from "@library/utility/utils";
+import { logWarning } from "@library/utility/utils";
 import { forceRenderStyles } from "typestyle";
-import ScrollLock, { TouchScrollable } from "react-scrolllock";
+import ScrollLock from "react-scrolllock";
+import { ModalView } from "@library/modal/ModalView";
 
 interface IHeadingDescription {
     titleID: string;
@@ -93,17 +93,7 @@ export default class Modal extends React.Component<IProps, IState> {
 
     public static focusHistory: HTMLElement[] = [];
     public static stack: Modal[] = [];
-
-    private id = uniqueIDFromPrefix("modal");
-    private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
-
-    private get modalID() {
-        return this.id + "-modal";
-    }
-
-    private get descriptionID() {
-        return this.id + "-description";
-    }
+    private selfRef = React.createRef<HTMLDivElement>();
 
     public state = {
         exitElementSet: false,
@@ -113,64 +103,22 @@ export default class Modal extends React.Component<IProps, IState> {
      * Render the contents into a portal.
      */
     public render() {
-        const { size } = this.props;
-        const classes = modalClasses();
-
-        let innerContent = (
-            <>
-                {this.props.description && (
-                    <div id={this.descriptionID} className="sr-only">
-                        {this.props.description}
-                    </div>
-                )}
-                {this.props.children}
-            </>
-        );
-
-        if (this.props.scrollable) {
-            innerContent = (
-                <TouchScrollable>
-                    <div className={classes.scroll}>{innerContent}</div>
-                </TouchScrollable>
-            );
-        }
         const portal = ReactDOM.createPortal(
-            <ScrollLock>
-                <div className={classes.overlay} onClick={this.handleScrimClick}>
-                    <div
-                        id={this.modalID}
-                        role="dialog"
-                        aria-modal={true}
-                        className={classNames(
-                            classes.root,
-                            {
-                                isFullScreen:
-                                    size === ModalSizes.FULL_SCREEN || size === ModalSizes.MODAL_AS_SIDE_PANEL,
-                                isSidePanel: size === ModalSizes.MODAL_AS_SIDE_PANEL,
-                                isDropDown: size === ModalSizes.MODAL_AS_DROP_DOWN,
-                                isLarge: size === ModalSizes.LARGE,
-                                isMedium: size === ModalSizes.MEDIUM,
-                                isSmall: size === ModalSizes.SMALL,
-                                isShadowed: size === ModalSizes.LARGE || ModalSizes.MEDIUM || ModalSizes.SMALL,
-                            },
-                            this.props.className,
-                        )}
-                        ref={this.selfRef}
-                        onKeyDown={this.handleTabbing}
-                        onClick={this.handleModalClick}
-                        aria-label={"label" in this.props ? this.props.label : undefined}
-                        aria-labelledby={"titleID" in this.props ? this.props.titleID : undefined}
-                        aria-describedby={this.props.description ? this.descriptionID : undefined}
-                    >
-                        {innerContent}
-                    </div>
-                </div>
-            </ScrollLock>,
+            <ModalView
+                scrollable={this.props.scrollable}
+                onKeyDown={this.handleTabbing}
+                onModalClick={this.handleModalClick}
+                onOverlayClick={this.handleScrimClick}
+                description={this.props.description}
+                size={this.props.size}
+                modalRef={this.selfRef}
+                titleID={"titleID" in this.props ? this.props.titleID : undefined}
+                label={"label" in this.props ? this.props.label : undefined}
+            >
+                {this.props.children}
+            </ModalView>,
             this.getModalContainer(),
         );
-        // We HAVE to render force the styles to render before componentDidMount
-        // And our various focusing tricks or the page will jump.
-        forceRenderStyles();
         return portal;
     }
 
@@ -208,6 +156,7 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         Modal.stack.push(this);
         this.forceUpdate();
     }
+
     /**
      * We need to check again for focus if the focus is by ref
      */

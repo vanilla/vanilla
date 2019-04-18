@@ -77,8 +77,10 @@ export const modalClasses = useThemeCache(() => {
     const headerVars = vanillaHeaderVariables();
 
     const overlay = style("overlay", {
-        position: "absolute",
-        height: percent(100),
+        position: "fixed",
+        // Viewport units are useful here because
+        // we're actually fine this being taller than the initially visible viewport.
+        height: viewHeight(100),
         width: percent(100),
         top: 0,
         left: 0,
@@ -90,7 +92,6 @@ export const modalClasses = useThemeCache(() => {
 
     const root = style({
         display: "block",
-        left: percent(50),
         width: percent(100),
         maxWidth: percent(100),
         maxHeight: viewHeight(80),
@@ -98,9 +99,13 @@ export const modalClasses = useThemeCache(() => {
         backgroundColor: colorOut(vars.colors.bg),
         position: "fixed",
         top: percent(50),
-        right: 0,
+        left: percent(50),
         bottom: "initial",
         overflow: "hidden",
+        // NOTE: This transform can cause issues if anything inside of us needs fixed positioning.
+        // See http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/
+        // See also https://www.w3.org/TR/2009/WD-css3-2d-transforms-20091201/#introduction
+        // This is why fullscreen unsets the transforms.
         transform: translate(`-50%`, `-50%`),
         ...margins({ all: "auto" }),
 
@@ -137,15 +142,18 @@ export const modalClasses = useThemeCache(() => {
                 flexDirection: "column",
                 top: 0,
                 bottom: 0,
+                right: 0,
                 transform: "none",
             },
             "&&.isDropDown": {
                 top: 0,
+                left: 0,
+                right: 0,
                 bottom: globalVars.gutter.size,
                 overflow: "auto",
                 width: percent(100),
                 marginBottom: "auto",
-                transform: translateX(`-50%`),
+                transform: "none",
                 maxHeight: percent(100),
                 borderTopLeftRadius: 0,
                 borderTopRightRadius: 0,
@@ -154,16 +162,11 @@ export const modalClasses = useThemeCache(() => {
                 ...shadows.dropDown(),
                 ...borders(),
             },
+            "&.isScrollable": {
+                overflow: "auto",
+            },
         },
     });
-
-    const scroll = style(
-        "scroll",
-        {
-            overflow: "auto",
-        },
-        fullSizeOfParent(),
-    );
 
     const content = style("content", shadows.modal());
 

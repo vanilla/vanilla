@@ -15,7 +15,7 @@ interface IProps {
     header?: React.ReactNode;
     body: React.ReactNode;
     footer: React.ReactNode;
-    canGrow?: boolean;
+    canGrow?: boolean; // Use this when the parent has a fixed height we want to fill.
 }
 
 /**

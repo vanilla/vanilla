@@ -74,7 +74,7 @@ abstract class VideoEmbed extends Embed {
      */
     protected function videoCode(string $embedUrl, string $name, string $photoUrl, int $width, int $height): string {
         $attr = [
-            'url' => htmlspecialchars($embedUrl),
+            'url' => htmlspecialchars(\Gdn_Format::sanitizeUrl($embedUrl)),
             'name' => htmlspecialchars($name),
             'photoUrl' => htmlspecialchars($photoUrl)
         ];

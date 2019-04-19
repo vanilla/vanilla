@@ -49,7 +49,7 @@ class SoundCloudEmbed extends Embed {
         $postID = htmlspecialchars($data['attributes']['postID']);
         $showArtwork = htmlspecialchars($data['attributes']['showArtwork']);
         $visual = htmlspecialchars($data['attributes']['visual']);
-        $url = htmlspecialchars($data['attributes']['embedUrl']);
+        $url = htmlspecialchars(\Gdn_Format::sanitizeUrl($data['attributes']['embedUrl']));
 
         $result = <<<HTML
 <div class="embedExternal embedSoundCloud">

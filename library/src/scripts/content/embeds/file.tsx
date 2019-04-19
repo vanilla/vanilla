@@ -10,6 +10,7 @@ import { onContent } from "@library/utility/appUtils";
 import React from "react";
 import ReactDOM from "react-dom";
 import { mimeTypeToAttachmentType } from "@library/content/attachments/attachmentUtils";
+import { sanitizeUrl } from "@library/utility/utils";
 
 export function initFileEmbeds() {
     registerEmbedComponent("file", FileEmbed);
@@ -54,7 +55,7 @@ export class FileEmbed extends BaseEmbed<IEmbedProps<IFileUploadData>> {
                 type={attachmentType}
                 size={size}
                 name={name}
-                url={url}
+                url={sanitizeUrl(url)}
                 dateUploaded={dateInserted}
                 mimeType={type}
             />

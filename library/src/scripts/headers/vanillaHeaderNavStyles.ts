@@ -9,8 +9,8 @@ import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import {
     absolutePosition,
     colorOut,
-    flexHelper,
-    negative,
+    flexHelper, margins,
+    negative, paddings,
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
@@ -32,6 +32,10 @@ export const vanillaHeaderNavigationVariables = useThemeCache(() => {
         size: varsFormElements.sizing.height,
     });
 
+    const padding = makeThemeVars("padding", {
+        horizontal: globalVars.gutter.half,
+    });
+
     const linkActive = makeThemeVars("linkActive", {
         offset: 2,
         height: 3,
@@ -43,10 +47,12 @@ export const vanillaHeaderNavigationVariables = useThemeCache(() => {
         border,
         item,
         linkActive,
+        padding,
     };
 });
 
 export default function vanillaHeaderNavClasses() {
+    const globalVars = globalVariables();
     const headerVars = vanillaHeaderVariables();
     const vars = vanillaHeaderNavigationVariables();
     const mediaQueries = layoutVariables().mediaQueries();
@@ -54,18 +60,25 @@ export default function vanillaHeaderNavClasses() {
     const style = styleFactory("vanillaHeaderNav");
 
     const root = style({
+        ...flex.middleLeft(),
         position: "relative",
-    });
+        height: unit(headerVars.sizing.height),
+    }, mediaQueries.oneColumn({
+        height: unit(headerVars.sizing.mobile.height),
+    }));
 
     const navigation = style("navigation",{
-        height: percent(100),
-    });
+        // height: unit(vars.item.size),
+    }, mediaQueries.oneColumn({
+        // height: unit(headerVars.sizing.mobile.height),
+    }));
 
     const items = style(
         "items",
         {
             ...flex.middleLeft(),
-            height: unit(vars.item.size),
+            height: unit(headerVars.sizing.height),
+            ...paddings(vars.padding),
         },
         mediaQueries.oneColumn({
             height: px(headerVars.sizing.mobile.height),
@@ -74,12 +87,19 @@ export default function vanillaHeaderNavClasses() {
 
     const link = style("link", {
         ...userSelect(),
+        color: colorOut(headerVars.colors.fg),
+        whiteSpace: "nowrap",
+        lineHeight: globalVars.lineHeights.condensed,
         display: "flex",
+        alignItems: 'center',
         justifyContent: "center",
-        alignItems: "stretch",
         height: unit(vars.item.size),
+        textDecoration: "none",
         $nest: {
             "&.focus-visible": {
+                backgroundColor: colorOut(headerVars.buttonContents.state.bg),
+            },
+            "&:focus": {
                 backgroundColor: colorOut(headerVars.buttonContents.state.bg),
             },
             "&:hover": {
@@ -105,12 +125,15 @@ export default function vanillaHeaderNavClasses() {
     });
 
     const linkContent = style("linkContent", {
-        ...flex.middleLeft(),
         position: "relative",
     });
 
+    const firstItem = style("lastItem", {
+        zIndex: 2,
+    });
+
     const lastItem = style("lastItem", {
-        zIndex: 1,
+        zIndex: 2,
     });
 
     return {
@@ -121,5 +144,6 @@ export default function vanillaHeaderNavClasses() {
         linkActive,
         linkContent,
         lastItem,
+        firstItem,
     };
 }

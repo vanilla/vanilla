@@ -12,15 +12,17 @@ import {
     borders,
     colorOut,
     emphasizeLightness,
-    flexHelper, margins,
-    modifyColorBasedOnLightness, paddings,
+    flexHelper,
+    modifyColorBasedOnLightness,
     unit,
     userSelect,
-    absolutePosition,
+    absolutePosition, pointerEvents,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import {percent, px, quote} from "csx";
+import {ColorHelper, percent, px, quote} from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
+import {ColorValues} from "@library/forms/buttonStyles";
+import {NestedCSSProperties} from "typestyle/lib/types";
 
 export const vanillaHeaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -121,9 +123,6 @@ export const vanillaHeaderVariables = useThemeCache(() => {
 
     const bottomRow = makeThemeVars("bottomRow",{
         bg: modifyColorBasedOnLightness(colors.bg, .1).desaturate(.2, true),
-        paddings: {
-            horizontal: globalVars.gutter.half,
-        },
     });
 
     return {
@@ -213,6 +212,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
             alignItems: "center",
             height: px(vars.sizing.height),
             width: percent(100),
+            overflow: "hidden",
             $nest: {
                 "&.isHome": {
                     justifyContent: "space-between",
@@ -254,9 +254,9 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     const nav = style("nav", {
         display: "flex",
         flexWrap: "wrap",
-        height: percent(100),
+        height: px(vars.sizing.height),
         color: "inherit",
-    });
+    },  mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }),);
 
     const locales = style(
         "locales",
@@ -301,7 +301,6 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         },
         mediaQueries.oneColumn({
             fontSize: px(vars.button.mobile.fontSize),
-            whiteSpace: "nowrap",
         }),
     );
 
@@ -435,8 +434,13 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         color: vars.count.fg.toString(),
     });
 
-    const horizontalScroll = style("horizontalScroll", {
-        overflowX: "auto",
+
+    const scroll = style("scroll", {
+        position: "relative",
+        top: 0,
+        left: 0,
+        height: percent(100),
+        ...scrollWithNoScrollBar() as NestedCSSProperties,
     });
 
     const rightFlexBasis = style(
@@ -531,7 +535,10 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         minWidth: unit(vars.button.guest.minWidth),
     });
 
-
+    const desktopNavWrap = style("desktopNavWrap", {
+        position: "relative",
+        ...addGradientsToHintOverflow( globalVars.gutter.half * 4, vars.colors.bg) as any,
+    });
 
     return {
         root,
@@ -552,7 +559,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         tabButton,
         dropDownContents,
         count,
-        horizontalScroll,
+        scroll,
         rightFlexBasis,
         leftFlexBasis,
         signIn,
@@ -562,6 +569,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         clearButtonClass,
         guestButton,
         logoFlexBasis,
+        desktopNavWrap,
     };
 });
 
@@ -581,11 +589,7 @@ export const vanillaHeaderLogoClasses = useThemeCache(() => {
         },
     });
 
-    const link = style("link", {
-        textDecoration: "none",
-    });
-
-    return { logoFrame, logo, link };
+    return { logoFrame, logo };
 });
 
 export const vanillaHeaderHomeClasses = useThemeCache(() => {
@@ -604,50 +608,58 @@ export const vanillaHeaderHomeClasses = useThemeCache(() => {
         flexBasis: vars.button.size,
     });
 
-    const inner = style("inner",{
-        ...paddings(vars.bottomRow.paddings),
-        // height: unit(vars.sizing.height),
-    });
-
     const bottom = style("bottom", {
         position: "relative",
-        // height: unit(vars.sizing.height),
         backgroundColor: colorOut(vars.bottomRow.bg),
-        $nest: {
-            "&:after": {
-                ...absolutePosition.topRight(),
-                content: quote(``),
-                height: percent(100),
-                width: unit(vars.bottomRow.paddings.horizontal * 4),
-                background: `linear-gradient(to right, transparent 0%, ${colorOut(vars.bottomRow.bg)} 100%)`,
-            },
-        },
-    },
-    mediaQueries.oneColumn({
+        height: unit(vars.sizing.height),
+        width: percent(100),
+        ...addGradientsToHintOverflow( globalVars.gutter.half * 4, vars.colors.bg) as any,
+    }, mediaQueries.oneColumn({
         height: px(vars.sizing.mobile.height),
+        ...addGradientsToHintOverflow( globalVars.gutter.half * 4, vars.bottomRow.bg) as any,
     }));
-
-    const scroll = style("scroll", {
-        position: "relative",
-        // height: unit(vars.sizing.height),
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        flexWrap: "nowrap",
-        overflow: ["-moz-scrollbars-none", "auto"],
-        "-ms-overflow-style": "none",
-        $nest: {
-            "&::-webkit-scrollbar": {
-                width: 0,
-            },
-        },
-    });
 
     return {
         root,
         bottom,
-        inner,
         left,
-        scroll,
     };
 });
+
+export const scrollWithNoScrollBar = (nestedStyles?: NestedCSSProperties) => {
+    return {
+        overflow: ["-moz-scrollbars-none", "auto"],
+        "-ms-overflow-style": "none",
+        $nest: {
+            "&::-webkit-scrollbar": {
+                display: "none",
+            },
+            ...nestedStyles,
+        },
+    };
+};
+
+export const addGradientsToHintOverflow = (width: number | string, color: ColorHelper) => {
+    const gradient = (direction: "right" | "left") => {
+        return `linear-gradient(to ${direction}, ${colorOut(color.fade(0))} 0%, ${colorOut(color.fade(.3))} 20%, ${colorOut(color)} 90%)`;
+    };
+    return {
+        $nest: {
+            "&:after": {
+                ...absolutePosition.topRight(),
+                background: gradient("right"),
+            },
+            "&:before": {
+                ...absolutePosition.topLeft(),
+                background: gradient("left"),
+            },
+            "&:before, &:after": {
+                ...pointerEvents(),
+                content: quote(``),
+                height: percent(100),
+                width: unit(width),
+                zIndex: 1,
+            },
+        },
+    };
+};

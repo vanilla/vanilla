@@ -29,7 +29,7 @@ import * as React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import { style } from "typestyle";
-import { Panel, PanelWidgetHorizontalPadding } from "../layout/PanelLayout";
+import { PanelWidgetHorizontalPadding } from "../layout/PanelLayout";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { signIn } from "@library/icons/common";
@@ -121,12 +121,16 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                             />
                         )}
                         {!this.state.openSearch && !isMobile && (
-                            <VanillaHeaderNav
-                                {...dummyNavigationData}
-                                className={classNames("vanillaHeader-nav", classes.nav)}
-                                linkClassName={classNames("vanillaHeader-navLink", classes.topElement)}
-                                linkContentClassName="vanillaHeader-navLinkContent"
-                            />
+                            <div className={classes.desktopNavWrap}>
+                                <div className={classes.scroll}>
+                                    <VanillaHeaderNav
+                                        {...dummyNavigationData}
+                                        className={classNames("vanillaHeader-nav", classes.nav)}
+                                        linkClassName={classNames("vanillaHeader-navLink", classes.topElement)}
+                                        linkContentClassName="vanillaHeader-navLinkContent"
+                                    />
+                                </div>
+                            </div>
                         )}
                         {showMobileDropDown && (
                             <MobileDropDown

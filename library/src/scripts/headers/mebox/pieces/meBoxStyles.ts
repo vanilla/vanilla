@@ -26,6 +26,7 @@ export const meBoxClasses = useThemeCache(() => {
             display: "flex",
             alignItems: "center",
             height: unit(vanillaHeaderVars.sizing.height),
+            flexBasis: unit(vanillaHeaderVars.sizing.height * 3),
         },
         mediaQueries.oneColumn({
             height: unit(vanillaHeaderVars.sizing.mobile.height),

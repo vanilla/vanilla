@@ -8,6 +8,7 @@ import React from "react";
 import VanillaHeaderNavItem, { IHeaderNav } from "@library/headers/mebox/pieces/VanillaHeaderNavItem";
 import vanillaHeaderNavClasses from "@library/headers/vanillaHeaderNavStyles";
 import classNames from "classnames";
+import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
 
 export interface IVanillaHeaderNavProps {
     className?: string;
@@ -25,12 +26,17 @@ export interface IVanillaHeaderNavProps {
 export default class VanillaHeaderNav extends React.Component<IVanillaHeaderNavProps> {
     public render() {
         const classes = vanillaHeaderNavClasses();
-        const dataLength = Object.keys(this.props.data!).length - 1;
+        const headerClasses = vanillaHeaderClasses();
+        const dataLength = this.props.data ? Object.keys(this.props.data!).length - 1 : 0;
         const content = !!this.props.data
             ? this.props.data.map((item, key) => {
                   return (
                       <VanillaHeaderNavItem
                           {...item}
+                          className={classNames(
+                              key === dataLength ? classes.lastItem : false,
+                              key === 0 ? classes.firstItem : false,
+                          )}
                           linkContentClassName={classNames(
                               this.props.linkContentClassName,
                               key === dataLength ? classes.lastItem : false,

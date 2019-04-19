@@ -25,6 +25,7 @@ import ReactDOM from "react-dom";
 import classNames from "classnames";
 import { connect } from "react-redux";
 import Container from "@library/layout/components/Container";
+import SmartAlign from "@library/layout/SmartAlign";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -44,7 +45,6 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
         const isGuest = isUserGuest(currentUser);
         const headerClasses = vanillaHeaderClasses();
         const classes = vanillaHeaderHomeClasses();
-        const classesVanillaHeader = vanillaHeaderClasses();
 
         return ReactDOM.createPortal(
             <header className={classNames(headerClasses.root, classes.root, this.props.className)}>
@@ -53,10 +53,7 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                         <div className={classNames(headerClasses.bar, "isHome")}>
                             <FlexSpacer className={classes.left} />
                             <HeaderLogo
-                                className={classNames(
-                                    "vanillaHeader-logoContainer",
-                                    classesVanillaHeader.logoContainer,
-                                )}
+                                className={classNames("vanillaHeader-logoContainer", headerClasses.logoContainer)}
                                 logoClassName="vanillaHeader-logo isCentred"
                                 logoType={LogoType.MOBILE}
                             />
@@ -73,25 +70,15 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                     </PanelWidgetHorizontalPadding>
                 </Container>
                 <div className={classes.bottom}>
-                    <div className="vanillaHeader-horizontalScroll">
-                        <VanillaHeaderNav
-                            {...dummyNavigationData}
-                            linkClassName="vanillaHeader-navLink"
-                            linkContentClassName="vanillaHeader-navLinkContent"
-                            className={classNames(headerClasses.nav, "isScrolled")}
-                        >
-                            <VanillaHeaderListItem>
-                                <LanguagesDropDown
-                                    {...dummyOtherLanguagesData}
-                                    renderLeft={true}
-                                    className="vanillaHeader-locales"
-                                    buttonClassName="vanillaHeader-localeToggle"
-                                    buttonBaseClass={ButtonTypes.CUSTOM}
-                                    widthOfParent={false}
-                                    openAsModal={isMobile}
-                                />
-                            </VanillaHeaderListItem>
-                        </VanillaHeaderNav>
+                    <div className={classes.scroll}>
+                        <div className={classes.inner}>
+                            <VanillaHeaderNav
+                                {...dummyNavigationData}
+                                className={classNames("vanillaHeader-nav", headerClasses.nav)}
+                                linkClassName={classNames("vanillaHeader-navLink", headerClasses.topElement)}
+                                linkContentClassName="vanillaHeader-navLinkContent"
+                            />
+                        </div>
                     </div>
                 </div>
             </header>,

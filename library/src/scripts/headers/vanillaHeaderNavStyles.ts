@@ -10,7 +10,6 @@ import {
     absolutePosition,
     colorOut,
     flexHelper,
-    modifyColorBasedOnLightness,
     negative,
     unit,
     userSelect,
@@ -19,7 +18,6 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";
-import { userContentClasses } from "@library/content/userContentStyles";
 
 export const vanillaHeaderNavigationVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("vanillaHeaderNavigation");
@@ -59,24 +57,14 @@ export default function vanillaHeaderNavClasses() {
         position: "relative",
     });
 
-    const navigation = style({
-        ...flex.middle(),
+    const navigation = style("navigation",{
         height: percent(100),
-        color: "inherit",
-        $nest: {
-            "&.isScrolled": {
-                alignItems: "center",
-                justifyContent: "center",
-                flexWrap: "nowrap",
-                minWidth: percent(100),
-            },
-        },
     });
 
     const items = style(
         "items",
         {
-            ...flex.middle(),
+            ...flex.middleLeft(),
             height: unit(vars.item.size),
         },
         mediaQueries.oneColumn({
@@ -121,6 +109,10 @@ export default function vanillaHeaderNavClasses() {
         position: "relative",
     });
 
+    const lastItem = style("lastItem", {
+        zIndex: 1,
+    });
+
     return {
         root,
         navigation,
@@ -128,5 +120,6 @@ export default function vanillaHeaderNavClasses() {
         link,
         linkActive,
         linkContent,
+        lastItem,
     };
 }

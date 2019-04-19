@@ -12,13 +12,14 @@ import {
     borders,
     colorOut,
     emphasizeLightness,
-    flexHelper,
-    modifyColorBasedOnLightness,
+    flexHelper, margins,
+    modifyColorBasedOnLightness, paddings,
     unit,
     userSelect,
+    absolutePosition,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { percent, px } from "csx";
+import {percent, px, quote} from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 
 export const vanillaHeaderVariables = useThemeCache(() => {
@@ -118,6 +119,13 @@ export const vanillaHeaderVariables = useThemeCache(() => {
         },
     });
 
+    const bottomRow = makeThemeVars("bottomRow",{
+        bg: modifyColorBasedOnLightness(colors.bg, .1).desaturate(.2, true),
+        paddings: {
+            horizontal: globalVars.gutter.half,
+        },
+    });
+
     return {
         sizing,
         colors,
@@ -132,6 +140,7 @@ export const vanillaHeaderVariables = useThemeCache(() => {
         buttonContents,
         mobileDropDown,
         meBox,
+        bottomRow,
     };
 });
 
@@ -515,12 +524,14 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     );
 
     const clearButtonClass = style("clearButtonClass", {
-        color: vars.colors.fg.toString(),
+        color: colorOut(vars.colors.fg),
     });
 
     const guestButton = style("guestButton", {
         minWidth: unit(vars.button.guest.minWidth),
     });
+
+
 
     return {
         root,
@@ -581,13 +592,10 @@ export const vanillaHeaderHomeClasses = useThemeCache(() => {
     const vars = vanillaHeaderVariables();
     const globalVars = globalVariables();
     const style = styleFactory("vanillaHeaderHome");
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style({
         minHeight: vars.sizing.mobile.height * 2,
-    });
-
-    const bottom = style("bottom", {
-        backgroundColor: globalVars.mainColors.fg.fade(0.1).toString(),
     });
 
     const left = style("left", {
@@ -596,5 +604,50 @@ export const vanillaHeaderHomeClasses = useThemeCache(() => {
         flexBasis: vars.button.size,
     });
 
-    return { root, bottom, left };
+    const inner = style("inner",{
+        ...paddings(vars.bottomRow.paddings),
+        // height: unit(vars.sizing.height),
+    });
+
+    const bottom = style("bottom", {
+        position: "relative",
+        // height: unit(vars.sizing.height),
+        backgroundColor: colorOut(vars.bottomRow.bg),
+        $nest: {
+            "&:after": {
+                ...absolutePosition.topRight(),
+                content: quote(``),
+                height: percent(100),
+                width: unit(vars.bottomRow.paddings.horizontal * 4),
+                background: `linear-gradient(to right, transparent 0%, ${colorOut(vars.bottomRow.bg)} 100%)`,
+            },
+        },
+    },
+    mediaQueries.oneColumn({
+        height: px(vars.sizing.mobile.height),
+    }));
+
+    const scroll = style("scroll", {
+        position: "relative",
+        // height: unit(vars.sizing.height),
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        flexWrap: "nowrap",
+        overflow: ["-moz-scrollbars-none", "auto"],
+        "-ms-overflow-style": "none",
+        $nest: {
+            "&::-webkit-scrollbar": {
+                width: 0,
+            },
+        },
+    });
+
+    return {
+        root,
+        bottom,
+        inner,
+        left,
+        scroll,
+    };
 });

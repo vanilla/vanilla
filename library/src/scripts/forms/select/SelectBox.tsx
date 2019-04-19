@@ -155,13 +155,9 @@ export default class SelectBox extends React.Component<ISelfLabelledProps | IExt
                         openAsModal={this.props.openAsModal}
                         selfPadded={true}
                     >
-                        <Frame>
-                            <FrameBody
-                                className={classNames("dropDownItem-verticalPadding", classesDropDown.verticalPadding)}
-                            >
-                                {selectItems}
-                            </FrameBody>
-                        </Frame>
+                        <div className={classNames("dropDownItem-verticalPadding", classesDropDown.verticalPadding)}>
+                            {selectItems}
+                        </div>
                     </DropDown>
                 </div>
             </div>

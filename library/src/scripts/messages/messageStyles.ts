@@ -96,7 +96,6 @@ export const messagesClasses = useThemeCache(() => {
 
     const root = style(
         {
-            position: "relative",
             width: percent(100),
         },
         margins({ horizontal: "auto" }),

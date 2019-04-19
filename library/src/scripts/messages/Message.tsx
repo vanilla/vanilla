@@ -18,16 +18,17 @@ export interface IMessageProps {
     stringContents: string;
     clearOnUnmount?: boolean; // reannounces the message if the page gets rerendered. This is an important message, so we want this by default.
     onConfirm?: () => void;
-    confirmText?: string;
+    confirmText?: React.ReactNode;
     onCancel?: () => void;
-    cancelText?: string;
+    cancelText?: React.ReactNode;
+    isFixed?: boolean;
 }
 
 export default function Message(props: IMessageProps) {
     const classes = messagesClasses();
     return (
         <>
-            <div className={classNames(classes.root, props.className)}>
+            <div className={classNames(classes.root, props.className, { [classes.fixed]: props.isFixed })}>
                 <div className={classNames(classes.wrap)}>
                     <div className={classes.message}>{props.contents || props.stringContents}</div>
                     {props.onConfirm && (

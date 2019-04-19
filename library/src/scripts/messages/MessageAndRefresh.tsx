@@ -10,6 +10,7 @@ import React from "react";
 
 interface IProps {
     className?: string;
+    isFixed?: boolean;
 }
 
 /**
@@ -27,6 +28,7 @@ export default function MessageAndRefresh(props: IProps) {
             contents={contents}
             stringContents={contents}
             className={props.className}
+            isFixed={props.isFixed}
         />
     );
 }

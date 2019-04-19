@@ -57,17 +57,39 @@ export const frameVariables = useThemeCache(() => {
 export const frameClasses = useThemeCache(() => {
     const vars = frameVariables();
     const style = styleFactory("frame");
+
+    const headerWrap = style("headerWrap", {
+        background: colorOut(vars.colors.bg),
+        zIndex: 2,
+        willChange: "height",
+    });
+    const bodyWrap = style("bodyWrap", {
+        background: colorOut(vars.colors.bg),
+    });
+    const footerWrap = style("footerWrap", {
+        background: colorOut(vars.colors.bg),
+        zIndex: 2,
+        willChange: "height",
+    });
+
     const root = style({
-        display: "flex",
-        flexDirection: "column",
-        position: "relative",
         backgroundColor: colorOut(vars.colors.bg),
         maxHeight: percent(100),
         height: percent(100),
         borderRadius: unit(vars.border.radius),
         width: percent(100),
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        $nest: {
+            [`.${bodyWrap}`]: {
+                flex: 1,
+                overflow: "auto",
+            },
+        },
     });
-    return { root };
+
+    return { root, headerWrap, bodyWrap, footerWrap };
 });
 
 export const frameHeaderClasses = useThemeCache(() => {
@@ -145,7 +167,6 @@ export const frameHeaderClasses = useThemeCache(() => {
         flexShrink: 1,
         height: unit(formElVars.sizing.height),
         width: unit(spacerWidth),
-        marginRight: unit(-6),
         color: colorOut(vars.colors.fg),
         $nest: {
             "&:not(.focus-visible)": {
@@ -170,12 +191,11 @@ export const frameHeaderClasses = useThemeCache(() => {
 
 export const frameBodyClasses = useThemeCache(() => {
     const vars = frameVariables();
+    const globalVars = globalVariables();
     const style = styleFactory("frameBody");
 
     const root = style({
         position: "relative",
-        flexGrow: 1,
-        overflow: "auto",
         ...paddings({
             left: vars.spacing.padding,
             right: vars.spacing.padding,
@@ -186,6 +206,16 @@ export const frameBodyClasses = useThemeCache(() => {
                     left: 0,
                     right: 0,
                 }),
+            },
+            "& > .inputBlock": {
+                $nest: {
+                    "&.isFirst": {
+                        marginTop: unit(globalVars.gutter.half),
+                    },
+                    "&.isLast": {
+                        marginBottom: unit(globalVars.gutter.half),
+                    },
+                },
             },
         },
     });
@@ -210,34 +240,6 @@ export const frameBodyClasses = useThemeCache(() => {
     return { root, noContentMessage, contents };
 });
 
-export const framePanelClasses = useThemeCache(() => {
-    const vars = frameVariables();
-    const globalVars = globalVariables();
-    const style = styleFactory("framePanel");
-
-    const root = style({
-        position: "relative",
-        flexGrow: 1,
-        height: percent(100),
-        backgroundColor: colorOut(vars.colors.bg),
-        maxHeight: calc(`100vh - ${unit(vars.header.minHeight + vars.footer.minHeight + vars.spacing.padding * 2)}`),
-        overflow: "auto",
-        $nest: {
-            "& > .inputBlock": {
-                $nest: {
-                    "&.isFirst": {
-                        marginTop: unit(globalVars.gutter.half),
-                    },
-                    "&.isLast": {
-                        marginBottom: unit(globalVars.gutter.half),
-                    },
-                },
-            },
-        },
-    });
-    return { root };
-});
-
 export const frameFooterClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("frameFooter");
@@ -251,13 +253,21 @@ export const frameFooterClasses = useThemeCache(() => {
         zIndex: 1,
         borderTop: singleBorder(),
         flexWrap: "wrap",
-        justifyContent: "flex-end",
+        justifyContent: "space-between",
         ...paddings({
             top: 0,
             bottom: 0,
             left: vars.footer.spacing,
             right: vars.footer.spacing,
         }),
+    });
+
+    const justifiedRight = style("justifiedRight", {
+        $nest: {
+            "&&": {
+                justifyContent: "flex-end",
+            },
+        },
     });
 
     const markRead = style("markRead", {
@@ -278,5 +288,5 @@ export const frameFooterClasses = useThemeCache(() => {
         paddingRight: important(0),
     });
 
-    return { root, markRead, selfPadded, actionButton };
+    return { root, markRead, selfPadded, actionButton, justifiedRight };
 });

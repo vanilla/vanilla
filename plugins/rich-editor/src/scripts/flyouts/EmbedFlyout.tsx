@@ -4,26 +4,25 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import KeyboardModule from "quill/modules/keyboard";
+import DropDown from "@library/flyouts/DropDown";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonStyles";
+import { embed } from "@library/icons/editorIcons";
+import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
+import Frame from "@library/layout/frame/Frame";
+import FrameBody from "@library/layout/frame/FrameBody";
+import FrameFooter from "@library/layout/frame/FrameFooter";
 import { isAllowedUrl, t } from "@library/utility/appUtils";
 import { getRequiredID, IRequiredComponentID } from "@library/utility/idUtils";
 import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
+import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { insertMediaClasses } from "@rich-editor/flyouts/pieces/insertMediaClasses";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import { forceSelectionUpdate } from "@rich-editor/quill/utility";
-import Button from "@library/forms/Button";
-import { embed } from "@library/icons/editorIcons";
 import classNames from "classnames";
-import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
-import { ButtonTypes } from "@library/forms/buttonStyles";
-import { insertMediaClasses } from "@rich-editor/flyouts/pieces/insertMediaClasses";
-import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
-import DropDown from "@library/flyouts/DropDown";
-import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
-import FrameHeader from "@library/layout/frame/FrameHeader";
-import FrameBody from "@library/layout/frame/FrameBody";
-import FrameFooter from "@library/layout/frame/FrameFooter";
-import Frame from "@library/layout/frame/Frame";
+import KeyboardModule from "quill/modules/keyboard";
+import React from "react";
 import { style } from "typestyle";
 
 interface IProps extends IWithEditorProps, IDeviceProps {
@@ -86,35 +85,39 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
                     selfPadded={true}
                     initialFocusElement={this.inputRef.current}
                 >
-                    <Frame>
-                        <FrameBody>
-                            <p className={style({ marginTop: 6, marginBottom: 6 })}>
-                                {t("Paste the URL of the media you want.")}
-                            </p>
-                            <input
-                                className={classNames("InputBox", classesInsertMedia.insert, {
-                                    inputText: !this.props.legacyMode,
-                                })}
-                                placeholder={t("http://")}
-                                value={this.state.url}
-                                onChange={this.inputChangeHandler}
-                                onKeyDown={this.buttonKeyDownHandler}
-                                aria-labelledby={this.titleID}
-                                aria-describedby={this.descriptionID}
-                                ref={this.inputRef}
-                            />
-                        </FrameBody>
-                        <FrameFooter>
-                            <Button
-                                className={classNames("insertMedia-insert", classesInsertMedia.button)}
-                                baseClass={ButtonTypes.TEXT_PRIMARY}
-                                disabled={!this.state.isInputValid}
-                                onClick={this.buttonClickHandler}
-                            >
-                                {t("Insert")}
-                            </Button>
-                        </FrameFooter>
-                    </Frame>
+                    <Frame
+                        body={
+                            <FrameBody>
+                                <p className={style({ marginTop: 6, marginBottom: 6 })}>
+                                    {t("Paste the URL of the media you want.")}
+                                </p>
+                                <input
+                                    className={classNames("InputBox", classesInsertMedia.insert, {
+                                        inputText: !this.props.legacyMode,
+                                    })}
+                                    placeholder={t("http://")}
+                                    value={this.state.url}
+                                    onChange={this.inputChangeHandler}
+                                    onKeyDown={this.buttonKeyDownHandler}
+                                    aria-labelledby={this.titleID}
+                                    aria-describedby={this.descriptionID}
+                                    ref={this.inputRef}
+                                />
+                            </FrameBody>
+                        }
+                        footer={
+                            <FrameFooter>
+                                <Button
+                                    className={classNames("insertMedia-insert", classesInsertMedia.button)}
+                                    baseClass={ButtonTypes.TEXT_PRIMARY}
+                                    disabled={!this.state.isInputValid}
+                                    onClick={this.buttonClickHandler}
+                                >
+                                    {t("Insert")}
+                                </Button>
+                            </FrameFooter>
+                        }
+                    />
                 </DropDown>
             </>
         );

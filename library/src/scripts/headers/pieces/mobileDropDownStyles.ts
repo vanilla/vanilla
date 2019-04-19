@@ -19,6 +19,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { border, calc, percent, px, translateX } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";
+import { frameVariables } from "@library/layout/frame/frameStyles";
 
 export const mobileDropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -60,6 +61,7 @@ export const mobileDropDownVariables = useThemeCache(() => {
 export const mobileDropDownClasses = useThemeCache(() => {
     const vars = mobileDropDownVariables();
     const globalVars = globalVariables();
+    const frameVars = frameVariables();
     const vanillaHeaderVars = vanillaHeaderVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
@@ -92,15 +94,6 @@ export const mobileDropDownClasses = useThemeCache(() => {
         position: "relative",
         maxHeight: percent(100),
         padding: px(0),
-    });
-
-    const content = style("content", {
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        maxHeight: percent(100),
-        width: percent(100),
-        margin: "auto",
     });
 
     const toggleButton = style(
@@ -224,7 +217,6 @@ export const mobileDropDownClasses = useThemeCache(() => {
         root,
         modal,
         panel,
-        content,
         toggleButton,
         buttonContents,
         closeButton,

@@ -126,7 +126,7 @@ export function fontFamilyWithDefaults(fontFamilies: string[]): string {
         .join(", ");
 }
 
-export function fullSizeOfParent() {
+export function fullSizeOfParent(): NestedCSSProperties {
     return {
         position: "absolute",
         display: "block",

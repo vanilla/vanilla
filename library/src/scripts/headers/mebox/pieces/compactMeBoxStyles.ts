@@ -68,6 +68,7 @@ export const compactMeBoxClasses = useThemeCache(() => {
 
     const tabPanels = style("tabPanels", {
         height: calc(`100% - ${vars.tab.height}px`),
+        position: "relative",
     });
 
     const tabButton = style("tabButton", {

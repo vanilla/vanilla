@@ -7,12 +7,12 @@
 import React from "react";
 import { frameBodyClasses } from "@library/layout/frame/frameStyles";
 import classNames from "classnames";
-import { TouchScrollable } from "react-scrolllock";
 
 export interface IFrameBodyProps {
     className?: string;
     selfPadded?: boolean;
     children: React.ReactNode;
+    scrollable?: boolean; // DON'T use at the same time as the Modal scrollable.
 }
 
 /**
@@ -23,15 +23,13 @@ export default class FrameBody extends React.PureComponent<IFrameBodyProps> {
     public render() {
         const classes = frameBodyClasses();
         return (
-            <TouchScrollable>
-                <div
-                    className={classNames("frameBody", this.props.className, classes.root, {
-                        isSelfPadded: this.props.selfPadded,
-                    })}
-                >
-                    {this.props.children}
-                </div>
-            </TouchScrollable>
+            <div
+                className={classNames("frameBody", this.props.className, classes.root, {
+                    isSelfPadded: this.props.selfPadded,
+                })}
+            >
+                {this.props.children}
+            </div>
         );
     }
 }

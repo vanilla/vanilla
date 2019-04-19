@@ -52,7 +52,6 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
 
         const classes = compactMeBoxClasses();
         const headerClasses = vanillaHeaderClasses();
-        const panelContentClass = classNames("compactMeBox-panel", classes.panel);
         const panelBodyClass = classNames("compactMeBox-body", classes.body);
 
         return (

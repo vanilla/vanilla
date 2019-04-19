@@ -8,7 +8,6 @@
         "@babel/runtime": "7.4.2",
         "@webcomponents/webcomponentsjs": "2.2.7",
         "axios": "0.18.0",
-        "body-scroll-lock": "2.6.1",
         "classnames": "2.2.6",
         "csx": "9.0.0",
         "emojibase-data": "3.2.1",

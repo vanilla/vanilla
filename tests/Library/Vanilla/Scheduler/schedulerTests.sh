@@ -9,7 +9,7 @@ echo "Deleting previous './tests.result'"
 rm -rf ./tests.result
 
 echo "Running 'composer dump-autoload -o'"
-composer dump-autoload -o
+composer -d../../../.. dump-autoload -o
 
 echo "Running 'phpunit phpunit.xml'"
 ../../../../vendor/bin/phpunit -cschedulerTests.xml

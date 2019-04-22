@@ -81,8 +81,8 @@ class ExternalBlot extends AbstractBlot {
 
         $url = $data['url'] ?? "";
         if ($url) {
-            $sanitizedUrl = \Gdn_Format::sanitizeUrl($url);
-            return "<div class=\"userContent\"><p><a href=\"$sanitizedUrl\">$url</a></p></div>";
+            $sanitizedUrl = htmlspecialchars(\Gdn_Format::sanitizeUrl($url));
+            return "<div class=\"userContent\"><p><a href=\"$sanitizedUrl\">$sanitizedUrl</a></p></div>";
         }
         return "";
     }

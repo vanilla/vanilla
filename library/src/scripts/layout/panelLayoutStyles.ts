@@ -12,9 +12,6 @@ export const panelLayoutClasses = useThemeCache(() => {
     const style = styleFactory("panelLayout");
 
     const panel = style({
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
         ...paddings({
             horizontal: globalVars.gutter.half,
         }),

@@ -23,9 +23,9 @@ interface IProps extends INavigationTreeItem {
     titleID?: string;
     openParent?: () => void;
     depth: number;
-    collapsible?: boolean;
     onItemHover?(item: INavigationTreeItem);
     clickableCategoryLabels?: boolean;
+    collapsible: boolean;
 }
 
 export interface IActiveRecord {
@@ -41,20 +41,19 @@ export default class SiteNavNode extends React.Component<IProps> {
     public context!: React.ContextType<typeof SiteNavContext>;
 
     public render() {
-        const hasChildren = !!this.props.children && this.props.children.length > 0;
         const depthClass = `hasDepth-${this.props.depth + 1}`;
-        const collapsible = !!this.props.collapsible;
+        const collapsible = this.props.collapsible && this.context.categoryRecordType === this.props.recordType;
         const classes = siteNavNodeClasses();
 
         const { activeRecord } = this.props;
 
         let linkContents;
         const linkContentClasses = classNames("siteNavNode-link", classes.link, {
-            hasChildren,
+            hasChildren: collapsible,
             isFirstLevel: this.props.depth === 0,
         });
 
-        if (this.props.clickableCategoryLabels && hasChildren) {
+        if (this.props.clickableCategoryLabels && collapsible) {
             linkContents = (
                 <Button
                     baseClass={ButtonTypes.CUSTOM}
@@ -73,7 +72,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                             {...provided}
                             onKeyDownCapture={this.handleKeyDown}
                             className={classNames("siteNavNode-link", classes.link, {
-                                hasChildren,
+                                hasChildren: collapsible,
                                 isFirstLevel: this.props.depth === 0,
                             })}
                             tabIndex={0}
@@ -87,7 +86,7 @@ export default class SiteNavNode extends React.Component<IProps> {
         }
 
         const childrenContents =
-            hasChildren &&
+            collapsible &&
             this.props.children.map(child => {
                 const key = activeRecord.recordType + activeRecord.recordID + "-" + child.recordType + child.recordID;
                 return (
@@ -111,7 +110,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                 role="treeitem"
                 aria-expanded={this.isOpen}
             >
-                {hasChildren && collapsible ? (
+                {collapsible && collapsible ? (
                     <div
                         className={classNames("siteNavNode-buttonOffset", classes.buttonOffset, {
                             hasNoOffset: this.props.depth === 1,
@@ -129,16 +128,10 @@ export default class SiteNavNode extends React.Component<IProps> {
                             {this.isOpen ? downTriangle("", t("Expand")) : rightTriangle("", t("Collapse"))}
                         </Button>
                     </div>
-                ) : (
-                    this.props.depth !== 0 && (
-                        <span className={classNames("siteNavNode-spacer", classes.spacer)} aria-hidden={true}>
-                            {` `}
-                        </span>
-                    )
-                )}
+                ) : null}
                 <div className={classNames("siteNavNode-contents", classes.contents)}>
                     {linkContents}
-                    {hasChildren && (
+                    {collapsible && (
                         <ul
                             className={classNames("siteNavNode-children", depthClass, classes.children, {
                                 isHidden: collapsible ? !this.isOpen : false,

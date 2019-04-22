@@ -23,7 +23,7 @@ const noop = () => {
 };
 
 const defaultContext: ISiteNavCtx = {
-    categoryRecordType: "someCategory",
+    categoryRecordType: "item",
     toggleItem: noop,
     openItem: noop,
     closeItem: noop,

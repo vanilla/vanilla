@@ -16,7 +16,8 @@ import {
     BackgroundRepeatProperty,
     BackgroundSizeProperty,
     BorderRadiusProperty,
-    BorderStyleProperty, BorderTopRightRadiusProperty,
+    BorderStyleProperty,
+    BorderTopRightRadiusProperty,
     BorderWidthProperty,
     BottomProperty,
     ContentProperty,
@@ -327,7 +328,7 @@ export interface IBordersSameAllSidesStyles extends ISingleBorderStyle {
     radius?: BorderRadiusProperty<TLength>;
 }
 
-type radiusType = (BorderRadiusProperty<TLength> | IBorderRadii);
+type radiusType = BorderRadiusProperty<TLength> | IBorderRadii;
 
 interface IBorderStyles extends ISingleBorderStyle {
     all?: ISingleBorderStyle;
@@ -339,7 +340,6 @@ interface IBorderStyles extends ISingleBorderStyle {
     right?: ISingleBorderStyle;
     radius?: radiusType;
 }
-
 
 interface IBorderRadii {
     all?: BorderRadiusProperty<TLength> | number;
@@ -379,7 +379,7 @@ export const borderRadii = (props: IBorderRadii) => {
 
 const borderStylesFallbacks = (fallbacks: any[], ultimateFallback, unitFunction?: (value: any) => string) => {
     let output = ultimateFallback;
-    const convert = unitFunction ? unitFunction : (value) => value.toString();
+    const convert = unitFunction ? unitFunction : value => value.toString();
     try {
         const BreakException = {};
         fallbacks.forEach((style, key) => {
@@ -394,7 +394,6 @@ const borderStylesFallbacks = (fallbacks: any[], ultimateFallback, unitFunction?
     return convert(output);
 };
 
-
 export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
     const globalVars = globalVariables();
 
@@ -408,7 +407,7 @@ export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
     // Set border radii
     let globalRadiusFound = false;
     let specificRadiusFound = false;
-    if ( typeof props.radius !== "object" ) {
+    if (typeof props.radius !== "object") {
         output.borderRadius = unit(props.radius as BorderRadiusProperty<TLength>);
         globalRadiusFound = true;
     } else {

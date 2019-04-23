@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import {styleFactory, useThemeCache} from "@library/styles/styleUtils";
 import {colorOut, defaultTransition} from "@library/styles/styleHelpers";
 import {countClasses} from "@library/content/countStyles";
-import {compactMeBoxClasses, compactMeBoxVariables} from "@library/headers/mebox/pieces/compactMeBoxStyles";
+import {compactMeBoxVariables} from "@library/headers/mebox/pieces/compactMeBoxStyles";
 
 export const tabButtonListClasses = useThemeCache(() => {
     const globalVars = globalVariables();

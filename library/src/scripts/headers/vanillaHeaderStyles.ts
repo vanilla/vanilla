@@ -20,7 +20,7 @@ import {
     pointerEvents,
 } from "@library/styles/styleHelpers";
 import {DEBUG_STYLES, styleFactory, useThemeCache, variableFactory} from "@library/styles/styleUtils";
-import {ColorHelper, percent, px, quote, viewHeight} from "csx";
+import {calc, ColorHelper, percent, px, quote, viewHeight} from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import {NestedCSSProperties} from "typestyle/lib/types";
 
@@ -292,8 +292,14 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         marginLeft: "auto",
         minWidth: unit(formElementVars.sizing.height),
         flexBasis: px(formElementVars.sizing.height),
-        height: px(vars.sizing.height),
-        flexShrink: 1,
+        maxWidth: percent(100),
+        height: unit(vars.sizing.height),
+        $nest: {
+            "&.isOpen": {
+                width: unit(vars.compactSearch.maxWidth),
+                flexBasis: "auto",
+            },
+        },
     });
 
     const topElement = style(
@@ -371,10 +377,6 @@ export const vanillaHeaderClasses = useThemeCache(() => {
                         $nest: {
                             "& .meBox-buttonContent": {
                                 backgroundColor: colorOut(vars.buttonContents.state.bg),
-                            },
-                            [`.${compactSearch}`]: {
-                                width: unit(vars.compactSearch.maxWidth),
-                                maxWidth: percent(100),
                             },
                         },
                     },
@@ -532,10 +534,10 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     const compactSearchResults = style(
         "compactSearchResults",
         {
-            top: (vars.sizing.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
+            top: 0,
             display: "flex",
             position: "relative",
-            margin: "auto",
+            margin: `${unit((vars.sizing.height - formElementVars.sizing.height + formElementVars.border.width) / -2)} auto`,
             maxWidth: px(vars.compactSearch.maxWidth),
         },
         mediaQueries.oneColumn({

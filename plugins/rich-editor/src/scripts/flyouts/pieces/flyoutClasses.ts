@@ -16,15 +16,23 @@ export const richEditorFlyoutClasses = useThemeCache(() => {
     const shadows = shadowHelper();
     const globalVars = globalVariables();
 
+    const richEditorWidth = 8 * vars.sizing.emojiSize;
+
     const root = style({
         ...shadows.dropDown(),
         position: "absolute",
         left: 0,
-        width: unit(vars.emojiBody.padding.horizontal * 2 + 8 * vars.sizing.emojiSize),
+        width: unit( richEditorWidth),
         zIndex: 6,
         overflow: "hidden",
         backgroundColor: colorOut(vars.colors.bg),
         ...borders(),
+
+        $nest: {
+            "& .ReactVirtualized__Grid": {
+                minWidth: unit(richEditorWidth ),
+            },
+        },
     });
 
     const header = style("header", {
@@ -51,7 +59,7 @@ export const richEditorFlyoutClasses = useThemeCache(() => {
     });
 
     const body = style("body", {
-        ...paddings(vars.emojiBody.padding),
+        ...paddings(vars.emojiBody.margin),
     });
 
     const footer = style("footer", {

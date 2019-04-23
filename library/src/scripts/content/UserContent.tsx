@@ -4,14 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import * as React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import className from "classnames";
 import { initAllUserContent } from "@library/content";
 import { userContentClasses } from "@library/content/userContentStyles";
+import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 
 interface IProps {
     className?: string;
-    scrollToOffset?: number;
     content: string;
 }
 
@@ -20,56 +20,43 @@ interface IProps {
  *
  * This will ensure that all embeds/etc are initialized.
  */
-export default class UserContent extends React.PureComponent<IProps> {
-    public static defaultProps: Partial<IProps> = {
-        scrollToOffset: 0,
-    };
-
-    public render() {
-        const classes = userContentClasses();
-
-        return (
-            <div
-                className={className("userContent", this.props.className, classes.root)}
-                dangerouslySetInnerHTML={{ __html: this.props.content }}
-            />
-        );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public componentDidMount() {
-        initAllUserContent();
-        this.scrollToHash();
-        window.addEventListener("hashchange", this.scrollToHash);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public componentDidUpdate() {
-        initAllUserContent();
-        this.scrollToHash();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public componentWillUnmount() {
-        window.removeEventListener("hashchange", this.scrollToHash);
-    }
+export default function UserContent(props: IProps) {
+    const classes = userContentClasses();
+    const offset = useScrollOffset();
 
     /**
      * Scroll to the window's current hash value.
      */
-    private scrollToHash = (event?: HashChangeEvent) => {
+    const scrollToHash = useCallback((event?: HashChangeEvent) => {
         event && event.preventDefault();
-        const id = window.location.hash.replace("#", "");
-        const element = document.querySelector(`[data-id="${id}"]`) as HTMLElement;
+
+        const targetID = window.location.hash.replace("#", "");
+        const element = document.querySelector(`[data-id="${targetID}"]`) as HTMLElement;
         if (element) {
-            const top = window.pageYOffset + element.getBoundingClientRect().top + this.props.scrollToOffset!;
+            const top = window.pageYOffset + element.getBoundingClientRect().top - offset.getCalcedHashOffset();
             window.scrollTo({ top, behavior: "smooth" });
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        initAllUserContent();
+    });
+
+    useEffect(() => {
+        scrollToHash();
+    }, []);
+
+    useEffect(() => {
+        window.addEventListener("hashchange", scrollToHash);
+        return () => {
+            window.removeEventListener("hashchange", scrollToHash);
+        };
+    }, [scrollToHash]);
+
+    return (
+        <div
+            className={className("userContent", props.className, classes.root)}
+            dangerouslySetInnerHTML={{ __html: props.content }}
+        />
+    );
 }

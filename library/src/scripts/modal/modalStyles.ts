@@ -111,6 +111,7 @@ export const modalClasses = useThemeCache(() => {
         left: percent(50),
         bottom: "initial",
         overflow: "hidden",
+        borderRadius: unit(vars.border.radius),
         // NOTE: This transform can cause issues if anything inside of us needs fixed positioning.
         // See http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/
         // See also https://www.w3.org/TR/2009/WD-css3-2d-transforms-20091201/#introduction
@@ -153,6 +154,8 @@ export const modalClasses = useThemeCache(() => {
                 bottom: 0,
                 right: 0,
                 transform: "none",
+                borderTopRightRadius: 0,
+                borderBottomRightRadius: 0,
             },
             "&&.isDropDown": {
                 top: 0,

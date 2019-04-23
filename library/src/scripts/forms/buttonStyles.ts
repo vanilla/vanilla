@@ -125,6 +125,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         borders: {
             color: globalVars.mixBgAndFg(0.24),
+            radius: globalVars.border.radius,
         },
         fonts: {
             color: globalVars.mainColors.fg,
@@ -184,6 +185,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         borders: {
             color: transparentColor,
+            radius: globalVars.border.radius,
         },
         hover: {
             fonts: {
@@ -219,6 +221,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         borders: {
             color: transparentColor,
+            radius: globalVars.border.radius,
         },
         hover: {
             fonts: {
@@ -264,6 +267,7 @@ export const buttonVariables = useThemeCache(() => {
         spinnerColor: globalVars.mainColors.bg,
         borders: {
             color: globalVars.mainColors.primary,
+            radius: globalVars.border.radius,
         },
         hover: {
             fonts: {
@@ -320,6 +324,7 @@ export const buttonVariables = useThemeCache(() => {
         },
         border: {
             color: modifyColorBasedOnLightness(globalVars.mainColors.fg, 1, true),
+            radius: globalVars.border.radius,
         },
         hover: {
             colors: {
@@ -353,6 +358,7 @@ export const buttonVariables = useThemeCache(() => {
         spinnerColor: globalVars.mainColors.bg,
         border: {
             color: globalVars.mainColors.bg,
+            radius: globalVars.border.radius,
         },
         hover: {
             colors: {
@@ -398,6 +404,7 @@ export const buttonVariables = useThemeCache(() => {
         spinnerColor: globalVars.elementaryColors.white,
         border: {
             color: globalVars.mainColors.fg,
+            radius: globalVars.border.radius,
         },
         hover: {
             colors: {

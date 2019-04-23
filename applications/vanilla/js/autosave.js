@@ -6,7 +6,7 @@ jQuery(document).ready(function($) {
         if (!options.button)
             return false;
 
-        var lastVal = null;
+        var lastVal = $(textarea).val();
 
         var save = function() {
             var currentVal = $(textarea).val();

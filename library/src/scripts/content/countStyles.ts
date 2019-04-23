@@ -1,45 +1,46 @@
+
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { absolutePosition, debugHelper, unit } from "@library/styles/styleHelpers";
+import {absolutePosition, colorOut, debugHelper, unit} from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
-import { style } from "typestyle";
+import {styleFactory, useThemeCache, variableFactory} from "@library/styles/styleUtils";
 
 export const countVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const themeVars = componentThemeVariables("count");
+    const themeVars = variableFactory("count");
 
-    const font = {
+    const font = themeVars("font",{
         size: 10,
-        ...themeVars.subComponentStyles("font"),
-    };
+    });
 
-    const sizing = {
+    const sizing = themeVars("sizing", {
         height: globalVars.fonts.size.large,
-        ...themeVars.subComponentStyles("sizing"),
-    };
+    });
 
-    const color = {
-        bg: globalVars.meta.colors.deleted,
-        ...themeVars.subComponentStyles("sizing"),
-    };
+    const notifications = themeVars("notifications", {
+        bg: globalVars.feedbackColors.deleted.bg,
+    });
 
-    return { font, sizing, color };
+    return {
+        font,
+        sizing,
+        notifications,
+    };
 });
 
 export const countClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = countVariables();
-    const debug = debugHelper("count");
+    const style = styleFactory("count");
 
     const root = style({
         ...absolutePosition.topRight(4),
         display: "block",
-        backgroundColor: vars.color.bg.toString(),
+        backgroundColor: colorOut(vars.notifications.bg),
         height: unit(vars.sizing.height),
         lineHeight: unit(vars.sizing.height),
         minWidth: unit(vars.sizing.height),
@@ -48,13 +49,11 @@ export const countClasses = useThemeCache(() => {
         borderRadius: unit(vars.sizing.height / 2),
         whiteSpace: "nowrap",
         padding: `0 3px`,
-        ...debug.name(),
     });
 
-    const text = style({
+    const text = style("test", {
         display: "block",
         textAlign: "center",
-        ...debug.name("text"),
     });
 
     return { root, text };

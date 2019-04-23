@@ -217,7 +217,6 @@ export const globalVariables = useThemeCache(() => {
         },
         colors: {
             fg: mixBgAndFg(0.85),
-            deleted: feedbackColors.deleted,
         },
     });
 

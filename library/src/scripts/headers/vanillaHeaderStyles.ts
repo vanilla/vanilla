@@ -16,12 +16,12 @@ import {
     modifyColorBasedOnLightness,
     unit,
     userSelect,
-    absolutePosition, pointerEvents,
+    absolutePosition,
+    pointerEvents,
 } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import {ColorHelper, percent, px, quote} from "csx";
+import {DEBUG_STYLES, styleFactory, useThemeCache, variableFactory} from "@library/styles/styleUtils";
+import {ColorHelper, percent, px, quote, viewHeight} from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
-import {ColorValues} from "@library/forms/buttonStyles";
 import {NestedCSSProperties} from "typestyle/lib/types";
 
 export const vanillaHeaderVariables = useThemeCache(() => {
@@ -72,6 +72,7 @@ export const vanillaHeaderVariables = useThemeCache(() => {
 
     const dropDownContents = makeThemeVars("dropDownContents", {
         minWidth: 350,
+        maxHeight: viewHeight(90),
     });
 
     const endElements = makeThemeVars("endElements", {
@@ -153,6 +154,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     const style = styleFactory("vanillaHeader");
 
     const root = style(
+        Symbol.for("Debug") as any,
         {
             maxWidth: percent(100),
             backgroundColor: headerColors.bg.toString(),
@@ -179,7 +181,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
                     color: vars.colors.fg.fade(0.8).toString(),
                     cursor: "pointer",
                 },
-                [`.${backLinkClasses().link}`]: {
+                [`& .${backLinkClasses().link}`]: {
                     $nest: {
                         "&, &:hover, &:focus, &:active": {
                             color: colorOut(vars.colors.fg),
@@ -187,10 +189,11 @@ export const vanillaHeaderClasses = useThemeCache(() => {
                     },
                 },
             },
+            ...mediaQueries.oneColumn({
+                height: px(vars.sizing.mobile.height),
+            }).$nest,
         },
-        mediaQueries.oneColumn({
-            height: px(vars.sizing.mobile.height),
-        }),
+
     );
 
     const spacer = style(
@@ -287,7 +290,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
 
     const compactSearch = style("compactSearch", {
         marginLeft: "auto",
-        minWidth: px(formElementVars.sizing.height),
+        minWidth: unit(formElementVars.sizing.height),
         flexBasis: px(formElementVars.sizing.height),
         height: px(vars.sizing.height),
         flexShrink: 1,
@@ -321,6 +324,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     });
 
     const button = style(
+
         "button",
         {
             color: vars.colors.fg.toString(),
@@ -367,6 +371,10 @@ export const vanillaHeaderClasses = useThemeCache(() => {
                         $nest: {
                             "& .meBox-buttonContent": {
                                 backgroundColor: colorOut(vars.buttonContents.state.bg),
+                            },
+                            [`.${compactSearch}`]: {
+                                width: unit(vars.compactSearch.maxWidth),
+                                maxWidth: percent(100),
                             },
                         },
                     },

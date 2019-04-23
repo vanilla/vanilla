@@ -6,10 +6,9 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, flexHelper, unit } from "@library/styles/styleHelpers";
-import { useThemeCache } from "@library/styles/styleUtils";
+import {styleFactory, useThemeCache} from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
-import { style } from "typestyle";
 import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const meBoxClasses = useThemeCache(() => {
@@ -19,6 +18,7 @@ export const meBoxClasses = useThemeCache(() => {
     const debug = debugHelper("meBox");
     const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
+    const style = styleFactory("meBox");
 
     const root = style(
         {
@@ -32,7 +32,7 @@ export const meBoxClasses = useThemeCache(() => {
         }),
     );
 
-    const buttonContent = style({
+    const buttonContent = style("buttonContent", {
         ...flex.middle(),
         width: unit(formVars.sizing.height),
         maxWidth: unit(formVars.sizing.height),
@@ -41,7 +41,7 @@ export const meBoxClasses = useThemeCache(() => {
     });
 
     const rootFlexClass = (count: number) => {
-        return style({
+        return style("footFlexClass",{
             flexBasis: unit(count * formElementsVariables().sizing.height),
         });
     };

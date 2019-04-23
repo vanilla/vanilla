@@ -147,7 +147,7 @@ export const modalClasses = useThemeCache(() => {
             },
             "&&&.isSidePanel": {
                 left: unit(vars.dropDown.padding),
-                width: calc(`100% - ${vars.dropDown.padding}px`),
+                width: calc(`100% - ${unit(vars.dropDown.padding)}`),
                 display: "flex",
                 flexDirection: "column",
                 top: 0,

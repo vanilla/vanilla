@@ -131,6 +131,18 @@ export function formatUrl(path: string, withDomain: boolean = false): string {
 }
 
 /**
+ * Extract relative URL part from absolute full URL.
+ *
+ * @param fullUrl - The absolute url to transform.
+ *
+ * @returns Returns a URL that can be used in the APP.
+ */
+export function getRelativeUrl(fullUrl: string): string {
+    const urlBase = window.location.origin + getMeta("context.basePath", "");
+    return fullUrl.replace(urlBase, '');
+}
+
+/**
  * Create the URL of an asset of the site.
  *
  * @param path - The path to format.

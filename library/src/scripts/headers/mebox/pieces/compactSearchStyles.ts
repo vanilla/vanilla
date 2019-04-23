@@ -78,11 +78,6 @@ export const compactSearchClasses = useThemeCache(() => {
         alignItems: "center",
         flexWrap: "nowrap",
         height: unit(headerVariables.sizing.height),
-        // $nest: {
-        //     ["& ." + searchBarClasses().content]: {
-        //         minHeight: "initial",
-        //     },
-        // },
     },
         mediaQueries.oneColumn({
         height: unit(headerVariables.sizing.mobile.height),

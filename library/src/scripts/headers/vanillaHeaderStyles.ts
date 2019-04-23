@@ -49,7 +49,7 @@ export const vanillaHeaderVariables = useThemeCache(() => {
 
     const buttonSize = formElementVars.sizing.height;
     const button = makeThemeVars("button", {
-        borderRadius: 3,
+        borderRadius: globalVars.border.radius,
         size: buttonSize,
         guest: {
             minWidth: 86,
@@ -212,7 +212,6 @@ export const vanillaHeaderClasses = useThemeCache(() => {
             alignItems: "center",
             height: px(vars.sizing.height),
             width: percent(100),
-            overflow: "hidden",
             $nest: {
                 "&.isHome": {
                     justifyContent: "space-between",
@@ -493,27 +492,32 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         marginLeft: unit(vars.guest.spacer),
         marginRight: unit(vars.guest.spacer),
         backgroundColor: colorOut(vars.resister.bg),
-        // Ugly solution, but not much choice until: https://github.com/vanilla/knowledge/issues/778
-        ...allButtonStates({
-            allStates: {
-                borderColor: colorOut(vars.resister.borderColor, true),
+        $nest: {
+            "&&": {
+                // Ugly solution, but not much choice until: https://github.com/vanilla/knowledge/issues/778
+                ...allButtonStates({
+                    allStates: {
+                        borderColor: colorOut(vars.resister.borderColor, true),
+                        color: colorOut(vars.resister.fg),
+                    },
+                    noState: {
+                        backgroundColor: colorOut(vars.resister.bg, true),
+                    },
+                    hover: {
+                        color: colorOut(vars.resister.fg),
+                        backgroundColor: colorOut(vars.resister.states.bg, true),
+                    },
+                    focus: {
+                        color: colorOut(vars.resister.fg),
+                        backgroundColor: colorOut(vars.resister.states.bg, true),
+                    },
+                    active: {
+                        color: colorOut(vars.resister.fg),
+                        backgroundColor: colorOut(vars.resister.states.bg, true),
+                    },
+                }),
             },
-            noState: {
-                backgroundColor: colorOut(vars.resister.bg, true),
-            },
-            hover: {
-                color: colorOut(vars.resister.fg),
-                backgroundColor: colorOut(vars.resister.states.bg, true),
-            },
-            focus: {
-                color: colorOut(vars.resister.fg),
-                backgroundColor: colorOut(vars.resister.states.bg, true),
-            },
-            active: {
-                color: colorOut(vars.resister.fg),
-                backgroundColor: colorOut(vars.resister.states.bg, true),
-            },
-        }),
+        },
     });
 
     const compactSearchResults = style(
@@ -536,6 +540,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
 
     const guestButton = style("guestButton", {
         minWidth: unit(vars.button.guest.minWidth),
+        borderRadius: unit(vars.button.borderRadius),
     });
 
     const desktopNavWrap = style("desktopNavWrap", {

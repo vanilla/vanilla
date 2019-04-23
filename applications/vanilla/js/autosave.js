@@ -10,8 +10,15 @@ jQuery(document).ready(function($) {
 
         var save = function() {
             var currentVal = $(textarea).val();
-            if (currentVal != undefined && currentVal != '' && currentVal != lastVal) {
-                lastVal = currentVal
+            var defaultValues = [
+                undefined,
+                null,
+                '',
+                '[{"insert":"\n"}]',
+                lastVal
+            ];
+            if (!defaultValues.includes(currentVal)) {
+                lastVal = currentVal;
                 $(options.button).click();
             }
         };

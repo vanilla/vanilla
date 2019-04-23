@@ -50,7 +50,7 @@ class CodePenEmbed extends Embed {
     public function renderData(array $data): string {
         $overflowValues = ['visible', 'hidden', 'scroll', 'auto', 'initial', 'inherit'];
         $height = $data['height'] ?? "";
-        $embedUrl = $data['attributes']['embedUrl'] ?? "";
+        $embedUrl = \Gdn_Format::sanitizeUrl($data['attributes']['embedUrl'] ?? "");
         $width = $data['attributes']['style']['width'] ?? "";
         $width = is_numeric($width) ? $width : "";
         $validWidth = ($width >= 1 && $width <= 100) ? $width : 100;

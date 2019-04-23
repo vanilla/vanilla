@@ -432,7 +432,8 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     const dropDownContents = style("dropDownContents", {
         $nest: {
             "&&&": {
-                minWidth: px(vars.dropDownContents.minWidth),
+                minWidth: unit(vars.dropDownContents.minWidth),
+                maxHeight: unit(vars.dropDownContents.maxHeight),
             },
         },
     });

@@ -6,19 +6,23 @@
 
 import { absolutePosition, flexHelper, unit, sticky, colorOut } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { componentThemeVariables, styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import {styleFactory, useThemeCache, variableFactory} from "@library/styles/styleUtils";
 import { calc, percent, viewHeight } from "csx";
 
 export const compactMeBoxVariables = useThemeCache(() => {
-    const themeVars = componentThemeVariables("compactMeBox");
+    const themeVars = variableFactory("compactMeBox");
+    const globalVars = globalVariables();
 
-    const tab = {
+    const tab = themeVars("tab", {
         height: 44,
         width: 44,
-        ...themeVars.subComponentStyles("something"),
-    };
+    });
 
-    return { tab };
+    const colors = themeVars("colors", {
+        bg: globalVars.mainColors.bg,
+    });
+
+    return { tab, colors };
 });
 
 export const compactMeBoxClasses = useThemeCache(() => {
@@ -51,7 +55,7 @@ export const compactMeBoxClasses = useThemeCache(() => {
 
     const tabList = style("tabList", sticky(), {
         top: 0,
-        background: colorOut(globalVars.mainColors.bg),
+        background: colorOut(vars.colors.bg),
         zIndex: 2,
         paddingRight: unit(vars.tab.width),
         height: unit(vars.tab.height),

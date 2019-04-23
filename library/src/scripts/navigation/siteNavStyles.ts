@@ -71,11 +71,6 @@ export const siteNavClasses = useThemeCache(() => {
     const children = style("children", {
         position: "relative",
         display: "block",
-        $nest: {
-            "& + .siteNavAdminLinks": {
-                margin: `25px 0 0`,
-            },
-        },
     });
 
     return { root, title, children };
@@ -99,7 +94,6 @@ export const siteNavNodeClasses = useThemeCache(() => {
         $nest: {
             "&.isCurrent": {
                 color: vars.node.active.fg.toString(),
-                fontWeight: vars.node.active.fontWeight,
             },
         },
     });

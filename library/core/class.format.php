@@ -1012,7 +1012,7 @@ class Gdn_Format {
      */
     public static function plainText($body, $format = 'Html', $collapse = false) {
         if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
-            return self::getRichFormatter()->renderPlainText($body);
+            return htmlspecialchars(self::getRichFormatter()->renderPlainText($body));
         }
 
         if (strcasecmp($format, 'text') === 0) {
@@ -1051,7 +1051,8 @@ class Gdn_Format {
      */
     public static function excerpt($body, $format = 'Html', $collapse = false) {
         if (strcasecmp($format, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY) === 0) {
-            return self::getRichFormatter()->renderExcerpt($body);
+            $result = htmlspecialchars(self::getRichFormatter()->renderExcerpt($body));
+            return $result;
         }
         $result = Gdn_Format::to($body, $format);
         $result = Gdn_Format::replaceSpoilers($result);

@@ -8,6 +8,7 @@
 import {absolutePosition, colorOut, debugHelper, unit} from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {styleFactory, useThemeCache, variableFactory} from "@library/styles/styleUtils";
+import {ColorValues} from "@library/forms/buttonStyles";
 
 export const countVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -37,24 +38,29 @@ export const countClasses = useThemeCache(() => {
     const vars = countVariables();
     const style = styleFactory("count");
 
-    const root = style({
-        ...absolutePosition.topRight(4),
-        display: "block",
-        backgroundColor: colorOut(vars.notifications.bg),
-        height: unit(vars.sizing.height),
-        lineHeight: unit(vars.sizing.height),
-        minWidth: unit(vars.sizing.height),
-        fontSize: unit(vars.font.size),
-        fontWeight: globalVars.fonts.weights.semiBold,
-        borderRadius: unit(vars.sizing.height / 2),
-        whiteSpace: "nowrap",
-        padding: `0 3px`,
-    });
+    const root = (countBg?: ColorValues) => {
+        return style({
+            ...absolutePosition.topRight(4),
+            display: "block",
+            backgroundColor: countBg ? colorOut(countBg) : colorOut(vars.notifications.bg),
+            height: unit(vars.sizing.height),
+            lineHeight: unit(vars.sizing.height),
+            minWidth: unit(vars.sizing.height),
+            fontSize: unit(vars.font.size),
+            fontWeight: globalVars.fonts.weights.semiBold,
+            borderRadius: unit(vars.sizing.height / 2),
+            whiteSpace: "nowrap",
+            padding: `0 3px`,
+        });
+    };
 
-    const text = style("test", {
-        display: "block",
-        textAlign: "center",
-    });
+    const text = (countFg?: ColorValues) => {
+        return style("text", {
+            display: "block",
+            textAlign: "center",
+            color: !!countFg ? colorOut(countFg) : "inherit",
+        });
+    };
 
     return { root, text };
 });

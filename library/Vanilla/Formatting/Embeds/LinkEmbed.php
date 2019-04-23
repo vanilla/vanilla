@@ -6,13 +6,17 @@
 
 namespace Vanilla\Formatting\Embeds;
 
+use Garden\TwigTrait;
 use Gdn_Format;
 use Vanilla\PageScraper;
+use Vanilla\Web\TwigRenderTrait;
 
 /**
  * Generic link embed.
  */
 class LinkEmbed extends Embed {
+
+    use TwigRenderTrait;
 
     /** @var PageScraper */
     private $pageScraper;
@@ -58,51 +62,15 @@ class LinkEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
-        $url = $data['url'] ?? null;
-        $name = $data['name'] ?? null;
-        $body = $data['body'] ?? null;
-        $photoUrl = $data['photoUrl'] ?? null;
-        $timestamp = $data['timestamp'] ?? null;
-        $humanTime = $data['humanTime'] ?? null;
 
-        if ($photoUrl) {
-            $photoUrlEncoded = htmlspecialchars($photoUrl);
-            $image = "<img src='$photoUrlEncoded' class='embedLink-image' aria-hidden='true'>";
-        } else {
-            $image = "";
-        }
+        $data['url'] = $data['url'] ?? null;
+        $data['name'] = $data['name'] ?? null;
+        $data['body'] = $data['body'] ?? null;
+        $data['photoUrl'] = $data['photoUrl'] ?? null;
+        $data['timestamp'] = $data['timestamp'] ?? null;
+        $data['humanTime'] = $data['humanTime'] ?? null;
 
-        if ($timestamp && $humanTime) {
-            $timestampAsMeta = "<time class=\"embedLink-dateTime metaStyle\" dateTime=\"$timestamp\">$humanTime</time>";
-        } else {
-            $timestampAsMeta = "";
-        }
-
-        $urlEncoded = htmlspecialchars(\Gdn_Format::sanitizeUrl($url));
-        $urlAsMeta = "<span class=\"embedLink-source metaStyle\">$urlEncoded</span>";
-        $nameEncoded = htmlspecialchars($name);
-        $bodyEncoded = htmlspecialchars($body);
-
-        $result = <<<HTML
-<div class="embedExternal embedText embedLink">
-    <div class="embedExternal-content embedText-content embedLink-content">
-        <a class="embedLink-link" href="{$urlEncoded}" rel="noopener noreferrer">
-            <article class="embedText-body">
-                {$image}
-                <div class="embedText-main">
-                    <div class="embedText-header">
-                        <h3 class="embedText-title">{$nameEncoded}</h3>
-                        {$timestampAsMeta}
-                        {$urlAsMeta}
-                    </div>
-                    <div class="embedLink-excerpt">{$bodyEncoded}</div>
-                </div>
-            </article>
-        </a>
-    </div>
-</div>
-HTML;
-
+        return $this->renderTwig('library/Vanilla/Formatting/Embeds/LinkEmbed.twig', $data);
         return $result;
     }
 }

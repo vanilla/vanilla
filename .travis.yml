@@ -130,10 +130,10 @@ jobs:
           - $TRAVIS_BUILD_DIR/plugins/rich-editor/node_modules
         yarn: true
       script:
-        - yarn audit
         - yarn build
         - yarn test
         - yarn check-types
+        - ./tests/travis/audit.sh
 
 # No additional system dependencies to install. Skip the install step.
 install: true

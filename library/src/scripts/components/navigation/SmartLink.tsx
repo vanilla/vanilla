@@ -8,6 +8,7 @@ import React from "react";
 import { formatUrl } from "@library/application";
 import { NavLinkProps, NavLink } from "react-router-dom";
 import { LocationDescriptor, createPath, createLocation } from "history";
+import {sanitizeUrl} from "@library/utility";
 
 export const LinkContext = React.createContext("https://changeme.dev.localhost");
 
@@ -54,7 +55,7 @@ export default function SmartLink(props: IProps) {
                         />
                     );
                 } else {
-                    return <a {...passthru} href={href} tabIndex={props.tabIndex} />;
+                    return <a {...passthru} href={sanitizeUrl(href)} tabIndex={props.tabIndex} />;
                 }
             }}
         </LinkContext.Consumer>

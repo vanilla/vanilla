@@ -12,6 +12,7 @@ import uniqueId from "lodash/uniqueId";
 import classnames from "classnames";
 import api from "@library/apiv2";
 import DateTime from "@library/components/DateTime";
+import SmartLink from "@library/components/navigation/SmartLink";
 
 export function initQuoteEmbeds() {
     registerEmbedComponent("quote", QuoteEmbed as any);
@@ -112,7 +113,7 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
             <blockquote className={bodyClasses}>
                 <div className="embedText-header embedQuote-header">
                     {title}
-                    <a href={userUrl} className="embedQuote-userLink">
+                    <SmartLink to={userUrl} className="embedQuote-userLink">
                         <span className="embedQuote-userPhotoWrap">
                             <img
                                 src={insertUser.photoUrl}
@@ -122,10 +123,10 @@ export class QuoteEmbed extends React.Component<IEmbedProps<IEmbedData>, IState>
                             />
                         </span>
                         <span className="embedQuote-userName">{insertUser.name}</span>
-                    </a>
-                    <a href={this.quoteData.url} className="embedQuote-metaLink">
+                    </SmartLink>
+                    <SmartLink to={this.quoteData.url} className="embedQuote-metaLink">
                         <DateTime timestamp={this.dateTime} className="embedText-dateTime embedQuote-dateTime meta" />
-                    </a>
+                    </SmartLink>
 
                     {this.state.needsCollapseButton && (
                         <button

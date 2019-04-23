@@ -92,15 +92,15 @@ helpAsset(t('About Theme Preview'), t('Not getting what you expect when you prev
         echo implode('<span class="spacer">|</span>', $info);
         echo '</div>';
         echo '</div>';
-        echo '<div class="media-description Description"><div class="description">'.$this->data('EnabledTheme.Description', '').'</div>';
+        echo '<div class="media-description Description"><p class="description">'.$this->data('EnabledTheme.Description', '').'</p>';
 
         if ($this->data('EnabledTheme.Options')) {
             $OptionsDescription = sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.'),
                 anchor(t('Theme Options'), '/dashboard/settings/themeoptions'));
 
-            echo '<div class="Options">',
+            echo '<p class="Options">',
             $OptionsDescription,
-            '</div>';
+            '</p>';
 
         }
 
@@ -133,10 +133,6 @@ helpAsset(t('About Theme Preview'), t('Not getting what you expect when you prev
         $EnabledUpgrade = $EnabledNewVersion != '' && version_compare($EnabledNewVersion, $EnabledVersion, '>');
         $EnabledPreviewUrl = $this->data('EnabledTheme.MobileScreenshotUrl', false);
         $EnabledThemeName = $this->data('EnabledThemeName');
-
-        if ($this->data('EnabledTheme.Options')) {
-            $OptionsDescription = sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.'), anchor(t('Theme Options'), '/dashboard/settings/themeoptions'));
-        }
 
         $Cols = 3;
         $Col = 0;
@@ -209,17 +205,6 @@ helpAsset(t('About Theme Preview'), t('Not getting what you expect when you prev
                 </div>
                 <div class="description">
                     <?php echo $DescriptionHtml; ?>
-
-                    <?php
-                    if ($this->data('EnabledTheme.Options')) {
-                        $OptionsDescription = sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.'),
-                            anchor(t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions'));
-
-                        echo '<div class="Options">',
-                        $OptionsDescription,
-                        '</div>';
-                    }
-                    ?>
 
                     <?php if (is_array($RequiredApplications)): ?>
 

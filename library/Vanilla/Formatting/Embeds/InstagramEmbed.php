@@ -45,7 +45,7 @@ class InstagramEmbed extends Embed {
     public function renderData(array $data): string {
         $instagramPermalink = $data['attributes']['permaLink'] ?? '';
         $instgramVersion = $data['attributes']['versionNumber'] ?? '';
-        $url = $data["url"];
+        $url = \Gdn_Format::sanitizeUrl($data["url"] ?? "");
 
         $encodedUrl = htmlspecialchars($url);
         $dataInstgrmPermalink =  htmlspecialchars($instagramPermalink);

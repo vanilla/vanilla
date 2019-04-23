@@ -6,10 +6,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { registerEmbedComponent, IEmbedProps, IFileUploadData } from "@library/embeds";
-import { onContent, onReady } from "@library/application";
+import { onContent } from "@library/application";
 import Attachment from "@library/components/attachments/Attachment";
-import { AttachmentType, mimeTypeToAttachmentType } from "@library/components/attachments";
 import BaseEmbed from "@library/user-content/embeds/BaseEmbed";
+import {mimeTypeToAttachmentType} from "@library/components/attachments";
+import {sanitizeUrl} from "@library/utility";
 
 export function initFileEmbeds() {
     registerEmbedComponent("file", FileEmbed);
@@ -54,7 +55,7 @@ export class FileEmbed extends BaseEmbed<IEmbedProps<IFileUploadData>> {
                 type={attachmentType}
                 size={size}
                 name={name}
-                url={url}
+                url={sanitizeUrl(url)}
                 dateUploaded={dateInserted}
                 mimeType={type}
             />

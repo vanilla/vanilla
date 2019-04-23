@@ -26,7 +26,6 @@ export const meBoxClasses = useThemeCache(() => {
             display: "flex",
             alignItems: "center",
             height: unit(vanillaHeaderVars.sizing.height),
-            flexBasis: unit(vanillaHeaderVars.sizing.height * 3),
         },
         mediaQueries.oneColumn({
             height: unit(vanillaHeaderVars.sizing.mobile.height),
@@ -41,5 +40,12 @@ export const meBoxClasses = useThemeCache(() => {
         height: unit(vanillaHeaderVars.meBox.sizing.buttonContents),
     });
 
-    return { root, buttonContent };
+    const rootFlexClass = (count: number) => {
+        return style({
+            flexBasis: unit(count * formElementsVariables().sizing.height),
+        });
+    };
+
+    return {
+        root, buttonContent, rootFlexClass };
 });

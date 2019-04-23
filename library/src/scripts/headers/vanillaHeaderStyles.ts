@@ -256,7 +256,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         flexWrap: "wrap",
         height: px(vars.sizing.height),
         color: "inherit",
-    },  mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }),);
+    },  mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }));
 
     const locales = style(
         "locales",
@@ -288,7 +288,10 @@ export const vanillaHeaderClasses = useThemeCache(() => {
 
     const compactSearch = style("compactSearch", {
         marginLeft: "auto",
-        maxWidth: px(vars.compactSearch.maxWidth),
+        minWidth: px(formElementVars.sizing.height),
+        flexBasis: px(formElementVars.sizing.height),
+        height: px(vars.sizing.height),
+        flexShrink: 1,
     });
 
     const topElement = style(
@@ -537,6 +540,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
 
     const desktopNavWrap = style("desktopNavWrap", {
         position: "relative",
+        flexGrow: 1,
         ...addGradientsToHintOverflow( globalVars.gutter.half * 4, vars.colors.bg) as any,
     });
 

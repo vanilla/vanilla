@@ -18,29 +18,5 @@ export const dummyNavigationData = {
             to: "/kb",
             children: "Help",
         },
-        {
-            to: "/categories",
-            children: "Categories",
-        },
-        {
-            to: "/discussions",
-            children: "Discussions",
-        },
-        {
-            to: "/kb",
-            children: "Help",
-        },
-        {
-            to: "/categories",
-            children: "Categories",
-        },
-        {
-            to: "/discussions",
-            children: "Discussions",
-        },
-        {
-            to: "/kb",
-            children: "Help",
-        },
     ],
 };

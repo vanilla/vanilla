@@ -16,6 +16,7 @@ interface IContextParams {
     offsetClass: string;
     getCalcedHashOffset(): number;
     hashOffsetRef: React.RefObject<HTMLDivElement>;
+    temporarilyDisabledWatching: (duration: number) => void;
 }
 
 export const ScrollOffsetContext = React.createContext<IContextParams>({
@@ -27,6 +28,9 @@ export const ScrollOffsetContext = React.createContext<IContextParams>({
     },
     scrollOffset: null,
     getCalcedHashOffset: () => 0,
+    temporarilyDisabledWatching: () => {
+        logWarning("Attempted to disable watching but a proper provider was not configured.");
+    },
     hashOffsetRef: {
         current: null,
     },
@@ -46,6 +50,7 @@ interface IState {
     scrollOffset: number;
     isScrolledOff: boolean;
     hashOffset: number;
+    isWatchingEnabled: boolean;
 }
 
 /**
@@ -64,6 +69,7 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
         scrollOffset: 0,
         isScrolledOff: false,
         hashOffset: 0,
+        isWatchingEnabled: true,
     };
 
     private hashOffsetRef = React.createRef<HTMLDivElement>();
@@ -92,6 +98,7 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
                     offsetClass: scrollWatchingEnabled ? offsetClass : "",
                     getCalcedHashOffset: this.getCalcedHashOffset,
                     hashOffsetRef: this.hashOffsetRef,
+                    temporarilyDisabledWatching: this.temporarilyDisabledWatching,
                 }}
             >
                 {this.props.children}
@@ -113,12 +120,23 @@ export class ScrollOffsetProvider extends React.Component<IProps, IState> {
         window.removeEventListener("scroll", this.scrollHandler);
     }
 
+    private get shouldWatchScroll() {
+        return this.props.scrollWatchingEnabled && this.state.isWatchingEnabled;
+    }
+
+    private temporarilyDisabledWatching = (duration: number) => {
+        this.setState({ isWatchingEnabled: false });
+        setTimeout(() => {
+            this.setState({ isWatchingEnabled: true });
+        }, duration);
+    };
+
     /** Keep a local copy of our previous window scroll value. */
     private previousScrollValue = 0;
 
     private scrollHandler = () => {
         // Early bailout if we aren't watching scroll position.
-        if (!this.props.scrollWatchingEnabled) {
+        if (!this.shouldWatchScroll) {
             return;
         }
 

@@ -33,6 +33,7 @@ export default function UserContent(props: IProps) {
         const targetID = window.location.hash.replace("#", "");
         const element = document.querySelector(`[data-id="${targetID}"]`) as HTMLElement;
         if (element) {
+            offset.temporarilyDisabledWatching(500);
             const top = window.pageYOffset + element.getBoundingClientRect().top - offset.getCalcedHashOffset();
             window.scrollTo({ top, behavior: "smooth" });
         }

@@ -97,7 +97,7 @@ class PanelLayout extends React.Component<IProps> {
 
         const fixedPanelClass = style(sticky(), {
             $debugName: "fixedPanelClasses",
-            top: headerVars.sizing.height * 2 + 18,
+            top: headerVars.sizing.height * 2,
             height: percent(100),
             overflow: "auto",
         });

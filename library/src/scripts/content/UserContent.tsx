@@ -9,6 +9,7 @@ import className from "classnames";
 import { initAllUserContent } from "@library/content";
 import { userContentClasses } from "@library/content/userContentStyles";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
+import { forceRenderStyles } from "typestyle";
 
 interface IProps {
     className?: string;
@@ -33,6 +34,7 @@ export default function UserContent(props: IProps) {
         const targetID = window.location.hash.replace("#", "");
         const element = document.querySelector(`[data-id="${targetID}"]`) as HTMLElement;
         if (element) {
+            forceRenderStyles();
             offset.temporarilyDisabledWatching(500);
             const top = window.pageYOffset + element.getBoundingClientRect().top - offset.getCalcedHashOffset();
             window.scrollTo({ top, behavior: "smooth" });

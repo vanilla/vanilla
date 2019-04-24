@@ -256,7 +256,7 @@ export const splashStyles = useThemeCache(() => {
         ...background(vars.outerBackground),
         opacity: vars.outerBackground.fallbackImage && image === vars.outerBackground.fallbackImage ? 0.4 : undefined,
     });
-    const customBackground = (url: string) => style("customBackground", { backgroundImage: `url(${url})` });
+    const customOuterBackground = (url: string) => style("customBackground", { backgroundImage: `url(${url})` });
 
     const innerContainer = style("innerContainer", {
         ...paddings(vars.spacing.padding),
@@ -383,7 +383,7 @@ export const splashStyles = useThemeCache(() => {
     return {
         root,
         outerBackground,
-        customBackground,
+        customOuterBackground,
         innerContainer,
         title,
         text,

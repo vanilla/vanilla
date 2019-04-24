@@ -20,7 +20,7 @@ interface IProps extends IDeviceProps {
     action?: React.ReactNode;
     title?: string; // Often the message to display isn't the real H1
     className?: string;
-    backgroundImage?: string;
+    outerBackgroundImage?: string;
 }
 
 /**
@@ -38,7 +38,8 @@ export class Splash extends React.Component<IProps> {
                 <div
                     className={classNames(
                         classes.outerBackground,
-                        this.props.backgroundImage && classes.customBackground(this.props.backgroundImage),
+                        this.props.outerBackgroundImage &&
+                            classes.customOuterBackground(this.props.outerBackgroundImage),
                     )}
                 />
                 <Container>

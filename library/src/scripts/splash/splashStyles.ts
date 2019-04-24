@@ -245,18 +245,22 @@ export const splashStyles = useThemeCache(() => {
     });
 
     const image = getBackgroundImage(vars.outerBackground.image, vars.outerBackground.fallbackImage);
-    const outerBackground = style("outerBackground", {
-        ...centeredBackgroundProps(),
-        display: "block",
-        position: "absolute",
-        top: px(0),
-        left: px(0),
-        width: percent(100),
-        height: percent(100),
-        ...background(vars.outerBackground),
-        opacity: vars.outerBackground.fallbackImage && image === vars.outerBackground.fallbackImage ? 0.4 : undefined,
-    });
-    const customOuterBackground = (url: string) => style("customBackground", { backgroundImage: `url(${url})` });
+    const outerBackground = (url?: string) => {
+        return style("outerBackground", {
+            ...centeredBackgroundProps(),
+            display: "block",
+            position: "absolute",
+            top: px(0),
+            left: px(0),
+            width: percent(100),
+            height: percent(100),
+            ...background(url ? { ...vars.outerBackground, image: url } : vars.outerBackground),
+            opacity:
+                !url && (vars.outerBackground.fallbackImage && image === vars.outerBackground.fallbackImage)
+                    ? 0.4
+                    : undefined,
+        });
+    };
 
     const innerContainer = style("innerContainer", {
         ...paddings(vars.spacing.padding),
@@ -383,7 +387,6 @@ export const splashStyles = useThemeCache(() => {
     return {
         root,
         outerBackground,
-        customOuterBackground,
         innerContainer,
         title,
         text,

@@ -10,6 +10,7 @@ import { initAllUserContent } from "@library/content";
 import { userContentClasses } from "@library/content/userContentStyles";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import { forceRenderStyles } from "typestyle";
+import { useHashScrolling } from "@library/content/hashScrolling";
 
 interface IProps {
     className?: string;
@@ -23,38 +24,11 @@ interface IProps {
  */
 export default function UserContent(props: IProps) {
     const classes = userContentClasses();
-    const offset = useScrollOffset();
-
-    /**
-     * Scroll to the window's current hash value.
-     */
-    const scrollToHash = useCallback((event?: HashChangeEvent) => {
-        event && event.preventDefault();
-
-        const targetID = window.location.hash.replace("#", "");
-        const element = document.querySelector(`[data-id="${targetID}"]`) as HTMLElement;
-        if (element) {
-            forceRenderStyles();
-            offset.temporarilyDisabledWatching(500);
-            const top = window.pageYOffset + element.getBoundingClientRect().top - offset.getCalcedHashOffset();
-            window.scrollTo({ top, behavior: "smooth" });
-        }
-    }, []);
 
     useEffect(() => {
         initAllUserContent();
     });
-
-    useEffect(() => {
-        scrollToHash();
-    }, []);
-
-    useEffect(() => {
-        window.addEventListener("hashchange", scrollToHash);
-        return () => {
-            window.removeEventListener("hashchange", scrollToHash);
-        };
-    }, [scrollToHash]);
+    useHashScrolling();
 
     return (
         <div

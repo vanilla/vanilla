@@ -10,8 +10,9 @@ import {
     absolutePosition,
     colorOut,
     flexHelper,
-    modifyColorBasedOnLightness,
+    margins,
     negative,
+    paddings,
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
@@ -19,7 +20,6 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";
-import { userContentClasses } from "@library/content/userContentStyles";
 
 export const vanillaHeaderNavigationVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("vanillaHeaderNavigation");
@@ -34,6 +34,10 @@ export const vanillaHeaderNavigationVariables = useThemeCache(() => {
         size: varsFormElements.sizing.height,
     });
 
+    const padding = makeThemeVars("padding", {
+        horizontal: globalVars.gutter.half,
+    });
+
     const linkActive = makeThemeVars("linkActive", {
         offset: 2,
         height: 3,
@@ -45,53 +49,68 @@ export const vanillaHeaderNavigationVariables = useThemeCache(() => {
         border,
         item,
         linkActive,
+        padding,
     };
 });
 
 export default function vanillaHeaderNavClasses() {
+    const globalVars = globalVariables();
     const headerVars = vanillaHeaderVariables();
     const vars = vanillaHeaderNavigationVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
     const style = styleFactory("vanillaHeaderNav");
 
-    const root = style({
-        position: "relative",
-    });
-
-    const navigation = style({
-        ...flex.middle(),
-        height: percent(100),
-        color: "inherit",
-        $nest: {
-            "&.isScrolled": {
-                alignItems: "center",
-                justifyContent: "center",
-                flexWrap: "nowrap",
-                minWidth: percent(100),
-            },
+    const root = style(
+        {
+            ...flex.middleLeft(),
+            position: "relative",
+            height: unit(headerVars.sizing.height),
         },
-    });
+        mediaQueries.oneColumn({
+            height: unit(headerVars.sizing.mobile.height),
+        }),
+    );
+
+    const navigation = style(
+        "navigation",
+        {
+            // height: unit(vars.item.size),
+        },
+        mediaQueries.oneColumn({
+            // height: unit(headerVars.sizing.mobile.height),
+        }),
+    );
 
     const items = style(
         "items",
         {
-            ...flex.middle(),
-            height: unit(vars.item.size),
+            ...flex.middleLeft(),
+            height: unit(headerVars.sizing.height),
+            ...paddings(vars.padding),
         },
         mediaQueries.oneColumn({
             height: px(headerVars.sizing.mobile.height),
+            justifyContent: "center",
+            width: percent(100),
         }),
     );
 
     const link = style("link", {
         ...userSelect(),
+        color: colorOut(headerVars.colors.fg),
+        whiteSpace: "nowrap",
+        lineHeight: globalVars.lineHeights.condensed,
         display: "flex",
+        alignItems: "center",
         justifyContent: "center",
-        alignItems: "stretch",
         height: unit(vars.item.size),
+        textDecoration: "none",
         $nest: {
             "&.focus-visible": {
+                backgroundColor: colorOut(headerVars.buttonContents.state.bg),
+            },
+            "&:focus": {
                 backgroundColor: colorOut(headerVars.buttonContents.state.bg),
             },
             "&:hover": {
@@ -117,8 +136,15 @@ export default function vanillaHeaderNavClasses() {
     });
 
     const linkContent = style("linkContent", {
-        ...flex.middleLeft(),
         position: "relative",
+    });
+
+    const firstItem = style("lastItem", {
+        zIndex: 2,
+    });
+
+    const lastItem = style("lastItem", {
+        zIndex: 2,
     });
 
     return {
@@ -128,5 +154,7 @@ export default function vanillaHeaderNavClasses() {
         link,
         linkActive,
         linkContent,
+        lastItem,
+        firstItem,
     };
 }

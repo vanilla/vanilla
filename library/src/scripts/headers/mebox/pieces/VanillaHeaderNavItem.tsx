@@ -7,7 +7,7 @@
 import React from "react";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import VanillaHeaderListItem from "@library/headers/mebox/pieces/VanillaHeaderListItem";
-import vanillaHeaderNavClasses from "@library/headers/VanillaHeaderNav";
+import vanillaHeaderNavClasses from "@library/headers/vanillaHeaderNavStyles";
 import SmartLink from "@library/routing/links/SmartLink";
 import { getDynamicClassFromButtonType } from "@library/forms/Button";
 import { RouteComponentProps, withRouter } from "react-router";

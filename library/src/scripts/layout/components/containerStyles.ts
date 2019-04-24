@@ -9,7 +9,6 @@ import { layoutVariables } from "@library/layout/layoutStyles";
 import { percent } from "csx";
 import { paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const containerVariables = useThemeCache(() => {
     const vars = layoutVariables();

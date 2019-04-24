@@ -18,7 +18,7 @@ import Container from "@library/layout/components/Container";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
 import FlexSpacer from "@library/layout/FlexSpacer";
-import { ScrollOffsetContext } from "@library/layout/ScrollOffsetContext";
+import { ScrollOffsetContext, HashOffsetReporter } from "@library/layout/ScrollOffsetContext";
 import BackLink from "@library/routing/links/BackLink";
 import { IWithPagesProps, withPages } from "@library/routing/PagesContext";
 import { sticky } from "@library/styles/styleHelpers";
@@ -94,83 +94,79 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         containerElement.classList.value = outerCssClasses;
 
         return ReactDOM.createPortal(
-            <Container>
-                <PanelWidgetHorizontalPadding>
-                    <div className={classNames("vanillaHeader-bar", classes.bar)}>
-                        {!this.state.openSearch && isMobile && (
-                            <BackLink
-                                className={classNames(
-                                    "vanillaHeader-leftFlexBasis",
-                                    "vanillaHeader-backLink",
-                                    classes.leftFlexBasis,
-                                )}
-                                linkClassName={classes.button}
-                                fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
-                            />
-                        )}
+            <HashOffsetReporter>
+                <Container>
+                    <PanelWidgetHorizontalPadding>
+                        <div className={classNames("vanillaHeader-bar", classes.bar)}>
+                            {!this.state.openSearch && isMobile && (
+                                <BackLink
+                                    className={classNames(
+                                        "vanillaHeader-leftFlexBasis",
+                                        "vanillaHeader-backLink",
+                                        classes.leftFlexBasis,
+                                    )}
+                                    linkClassName={classes.button}
+                                    fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
+                                />
+                            )}
+                            {!isMobile && (
+                                <HeaderLogo
+                                    className={classNames("vanillaHeader-logoContainer", classes.logoContainer)}
+                                    logoClassName="vanillaHeader-logo"
+                                    logoType={LogoType.DESKTOP}
+                                />
+                            )}
+                            {!this.state.openSearch && !isMobile && (
+                                <VanillaHeaderNav
+                                    {...dummyNavigationData}
+                                    className={classNames("vanillaHeader-nav", classes.nav)}
+                                    linkClassName={classNames("vanillaHeader-navLink", classes.topElement)}
+                                    linkContentClassName="vanillaHeader-navLinkContent"
+                                />
+                            )}
+                            {showMobileDropDown && (
+                                <MobileDropDown
+                                    title={this.props.title!}
+                                    buttonClass={classNames("vanillaHeader-mobileDropDown", classes.topElement)}
+                                >
+                                    {this.props.mobileDropDownContent}
+                                </MobileDropDown>
+                            )}
 
-                        {!isMobile && (
-                            <HeaderLogo
-                                className={classNames(
-                                    "vanillaHeader-logoContainer",
-                                    classes.logoContainer,
-                                    classes.logoFlexBasis,
-                                )}
-                                logoClassName="vanillaHeader-logo"
-                                logoType={LogoType.DESKTOP}
-                            />
-                        )}
-                        {!this.state.openSearch && !isMobile && (
-                            <div className={classes.desktopNavWrap}>
-                                <div className={classes.scroll}>
-                                    <VanillaHeaderNav
-                                        {...dummyNavigationData}
-                                        className={classNames("vanillaHeader-nav", classes.nav)}
-                                        linkClassName={classNames("vanillaHeader-navLink", classes.topElement)}
-                                        linkContentClassName="vanillaHeader-navLinkContent"
-                                    />
-                                </div>
-                            </div>
-                        )}
-                        {showMobileDropDown && (
-                            <MobileDropDown
-                                title={this.props.title!}
-                                buttonClass={classNames("vanillaHeader-mobileDropDown", classes.topElement)}
+                            <ConditionalWrap
+                                className={classNames("vanillaHeader-rightFlexBasis", classes.rightFlexBasis)}
+                                condition={!!showMobileDropDown}
                             >
-                                {this.props.mobileDropDownContent}
-                            </MobileDropDown>
-                        )}
-
-                        <ConditionalWrap
-                            className={classNames("vanillaHeader-rightFlexBasis", classes.rightFlexBasis)}
-                            condition={!!showMobileDropDown}
-                        >
-                            <CompactSearch
-                                className={classNames("vanillaHeader-compactSearch", classes.compactSearch, {
-                                    isCentered: this.state.openSearch,
-                                })}
-                                focusOnMount
-                                open={this.state.openSearch}
-                                onSearchButtonClick={this.openSearch}
-                                onCloseSearch={this.closeSearch}
-                                cancelButtonClassName={classNames(
-                                    "vanillaHeader-searchCancel",
-                                    classes.topElement,
-                                    classes.searchCancel,
-                                )}
-                                cancelContentClassName="meBox-buttonContent"
-                                buttonClass={classes.button}
-                                showingSuggestions={this.state.showingSuggestions}
-                                onOpenSuggestions={this.setOpenSuggestions}
-                                onCloseSuggestions={this.setCloseSuggestions}
-                                buttonContentClassName={classNames(classesMeBox.buttonContent, "meBox-buttonContent")}
-                                clearButtonClass={classes.clearButtonClass}
-                            />
-                            {isMobile ? this.renderMobileMeBox() : this.renderDesktopMeBox()}
-                        </ConditionalWrap>
-                    </div>
-                </PanelWidgetHorizontalPadding>
-            </Container>,
+                                <CompactSearch
+                                    className={classNames("vanillaHeader-compactSearch", classes.compactSearch, {
+                                        isCentered: this.state.openSearch,
+                                    })}
+                                    focusOnMount
+                                    open={this.state.openSearch}
+                                    onSearchButtonClick={this.openSearch}
+                                    onCloseSearch={this.closeSearch}
+                                    cancelButtonClassName={classNames(
+                                        "vanillaHeader-searchCancel",
+                                        classes.topElement,
+                                        classes.searchCancel,
+                                    )}
+                                    cancelContentClassName="meBox-buttonContent"
+                                    buttonClass={classes.button}
+                                    showingSuggestions={this.state.showingSuggestions}
+                                    onOpenSuggestions={this.setOpenSuggestions}
+                                    onCloseSuggestions={this.setCloseSuggestions}
+                                    buttonContentClassName={classNames(
+                                        classesMeBox.buttonContent,
+                                        "meBox-buttonContent",
+                                    )}
+                                    clearButtonClass={classes.clearButtonClass}
+                                />
+                                {isMobile ? this.renderMobileMeBox() : this.renderDesktopMeBox()}
+                            </ConditionalWrap>
+                        </div>
+                    </PanelWidgetHorizontalPadding>
+                </Container>
+            </HashOffsetReporter>,
             containerElement,
         );
     }

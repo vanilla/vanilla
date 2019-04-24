@@ -116,6 +116,7 @@ export const searchResultsClasses = useThemeCache(() => {
     const result = style("result", {
         position: "relative",
         display: "block",
+        width: percent(100),
     });
 
     return {
@@ -153,6 +154,7 @@ export const searchResultClasses = useThemeCache(() => {
             justifyContent: "space-between",
             ...paddings(vars.spacing.padding),
             cursor: "pointer",
+            color: colorOut(vars.title.fg),
             borderBottom: singleBorder({
                 color: vars.separator.fg,
                 width: vars.separator.width,

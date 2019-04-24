@@ -9,6 +9,7 @@ import { borders, colorOut, longWordEllipsis, paddings, singleBorder, unit } fro
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { calc, percent } from "csx";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
+import {important} from "csx";
 
 export const richEditorFlyoutClasses = useThemeCache(() => {
     const vars = richEditorVariables();
@@ -16,21 +17,19 @@ export const richEditorFlyoutClasses = useThemeCache(() => {
     const shadows = shadowHelper();
     const globalVars = globalVariables();
 
-    const richEditorWidth = 8 * vars.sizing.emojiSize;
-
     const root = style({
         ...shadows.dropDown(),
         position: "absolute",
         left: 0,
-        width: unit( richEditorWidth),
+        width: unit( vars.richEditorWidth + vars.emojiBody.padding.horizontal * 2),
         zIndex: 6,
         overflow: "hidden",
         backgroundColor: colorOut(vars.colors.bg),
         ...borders(),
 
         $nest: {
-            "& .ReactVirtualized__Grid": {
-                minWidth: unit(richEditorWidth ),
+            "&& .ReactVirtualized__Grid": {
+                width: important(unit(vars.richEditorWidth) as string),
             },
         },
     });
@@ -60,6 +59,7 @@ export const richEditorFlyoutClasses = useThemeCache(() => {
 
     const body = style("body", {
         ...paddings(vars.emojiBody.padding),
+        width: unit( vars.richEditorWidth + vars.emojiBody.padding.horizontal * 2),
     });
 
     const footer = style("footer", {

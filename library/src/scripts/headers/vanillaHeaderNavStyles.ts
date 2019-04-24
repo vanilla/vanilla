@@ -9,8 +9,10 @@ import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import {
     absolutePosition,
     colorOut,
-    flexHelper, margins,
-    negative, paddings,
+    flexHelper,
+    margins,
+    negative,
+    paddings,
     unit,
     userSelect,
 } from "@library/styles/styleHelpers";
@@ -59,19 +61,26 @@ export default function vanillaHeaderNavClasses() {
     const flex = flexHelper();
     const style = styleFactory("vanillaHeaderNav");
 
-    const root = style({
-        ...flex.middleLeft(),
-        position: "relative",
-        height: unit(headerVars.sizing.height),
-    }, mediaQueries.oneColumn({
-        height: unit(headerVars.sizing.mobile.height),
-    }));
+    const root = style(
+        {
+            ...flex.middleLeft(),
+            position: "relative",
+            height: unit(headerVars.sizing.height),
+        },
+        mediaQueries.oneColumn({
+            height: unit(headerVars.sizing.mobile.height),
+        }),
+    );
 
-    const navigation = style("navigation",{
-        // height: unit(vars.item.size),
-    }, mediaQueries.oneColumn({
-        // height: unit(headerVars.sizing.mobile.height),
-    }));
+    const navigation = style(
+        "navigation",
+        {
+            // height: unit(vars.item.size),
+        },
+        mediaQueries.oneColumn({
+            // height: unit(headerVars.sizing.mobile.height),
+        }),
+    );
 
     const items = style(
         "items",
@@ -82,6 +91,8 @@ export default function vanillaHeaderNavClasses() {
         },
         mediaQueries.oneColumn({
             height: px(headerVars.sizing.mobile.height),
+            justifyContent: "center",
+            width: percent(100),
         }),
     );
 
@@ -91,7 +102,7 @@ export default function vanillaHeaderNavClasses() {
         whiteSpace: "nowrap",
         lineHeight: globalVars.lineHeights.condensed,
         display: "flex",
-        alignItems: 'center',
+        alignItems: "center",
         justifyContent: "center",
         height: unit(vars.item.size),
         textDecoration: "none",

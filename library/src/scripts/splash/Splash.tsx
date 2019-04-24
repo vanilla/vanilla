@@ -20,6 +20,7 @@ interface IProps extends IDeviceProps {
     action?: React.ReactNode;
     title?: string; // Often the message to display isn't the real H1
     className?: string;
+    outerBackgroundImage?: string;
 }
 
 /**
@@ -34,7 +35,7 @@ export class Splash extends React.Component<IProps> {
 
         return (
             <div className={classNames(className, classes.root)}>
-                <div className={classes.outerBackground} />
+                <div className={classNames(classes.outerBackground(this.props.outerBackgroundImage))} />
                 <Container>
                     <div className={classes.innerContainer}>
                         <PanelWidgetHorizontalPadding>

@@ -7,13 +7,8 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import {
-    BackgroundColorProperty,
-    FontWeightProperty,
-    PaddingProperty,
-    TextShadowProperty,
-} from "csstype";
-import {important, percent, px, quote,translateX} from "csx";
+import { BackgroundColorProperty, FontWeightProperty, PaddingProperty, TextShadowProperty } from "csstype";
+import { important, percent, px, quote, translateX } from "csx";
 import {
     centeredBackgroundProps,
     colorOut,
@@ -25,17 +20,14 @@ import {
     paddings,
     unit,
     background,
-    absolutePosition, borders,
+    absolutePosition,
+    borders,
 } from "@library/styles/styleHelpers";
-import {
-    transparentColor,
-    IButtonType,
-    generateButtonClass,
-} from "@library/forms/buttonStyles";
+import { transparentColor, IButtonType, generateButtonClass } from "@library/forms/buttonStyles";
 import { assetUrl } from "@library/utility/appUtils";
-import {TLength} from "typestyle/lib/types";
+import { TLength } from "typestyle/lib/types";
 import { widgetVariables } from "@library/styles/widgetStyleVars";
-import {searchBarClasses} from "@library/features/search/searchBarStyles";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
 
 export const splashVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("splash");
@@ -96,7 +88,11 @@ export const splashVariables = useThemeCache(() => {
             size: globalVars.fonts.size.title,
             weight: globalVars.fonts.weights.semiBold as FontWeightProperty,
             align: "center",
-            shadow: `0 1px 1px ${colorOut(modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(text.innerShadowOpacity))}, 0 1px 25px ${colorOut(modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(text.outerShadowOpacity))}` as TextShadowProperty,
+            shadow: `0 1px 1px ${colorOut(
+                modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(text.innerShadowOpacity),
+            )}, 0 1px 25px ${colorOut(
+                modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(text.outerShadowOpacity),
+            )}` as TextShadowProperty,
         },
         marginTop: 28,
         marginBottom: 40,
@@ -139,19 +135,16 @@ export const splashVariables = useThemeCache(() => {
             size: formElVars.giantInput.fontSize,
         },
         border: {
-            leftColor: colors.input.fade(.4),
+            leftColor: colors.input.fade(0.4),
             radius: globalVars.border.radius,
         },
     });
 
     const shadow = makeThemeVars("shadow", {
-        color: modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(.05),
+        color: modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(0.05),
         full: `0 1px 15px ${colorOut(modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(0.3))}`,
-        background: modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(
-            0.1,
-        ) as BackgroundColorProperty,
+        background: modifyColorBasedOnLightness(colors.contrast, text.shadowMix).fade(0.1) as BackgroundColorProperty,
     });
-
 
     const searchButtonType: IButtonType = makeThemeVars("buttonTypeSplash", {
         spinnerColor: colors.contrast,
@@ -252,17 +245,22 @@ export const splashStyles = useThemeCache(() => {
     });
 
     const image = getBackgroundImage(vars.outerBackground.image, vars.outerBackground.fallbackImage);
-    const outerBackground = style("outerBackground", {
-        ...centeredBackgroundProps(),
-        display: "block",
-        position: "absolute",
-        top: px(0),
-        left: px(0),
-        width: percent(100),
-        height: percent(100),
-        ...background(vars.outerBackground),
-        opacity: vars.outerBackground.fallbackImage && image === vars.outerBackground.fallbackImage ? 0.4 : undefined,
-    });
+    const outerBackground = (url?: string) => {
+        return style("outerBackground", {
+            ...centeredBackgroundProps(),
+            display: "block",
+            position: "absolute",
+            top: px(0),
+            left: px(0),
+            width: percent(100),
+            height: percent(100),
+            ...background(url ? { ...vars.outerBackground, image: url } : vars.outerBackground),
+            opacity:
+                !url && (vars.outerBackground.fallbackImage && image === vars.outerBackground.fallbackImage)
+                    ? 0.4
+                    : undefined,
+        });
+    };
 
     const innerContainer = style("innerContainer", {
         ...paddings(vars.spacing.padding),

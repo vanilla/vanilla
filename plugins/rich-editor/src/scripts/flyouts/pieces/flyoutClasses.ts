@@ -59,7 +59,7 @@ export const richEditorFlyoutClasses = useThemeCache(() => {
     });
 
     const body = style("body", {
-        ...paddings(vars.emojiBody.margin),
+        ...paddings(vars.emojiBody.padding),
     });
 
     const footer = style("footer", {

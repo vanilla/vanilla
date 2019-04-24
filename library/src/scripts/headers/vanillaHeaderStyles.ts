@@ -153,9 +153,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     const flex = flexHelper();
     const style = styleFactory("vanillaHeader");
 
-    const root = style(
-        Symbol.for("Debug") as any,
-        {
+    const root = style({
             maxWidth: percent(100),
             backgroundColor: headerColors.bg.toString(),
             color: headerColors.fg.toString(),

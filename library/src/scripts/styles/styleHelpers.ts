@@ -397,59 +397,61 @@ const borderStylesFallbacks = (fallbacks: any[], ultimateFallback, unitFunction?
 export const borders = (props: IBorderStyles = {}, debug: boolean = false) => {
     const globalVars = globalVariables();
 
-    const output = {
+    const output: NestedCSSProperties = {
         borderLeft: undefined,
         borderRight: undefined,
         borderTop: undefined,
         borderBottom: undefined,
-    } as any;
+    };
 
     // Set border radii
     let globalRadiusFound = false;
     let specificRadiusFound = false;
-    if (typeof props.radius !== "object") {
-        output.borderRadius = unit(props.radius as BorderRadiusProperty<TLength>);
-        globalRadiusFound = true;
-    } else {
-        if (props.radius.all) {
-            globalRadiusFound = true;
+    if (props.radius !== undefined) {
+        if (typeof props.radius === "string" || typeof props.radius === "number") {
             output.borderRadius = unit(props.radius as BorderRadiusProperty<TLength>);
+            globalRadiusFound = true;
         } else {
-            if (props.radius.top) {
-                specificRadiusFound = true;
-                output.borderTopRightRadius = unit(props.radius.top);
-                output.borderTopLeftRadius = unit(props.radius.top);
-            }
-            if (props.radius.bottom) {
-                specificRadiusFound = true;
-                output.borderBottomRightRadius = unit(props.radius.bottom);
-                output.borderBottomLeftRadius = unit(props.radius.bottom);
-            }
-            if (props.radius.right) {
-                specificRadiusFound = true;
-                output.borderTopRightRadius = unit(props.radius.right);
-                output.borderBottomRightRadius = unit(props.radius.right);
-            }
-            if (props.radius.left) {
-                specificRadiusFound = true;
-                output.borderTopLeftRadius = unit(props.radius.left);
-                output.borderBottomLeftRadius = unit(props.radius.left);
-            }
-            if (props.radius.topRight) {
-                specificRadiusFound = true;
-                output.borderTopRightRadius = unit(props.radius.topRight);
-            }
-            if (props.radius.topLeft) {
-                specificRadiusFound = true;
-                output.borderTopLeftRadius = unit(props.radius.topLeft);
-            }
-            if (props.radius.bottomRight) {
-                specificRadiusFound = true;
-                output.borderbottomRightRadius = unit(props.radius.bottomRight);
-            }
-            if (props.radius.topLeft) {
-                specificRadiusFound = true;
-                output.borderbottomLeftRadius = unit(props.radius.bottomLeft);
+            if (props.radius.all) {
+                globalRadiusFound = true;
+                output.borderRadius = unit(props.radius as BorderRadiusProperty<TLength>);
+            } else {
+                if (props.radius.top) {
+                    specificRadiusFound = true;
+                    output.borderTopRightRadius = unit(props.radius.top);
+                    output.borderTopLeftRadius = unit(props.radius.top);
+                }
+                if (props.radius.bottom) {
+                    specificRadiusFound = true;
+                    output.borderBottomRightRadius = unit(props.radius.bottom);
+                    output.borderBottomLeftRadius = unit(props.radius.bottom);
+                }
+                if (props.radius.right) {
+                    specificRadiusFound = true;
+                    output.borderTopRightRadius = unit(props.radius.right);
+                    output.borderBottomRightRadius = unit(props.radius.right);
+                }
+                if (props.radius.left) {
+                    specificRadiusFound = true;
+                    output.borderTopLeftRadius = unit(props.radius.left);
+                    output.borderBottomLeftRadius = unit(props.radius.left);
+                }
+                if (props.radius.topRight) {
+                    specificRadiusFound = true;
+                    output.borderTopRightRadius = unit(props.radius.topRight);
+                }
+                if (props.radius.topLeft) {
+                    specificRadiusFound = true;
+                    output.borderTopLeftRadius = unit(props.radius.topLeft);
+                }
+                if (props.radius.bottomRight) {
+                    specificRadiusFound = true;
+                    output.borderBottomLeftRadius = unit(props.radius.bottomRight);
+                }
+                if (props.radius.topLeft) {
+                    specificRadiusFound = true;
+                    output.borderBottomRightRadius = unit(props.radius.bottomLeft);
+                }
             }
         }
     }

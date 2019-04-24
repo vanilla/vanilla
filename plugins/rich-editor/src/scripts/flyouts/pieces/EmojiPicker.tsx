@@ -17,8 +17,9 @@ import { EmojiGroupButton } from "@rich-editor/flyouts/pieces/EmojiGroupButton";
 import EmojiButton from "@rich-editor/flyouts/pieces/EmojiButton";
 import Flyout from "@rich-editor/flyouts/pieces/Flyout";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
-const BUTTON_SIZE = 40;
+const BUTTON_SIZE = richEditorVariables().sizing.emojiSize;
 const COL_SIZE = 8;
 const ROW_SIZE = 8;
 const rowIndexesByGroupId = {};

@@ -29,7 +29,7 @@ import * as React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import { style } from "typestyle";
-import { Panel, PanelWidgetHorizontalPadding } from "../layout/PanelLayout";
+import { PanelWidgetHorizontalPadding } from "../layout/PanelLayout";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { signIn } from "@library/icons/common";
@@ -109,7 +109,6 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                     fallbackElement={<FlexSpacer className="pageHeading-leftSpacer" />}
                                 />
                             )}
-
                             {!isMobile && (
                                 <HeaderLogo
                                     className={classNames("vanillaHeader-logoContainer", classes.logoContainer)}

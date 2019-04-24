@@ -16,9 +16,13 @@ import {
     modifyColorBasedOnLightness,
     unit,
     userSelect,
+    absolutePosition,
+    pointerEvents,
 } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { percent, px } from "csx";
+import {DEBUG_STYLES, styleFactory, useThemeCache, variableFactory} from "@library/styles/styleUtils";
+import {calc, ColorHelper, percent, px, quote, viewHeight} from "csx";
+import backLinkClasses from "@library/routing/links/backLinkStyles";
+import {NestedCSSProperties} from "typestyle/lib/types";
 
 export const vanillaHeaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -45,7 +49,7 @@ export const vanillaHeaderVariables = useThemeCache(() => {
 
     const buttonSize = formElementVars.sizing.height;
     const button = makeThemeVars("button", {
-        borderRadius: 3,
+        borderRadius: globalVars.border.radius,
         size: buttonSize,
         guest: {
             minWidth: 86,
@@ -68,6 +72,7 @@ export const vanillaHeaderVariables = useThemeCache(() => {
 
     const dropDownContents = makeThemeVars("dropDownContents", {
         minWidth: 350,
+        maxHeight: viewHeight(90),
     });
 
     const endElements = makeThemeVars("endElements", {
@@ -117,6 +122,10 @@ export const vanillaHeaderVariables = useThemeCache(() => {
         },
     });
 
+    const bottomRow = makeThemeVars("bottomRow",{
+        bg: modifyColorBasedOnLightness(colors.bg, .1).desaturate(.2, true),
+    });
+
     return {
         sizing,
         colors,
@@ -131,6 +140,7 @@ export const vanillaHeaderVariables = useThemeCache(() => {
         buttonContents,
         mobileDropDown,
         meBox,
+        bottomRow,
     };
 });
 
@@ -143,8 +153,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     const flex = flexHelper();
     const style = styleFactory("vanillaHeader");
 
-    const root = style(
-        {
+    const root = style({
             maxWidth: percent(100),
             backgroundColor: headerColors.bg.toString(),
             color: headerColors.fg.toString(),
@@ -170,11 +179,19 @@ export const vanillaHeaderClasses = useThemeCache(() => {
                     color: vars.colors.fg.fade(0.8).toString(),
                     cursor: "pointer",
                 },
+                [`& .${backLinkClasses().link}`]: {
+                    $nest: {
+                        "&, &:hover, &:focus, &:active": {
+                            color: colorOut(vars.colors.fg),
+                        },
+                    },
+                },
             },
+            ...mediaQueries.oneColumn({
+                height: px(vars.sizing.mobile.height),
+            }).$nest,
         },
-        mediaQueries.oneColumn({
-            height: px(vars.sizing.mobile.height),
-        }),
+
     );
 
     const spacer = style(
@@ -210,7 +227,6 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         {
             display: "inline-flex",
             alignSelf: "center",
-            flexBasis: vars.endElements.flexBasis,
             color: colorOut(vars.colors.fg),
             $nest: {
                 "&.focus-visible": {
@@ -227,6 +243,10 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }),
     );
 
+    const logoFlexBasis = style("logoFlexBasis", {
+        flexBasis: vars.endElements.flexBasis,
+    });
+
     const meBox = style("meBox", {
         justifyContent: "flex-end",
     });
@@ -234,9 +254,9 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     const nav = style("nav", {
         display: "flex",
         flexWrap: "wrap",
-        height: percent(100),
+        height: px(vars.sizing.height),
         color: "inherit",
-    });
+    },  mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }));
 
     const locales = style(
         "locales",
@@ -268,7 +288,16 @@ export const vanillaHeaderClasses = useThemeCache(() => {
 
     const compactSearch = style("compactSearch", {
         marginLeft: "auto",
-        maxWidth: px(vars.compactSearch.maxWidth),
+        minWidth: unit(formElementVars.sizing.height),
+        flexBasis: px(formElementVars.sizing.height),
+        maxWidth: percent(100),
+        height: unit(vars.sizing.height),
+        $nest: {
+            "&.isOpen": {
+                width: unit(vars.compactSearch.maxWidth),
+                flexBasis: "auto",
+            },
+        },
     });
 
     const topElement = style(
@@ -281,7 +310,6 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         },
         mediaQueries.oneColumn({
             fontSize: px(vars.button.mobile.fontSize),
-            whiteSpace: "nowrap",
         }),
     );
 
@@ -300,6 +328,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     });
 
     const button = style(
+
         "button",
         {
             color: vars.colors.fg.toString(),
@@ -403,7 +432,8 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     const dropDownContents = style("dropDownContents", {
         $nest: {
             "&&&": {
-                minWidth: px(vars.dropDownContents.minWidth),
+                minWidth: unit(vars.dropDownContents.minWidth),
+                maxHeight: unit(vars.dropDownContents.maxHeight),
             },
         },
     });
@@ -415,8 +445,13 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         color: vars.count.fg.toString(),
     });
 
-    const horizontalScroll = style("horizontalScroll", {
-        overflowX: "auto",
+
+    const scroll = style("scroll", {
+        position: "relative",
+        top: 0,
+        left: 0,
+        height: percent(100),
+        ...scrollWithNoScrollBar() as NestedCSSProperties,
     });
 
     const rightFlexBasis = style(
@@ -466,36 +501,41 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         marginLeft: unit(vars.guest.spacer),
         marginRight: unit(vars.guest.spacer),
         backgroundColor: colorOut(vars.resister.bg),
-        // Ugly solution, but not much choice until: https://github.com/vanilla/knowledge/issues/778
-        ...allButtonStates({
-            allStates: {
-                borderColor: colorOut(vars.resister.borderColor, true),
+        $nest: {
+            "&&": {
+                // Ugly solution, but not much choice until: https://github.com/vanilla/knowledge/issues/778
+                ...allButtonStates({
+                    allStates: {
+                        borderColor: colorOut(vars.resister.borderColor, true),
+                        color: colorOut(vars.resister.fg),
+                    },
+                    noState: {
+                        backgroundColor: colorOut(vars.resister.bg, true),
+                    },
+                    hover: {
+                        color: colorOut(vars.resister.fg),
+                        backgroundColor: colorOut(vars.resister.states.bg, true),
+                    },
+                    focus: {
+                        color: colorOut(vars.resister.fg),
+                        backgroundColor: colorOut(vars.resister.states.bg, true),
+                    },
+                    active: {
+                        color: colorOut(vars.resister.fg),
+                        backgroundColor: colorOut(vars.resister.states.bg, true),
+                    },
+                }),
             },
-            noState: {
-                backgroundColor: colorOut(vars.resister.bg, true),
-            },
-            hover: {
-                color: colorOut(vars.resister.fg),
-                backgroundColor: colorOut(vars.resister.states.bg, true),
-            },
-            focus: {
-                color: colorOut(vars.resister.fg),
-                backgroundColor: colorOut(vars.resister.states.bg, true),
-            },
-            active: {
-                color: colorOut(vars.resister.fg),
-                backgroundColor: colorOut(vars.resister.states.bg, true),
-            },
-        }),
+        },
     });
 
     const compactSearchResults = style(
         "compactSearchResults",
         {
-            top: (vars.sizing.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
+            top: 0,
             display: "flex",
             position: "relative",
-            margin: "auto",
+            margin: `${unit((vars.sizing.height - formElementVars.sizing.height + formElementVars.border.width) / -2)} auto`,
             maxWidth: px(vars.compactSearch.maxWidth),
         },
         mediaQueries.oneColumn({
@@ -504,11 +544,18 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     );
 
     const clearButtonClass = style("clearButtonClass", {
-        color: vars.colors.fg.toString(),
+        color: colorOut(vars.colors.fg),
     });
 
     const guestButton = style("guestButton", {
         minWidth: unit(vars.button.guest.minWidth),
+        borderRadius: unit(vars.button.borderRadius),
+    });
+
+    const desktopNavWrap = style("desktopNavWrap", {
+        position: "relative",
+        flexGrow: 1,
+        ...addGradientsToHintOverflow( globalVars.gutter.half * 4, vars.colors.bg) as any,
     });
 
     return {
@@ -530,7 +577,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         tabButton,
         dropDownContents,
         count,
-        horizontalScroll,
+        scroll,
         rightFlexBasis,
         leftFlexBasis,
         signIn,
@@ -539,6 +586,8 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         compactSearchResults,
         clearButtonClass,
         guestButton,
+        logoFlexBasis,
+        desktopNavWrap,
     };
 });
 
@@ -558,24 +607,17 @@ export const vanillaHeaderLogoClasses = useThemeCache(() => {
         },
     });
 
-    const link = style("link", {
-        textDecoration: "none",
-    });
-
-    return { logoFrame, logo, link };
+    return { logoFrame, logo };
 });
 
 export const vanillaHeaderHomeClasses = useThemeCache(() => {
     const vars = vanillaHeaderVariables();
     const globalVars = globalVariables();
     const style = styleFactory("vanillaHeaderHome");
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style({
         minHeight: vars.sizing.mobile.height * 2,
-    });
-
-    const bottom = style("bottom", {
-        backgroundColor: globalVars.mainColors.fg.fade(0.1).toString(),
     });
 
     const left = style("left", {
@@ -584,5 +626,58 @@ export const vanillaHeaderHomeClasses = useThemeCache(() => {
         flexBasis: vars.button.size,
     });
 
-    return { root, bottom, left };
+    const bottom = style("bottom", {
+        position: "relative",
+        backgroundColor: colorOut(vars.bottomRow.bg),
+        height: unit(vars.sizing.height),
+        width: percent(100),
+        ...addGradientsToHintOverflow( globalVars.gutter.half * 4, vars.colors.bg) as any,
+    }, mediaQueries.oneColumn({
+        height: px(vars.sizing.mobile.height),
+        ...addGradientsToHintOverflow( globalVars.gutter.half * 4, vars.bottomRow.bg) as any,
+    }));
+
+    return {
+        root,
+        bottom,
+        left,
+    };
 });
+
+export const scrollWithNoScrollBar = (nestedStyles?: NestedCSSProperties) => {
+    return {
+        overflow: ["-moz-scrollbars-none", "auto"],
+        "-ms-overflow-style": "none",
+        $nest: {
+            "&::-webkit-scrollbar": {
+                display: "none",
+            },
+            ...nestedStyles,
+        },
+    };
+};
+
+export const addGradientsToHintOverflow = (width: number | string, color: ColorHelper) => {
+    const gradient = (direction: "right" | "left") => {
+        return `linear-gradient(to ${direction}, ${colorOut(color.fade(0))} 0%, ${colorOut(color.fade(.3))} 20%, ${colorOut(color)} 90%)`;
+    };
+    return {
+        $nest: {
+            "&:after": {
+                ...absolutePosition.topRight(),
+                background: gradient("right"),
+            },
+            "&:before": {
+                ...absolutePosition.topLeft(),
+                background: gradient("left"),
+            },
+            "&:before, &:after": {
+                ...pointerEvents(),
+                content: quote(``),
+                height: percent(100),
+                width: unit(width),
+                zIndex: 1,
+            },
+        },
+    };
+};

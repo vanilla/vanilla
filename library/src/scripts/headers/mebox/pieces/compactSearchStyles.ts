@@ -11,6 +11,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import {layoutVariables} from "@library/layout/layoutStyles";
 
 export const compactSearchVariables = useThemeCache(() => {
     const makeVars = variableFactory("compactSearch");
@@ -32,8 +33,10 @@ export const compactSearchVariables = useThemeCache(() => {
 export const compactSearchClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementsVars = formElementsVariables();
+    const headerVariables = vanillaHeaderVariables();
     const vars = compactSearchVariables();
     const style = styleFactory("compactSearch");
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style({
         $nest: {
@@ -58,7 +61,7 @@ export const compactSearchClasses = useThemeCache(() => {
                 color: colorOut(vars.colors.placeholder),
             },
             "&.isOpen": {
-                width: percent(100),
+                maxWidth: percent(100),
             },
             "&.isCentered": {
                 margin: "auto",
@@ -74,12 +77,11 @@ export const compactSearchClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         flexWrap: "nowrap",
-        $nest: {
-            ["& ." + searchBarClasses().content]: {
-                minHeight: "initial",
-            },
-        },
-    });
+        height: unit(headerVariables.sizing.height),
+    },
+        mediaQueries.oneColumn({
+        height: unit(headerVariables.sizing.mobile.height),
+    }));
 
     const close = style("close", {
         color: "inherit",

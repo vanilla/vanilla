@@ -5,19 +5,15 @@
  */
 
 import React from "react";
-import LanguagesDropDown from "@library/layout/LanguagesDropDown";
 import CompactMeBox from "@library/headers/mebox/pieces/CompactMeBox";
 import VanillaHeaderNavItem from "@library/headers/mebox/pieces/VanillaHeaderNavItem";
 import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
 import { IInjectableUserState, mapUsersStoreState, isUserGuest } from "@library/features/users/userModel";
-import { dummyOtherLanguagesData } from "@library/redux/dummyOtherLanguages";
 import { vanillaHeaderClasses, vanillaHeaderHomeClasses } from "@library/headers/vanillaHeaderStyles";
 import { LogoType } from "@library/theming/ThemeLogo";
 import VanillaHeaderNav from "@library/headers/mebox/pieces/VanillaHeaderNav";
 import HeaderLogo from "@library/headers/mebox/pieces/HeaderLogo";
 import FlexSpacer from "@library/layout/FlexSpacer";
-import VanillaHeaderListItem from "@library/headers/mebox/pieces/VanillaHeaderListItem";
-import { ButtonTypes } from "@library/forms/buttonStyles";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { dummyNavigationData } from "@library/headers/mebox/state/dummyNavigationData";
 import { signIn } from "@library/icons/common";
@@ -37,10 +33,8 @@ interface IProps extends IDeviceProps, IInjectableUserState {
  * render in a specific div in the default-master.
  */
 export class VanillaMobileHomeHeader extends React.Component<IProps> {
-    private resultsRef: React.RefObject<HTMLDivElement> = React.createRef();
     public render() {
         const currentUser = this.props.currentUser.data;
-        const isMobile = this.props.device === Devices.MOBILE;
         const isGuest = isUserGuest(currentUser);
         const headerClasses = vanillaHeaderClasses();
         const classes = vanillaHeaderHomeClasses();
@@ -52,7 +46,7 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                         <div className={classNames(headerClasses.bar, "isHome")}>
                             <FlexSpacer className={classes.left} />
                             <HeaderLogo
-                                className="vanillaHeader-logoContainer"
+                                className={classNames("vanillaHeader-logoContainer", headerClasses.logoContainer)}
                                 logoClassName="vanillaHeader-logo isCentred"
                                 logoType={LogoType.MOBILE}
                             />
@@ -69,25 +63,13 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                     </PanelWidgetHorizontalPadding>
                 </Container>
                 <div className={classes.bottom}>
-                    <div className="vanillaHeader-horizontalScroll">
+                    <div className={headerClasses.scroll}>
                         <VanillaHeaderNav
                             {...dummyNavigationData}
-                            linkClassName="vanillaHeader-navLink"
+                            className={classNames("vanillaHeader-nav", headerClasses.nav)}
+                            linkClassName={classNames("vanillaHeader-navLink", headerClasses.topElement)}
                             linkContentClassName="vanillaHeader-navLinkContent"
-                            className={classNames(headerClasses.nav, "isScrolled")}
-                        >
-                            <VanillaHeaderListItem>
-                                <LanguagesDropDown
-                                    {...dummyOtherLanguagesData}
-                                    renderLeft={true}
-                                    className="vanillaHeader-locales"
-                                    buttonClassName="vanillaHeader-localeToggle"
-                                    buttonBaseClass={ButtonTypes.CUSTOM}
-                                    widthOfParent={false}
-                                    openAsModal={isMobile}
-                                />
-                            </VanillaHeaderListItem>
-                        </VanillaHeaderNav>
+                        />
                     </div>
                 </div>
             </header>,

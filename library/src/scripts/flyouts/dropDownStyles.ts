@@ -112,7 +112,7 @@ export const dropDownClasses = useThemeCache(() => {
         minWidth: unit(vars.sizing.width),
         backgroundColor: colorOut(vars.contents.bg),
         color: colorOut(vars.contents.fg),
-        overflow: "hidden",
+        overflow: "auto",
         ...shadowOrBorderBasedOnLightness(vars.contents.bg, borders({}), shadows.dropDown()),
         ...borders(vars.contents.border),
         zIndex: 3,

@@ -16,7 +16,9 @@ import Paragraph from "@library/layout/Paragraph";
 interface IProps {
     className?: string;
     searchTerm?: string;
-    results: IResult[];
+    results: any[];
+    result?: React.ComponentClass;
+    emptyMessage?: string;
 }
 
 /**
@@ -30,13 +32,14 @@ export default class ResultList extends React.Component<IProps> {
         const classesSearchResults = searchResultsClasses();
 
         if (hasResults) {
+            const ResultComponent = this.props.result ? this.props.result : Result;
             content = this.props.results.map((result, i) => {
-                return <Result {...result} key={i} />;
+                return <ResultComponent {...result} key={i} />;
             });
         } else if (this.props.searchTerm === undefined || this.props.searchTerm === "") {
             content = (
                 <Paragraph className={classNames("searchResults-noResults", classesSearchResults.noResults)}>
-                    {t("No results found.")}
+                    {this.props.emptyMessage ? this.props.emptyMessage : t("No results found.")}
                 </Paragraph>
             );
         } else {

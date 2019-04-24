@@ -139,7 +139,7 @@ export function formatUrl(path: string, withDomain: boolean = false): string {
  */
 export function getRelativeUrl(fullUrl: string): string {
     const urlBase = window.location.origin + getMeta("context.basePath", "");
-    return fullUrl.replace(urlBase, '');
+    return fullUrl.replace(urlBase, "");
 }
 
 /**

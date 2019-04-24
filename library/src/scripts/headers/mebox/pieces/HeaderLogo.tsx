@@ -32,7 +32,7 @@ export default class HeaderLogo extends React.Component<IHeaderLogo> {
         const logoClassName = classNames("headerLogo-logo", this.props.logoClassName, classes.logo);
 
         return (
-            <SmartLink to={this.props.to} className={classNames("headerLogo", classes.link, this.props.className)}>
+            <SmartLink to={this.props.to} className={classNames("headerLogo", this.props.className)}>
                 <span className={classNames("headerLogo-logoFrame", classes.logoFrame)}>
                     <ThemeLogo alt={t("Vanilla")} className={logoClassName} type={this.props.logoType} />
                 </span>

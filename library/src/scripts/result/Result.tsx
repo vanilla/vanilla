@@ -66,7 +66,7 @@ export default class Result extends React.Component<IResult> {
         return (
             <li className={classNames("searchResults-item", classesSearchResults.item, this.props.className)}>
                 <article className={classNames("searchResults-result", classesSearchResults.result)}>
-                    <SmartLink to={this.props.url} className={classNames("searchResult", classes.root)}>
+                    <SmartLink to={this.props.url} className={classNames("searchResult", classes.root)} tabIndex={0}>
                         <div className={classNames("searchResult-main", classes.main, { hasMedia: !!media })}>
                             <HeadingTag className={classNames("searchResult-title", classes.title)}>
                                 {this.props.name}

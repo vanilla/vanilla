@@ -47,11 +47,11 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
                 flexGrow: 1,
                 position: "relative",
             },
-            ".ql-clipboard": {
+            "& .ql-clipboard": {
                 ...srOnly(),
                 position: "fixed", // Fixed https://github.com/quilljs/quill/issues/1374#issuecomment-415333651
             },
-            ".richEditor-nextInput, .iconButton, .richEditor-button": {
+            "& .richEditor-nextInput, .iconButton, .richEditor-button": {
                 ...singleLineEllipsis(),
                 ...appearance(),
                 position: "relative",
@@ -60,18 +60,15 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
                 background: "none",
                 textAlign: "left",
             },
-            ".Close-x": {
+            "& .Close-x": {
                 display: "block",
                 cursor: "pointer",
             },
-            ".content-wrapper": {
+            "& .content-wrapper": {
                 height: percent(100),
             },
-            ".embedDialogue": {
+            "& .embedDialogue": {
                 position: "relative",
-            },
-            ".ReactVirtualized__Grid": {
-                minWidth: unit(252),
             },
         },
     });

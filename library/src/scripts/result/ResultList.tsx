@@ -12,7 +12,6 @@ import { searchResultsClasses } from "@library/features/search/searchResultsStyl
 import Translate from "@library/content/Translate";
 import Result, { IResult } from "@library/result/Result";
 import Paragraph from "@library/layout/Paragraph";
-import { IResponseArticleDraft } from "@knowledge/@types/api/article";
 
 interface IProps {
     className?: string;

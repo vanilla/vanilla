@@ -39,7 +39,7 @@ class GettyEmbed extends Embed {
                 throw new Exception('Unable to get post ID.', 400);
             }
 
-            $oembedData = $this->oembed("http://embed.gettyimages.com/oembed?url=http://gty.im/" . $post['postID']);
+            $oembedData = $this->oembed("https://embed.gettyimages.com/oembed?url=http://gty.im/" . $post['postID']);
             if ($oembedData) {
                 $data = $oembedData;
                 $data['attributes'] = array_key_exists('html', $data) ? $this->parseResponseHtml($data['html']) : [];
@@ -56,7 +56,7 @@ class GettyEmbed extends Embed {
      * @inheritdoc
      */
     public function renderData(array $data): string {
-        $url = "//www.gettyimages.com/detail/".$data['attributes']['postID'];
+        $url = "https://www.gettyimages.com/detail/".$data['attributes']['postID'];
         $encodedURL = htmlspecialchars($url);
         $encodeID = htmlspecialchars($data['attributes']['id']);
 

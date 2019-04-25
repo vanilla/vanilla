@@ -154,12 +154,11 @@ export function inputLineHeight(height: number, paddingTop: number, fullBorderWi
     return unit(height - (2 * paddingTop + fullBorderWidth));
 }
 
-export const textInputSizing = (height: number, fontSize: number, paddingTop: number, fullBorderWidth: number) => {
+export const textInputSizingFromSpacing = (fontSize: number, paddingTop: number, fullBorderWidth: number) => {
     return {
         fontSize: unit(fontSize),
         width: percent(100),
-        height: unit(height),
-        lineHeight: inputLineHeight(height, paddingTop, fullBorderWidth),
+        lineHeight: 1.5,
         ...paddings({
             top: unit(paddingTop),
             bottom: unit(paddingTop),
@@ -168,6 +167,21 @@ export const textInputSizing = (height: number, fontSize: number, paddingTop: nu
         }),
     };
 };
+
+export const textInputSizingFromFixedHeight = (height: number, fontSize: number , fullBorderWidth: number) => {
+    const paddingTop = (height - fullBorderWidth - (fontSize * 1.5)) / 2;
+    return {
+        fontSize: unit(fontSize),
+        width: percent(100),
+        lineHeight: 1.5,
+        ...paddings({
+            top: unit(paddingTop),
+            bottom: unit(paddingTop),
+            left: unit(paddingTop * 2),
+            right: unit(paddingTop * 2),
+        }),
+    };
+}
 
 // must be nested
 export const placeholderStyles = (styles: NestedCSSProperties) => {

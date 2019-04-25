@@ -181,7 +181,7 @@ export const textInputSizingFromFixedHeight = (height: number, fontSize: number 
             right: unit(paddingTop * 2),
         }),
     };
-}
+};
 
 // must be nested
 export const placeholderStyles = (styles: NestedCSSProperties) => {

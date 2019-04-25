@@ -14,7 +14,7 @@ import {
     negative,
     textInputSizingFromSpacing,
 } from "@library/styles/styleHelpers";
-import {styleFactory, useThemeCache} from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { calc, percent, px } from "csx";
@@ -39,14 +39,10 @@ export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false)
         }),
     });
 
-    const title = style( "title", {
+    const title = style("title", {
         $nest: {
             "&.inputText, &&": {
-                ...textInputSizingFromSpacing(
-                    vars.title.fontSize,
-                    0,
-                    formElementVars.border.fullWidth,
-                ),
+                ...textInputSizingFromSpacing(vars.title.fontSize, 0, formElementVars.border.fullWidth),
                 color: colorOut(formElementVars.colors.fg),
                 backgroundColor: colorOut(formElementVars.colors.bg),
                 position: "relative",

@@ -140,12 +140,11 @@ class ProxyRequest {
         $startTime = microtime(true);
         $response = curl_exec($handler);
         $this->ResponseTime = microtime(true) - $startTime;
-
-        if ($response == false) {
+        $this->ResponseStatus = curl_getinfo($handler, CURLINFO_HTTP_CODE);
+        if ($response === false || !$this->responseClass('2xx')) {
             $this->ResponseBody = curl_error($handler);
             $this->ResponseStatus = 400;
         } else {
-            $this->ResponseStatus = curl_getinfo($handler, CURLINFO_HTTP_CODE);
             $this->ContentType = strtolower(curl_getinfo($handler, CURLINFO_CONTENT_TYPE));
             $this->ContentLength = (int)curl_getinfo($handler, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
 

@@ -387,6 +387,8 @@ class PostController extends VanillaController {
                     }
                 }
             }
+        } else {
+            throw forbiddenException('GET');
         }
 
         // Add hidden fields for editing

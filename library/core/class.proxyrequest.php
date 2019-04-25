@@ -141,9 +141,8 @@ class ProxyRequest {
         $response = curl_exec($handler);
         $this->ResponseTime = microtime(true) - $startTime;
         $this->ResponseStatus = curl_getinfo($handler, CURLINFO_HTTP_CODE);
-        if ($response === false || !$this->responseClass('2xx')) {
-            $this->ResponseBody = curl_error($handler);
-            $this->ResponseStatus = 400;
+        if (!$this->responseClass('2xx')) {
+            $this->ResponseBody = curl_error($handler) ?? t('An error has occurred, please try again.');
         } else {
             $this->ContentType = strtolower(curl_getinfo($handler, CURLINFO_CONTENT_TYPE));
             $this->ContentLength = (int)curl_getinfo($handler, CURLINFO_CONTENT_LENGTH_DOWNLOAD);

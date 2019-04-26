@@ -5,7 +5,7 @@
  */
 
 import { percent, px, calc, quote } from "csx";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 import {
     absolutePosition,
     colorOut,
@@ -21,8 +21,8 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";
 
-export const vanillaHeaderNavigationVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("vanillaHeaderNavigation");
+export const titleBarNavigationVariables = useThemeCache(() => {
+    const makeThemeVars = variableFactory("titleBarNavigation");
     const globalVars = globalVariables();
     const varsFormElements = formElementsVariables();
 
@@ -53,13 +53,13 @@ export const vanillaHeaderNavigationVariables = useThemeCache(() => {
     };
 });
 
-export default function vanillaHeaderNavClasses() {
+export default function titleBarNavClasses() {
     const globalVars = globalVariables();
-    const headerVars = vanillaHeaderVariables();
-    const vars = vanillaHeaderNavigationVariables();
+    const headerVars = titleBarVariables();
+    const vars = titleBarNavigationVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
-    const style = styleFactory("vanillaHeaderNav");
+    const style = styleFactory("titleBarNav");
 
     const root = style(
         {

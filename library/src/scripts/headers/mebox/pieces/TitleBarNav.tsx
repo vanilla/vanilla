@@ -5,17 +5,17 @@
  */
 
 import React from "react";
-import VanillaHeaderNavItem, { IHeaderNav } from "@library/headers/mebox/pieces/VanillaHeaderNavItem";
-import vanillaHeaderNavClasses from "@library/headers/vanillaHeaderNavStyles";
+import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import classNames from "classnames";
-import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
+import { titleBarClasses } from "@library/headers/titleBarStyles";
+import TitleBarNavItem, { ITitleBarNav } from "@library/headers/mebox/pieces/TitleBarNavItem";
 
-export interface IVanillaHeaderNavProps {
+export interface ITitleBarNavProps {
     className?: string;
     linkClassName?: string;
     linkContentClassName?: string;
     listClassName?: string;
-    data?: IHeaderNav[];
+    data?: ITitleBarNav[];
     children?: React.ReactNode;
     wrapper?: JSX.Element;
 }
@@ -23,15 +23,14 @@ export interface IVanillaHeaderNavProps {
 /**
  * Implements Navigation component for header
  */
-export default class VanillaHeaderNav extends React.Component<IVanillaHeaderNavProps> {
+export default class TitleBarNav extends React.Component<ITitleBarNavProps> {
     public render() {
-        const classes = vanillaHeaderNavClasses();
-        const headerClasses = vanillaHeaderClasses();
+        const classes = titleBarNavClasses();
         const dataLength = this.props.data ? Object.keys(this.props.data!).length - 1 : 0;
         const content = !!this.props.data
             ? this.props.data.map((item, key) => {
                   return (
-                      <VanillaHeaderNavItem
+                      <TitleBarNavItem
                           {...item}
                           className={classNames(
                               key === dataLength ? classes.lastItem : false,

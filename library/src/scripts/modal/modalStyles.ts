@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
@@ -82,7 +82,7 @@ export const modalClasses = useThemeCache(() => {
     const style = styleFactory("modal");
     const mediaQueries = layoutVariables().mediaQueries();
     const shadows = shadowHelper();
-    const headerVars = vanillaHeaderVariables();
+    const headerVars = titleBarVariables();
 
     const overlay = style("overlay", {
         position: "fixed",

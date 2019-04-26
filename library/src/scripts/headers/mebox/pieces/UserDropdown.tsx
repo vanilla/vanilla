@@ -10,7 +10,7 @@ import DropDown from "@library/flyouts/DropDown";
 import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
 import { userDropDownClasses } from "@library/headers/mebox/pieces/userDropDownStyles";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
-import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
+import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
@@ -38,7 +38,7 @@ function UserDropDown(props: IProps) {
     }
 
     const classes = userDropDownClasses();
-    const classesHeader = vanillaHeaderClasses();
+    const classesHeader = titleBarClasses();
 
     return (
         <DropDown

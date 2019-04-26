@@ -10,7 +10,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { borderRadii, borders, colorOut, unit } from "@library/styles/styleHelpers";
 import { calc, important, percent, px } from "csx";
 
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { buttonClasses, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";
 
@@ -72,7 +72,7 @@ export const searchBarVariables = useThemeCache(() => {
 export const searchBarClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = searchBarVariables();
-    const vanillaHeaderVars = vanillaHeaderVariables();
+    const titleBarVars = titleBarVariables();
     const classesButton = buttonClasses();
     const formElementVars = formElementsVariables();
     const mediaQueries = layoutVariables().mediaQueries();
@@ -151,7 +151,7 @@ export const searchBarClasses = useThemeCache(() => {
                     },
                 },
                 "& .searchBar__menu-list": {
-                    maxHeight: calc(`100vh - ${unit(vanillaHeaderVars.sizing.height)}`),
+                    maxHeight: calc(`100vh - ${unit(titleBarVars.sizing.height)}`),
                 },
             },
         },

@@ -23,7 +23,7 @@ import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownCont
 import classNames from "classnames";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
-import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
+import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
 import { user } from "@library/icons/header";
 import { TouchScrollable } from "react-scrolllock";
@@ -51,14 +51,14 @@ export default class CompactMeBox extends React.Component<IProps, IState> {
         }
 
         const classes = compactMeBoxClasses();
-        const headerClasses = vanillaHeaderClasses();
+        const titleBarVars = titleBarClasses();
         const panelBodyClass = classNames("compactMeBox-body", classes.body);
 
         return (
             <div className={classNames("compactMeBox", this.props.className, classes.root)}>
                 <Button
                     title={t("My Account")}
-                    className={classNames(classes.openButton, headerClasses.centeredButtonClass, headerClasses.button)}
+                    className={classNames(classes.openButton, titleBarVars.centeredButtonClass, titleBarVars.button)}
                     onClick={this.open}
                     buttonRef={this.buttonRef}
                     baseClass={ButtonTypes.CUSTOM}

@@ -9,11 +9,11 @@ import MeBox from "@library/headers/mebox/MeBox";
 import CompactMeBox from "@library/headers/mebox/pieces/CompactMeBox";
 import CompactSearch from "@library/headers/mebox/pieces/CompactSearch";
 import HeaderLogo from "@library/headers/mebox/pieces/HeaderLogo";
-import VanillaHeaderNav from "@library/headers/mebox/pieces/VanillaHeaderNav";
-import VanillaHeaderNavItem from "@library/headers/mebox/pieces/VanillaHeaderNavItem";
+import TitleBarNav from "@library/headers/mebox/pieces/TitleBarNav";
+import TitleBarNavItem from "@library/headers/mebox/pieces/TitleBarNavItem";
 import { dummyNavigationData } from "@library/headers/mebox/state/dummyNavigationData";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
-import { vanillaHeaderClasses, vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { titleBarClasses, titleBarVariables } from "@library/headers/titleBarStyles";
 import Container from "@library/layout/components/Container";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
@@ -54,7 +54,7 @@ interface IState {
  * That means the exact location in the page is not that important, since it will
  * render in a specific div in the default-master.
  */
-export class VanillaHeader extends React.Component<IProps, IState> {
+export class TitleBar extends React.Component<IProps, IState> {
     public static contextType = ScrollOffsetContext;
     public context!: React.ContextType<typeof ScrollOffsetContext>;
 
@@ -71,7 +71,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
     public render() {
         const { isFixed } = this.props;
         const isMobile = this.props.device === Devices.MOBILE;
-        const classes = vanillaHeaderClasses();
+        const classes = titleBarClasses();
         const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
         const classesMeBox = meBoxClasses();
 
@@ -83,26 +83,26 @@ export class VanillaHeader extends React.Component<IProps, IState> {
         });
 
         const outerCssClasses = classNames(
-            "vanillaHeader",
+            "titleBar",
             classes.root,
             this.props.className,
             { [fixedClass]: isFixed },
             this.context.offsetClass,
         );
 
-        const containerElement = this.props.container || document.getElementById("vanillaHeader")!;
+        const containerElement = this.props.container || document.getElementById("titleBar")!;
         containerElement.classList.value = outerCssClasses;
 
         return ReactDOM.createPortal(
             <HashOffsetReporter>
                 <Container>
                     <PanelWidgetHorizontalPadding>
-                        <div className={classNames("vanillaHeader-bar", classes.bar)}>
+                        <div className={classNames("titleBar-bar", classes.bar)}>
                             {!this.state.openSearch && isMobile && (
                                 <BackLink
                                     className={classNames(
-                                        "vanillaHeader-leftFlexBasis",
-                                        "vanillaHeader-backLink",
+                                        "titleBar-leftFlexBasis",
+                                        "titleBar-backLink",
                                         classes.leftFlexBasis,
                                     )}
                                     linkClassName={classes.button}
@@ -111,34 +111,34 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                             )}
                             {!isMobile && (
                                 <HeaderLogo
-                                    className={classNames("vanillaHeader-logoContainer", classes.logoContainer)}
-                                    logoClassName="vanillaHeader-logo"
+                                    className={classNames("titleBar-logoContainer", classes.logoContainer)}
+                                    logoClassName="titleBar-logo"
                                     logoType={LogoType.DESKTOP}
                                 />
                             )}
                             {!this.state.openSearch && !isMobile && (
-                                <VanillaHeaderNav
+                                <TitleBarNav
                                     {...dummyNavigationData}
-                                    className={classNames("vanillaHeader-nav", classes.nav)}
-                                    linkClassName={classNames("vanillaHeader-navLink", classes.topElement)}
-                                    linkContentClassName="vanillaHeader-navLinkContent"
+                                    className={classNames("titleBar-nav", classes.nav)}
+                                    linkClassName={classNames("titleBar-navLink", classes.topElement)}
+                                    linkContentClassName="titleBar-navLinkContent"
                                 />
                             )}
                             {showMobileDropDown && (
                                 <MobileDropDown
                                     title={this.props.title!}
-                                    buttonClass={classNames("vanillaHeader-mobileDropDown", classes.topElement)}
+                                    buttonClass={classNames("titleBar-mobileDropDown", classes.topElement)}
                                 >
                                     {this.props.mobileDropDownContent}
                                 </MobileDropDown>
                             )}
 
                             <ConditionalWrap
-                                className={classNames("vanillaHeader-rightFlexBasis", classes.rightFlexBasis)}
+                                className={classNames("titleBar-rightFlexBasis", classes.rightFlexBasis)}
                                 condition={!!showMobileDropDown}
                             >
                                 <CompactSearch
-                                    className={classNames("vanillaHeader-compactSearch", classes.compactSearch, {
+                                    className={classNames("titleBar-compactSearch", classes.compactSearch, {
                                         isCentered: this.state.openSearch,
                                     })}
                                     focusOnMount
@@ -146,7 +146,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
                                     onSearchButtonClick={this.openSearch}
                                     onCloseSearch={this.closeSearch}
                                     cancelButtonClassName={classNames(
-                                        "vanillaHeader-searchCancel",
+                                        "titleBar-searchCancel",
                                         classes.topElement,
                                         classes.searchCancel,
                                     )}
@@ -172,7 +172,7 @@ export class VanillaHeader extends React.Component<IProps, IState> {
     }
 
     public componentDidMount() {
-        const headerVars = vanillaHeaderVariables();
+        const headerVars = titleBarVariables();
         this.context.setScrollOffset(headerVars.sizing.height);
     }
 
@@ -185,20 +185,20 @@ export class VanillaHeader extends React.Component<IProps, IState> {
             // We don't display when search is open.
             return null;
         }
-        const classes = vanillaHeaderClasses();
+        const classes = titleBarClasses();
         if (this.isGuest) {
             return (
                 <SmartLink
                     className={classNames(classes.centeredButtonClass, classes.button)}
                     to={`/entry/signin?target=${window.location.pathname}`}
                 >
-                    {signIn("vanillaHeader-signInIcon")}
+                    {signIn("titleBar-signInIcon")}
                 </SmartLink>
             );
         } else {
             return (
                 <CompactMeBox
-                    className={classNames("vanillaHeader-button", classes.button)}
+                    className={classNames("titleBar-button", classes.button)}
                     currentUser={this.props.currentUser}
                 />
             );
@@ -206,33 +206,33 @@ export class VanillaHeader extends React.Component<IProps, IState> {
     }
 
     private renderDesktopMeBox() {
-        const classes = vanillaHeaderClasses();
+        const classes = titleBarClasses();
         if (this.isGuest) {
             return (
-                <VanillaHeaderNav className={classNames("vanillaHeader-nav vanillaHeader-guestNav", classes.nav)}>
-                    <VanillaHeaderNavItem
+                <TitleBarNav className={classNames("titleBar-nav titleBar-guestNav", classes.nav)}>
+                    <TitleBarNavItem
                         buttonType={ButtonTypes.TRANSLUCID}
                         linkClassName={classNames(classes.signIn, classes.guestButton)}
                         to={`/entry/signin?target=${window.location.pathname}`}
                     >
                         {t("Sign in")}
-                    </VanillaHeaderNavItem>
-                    <VanillaHeaderNavItem
+                    </TitleBarNavItem>
+                    <TitleBarNavItem
                         buttonType={ButtonTypes.INVERTED}
                         linkClassName={classNames(classes.register, classes.guestButton)}
                         to={`/entry/register?target=${window.location.pathname}`}
                     >
                         {t("Register")}
-                    </VanillaHeaderNavItem>
-                </VanillaHeaderNav>
+                    </TitleBarNavItem>
+                </TitleBarNav>
             );
         } else {
             return (
                 <MeBox
                     currentUser={this.props.currentUser}
-                    className={classNames("vanillaHeader-meBox", classes.meBox)}
+                    className={classNames("titleBar-meBox", classes.meBox)}
                     buttonClassName={classes.button}
-                    contentClassName={classNames("vanillaHeader-dropDownContents", classes.dropDownContents)}
+                    contentClassName={classNames("titleBar-dropDownContents", classes.dropDownContents)}
                 />
             );
         }
@@ -279,4 +279,4 @@ export class VanillaHeader extends React.Component<IProps, IState> {
 }
 
 const withRedux = connect(mapUsersStoreState);
-export default withRedux(withPages(withDevice(VanillaHeader)));
+export default withRedux(withPages(withDevice(TitleBar)));

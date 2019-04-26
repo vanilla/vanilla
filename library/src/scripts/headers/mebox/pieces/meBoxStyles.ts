@@ -6,15 +6,15 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, flexHelper, unit } from "@library/styles/styleHelpers";
-import {styleFactory, useThemeCache} from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const meBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formVars = formElementsVariables();
-    const vanillaHeaderVars = vanillaHeaderVariables();
+    const titleBarVars = titleBarVariables();
     const debug = debugHelper("meBox");
     const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
@@ -25,10 +25,10 @@ export const meBoxClasses = useThemeCache(() => {
             ...debug.name(),
             display: "flex",
             alignItems: "center",
-            height: unit(vanillaHeaderVars.sizing.height),
+            height: unit(titleBarVars.sizing.height),
         },
         mediaQueries.oneColumn({
-            height: unit(vanillaHeaderVars.sizing.mobile.height),
+            height: unit(titleBarVars.sizing.mobile.height),
         }),
     );
 
@@ -37,15 +37,18 @@ export const meBoxClasses = useThemeCache(() => {
         width: unit(formVars.sizing.height),
         maxWidth: unit(formVars.sizing.height),
         flexBasis: unit(formVars.sizing.height),
-        height: unit(vanillaHeaderVars.meBox.sizing.buttonContents),
+        height: unit(titleBarVars.meBox.sizing.buttonContents),
     });
 
     const rootFlexClass = (count: number) => {
-        return style("footFlexClass",{
+        return style("footFlexClass", {
             flexBasis: unit(count * formElementsVariables().sizing.height),
         });
     };
 
     return {
-        root, buttonContent, rootFlexClass };
+        root,
+        buttonContent,
+        rootFlexClass,
+    };
 });

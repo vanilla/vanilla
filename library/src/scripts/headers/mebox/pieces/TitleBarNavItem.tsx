@@ -6,14 +6,14 @@
 
 import React from "react";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import VanillaHeaderListItem from "@library/headers/mebox/pieces/VanillaHeaderListItem";
-import vanillaHeaderNavClasses from "@library/headers/vanillaHeaderNavStyles";
+import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import SmartLink from "@library/routing/links/SmartLink";
 import { getDynamicClassFromButtonType } from "@library/forms/Button";
 import { RouteComponentProps, withRouter } from "react-router";
 import classNames from "classnames";
+import TitleBarListItem from "@library/headers/mebox/pieces/TitleBarListItem";
 
-export interface IHeaderNav {
+export interface ITitleBarNav {
     className?: string;
     to: string;
     children: React.ReactNode;
@@ -22,17 +22,17 @@ export interface IHeaderNav {
     buttonType?: ButtonTypes;
 }
 
-interface IProps extends IHeaderNav, RouteComponentProps<{}> {}
+interface IProps extends ITitleBarNav, RouteComponentProps<{}> {}
 
 /**
  * Implements Navigation item component for header
  */
-export class VanillaHeaderNavItem extends React.Component<IProps> {
+export class TitleBarNavItem extends React.Component<IProps> {
     public render() {
         const isCurrent = this.currentPage();
-        const classes = vanillaHeaderNavClasses();
+        const classes = titleBarNavClasses();
         return (
-            <VanillaHeaderListItem className={classNames(this.props.className, classes.root, { isCurrent })}>
+            <TitleBarListItem className={classNames(this.props.className, classes.root, { isCurrent })}>
                 <SmartLink
                     to={this.props.to}
                     className={classNames(
@@ -51,7 +51,7 @@ export class VanillaHeaderNavItem extends React.Component<IProps> {
                         {this.props.children}
                     </div>
                 </SmartLink>
-            </VanillaHeaderListItem>
+            </TitleBarListItem>
         );
     }
 
@@ -68,4 +68,4 @@ export class VanillaHeaderNavItem extends React.Component<IProps> {
     };
 }
 
-export default withRouter<IProps>(VanillaHeaderNavItem);
+export default withRouter<IProps>(TitleBarNavItem);

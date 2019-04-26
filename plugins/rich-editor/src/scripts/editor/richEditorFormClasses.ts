@@ -6,24 +6,24 @@
 import {
     paddings,
     placeholderStyles,
-    textInputSizing,
     colorOut,
     unit,
     absolutePosition,
     pointerEvents,
     margins,
     negative,
+    textInputSizingFromFixedHeight,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { calc, percent, px } from "csx";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
 export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false) => {
     const globalVars = globalVariables();
-    const headerVars = vanillaHeaderVariables();
+    const headerVars = titleBarVariables();
     const vars = richEditorVariables();
     const formElementVars = formElementsVariables();
     const style = styleFactory("richEditorForm");
@@ -42,10 +42,9 @@ export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false)
     const title = style("title", {
         $nest: {
             "&.inputText, &&": {
-                ...textInputSizing(
+                ...textInputSizingFromFixedHeight(
                     vars.title.height,
                     vars.title.fontSize,
-                    globalVars.gutter.half,
                     formElementVars.border.fullWidth,
                 ),
                 color: colorOut(formElementVars.colors.fg),

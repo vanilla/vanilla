@@ -8,7 +8,7 @@ import React from "react";
 import ThemeLogo, { LogoType } from "@library/theming/ThemeLogo";
 import { formatUrl, t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
-import { vanillaHeaderLogoClasses } from "@library/headers/vanillaHeaderStyles";
+import { titleBarLogoClasses } from "@library/headers/titleBarStyles";
 import classNames from "classnames";
 
 export interface IHeaderLogo {
@@ -28,7 +28,7 @@ export default class HeaderLogo extends React.Component<IHeaderLogo> {
     };
 
     public render() {
-        const classes = vanillaHeaderLogoClasses();
+        const classes = titleBarLogoClasses();
         const logoClassName = classNames("headerLogo-logo", this.props.logoClassName, classes.logo);
 
         return (

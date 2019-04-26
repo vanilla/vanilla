@@ -6,12 +6,11 @@
 
 import React from "react";
 import CompactMeBox from "@library/headers/mebox/pieces/CompactMeBox";
-import VanillaHeaderNavItem from "@library/headers/mebox/pieces/VanillaHeaderNavItem";
 import { withDevice, IDeviceProps, Devices } from "@library/layout/DeviceContext";
 import { IInjectableUserState, mapUsersStoreState, isUserGuest } from "@library/features/users/userModel";
-import { vanillaHeaderClasses, vanillaHeaderHomeClasses } from "@library/headers/vanillaHeaderStyles";
+import { titleBarClasses, titleBarHomeClasses } from "@library/headers/titleBarStyles";
 import { LogoType } from "@library/theming/ThemeLogo";
-import VanillaHeaderNav from "@library/headers/mebox/pieces/VanillaHeaderNav";
+import TitleBarNav from "@library/headers/mebox/pieces/TitleBarNav";
 import HeaderLogo from "@library/headers/mebox/pieces/HeaderLogo";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
@@ -21,6 +20,7 @@ import ReactDOM from "react-dom";
 import classNames from "classnames";
 import { connect } from "react-redux";
 import Container from "@library/layout/components/Container";
+import TitleBarNavItem from "@library/headers/mebox/pieces/TitleBarNavItem";
 
 interface IProps extends IDeviceProps, IInjectableUserState {
     container?: Element; // Element containing header. Should be the default most if not all of the time.
@@ -32,30 +32,30 @@ interface IProps extends IDeviceProps, IInjectableUserState {
  * That means the exact location in the page is not that important, since it will
  * render in a specific div in the default-master.
  */
-export class VanillaMobileHomeHeader extends React.Component<IProps> {
+export class TitleBarMobileHome extends React.Component<IProps> {
     public render() {
         const currentUser = this.props.currentUser.data;
         const isGuest = isUserGuest(currentUser);
-        const headerClasses = vanillaHeaderClasses();
-        const classes = vanillaHeaderHomeClasses();
+        const titleBarVars = titleBarClasses();
+        const classes = titleBarHomeClasses();
 
         return ReactDOM.createPortal(
-            <header className={classNames(headerClasses.root, classes.root, this.props.className)}>
-                <Container className="vanillaHeaderHome-top">
+            <header className={classNames(titleBarVars.root, classes.root, this.props.className)}>
+                <Container className="titleBarHome-top">
                     <PanelWidgetHorizontalPadding>
-                        <div className={classNames(headerClasses.bar, "isHome")}>
+                        <div className={classNames(titleBarVars.bar, "isHome")}>
                             <FlexSpacer className={classes.left} />
                             <HeaderLogo
-                                className={classNames("vanillaHeader-logoContainer", headerClasses.logoContainer)}
-                                logoClassName="vanillaHeader-logo isCentred"
+                                className={classNames("titleBar-logoContainer", titleBarVars.logoContainer)}
+                                logoClassName="titleBar-logo isCentred"
                                 logoType={LogoType.MOBILE}
                             />
                             {isGuest ? (
-                                <VanillaHeaderNav className={classNames(headerClasses.nav, "vanillaHeader-guest")}>
-                                    <VanillaHeaderNavItem to={`/entry/signin?target=${window.location.pathname}`}>
-                                        {signIn("vanillaHeader-signInIcon")}
-                                    </VanillaHeaderNavItem>
-                                </VanillaHeaderNav>
+                                <TitleBarNav className={classNames(titleBarVars.nav, "titleBar-guest")}>
+                                    <TitleBarNavItem to={`/entry/signin?target=${window.location.pathname}`}>
+                                        {signIn("titleBar-signInIcon")}
+                                    </TitleBarNavItem>
+                                </TitleBarNav>
                             ) : (
                                 <CompactMeBox currentUser={this.props.currentUser} />
                             )}
@@ -63,20 +63,20 @@ export class VanillaMobileHomeHeader extends React.Component<IProps> {
                     </PanelWidgetHorizontalPadding>
                 </Container>
                 <div className={classes.bottom}>
-                    <div className={headerClasses.scroll}>
-                        <VanillaHeaderNav
+                    <div className={titleBarVars.scroll}>
+                        <TitleBarNav
                             {...dummyNavigationData}
-                            className={classNames("vanillaHeader-nav", headerClasses.nav)}
-                            linkClassName={classNames("vanillaHeader-navLink", headerClasses.topElement)}
-                            linkContentClassName="vanillaHeader-navLinkContent"
+                            className={classNames("titleBar-nav", titleBarVars.nav)}
+                            linkClassName={classNames("titleBar-navLink", titleBarVars.topElement)}
+                            linkContentClassName="titleBar-navLinkContent"
                         />
                     </div>
                 </div>
             </header>,
-            this.props.container || document.getElementById("vanillaHeader")!,
+            this.props.container || document.getElementById("titleBar")!,
         );
     }
 }
 
 const withRedux = connect(mapUsersStoreState);
-export default withRedux(withDevice(VanillaMobileHomeHeader));
+export default withRedux(withDevice(TitleBarMobileHome));

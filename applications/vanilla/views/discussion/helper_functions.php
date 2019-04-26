@@ -642,7 +642,7 @@ if (!function_exists('writeEmbedCommentForm')) :
                 }
                 echo "</div>\n";
                 echo $controller->Form->close();
-            echo '</div> ';
+                echo '</div> ';
                 ?>
             </div>
         <?php

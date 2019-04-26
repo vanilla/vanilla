@@ -5,12 +5,20 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { borders, colorOut, IBordersSameAllSidesStyles, placeholderStyles } from "@library/styles/styleHelpers";
+import {
+    borders,
+    colorOut,
+    IBordersSameAllSidesStyles,
+    placeholderStyles,
+    textInputSizingFromFixedHeight,
+} from "@library/styles/styleHelpers";
 import { px } from "csx";
 import { cssRule } from "typestyle";
+import { formElementsVariables } from "@library/forms/formElementStyles";
 
 export const inputVariables = useThemeCache(() => {
     const globalVars = globalVariables();
+    const formElementVars = formElementsVariables();
     const makeThemeVars = variableFactory("input");
 
     const colors = makeThemeVars("colors", {
@@ -22,16 +30,31 @@ export const inputVariables = useThemeCache(() => {
         },
     });
 
+    const sizing = makeThemeVars("sizing", {
+        height: formElementVars.sizing.height,
+    });
+
+    const font = makeThemeVars("font", {
+        size: globalVars.fonts.size.large,
+    });
+
     const border: IBordersSameAllSidesStyles = makeThemeVars("borders", globalVars.border);
 
-    return { colors, border };
+    return {
+        colors,
+        border,
+        sizing,
+        font,
+    };
 });
 
 export const inputClasses = useThemeCache(() => {
     const vars = inputVariables();
     const style = styleFactory("input");
+    const formElementVars = formElementsVariables();
 
     const textStyles = {
+        ...textInputSizingFromFixedHeight(vars.sizing.height, vars.font.size, formElementVars.border.fullWidth),
         backgroundColor: colorOut(vars.colors.bg),
         color: colorOut(vars.colors.fg),
         ...borders(vars.border),

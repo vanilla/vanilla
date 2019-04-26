@@ -19,10 +19,11 @@ import {
     absolutePosition,
     pointerEvents,
 } from "@library/styles/styleHelpers";
-import {DEBUG_STYLES, styleFactory, useThemeCache, variableFactory} from "@library/styles/styleUtils";
-import {calc, ColorHelper, percent, px, quote, viewHeight} from "csx";
+import { DEBUG_STYLES, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { calc, ColorHelper, percent, px, quote, viewHeight } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
-import {NestedCSSProperties} from "typestyle/lib/types";
+import { NestedCSSProperties } from "typestyle/lib/types";
+import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
 
 export const vanillaHeaderVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -122,8 +123,8 @@ export const vanillaHeaderVariables = useThemeCache(() => {
         },
     });
 
-    const bottomRow = makeThemeVars("bottomRow",{
-        bg: modifyColorBasedOnLightness(colors.bg, .1).desaturate(.2, true),
+    const bottomRow = makeThemeVars("bottomRow", {
+        bg: modifyColorBasedOnLightness(colors.bg, 0.1).desaturate(0.2, true),
     });
 
     return {
@@ -154,45 +155,43 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     const style = styleFactory("vanillaHeader");
 
     const root = style({
-            maxWidth: percent(100),
-            backgroundColor: headerColors.bg.toString(),
-            color: headerColors.fg.toString(),
-            $nest: {
-                "& .searchBar__control": {
-                    color: vars.colors.fg.toString(),
-                    cursor: "pointer",
-                },
-                "&& .suggestedTextInput-clear.searchBar-clear": {
-                    $nest: {
-                        "&:hover": {
-                            color: vars.colors.fg.toString(),
-                        },
-                        "&:active": {
-                            color: vars.colors.fg.toString(),
-                        },
-                        "&:focus": {
-                            color: vars.colors.fg.toString(),
-                        },
+        maxWidth: percent(100),
+        backgroundColor: headerColors.bg.toString(),
+        color: headerColors.fg.toString(),
+        $nest: {
+            "& .searchBar__control": {
+                color: vars.colors.fg.toString(),
+                cursor: "pointer",
+            },
+            "&& .suggestedTextInput-clear.searchBar-clear": {
+                $nest: {
+                    "&:hover": {
+                        color: vars.colors.fg.toString(),
                     },
-                },
-                "& .searchBar__placeholder": {
-                    color: vars.colors.fg.fade(0.8).toString(),
-                    cursor: "pointer",
-                },
-                [`& .${backLinkClasses().link}`]: {
-                    $nest: {
-                        "&, &:hover, &:focus, &:active": {
-                            color: colorOut(vars.colors.fg),
-                        },
+                    "&:active": {
+                        color: vars.colors.fg.toString(),
+                    },
+                    "&:focus": {
+                        color: vars.colors.fg.toString(),
                     },
                 },
             },
-            ...mediaQueries.oneColumn({
-                height: px(vars.sizing.mobile.height),
-            }).$nest,
+            "& .searchBar__placeholder": {
+                color: vars.colors.fg.fade(0.8).toString(),
+                cursor: "pointer",
+            },
+            [`& .${backLinkClasses().link}`]: {
+                $nest: {
+                    "&, &:hover, &:focus, &:active": {
+                        color: colorOut(vars.colors.fg),
+                    },
+                },
+            },
         },
-
-    );
+        ...mediaQueries.oneColumn({
+            height: px(vars.sizing.mobile.height),
+        }).$nest,
+    });
 
     const spacer = style(
         "spacer",
@@ -251,12 +250,16 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         justifyContent: "flex-end",
     });
 
-    const nav = style("nav", {
-        display: "flex",
-        flexWrap: "wrap",
-        height: px(vars.sizing.height),
-        color: "inherit",
-    },  mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }));
+    const nav = style(
+        "nav",
+        {
+            display: "flex",
+            flexWrap: "wrap",
+            height: px(vars.sizing.height),
+            color: "inherit",
+        },
+        mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }),
+    );
 
     const locales = style(
         "locales",
@@ -328,7 +331,6 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     });
 
     const button = style(
-
         "button",
         {
             color: vars.colors.fg.toString(),
@@ -430,6 +432,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     });
 
     const dropDownContents = style("dropDownContents", {
+        marginTop: `${unit((vars.sizing.height - vars.meBox.sizing.buttonContents) / -2 + 2)}`,
         $nest: {
             "&&&": {
                 minWidth: unit(vars.dropDownContents.minWidth),
@@ -445,13 +448,12 @@ export const vanillaHeaderClasses = useThemeCache(() => {
         color: vars.count.fg.toString(),
     });
 
-
     const scroll = style("scroll", {
         position: "relative",
         top: 0,
         left: 0,
         height: percent(100),
-        ...scrollWithNoScrollBar() as NestedCSSProperties,
+        ...(scrollWithNoScrollBar() as NestedCSSProperties),
     });
 
     const rightFlexBasis = style(
@@ -535,7 +537,9 @@ export const vanillaHeaderClasses = useThemeCache(() => {
             top: 0,
             display: "flex",
             position: "relative",
-            margin: `${unit((vars.sizing.height - formElementVars.sizing.height + formElementVars.border.width) / -2)} auto`,
+            margin: `${unit(
+                (vars.sizing.height - formElementVars.sizing.height + formElementVars.border.width) / -2,
+            )} auto`,
             maxWidth: px(vars.compactSearch.maxWidth),
         },
         mediaQueries.oneColumn({
@@ -555,7 +559,7 @@ export const vanillaHeaderClasses = useThemeCache(() => {
     const desktopNavWrap = style("desktopNavWrap", {
         position: "relative",
         flexGrow: 1,
-        ...addGradientsToHintOverflow( globalVars.gutter.half * 4, vars.colors.bg) as any,
+        ...(addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.colors.bg) as any),
     });
 
     return {
@@ -626,16 +630,20 @@ export const vanillaHeaderHomeClasses = useThemeCache(() => {
         flexBasis: vars.button.size,
     });
 
-    const bottom = style("bottom", {
-        position: "relative",
-        backgroundColor: colorOut(vars.bottomRow.bg),
-        height: unit(vars.sizing.height),
-        width: percent(100),
-        ...addGradientsToHintOverflow( globalVars.gutter.half * 4, vars.colors.bg) as any,
-    }, mediaQueries.oneColumn({
-        height: px(vars.sizing.mobile.height),
-        ...addGradientsToHintOverflow( globalVars.gutter.half * 4, vars.bottomRow.bg) as any,
-    }));
+    const bottom = style(
+        "bottom",
+        {
+            position: "relative",
+            backgroundColor: colorOut(vars.bottomRow.bg),
+            height: unit(vars.sizing.height),
+            width: percent(100),
+            ...(addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.colors.bg) as any),
+        },
+        mediaQueries.oneColumn({
+            height: px(vars.sizing.mobile.height),
+            ...(addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.bottomRow.bg) as any),
+        }),
+    );
 
     return {
         root,
@@ -659,7 +667,9 @@ export const scrollWithNoScrollBar = (nestedStyles?: NestedCSSProperties) => {
 
 export const addGradientsToHintOverflow = (width: number | string, color: ColorHelper) => {
     const gradient = (direction: "right" | "left") => {
-        return `linear-gradient(to ${direction}, ${colorOut(color.fade(0))} 0%, ${colorOut(color.fade(.3))} 20%, ${colorOut(color)} 90%)`;
+        return `linear-gradient(to ${direction}, ${colorOut(color.fade(0))} 0%, ${colorOut(
+            color.fade(0.3),
+        )} 20%, ${colorOut(color)} 90%)`;
     };
     return {
         $nest: {

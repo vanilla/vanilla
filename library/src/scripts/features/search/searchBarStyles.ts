@@ -208,6 +208,7 @@ export const searchBarClasses = useThemeCache(() => {
         borderRight: 0,
         paddingTop: 0,
         paddingBottom: 0,
+        height: vars.sizing.height,
         backgroundColor: colorOut(vars.input.bg),
         color: colorOut(vars.input.fg),
         ...borderRadii({

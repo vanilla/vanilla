@@ -6,13 +6,13 @@
 import {
     paddings,
     placeholderStyles,
+    textInputSizing,
     colorOut,
     unit,
     absolutePosition,
     pointerEvents,
     margins,
     negative,
-    textInputSizingFromFixedHeight,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -42,9 +42,10 @@ export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false)
     const title = style("title", {
         $nest: {
             "&.inputText, &&": {
-                ...textInputSizingFromFixedHeight(
+                ...textInputSizing(
                     vars.title.height,
                     vars.title.fontSize,
+                    globalVars.gutter.half,
                     formElementVars.border.fullWidth,
                 ),
                 color: colorOut(formElementVars.colors.fg),

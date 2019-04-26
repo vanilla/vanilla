@@ -6,7 +6,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, flexHelper, unit } from "@library/styles/styleHelpers";
-import {styleFactory, useThemeCache} from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";
@@ -41,11 +41,14 @@ export const meBoxClasses = useThemeCache(() => {
     });
 
     const rootFlexClass = (count: number) => {
-        return style("footFlexClass",{
+        return style("footFlexClass", {
             flexBasis: unit(count * formElementsVariables().sizing.height),
         });
     };
 
     return {
-        root, buttonContent, rootFlexClass };
+        root,
+        buttonContent,
+        rootFlexClass,
+    };
 });

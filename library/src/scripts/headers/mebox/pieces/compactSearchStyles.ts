@@ -11,7 +11,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
-import {layoutVariables} from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const compactSearchVariables = useThemeCache(() => {
     const makeVars = variableFactory("compactSearch");
@@ -73,15 +73,18 @@ export const compactSearchClasses = useThemeCache(() => {
         },
     });
 
-    const contents = style("contents", {
-        display: "flex",
-        alignItems: "center",
-        flexWrap: "nowrap",
-        height: unit(headerVariables.sizing.height),
-    },
+    const contents = style(
+        "contents",
+        {
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "nowrap",
+            height: unit(headerVariables.sizing.height),
+        },
         mediaQueries.oneColumn({
-        height: unit(headerVariables.sizing.mobile.height),
-    }));
+            height: unit(headerVariables.sizing.mobile.height),
+        }),
+    );
 
     const close = style("close", {
         color: "inherit",

@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import {borderRadii, borders, colorOut, unit} from "@library/styles/styleHelpers";
+import { borderRadii, borders, colorOut, unit } from "@library/styles/styleHelpers";
 import { calc, important, percent, px } from "csx";
 
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
@@ -22,8 +22,6 @@ export const searchBarVariables = useThemeCache(() => {
     const search = themeVars("search", {
         minWidth: 109,
     });
-
-
 
     const sizing = themeVars("sizing", {
         height: 40,
@@ -234,7 +232,7 @@ export const searchBarClasses = useThemeCache(() => {
     });
 
     const actionButton = style("actionButton", {
-        marginLeft: -(vars.border.width),
+        marginLeft: -vars.border.width,
         ...borderRadii({
             left: 0,
             right: vars.border.radius,

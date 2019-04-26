@@ -8,7 +8,7 @@ import classNames from "classnames";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import { ScrollOffsetContext } from "@library/layout/ScrollOffsetContext";
 import { inheritHeightClass, sticky } from "@library/styles/styleHelpers";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { style } from "typestyle";
 import { percent } from "csx";
 import { panelLayoutClasses } from "@library/layout/panelLayoutStyles";
@@ -93,7 +93,7 @@ class PanelLayout extends React.Component<IProps> {
             { hasTopPadding: topPadding },
             growMiddleBottom ? inheritHeightClass() : "",
         );
-        const headerVars = vanillaHeaderVariables();
+        const headerVars = titleBarVariables();
 
         const fixedPanelClass = style(sticky(), {
             $debugName: "fixedPanelClasses",

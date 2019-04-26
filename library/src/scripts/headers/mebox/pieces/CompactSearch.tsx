@@ -11,7 +11,7 @@ import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
 import SearchBar from "@library/features/search/SearchBar";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { RouteComponentProps, withRouter } from "react-router";
-import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
+import { titleBarClasses } from "@library/headers/titleBarStyles";
 import SearchOption from "@library/features/search/SearchOption";
 import { search } from "@library/icons/header";
 import { t } from "@library/utility/appUtils";
@@ -55,7 +55,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
     };
 
     public render() {
-        const headerClasses = vanillaHeaderClasses();
+        const titleBarVars = titleBarClasses();
         const classes = compactSearchClasses();
         const classesSearchBar = searchBarClasses();
         return (
@@ -66,7 +66,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                 {!this.props.open && (
                     <Button
                         onClick={this.props.onSearchButtonClick}
-                        className={classNames(headerClasses.centeredButtonClass, this.props.buttonClass)}
+                        className={classNames(titleBarVars.centeredButtonClass, this.props.buttonClass)}
                         title={t("Search")}
                         aria-expanded={false}
                         aria-haspopup="true"
@@ -128,8 +128,8 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                 <div
                     ref={this.resultsRef}
                     className={classNames(
-                        "vanillaHeader-compactSearchResults",
-                        headerClasses.compactSearchResults,
+                        "titleBar-compactSearchResults",
+                        titleBarVars.compactSearchResults,
                         classesSearchBar.results,
                     )}
                 />

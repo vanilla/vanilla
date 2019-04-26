@@ -17,19 +17,19 @@ import {
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { border, calc, percent, px, translateX } from "csx";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { frameVariables } from "@library/layout/frame/frameStyles";
 
 export const mobileDropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const vanillaHeaderVars = vanillaHeaderVariables();
+    const titleBarVars = titleBarVariables();
     const mixBgAndFg = globalVars.mixBgAndFg;
     const vars = variableFactory("mobileDropDown");
 
     const title = vars("title", {
         letterSpacing: -0.26,
-        maxWidth: calc(`100% - ${px(vanillaHeaderVars.endElements.flexBasis * 2)}`),
+        maxWidth: calc(`100% - ${px(titleBarVars.endElements.flexBasis * 2)}`),
     });
     const chevron = vars("chevron", {
         width: 8,
@@ -38,7 +38,7 @@ export const mobileDropDownVariables = useThemeCache(() => {
     });
 
     const header = vars("header", {
-        minHeight: vanillaHeaderVars.sizing.height,
+        minHeight: titleBarVars.sizing.height,
     });
 
     const padding = vars("padding", {
@@ -62,7 +62,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
     const vars = mobileDropDownVariables();
     const globalVars = globalVariables();
     const frameVars = frameVariables();
-    const vanillaHeaderVars = vanillaHeaderVariables();
+    const titleBarVars = titleBarVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
     const style = styleFactory("mobileDropDown");
@@ -196,7 +196,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "center",
         textTransform: "uppercase",
-        minHeight: unit(vanillaHeaderVars.sizing.height - 4),
+        minHeight: unit(titleBarVars.sizing.height - 4),
         fontSize: unit(globalVars.fonts.size.small),
         textOverflow: "ellipsis",
         ...paddings({

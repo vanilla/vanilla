@@ -15,7 +15,7 @@ export interface IProps {
 /**
  * Implements Navigation list item
  */
-export default class VanillaHeaderListItem extends React.Component<IProps> {
+export default class TitleBarListItem extends React.Component<IProps> {
     public render() {
         return <li className={classNames(this.props.className)}>{this.props.children}</li>;
     }

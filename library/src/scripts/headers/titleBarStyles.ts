@@ -23,6 +23,7 @@ import { DEBUG_STYLES, styleFactory, useThemeCache, variableFactory } from "@lib
 import { calc, ColorHelper, percent, px, quote, viewHeight } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
 
 export const titleBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -431,6 +432,7 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const dropDownContents = style("dropDownContents", {
+        marginTop: `${unit((vars.sizing.height - vars.meBox.sizing.buttonContents) / -2 + 2)}`,
         $nest: {
             "&&&": {
                 minWidth: unit(vars.dropDownContents.minWidth),

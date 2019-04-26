@@ -18,12 +18,12 @@ import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { calc, percent, px } from "csx";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
 export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false) => {
     const globalVars = globalVariables();
-    const headerVars = vanillaHeaderVariables();
+    const headerVars = titleBarVariables();
     const vars = richEditorVariables();
     const formElementVars = formElementsVariables();
     const style = styleFactory("richEditorForm");

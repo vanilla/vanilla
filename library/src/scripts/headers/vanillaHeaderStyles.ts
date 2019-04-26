@@ -431,6 +431,7 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const dropDownContents = style("dropDownContents", {
+        marginTop: `${unit((vars.sizing.height - vars.meBox.sizing.buttonContents) / -2 + 2)}`,
         $nest: {
             "&&&": {
                 minWidth: unit(vars.dropDownContents.minWidth),

@@ -22,7 +22,7 @@ export async function renderGetty(elements: IEmbedElements, data: IScrapeData) {
     const url = data.attributes.post;
     const newLink = document.createElement("a");
     newLink.classList.add("gie-single");
-    newLink.setAttribute("href", "http://www.gettyimages.ca/detail/" + url);
+    newLink.setAttribute("href", "https://www.gettyimages.ca/detail/" + url);
     newLink.setAttribute("id", data.attributes.id);
     contentElement.style.width = `${data.width}px`;
     contentElement.appendChild(newLink);
@@ -87,5 +87,5 @@ async function loadGettyImages(data) {
 
     /// DO NOT IGNORE
     /// This will turn totally sideways if window.gie is not populated before the script is initially loaded.
-    await ensureScript("//embed-cdn.gettyimages.com/widgets.js");
+    await ensureScript("https://embed-cdn.gettyimages.com/widgets.js");
 }

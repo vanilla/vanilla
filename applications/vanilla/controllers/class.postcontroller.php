@@ -243,7 +243,7 @@ class PostController extends VanillaController {
             // Decode HTML entities escaped by DiscussionModel::calculate() here.
             $this->Form->setValue('Name', htmlspecialchars_decode($this->Form->getValue('Name')));
 
-        } elseif ($this->Form->authenticatedPostBack()) { // Form was submitted
+        } elseif ($this->Form->authenticatedPostBack(true)) { // Form was submitted
             // Save as a draft?
             $formValues = $this->Form->formValues();
             $filters = ['Score'];
@@ -387,8 +387,6 @@ class PostController extends VanillaController {
                     }
                 }
             }
-        } else {
-            throw forbiddenException('GET');
         }
 
         // Add hidden fields for editing

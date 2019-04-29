@@ -1000,3 +1000,4 @@ if ($mobileInputFormatter === "Rich" && $richEditorEnabled === false) {
 }
 
 Gdn::router()->setRoute('apple-touch-icon.png', 'utility/showtouchicon', 'Internal');
+Gdn::router()->setRoute("robots.txt", "/utility/robots", "Internal");

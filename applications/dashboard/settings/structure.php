@@ -1003,13 +1003,7 @@ Gdn::router()->setRoute('apple-touch-icon.png', 'utility/showtouchicon', 'Intern
 Gdn::router()->setRoute("robots.txt", "/utility/robots", "Internal");
 
 // Migrate rules from Sitemaps addon.
-$sitemapsRobotsRules = Gdn::config()->get("Sitemap.Robots.Rules");
-if ($sitemapsRobotsRules !== false) {
-    // Remove old robots config.
+if (Gdn::config()->get("Robots.Rules") === false && $sitemapsRobotsRules = Gdn::config()->get("Sitemap.Robots.Rules")) {
+    Gdn::config()->set("Robots.Rules", $sitemapsRobotsRules);
     Gdn::config()->remove("Sitemap.Robots.Rules");
-
-    // Only migrate the rules if we don't already have any.
-    if (Gdn::config()->get("Robots.Rules") === false) {
-        Gdn::config()->set("Robots.Rules", $sitemapsRobotsRules);
-    }
 }

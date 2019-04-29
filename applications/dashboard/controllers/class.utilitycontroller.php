@@ -29,10 +29,10 @@ Disallow: /search/
 ROBOTS_DEFAULT;
 
     /** Content of robots.txt when the site is supposed to be "invisible" to crawlers and bots. */
-    private const ROBOTS_INVISIBLE = <<<RULES
+    private const ROBOTS_INVISIBLE = <<<ROBOTS_INVISIBLE
 User-agent: *
 Disallow: /
-RULES;
+ROBOTS_INVISIBLE;
 
     /** A flag used to indicate the site was put into maintenance mode in an automated fashion. */
     const MAINTENANCE_AUTO = 2;

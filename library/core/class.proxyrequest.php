@@ -141,7 +141,7 @@ class ProxyRequest {
         $response = curl_exec($handler);
         $this->ResponseTime = microtime(true) - $startTime;
 
-        if ($response == false) {
+        if ($response === false) {
             $this->ResponseBody = curl_error($handler);
             $this->ResponseStatus = 400;
         } else {

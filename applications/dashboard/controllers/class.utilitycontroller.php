@@ -701,7 +701,7 @@ RULES;
         $this->deliveryMethod(DELIVERY_METHOD_TEXT);
         $this->deliveryType(DELIVERY_TYPE_VIEW);
 
-        $isInvisible = $this->configuration->get("Robots.Invisible", false);
+        $isInvisible = $this->configuration->get("Robots.Invisible");
 
         $robots = new Robots();
         if ($isInvisible) {

@@ -215,7 +215,7 @@ export class TitleBar extends React.Component<IProps, IState> {
                         linkClassName={classNames(classes.signIn, classes.guestButton)}
                         to={`/entry/signin?target=${window.location.pathname}`}
                     >
-                        {t("Sign in")}
+                        {t("Sign In")}
                     </TitleBarNavItem>
                     <TitleBarNavItem
                         buttonType={ButtonTypes.INVERTED}

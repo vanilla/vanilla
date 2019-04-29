@@ -43,7 +43,7 @@ interface IState {
 export default class ModalConfirm extends React.Component<IProps, IState> {
     public static defaultProps: Partial<IProps> = {
         srOnlyTitle: false,
-        confirmTitle: t("Ok"),
+        confirmTitle: t("OK"),
     };
 
     private cancelRef;

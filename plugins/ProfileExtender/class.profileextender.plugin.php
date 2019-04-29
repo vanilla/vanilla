@@ -47,7 +47,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      * Whitelist of allowed field properties.
      */
     public $FieldProperties = ['Name', 'Label', 'FormType', 'Required', 'Locked',
-        'Options', 'Length', 'Sort', 'OnRegister', 'OnProfile', 'OnDiscussion'];
+        'Options', 'Length', 'Sort', 'OnRegister', 'OnProfile', 'OnDiscussion', 'SalesForceID'];
 
     /**
      * Blacklist of disallowed field names.

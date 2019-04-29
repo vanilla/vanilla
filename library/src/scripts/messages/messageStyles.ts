@@ -20,7 +20,7 @@ import { percent, viewWidth } from "csx";
 import { FontWeightProperty } from "csstype";
 import { layoutVariables } from "@library/layout/layoutStyles";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 
 export const messagesVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -79,7 +79,7 @@ export const messagesClasses = useThemeCache(() => {
     const vars = messagesVariables();
     const globalVars = globalVariables();
     const style = styleFactory("messages");
-    const headerVars = vanillaHeaderVariables();
+    const headerVars = titleBarVariables();
     const shadows = shadowHelper();
     const mediaQueries = layoutVariables().mediaQueries();
 

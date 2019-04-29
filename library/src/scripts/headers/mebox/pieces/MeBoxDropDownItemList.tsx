@@ -13,7 +13,7 @@ import MeBoxDropDownItem, {
 import { frameBodyClasses } from "@library/layout/frame/frameStyles";
 import classNames from "classnames";
 
-export interface IVanillaHeaderNavProps {
+export interface ITitleBarNavProps {
     className?: string;
     data: Array<IMeBoxMessageItem | IMeBoxNotificationItem>;
     emptyMessage?: string;
@@ -23,7 +23,7 @@ export interface IVanillaHeaderNavProps {
 /**
  * Implements Navigation component for header
  */
-export default class MeBoxDropDownItemList extends React.Component<IVanillaHeaderNavProps> {
+export default class MeBoxDropDownItemList extends React.Component<ITitleBarNavProps> {
     public render() {
         const count = this.props.data.length;
         const classesFrameBody = frameBodyClasses();

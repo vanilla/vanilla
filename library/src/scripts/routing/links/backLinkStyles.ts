@@ -8,14 +8,14 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut, srOnly, userSelect } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { px } from "csx";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/layoutStyles";
 
 const backLinkClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const style = styleFactory("backLink");
-    const headerVars = vanillaHeaderVariables();
+    const headerVars = titleBarVariables();
 
     const root = style({
         ...userSelect(),

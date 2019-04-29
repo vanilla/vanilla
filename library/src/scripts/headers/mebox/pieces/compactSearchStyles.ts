@@ -9,19 +9,19 @@ import { colorOut, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
-import {layoutVariables} from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/layoutStyles";
 
 export const compactSearchVariables = useThemeCache(() => {
     const makeVars = variableFactory("compactSearch");
-    const vanillaHeaderVars = vanillaHeaderVariables();
+    const titleBarVars = titleBarVariables();
     const globalVars = globalVariables();
 
-    const baseColor = vanillaHeaderVars.colors.bg.darken(0.05);
+    const baseColor = titleBarVars.colors.bg.darken(0.05);
     const colors = makeVars("colors", {
         bg: baseColor.fade(0.8),
-        fg: vanillaHeaderVars.colors.fg,
+        fg: titleBarVars.colors.fg,
         placeholder: globalVars.mainColors.bg,
         active: {
             bg: baseColor,
@@ -33,7 +33,7 @@ export const compactSearchVariables = useThemeCache(() => {
 export const compactSearchClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementsVars = formElementsVariables();
-    const headerVariables = vanillaHeaderVariables();
+    const titleBarVars = titleBarVariables();
     const vars = compactSearchVariables();
     const style = styleFactory("compactSearch");
     const mediaQueries = layoutVariables().mediaQueries();
@@ -73,15 +73,18 @@ export const compactSearchClasses = useThemeCache(() => {
         },
     });
 
-    const contents = style("contents", {
-        display: "flex",
-        alignItems: "center",
-        flexWrap: "nowrap",
-        height: unit(headerVariables.sizing.height),
-    },
+    const contents = style(
+        "contents",
+        {
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "nowrap",
+            height: unit(titleBarVars.sizing.height),
+        },
         mediaQueries.oneColumn({
-        height: unit(headerVariables.sizing.mobile.height),
-    }));
+            height: unit(titleBarVars.sizing.mobile.height),
+        }),
+    );
 
     const close = style("close", {
         color: "inherit",

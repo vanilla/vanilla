@@ -413,7 +413,7 @@ class MediaItemModule extends Gdn_Module {
      * @param $attributes The button attributes.
      * @return MediaItemModule $this
      */
-    public function addButton($text, $url, $attributes) {
+    public function addButton($text, $url, $attributes = ['class' => 'btn btn-secondary']) {
         if (is_string($attributes)) {
             $attr = ['class' => $attributes];
         } elseif (is_array($attributes)) {

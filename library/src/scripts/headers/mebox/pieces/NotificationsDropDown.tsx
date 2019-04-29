@@ -7,7 +7,7 @@
 import DropDown from "@library/flyouts/DropDown";
 import NotificationsContents, { INotificationsProps } from "@library/headers/mebox/pieces/NotificationsContents";
 import NotificationsCount from "@library/headers/mebox/pieces/NotificationsCount";
-import { vanillaHeaderClasses } from "@library/headers/vanillaHeaderStyles";
+import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import React from "react";
@@ -38,7 +38,7 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
      */
     public render() {
         const { userSlug } = this.props;
-        const classesHeader = vanillaHeaderClasses();
+        const classesHeader = titleBarClasses();
 
         return (
             <DropDown

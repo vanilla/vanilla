@@ -18,6 +18,22 @@ use Vanilla\Web\Robots;
  */
 class UtilityController extends DashboardController {
 
+    /** Default robots.txt contents. */
+    private const ROBOTS_DEFAULT = <<<ROBOTS_DEFAULT
+User-agent: *
+Disallow: /entry/
+Disallow: /messages/
+Disallow: /profile/comments/
+Disallow: /profile/discussions/
+Disallow: /search/
+ROBOTS_DEFAULT;
+
+    /** Content of robots.txt when the site is supposed to be "invisible" to crawlers and bots. */
+    private const ROBOTS_INVISIBLE = <<<RULES
+User-agent: *
+Disallow: /
+RULES;
+
     /** A flag used to indicate the site was put into maintenance mode in an automated fashion. */
     const MAINTENANCE_AUTO = 2;
 
@@ -669,14 +685,7 @@ class UtilityController extends DashboardController {
         // Config lookup is backwards-compatible with Sitemaps addon.
         $rules = $this->configuration->get("Robots.Rules", $this->configuration->get("Sitemap.Robots.Rules", null));
         if ($rules === null) {
-            $rules = <<<RULES
-User-agent: *
-Disallow: /entry/
-Disallow: /messages/
-Disallow: /profile/comments/
-Disallow: /profile/discussions/
-Disallow: /search/
-RULES;
+            $rules = self::ROBOTS_DEFAULT;
         }
         return $rules;
     }
@@ -689,12 +698,18 @@ RULES;
         $this->session->UserID = 0;
         $this->session->User = false;
 
-        $this->deliveryMethod(DELIVERY_METHOD_XHTML);
+        $this->deliveryMethod(DELIVERY_METHOD_TEXT);
         $this->deliveryType(DELIVERY_TYPE_VIEW);
 
+        $isInvisible = $this->configuration->get("Robots.Invisible", false);
+
         $robots = new Robots();
-        $robots->addRule($this->robotRules());
-        $this->eventManager->fire("robots_init", $robots);
+        if ($isInvisible) {
+            $robots->addRule(self::ROBOTS_INVISIBLE);
+        } else {
+            $robots->addRule($this->robotRules());
+            $this->eventManager->fire("robots_init", $robots);
+        }
 
         $this->setHeader("Content-Type", "text/plain");
         $this->setData("rules", $robots->getRules());

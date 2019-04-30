@@ -180,6 +180,7 @@ declare module "quill/core" {
         getText(index?: number, length?: number): string;
         insertEmbed(index: number, type: string, value: any, source?: Sources): DeltaStatic;
         insertText(index: number, text: string, source?: Sources): DeltaStatic;
+        insertText(index: number, text: string, source?: Sources): DeltaStatic;
         insertText(index: number, text: string, format: string, value: any, source?: Sources): DeltaStatic;
         insertText(index: number, text: string, formats: StringMap, source?: Sources): DeltaStatic;
         /**
@@ -367,7 +368,7 @@ declare module "quill/modules/keyboard" {
               [key: string]: string | boolean | number;
           };
 
-    interface Context {
+    interface ConfigurationContext {
         collapsed?: boolean;
         format?: Formats;
         offset?: number;
@@ -376,7 +377,22 @@ declare module "quill/modules/keyboard" {
         suffix?: RegExp;
     }
 
-    type KeyboardHandler = (selectedRange: RangeStatic) => boolean | null | undefined | void; // False to prevent default.
+    interface HandlerContext extends ConfigurationContext {
+        collapsed: boolean;
+        format: Formats;
+        offset: number;
+        empty: boolean;
+        prefix: string;
+        suffix: string;
+        event: KeyboardEvent;
+    }
+
+    interface IBindingObject extends ConfigurationContext, KeyBinding {
+        handler: KeyboardHandler;
+    }
+    export type BindingObject = IBindingObject | false | undefined;
+
+    type KeyboardHandler = (selectedRange: RangeStatic, context: HandlerContext) => boolean | null | undefined | void; // False to prevent default.
 
     export default class KeyboardModule extends Module {
         public static match(event: KeyboardEvent, binding: KeyBinding | string | number);

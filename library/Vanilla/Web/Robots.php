@@ -11,7 +11,6 @@ namespace Vanilla\Web;
  * A data collector for robots.txt data.
  */
 class Robots implements \JsonSerializable {
-
     /**
      * @var array
      */

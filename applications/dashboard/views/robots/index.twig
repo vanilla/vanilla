@@ -1,0 +1,6 @@
+{% for sitemap in sitemaps %}
+Sitemap: {{ url(sitemap, true) }}
+{% endfor %}
+{% for rule in rules %}
+{{ rule }}
+{% endfor %}

@@ -9,6 +9,7 @@ import Quill, { QuillOptionsStatic } from "quill/core";
 import ThemeBase from "quill/core/theme";
 import KeyboardBindings from "@rich-editor/quill/KeyboardBindings";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
+import MarkdownModule from "@rich-editor/quill/MarkdownModule";
 
 export default class VanillaTheme extends ThemeBase {
     /**
@@ -26,6 +27,7 @@ export default class VanillaTheme extends ThemeBase {
         };
 
         super(quill, themeOptions);
+
         this.quill.root.classList.add(classesRichEditor.text);
         this.quill.root.classList.add("richEditor-text");
         this.quill.root.classList.add("userContent");
@@ -38,5 +40,8 @@ export default class VanillaTheme extends ThemeBase {
             ...this.options.modules.keyboard.bindings,
             ...keyboardBindings.bindings,
         };
+
+        // Attaches the markdown keyboard listener.
+        const markdownModule = new MarkdownModule(this.quill);
     }
 }

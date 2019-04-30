@@ -43,5 +43,6 @@ export default class VanillaTheme extends ThemeBase {
 
         // Attaches the markdown keyboard listener.
         const markdownModule = new MarkdownModule(this.quill);
+        markdownModule.registerHandler();
     }
 }

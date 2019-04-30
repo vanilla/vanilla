@@ -137,7 +137,7 @@ class EmbedManagerTest extends SharedBootstrapTestCase {
     <div class="embedExternal-content">
         <a
             class="embedExternal-content gie-single js-gettyEmbed"
-            href="//www.gettyimages.com/detail/460707851"
+            href="https://www.gettyimages.com/detail/460707851"
             id="CdkwD1KlQeN8rV9xoKzSAg"
             data-height="337"
             data-width="508"

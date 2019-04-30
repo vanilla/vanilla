@@ -12,12 +12,6 @@ namespace Vanilla\Web;
  */
 class Robots implements \JsonSerializable {
 
-    /** Content of robots.txt when the site is supposed to be "invisible" to crawlers and bots. */
-    const ROBOTS_INVISIBLE = <<<ROBOTS_INVISIBLE
-User-agent: *
-Disallow: /
-ROBOTS_INVISIBLE;
-
     /**
      * @var array
      */

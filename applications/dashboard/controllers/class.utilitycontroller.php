@@ -28,12 +28,6 @@ Disallow: /profile/discussions/
 Disallow: /search/
 ROBOTS_DEFAULT;
 
-    /** Content of robots.txt when the site is supposed to be "invisible" to crawlers and bots. */
-    private const ROBOTS_INVISIBLE = <<<ROBOTS_INVISIBLE
-User-agent: *
-Disallow: /
-ROBOTS_INVISIBLE;
-
     /** A flag used to indicate the site was put into maintenance mode in an automated fashion. */
     const MAINTENANCE_AUTO = 2;
 
@@ -705,7 +699,7 @@ ROBOTS_INVISIBLE;
 
         $robots = new Robots();
         if ($isInvisible) {
-            $robots->addRule(self::ROBOTS_INVISIBLE);
+            $robots->addRule(Robots::ROBOTS_INVISIBLE);
         } else {
             $robots->addRule($this->robotRules());
             $this->eventManager->fire("robots_init", $robots);

@@ -11,6 +11,13 @@ namespace Vanilla\Web;
  * A data collector for robots.txt data.
  */
 class Robots implements \JsonSerializable {
+
+    /** Content of robots.txt when the site is supposed to be "invisible" to crawlers and bots. */
+    const ROBOTS_INVISIBLE = <<<ROBOTS_INVISIBLE
+User-agent: *
+Disallow: /
+ROBOTS_INVISIBLE;
+
     /**
      * @var array
      */

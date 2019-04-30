@@ -57,7 +57,7 @@ export default class MarkdownModule {
         }
 
         const { textContent, tagName } = line.domNode;
-        return typeof textContent !== "undefined" && !!textContent && this.ignoreTags.includes(tagName);
+        return typeof textContent !== "undefined" && !!textContent && !this.ignoreTags.includes(tagName);
     }
 
     /**

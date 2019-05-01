@@ -104,8 +104,6 @@ class EntryController extends Gdn_Controller {
      * @param string $authenticationSchemeAlias Type of authentication we're attempting.
      */
     public function auth($authenticationSchemeAlias = 'default') {
-        Gdn::session()->ensureTransientKey();
-
         $this->EventArguments['AuthenticationSchemeAlias'] = $authenticationSchemeAlias;
         $this->fireEvent('BeforeAuth');
 
@@ -1039,8 +1037,6 @@ class EntryController extends Gdn_Controller {
         if (!$this->Request->isPostBack()) {
             $this->checkOverride('SignIn', $this->target());
         }
-
-        Gdn::session()->ensureTransientKey();
 
         $this->addJsFile('entry.js');
         $this->setData('Title', t('Sign In'));

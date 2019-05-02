@@ -71,6 +71,8 @@ class EntryController extends Gdn_Controller {
         parent::initialize();
         Gdn_Theme::section('Entry');
 
+        $this->CssClass .= " AjaxForm";
+
         if ($this->UserModel->isNameUnique() && !$this->UserModel->isEmailUnique()) {
             $this->setData('RecoverPasswordLabelCode', 'Enter your username to continue.');
         } else {

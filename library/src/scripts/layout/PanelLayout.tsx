@@ -7,8 +7,10 @@ import React from "react";
 import classNames from "classnames";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import { ScrollOffsetContext } from "@library/layout/ScrollOffsetContext";
-import { inheritHeightClass, sticky } from "@library/styles/styleHelpers";
-import { panelAreaClasses, panelLayoutClasses, panelWidgetClasses } from "@library/layout/panelLayoutStyles";
+import { inheritHeightClass } from "@library/styles/styleHelpers";
+import { panelLayoutClasses  } from "@library/layout/panelLayoutStyles";
+import {panelAreaClasses} from "@library/layout/panelAreaStyles";
+import {panelWidgetClasses} from "@library/layout/panelWidgetStyles";
 
 interface IProps extends IDeviceProps {
     className?: string;
@@ -101,15 +103,11 @@ class PanelLayout extends React.Component<IProps> {
                         )}
                         <Panel
                             className={classNames(classes.middleColumnMaxWidth, {
-                                hasAdjacentPanel: shouldRenderLeftPanel || shouldRenderRightPanel,
-                                hasTwoAdjacentPanels: shouldRenderLeftPanel && shouldRenderRightPanel,
+                                hasAdjacentPanel: shouldRenderLeftPanel,
                             })}
                         >
                             <PanelArea>{childComponents.breadcrumbs}</PanelArea>
                         </Panel>
-                        {shouldRenderRightPanel && (
-                            <Panel className={classNames(classes.rightColumn)} ariaHidden={true} />
-                        )}
                     </div>
                 )}
 

@@ -62,7 +62,6 @@ export const bodyCSS = useThemeCache(() => {
         display: "flex",
         flexDirection: "column",
     });
-
 });
 
 export const bodyClasses = useThemeCache(() => {

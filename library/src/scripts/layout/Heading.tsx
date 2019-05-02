@@ -6,6 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
+import {typographyClasses} from "@library/styles/typographyStyles";
 
 export interface ICommonHeadingProps {
     id?: string;
@@ -34,6 +35,7 @@ export default class Heading extends React.Component<IHeadingProps> {
     public render() {
         const { children, title } = this.props;
         const Tag = `h${this.props.depth}` as "h1";
+        const classesTypography = typographyClasses();
 
         return (
             <Tag
@@ -41,7 +43,7 @@ export default class Heading extends React.Component<IHeadingProps> {
                 className={classNames(
                     "heading",
                     `heading-${this.renderAsDepth}`,
-                    { pageTitle: this.renderAsDepth === 1 },
+                    { [`${classesTypography.pageTitle}`]: this.renderAsDepth === 1 },
                     this.props.className,
                 )}
             >

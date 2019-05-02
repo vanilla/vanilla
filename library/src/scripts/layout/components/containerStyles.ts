@@ -52,8 +52,6 @@ export const containerClasses = useThemeCache(() => {
         marginLeft: "auto",
         marginRight: "auto",
         ...paddings(vars.spacing.padding),
-        // Temporary
-        backgroundColor: color("#b3b184").toString(),
     });
 
     return { root };

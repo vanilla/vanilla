@@ -46,6 +46,23 @@ export const bodyCSS = useThemeCache(() => {
             all: 0,
         }),
     });
+
+    cssRule(".page", {
+        display: "flex",
+        overflow: "visible",
+        flexDirection: "column",
+        width: percent(100),
+        minHeight: viewHeight(100),
+        position: "relative",
+        zIndex: 0,
+    });
+
+    cssRule(".page-minHeight", {
+        flexGrow: 1,
+        display: "flex",
+        flexDirection: "column",
+    });
+
 });
 
 export const bodyClasses = useThemeCache(() => {

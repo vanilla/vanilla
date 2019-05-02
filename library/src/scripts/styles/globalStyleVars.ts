@@ -127,10 +127,7 @@ export const globalVariables = useThemeCache(() => {
     });
 
     const content = makeThemeVars("content", {
-        width:
-            panel.paddedWidth * 2 +
-            middleColumn.paddedWidth +
-            gutter.size * 3 /* *3 from margin between columns and half margin on .container*/,
+        width: middleColumn.paddedWidth + panel.paddedWidth * 2 + gutter.size,
     });
 
     const fonts = makeThemeVars("fonts", {

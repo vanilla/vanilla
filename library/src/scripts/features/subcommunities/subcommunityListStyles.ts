@@ -8,7 +8,7 @@ import React from "react";
 import { unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const subcommunityListVariables = useThemeCache(() => {
     const themeVars = variableFactory("subcommunityList");

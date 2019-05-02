@@ -29,7 +29,7 @@ import * as React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import { style } from "typestyle";
-import { PanelWidgetHorizontalPadding } from "../layout/PanelLayout";
+import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { signIn } from "@library/icons/common";
@@ -172,8 +172,8 @@ export class TitleBar extends React.Component<IProps, IState> {
     }
 
     public componentDidMount() {
-        const headerVars = titleBarVariables();
-        this.context.setScrollOffset(headerVars.sizing.height);
+        const titleBarVars = titleBarVariables();
+        this.context.setScrollOffset(titleBarVars.sizing.height);
     }
 
     public componentWillUnmount() {

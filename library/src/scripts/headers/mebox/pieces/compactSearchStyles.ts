@@ -11,7 +11,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const compactSearchVariables = useThemeCache(() => {
     const makeVars = variableFactory("compactSearch");

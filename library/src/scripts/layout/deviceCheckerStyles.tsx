@@ -6,7 +6,7 @@
 
 import { styleFactory } from "@library/styles/styleUtils";
 import { important, px } from "csx";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export function deviceCheckerClasses() {
     const style = styleFactory("deviceChecker");

@@ -5,8 +5,8 @@
  */
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { layoutVariables } from "@library/layout/layoutStyles";
-import { percent } from "csx";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { percent, color } from "csx";
 import { paddings, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 
@@ -17,13 +17,13 @@ export const containerVariables = useThemeCache(() => {
 
     const spacing = makeThemeVars("spacing", {
         padding: {
-            horizontal: vars.gutter.halfSize,
+            horizontal: vars.gutter.size,
         },
     });
 
     const sizing = makeThemeVars("sizes", {
         full: vars.contentSizes.full,
-        widgets: vars.contentSizes.widgets,
+        narrowContentSize: vars.contentSizes.narrow,
     });
 
     const colors = makeThemeVars("colors", {
@@ -40,6 +40,7 @@ export const containerVariables = useThemeCache(() => {
 export const containerClasses = useThemeCache(() => {
     const style = styleFactory("container");
     const globalVars = globalVariables();
+    const vars = containerVariables();
 
     const root = style({
         display: "flex",
@@ -50,9 +51,9 @@ export const containerClasses = useThemeCache(() => {
         maxWidth: globalVars.content.width,
         marginLeft: "auto",
         marginRight: "auto",
-        ...paddings({
-            horizontal: globalVars.gutter.half,
-        }),
+        ...paddings(vars.spacing.padding),
+        // Temporary
+        backgroundColor: color("#b3b184").toString(),
     });
 
     return { root };

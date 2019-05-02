@@ -17,7 +17,7 @@ export const widgetContainerClasses = useThemeCache(() => {
         position: "relative",
         maxWidth: percent(100),
         margin: "auto",
-        width: unit(vars.sizing.widgets),
+        width: unit(vars.sizing.narrowContentSize),
     });
 
     return {

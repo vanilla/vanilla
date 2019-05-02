@@ -23,7 +23,7 @@ import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
 export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false) => {
     const globalVars = globalVariables();
-    const headerVars = titleBarVariables();
+    const titleBarVars = titleBarVariables();
     const vars = richEditorVariables();
     const formElementVars = formElementsVariables();
     const style = styleFactory("richEditorForm");
@@ -85,7 +85,7 @@ export const richEditorFormClasses = useThemeCache((legacyMode: boolean = false)
         alignItems: "center",
         justifyContent: "flex-start",
         flexGrow: 1,
-        maxHeight: calc(`100vh - ${unit(headerVars.sizing.height)}`),
+        maxHeight: calc(`100vh - ${unit(titleBarVars.sizing.height)}`),
         paddingTop: unit(globalVars.overlay.fullPageHeadingSpacer),
         marginBottom: px(12),
         overflow: "hidden",

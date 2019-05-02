@@ -1216,9 +1216,6 @@ class AddonManager implements Contracts\AddonProviderInterface {
      * @return AddonManager Returns `$this` for fluent calls.
      */
     public function setCacheDir($cacheDir) {
-        if ($cacheDir !== null && strpos($cacheDir, PATH_ROOT) !== 0) {
-            $cacheDir = PATH_ROOT.$cacheDir;
-        }
         $this->cacheDir = $cacheDir;
         return $this;
     }

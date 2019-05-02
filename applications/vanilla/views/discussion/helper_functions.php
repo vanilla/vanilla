@@ -66,6 +66,8 @@ if (!function_exists('writeComment')) :
         // Whether to order the name & photo with the latter first.
         static $userPhotoFirst = null;
 
+        $comment = (is_array($comment)) ? (object)$comment: $comment;
+
         if ($userPhotoFirst === null) {
             $userPhotoFirst = c('Vanilla.Comment.UserPhotoFirst', true);
         }
@@ -608,7 +610,7 @@ if (!function_exists('writeEmbedCommentForm')) :
                 echo $controller->Form->open(['id' => 'Form_Comment']);
                 echo $controller->Form->errors();
                 echo $controller->Form->hidden('Name');
-                echo wrap($controller->Form->bodyBox('Body', ['Format' => 'TextEx']));
+                echo wrap($controller->Form->bodyBox('Body'));
                 echo "<div class=\"Buttons\">\n";
 
                 $allowSigninPopup = c('Garden.SignIn.Popup');

@@ -119,9 +119,12 @@ class RichEditorPlugin extends Gdn_Plugin {
     protected function addQuoteButton($sender, $args) {
         // There are some case were Discussion is not set as an event argument so we use the sender data instead.
         $discussion = $sender->data('Discussion');
+        $discussion = (is_array($discussion)) ? (object)$discussion : $discussion;
+
         if (!$discussion) {
             return;
         }
+
 
         if (!Gdn::session()->UserID) {
             return;

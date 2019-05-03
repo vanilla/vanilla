@@ -83,19 +83,41 @@ export const layoutVariables = useThemeCache(() => {
 
     const mediaQueries = () => {
         const noBleed = styles => {
-            return media({ minWidth: px(panelLayoutBreakPoints.noBleed) }, styles);
+            return media(
+                {
+                    minWidth: px(panelLayoutBreakPoints.noBleed),
+                },
+                styles,
+            );
         };
 
         const twoColumns = styles => {
-            return media({ maxWidth: px(panelLayoutBreakPoints.twoColumn) }, styles);
+            return media(
+                {
+                    maxWidth: px(panelLayoutBreakPoints.noBleed),
+                    minWidth: px(panelLayoutBreakPoints.oneColumn + 1),
+                },
+                styles,
+            );
         };
 
         const oneColumn = styles => {
-            return media({ maxWidth: px(panelLayoutBreakPoints.oneColumn) }, styles);
+            return media(
+                {
+                    maxWidth: px(panelLayoutBreakPoints.oneColumn),
+                    minWidth: px(panelLayoutBreakPoints.xs + 1),
+                },
+                styles,
+            );
         };
 
         const xs = styles => {
-            return media({ maxWidth: px(panelLayoutBreakPoints.xs) }, styles);
+            return media(
+                {
+                    maxWidth: px(panelLayoutBreakPoints.xs),
+                },
+                styles,
+            );
         };
 
         return { noBleed, twoColumns, oneColumn, xs };

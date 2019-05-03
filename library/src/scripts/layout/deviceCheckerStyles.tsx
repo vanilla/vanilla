@@ -24,18 +24,10 @@ export function deviceCheckerClasses() {
             width: px(3),
         }),
         queries.twoColumns({
-            $nest: {
-                "&&": {
-                    width: px(2),
-                },
-            },
+            width: px(2),
         }),
         queries.oneColumn({
-            $nest: {
-                "&&&": {
-                    width: px(1),
-                },
-            },
+            width: px(1),
         }),
     );
 

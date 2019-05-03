@@ -43,7 +43,7 @@ const userContentVariables = useThemeCache(() => {
 
     const code = makeThemeVars("code", {
         fontSize: em(0.85),
-        borderRadius: 0,
+        borderRadius: 2,
         // bg target rgba(127, 127, 127, .15);
         bg: blocks.bg,
         fg: blocks.fg,
@@ -174,7 +174,6 @@ export const userContentClasses = useThemeCache(() => {
     const codeStyles: NestedCSSSelectors = {
         "& .code": {
             position: "relative",
-            verticalAlign: "middle",
             fontSize: vars.code.fontSize,
             fontFamily: `Menlo, Monaco, Consolas, "Courier New", monospace`,
             maxWidth: percent(100),

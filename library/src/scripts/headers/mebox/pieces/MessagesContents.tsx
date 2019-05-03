@@ -81,7 +81,7 @@ export class MessagesContents extends React.Component<IProps> {
         if (status !== LoadStatus.SUCCESS || !data) {
             // This is the height that it happens to be right now.
             // This will be calculated better once we finish the CSS in JS transition.
-            const height = this.props.device === Devices.MOBILE ? 80 : 69;
+            const height = this.props.device === Devices.MOBILE || this.props.device === Devices.XS ? 80 : 69;
             return <Loader loaderStyleClass={classesLoader.smallLoader} height={height} minimumTime={0} padding={10} />;
         }
 

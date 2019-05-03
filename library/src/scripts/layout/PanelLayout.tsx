@@ -101,13 +101,13 @@ class PanelLayout extends React.Component<IProps> {
                         {shouldRenderLeftPanel && (
                             <Panel className={classNames(classes.leftColumn)} ariaHidden={true} />
                         )}
-                        <Panel
+                        <PanelAreaHorizontalPadding
                             className={classNames(classes.middleColumnMaxWidth, {
                                 hasAdjacentPanel: shouldRenderLeftPanel,
                             })}
                         >
-                            <PanelArea>{childComponents.breadcrumbs}</PanelArea>
-                        </Panel>
+                            <PanelWidgetHorizontalPadding>{childComponents.breadcrumbs}</PanelWidgetHorizontalPadding>
+                        </PanelAreaHorizontalPadding>
                     </div>
                 )}
 
@@ -206,6 +206,12 @@ export function PanelArea(props: IContainerProps) {
     return <Tag className={classNames(classes.root, props.className)}>{props.children}</Tag>;
 }
 
+export function PanelAreaHorizontalPadding(props: IContainerProps) {
+    const Tag = props.tag || "div";
+    const classes = panelAreaClasses();
+    return <Tag className={classNames(classes.root, props.className, "hasNoVerticalPadding")}>{props.children}</Tag>;
+}
+
 export function PanelWidget(props: IContainerProps) {
     const classes = panelWidgetClasses();
     return <div className={classNames(classes.root, props.className)}>{props.children}</div>;
@@ -220,5 +226,6 @@ export function PanelWidgetHorizontalPadding(props: IContainerProps) {
     const classes = panelWidgetClasses();
     return <div className={classNames(classes.root, "hasNoVerticalPadding", props.className)}>{props.children}</div>;
 }
+
 
 export default withDevice(PanelLayout);

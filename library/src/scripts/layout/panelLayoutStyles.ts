@@ -74,7 +74,10 @@ export const layoutVariables = useThemeCache(() => {
             top: gutter.halfSize * 1.5,
         },
         extraPadding: {
-            top: 6,
+            top: 32,
+            noBreadcrumbs: {
+                top: 16,
+            },
         },
         largePadding: {
             top: 64,
@@ -204,6 +207,9 @@ export const panelLayoutClasses = useThemeCache(() => {
             },
             "&.hasTopPadding": {
                 paddingTop: unit(vars.panelLayoutSpacing.extraPadding.top),
+            },
+            "&.hasTopPadding.noBreadcrumbs": {
+                paddingTop: unit(vars.panelLayoutSpacing.extraPadding.noBreadcrumbs.top),
             },
             "&.hasLargePadding": {
                 ...paddings(vars.panelLayoutSpacing.largePadding),

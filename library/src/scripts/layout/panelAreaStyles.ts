@@ -32,9 +32,18 @@ export const panelAreaClasses = useThemeCache(() => {
                 [`&.inheritHeight > .${classesPanelWidget.root}`]: {
                     flexGrow: 1,
                 },
+                "&.hasNoVerticalPadding": {
+                    ...paddings({ vertical: 0 }),
+                },
+                "&.hasNoHorizontalPadding": {
+                    ...paddings({ horizontal: 0 }),
+                },
+                "&.isSelfPadded": {
+                    ...paddings({ all: 0 }),
+                },
             },
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             ...paddings({
                 horizontal: 0,
             }),

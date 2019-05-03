@@ -11,7 +11,8 @@ import ParagraphMenusBarToggle from "@rich-editor/menuBar/paragraph/ParagraphMen
 
 export function EditorParagraphMenu() {
     const { isLoading, quill } = useEditor();
-    const isMobile = useDevice() === Devices.MOBILE;
+    const device = useDevice();
+    const isMobile = device === Devices.MOBILE || device === Devices.XS;
     if (!quill || isLoading || isMobile) {
         return null;
     } else {

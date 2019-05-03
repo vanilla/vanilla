@@ -9,13 +9,13 @@ import { colorOut, srOnly, userSelect } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { px } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 const backLinkClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const style = styleFactory("backLink");
-    const headerVars = titleBarVariables();
+    const titleBarVars = titleBarVariables();
 
     const root = style({
         ...userSelect(),
@@ -30,7 +30,7 @@ const backLinkClasses = useThemeCache(() => {
         justifyContent: "flex-start",
         color: "inherit",
         minWidth: globalVars.icon.sizes.default,
-        maxHeight: px(headerVars.sizing.height),
+        maxHeight: px(titleBarVars.sizing.height),
         $nest: {
             "&:hover, &:focus": {
                 color: colorOut(globalVars.mainColors.primary),

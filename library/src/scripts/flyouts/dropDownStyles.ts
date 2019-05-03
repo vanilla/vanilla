@@ -19,7 +19,7 @@ import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/sh
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { important, percent } from "csx";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const dropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -248,7 +248,7 @@ export const dropDownClasses = useThemeCache(() => {
                 },
             }),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             fontSize: unit(vars.item.mobile.fontSize),
             fontWeight: globalVars.fonts.weights.semiBold,
             minHeight: unit(vars.item.mobile.minHeight),
@@ -284,16 +284,20 @@ export const dropDownClasses = useThemeCache(() => {
         marginLeft: "auto",
     });
 
-    const verticalPadding = style("verticalPadding", {
-        ...paddings({
-            vertical: vars.contents.padding.vertical,
-            horizontal: 0,
+    const verticalPadding = style(
+        "verticalPadding",
+        {
+            ...paddings({
+                vertical: vars.contents.padding.vertical,
+                horizontal: 0,
+            }),
+        },
+        mediaQueries.oneColumnDown({
+            ...paddings({
+                vertical: 0,
+            }),
         }),
-    }, mediaQueries.oneColumn({
-        ...paddings({
-            vertical: 0,
-        }),
-    }));
+    );
 
     const title = style("title", {
         ...fonts({

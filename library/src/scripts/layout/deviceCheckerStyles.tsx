@@ -6,7 +6,7 @@
 
 import { styleFactory } from "@library/styles/styleUtils";
 import { important, px } from "csx";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export function deviceCheckerClasses() {
     const style = styleFactory("deviceChecker");
@@ -28,6 +28,9 @@ export function deviceCheckerClasses() {
         }),
         queries.oneColumn({
             width: px(1),
+        }),
+        queries.xs({
+            width: px(0),
         }),
     );
 

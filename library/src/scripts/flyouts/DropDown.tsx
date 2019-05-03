@@ -74,7 +74,7 @@ class DropDown extends React.Component<IProps, IState> {
         const classesFrameHeader = frameHeaderClasses();
         const classes = dropDownClasses();
 
-        const openAsModal = this.props.openAsModal || this.props.device === Devices.MOBILE;
+        const openAsModal = this.props.openAsModal || this.props.device === Devices.MOBILE || this.props.device === Devices.XS;
         return (
             <FlyoutToggle
                 id={this.id}

@@ -18,7 +18,7 @@ import {
 } from "@library/styles/styleHelpers";
 import { percent, viewWidth } from "csx";
 import { FontWeightProperty } from "csstype";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 
@@ -79,7 +79,7 @@ export const messagesClasses = useThemeCache(() => {
     const vars = messagesVariables();
     const globalVars = globalVariables();
     const style = styleFactory("messages");
-    const headerVars = titleBarVariables();
+    const titleBarVars = titleBarVariables();
     const shadows = shadowHelper();
     const mediaQueries = layoutVariables().mediaQueries();
 
@@ -87,7 +87,7 @@ export const messagesClasses = useThemeCache(() => {
     const fixed = style("fixed", {
         position: "fixed",
         left: 0,
-        top: unit(headerVars.sizing.height - 8),
+        top: unit(titleBarVars.sizing.height - 8),
         minHeight: unit(vars.sizing.minHeight),
         width: percent(100),
         maxWidth: viewWidth(100),

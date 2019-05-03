@@ -1000,3 +1000,11 @@ if ($mobileInputFormatter === "Rich" && $richEditorEnabled === false) {
 }
 
 Gdn::router()->setRoute('apple-touch-icon.png', 'utility/showtouchicon', 'Internal');
+Gdn::router()->setRoute("robots.txt", "/robots", "Internal");
+Gdn::router()->setRoute("utility/robots", "/robots", "Internal");
+
+// Migrate rules from Sitemaps addon.
+if (Gdn::config()->get("Robots.Rules") === false && $sitemapsRobotsRules = Gdn::config()->get("Sitemap.Robots.Rules")) {
+    Gdn::config()->set("Robots.Rules", $sitemapsRobotsRules);
+    Gdn::config()->remove("Sitemap.Robots.Rules");
+}

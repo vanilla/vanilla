@@ -117,20 +117,17 @@ export const globalVariables = useThemeCache(() => {
     const panelWidth = 216;
     const panel = makeThemeVars("panelWidth", {
         width: panelWidth,
-        paddedWidth: panelWidth + gutter.size,
+        paddedWidth: panelWidth + gutter.size * 2,
     });
 
     const middleColumnWidth = 672;
     const middleColumn = makeThemeVars("middleColumn", {
         width: middleColumnWidth,
-        paddedWidth: middleColumnWidth + gutter.size,
+        paddedWidth: middleColumnWidth + gutter.size * 2,
     });
 
     const content = makeThemeVars("content", {
-        width:
-            panel.paddedWidth * 2 +
-            middleColumn.paddedWidth +
-            gutter.size * 3 /* *3 from margin between columns and half margin on .container*/,
+        width: middleColumn.paddedWidth + panel.paddedWidth * 2 + gutter.size * 2,
     });
 
     const fonts = makeThemeVars("fonts", {

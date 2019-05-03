@@ -41,18 +41,26 @@ export const containerClasses = useThemeCache(() => {
     const style = styleFactory("container");
     const globalVars = globalVariables();
     const vars = containerVariables();
+    const mediaQueries = layoutVariables().mediaQueries();
 
-    const root = style({
-        display: "flex",
-        flexDirection: "column",
-        position: "relative",
-        boxSizing: "border-box",
-        width: percent(100),
-        maxWidth: globalVars.content.width,
-        marginLeft: "auto",
-        marginRight: "auto",
-        ...paddings(vars.spacing.padding),
-    });
+    const root = style(
+        {
+            display: "flex",
+            flexDirection: "column",
+            position: "relative",
+            boxSizing: "border-box",
+            width: percent(100),
+            maxWidth: globalVars.content.width,
+            marginLeft: "auto",
+            marginRight: "auto",
+            ...paddings(vars.spacing.padding),
+        },
+        mediaQueries.oneColumnDown({
+            ...paddings({
+                horizontal: 8,
+            }),
+        }),
+    );
 
     return { root };
 });

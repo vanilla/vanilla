@@ -79,7 +79,8 @@ export const compactSearchClasses = useThemeCache(() => {
             display: "flex",
             alignItems: "center",
             flexWrap: "nowrap",
-            height: unit(titleBarVars.sizing.height),
+            minHeight: unit(formElementsVars.sizing.height),
+            justifyContent: "center",
         },
         mediaQueries.oneColumnDown({
             height: unit(titleBarVars.sizing.mobile.height),

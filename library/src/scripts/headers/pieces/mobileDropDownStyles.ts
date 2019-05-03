@@ -18,7 +18,7 @@ import {
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { border, calc, percent, px, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { frameVariables } from "@library/layout/frame/frameStyles";
 
 export const mobileDropDownVariables = useThemeCache(() => {

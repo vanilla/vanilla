@@ -6,7 +6,7 @@
 
 import { useThemeCache, variableFactory, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { unit } from "@library/styles/styleHelpers";
 import { percent, px, calc } from "csx";
 
@@ -58,7 +58,7 @@ export const siteNavClasses = useThemeCache(() => {
             zIndex: 1,
             marginTop: unit(vars.nodeToggle.height / 2 - vars.node.fontSize / 2),
         },
-        mediaQueries.noBleed({
+        mediaQueries.noBleedDown({
             marginLeft: unit(vars.nodeToggle.width - vars.nodeToggle.iconWidth / 2 - vars.spacer.default),
         }),
     );
@@ -155,7 +155,7 @@ export const siteNavNodeClasses = useThemeCache(() => {
             paddingBottom: unit(vars.node.padding + vars.node.borderWidth),
             paddingLeft: unit(vars.nodeToggle.width - vars.node.borderWidth),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             fontSize: unit(globalVars.fonts.size.large),
         }),
     );

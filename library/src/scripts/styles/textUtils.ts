@@ -6,7 +6,7 @@
 import { em } from "csx";
 import { NestedCSSSelectors, TLength } from "typestyle/lib/types";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { unit } from "@library/styles/styleHelpers";
+import { negative, unit } from "@library/styles/styleHelpers";
 
 /**
  * Many fonts don't set the capital letter to take the whole line height. This mixin is used to line up the top of the Text with the top of the container.
@@ -34,7 +34,7 @@ export function lineHeightAdjustment(
     const calculate = (type: "before" | "after"): TLength => {
         const ratio = type === "after" ? baseLineOffset : 1 - baseLineOffset;
         const emValue = capitalLetterRatio - lineHeight * ratio;
-        return em(emValue);
+        return negative(em(emValue));
     };
 
     const result: NestedCSSSelectors = {

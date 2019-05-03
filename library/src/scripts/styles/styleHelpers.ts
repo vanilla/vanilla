@@ -168,8 +168,8 @@ export const textInputSizingFromSpacing = (fontSize: number, paddingTop: number,
     };
 };
 
-export const textInputSizingFromFixedHeight = (height: number, fontSize: number , fullBorderWidth: number) => {
-    const paddingTop = (height - fullBorderWidth - (fontSize * 1.5)) / 2;
+export const textInputSizingFromFixedHeight = (height: number, fontSize: number, fullBorderWidth: number) => {
+    const paddingTop = (height - fullBorderWidth - fontSize * 1.5) / 2;
     return {
         fontSize: unit(fontSize),
         width: percent(100),

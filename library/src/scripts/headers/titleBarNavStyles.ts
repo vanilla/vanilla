@@ -19,7 +19,7 @@ import {
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const titleBarNavigationVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("titleBarNavigation");
@@ -55,7 +55,7 @@ export const titleBarNavigationVariables = useThemeCache(() => {
 
 export default function titleBarNavClasses() {
     const globalVars = globalVariables();
-    const headerVars = titleBarVariables();
+    const titleBarVars = titleBarVariables();
     const vars = titleBarNavigationVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const flex = flexHelper();
@@ -65,32 +65,24 @@ export default function titleBarNavClasses() {
         {
             ...flex.middleLeft(),
             position: "relative",
-            height: unit(headerVars.sizing.height),
+            height: unit(titleBarVars.sizing.height),
         },
-        mediaQueries.oneColumn({
-            height: unit(headerVars.sizing.mobile.height),
+        mediaQueries.oneColumnDown({
+            height: unit(titleBarVars.sizing.mobile.height),
         }),
     );
 
-    const navigation = style(
-        "navigation",
-        {
-            // height: unit(vars.item.size),
-        },
-        mediaQueries.oneColumn({
-            // height: unit(headerVars.sizing.mobile.height),
-        }),
-    );
+    const navigation = style("navigation", {});
 
     const items = style(
         "items",
         {
             ...flex.middleLeft(),
-            height: unit(headerVars.sizing.height),
+            height: unit(titleBarVars.sizing.height),
             ...paddings(vars.padding),
         },
-        mediaQueries.oneColumn({
-            height: px(headerVars.sizing.mobile.height),
+        mediaQueries.oneColumnDown({
+            height: px(titleBarVars.sizing.mobile.height),
             justifyContent: "center",
             width: percent(100),
         }),
@@ -98,7 +90,7 @@ export default function titleBarNavClasses() {
 
     const link = style("link", {
         ...userSelect(),
-        color: colorOut(headerVars.colors.fg),
+        color: colorOut(titleBarVars.colors.fg),
         whiteSpace: "nowrap",
         lineHeight: globalVars.lineHeights.condensed,
         display: "flex",
@@ -108,13 +100,13 @@ export default function titleBarNavClasses() {
         textDecoration: "none",
         $nest: {
             "&.focus-visible": {
-                backgroundColor: colorOut(headerVars.buttonContents.state.bg),
+                backgroundColor: colorOut(titleBarVars.buttonContents.state.bg),
             },
             "&:focus": {
-                backgroundColor: colorOut(headerVars.buttonContents.state.bg),
+                backgroundColor: colorOut(titleBarVars.buttonContents.state.bg),
             },
             "&:hover": {
-                backgroundColor: colorOut(headerVars.buttonContents.state.bg),
+                backgroundColor: colorOut(titleBarVars.buttonContents.state.bg),
             },
         },
     });
@@ -130,7 +122,7 @@ export default function titleBarNavClasses() {
                 marginLeft: unit(negative(vars.linkActive.offset)),
                 width: calc(`100% + ${unit(vars.linkActive.offset * 2)}`),
                 backgroundColor: colorOut(vars.linkActive.bg),
-                transform: `translateY(${unit(headerVars.sizing.height / 2)})`,
+                transform: `translateY(${unit(titleBarVars.sizing.height / 2)})`,
             },
         },
     });

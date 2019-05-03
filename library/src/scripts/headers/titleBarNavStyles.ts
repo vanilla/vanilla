@@ -67,20 +67,12 @@ export default function titleBarNavClasses() {
             position: "relative",
             height: unit(titleBarVars.sizing.height),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             height: unit(titleBarVars.sizing.mobile.height),
         }),
     );
 
-    const navigation = style(
-        "navigation",
-        {
-            // height: unit(vars.item.size),
-        },
-        mediaQueries.oneColumn({
-            // height: unit(titleBarVars.sizing.mobile.height),
-        }),
-    );
+    const navigation = style("navigation", {});
 
     const items = style(
         "items",
@@ -89,7 +81,7 @@ export default function titleBarNavClasses() {
             height: unit(titleBarVars.sizing.height),
             ...paddings(vars.padding),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             height: px(titleBarVars.sizing.mobile.height),
             justifyContent: "center",
             width: percent(100),

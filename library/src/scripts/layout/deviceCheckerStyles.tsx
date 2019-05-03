@@ -29,6 +29,9 @@ export function deviceCheckerClasses() {
         queries.oneColumn({
             width: px(1),
         }),
+        queries.xs({
+            width: px(0),
+        }),
     );
 
     return { root };

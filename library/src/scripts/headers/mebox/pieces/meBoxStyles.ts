@@ -27,7 +27,7 @@ export const meBoxClasses = useThemeCache(() => {
             alignItems: "center",
             height: unit(titleBarVars.sizing.height),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             height: unit(titleBarVars.sizing.mobile.height),
         }),
     );

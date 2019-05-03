@@ -37,7 +37,7 @@ export const panelWidgetClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             ...paddings({
                 horizontal: 4,
             }),

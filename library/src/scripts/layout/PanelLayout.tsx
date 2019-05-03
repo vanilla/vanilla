@@ -73,7 +73,7 @@ class PanelLayout extends React.Component<IProps> {
         const { topPadding, className, growMiddleBottom, device, isFixed, ...childComponents } = this.props;
 
         // Calculate some rendering variables.
-        const isMobile = device === Devices.MOBILE;
+        const isMobile = device === Devices.MOBILE || this.props.device === Devices.XS;
         const isTablet = device === Devices.TABLET;
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
         const shouldRenderLeftPanel: boolean = !isMobile && (!!childComponents.leftTop || !!childComponents.leftBottom);

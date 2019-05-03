@@ -70,7 +70,7 @@ export class TitleBar extends React.Component<IProps, IState> {
     };
     public render() {
         const { isFixed } = this.props;
-        const isMobile = this.props.device === Devices.MOBILE;
+        const isMobile = this.props.device === Devices.MOBILE || this.props.device === Devices.XS;
         const classes = titleBarClasses();
         const showMobileDropDown = isMobile && !this.state.openSearch && this.props.title;
         const classesMeBox = meBoxClasses();

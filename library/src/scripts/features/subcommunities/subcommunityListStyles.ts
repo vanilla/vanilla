@@ -36,7 +36,7 @@ export const subcommunityListClasses = useThemeCache(() => {
             padding: unit(vars.spacing.padding),
             margin: "auto",
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             padding: 0,
         }),
     );
@@ -50,7 +50,7 @@ export const subcommunityListClasses = useThemeCache(() => {
             alignItems: "stretch",
             justifyContent: "space-between",
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             display: "block",
         }),
     );
@@ -64,7 +64,7 @@ export const subcommunityListClasses = useThemeCache(() => {
             justifyContent: "stretch",
             width: unit(vars.sizing.columnWidth),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             display: "block",
             width: percent(100),
         }),

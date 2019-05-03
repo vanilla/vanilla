@@ -204,7 +204,7 @@ export const modalClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             minHeight: unit(titleBarVars.sizing.mobile.height),
         }),
     );

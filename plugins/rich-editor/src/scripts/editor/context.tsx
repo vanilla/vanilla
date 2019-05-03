@@ -62,7 +62,7 @@ export const Editor = (props: IEditorProps) => {
     const [quill, setQuillInstance] = useState<Quill | null>(null);
     const quillID = quill ? getIDForQuill(quill) : null;
     const device = useDevice();
-    const isMobile = device === Devices.MOBILE;
+    const isMobile = (device === Devices.MOBILE || device === Devices.XS);
     const ID = uniqueId("editor");
     const descriptionID = ID + "-description";
 

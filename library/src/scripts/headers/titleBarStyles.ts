@@ -188,7 +188,7 @@ export const titleBarClasses = useThemeCache(() => {
                 },
             },
         },
-        ...mediaQueries.oneColumn({
+        ...mediaQueries.oneColumnDown({
             height: px(vars.sizing.mobile.height),
         }).$nest,
     });
@@ -198,7 +198,7 @@ export const titleBarClasses = useThemeCache(() => {
         {
             height: px(vars.sizing.height),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             height: px(vars.sizing.mobile.height),
         }),
     );
@@ -218,7 +218,7 @@ export const titleBarClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }),
+        mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
     );
 
     const logoContainer = style(
@@ -239,7 +239,7 @@ export const titleBarClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }),
+        mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
     );
 
     const logoFlexBasis = style("logoFlexBasis", {
@@ -258,7 +258,7 @@ export const titleBarClasses = useThemeCache(() => {
             height: px(vars.sizing.height),
             color: "inherit",
         },
-        mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }),
+        mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
     );
 
     const locales = style(
@@ -278,7 +278,7 @@ export const titleBarClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumn({ height: px(vars.sizing.mobile.height) }),
+        mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
     );
 
     const messages = style("messages", {
@@ -311,7 +311,7 @@ export const titleBarClasses = useThemeCache(() => {
             margin: `0 ${px(vars.sizing.spacer / 2)}`,
             borderRadius: px(vars.button.borderRadius),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             fontSize: px(vars.button.mobile.fontSize),
         }),
     );
@@ -321,7 +321,7 @@ export const titleBarClasses = useThemeCache(() => {
         {
             height: px(vars.sizing.height),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             height: px(vars.sizing.mobile.height),
         }),
     );
@@ -383,7 +383,7 @@ export const titleBarClasses = useThemeCache(() => {
                 },
             ),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             height: px(vars.sizing.mobile.height),
             width: px(vars.sizing.mobile.width),
             minWidth: px(vars.sizing.mobile.width),
@@ -466,7 +466,7 @@ export const titleBarClasses = useThemeCache(() => {
             alignItems: "center",
             flexBasis: vars.endElements.flexBasis,
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             flexShrink: 1,
             flexBasis: px(vars.endElements.mobile.flexBasis),
             height: px(vars.sizing.mobile.height),
@@ -479,7 +479,7 @@ export const titleBarClasses = useThemeCache(() => {
             ...flex.middleLeft(),
             flexBasis: vars.endElements.flexBasis,
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             flexShrink: 1,
             flexBasis: px(vars.endElements.mobile.flexBasis),
         }),
@@ -542,7 +542,7 @@ export const titleBarClasses = useThemeCache(() => {
             )} auto`,
             maxWidth: px(vars.compactSearch.maxWidth),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             top: (vars.sizing.mobile.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
         }),
     );
@@ -639,7 +639,7 @@ export const titleBarHomeClasses = useThemeCache(() => {
             width: percent(100),
             ...(addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.colors.bg) as any),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             height: px(vars.sizing.mobile.height),
             ...(addGradientsToHintOverflow(globalVars.gutter.half * 4, vars.bottomRow.bg) as any),
         }),

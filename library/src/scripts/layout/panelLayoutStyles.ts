@@ -85,7 +85,26 @@ export const layoutVariables = useThemeCache(() => {
         const noBleed = styles => {
             return media(
                 {
-                    minWidth: px(panelLayoutBreakPoints.noBleed),
+                    maxWidth: px(panelLayoutBreakPoints.noBleed),
+                    minWidth: px(panelLayoutBreakPoints.twoColumn + 1),
+                },
+                styles,
+            );
+        };
+
+        const noBleedDown = styles => {
+            return media(
+                {
+                    maxWidth: px(panelLayoutBreakPoints.noBleed),
+                },
+                styles,
+            );
+        };
+
+        const twoColumnsDown = styles => {
+            return media(
+                {
+                    maxWidth: px(panelLayoutBreakPoints.twoColumn),
                 },
                 styles,
             );
@@ -94,7 +113,7 @@ export const layoutVariables = useThemeCache(() => {
         const twoColumns = styles => {
             return media(
                 {
-                    maxWidth: px(panelLayoutBreakPoints.noBleed),
+                    maxWidth: px(panelLayoutBreakPoints.twoColumn),
                     minWidth: px(panelLayoutBreakPoints.oneColumn + 1),
                 },
                 styles,
@@ -111,6 +130,15 @@ export const layoutVariables = useThemeCache(() => {
             );
         };
 
+        const oneColumnDown = styles => {
+            return media(
+                {
+                    maxWidth: px(panelLayoutBreakPoints.oneColumn),
+                },
+                styles,
+            );
+        };
+
         const xs = styles => {
             return media(
                 {
@@ -120,7 +148,15 @@ export const layoutVariables = useThemeCache(() => {
             );
         };
 
-        return { noBleed, twoColumns, oneColumn, xs };
+        return {
+            noBleed,
+            noBleedDown,
+            twoColumns,
+            twoColumnsDown,
+            oneColumn,
+            oneColumnDown,
+            xs,
+        };
     };
 
     return {
@@ -149,15 +185,12 @@ export const panelLayoutClasses = useThemeCache(() => {
     });
 
     const root = style({
-        // ...paddings({
-        //     horizontal: globalVars.gutter.half,
-        // }),
         ...margins(vars.panelLayoutSpacing.margin),
         width: percent(100),
         $nest: {
             [`&.noBreadcrumbs > .${main}`]: {
                 paddingTop: unit(globalVars.gutter.size),
-                ...mediaQueries.oneColumn({
+                ...mediaQueries.oneColumnDown({
                     paddingTop: 0,
                 }),
             },
@@ -165,7 +198,7 @@ export const panelLayoutClasses = useThemeCache(() => {
                 width: unit(vars.middleColumn.paddedWidth),
                 maxWidth: percent(100),
                 margin: "auto",
-                ...mediaQueries.oneColumn({
+                ...mediaQueries.oneColumnDown({
                     width: percent(100),
                 }),
             },
@@ -234,7 +267,7 @@ export const panelLayoutClasses = useThemeCache(() => {
         flexGrow: 1,
         width: percent(100),
         maxWidth: percent(100),
-        ...mediaQueries.oneColumn(paddings({ left: important(0), right: important(0) })),
+        ...mediaQueries.oneColumnDown(paddings({ left: important(0), right: important(0) })),
     });
 
     const middleColumnMaxWidth = style("middleColumnMaxWidth", {
@@ -242,7 +275,7 @@ export const panelLayoutClasses = useThemeCache(() => {
             "&.hasAdjacentPanel": {
                 flexBasis: calc(`100% - ${unit(vars.panel.paddedWidth)}`),
                 maxWidth: calc(`100% - ${unit(vars.panel.paddedWidth)}`),
-                ...mediaQueries.oneColumn({
+                ...mediaQueries.oneColumnDown({
                     flexBasis: percent(100),
                     maxWidth: percent(100),
                 }),
@@ -250,7 +283,7 @@ export const panelLayoutClasses = useThemeCache(() => {
             "&.hasTwoAdjacentPanels": {
                 flexBasis: calc(`100% - ${unit(vars.panel.paddedWidth * 2)}`),
                 maxWidth: calc(`100% - ${unit(vars.panel.paddedWidth * 2)}`),
-                ...mediaQueries.oneColumn({
+                ...mediaQueries.oneColumnDown({
                     flexBasis: percent(100),
                     maxWidth: percent(100),
                 }),
@@ -268,7 +301,7 @@ export const panelLayoutClasses = useThemeCache(() => {
             height: percent(100),
             overflow: "auto",
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             position: "relative",
             top: "auto",
             left: "auto",

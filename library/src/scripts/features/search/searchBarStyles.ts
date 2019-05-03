@@ -155,7 +155,7 @@ export const searchBarClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             $nest: {
                 "& .searchBar-submitButton": {
                     minWidth: 0,

@@ -125,7 +125,7 @@ export const radioTabClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             flexGrow: 0,
             $nest: {
                 label: {

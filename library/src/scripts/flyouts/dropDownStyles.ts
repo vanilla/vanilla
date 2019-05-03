@@ -248,7 +248,7 @@ export const dropDownClasses = useThemeCache(() => {
                 },
             }),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             fontSize: unit(vars.item.mobile.fontSize),
             fontWeight: globalVars.fonts.weights.semiBold,
             minHeight: unit(vars.item.mobile.minHeight),
@@ -292,7 +292,7 @@ export const dropDownClasses = useThemeCache(() => {
                 horizontal: 0,
             }),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             ...paddings({
                 vertical: 0,
             }),

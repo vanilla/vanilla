@@ -81,7 +81,7 @@ export const compactSearchClasses = useThemeCache(() => {
             flexWrap: "nowrap",
             height: unit(titleBarVars.sizing.height),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             height: unit(titleBarVars.sizing.mobile.height),
         }),
     );

@@ -290,6 +290,9 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const compactSearch = style("compactSearch", {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         marginLeft: "auto",
         minWidth: unit(formElementVars.sizing.height),
         flexBasis: px(formElementVars.sizing.height),
@@ -534,17 +537,15 @@ export const titleBarClasses = useThemeCache(() => {
     const compactSearchResults = style(
         "compactSearchResults",
         {
-            top: 0,
-            display: "flex",
-            position: "relative",
-            margin: `${unit(
-                (vars.sizing.height - formElementVars.sizing.height + formElementVars.border.width) / -2,
-            )} auto`,
+            position: "absolute",
+            top: unit(formElementVars.sizing.height),
+            // top: unit(vars.sizing.height + (vars.sizing.height - formElementVars.sizing.height) / 2),
             maxWidth: px(vars.compactSearch.maxWidth),
+            width: percent(100),
         },
-        mediaQueries.oneColumnDown({
-            top: (vars.sizing.mobile.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
-        }),
+        // mediaQueries.oneColumnDown({
+        //     top: (vars.sizing.mobile.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
+        // }),
     );
 
     const clearButtonClass = style("clearButtonClass", {

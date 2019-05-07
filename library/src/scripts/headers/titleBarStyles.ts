@@ -18,6 +18,7 @@ import {
     userSelect,
     absolutePosition,
     pointerEvents,
+    negative,
 } from "@library/styles/styleHelpers";
 import { DEBUG_STYLES, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, ColorHelper, percent, px, quote, viewHeight } from "csx";
@@ -227,6 +228,7 @@ export const titleBarClasses = useThemeCache(() => {
             display: "inline-flex",
             alignSelf: "center",
             color: colorOut(vars.colors.fg),
+            marginRight: unit(globalVars.gutter.size),
             $nest: {
                 "&.focus-visible": {
                     $nest: {
@@ -257,6 +259,7 @@ export const titleBarClasses = useThemeCache(() => {
             flexWrap: "wrap",
             height: px(vars.sizing.height),
             color: "inherit",
+            marginLeft: unit(negative(globalVars.gutter.size)),
         },
         mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
     );
@@ -289,22 +292,26 @@ export const titleBarClasses = useThemeCache(() => {
         color: "inherit",
     });
 
-    const compactSearch = style("compactSearch", {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        marginLeft: "auto",
-        minWidth: unit(formElementVars.sizing.height),
-        flexBasis: px(formElementVars.sizing.height),
-        maxWidth: percent(100),
-        height: unit(vars.sizing.height),
-        $nest: {
-            "&.isOpen": {
-                width: unit(vars.compactSearch.maxWidth),
-                flexBasis: "auto",
+    const compactSearch = style(
+        "compactSearch",
+        {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginLeft: "auto",
+            minWidth: unit(formElementVars.sizing.height),
+            flexBasis: px(formElementVars.sizing.height),
+            maxWidth: percent(100),
+            height: unit(vars.sizing.height),
+            $nest: {
+                "&.isOpen": {
+                    width: unit(vars.compactSearch.maxWidth),
+                    flexBasis: "auto",
+                },
             },
         },
-    });
+        mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
+    );
 
     const topElement = style(
         "topElement",
@@ -485,9 +492,6 @@ export const titleBarClasses = useThemeCache(() => {
         mediaQueries.oneColumnDown({
             flexShrink: 1,
             flexBasis: px(vars.endElements.mobile.flexBasis),
-        }),
-        mediaQueries.xs({
-            flexBasis: px(formElementVars.sizing.height),
         }),
     );
 

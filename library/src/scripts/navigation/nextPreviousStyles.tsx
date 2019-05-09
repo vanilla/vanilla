@@ -12,7 +12,7 @@ import { colorOut, paddings, unit } from "@library/styles/styleHelpers";
 
 export const nextPreviousVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const themeVars = variableFactory("nextPreviousVars");
+    const themeVars = variableFactory("nextPrevious");
 
     const fonts = themeVars("fonts", {
         label: globalVars.fonts.size.small,

@@ -47,7 +47,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      * Whitelist of allowed field properties.
      */
     public $FieldProperties = ['Name', 'Label', 'FormType', 'Required', 'Locked',
-        'Options', 'Length', 'Sort', 'OnRegister', 'OnProfile', 'OnDiscussion'];
+        'Options', 'Length', 'Sort', 'OnRegister', 'OnProfile', 'OnDiscussion', 'SalesForceID'];
 
     /**
      * Blacklist of disallowed field names.
@@ -369,6 +369,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
         $sender->setData('FormTypes', $formTypes);
         $sender->setData('CurrentFields', $currentFields);
+        $sender->fireEvent('beforeProfileExtenderAddEditRender');
 
         $sender->render('addedit', '', 'plugins/ProfileExtender');
     }
@@ -466,20 +467,20 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     /**
      * Save custom profile fields when saving the user.
      *
-     * @param $sender object
-     * @param $args array
+     * @param \UserModel $sender
+     * @param array $args
      */
-    public function userModel_afterSave_handler($sender, $args) {
+    public function userModel_afterSave_handler(\UserModel $sender, array $args) {
         $this->updateUserFields($args['UserID'], $args['FormPostValues']);
     }
 
     /**
      * Save custom profile fields on registration.
      *
-     * @param $sender object
-     * @param $args array
+     * @param \UserModel $sender
+     * @param array $args
      */
-    public function userModel_afterInsertUser_handler($sender, $args) {
+    public function userModel_afterInsertUser_handler(\UserModel $sender, array $args) {
         $this->updateUserFields($args['InsertUserID'], $args['RegisteringUser']);
     }
 

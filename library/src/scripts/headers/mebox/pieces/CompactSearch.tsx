@@ -6,7 +6,6 @@
 
 import React from "react";
 import { compactSearchClasses } from "@library/headers/mebox/pieces/compactSearchStyles";
-import FocusWatcher from "@library/dom/FocusWatcher";
 import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
 import SearchBar from "@library/features/search/SearchBar";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
@@ -137,25 +136,11 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
         );
     }
 
-    private focusWatcher: FocusWatcher;
     public componentDidMount() {
-        this.focusWatcher = new FocusWatcher(this.selfRef.current!, this.handleFocusChange);
-        this.focusWatcher.start();
-
         if (this.props.focusOnMount && this.props.open) {
             this.searchInputRef.current!.focus();
         }
     }
-
-    public componentWillUnmount() {
-        this.focusWatcher.stop();
-    }
-
-    private handleFocusChange = (gainedFocus: boolean) => {
-        if (!gainedFocus && this.selfRef.current && !this.selfRef.current!.contains(document.activeElement)) {
-            this.props.onCloseSearch();
-        }
-    };
 
     private handleSearchChange = (newQuery: string) => {
         this.setState({ query: newQuery });

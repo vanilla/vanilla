@@ -14,7 +14,6 @@ import { printVerbose } from "../utility/utils";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import EntryModel from "../utility/EntryModel";
 import WebpackBar from "webpackbar";
-import HardSourceWebpackPlugin from "hard-source-webpack-plugin";
 
 /**
  * Create the core webpack config.
@@ -126,17 +125,6 @@ ${chalk.green(aliases)}`;
         plugins: [
             new webpack.DefinePlugin({
                 __BUILD__SECTION__: JSON.stringify(section),
-            }),
-            new HardSourceWebpackPlugin({
-                // Clean up large, old caches automatically.
-                cachePrune: {
-                    // Caches younger than `maxAge` are not considered for deletion. They must
-                    // be at least this old in milliseconds.
-                    maxAge: 0,
-                    // All caches together must be larger than `sizeThreshold` before any
-                    // caches will be deleted. Together they must be at least this big in bytes.
-                    sizeThreshold: 2 * 1024 * 1024 * 1024, // 2 GB
-                },
             }),
         ] as any[],
         resolve: {

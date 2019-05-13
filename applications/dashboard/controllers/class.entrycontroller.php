@@ -1771,7 +1771,7 @@ class EntryController extends Gdn_Controller {
      */
     public function passwordRequest() {
         if (!$this->UserModel->isEmailUnique() && $this->UserModel->isNameUnique()) {
-            Gdn::locale()->setTranslation('Email', t('Usermame'));
+            Gdn::locale()->setTranslation('Email', t('Username'));
         }
 
         if ($this->Form->isPostBack() === true) {

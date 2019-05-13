@@ -4,47 +4,54 @@
  * @license GPL-2.0-only
  */
 
-import { debugHelper, unit } from "@library/styles/styleHelpers";
-import { componentThemeVariables, useThemeCache } from "@library/styles/styleUtils";
-import { style } from "typestyle";
+import { unit } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { buttonGlobalVariables } from "@library/forms/buttonStyles";
 
 export const simplePagerVariables = useThemeCache(() => {
-    const themeVars = componentThemeVariables("simplePager");
+    const themeVars = variableFactory("simplePage");
+    const buttonVars = buttonGlobalVariables();
 
-    const sizing = {
-        minWidth: 208,
-    };
+    const sizing = themeVars("sizing", {
+        minWidth: buttonVars.sizing.minWidth,
+    });
 
-    const spacing = {
+    const spacing = themeVars("spacing", {
         outerMargin: 10,
         innerMargin: 8,
-        ...themeVars.subComponentStyles("spacing"),
-    };
+    });
 
-    return { spacing, sizing };
+    return {
+        spacing,
+        sizing,
+    };
 });
 
 export const simplePagerClasses = useThemeCache(() => {
     const vars = simplePagerVariables();
-    const debug = debugHelper("simplePager");
+    const style = styleFactory("simplePager");
 
     const root = style({
         alignItems: "center",
         display: "flex",
         justifyContent: "center",
         margin: `${unit(vars.spacing.outerMargin)} 0`,
-        ...debug.name(),
     });
 
-    const button = {
+    const button = style("button", {
         margin: unit(vars.spacing.innerMargin),
+        minWidth: unit(vars.sizing.minWidth),
         $nest: {
             "&.isSingle": {
-                minWidth: unit(vars.sizing.minWidth),
+                minWidth: unit(vars.sizing.minWidth * 2),
             },
         },
-        ...debug.name("button"),
-    };
+    });
 
-    return { root, button };
+    return {
+        root,
+        button,
+    };
 });

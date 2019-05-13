@@ -233,7 +233,7 @@ export const searchResultClasses = useThemeCache(() => {
     );
 
     const metas = style("metas", {
-        marginTop: unit(4),
+        marginTop: unit(2),
         ...margins({
             left: -metaVars.spacing.default,
         }),

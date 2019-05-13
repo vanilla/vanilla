@@ -46,7 +46,7 @@ export const buttonGlobalVariables = useThemeCache(() => {
 
     const sizing = makeThemeVars("sizing", {
         minHeight: formElVars.sizing.height,
-        minWidth: 96,
+        minWidth: 104,
         compactHeight: 24,
     });
 

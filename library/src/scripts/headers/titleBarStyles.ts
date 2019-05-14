@@ -400,7 +400,7 @@ export const titleBarClasses = useThemeCache(() => {
     );
 
     const buttonOffset = style("buttonOffset", {
-        transform: `translateX(10px)`,
+        transform: `translateX(6px)`,
     });
 
     const centeredButtonClass = style("centeredButtonClass", {

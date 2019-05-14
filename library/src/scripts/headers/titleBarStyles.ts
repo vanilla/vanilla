@@ -18,6 +18,7 @@ import {
     userSelect,
     absolutePosition,
     pointerEvents,
+    negative,
 } from "@library/styles/styleHelpers";
 import { DEBUG_STYLES, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, ColorHelper, percent, px, quote, viewHeight } from "csx";
@@ -227,6 +228,7 @@ export const titleBarClasses = useThemeCache(() => {
             display: "inline-flex",
             alignSelf: "center",
             color: colorOut(vars.colors.fg),
+            marginRight: unit(globalVars.gutter.size),
             $nest: {
                 "&.focus-visible": {
                     $nest: {
@@ -239,7 +241,10 @@ export const titleBarClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
+        mediaQueries.oneColumnDown({
+            height: px(vars.sizing.mobile.height),
+            marginRight: unit(0),
+        }),
     );
 
     const logoFlexBasis = style("logoFlexBasis", {
@@ -289,19 +294,26 @@ export const titleBarClasses = useThemeCache(() => {
         color: "inherit",
     });
 
-    const compactSearch = style("compactSearch", {
-        marginLeft: "auto",
-        minWidth: unit(formElementVars.sizing.height),
-        flexBasis: px(formElementVars.sizing.height),
-        maxWidth: percent(100),
-        height: unit(vars.sizing.height),
-        $nest: {
-            "&.isOpen": {
-                width: unit(vars.compactSearch.maxWidth),
-                flexBasis: "auto",
+    const compactSearch = style(
+        "compactSearch",
+        {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginLeft: "auto",
+            minWidth: unit(formElementVars.sizing.height),
+            flexBasis: px(formElementVars.sizing.height),
+            maxWidth: percent(100),
+            height: unit(vars.sizing.height),
+            $nest: {
+                "&.isOpen": {
+                    width: unit(vars.compactSearch.maxWidth),
+                    flexBasis: "auto",
+                },
             },
         },
-    });
+        mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
+    );
 
     const topElement = style(
         "topElement",
@@ -389,6 +401,10 @@ export const titleBarClasses = useThemeCache(() => {
             minWidth: px(vars.sizing.mobile.width),
         }),
     );
+
+    const buttonOffset = style("buttonOffset", {
+        transform: `translateX(6px)`,
+    });
 
     const centeredButtonClass = style("centeredButtonClass", {
         ...flex.middle(),
@@ -483,9 +499,6 @@ export const titleBarClasses = useThemeCache(() => {
             flexShrink: 1,
             flexBasis: px(vars.endElements.mobile.flexBasis),
         }),
-        mediaQueries.xs({
-            flexBasis: px(formElementVars.sizing.height),
-        }),
     );
 
     const signIn = style("signIn", {
@@ -534,21 +547,27 @@ export const titleBarClasses = useThemeCache(() => {
     const compactSearchResults = style(
         "compactSearchResults",
         {
-            top: 0,
-            display: "flex",
-            position: "relative",
-            margin: `${unit(
-                (vars.sizing.height - formElementVars.sizing.height + formElementVars.border.width) / -2,
-            )} auto`,
+            position: "absolute",
+            top: unit(formElementVars.sizing.height),
+            // top: unit(vars.sizing.height + (vars.sizing.height - formElementVars.sizing.height) / 2),
             maxWidth: px(vars.compactSearch.maxWidth),
+            width: percent(100),
         },
-        mediaQueries.oneColumnDown({
-            top: (vars.sizing.mobile.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
-        }),
+        // mediaQueries.oneColumnDown({
+        //     top: (vars.sizing.mobile.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
+        // }),
     );
 
     const clearButtonClass = style("clearButtonClass", {
-        color: colorOut(vars.colors.fg),
+        opacity: 0.7,
+        $nest: {
+            "&&": {
+                color: colorOut(vars.colors.fg),
+            },
+            "&:hover, &:focus": {
+                opacity: 1,
+            },
+        },
     });
 
     const guestButton = style("guestButton", {
@@ -577,6 +596,7 @@ export const titleBarClasses = useThemeCache(() => {
         localeToggle,
         languages,
         button,
+        buttonOffset,
         searchCancel,
         tabButton,
         dropDownContents,

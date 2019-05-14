@@ -30,6 +30,7 @@ export const mobileDropDownVariables = useThemeCache(() => {
     const title = vars("title", {
         letterSpacing: -0.26,
         maxWidth: calc(`100% - ${px(titleBarVars.endElements.flexBasis * 2)}`),
+        lineHeight: 2,
     });
     const chevron = vars("chevron", {
         width: 8,
@@ -130,6 +131,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
             letterSpacing: vars.title.letterSpacing,
             fontWeight: globalVars.fonts.weights.semiBold,
             textAlign: "center",
+            lineHeight: vars.title.lineHeight,
         },
         mediaQueries.xs({
             textAlign: "left",

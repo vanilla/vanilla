@@ -81,6 +81,8 @@ export const compactSearchClasses = useThemeCache(() => {
             flexWrap: "nowrap",
             minHeight: unit(formElementsVars.sizing.height),
             justifyContent: "center",
+            width: percent(100),
+            position: "relative",
         },
         mediaQueries.oneColumnDown({
             height: unit(titleBarVars.sizing.mobile.height),
@@ -96,5 +98,20 @@ export const compactSearchClasses = useThemeCache(() => {
     const cancelContents = style("cancelContents", {
         padding: px(4),
     });
-    return { root, contents, close, cancelContents };
+
+    const searchAndResults = style("searchAndResults", {
+        position: "relative",
+        width: percent(100),
+        height: unit(formElementsVars.sizing.height),
+        display: "flex",
+        flexWrap: "nowrap",
+    });
+
+    return {
+        root,
+        contents,
+        close,
+        cancelContents,
+        searchAndResults,
+    };
 });

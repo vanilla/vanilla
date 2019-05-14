@@ -6,7 +6,7 @@
 
 import Module from "quill/core/module";
 import Parchment from "parchment";
-import Quill, { RangeStatic } from "quill/core";
+import Quill from "quill/core";
 import api, { uploadFile } from "@library/apiv2";
 import { getPastedFile, getDraggedFile } from "@library/dom/domUtils";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
@@ -18,22 +18,10 @@ import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
  * A Quill module for managing insertion of embeds/loading/error states.
  */
 export default class EmbedInsertionModule extends Module {
-    /** The previous selection */
-    private lastSelection: RangeStatic = {
-        index: 0,
-        length: 0,
-    };
     constructor(public quill: Quill, options = {}) {
         super(quill, options);
         this.quill = quill;
         this.setupImageUploads();
-
-        // Track user selection events.
-        quill.on("selection-change", (range, oldRange, source) => {
-            if (range && source !== Quill.sources.SILENT) {
-                this.lastSelection = range;
-            }
-        });
     }
 
     /**
@@ -60,7 +48,7 @@ export default class EmbedInsertionModule extends Module {
      */
     public createEmbed = (embedValue: IEmbedValue) => {
         const externalEmbed = Parchment.create("embed-external", embedValue) as ExternalEmbedBlot;
-        insertBlockBlotAt(this.quill, this.lastSelection.index, externalEmbed);
+        insertBlockBlotAt(this.quill, this.quill.getLastGoodSelection().index, externalEmbed);
         this.quill.update(Quill.sources.USER);
         externalEmbed.focus();
     };

@@ -4,11 +4,8 @@
  * @license GPL-2.0-only
  */
 
-import editorReducer from "@rich-editor/state/editorReducer";
-import { registerReducer } from "@library/redux/reducerRegistry";
 import { onReady, onContent } from "@library/utility/appUtils";
 
-registerReducer("editor", editorReducer);
 onReady(() => {
     void setupEditor();
 });

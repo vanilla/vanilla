@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { em } from "csx";
+import { em, quote } from "csx";
 import { NestedCSSSelectors, TLength } from "typestyle/lib/types";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { negative, unit } from "@library/styles/styleHelpers";
@@ -23,24 +23,29 @@ import { negative, unit } from "@library/styles/styleHelpers";
  */
 export function lineHeightAdjustment(
     lineHeight: number,
-    baseLineOffset: number = 0.5,
-    bottomOffset = false,
+    bottomOffset?: boolean,
+    baseLineOffset?: number,
 ): NestedCSSSelectors {
-    const capitalLetterRatio = 0.91;
+    const lineHeightAdjustments = globalVariables().fonts.lineHeightAdjustments;
+    const capitalLetterRatio = lineHeightAdjustments.headings.capitalLetterRatio;
+    if (!baseLineOffset) {
+        baseLineOffset = lineHeightAdjustments.headings.baseLineOffset;
+    }
 
     /**
      * Calculate the actual margin values.
      */
     const calculate = (type: "before" | "after"): TLength => {
-        const ratio = type === "after" ? baseLineOffset : 1 - baseLineOffset;
-        const emValue = capitalLetterRatio - lineHeight * ratio;
+        const ratio = type === "after" ? baseLineOffset : 1 - baseLineOffset!;
+        const emValue = capitalLetterRatio - lineHeight * ratio!;
         return negative(em(emValue));
     };
 
     const result: NestedCSSSelectors = {
         "&::before, &::after": {
-            content: "''",
+            content: quote(""),
             display: "block",
+            position: "relative",
             height: 0,
             width: 0,
         },

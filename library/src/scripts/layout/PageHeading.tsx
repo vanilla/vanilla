@@ -8,6 +8,8 @@ import React from "react";
 import classNames from "classnames";
 import BackLink from "@library/routing/links/BackLink";
 import Heading from "@library/layout/Heading";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { pageHeadingClasses } from "@library/layout/pageHeadingStyles";
 
 interface IPageHeading {
     title: string;
@@ -27,15 +29,18 @@ export default class PageHeading extends React.Component<IPageHeading> {
         includeBackLink: true,
     };
     public render() {
+        const classes = pageHeadingClasses();
         return (
-            <div className={classNames("pageHeading", this.props.className)}>
-                <div className="pageHeading-main">
-                    {this.props.includeBackLink && <BackLink className="pageHeading-backLink" fallbackElement={null} />}
-                    <Heading depth={1} title={this.props.title} className={this.props.headingClassName}>
-                        {this.props.children}
-                    </Heading>
+            <div className={classNames(classes.root, this.props.className)}>
+                <div className={classes.main}>
+                    {this.props.includeBackLink && <BackLink fallbackElement={null} />}
+                    <ConditionalWrap condition={!!this.props.actions} className={classes.titleWrap}>
+                        <Heading depth={1} title={this.props.title} className={this.props.headingClassName}>
+                            {this.props.children}
+                        </Heading>
+                    </ConditionalWrap>
                 </div>
-                {this.props.actions && <div className="pageHeading-actions">{this.props.actions}</div>}
+                {this.props.actions && <div className={classes.actions}>{this.props.actions}</div>}
             </div>
         );
     }

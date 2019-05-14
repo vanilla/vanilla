@@ -154,6 +154,12 @@ export const globalVariables = useThemeCache(() => {
         families: {
             body: ["Open Sans"],
         },
+        lineHeightAdjustments: {
+            headings: {
+                capitalLetterRatio: 0.677, // Calibrated for Open Sans
+                baseLineOffset: 0.549, // Calibrated for Open Sans
+            },
+        },
     });
 
     const icon = makeThemeVars("icon", {

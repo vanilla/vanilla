@@ -51,9 +51,9 @@ export const searchResultsVariables = useThemeCache(() => {
 
     const spacing = makeThemeVars("spacing", {
         padding: {
-            top: 18,
+            top: 15,
             right: globalVars.gutter.half,
-            bottom: 18,
+            bottom: 16,
             left: globalVars.gutter.half,
         },
     });
@@ -233,7 +233,7 @@ export const searchResultClasses = useThemeCache(() => {
     );
 
     const metas = style("metas", {
-        marginTop: unit(4),
+        marginTop: unit(2),
         ...margins({
             left: -metaVars.spacing.default,
         }),

@@ -71,7 +71,6 @@ export const mobileDropDownClasses = useThemeCache(() => {
         ...flex.middle(),
         position: "relative",
         flexGrow: 1,
-        overflow: "hidden",
     });
 
     const modal = style("modal", {
@@ -118,6 +117,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
         display: "inline-block",
         position: "relative",
         paddingRight: vars.chevron.width * 2,
+        lineHeight: 1.5,
         overflow: "hidden",
         textOverflow: "ellipsis",
         maxWidth: percent(100),

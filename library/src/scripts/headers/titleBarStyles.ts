@@ -241,7 +241,10 @@ export const titleBarClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
+        mediaQueries.oneColumnDown({
+            height: px(vars.sizing.mobile.height),
+            marginRight: unit(0),
+        }),
     );
 
     const logoFlexBasis = style("logoFlexBasis", {

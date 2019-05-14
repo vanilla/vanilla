@@ -67,4 +67,19 @@ class DeploymentCacheBusterTest extends TestCase {
             "The buster should change after the grace period."
         );
     }
+
+    /**
+     * Test that subsequent calls for the buster's value should be equal.
+     */
+    public function testConsistentValue() {
+        $buster = new DeploymentCacheBuster(
+            new \DateTimeImmutable(1000),
+            500
+        );
+
+        $valueA = $buster->value();
+        $valueB = $buster->value();
+
+        $this->assertEquals($valueA, $valueB);
+    }
 }

@@ -5,7 +5,7 @@
 
 import { hasPermission } from "@library/features/users/permissionUtils";
 import getStore from "@library/redux/getStore";
-import { Editor } from "@rich-editor/editor/context";
+import { Editor } from "@rich-editor/editor/Editor";
 import EditorContent from "@rich-editor/editor/EditorContent";
 import { EditorInlineMenus } from "@rich-editor/editor/EditorInlineMenus";
 import { EditorParagraphMenu } from "@rich-editor/editor/EditorParagraphMenu";

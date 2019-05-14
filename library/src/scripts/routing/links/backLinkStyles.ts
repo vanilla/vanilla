@@ -5,23 +5,48 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, srOnly, userSelect } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { absolutePosition, colorOut, margins, negative, srOnly, unit, userSelect } from "@library/styles/styleHelpers";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { px } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+
+const backLinkVariables = useThemeCache(() => {
+    const globalVars = globalVariables();
+    const makeThemeVars = variableFactory("backLink");
+
+    const sizing = makeThemeVars("backLink", {
+        height: globalVars.icon.sizes.default,
+        width: (globalVars.icon.sizes.default * 12) / 21, // From SVG ratio
+    });
+
+    return {
+        sizing,
+    };
+});
 
 const backLinkClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const style = styleFactory("backLink");
     const titleBarVars = titleBarVariables();
+    const vars = backLinkVariables();
 
     const root = style({
         ...userSelect(),
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "flex-start",
+        ...absolutePosition.topLeft("50%"),
+        overflow: "visible",
+        transform: `translateY(-50%)`,
+        height: unit(vars.sizing.height),
+        width: unit(vars.sizing.width),
+        flexBasis: unit(vars.sizing.width),
+
+        ...margins({
+            left: unit(negative(vars.sizing.width + globalVars.gutter.half)),
+        }),
     });
 
     const link = style("link", {
@@ -30,7 +55,7 @@ const backLinkClasses = useThemeCache(() => {
         justifyContent: "flex-start",
         color: "inherit",
         minWidth: globalVars.icon.sizes.default,
-        maxHeight: px(titleBarVars.sizing.height),
+        height: px(titleBarVars.sizing.height),
         $nest: {
             "&:hover, &:focus": {
                 color: colorOut(globalVars.mainColors.primary),
@@ -51,10 +76,16 @@ const backLinkClasses = useThemeCache(() => {
         mediaQueries.xs(srOnly()),
     );
 
+    const icon = style("icon", {
+        height: globalVars.icon.sizes.default,
+        width: (globalVars.icon.sizes.default * 12) / 21, // From SVG ratio
+    });
+
     return {
         root,
         link,
         label,
+        icon,
     };
 });
 

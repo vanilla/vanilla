@@ -8,9 +8,9 @@ import classNames from "classnames";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import { ScrollOffsetContext } from "@library/layout/ScrollOffsetContext";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
-import { panelLayoutClasses  } from "@library/layout/panelLayoutStyles";
-import {panelAreaClasses} from "@library/layout/panelAreaStyles";
-import {panelWidgetClasses} from "@library/layout/panelWidgetStyles";
+import { panelLayoutClasses } from "@library/layout/panelLayoutStyles";
+import { panelAreaClasses } from "@library/layout/panelAreaStyles";
+import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
 
 interface IProps extends IDeviceProps {
     className?: string;
@@ -226,6 +226,5 @@ export function PanelWidgetHorizontalPadding(props: IContainerProps) {
     const classes = panelWidgetClasses();
     return <div className={classNames(classes.root, "hasNoVerticalPadding", props.className)}>{props.children}</div>;
 }
-
 
 export default withDevice(PanelLayout);

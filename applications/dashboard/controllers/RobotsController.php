@@ -22,6 +22,8 @@ Disallow: /messages/
 Disallow: /profile/comments/
 Disallow: /profile/discussions/
 Disallow: /search/
+Disallow: /sso/
+Disallow: /sso
 ROBOTS_DEFAULT;
 
     /** Content of robots.txt when the site is supposed to be "invisible" to crawlers and bots. */

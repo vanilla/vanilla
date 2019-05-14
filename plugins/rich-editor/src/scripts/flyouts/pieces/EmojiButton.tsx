@@ -8,7 +8,8 @@ import React from "react";
 import Quill from "quill/core";
 import classNames from "classnames";
 import { convertToSafeEmojiCharacters } from "@library/dom/domUtils";
-import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import { IWithEditorProps } from "@rich-editor/editor/context";
+import { withEditor } from "@rich-editor/editor/withEditor";
 import { insertEmojiClasses } from "@rich-editor/flyouts/pieces/insertEmojiClasses";
 
 interface IProps extends IWithEditorProps {

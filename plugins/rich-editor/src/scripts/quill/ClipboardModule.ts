@@ -10,7 +10,6 @@ import Quill, { DeltaStatic } from "quill/core";
 import { rangeContainsBlot, getIDForQuill } from "@rich-editor/quill/utility";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
-import getStore from "@library/redux/getStore";
 import { IStoreState } from "@rich-editor/@types/store";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 
@@ -143,13 +142,7 @@ export default class ClipboardModule extends ClipboardBase {
      * Determine if we are in a code formatted item or not.
      */
     private get inCodeFormat() {
-        const instance = getStore<IStoreState>().getState().editor.instances[getIDForQuill(this.quill)];
-        if (!instance || !instance.lastGoodSelection) {
-            return false;
-        }
-        return (
-            rangeContainsBlot(this.quill, CodeBlockBlot, instance.lastGoodSelection) ||
-            rangeContainsBlot(this.quill, CodeBlot, instance.lastGoodSelection)
-        );
+        const range = this.quill.getLastGoodSelection();
+        return rangeContainsBlot(this.quill, CodeBlockBlot, range) || rangeContainsBlot(this.quill, CodeBlot, range);
     }
 }

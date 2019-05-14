@@ -171,6 +171,9 @@ declare module "quill/core" {
         options: AnyObject;
         history: HistoryModule;
 
+        // Custom
+        getLastGoodSelection(): RangeStatic;
+
         constructor(container: string | Element, options?: QuillOptionsStatic);
         deleteText(index: number, length: number, source?: Sources): DeltaStatic;
         disable(): void;

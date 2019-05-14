@@ -9,7 +9,8 @@ import { t } from "@library/utility/appUtils";
 import CloseButton from "@library/navigation/CloseButton";
 import classNames from "classnames";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import { IWithEditorProps } from "@rich-editor/editor/context";
+import { withEditor } from "@rich-editor/editor/withEditor";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { insertLinkClasses } from "@rich-editor/toolbars/pieces/insertLinkClasses";
 

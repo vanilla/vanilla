@@ -21,7 +21,7 @@ export default function MessagesCount(props: IProps) {
     const { open, compact } = props;
 
     return (
-        <MeBoxIcon count={0} countLabel={t("Messages") + ': '} compact={compact}>
+        <MeBoxIcon count={0} countLabel={t("Messages") + ": "} compact={compact}>
             {messages(!!open)}
         </MeBoxIcon>
     );

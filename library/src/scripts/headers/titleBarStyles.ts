@@ -259,7 +259,6 @@ export const titleBarClasses = useThemeCache(() => {
             flexWrap: "wrap",
             height: px(vars.sizing.height),
             color: "inherit",
-            marginLeft: unit(negative(globalVars.gutter.size)),
         },
         mediaQueries.oneColumnDown({ height: px(vars.sizing.mobile.height) }),
     );
@@ -399,6 +398,10 @@ export const titleBarClasses = useThemeCache(() => {
             minWidth: px(vars.sizing.mobile.width),
         }),
     );
+
+    const buttonOffset = style("buttonOffset", {
+        transform: `translateX(10px)`,
+    });
 
     const centeredButtonClass = style("centeredButtonClass", {
         ...flex.middle(),
@@ -554,6 +557,12 @@ export const titleBarClasses = useThemeCache(() => {
 
     const clearButtonClass = style("clearButtonClass", {
         color: colorOut(vars.colors.fg),
+        opacity: 0.7,
+        $nest: {
+            "&:hover, &:focus": {
+                opacity: 1,
+            },
+        },
     });
 
     const guestButton = style("guestButton", {
@@ -582,6 +591,7 @@ export const titleBarClasses = useThemeCache(() => {
         localeToggle,
         languages,
         button,
+        buttonOffset,
         searchCancel,
         tabButton,
         dropDownContents,

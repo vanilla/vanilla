@@ -151,7 +151,9 @@ export class TitleBar extends React.Component<IProps, IState> {
                                         classes.searchCancel,
                                     )}
                                     cancelContentClassName="meBox-buttonContent"
-                                    buttonClass={classes.button}
+                                    buttonClass={classNames(classes.button, {
+                                        [classes.buttonOffset]: !isMobile,
+                                    })}
                                     showingSuggestions={this.state.showingSuggestions}
                                     onOpenSuggestions={this.setOpenSuggestions}
                                     onCloseSuggestions={this.setCloseSuggestions}

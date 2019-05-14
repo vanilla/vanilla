@@ -7,12 +7,9 @@
 import Enzyme from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
 import { importAll } from "@library/__tests__/utility";
-import reducerRegistry from "@library/redux/reducerRegistry";
-import editorReducer from "@rich-editor/state/editorReducer";
 import registerQuill from "@rich-editor/quill/registerQuill";
 
 // Setup enzyme
 Enzyme.configure({ adapter: new Adapter() });
-reducerRegistry.register("editor", editorReducer);
 registerQuill();
 importAll((require as any).context("..", true, /.test.(ts|tsx)$/));

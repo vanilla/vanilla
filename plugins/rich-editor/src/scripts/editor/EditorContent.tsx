@@ -6,6 +6,7 @@
 
 import { userContentClasses } from "@library/content/userContentStyles";
 import { delegateEvent, removeDelegatedEvent } from "@library/dom/domUtils";
+import { useLastValue } from "@library/dom/hookUtils";
 import { debug } from "@library/utility/utils";
 import { useEditorContents } from "@rich-editor/editor/contentContext";
 import { useEditor } from "@rich-editor/editor/context";
@@ -19,21 +20,25 @@ import hljs from "highlight.js";
 import throttle from "lodash/throttle";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import React, { useCallback, useEffect, useRef } from "react";
-import { useLastValue } from "@library/dom/hookUtils";
 
 interface IProps {
     legacyTextArea?: HTMLInputElement;
 }
 
+/**
+ * The content area for Rich Editor.
+ *
+ * This is essentially a React wrapper around quill.
+ */
 export default function EditorContent(props: IProps) {
     const quillMountRef = React.createRef<HTMLDivElement>();
     useQuillInstance(quillMountRef);
+    useLegacyTextAreaSync(props.legacyTextArea);
+    useDebugPasteListener(props.legacyTextArea);
     useCssClassSetup();
     useLoadStatus();
     useInitialValue();
     useOperationsQueue();
-    useLegacyTextAreaSync(props.legacyTextArea);
-    useDebugPasteListener(props.legacyTextArea);
     useQuoteButtonHandler();
     useGlobalSelectionHandler();
     useSynchronization();
@@ -41,75 +46,11 @@ export default function EditorContent(props: IProps) {
     return <div className="richEditor-textWrap" ref={quillMountRef} />;
 }
 
-function useCssClassSetup() {
-    const { legacyMode, quill } = useEditor();
-    const classesRichEditor = richEditorClasses(legacyMode);
-    const classesUserContent = userContentClasses();
-    const quillRootClasses = classNames("ql-editor", "richEditor-text", "userContent", classesRichEditor.text, {
-        // These classes shouln't be applied until the forum is converted to the new styles.
-        [classesUserContent.root]: !legacyMode,
-    });
-
-    useEffect(() => {
-        if (quill) {
-            // Initialize some CSS classes onto the quill root.
-            quill.root.classList.value = quillRootClasses;
-        }
-    }, [quill, quillRootClasses]);
-
-    return quillRootClasses;
-}
-
-function useLoadStatus() {
-    const { quill, isLoading } = useEditor();
-    const prevLoading = useLastValue(isLoading);
-    useEffect(() => {
-        if (quill) {
-            if (!prevLoading && isLoading) {
-                quill.disable();
-            } else if (prevLoading && !isLoading) {
-                quill.enable();
-            }
-        }
-    }, [isLoading, quill]);
-}
-
-function useInitialValue() {
-    const { quill, initialValue, reinitialize } = useEditor();
-    const prevInitialValue = useLastValue(initialValue);
-    const prevReinitialize = useLastValue(reinitialize);
-
-    useEffect(() => {
-        if (quill && initialValue) {
-            if (prevInitialValue !== initialValue && prevReinitialize !== reinitialize) {
-                quill.setContents(initialValue);
-            }
-        }
-    }, [quill, initialValue, reinitialize]);
-}
-
-function useOperationsQueue() {
-    const { operationsQueue, quill, clearOperationsQueue } = useEditor();
-    useEffect(() => {
-        if (!operationsQueue || !quill) {
-            return;
-        }
-        operationsQueue.forEach(operation => {
-            const scrollLength = quill.scroll.length();
-
-            if (typeof operation === "string") {
-                quill.clipboard.dangerouslyPasteHTML(scrollLength, operation);
-            } else {
-                const offsetOperations = scrollLength > 1 ? { retain: scrollLength } : { delete: 1 };
-                quill.updateContents([offsetOperations, ...operation]);
-            }
-        });
-        if (clearOperationsQueue) {
-            clearOperationsQueue();
-        }
-    }, [operationsQueue, clearOperationsQueue]);
-}
-
+/**
+ * Manage and construct a quill instance ot some ref.
+ *
+ * @param mountRef The ref to mount quill onto.
+ */
 export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>) {
     const ref = useRef<Quill>();
     const { setQuillInstance } = useEditor();
@@ -138,6 +79,87 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>) {
         }
     }, [mountRef.current]);
     return ref.current;
+}
+
+/**
+ * Apply our CSS classes/styles to quill's root. (Not a react component).
+ */
+function useCssClassSetup() {
+    const { legacyMode, quill } = useEditor();
+    const classesRichEditor = richEditorClasses(legacyMode);
+    const classesUserContent = userContentClasses();
+    const quillRootClasses = classNames("ql-editor", "richEditor-text", "userContent", classesRichEditor.text, {
+        // These classes shouln't be applied until the forum is converted to the new styles.
+        [classesUserContent.root]: !legacyMode,
+    });
+
+    useEffect(() => {
+        if (quill) {
+            // Initialize some CSS classes onto the quill root.
+            quill.root.classList.value = quillRootClasses;
+        }
+    }, [quill, quillRootClasses]);
+
+    return quillRootClasses;
+}
+
+/**
+ * Map our isLoading context into quill being enabled or disabled.
+ */
+function useLoadStatus() {
+    const { quill, isLoading } = useEditor();
+    const prevLoading = useLastValue(isLoading);
+    useEffect(() => {
+        if (quill) {
+            if (!prevLoading && isLoading) {
+                quill.disable();
+            } else if (prevLoading && !isLoading) {
+                quill.enable();
+            }
+        }
+    }, [isLoading, quill]);
+}
+
+/**
+ * Handle the updating of the initial editor value.
+ */
+function useInitialValue() {
+    const { quill, initialValue, reinitialize } = useEditor();
+    const prevInitialValue = useLastValue(initialValue);
+    const prevReinitialize = useLastValue(reinitialize);
+
+    useEffect(() => {
+        if (quill && initialValue) {
+            if (prevInitialValue !== initialValue && prevReinitialize !== reinitialize) {
+                quill.setContents(initialValue);
+            }
+        }
+    }, [quill, initialValue, reinitialize]);
+}
+
+/**
+ * Handle queued insert operations when the editor loads up.
+ */
+function useOperationsQueue() {
+    const { operationsQueue, quill, clearOperationsQueue } = useEditor();
+    useEffect(() => {
+        if (!operationsQueue || !quill) {
+            return;
+        }
+        operationsQueue.forEach(operation => {
+            const scrollLength = quill.scroll.length();
+
+            if (typeof operation === "string") {
+                quill.clipboard.dangerouslyPasteHTML(scrollLength, operation);
+            } else {
+                const offsetOperations = scrollLength > 1 ? { retain: scrollLength } : { delete: 1 };
+                quill.updateContents([offsetOperations, ...operation]);
+            }
+        });
+        if (clearOperationsQueue) {
+            clearOperationsQueue();
+        }
+    }, [operationsQueue, clearOperationsQueue]);
 }
 
 /**
@@ -186,7 +208,7 @@ function useLegacyTextAreaSync(textArea?: HTMLInputElement) {
 }
 
 /**
- *
+ * Page handlers for the rich quote buttons.
  */
 function useQuoteButtonHandler() {
     const { quill } = useEditor();
@@ -213,71 +235,14 @@ function useQuoteButtonHandler() {
     }, [quill]);
 }
 
-function useQuillHandlers() {
-    const { onChange, quill } = useEditor();
-    const editorContents = useEditorContents();
-
-    const getOperations = useCallback((): DeltaOperation[] => {
-        if (!quill) {
-            return [];
-        }
-
-        HeaderBlot.resetCounters();
-        const headers = (quill.scroll.descendants(
-            blot => blot instanceof HeaderBlot,
-            0,
-            quill.scroll.length(),
-        ) as any) as HeaderBlot[]; // Explicit mapping of types because the parchments types suck.
-
-        headers.forEach(header => header.setGeneratedID());
-        quill.update(Quill.sources.API);
-        return quill.getContents().ops!;
-    }, [quill]);
-
-    /**
-     * Quill dispatches a lot of unnecessary updates. We need to filter out only the ones we want.
-     *
-     * We need
-     * - Every non-silent event.
-     * - Every selection change event (even the "silent" ones).
-     */
-    const handleUpdate = useCallback(
-        throttle((type: string, newValue, oldValue, source: Sources) => {
-            if (!quill) {
-                return;
-            }
-            if (onChange && type === Quill.events.TEXT_CHANGE && source !== Quill.sources.SILENT) {
-                onChange(getOperations());
-            }
-
-            let shouldDispatch = false;
-            if (type === Quill.events.SELECTION_CHANGE) {
-                shouldDispatch = true;
-            } else if (source !== Quill.sources.SILENT) {
-                shouldDispatch = true;
-            }
-
-            if (shouldDispatch) {
-                editorContents.updateSelection(quill.getSelection());
-            }
-        }, 1000 / 60), // Throttle to 60 FPS.
-        [quill, onChange, getOperations],
-    );
-
-    return {
-        getOperations,
-        handleUpdate,
-    };
-}
-
 /**
- * Handle forced selection updates.
+ * Handle global forced selection updates.
  */
 function useGlobalSelectionHandler() {
-    const handlers = useQuillHandlers();
+    const updateHandler = useUpdateHandler();
 
     const handleGlobalSelectionUpdate = () => {
-        handlers.handleUpdate(Quill.events.SELECTION_CHANGE, null, null, Quill.sources.USER);
+        updateHandler(Quill.events.SELECTION_CHANGE, null, null, Quill.sources.USER);
     };
 
     useEffect(() => {
@@ -318,18 +283,76 @@ function useDebugPasteListener(textArea?: HTMLInputElement) {
     }, [legacyMode, quill]);
 }
 
+/**
+ * Hook for a re-usable quill update handler.
+ * Quill dispatches a lot of unnecessary updates. We need to filter out only the ones we want.
+ *
+ * We need
+ * - Every non-silent event.
+ * - Every selection change event (even the "silent" ones).
+ */
+function useUpdateHandler() {
+    const { onChange, quill } = useEditor();
+    const editorContents = useEditorContents();
+
+    const getOperations = useCallback((): DeltaOperation[] => {
+        if (!quill) {
+            return [];
+        }
+
+        HeaderBlot.resetCounters();
+        const headers = (quill.scroll.descendants(
+            blot => blot instanceof HeaderBlot,
+            0,
+            quill.scroll.length(),
+        ) as any) as HeaderBlot[]; // Explicit mapping of types because the parchments types suck.
+
+        headers.forEach(header => header.setGeneratedID());
+        quill.update(Quill.sources.API);
+        return quill.getContents().ops!;
+    }, [quill]);
+
+    const handleUpdate = useCallback(
+        throttle((type: string, newValue, oldValue, source: Sources) => {
+            if (!quill) {
+                return;
+            }
+            if (onChange && type === Quill.events.TEXT_CHANGE && source !== Quill.sources.SILENT) {
+                onChange(getOperations());
+            }
+
+            let shouldDispatch = false;
+            if (type === Quill.events.SELECTION_CHANGE) {
+                shouldDispatch = true;
+            } else if (source !== Quill.sources.SILENT) {
+                shouldDispatch = true;
+            }
+
+            if (shouldDispatch) {
+                editorContents.updateSelection(quill.getSelection());
+            }
+        }, 1000 / 60), // Throttle to 60 FPS.
+        [quill, onChange, getOperations],
+    );
+
+    return handleUpdate;
+}
+
+/**
+ * Hook for synchonizing quill's values to our update handler.
+ */
 function useSynchronization() {
     const { quill } = useEditor();
-    const handlers = useQuillHandlers();
+    const updateHandler = useUpdateHandler();
 
     useEffect(() => {
         if (!quill) {
             return;
         }
 
-        quill.on(Quill.events.EDITOR_CHANGE, handlers.handleUpdate);
+        quill.on(Quill.events.EDITOR_CHANGE, updateHandler);
         return () => {
-            quill.off(Quill.events.EDITOR_CHANGE, handlers.handleUpdate);
+            quill.off(Quill.events.EDITOR_CHANGE, updateHandler);
         };
     });
 }

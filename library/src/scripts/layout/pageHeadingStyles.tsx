@@ -59,11 +59,6 @@ export const pageHeadingClasses = useThemeCache(() => {
         alignItems: "center",
     });
 
-    const paragraph = style("paragraph", {
-        fontSize: unit(globalVars.fonts.size.small),
-        marginBottom: unit(12),
-    });
-
     const actions = style("actions", {
         display: "flex",
         marginLeft: unit(vars.cta.margin),
@@ -90,7 +85,6 @@ export const pageHeadingClasses = useThemeCache(() => {
         root,
         main,
         titleBar,
-        paragraph,
         actions,
         link,
         titleWrap,
@@ -101,7 +95,7 @@ export const pageHeadingClasses = useThemeCache(() => {
 export const pageTitleClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = pageHeadingVariables();
-    const style = styleFactory("pageHeading");
+    const style = styleFactory("pageTitle");
 
     const root = style({
         ...lineHeightAdjustment(vars.font.lineHeight),
@@ -122,13 +116,8 @@ export const pageTitleClasses = useThemeCache(() => {
         }),
     });
 
-    const underTitle = style("underTitle", {
-        marginTop: unit(6),
-    });
-
     return {
         root,
         pageSmallTitle,
-        underTitle,
     };
 });

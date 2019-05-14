@@ -12,6 +12,7 @@ import { hashString } from "../utility/utils";
 import React from "react";
 import ReactDOM from "react-dom";
 import { forceRenderStyles } from "typestyle";
+import { spawn } from "child_process";
 
 smoothscroll.polyfill();
 
@@ -469,9 +470,40 @@ export function prepareShadowRoot(element: HTMLElement, cloneElement: boolean = 
  *
  * - ReactDOM render.
  * - Typestyle render.
+ *
+ * If the overwrite option is passed this component will replace the components you passed as target.
+ *
+ * Default Mode:
+ * <div><TARGET /></div> -> <div><TARGET><REACT></TARGET><div>
+ *
+ * Overwrite Mode:
+ * <div><TARGET /></div> -> <div><REACT/></div>
  */
-export function mountReact(component: React.ReactElement, target: HTMLElement, callback?: () => void) {
-    const result = ReactDOM.render(component, target, callback);
+export function mountReact(
+    component: React.ReactElement,
+    target: HTMLElement,
+    callback?: () => void,
+    options?: { overwrite: true },
+) {
+    let mountPoint = target;
+    let cleanupContainer: HTMLElement | undefined;
+    if (options && options.overwrite) {
+        const container = document.createElement("span");
+        cleanupContainer = container;
+        target.parentElement!.insertBefore(container, target);
+        mountPoint = container;
+    }
+    const result = ReactDOM.render(component, mountPoint, () => {
+        if (cleanupContainer) {
+            target.remove();
+            if (cleanupContainer.firstElementChild) {
+                cleanupContainer.parentElement!.insertBefore(cleanupContainer.firstElementChild, cleanupContainer);
+                cleanupContainer.remove();
+                target.remove();
+            }
+        }
+        callback && callback();
+    });
     forceRenderStyles();
     return result;
 }

@@ -9,6 +9,7 @@ import { onContent, getMeta, _executeReady, _mountComponents } from "@library/ut
 import { log, logError, debug } from "@library/utility/utils";
 import gdn from "@library/gdn";
 import apiv2 from "@library/apiv2";
+import { mountInputs } from "@library/forms/mountInputs";
 
 // Inject the debug flag into the utility.
 const debugValue = getMeta("context.debug", getMeta("debug", false));
@@ -24,6 +25,7 @@ _executeReady()
         // Mount all data-react components.
         onContent(e => {
             _mountComponents(e.target);
+            mountInputs();
         });
 
         const contentEvent = new CustomEvent("X-DOMContentReady", { bubbles: true, cancelable: false });

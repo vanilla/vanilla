@@ -44,6 +44,9 @@ class DeploymentCacheBuster {
     /** @var int|null */
     private $deploymentTime;
 
+    /** @var int|null */
+    private $gracedDeploymentTime;
+
     /**
      * DeploymentCacheBuster constructor.
      *
@@ -53,6 +56,9 @@ class DeploymentCacheBuster {
     public function __construct(\DateTimeInterface $currentTime, $deploymentTime) {
         $this->currentTime = $currentTime;
         $this->deploymentTime = $deploymentTime;
+        if ($this->deploymentTime) {
+            $this->gracedDeploymentTime = $this->deploymentTime + self::GRACE_PERIOD;
+        }
     }
 
     /**
@@ -65,11 +71,9 @@ class DeploymentCacheBuster {
      */
     public function value(): string {
         if ($this->deploymentTime) {
-            $graced = $this->deploymentTime + self::GRACE_PERIOD;
-            if ($this->currentTime->getTimestamp() >= $graced) {
-                $this->deploymentTime = $graced;
-            }
-            $result = dechex($this->deploymentTime);
+            $isBeyondGracePeriod = $this->currentTime->getTimestamp() >= $this->gracedDeploymentTime;
+            $deploymentTime = $isBeyondGracePeriod ? $this->gracedDeploymentTime : $this->deploymentTime;
+            $result = dechex($deploymentTime);
         } else {
             $result = APPLICATION_VERSION;
         }

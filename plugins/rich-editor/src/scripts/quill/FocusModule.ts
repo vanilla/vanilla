@@ -134,7 +134,7 @@ export default class EmbedFocusModule extends Module {
 
         // We need to place the selection at the end of quill.
         if (nextElement === this.quill.root) {
-            this.focusFirstLine();
+            this.focusQuillStart();
         } else {
             nextElement.focus();
         }
@@ -167,7 +167,7 @@ export default class EmbedFocusModule extends Module {
 
         // We need to place the selection at the end of quill.
         if (prevElement === this.quill.root) {
-            this.focusLastLine();
+            this.focusQuillEnd();
         } else {
             prevElement.focus();
         }
@@ -180,14 +180,13 @@ export default class EmbedFocusModule extends Module {
      *
      * Handles embed blots in addition to plain text.
      */
-    public focusLastLine() {
+    public focusQuillEnd() {
         const lastIndex = this.quill.scroll.length() - 1;
         const lastEmbedBlot = getBlotAtIndex(this.quill, lastIndex, FocusableEmbedBlot);
         if (lastEmbedBlot) {
             lastEmbedBlot.focus();
         } else {
             this.quill.focus();
-            this.quill.setSelection(lastIndex, 0, Quill.sources.USER);
         }
     }
 
@@ -196,13 +195,12 @@ export default class EmbedFocusModule extends Module {
      *
      * Handles embed blots in addition to plain text.
      */
-    public focusFirstLine() {
+    public focusQuillStart() {
         const firstEmbedBlot = this.quill.scroll.children.head;
         if (firstEmbedBlot instanceof FocusableEmbedBlot) {
             firstEmbedBlot.focus();
         } else {
             this.quill.focus();
-            this.quill.setSelection(0, 0, Quill.sources.USER);
         }
     }
 

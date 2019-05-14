@@ -20,7 +20,7 @@ export interface IResult {
     className?: string;
     meta: React.ReactNode;
     url: string;
-    excerpt: string;
+    excerpt?: string;
     image?: string;
     headingLevel?: 2 | 3;
     attachments?: IAttachmentIcon[];

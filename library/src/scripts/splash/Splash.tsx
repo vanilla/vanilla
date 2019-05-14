@@ -54,7 +54,9 @@ export class Splash extends React.Component<IProps> {
                                     inputClass={classes.input}
                                     iconClass={classes.icon}
                                     buttonLoaderClassName={classes.buttonLoader}
-                                    hideSearchButton={this.props.device === Devices.MOBILE || this.props.device === Devices.XS}
+                                    hideSearchButton={
+                                        this.props.device === Devices.MOBILE || this.props.device === Devices.XS
+                                    }
                                     contentClass={classes.content}
                                     valueContainerClasses={classes.valueContainer}
                                 />

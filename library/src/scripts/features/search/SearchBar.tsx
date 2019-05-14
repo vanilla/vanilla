@@ -351,22 +351,13 @@ export default class SearchBar extends React.Component<IProps, IState> {
      */
 
     private Menu = (props: MenuProps<any>) => {
-        const classes = dropDownClasses();
-        return (
-            <React.Fragment>
-                {ReactDOM.createPortal(
-                    <components.Menu
-                        {...props}
-                        className={classNames(
-                            "suggestedTextInput-menu",
-                            "dropDown-contents",
-                            "isParentWidth",
-                            classes.contents,
-                        )}
-                    />,
-                    this.props.resultsRef!.current!,
-                )}
-            </React.Fragment>
+        const classes = searchBarClasses();
+        return ReactDOM.createPortal(
+            <components.Menu
+                {...props}
+                className={classNames("suggestedTextInput-menu", "dropDown-contents", "isParentWidth", classes.menu)}
+            />,
+            this.props.resultsRef!.current!,
         );
     };
 

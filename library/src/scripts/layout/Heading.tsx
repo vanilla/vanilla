@@ -6,7 +6,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import {typographyClasses} from "@library/styles/typographyStyles";
+import { typographyClasses } from "@library/styles/typographyStyles";
 
 export interface ICommonHeadingProps {
     id?: string;

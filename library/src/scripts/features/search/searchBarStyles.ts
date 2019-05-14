@@ -9,10 +9,10 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { borderRadii, borders, colorOut, unit } from "@library/styles/styleHelpers";
 import { calc, important, percent, px } from "csx";
-
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { buttonClasses, buttonVariables } from "@library/forms/buttonStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { shadowHelper } from "@library/styles/shadowHelpers";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -55,6 +55,7 @@ export const searchBarVariables = useThemeCache(() => {
     const results = themeVars("results", {
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
+        borderRadius: globalVars.border.radius,
     });
 
     return {
@@ -77,6 +78,7 @@ export const searchBarClasses = useThemeCache(() => {
     const formElementVars = formElementsVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const style = styleFactory("searchBar");
+    const shadow = shadowHelper();
 
     const root = style(
         {
@@ -153,7 +155,19 @@ export const searchBarClasses = useThemeCache(() => {
     const results = style("results", {
         backgroundColor: colorOut(vars.results.bg),
         color: colorOut(vars.results.fg),
+        position: "absolute",
+        top: unit(vars.sizing.height),
+        left: 0,
+        overflow: "hidden",
+        ...borders({
+            radius: unit(vars.results.borderRadius),
+        }),
+        ...shadow.dropDown(),
+        zIndex: 1,
         $nest: {
+            "&:empty": {
+                display: "none",
+            },
             ".suggestedTextInput__placeholder": {
                 color: colorOut(formElementVars.placeholder.color),
             },
@@ -259,7 +273,7 @@ export const searchBarClasses = useThemeCache(() => {
         alignItems: "flex-start",
         justifyContent: "flex-start",
         position: "relative",
-        height: unit(formElementVars.sizing.height),
+        height: unit(vars.sizing.height),
     });
 
     // special selector

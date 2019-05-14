@@ -39,8 +39,8 @@ export function ForumEditor(props: IProps) {
                 >
                     <div className={classNames("richEditor-frame", "InputBox", classes.legacyFrame, classes.root)}>
                         <EditorContent legacyTextArea={props.legacyTextArea} />
-                        <EditorParagraphMenu />
                         <EditorInlineMenus />
+                        <EditorParagraphMenu />
                         <EditorEmbedBar />
                     </div>
                 </Editor>

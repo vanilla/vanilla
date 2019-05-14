@@ -5,13 +5,14 @@
  */
 
 import Emitter from "quill/core/emitter";
-import Quill, { RangeStatic, Blot } from "quill/core";
+import Quill, { RangeStatic, Blot, DeltaOperation } from "quill/core";
 import Delta from "quill-delta";
 import { matchAtMention } from "@library/utility/utils";
 import uniqueId from "lodash/uniqueId";
 import FocusableEmbedBlot from "@rich-editor/quill/blots/abstract/FocusableEmbedBlot";
 import BlockBlot from "quill/blots/block";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
+import { log } from "@library/utility/utils";
 
 interface IBoundary {
     start: number;
@@ -390,4 +391,17 @@ export const SELECTION_UPDATE = "[editor] force selection update";
  */
 export function forceSelectionUpdate() {
     document.dispatchEvent(new CustomEvent(SELECTION_UPDATE));
+}
+
+/**
+ * Set the quill editor contents.
+ *
+ * @param quill The quill instance to work on.
+ * @param content The delta to set.
+ */
+export function resetQuillContent(quill: Quill, content: DeltaOperation[]) {
+    log("Setting existing content as contents of editor");
+    quill.setContents(content);
+    // Clear the history so that you can't "undo" your initial content.
+    quill.getModule("history").clear();
 }

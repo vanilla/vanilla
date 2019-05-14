@@ -559,9 +559,11 @@ export const titleBarClasses = useThemeCache(() => {
     );
 
     const clearButtonClass = style("clearButtonClass", {
-        color: colorOut(vars.colors.fg),
         opacity: 0.7,
         $nest: {
+            "&&": {
+                color: colorOut(vars.colors.fg),
+            },
             "&:hover, &:focus": {
                 opacity: 1,
             },

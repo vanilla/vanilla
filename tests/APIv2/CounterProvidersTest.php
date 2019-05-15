@@ -6,6 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
+
 use Vanilla\Forum\Menu\UserCounterProvider;
 use Vanilla\Menu\Counter;
 
@@ -13,6 +14,16 @@ use Vanilla\Menu\Counter;
  * Test the CounterProviders
  */
 class CounterProvidersTest extends AbstractAPIv2Test {
+    /**
+    * {@inheritdoc}
+    */
+    public static function setupBeforeClass() {
+        parent::setupBeforeClass();
+    }
+
+    public function setUp() {
+        parent::setUp();
+    }
 
     /**
      * Test ConversationCounterProvider.

@@ -65,6 +65,7 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
     public render() {
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const classesInsertMedia = insertMediaClasses();
+        const placeholderText = `https://`;
         return (
             <>
                 <DropDown
@@ -99,7 +100,7 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
                                     className={classNames("InputBox", classesInsertMedia.insert, {
                                         inputText: !this.props.legacyMode,
                                     })}
-                                    placeholder={t("https://")}
+                                    placeholder={placeholderText}
                                     value={this.state.url}
                                     onChange={this.inputChangeHandler}
                                     onKeyDown={this.buttonKeyDownHandler}

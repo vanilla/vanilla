@@ -6,7 +6,6 @@
 
 namespace VanillaTests\APIv2;
 
-
 use Vanilla\Forum\Menu\UserCounterProvider;
 use Vanilla\Menu\Counter;
 

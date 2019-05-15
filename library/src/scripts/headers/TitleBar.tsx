@@ -79,7 +79,7 @@ export class TitleBar extends React.Component<IProps, IState> {
             ...sticky(),
             $debugName: "isFixed",
             top: 0,
-            zIndex: 1,
+            zIndex: 2,
         });
 
         const outerCssClasses = classNames(

@@ -78,7 +78,10 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
                     contentClass={this.props.contentClass}
                     valueContainerClasses={this.props.valueContainerClasses}
                 />
-                <div ref={this.resultsRef} className={classNames("search-results", classesSearchBar.results)} />
+                <div
+                    ref={this.resultsRef}
+                    className={classNames("search-results", classesSearchBar.results, classesSearchBar.resultsAsModal)}
+                />
             </div>
         );
     }

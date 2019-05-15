@@ -155,15 +155,6 @@ export const searchBarClasses = useThemeCache(() => {
     const results = style("results", {
         backgroundColor: colorOut(vars.results.bg),
         color: colorOut(vars.results.fg),
-        position: "absolute",
-        top: unit(vars.sizing.height),
-        left: 0,
-        overflow: "hidden",
-        ...borders({
-            radius: unit(vars.results.borderRadius),
-        }),
-        ...shadow.dropDown(),
-        zIndex: 1,
         $nest: {
             "&:empty": {
                 display: "none",
@@ -195,6 +186,18 @@ export const searchBarClasses = useThemeCache(() => {
                 },
             },
         },
+    });
+
+    const resultsAsModal = style("results", {
+        position: "absolute",
+        top: unit(vars.sizing.height),
+        left: 0,
+        overflow: "hidden",
+        ...borders({
+            radius: unit(vars.results.borderRadius),
+        }),
+        ...shadow.dropDown(),
+        zIndex: 1,
     });
 
     const valueContainer = style("valueContainer", {
@@ -351,6 +354,7 @@ export const searchBarClasses = useThemeCache(() => {
         iconContainer,
         icon,
         results,
+        resultsAsModal,
         menu,
     };
 });

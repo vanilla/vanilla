@@ -126,7 +126,7 @@ export const frameHeaderClasses = useThemeCache(() => {
         justifyContent: "center",
         alignItems: "flex-end",
         flexShrink: 1,
-        marginLeft: unit(-6),
+        transform: `translateX(-5px) translateY(-1px)`,
     });
 
     const heading = style("heading", {

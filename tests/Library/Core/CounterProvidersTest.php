@@ -5,6 +5,7 @@
  */
 
 namespace VanillaTests\APIv2;
+
 use Vanilla\Forum\Menu\UserCounterProvider;
 use Vanilla\Menu\Counter;
 
@@ -54,8 +55,7 @@ class CounterProvidersTest extends AbstractAPIv2Test {
     /**
      * Test RoleCounterProvider.
      */
-    public function testRoleCounterProvider()
-    {
+    public function testRoleCounterProvider() {
         $session = self::container()->get(\Gdn_Session::class);
 
         $provider = new \RoleCounterProvider(self::container()->get(\RoleModel::class), $session);
@@ -73,8 +73,7 @@ class CounterProvidersTest extends AbstractAPIv2Test {
     /**
      * Test LogCounterProvider.
      */
-    public function testLogCounterProvider()
-    {
+    public function testLogCounterProvider() {
         $session = self::container()->get(\Gdn_Session::class);
 
         $provider = new \LogCounterProvider(self::container()->get(\LogModel::class), $session);
@@ -93,8 +92,7 @@ class CounterProvidersTest extends AbstractAPIv2Test {
     /**
      * Test ActivityCounterProvider.
      */
-    public function testActivityCounterProvider()
-    {
+    public function testActivityCounterProvider() {
         $session = self::container()->get(\Gdn_Session::class);
 
         $provider = new \ActivityCounterProvider(self::container()->get(\ActivityModel::class), $session);

@@ -26,7 +26,10 @@ export const dropDownVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("dropDown");
 
     const sizing = makeThemeVars("sizing", {
-        width: 250,
+        widths: {
+            default: 250,
+            medium: 350,
+        },
         minHeight: 600,
     });
 
@@ -109,7 +112,7 @@ export const dropDownClasses = useThemeCache(() => {
 
     const contents = style("contents", {
         position: "absolute",
-        minWidth: unit(vars.sizing.width),
+        minWidth: unit(vars.sizing.widths.default),
         backgroundColor: colorOut(vars.contents.bg),
         color: colorOut(vars.contents.fg),
         overflow: "auto",
@@ -117,6 +120,9 @@ export const dropDownClasses = useThemeCache(() => {
         ...borders(vars.contents.border),
         zIndex: 3,
         $nest: {
+            "&.isMedium": {
+                width: unit(vars.sizing.widths.medium),
+            },
             "&.isParentWidth": {
                 minWidth: "initial",
             },

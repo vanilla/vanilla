@@ -39,6 +39,12 @@ export interface IProps extends IDeviceProps {
     openAsModal?: boolean;
     title?: string;
     selfPadded?: boolean;
+    flyoutSize?: FlyoutSizes;
+}
+
+export enum FlyoutSizes {
+    DEFAULT = "default",
+    MEDIUM = "medium",
 }
 
 export interface IState {
@@ -104,6 +110,7 @@ class DropDown extends React.Component<IProps, IState> {
                             renderAbove={!!this.props.renderAbove}
                             openAsModal={openAsModal}
                             selfPadded={this.props.selfPadded}
+                            flyoutSize={this.props.flyoutSize}
                         >
                             {title ? (
                                 <header className={classNames("frameHeader", classesFrameHeader.root)}>

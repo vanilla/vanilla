@@ -19,7 +19,9 @@ class CounterProvidersTest extends AbstractAPIv2Test {
     public static function setupBeforeClass() {
         parent::setupBeforeClass();
     }
-
+    /**
+     * {@inheritdoc}
+     */
     public function setUp() {
         parent::setUp();
     }

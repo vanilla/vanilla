@@ -80,7 +80,7 @@ class DropDown extends React.Component<IProps, IState> {
             <FlyoutToggle
                 id={this.id}
                 className={classNames(this.props.className)}
-                buttonBaseClass={this.props.buttonBaseClass || ButtonTypes.CUSTOM}
+                buttonBaseClass={this.props.buttonBaseClass || ButtonTypes.ICON}
                 name={this.props.name}
                 buttonContents={this.props.buttonContents || dropDownMenu()}
                 buttonClassName={this.props.buttonClassName}

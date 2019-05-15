@@ -10,6 +10,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { px } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { media } from "typestyle";
 
 const backLinkVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -32,29 +33,32 @@ const backLinkClasses = useThemeCache(() => {
     const titleBarVars = titleBarVariables();
     const vars = backLinkVariables();
 
-    const root = style({
-        ...userSelect(),
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        ...absolutePosition.topLeft("50%"),
-        overflow: "visible",
-        transform: `translateY(-50%)`,
-        height: unit(vars.sizing.height),
-        width: unit(vars.sizing.width),
-        flexBasis: unit(vars.sizing.width),
-
-        ...margins({
-            left: unit(negative(vars.sizing.width + globalVars.gutter.half)),
+    const root = style(
+        {
+            ...userSelect(),
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            overflow: "visible",
+            height: unit(vars.sizing.height),
+            minWidth: unit(vars.sizing.width),
+            ...margins({
+                left: negative(vars.sizing.width + globalVars.gutter.half),
+                right: globalVars.gutter.half,
+            }),
+        },
+        mediaQueries.oneColumnDown({
+            ...margins({
+                left: 0,
+            }),
         }),
-    });
+    );
 
     const link = style("link", {
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "flex-start",
         color: "inherit",
-        minWidth: globalVars.icon.sizes.default,
         height: px(titleBarVars.sizing.height),
         $nest: {
             "&:hover, &:focus": {
@@ -71,7 +75,6 @@ const backLinkClasses = useThemeCache(() => {
             fontWeight: globalVars.fonts.weights.semiBold,
             whiteSpace: "nowrap",
             paddingLeft: px(12),
-            paddingRight: globalVars.gutter.half,
         },
         mediaQueries.xs(srOnly()),
     );

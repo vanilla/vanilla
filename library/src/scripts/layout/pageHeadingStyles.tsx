@@ -48,7 +48,8 @@ export const pageHeadingClasses = useThemeCache(() => {
     const main = style("main", {
         ...lineHeightAdjustment(vars.font.lineHeight),
         position: "relative",
-        display: "block",
+        display: "flex",
+
         width: percent(100),
         flexGrow: 1,
     });

@@ -5,13 +5,13 @@ paths:
     get:
       parameters:
       - description: >
-          When the user was created.<br />
+          When the user was created.
 
-          This filter receive a string that can take two forms.<br />
+          This filter receive a string that can take two forms.
 
           A single date that matches '{Operator}{DateTime}' where {Operator}
           can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to
-          =.<br />
+          =.
 
           A date range that matches '{Opening}{DateTime},{DateTime}{Closing}'
           where {Opening} can be '[' or '(' and {Closing} can be ']' or ')'.
@@ -22,13 +22,13 @@ paths:
           format: date-filter
           type: string
       - description: >
-          When the user was updated.<br />
+          When the user was updated.
 
-          This filter receive a string that can take two forms.<br />
+          This filter receive a string that can take two forms.
 
           A single date that matches '{Operator}{DateTime}' where {Operator}
           can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to
-          =.<br />
+          =.
 
           A date range that matches '{Opening}{DateTime},{DateTime}{Closing}'
           where {Opening} can be '[' or '(' and {Closing} can be ']' or ')'.
@@ -49,14 +49,7 @@ paths:
         style: form
         x-filter:
           field: u.UserID
-      - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
-        in: query
-        name: page
-        schema:
-          type: integer
-          default: 1
-          minimum: 1
+      - $ref: '#/components/parameters/Page'
       - description: |
           Desired number of items per page.
         in: query
@@ -121,7 +114,7 @@ paths:
           minLength: 1
           type: string
       - description: >
-          Sort method for results.<br />
+          Sort method for results.
 
           Must be one of: "countComments", "dateLastActive", "name",
           "mention".
@@ -136,7 +129,7 @@ paths:
           - name
           - mention
       - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
         in: query
         name: page
         schema:

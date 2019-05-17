@@ -388,7 +388,7 @@ class Gdn_Form extends Gdn_Pluggable {
 
         $cssClass = 'js-color-picker color-picker input-group';
 
-        $allowEmpty = $options['AllowEmpty'] ?? '';
+        $allowEmpty = $options['AllowEmpty'] ?? false;
         $dataAttribute = $allowEmpty ? ' data-allow-empty="true"' : ' data-allow-empty="false"';
 
         return '<div id="'.$this->escapeFieldName($fieldName).'" class="'.$cssClass.'"'.$dataAttribute.'>'

@@ -13,7 +13,7 @@ import FlexSpacer from "@library/layout/FlexSpacer";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
-import { frameHeaderClasses } from "@library/layout/frame/frameStyles";
+import { frameHeaderClasses } from "@library/layout/frame/frameHeaderStyles";
 import Heading from "@library/layout/Heading";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import SmartAlign from "@library/layout/SmartAlign";

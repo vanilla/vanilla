@@ -27,7 +27,7 @@ export const panelAreaClasses = useThemeCache(() => {
             }),
             $nest: {
                 "& .heading": {
-                    $nest: lineHeightAdjustment(globalVars.lineHeights.condensed),
+                    $nest: lineHeightAdjustment(),
                 },
                 [`&.inheritHeight > .${classesPanelWidget.root}`]: {
                     flexGrow: 1,

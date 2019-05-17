@@ -154,10 +154,11 @@ export const globalVariables = useThemeCache(() => {
         families: {
             body: ["Open Sans"],
         },
-        lineHeightAdjustments: {
+        alignment: {
             headings: {
-                capitalLetterRatio: 0.677, // Calibrated for Open Sans
-                baseLineOffset: 0.549, // Calibrated for Open Sans
+                capitalLetterRatio: 0.715, // Calibrated for Open Sans
+                verticalOffset: 1, // Calibrated for Open Sans
+                horizontal: -0.082, // Calibrated for Open Sans
             },
         },
     });

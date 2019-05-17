@@ -6,13 +6,14 @@
 
 import React from "react";
 import Heading, { ICommonHeadingProps } from "@library/layout/Heading";
-import { frameHeaderClasses } from "@library/layout/frame/frameStyles";
+import { frameHeaderClasses } from "@library/layout/frame/frameHeaderStyles";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { leftChevron } from "@library/icons/common";
 import CloseButton from "@library/navigation/CloseButton";
 import classNames from "classnames";
+import backLinkClasses from "@library/routing/links/backLinkStyles";
 
 export interface IFrameHeaderProps extends ICommonHeadingProps {
     closeFrame?: (e) => void; // Necessary when in modal, but not if in flyouts
@@ -45,7 +46,7 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                     onClick={this.props.onBackClick}
                     className={classNames("frameHeader-backButton", classes.backButton)}
                 >
-                    {leftChevron("frameHeader-backIcon", true)}
+                    {leftChevron(classNames("frameHeader-backIcon", classes.backButtonIcon), true)}
                 </Button>
             );
         }

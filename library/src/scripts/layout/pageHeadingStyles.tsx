@@ -4,11 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import { percent, px } from "csx";
+import { em, percent, px } from "csx";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { margins, unit } from "@library/styles/styleHelpers";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const pageHeadingVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -46,10 +47,8 @@ export const pageHeadingClasses = useThemeCache(() => {
     });
 
     const main = style("main", {
-        ...lineHeightAdjustment(vars.font.lineHeight),
         position: "relative",
         display: "flex",
-
         width: percent(100),
         flexGrow: 1,
     });
@@ -64,6 +63,7 @@ export const pageHeadingClasses = useThemeCache(() => {
         display: "flex",
         marginLeft: unit(vars.cta.margin),
         position: "relative",
+        alignSelf: "flex-start",
     });
 
     const link = style("link", {
@@ -82,6 +82,14 @@ export const pageHeadingClasses = useThemeCache(() => {
         height: px(20),
     });
 
+    const lineHeightCentering = (lineHeight: number) => {
+        // px value of line height
+        return style("lineHeightCentering", {
+            top: unit(lineHeight / 2),
+            transform: `translateY(-50%)`,
+        });
+    };
+
     return {
         root,
         main,
@@ -90,6 +98,7 @@ export const pageHeadingClasses = useThemeCache(() => {
         link,
         titleWrap,
         actionButton,
+        lineHeightCentering,
     };
 });
 
@@ -99,15 +108,16 @@ export const pageTitleClasses = useThemeCache(() => {
     const style = styleFactory("pageTitle");
 
     const root = style({
-        ...lineHeightAdjustment(vars.font.lineHeight),
         lineHeight: vars.font.lineHeight,
         display: "block",
         ...margins({
             vertical: 0,
         }),
-    });
+        $nest: lineHeightAdjustment(),
+    } as NestedCSSProperties);
+
     const pageSmallTitle = style("pageSmallTitle", {
-        ...lineHeightAdjustment(vars.font.lineHeight),
+        $nest: lineHeightAdjustment(),
         lineHeight: vars.font.lineHeight,
         fontSize: globalVars.fonts.size.smallTitle,
         fontWeight: globalVars.fonts.weights.bold,
@@ -115,7 +125,7 @@ export const pageTitleClasses = useThemeCache(() => {
         ...margins({
             vertical: 0,
         }),
-    });
+    } as NestedCSSProperties);
 
     return {
         root,

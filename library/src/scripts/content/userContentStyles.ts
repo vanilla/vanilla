@@ -4,7 +4,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { borders, colorOut, margins, paddings, setAllLinkColors } from "@library/styles/styleHelpers";
+import { borders, colorOut, margins, paddings, setAllLinkColors, unit } from "@library/styles/styleHelpers";
 import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/shadowHelpers";
 import { NestedCSSProperties, NestedCSSSelectors, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -101,12 +101,12 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
-    const headingStyle = (tag: string, fontSize: FontSizeProperty<TLength>): NestedCSSProperties => {
+    const headingStyle = (tag: string, fontSize: FontSizeProperty<TLength>) => {
         return {
             marginTop: globalVars.spacer.size,
             fontSize,
-            $nest: lineHeightAdjustment(globalVars.lineHeights.condensed),
-        };
+            $nest: lineHeightAdjustment(),
+        } as NestedCSSProperties;
     };
     const headings: NestedCSSSelectors = {
         "& h1": headingStyle("h1", vars.fonts.headings.h1),
@@ -131,16 +131,18 @@ export const userContentClasses = useThemeCache(() => {
         },
     };
 
-    const paragraphSpacing: NestedCSSSelectors = {
+    const paragraphSpacing = {
         "& p": {
-            marginTop: 0,
-            marginBottom: 0,
+            ...margins({
+                vertical: 0,
+            }),
+            transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontal)})`,
             $nest: {
                 "&:not(:first-child)": {
                     marginTop: vars.blocks.margin * 0.5,
                 },
                 "&:first-child": {
-                    $nest: lineHeightAdjustment(globalVars.lineHeights.base),
+                    $nest: lineHeightAdjustment(),
                 },
             },
         },
@@ -152,7 +154,7 @@ export const userContentClasses = useThemeCache(() => {
         "&& > *:first-child": {
             marginTop: 0,
         },
-    };
+    } as NestedCSSProperties;
 
     const linkColors = setAllLinkColors();
     const linkStyle = {
@@ -281,7 +283,7 @@ export const userContentClasses = useThemeCache(() => {
             ...codeStyles,
             ...spoilersAndQuotes,
         },
-    });
+    }) as NestedCSSProperties;
 
     return { root };
 });

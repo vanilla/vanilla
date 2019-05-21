@@ -51,8 +51,4 @@ export default class Heading extends React.Component<IHeadingProps> {
             </Tag>
         );
     }
-
-    public get lineHeight(): number | string {
-        return 1;
-    }
 }

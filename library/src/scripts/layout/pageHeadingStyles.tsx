@@ -60,13 +60,17 @@ export const pageHeadingClasses = useThemeCache(() => {
         alignItems: "center",
     });
 
-    const actions = style("actions", {
-        display: "flex",
-        marginLeft: unit(vars.cta.margin),
-        position: "relative",
-        alignSelf: "flex-start",
-        background: "orange",
-    });
+    const actions = lineHeight => {
+        return style("actions", {
+            display: "flex",
+            marginLeft: unit(vars.cta.margin),
+            position: "relative",
+            alignSelf: "flex-start",
+            marginTop: lineHeight ? unit(lineHeight) : undefined,
+
+            background: "orange",
+        });
+    };
 
     const link = style("link", {
         display: "block",

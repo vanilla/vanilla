@@ -40,5 +40,9 @@ export const typographyClasses = useThemeCache(() => {
         fontSize: unit(globalVars.fonts.size.large),
     });
 
-    return { pageTitle, subTitle, componentSubTitle };
+    return {
+        pageTitle,
+        subTitle,
+        componentSubTitle,
+    };
 });

@@ -22,9 +22,9 @@ components:
     Page:
       name: page
       in: query
-      description: |
+      description: >
         Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
       schema:
-      type: integer
-      default: 1
-      minimum: 1
+        type: integer
+        default: 1
+        minimum: 1

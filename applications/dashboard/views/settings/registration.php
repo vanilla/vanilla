@@ -78,6 +78,14 @@ echo $this->Form->errors(); ?>
     <?php echo $this->Form->dropDown('Garden.Registration.InviteExpiration', $this->InviteExpirationOptions, ['value' => $this->InviteExpiration]); ?>
     </div>
 </div>
+<div id="InvitationTarget" class="form-group">
+    <div class="label-wrap">
+        <?php echo $this->Form->label('Invitation target', 'Garden.Registration.Target'); ?>
+    </div>
+    <div class="input-wrap">
+        <?php echo $this->Form->textBox('Garden.Registration.Target', ['value' => $this->Target]); ?>
+    </div>
+</div>
 <div id="InvitationSettings">
     <?php
     echo '<div class="padded">'.t('Choose who can send out invitations to new members:').'</div>';

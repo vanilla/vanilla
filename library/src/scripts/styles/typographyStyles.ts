@@ -22,7 +22,7 @@ export const typographyClasses = useThemeCache(() => {
     const pageTitle = style(
         "pageTitle",
         {
-            fontSize: unit(globalVars.fonts.size.title * 2),
+            fontSize: unit(globalVars.fonts.size.title),
             lineHeight: globalVars.lineHeights.condensed,
             transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontal)})`,
             $nest: lineHeightAdjustment(),

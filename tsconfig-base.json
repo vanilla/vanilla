@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "jsx": "react",
+        "lib": ["es2018", "dom", "dom.iterable"],
+        "noImplicitThis": true,
+        "allowSyntheticDefaultImports": true,
+        "moduleResolution": "node",
+        "strictNullChecks": true,
+        "target": "esnext",
+        "module": "esnext",
+        "isolatedModules": false,
+        "typeRoots": ["@types", "./node_modules/@types"],
+        "skipLibCheck": true,
+        "sourceMap": true,
+        "plugins": [
+            {
+                "name": "typescript-tslint-plugin"
+            }
+        ]
+    }
+}

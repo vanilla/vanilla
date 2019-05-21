@@ -7,7 +7,7 @@
 import { em, percent, px } from "csx";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { margins, unit } from "@library/styles/styleHelpers";
+import { absolutePosition, margins, unit } from "@library/styles/styleHelpers";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
@@ -42,8 +42,8 @@ export const pageHeadingClasses = useThemeCache(() => {
     const root = style({
         display: "flex",
         width: percent(100),
-        alignItems: "center",
         lineHeight: vars.font.lineHeight,
+        alignItems: "flex-start",
     });
 
     const main = style("main", {
@@ -51,6 +51,7 @@ export const pageHeadingClasses = useThemeCache(() => {
         display: "flex",
         width: percent(100),
         flexGrow: 1,
+        background: "pink",
     });
 
     const titleBar = style("titleBar", {
@@ -64,6 +65,7 @@ export const pageHeadingClasses = useThemeCache(() => {
         marginLeft: unit(vars.cta.margin),
         position: "relative",
         alignSelf: "flex-start",
+        background: "orange",
     });
 
     const link = style("link", {

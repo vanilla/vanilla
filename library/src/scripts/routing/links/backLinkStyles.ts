@@ -102,6 +102,7 @@ const backLinkClasses = useThemeCache(() => {
         label,
         icon,
         forHeading,
+        getLineHeight,
     };
 });
 

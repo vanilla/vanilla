@@ -33,6 +33,11 @@ export default class PageHeading extends React.Component<IPageHeading> {
         const classes = pageHeadingClasses();
         const linkClasses = backLinkClasses();
         const space = ` `;
+        const heading = (
+            <Heading depth={1} title={this.props.title} className={this.props.headingClassName}>
+                {this.props.children}
+            </Heading>
+        );
         return (
             <div className={classNames(classes.root, this.props.className)}>
                 <div className={classes.main}>
@@ -48,12 +53,12 @@ export default class PageHeading extends React.Component<IPageHeading> {
                         {/*        </Heading>*/}
                         {/*    </BackLink>*/}
                         {/*)}*/}
-                        <Heading depth={1} title={this.props.title} className={this.props.headingClassName}>
-                            {this.props.children}
-                        </Heading>
+                        {heading}
                     </div>
                 </div>
-                {/*{this.props.actions && <div className={classes.actions}>{this.props.actions}</div>}*/}
+                {this.props.actions && (
+                    <div className={classes.actions(heading.lineHeight())}>{this.props.actions}</div>
+                )}
             </div>
         );
     }

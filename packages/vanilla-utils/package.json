@@ -1,0 +1,5 @@
+{
+    "name": "@vanilla/utils",
+    "main": "./src/index.ts",
+    "version": "3.0.0"
+}

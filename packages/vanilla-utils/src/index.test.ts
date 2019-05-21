@@ -12,7 +12,7 @@ import {
     splitStringLoosely,
     isInstanceOfOneOf,
     matchAtMention,
-} from "@library/utility/utils";
+} from "./index";
 chai.use(asPromised);
 
 describe("resolvePromisesSequentially()", () => {

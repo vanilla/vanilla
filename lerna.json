@@ -1,0 +1,13 @@
+{
+    "packages": [
+        "packages/*",
+        "library",
+        "applications/dashboard",
+        "applications/vanilla",
+        "plugins/rich-editor",
+        "plugins/swagger-ui"
+    ],
+    "version": "3.0.0",
+    "npmClient": "yarn",
+    "npmClientArgs": ["--no-lockfile"]
+}

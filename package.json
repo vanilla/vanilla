@@ -122,6 +122,7 @@
         "karma-sourcemap-loader": "0.3.7",
         "karma-spec-reporter": "0.0.32",
         "karma-webpack": "3.0.5",
+        "lerna": "^3.14.1",
         "mini-css-extract-plugin": "0.6.0",
         "mocha": "6.1.4",
         "optimize-css-assets-webpack-plugin": "5.0.1",

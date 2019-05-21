@@ -124,7 +124,6 @@
         "karma-webpack": "3.0.5",
         "mini-css-extract-plugin": "0.6.0",
         "mocha": "6.1.4",
-        "node-sass": "4.9.4",
         "optimize-css-assets-webpack-plugin": "5.0.1",
         "postcss-loader": "3.0.0",
         "prettier": "1.17.0",
@@ -156,6 +155,7 @@
         "@types/react": "16.7.20",
         "@types/react-dom": "16.0.11",
         "js-yaml": ">=3.13.1",
+        "node-sass": "4.12.0",
         "tar": ">=4.4.2"
     },
     "scripts": {

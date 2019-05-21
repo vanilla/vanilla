@@ -6,7 +6,7 @@
  */
 
 import { formatUrl, getMeta } from "@library/utility/appUtils";
-import { log, matchAtMention as _matchAtMention } from "@library/utility/utils";
+import { log, matchAtMention as _matchAtMention } from "@vanilla/utils";
 
 // Store cache results in an outer scoped variable., so all instances share the same data
 // and can build the cache together.

@@ -11,7 +11,7 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { modalClasses } from "@library/modal/modalStyles";
 import TabHandler from "@library/dom/TabHandler";
-import { logWarning } from "@library/utility/utils";
+import { logWarning } from "@vanilla/utils";
 import { forceRenderStyles } from "typestyle";
 import ScrollLock from "react-scrolllock";
 import { ModalView } from "@library/modal/ModalView";

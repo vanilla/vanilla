@@ -52,7 +52,7 @@ export default class Builder {
      */
     public async build() {
         await this.entryModel.init();
-        await this.installNodeModules();
+        // await this.installNodeModules();
         switch (this.options.mode) {
             case BuildMode.PRODUCTION:
             case BuildMode.ANALYZE:

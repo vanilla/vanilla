@@ -7,7 +7,7 @@
 import React from "react";
 import { NavLink, NavLinkProps } from "react-router-dom";
 import { makeLocationDescriptorObject, LinkContext } from "@library/routing/links/LinkContextProvider";
-import { sanitizeUrl } from "@library/utility/utils";
+import { sanitizeUrl } from "@vanilla/utils";
 
 interface IProps extends NavLinkProps {
     tabIndex?: number;

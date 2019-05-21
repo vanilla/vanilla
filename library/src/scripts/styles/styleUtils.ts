@@ -12,7 +12,7 @@ import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import memoize from "lodash/memoize";
 import merge from "lodash/merge";
 import { color } from "csx";
-import { log, logWarning } from "@library/utility/utils";
+import { log, logWarning } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 
 export const DEBUG_STYLES = Symbol.for("Debug");

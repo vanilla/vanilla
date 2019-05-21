@@ -6,7 +6,7 @@
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { log } from "@library/utility/utils";
+import { log } from "@vanilla/utils";
 import {
     AlignItemsProperty,
     AppearanceProperty,

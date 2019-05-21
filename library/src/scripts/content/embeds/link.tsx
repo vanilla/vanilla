@@ -5,7 +5,7 @@
 
 import React from "react";
 import BaseEmbed from "@library/content/embeds/BaseEmbed";
-import { sanitizeUrl } from "@library/utility/utils";
+import { sanitizeUrl } from "@vanilla/utils";
 import { getData, setData } from "@library/dom/domUtils";
 import debounce from "lodash/debounce";
 import shave from "shave";

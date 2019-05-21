@@ -7,7 +7,7 @@
 import { userContentClasses } from "@library/content/userContentStyles";
 import { delegateEvent, removeDelegatedEvent } from "@library/dom/domUtils";
 import { useLastValue } from "@library/dom/hookUtils";
-import { debug } from "@library/utility/utils";
+import { debug } from "@vanilla/utils";
 import { useEditorContents } from "@rich-editor/editor/contentContext";
 import { useEditor } from "@rich-editor/editor/context";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";

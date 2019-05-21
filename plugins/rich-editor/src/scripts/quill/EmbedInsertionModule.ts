@@ -11,7 +11,7 @@ import api, { uploadFile } from "@library/apiv2";
 import { getPastedFile, getDraggedFile } from "@library/dom/domUtils";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
 import { insertBlockBlotAt } from "@rich-editor/quill/utility";
-import { isFileImage } from "@library/utility/utils";
+import { isFileImage } from "@vanilla/utils";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
 
 /**

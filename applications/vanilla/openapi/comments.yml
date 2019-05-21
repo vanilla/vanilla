@@ -4,35 +4,15 @@ paths:
   /comments:
     get:
       parameters:
-      - description: |
-          When the comment was created. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).
-        in: query
-        name: dateInserted
-        schema:
-          format: date-filter
-          type: string
-      - description: >
-          When the comment was updated. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).
-        in: query
-        name: dateUpdated
-        schema:
-          format: date-filter
-          type: string
+      - $ref: '#/components/parameters/DateInserted'
+      - $ref: '#/components/parameters/DateUpdated'
       - description: |
           The discussion ID.
         in: query
         name: discussionID
         schema:
           type: integer
-      - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
-        in: query
-        name: page
-        schema:
-          type: integer
-          default: 1
-          maximum: 100
-          minimum: 1
+      - $ref: '#/components/parameters/Page'
       - description: |
           Desired number of items per page.
         in: query
@@ -104,15 +84,7 @@ paths:
         schema:
           minLength: 1
           type: string
-      - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
-        in: query
-        name: page
-        schema:
-          type: integer
-          default: 1
-          maximum: 100
-          minimum: 1
+      - $ref: '#/components/parameters/Page'
       - description: |
           Desired number of items per page.
         in: query
@@ -404,15 +376,7 @@ paths:
           minLength: 1
           type: string
         allowEmptyValue: true
-      - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
-        in: query
-        name: page
-        schema:
-          type: integer
-          default: 1
-          maximum: 100
-          minimum: 1
+      - $ref: '#/components/parameters/Page'
       - description: |
           Desired number of items per page.
         in: query
@@ -609,7 +573,6 @@ components:
           description: The user that created the comment.
           type: integer
         reactions:
-          x-addon: reactions
           type: array
           items:
             properties:

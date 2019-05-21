@@ -11,6 +11,7 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
 import { paddings } from "@library/styles/styleHelpers";
+import { NestedCSSSelectors } from "typestyle/lib/types";
 
 export const panelAreaClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -27,7 +28,7 @@ export const panelAreaClasses = useThemeCache(() => {
             }),
             $nest: {
                 "& .heading": {
-                    $nest: lineHeightAdjustment(),
+                    $nest: lineHeightAdjustment() as NestedCSSSelectors,
                 },
                 [`&.inheritHeight > .${classesPanelWidget.root}`]: {
                     flexGrow: 1,

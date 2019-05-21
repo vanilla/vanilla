@@ -11,7 +11,7 @@ import { margins, paddings, unit } from "@library/styles/styleHelpers";
 import { containerVariables } from "@library/layout/components/containerStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { NestedCSSProperties, NestedCSSSelectors } from "typestyle/lib/types";
 
 export const typographyClasses = useThemeCache(() => {
     const style = styleFactory("typography");
@@ -25,7 +25,7 @@ export const typographyClasses = useThemeCache(() => {
             fontSize: unit(globalVars.fonts.size.title),
             lineHeight: globalVars.lineHeights.condensed,
             transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontal)})`,
-            $nest: lineHeightAdjustment(),
+            $nest: lineHeightAdjustment() as NestedCSSSelectors,
         } as NestedCSSProperties,
         mediaQueries.oneColumnDown({
             fontSize: unit(globalVars.fonts.mobile.size.title),

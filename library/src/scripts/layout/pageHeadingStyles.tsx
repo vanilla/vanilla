@@ -9,7 +9,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { absolutePosition, margins, unit } from "@library/styles/styleHelpers";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { NestedCSSProperties } from "typestyle/lib/types";
+import { NestedCSSProperties, NestedCSSSelectors } from "typestyle/lib/types";
 
 export const pageHeadingVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -51,7 +51,6 @@ export const pageHeadingClasses = useThemeCache(() => {
         display: "flex",
         width: percent(100),
         flexGrow: 1,
-        background: "pink",
     });
 
     const titleBar = style("titleBar", {
@@ -60,17 +59,12 @@ export const pageHeadingClasses = useThemeCache(() => {
         alignItems: "center",
     });
 
-    const actions = lineHeight => {
-        return style("actions", {
-            display: "flex",
-            marginLeft: unit(vars.cta.margin),
-            position: "relative",
-            alignSelf: "flex-start",
-            marginTop: lineHeight ? unit(lineHeight) : undefined,
-
-            background: "orange",
-        });
-    };
+    const actions = style("actions", {
+        display: "flex",
+        marginLeft: unit(vars.cta.margin),
+        position: "relative",
+        alignSelf: "flex-start",
+    });
 
     const link = style("link", {
         display: "block",
@@ -119,11 +113,11 @@ export const pageTitleClasses = useThemeCache(() => {
         ...margins({
             vertical: 0,
         }),
-        $nest: lineHeightAdjustment(),
+        $nest: lineHeightAdjustment() as NestedCSSSelectors,
     } as NestedCSSProperties);
 
     const pageSmallTitle = style("pageSmallTitle", {
-        $nest: lineHeightAdjustment(),
+        $nest: lineHeightAdjustment() as NestedCSSSelectors,
         lineHeight: vars.font.lineHeight,
         fontSize: globalVars.fonts.size.smallTitle,
         fontWeight: globalVars.fonts.weights.bold,

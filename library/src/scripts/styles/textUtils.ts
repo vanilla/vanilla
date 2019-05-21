@@ -24,7 +24,7 @@ export function lineHeightAdjustment(
     nestedStyles?: NestedCSSProperties,
     letterToLineHeightRatio?: number,
     verticalOffset?: number,
-): NestedCSSProperties {
+) {
     const globalVars = globalVariables();
     const vOffset = verticalOffset ? verticalOffset : globalVars.fonts.alignment.headings.verticalOffset; // for now we only support one font, but if we add more than one, we'll need to distinguish between them
     const letterRatio = letterToLineHeightRatio

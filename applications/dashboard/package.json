@@ -1,5 +1,6 @@
 {
-    "name": "dashboard3",
+    "name": "@vanilla/dashboard",
+    "version": "3.0",
     "private": true,
     "devDependencies": {
         "bower": "1.8.8",
@@ -17,7 +18,8 @@
         "grunt-wiredep": "3.0.x",
         "load-grunt-tasks": "4.0.0",
         "sass": "1.20.1",
-        "time-grunt": "2.0.0"
+        "time-grunt": "2.0.0",
+        "@vanilla/utils": "*"
     },
     "engines": {
         "node": ">=10.0.0"

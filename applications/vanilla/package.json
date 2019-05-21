@@ -1,0 +1,8 @@
+{
+    "name": "@vanilla/forum",
+    "version": "3.0",
+    "private": true,
+    "dependencies": {
+        "@vanilla/utils": "*"
+    }
+}

@@ -1,5 +1,9 @@
 {
+    "name": "@vanilla/plugin-rich-editor",
+    "version": "3.0",
+    "private": true,
     "dependencies": {
-        "quill": "https://github.com/vanilla/quill.git#1.3.7"
+        "quill": "https://github.com/vanilla/quill.git#1.3.7",
+        "@vanilla/utils": "*"
     }
 }

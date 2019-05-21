@@ -14,8 +14,8 @@ export function initCodePenEmbeds() {
 export class CodePenEmbed extends BaseEmbed {
     public render() {
         const { attributes, height } = this.props.data;
-        const { id, src, style } = attributes;
+        const { id, embedUrl, style } = attributes;
 
-        return <iframe id={id} src={src} height={height || 300} style={style} scrolling="no" />;
+        return <iframe id={id} src={embedUrl} height={height || 300} style={style} scrolling="no" />;
     }
 }

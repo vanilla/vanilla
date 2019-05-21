@@ -71,8 +71,6 @@ const backLinkClasses = useThemeCache(() => {
 
     const forHeading = lineHeight => {
         return style("forHeading", {
-            // ...absolutePosition.topLeft(".5em"),
-            // transform: `translateY(50%)`,
             marginTop: lineHeight ? unit(lineHeight) : undefined,
         });
     };

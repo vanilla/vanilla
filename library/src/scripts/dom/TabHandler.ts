@@ -6,7 +6,7 @@
  */
 
 import tabbable from "tabbable";
-import { logError } from "../utility/utils";
+import { logError } from "@vanilla/utils";
 import { useCallback } from "react";
 
 export function useTabKeyboardHandler(

@@ -170,6 +170,7 @@
         "check-types": "tsc -p tsconfig.json --noemit && yarn lint",
         "check-types:watch": "tsc-watch -p tsconfig.json --noemit --onSuccess \"yarn lint\"",
         "lint": "tslint -c ./tslint.json -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish",
-        "storybook": "start-storybook -p 9001 -c build/.storybook"
+        "storybook": "start-storybook -p 9001 -c build/.storybook",
+        "bootstrap": "lerna bootstrap"
     }
 }

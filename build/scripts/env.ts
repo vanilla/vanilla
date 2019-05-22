@@ -14,6 +14,7 @@ export const VANILLA_PLUGINS = resolve(VANILLA_ROOT, "plugins");
 export const VANILLA_APPS = resolve(VANILLA_ROOT, "applications");
 export const VANILLA_THEMES = resolve(VANILLA_ROOT, "themes");
 
+export const PACKAGES_DIRECTORY = resolve(VANILLA_ROOT, "packages");
 export const DIST_DIRECTORY = resolve(VANILLA_ROOT, "dist");
 export const LIBRARY_SRC_DIRECTORY = resolve(VANILLA_ROOT, "library/src/scripts");
 

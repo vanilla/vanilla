@@ -9,5 +9,5 @@
     ],
     "version": "3.0.0",
     "npmClient": "yarn",
-    "npmClientArgs": ["--no-lockfile"]
+    "npmClientArgs": ["--pure-lockfile"]
 }

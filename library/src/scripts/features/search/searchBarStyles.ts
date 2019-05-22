@@ -293,7 +293,7 @@ export const searchBarClasses = useThemeCache(() => {
         top: 0,
         bottom: 0,
         left: unit(globalVars.border.width * 2),
-        height: percent(100),
+        height: unit(formElementVars.sizing.height),
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

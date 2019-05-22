@@ -105,7 +105,7 @@ export const userContentClasses = useThemeCache(() => {
         return {
             marginTop: globalVars.spacer.size,
             fontSize,
-            $nest: lineHeightAdjustment() as NestedCSSSelectors,
+            $nest: lineHeightAdjustment(),
         };
     };
     const headings: NestedCSSSelectors = {
@@ -140,7 +140,7 @@ export const userContentClasses = useThemeCache(() => {
                     marginTop: vars.blocks.margin * 0.5,
                 },
                 "&:first-child": {
-                    $nest: lineHeightAdjustment() as NestedCSSSelectors,
+                    $nest: lineHeightAdjustment(),
                 },
             },
         },

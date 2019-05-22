@@ -55,9 +55,6 @@ const backLinkClasses = useThemeCache(() => {
     );
 
     const link = style("link", {
-        // display: "inline-flex",
-        // alignItems: "center",
-        // justifyContent: "flex-start",
         color: "inherit",
         height: unit(vars.sizing.height),
         width: unit(vars.sizing.width),
@@ -68,12 +65,6 @@ const backLinkClasses = useThemeCache(() => {
             },
         },
     });
-
-    const forHeading = lineHeight => {
-        return style("forHeading", {
-            marginTop: lineHeight ? unit(lineHeight) : undefined,
-        });
-    };
 
     const label = style(
         "label",
@@ -102,7 +93,6 @@ const backLinkClasses = useThemeCache(() => {
         link,
         label,
         icon,
-        forHeading,
         getLineHeight,
     };
 });

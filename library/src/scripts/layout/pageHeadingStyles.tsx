@@ -113,11 +113,11 @@ export const pageTitleClasses = useThemeCache(() => {
         ...margins({
             vertical: 0,
         }),
-        $nest: lineHeightAdjustment() as NestedCSSSelectors,
+        $nest: lineHeightAdjustment(),
     } as NestedCSSProperties);
 
     const pageSmallTitle = style("pageSmallTitle", {
-        $nest: lineHeightAdjustment() as NestedCSSSelectors,
+        $nest: lineHeightAdjustment(),
         lineHeight: vars.font.lineHeight,
         fontSize: globalVars.fonts.size.smallTitle,
         fontWeight: globalVars.fonts.weights.bold,

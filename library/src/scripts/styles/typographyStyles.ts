@@ -25,7 +25,7 @@ export const typographyClasses = useThemeCache(() => {
             fontSize: unit(globalVars.fonts.size.title),
             lineHeight: globalVars.lineHeights.condensed,
             transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontal)})`,
-            $nest: lineHeightAdjustment() as NestedCSSSelectors,
+            $nest: lineHeightAdjustment(),
         } as NestedCSSProperties,
         mediaQueries.oneColumnDown({
             fontSize: unit(globalVars.fonts.mobile.size.title),

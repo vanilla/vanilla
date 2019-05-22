@@ -73,7 +73,7 @@ export function lineHeightAdjustment(
         result["&::after"] = after;
     }
 
-    return result;
+    return result as NestedCSSSelectors;
 }
 
 export function defaultHyphenation() {

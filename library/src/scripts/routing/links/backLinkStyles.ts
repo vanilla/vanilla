@@ -68,6 +68,14 @@ const backLinkClasses = useThemeCache(() => {
         },
     });
 
+    const inHeading = (lineHeight?: number) => {
+        return style("inHeading", {
+            ...absolutePosition.topLeft(".5em"),
+            transform: `translateY(-50%)`,
+            lineHeight: unit(lineHeight),
+        });
+    };
+
     const label = style(
         "label",
         {
@@ -96,6 +104,7 @@ const backLinkClasses = useThemeCache(() => {
         label,
         icon,
         getLineHeight,
+        inHeading,
     };
 });
 

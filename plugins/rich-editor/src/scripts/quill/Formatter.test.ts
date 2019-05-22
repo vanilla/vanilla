@@ -334,10 +334,29 @@ describe("Formatter", () => {
                 OpUtils.op(),
                 OpUtils.list(ListType.BULLETED, 1),
                 OpUtils.op(),
+                OpUtils.list(ListType.BULLETED, 2),
+                OpUtils.op(),
+                OpUtils.list(ListType.BULLETED, 3),
+                OpUtils.op(),
+                OpUtils.list(ListType.BULLETED, 1),
+                OpUtils.op(),
                 OpUtils.list(ListType.BULLETED, 0),
             ];
 
-            const expected = [OpUtils.op(), lineOp, OpUtils.op(), lineOp, OpUtils.op(), lineOp];
+            const expected = [
+                OpUtils.op(),
+                lineOp,
+                OpUtils.op(),
+                lineOp,
+                OpUtils.op(),
+                lineOp,
+                OpUtils.op(),
+                lineOp,
+                OpUtils.op(),
+                lineOp,
+                OpUtils.op(),
+                lineOp,
+            ];
             const formatterFunction = () => format(getFullRange());
             assertQuillInputOutput(initial, expected, formatterFunction);
         });

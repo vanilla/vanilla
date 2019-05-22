@@ -120,7 +120,7 @@ describe("Formatter", () => {
         testMultiLineFormatting("bulletedList", formattingFunction, OpUtils.list(ListType.BULLETED));
     });
 
-    describe.only("paragraph()", () => {
+    describe("paragraph()", () => {
         const formattingFunction = (range?: RangeStatic) => makeFormatter(range).paragraph();
         testLineFormatInlinePreservation("paragraph", formattingFunction, OpUtils.newline());
         testLineFormatExclusivity("paragraph", formattingFunction, OpUtils.newline());
@@ -324,6 +324,21 @@ describe("Formatter", () => {
             const expected = [OpUtils.op(`${opInsert}\n${opInsert}\n${opInsert}\n`)];
 
             const formatterFunction = () => makeFormatter().paragraph();
+            assertQuillInputOutput(initial, expected, formatterFunction);
+        });
+
+        it(`can be formatted over a nested list`, () => {
+            const initial = [
+                OpUtils.op(),
+                OpUtils.list(ListType.BULLETED, 0),
+                OpUtils.op(),
+                OpUtils.list(ListType.BULLETED, 1),
+                OpUtils.op(),
+                OpUtils.list(ListType.BULLETED, 0),
+            ];
+
+            const expected = [OpUtils.op(), lineOp, OpUtils.op(), lineOp, OpUtils.op(), lineOp];
+            const formatterFunction = () => format(getFullRange());
             assertQuillInputOutput(initial, expected, formatterFunction);
         });
 

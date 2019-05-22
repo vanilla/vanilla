@@ -55,9 +55,11 @@ const backLinkClasses = useThemeCache(() => {
     );
 
     const link = style("link", {
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "flex-start",
         color: "inherit",
         height: unit(vars.sizing.height),
-        width: unit(vars.sizing.width),
         $nest: {
             "&:hover, &:focus": {
                 color: colorOut(globalVars.mainColors.primary),

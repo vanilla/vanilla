@@ -57,6 +57,11 @@ export const bodyCSS = useThemeCache(() => {
         zIndex: 0,
     });
 
+    cssRule("button", {
+        "-webkit-appearance": "none",
+        "-moz-appearance": "none",
+    });
+
     cssRule(".page-minHeight", {
         flexGrow: 1,
         display: "flex",

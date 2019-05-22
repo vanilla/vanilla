@@ -18,13 +18,11 @@ import {
     userSelect,
     absolutePosition,
     pointerEvents,
-    negative,
 } from "@library/styles/styleHelpers";
-import { DEBUG_STYLES, styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { calc, ColorHelper, percent, px, quote, viewHeight } from "csx";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { ColorHelper, percent, px, quote, viewHeight } from "csx";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
 
 export const titleBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -120,7 +118,7 @@ export const titleBarVariables = useThemeCache(() => {
 
     const meBox = makeThemeVars("meBox", {
         sizing: {
-            buttonContents: 32,
+            buttonContents: formElementVars.sizing.height,
         },
     });
 
@@ -350,50 +348,56 @@ export const titleBarClasses = useThemeCache(() => {
             minWidth: px(vars.button.size),
             maxWidth: percent(100),
             padding: px(0),
-            ...allButtonStates(
-                {
-                    active: {
-                        // color: vars.colors.fg.toString(),
-                        $nest: {
-                            "& .meBox-buttonContent": {
-                                backgroundColor: colorOut(vars.buttonContents.state.bg),
+            $nest: {
+                "&&": {
+                    ...allButtonStates(
+                        {
+                            active: {
+                                color: colorOut(vars.colors.fg),
+                                $nest: {
+                                    "& .meBox-buttonContent": {
+                                        backgroundColor: colorOut(vars.buttonContents.state.bg),
+                                    },
+                                },
+                            },
+                            hover: {
+                                color: colorOut(vars.colors.fg),
+                                $nest: {
+                                    "& .meBox-buttonContent": {
+                                        backgroundColor: colorOut(vars.buttonContents.state.bg),
+                                    },
+                                },
+                            },
+                            accessibleFocus: {
+                                outline: 0,
+                                color: colorOut(vars.colors.fg),
+                                $nest: {
+                                    "& .meBox-buttonContent": {
+                                        borderColor: colorOut(vars.colors.fg),
+                                        backgroundColor: colorOut(vars.buttonContents.state.bg),
+                                    },
+                                },
                             },
                         },
-                    },
-                    hover: {
-                        // color: vars.colors.fg.toString(),
-                        $nest: {
+                        {
                             "& .meBox-buttonContent": {
-                                backgroundColor: colorOut(vars.buttonContents.state.bg),
+                                ...borders({
+                                    width: 1,
+                                    color: "transparent",
+                                }),
+                            },
+                            "&.isOpen": {
+                                color: colorOut(vars.colors.fg),
+                                $nest: {
+                                    "& .meBox-buttonContent": {
+                                        backgroundColor: colorOut(vars.buttonContents.state.bg),
+                                    },
+                                },
                             },
                         },
-                    },
-                    accessibleFocus: {
-                        outline: 0,
-                        $nest: {
-                            "& .meBox-buttonContent": {
-                                borderColor: colorOut(vars.colors.fg),
-                                backgroundColor: colorOut(vars.buttonContents.state.bg),
-                            },
-                        },
-                    },
+                    ),
                 },
-                {
-                    "& .meBox-buttonContent": {
-                        ...borders({
-                            width: 1,
-                            color: "transparent",
-                        }),
-                    },
-                    "&.isOpen": {
-                        $nest: {
-                            "& .meBox-buttonContent": {
-                                backgroundColor: colorOut(vars.buttonContents.state.bg),
-                            },
-                        },
-                    },
-                },
-            ),
+            },
         },
         mediaQueries.oneColumnDown({
             height: px(vars.sizing.mobile.height),
@@ -448,7 +452,6 @@ export const titleBarClasses = useThemeCache(() => {
     });
 
     const dropDownContents = style("dropDownContents", {
-        marginTop: `${unit((vars.sizing.height - vars.meBox.sizing.buttonContents) / -2 + 2)}`,
         $nest: {
             "&&&": {
                 minWidth: unit(vars.dropDownContents.minWidth),

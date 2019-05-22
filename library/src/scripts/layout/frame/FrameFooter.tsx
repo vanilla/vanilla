@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { frameFooterClasses } from "@library/layout/frame/frameStyles";
+import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import classNames from "classnames";
 
 export interface IFrameFooterProps {

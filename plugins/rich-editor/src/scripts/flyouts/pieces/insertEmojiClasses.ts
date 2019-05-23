@@ -65,7 +65,6 @@ export const insertEmojiClasses = useThemeCache(() => {
     const body = style("body", {
         height: unit(vars.emojiBody.height),
         maxHeight: viewHeight(80),
-
     });
 
     const popoverDescription = style("popoverDescription", {

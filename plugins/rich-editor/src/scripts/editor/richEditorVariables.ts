@@ -10,8 +10,6 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { viewHeight } from "csx";
 
-
-
 export const richEditorVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const varsFormElements = formElementsVariables();

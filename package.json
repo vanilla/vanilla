@@ -5,7 +5,6 @@
     "private": true,
     "dependencies": {
         "@babel/polyfill": "7.4.0",
-        "@babel/runtime": "7.4.2",
         "@webcomponents/webcomponentsjs": "2.2.7",
         "axios": "0.18.0",
         "classnames": "2.2.6",
@@ -96,7 +95,7 @@
         "@types/webpack-serve": "2.0.1",
         "@types/webpackbar": "2.6.0",
         "@types/yargs": "13.0.0",
-        "@vanillaforums/babel-preset": "2.1.2",
+        "@vanilla/babel-preset": "*",
         "@vanillaforums/prettier-config": "1.0.0",
         "@vanillaforums/tslint-config": "1.1.9",
         "autoprefixer": "9.5.1",

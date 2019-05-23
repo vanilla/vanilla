@@ -1,0 +1,19 @@
+{
+    "name": "@vanilla/babel-preset",
+    "version": "3.0.0",
+    "description": "The Vanilla babel preset. Supports Typescript, React, & Polyfills.",
+    "main": "index.js",
+    "repository": "git@github.com:vanilla/babel-preset.git",
+    "author": "Adam Charron <adam@charrondev.com>",
+    "license": "MIT",
+    "dependencies": {
+        "@babel/core": "^7.4.0",
+        "@babel/plugin-proposal-class-properties": "^7.4.0",
+        "@babel/plugin-proposal-object-rest-spread": "^7.4.0",
+        "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+        "@babel/preset-env": "^7.4.2",
+        "@babel/preset-react": "^7.0.0",
+        "@babel/preset-typescript": "^7.3.3",
+        "@babel/runtime": "^7.4.2"
+    }
+}

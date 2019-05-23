@@ -5,59 +5,54 @@
 
 import React, { createRef, useContext, useEffect, useState } from "react";
 import { logWarning } from "@library/utility/utils";
-import { style } from "typestyle";
-import DeviceContext, { IDeviceProps } from "@library/layout/DeviceContext";
-import { Optionalize } from "@library/@types/utils";
 
-type LineHeightSetter = (lineHeight: number | null) => void;
+type FontSizeSetter = (fontSize: number | null) => void;
 
 interface IContextParams {
-    setLineHeight: LineHeightSetter;
-    lineHeight: number | null;
+    setFontSize: FontSizeSetter;
+    fontSize: number | null;
 }
 
-export const LineHeightCalculatorContext = React.createContext<IContextParams>({
-    setLineHeight: () => {
-        logWarning("'setLineHeight' called, but a proper provider was not configured.");
+export const FontSizeCalculatorContext = React.createContext<IContextParams>({
+    setFontSize: () => {
+        logWarning("'setFontSize' called, but a proper provider was not configured.");
     },
-    lineHeight: null,
+    fontSize: null,
 });
 
-export interface IWithLineHeight {
-    setLineHeight: LineHeightSetter;
+export interface IWithFontSize {
+    setFontSize: FontSizeSetter;
 }
 
 interface IProps {
     children: React.ReactNode;
 }
 
-interface IState {
-    lineHeight: number | null;
-}
-
 /**
- * Provider for getting a calculated line height from an element.
- * This context is to center elements based on the line height of text, so it stays centered on the first line
+ * Provider for getting a calculated font size from an element.
+ * This context is to center elements based on the font size of text,
+ * so it stays centered on the first line.
  *
  * Returns the line height in pixels
- * @see lineHeight
+ *
+ * @see fontSize
  */
-export function LineHeightCalculatorProvider(props: IProps) {
+export function FontSizeCalculatorProvider(props: IProps) {
     const { children } = props;
-    const [lineHeight, setLineHeight] = useState<number | null>(null);
+    const [fontSize, setFontSize] = useState<number | null>(null);
 
     return (
-        <LineHeightCalculatorContext.Provider
+        <FontSizeCalculatorContext.Provider
             value={{
-                setLineHeight,
-                lineHeight,
+                setFontSize,
+                fontSize,
             }}
         >
             {children}
-        </LineHeightCalculatorContext.Provider>
+        </FontSizeCalculatorContext.Provider>
     );
 }
 
-export function useLineHeightCalculator() {
-    return useContext(LineHeightCalculatorContext);
+export function useFontSizeCalculator() {
+    return useContext(FontSizeCalculatorContext);
 }

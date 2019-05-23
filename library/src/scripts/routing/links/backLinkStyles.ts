@@ -22,8 +22,15 @@ const backLinkVariables = useThemeCache(() => {
         width: (globalVars.icon.sizes.default * 12) / 21, // From SVG ratio
     });
 
+    // We do a best guess based on calculations for the vertical position of the back link.
+    // However, it might visually be a little off and need some adjustment
+    const position = makeThemeVars("position", {
+        verticalOffset: globalVars.fonts.alignment.headings.verticalOffsetForAdjacentElements,
+    });
+
     return {
         sizing,
+        position,
     };
 });
 
@@ -69,16 +76,13 @@ const backLinkClasses = useThemeCache(() => {
         },
     });
 
-    const inHeading = (lineHeight?: number | null) => {
-        if (lineHeight) {
+    const inHeading = (fontSize?: number | null) => {
+        if (fontSize) {
             return style("inHeading", {
-                backgroundColor: "red",
                 ...absolutePosition.topLeft(".5em"),
-                // $nest: lineHeightAdjustment(),
-                // ...absolutePosition.topLeft(lineHeight / 2),
-                lineHeight: unit(lineHeight),
-                // lineHeight ? absolutePosition.topLeft(lineHeight / 2) : null,
-                // transform: `translateY(-50%)`,
+                fontSize: unit(fontSize),
+                transform: `translateY(-50%)`,
+                marginTop: unit(vars.position.verticalOffset),
             });
         } else {
             return "";

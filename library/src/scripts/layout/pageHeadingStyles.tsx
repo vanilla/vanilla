@@ -48,11 +48,8 @@ export const pageHeadingClasses = useThemeCache(() => {
 
     const main = style("main", {
         position: "relative",
-        // display: "flex",
-        // alignItems: "flex-start",
         width: percent(100),
         flexGrow: 1,
-        backgroundColor: "pink",
     });
 
     const titleBar = style("titleBar", {
@@ -61,7 +58,7 @@ export const pageHeadingClasses = useThemeCache(() => {
         alignItems: "center",
     });
 
-    const actions = (lineHeight?: number | null) => {
+    const actions = (fontSize?: number | null) => {
         return style(
             "actions",
             {
@@ -69,16 +66,15 @@ export const pageHeadingClasses = useThemeCache(() => {
                 marginLeft: unit(vars.cta.margin),
                 position: "relative",
                 alignSelf: "flex-start",
-                background: "orange",
+                zIndex: 1,
             },
-            lineHeight
+            fontSize
                 ? {
-                      top: unit(lineHeight / 2),
-                      // transform: `translateY(-50%)`,
-                      // ...lineHeightAdjustment(),
-                      marginTop: "-0.28500000000000003em",
+                      top: ".5em",
+                      fontSize: unit(fontSize),
+                      transform: `translateY(-50%)`,
                   }
-                : undefined,
+                : {},
         );
     };
 

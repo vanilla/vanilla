@@ -10,7 +10,7 @@ import BackLink from "@library/routing/links/BackLink";
 import Heading from "@library/layout/Heading";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { pageHeadingClasses } from "@library/layout/pageHeadingStyles";
-import { useLineHeightCalculator } from "@library/layout/pageHeadingContext";
+import { IWithFontSize, useFontSizeCalculator } from "@library/layout/pageHeadingContext";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
 
 interface IPageHeading {
@@ -34,29 +34,29 @@ export function PageHeading(props: IPageHeading) {
     // public context!: React.ContextType<typeof LineHeightCalculatorContext>;
     // public titleRef: React.RefObject<HTMLHeadingElement>;
     const ref = useRef<HTMLHeadingElement>(null);
-    const { setLineHeight, lineHeight, offset } = useLineHeightCalculator();
+    const { setFontSize, fontSize } = useFontSizeCalculator();
 
     const classes = pageHeadingClasses();
     const linkClasses = backLinkClasses();
 
     useEffect(() => {
         if (ref.current) {
-            const length = parseInt(getComputedStyle(ref.current)["line-height"], 10);
-            const before = !!length && setLineHeight(length);
+            const length = parseInt(getComputedStyle(ref.current)["font-size"], 10);
+            const before = !!length && setFontSize(length);
         }
-    }, [ref.current, setLineHeight]);
+    }, [ref.current, setFontSize]);
 
     return (
         <div className={classNames(classes.root, className)}>
             <div className={classes.main}>
-                {includeBackLink && <BackLink fallbackElement={null} className={linkClasses.inHeading(lineHeight)} />}
+                {includeBackLink && <BackLink fallbackElement={null} className={linkClasses.inHeading(fontSize)} />}
                 <ConditionalWrap condition={!!actions} className={classes.titleWrap}>
                     <Heading titleRef={ref} depth={1} title={title} className={headingClassName}>
                         {children}
                     </Heading>
                 </ConditionalWrap>
             </div>
-            {actions && <div className={classes.actions(lineHeight)}>{actions}</div>}
+            {actions && <div className={classes.actions(fontSize)}>{actions}</div>}
         </div>
     );
 }

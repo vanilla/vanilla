@@ -21,7 +21,10 @@ export const subcommunityListVariables = useThemeCache(() => {
         columnsWidth: 912,
     });
 
-    return { spacing, sizing };
+    return {
+        spacing,
+        sizing,
+    };
 });
 
 export const subcommunityListClasses = useThemeCache(() => {

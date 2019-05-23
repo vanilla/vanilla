@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { frameHeaderClasses } from "@library/layout/frame/frameStyles";
+import { frameHeaderClasses } from "@library/layout/frame/frameHeaderStyles";
 import Heading from "@library/layout/Heading";
 import DropDownContents from "@library/flyouts/DropDownContents";
 import { ButtonTypes } from "@library/forms/buttonStyles";

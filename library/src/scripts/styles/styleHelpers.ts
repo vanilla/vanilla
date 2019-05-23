@@ -607,13 +607,13 @@ export const negative = val => {
 };
 
 export interface IMargins {
-    top?: string | number;
-    right?: string | number;
-    bottom?: string | number;
-    left?: string | number;
-    horizontal?: string | number;
-    vertical?: string | number;
-    all?: string | number;
+    top?: string | number | undefined;
+    right?: string | number | undefined;
+    bottom?: string | number | undefined;
+    left?: string | number | undefined;
+    horizontal?: string | number | undefined;
+    vertical?: string | number | undefined;
+    all?: string | number | undefined;
 }
 
 export const margins = (styles: IMargins): NestedCSSProperties => {

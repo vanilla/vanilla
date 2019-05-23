@@ -6,11 +6,12 @@
 
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { color, percent } from "csx";
-import { paddings, unit } from "@library/styles/styleHelpers";
+import { color, em, percent } from "csx";
+import { margins, paddings, unit } from "@library/styles/styleHelpers";
 import { containerVariables } from "@library/layout/components/containerStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
+import { NestedCSSProperties, NestedCSSSelectors } from "typestyle/lib/types";
 
 export const typographyClasses = useThemeCache(() => {
     const style = styleFactory("typography");
@@ -23,18 +24,25 @@ export const typographyClasses = useThemeCache(() => {
         {
             fontSize: unit(globalVars.fonts.size.title),
             lineHeight: globalVars.lineHeights.condensed,
-            $nest: lineHeightAdjustment(globalVars.lineHeights.condensed, true),
-        },
+            transform: `translateX(${em(globalVars.fonts.alignment.headings.horizontal)})`,
+            $nest: lineHeightAdjustment(),
+        } as NestedCSSProperties,
         mediaQueries.oneColumnDown({
             fontSize: unit(globalVars.fonts.mobile.size.title),
         }),
     );
+
     const subTitle = style("subTitle", {
         fontSize: unit(globalVars.fonts.size.subTitle),
     });
+
     const componentSubTitle = style("componentSubTitle", {
         fontSize: unit(globalVars.fonts.size.large),
     });
 
-    return { pageTitle, subTitle, componentSubTitle };
+    return {
+        pageTitle,
+        subTitle,
+        componentSubTitle,
+    };
 });

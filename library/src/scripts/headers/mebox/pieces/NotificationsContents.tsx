@@ -18,7 +18,7 @@ import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
-import { frameFooterClasses } from "@library/layout/frame/frameStyles";
+import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import Loader from "@library/loaders/Loader";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import LinkAsButton from "@library/routing/LinkAsButton";

@@ -7,7 +7,7 @@
 import React from "react";
 import FrameHeader, { IFrameHeaderProps } from "@library/layout/frame/FrameHeader";
 import { ICommonHeadingProps } from "@library/layout/Heading";
-import { frameHeaderClasses } from "@library/layout/frame/frameStyles";
+import { frameHeaderClasses } from "@library/layout/frame/frameHeaderStyles";
 import classNames from "classnames";
 
 interface IProps extends ICommonHeadingProps {

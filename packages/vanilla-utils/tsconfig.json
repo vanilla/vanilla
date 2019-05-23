@@ -1,10 +1,6 @@
 {
     "extends": "../../tsconfig-base.json",
     "compilerOptions": {
-        "baseUrl": ".",
-        "lib": ["es2018", "dom"],
-        "paths": {
-            "@vanilla/utils/*": ["./src/*"]
-        }
+        "baseUrl": "."
     }
 }

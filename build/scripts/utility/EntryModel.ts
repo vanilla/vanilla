@@ -153,7 +153,11 @@ export default class EntryModel {
     public get aliases() {
         const result: IWebpackEntries = {};
         for (const addonPath of this.addonDirs) {
-            const key = "@" + path.basename(addonPath);
+            let key = "@" + path.basename(addonPath);
+            if (key === "@vanilla") {
+                // @vanilla is actually our npm organization so there was a conflict here.
+                key = "@vanilla/addon-vanilla";
+            }
             result[key] = path.resolve(addonPath, "src/scripts");
         }
 

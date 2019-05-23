@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { ICategoriesState } from "@vanilla/categories/categoriesReducer";
+import { ICategoriesState } from "@vanilla/addon-vanilla/categories/categoriesReducer";
 
 export interface IForumState {
     categories: ICategoriesState;

@@ -12,7 +12,7 @@ import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import memoize from "lodash/memoize";
 import merge from "lodash/merge";
 import { color } from "csx";
-import { log, logWarning } from "@vanilla/utils";
+import { logDebug, logWarning } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 
 export const DEBUG_STYLES = Symbol.for("Debug");
@@ -55,7 +55,7 @@ export function styleFactory(componentName: string) {
 
         if (shouldLogDebug) {
             logWarning(`Debugging component ${debugName}`);
-            log(styleObjs);
+            logDebug(styleObjs);
         }
 
         return style({ $debugName: debugName }, ...styleObjs);

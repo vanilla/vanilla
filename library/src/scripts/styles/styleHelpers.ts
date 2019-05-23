@@ -6,7 +6,7 @@
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
-import { log } from "@vanilla/utils";
+import { logDebug } from "@vanilla/utils";
 import {
     AlignItemsProperty,
     AppearanceProperty,
@@ -572,10 +572,10 @@ export const allButtonStates = (styles: IButtonStates, nested?: object, debugMod
     };
 
     if (debugMode) {
-        log("allButtonStates: ");
-        log("style: ", styles);
-        log("nested: ", nested);
-        log("output: ", output);
+        logDebug("allButtonStates: ");
+        logDebug("style: ", styles);
+        logDebug("nested: ", nested);
+        logDebug("output: ", output);
     }
 
     return output;

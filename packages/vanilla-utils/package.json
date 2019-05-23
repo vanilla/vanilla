@@ -1,5 +1,6 @@
 {
     "name": "@vanilla/utils",
     "main": "./src/index.ts",
+    "module": "./src/index.ts",
     "version": "3.0.0"
 }

@@ -10,7 +10,7 @@ import { VANILLA_ROOT, PRETTIER_FILE } from "../env";
 import PrettierPlugin from "prettier-webpack-plugin";
 import { getOptions, BuildMode } from "../options";
 import chalk from "chalk";
-import { printVerbose } from "@vanilla/utils";
+import { printVerbose } from "../utility/utils";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import EntryModel from "../utility/EntryModel";
 import WebpackBar from "webpackbar";
@@ -25,12 +25,9 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
 
     const modulePaths = [
         "node_modules",
-        path.join(VANILLA_ROOT, "node_modules"),
         ...entryModel.addonDirs.map(dir => path.resolve(dir, "node_modules")),
-        ...entryModel.packageDirs.map(dir => path.resolve(dir, "node_modules")),
+        path.join(VANILLA_ROOT, "node_modules"),
     ];
-
-    console.log(JSON.stringify(modulePaths, null, 4));
 
     const aliases = Object.keys(entryModel.aliases).join(", ");
     const message = `Building section ${chalk.yellowBright(section)} with the following aliases
@@ -132,7 +129,7 @@ ${chalk.green(aliases)}`;
             }),
         ] as any[],
         resolve: {
-            // modules: modulePaths,
+            modules: modulePaths,
             alias: {
                 ...hotAliases,
                 ...entryModel.aliases,

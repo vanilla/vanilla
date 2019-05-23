@@ -8,10 +8,10 @@
 $richEditor-mobile_spacing                        : 18px !default;
 $richEditor-mobileBreakPoint                      : 700px !default;
 
-@mixin defaultTransition($timing-default: .15s, $easing-default: ease-out, $properties...) {
+@mixin defaultTransition($properties...) {
     transition-property: $properties;
-    transition-duration: $timing-default;
-    transition-timing-function: $easing-default;
+    transition-duration: .15s;
+    transition-timing-function: ease-out;
 }
 
 @mixin customCubicBezier($startA, $endA, $startB, $endB){

@@ -2,33 +2,42 @@
  * Editor action styles within editor and post
  */
 .post-font-size-smaller {
-  font-size: smaller; }
+  font-size: smaller;
+}
 
 .post-font-size-larger {
-  font-size: larger; }
+  font-size: larger;
+}
 
 .post-font-size-xx-large {
-  font-size: xx-large; }
+  font-size: xx-large;
+}
 
 .post-font-size-x-large {
-  font-size: x-large; }
+  font-size: x-large;
+}
 
 .post-font-size-large {
-  font-size: 18px; }
+  font-size: 18px;
+}
 
 .post-font-size-medium,
 .post-font-size-normal,
 .post-font-size-default {
-  font-size: 13px; }
+  font-size: 13px;
+}
 
 .post-font-size-small {
-  font-size: 11px; }
+  font-size: 11px;
+}
 
 .post-font-size-x-small {
-  font-size: x-small; }
+  font-size: x-small;
+}
 
 .post-font-size-xx-small {
-  font-size: xx-small; }
+  font-size: xx-small;
+}
 
 /**
  * These two are not actually inserted into the editor. They are only used for
@@ -37,189 +46,242 @@
 .post-font-size-h1 {
   font-size: 21px;
   font-weight: bold;
-  line-height: 31px !important; }
+  line-height: 31px !important;
+}
 
 .post-font-size-h2 {
   font-size: 18px;
   font-weight: bold;
-  line-height: 26px !important; }
+  line-height: 26px !important;
+}
 
 /* Colours based on http://clrs.cc/
 cell-* are used for the dropdown */
 .post-color-black {
-  color: #111111; }
+  color: #111111;
+}
 
 .cell-color-black,
 .post-highlightcolor-black {
-  background-color: #111111; }
+  background-color: #111111;
+}
 
 .post-color-silver {
-  color: #dddddd; }
+  color: #dddddd;
+}
 
 .cell-color-silver,
 .post-highlightcolor-silver {
-  background-color: #dddddd; }
+  background-color: #dddddd;
+}
 
 .post-color-gray {
-  color: #aaaaaa; }
+  color: #aaaaaa;
+}
 
 .cell-color-gray,
 .post-highlightcolor-gray {
-  background-color: #aaaaaa; }
+  background-color: #aaaaaa;
+}
 
 .post-color-white {
-  color: #ffffff; }
+  color: #ffffff;
+}
 
 .cell-color-white,
 .post-highlightcolor-white {
-  background-color: #ffffff; }
+  background-color: #ffffff;
+}
 
 .post-color-maroon {
-  color: #85144b; }
+  color: #85144b;
+}
 
 .cell-color-maroon,
 .post-highlightcolor-maroon {
-  background-color: #85144b; }
+  background-color: #85144b;
+}
 
 .post-color-red {
-  color: #ff4136; }
+  color: #ff4136;
+}
 
 .cell-color-red,
 .post-highlightcolor-red {
-  background-color: #ff4136; }
+  background-color: #ff4136;
+}
 
 .post-color-purple {
-  color: #7b11d0; }
+  color: #7b11d0;
+}
 
 .cell-color-purple,
 .post-highlightcolor-purple {
-  background-color: #7b11d0; }
+  background-color: #7b11d0;
+}
 
 .post-color-fuchsia {
-  color: #f012be; }
+  color: #f012be;
+}
 
 .cell-color-fuchsia,
 .post-highlightcolor-fuchsia {
-  background-color: #f012be; }
+  background-color: #f012be;
+}
 
 .post-color-green {
-  color: #2ecc40; }
+  color: #2ecc40;
+}
 
 .cell-color-green,
 .post-highlightcolor-green {
-  background-color: #2ecc40; }
+  background-color: #2ecc40;
+}
 
 .post-color-lime {
-  color: #01ff70; }
+  color: #01ff70;
+}
 
 .cell-color-lime,
 .post-highlightcolor-lime {
-  background-color: #01ff70; }
+  background-color: #01ff70;
+}
 
 .post-color-olive {
-  color: #3d9970; }
+  color: #3d9970;
+}
 
 .cell-color-olive,
 .post-highlightcolor-olive {
-  background-color: #3d9970; }
+  background-color: #3d9970;
+}
 
 .post-color-yellow {
-  color: #ffdc00; }
+  color: #ffdc00;
+}
 
 .cell-color-yellow,
 .post-highlightcolor-yellow {
-  background-color: #ffdc00; }
+  background-color: #ffdc00;
+}
 
 .post-color-navy {
-  color: #001f3f; }
+  color: #001f3f;
+}
 
 .cell-color-navy,
 .post-highlightcolor-navy {
-  background-color: #001f3f; }
+  background-color: #001f3f;
+}
 
 .post-color-blue {
-  color: #0074d9; }
+  color: #0074d9;
+}
 
 .cell-color-blue,
 .post-highlightcolor-blue {
-  background-color: #0074d9; }
+  background-color: #0074d9;
+}
 
 .post-color-teal {
-  color: #39cccc; }
+  color: #39cccc;
+}
 
 .cell-color-teal,
 .post-highlightcolor-teal {
-  background-color: #39cccc; }
+  background-color: #39cccc;
+}
 
 .post-color-aqua {
-  color: #7fdbff; }
+  color: #7fdbff;
+}
 
 .cell-color-aqua,
 .post-highlightcolor-aqua {
-  background-color: #7fdbff; }
+  background-color: #7fdbff;
+}
 
 .post-color-orange {
-  color: #ffa500; }
+  color: #ffa500;
+}
 
 .cell-color-orange,
 .post-highlightcolor-orange {
-  background-color: #ffa500; }
+  background-color: #ffa500;
+}
 
 .post-text-align-right {
-  text-align: right; }
+  text-align: right;
+}
 
 .post-text-align-center {
-  text-align: center; }
+  text-align: center;
+}
 
 .post-text-align-left {
-  text-align: left; }
+  text-align: left;
+}
 
 .post-text-align-justify {
-  text-align: justify; }
+  text-align: justify;
+}
 
 .post-float-left {
   float: left;
-  margin: 0 8px 8px 0; }
+  margin: 0 8px 8px 0;
+}
 
 .post-float-right {
   float: right;
-  margin: 0 0 8px 8px; }
+  margin: 0 0 8px 8px;
+}
 
 .post-clear-right {
-  clear: right; }
+  clear: right;
+}
 
 .post-clear-left {
-  clear: left; }
+  clear: left;
+}
 
 /**
  * Font families
  */
 .post-fontfamily-default {
-  font-family: inherit; }
+  font-family: inherit;
+}
 
 .post-fontfamily-arial {
-  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; }
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
 
 .post-fontfamily-comicsansms {
-  font-family: 'Comic Sans MS', cursive !important; }
+  font-family: "Comic Sans MS", cursive !important;
+}
 
 .post-fontfamily-couriernew {
-  font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace; }
+  font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+}
 
 .post-fontfamily-georgia {
-  font-family: Georgia, Times, 'Times New Roman', serif; }
+  font-family: Georgia, Times, "Times New Roman", serif;
+}
 
 .post-fontfamily-impact {
-  font-family: Impact, Haettenschweiler, 'Franklin Gothic Bold', Charcoal, 'Helvetica Inserat', 'Bitstream Vera Sans Bold', 'Arial Black', sans-serif; }
+  font-family: Impact, Haettenschweiler, "Franklin Gothic Bold", Charcoal, "Helvetica Inserat", "Bitstream Vera Sans Bold", "Arial Black", sans-serif;
+}
 
 .post-fontfamily-timesnewroman {
-  font-family: 'Times New Roman', Times, Baskerville, Georgia, serif; }
+  font-family: "Times New Roman", Times, Baskerville, Georgia, serif;
+}
 
 .post-fontfamily-trebuchetms {
-  font-family: 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; }
+  font-family: "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif;
+}
 
 .post-fontfamily-verdana {
-  font-family: Verdana, Geneva, sans-serif; }
+  font-family: Verdana, Geneva, sans-serif;
+}
 
 /* Custom classes */
 blockquote.Quote,
@@ -229,19 +291,23 @@ div.Quote {
   margin: 1em;
   padding: 1ex 10px;
   min-width: 200px;
-  overflow-y: auto; }
+  overflow-y: auto;
+}
 
 .bbcode_left,
 .AlignLeft {
-  text-align: left; }
+  text-align: left;
+}
 
 .bbcode_center,
 .AlignCenter {
-  text-align: center; }
+  text-align: center;
+}
 
 .bbcode_right,
 .AlignRight {
-  text-align: right; }
+  text-align: right;
+}
 
 /**
  * Target iframe and actual body within editor iframe. Do not use body to set
@@ -258,44 +324,51 @@ div.Quote {
   border: 0;
   padding: inherit;
   font: inherit;
-  outline: none; }
-  .editor-composer img {
-    max-width: 100%; }
-  .editor-composer div.Spoiler {
-    padding: 10px 10px;
-    margin: 4px 10px 4px 0;
-    background-color: #e6e6e6;
-    border-radius: 3px; }
-  .editor-composer div.Spoiler p {
-    padding: 3px 0 3px 5px;
-    margin: 0;
-    border-left: 1px solid #818181;
-    border-left: 1px solid rgba(0, 0, 0, 0.2); }
-  .editor-composer pre {
-    display: block;
-    padding: 4px 8px;
-    margin: 1em 0;
-    font-size: 13px;
-    word-break: break-all;
-    word-wrap: break-word;
-    background: #ff9;
-    border-radius: 2px;
-    border: 1px solid #eec; }
-  .editor-composer pre code {
-    padding: 0;
-    font-size: inherit;
-    color: inherit;
-    white-space: pre-wrap;
-    background-color: transparent;
-    border: 0;
-    border-radius: 0; }
+  outline: none;
+}
+.editor-composer img {
+  max-width: 100%;
+}
+.editor-composer div.Spoiler {
+  padding: 10px 10px;
+  margin: 4px 10px 4px 0;
+  background-color: #e6e6e6;
+  border-radius: 3px;
+}
+.editor-composer div.Spoiler p {
+  padding: 3px 0 3px 5px;
+  margin: 0;
+  border-left: 1px solid #818181;
+  border-left: 1px solid rgba(0, 0, 0, 0.2);
+}
+.editor-composer pre {
+  display: block;
+  padding: 4px 8px;
+  margin: 1em 0;
+  font-size: 13px;
+  word-break: break-all;
+  word-wrap: break-word;
+  background: #ff9;
+  border-radius: 2px;
+  border: 1px solid #eec;
+}
+.editor-composer pre code {
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  white-space: pre-wrap;
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+}
 
 /**
  * Adjust some styles explicitly within the editor composer. These match the
  * styles in styles.css. These rules match the font sizes for post-font-size-h*
  */
 .editor-composer h1 {
-  font-size: 21px; }
-
+  font-size: 21px;
+}
 .editor-composer h2 {
-  font-size: 18px; }
+  font-size: 18px;
+}

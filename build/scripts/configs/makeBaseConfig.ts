@@ -115,6 +115,7 @@ ${chalk.green(aliases)}`;
                             loader: "sass-loader",
                             options: {
                                 sourceMap: true,
+                                implementation: require("sass"), // Use dart sass
                             },
                         },
                     ],

@@ -4,19 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import React, { createRef, useContext, useEffect } from "react";
+import React, { createRef, useContext, useEffect, useRef } from "react";
 import classNames from "classnames";
 import BackLink from "@library/routing/links/BackLink";
 import Heading from "@library/layout/Heading";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { pageHeadingClasses } from "@library/layout/pageHeadingStyles";
-import {
-    IWithLineHeight,
-    LineHeightCalculatorContext,
-    useLineHeightCalculator,
-} from "@library/layout/pageHeadingContext";
+import { useLineHeightCalculator } from "@library/layout/pageHeadingContext";
 import backLinkClasses from "@library/routing/links/backLinkStyles";
-import { ScrollOffsetContext, useScrollOffset } from "@library/layout/ScrollOffsetContext";
 
 interface IPageHeading {
     title: string;
@@ -38,32 +33,30 @@ export function PageHeading(props: IPageHeading) {
 
     // public context!: React.ContextType<typeof LineHeightCalculatorContext>;
     // public titleRef: React.RefObject<HTMLHeadingElement>;
-    const ref: React.RefObject<HTMLHeadingElement> = createRef();
+    const ref = useRef<HTMLHeadingElement>(null);
+    const { setLineHeight, lineHeight, offset } = useLineHeightCalculator();
 
     const classes = pageHeadingClasses();
     const linkClasses = backLinkClasses();
-    const lineHeight = useLineHeightCalculator();
-    console.log("lineHeight: ", lineHeight);
 
-    // useEffect(()=>{
-    //     context.setLine
-    // });
+    useEffect(() => {
+        if (ref.current) {
+            const length = parseInt(getComputedStyle(ref.current)["line-height"], 10);
+            const before = !!length && setLineHeight(length);
+        }
+    }, [ref.current, setLineHeight]);
 
     return (
-        <LineHeightCalculatorContext.Consumer component={ref}>
-            <div className={classNames(classes.root, className)}>
-                <div className={classes.main}>
-                    {includeBackLink && (
-                        <BackLink fallbackElement={null} className={linkClasses.inHeading(lineHeight)} />
-                    )}
-                    <ConditionalWrap condition={!!actions} className={classes.titleWrap}>
-                        <Heading titleRef={ref} depth={1} title={title} className={headingClassName}>
-                            {children}
-                        </Heading>
-                    </ConditionalWrap>
-                </div>
-                {actions && <div className={classes.actions(lineHeight)}>{actions}</div>}
+        <div className={classNames(classes.root, className)}>
+            <div className={classes.main}>
+                {includeBackLink && <BackLink fallbackElement={null} className={linkClasses.inHeading(lineHeight)} />}
+                <ConditionalWrap condition={!!actions} className={classes.titleWrap}>
+                    <Heading titleRef={ref} depth={1} title={title} className={headingClassName}>
+                        {children}
+                    </Heading>
+                </ConditionalWrap>
             </div>
-        </LineHeightCalculatorContext.Consumer>
+            {actions && <div className={classes.actions(lineHeight)}>{actions}</div>}
+        </div>
     );
 }

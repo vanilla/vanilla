@@ -18,7 +18,7 @@ export interface ICommonHeadingProps {
 
 export interface IHeadingProps extends ICommonHeadingProps {
     children?: React.ReactNode;
-    titleRef?: React.RefObject<HTMLHeadingElement>;
+    titleRef: React.RefObject<HTMLHeadingElement | null>;
 }
 
 /**

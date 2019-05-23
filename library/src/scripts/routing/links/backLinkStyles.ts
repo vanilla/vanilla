@@ -11,6 +11,7 @@ import { important, px } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { media } from "typestyle";
+import { lineHeightAdjustment } from "@library/styles/textUtils";
 
 const backLinkVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -68,12 +69,20 @@ const backLinkClasses = useThemeCache(() => {
         },
     });
 
-    const inHeading = (lineHeight?: number) => {
-        return style("inHeading", {
-            ...absolutePosition.topLeft(".5em"),
-            transform: `translateY(-50%)`,
-            lineHeight: unit(lineHeight),
-        });
+    const inHeading = (lineHeight?: number | null) => {
+        if (lineHeight) {
+            return style("inHeading", {
+                backgroundColor: "red",
+                ...absolutePosition.topLeft(".5em"),
+                // $nest: lineHeightAdjustment(),
+                // ...absolutePosition.topLeft(lineHeight / 2),
+                lineHeight: unit(lineHeight),
+                // lineHeight ? absolutePosition.topLeft(lineHeight / 2) : null,
+                // transform: `translateY(-50%)`,
+            });
+        } else {
+            return "";
+        }
     };
 
     const label = style(

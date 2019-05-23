@@ -39,7 +39,7 @@ echo -n "$GIT_DIFF" > $GIT_DIFF_FILENAME
 
 echo "Exporting full PHP_CodeSniffer scan of changed files to $PHPCS_DIFF_FILENAME..."
 rm -f $PHPCS_DIFF_FILENAME
-./vendor/bin/phpcs --standard=./vendor/vanilla/standards/code-sniffer/Vanilla --report=json $(git diff --name-only $DIFF_BRANCH -- '*.php') > $PHPCS_DIFF_FILENAME
+./vendor/bin/phpcs --standard=./vendor/vanilla/standards/code-sniffer/Vanilla --report=json $(git diff --diff-filter=ACM --name-only $DIFF_BRANCH -- '*.php') > $PHPCS_DIFF_FILENAME
 
 [ $TRAVIS ] && echo "travis_fold:end:coding_standards_setup"
 

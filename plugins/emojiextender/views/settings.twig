@@ -1,0 +1,23 @@
+@
+<div class="image-wrap">
+    {% if iconUrl %}
+    <img
+        src="{{ iconUrl }}"
+        alt="{{ name }}"
+        class="label-selector-image"
+    >
+    {% endif %}
+    <div class="overlay">
+        <div class="buttons"><a class="btn btn-overlay">{{ t('Select') }}</a></div>
+        <div class="selected">
+            <svg class="icon icon-svg-checkmark" viewBox="0 0 17 17">
+                <use xlink:href="#checkmark"></use>
+            </svg>
+        </div>
+    </div>
+</div>
+<div emojiset-body="">
+    <div><b>{{ name }}</b></div>
+    <div class="emojiset-author info">{{ author }}</div>
+    <p class="emojiset-description">{{ descriptionHtml|raw }}</p>
+</div>

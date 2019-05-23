@@ -13,6 +13,7 @@ use Exception;
 use Gdn_Plugin;
 use SettingsController;
 use Gdn_Format;
+use Vanilla\Web\TwigRenderTrait;
 
 /**
  * Emoji Extender Plugin
@@ -20,6 +21,8 @@ use Gdn_Format;
  * Users can change or delete emoji sets for their forums.
  */
 class EmojiExtenderPlugin extends Gdn_Plugin {
+
+    use TwigRenderTrait;
 
     /**
      * @var array List of all available emoji sets.
@@ -165,36 +168,16 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
         $items = [];
         foreach ($this->getEmojiSets() as $key => $emojiSet) {
             $manifest = $this->getManifest($emojiSet);
-            $selected = '<svg class="icon icon-svg-checkmark" viewBox="0 0 17 17"><use xlink:href="#checkmark" /></svg>';
-            $hasManifestIcon = isset($manifest['icon']);
-            $icon = $hasManifestIcon
-                ? img(
-                    $emojiSet['basePath'] . '/' . $manifest['icon'],
-                    [
-                        'alt' => $manifest['name'],
-                        'class' => 'label-selector-image'
-                    ]
-                )
-                : '';
-            $items[$key] =
-                '@<div class="image-wrap">' .
-                $icon .
-                '<div class="overlay">' .
-                '<div class="buttons">' .
-                '<a class="btn btn-overlay">' . t('Select') . '</a>' .
-                '</div>' .
-                '<div class="selected">' . $selected . '</div>' .
-                '</div>' .
-                '</div>' .
-                '<div emojiset-body>' .
-                '<div><b>' . htmlspecialchars($manifest['name']) . '</b></div>' .
-                (empty($manifest['author'])
-                    ? ''
-                    : '<div class="emojiset-author info">' . sprintf(t('by %s'), $manifest['author']) . '</div>') .
-                (empty($manifest['description'])
-                    ? ''
-                    : '<p class="emojiset-description">' . Gdn_Format::wysiwyg($manifest['description']) . '</p>') .
-                '</div>';
+            $data = [
+                'iconUrl' => isset($manifest['icon'])
+                    ? asset($emojiSet['basePath'] . '/' . $manifest['icon'], true, true)
+                    : '',
+                'name' => $manifest['name'],
+                'author' => !empty($manifest['author']) ? sprintf(t('by %s'), $manifest['author']) : null,
+                'descriptionHtml' => Gdn_Format::text($manifest['description'])
+            ];
+
+            $items[$key] = $this->renderTwig('/plugins/emojiextender/views/settings.twig', $data);
         }
         $cf = new ConfigurationModule($sender);
         $cf->initialize([

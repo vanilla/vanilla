@@ -8,7 +8,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { percent } from "csx";
+import { calc, percent } from "csx";
 import { frameVariables } from "@library/layout/frame/frameStyles";
 
 export const frameHeaderClasses = useThemeCache(() => {
@@ -45,7 +45,7 @@ export const frameHeaderClasses = useThemeCache(() => {
         justifyContent: "center",
         alignItems: "flex-end",
         flexShrink: 1,
-        transform: `translateX(-5px) translateY(-1px)`,
+        transform: `translateX(-6px) translateY(-1px)`,
     });
 
     const heading = style("heading", {
@@ -54,6 +54,8 @@ export const frameHeaderClasses = useThemeCache(() => {
         flexGrow: 1,
         margin: 0,
         textOverflow: "ellipsis",
+        width: calc(`100% - ${formElVars.sizing.height}`),
+        flexBasis: calc(`100% - ${formElVars.sizing.height}`),
         fontWeight: globalVars.fonts.weights.semiBold,
         fontSize: unit(globalVars.fonts.size.large),
     });
@@ -86,8 +88,10 @@ export const frameHeaderClasses = useThemeCache(() => {
         position: "relative",
         flexShrink: 1,
         height: unit(formElVars.sizing.height),
-        width: unit(spacerWidth),
+        width: unit(formElVars.sizing.height),
+        flexBasis: unit(formElVars.sizing.height),
         color: colorOut(vars.colors.fg),
+        transform: `translateX(10px)`,
         $nest: {
             "&:not(.focus-visible)": {
                 outline: 0,
@@ -102,6 +106,13 @@ export const frameHeaderClasses = useThemeCache(() => {
         display: "block",
     });
 
+    const close = style("close", {
+        height: unit(formElVars.sizing.height),
+        width: unit(formElVars.sizing.height),
+        flexBasis: unit(formElVars.sizing.height),
+        padding: 0,
+    });
+
     return {
         root,
         backButton,
@@ -111,5 +122,6 @@ export const frameHeaderClasses = useThemeCache(() => {
         leftSpacer,
         action,
         backButtonIcon,
+        close,
     };
 });

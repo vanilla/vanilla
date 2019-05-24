@@ -1,7 +1,0 @@
-{
-  "generator-vanilla": {
-    "type": "Plugin",
-    "preprocessor": "SCSS",
-    "buildtool": "Gulp"
-  }
-}

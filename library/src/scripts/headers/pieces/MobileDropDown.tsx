@@ -96,12 +96,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                                                 >
                                                     <SmartAlign>{title}</SmartAlign>
                                                 </Heading>
-                                                <div
-                                                    className={classNames(
-                                                        "frameHeader-closePosition",
-                                                        classesFrameHeader.action,
-                                                    )}
-                                                >
+                                                <div className={classNames(classesFrameHeader.action)}>
                                                     <CloseButton
                                                         className={classNames(classes.closeButton)}
                                                         onClick={this.close}

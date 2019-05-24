@@ -65,7 +65,6 @@ interface IProps extends IOptionalComponentID, RouteComponentProps<any> {
     contentClass?: string;
     buttonBaseClass?: ButtonTypes;
     valueContainerClasses?: string;
-    iconContainerClasses?: string;
 }
 
 interface IState {
@@ -321,11 +320,9 @@ export default class SearchBar extends React.Component<IProps, IState> {
                         </ConditionalWrap>
                         <div
                             onClick={this.focus}
-                            className={classNames(
-                                "searchBar-iconContainer",
-                                classes.iconContainer,
-                                this.props.iconContainerClasses,
-                            )}
+                            className={classNames("searchBar-iconContainer", classes.iconContainer, {
+                                [classes.iconContainerBigInput]: this.props.isBigInput,
+                            })}
                         >
                             {search(classNames("searchBar-icon", classes.icon))}
                         </div>

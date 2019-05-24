@@ -132,6 +132,7 @@ export const searchBarClasses = useThemeCache(() => {
                 },
                 "& .searchBar__value-container": {
                     overflow: "auto",
+                    cursor: "text",
                     $nest: {
                         "& > div": {
                             width: percent(100),
@@ -299,6 +300,7 @@ export const searchBarClasses = useThemeCache(() => {
         justifyContent: "center",
         width: unit(vars.searchIcon.gap),
         zIndex: 1,
+        cursor: "text",
     });
 
     const iconContainerBigInput = style("iconContainerBig", {

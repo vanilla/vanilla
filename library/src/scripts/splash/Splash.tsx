@@ -46,7 +46,6 @@ export class Splash extends React.Component<IProps> {
                             </div>
                             <div className={classes.searchContainer}>
                                 <IndependentSearch
-                                    className={classes.searchContainer}
                                     buttonClass={classNames(classes.searchButton, classes.buttonOverwrite)}
                                     buttonBaseClass={ButtonTypes.CUSTOM}
                                     isLarge={true}

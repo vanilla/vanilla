@@ -21,8 +21,11 @@ import throttle from "lodash/throttle";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import React, { useCallback, useEffect, useRef } from "react";
 
+const DEFAULT_CONTENT = [{ insert: "\n" }];
+
 interface IProps {
     legacyTextArea?: HTMLInputElement;
+    options?: QuillOptionsStatic;
 }
 
 /**
@@ -32,7 +35,7 @@ interface IProps {
  */
 export default function EditorContent(props: IProps) {
     const quillMountRef = React.createRef<HTMLDivElement>();
-    useQuillInstance(quillMountRef);
+    useQuillInstance(quillMountRef, props.options);
     useLegacyTextAreaSync(props.legacyTextArea);
     useDebugPasteListener(props.legacyTextArea);
     useCssClassSetup();
@@ -51,7 +54,7 @@ export default function EditorContent(props: IProps) {
  *
  * @param mountRef The ref to mount quill onto.
  */
-export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>) {
+export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extraOptions?: QuillOptionsStatic) {
     const ref = useRef<Quill>();
     const { setQuillInstance } = useEditor();
 
@@ -64,9 +67,11 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>) {
                     highlight: text => hljs.highlightAuto(text).value,
                 },
             },
+            ...extraOptions,
         };
         if (mountRef.current) {
             const quill = new Quill(mountRef.current, options);
+            quill.setContents(DEFAULT_CONTENT);
             setQuillInstance(quill);
             ref.current = quill;
 
@@ -77,7 +82,7 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>) {
                 window.quill = null;
             };
         }
-    }, [mountRef.current]);
+    }, [mountRef.current, extraOptions]);
     return ref.current;
 }
 
@@ -88,10 +93,16 @@ function useCssClassSetup() {
     const { legacyMode, quill } = useEditor();
     const classesRichEditor = richEditorClasses(legacyMode);
     const classesUserContent = userContentClasses();
-    const quillRootClasses = classNames("ql-editor", "richEditor-text", "userContent", classesRichEditor.text, {
-        // These classes shouln't be applied until the forum is converted to the new styles.
-        [classesUserContent.root]: !legacyMode,
-    });
+    const quillRootClasses = classNames(
+        quill && quill.root.classList.value,
+        "richEditor-text",
+        "userContent",
+        classesRichEditor.text,
+        {
+            // These classes shouln't be applied until the forum is converted to the new styles.
+            [classesUserContent.root]: !legacyMode,
+        },
+    );
 
     useEffect(() => {
         if (quill) {
@@ -129,7 +140,7 @@ function useInitialValue() {
     const prevReinitialize = useLastValue(reinitialize);
 
     useEffect(() => {
-        if (quill && initialValue) {
+        if (quill && initialValue && initialValue.length > 0) {
             if (prevInitialValue !== initialValue && prevReinitialize !== reinitialize) {
                 quill.setContents(initialValue);
             }

@@ -547,19 +547,17 @@ export const titleBarClasses = useThemeCache(() => {
         },
     });
 
-    const compactSearchResults = style(
-        "compactSearchResults",
-        {
-            position: "absolute",
-            top: unit(formElementVars.sizing.height),
-            // top: unit(vars.sizing.height + (vars.sizing.height - formElementVars.sizing.height) / 2),
-            maxWidth: px(vars.compactSearch.maxWidth),
-            width: percent(100),
+    const compactSearchResults = style("compactSearchResults", {
+        position: "absolute",
+        top: unit(formElementVars.sizing.height),
+        maxWidth: px(vars.compactSearch.maxWidth),
+        width: percent(100),
+        $nest: {
+            "&:empty": {
+                display: "none",
+            },
         },
-        // mediaQueries.oneColumnDown({
-        //     top: (vars.sizing.mobile.height - formElementVars.sizing.height + formElementVars.border.width) / 2,
-        // }),
-    );
+    });
 
     const clearButtonClass = style("clearButtonClass", {
         opacity: 0.7,

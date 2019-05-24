@@ -145,9 +145,6 @@ export const dropDownClasses = useThemeCache(() => {
                     horizontal: important(0),
                 }),
             },
-            "&:empty": {
-                display: "none",
-            },
         },
     });
 

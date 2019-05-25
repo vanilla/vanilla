@@ -65,7 +65,7 @@ ${chalk.green(aliases)}`;
                         {
                             loader: "babel-loader",
                             options: {
-                                presets: [require.resolve("@vanillaforums/babel-preset")],
+                                presets: [require.resolve("@vanilla/babel-preset")],
                                 plugins: babelPlugins,
                                 cacheDirectory: true,
                             },

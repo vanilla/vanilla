@@ -1,5 +1,6 @@
 {
     "name": "advanced-editor",
+    "version": "3.0.0",
     "private": true,
     "devDependencies": {
         "fibers": "4.0.1",

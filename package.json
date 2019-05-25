@@ -3,6 +3,7 @@
     "description": "Vanilla is a powerfully simple discussion forum you can easily customize to make as unique as your community.",
     "license": "GPL-2.0-only",
     "private": true,
+    "prettier": "@vanilla/prettier-config",
     "workspaces": {
         "packages": [
             "packages/*",
@@ -103,7 +104,7 @@
         "@types/webpackbar": "^2.6.0",
         "@types/yargs": "^13.0.0",
         "@vanilla/babel-preset": "*",
-        "@vanillaforums/prettier-config": "1.0.0",
+        "@vanilla/prettier-config": "*",
         "@vanillaforums/tslint-config": "1.1.9",
         "autoprefixer": "^9.5.1",
         "axios-mock-adapter": "^1.16.0",

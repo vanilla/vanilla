@@ -31,4 +31,5 @@ export const PUBLIC_PATH_SOURCE_FILE = resolve(VANILLA_ROOT, "build/entries/publ
 // Tests
 export const TEST_FILE_ROOTS = process.env.TEST_FILE_ROOTS
     ? process.env.TEST_FILE_ROOTS.split(",")
-    : ["library", "applications/*", "plugins/*"];
+    : ["library", "packages/*", "applications/*", "plugins/*"];
+export const PACKAGES_TEST_ENTRY = resolve(PACKAGES_DIRECTORY, "packageTestSetup.ts");

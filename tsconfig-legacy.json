@@ -7,8 +7,7 @@
             "@vanilla/addon-vanilla/*": ["./applications/vanilla/src/scripts/*"],
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"],
             "@rich-editor/*": ["./plugins/rich-editor/src/scripts/*"],
-            "@knowledge/*": ["./plugins/knowledge/src/scripts/*"],
-            "@testroot/*": ["./tests/javascript/*"]
+            "@knowledge/*": ["./plugins/knowledge/src/scripts/*"]
         }
     }
 }

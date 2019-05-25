@@ -2589,7 +2589,14 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.3.tgz#7ee330ba7caafb98090bece86a5ee44115904c2c"
   integrity sha512-ewFXqrQHlFsgc09MK5jP5iR7vumV/BYayNC6PgJO2LPe8vrnNFyjQjSppfEngITi0qvfKtzFvgKymGheFM9UOA==
 
-"@types/react-dom@*", "@types/react-dom@^16.8.4":
+"@types/react-dom@*":
+  version "16.0.11"
+  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-16.0.11.tgz#bd10ccb0d9260343f4b9a49d4f7a8330a5c1f081"
+  integrity sha512-x6zUx9/42B5Kl2Vl9HlopV8JF64wLpX3c+Pst9kc1HgzrsH+mkehe/zmHMQTplIrR48H2gpU7ZqurQolYu8XBA==
+  dependencies:
+    "@types/react" "*"
+
+"@types/react-dom@^16.8.4":
   version "16.8.4"
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-16.8.4.tgz#7fb7ba368857c7aa0f4e4511c4710ca2c5a12a88"
   integrity sha512-eIRpEW73DCzPIMaNBDP5pPIpK1KXyZwNgfxiVagb5iGiz6da+9A5hslSX6GAQKdO7SayVCS/Fr2kjqprgAvkfA==
@@ -2653,10 +2660,10 @@
     "@types/prop-types" "*"
     "@types/react" "*"
 
-"@types/react@*", "@types/react@^16.8.14":
-  version "16.8.18"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.8.18.tgz#fe66fb748b0b6ca9709d38b87b2d1356d960a511"
-  integrity sha512-lUXdKzRqWR4FebR5tGHkLCqnvQJS4fdXKCBrNGGbglqZg2gpU+J82pMONevQODUotATs9fc9k66bx3/St8vReg==
+"@types/react@*", "@types/react@16.8.4", "@types/react@^16.8.4":
+  version "16.8.4"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.8.4.tgz#134307f5266e866d5e7c25e47f31f9abd5b2ea34"
+  integrity sha512-Mpz1NNMJvrjf0GcDqiK8+YeOydXfD8Mgag3UtqQ5lXYTsMnOiHcKmO48LiSWMb1rSHB9MV/jlgyNzeAVxWMZRQ==
   dependencies:
     "@types/prop-types" "*"
     csstype "^2.2.0"

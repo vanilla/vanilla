@@ -9,7 +9,6 @@
         "target": "esnext",
         "module": "esnext",
         "isolatedModules": false,
-        "typeRoots": ["@types", "./node_modules/@types"],
         "skipLibCheck": true,
         "sourceMap": true,
         "plugins": [

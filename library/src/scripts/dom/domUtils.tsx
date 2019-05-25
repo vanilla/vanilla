@@ -12,7 +12,6 @@ import { hashString } from "@vanilla/utils";
 import React from "react";
 import ReactDOM from "react-dom";
 import { forceRenderStyles } from "typestyle";
-import { spawn } from "child_process";
 
 smoothscroll.polyfill();
 

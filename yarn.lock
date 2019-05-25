@@ -2853,11 +2853,6 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@vanillaforums/prettier-config@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@vanillaforums/prettier-config/-/prettier-config-1.0.0.tgz#e08bae366a888ac130d90a9f9d0eeaf48f0f0f1d"
-  integrity sha512-av01ftyfh5eQIH4Iuj0zFNLSiY+RggK6G68RDYE+H178TNpx2C5ZrI4agJzAWNZN0bwXEsaYEIVDvPNPHcJQyw==
-
 "@vanillaforums/tslint-config@1.1.9":
   version "1.1.9"
   resolved "https://registry.yarnpkg.com/@vanillaforums/tslint-config/-/tslint-config-1.1.9.tgz#a6f94d55877d00917876ff0c7ce5eca0eb7ebc66"

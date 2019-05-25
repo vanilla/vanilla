@@ -9,6 +9,7 @@
     },
     "dependencies": {
         "quill": "https://github.com/vanilla/quill.git#1.3.7",
-        "@vanilla/utils": "*"
+        "@vanilla/utils": "*",
+        "@vanilla/library": "*"
     }
 }

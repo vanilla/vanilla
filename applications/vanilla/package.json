@@ -1,8 +1,9 @@
 {
-    "name": "@vanilla/forum",
+    "name": "@vanilla/addon-vanilla",
     "version": "3.0.0",
     "private": true,
     "dependencies": {
-        "@vanilla/utils": "*"
+        "@vanilla/utils": "*",
+        "@vanilla/library": "*"
     }
 }

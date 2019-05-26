@@ -29,7 +29,7 @@ export function debug(newValue?: boolean): boolean {
  */
 export function logDebug(...value: any[]) {
     if (internalDebugValue) {
-        // tslint:disable-next-line:no-console
+        // eslint-disable-next-line no-console
         console.log(...value);
     }
 }
@@ -44,7 +44,7 @@ export function logError(...value: any[]) {
     if (!internalDebugValue && process.env.NODE_ENV === "test") {
         return;
     }
-    // tslint:disable-next-line:no-console
+    // eslint-disable-next-line no-console
     console.error(...value);
 }
 
@@ -58,6 +58,6 @@ export function logWarning(...value: any[]) {
     if (!internalDebugValue && process.env.NODE_ENV === "test") {
         return;
     }
-    // tslint:disable-next-line:no-console
+    // eslint-disable-next-line no-console
     console.warn(...value);
 }

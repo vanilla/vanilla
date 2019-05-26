@@ -397,7 +397,7 @@ const borderStylesFallbacks = (fallbacks: any[], ultimateFallback, unitFunction?
     try {
         const BreakException = {};
         fallbacks.forEach((style, key) => {
-            if (!!style) {
+            if (style) {
                 output = style;
                 throw BreakException;
             }

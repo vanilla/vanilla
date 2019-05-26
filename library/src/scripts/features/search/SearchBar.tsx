@@ -306,7 +306,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
                                         isLarge: this.props.isBigInput,
                                     },
                                 )}
-                                tabIndex={!!this.props.hideSearchButton ? -1 : 0}
+                                tabIndex={this.props.hideSearchButton ? -1 : 0}
                             >
                                 {this.props.isLoading ? (
                                     <ButtonLoader
@@ -370,7 +370,7 @@ export default class SearchBar extends React.Component<IProps, IState> {
     private componentOverwrites = {
         Control: this.SearchControl,
         IndicatorSeparator: selectOverrides.NullComponent,
-        Menu: !!this.props.resultsRef ? this.Menu : selectOverrides.Menu,
+        Menu: this.props.resultsRef ? this.Menu : selectOverrides.Menu,
         MenuList: selectOverrides.MenuList,
         Option: this.props.optionComponent!,
         NoOptionsMessage: selectOverrides.NoOptionsMessage,

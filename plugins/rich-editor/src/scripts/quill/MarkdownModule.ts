@@ -131,7 +131,7 @@ export default class MarkdownModule {
         {
             name: "spoiler",
 
-            pattern: /^\!>/g,
+            pattern: /^!>/g,
             handler: (text, selection) => {
                 const offset = text.length;
                 const delta = new Delta()

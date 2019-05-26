@@ -99,7 +99,7 @@ export default class SelectOne extends React.Component<ISelectOneProps, IState> 
             <div className={this.props.className}>
                 <label htmlFor={this.inputID} className="inputBlock-labelAndDescription">
                     <span className={classNames("inputBlock-labelText", this.props.label)}>{this.props.label}</span>
-                    <Paragraph className="inputBlock-labelNote" children={this.props.labelNote} />
+                    <Paragraph className="inputBlock-labelNote">{this.props.labelNote}</Paragraph>
                 </label>
 
                 <div className={classNames("inputBlock-inputWrap", inputWrapClass, { hasFocus: this.state.focus })}>
@@ -126,7 +126,7 @@ export default class SelectOne extends React.Component<ISelectOneProps, IState> 
                         onFocus={this.onFocus}
                         onBlur={this.onBlur}
                     />
-                    <Paragraph className="inputBlock-labelNote" children={this.props.noteAfterInput} />
+                    <Paragraph className="inputBlock-labelNote">{this.props.noteAfterInput}</Paragraph>
                     <ErrorMessages id={this.errorID} errors={this.props.errors} />
                 </div>
             </div>

@@ -14,7 +14,7 @@ const currentColorFill = {
 };
 
 export function fileGeneric(className?: string, fileType?: string) {
-    const title = !!fileType ? fileType : t("File");
+    const title = fileType ? fileType : t("File");
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"

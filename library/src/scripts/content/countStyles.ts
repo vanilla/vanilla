@@ -57,7 +57,7 @@ export const countClasses = useThemeCache(() => {
         return style("text", {
             display: "block",
             textAlign: "center",
-            color: !!countFg ? colorOut(countFg) : "inherit",
+            color: countFg ? colorOut(countFg) : "inherit",
         });
     };
 

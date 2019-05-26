@@ -110,7 +110,7 @@
         "@vanilla/babel-preset": "*",
         "@vanilla/prettier-config": "*",
         "@vanilla/tsconfig": "*",
-        "@vanillaforums/tslint-config": "1.1.9",
+        "@vanilla/eslint-config": "*",
         "autoprefixer": "^9.5.1",
         "axios-mock-adapter": "^1.16.0",
         "babel-loader": "^8.0.5",
@@ -153,9 +153,7 @@
         "ts-lint": "^4.5.1",
         "ts-node": "^8.1.0",
         "tsconfig-paths-webpack-plugin": "^3.2.0",
-        "tslint": "^5.16.0",
         "typescript": "3.4.4",
-        "typescript-tslint-plugin": "^0.3.1",
         "webpack": "^4.30.0",
         "webpack-bundle-analyzer": "^3.3.2",
         "webpack-dev-server": "^3.3.1",
@@ -181,7 +179,7 @@
         "test:debug": "ts-node -P build/tsconfig.json build/scripts/test.ts --mode=testdebug",
         "check-types": "tsc -p tsconfig.json --noemit && yarn lint",
         "check-types:watch": "tsc-watch -p tsconfig.json --noemit --onSuccess \"yarn lint\"",
-        "lint": "tslint -c ./tslint.json -e './**/node_modules/**' -e './**/src/**/*.{js,jsx}' -p ./tsconfig.json -t stylish",
+        "lint": "eslint \"**/*.{ts,tsx}\"",
         "storybook": "start-storybook -p 9001 -c build/.storybook",
         "bootstrap": "lerna bootstrap"
     }

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { expect } from "chai";
+import chai, { expect } from "chai";
 import asPromised from "chai-as-promised";
 import { resolvePromisesSequentially } from "./promiseUtils";
 chai.use(asPromised);

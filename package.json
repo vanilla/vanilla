@@ -13,6 +13,10 @@
             "plugins/*"
         ]
     },
+    "engines": {
+        "node": ">=8.0.0 <12.0.0",
+        "yarn": "^1.4.2"
+    },
     "dependencies": {
         "axios": "0.18.0",
         "classnames": "2.2.6",

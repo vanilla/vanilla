@@ -55,7 +55,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
     };
 
     public render() {
-        const titleBarVars = titleBarClasses();
+        const classesTitleBar = titleBarClasses();
         const classes = compactSearchClasses();
         const classesSearchBar = searchBarClasses();
         const classesDropDown = dropDownClasses();
@@ -67,7 +67,7 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                 {!this.props.open && (
                     <Button
                         onClick={this.props.onSearchButtonClick}
-                        className={classNames(titleBarVars.centeredButtonClass, this.props.buttonClass)}
+                        className={classNames(classesTitleBar.centeredButtonClass, this.props.buttonClass)}
                         title={t("Search")}
                         aria-expanded={false}
                         aria-haspopup="true"
@@ -102,14 +102,14 @@ export class CompactSearch extends React.Component<ICompactSearchProps, IState> 
                                 className={"compactSearch-searchBar"}
                                 clearButtonClass={this.props.clearButtonClass}
                             />
+
                             <div
                                 ref={this.resultsRef}
-                                className={classNames(
-                                    "titleBar-compactSearchResults",
-                                    titleBarVars.compactSearchResults,
-                                    classesSearchBar.results,
-                                    classesDropDown.contents,
-                                )}
+                                className={classNames({
+                                    [classesTitleBar.compactSearchResults]: this.props.showingSuggestions,
+                                    [classesSearchBar.results]: this.props.showingSuggestions,
+                                    [classesDropDown.contents]: this.props.showingSuggestions,
+                                })}
                             />
                         </div>
 

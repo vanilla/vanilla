@@ -686,8 +686,6 @@ class Gdn_Session {
             $return = ($forceValid && Gdn::request()->isPostBack()) ||
                 (hash_equals($this->_TransientKey, $foreignKey) && !empty($this->_TransientKey));
         }
-        $return = false;
-
 
         if (!$return && $forceValid !== true) {
             if (Gdn::session()->User) {

@@ -17,6 +17,7 @@ class Gdn_CoreException extends Exception {
      * Constructs the Gdn_ApplicationException.
      *
      * @param string $message A user readable message for the exception.
+     * @param int $code The error code.
      * @param Exception $previous The previous exception used for exception chaining.
      */
     public function __construct($message, $code = 400, $previous = null) {

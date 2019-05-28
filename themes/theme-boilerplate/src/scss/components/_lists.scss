@@ -173,6 +173,10 @@
         }
     }
 
+    .MItem.Hidden {
+        display: none;
+    }
+
     .Tag:not([class*="Status-Tag"]),
     .HasNew {
         margin-bottom: $utility-baseUnitHalf;

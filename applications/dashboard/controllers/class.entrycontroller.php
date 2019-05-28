@@ -1129,6 +1129,10 @@ class EntryController extends Gdn_Controller {
                                 'Reason' => 'Password',
                             ]);
                         }
+                    } catch (Gdn_CoreException $ex) {
+                        $errorMessage = htmlspecialchars(strip_tags($ex->getMessage()));
+                        $errorMessage .= sprintf(' Click <a href=%s>here</a> to reset your password', url('/entry/passwordrequest'));
+                        $this->Form->addError($errorMessage);
                     } catch (Gdn_UserException $ex) {
                         $this->Form->addError($ex);
                     }

@@ -17,13 +17,13 @@
                  $(btn).after('<span class="Progress">&#160;</span>');
               }
             },
-            success: function(json, status, $frm) {
+            success: function(json, status, ajax, $frm) {
                if (json.FormSaved == true) {
                   gdn.inform(json);
                   if (json.RedirectUrl) {
                      setTimeout("document.location='" + json.RedirectUrl + "';", 300);
                   } else if(json.DeliveryType == 'ASSET') {
-                     $frm.parents($(handle).selector).html(json.Data);
+                     $frm.html(json.Data);
                   } else {
                      // Remove the spinner if not redirecting...
                      $('span.Progress').remove();
@@ -36,7 +36,7 @@
                      gdn.inform(json.Data, false);
                      $frm.find('span.Progress').remove();
                   } else {
-                     $frm.parents($(handle).selector).html(json.Data);
+                     $frm.html(json.Data);
                   }
                }
                // If there are additional targets in the result then set them now.
@@ -50,12 +50,12 @@
                      }
                   }
                }
-               
+
                // Re-attach the handler
                $($(handle).selector).handleAjaxForm(options);
              }
          }, options || {});
-         
+
          $(this).ajaxForm(options);
       });
    }

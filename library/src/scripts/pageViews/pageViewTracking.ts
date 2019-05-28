@@ -22,6 +22,7 @@ export function onPageView(handler: PageViewHandler) {
  */
 export function initPageViewTracking(history: History) {
     const callHandlers = () => {
+        console.log("page view");
         handlers.forEach(handler => handler({ history }));
     };
 

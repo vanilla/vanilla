@@ -25,6 +25,16 @@
         font-size: 48px;
     }
 
+    .followButton {
+        color: $herobanner_fg;
+
+        &:active,
+        &:focus,
+        &:hover {
+            color: $herobanner_fg;
+        }
+    }
+
     .HomepageTitle,
     .PageDescription {
         text-shadow: $herobanner_dropShadow;

@@ -28,6 +28,8 @@
 
     {if $ThemeOptions.Options.hasFeatureSearchbox}
         ThemeOptions-hasFeatureSearchbox
+    {else}
+        hideHomepageTitle
     {/if}
 
     {if $ThemeOptions.Options.panelToLeft}
@@ -152,7 +154,7 @@
                                 </div>
                             {else}
                                 {if $Category}
-                                    <h2 class="H HomepageTitle">{$Category.Name}</h2>
+                                    <h2 class="H HomepageTitle">{$Category.Name}{follow_button}</h2>
                                     <p class="P PageDescription">{$Category.Description}</p>
                                 {else}
                                     {if {homepage_title} !== ""}

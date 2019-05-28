@@ -41,7 +41,7 @@
     }
 }
 
-.ThemeOptions-hasHeroBanner {
+.hideHomepageTitle {
 
     .MainContent {
 
@@ -49,11 +49,13 @@
         .PageDescription {
             display: none;
         }
+    }
+}
 
-        .BreadcrumbsBox {
-            margin-left: 0;
-            width: 100%;
-        }
+.ThemeOptions-hasHeroBanner {
+    .BreadcrumbsBox {
+        margin-left: 0;
+        width: 100%;
     }
 }
 

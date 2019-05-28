@@ -207,7 +207,7 @@
     });
 
     $(document).on("contentLoad", function (e) {
-        
+
         // Setup AJAX filtering for flat category module.
         // Find each flat category module container, if any.
         $(".BoxFlatCategory", e.target).each(function(index, value){
@@ -1234,17 +1234,6 @@ jQuery(document).ready(function($) {
     };
     $('.Item :checkbox').each(checkItems);
     $('.Item :checkbox').change(checkItems);
-
-    // Hide/Reveal the "forgot your password" form if the ForgotPassword button is clicked.
-    $(document).delegate('a.ForgotPassword', 'click', function() {
-        // Make sure we have both forms
-        if ($('#Form_User_SignIn').length) {
-            $('.Methods').toggle();
-            $('#Form_User_Password').toggle();
-            $('#Form_User_SignIn').toggle();
-            return false;
-        }
-    });
 
     // If we are not inside an iframe, focus the email input on the signin page.
     if ($('#Form_User_SignIn').length && window.top.location === window.location) {

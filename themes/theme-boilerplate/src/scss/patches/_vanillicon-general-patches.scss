@@ -147,13 +147,6 @@
     content: $icon-heart;
 }
 
-// This icon has a weird shape
-.RecordReactions .ReactAwesome::before {
-    font-size: 11px;
-    margin-left: 1.5px;
-    margin-top: 1px;
-}
-
 .ReactLOL::before {
     content: $icon-lol;
 }

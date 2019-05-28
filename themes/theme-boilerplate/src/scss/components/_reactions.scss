@@ -49,4 +49,11 @@ $reactions_bg:                        rgba(0,0,0,0.5) !default;
         width: 24px;
         margin: 0 $utility-baseUnitHalf $utility-baseUnitHalf;
     }
+
+    // icon has a weird shape
+    .ReactAwesome::before {
+        font-size: 11px;
+        margin-left: 1.5px;
+        margin-top: 1px;
+    }
 }

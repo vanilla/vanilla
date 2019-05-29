@@ -10,6 +10,8 @@ use Gdn_Configuration;
 use Gdn_Upload;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
+use Garden\Container\Reference;
+use Vanilla\Models\FsThemeProvider;
 
 /**
  * Test the /api/v2/themes endpoints.
@@ -28,7 +30,14 @@ class ThemesTest extends AbstractAPIv2Test {
         parent::setupBeforeClass();
         /** @var AddonManager */
         $theme = new Addon("/tests/fixtures/themes/asset-test");
-        static::container()->get(AddonManager::class)->add($theme);
+
+        static::container()
+            ->get(AddonManager::class)
+            ->add($theme);
+        static::container()
+            ->rule(\Vanilla\Models\ThemeModel::class)
+            ->addCall("addThemeProvider", [new Reference(FsThemeProvider::class)])
+        ;
     }
 
     /**

@@ -2,15 +2,13 @@ version: 2
 aliases:
     - &php72
         - image: circleci/php:7.2.9
-        - image: mysql:5.7
-          command: mysqld
+        - image: mysql:5.7.26
           environment:
                 MYSQL_USER: travis
                 MYSQL_ALLOW_EMPTY_PASSWORD: true
     - &php73
         - image: circleci/php:7.3.5
-        - image: mysql:5.7
-          command: mysqld
+        - image: mysql:5.7.26
           environment:
                 MYSQL_USER: travis
                 MYSQL_ALLOW_EMPTY_PASSWORD: true

@@ -88,11 +88,12 @@ class Gdn_PasswordHash {
                 $result = $this->getAlgorithm('Punbb')->verify($password, $storedHash);
                 break;
             case 'reset':
-                throw new Gdn_SanitizedUserException(t('You need to reset your password.', 'You need to reset your password.
-                 This is most likely because an administrator recently changed your account information.'));
+                $resetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='.urlencode(Gdn::request()->get('display')) : ''));
+                throw new Gdn_SanitizedUserException(sprintf(t('You need to reset your password.', 'You need to reset your password. This is most likely because an administrator recently changed your account information. Click <a href="%s">here</a> to reset your password.'), $resetUrl));
                 break;
             case 'random':
-                throw new Gdn_SanitizedUserException(t('You don\'t have a password.', 'Your account does not have a password assigned to it yet.'));
+                $resetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='.urlencode(Gdn::request()->get('display')) : ''));
+                throw new Gdn_SanitizedUserException(sprintf(t('You don\'t have a password.', 'Your account does not have a password assigned to it yet. Click <a href="%s">here</a> to reset your password.'), $resetUrl));
                 break;
             case 'smf':
                 $result = $this->getAlgorithm('Smf')->verify($password, $storedHash);

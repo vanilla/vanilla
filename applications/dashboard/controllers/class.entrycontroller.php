@@ -1130,8 +1130,7 @@ class EntryController extends Gdn_Controller {
                             ]);
                         }
                     } catch (Gdn_SanitizedUserException $ex) {
-                        $errorMessage = htmlspecialchars($ex->getMessage());
-                        $errorMessage .= sprintf(' Click <a href=%s>here</a> to reset your password', url('/entry/passwordrequest'));
+                        $errorMessage = $ex->getMessage();
                         $this->Form->addError($errorMessage);
                     } catch (Gdn_UserException $ex) {
                         $this->Form->addError($ex);

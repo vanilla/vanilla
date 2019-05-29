@@ -36,33 +36,35 @@ aliases:
             command: yarn install --frozen-lockfile
 jobs:
     setup:
-        docker: &php73
+        docker: *php73
         steps:
             - checkout
             - run:
                 name: Nodejs Version
                 command: node --version
-            - &restore_composer_cache
-            - &run_composer
-            - &save_composer_cache
-            - &restore_yarn_cache
-            - &run_yarn
-            - &save_yarn_cache
+            - *restore_composer_cache
+            - *run_composer
+            - *save_composer_cache
+            - *restore_yarn_cache
+            - *run_yarn
+            - *save_yarn_cache
     frontend_lint:
-        docker: &php73
+        docker: *php73
         steps:
             - yarn lint
             - yarn prettier --check "**/src/scripts/**/*"
     frontend_typechecker:
-        docker: &php73
+        docker: *php73
         steps:
             - yarn check-types
     frontend_build:
-        docker: &php73
+        docker: *php73
         steps:
-            - &restore_yarn_cache
-            - run: yarn build
-            - &save_yarn_cache
+            - *restore_yarn_cache
+            - run:
+                name: Build Frontend
+                command: yarn build
+            - *save_yarn_cache
 workflows:
     version: 2
     commit:

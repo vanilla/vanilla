@@ -170,7 +170,7 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         $nest: {
             // When the editor is empty we should be displaying a placeholder.
             "&.ql-blank::before": {
-                content: `attr(data-placeholder)`,
+                content: `attr(placeholder)`,
                 display: "block",
                 color: colorOut(vars.text.placeholder.color),
                 position: "absolute",

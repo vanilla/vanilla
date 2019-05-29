@@ -25,7 +25,7 @@ const DEFAULT_CONTENT = [{ insert: "\n" }];
 
 interface IProps {
     legacyTextArea?: HTMLInputElement;
-    options?: QuillOptionsStatic;
+    placeholder?: string;
 }
 
 /**
@@ -35,10 +35,10 @@ interface IProps {
  */
 export default function EditorContent(props: IProps) {
     const quillMountRef = React.createRef<HTMLDivElement>();
-    useQuillInstance(quillMountRef, props.options);
+    useQuillInstance(quillMountRef);
     useLegacyTextAreaSync(props.legacyTextArea);
     useDebugPasteListener(props.legacyTextArea);
-    useCssClassSetup();
+    useQuillAttributeSync(props.placeholder);
     useLoadStatus();
     useInitialValue();
     useOperationsQueue();
@@ -67,7 +67,6 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extr
                     highlight: text => hljs.highlightAuto(text).value,
                 },
             },
-            ...extraOptions,
         };
         if (mountRef.current) {
             const quill = new Quill(mountRef.current, options);
@@ -87,9 +86,9 @@ export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extr
 }
 
 /**
- * Apply our CSS classes/styles to quill's root. (Not a react component).
+ * Apply our CSS classes/styles and other attributes to quill's root. (Not a react component).
  */
-function useCssClassSetup() {
+function useQuillAttributeSync(placeholder?: string) {
     const { legacyMode, quill } = useEditor();
     const classesRichEditor = richEditorClasses(legacyMode);
     const classesUserContent = userContentClasses();
@@ -110,6 +109,12 @@ function useCssClassSetup() {
             quill.root.classList.value = quillRootClasses;
         }
     }, [quill, quillRootClasses]);
+
+    useEffect(() => {
+        if (quill && placeholder) {
+            quill.root.setAttribute("placeholder", placeholder);
+        }
+    }, [quill, placeholder]);
 
     return quillRootClasses;
 }

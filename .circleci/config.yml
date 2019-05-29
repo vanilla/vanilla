@@ -16,11 +16,12 @@ aliases:
             paths:
                 - ~/workspace/repo/node_modules
                 - ~/.cache/yarn
-            key: yarn-packages-v1-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}
+            key: yarn-packages-v1-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}-{{ checksum "~/workspace/repo/.yarnclean" }}
     - &restore_yarn_cache
         restore_cache:
             name: Restore node_modules cache
             keys:
+                - yarn-packages-v1-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}-{{ checksum "~/workspace/repo/.yarnclean" }}
                 - yarn-packages-v1-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}
                 - yarn-packages-v1-{{ .Branch }}-
                 - yarn-packages-v1-

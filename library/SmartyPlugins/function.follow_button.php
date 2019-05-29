@@ -1,6 +1,6 @@
 <?php
 /**
- * Returns category follow toggle
+ * Returns category follow toggle button
  *
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -8,11 +8,15 @@
  * @since 2.0
  * @return string
  */
-
 function smarty_function_follow_button() {
+    $followButton = '';
     $controller = Gdn::controller();
     $controller->fetchViewLocation('helper_functions', 'categories', false, false);
     $categoryID = $controller->Category->CategoryID;
 
-    return followButton($categoryID);
+    if ($categoryID) {
+        $followButton = followButton($categoryID);
+    }
+
+    return $followButton;
 }

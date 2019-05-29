@@ -183,7 +183,6 @@ class ThemesApiController extends AbstractApiController {
             throw new \Garden\Schema\ValidationException('Unknown asset "'.$pathInfo['filename'].'" field.'.
                 'Should be one of: '.implode(array_column(ThemeModel::ASSET_LIST, 'file')));
         }
-
         return $out->validate($asset);
     }
 

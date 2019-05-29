@@ -1148,3 +1148,26 @@ export const pointerEventsClass = (value: PointerEventsProperty = "none") => {
     const style = styleFactory("pointerEvents");
     return style(pointerEvents(value));
 };
+
+export const visibility = () => {
+    const style = styleFactory("visibility");
+    const onEmpty = (nest?: object) => {
+        return style("onEmpty", {
+            $nest: {
+                "&:empty": {
+                    display: "none",
+                },
+                ...nest,
+            },
+        });
+    };
+
+    const displayNone = style("displayNone", {
+        display: important("none"),
+    });
+
+    return {
+        onEmpty,
+        displayNone,
+    };
+};

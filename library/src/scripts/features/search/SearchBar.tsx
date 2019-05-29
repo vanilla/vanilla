@@ -27,6 +27,7 @@ import ReactDOM from "react-dom";
 import * as selectOverrides from "@library/forms/select/overwrites";
 import { OptionProps } from "react-select/lib/components/Option";
 import AsyncCreatable from "react-select/lib/AsyncCreatable";
+import { visibility } from "@library/styles/styleHelpers";
 
 export interface IComboBoxOption<T = any> {
     value: string | number;
@@ -319,7 +320,9 @@ export default class SearchBar extends React.Component<IProps, IState> {
                         </ConditionalWrap>
                         <div
                             onClick={this.focus}
-                            className={classNames("searchBar-iconContainer", classes.iconContainer)}
+                            className={classNames("searchBar-iconContainer", classes.iconContainer, {
+                                [classes.iconContainerBigInput]: this.props.isBigInput,
+                            })}
                         >
                             {search(classNames("searchBar-icon", classes.icon))}
                         </div>

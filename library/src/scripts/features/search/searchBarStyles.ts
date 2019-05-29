@@ -132,6 +132,7 @@ export const searchBarClasses = useThemeCache(() => {
                 },
                 "& .searchBar__value-container": {
                     overflow: "auto",
+                    cursor: "text",
                     $nest: {
                         "& > div": {
                             width: percent(100),
@@ -299,7 +300,17 @@ export const searchBarClasses = useThemeCache(() => {
         justifyContent: "center",
         width: unit(vars.searchIcon.gap),
         zIndex: 1,
+        cursor: "text",
     });
+
+    const iconContainerBigInput = style("iconContainerBig", {
+        $nest: {
+            "&&": {
+                height: unit(vars.sizing.height),
+            },
+        },
+    });
+
     const icon = style("icon", {
         width: unit(vars.searchIcon.width),
         height: unit(vars.searchIcon.height),
@@ -338,6 +349,9 @@ export const searchBarClasses = useThemeCache(() => {
                 marginTop: unit(-formElementVars.border.width),
                 marginBottom: unit(-formElementVars.border.width),
             },
+            "&:empty": {
+                display: "none",
+            },
         },
     });
 
@@ -352,6 +366,7 @@ export const searchBarClasses = useThemeCache(() => {
         content,
         heading,
         iconContainer,
+        iconContainerBigInput,
         icon,
         results,
         resultsAsModal,

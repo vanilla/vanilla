@@ -15,6 +15,7 @@ import { searchClasses } from "@library/features/search/searchStyles";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { RouteComponentProps, withRouter } from "react-router";
 import classNames from "classnames";
+import { visibility } from "@library/styles/styleHelpers";
 
 export interface ICompactSearchProps extends IWithSearchProps, RouteComponentProps<{}> {
     className?: string;
@@ -22,9 +23,6 @@ export interface ICompactSearchProps extends IWithSearchProps, RouteComponentPro
     buttonClass?: string;
     inputClass?: string;
     iconClass?: string;
-    showingSuggestions?: boolean;
-    onOpenSuggestions?: () => void;
-    onCloseSuggestions?: () => void;
     buttonContentClassName?: string;
     buttonLoaderClassName?: string;
     cancelContentClassName?: string;
@@ -37,6 +35,7 @@ export interface ICompactSearchProps extends IWithSearchProps, RouteComponentPro
 
 interface IState {
     query: string;
+    showingSuggestions: boolean;
 }
 
 /**
@@ -48,6 +47,7 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
 
     public state: IState = {
         query: "",
+        showingSuggestions: false,
     };
 
     public render() {
@@ -67,8 +67,8 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
                     loadOptions={this.props.searchOptionProvider.autocomplete}
                     triggerSearchOnClear={false}
                     resultsRef={this.resultsRef}
-                    onOpenSuggestions={this.props.onOpenSuggestions}
-                    onCloseSuggestions={this.props.onCloseSuggestions}
+                    onOpenSuggestions={this.setOpenSuggestions}
+                    onCloseSuggestions={this.setCloseSuggestions}
                     buttonClassName={this.props.buttonClass}
                     buttonBaseClass={this.props.buttonBaseClass}
                     className={classes.root}
@@ -80,20 +80,42 @@ export class IndependentSearch extends React.Component<ICompactSearchProps, ISta
                 />
                 <div
                     ref={this.resultsRef}
-                    className={classNames("search-results", classesSearchBar.results, classesSearchBar.resultsAsModal)}
+                    className={classNames("search-results", {
+                        [classesSearchBar.results]: this.state.showingSuggestions,
+                        [classesSearchBar.resultsAsModal]: this.state.showingSuggestions,
+                        [visibility().displayNone]: !this.state.showingSuggestions,
+                    })}
                 />
             </div>
         );
     }
 
-    private handleSearchChange = (newQuery: string) => {
-        this.setState({ query: newQuery });
+    /**
+     * Keep track of visibility of suggestions
+     */
+    public setOpenSuggestions = () => {
+        this.setState({
+            showingSuggestions: true,
+        });
+    };
+
+    /**
+     * Keep track of visibility of suggestions
+     */
+    public setCloseSuggestions = () => {
+        this.setState({
+            showingSuggestions: false,
+        });
     };
 
     private handleSubmit = () => {
         const { searchOptionProvider, history } = this.props;
         const { query } = this.state;
         this.props.history.push(searchOptionProvider.makeSearchUrl(query));
+    };
+
+    private handleSearchChange = (newQuery: string) => {
+        this.setState({ query: newQuery });
     };
 }
 

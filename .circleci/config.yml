@@ -13,9 +13,9 @@ aliases:
         restore_cache:
             name: Restore node_modules cache
             keys:
-                - v1-node-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
-                - v1-node-{{ arch }}-{{ .Branch }}-
-                - v1-node-{{ arch }}-
+                - yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
+                - yarn-packages-v1-{{ .Branch }}-
+                - yarn-packages-v1-
     - &save_composer_cache
         save_cache:
             key: composer-v1-{{ checksum "composer.lock" }}

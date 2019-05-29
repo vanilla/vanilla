@@ -6,10 +6,9 @@
 
 namespace Vanilla\Models;
 
-use Garden\Web\Exception\ClientException;
-use Vanilla\Theme\JsonAsset;
-use Vanilla\Theme\ThemeProviderInterface;
 use Vanilla\Theme\VariablesProviderInterface;
+use Garden\Web\Exception\ClientException;
+use Vanilla\Theme\ThemeProviderInterface;
 
 /**
  * Handle custom themes.
@@ -62,12 +61,11 @@ class ThemeModel {
 
     const ASSET_KEY = "assets";
 
+    /** @var ThemeProviderInterface[] */
+    private $themeProviders = [];
+
     /** @var VariablesProviderInterface[] */
     private $variableProviders = [];
-
-
-    /** @var ThemeProviderInterface[] */
-    private $themeProviders;
 
 
     /**

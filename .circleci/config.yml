@@ -4,6 +4,10 @@ aliases:
         - image: circleci/php:7.2.9-node-browsers
     - &php73
         - image: circleci/php:7.3.5-node-browsers
+    - &run_yarn
+        run:
+            name: Install Yarn Packages
+            command: yarn install --frozen-lockfile
     - &save_yarn_cache
         save_cache:
             paths:
@@ -16,6 +20,10 @@ aliases:
                 - yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
                 - yarn-packages-v1-{{ .Branch }}-
                 - yarn-packages-v1-
+    - &attach_workspace
+        attach_workspace:
+            at: ~/repo
+        run: cd ~/repo
     - &save_composer_cache
         save_cache:
             key: composer-v1-{{ checksum "composer.lock" }}
@@ -30,16 +38,15 @@ aliases:
         run:
             name: Install Composer Packages
             command: VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
-    - &run_yarn
-        run:
-            name: Install Yarn Packages
-            command: yarn install --frozen-lockfile
 jobs:
     setup:
         docker: *php73
+        working_directory: ~/
         resource_class: xlarge
         steps:
-            - checkout
+            - checkout:
+                path: ~/repo
+            - run: rm -rf .git
             - run:
                 name: Nodejs Version
                 command: node --version
@@ -52,18 +59,20 @@ jobs:
                 name: Build Frontend
                 command: yarn build
             - *save_yarn_cache
+            - persist_to_workspace:
+                root: ~/
+                paths:
+                    - repo
     frontend_lint:
         docker: *php73
         steps:
-            - checkout
-            - *restore_yarn_cache
-            - *run_yarn
+            - *attach_workspace
             - run: yarn lint
             - run: yarn prettier --check "**/src/scripts/**/*"
     frontend_typechecker:
         docker: *php73
         steps:
-            - checkout
+            - *attach_workspace
             - *restore_yarn_cache
             - *run_yarn
             - run: yarn check-types
@@ -76,8 +85,5 @@ workflows:
                 requires:
                     - setup
             - frontend_typechecker:
-                requires:
-                    - setup
-            - frontend_build:
                 requires:
                     - setup

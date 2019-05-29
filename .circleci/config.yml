@@ -97,7 +97,7 @@ jobs:
             - run:
                 name: Build Frontend
                 command: |
-                    cd ~/workspace/repo
+                    cd ~/workspace/frontend
                     yarn build
     frontend_test:
         docker: *node
@@ -107,14 +107,14 @@ jobs:
             - run:
                 name: Build Frontend
                 command: |
-                    cd ~/workspace/repo
+                    cd ~/workspace/frontend
                     yarn test
     frontend_lint:
         docker: *node
         steps:
             - *attach_workspace
             - run: |
-                cd ~/workspace/repo
+                cd ~/workspace/frontend
                 yarn lint
                 yarn prettier --check "**/src/scripts/**/*"
     frontend_typechecker:
@@ -123,7 +123,7 @@ jobs:
         steps:
             - *attach_workspace
             - run: |
-                cd ~/workspace/repo
+                cd ~/workspace/frontend
                 yarn check-types
     php_setup:
         docker: *php73

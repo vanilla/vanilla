@@ -26,6 +26,7 @@ use Gdn_Request;
  * Handle custom themes.
  */
 class FsThemeProvider implements ThemeProviderInterface {
+    use FsThemeMissingTrait;
     /**
      * @var AddonManager
      */
@@ -79,54 +80,6 @@ class FsThemeProvider implements ThemeProviderInterface {
     }
 
     /**
-     * @inheritdoc
-     */
-    public function postTheme(array $body): array {
-        throw new ClientException(__CLASS__.' does not provide '.__FUNCTION__.' method!', 501);
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function patchTheme(int $themeID, array $body): array {
-        throw new ClientException(__CLASS__.' does not provide '.__FUNCTION__.' method!', 501);
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function deleteTheme(int $themeID) {
-        throw new ClientException(__CLASS__.' does not provide '.__FUNCTION__.' method!', 501);
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setCurrent(int $themeID): array {
-        throw new ClientException(__CLASS__.' does not provide '.__FUNCTION__.' method!', 501);
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCurrent(): ?array {
-        throw new ClientException(__CLASS__.' does not provide '.__FUNCTION__.' method!', 501);
-        return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setAsset(int $themeID, string $assetKey, string $data): array {
-        throw new ClientException(__CLASS__.' does not provide '.__FUNCTION__.' method!', 501);
-        return [];
-    }
-
-    /**
      * Get theme by name
      *
      * @param string $themeKey
@@ -135,13 +88,13 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @throws NotFoundException Throws an exception when themeName not found.
      */
     public function getThemeByName($themeKey): Addon {
+        die(print_r($this->themes));
         $theme = $this->themes[$themeKey] ?? false;
         if ($theme === false) {
             throw new NotFoundException("Theme");
         }
         return $theme;
     }
-
 
     /**
      * Get all theme assets
@@ -250,6 +203,7 @@ class FsThemeProvider implements ThemeProviderInterface {
      */
     public function getAllThemes(): array {
         $themes = $this->addonManager->lookupAllByType(Addon::TYPE_THEME);
+        die(print_r($themes));
         $result = [];
         foreach ($themes as $theme) {
             $result[$theme->getKey()] = $theme;

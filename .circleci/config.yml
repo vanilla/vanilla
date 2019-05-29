@@ -3,12 +3,17 @@ aliases:
     - &php72
         - image: circleci/php:7.2.9
         - image: mysql:5.7
-          command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_bin --innodb-large-prefix=true --innodb-file-format=Barracuda
+          command: mysqld
           environment:
                 MYSQL_USER: travis
                 MYSQL_ALLOW_EMPTY_PASSWORD: true
     - &php73
         - image: circleci/php:7.3.5
+        - image: mysql:5.7
+          command: mysqld
+          environment:
+                MYSQL_USER: travis
+                MYSQL_ALLOW_EMPTY_PASSWORD: true
     - &node
         - image: circleci/node:lts
     - &run_yarn

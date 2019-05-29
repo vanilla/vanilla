@@ -41,8 +41,20 @@ aliases:
     - phpunit_steps: &phpunit_steps
         - *attach_workspace
         - run:
+            name: Waiting for MySQL to be ready
+            command: |
+                for i in `seq 1 30`;
+                do
+                nc -z 127.0.0.1 3306 && echo Success && exit 0
+                echo -n .
+                sleep 1
+                done
+                echo Failed waiting for MySQL && exit 1
+        - run:
             name: Mysql database
-            command: mysql  -h 127.0.0.1 -u root -e "create database vanilla_tests;"
+            command: |
+                sudo apt-get install mysql-client
+                mysql -h 127.0.0.1 -u root -e "create database vanilla_tests;"
         - run:
             name: Test setup
             command: |

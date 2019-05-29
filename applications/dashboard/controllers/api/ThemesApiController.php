@@ -12,7 +12,7 @@ use Vanilla\Models\ThemeModel;
  * API Controller for the `/themes` resource.
  */
 class ThemesApiController extends AbstractApiController {
-    use ThemeApiSchemes;
+    use ThemesApiSchemes;
 
     // Theming
     const GET_THEME_ACTION = "@@themes/GET_DONE";

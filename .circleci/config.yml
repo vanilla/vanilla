@@ -24,7 +24,7 @@ aliases:
                 - yarn-packages-v1-
     - &attach_workspace
         attach_workspace:
-            at: ~/workspace/repo
+            at: ~/workspace
     - &save_composer_cache
         save_cache:
             key: composer-v1-{{ checksum "~/workspace/repo/composer.lock" }}
@@ -54,7 +54,7 @@ jobs:
                     php --version
                     composer --version
             - checkout:
-                path: ~/workspace # Repository will be named repo.
+                path: ~/workspace/repo # Repository will be named repo.
             - run: |
                 cd ~/workspace/repo
                 rm -rf .git

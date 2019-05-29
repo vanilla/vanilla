@@ -46,6 +46,7 @@ jobs:
         steps:
             - checkout:
                 path: ~/repo
+            - run: cd ~/repo
             - run: rm -rf .git
             - run:
                 name: Nodejs Version

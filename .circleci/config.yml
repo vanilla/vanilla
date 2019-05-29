@@ -152,7 +152,8 @@ workflows:
     version: 2
     commit:
         jobs:
-            - setup
+            - frontend_setup
+            - php_setup
             - frontend_lint:
                 requires:
                     - frontend_setup

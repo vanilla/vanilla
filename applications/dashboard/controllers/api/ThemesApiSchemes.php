@@ -5,11 +5,18 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Utility\InstanceValidatorSchema;
+use Vanilla\Theme\FontsAsset;
+use Vanilla\Theme\HtmlAsset;
+use Vanilla\Theme\JsonAsset;
+use Vanilla\Theme\StyleAsset;
+use Vanilla\Theme\ScriptsAsset;
+use Vanilla\Theme\ImageAsset;
 
 /**
  * ThemesApiController schemes.
  */
-trait ThemeApiSchemes {
+trait ThemesApiSchemes {
 
     /**
      * Result theme schema
@@ -20,9 +27,9 @@ trait ThemeApiSchemes {
     private function themeResultSchema(string $type = 'out'): Schema {
         $schema = $this->schema(
             Schema::parse([
-                'themeID:i',
-                'name:s',
-                'version:s',
+                'themeID:s?',
+                'name:s?',
+                'version:s?',
                 'current:b?',
                 'assets?' => $this->assetsSchema()
             ]),

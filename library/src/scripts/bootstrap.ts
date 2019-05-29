@@ -10,6 +10,8 @@ import { log, logError, debug } from "@library/utility/utils";
 import gdn from "@library/gdn";
 import apiv2 from "@library/apiv2";
 import { mountInputs } from "@library/forms/mountInputs";
+import { onPageView } from "./pageViews/pageViewTracking";
+import { History } from "history";
 
 // Inject the debug flag into the utility.
 const debugValue = getMeta("context.debug", getMeta("debug", false));
@@ -17,6 +19,13 @@ debug(debugValue);
 
 // Export the API to the global object.
 gdn.apiv2 = apiv2;
+
+// Record the page view.
+onPageView((params: { history: History }) => {
+    void apiv2.post("/tick").then(() => {
+        window.dispatchEvent(new Event("analyticsTick"));
+    });
+});
 
 log("Bootstrapping");
 _executeReady()

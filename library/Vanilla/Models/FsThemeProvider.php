@@ -21,6 +21,7 @@ use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
 use Garden\Web\Exception\NotFoundException;
 use Gdn_Request;
+use Gdn_Upload;
 
 /**
  * Handle custom themes.
@@ -31,11 +32,6 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @var AddonManager
      */
     private $addonManager;
-
-    /**
-     * @var Addon[]
-     */
-    private $themes;
 
     /** @var Gdn_Request */
     private $request;
@@ -56,7 +52,6 @@ class FsThemeProvider implements ThemeProviderInterface {
         ConfigurationInterface $config
     ) {
         $this->addonManager = $addonManager;
-        $this->themes = $this->getAllThemes();
         $this->request = $request;
         $this->config = $config;
     }
@@ -88,9 +83,8 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @throws NotFoundException Throws an exception when themeName not found.
      */
     public function getThemeByName($themeKey): Addon {
-        die(print_r($this->themes));
-        $theme = $this->themes[$themeKey] ?? false;
-        if ($theme === false) {
+        $theme = $this->addonManager->lookupTheme($themeKey);
+        if (!($theme instanceof Addon)) {
             throw new NotFoundException("Theme");
         }
         return $theme;
@@ -194,21 +188,6 @@ class FsThemeProvider implements ThemeProviderInterface {
             default:
                 throw new ServerException("Unrecognized data asset: {$key}");
         }
-    }
-
-    /**
-     * Get list of all available themes
-     *
-     * @return array List of all available themes
-     */
-    public function getAllThemes(): array {
-        $themes = $this->addonManager->lookupAllByType(Addon::TYPE_THEME);
-        die(print_r($themes));
-        $result = [];
-        foreach ($themes as $theme) {
-            $result[$theme->getKey()] = $theme;
-        }
-        return $result;
     }
 
     /**

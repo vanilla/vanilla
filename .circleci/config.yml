@@ -1,8 +1,77 @@
- version: 2
- jobs:
-   build:
-     docker:
-       - image: circleci/node:lts
-     steps:
-       - checkout
-       - run: echo "A first hello"
+version: 2
+aliases:
+    - &php72
+        - image: circleci/php:7.2.9-node-browsers
+    - &php73
+        - image: circleci/php:7.3.5-node-browsers
+    - &save_yarn_cache
+        save_cache:
+            paths:
+                - ~/.cache/yarn
+            key: yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
+    - &restore_yarn_cache
+        restore_cache:
+            name: Restore node_modules cache
+            keys:
+                - v1-node-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+                - v1-node-{{ arch }}-{{ .Branch }}-
+                - v1-node-{{ arch }}-
+    - &save_composer_cache
+        save_cache:
+            key: composer-v1-{{ checksum "composer.lock" }}
+            paths:
+                - vendor
+    - &restore_composer_cache
+        restore_cache:
+            keys:
+                - composer-v1-{{ checksum "composer.lock" }}
+                - composer-v1-
+    - &run_composer
+        run:
+            name: Install Composer Packages
+            command: VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
+    - &run_yarn
+        run:
+            name: Install Yarn Packages
+            command: yarn install --frozen-lockfile
+jobs:
+    setup:
+        docker: &php73
+        steps:
+            - checkout
+            - run:
+                name: Nodejs Version
+                command: node --version
+            - &restore_composer_cache
+            - &run_composer
+            - &save_composer_cache
+            - &restore_yarn_cache
+            - &run_yarn
+            - &save_yarn_cache
+    frontend_lint:
+        docker: &php73
+        steps:
+            - yarn lint
+            - yarn prettier --check "**/src/scripts/**/*"
+    frontend_typechecker:
+        docker: &php73
+        steps:
+            - yarn check-types
+    frontend_build:
+        - &restore_yarn_cache
+        - run: yarn build
+        - &save_yarn_cache
+workflows:
+    version: 2
+    commit:
+        jobs:
+            - setup
+            - frontend_lint
+                requires:
+                    - setup
+            - frontend_typechecker
+                requires:
+                    - setup
+            - frontend_build
+                requires:
+                    - setup

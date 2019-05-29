@@ -58,20 +58,22 @@ jobs:
         steps:
             - yarn check-types
     frontend_build:
-        - &restore_yarn_cache
-        - run: yarn build
-        - &save_yarn_cache
+        docker: &php73
+        steps:
+            - &restore_yarn_cache
+            - run: yarn build
+            - &save_yarn_cache
 workflows:
     version: 2
     commit:
         jobs:
             - setup
-            - frontend_lint
+            - frontend_lint:
                 requires:
                     - setup
-            - frontend_typechecker
+            - frontend_typechecker:
                 requires:
                     - setup
-            - frontend_build
+            - frontend_build:
                 requires:
                     - setup

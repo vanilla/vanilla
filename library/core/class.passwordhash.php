@@ -97,8 +97,8 @@ class Gdn_PasswordHash {
             case 'random':
                 $resetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='
                         .urlencode(Gdn::request()->get('display')) : ''));
-                throw new Gdn_SanitizedUserException(sprintf(t('You don\'t have a password.', 'Your account does not 
-                have a password assigned to it yet. Click <a href="%s">here</a> to reset your password.'), $resetUrl));
+                $messageRandom ='Your account does not have a password assigned to it yet. Click <a href="%s">here</a> to reset your password.';
+                throw new Gdn_SanitizedUserException(sprintf(t('You don\'t have a password.', $messageRandom), $resetUrl));
                 break;
             case 'smf':
                 $result = $this->getAlgorithm('Smf')->verify($password, $storedHash);

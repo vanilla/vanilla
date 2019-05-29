@@ -7,49 +7,57 @@ aliases:
     - &run_yarn
         run:
             name: Install Yarn Packages
-            command: yarn install --frozen-lockfile
+            command: |
+                cd ~/vanilla/repo
+                yarn install --frozen-lockfile
     - &save_yarn_cache
         save_cache:
             paths:
                 - ~/.cache/yarn
-            key: yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            key: yarn-packages-v1-{{ .Branch }}-{{ checksum "~/vanilla/repo/yarn.lock" }}
     - &restore_yarn_cache
         restore_cache:
             name: Restore node_modules cache
             keys:
-                - yarn-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
+                - yarn-packages-v1-{{ .Branch }}-{{ checksum "~/vanilla/repo/yarn.lock" }}
                 - yarn-packages-v1-{{ .Branch }}-
                 - yarn-packages-v1-
     - &attach_workspace
         attach_workspace:
-            at: ~/repo
+            at: ~/vanilla/repo
     - &save_composer_cache
         save_cache:
-            key: composer-v1-{{ checksum "composer.lock" }}
+            key: composer-v1-{{ checksum "~/vanilla/repo/composer.lock" }}
             paths:
                 - vendor
     - &restore_composer_cache
         restore_cache:
             keys:
-                - composer-v1-{{ checksum "composer.lock" }}
+                - composer-v1-{{ checksum "~/vanilla/repo/composer.lock" }}
                 - composer-v1-
     - &run_composer
         run:
             name: Install Composer Packages
-            command: VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
+            command: |
+                cd ~/vanilla/repo
+                VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
 jobs:
     setup:
         docker: *php73
-        working_directory: ~/
         resource_class: xlarge
         steps:
-            - checkout:
-                path: ~/repo
-            - run: cd ~/repo
-            - run: rm -rf .git
             - run:
-                name: Nodejs Version
-                command: node --version
+                name: Versions
+                command: |
+                    node --version
+                    yarn --version
+                    php --version
+                    composer --version
+            - checkout:
+                path: ~/vanilla/repo
+            - run: |
+                cd ~/vanilla/repo
+                rm -rf .git
             - *restore_composer_cache
             - *run_composer
             - *save_composer_cache
@@ -57,10 +65,12 @@ jobs:
             - *run_yarn
             - run:
                 name: Build Frontend
-                command: yarn build
+                command: |
+                    cd ~/vanilla/repo
+                    yarn build
             - *save_yarn_cache
             - persist_to_workspace:
-                root: ~/
+                root: ~/vanilla
                 paths:
                     - repo
     frontend_lint:
@@ -68,18 +78,19 @@ jobs:
         working_directory: ~/
         steps:
             - *attach_workspace
-            - run: cd ~/repo
-            - run: yarn lint
-            - run: yarn prettier --check "**/src/scripts/**/*"
+            - run: |
+                cd ~/vanilla/repo
+                yarn lint
+                yarn prettier --check "**/src/scripts/**/*"
     frontend_typechecker:
         docker: *php73
+        resource_class: large
         working_directory: ~/
         steps:
             - *attach_workspace
-            - run: cd ~/repo
-            - *restore_yarn_cache
-            - *run_yarn
-            - run: yarn check-types
+            - run: |
+                cd ~/vanilla/repo
+                yarn check-types
 workflows:
     version: 2
     commit:

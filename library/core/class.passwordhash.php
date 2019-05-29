@@ -90,9 +90,10 @@ class Gdn_PasswordHash {
             case 'reset':
                 $resetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='
                         .urlencode(Gdn::request()->get('display')) : ''));
-                throw new Gdn_SanitizedUserException(sprintf(t('You need to reset your password.', 'You need to reset
-                your password. This is most likely because an administrator recently changed your account information.
-                Click <a href="%s">here</a> to reset your password.'), $resetUrl));
+                $messageReset = 'You need to reset your password. 
+                This is most likely because an administrator recently changed your account information.
+                Click <a href="%s">here</a> to reset your password.';
+                throw new Gdn_SanitizedUserException(sprintf(t('You need to reset your password.', $messageReset), $resetUrl));
                 break;
             case 'random':
                 $resetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='

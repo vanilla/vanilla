@@ -11,33 +11,9 @@ aliases:
                 cd ~/workspace/repo
                 yarn install --pure-lockfile
                 yarn install-all
-    - &save_yarn_cache
-        save_cache:
-            paths:
-                - ~/workspace/repo/node_modules
-                - ~/.cache/yarn
-            key: yarn-packages-{{ .Environment.CacheVersion }}-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}-{{ checksum "~/workspace/repo/.yarnclean" }}
-    - &restore_yarn_cache
-        restore_cache:
-            name: Restore node_modules cache
-            keys:
-                - yarn-packages-{{ .Environment.CacheVersion }}-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}-{{ checksum "~/workspace/repo/.yarnclean" }}
-                - yarn-packages-{{ .Environment.CacheVersion }}-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}
-                - yarn-packages-{{ .Environment.CacheVersion }}-{{ .Branch }}-
-                - yarn-packages-{{ .Environment.CacheVersion }}-
     - &attach_workspace
         attach_workspace:
             at: ~/workspace
-    - &save_composer_cache
-        save_cache:
-            key: composer-v1-{{ checksum "~/workspace/repo/composer.lock" }}
-            paths:
-                - vendor
-    - &restore_composer_cache
-        restore_cache:
-            keys:
-                - composer-v1-{{ checksum "~/workspace/repo/composer.lock" }}
-                - composer-v1-
     - &run_composer
         run:
             name: Install Composer Packages
@@ -60,12 +36,10 @@ jobs:
             - run: |
                 cd ~/workspace/repo
                 rm -rf .git
-            - *restore_composer_cache
+            # We explcitly don't cache dependencies.
+            # The cache validation & fetching seems to take longer than fetching from source.
             - *run_composer
-            - *save_composer_cache
-            - *restore_yarn_cache
             - *run_yarn
-            - *save_yarn_cache
             - persist_to_workspace:
                 root: ~/workspace
                 paths:

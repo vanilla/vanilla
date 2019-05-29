@@ -23,7 +23,6 @@ aliases:
     - &attach_workspace
         attach_workspace:
             at: ~/repo
-        run: cd ~/repo
     - &save_composer_cache
         save_cache:
             key: composer-v1-{{ checksum "composer.lock" }}
@@ -66,14 +65,18 @@ jobs:
                     - repo
     frontend_lint:
         docker: *php73
+        working_directory: ~/
         steps:
             - *attach_workspace
+            - run: cd ~/repo
             - run: yarn lint
             - run: yarn prettier --check "**/src/scripts/**/*"
     frontend_typechecker:
         docker: *php73
+        working_directory: ~/
         steps:
             - *attach_workspace
+            - run: cd ~/repo
             - *restore_yarn_cache
             - *run_yarn
             - run: yarn check-types

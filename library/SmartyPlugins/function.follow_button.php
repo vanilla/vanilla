@@ -1,11 +1,17 @@
 <?php
 /**
- * Returns category follow toggle button
+ * Returns category follow toggle button.
  *
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package vanilla-smarty
  * @since 2.0
+ * @return string
+ */
+
+/**
+ * Follow button.
+ *
  * @return string
  */
 function smarty_function_follow_button() {

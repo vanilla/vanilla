@@ -27,7 +27,8 @@ trait ThemesApiSchemes {
     private function themeResultSchema(string $type = 'out'): Schema {
         $schema = $this->schema(
             Schema::parse([
-                'themeID:s?',
+                'themeID:s',
+                'type:s',
                 'name:s?',
                 'version:s?',
                 'current:b?',

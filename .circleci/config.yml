@@ -51,15 +51,18 @@ jobs:
     frontend_lint:
         docker: *php73
         steps:
-            - yarn lint
-            - yarn prettier --check "**/src/scripts/**/*"
+            - checkout
+            - run: yarn lint
+            - run: yarn prettier --check "**/src/scripts/**/*"
     frontend_typechecker:
         docker: *php73
         steps:
-            - yarn check-types
+            - checkout
+            - run: yarn check-types
     frontend_build:
         docker: *php73
         steps:
+            - checkout
             - *restore_yarn_cache
             - run:
                 name: Build Frontend

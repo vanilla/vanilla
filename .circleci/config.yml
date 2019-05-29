@@ -1,14 +1,21 @@
 version: 2
 aliases:
     - &php72
-        - image: circleci/php:7.2.9-node-browsers
+        - image: circleci/php:7.2.9
+        - image: mysql:5.7
+          command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_bin --innodb-large-prefix=true --innodb-file-format=Barracuda
+          environment:
+                MYSQL_USER: travis
+                MYSQL_ALLOW_EMPTY_PASSWORD: true
     - &php73
-        - image: circleci/php:7.3.5-node-browsers
+        - image: circleci/php:7.3.5
+    - &node
+        - image: circleci/node:lts
     - &run_yarn
         run:
             name: Install Yarn Packages
             command: |
-                cd ~/workspace/repo
+                cd ~/workspace/frontend
                 yarn install --pure-lockfile
                 yarn install-all
     - &attach_workspace
@@ -18,34 +25,57 @@ aliases:
         run:
             name: Install Composer Packages
             command: |
-                cd ~/workspace/repo
+                cd ~/workspace/php
                 VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
+    - &run_php_lint
+        run: |
+            cd ~/workspace/php
+            tests/travis/php-lint.sh ./applications
+            tests/travis/php-lint.sh ./conf
+            tests/travis/php-lint.sh ./library
+            tests/travis/php-lint.sh ./plugins
+            tests/travis/php-lint.sh ./themes
+    - phpunit_steps: &phpunit_steps
+        - *attach_workspace
+        - run:
+            name: Mysql database
+            command: mysql  -h 127.0.0.1 -u root -e "create database vanilla_tests;"
+        - run:
+            name: Test setup
+            command: |
+                cd ~/workspace/php
+                cp ./tests/travis/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
+        - run: |
+            cd ~/workspace/php
+            mkdir -p ~/phpunit
+            ./vendor/bin/phpunit --log-junit ~/phpunit/junit.xml -c phpunit.xml.dist --exclude-group=ignore
+        - store_test_results:
+            path: ~/phpunit
+        - store_artifacts:
+            path: ~/phpunit
 jobs:
-    setup:
-        docker: *php73
+    frontend_setup:
+        docker: *node
         steps:
             - run:
                 name: Versions
                 command: |
                     node --version
                     yarn --version
-                    php --version
-                    composer --version
             - checkout:
-                path: ~/workspace/repo # Repository will be named repo.
+                path: ~/workspace/frontend # Repository will be named repo.
             - run: |
-                cd ~/workspace/repo
+                cd ~/workspace/frontend
                 rm -rf .git
             # We explcitly don't cache dependencies.
             # The cache validation & fetching seems to take longer than fetching from source.
-            - *run_composer
             - *run_yarn
             - persist_to_workspace:
                 root: ~/workspace
                 paths:
-                    - repo
+                    - frontend
     frontend_build:
-        docker: *php73
+        docker: *node
         resource_class: xlarge
         steps:
             - *attach_workspace
@@ -55,7 +85,7 @@ jobs:
                     cd ~/workspace/repo
                     yarn build
     frontend_test:
-        docker: *php73
+        docker: *node
         resource_class: xlarge
         steps:
             - *attach_workspace
@@ -65,8 +95,7 @@ jobs:
                     cd ~/workspace/repo
                     yarn test
     frontend_lint:
-        docker: *php73
-        working_directory: ~/
+        docker: *node
         steps:
             - *attach_workspace
             - run: |
@@ -74,14 +103,51 @@ jobs:
                 yarn lint
                 yarn prettier --check "**/src/scripts/**/*"
     frontend_typechecker:
-        docker: *php73
+        docker: *node
         resource_class: large
-        working_directory: ~/
         steps:
             - *attach_workspace
             - run: |
                 cd ~/workspace/repo
                 yarn check-types
+    php_setup:
+        docker: *php73
+        steps:
+            - run:
+                name: Versions
+                command: |
+                    php --version
+                    composer --version
+            - checkout:
+                path: ~/workspace/php # Repository will be named repo.
+            - run: |
+                cd ~/workspace/php
+                rm -rf .git
+            # We explcitly don't cache dependencies.
+            # The cache validation & fetching seems to take longer than fetching from source.
+            - *run_composer
+            - persist_to_workspace:
+                root: ~/workspace
+                paths:
+                    - php
+    php_73_lint:
+        docker: *php73
+        steps:
+            - *attach_workspace
+            - *run_php_lint
+    php_73_tests:
+        docker: *php73
+        resource_class: xlarge
+        steps: *phpunit_steps
+    php_72_lint:
+        docker: *php72
+        steps:
+            - *attach_workspace
+            - *run_php_lint
+    php_72_tests:
+        docker: *php72
+        resource_class: xlarge
+        steps: *phpunit_steps
 workflows:
     version: 2
     commit:
@@ -89,13 +155,25 @@ workflows:
             - setup
             - frontend_lint:
                 requires:
-                    - setup
+                    - frontend_setup
             - frontend_typechecker:
                 requires:
-                    - setup
+                    - frontend_setup
             - frontend_build:
                 requires:
-                    - setup
+                    - frontend_setup
             - frontend_test:
                 requires:
-                    - setup
+                    - frontend_setup
+            - php_73_lint:
+                requires:
+                    - php_setup
+            - php_73_tests:
+                requires:
+                    - php_setup
+            - php_72_lint:
+                requires:
+                    - php_setup
+            - php_72_tests:
+                requires:
+                    - php_setup

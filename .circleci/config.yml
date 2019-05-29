@@ -8,38 +8,38 @@ aliases:
         run:
             name: Install Yarn Packages
             command: |
-                cd ~/vanilla/repo
+                cd ~/workspace/repo
                 yarn install --frozen-lockfile
     - &save_yarn_cache
         save_cache:
             paths:
                 - ~/.cache/yarn
-            key: yarn-packages-v1-{{ .Branch }}-{{ checksum "~/vanilla/repo/yarn.lock" }}
+            key: yarn-packages-v1-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}
     - &restore_yarn_cache
         restore_cache:
             name: Restore node_modules cache
             keys:
-                - yarn-packages-v1-{{ .Branch }}-{{ checksum "~/vanilla/repo/yarn.lock" }}
+                - yarn-packages-v1-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}
                 - yarn-packages-v1-{{ .Branch }}-
                 - yarn-packages-v1-
     - &attach_workspace
         attach_workspace:
-            at: ~/vanilla/repo
+            at: ~/workspace/repo
     - &save_composer_cache
         save_cache:
-            key: composer-v1-{{ checksum "~/vanilla/repo/composer.lock" }}
+            key: composer-v1-{{ checksum "~/workspace/repo/composer.lock" }}
             paths:
                 - vendor
     - &restore_composer_cache
         restore_cache:
             keys:
-                - composer-v1-{{ checksum "~/vanilla/repo/composer.lock" }}
+                - composer-v1-{{ checksum "~/workspace/repo/composer.lock" }}
                 - composer-v1-
     - &run_composer
         run:
             name: Install Composer Packages
             command: |
-                cd ~/vanilla/repo
+                cd ~/workspace/repo
                 VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --optimize-autoloader
 jobs:
     setup:
@@ -54,9 +54,9 @@ jobs:
                     php --version
                     composer --version
             - checkout:
-                path: ~/vanilla/repo
+                path: ~/workspace # Repository will be named repo.
             - run: |
-                cd ~/vanilla/repo
+                cd ~/workspace/repo
                 rm -rf .git
             - *restore_composer_cache
             - *run_composer
@@ -66,11 +66,11 @@ jobs:
             - run:
                 name: Build Frontend
                 command: |
-                    cd ~/vanilla/repo
+                    cd ~/workspace/repo
                     yarn build
             - *save_yarn_cache
             - persist_to_workspace:
-                root: ~/vanilla
+                root: ~/workspace
                 paths:
                     - repo
     frontend_lint:
@@ -79,7 +79,7 @@ jobs:
         steps:
             - *attach_workspace
             - run: |
-                cd ~/vanilla/repo
+                cd ~/workspace/repo
                 yarn lint
                 yarn prettier --check "**/src/scripts/**/*"
     frontend_typechecker:
@@ -89,7 +89,7 @@ jobs:
         steps:
             - *attach_workspace
             - run: |
-                cd ~/vanilla/repo
+                cd ~/workspace/repo
                 yarn check-types
 workflows:
     version: 2

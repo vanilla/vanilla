@@ -10,9 +10,11 @@ aliases:
             command: |
                 cd ~/workspace/repo
                 yarn install --pure-lockfile
+                yarn install-all
     - &save_yarn_cache
         save_cache:
             paths:
+                - ~/workspace/repo/node_modules
                 - ~/.cache/yarn
             key: yarn-packages-v1-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}
     - &restore_yarn_cache
@@ -44,7 +46,6 @@ aliases:
 jobs:
     setup:
         docker: *php73
-        resource_class: xlarge
         steps:
             - run:
                 name: Versions
@@ -63,16 +64,31 @@ jobs:
             - *save_composer_cache
             - *restore_yarn_cache
             - *run_yarn
-            - run:
-                name: Build Frontend
-                command: |
-                    cd ~/workspace/repo
-                    yarn build
             - *save_yarn_cache
             - persist_to_workspace:
                 root: ~/workspace
                 paths:
                     - repo
+    frontend_build:
+        docker: *php73
+        resource_class: xlarge
+        steps:
+            - *attach_workspace
+            - run:
+                name: Build Frontend
+                command: |
+                    cd ~/workspace/repo
+                    yarn build
+    frontend_test:
+        docker: *php73
+        resource_class: xlarge
+        steps:
+            - *attach_workspace
+            - run:
+                name: Build Frontend
+                command: |
+                    cd ~/workspace/repo
+                    yarn test
     frontend_lint:
         docker: *php73
         working_directory: ~/
@@ -100,5 +116,11 @@ workflows:
                 requires:
                     - setup
             - frontend_typechecker:
+                requires:
+                    - setup
+            - frontend_build:
+                requires:
+                    - setup
+            - frontend_test:
                 requires:
                     - setup

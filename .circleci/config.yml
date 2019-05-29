@@ -9,7 +9,7 @@ aliases:
             name: Install Yarn Packages
             command: |
                 cd ~/workspace/repo
-                yarn install --frozen-lockfile
+                yarn install --pure-lockfile
     - &save_yarn_cache
         save_cache:
             paths:

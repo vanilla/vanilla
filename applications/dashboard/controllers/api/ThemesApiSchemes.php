@@ -10,7 +10,7 @@ use Vanilla\Theme\FontsAsset;
 use Vanilla\Theme\HtmlAsset;
 use Vanilla\Theme\JsonAsset;
 use Vanilla\Theme\StyleAsset;
-use Vanilla\Theme\JavascriptAsset;
+//use Vanilla\Theme\JavascriptAsset;
 use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Theme\ImageAsset;
 
@@ -52,8 +52,8 @@ trait ThemesApiSchemes {
             "variables?" => new InstanceValidatorSchema(JsonAsset::class),
             "fonts?" => new InstanceValidatorSchema(FontsAsset::class),
             "scripts?" => new InstanceValidatorSchema(ScriptsAsset::class),
-            "styles:s?" => new InstanceValidatorSchema(StyleAsset::class),
-            "javascript:s?" => new InstanceValidatorSchema(JavascriptAsset::class),
+            "styles:s?",
+            "javascript:s?",
             "logo?" => new InstanceValidatorSchema(ImageAsset::class),
             "mobileLogo?" => new InstanceValidatorSchema(ImageAsset::class),
         ])->setID('themeAssetsSchema');

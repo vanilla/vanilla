@@ -37,6 +37,7 @@ aliases:
 jobs:
     setup:
         docker: *php73
+        resource_class: xlarge
         steps:
             - checkout
             - run:
@@ -47,27 +48,25 @@ jobs:
             - *save_composer_cache
             - *restore_yarn_cache
             - *run_yarn
+            - run:
+                name: Build Frontend
+                command: yarn build
             - *save_yarn_cache
     frontend_lint:
         docker: *php73
         steps:
             - checkout
+            - *restore_yarn_cache
+            - *run_yarn
             - run: yarn lint
             - run: yarn prettier --check "**/src/scripts/**/*"
     frontend_typechecker:
         docker: *php73
         steps:
             - checkout
-            - run: yarn check-types
-    frontend_build:
-        docker: *php73
-        steps:
-            - checkout
             - *restore_yarn_cache
-            - run:
-                name: Build Frontend
-                command: yarn build
-            - *save_yarn_cache
+            - *run_yarn
+            - run: yarn check-types
 workflows:
     version: 2
     commit:

@@ -214,7 +214,7 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @param string $themeKey
      * @param string $assetKey
      * @return string
-     * @throws NotFoundException
+     * @throws NotFoundException If no asset found throw an exception
      */
     public function getAssetData($themeKey, string $assetKey): string {
         $theme = $this->getThemeByName($themeKey);

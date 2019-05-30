@@ -217,8 +217,15 @@ class FsThemeProvider implements ThemeProviderInterface {
     public function getAssetData($themeKey, string $assetKey): string {
         $theme = $this->getThemeByName($themeKey);
         $assets = $this->getAssets($themeKey);
+        $files = array_column($assets, "file");
 
         if (array_key_exists($assetKey, $assets)) {
+            $asset = $assets[$assetKey];
+            if (!is_array($asset) || !array_key_exists("data", $asset)) {
+                throw new ServerException("Asset does not have a data key.");
+            }
+            return $assets[$assetKey]["data"];
+        } elseif (in_array($assetKey, $files)) {
             return $this->getFileAsset($theme, $assetKey);
         } else {
             throw new NotFoundException("Asset");

@@ -38,18 +38,6 @@ aliases:
             tests/travis/php-lint.sh ./library
             tests/travis/php-lint.sh ./plugins
             tests/travis/php-lint.sh ./themes
-    - &install_php_exts
-        run:
-            name: Install PHP exts
-            command: |
-                sudo docker-php-ext-install zip
-                sudo docker-php-ext-configure intl
-                sudo docker-php-ext-install intl
-                sudo docker-php-ext-install pdo
-                sudo docker-php-ext-install pdo_mysql
-                sudo docker-php-ext-install mbstring
-                # sudo docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
-                # sudo docker-php-ext-install gd
     - &await_mysql
         run:
             name: Waiting for MySQL to be ready
@@ -63,7 +51,6 @@ aliases:
                 echo Failed waiting for MySQL && exit 1
     - phpunit_steps: &phpunit_steps
         - *attach_workspace
-        - *install_php_exts
         - run:
             name: Test setup
             command: |
@@ -74,6 +61,7 @@ aliases:
             name: Mysql database
             command: |
                 sudo apt-get install mysql-client
+                sudo docker-php-ext-install pdo_mysql
                 mysql -h 127.0.0.1 -u root -e "create database vanilla_tests;"
         - run: |
             cd ~/workspace/php

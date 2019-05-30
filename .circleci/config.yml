@@ -13,7 +13,7 @@ aliases:
                 MYSQL_USER: travis
                 MYSQL_ALLOW_EMPTY_PASSWORD: true
     - &node
-        - image: circleci/node:lts
+        - image: circleci/node:lts-browsers
     - &run_yarn
         run:
             name: Install Yarn Packages
@@ -60,8 +60,9 @@ aliases:
         - run:
             name: Mysql database
             command: |
-                sudo apt-get install mysql-client
+                sudo docker-php-ext-install pdo
                 sudo docker-php-ext-install pdo_mysql
+                sudo apt-get install mysql-client
                 mysql -h 127.0.0.1 -u root -e "create database vanilla_tests;"
         - run: |
             cd ~/workspace/php

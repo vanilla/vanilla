@@ -115,7 +115,6 @@ class PanelLayout extends React.Component<IProps> {
                     <div
                         className={classNames(
                             classes.container,
-                            classes.middleColumnMaxWidth,
                             this.props.growMiddleBottom ? inheritHeightClass() : "",
                         )}
                     >
@@ -132,7 +131,7 @@ class PanelLayout extends React.Component<IProps> {
                         )}
 
                         <ContentTag
-                            className={classNames(classes.content, {
+                            className={classNames(classes.content, classes.middleColumnMaxWidth, {
                                 hasAdjacentPanel: shouldRenderLeftPanel || shouldRenderRightPanel,
                                 hasTwoAdjacentPanels: shouldRenderLeftPanel && shouldRenderRightPanel,
                             })}

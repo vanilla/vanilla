@@ -39,6 +39,14 @@ interface ThemeProviderInterface {
     public function getAssetData($themeKey, string $assetKey): string;
 
     /**
+     * DELETE theme asset.
+     *
+     * @param string|int $themeKey The unique theme key or ID.
+     * @param string $assetKey Unique asset key (ex: header.html, footer.html, fonts.json, styles.css)
+     */
+    public function deleteAsset($themeKey, string $assetKey);
+
+    /**
      * Create new theme.
      *
      * @param array $body Array of incoming params.

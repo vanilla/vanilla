@@ -206,4 +206,15 @@ class ThemeModel {
         $provider = $this->getThemeProvider($themeKey);
         return $provider->getAssetData($themeKey, $assetKey);
     }
+
+    /**
+     * DELETE theme asset.
+     *
+     * @param string $themeKey The unique theme key or ID.
+     * @param string $assetKey Unique asset key (ex: header.html, footer.html, fonts.json, styles.css)
+     */
+    public function deleteAsset(string $themeKey, string $assetKey) {
+        $provider = $this->getThemeProvider($themeKey);
+        return $provider->deleteAsset($themeKey, $assetKey);
+    }
 }

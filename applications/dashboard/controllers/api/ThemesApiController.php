@@ -170,19 +170,10 @@ class ThemesApiController extends AbstractApiController {
         $out = $this->schema($this->assetsSchema(), 'out');
 
         $body = $in->validate($body);
+        $this->validateAssetKey($assetKey);
 
-        $pathInfo = pathinfo($assetKey);
-        if (isset(ThemeModel::ASSET_LIST[$pathInfo['filename']])) {
-            if ($pathInfo['basename'] === ThemeModel::ASSET_LIST[$pathInfo['filename']]['file']) {
-                $asset = $this->themeModel->setAsset($themeID, $pathInfo['filename'], $body['data']);
-            } else {
-                throw new ClientException('Unknown asset file name: "'.$pathInfo['basename'].'".'.
-                    'Try: '.ThemeModel::ASSET_LIST[$pathInfo['filename']]['file']);
-            }
-        } else {
-            throw new \Garden\Schema\ValidationException('Unknown asset "'.$pathInfo['filename'].'" field.'.
-                'Should be one of: '.implode(array_column(ThemeModel::ASSET_LIST, 'file')));
-        }
+        $asset = $this->themeModel->setAsset($themeID, $assetKey, $body['data']);
+
         return $out->validate($asset);
     }
 
@@ -193,7 +184,11 @@ class ThemesApiController extends AbstractApiController {
      * @param string $assetKey Unique asset key (ex: header.html, footer.html, fonts.json, styles.css)
      */
     public function delete_assets(int $themeID, string $assetKey) {
-        return $this->getCustomThemeProvider()->delete_assets($themeID, $assetKey);
+        $this->permission("Garden.Settings.Manage");
+
+        $this->validateAssetKey($assetKey);
+
+        $this->themeModel->deleteAsset($themeID, $assetKey);
     }
 
     /**
@@ -209,9 +204,25 @@ class ThemesApiController extends AbstractApiController {
      */
     public function get_assets(string $id, string $assetKey) {
         $this->permission();
+        $this->validateAssetKey($assetKey);
         $content = $this->themeModel->getAssetData($id, $assetKey);
         $contentType = $this->contentTypeByAsset($assetKey);
         $result = new Data($content);
         return $result->setHeader("Content-Type", $contentType);
+    }
+
+    private function validateAssetKey(string &$assetKey) {
+        $pathInfo = pathinfo($assetKey);
+        if (isset(ThemeModel::ASSET_LIST[$pathInfo['filename']])) {
+            if ($pathInfo['basename'] === ThemeModel::ASSET_LIST[$pathInfo['filename']]['file']) {
+                $assetKey = $pathInfo['filename'];
+            } else {
+                throw new ClientException('Unknown asset file name: "'.$pathInfo['basename'].'".'.
+                    'Try: '.ThemeModel::ASSET_LIST[$pathInfo['filename']]['file']);
+            }
+        } else {
+            throw new \Garden\Schema\ValidationException('Unknown asset "'.$pathInfo['filename'].'" field.'.
+                'Should be one of: '.implode(array_column(ThemeModel::ASSET_LIST, 'file')));
+        }
     }
 }

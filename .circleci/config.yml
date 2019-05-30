@@ -68,15 +68,15 @@ aliases:
             command: |
                 mysql -h 127.0.0.1 -u root -e "create database vanilla_tests;"
         - run:
-            name: Library Tests
-            command: |
-                cd ~/workspace/php
-                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library"
-        - run:
             name: Formatting Tests
             command: |
                 cd ~/workspace/php
                 ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Formatting"
+        - run:
+            name: Library Tests
+            command: |
+                cd ~/workspace/php
+                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library"
         - run:
             name: APIv2 Tests
             command: |

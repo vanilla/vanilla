@@ -215,7 +215,7 @@ class ThemesApiController extends AbstractApiController {
      * Validate asset filename to ba part of allowed ASSET_LIST
      *
      * @param string $assetKey
-     * @throws \Garden\Schema\ValidationException If assetKey is invalid throw validation exception
+     * @throws \Garden\Schema\ValidationException If assetKey is invalid throw validation exception.
      */
     private function validateAssetKey(string &$assetKey) {
         $pathInfo = pathinfo($assetKey);

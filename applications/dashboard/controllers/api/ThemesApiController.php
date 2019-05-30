@@ -211,6 +211,12 @@ class ThemesApiController extends AbstractApiController {
         return $result->setHeader("Content-Type", $contentType);
     }
 
+    /**
+     * Validate asset filename to ba part of allowed ASSET_LIST
+     *
+     * @param string $assetKey
+     * @throws \Garden\Schema\ValidationException
+     */
     private function validateAssetKey(string &$assetKey) {
         $pathInfo = pathinfo($assetKey);
         if (isset(ThemeModel::ASSET_LIST[$pathInfo['filename']])) {

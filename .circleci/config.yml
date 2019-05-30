@@ -41,6 +41,22 @@ aliases:
     - phpunit_steps: &phpunit_steps
         - *attach_workspace
         - run:
+            name: Install PHP exts
+            command: |
+                sudo docker-php-ext-install zip
+                sudo docker-php-ext-configure intl
+                sudo docker-php-ext-install intl
+                sudo docker-php-ext-install pdo
+                sudo docker-php-ext-install pdo_mysql
+                sudo docker-php-ext-install mbstring
+                sudo docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
+                sudo docker-php-ext-install gd
+        - run:
+            name: Test setup
+            command: |
+                cd ~/workspace/php
+                cp ./tests/travis/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
+        - run:
             name: Waiting for MySQL to be ready
             command: |
                 for i in `seq 1 30`;
@@ -55,11 +71,6 @@ aliases:
             command: |
                 sudo apt-get install mysql-client
                 mysql -h 127.0.0.1 -u root -e "create database vanilla_tests;"
-        - run:
-            name: Test setup
-            command: |
-                cd ~/workspace/php
-                cp ./tests/travis/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
         - run: |
             cd ~/workspace/php
             mkdir -p ~/phpunit

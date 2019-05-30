@@ -71,22 +71,22 @@ aliases:
             name: Library Tests
             command: |
                 cd ~/workspace/php
-                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --test-suite="Library"
+                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Library"
         - run:
             name: Formatting Tests
             command: |
                 cd ~/workspace/php
-                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --test-suite="Formatting"
+                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Formatting"
         - run:
             name: APIv2 Tests
             command: |
                 cd ~/workspace/php
-                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --test-suite="APIv2"
+                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="APIv2"
         - run:
             name: Models Tests
             command: |
                 cd ~/workspace/php
-                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --test-suite="Models"
+                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --testsuite="Models"
 jobs:
     frontend_setup:
         docker: *node

@@ -38,9 +38,8 @@ aliases:
             tests/travis/php-lint.sh ./library
             tests/travis/php-lint.sh ./plugins
             tests/travis/php-lint.sh ./themes
-    - phpunit_steps: &phpunit_steps
-        - *attach_workspace
-        - run:
+    - &install_php_exts
+        run:
             name: Install PHP exts
             command: |
                 sudo docker-php-ext-install zip
@@ -49,14 +48,10 @@ aliases:
                 sudo docker-php-ext-install pdo
                 sudo docker-php-ext-install pdo_mysql
                 sudo docker-php-ext-install mbstring
-                sudo docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
-                sudo docker-php-ext-install gd
-        - run:
-            name: Test setup
-            command: |
-                cd ~/workspace/php
-                cp ./tests/travis/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
-        - run:
+                # sudo docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
+                # sudo docker-php-ext-install gd
+    - &await_mysql
+        run:
             name: Waiting for MySQL to be ready
             command: |
                 for i in `seq 1 30`;
@@ -66,6 +61,15 @@ aliases:
                 sleep 1
                 done
                 echo Failed waiting for MySQL && exit 1
+    - phpunit_steps: &phpunit_steps
+        - *attach_workspace
+        - *install_php_exts
+        - run:
+            name: Test setup
+            command: |
+                cd ~/workspace/php
+                cp ./tests/travis/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
+        - *await_mysql
         - run:
             name: Mysql database
             command: |

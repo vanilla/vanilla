@@ -22,6 +22,9 @@ class CacheControlMiddleware {
     /** @var string Standard Cache-Control header for content that should not be cached. */
     const NO_CACHE = 'private, no-cache, max-age=0, must-revalidate';
 
+    /** @var string Standard vary header when using public cache control based on session. */
+    const VARY_COOKIE = 'Accept-Encoding, Cookie';
+
     /** @var SessionInterface An instance of the current user session. */
     private $session;
 

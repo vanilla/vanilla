@@ -10,8 +10,6 @@ import { log, logError, debug } from "@library/utility/utils";
 import gdn from "@library/gdn";
 import apiv2 from "@library/apiv2";
 import { mountInputs } from "@library/forms/mountInputs";
-import { initPageViewTracking } from "@library/pageViews/pageViewTracking";
-import { createBrowserHistory } from "history";
 
 // Inject the debug flag into the utility.
 const debugValue = getMeta("context.debug", getMeta("debug", false));
@@ -29,8 +27,6 @@ _executeReady()
             _mountComponents(e.target);
             mountInputs();
         });
-
-        initPageViewTracking(createBrowserHistory());
 
         const contentEvent = new CustomEvent("X-DOMContentReady", { bubbles: true, cancelable: false });
         document.dispatchEvent(contentEvent);

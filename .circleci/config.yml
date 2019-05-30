@@ -58,11 +58,14 @@ aliases:
                 cp ./tests/travis/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
         - *await_mysql
         - run:
-            name: Mysql database
+            name: Prepare Database Dependencies
             command: |
-                sudo docker-php-ext-install pdo
-                sudo docker-php-ext-install pdo_mysql
+                sudo apt update && sudo apt install zlib1g-dev libsqlite3-dev
+                sudo docker-php-ext-install pdo pdo_mysql
                 sudo apt-get install mysql-client
+        - run:
+            name: "Create Test Table"
+            command: |
                 mysql -h 127.0.0.1 -u root -e "create database vanilla_tests;"
         - run: |
             cd ~/workspace/php

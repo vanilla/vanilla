@@ -64,17 +64,29 @@ aliases:
                 sudo docker-php-ext-install pdo pdo_mysql
                 sudo apt-get install mysql-client
         - run:
-            name: "Create Test Table"
+            name: Create Test Table
             command: |
                 mysql -h 127.0.0.1 -u root -e "create database vanilla_tests;"
-        - run: |
-            cd ~/workspace/php
-            mkdir -p ~/phpunit
-            ./vendor/bin/phpunit --log-junit ~/phpunit/junit.xml -c phpunit.xml.dist --exclude-group=ignore
-        - store_test_results:
-            path: ~/phpunit
-        - store_artifacts:
-            path: ~/phpunit
+        - run:
+            name: Library Tests
+            command: |
+                cd ~/workspace/php
+                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --test-suite="Library"
+        - run:
+            name: Formatting Tests
+            command: |
+                cd ~/workspace/php
+                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --test-suite="Formatting"
+        - run:
+            name: APIv2 Tests
+            command: |
+                cd ~/workspace/php
+                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --test-suite="APIv2"
+        - run:
+            name: Models Tests
+            command: |
+                cd ~/workspace/php
+                ./vendor/bin/phpunit -c phpunit.xml.dist --exclude-group=ignore --test-suite="Models"
 jobs:
     frontend_setup:
         docker: *node

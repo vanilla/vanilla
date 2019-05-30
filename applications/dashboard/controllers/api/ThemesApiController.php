@@ -223,7 +223,7 @@ class ThemesApiController extends AbstractApiController {
             if ($pathInfo['basename'] === ThemeModel::ASSET_LIST[$pathInfo['filename']]['file']) {
                 $assetKey = $pathInfo['filename'];
             } else {
-                throw new ClientException('Unknown asset file name: "'.$pathInfo['basename'].'".'.
+                throw new \Garden\Schema\ValidationException('Unknown asset file name: "'.$pathInfo['basename'].'".'.
                     'Try: '.ThemeModel::ASSET_LIST[$pathInfo['filename']]['file']);
             }
         } else {

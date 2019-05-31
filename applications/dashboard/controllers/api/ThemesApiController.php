@@ -77,7 +77,7 @@ class ThemesApiController extends AbstractApiController {
     public function post(array $body): array {
         $this->permission("Garden.Settings.Manage");
 
-        $in = $this->themePostSchema('in')->setDescription('Create new custom theme.');
+        $in = $this->themePostSchema('in');
 
         $out = $this->themeResultSchema('out');
 
@@ -100,7 +100,7 @@ class ThemesApiController extends AbstractApiController {
      */
     public function patch(int $themeID, array $body): array {
         $this->permission("Garden.Settings.Manage");
-        $in = $this->themePostSchema('in')->setDescription('Update theme name.');
+        $in = $this->themePostSchema('in');
         $out = $this->themeResultSchema('out');
         $body = $in->validate($body);
 
@@ -129,7 +129,7 @@ class ThemesApiController extends AbstractApiController {
      */
     public function put_current(array $body): array {
         $this->permission("Garden.Settings.Manage");
-        $in = $this->themePutCurrentSchema('in')->setDescription('Set current theme.');
+        $in = $this->themePutCurrentSchema('in');
         $out = $this->themeResultSchema('out');
         $body = $in->validate($body);
 
@@ -145,7 +145,7 @@ class ThemesApiController extends AbstractApiController {
      */
     public function get_current(): ?array {
         $this->permission();
-        $in = $this->schema([], 'in')->setDescription('Get current theme.');
+        $in = $this->schema([], 'in');
         $out = $this->themeResultSchema('out');
 
         $theme = $this->themeModel->getCurrentTheme();
@@ -166,7 +166,7 @@ class ThemesApiController extends AbstractApiController {
     public function put_assets(int $themeID, string $assetKey, array $body): array {
         $this->permission("Garden.Settings.Manage");
 
-        $in = $this->schema($this->assetsPutSchema(), 'in')->setDescription('PUT theme asset.');
+        $in = $this->schema($this->assetsPutSchema(), 'in');
         $out = $this->schema($this->assetsSchema(), 'out');
 
         $body = $in->validate($body);
@@ -191,7 +191,7 @@ class ThemesApiController extends AbstractApiController {
     public function patch_assets(int $themeID, string $assetKey, array $body): array {
         $this->permission("Garden.Settings.Manage");
 
-        $in = $this->schema($this->assetsPutSchema(), 'in')->setDescription('PUT theme asset.');
+        $in = $this->schema($this->assetsPutSchema(), 'in');
         $out = $this->schema($this->assetsSchema(), 'out');
 
         $body = $in->validate($body);

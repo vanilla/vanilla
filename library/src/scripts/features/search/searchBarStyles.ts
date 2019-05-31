@@ -158,7 +158,7 @@ export const searchBarClasses = useThemeCache(() => {
         color: colorOut(vars.results.fg),
         $nest: {
             "&:empty": {
-                display: "none",
+                display: important("none"),
             },
             ".suggestedTextInput__placeholder": {
                 color: colorOut(formElementVars.placeholder.color),

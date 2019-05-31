@@ -5,7 +5,7 @@
 
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { log } from "@library/utility/utils";
 import {
     AlignItemsProperty,
@@ -1149,7 +1149,7 @@ export const pointerEventsClass = (value: PointerEventsProperty = "none") => {
     return style(pointerEvents(value));
 };
 
-export const visibility = () => {
+export const visibility = useThemeCache(() => {
     const style = styleFactory("visibility");
     const onEmpty = (nest?: object) => {
         return style("onEmpty", {
@@ -1170,4 +1170,4 @@ export const visibility = () => {
         onEmpty,
         displayNone,
     };
-};
+});

@@ -3,12 +3,9 @@ $Methods = $this->data('Methods', []);
 $SelectedMethod = $this->data('SelectedMethod', []);
 $CssClass = count($Methods) > 0 ? ' MultipleEntryMethods' : ' SingleEntryMethod';
 
-// Testing
-//$Methods['Facebook'] = array('Label' => 'Facebook', 'Url' => '#', 'ViewLocation' => 'signin');
-//$Methods['Twitter'] = array('Label' => 'Twitter', 'Url' => '#', 'ViewLocation' => 'signin');
-
+echo '<div class="FormTitleWrapper AjaxForm">';
 echo '<h1>'.$this->data('Title').'</h1>';
-
+echo '<div class="FormWrapper">';
 // Make sure to force this form to post to the correct place in case the view is
 // rendered within another view (ie. /dashboard/entry/index/):
 echo $this->Form->open(['Action' => $this->data('FormUrl', url('/entry/signin')), 'id' => 'Form_User_SignIn']);
@@ -36,7 +33,6 @@ echo '<div class="MainForm">';
     </ul>
 <?php
 
-//   echo $this->data('MainForm');
 
 echo '</div>';
 
@@ -82,22 +78,5 @@ echo '</div>';
 
 <?php
 echo $this->Form->close();
-
-// Password reset form.
-echo $this->Form->open(['Action' => url('/entry/passwordrequest'), 'id' => 'Form_User_Password', 'style' => 'display: none;']);
-?>
-    <ul>
-        <li>
-            <?php
-            echo $this->Form->label($this->data('RecoverPasswordLabelCode', 'Enter your email to continue.'), 'Email');
-            echo $this->Form->textBox('Email');
-            ?>
-        </li>
-        <li class="Buttons">
-            <?php
-            echo $this->Form->button('Request a new password', ['class' => 'Button Primary']);
-            echo anchor(t('I remember now!'), '/entry/signin', 'ForgotPassword ForgotPassword-remember');
-            ?>
-        </li>
-    </ul>
-<?php echo $this->Form->close();
+echo '<div />';
+echo '<div />';

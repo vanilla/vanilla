@@ -70,8 +70,6 @@ class EntryController extends Gdn_Controller {
         parent::initialize();
         Gdn_Theme::section('Entry');
 
-        $this->CssClass .= " AjaxForm";
-
         if ($this->UserModel->isNameUnique() && !$this->UserModel->isEmailUnique()) {
             $this->setData('RecoverPasswordLabelCode', 'Enter your username to continue.');
         } else {
@@ -1058,6 +1056,7 @@ class EntryController extends Gdn_Controller {
 
             if (!$this->Request->isAuthenticatedPostBack() && !c('Garden.Embed.Allow')) {
                 $this->Form->addError('Please try again.');
+                Gdn::session()->ensureTransientKey();
             }
 
             // Check the user.

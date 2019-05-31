@@ -68,10 +68,15 @@ async function run() {
         shell.rm(outFile);
     }
 
-    shell.mv(builtFile, outFile);
-    console.log(chalk.greenBright(`✓ Successfully built ${prettyName} to:\n ${outFile}`));
-    process.stdout.write("\nCleaning up temporary directories... ");
-    console.log(chalk.greenBright("✓"));
+    if (fs.existsSync(builtFile)) {
+        shell.mv(builtFile, outFile);
+        console.log(chalk.greenBright(`✓ Successfully built ${prettyName} to:\n ${outFile}`));
+        process.stdout.write("\nCleaning up temporary directories... ");
+        shell.rm("-rf", TEMP_DIR);
+        console.log(chalk.greenBright("✓"));
+    } else {
+        console.log(chalk.redBright(`Failed to build ${prettyName} to:\n ${outFile}`));
+    }
 }
 
 run();

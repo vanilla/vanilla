@@ -167,6 +167,18 @@ export const richEditorClasses = useThemeCache((legacyMode: boolean, mobile?: bo
         position: "relative",
         whiteSpace: important("pre-wrap"),
         outline: 0,
+        $nest: {
+            // When the editor is empty we should be displaying a placeholder.
+            "&.ql-blank::before": {
+                content: `attr(placeholder)`,
+                display: "block",
+                color: colorOut(vars.text.placeholder.color),
+                position: "absolute",
+                top: vars.text.offset,
+                left: 0,
+                cursor: "text",
+            },
+        },
     });
 
     const menuItems = style("menuItems", {

@@ -9,10 +9,10 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { borderRadii, borders, colorOut, unit } from "@library/styles/styleHelpers";
 import { calc, important, percent, px } from "csx";
-
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { buttonClasses, buttonVariables } from "@library/forms/buttonStyles";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { shadowHelper } from "@library/styles/shadowHelpers";
 
 export const searchBarVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -55,6 +55,7 @@ export const searchBarVariables = useThemeCache(() => {
     const results = themeVars("results", {
         fg: globalVars.mainColors.fg,
         bg: globalVars.mainColors.bg,
+        borderRadius: globalVars.border.radius,
     });
 
     return {
@@ -77,6 +78,7 @@ export const searchBarClasses = useThemeCache(() => {
     const formElementVars = formElementsVariables();
     const mediaQueries = layoutVariables().mediaQueries();
     const style = styleFactory("searchBar");
+    const shadow = shadowHelper();
 
     const root = style(
         {
@@ -130,6 +132,7 @@ export const searchBarClasses = useThemeCache(() => {
                 },
                 "& .searchBar__value-container": {
                     overflow: "auto",
+                    cursor: "text",
                     $nest: {
                         "& > div": {
                             width: percent(100),
@@ -139,23 +142,9 @@ export const searchBarClasses = useThemeCache(() => {
                 "& .searchBar__indicators": {
                     display: "none",
                 },
-                "& .searchBar__input": {
-                    color: colorOut(globalVars.mainColors.fg),
-                    width: percent(100),
-                    display: important("block"),
-                    $nest: {
-                        input: {
-                            width: important(percent(100).toString()),
-                            lineHeight: globalVars.lineHeights.base,
-                        },
-                    },
-                },
-                "& .searchBar__menu-list": {
-                    maxHeight: calc(`100vh - ${unit(titleBarVars.sizing.height)}`),
-                },
             },
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             $nest: {
                 "& .searchBar-submitButton": {
                     minWidth: 0,
@@ -168,6 +157,9 @@ export const searchBarClasses = useThemeCache(() => {
         backgroundColor: colorOut(vars.results.bg),
         color: colorOut(vars.results.fg),
         $nest: {
+            "&:empty": {
+                display: important("none"),
+            },
             ".suggestedTextInput__placeholder": {
                 color: colorOut(formElementVars.placeholder.color),
             },
@@ -187,11 +179,6 @@ export const searchBarClasses = useThemeCache(() => {
                     },
                 },
             },
-            ".suggestedTextInput-menu": {
-                borderRadius: unit(globalVars.border.radius),
-                marginTop: unit(-formElementVars.border.width),
-                marginBottom: unit(-formElementVars.border.width),
-            },
             ".suggestedTextInput-item": {
                 $nest: {
                     "& + .suggestedTextInput-item": {
@@ -202,15 +189,29 @@ export const searchBarClasses = useThemeCache(() => {
         },
     });
 
+    const resultsAsModal = style("results", {
+        position: "absolute",
+        top: unit(vars.sizing.height),
+        left: 0,
+        overflow: "hidden",
+        ...borders({
+            radius: unit(vars.results.borderRadius),
+        }),
+        ...shadow.dropDown(),
+        zIndex: 1,
+    });
+
     const valueContainer = style("valueContainer", {
         display: "flex",
         alignItems: "center",
         borderRight: 0,
         paddingTop: 0,
         paddingBottom: 0,
-        height: vars.sizing.height,
+        paddingRight: 0,
+        height: unit(vars.sizing.height),
         backgroundColor: colorOut(vars.input.bg),
         color: colorOut(vars.input.fg),
+        cursor: "text",
         ...borderRadii({
             right: 0,
             left: vars.border.radius,
@@ -276,12 +277,7 @@ export const searchBarClasses = useThemeCache(() => {
         alignItems: "flex-start",
         justifyContent: "flex-start",
         position: "relative",
-        minHeight: unit(vars.sizing.height),
-        $nest: {
-            "&.hasFocus .searchBar-valueContainer": {
-                borderColor: colorOut(globalVars.mainColors.primary),
-            },
-        },
+        height: unit(vars.sizing.height),
     });
 
     // special selector
@@ -297,18 +293,66 @@ export const searchBarClasses = useThemeCache(() => {
         position: "absolute",
         top: 0,
         bottom: 0,
-        left: "2px",
-        height: percent(100),
+        left: unit(globalVars.border.width * 2),
+        height: unit(formElementVars.sizing.height),
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         width: unit(vars.searchIcon.gap),
         zIndex: 1,
+        cursor: "text",
     });
+
+    const iconContainerBigInput = style("iconContainerBig", {
+        $nest: {
+            "&&": {
+                height: unit(vars.sizing.height),
+            },
+        },
+    });
+
     const icon = style("icon", {
         width: unit(vars.searchIcon.width),
         height: unit(vars.searchIcon.height),
         color: colorOut(vars.searchIcon.fg),
+    });
+
+    const menu = style("menu", {
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
+        minHeight: unit(vars.sizing.height),
+        $nest: {
+            "&.hasFocus .searchBar-valueContainer": {
+                borderColor: colorOut(globalVars.mainColors.primary),
+            },
+            "&&": {
+                position: "relative",
+            },
+            "& .searchBar__menu-list": {
+                maxHeight: calc(`100vh - ${unit(titleBarVars.sizing.height)}`),
+                width: percent(100),
+            },
+            "& .searchBar__input": {
+                color: colorOut(globalVars.mainColors.fg),
+                width: percent(100),
+                display: important("block"),
+                $nest: {
+                    input: {
+                        width: important(percent(100).toString()),
+                        lineHeight: globalVars.lineHeights.base,
+                    },
+                },
+            },
+            "& .suggestedTextInput-menu": {
+                borderRadius: unit(globalVars.border.radius),
+                marginTop: unit(-formElementVars.border.width),
+                marginBottom: unit(-formElementVars.border.width),
+            },
+            "&:empty": {
+                display: "none",
+            },
+        },
     });
 
     return {
@@ -322,7 +366,10 @@ export const searchBarClasses = useThemeCache(() => {
         content,
         heading,
         iconContainer,
+        iconContainerBigInput,
         icon,
         results,
+        resultsAsModal,
+        menu,
     };
 });

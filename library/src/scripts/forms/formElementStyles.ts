@@ -7,7 +7,7 @@
 import { globalVariables, IIconSizes } from "@library/styles/globalStyleVars";
 import { absolutePosition, colorOut, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const formElementsVariables = useThemeCache(() => {
     const vars = globalVariables();

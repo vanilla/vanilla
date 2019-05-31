@@ -342,7 +342,7 @@ paths:
           minLength: 1
           type: string
       - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
         in: query
         name: page
         schema:

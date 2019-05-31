@@ -5,18 +5,9 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {
-    allLinkStates,
-    colorOut,
-    debugHelper,
-    margins,
-    paddings,
-    setAllLinkColors,
-    unit,
-} from "@library/styles/styleHelpers";
+import { colorOut, margins, paddings, setAllLinkColors, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent, px } from "csx";
-import { layoutVariables } from "@library/layout/layoutStyles";
 import { media } from "typestyle";
 
 export const navLinksVariables = useThemeCache(() => {
@@ -238,6 +229,7 @@ export const navLinksClasses = useThemeCache(() => {
     const separatorOdd = style(
         "separatorOdd",
         {
+            $unique: true,
             display: "none",
         },
         mediaQueries.oneColumn({

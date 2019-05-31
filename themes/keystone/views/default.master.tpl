@@ -220,7 +220,6 @@
                                         <!---------- Profile Page Header END ---------->
 
                                         {asset name="Content"}
-                                        {event name="AfterBody"}
                                     </main>
                                     <!---------- Main Content END ---------->
 
@@ -269,6 +268,7 @@
         </div>
     </div>
     <div id="modals"></div>
+    {event name="AfterBody"}
 </body>
 
 </html>

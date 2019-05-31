@@ -84,10 +84,13 @@ jobs:
             - google-chrome
         chrome: stable
       script:
+        - set -e
+        - yarn prettier --check "**/src/scripts/**/*"
         - yarn build
-        - yarn test
         - yarn check-types
+        - yarn test
         - ./tests/travis/audit.sh
+        - set +e
 
 install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.12.3 # Ensure a consistent yarn version

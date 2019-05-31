@@ -8,28 +8,29 @@ import React from "react";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { px } from "csx";
-import { colorOut, paddings } from "@library/styles/styleHelpers";
+import { colorOut, paddings, unit } from "@library/styles/styleHelpers";
 
 export const nextPreviousVariables = useThemeCache(() => {
     const globalVars = globalVariables();
-    const themeVars = variableFactory("nextPreviousVars");
+    const themeVars = variableFactory("nextPrevious");
 
     const fonts = themeVars("fonts", {
         label: globalVars.fonts.size.small,
         title: globalVars.fonts.size.medium,
     });
 
-    const lineHeights = themeVars("lineHeights", {
-        label: globalVars.lineHeights.condensed,
-        title: globalVars.lineHeights.condensed,
-    });
-
     const colors = themeVars("colors", {
         title: globalVars.mixBgAndFg(0.9),
         label: globalVars.mixBgAndFg(0.85),
-        hover: globalVars.mainColors.primary,
+        chevron: globalVars.mixBgAndFg(0.75),
+        hover: {
+            fg: globalVars.mainColors.primary,
+        },
     });
-    return { lineHeights, fonts, colors };
+    return {
+        fonts,
+        colors,
+    };
 });
 
 export const nextPreviousClasses = useThemeCache(() => {
@@ -42,7 +43,6 @@ export const nextPreviousClasses = useThemeCache(() => {
         alignItems: "flex-start",
         flexWrap: "wrap",
         justifyContent: "space-between",
-        color: colorOut(globalVars.mainColors.fg),
     });
 
     const directionLabel = style("directionLabel", {
@@ -50,7 +50,7 @@ export const nextPreviousClasses = useThemeCache(() => {
         fontSize: px(globalVars.fonts.size.small),
         lineHeight: globalVars.lineHeights.condensed,
         color: colorOut(vars.colors.label),
-        marginBottom: px(2),
+        marginBottom: unit(2),
     });
 
     const title = style("title", {
@@ -64,9 +64,9 @@ export const nextPreviousClasses = useThemeCache(() => {
 
     const chevron = style("chevron", {
         position: "absolute",
-        top: px((vars.fonts.title * vars.lineHeights.title) / 2),
+        top: px((vars.fonts.title * globalVars.lineHeights.condensed) / 2),
         transform: `translateY(-50%)`,
-        color: globalVars.mixBgAndFg(0.75).toString(),
+        color: colorOut(vars.colors.chevron),
     });
 
     const chevronLeft = style("chevronLeft", {
@@ -82,7 +82,7 @@ export const nextPreviousClasses = useThemeCache(() => {
     const activeStyles = {
         $nest: {
             "& .adjacentLinks-icon, & .adjacentLinks-title": {
-                color: colorOut(globalVars.mainColors.primary),
+                color: colorOut(vars.colors.hover.fg),
             },
         },
     };

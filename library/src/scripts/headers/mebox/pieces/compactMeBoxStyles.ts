@@ -6,7 +6,7 @@
 
 import { absolutePosition, flexHelper, unit, sticky, colorOut } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import {styleFactory, useThemeCache, variableFactory} from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, viewHeight } from "csx";
 
 export const compactMeBoxVariables = useThemeCache(() => {

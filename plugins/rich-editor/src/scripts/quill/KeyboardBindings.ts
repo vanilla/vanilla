@@ -5,7 +5,7 @@
  */
 
 import Quill, { RangeStatic, Blot } from "quill/core";
-import KeyboardModule from "quill/modules/keyboard";
+import KeyboardModule, { BindingObject, HandlerContext } from "quill/modules/keyboard";
 import Delta from "quill-delta";
 import Emitter from "quill/core/emitter";
 import {
@@ -27,6 +27,7 @@ import BlockquoteLineBlot from "@rich-editor/quill/blots/blocks/BlockquoteBlot";
 import SpoilerLineBlot from "@rich-editor/quill/blots/blocks/SpoilerBlot";
 import { ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
 import Formatter from "@rich-editor/quill/Formatter";
+import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 
 export default class KeyboardBindings {
     private static MULTI_LINE_BLOTS = [
@@ -35,7 +36,9 @@ export default class KeyboardBindings {
         CodeBlockBlot.blotName,
         ListItem.blotName,
     ];
-    public bindings: any = {};
+    public bindings: {
+        [key: string]: BindingObject;
+    } = {};
 
     constructor(private quill: Quill) {
         // Keyboard behaviours
@@ -380,11 +383,11 @@ export default class KeyboardBindings {
      * Create a keyboard shortcut to enable/disable a format. These differ from Quill's built in
      * keyboard shortcuts because they do not work if the selection contains a codeBlock or inline-code.
      */
-    private makeFormatHandler(format) {
+    private makeFormatHandler(format): BindingObject {
         return {
             key: format[0].toUpperCase(),
             shortKey: true,
-            handler: (range, context) => {
+            handler: (range: RangeStatic, context: HandlerContext) => {
                 if (
                     rangeContainsBlot(this.quill, CodeBlockBlot, range) ||
                     rangeContainsBlot(this.quill, CodeBlot, range)
@@ -392,7 +395,7 @@ export default class KeyboardBindings {
                     return;
                 }
 
-                this.quill.format(format, !context.format[format], Quill.sources.USER);
+                this.quill.format(format, !context.format![format], Quill.sources.USER);
             },
         };
     }

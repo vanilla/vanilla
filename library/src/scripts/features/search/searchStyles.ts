@@ -42,10 +42,6 @@ export const searchClasses = useThemeCache(() => {
             ".inputText": {
                 borderColor: vars.input.border.color.toString(),
             },
-            ".searchBar-valueContainer": {
-                ...debug.name("valueContainer"),
-                cursor: "text",
-            },
             ".searchBar__control": {
                 ...debug.name("control"),
                 cursor: "text",

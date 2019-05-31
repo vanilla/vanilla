@@ -6,70 +6,59 @@
 
 import { userContentClasses } from "@library/content/userContentStyles";
 import { delegateEvent, removeDelegatedEvent } from "@library/dom/domUtils";
-import getStore from "@library/redux/getStore";
-import { debug, log } from "@library/utility/utils";
-import { IStoreState } from "@rich-editor/@types/store";
-import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import { useLastValue } from "@library/dom/hookUtils";
+import { debug } from "@library/utility/utils";
+import { useEditorContents } from "@rich-editor/editor/contentContext";
+import { useEditor } from "@rich-editor/editor/context";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import HeaderBlot from "@rich-editor/quill/blots/blocks/HeaderBlot";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import registerQuill from "@rich-editor/quill/registerQuill";
-import { getIDForQuill, SELECTION_UPDATE } from "@rich-editor/quill/utility";
-import { actions } from "@rich-editor/state/instance/instanceActions";
+import { resetQuillContent, SELECTION_UPDATE } from "@rich-editor/quill/utility";
 import classNames from "classnames";
 import hljs from "highlight.js";
 import throttle from "lodash/throttle";
 import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
-import React from "react";
-import { hot } from "react-hot-loader";
+import React, { useCallback, useEffect, useRef } from "react";
 
-interface IProps extends IWithEditorProps {
+const DEFAULT_CONTENT = [{ insert: "\n" }];
+
+interface IProps {
     legacyTextArea?: HTMLInputElement;
+    placeholder?: string;
 }
 
 /**
- * The content area of the RichEditor. This mounts the quill instance.
+ * The content area for Rich Editor.
+ *
+ * This is essentially a React wrapper around quill.
  */
-export class EditorContent extends React.Component<IProps> {
-    /** Ref for a dom node for quill to mount into. */
-    private quillMountRef = React.createRef<HTMLDivElement>();
+export default function EditorContent(props: IProps) {
+    const quillMountRef = React.createRef<HTMLDivElement>();
+    useQuillInstance(quillMountRef);
+    useLegacyTextAreaSync(props.legacyTextArea);
+    useDebugPasteListener(props.legacyTextArea);
+    useQuillAttributeSync(props.placeholder);
+    useLoadStatus();
+    useInitialValue();
+    useOperationsQueue();
+    useQuoteButtonHandler();
+    useGlobalSelectionHandler();
+    useSynchronization();
 
-    /** The redux store. */
-    private store = getStore<IStoreState>();
+    return <div className="richEditor-textWrap" ref={quillMountRef} />;
+}
 
-    private skipCallback = false;
+/**
+ * Manage and construct a quill instance ot some ref.
+ *
+ * @param mountRef The ref to mount quill onto.
+ */
+export function useQuillInstance(mountRef: React.RefObject<HTMLDivElement>, extraOptions?: QuillOptionsStatic) {
+    const ref = useRef<Quill>();
+    const { setQuillInstance } = useEditor();
 
-    /** The hash of our delegated quote event handler. Used to unset the handler on unmount. */
-    private quoteHandler: string;
-
-    /** The quill instance */
-    private quill: Quill;
-
-    /** The ID for accessing quill in redux */
-    private quillID: string;
-
-    /**
-     * Render either the legacy or modern view for the editor.
-     */
-    public render() {
-        return <div className="richEditor-textWrap" ref={this.quillMountRef} />;
-    }
-
-    private get contentClasses() {
-        const classesRichEditor = richEditorClasses(this.props.legacyMode);
-        const classesUserContent = userContentClasses();
-        return classNames("ql-editor", "richEditor-text", "userContent", classesRichEditor.text, {
-            [classesUserContent.root]: !this.props.legacyMode,
-            // These classes shouln't be applied until the forum is converted to the new styles.
-        });
-    }
-    /**
-     * Initial editor setup.
-     */
-    public componentDidMount() {
-        document.body.classList.add("hasFullHeight");
-
-        // Setup quill
+    useEffect(() => {
         registerQuill();
         const options: QuillOptionsStatic = {
             theme: "vanilla",
@@ -78,258 +67,308 @@ export class EditorContent extends React.Component<IProps> {
                     highlight: text => hljs.highlightAuto(text).value,
                 },
             },
-            // scrollingContainer: this.scrollContainerRef.current || document.documentElement!,
         };
-        this.quill = new Quill(this.quillMountRef.current!, options);
-        this.quill.root.classList.value = this.contentClasses;
-        if (this.props.initialValue) {
-            this.quill.setContents(this.props.initialValue);
+        if (mountRef.current) {
+            const quill = new Quill(mountRef.current, options);
+            quill.setContents(DEFAULT_CONTENT);
+            setQuillInstance(quill);
+            ref.current = quill;
+
+            // The latest quill gets synced to the window element.
+            window.quill = quill;
+            return () => {
+                setQuillInstance(null);
+                window.quill = null;
+            };
         }
-        if (this.props.isLoading) {
-            this.quill.disable();
+    }, [mountRef.current, extraOptions]);
+    return ref.current;
+}
+
+/**
+ * Apply our CSS classes/styles and other attributes to quill's root. (Not a react component).
+ */
+function useQuillAttributeSync(placeholder?: string) {
+    const { legacyMode, quill } = useEditor();
+    const classesRichEditor = richEditorClasses(legacyMode);
+    const classesUserContent = userContentClasses();
+    const quillRootClasses = classNames(
+        quill && quill.root.classList.value,
+        "richEditor-text",
+        "userContent",
+        classesRichEditor.text,
+        {
+            // These classes shouln't be applied until the forum is converted to the new styles.
+            [classesUserContent.root]: !legacyMode,
+        },
+    );
+
+    useEffect(() => {
+        if (quill) {
+            // Initialize some CSS classes onto the quill root.
+            quill.root.classList.value = quillRootClasses;
         }
-        window.quill = this.quill;
-        this.quillID = getIDForQuill(this.quill);
+    }, [quill, quillRootClasses]);
 
-        // Setup syncing
-        this.setupLegacyTextAreaSync();
-        this.setupDebugPasteListener();
-        this.store.dispatch(actions.createInstance(this.quillID));
-        this.quill.on(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
-
-        this.addGlobalSelectionHandler();
-        this.addQuoteHandler();
-
-        // Once we've created our quill instance we need to force an update to allow all of the quill dependent
-        // Modules to render.
-        this.props.setQuillInstance(this.quill);
-    }
-
-    /**
-     * Cleanup from componentDidMount.
-     */
-    public componentWillUnmount() {
-        this.removeGlobalSelectionHandler();
-        this.removeQuoteHandler();
-        this.quill.off(Quill.events.EDITOR_CHANGE, this.onQuillUpdate);
-        this.store.dispatch(actions.deleteInstance(this.quillID));
-    }
-
-    public componentDidUpdate(oldProps: IProps) {
-        if (oldProps.isLoading && !this.props.isLoading) {
-            this.quill.enable();
-        } else if (!oldProps.isLoading && this.props.isLoading) {
-            this.quill.disable();
+    useEffect(() => {
+        if (quill && placeholder) {
+            quill.root.setAttribute("placeholder", placeholder);
         }
+    }, [quill, placeholder]);
 
-        if (!oldProps.reinitialize && this.props.reinitialize) {
-            if (this.props.initialValue) {
-                this.skipCallback = true;
-                this.setEditorContent(this.props.initialValue);
+    return quillRootClasses;
+}
+
+/**
+ * Map our isLoading context into quill being enabled or disabled.
+ */
+function useLoadStatus() {
+    const { quill, isLoading } = useEditor();
+    const prevLoading = useLastValue(isLoading);
+    useEffect(() => {
+        if (quill) {
+            if (!prevLoading && isLoading) {
+                quill.disable();
+            } else if (prevLoading && !isLoading) {
+                quill.enable();
             }
         }
+    }, [isLoading, quill]);
+}
 
-        if (this.props.operationsQueue && this.props.operationsQueue.length > 0) {
-            this.props.operationsQueue.forEach(operation => {
-                const scrollLength = this.quill.scroll.length();
+/**
+ * Handle the updating of the initial editor value.
+ */
+function useInitialValue() {
+    const { quill, initialValue, reinitialize } = useEditor();
+    const prevInitialValue = useLastValue(initialValue);
+    const prevReinitialize = useLastValue(reinitialize);
 
-                if (typeof operation === "string") {
-                    this.quill.clipboard.dangerouslyPasteHTML(scrollLength, operation);
-                } else {
-                    const offsetOperations = scrollLength > 1 ? { retain: scrollLength } : { delete: 1 };
-                    this.quill.updateContents([offsetOperations, ...operation]);
-                }
-            });
-            if (this.props.clearOperationsQueue) {
-                this.props.clearOperationsQueue();
+    useEffect(() => {
+        if (quill && initialValue && initialValue.length > 0) {
+            if (prevInitialValue !== initialValue && prevReinitialize !== reinitialize) {
+                quill.setContents(initialValue);
             }
         }
-    }
+    }, [quill, initialValue, reinitialize]);
+}
 
-    /**
-     * Get the content out of the quill editor.
-     */
-    public getEditorOperations(): DeltaOperation[] | undefined {
-        this.ensureUniqueHeaderIDs();
-        return this.quill.getContents().ops;
-    }
+/**
+ * Handle queued insert operations when the editor loads up.
+ */
+function useOperationsQueue() {
+    const { operationsQueue, quill, clearOperationsQueue } = useEditor();
+    useEffect(() => {
+        if (!operationsQueue || !quill) {
+            return;
+        }
+        operationsQueue.forEach(operation => {
+            const scrollLength = quill.scroll.length();
 
-    /**
-     * Loop through the editor document and ensure every header has a unique data-id.
-     */
-    private ensureUniqueHeaderIDs() {
+            if (typeof operation === "string") {
+                quill.clipboard.dangerouslyPasteHTML(scrollLength, operation);
+            } else {
+                const offsetOperations = scrollLength > 1 ? { retain: scrollLength } : { delete: 1 };
+                quill.updateContents([offsetOperations, ...operation]);
+            }
+        });
+        if (clearOperationsQueue) {
+            clearOperationsQueue();
+        }
+    }, [operationsQueue, clearOperationsQueue]);
+}
+
+/**
+ * Synchronization from quill's contents to the bodybox for legacy contexts.
+ *
+ * Once we rewrite the post page, this should no longer be necessary.
+ */
+function useLegacyTextAreaSync(textArea?: HTMLInputElement) {
+    const { legacyMode, quill } = useEditor();
+
+    useEffect(() => {
+        if (!legacyMode || !textArea || !quill) {
+            return;
+        }
+        const initialValue = textArea.value;
+        if (initialValue) {
+            resetQuillContent(quill, JSON.parse(initialValue));
+        }
+    }, [textArea]);
+
+    useEffect(() => {
+        if (!legacyMode || !textArea || !quill) {
+            return;
+        }
+        // Sync the text areas together.
+        const handleChange = () => {
+            textArea.value = JSON.stringify(quill.getContents().ops);
+        };
+        quill.on(Quill.events.TEXT_CHANGE, handleChange);
+
+        // Listen for the legacy form event if applicable and clear the form.
+        const handleFormClear = () => {
+            resetQuillContent(quill, []);
+            quill.setSelection(null as any, Quill.sources.USER);
+        };
+
+        const form = quill.container.closest("form");
+        form && form.addEventListener("X-ClearCommentForm", handleFormClear);
+
+        // Cleanup function
+        return () => {
+            quill.off(Quill.events.TEXT_CHANGE, handleChange);
+            form && form.removeEventListener("X-ClearCommentForm", handleFormClear);
+        };
+    });
+}
+
+/**
+ * Page handlers for the rich quote buttons.
+ */
+function useQuoteButtonHandler() {
+    const { quill } = useEditor();
+
+    useEffect(() => {
+        /**
+         * Handler for clicking on quote button.
+         *
+         * Triggers a media scraping.
+         */
+        const handleQuoteButtonClick = (event: MouseEvent, triggeringElement: Element) => {
+            if (!quill) {
+                return;
+            }
+            event.preventDefault();
+            const embedInserter: EmbedInsertionModule = quill.getModule("embed/insertion");
+            const url = triggeringElement.getAttribute("data-scrape-url") || "";
+            void embedInserter.scrapeMedia(url);
+        };
+        const delegatedHandler = delegateEvent("click", ".js-quoteButton", handleQuoteButtonClick)!;
+        return () => {
+            removeDelegatedEvent(delegatedHandler);
+        };
+    }, [quill]);
+}
+
+/**
+ * Handle global forced selection updates.
+ */
+function useGlobalSelectionHandler() {
+    const updateHandler = useUpdateHandler();
+
+    const handleGlobalSelectionUpdate = () => {
+        updateHandler(Quill.events.SELECTION_CHANGE, null, null, Quill.sources.USER);
+    };
+
+    useEffect(() => {
+        document.addEventListener(SELECTION_UPDATE, handleGlobalSelectionUpdate);
+        return () => {
+            document.removeEventListener(SELECTION_UPDATE, handleGlobalSelectionUpdate);
+        };
+    }, [handleGlobalSelectionUpdate]);
+}
+
+/**
+ * Adds a paste listener on the old bodybox for debugging purposes. Only works in legacy mode.
+ *
+ * Pasting a valid quill JSON delta into the box will reset the contents of the editor to that delta.
+ * This only works for PASTE. Not editing the contents.
+ */
+function useDebugPasteListener(textArea?: HTMLInputElement) {
+    const { legacyMode, quill } = useEditor();
+    useEffect(() => {
+        if (!legacyMode || !textArea || !debug() || !quill) {
+            return;
+        }
+        const pasteHandler = (event: ClipboardEvent) => {
+            event.stopPropagation();
+            event.preventDefault();
+
+            // Get pasted data via clipboard API
+            const clipboardData = event.clipboardData || window.clipboardData;
+            const pastedData = clipboardData.getData("Text");
+            const delta = JSON.parse(pastedData);
+            quill.setContents(delta);
+        };
+
+        textArea.addEventListener("paste", pasteHandler);
+        return () => {
+            textArea.addEventListener("paste", pasteHandler);
+        };
+    }, [legacyMode, quill]);
+}
+
+/**
+ * Hook for a re-usable quill update handler.
+ * Quill dispatches a lot of unnecessary updates. We need to filter out only the ones we want.
+ *
+ * We need
+ * - Every non-silent event.
+ * - Every selection change event (even the "silent" ones).
+ */
+function useUpdateHandler() {
+    const { onChange, quill } = useEditor();
+    const editorContents = useEditorContents();
+
+    const getOperations = useCallback((): DeltaOperation[] => {
+        if (!quill) {
+            return [];
+        }
+
         HeaderBlot.resetCounters();
-        const headers = (this.quill.scroll.descendants(
+        const headers = (quill.scroll.descendants(
             blot => blot instanceof HeaderBlot,
             0,
-            this.quill.scroll.length(),
+            quill.scroll.length(),
         ) as any) as HeaderBlot[]; // Explicit mapping of types because the parchments types suck.
 
         headers.forEach(header => header.setGeneratedID());
-        this.quill.update(Quill.sources.API);
-    }
+        quill.update(Quill.sources.API);
+        return quill.getContents().ops!;
+    }, [quill]);
 
-    /**
-     * Get the content out of the quill editor.
-     */
-    public getEditorText(): string {
-        return this.quill.getText();
-    }
+    const handleUpdate = useCallback(
+        throttle((type: string, newValue, oldValue, source: Sources) => {
+            if (!quill) {
+                return;
+            }
+            if (onChange && type === Quill.events.TEXT_CHANGE && source !== Quill.sources.SILENT) {
+                onChange(getOperations());
+            }
 
-    /**
-     * Set the quill editor contents.
-     *
-     * @param content The delta to set.
-     */
-    public setEditorContent(content: DeltaOperation[]) {
-        log("Setting existing content as contents of editor");
-        this.quill.setContents(content);
-        // Clear the history so that you can't "undo" your initial content.
-        this.quill.getModule("history").clear();
-    }
+            let shouldDispatch = false;
+            if (type === Quill.events.SELECTION_CHANGE) {
+                shouldDispatch = true;
+            } else if (source !== Quill.sources.SILENT) {
+                shouldDispatch = true;
+            }
 
-    /**
-     * Quill dispatches a lot of unnecessary updates. We need to filter out only the ones we want.
-     *
-     * We need
-     * - Every non-silent event.
-     * - Every selection change event (even the "silent" ones).
-     */
-    private onQuillUpdate = throttle((type: string, newValue, oldValue, source: Sources) => {
-        if (this.skipCallback) {
-            this.skipCallback = false;
-            return;
-        }
-        if (this.props.onChange && type === Quill.events.TEXT_CHANGE && source !== Quill.sources.SILENT) {
-            this.props.onChange(this.getEditorOperations()!);
-        }
+            if (shouldDispatch) {
+                editorContents.updateSelection(quill.getSelection());
+            }
+        }, 1000 / 60), // Throttle to 60 FPS.
+        [quill, onChange, getOperations],
+    );
 
-        let shouldDispatch = false;
-        if (type === Quill.events.SELECTION_CHANGE) {
-            shouldDispatch = true;
-        } else if (source !== Quill.sources.SILENT) {
-            shouldDispatch = true;
-        }
-
-        if (shouldDispatch) {
-            this.store.dispatch(actions.setSelection(this.quillID, this.quill.getSelection(), this.quill));
-        }
-    }, 1000 / 60); // Throttle to 60 FPS.
-
-    /**
-     * Synchronization from quill's contents to the bodybox for legacy contexts.
-     *
-     * Once we rewrite the post page, this should no longer be necessary.
-     */
-    private setupLegacyTextAreaSync() {
-        if (!this.props.legacyMode) {
-            return;
-        }
-
-        const { legacyTextArea } = this.props;
-        if (!legacyTextArea) {
-            return;
-        }
-
-        const initialValue = legacyTextArea.value;
-
-        if (initialValue) {
-            this.setEditorContent(JSON.parse(initialValue));
-        }
-
-        this.quill.on("text-change", () => {
-            legacyTextArea.value = JSON.stringify(this.quill.getContents().ops);
-        });
-
-        // Listen for the legacy form event if applicable and clear the form.
-        const form = this.quill.container.closest("form");
-        if (form) {
-            form.addEventListener("X-ClearCommentForm", () => {
-                this.quill.setContents([]);
-                this.quill.setSelection(null as any, Quill.sources.USER);
-            });
-        }
-    }
-
-    /**
-     * Handler for clicking on quote button.
-     *
-     * Triggers a media scraping.
-     */
-    private quoteButtonClickHandler = (event: MouseEvent, triggeringElement: Element) => {
-        event.preventDefault();
-        const embedInserter: EmbedInsertionModule = this.quill.getModule("embed/insertion");
-        const url = triggeringElement.getAttribute("data-scrape-url") || "";
-        void embedInserter.scrapeMedia(url);
-    };
-
-    /**
-     * Add the handler for when a quote button is clicked.
-     */
-    private addQuoteHandler() {
-        this.quoteHandler = delegateEvent("click", ".js-quoteButton", this.quoteButtonClickHandler)!;
-    }
-
-    /**
-     * Removes the event listener from addQuoteHandler.
-     *
-     * In some rare instances the component will unmount before quoteHandler exists.
-     * Because of this we need to check that it has been set.
-     */
-    private removeQuoteHandler() {
-        if (this.quoteHandler) {
-            removeDelegatedEvent(this.quoteHandler);
-        }
-    }
-
-    /**
-     * Handle forced selection updates.
-     */
-    private handleGlobalSelectionUpdate = () => {
-        window.requestAnimationFrame(() => {
-            this.onQuillUpdate(Quill.events.SELECTION_CHANGE, null, null, Quill.sources.USER);
-        });
-    };
-
-    /**
-     * Add a handler for forced selection updates.
-     */
-    private addGlobalSelectionHandler() {
-        document.addEventListener(SELECTION_UPDATE, this.handleGlobalSelectionUpdate);
-    }
-
-    /**
-     * Remove the handler for forced selection updates.
-     */
-    private removeGlobalSelectionHandler() {
-        document.removeEventListener(SELECTION_UPDATE, this.handleGlobalSelectionUpdate);
-    }
-
-    /**
-     * Adds a paste listener on the old bodybox for debugging purposes.
-     *
-     * Pasting a valid quill JSON delta into the box will reset the contents of the editor to that delta.
-     * This only works for PASTE. Not editing the contents.
-     */
-    private setupDebugPasteListener() {
-        if (!this.props.legacyMode) {
-            return;
-        }
-        const { legacyTextArea } = this.props;
-
-        if (debug() && legacyTextArea) {
-            legacyTextArea.addEventListener("paste", event => {
-                event.stopPropagation();
-                event.preventDefault();
-
-                // Get pasted data via clipboard API
-                const clipboardData = event.clipboardData || window.clipboardData;
-                const pastedData = clipboardData.getData("Text");
-                const delta = JSON.parse(pastedData);
-                this.quill.setContents(delta);
-            });
-        }
-    }
+    return handleUpdate;
 }
 
-export default hot(module)(withEditor(EditorContent));
+/**
+ * Hook for synchonizing quill's values to our update handler.
+ */
+function useSynchronization() {
+    const { quill } = useEditor();
+    const updateHandler = useUpdateHandler();
+
+    useEffect(() => {
+        if (!quill) {
+            return;
+        }
+
+        quill.on(Quill.events.EDITOR_CHANGE, updateHandler);
+        return () => {
+            quill.off(Quill.events.EDITOR_CHANGE, updateHandler);
+        };
+    });
+}

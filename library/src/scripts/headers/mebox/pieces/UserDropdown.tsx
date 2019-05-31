@@ -48,16 +48,14 @@ function UserDropDown(props: IProps) {
             contentsClassName={classNames(classes.contents, classesHeader.dropDownContents)}
             renderLeft={true}
             buttonContents={
-                <div className="meBox-buttonContent">
-                    <MeBoxIcon compact={false}>
-                        <UserPhoto
-                            userInfo={userInfo}
-                            open={isOpen}
-                            className="headerDropDown-user meBox-user"
-                            size={UserPhotoSize.SMALL}
-                        />
-                    </MeBoxIcon>
-                </div>
+                <MeBoxIcon compact={false}>
+                    <UserPhoto
+                        userInfo={userInfo}
+                        open={isOpen}
+                        className="headerDropDown-user meBox-user"
+                        size={UserPhotoSize.SMALL}
+                    />
+                </MeBoxIcon>
             }
             selfPadded={true}
             onVisibilityChange={setOpen}

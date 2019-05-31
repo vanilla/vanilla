@@ -13,15 +13,7 @@ paths:
           default: 30
           maximum: 100
           minimum: 1
-      - description: |
-          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
-        in: query
-        name: page
-        required: true
-        schema:
-          type: integer
-          default: 1
-          minimum: 1
+      - $ref: '#/components/parameters/Page'
       responses:
         '200':
           content:

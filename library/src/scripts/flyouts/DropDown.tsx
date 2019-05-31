@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { frameHeaderClasses } from "@library/layout/frame/frameStyles";
+import { frameHeaderClasses } from "@library/layout/frame/frameHeaderStyles";
 import Heading from "@library/layout/Heading";
 import DropDownContents from "@library/flyouts/DropDownContents";
 import { ButtonTypes } from "@library/forms/buttonStyles";
@@ -39,6 +39,12 @@ export interface IProps extends IDeviceProps {
     openAsModal?: boolean;
     title?: string;
     selfPadded?: boolean;
+    flyoutSize?: FlyoutSizes;
+}
+
+export enum FlyoutSizes {
+    DEFAULT = "default",
+    MEDIUM = "medium",
 }
 
 export interface IState {
@@ -74,12 +80,13 @@ class DropDown extends React.Component<IProps, IState> {
         const classesFrameHeader = frameHeaderClasses();
         const classes = dropDownClasses();
 
-        const openAsModal = this.props.openAsModal || this.props.device === Devices.MOBILE;
+        const openAsModal =
+            this.props.openAsModal || this.props.device === Devices.MOBILE || this.props.device === Devices.XS;
         return (
             <FlyoutToggle
                 id={this.id}
                 className={classNames(this.props.className)}
-                buttonBaseClass={this.props.buttonBaseClass || ButtonTypes.CUSTOM}
+                buttonBaseClass={this.props.buttonBaseClass || ButtonTypes.ICON}
                 name={this.props.name}
                 buttonContents={this.props.buttonContents || dropDownMenu()}
                 buttonClassName={this.props.buttonClassName}
@@ -103,6 +110,7 @@ class DropDown extends React.Component<IProps, IState> {
                             renderAbove={!!this.props.renderAbove}
                             openAsModal={openAsModal}
                             selfPadded={this.props.selfPadded}
+                            flyoutSize={this.props.flyoutSize}
                         >
                             {title ? (
                                 <header className={classNames("frameHeader", classesFrameHeader.root)}>

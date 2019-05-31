@@ -18,7 +18,7 @@ import {
     borderRadii,
 } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent } from "csx";
 
@@ -125,7 +125,7 @@ export const radioTabClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             flexGrow: 0,
             $nest: {
                 label: {

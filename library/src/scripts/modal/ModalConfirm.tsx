@@ -10,7 +10,6 @@ import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import FrameHeader from "@library/layout/frame/FrameHeader";
-import { frameBodyClasses, frameFooterClasses } from "@library/layout/frame/frameStyles";
 import SmartAlign from "@library/layout/SmartAlign";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import Modal from "@library/modal/Modal";
@@ -19,7 +18,8 @@ import { t } from "@library/utility/appUtils";
 import { getRequiredID } from "@library/utility/idUtils";
 import classNames from "classnames";
 import React from "react";
-import FlexSpacer from "@library/layout/FlexSpacer";
+import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
+import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 
 interface IProps {
     title: string; // required for accessibility

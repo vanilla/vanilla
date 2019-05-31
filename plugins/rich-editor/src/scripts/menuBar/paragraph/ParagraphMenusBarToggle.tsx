@@ -20,7 +20,8 @@ import {
 } from "@library/icons/editorIcons";
 import { srOnly } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
-import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import { IWithEditorProps } from "@rich-editor/editor/context";
+import { withEditor } from "@rich-editor/editor/withEditor";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { menuState } from "@rich-editor/menuBar/paragraph/formats/formatting";
 import ParagraphMenuBar from "@rich-editor/menuBar/paragraph/ParagraphMenuBar";

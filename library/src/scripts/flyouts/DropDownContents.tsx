@@ -8,6 +8,7 @@ import * as React from "react";
 import classNames from "classnames";
 import { flyoutPosition } from "@rich-editor/flyouts/pieces/flyoutPosition";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { FlyoutSizes } from "@library/flyouts/DropDown";
 
 export interface IProps {
     id: string;
@@ -21,6 +22,7 @@ export interface IProps {
     legacyMode?: boolean;
     openAsModal?: boolean;
     selfPadded?: boolean;
+    flyoutSize?: FlyoutSizes;
 }
 /**
  * The contents of the flyouts (not the wrapper and not the button to toggle it).
@@ -29,8 +31,9 @@ export interface IProps {
 export default class DropDownContents extends React.Component<IProps> {
     public render() {
         const classes = dropDownClasses();
+        const size = this.props.flyoutSize ? this.props.flyoutSize : FlyoutSizes.DEFAULT;
         const asDropDownClasses = !this.props.openAsModal
-            ? classNames("dropDown-contents", classes.contents)
+            ? classNames("dropDown-contents", classes.contents, { isMedium: size === FlyoutSizes.MEDIUM })
             : undefined;
         const asModalClasses = this.props.openAsModal ? classNames("dropDown-asModal", classes.asModal) : undefined;
 

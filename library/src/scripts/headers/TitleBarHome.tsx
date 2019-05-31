@@ -16,7 +16,7 @@ interface IProps extends IDeviceProps {}
  */
 export class TitleBarHome extends React.Component<IProps> {
     public render() {
-        const isMobile = this.props.device === Devices.MOBILE;
+        const isMobile = this.props.device === Devices.MOBILE || this.props.device === Devices.XS;
         return isMobile ? <TitleBarMobileHome /> : <TitleBar />;
     }
 }

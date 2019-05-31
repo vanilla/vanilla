@@ -11,9 +11,9 @@ import Quill from "quill/core";
  *
  * @param withTheme Whether or not the editor should be created with the full Vanilla UI.
  */
-export function setupTestQuill(): Quill {
+export function setupTestQuill(htmlBody?: string): Quill {
     registerQuill();
-    document.body.innerHTML = `<form class="FormWrapper"><div id='quill' class="richEditor"></div></form>`;
+    document.body.innerHTML = htmlBody || `<form class="FormWrapper"><div id='quill' class="richEditor"></div></form>`;
     const mountPoint = document.getElementById("quill")!;
     const options = {
         theme: "vanilla",

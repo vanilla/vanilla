@@ -5,7 +5,7 @@
  */
 
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import {
@@ -82,7 +82,7 @@ export const modalClasses = useThemeCache(() => {
     const style = styleFactory("modal");
     const mediaQueries = layoutVariables().mediaQueries();
     const shadows = shadowHelper();
-    const headerVars = titleBarVariables();
+    const titleBarVars = titleBarVariables();
 
     const overlay = style("overlay", {
         position: "fixed",
@@ -194,8 +194,8 @@ export const modalClasses = useThemeCache(() => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            height: unit(headerVars.sizing.height),
-            minHeight: unit(headerVars.sizing.height),
+            height: unit(titleBarVars.sizing.height),
+            minHeight: unit(titleBarVars.sizing.height),
             zIndex: 2,
             background: colorOut(vars.colors.bg),
             $nest: {
@@ -204,8 +204,8 @@ export const modalClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumn({
-            minHeight: unit(headerVars.sizing.mobile.height),
+        mediaQueries.oneColumnDown({
+            minHeight: unit(titleBarVars.sizing.mobile.height),
         }),
     );
 

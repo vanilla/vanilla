@@ -15,7 +15,7 @@ function NotificationsCount(props: IProps) {
     const { count, open, compact } = props;
 
     return (
-        <MeBoxIcon count={count} countLabel={t("Notifications") + ': '} compact={compact}>
+        <MeBoxIcon count={count} countLabel={t("Notifications") + ": "} compact={compact}>
             {notifications(!!open)}
         </MeBoxIcon>
     );

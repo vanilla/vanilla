@@ -6,7 +6,6 @@
 
 namespace Vanilla\Models;
 
-use Garden\Web\Exception\ClientException;
 use Vanilla\Addon;
 use Vanilla\Theme\Asset;
 use Vanilla\Theme\FontsAsset;
@@ -16,7 +15,6 @@ use Vanilla\Theme\StyleAsset;
 use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Theme\ImageAsset;
 use Vanilla\Theme\ThemeProviderInterface;
-use Vanilla\Theme\VariablesProviderInterface;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
 use Garden\Web\Exception\NotFoundException;

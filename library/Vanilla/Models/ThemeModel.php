@@ -202,10 +202,10 @@ class ThemeModel {
      * @throws ClientException Throws an exception if no suitable theme provider found.
      */
     private function getThemeProvider($themeKey): ThemeProviderInterface {
-        $isNumeric = is_int($themeKey) || ctype_digit($themeKey);
+        $isDB = is_int($themeKey) || ctype_digit($themeKey);
         foreach ($this->themeProviders as $provider) {
             $provider->setVariableProviders($this->getVariableProviders());
-            if ($isNumeric === $provider->themeKeyType()) {
+            if ($isDB === $provider->themeKeyType()) {
                 return $provider;
             }
         }

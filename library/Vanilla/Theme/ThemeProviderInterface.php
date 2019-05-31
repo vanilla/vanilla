@@ -10,15 +10,15 @@
   * Interface for providing variables on a theme.
   */
 interface ThemeProviderInterface {
-    const TYPE_FS = false;
-    const TYPE_DB = true;
+    const TYPE_FS = 0;
+    const TYPE_DB = 1;
 
     /**
      * Returns type of themeKey used for this provider
      *
      * @return bool When theme key is numeric return TRUE if alphanumeric FALSE
      */
-    public function themeKeyType(): bool;
+    public function themeKeyType(): int;
 
     /**
      * Returns type of theme with all assets

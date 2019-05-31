@@ -1057,6 +1057,7 @@ class EntryController extends Gdn_Controller {
 
             if (!$this->Request->isAuthenticatedPostBack() && !c('Garden.Embed.Allow')) {
                 $this->Form->addError('Please try again.');
+                Gdn::session()->ensureTransientKey();
             }
 
             // Check the user.

@@ -1963,7 +1963,7 @@ class DiscussionModel extends Gdn_Model {
         if ($categoryID !== false) {
             $checkPermission = val('CheckPermission', $settings, true);
             $category = CategoryModel::categories($categoryID);
-           if ($category && $checkPermission && !CategoryModel::checkPermission($category, 'Vanilla.Discussions.Add')) {
+            if ($category && $checkPermission && !CategoryModel::checkPermission($category, 'Vanilla.Discussions.Add')) {
                 $this->Validation->addValidationResult('CategoryID', 'You do not have permission to post in this category');
             }
         }

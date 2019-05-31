@@ -19,7 +19,7 @@ use Garden\Http\HttpClient;
 abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
 
     /** @var HttpClient */
-    private $httpClient;
+    protected $httpClient;
 
     /**
      * Dependency Injection

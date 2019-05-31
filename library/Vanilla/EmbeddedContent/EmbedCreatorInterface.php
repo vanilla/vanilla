@@ -17,6 +17,7 @@ interface EmbedCreatorInterface {
      *
      * @param string $url
      * @return AbstractEmbed
+     * @throws \Garden\Schema\ValidationException Creation of embed classes use Garden\Schema.
      */
     public function createEmbedForUrl(string $url): AbstractEmbed;
 
@@ -26,6 +27,7 @@ interface EmbedCreatorInterface {
      *
      * @param array $data
      * @return AbstractEmbed
+     * @throws \Garden\Schema\ValidationException Creation of embed classes use Garden\Schema.
      */
     public function createEmbedFromData(array $data): AbstractEmbed;
 }

@@ -7,7 +7,8 @@
 import React from "react";
 import debounce from "lodash/debounce";
 import Quill, { RangeStatic, BoundsStatic } from "quill/core";
-import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import { IWithEditorProps } from "@rich-editor/editor/context";
+import { withEditor } from "@rich-editor/editor/withEditor";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
 
 interface IXCoordinates {

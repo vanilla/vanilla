@@ -45,7 +45,6 @@ class EntryController extends Gdn_Controller {
         if (Gdn::request()->get('display') === 'popup') {
             $this->MasterView = 'popup';
         }
-        $this->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
     }
 
     /**
@@ -104,8 +103,6 @@ class EntryController extends Gdn_Controller {
      * @param string $authenticationSchemeAlias Type of authentication we're attempting.
      */
     public function auth($authenticationSchemeAlias = 'default') {
-        Gdn::session()->ensureTransientKey();
-
         $this->EventArguments['AuthenticationSchemeAlias'] = $authenticationSchemeAlias;
         $this->fireEvent('BeforeAuth');
 
@@ -1040,8 +1037,6 @@ class EntryController extends Gdn_Controller {
             $this->checkOverride('SignIn', $this->target());
         }
 
-        Gdn::session()->ensureTransientKey();
-
         $this->addJsFile('entry.js');
         $this->setData('Title', t('Sign In'));
         $this->Form->addHidden('Target', $this->target());
@@ -1061,6 +1056,7 @@ class EntryController extends Gdn_Controller {
 
             if (!$this->Request->isAuthenticatedPostBack() && !c('Garden.Embed.Allow')) {
                 $this->Form->addError('Please try again.');
+                Gdn::session()->ensureTransientKey();
             }
 
             // Check the user.
@@ -1131,6 +1127,9 @@ class EntryController extends Gdn_Controller {
                                 'Reason' => 'Password',
                             ]);
                         }
+                    } catch (Gdn_SanitizedUserException $ex) {
+                        $errorMessage = $ex->getMessage();
+                        $this->Form->addError($errorMessage);
                     } catch (Gdn_UserException $ex) {
                         $this->Form->addError($ex);
                     }
@@ -1771,7 +1770,7 @@ class EntryController extends Gdn_Controller {
      */
     public function passwordRequest() {
         if (!$this->UserModel->isEmailUnique() && $this->UserModel->isNameUnique()) {
-            Gdn::locale()->setTranslation('Email', t('Usermame'));
+            Gdn::locale()->setTranslation('Email', t('Username'));
         }
 
         if ($this->Form->isPostBack() === true) {

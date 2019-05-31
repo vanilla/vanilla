@@ -48,8 +48,8 @@ class Gdn_PasswordHash {
      * @param string $storedHash The password hash stored in the database.
      * @param bool|string $method The password hashing method.
      * @return bool Returns **true** if the password matches the hash or **false** if it doesn't.
-     * @throws Gdn_UserException if the password needs to be reset.
-     * @throws Gdn_UserException if the password has a method of "random".
+     * @throws Gdn_UserException If the password needs to be reset.
+     * @throws Gdn_UserException If the password has a method of "random".
      */
     public function checkPassword($password, $storedHash, $method = false) {
         $result = false;
@@ -88,12 +88,18 @@ class Gdn_PasswordHash {
                 $result = $this->getAlgorithm('Punbb')->verify($password, $storedHash);
                 break;
             case 'reset':
-                $resetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='.urlencode(Gdn::request()->get('display')) : ''));
-                throw new Gdn_UserException(sprintf(t('You need to reset your password.', 'You need to reset your password. This is most likely because an administrator recently changed your account information. Click <a href="%s">here</a> to reset your password.'), $resetUrl));
+                $resetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='
+                        .urlencode(Gdn::request()->get('display')) : ''));
+                $messageReset = 'You need to reset your password. 
+                This is most likely because an administrator recently changed your account information.
+                Click <a href="%s">here</a> to reset your password.';
+                throw new Gdn_SanitizedUserException(sprintf(t('You need to reset your password.', $messageReset), $resetUrl));
                 break;
             case 'random':
-                $resetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='.urlencode(Gdn::request()->get('display')) : ''));
-                throw new Gdn_UserException(sprintf(t('You don\'t have a password.', 'Your account does not have a password assigned to it yet. Click <a href="%s">here</a> to reset your password.'), $resetUrl));
+                $resetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='
+                        .urlencode(Gdn::request()->get('display')) : ''));
+                $messageRandom ='Your account does not have a password assigned to it yet. Click <a href="%s">here</a> to reset your password.';
+                throw new Gdn_SanitizedUserException(sprintf(t('You don\'t have a password.', $messageRandom), $resetUrl));
                 break;
             case 'smf':
                 $result = $this->getAlgorithm('Smf')->verify($password, $storedHash);
@@ -160,8 +166,8 @@ class Gdn_PasswordHash {
      *
      * @param string $algorithm
      * @return object
-     * @throws Exception if a matching class cannot be found
-     * @throws Exception if the found class is not an instance of PasswordInterface
+     * @throws Exception If a matching class cannot be found.
+     * @throws Exception If the found class is not an instance of PasswordInterface.
      */
     protected function getAlgorithm($algorithm) {
         if (!stringEndsWith($algorithm, 'Password')) {

@@ -19,14 +19,17 @@ import { shadowHelper, shadowOrBorderBasedOnLightness } from "@library/styles/sh
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { important, percent } from "csx";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const dropDownVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("dropDown");
 
     const sizing = makeThemeVars("sizing", {
-        width: 250,
+        widths: {
+            default: 250,
+            medium: 350,
+        },
         minHeight: 600,
     });
 
@@ -109,7 +112,7 @@ export const dropDownClasses = useThemeCache(() => {
 
     const contents = style("contents", {
         position: "absolute",
-        minWidth: unit(vars.sizing.width),
+        minWidth: unit(vars.sizing.widths.default),
         backgroundColor: colorOut(vars.contents.bg),
         color: colorOut(vars.contents.fg),
         overflow: "auto",
@@ -117,6 +120,9 @@ export const dropDownClasses = useThemeCache(() => {
         ...borders(vars.contents.border),
         zIndex: 3,
         $nest: {
+            "&.isMedium": {
+                width: unit(vars.sizing.widths.medium),
+            },
             "&.isParentWidth": {
                 minWidth: "initial",
             },
@@ -138,9 +144,6 @@ export const dropDownClasses = useThemeCache(() => {
                     vertical: 12,
                     horizontal: important(0),
                 }),
-            },
-            "&:empty": {
-                display: "none",
             },
         },
     });
@@ -248,7 +251,7 @@ export const dropDownClasses = useThemeCache(() => {
                 },
             }),
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             fontSize: unit(vars.item.mobile.fontSize),
             fontWeight: globalVars.fonts.weights.semiBold,
             minHeight: unit(vars.item.mobile.minHeight),
@@ -284,16 +287,20 @@ export const dropDownClasses = useThemeCache(() => {
         marginLeft: "auto",
     });
 
-    const verticalPadding = style("verticalPadding", {
-        ...paddings({
-            vertical: vars.contents.padding.vertical,
-            horizontal: 0,
+    const verticalPadding = style(
+        "verticalPadding",
+        {
+            ...paddings({
+                vertical: vars.contents.padding.vertical,
+                horizontal: 0,
+            }),
+        },
+        mediaQueries.oneColumnDown({
+            ...paddings({
+                vertical: 0,
+            }),
         }),
-    }, mediaQueries.oneColumn({
-        ...paddings({
-            vertical: 0,
-        }),
-    }));
+    );
 
     const title = style("title", {
         ...fonts({

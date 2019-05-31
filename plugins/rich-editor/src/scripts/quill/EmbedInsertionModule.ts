@@ -10,9 +10,7 @@ import Quill from "quill/core";
 import api, { uploadFile } from "@library/apiv2";
 import { getPastedFile, getDraggedFile } from "@library/dom/domUtils";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
-import getStore from "@library/redux/getStore";
-import { getIDForQuill, insertBlockBlotAt } from "@rich-editor/quill/utility";
-import { IStoreState } from "@rich-editor/@types/store";
+import { insertBlockBlotAt } from "@rich-editor/quill/utility";
 import { isFileImage } from "@library/utility/utils";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
 
@@ -20,17 +18,10 @@ import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
  * A Quill module for managing insertion of embeds/loading/error states.
  */
 export default class EmbedInsertionModule extends Module {
-    private store = getStore<IStoreState>();
-
-    constructor(public quill: Quill, options = {}, editorID) {
+    constructor(public quill: Quill, options = {}) {
         super(quill, options);
         this.quill = quill;
         this.setupImageUploads();
-    }
-
-    private get state() {
-        const id = getIDForQuill(this.quill);
-        return this.store.getState().editor.instances[id];
     }
 
     /**
@@ -57,8 +48,7 @@ export default class EmbedInsertionModule extends Module {
      */
     public createEmbed = (embedValue: IEmbedValue) => {
         const externalEmbed = Parchment.create("embed-external", embedValue) as ExternalEmbedBlot;
-        const selection = this.state.lastGoodSelection || { index: this.quill.scroll.length(), length: 0 };
-        insertBlockBlotAt(this.quill, selection.index, externalEmbed);
+        insertBlockBlotAt(this.quill, this.quill.getLastGoodSelection().index, externalEmbed);
         this.quill.update(Quill.sources.USER);
         externalEmbed.focus();
     };

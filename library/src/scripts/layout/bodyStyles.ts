@@ -11,6 +11,10 @@ import { colorOut, background, fontFamilyWithDefaults, margins, paddings, fonts 
 
 export const bodyCSS = useThemeCache(() => {
     const globalVars = globalVariables();
+    cssRule("html", {
+        "-ms-overflow-style": "-ms-autohiding-scrollbar",
+    });
+
     cssRule("html, body", {
         backgroundColor: colorOut(globalVars.body.backgroundImage.color),
         ...fonts({
@@ -46,6 +50,38 @@ export const bodyCSS = useThemeCache(() => {
             all: 0,
         }),
     });
+
+    cssRule(".page", {
+        display: "flex",
+        overflow: "visible",
+        flexDirection: "column",
+        width: percent(100),
+        minHeight: viewHeight(100),
+        position: "relative",
+        zIndex: 0,
+    });
+
+    cssRule("button", {
+        "-webkit-appearance": "none",
+        "-moz-appearance": "none",
+    });
+
+    cssRule(".page-minHeight", {
+        flexGrow: 1,
+        display: "flex",
+        flexDirection: "column",
+    });
+
+    cssRule(
+        `input::-webkit-search-decoration,
+        input::-webkit-search-cancel-button,
+        input::-webkit-search-results-button,
+        input::-webkit-search-results-decoration,
+        input::-ms-clear`,
+        {
+            display: "none",
+        },
+    );
 });
 
 export const bodyClasses = useThemeCache(() => {

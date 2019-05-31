@@ -13,7 +13,7 @@ import FlexSpacer from "@library/layout/FlexSpacer";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
-import { frameHeaderClasses } from "@library/layout/frame/frameStyles";
+import { frameHeaderClasses } from "@library/layout/frame/frameHeaderStyles";
 import Heading from "@library/layout/Heading";
 import { PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import SmartAlign from "@library/layout/SmartAlign";
@@ -96,12 +96,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                                                 >
                                                     <SmartAlign>{title}</SmartAlign>
                                                 </Heading>
-                                                <div
-                                                    className={classNames(
-                                                        "frameHeader-closePosition",
-                                                        classesFrameHeader.action,
-                                                    )}
-                                                >
+                                                <div className={classNames(classesFrameHeader.action)}>
                                                     <CloseButton
                                                         className={classNames(classes.closeButton)}
                                                         onClick={this.close}

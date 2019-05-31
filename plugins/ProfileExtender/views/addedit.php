@@ -23,6 +23,7 @@ echo $this->Form->errors();
             </div>
         </div>
     </div>
+    <?php echo $this->data('beforeProfileExtenderCheckbox');  ?>
     <div class="js-options<?php if ($this->Form->getValue('FormType') != 'Dropdown') echo ' Hidden'; ?>">
         <div class="form-group">
             <div class="label-wrap">

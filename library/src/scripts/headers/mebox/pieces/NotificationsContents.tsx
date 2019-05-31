@@ -18,7 +18,7 @@ import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import FrameHeaderWithAction from "@library/layout/frame/FrameHeaderWithAction";
-import { frameFooterClasses } from "@library/layout/frame/frameStyles";
+import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import Loader from "@library/loaders/Loader";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import LinkAsButton from "@library/routing/LinkAsButton";
@@ -93,7 +93,7 @@ export class NotificationsContents extends React.Component<IProps> {
         if (notifications.status !== LoadStatus.SUCCESS || !notifications.data) {
             // This is the height that it happens to be right now.
             // This will be calculated better once we finish the CSS in JS transition.
-            const height = this.props.device === Devices.MOBILE ? 80 : 69;
+            const height = this.props.device === Devices.MOBILE || this.props.device === Devices.XS ? 80 : 69;
             const loaders = loaderClasses();
             return <Loader loaderStyleClass={loaders.smallLoader} height={height} minimumTime={0} padding={10} />;
         }

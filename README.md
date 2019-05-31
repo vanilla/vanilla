@@ -71,7 +71,7 @@ The `release/VERSION+BUILD` branches are production-ready branches for our cloud
 | ------------------- | ------------------- | ------------------- |
 | **Version**         | `2.8`               | `2.6`               |
 | **Initial Release** | 8 Feb 2019          | 17 Aug 2018         |
-| **Last Updated**    | 15 Mar 2019 (2.8.1) | 28 Oct 2018 (2.6.4) |
+| **Last Updated**    | 23 Apr 2019 (2.8.3) | 28 Oct 2018 (2.6.4) |
 | **EOL**             | Next release        | **8 Feb 2019**      |
 
 Refer to the [OSS changelog](https://docs.vanillaforums.com/developer/changelog/) and the [Vanilla Cloud changelog](https://docs.vanillaforums.com/help/releases/) to track active changes between releases.

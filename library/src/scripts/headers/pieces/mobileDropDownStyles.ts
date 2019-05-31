@@ -18,7 +18,7 @@ import {
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { border, calc, percent, px, translateX } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { frameVariables } from "@library/layout/frame/frameStyles";
 
 export const mobileDropDownVariables = useThemeCache(() => {
@@ -30,6 +30,7 @@ export const mobileDropDownVariables = useThemeCache(() => {
     const title = vars("title", {
         letterSpacing: -0.26,
         maxWidth: calc(`100% - ${px(titleBarVars.endElements.flexBasis * 2)}`),
+        lineHeight: 2,
     });
     const chevron = vars("chevron", {
         width: 8,
@@ -71,7 +72,6 @@ export const mobileDropDownClasses = useThemeCache(() => {
         ...flex.middle(),
         position: "relative",
         flexGrow: 1,
-        overflow: "hidden",
     });
 
     const modal = style("modal", {
@@ -118,6 +118,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
         display: "inline-block",
         position: "relative",
         paddingRight: vars.chevron.width * 2,
+        lineHeight: 1.5,
         overflow: "hidden",
         textOverflow: "ellipsis",
         maxWidth: percent(100),
@@ -130,6 +131,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
             letterSpacing: vars.title.letterSpacing,
             fontWeight: globalVars.fonts.weights.semiBold,
             textAlign: "center",
+            lineHeight: vars.title.lineHeight,
         },
         mediaQueries.xs({
             textAlign: "left",

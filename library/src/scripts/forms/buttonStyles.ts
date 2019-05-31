@@ -46,7 +46,7 @@ export const buttonGlobalVariables = useThemeCache(() => {
 
     const sizing = makeThemeVars("sizing", {
         minHeight: formElVars.sizing.height,
-        minWidth: 96,
+        minWidth: 104,
         compactHeight: 24,
     });
 
@@ -664,10 +664,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
             "&:not(.focus-visible)": {
                 outline: 0,
             },
-            "&:hover": {
-                color: colorOut(globalVars.mainColors.primary),
-            },
-            "&:focus, &:active": {
+            "&:focus, &:active, &:hover": {
                 color: colorOut(globalVars.mainColors.secondary),
             },
         },

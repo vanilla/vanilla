@@ -43,7 +43,7 @@ const userContentVariables = useThemeCache(() => {
 
     const code = makeThemeVars("code", {
         fontSize: em(0.85),
-        borderRadius: 0,
+        borderRadius: 2,
         // bg target rgba(127, 127, 127, .15);
         bg: blocks.bg,
         fg: blocks.fg,
@@ -105,7 +105,7 @@ export const userContentClasses = useThemeCache(() => {
         return {
             marginTop: globalVars.spacer.size,
             fontSize,
-            $nest: lineHeightAdjustment(globalVars.lineHeights.condensed),
+            $nest: lineHeightAdjustment(),
         };
     };
     const headings: NestedCSSSelectors = {
@@ -140,7 +140,7 @@ export const userContentClasses = useThemeCache(() => {
                     marginTop: vars.blocks.margin * 0.5,
                 },
                 "&:first-child": {
-                    $nest: lineHeightAdjustment(globalVars.lineHeights.base),
+                    $nest: lineHeightAdjustment(),
                 },
             },
         },
@@ -174,7 +174,6 @@ export const userContentClasses = useThemeCache(() => {
     const codeStyles: NestedCSSSelectors = {
         "& .code": {
             position: "relative",
-            verticalAlign: "middle",
             fontSize: vars.code.fontSize,
             fontFamily: `Menlo, Monaco, Consolas, "Courier New", monospace`,
             maxWidth: percent(100),
@@ -275,6 +274,10 @@ export const userContentClasses = useThemeCache(() => {
         lineHeight: globalVars.lineHeights.base,
         fontSize: vars.fonts.size,
         $nest: {
+            // A placeholder might be put in a ::before element. Make sure we match the line-height adjustment.
+            "&::before": {
+                marginTop: lineHeightAdjustment()["&::before"]!.marginTop,
+            },
             ...headings,
             ...lists,
             ...paragraphSpacing,

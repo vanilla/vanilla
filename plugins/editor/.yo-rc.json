@@ -1,6 +1,0 @@
-{
-  "generator-vanilla": {
-    "preprocessor": "SCSS",
-    "buildtool": "Grunt"
-  }
-}

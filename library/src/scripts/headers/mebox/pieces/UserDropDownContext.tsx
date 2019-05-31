@@ -15,7 +15,7 @@ import DropDownSection from "@library/flyouts/items/DropDownSection";
 import DropDownUserCard from "@library/flyouts/items/DropDownUserCard";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
-import { frameBodyClasses } from "@library/layout/frame/frameStyles";
+import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";

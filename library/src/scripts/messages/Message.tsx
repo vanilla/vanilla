@@ -11,6 +11,7 @@ import { LiveMessage } from "react-aria-live";
 import { messagesClasses } from "@library/messages/messageStyles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import Container from "@library/layout/components/Container";
 
 export interface IMessageProps {
     className?: string;
@@ -29,23 +30,29 @@ export default function Message(props: IMessageProps) {
     return (
         <>
             <div className={classNames(classes.root, props.className, { [classes.fixed]: props.isFixed })}>
-                <div className={classNames(classes.wrap)}>
-                    <div className={classes.message}>{props.contents || props.stringContents}</div>
-                    {props.onConfirm && (
-                        <Button
-                            baseClass={ButtonTypes.TEXT_PRIMARY}
-                            onClick={props.onConfirm}
-                            className={classes.actionButton}
-                        >
-                            {props.confirmText || t("OK")}
-                        </Button>
-                    )}
-                    {props.onCancel && (
-                        <Button baseClass={ButtonTypes.TEXT} onClick={props.onCancel} className={classes.actionButton}>
-                            {props.cancelText || t("Cancel")}
-                        </Button>
-                    )}
-                </div>
+                <Container>
+                    <div className={classNames(classes.wrap)}>
+                        <div className={classes.message}>{props.contents || props.stringContents}</div>
+                        {props.onConfirm && (
+                            <Button
+                                baseClass={ButtonTypes.TEXT_PRIMARY}
+                                onClick={props.onConfirm}
+                                className={classes.actionButton}
+                            >
+                                {props.confirmText || t("OK")}
+                            </Button>
+                        )}
+                        {props.onCancel && (
+                            <Button
+                                baseClass={ButtonTypes.TEXT}
+                                onClick={props.onCancel}
+                                className={classes.actionButton}
+                            >
+                                {props.cancelText || t("Cancel")}
+                            </Button>
+                        )}
+                    </div>
+                </Container>
             </div>
             {/* Does not visually render, but sends message to screen reader users*/}
             <LiveMessage clearOnUnmount={!!props.clearOnUnmount} message={props.stringContents} aria-live="assertive" />

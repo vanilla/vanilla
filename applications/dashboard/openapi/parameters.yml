@@ -1,0 +1,30 @@
+openapi: 3.0.2
+info:
+paths:
+components:
+  parameters:
+    DateInserted:
+      name: dateInserted
+      in: query
+      description: >
+        Filter by insert date. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).
+      schema:
+        format: date-filter
+        type: string
+    DateUpdated:
+      name: dateUpdated
+      in: query
+      description: >
+        Filter by update date. See [date filters](https://docs.vanillaforums.com/help/apiv2/date-filters/).
+      schema:
+        format: date-filter
+        type: string
+    Page:
+      name: page
+      in: query
+      description: >
+        Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+      schema:
+        type: integer
+        default: 1
+        minimum: 1

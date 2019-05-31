@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import DropDown from "@library/flyouts/DropDown";
+import DropDown, { FlyoutSizes } from "@library/flyouts/DropDown";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { embed } from "@library/icons/editorIcons";
@@ -14,7 +14,8 @@ import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { isAllowedUrl, t } from "@library/utility/appUtils";
 import { getRequiredID, IRequiredComponentID } from "@library/utility/idUtils";
-import { IWithEditorProps, withEditor } from "@rich-editor/editor/context";
+import { IWithEditorProps } from "@rich-editor/editor/context";
+import { withEditor } from "@rich-editor/editor/withEditor";
 import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
 import { richEditorClasses } from "@rich-editor/editor/richEditorClasses";
 import { insertMediaClasses } from "@rich-editor/flyouts/pieces/insertMediaClasses";
@@ -24,6 +25,7 @@ import classNames from "classnames";
 import KeyboardModule from "quill/modules/keyboard";
 import React from "react";
 import { style } from "typestyle";
+import Flyout from "@rich-editor/flyouts/pieces/Flyout";
 
 interface IProps extends IWithEditorProps, IDeviceProps {
     disabled?: boolean;
@@ -63,6 +65,7 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
     public render() {
         const classesRichEditor = richEditorClasses(this.props.legacyMode);
         const classesInsertMedia = insertMediaClasses();
+        const placeholderText = `https://`;
         return (
             <>
                 <DropDown
@@ -84,6 +87,8 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
                     renderLeft={!!this.props.renderLeft}
                     selfPadded={true}
                     initialFocusElement={this.inputRef.current}
+                    flyoutSize={FlyoutSizes.MEDIUM}
+                    contentsClassName={!this.props.legacyMode ? classesRichEditor.flyoutOffset : ""}
                 >
                     <Frame
                         body={
@@ -95,7 +100,7 @@ export class EmbedFlyout extends React.PureComponent<IProps, IState> {
                                     className={classNames("InputBox", classesInsertMedia.insert, {
                                         inputText: !this.props.legacyMode,
                                     })}
-                                    placeholder={t("http://")}
+                                    placeholder={placeholderText}
                                     value={this.state.url}
                                     onChange={this.inputChangeHandler}
                                     onKeyDown={this.buttonKeyDownHandler}

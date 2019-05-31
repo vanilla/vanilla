@@ -5,12 +5,13 @@
  */
 
 import Formatter from "@rich-editor/quill/Formatter";
-import Quill, { RangeStatic } from "quill/core";
+import Quill, { RangeStatic, DeltaOperation } from "quill/core";
 import { expect } from "chai";
 import OpUtils, { inlineFormatOps, blockFormatOps } from "@rich-editor/__tests__/OpUtils";
 import registerQuill from "./registerQuill";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import { ListType, ListItem } from "@rich-editor/quill/blots/blocks/ListBlot";
+import cloneDeep from "lodash/cloneDeep";
 
 describe("Formatter", () => {
     let quill: Quill;
@@ -119,19 +120,47 @@ describe("Formatter", () => {
         testMultiLineFormatting("bulletedList", formattingFunction, OpUtils.list(ListType.BULLETED));
     });
 
+    describe("paragraph()", () => {
+        const formattingFunction = (range?: RangeStatic) => makeFormatter(range).paragraph();
+        testLineFormatInlinePreservation("paragraph", formattingFunction, OpUtils.newline());
+        testLineFormatExclusivity("paragraph", formattingFunction, OpUtils.newline());
+        testMultiLineFormatting("paragraph", formattingFunction, OpUtils.newline());
+    });
+
     function assertQuillInputOutput(input: any[], expectedOutput: any[], formattingFunction: () => void) {
         quill.setContents(input, Quill.sources.USER);
         formattingFunction();
 
+        // Kludge out the dynamically generated refs.
         const stripRefs = op => {
             if (op.attributes && op.attributes.header && op.attributes.header.ref) {
                 op.attributes.header.ref = "";
             }
             return op;
         };
-        // Kludge out the dynamically generated refs.
-        const result = quill.getContents().ops!.map(stripRefs);
-        expectedOutput = expectedOutput.map(stripRefs);
+
+        const normalize = (ops: DeltaOperation[]) => {
+            return cloneDeep(ops)
+                .map(stripRefs)
+                .reduce((acc: DeltaOperation[], current: DeltaOperation) => {
+                    const lastValue = acc[acc.length - 1];
+                    if (
+                        lastValue &&
+                        !current.attributes &&
+                        !lastValue.attributes &&
+                        typeof lastValue.insert === "string" &&
+                        typeof current.insert === "string"
+                    ) {
+                        lastValue.insert += current.insert;
+                    } else {
+                        acc.push(current);
+                    }
+                    return acc;
+                }, []);
+        };
+
+        const result = normalize(quill.getContents().ops!);
+        expectedOutput = normalize(expectedOutput);
         expect(result).deep.equals(expectedOutput);
     }
 
@@ -289,6 +318,49 @@ describe("Formatter", () => {
             assertQuillInputOutput(initial, expected, formatterFunction);
         });
 
+        it(`can be unformatted using the paragraph format`, () => {
+            const initial = [OpUtils.op(), lineOp, OpUtils.op(), lineOp, OpUtils.op(), lineOp];
+            const opInsert = OpUtils.op().insert;
+            const expected = [OpUtils.op(`${opInsert}\n${opInsert}\n${opInsert}\n`)];
+
+            const formatterFunction = () => makeFormatter().paragraph();
+            assertQuillInputOutput(initial, expected, formatterFunction);
+        });
+
+        it(`can be formatted over a nested list`, () => {
+            const initial = [
+                OpUtils.op(),
+                OpUtils.list(ListType.BULLETED, 0),
+                OpUtils.op(),
+                OpUtils.list(ListType.BULLETED, 1),
+                OpUtils.op(),
+                OpUtils.list(ListType.BULLETED, 2),
+                OpUtils.op(),
+                OpUtils.list(ListType.BULLETED, 3),
+                OpUtils.op(),
+                OpUtils.list(ListType.BULLETED, 1),
+                OpUtils.op(),
+                OpUtils.list(ListType.BULLETED, 0),
+            ];
+
+            const expected = [
+                OpUtils.op(),
+                lineOp,
+                OpUtils.op(),
+                lineOp,
+                OpUtils.op(),
+                lineOp,
+                OpUtils.op(),
+                lineOp,
+                OpUtils.op(),
+                lineOp,
+                OpUtils.op(),
+                lineOp,
+            ];
+            const formatterFunction = () => format(getFullRange());
+            assertQuillInputOutput(initial, expected, formatterFunction);
+        });
+
         describe(`can apply the ${lineFormatName} format to single line of all other multiline blots`, () => {
             blockFormatOps
                 .filter(({ name }) => name !== lineFormatName)
@@ -298,21 +370,21 @@ describe("Formatter", () => {
                     const three = OpUtils.op("3");
                     const initial = [one, op, two, op, three, op];
 
-                    it(`can apply the ${lineFormatName} format to the 1st line of 3 lines of the ${name} format`, () => {
+                    it(`--- apply the ${lineFormatName} format to the 1st line of 3 lines of the ${name} format`, () => {
                         const expected = [one, lineOp, two, op, three, op];
                         const range: RangeStatic = { index: 0, length: 0 };
                         const formatterFunction = () => format(range);
                         assertQuillInputOutput(initial, expected, formatterFunction);
                     });
 
-                    it(`can apply the ${lineFormatName} format to the 2nd line of 3 lines of the ${name} format`, () => {
+                    it(`--- apply the ${lineFormatName} format to the 2nd line of 3 lines of the ${name} format`, () => {
                         const expected = [one, op, two, lineOp, three, op];
                         const range: RangeStatic = { index: 2, length: 0 };
                         const formatterFunction = () => format(range);
                         assertQuillInputOutput(initial, expected, formatterFunction);
                     });
 
-                    it(`can apply the ${lineFormatName} format to the 3rd line of 3 lines of the ${name} format`, () => {
+                    it(`--- apply the ${lineFormatName} format to the 3rd line of 3 lines of the ${name} format`, () => {
                         const expected = [one, op, two, op, three, lineOp];
                         const range: RangeStatic = { index: 4, length: 0 };
                         const formatterFunction = () => format(range);

@@ -11,7 +11,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, px } from "csx";
 import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
-import { layoutVariables } from "@library/layout/layoutStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const compactSearchVariables = useThemeCache(() => {
     const makeVars = variableFactory("compactSearch");
@@ -79,9 +79,12 @@ export const compactSearchClasses = useThemeCache(() => {
             display: "flex",
             alignItems: "center",
             flexWrap: "nowrap",
-            height: unit(titleBarVars.sizing.height),
+            minHeight: unit(formElementsVars.sizing.height),
+            justifyContent: "center",
+            width: percent(100),
+            position: "relative",
         },
-        mediaQueries.oneColumn({
+        mediaQueries.oneColumnDown({
             height: unit(titleBarVars.sizing.mobile.height),
         }),
     );
@@ -95,5 +98,20 @@ export const compactSearchClasses = useThemeCache(() => {
     const cancelContents = style("cancelContents", {
         padding: px(4),
     });
-    return { root, contents, close, cancelContents };
+
+    const searchAndResults = style("searchAndResults", {
+        position: "relative",
+        width: percent(100),
+        height: unit(formElementsVars.sizing.height),
+        display: "flex",
+        flexWrap: "nowrap",
+    });
+
+    return {
+        root,
+        contents,
+        close,
+        cancelContents,
+        searchAndResults,
+    };
 });

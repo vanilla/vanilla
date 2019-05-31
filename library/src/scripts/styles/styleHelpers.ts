@@ -5,7 +5,7 @@
 
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { log } from "@library/utility/utils";
 import {
     AlignItemsProperty,
@@ -168,8 +168,8 @@ export const textInputSizingFromSpacing = (fontSize: number, paddingTop: number,
     };
 };
 
-export const textInputSizingFromFixedHeight = (height: number, fontSize: number , fullBorderWidth: number) => {
-    const paddingTop = (height - fullBorderWidth - (fontSize * 1.5)) / 2;
+export const textInputSizingFromFixedHeight = (height: number, fontSize: number, fullBorderWidth: number) => {
+    const paddingTop = (height - fullBorderWidth - fontSize * 1.5) / 2;
     return {
         fontSize: unit(fontSize),
         width: percent(100),
@@ -607,13 +607,13 @@ export const negative = val => {
 };
 
 export interface IMargins {
-    top?: string | number;
-    right?: string | number;
-    bottom?: string | number;
-    left?: string | number;
-    horizontal?: string | number;
-    vertical?: string | number;
-    all?: string | number;
+    top?: string | number | undefined;
+    right?: string | number | undefined;
+    bottom?: string | number | undefined;
+    left?: string | number | undefined;
+    horizontal?: string | number | undefined;
+    vertical?: string | number | undefined;
+    all?: string | number | undefined;
 }
 
 export const margins = (styles: IMargins): NestedCSSProperties => {
@@ -1148,3 +1148,26 @@ export const pointerEventsClass = (value: PointerEventsProperty = "none") => {
     const style = styleFactory("pointerEvents");
     return style(pointerEvents(value));
 };
+
+export const visibility = useThemeCache(() => {
+    const style = styleFactory("visibility");
+    const onEmpty = (nest?: object) => {
+        return style("onEmpty", {
+            $nest: {
+                "&:empty": {
+                    display: "none",
+                },
+                ...nest,
+            },
+        });
+    };
+
+    const displayNone = style("displayNone", {
+        display: important("none"),
+    });
+
+    return {
+        onEmpty,
+        displayNone,
+    };
+});

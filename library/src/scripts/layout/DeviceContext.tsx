@@ -11,6 +11,7 @@ import { deviceCheckerClasses } from "@library/layout/deviceCheckerStyles";
 import { forceRenderStyles } from "typestyle";
 
 export enum Devices {
+    XS = "xs",
     MOBILE = "mobile",
     TABLET = "tablet",
     NO_BLEED = "no_bleed", // Not enough space for back link which goes outside the margin.
@@ -63,6 +64,9 @@ export class DeviceProvider extends React.Component<IProps, IState> {
         if (this.deviceChecker.current) {
             let device = Devices.DESKTOP;
             switch (`${this.deviceChecker.current.offsetWidth}`) {
+                case "0":
+                    device = Devices.XS;
+                    break;
                 case "1":
                     device = Devices.MOBILE;
                     break;

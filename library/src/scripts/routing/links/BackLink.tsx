@@ -50,7 +50,7 @@ export class BackLink extends React.Component<IProps> {
                             this.props.linkClassName,
                         )}
                     >
-                        {leftChevronCompact("backLink-icon")}
+                        {leftChevronCompact(classes.icon)}
                         {this.props.visibleLabel && <span className={classes.label}>{this.props.title}</span>}
                     </Link>
                 </div>

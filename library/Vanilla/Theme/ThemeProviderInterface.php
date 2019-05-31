@@ -10,8 +10,8 @@
   * Interface for providing variables on a theme.
   */
 interface ThemeProviderInterface {
-    const TYPE_FS = 0;
-    const TYPE_DB = 1;
+    const TYPE_FS = false;
+    const TYPE_DB = true;
 
     /**
      * Returns type of themeKey used for this provider

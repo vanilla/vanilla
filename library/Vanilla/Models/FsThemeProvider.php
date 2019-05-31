@@ -28,6 +28,7 @@ use Gdn_Upload;
  */
 class FsThemeProvider implements ThemeProviderInterface {
     use FsThemeMissingTrait;
+    use ThemeVarialblesTrait;
     /**
      * @var AddonManager
      */
@@ -205,7 +206,12 @@ class FsThemeProvider implements ThemeProviderInterface {
         if (!is_readable($fullFilename)) {
             throw new ServerException("Unable to read theme asset file: {$fullFilename}");
         }
-        return file_get_contents($fullFilename);
+        $assetContent = file_get_contents($fullFilename);
+        if ($filename === 'variables.json') {
+            $assetContent = $this->addAddonVariables($assetContent);
+        }
+
+        return $assetContent;
     }
 
     /**

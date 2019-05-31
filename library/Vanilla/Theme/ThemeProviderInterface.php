@@ -97,4 +97,12 @@ interface ThemeProviderInterface {
      * @return array
      */
     public function setAsset(int $themeID, string $assetKey, string $data): array;
+
+    /**
+     * Set variable providers
+     *
+     * @param array $variableProviders
+     * @return mixed
+     */
+    public function setVariableProviders(array $variableProviders = []);
 }

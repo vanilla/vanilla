@@ -189,6 +189,7 @@ class ThemeModel {
     private function getThemeProvider($themeKey): ThemeProviderInterface {
         $isNumeric = is_int($themeKey) || ctype_digit($themeKey);
         foreach ($this->themeProviders as $provider) {
+            $provider->setVariableProviders($this->getVariableProviders());
             if ($isNumeric === $provider->themeKeyType()) {
                 return $provider;
             }

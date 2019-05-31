@@ -61,7 +61,7 @@ class FsThemeProvider implements ThemeProviderInterface {
      * @inheritdoc
      */
     public function themeKeyType(): bool {
-        return self::TYPE_STRING;
+        return self::TYPE_FS;
     }
 
     /**

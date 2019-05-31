@@ -180,6 +180,21 @@ class ThemeModel {
     }
 
     /**
+     * Sparse theme asset (update existing or create new if asset does not exist).
+     *
+     * @param int $themeID The unique theme ID.
+     * @param string $assetKey Asset key.
+     *       Note: variables.json only allowed.
+     * @param string $data Data content for asset to set
+     *
+     * @return array
+     */
+    public function sparseAsset(int $themeID, string $assetKey, string $data): array {
+        $provider = $this->getThemeProvider($themeID);
+        return $provider->sparseAsset($themeID, $assetKey, $data);
+    }
+
+    /**
      * Get theme provider.
      *
      * @param string|int $themeKey Theme key or id

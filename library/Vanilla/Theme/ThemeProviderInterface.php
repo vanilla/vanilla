@@ -10,9 +10,8 @@
   * Interface for providing variables on a theme.
   */
 interface ThemeProviderInterface {
-    const TYPE_INT = true;
-    const TYPE_STRING = false;
-
+    const TYPE_DB = true;
+    const TYPE_FS = false;
 
     /**
      * Returns type of themeKey used for this provider
@@ -88,7 +87,7 @@ interface ThemeProviderInterface {
     public function getCurrent(): ?array;
 
     /**
-     * Set theme asset (update existing or create new if asset does not exist).
+     * Set theme asset (replace existing or create new if asset does not exist).
      *
      * @param int $themeID The unique theme ID.
      * @param string $assetKey Unique asset key (ex: header.html, footer.html, fonts.json, styles.css)
@@ -97,6 +96,19 @@ interface ThemeProviderInterface {
      * @return array
      */
     public function setAsset(int $themeID, string $assetKey, string $data): array;
+
+    /**
+     * Sparse update/set theme asset (update existing or create new if asset does not exist).
+     *
+     * @param int $themeID The unique theme ID.
+     * @param string $assetKey Asset key.
+     *        Note: only 'variables.json' allowed at the moment
+     * @param string $data Data content for asset.
+     *        Note: Expect json encoded associative array of values to update.
+     *
+     * @return array
+     */
+    public function sparseAsset(int $themeID, string $assetKey, string $data): array;
 
     /**
      * Set variable providers

@@ -178,6 +178,34 @@ class ThemesApiController extends AbstractApiController {
     }
 
     /**
+     * PATCH theme asset variables.json.
+     *
+     * @param int $themeID The unique theme ID.
+     * @param string $assetKey Asset key.
+     *        Note: only 'variables.json' allowed.
+     * @param array $body Array of incoming params.
+     *              Should have 'data' key with content for asset.
+     *
+     * @return array
+     */
+    public function patch_assets(int $themeID, string $assetKey, array $body): array {
+        $this->permission("Garden.Settings.Manage");
+
+        $in = $this->schema($this->assetsPutSchema(), 'in')->setDescription('PUT theme asset.');
+        $out = $this->schema($this->assetsSchema(), 'out');
+
+        $body = $in->validate($body);
+        $this->validateAssetKey($assetKey);
+        if ($assetKey !== 'variables') {
+            throw new ClientException('Asset "'.$assetKey.'" does not support PATCH method.', 501);
+        }
+
+        $asset = $this->themeModel->sparseAsset($themeID, $assetKey, $body['data']);
+
+        return $out->validate($asset);
+    }
+
+    /**
      * DELETE theme asset.
      *
      * @param int $themeID The unique theme ID.

@@ -23,5 +23,6 @@ applications/dashboard/styleguide/**
 applications/dashboard/template/**
 applications/dashboard/scss/**
 applications/dashboard/js/src/**
+dist/knowledge/**
 library/vendors/simplehtmldom/**
 plugins/Debugger/**

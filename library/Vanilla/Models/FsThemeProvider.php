@@ -26,7 +26,7 @@ use Gdn_Upload;
  */
 class FsThemeProvider implements ThemeProviderInterface {
     use FsThemeMissingTrait;
-    use ThemeVarialblesTrait;
+    use ThemeVariablesTrait;
     /**
      * @var AddonManager
      */

@@ -11,7 +11,7 @@ use Vanilla\Theme\VariablesProviderInterface;
 /**
  * Trait ThemeVarialblesTrait
  */
-trait ThemeVarialblesTrait {
+trait ThemeVariablesTrait {
     /** @var VariablesProviderInterface[] */
     private $variableProviders = [];
 

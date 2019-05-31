@@ -16,7 +16,7 @@ use Garden\Http\HttpClient;
  * - Gathering additional information through I/O.
  * - Create an AbstractEmbed instance.
  */
-abstract class AbstractEmbedFactory {
+abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
 
     /** @var HttpClient */
     private $httpClient;
@@ -67,25 +67,16 @@ abstract class AbstractEmbedFactory {
     }
 
     /**
-     * Create an embed class from a given URL.
-     *
-     * @param string $url
-     *
-     * @return AbstractEmbed
-     */
-    abstract public function createEmbedForUrl(string $url): AbstractEmbed;
-
-    /**
      * Get an array of supported domains for the site.
      *
      * @return array
      */
-    abstract public function getSupportedDomains(): array;
+    abstract protected function getSupportedDomains(): array;
 
     /**
      * Get a regex to match the path of the site against.
      *
      * @return string
      */
-    abstract public function getSupportedPathRegex(): string;
+    abstract protected function getSupportedPathRegex(): string;
 }

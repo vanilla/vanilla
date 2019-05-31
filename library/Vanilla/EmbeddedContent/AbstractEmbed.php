@@ -55,7 +55,8 @@ abstract class AbstractEmbed {
      * @return string
      */
     public function renderHtml(): string {
-        $viewPath = dirname(__FILE__) . '/json-embed-view.twig';
+        $viewPath = dirname(__FILE__) . '/AbstractEmbed.twig';
+        // MAYBE??        $viewPath = realpath('./AbstractEmbed.twig');
         return $this->renderTwig($viewPath, [
             'url' => $this->getUrl(),
             'embedJson' => json_encode($this->data),
@@ -101,6 +102,6 @@ abstract class AbstractEmbed {
             ],
         ]);
 
-        return $this->schema()->add($baseSchema);
+        return $this->schema()->merge($baseSchema);
     }
 }

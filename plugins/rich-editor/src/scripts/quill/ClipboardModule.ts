@@ -7,11 +7,12 @@
 import ClipboardBase from "quill/modules/clipboard";
 import Delta from "quill-delta";
 import Quill, { DeltaStatic } from "quill/core";
-import { rangeContainsBlot, getIDForQuill } from "@rich-editor/quill/utility";
+import { rangeContainsBlot } from "@rich-editor/quill/utility";
 import CodeBlockBlot from "@rich-editor/quill/blots/blocks/CodeBlockBlot";
 import CodeBlot from "@rich-editor/quill/blots/inline/CodeBlot";
-import { IStoreState } from "@rich-editor/@types/store";
 import ExternalEmbedBlot, { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
+
+export const EDITOR_SCROLL_CONTAINER_CLASS = "js-richEditorScrollContainer";
 
 export default class ClipboardModule extends ClipboardBase {
     /**
@@ -67,7 +68,7 @@ export default class ClipboardModule extends ClipboardBase {
             return;
         }
         const range = this.quill.getSelection();
-        const container = this.options.scrollingContainer;
+        const container = this.quill.root.closest(`.${EDITOR_SCROLL_CONTAINER_CLASS}`);
 
         // Get our scroll positions
         const scrollTop = document.documentElement!.scrollTop || document.body.scrollTop;

@@ -100,6 +100,9 @@ export const richEditorVariables = useThemeCache(() => {
 
     const text = makeThemeVars("text", {
         offset: 0,
+        placeholder: {
+            color: globalVars.mixBgAndFg(0.5),
+        },
     });
 
     const title = makeThemeVars("titleInput", {

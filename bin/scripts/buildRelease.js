@@ -44,7 +44,7 @@ async function run() {
     const clonedDir = path.join(TEMP_DIR, "vanilla");
     shell.cd(clonedDir);
     printTitle("Installing dependencies & Building");
-    shell.exec("composer install --no-dev --optimize-autoloader");
+    shell.exec("VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --no-dev --optimize-autoloader");
     const buildDir = path.join(TEMP_DIR, "vanilla/build");
     shell.cd(buildDir);
     shell.exec(`env version=${newVersion} ${PHING_PATH}`);

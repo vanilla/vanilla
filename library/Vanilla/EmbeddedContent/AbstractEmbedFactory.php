@@ -18,18 +18,6 @@ use Garden\Http\HttpClient;
  */
 abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
 
-    /** @var HttpClient */
-    protected $httpClient;
-
-    /**
-     * Dependency Injection
-     *
-     * @param HttpClient $httpClient
-     */
-    public function __construct(HttpClient $httpClient) {
-        $this->httpClient = $httpClient;
-    }
-
     /**
      * Determine if factory can handle a particular URL.
      * Default implementation uses getSupportedDomains and getSupportedPathRegex

@@ -22,11 +22,9 @@ class LinkEmbedFactory extends AbstractEmbedFactory {
     /**
      * DI
      *
-     * @param HttpClient $httpClient
      * @param PageScraper $pageScraper
      */
-    public function __construct(HttpClient $httpClient, PageScraper $pageScraper) {
-        parent::__construct($httpClient);
+    public function __construct(PageScraper $pageScraper) {
         $this->pageScraper = $pageScraper;
     }
 
@@ -70,5 +68,4 @@ class LinkEmbedFactory extends AbstractEmbedFactory {
     public function createEmbedFromData(array $data): AbstractEmbed {
         return new LinkEmbed($data);
     }
-
 }

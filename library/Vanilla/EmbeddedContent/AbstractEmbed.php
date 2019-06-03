@@ -64,6 +64,17 @@ abstract class AbstractEmbed {
     }
 
     /**
+     * Normalize backwards compatible versions of the data structure.
+     * By default no normalization is implemented.
+     *
+     * @param array $data The raw data.
+     * @return array The normalized data.
+     */
+    public function normalizeData(array $data): array {
+        return $data;
+    }
+
+    /**
      * Get the various values of `type` that this embed supports.
      *
      * @return string[]
@@ -100,6 +111,7 @@ abstract class AbstractEmbed {
                 'type' => 'string',
                 'enum' => $this->getAllowedTypes(),
             ],
+            'name:s?'
         ]);
 
         return $this->schema()->merge($baseSchema);

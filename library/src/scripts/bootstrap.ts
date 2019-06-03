@@ -23,7 +23,7 @@ gdn.apiv2 = apiv2;
 // Record the page view.
 onPageView((params: { history: History }) => {
     void apiv2.post("/tick").then(() => {
-        window.dispatchEvent(new Event("analyticsTick"));
+        window.dispatchEvent(new CustomEvent("analyticsTick"));
     });
 });
 

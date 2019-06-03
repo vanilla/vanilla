@@ -194,7 +194,7 @@ function useLegacyTextAreaSync(textArea?: HTMLInputElement) {
         if (initialValue) {
             resetQuillContent(quill, JSON.parse(initialValue));
         }
-    }, [textArea]);
+    }, [legacyMode, textArea, quill]);
 
     useEffect(() => {
         if (!legacyMode || !textArea || !quill) {
@@ -220,7 +220,7 @@ function useLegacyTextAreaSync(textArea?: HTMLInputElement) {
             quill.off(Quill.events.TEXT_CHANGE, handleChange);
             form && form.removeEventListener("X-ClearCommentForm", handleFormClear);
         };
-    });
+    }, [legacyMode, textArea, quill]);
 }
 
 /**

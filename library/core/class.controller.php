@@ -1525,7 +1525,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             // Remove standard and "protected" data from the top level.
             foreach ($this->Data as $Key => $Value) {
-                if ($Key && in_array($Key, ['Title', 'Breadcrumbs'])) {
+                if ($Key && in_array($Key, ['Title', 'Breadcrumbs', 'isHomepage'])) {
                     continue;
                 }
                 if (isset($Key[0]) && $Key[0] === '_') {
@@ -1583,7 +1583,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $Data = removeKeysFromNestedArray($Data, $Remove);
         }
 
-        if (debug() && $Trace = trace()) {
+        if (debug() && $this->deliveryMethod() !== DELIVERY_METHOD_XML && $Trace = trace()) {
             // Clear passwords from the trace.
             array_walk_recursive($Trace, function (&$Value, $Key) {
                 if (in_array(strtolower($Key), ['password'])) {

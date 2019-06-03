@@ -7,7 +7,6 @@
 
 namespace Garden\Web;
 
-
 interface RequestInterface {
     /**
      * Get the hostname of the request.
@@ -29,7 +28,7 @@ interface RequestInterface {
      *
      * @return string
      */
-    public function getMethod();
+    public function getMethod(): string;
 
     /**
      * Set the HTTP method used to do the request.
@@ -136,7 +135,7 @@ interface RequestInterface {
      *
      * @return array
      */
-    public function getHeaders();
+    public function getHeaders(): array;
 
     /**
      * Get a header value.
@@ -144,7 +143,7 @@ interface RequestInterface {
      * @param string $header The name of the header.
      * @return string Returns the header value or an empty string.
      */
-    public function getHeader($header);
+    public function getHeader($header): string;
 
     /**
      * Set a header value.
@@ -153,7 +152,7 @@ interface RequestInterface {
      * @param mixed $value The new value.
      * @return $this
      */
-    public function setHeader($header, $value);
+    public function setHeader(string $header, $value);
 
     /**
      * Checks if a header exists by the given case-insensitive name.
@@ -161,7 +160,7 @@ interface RequestInterface {
      * @param string $header Case-insensitive header name.
      * @return bool Returns **true** if the header exists or **false** otherwise.
      */
-    public function hasHeader($header);
+    public function hasHeader(string $header): bool;
 
     /**
      * Conditionally gets the domain of the request.

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "995b24b115286e6935abdf0fa4d244ef",
+    "content-hash": "276632fa2d34259857e6e4314b6f044e",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -774,21 +774,21 @@
         },
         {
             "name": "vanilla/garden-http",
-            "version": "v2.0.1",
+            "version": "v1.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-http.git",
-                "reference": "d5d206ce0c197c5af214da6ab594bf8dc8888a8e"
+                "reference": "020b7b117ef99decef062be0978fb8d292c3e06c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-http/zipball/d5d206ce0c197c5af214da6ab594bf8dc8888a8e",
-                "reference": "d5d206ce0c197c5af214da6ab594bf8dc8888a8e",
+                "url": "https://api.github.com/repos/vanilla/garden-http/zipball/020b7b117ef99decef062be0978fb8d292c3e06c",
+                "reference": "020b7b117ef99decef062be0978fb8d292c3e06c",
                 "shasum": ""
             },
             "require": {
                 "lib-curl": "*",
-                "php": ">=7.0.0"
+                "php": ">=5.4.0"
             },
             "require-dev": {
                 "vanilla/garden": "dev-master"
@@ -810,7 +810,7 @@
                 }
             ],
             "description": "An unbloated HTTP client library for building RESTful API clients.",
-            "time": "2018-06-08T18:45:31+00:00"
+            "time": "2019-06-03T21:18:24+00:00"
         },
         {
             "name": "vanilla/garden-password",

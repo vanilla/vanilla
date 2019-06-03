@@ -55,11 +55,6 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     protected $settingsView;
 
     /**
-     * @var bool
-     */
-    private $useBasicAuth = false;
-
-    /**
      * Set up OAuth2 access properties.
      *
      * @param string $providerKey Fixed key set in child class.
@@ -72,7 +67,6 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             // We passed in a connection
             $this->accessToken = $accessToken;
         }
-        $this->setUseBasicAuth($this->provider['UseBasicAuth'] ?? false);
     }
 
 
@@ -263,20 +257,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * @return array
      */
     public function getAccessTokenRequestOptions() {
-        $provider = $this->provider();
-
-        if ($this->useBasicAuth()) {
-            $clientID = $provider['AssociationKey'] ?? '';
-            $secret = $provider['AssociationSecret'] ?? '';
-
-            $r = [
-                'Authorization-Header-Message' => 'Basic ' . base64_encode("$clientID:$secret"),
-            ];
-        } else {
-            $r = [];
-        }
-
-        return $r;
+        return [];
     }
 
 
@@ -399,8 +380,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'URL where users sign-in with the authentication provider.'],
             'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Endpoint to retrieve the authorization token for a user.'],
             'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Endpoint to retrieve a user\'s profile.'],
-            'UseBasicAuth' => ['LabelCode' => 'Use HTTP basic authentication with the authorization server.', 'Control' => 'checkbox'],
-            'BearerToken' => ['LabelCode' => 'Authorization Code in Header', 'Description' => 'When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]', 'Control' => 'checkbox'],
+            'BearerToken' => ['LabelCode' => 'Authorization Code in Header', 'Description' => 'When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]', 'Control' => 'checkbox']
         ];
 
         $formFields = $formFields + $this->getSettingsFormFields();
@@ -681,7 +661,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      */
     public function requestAccessToken($code, $refresh=false) {
         $provider = $this->provider();
-        $uri = $provider['TokenUrl'] ?? '';
+        $uri = val('TokenUrl', $provider);
 
         //When requesting the AccessToken using the RefreshToken the params are different.
         if ($refresh) {
@@ -692,15 +672,12 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         } else {
             $defaultParams = [
                 'code' => $code,
-                'client_id' => $provider['AssociationKey'] ?? '',
+                'client_id' => val('AssociationKey', $provider),
                 'redirect_uri' => url('/entry/'. $this->getProviderKey(), true),
+                'client_secret' => val('AssociationSecret', $provider),
                 'grant_type' => 'authorization_code',
-                'scope' => $provider['AcceptedScope'] ?? '',
+                'scope' => val('AcceptedScope', $provider)
             ];
-
-            if (!$this->useBasicAuth()) {
-                $defaultParams['client_secret'] = $provider['AssociationSecret'];
-            }
         }
 
         // Merge any parameters inherited parameters, remove any empty parameters before sending them in the request.
@@ -956,28 +933,5 @@ class Gdn_OAuth2 extends Gdn_Plugin {
                 $data
             );
         }
-    }
-
-    /**
-     * Whether or not to use HTTP basic authentication with the authorization server.
-     *
-     * @return bool Returns the setting.
-     * @see https://tools.ietf.org/html/rfc6749#section-3.2.1
-     */
-    public function useBasicAuth(): bool {
-        return $this->useBasicAuth;
-    }
-
-    /**
-     * Whether or not to use HTTP basic authentication with the authorization server.
-     *
-     * @param bool $useBasicAuth The new value.
-     * @return $this
-     * @see https://tools.ietf.org/html/rfc6749#section-3.2.1
-     */
-    public function setUseBasicAuth(bool $useBasicAuth) {
-        $this->useBasicAuth = $useBasicAuth;
-
-        return $this;
     }
 }

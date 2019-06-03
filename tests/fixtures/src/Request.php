@@ -73,7 +73,7 @@ class Request implements RequestInterface {
     /**
      * {@inheritdoc}
      */
-    public function getMethod() {
+    public function getMethod(): string {
         return $this->method;
     }
 
@@ -204,7 +204,7 @@ class Request implements RequestInterface {
      * @param mixed $value The value of the header.
      * @return $this
      */
-    public function setHeader($header, $value) {
+    public function setHeader(string $header, $value) {
         $this->headers[$header] = $value;
         return $this;
     }
@@ -223,7 +223,7 @@ class Request implements RequestInterface {
     /**
      * {@inheritdoc}
      */
-    public function getHeaders() {
+    public function getHeaders(): array {
         return $this->headers;
     }
 
@@ -233,7 +233,7 @@ class Request implements RequestInterface {
      * @param string $header Case-insensitive header name.
      * @return bool Returns **true** if the header exists or **false** otherwise.
      */
-    public function hasHeader($header) {
+    public function hasHeader(string $header): bool {
         return !empty($this->headers[$header]);
     }
 

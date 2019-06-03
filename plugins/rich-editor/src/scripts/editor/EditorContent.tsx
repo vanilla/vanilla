@@ -159,7 +159,7 @@ function useInitialValue() {
 function useOperationsQueue() {
     const { operationsQueue, quill, clearOperationsQueue } = useEditor();
     useEffect(() => {
-        if (!operationsQueue || !quill) {
+        if (!operationsQueue || !quill || operationsQueue.length === 0) {
             return;
         }
         operationsQueue.forEach(operation => {
@@ -172,10 +172,10 @@ function useOperationsQueue() {
                 quill.updateContents([offsetOperations, ...operation]);
             }
         });
-        if (clearOperationsQueue) {
-            clearOperationsQueue();
-        }
-    }, [operationsQueue, clearOperationsQueue]);
+        return () => {
+            clearOperationsQueue && clearOperationsQueue();
+        };
+    }, [quill, operationsQueue, clearOperationsQueue]);
 }
 
 /**

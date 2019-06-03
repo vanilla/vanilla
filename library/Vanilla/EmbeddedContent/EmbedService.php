@@ -7,6 +7,8 @@
 namespace Vanilla\EmbeddedContent;
 
 use Garden\Container;
+use Vanilla\EmbeddedContent\Embeds\GiphyEmbedFactory;
+use Vanilla\EmbeddedContent\Embeds\LinkEmbedFactory;
 
 /**
  * Manage scraping embed data and generating markup.
@@ -65,6 +67,8 @@ class EmbedService implements EmbedCreatorInterface {
      */
     public function addCoreEmbeds() {
         $dic = \Gdn::getContainer();
+        $this->setFallbackEmbed($dic->get(LinkEmbedFactory::class))
+            ->registerFactory($dic->get(GiphyEmbedFactory::class));
 //        $this->setFallbackEmbed($dic->get(Embeds\LinkEmbed::class))
 //            ->addEmbed($dic->get(Embeds\QuoteEmbed::class))
 //            ->addEmbed($dic->get(Embeds\TwitterEmbed::class))
@@ -87,11 +91,13 @@ class EmbedService implements EmbedCreatorInterface {
      * Implements URL based caching.
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
+    public function createEmbedForUrl(string $url, bool $force = false): AbstractEmbed {
         // Check the cache first.
-        $cachedEmbed = $this->cache->getCachedEmbed($url);
-        if ($cachedEmbed !== null) {
-            return $cachedEmbed;
+        if (!$force) {
+            $cachedEmbed = $this->cache->getCachedEmbed($url);
+            if ($cachedEmbed !== null) {
+                return $cachedEmbed;
+            }
         }
 
         $factory = $this->getFactoryForUrl($url);
@@ -108,7 +114,7 @@ class EmbedService implements EmbedCreatorInterface {
         // Fallback in case we have bad data (will fallback to fallback embed).
         $url = $data['url'] ?? null;
         $factory = $this->getFactoryForUrl($url);
-        return $factory->createEmbedFromData($url);
+        return $factory->createEmbedFromData($data);
     }
 
     /**

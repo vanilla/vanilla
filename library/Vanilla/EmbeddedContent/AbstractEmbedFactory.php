@@ -37,8 +37,8 @@ abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
         $scheme = $pieces['scheme'];
         $schemeMatches = in_array($scheme, ['http', 'https']);
 
-        // Validate he have domain. We allow all subdomains here.
-        $domain = $pieces['domain'];
+        // Validate we have domain. We allow all subdomains here.
+        $domain = $pieces['host'];
         $domainMatches = false;
         foreach ($this->getSupportedDomains() as $supportedDomain) {
             if ($domain === $supportedDomain || stringEndsWith($domain, ".{$supportedDomain}")) {
@@ -49,7 +49,7 @@ abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
 
         // Check our URL path.
         $path = $pieces['path'];
-        $pathMatches = preg_match($this->getSupportedPathRegex(), $path);
+        $pathMatches = (bool) preg_match($this->getSupportedPathRegex($domain), $path);
 
         return $schemeMatches && $pathMatches && $domainMatches;
     }
@@ -64,7 +64,9 @@ abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
     /**
      * Get a regex to match the path of the site against.
      *
+     * @param string $domain The current domain we are matching on.
+     *
      * @return string
      */
-    abstract protected function getSupportedPathRegex(): string;
+    abstract protected function getSupportedPathRegex(string $domain): string;
 }

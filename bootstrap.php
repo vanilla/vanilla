@@ -3,6 +3,7 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
+use Vanilla\Formatting\Embeds\EmbedManager;
 use Vanilla\InjectableInterface;
 use Vanilla\Contracts;
 use Vanilla\Utility\ContainerUtils;
@@ -288,6 +289,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addAlias('Form')
 
     ->rule(Vanilla\Formatting\Embeds\EmbedManager::class)
+    ->addCall('addCoreEmbeds')
+    ->setShared(true)
+
+    ->rule(\Vanilla\EmbeddedContent\EmbedService::class)
     ->addCall('addCoreEmbeds')
     ->setShared(true)
 

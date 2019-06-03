@@ -17,7 +17,7 @@ use Vanilla\Web\TwigRenderTrait;
  * - Storing/validating embed data.
  * - Rendering that data as HTML.
  */
-abstract class AbstractEmbed {
+abstract class AbstractEmbed implements \JsonSerializable {
 
     use TwigRenderTrait;
 
@@ -35,6 +35,13 @@ abstract class AbstractEmbed {
         // Validate the data before assigning local variables.
         $validatedData = $this->fullSchema()->validate($data);
         $this->data = $validatedData;
+    }
+
+    /**
+     * @return array|mixed
+     */
+    public function jsonSerialize() {
+        return $this->data;
     }
 
     /**
@@ -107,8 +114,7 @@ abstract class AbstractEmbed {
                 'type' => 'string',
                 'format' => 'uri',
             ],
-            'type' => [
-                'type' => 'string',
+            'type:s' => [
                 'enum' => $this->getAllowedTypes(),
             ],
             'name:s?'

@@ -41,7 +41,7 @@ class LinkEmbedFactory extends AbstractEmbedFactory {
      * No supported doamins. This is a fallback.
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(): string {
+    protected function getSupportedPathRegex(string $domain): string {
         return "/$^/";
     }
 
@@ -54,12 +54,15 @@ class LinkEmbedFactory extends AbstractEmbedFactory {
     public function createEmbedForUrl(string $url): AbstractEmbed {
         $scraped = $this->pageScraper->pageInfo($url);
 
-        $result = [];
         $images = $scraped['Images'] ?? [];
-        $result['name'] = $scraped['Title'] ?? null;
-        $result['body'] = $scraped['Description'] ?? null;
-        $result['photoUrl'] = !empty($images) ? $images[0] : null;
-        return new LinkEmbed($result);
+        $data = [
+            'type' => LinkEmbed::TYPE,
+            'url' => $url,
+            'name' =>  $scraped['Title'] ?? null,
+            'body' => $scraped['Description'] ?? null,
+            'photoUrl' => !empty($images) ? $images[0] : null,
+        ];
+        return new LinkEmbed($data);
     }
 
     /**

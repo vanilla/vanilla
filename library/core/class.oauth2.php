@@ -399,8 +399,14 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'URL where users sign-in with the authentication provider.'],
             'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Endpoint to retrieve the authorization token for a user.'],
             'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Endpoint to retrieve a user\'s profile.'],
-            'UseBasicAuth' => ['LabelCode' => 'HTTP Basic Authentication', 'Description' => 'Use HTTP basic authentication with the authorization server.', 'Control' => 'checkbox'],
-            'BearerToken' => ['LabelCode' => 'Authorization Code in Header', 'Description' => 'When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]', 'Control' => 'checkbox'],
+            'UseBasicAuth' => [
+                'LabelCode' => 'HTTP Basic Authentication',
+                'Description' => 'Use HTTP basic authentication with the authorization server.', 'Control' => 'checkbox',
+            ],
+            'BearerToken' => [
+                'LabelCode' => 'Authorization Code in Header',
+                'Description' => 'When requesting the profile, pass the access token in the HTTP header. i.e Authorization: Bearer [accesstoken]', 'Control' => 'checkbox',
+            ],
         ];
 
         $formFields = $formFields + $this->getSettingsFormFields();

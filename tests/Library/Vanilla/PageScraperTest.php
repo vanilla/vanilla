@@ -26,6 +26,7 @@ class PageScraperTest extends SharedBootstrapTestCase {
     private function pageScraper() {
         // Create the test instance. Register the metadata handlers.
         $pageScraper = new PageScraper(new HttpRequest());
+        $pageScraper->setHtmlDir(self::HTML_DIR);
         $pageScraper->registerMetadataParser(new OpenGraphParser());
         $pageScraper->registerMetadataParser(new JsonLDParser());
         return $pageScraper;
@@ -97,9 +98,8 @@ class PageScraperTest extends SharedBootstrapTestCase {
      */
     public function testFetch(string $file, array $expected) {
         $pageScraper = $this->pageScraper();
-        $url = 'file://'.self::HTML_DIR."/{$file}";
-        $result = $pageScraper->pageInfo($url);
-        $expected['Url'] = $url;
+        $result = $pageScraper->pageInfo($file);
+        $expected["Url"] = $file;
         $this->assertEquals($expected, $result);
     }
 
@@ -112,11 +112,8 @@ class PageScraperTest extends SharedBootstrapTestCase {
      */
     protected function scrapeFile(string $file) {
         $scraper = $this->pageScraper();
-        $url = 'file://'.self::HTML_DIR."/{$file}";
-        $result = $scraper->pageInfo($url);
-
+        $result = $scraper->pageInfo($file);
         return $result;
-
     }
 
     /**

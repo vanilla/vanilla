@@ -274,6 +274,10 @@ export const userContentClasses = useThemeCache(() => {
         lineHeight: globalVars.lineHeights.base,
         fontSize: vars.fonts.size,
         $nest: {
+            // A placeholder might be put in a ::before element. Make sure we match the line-height adjustment.
+            "&::before": {
+                marginTop: lineHeightAdjustment()["&::before"]!.marginTop,
+            },
             ...headings,
             ...lists,
             ...paragraphSpacing,

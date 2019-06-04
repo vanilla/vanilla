@@ -55,13 +55,17 @@ describe("delegateEvent()", () => {
 
     it("identical events will not be registered twice", () => {
         const callback = sinon.spy();
-        delegateEvent("click", "", callback);
-        delegateEvent("click", "", callback);
-        delegateEvent("click", "", callback);
+        const hash1 = delegateEvent("click", "", callback);
+        const hash2 = delegateEvent("click", "", callback);
+        const hash3 = delegateEvent("click", "", callback);
 
         const button = document.querySelector(".filterSelector") as HTMLElement;
         button.click();
         sinon.assert.calledOnce(callback);
+
+        // Hashes should all be for the same handler.
+        expect(hash1).eq(hash2);
+        expect(hash2).eq(hash3);
     });
 
     describe("delegation filtering works()", () => {

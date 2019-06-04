@@ -32,7 +32,7 @@
                 {if $User.SignedIn}
                     <button class="mobileMeBox-button">
                         <span class="Photo PhotoWrap">
-                            <img src="{$User.Photo}" class="ProfilePhotoSmall" alt="{t c='Avatar'}">
+                            <img src="{$User.Photo|escape:'html'}" class="ProfilePhotoSmall" alt="{t c='Avatar'}">
                         </span>
                     </button>
                 {/if}

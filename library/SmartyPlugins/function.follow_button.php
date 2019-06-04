@@ -18,6 +18,7 @@ function smarty_function_follow_button() {
     $followButton = '';
     $controller = Gdn::controller();
     $controller->fetchViewLocation('helper_functions', 'categories', false, false);
+    require_once PATH_APPLICATIONS.'/vanilla/views/categories/helper_functions.php';
     $categoryID = $controller->Category->CategoryID;
 
     if ($categoryID) {

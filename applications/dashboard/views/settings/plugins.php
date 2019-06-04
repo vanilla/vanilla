@@ -18,7 +18,7 @@ if ($addonType === 'applications') {
     $title = '';
     $helpTitle = sprintf(t('About %s'), t('Locales'));
     $pathHelp = sprintf(
-        t('LocaleHelp', 'Locales allow you to support other languages on your site. Once a locale has been added to your %s folder, you can enable or disable it here.'),
+        t('Locales allow you to support other languages on your site.'),
         '<code>'.PATH_ROOT.'/locales</code>'
     );
     $getMore = wrap(anchor(t('Get More Locales').' <span class="icon icon-external-link"></span>', $addonUrl), 'li');

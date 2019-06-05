@@ -17,10 +17,7 @@ if ($addonType === 'applications') {
 } elseif ($addonType === 'locales') {
     $title = '';
     $helpTitle = sprintf(t('About %s'), t('Locales'));
-    $pathHelp = sprintf(
-        t('Locales allow you to support other languages on your site.'),
-        '<code>'.PATH_ROOT.'/locales</code>'
-    );
+    $pathHelp = t('Locales allow you to support other languages on your site.');
     $getMore = wrap(anchor(t('Get More Locales').' <span class="icon icon-external-link"></span>', $addonUrl), 'li');
     $availableAddons = $this->data('AvailableLocales');
     $enabledAddons = $this->data('EnabledLocales');

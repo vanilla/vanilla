@@ -18,7 +18,7 @@ if (!defined('APPLICATION')) {
 if (!defined('APPLICATION_VERSION')) {
     // Rules for the versioning
     // {OSS version}-{Cloud release version}-{? SNAPSHOT if it's a dev build}
-    define('APPLICATION_VERSION', '3.0-2019.007-SNAPSHOT');
+    define('APPLICATION_VERSION', '3.0-2019.007');
 }
 if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);

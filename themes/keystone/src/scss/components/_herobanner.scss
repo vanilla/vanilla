@@ -22,7 +22,21 @@
     }
 
     .HomepageTitle {
-        font-size: 48px;
+        font-size: $herobanner_fontSize;
+    }
+
+    .followButton {
+        color: $herobanner_fg;
+        padding: 10px 5px;
+        min-height: $herobanner_fontSize;
+        display: inline-flex;
+        align-items: flex-end;
+
+        &:active,
+        &:focus,
+        &:hover {
+            color: $herobanner_fg;
+        }
     }
 
     .HomepageTitle,

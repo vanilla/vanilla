@@ -54,7 +54,7 @@
     .SearchBoxMobile {
         display: none;
 
-        @include maxWidth {
+        @include maxWidth($theme-breakpoint_tablet) {
             display: block;
         }
     }

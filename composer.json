@@ -56,7 +56,7 @@
         "vanilla/standards": "~1.3",
         "voku/html-min": "3.0.5",
         "voku/simple_html_dom": "4.1.7",
-        "mikey179/vfsStream": "~1.6",
+        "mikey179/vfsstream": "~1.6",
         "phing/phing": "2.*"
     },
     "provide": {

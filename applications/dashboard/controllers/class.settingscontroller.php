@@ -1244,7 +1244,7 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         $this->title(t('Locales'));
-        $this->setHighlightRoute('dashboard/settings/locales');
+        $this->setHighlightRoute('/settings/locales');
         $this->addJsFile('addons.js');
 
         $LocaleModel = new LocaleModel();

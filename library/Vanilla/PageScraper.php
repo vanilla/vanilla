@@ -89,7 +89,7 @@ class PageScraper {
      * @param string $url The URL where the request will be sent.
      * @return HttpResponse
      */
-    private function getUrl(string $url): HttpResponse {
+    protected function getUrl(string $url): HttpResponse {
         $urlParts = parse_url($url);
         if ($urlParts === false) {
             throw new InvalidArgumentException('Invalid URL.');

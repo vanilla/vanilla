@@ -152,8 +152,9 @@ export function delegateEvent(
             eventName,
             wrappedCallback,
         };
-        return eventHash;
     }
+
+    return eventHash;
 }
 
 /**

@@ -365,28 +365,33 @@ class Gdn_Form extends Gdn_Pluggable {
      * is set to true. The hex value to be saved is the value of the input with the color-picker-value class.
      *
      * @param string $fieldName Name of the field being posted with this input.
-     * @param array $options Currently supports a key of 'AllowEmpty' which signifies whether to accept empty
-     * values for the color picker
+     * @param array $options An array of options with the following keys:
+     *      'AllowEmpty' (bool) Whether to accept empty values for the color picker, defaults to false
+     *      'Value' (string) Hex color code for the color picker to start with, defaults to "#ffffff"
      * @return string The form element for a color picker.
      */
     public function color($fieldName, $options = []) {
-
-        $allowEmpty = val('AllowEmpty', $options, false);
-
         Gdn::controller()->addJsFile('colorpicker.js');
 
         $valueAttributes['class'] = 'js-color-picker-value color-picker-value Hidden';
         $textAttributes['class'] = 'js-color-picker-text color-picker-text';
         $colorAttributes['class'] = 'js-color-picker-color color-picker-color';
 
-        // Default starting color for color input. Color inputs require one, Chrome will throw a warning if one
-        // doesn't exist. The javascript will override this.
-        $colorAttributes['value'] = '#ffffff';
+        if (isset($options['Value'])) {
+            $valueAttributes['value'] = $options['Value'];
+            $colorAttributes['value'] = $options['Value'];
+        } else {
+            // Default dummy starting color for color input. Color inputs require one, Chrome
+            // will throw a warning if one doesn't exist. The javascript will ignore this.
+            $colorAttributes['value'] = '#ffffff';
+        }
 
         $cssClass = 'js-color-picker color-picker input-group';
-        $dataAttribute = $allowEmpty ? 'data-allow-empty="true"' : 'data-allow-empty="false"';
 
-        return '<div id="'.$this->escapeFieldName($fieldName).'" class="'.$cssClass.'" '.$dataAttribute.'>'
+        $allowEmpty = $options['AllowEmpty'] ?? false;
+        $dataAttribute = $allowEmpty ? ' data-allow-empty="true"' : ' data-allow-empty="false"';
+
+        return '<div id="'.$this->escapeFieldName($fieldName).'" class="'.$cssClass.'"'.$dataAttribute.'>'
         .$this->input($fieldName, 'text', $valueAttributes)
         .$this->input($fieldName.'-text', 'text', $textAttributes)
         .'<span class="js-color-picker-preview color-picker-preview"></span>'

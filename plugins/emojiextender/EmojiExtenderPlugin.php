@@ -116,7 +116,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      */
     public function getEmojiSets() {
         if (!isset($this->emojiSets)) {
-            $root = '/plugins/EmojiExtender/emoji';
+            $root = '/plugins/emojiextender/emoji';
 
             $this->addEmojiSet(
                 '',

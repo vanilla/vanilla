@@ -153,7 +153,7 @@ interface RequestInterface {
      * @param mixed $value The new value.
      * @return $this
      */
-    public function setHeader($header, $value);
+    public function setHeader(string $header, $value);
 
     /**
      * Checks if a header exists by the given case-insensitive name.

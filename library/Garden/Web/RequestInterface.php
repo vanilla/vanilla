@@ -39,7 +39,7 @@ interface RequestInterface {
      * @param string $method The HTTP method.
      * @return $this
      */
-    public function setMethod($method);
+    public function setMethod(string $method);
 
     /**
      * Get the root folder of the request.

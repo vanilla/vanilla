@@ -76,7 +76,7 @@ class InternalRequest extends HttpRequest implements RequestInterface {
     /**
      * {@inheritdoc}
      */
-    public function send() {
+    public function send(): HttpResponse {
         $this->container->setInstance(\Gdn_Request::class, $this->convertToLegacyRequest());
 
         $cookieStash = $_COOKIE;

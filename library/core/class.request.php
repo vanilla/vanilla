@@ -480,7 +480,7 @@ class Gdn_Request implements RequestInterface {
      * @param string $method The new HTTP method.
      * @return $this
      */
-    public function setMethod($method) {
+    public function setMethod(string $method) {
         $this->requestMethod($method);
         return $this;
     }

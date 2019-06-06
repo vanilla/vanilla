@@ -144,7 +144,7 @@ interface RequestInterface {
      * @param string $header The name of the header.
      * @return string Returns the header value or an empty string.
      */
-    public function getHeader($header);
+    public function getHeader(string $header);
 
     /**
      * Set a header value.

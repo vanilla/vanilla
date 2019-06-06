@@ -418,7 +418,7 @@ class Gdn_Request implements RequestInterface {
     /**
      * {@inheritdoc}
      */
-    public function hasHeader($header) {
+    public function hasHeader(string $header): bool {
         return !empty($this->getHeader($header));
     }
 

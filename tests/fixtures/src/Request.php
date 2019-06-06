@@ -233,7 +233,7 @@ class Request implements RequestInterface {
      * @param string $header Case-insensitive header name.
      * @return bool Returns **true** if the header exists or **false** otherwise.
      */
-    public function hasHeader($header) {
+    public function hasHeader(string $header): bool {
         return !empty($this->headers[$header]);
     }
 

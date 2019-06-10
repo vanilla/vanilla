@@ -33,7 +33,8 @@ abstract class AbstractEmbed implements \JsonSerializable {
      */
     public function __construct(array $data) {
         // Validate the data before assigning local variables.
-        $validatedData = $this->fullSchema()->validate($data);
+        $normalizedData = $this->normalizeData($data);
+        $validatedData = $this->fullSchema()->validate($normalizedData);
         $this->data = $validatedData;
     }
 

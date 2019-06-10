@@ -45,7 +45,6 @@ class EntryController extends Gdn_Controller {
         if (Gdn::request()->get('display') === 'popup') {
             $this->MasterView = 'popup';
         }
-        $this->setHeader('Cache-Control', \Vanilla\Web\CacheControlMiddleware::NO_CACHE);
     }
 
     /**
@@ -70,8 +69,6 @@ class EntryController extends Gdn_Controller {
         $this->addCssFile('vanillicon.css', 'static');
         parent::initialize();
         Gdn_Theme::section('Entry');
-
-        $this->CssClass .= " AjaxForm";
 
         if ($this->UserModel->isNameUnique() && !$this->UserModel->isEmailUnique()) {
             $this->setData('RecoverPasswordLabelCode', 'Enter your username to continue.');
@@ -818,7 +815,7 @@ class EntryController extends Gdn_Controller {
             if (!$userSelect || $userSelect == 'other') {
                 // The user entered a username. Validate it.
                 $connectNameEntered = true;
-                if ($this->Form->validateRule('ConnectName', 'ValidateRequired')) {
+                if (!empty($this->Form->getFormValue('ConnectName'))) {
                     $connectName = $this->Form->getFormValue('ConnectName');
                     $user = false;
 
@@ -851,9 +848,7 @@ class EntryController extends Gdn_Controller {
                 if ($allowConnect) {
                     // If the user is connecting to their current account, make sure it was intentional.
                     if (intval($user['UserID']) === intval(Gdn::session()->UserID)) {
-                        if (!Gdn::session()->validateTransientKey($this->Form->getFormValue('TransientKey'))) {
-                            throw permissionException();
-                        }
+                        $this->Request->isAuthenticatedPostBack(true);
                     } else {
                         $hasPassword = $this->Form->validateRule('ConnectPassword', 'ValidateRequired', sprintf(t('ValidateRequired'), t('Password')));
                         if ($hasPassword) {
@@ -1059,6 +1054,7 @@ class EntryController extends Gdn_Controller {
 
             if (!$this->Request->isAuthenticatedPostBack() && !c('Garden.Embed.Allow')) {
                 $this->Form->addError('Please try again.');
+                Gdn::session()->ensureTransientKey();
             }
 
             // Check the user.
@@ -1129,9 +1125,8 @@ class EntryController extends Gdn_Controller {
                                 'Reason' => 'Password',
                             ]);
                         }
-                    } catch (Gdn_CoreException $ex) {
-                        $errorMessage = htmlspecialchars(strip_tags($ex->getMessage()));
-                        $errorMessage .= sprintf(' Click <a href=%s>here</a> to reset your password', url('/entry/passwordrequest'));
+                    } catch (Gdn_SanitizedUserException $ex) {
+                        $errorMessage = $ex->getMessage();
                         $this->Form->addError($errorMessage);
                     } catch (Gdn_UserException $ex) {
                         $this->Form->addError($ex);
@@ -1901,7 +1896,7 @@ class EntryController extends Gdn_Controller {
                         '{username} has reset their password.'
                     );
                     Gdn::session()->start($user->UserID, true);
-                    redirectTo('/');
+                    $this->setRedirectTo('/', false);
                 }
             }
 

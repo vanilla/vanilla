@@ -1,6 +1,6 @@
 <?php
 /**
- * Gdn_CoreException
+ * Gdn_SanitizedUserException
  *
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -9,10 +9,10 @@
  */
 
 /**
- * A wrapper for the Exception class so that methods can throw a specific
+ * A wrapper for the UserException class so that methods can throw a specific
  * application as a means of validation or user error, rather than a critical exception.
  */
-class Gdn_CoreException extends Exception {
+class Gdn_SanitizedUserException extends Gdn_UserException {
     /**
      * Constructs the Gdn_ApplicationException.
      *

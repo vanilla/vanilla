@@ -4,7 +4,7 @@
     "version": "1.1",
     "license": "GNU GPL2",
     "icon": "emoji_set.png",
-    "settingsUrl": "/settings/EmojiExtender",
+    "settingsUrl": "/settings/emojiextender",
     "mobileFriendly": true,
     "key": "emojiextender",
     "type": "addon",

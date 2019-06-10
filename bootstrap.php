@@ -90,6 +90,11 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addAlias('ThemeManager')
 
+    // File base theme api provider
+    ->rule(\Vanilla\Models\ThemeModel::class)
+        ->addCall("addThemeProvider", [new Reference(\Vanilla\Models\FsThemeProvider::class)])
+
+
     // Logger
     ->rule(\Vanilla\Logger::class)
     ->setShared(true)
@@ -297,6 +302,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule(Vanilla\Formatting\FormatService::class)
     ->addCall('registerFormat', [Formats\RichFormat::FORMAT_KEY, Formats\RichFormat::class])
     ->setShared(true)
+
+    ->rule(\Vanilla\Analytics\Client::class)
+    ->setShared(true)
+    ->addAlias(\Vanilla\Contracts\Analytics\ClientInterface::class)
 ;
 
 // Run through the bootstrap with dependencies.

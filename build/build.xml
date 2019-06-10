@@ -59,9 +59,6 @@
         </copy>
 
         <!-- Archive everything in the package contents directory. -->
-        <zip
-            destfile="${project.destfile}"
-            basedir="${package.dir}">
-        </zip>
+        <exec command="zip -X -r vanilla.zip ./package" dir="." />
     </target>
 </project>

@@ -44,7 +44,7 @@ async function run() {
     const clonedDir = path.join(TEMP_DIR, "vanilla");
     shell.cd(clonedDir);
     printTitle("Installing dependencies & Building");
-    shell.exec("composer install --no-dev --optimize-autoloader");
+    shell.exec("VANILLA_BUILD_DISABLE_AUTO_BUILD=true composer install --no-dev --optimize-autoloader");
     const buildDir = path.join(TEMP_DIR, "vanilla/build");
     shell.cd(buildDir);
     shell.exec(`env version=${newVersion} ${PHING_PATH}`);
@@ -68,10 +68,15 @@ async function run() {
         shell.rm(outFile);
     }
 
-    shell.mv(builtFile, outFile);
-    console.log(chalk.greenBright(`✓ Successfully built ${prettyName} to:\n ${outFile}`));
-    process.stdout.write("\nCleaning up temporary directories... ");
-    console.log(chalk.greenBright("✓"));
+    if (fs.existsSync(builtFile)) {
+        shell.mv(builtFile, outFile);
+        console.log(chalk.greenBright(`✓ Successfully built ${prettyName} to:\n ${outFile}`));
+        process.stdout.write("\nCleaning up temporary directories... ");
+        shell.rm("-rf", TEMP_DIR);
+        console.log(chalk.greenBright("✓"));
+    } else {
+        console.log(chalk.redBright(`Failed to build ${prettyName} to:\n ${outFile}`));
+    }
 }
 
 run();

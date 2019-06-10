@@ -67,9 +67,9 @@ class EmbedService implements EmbedCreatorInterface {
      */
     public function addCoreEmbeds() {
         $dic = \Gdn::getContainer();
-        $this->setFallbackEmbed($dic->get(LinkEmbedFactory::class))
+        $this->setFallbackFactory($dic->get(LinkEmbedFactory::class))
             ->registerFactory($dic->get(GiphyEmbedFactory::class));
-//        $this->setFallbackEmbed($dic->get(Embeds\LinkEmbed::class))
+//        $this->setFallbackFactory($dic->get(Embeds\LinkEmbed::class))
 //            ->addEmbed($dic->get(Embeds\QuoteEmbed::class))
 //            ->addEmbed($dic->get(Embeds\TwitterEmbed::class))
 //            ->addEmbed($dic->get(Embeds\YouTubeEmbed::class))
@@ -142,7 +142,7 @@ class EmbedService implements EmbedCreatorInterface {
      *
      * @return $this
      */
-    public function setFallbackEmbed(AbstractEmbedFactory $fallbackFactory) {
+    public function setFallbackFactory(AbstractEmbedFactory $fallbackFactory) {
         $this->fallbackFactory = $fallbackFactory;
         return $this;
     }

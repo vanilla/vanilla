@@ -80,7 +80,8 @@ class GiphyEmbedFactory extends AbstractEmbedFactory {
         // {
         //     "width": 650,
         //     "author_url": "https://giphy.com/",
-        //     "title": "Saved By The Bell Hello GIF - Find & Share on GIPHY",
+        //     "title": "Saved
+        // By The Bell Hello GIF - Find & Share on GIPHY",
         //     "url": "https://media.giphy.com/media/kW8mnYSNkUYKc/giphy.gif",
         //     "type": "photo",
         //     "provider_name": "GIPHY",

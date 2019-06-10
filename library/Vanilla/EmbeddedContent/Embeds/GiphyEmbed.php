@@ -29,9 +29,9 @@ class GiphyEmbed extends AbstractEmbed {
      */
     public function normalizeData(array $data): array {
         $legacyPostID = $data['attributes']['postID'] ?? null;
-        $postID = $data['postID'] ?? null;
-        if ($postID === null && $legacyPostID !== null) {
-            $data['postID'] = $legacyPostID;
+        $giphyID = $data['giphyID'] ?? null;
+        if ($giphyID === null && $legacyPostID !== null) {
+            $data['giphyID'] = $legacyPostID;
         }
         return $data;
     }

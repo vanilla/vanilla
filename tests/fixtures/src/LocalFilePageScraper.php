@@ -11,7 +11,7 @@ use Garden\Http\HttpResponse;
 /**
  * A PageScraper class, limited to local files.
  */
-class PageScraper extends \Vanilla\PageScraper {
+class LocalFilePageScraper extends \Vanilla\PageScraper {
 
     /** @var string */
     private $htmlDir;

@@ -534,6 +534,29 @@ $embedOperations = '[
             }
         }
     },
+    { "insert": "CodePen:" },
+    { "attributes": { "header": 2 }, "insert": "\n" },
+    {
+        "insert": {
+            "embed-external": {
+                "data": {
+                    "url": "https://codepen.io/hiroshi_m/pen/YoKYVv",
+                    "type": "codepen",
+                    "name": null,
+                    "body": null,
+                    "photoUrl": null,
+                    "height": 300,
+                    "width": null,
+                    "attributes": {
+                        "id": "cp_embed_YoKYVv",
+                        "embedUrl": "https://codepen.io/hiroshi_m/embed/preview/YoKYVv?theme-id=0",
+                        "style": { "width": " 100%", "overflow": "hidden" }
+                    }
+                },
+                "loaderData": { "type": "link", "link": "https://codepen.io/hiroshi_m/pen/YoKYVv" }
+            }
+        }
+    },
     { "insert": "" },
     {
         "insert": {

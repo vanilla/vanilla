@@ -39,7 +39,6 @@ class GiphyEmbedFactory extends AbstractEmbedFactory {
     }
 
     /**
-     * No supported doamins. This is a fallback.
      * @inheritdoc
      */
     protected function getSupportedDomains(): array {

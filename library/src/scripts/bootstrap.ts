@@ -10,7 +10,7 @@ import { log, logError, debug } from "@library/utility/utils";
 import gdn from "@library/gdn";
 import apiv2 from "@library/apiv2";
 import { mountInputs } from "@library/forms/mountInputs";
-import { onPageView } from "./pageViews/pageViewTracking";
+import { onPageView } from "@library/pageViews/pageViewTracking";
 import { History } from "history";
 
 // Inject the debug flag into the utility.

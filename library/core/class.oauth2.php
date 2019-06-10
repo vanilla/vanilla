@@ -90,12 +90,12 @@ class Gdn_OAuth2 extends Gdn_Plugin {
                 'AuthenticationKey' => $this->providerKey,
                 'AuthenticationSchemeAlias' => $this->providerKey,
                 'Name' => $this->providerKey,
-                'AcceptedScope' => 'profile',
+                'AcceptedScope' => 'openid email profile',
                 'ProfileKeyEmail' => 'email', // Can be overwritten in settings, the key the authenticator uses for email in response.
                 'ProfileKeyPhoto' => 'picture',
-                'ProfileKeyName' => 'displayname',
+                'ProfileKeyName' => 'nickname',
                 'ProfileKeyFullName' => 'name',
-                'ProfileKeyUniqueID' => 'user_id'
+                'ProfileKeyUniqueID' => 'sub'
             ];
 
             $model->save($provider);

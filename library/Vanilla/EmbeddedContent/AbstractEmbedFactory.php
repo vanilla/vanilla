@@ -19,6 +19,12 @@ use Garden\Http\HttpClient;
 abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
 
     /**
+     * @var bool Set this flag if you want the embed to be able empty paths.
+     *      Eg. http://test.com with no path on the end.
+     */
+    protected $canHandleEmptyPaths = false;
+
+    /**
      * Determine if factory can handle a particular URL.
      * Default implementation uses getSupportedDomains and getSupportedPathRegex
      *
@@ -34,11 +40,11 @@ abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
         $pieces = parse_url($url);
 
         // We only allow limited URL schemes.
-        $scheme = $pieces['scheme'];
+        $scheme = $pieces['scheme'] ?? '';
         $schemeMatches = in_array($scheme, ['http', 'https']);
 
         // Validate we have domain. We allow all subdomains here.
-        $domain = $pieces['host'];
+        $domain = $pieces['host'] ?? '';
         $domainMatches = false;
         foreach ($this->getSupportedDomains() as $supportedDomain) {
             if ($domain === $supportedDomain || stringEndsWith($domain, ".{$supportedDomain}")) {
@@ -48,8 +54,12 @@ abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
         }
 
         // Check our URL path.
-        $path = $pieces['path'];
-        $pathMatches = (bool) preg_match($this->getSupportedPathRegex($domain), $path);
+        $path = $pieces['path'] ?? null;
+        if ($path === null) {
+            $pathMatches = $this->canHandleEmptyPaths;
+        } else {
+            $pathMatches = (bool) preg_match($this->getSupportedPathRegex($domain), $path);
+        }
 
         return $schemeMatches && $pathMatches && $domainMatches;
     }

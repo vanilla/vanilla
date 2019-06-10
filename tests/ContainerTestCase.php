@@ -22,7 +22,7 @@ class ContainerTestCase extends TestCase {
      * Setup the container.
      */
     public function setUp() {
-        $container = new Container();
-        \Gdn::setContainer($container);
+        $this->container = new Container();
+        \Gdn::setContainer($this->container);
     }
 }

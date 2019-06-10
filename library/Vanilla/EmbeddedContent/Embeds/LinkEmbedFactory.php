@@ -19,6 +19,8 @@ class LinkEmbedFactory extends AbstractEmbedFactory {
     /** @var PageScraper */
     private $pageScraper;
 
+    protected $canHandleEmptyPaths = true;
+
     /**
      * DI
      *
@@ -27,7 +29,6 @@ class LinkEmbedFactory extends AbstractEmbedFactory {
     public function __construct(PageScraper $pageScraper) {
         $this->pageScraper = $pageScraper;
     }
-
 
     /**
      * No supported doamins. This is a fallback.
